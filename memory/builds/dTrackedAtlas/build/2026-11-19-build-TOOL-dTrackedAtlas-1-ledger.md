@@ -25,7 +25,7 @@ probe that loads the derivation and swaps one object.
   `TOOL-dSafePassage-61` `advances` `TOOL-dSafePassage-14`; dDeclaredLoop 101, 1, 1, carrying
   `TOOL-dDeclaredLoop-34` `advances` `TOOL-dDeclaredLoop-35`; dWitnessedBar DEFERRED 88, dPlacedRequest
   DEFERRED 63, dTrueNorth CLOSED 30. Every build's `deviations` length equals the `ls-tree | grep -c`
-  count, 22 of 22, 2211 records in all. Red: the pre-change schedule counted dSafePassage's and
+  count, 22 of 22, 2211 records in all (PINNED at 9e21ac760). Red: the pre-change schedule counted dSafePassage's and
   dDeclaredLoop's DEFERRED unit as unbuilt (AC1's red); a staged `VERB` that matches nothing read
   dSafePassage's carried unit with `verb` and `ask` null.
 - AC4 — in the clone, a branch rotated dWitnessedBar's `RUN.md` to `RUN.LANDED.00000001.md` and wrote a

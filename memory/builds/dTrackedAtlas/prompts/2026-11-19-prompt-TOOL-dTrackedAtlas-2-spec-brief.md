@@ -7,7 +7,9 @@ You author ONE spec and write no product code. Read first, whole: the build READ
 `memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md`, the committed spec of
 TOOL-dTrackedAtlas-1 under `memory/builds/dTrackedAtlas/spec/` (its interface section is your contract: consume
 the derivation through it, never re-derive a build's state), `memory/TEMPLATE-SPEC.md`, and
-`memory/guides/BUILD-METHOD.md` M2, M3, M5, M12.
+`memory/guides/BUILD-METHOD.md` at `doc.build-method#m2-the-spec-set-decompose-detect-classify-act`,
+`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`, `doc.build-method#m5-recall-and-reuse` and
+`doc.build-method#m12-research-test-choose-when-the-solution-is-not-given`.
 
 ## The mechanism
 

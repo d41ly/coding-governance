@@ -1,12 +1,13 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
+**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -160,11 +161,11 @@ handled in the same run, up to `ROUNDS` times.
 
 | Bound | Value | On expiry |
 |---|---|---|
-| the fast path | none set; 56 to 68 ms measured | the harness `timeout` of 10 s kills it |
-| each git call | `GIT_BOUND_S`, 300 s | the step fails and is logged |
-| the page check | `CHECK_BOUND_S`, 300 s | read as not current, so the page regenerates |
-| the generation | `GEN_BOUND_S`, 1500 s | the step fails and is logged |
-| the whole runner | `RUN_BOUND_S`, 2400 s, armed as a timer | kills its child, logs `failed — no answer within 2400 s`, releases the lock, exits 1 |
+| the fast path | none set; 56 to 68 ms measured | the harness `timeout` of `10 s` kills it |
+| each git call | `GIT_BOUND_S`, `300 s` | the step fails and is logged |
+| the page check | `CHECK_BOUND_S`, `300 s` | read as not current, so the page regenerates |
+| the generation | `GEN_BOUND_S`, `1500 s` | the step fails and is logged |
+| the whole runner | `RUN_BOUND_S`, `2400 s`, armed as a timer | kills its child, logs `failed — no answer within 2400 s`, releases the lock, exits 1 |
 
 The landing itself is never slowed: the hook fires after the lander's tool call has returned, and
 the runner holds no lock the lander takes. A runner can compete for CPU with a bar running at the
@@ -289,11 +290,12 @@ start, so the group takes effect in sessions started after the checkout carries 
   conf read, its folder is never created, and the only folder deleted is a `regen-<digits>` one
   inside it. An unknown switch value skips: deny by default.
 - perf / scale — 56 to 68 ms added to each Bash or PowerShell tool call (PINNED, §4); at most one
-  runner start per 60 s; a regeneration costs a checkout of about 13 s plus one generation.
+  runner start per `60 s`; a regeneration costs a checkout of about 13 s (DERIVED, §4's measured
+  add and removal) plus one generation.
 - error / empty / loading states — No conf, no folder, a held lock, an unresolved tip, a failing
   check, generation or rename: each is a named exit or log line, and the page stays as it was.
 - observability — The log sidecar, one line per handled tip; the stdout line for a missing folder.
-- risks — A wedged generation is killed at 2400 s. A browser holding the page open can refuse the
+- risks — A wedged generation is killed at `2400 s`. A browser holding the page open can refuse the
   rename on Windows, which logs `failed` and keeps the old page.
 - testing — The fixture observations of §6, on a scratch clone.
 - migration — N/A — a new file pair and one appended settings group; nothing existing changes shape.
@@ -321,14 +323,14 @@ git -C "$C" remote set-url origin "$T/ta4o" && git -C "$C" push -q -f origin HEA
 A landing below is a commit in `$C` followed by `git -C "$C" push -q origin HEAD:main`. Running the
 runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone's tip `T0`.
 
-- **AC1** — When the stamp `$H/closed-loop-atlas.regen.stamp` is younger than 60 s and
-  `echo '{"tool_input":{"command":"ls"}}' | node "$C/$REGEN"` runs, it exits 0 within 1 s, prints
+- **AC1** — When the stamp `$H/closed-loop-atlas.regen.stamp` is younger than `60 s` and
+  `echo '{"tool_input":{"command":"ls"}}' | node "$C/$REGEN"` runs, it exits 0 within `1 s`, prints
   nothing, and the stamp's modification time, read with `stat -c %Y`, is unchanged.
-  Red when: the stamp is older than 60 s, where the same call moves its modification time and a
+  Red when: the stamp is older than `60 s`, where the same call moves its modification time and a
   runner starts.
 - **AC2** — When a landing `T1` appends a line to `memory/builds/dWitnessedBar/RUN.md`, the stamp is
   deleted, and `echo '{"tool_input":{"command":"bash tools/push-main.sh --land --slug x"}}' | node "$C/$REGEN"`
-  runs, it exits 0 within 2 s; then, once `$H/closed-loop-atlas.regen.log` gains a line naming
+  runs, it exits 0 within `2 s`; then, once `$H/closed-loop-atlas.regen.log` gains a line naming
   `T1`'s first 12 hex and `regenerated`, `"$PY" "$ATLAS" --check --page "$P" --ref origin/main` run
   in `$C` exits 0 with `atlas: current`, and the page's `stamp.commit` equals
   `git -C "$C" rev-parse origin/main`.
@@ -358,8 +360,8 @@ runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone'
   Red when: the scratch checkout's removal is skipped, where `$H/regen-<pid>` remains and
   `git -C "$C" worktree list` lists it.
 - **AC7** — When `$H/closed-loop-atlas.regen.lock` is written fresh by hand before a landing and the
-  runner runs, it exits 0 within 2 s and the log gains no line; with the lock's modification time set
-  older than 2400 s by `touch -d`, the run logs `stale lock removed` and handles the tip.
+  runner runs, it exits 0 within `2 s` and the log gains no line; with the lock's modification time set
+  older than `2400 s` by `touch -d`, the run logs `stale lock removed` and handles the tip.
   Red when: the lock is ignored, where the first run handles the tip.
 - **AC8** — When a `node -e` one-liner parses `.claude/settings.json` in `$W`, it finds exactly one
   `PostToolUse` group with matcher `Bash|PowerShell` whose command names `$REGEN`, with a `timeout`
@@ -395,7 +397,7 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   loses earlier still: `--land` pushes `HEAD` and merges no local branch
   (`tools/push-main.sh@cd8cf5622e82726547fd8f5dd7a8e7815eb0e904:1233`).
   (b) A Claude Code `PostToolUse` hook in `.claude/settings.json`, throttled by a stamp, starting a
-  detached runner. Loses if its fast path costs more than 1 s, if its detached child dies with it, or
+  detached runner. Loses if its fast path costs more than `1 s`, if its detached child dies with it, or
   if its wiring reds a leg only a `tools/` edit clears. Tested: 56 to 68 ms (PINNED, §4); the
   detached child outlived its parent and the tool call; and §4 "The wiring" names the two readers of
   the file, neither grading a hook group. It survives. Its limit is §4 "What it does not check": a
@@ -423,6 +425,10 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
 ## 9. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §4 · §5 · §6 · §8 · the pass legs' reds after `390c2bc05`, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: the figures of the Bounds table, the
+  checklist, AC1, AC2, AC7 and F1 (b) that are constants or thresholds this spec declares now sit
+  in code spans, and the checkout cost is marked DERIVED from §4's measurement. No design change.
 
 ## 10. Reuse audit
 

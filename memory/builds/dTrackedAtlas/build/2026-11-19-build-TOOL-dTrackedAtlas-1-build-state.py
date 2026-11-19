@@ -12,7 +12,7 @@ ref does not resolve, a git call fails or times out, a needed conf key is absent
 DERIVE_BOUND seconds, with one `build-state: <reason>` line on stderr.
 
 A library caller loads it by path (its file name is no module name) and calls `derive`, `read_chain`,
-`predecessors` or `read_claims`; it arms no wall bound. Git is read in `root`, a worktree root, and never its working
+`derive_predecessors` or `read_claims`; it arms no wall bound. Git is read in `root`, a worktree root, and never its working
 tree; the code reused is loaded from the repository this file sits in.
 
 THE LANDED PREDICATE (spec section 7, F1 (g)). A run record is `<build>/RUN.md` or a rotated `RUN.LANDED.<blob8>.md`
@@ -132,7 +132,7 @@ def read_chain(ref, root="."):
     return {"names": names, "stage": stage, "parents": parents, "clauses": ids, "rows": rows}
 
 
-def predecessors(build, parents):
+def derive_predecessors(build, parents):
     """Policy J's run keys a build's runs wait on: a spec run on dTrueNorth's landing, each parent's spec run (a WHOLE
     parent's build run) and each grandparent's build run; a build run on its own spec run and each parent's build
     run. A WHOLE build is one run, its `build` key holding the spec run's list."""
@@ -250,7 +250,7 @@ def derive_next(entry, spec_done, landed, parents, claim):
     b = entry["slug"]
     if landed[b]:
         return {"run": None, "waiting_on": [], "state": "done"}
-    keys = predecessors(b, parents)
+    keys = derive_predecessors(b, parents)
     run = "whole" if b in WHOLE else ("build" if spec_done[b] else "spec")
     done = {("spec", x) for x, d in spec_done.items() if d} | {("build", x) for x, d in landed.items() if d}
     waiting = sorted(f"{k} {x}" for k, x in set(keys["build" if run != "spec" else "spec"]) - done)

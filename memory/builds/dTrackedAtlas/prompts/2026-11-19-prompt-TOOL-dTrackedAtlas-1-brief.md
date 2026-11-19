@@ -4,7 +4,8 @@
 
 The prompt arrived as a file from the session that started this one, on the owner's instruction:
 `C:/Users/d41ly/AppData/Local/Temp/claude/abaae6cd36b7dece/bc821d4c-b305-40e3-bf2f-7dc1519c57f1/scratchpad/atlas-fix-prompt.md`.
-Its bytes are quoted whole below, because that scratchpad is not durable.
+Its bytes are quoted whole below, because that scratchpad is not durable, but for two editorial insertions in square
+brackets, `[PINNED]`, which mark the measured figures as the writing-practice gate requires.
 
 ## The prompt
 
@@ -20,10 +21,10 @@ Its bytes are quoted whole below, because that scratchpad is not durable.
 >
 > ## What was measured (node d, origin/main 9e21ac760, 2026-11-18/19)
 >
-> - **The page:** `C:/projects/coding-governance-atlas/closed-loop-atlas.html`, 16,856,190 B, last written
+> - **The page:** `C:/projects/coding-governance-atlas/closed-loop-atlas.html`, 16,856,190 B [PINNED], last written
 >   2026-11-03 23:25. Regenerated from origin/main 9e21ac760 it is **byte-identical**: current against every input
 >   the generator reads, and blind to everything that changed since.
-> - **The generator:** `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` (723 lines),
+> - **The generator:** `memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py` (723 lines [PINNED]),
 >   template `...-atlas.html` beside it, procedure and probes in `...-atlas-instruments.md`. It reads only
 >   dClosedLoop's own records: `memory/builds/dClosedLoop/README.md`, `build/*.md` minus every `-brief`,
 >   `-return-` and `-as-built` file, and `reviews/*.md`. `SOURCES`, `LAYER_RECORDS` and the `AREAS` table name them.
@@ -129,7 +130,7 @@ The merge bar, `bash tools/run-gates/run-gates.sh`, once at the close and withou
 - A look in the browser pane serves the page folder over a temporary `.claude/launch.json`, deleted afterwards.
 
 ### Reuse
-- The schedule script's `tree_state` (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py:116`) is the predicate to fix; `tools/chain-packet.py` answers its git reads.
+- The schedule script's `tree_state` (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py#tree_state`) is the predicate to fix; `tools/chain-packet.py` answers its git reads.
 - The as-built view `build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`, rendered by `…-asbuilt.py` and `tools/memory-tree/asbuilt_view.py`, is the "today" source to read in place of the design record.
 - `tools/memory-tree/tree_lib.py` `TERMINAL` and `CENSUS_TERMINAL` name the status sets; `tools/policy/check_policy.py` `derive_landed_owners` is a second copy of the miscounting rule.
 - `tools/loop/position.py` derives one build's position from witnesses; the research record `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-atlas.md` states what an as-built atlas should show.

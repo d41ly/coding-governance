@@ -1,12 +1,13 @@
 # TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-2-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-2-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -224,8 +225,8 @@ Reading the chain state inside `derive`: the design map, the fold-state probe an
 inherit a git read at `HEAD`, the claim cache and the fork grading, none of which they render.
 
 Carrying only the changed clauses and substituting them into v2's "Planned units" cell in the
-browser: that needs a second parser of the cell beside `design_lib.py#parse_chain_cell`. The whole
-view costs 248,110 B (PINNED, measured on 2026-11-19), about 1.5 % of the 16,856,190 B page.
+browser: that needs a second parser of the cell beside
+`tools/memory-tree/design_lib.py#parse_chain_cell`. The whole view costs 248,110 B (PINNED, measured on 2026-11-19), about 1.5 % of the 16,856,190 B page.
 
 Adding the as-built view to `corpus`: the page would carry it as a record, and the Records view
 would show it beside v2 with no join to the builds. Its skip by name in `corpus` stays.
@@ -266,8 +267,8 @@ def page_data(path):
   `plan`.
   figure: PINNED at `9e21ac760`, measured on 2026-11-19 with a scratch probe of `derive`.
 - **AC3** — When `page_data` reads the same page, `asBuilt` holds 22 builds in `[chain]` row order
-  and 509 rows, 51 of them not `baseline`. dTrueNorth's `cl-dClosedLoop-0002` row reads `since`
-  `deviation 2026-10-21-build-TOOL-dTrueNorth-2-deviation-3`.
+  and 509 rows (PINNED), 51 of them not `baseline`. dTrueNorth's `cl-dClosedLoop-0002` row reads
+  `since` `deviation 2026-10-21-build-TOOL-dTrueNorth-2-deviation-3`.
   Red when: the rows come from v2's `[chain]` rather than the view, so no row cites a record.
   figure: PINNED, the view at `9e21ac760` as `read_design_view` read it on 2026-11-19.
 - **AC4** — When `grep -c` runs over the edited template for each of `Today: an implicit loop`,
@@ -302,13 +303,14 @@ def page_data(path):
   written to a scratch `.js` file and `node --check` runs on it, it exits 0.
   Red when: an edit leaves a syntax error, which a staged stray `)` shows.
 - **AC12** — When the browser pane opens `$OUT` served by `python -m http.server` from `$SCRATCH`
-  through a temporary launch configuration, the Chain view's table holds 22 rows. Six rows read
-  landed, with the merges of AC1, and dPlacedRequest and dWitnessedBar read `can start`. In "Today vs
-  target", the area Build's "Since the baseline" panel names dTrueNorth and `2511c1181`, and no
+  through a temporary launch configuration, the Chain view's table holds 22 rows (DERIVED, one per
+  `[chain]` row). Six rows read landed, with the merges of AC1, and dPlacedRequest and dWitnessedBar
+  read `can start`. In "Today vs target", the area Build's "Since the baseline" panel names dTrueNorth and `2511c1181`, and no
   measured side is labelled Today.
   Red when: the page at `9e21ac760`, whose Chain view has no table and whose Build area names no
   landing.
-  cost: a browser pane, and minutes to load a page of about 17 MB.
+  cost: a browser pane, and minutes to load a page of about 17 MB (DERIVED from the 16,856,190 B
+  page of §4).
   fixture: a launch configuration written to the worktree's `.claude` folder and deleted after; the
   pane refuses a `file://` open of a page this size.
 
@@ -327,6 +329,10 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §4 · §5 · §9 · the pass legs' reds after `390c2bc05`, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: the row and size figures of AC3 and AC12
+  are pinned on their lines, and each `design_lib` symbol cited by a bare basename now gives its
+  repository-relative path. No design change.
 
 ## 9. Reuse audit
 
@@ -336,8 +342,8 @@ its `plant_memory` refusal; the template's `views.chain`, `chainDiagram`, `showB
 `TOOL-dTrackedAtlas-1`'s `derive`. The as-built view is read by
 `tools/memory-tree/design_lib.py#read_design_view`, whose host's docstring
 (`tools/memory-tree/asbuilt_view.py`) names the atlas render as one of its readers, with the design
-keys read by `design_lib.py#read_design_conf` and `design_lib.py#read_design_keys`. The brief named
-the bootstrap renderer `asbuilt.py`, and its product successor is the reader taken.
+keys read by `tools/memory-tree/design_lib.py#read_design_conf` and
+`tools/memory-tree/design_lib.py#read_design_keys`. The brief named the bootstrap renderer `asbuilt.py`, and its product successor is the reader taken.
 `python tools/codebase-map/reuse_lookup.py "render chain build landed state and as-built clauses into the atlas page"`
 ranked only name-stem helpers (`build`, `render`, `build_records`), none a renderer of chain state.
 The recall probe returned TOOL-dTrueNorth-6 (the as-built view and its reader), PLAY-dClosedLoop-24

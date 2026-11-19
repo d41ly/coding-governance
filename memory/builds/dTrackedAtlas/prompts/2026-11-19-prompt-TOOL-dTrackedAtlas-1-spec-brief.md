@@ -5,7 +5,9 @@
 You author ONE spec and write no product code. Read first, whole: the build README
 `memory/builds/dTrackedAtlas/README.md`, the prompt record
 `memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md` (it quotes the owner and
-carries every measurement), `memory/TEMPLATE-SPEC.md`, and `memory/guides/BUILD-METHOD.md` M2, M3, M5 and M12.
+carries every measurement), `memory/TEMPLATE-SPEC.md`, and `memory/guides/BUILD-METHOD.md` at `doc.build-method#m2-the-spec-set-decompose-detect-classify-act`,
+`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`, `doc.build-method#m5-recall-and-reuse` and
+`doc.build-method#m12-research-test-choose-when-the-solution-is-not-given`.
 Units 2, 3 and 4 are specced AFTER this one and read its interface section as their contract, so state the
 interface exactly: module path, function names, signatures, the returned shape and every field name.
 
@@ -16,7 +18,7 @@ its spec run (done or not), its build run (landed, not built, or landed with uni
 first-parent landing merge on the default branch that landed the build run (sha and subject), unit counts by
 spec status, open forks (unresolved §8 items), spec revisions, the deviation records it owns, its run claim where
 one is cached, and whether its next run can start now under the schedule's Policy J. The schedule script's
-`tree_state` (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py:116`) stops being a
+`tree_state` (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py#tree_state`) stops being a
 second answer: it reads this derivation, so both print the same landed set.
 
 ## Facts measured at origin/main `9e21ac760` (re-verify each before you rely on it)

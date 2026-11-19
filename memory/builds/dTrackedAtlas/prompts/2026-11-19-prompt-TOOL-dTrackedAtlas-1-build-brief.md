@@ -17,4 +17,4 @@ touched names. The spec is the design; diverge only by returning `diverged: true
 - No path under `tools/`; no new file under `memory/builds/dClosedLoop/build/` (the schedule is edited in place).
 - Commit once, with a `Pass: TOOL-dTrackedAtlas-1` trailer and `Co-Authored-By: Claude Opus 5.5
   <noreply@anthropic.com>`; flip the spec's status to CLOSED in that commit. The pre-commit hook takes minutes:
-  bound the commit at 600 s. Never `--no-verify`, never `git add -A`.
+  bound the commit at `600 s`. Never `--no-verify`, never `git add -A`.

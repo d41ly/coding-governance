@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas
 
-**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 1
+**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 1
 
 <!-- gen:spec-records -->
 
@@ -10,9 +10,11 @@
 | [2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md) | research | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -43,7 +45,9 @@ at `9e21ac760` where the schedule prints four today.
 - **S6** — The schedule script reads the derivation: `tree_state`, the `[chain]` parse in `chain`,
   the claim-cache parse in `claims` and the Policy J predecessor lists in `graph` call it, its
   printed output keeps its shape, and `tree_state(ref, ids)` keeps the signature and the
-  `(spec done, build done)` tuples `packet.py#derive_sources` reads. Observed by AC1, AC4 and AC7.
+  `(spec done, build done)` tuples
+  `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py#derive_sources`
+  reads. Observed by AC1, AC4 and AC7.
 - **S7** — A CLI, `--ref <rev>` (default `HEAD`) and `--claims cache|none` (default `cache`),
   printing the state document as JSON. Observed by AC2.
 
@@ -97,7 +101,7 @@ loads the code it reuses from the repository its own file sits in.
 | `ChainError` | exception | v2's `[chain]` does not hold 22 builds and 509 clauses |
 | `StateError` | exception | the ref does not resolve, a git call fails or times out, or a needed conf key is absent |
 | `read_chain(ref, root=".")` | function | `{"names", "stage", "parents", "clauses", "rows"}` |
-| `predecessors(build, parents)` | function | `{"spec": [...], "build": [...]}`, or `{"build": [...]}` for a `WHOLE` build |
+| `derive_predecessors(build, parents)` | function | `{"spec": [...], "build": [...]}`, or `{"build": [...]}` for a `WHOLE` build |
 | `read_claims(ref, names, root=".", now=None)` | function | `{slug: claim}` for each slug of `names` the cache holds |
 | `derive(ref="HEAD", root=".", claims=True, detail=True)` | function | the state document |
 
@@ -105,7 +109,7 @@ loads the code it reuses from the repository its own file sits in.
 parses them today, `clauses` as each row's `cl-` ids, and `rows` as the `[chain]` section text. It
 raises `ChainError` carrying the schedule's current message, word for word.
 
-`predecessors` returns run keys, `(kind, slug)` tuples with kind `"spec"` or `"build"`, exactly the
+`derive_predecessors` returns run keys, `(kind, slug)` tuples with kind `"spec"` or `"build"`, exactly the
 lists the schedule's `graph` builds today: a spec run waits on `("build", ROOT)`, each parent's spec
 run (a `WHOLE` parent's build run) and each grandparent's build run; a build run waits on its own
 spec run and each parent's build run. A `WHOLE` build has the one key `"build"`, holding the spec
@@ -164,14 +168,16 @@ names a past run and decides nothing.
 
 A run record is `memory/builds/<slug>/RUN.md` or a rotated `RUN.LANDED.<blob8>.md` beside it, read
 at the ref. Its `base:` and `phase:` lines come from its `## Run facts` section. Its `kind` is
-README rule 1 at that `base:`, through `deviations.py#derive_run_kind`, which is the test
-`unattended.sh#check_spec_run` applies: an open ask of the build and a roster unit with no spec at
-`base:` make a spec run, anything else a build run.
+README rule 1 at that `base:`, through
+`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py#derive_run_kind`,
+which is the test `tools/unattended/unattended.sh#check_spec_run` applies: an open ask of the build
+and a roster unit with no spec at `base:` make a spec run, anything else a build run.
 
 A run's `landings` are the merge commits on the ref's first-parent history whose diff against their
 first parent touches the build's `RUN.md` and whose `RUN.md` carries that run's `base:`. One
 `git log --first-parent --merges --format=%H%x09%s <ref> -- memory/builds/<slug>/RUN.md` per build
-lists the candidates, and one `tree_lib.py#read_blobs_at` batch reads their `RUN.md` blobs.
+lists the candidates, and one `tools/memory-tree/tree_lib.py#read_blobs_at` batch reads their
+`RUN.md` blobs.
 
 The build run has landed when a build-kind record has at least one landing. A build-kind `RUN.md`
 on a run branch that never merged has none, so it reads `not-landed`.
@@ -187,15 +193,19 @@ first-parent history also holds non-merge commits touching `RUN.md`, such as `62
 ### Reads and bounds
 
 - Spec, run-record and deviation blobs at the ref: one `git ls-tree -r --name-only <ref>
-  memory/builds/<slug>/` per build and one `tree_lib.py#read_blobs_at` batch for all of them.
-- The memory-tree conf at the ref: `gen_build_index.py#read_conf_at_rev`, from which the family
-  prefixes, `MEMORY_ROOT` and `FORK_ITEM_CUTOFF` are read. `RESUME_STALE_BOUND` is read from
-  `.unattended.conf` at the ref, as the schedule reads it.
-- Unit ids: `tree_lib.py#parse_spec_h1`. Header revisions: `tree_lib.py#HDR_RE`. Deviation fields:
-  `deviations.py#read_record` over each `*-deviation-*.md` blob of the build's `build/` folder.
+  memory/builds/<slug>/` per build and one `tools/memory-tree/tree_lib.py#read_blobs_at` batch for
+  all of them.
+- The memory-tree conf at the ref: `tools/memory-tree/gen_build_index.py#read_conf_at_rev`, from
+  which the family prefixes, `MEMORY_ROOT` and `FORK_ITEM_CUTOFF` are read. `RESUME_STALE_BOUND` is
+  read from `.unattended.conf` at the ref, as the schedule reads it.
+- Unit ids: `tools/memory-tree/tree_lib.py#parse_spec_h1`. Header revisions:
+  `tools/memory-tree/tree_lib.py#HDR_RE`. Deviation fields:
+  `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py#read_record`
+  over each `*-deviation-*.md` blob of the build's `build/` folder.
 - Forks: each non-terminal spec's blob is written under one `tempfile.TemporaryDirectory`, keeping
   its file name because `plan_state` dates it by name, and graded in one bash run of
-  `breakpoints.py#run_sourced`, which sources the unattended driver and has its own 900 s timeout.
+  `tools/loop/breakpoints.py#run_sourced`, which sources the unattended driver and has its own
+  900 s timeout (tools/loop/breakpoints.py@418b3e8e3a13cfc57e9f248dcc052186d03e9b9c:330).
   A CLOSED or WONTDO spec is not graded: hygiene check 12 already refuses an unresolved §8 there.
 - Every git call this file makes passes `timeout=GIT_TIMEOUT` and raises `StateError` naming the
   call when it expires. The reused readers spawn git without a timeout, so the CLI arms a
@@ -215,13 +225,14 @@ driver; the open forks of a terminal spec; and claims newer than the last `unatt
 derivation by a path relative to its own file and then:
 
 - binds `ROOT`, `WHOLE`, `STATUS` and `CARRY` to the derivation's objects, because `packet.py` and
-  `open.py` read `schedule.WHOLE` and `tools/chain-packet.test.sh` cites `schedule.py#CARRY`;
+  `open.py` read `schedule.WHOLE` and `tools/chain-packet.test.sh` cites
+  `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py#CARRY`;
 - `chain(ref)` calls `read_chain`, prints the `ChainError` message and exits 1 as it does today;
 - `tree_state(ref, ids)` returns `{b: (spec_run.done, build_run.state != "not-landed")}` for each
   `b` of `ids`, from `derive(ref, claims=False, detail=False)`;
 - `claims(ref, names)` builds its `(held, other, stale)` from `read_claims`, with its fleet-tag map,
   its messages and its two exits unchanged;
-- `graph` takes each run's predecessor list from `predecessors`;
+- `graph` takes each run's predecessor list from `derive_predecessors`;
 - its docstring's INPUTS paragraph names the derivation as the build-phase rule.
 
 `EXTRA`, `SPEC_ONLY`, `NODES`, `SURFACES`, `git` and the simulation stay where they are.
@@ -292,8 +303,9 @@ SCHED=memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedu
   compares equal under `cmp` to the one taken before the edit.
   Red when: a reader reads the working tree, which a staged swap of one `git show` for a file read
   shows by moving `counts`.
-- **AC7** — When `packet.py#derive_sources`'s call shape is made directly, loading `"$SCHED"` and
-  calling `tree_state("9e21ac760", {"dDeclaredLoop": [], "dWitnessedBar": []})`, it returns
+- **AC7** — When the call shape of `derive_sources` in
+  `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` is made directly,
+  loading `"$SCHED"` and calling `tree_state("9e21ac760", {"dDeclaredLoop": [], "dWitnessedBar": []})`, it returns
   exactly those two keys, `(True, True)` and `(True, False)`.
   Red when: `tree_state` returns the derivation's document, or keys outside the `ids` it was given.
 
@@ -315,8 +327,8 @@ the one ask the main loop files at the close.
   candidates below that fail it show.
   (a) Every spec CLOSED or WONTDO, the schedule's `tree_state` today. Rejected: it reads four,
   missing dSafePassage and dDeclaredLoop, whose one DEFERRED unit each was carried forward.
-  (b) `tree_lib.py#CENSUS_TERMINAL`, DEFERRED counted done. Rejected: it reads all 22, because a
-  spec run carries every unit forward as DEFERRED (PLAY-dClosedLoop-2).
+  (b) `tools/memory-tree/tree_lib.py#CENSUS_TERMINAL`, DEFERRED counted done. Rejected: it reads all
+  22, because a spec run carries every unit forward as DEFERRED (PLAY-dClosedLoop-2).
   (c) Every DEFERRED spec carries a `closes` or `advances` verb. Rejected: dWitnessedBar's 88
   spec-run carries all carry `advances`, so all 22 read landed.
   (d) At least one CLOSED spec. Rejected: dWellOiledMachine holds one and dRankedPlan two, built
@@ -344,7 +356,8 @@ the one ask the main loop files at the close.
   (b) Leave the schedule's bytes alone and run its `main` through a door in this unit's file that
   rebinds `tree_state`, as `tools/chain-packet.py` rebinds `schedule.git`. No pin moves, but the
   schedule run directly still prints `builds landed 4`, which fails the owner's acceptance, and
-  `packet.py#derive_sources` keeps reading parents as unbuilt.
+  `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py#derive_sources`
+  keeps reading parents as unbuilt.
   (c) Edit the schedule and re-pin both in this build. Refused: the door is under `tools/`, which
   owes a `GATE_SELFTESTS=1` bar the owner ruled out for this run, and the packet re-pin is the
   owner's.
@@ -359,18 +372,27 @@ the one ask the main loop files at the close.
 - rev-1 · 2026-11-19 · initial draft.
 - rev-2 · 2026-11-19 · §3 · §6 · §7 · F2 resolved to (a), the schedule edited in place, under the
   mandate's delegated authority; folded from 2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.
+- rev-3 · 2026-11-19 · §2 · §4 · §5 · §7 · §9 · the pass legs' reds after `390c2bc05`, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: the interface function `predecessors` is
+  renamed `derive_predecessors`, whose leading token is a declared verb, in the interface table,
+  its prose and the schedule's edit, and the built code is renamed by the main loop's inline red fix
+  in the same commit; the breakpoints timeout figure is pinned on its line; and each symbol cited
+  by a bare basename now gives its repository-relative path. No other design change.
 
 ## 9. Reuse audit
 
 The seams extended: the schedule's own `tree_state`, `chain`, `claims` and `graph`, whose rules move
-into the derivation. `deviations.py#derive_run_kind` answers the run kind, the test
-`unattended.sh#check_spec_run` applies. `tree_lib.py#read_blobs_at` reads every blob at the ref.
-`gen_build_index.py#read_conf_at_rev` reads the conf at the ref. `deviations.py#read_record` parses
-deviation records, and `breakpoints.py#run_sourced` runs the driver's `plan_state`.
+into the derivation.
+`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py#derive_run_kind`
+answers the run kind, the test `tools/unattended/unattended.sh#check_spec_run` applies.
+`tools/memory-tree/tree_lib.py#read_blobs_at` reads every blob at the ref.
+`tools/memory-tree/gen_build_index.py#read_conf_at_rev` reads the conf at the ref.
+`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py#read_record`
+parses deviation records, and `tools/loop/breakpoints.py#run_sourced` runs the driver's `plan_state`.
 `python tools/codebase-map/reuse_lookup.py "derive whether a build run landed from run records at a git ref"`
 ranked only name-stem helpers (`run`, `git`, `build`, `records`, `run_git`), no reader of a chain
-build's state. Seams read and not taken: `lib-unattended.sh#read_landing_commit` derives a landing
-from HEAD's working copy, not at a ref; `tools/loop/position.py` derives one build's step inside
+build's state. Seams read and not taken: `tools/unattended/lib-unattended.sh#read_landing_commit`
+derives a landing from HEAD's working copy, not at a ref; `tools/loop/position.py` derives one build's step inside
 its own run; `DEPL-dShippedRelease-49` specs a parent-landed reading for a chain build not yet built.
 The recall probe returned PLAY-dClosedLoop-2 (a spec run carries every unit forward), the ask
 PLAY-dClosedLoop-37 and TOOL-dTrueNorth-7, the unit behind `check_spec_run`.

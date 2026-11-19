@@ -4,7 +4,7 @@
 
 ## The prompt
 
-> Resolve fork F2 of TOOL-dTrackedAtlas-1 under the mandate's delegated authority (BUILD-METHOD M3) and fold it into the spec as rev-2.
+> Resolve fork F2 of TOOL-dTrackedAtlas-1 under the mandate's delegated authority (`doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`) and fold it into the spec as rev-2.
 
 ## The brief
 
@@ -16,7 +16,7 @@ Fold the run's resolution of fork F2 into `memory/builds/dTrackedAtlas/spec/2026
 2. Make §6 Gates and every sentence citing F2 agree with (a) as resolved, so no "recommendation" is left standing.
 3. Bump the status header to rev-2 and add one revision-log line naming F2's resolution and this record.
 4. Run `bash tools/unattended/unattended.sh --check-specs dTrackedAtlas TOOL-dTrackedAtlas-1` and fix every refusal it names for this unit.
-5. Stage only that spec and what `python tools/memory-tree/gen_build_index.py --write` re-renders, then commit with subject `spec(dTrackedAtlas): TOOL-dTrackedAtlas-1 rev-2 — F2 resolved, the schedule edited in place`, a `Pass: none` trailer and `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`, under a 600 s bound, since the pre-commit hook takes minutes.
+5. Stage only that spec and what `python tools/memory-tree/gen_build_index.py --write` re-renders, then commit with subject `spec(dTrackedAtlas): TOOL-dTrackedAtlas-1 rev-2 — F2 resolved, the schedule edited in place`, a `Pass: none` trailer and `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`, under a `600 s` bound, since the pre-commit hook takes minutes.
 
 ### Acceptance
 `bash tools/unattended/unattended.sh --plan dTrackedAtlas --paths` grades TOOL-dTrackedAtlas-1 READY, not FORKED; `--check-specs` prints no refusal for it; the commit exists on the run branch with the subject above.

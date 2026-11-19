@@ -1,12 +1,13 @@
 # TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 3
+**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-4 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -276,7 +277,8 @@ S=<the run's scratch directory>
   a temporary launch configuration of the session that is deleted afterwards, shows
   `generated from` and the first 12 hex of `HEAD` in its header line.
   Red when: the template's statement is unedited, where the same `grep` prints nothing.
-  cost: a browser pane look at a page of about 16 MB.
+  cost: a browser pane look at a page of about 16 MB (DERIVED from the page size
+  `TOOL-dTrackedAtlas-2` measured).
 
 ## 6. Gates
 
@@ -324,6 +326,9 @@ suite arm is added or moved, so no arm line is declared.
 ## 8. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §5 · the pass legs' reds after `390c2bc05`, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: AC8's page-size figure is pinned on its
+  line. No design change.
 
 ## 9. Reuse audit
 

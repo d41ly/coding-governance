@@ -157,7 +157,7 @@ def graph(names, parents, ids, state, s):
     T = {}
     for b in names:
         U = len(ids[b]) + EXTRA.get(b, 0)
-        pre = STATE.predecessors(b, parents)
+        pre = STATE.derive_predecessors(b, parents)
         if b in WHOLE:                      # one run: the build key carries the whole of it
             T[("build", b)] = (U, pre["build"])
             continue
