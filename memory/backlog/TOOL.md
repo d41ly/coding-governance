@@ -562,12 +562,9 @@ Cite ids, never line numbers.
 | [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |
 | [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
 | [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
-| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | INPROGRESS | MED | TOOL-dPlacedRequest-2 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dPlacedRequest-65](../builds/dPlacedRequest/BACKLOG.md) | INPROGRESS | MED | TOOL-dPlacedRequest-2 | 2026-10-26 | THE RESUME OVERRIDE READS THE IMPORT LINE, NOT THE FIXTURE.… |
+| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-10 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dPlacedRequest-68](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-4 | 2026-10-26 | THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16… |
 | [TOOL-dPlacedRequest-69](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | LOW | TOOL-dPlacedRequest-7 | 2026-10-26 | THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item… |
-| [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | INPROGRESS | LOW | TOOL-dPlacedRequest-2 | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
-| [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | INPROGRESS | MED | TOOL-dPlacedRequest-2 | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
 | [TOOL-dPlacedRequest-74](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPlacedRequest-75](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
 | [TOOL-dPlacedRequest-76](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS rule-stated-with-no-check-that-fails EARNED A GATE AT ITS… |
