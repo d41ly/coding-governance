@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-18 — the positional references, the producer hits, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0356@4d098894 whole
 
@@ -39,17 +39,18 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
   (`tools/playbook/render_playbook.py#write_empty_lists`); `positional-producers`, `unpinned-facts` and
   `instructions-legacy` as `shrink-only` populations, and `landed-steps` as an `append-only` population
   keyed by step id, in `tools/govkit/registry.toml`, beside the `[[exempt_leg]]` rows of the gov legs
-  that read them (§8 F2, F4). Observed by AC1.
-- **S2** — The four lists take the ledger grammar in place, in their homes at HEAD:
+  that read them (§8 F2, F4). Every home sits under `memory/project/` (§8 F7). Observed by AC1.
+- **S2** — The four lists take the ledger grammar in place:
   `memory/project/positional-refs.txt`, `memory/project/positional-producers.txt` and
-  `memory/project/unpinned-facts.txt` under the memory root's `project/` folder (PLAY-dOrderedCharter-72,
-  -29), and `tools/playbook/instructions-legacy.txt` in the kit. Each keeps its key set: each row its
+  `memory/project/unpinned-facts.txt` in their homes at HEAD, under the memory root's `project/`
+  folder (PLAY-dOrderedCharter-72, -29), and the legacy list, moved by `git mv` from
+  `tools/playbook/instructions-legacy.txt` to `memory/project/instructions-legacy.txt` (§8 F7). Each keeps its key set: each row its
   key fields, the count `1`, the build run's base SHA and `seeded`, written through `write_rows`. The
   `#` lines two of them hold leave the files: `instructions-legacy.txt`'s preamble, and
   `positional-producers.txt`'s `# ` reason lines, each reason written keyed by the rows below it into
   the conversion record `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-18-list-conversion.md`
   (§8 F5). Observed by AC1 and AC2.
-- **S3** — The step rows' home. `tools/govkit/landed-steps.txt` holds one row per landed step id, read
+- **S3** — The step rows' home. `memory/project/landed-steps.txt` holds one row per landed step id, read
   through `upgrade_steps.read_steps` with its landed reference, the base the `ratchet` pack's
   `both ways` and `never gains` legs compare the step file against; `check_frozen` keeps grading each
   landed row's fields. Observed by AC5.
@@ -84,9 +85,15 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
   tree, and `instruction_units.py`'s `arm_legacy`, each writing the `[[ledger]]` table its list's
   registration holds into the scratch tree, read from gov's descriptor and never retyped · by value:
   the positional arm's both-ways compare of tree and list, the producers limb's, the pinned-facts arm's
-  and `check_legacy`'s, each now over the factory's rows. Outside the population: `tools/govkit/selftest.py`
-  names `instructions-legacy.txt` as a path of the install surface and reads no row; the help and kit
-  pages S7 re-words.
+  and `check_legacy`'s, each now over the factory's rows; and, for the legacy list's move (§8 F7):
+  the playbook descriptor's `project-owned` `include` (`tools/playbook/kit.toml`), which drops the list;
+  the `instruction render (one renderer of record)` row's `why` in `tools/govkit/registry.toml`, which
+  names its old path; the `[dOC-71 S3]` arms of `tools/govkit/selftest.py`, which plant into the list
+  and strip it from that include, re-pointed to `core-pending.txt`, the include's remaining file; and
+  `memory/project/method-carriers.txt`, whose row for the list is drained, since the carrier check
+  skips the memory root (`tools/memory-tree/check-method-carriers.sh@91073d780040:65`). Outside the
+  population: gov's receipt `.governance/install.json`, whose `engine` row for the old path gov's own
+  install writes (its last commit `67f1ffb18`), not this unit; the help and kit pages S7 re-words.
 - **S6** — The merge attribute. `.gitattributes` gains a `merge=rows` line for each of the five homes.
   Observed by AC6.
 - **S7** — The pages. `help/tags.md` and `tools/playbook/README.md` name the four lists' rows as the
@@ -107,8 +114,7 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
 ### Edges
 
 - **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`: the registration, the row grammar, `read_rows`, `write_rows` and `check_ledger`, which every population here is registered on
-- **consumes-from** `TOOL-dWitnessedBar-14` — `ratchet.py`, whose `never gains` and `both ways` legs grade the five populations and whose selftest takes S5's plant
-- **consumes-from** external — PLAY-dOrderedCharter-19 S11, -26 S2 and S3, -20 S8, -29 S4, -48 and -72, the four lists and their checks, and TOOL-dSafePassage-1 S1, S3 and S9, the step rows, `read_steps` and `check_frozen`, all landed by the chain before this build run
+- **consumes-from** `TOOL-dWitnessedBar-14` — `ratchet.py`, whose `never gains` and `both ways` legs grade the five populations and whose selftest takes S5's plant- **consumes-from** external — PLAY-dOrderedCharter-19 S11, -26 S2 and S3, -20 S8, -29 S4, -48 and -72, the four lists and their checks, and TOOL-dSafePassage-1 S1, S3 and S9, the step rows, `read_steps` and `check_frozen`, all landed by the chain before this build run
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minor id 5: a landed step row's removal observed through `both-ways`, a scope item of that unit
 
 ## 4. Design
@@ -120,17 +126,26 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
 | `positional-refs` | `memory/project/positional-refs.txt` | shrink-only | site · path, ref | `positional.py list` | `tags (the resolver's checks)` | `tools/playbook/kit.toml` |
 | `positional-producers` | `memory/project/positional-producers.txt` | shrink-only | site · path, text | `positional.py producers --list` | `tags (the resolver's checks)` | `tools/govkit/registry.toml` |
 | `unpinned-facts` | `memory/project/unpinned-facts.txt` | shrink-only | site · path, fact | `writing_practice.py check pinned-facts --list` | `writing practice (records and units)` | `tools/govkit/registry.toml` |
-| `instructions-legacy` | `tools/playbook/instructions-legacy.txt` | shrink-only | site · path | `instruction_units.py legacy --list` | `instruction render (one renderer of record)` | `tools/govkit/registry.toml` |
-| `landed-steps` | `tools/govkit/landed-steps.txt` | append-only | key · id | `upgrade_steps.py list --ids` | `ratchet (both ways)` (§8 F6) | `tools/govkit/registry.toml` |
+| `instructions-legacy` | `memory/project/instructions-legacy.txt` (§8 F7) | shrink-only | site · path | `instruction_units.py legacy --list` | `instruction render (one renderer of record)` | `tools/govkit/registry.toml` |
+| `landed-steps` | `memory/project/landed-steps.txt` (§8 F7) | append-only | key · id | `upgrade_steps.py list --ids` | `ratchet (both ways)` (§8 F6) | `tools/govkit/registry.toml` |
 
 The `site` key kind's `path` field is the citing path (`positional-refs`, `positional-producers`,
 `unpinned-facts`) or the listed path (`instructions-legacy`): a field the factory requires of a `site`
-table and the one `carry_renames` re-keys. Each seed argv is spelled with `{prefix}`, as
-TOOL-dWitnessedBar-13 §4's registration is, and with the kit's `python3` head.
+table and the one `carry_renames` re-keys. Each seed argv is spelled `python` then
+`{prefix}/<kit>/<file>`, as unit 16's landed registry tables spell theirs (`tools/govkit/registry.toml`,
+its `[[ledger]]` tables), a spelling `install-prefix (shipped surface)` drains; the landed seed run
+runs an argv as written (`tools/lib/legacy_ledger.py#run_seed_argv`), and TOOL-dWitnessedBar-17 S9,
+which builds before this unit, resolves its `{prefix}`, so `ratchet (both ways)` runs `landed-steps`'
+seed in gov's tree. No other leg runs these seeds: the four lists name their checks' legs, and each
+home is written here, so `test.seed` finds none absent. This unit consumes unit 17's S9 and unit 16's
+step program (§4 Migration) and names no §3 edge on either, since neither spec declares one back
+(unit 16 is CLOSED); the main loop may add the pair.
 
-Rows at `045405ff8` (PINNED 2026-11-19, `grep -cvE '^\s*(#|$)' <home>` per list, `upgrade_steps.py list`
-for the steps): `positional-refs` 38364, `positional-producers` 15, `unpinned-facts` 15216,
-`instructions-legacy` 33, landed steps 5; no list holds a duplicate row
+Rows at `86dac0fcc` (PINNED 2026-11-19, `grep -cvE '^\s*(#|$)' <home>` per list, `upgrade_steps.py list`
+for the steps): `positional-refs` 38334 (38364 at `045405ff8`), `positional-producers` 15,
+`unpinned-facts` 15216, `instructions-legacy` 33, landed steps 5 of 16 step rows against the landed
+ref `origin/main` (PINNED 2026-11-19 at `86dac0fcc`), the other 11 unit 16's, landed when that ref
+moves (PINNED 2026-11-19 at `86dac0fcc`); no list holds a duplicate row
 (`grep -vE '^\s*(#|$)' <home> | sort | uniq -d` prints nothing), so each key keeps the count `1`.
 
 Directions: the lists are shrink-only by their own specs (PLAY-dOrderedCharter-26 S3 "`shrink` only
@@ -141,10 +156,12 @@ the four lists, `none` for `landed-steps`. The four lists' registrations name th
 reads them, so `ratchet (both ways)` prints each `graded by <leg>`; `landed-steps` has no check of its
 own, so it names the both-ways leg itself (§8 F6).
 
-Check 3 admits every home already: `positional-refs.txt` is its named case
-(`tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:1021`), and `positional-producers.txt` and
+Check 3 admits three homes already: `positional-refs.txt` is its named case
+(`tools/memory-tree/check-memory-hygiene.sh@2ef59a33f96d:1044`), and `positional-producers.txt` and
 `unpinned-facts.txt` are members of gov's `PROJECT_REGISTRY_EXTRA` in `.memory-tree.conf`, which the
-two registry-registered lists need, since no target is written either.
+registry-registered lists need, since no target is written any. `instructions-legacy.txt` and
+`landed-steps.txt` join that assignment, as unit 16's moved `dead-path-waivers.txt` and
+`playbook-kit-waivers.txt` did (`3ce285ad7`).
 
 ### The reference field
 
@@ -153,30 +170,33 @@ subject; the factory refuses a key field ending in `:<digits>` as a line number
 (`tools/lib/legacy_ledger.py#LINE_NUMBER_RE`). The registration declares `verbatim = ["ref"]`, the
 field the refusal skips, which unit 13 landed at `34f8bb7db` (`tools/lib/legacy_ledger.py#_check_table`,
 `#read_ledger`), because the number is the text being tracked and not the row's position (§8 F1). At
-`045405ff8` 22237 of the 38364 rows end in `:<digits>` (PINNED 2026-11-19, the rows less the 16127
+`86dac0fcc` 22217 of the 38334 rows end in `:<digits>` (PINNED 2026-11-19, the rows less the 16117
 whose ref does not: `cut -f2 | grep -vcE ':[0-9]+$'`). No `fact` row of `unpinned-facts` and no
-`text` row of `positional-producers` reads as a line number at `045405ff8` (PINNED 2026-11-19,
+`text` row of `positional-producers` reads as a line number at `86dac0fcc` (PINNED 2026-11-19,
 `cut -f2 | grep -cE '^[0-9]+$|:[0-9]+$'` prints 0 for each), so neither declares a `verbatim` field.
 
 ### Inventory
 
-Minted: five `[[ledger]]` tables; `tools/govkit/landed-steps.txt`; the verbs `positional.py list`,
+Minted: five `[[ledger]]` tables; `memory/project/landed-steps.txt`; the verbs `positional.py list`,
 `positional.py producers --list`, `writing_practice.py check pinned-facts --list`,
 `instruction_units.py legacy --list` and `upgrade_steps.py list --ids`; the playbook-render
-descriptor's `[[upgrade]]` row; the conversion record. Naming cells: each verb and flag is asked of
+descriptor's `[[upgrade]]` row and its `LEGACY` row; the conversion record. Naming cells: each verb and flag is asked of
 `python tools/lexicon/lexicon.py --suggest <name> --as cli.flag` at the pass.
 
 ### Migration
 
-One commit converts the four lists and writes `landed-steps.txt` at the build run's base, keeping every
-key. The three registry-registered lists and `landed-steps` are gov's own, which no target is written,
-and owe no step. An adopter's `positional-refs.txt` converts through one `[[upgrade]]` row in
-`tools/playbook/kit.toml`, id `playbook-render/positional-refs-to-ledger`, argv
-`["python", "{gov}/memory-tree/convert_registry.py", "<verb>", "{target}", "--home",
-"memory/project/positional-refs.txt"]` for each of `up`, `down` and `witness`, `surfaces =
-["file:memory/project/positional-refs.txt"]`, `needs-target = false`: TOOL-dWitnessedBar-16 S10's
-step program, whose legacy-grammar table gains this list's two-column grammar. An empty list, which
-`write_empty_lists` wrote at every target, converts to the header alone.
+One commit moves `instructions-legacy.txt` to `memory/project/`, converts the four lists and writes
+`landed-steps.txt` at the build run's base, keeping every key. The three registry-registered lists and
+`landed-steps` are gov's own, which no target is written, and owe no step. An adopter's
+`positional-refs.txt` converts through one `[[upgrade]]` row in `tools/playbook/kit.toml`, id
+`playbook-render/positional-refs-to-ledger`, argv `["python", "{gov}/govkit/steps/registry_to_ledger.py",
+"<verb>", "{target}", "--home", "memory/project/positional-refs.txt"]` for each of `up`, `down` and
+`witness`, `surfaces = ["file:memory/project/positional-refs.txt"]`, `needs-target = false`, as unit
+16's landed rows are spelled (`tools/memory-tree/kit.toml`, its `memory-tree/curation-debt-to-ledger`
+row). That step program reads `tools/memory-tree/convert_registry.py#LEGACY`, which gains the row
+`positional-refs.txt` read by the existing `parse_keyed_reason(2)`, as `trace-waiver.txt`'s is; the
+step id's head is the descriptor's `id`, `playbook-render` (`convert_registry.py#derive_registration`).
+An empty list, which `write_empty_lists` wrote at every target, converts to the header alone.
 
 ### Rollout
 
@@ -188,7 +208,9 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - `memory/project/positional-refs.txt`
 - `memory/project/positional-producers.txt`
 - `memory/project/unpinned-facts.txt`
-- `tools/playbook/instructions-legacy.txt`
+- `memory/project/instructions-legacy.txt` (moved from `tools/playbook/instructions-legacy.txt`)
+- `memory/project/method-carriers.txt` (the moved list's row drained)
+- `.memory-tree.conf` (`PROJECT_REGISTRY_EXTRA`)
 - `tools/playbook/positional.py`
 - `tools/playbook/gov_tag.py` (its `positional-*` fixture plants)
 - `tools/playbook/writing_practice.py`
@@ -197,9 +219,11 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - `tools/playbook/kit.toml`
 - `tools/playbook/README.md`
 - `help/tags.md`
-- `tools/govkit/landed-steps.txt`
+- `memory/project/landed-steps.txt`
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/registry.toml`
+- `tools/govkit/selftest.py` (its `[dOC-71 S3]` arms)
+- `tools/memory-tree/convert_registry.py` (its `LEGACY` table)
 - `.gitattributes`
 - `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-18-list-conversion.md`
 
@@ -213,6 +237,8 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
   `seed laundering` row.
 - **A copy of each list's arity and `verbatim` in its reader.** Two places would state one
   registration; each reader reads the registration instead.
+- **Keep the legacy list and the step rows' home under `tools/`.** Each `home` would add an
+  `install-prefix (shipped surface)` offender, which takes no waiver (§8 F7).
 
 ## 5. Production-readiness checklist
 
@@ -226,7 +252,9 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - observability — each check prints its population count, as today.
 - risks — a producer reason now lives in the conversion record and a widen record, not above its row
   (§8 F5); the playbook descriptor's registration travels to every adopter, whose memory root may not
-  be `memory`, and the home it names is literal, as unit 16's memory-tree registrations are.
+  be `memory`, and the home it names is literal, as unit 16's memory-tree registrations are. Gov's
+  receipt keeps an `engine` row for the legacy list's old path until gov's own install rewrites it
+  (S5); a reader that requires a receipt row's path to exist meets it at the close.
 - testing — AC1 to AC7; the arm in §7 is observed RED then GREEN by the main loop at the close.
 - migration — §4.
 - user docs — `help/tags.md` and `tools/playbook/README.md` name the lists' rows as ledger rows (S7).
@@ -251,12 +279,15 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
   in a scratch clone an instruction file neither rendered nor listed makes the first exit 1, and a
   planted unpinned fact makes the second exit 1.
   Red when: a re-pointed reader grades only the listed rows, so a new offender passes.
-- **AC5** — When a scratch clone removes one landed `[[upgrade]]` row and runs
-  `python ratchet.py never-gains`, it exits 1 naming `landed-steps` and the id
-  `removed`; adding a new step row and its ledger row exits 0.
+- **AC5** — When a scratch clone removes one landed step's `[[upgrade]]` row and that id's row of
+  `landed-steps.txt` and runs `python ratchet.py never-gains`, it exits 1 naming `landed-steps`,
+  `removed` and the id; adding a new step row and its ledger row exits 0.
   Red when: an append-only population accepts a removal, so a landed step leaves silently.
-- **AC6** — When `git check-attr merge -- memory/project/positional-refs.txt memory/project/positional-producers.txt memory/project/unpinned-facts.txt tools/playbook/instructions-legacy.txt`
-  runs, it prints `merge: rows` for each, and the same for `landed-steps.txt` run in `tools/govkit/`.
+  The descriptor row removed alone is the step-rows-frozen leg's, through `check_frozen`, and through
+  `both-ways` TOOL-dWitnessedBar-51's; `never-gains` compares the home with its base through
+  `compare_to_base` and runs no seed.
+- **AC6** — When `git check-attr merge -- positional-refs.txt positional-producers.txt unpinned-facts.txt instructions-legacy.txt landed-steps.txt`
+  runs in `memory/project/`, it prints `merge: rows` for each.
   Red when: a home lacks the line.
 - **AC7** — When `python gov_tag.py --fixture --plant positional-seed`, `--plant positional-pin` and
   `--plant positional-producer-new`, `python writing_practice.py --fixture --plant facts-stale` and
@@ -268,11 +299,14 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 
 ## 7. Gates
 
-The `ratchet` pack's legs (unit 14) grade the five populations at the close; they are not on the leg
-line below, which the leg join reads against today's manifest. `tags positional selftest` is on it:
-PLAY-dOrderedCharter-26 S7 adds it, landed before this build run.
+The `ratchet` pack's legs, landed by unit 14 at `49f5d3ff6` with no `guard`, grade the five
+populations at the close and are on the leg line below: AC5 observes `ratchet (never gains)`, and the
+new arm sits in `ratchet selftest`. `step-rows-frozen` reads the step rows S3 counts, and
+`install-prefix (shipped surface)` is the ban §8 F7 places the homes for; `kit/dogfood doc parity`,
+`straggler-guard arms` and `transition-audit arms` guard `.memory-tree.conf`. `tags positional selftest`
+is on it: PLAY-dOrderedCharter-26 S7 adds it, landed before this build run.
 
-`playbook render wiring` · `playbook render selftest` · `tags positional selftest` · `playbook parity` · `govkit selfcheck` · `govkit selftest` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures`
+`playbook render wiring` · `playbook render selftest` · `tags positional selftest` · `playbook parity` · `govkit selfcheck` · `govkit selftest` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `ratchet (never gains)` · `ratchet (both ways)` · `ratchet (unarmed)` · `ratchet (populated)` · `ratchet selftest` · `step-rows-frozen` · `install-prefix (shipped surface)` · `kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms`
 
 New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant in `ratchet selftest` over a fixture `landed-steps` population · none
 
@@ -327,6 +361,19 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   change to unit 13's landed `_check_table` against §3 (veto 1). RESOLVED (agent, 2026-11-19,
   delegated): (a), the one survivor; returned to the main loop as an ask on unit 14 S6.
   widens: none · relaxes: none
+- **F7 — Where do the legacy list and the step rows live, given `install-prefix (shipped surface)`
+  takes no waiver?** `tools/govkit/registry.toml` is in that ban's population, every tracked file under
+  the tool root (`tools/check-install-prefix.sh#derive_ban_files`); its rule 2 counts a `tools/<kit>`
+  spelling after a quote; and the factory reads `home` literally
+  (`tools/lib/legacy_ledger.py#read_registrations`). So a `home` of `tools/playbook/instructions-legacy.txt`
+  or `tools/govkit/landed-steps.txt` adds an offender. Options: (a) both homes under `memory/project/`,
+  the list moved by `git mv` and both admitted through gov's `PROJECT_REGISTRY_EXTRA`, as unit 16 moved
+  `tools/dead-path-waivers.txt` and `tools/playbook-kit-waivers.txt` (`3ce285ad7`); (b) both kept under
+  `tools/`; (c) a `home` token the factory resolves. (b) reds the ban at this unit's pass, a leg on §7's
+  line (veto 1); (c) changes unit 13's landed `read_registrations`, outside this unit's write set
+  (veto 3). RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor and unit 16's precedent; the
+  move re-points S5's readers of the old path and drains the list's `method-carriers` row.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -351,19 +398,29 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   by F4; the legacy seed lands beside `check_legacy` in `instruction_units.py`; S5's readers re-derived
   by symbol; `verbatim` landed by unit 13; every population names a leg (F6); counts PINNED.
   No Goal or Scope intent moved.
+- rev-6 · 2026-11-19 · S1 · S2 · S3 · S5 · §4 The populations, The reference field, Inventory,
+  Migration, Files touched, Alternatives rejected · §5 · AC5 · AC6 · §7 · §8 F7 · §10 · re-grounded at
+  `86dac0fcc` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over units 14, 16 and 46
+  as landed and unit 17's S9: the legacy list and the step rows' home move to `memory/project/`, since
+  `install-prefix (shipped surface)` counts a `tools/` home (F7), with the readers that move names; the
+  adopter step runs unit 16's `registry_to_ledger.py` over a new `LEGACY` row; seeds spelled `python`
+  and `{prefix}`, which unit 17 S9 resolves; AC5 grades the home through `never-gains`; the ratchet
+  legs join the leg line; counts re-pinned, `positional-refs` 38334. No Goal intent moved.
 
 ## 10. Reuse audit
 
 The seam extended is the ledger factory (`tools/lib/legacy_ledger.py`, unit 13, landed at `34f8bb7db`,
 read through memory-tree's inline copy `tools/memory-tree/legacy_ledger.py`); each list's own check is
 the reader re-pointed, and each seed is that check's existing measurement exposed as a verb, so no
-predicate is written twice. The adopter step reuses TOOL-dWitnessedBar-16 S10's `convert_registry.py`
-and the landed `[[upgrade]]` grammar (`tools/govkit/upgrade_steps.py#STEP_KEYS`), minting no step
-program. At `045405ff8` the four lists, `positional.py`, `writing_practice.py`, `instruction_units.py`
+predicate is written twice. The adopter step reuses unit 16's step program
+`tools/govkit/steps/registry_to_ledger.py` with `tools/memory-tree/convert_registry.py#LEGACY` and its
+`parse_keyed_reason`, and the landed `[[upgrade]]` grammar (`tools/govkit/upgrade_steps.py#STEP_KEYS`),
+minting no step program or parser; the home move follows unit 16's (`3ce285ad7`).
+At `86dac0fcc` the four lists, `positional.py`, `writing_practice.py`, `instruction_units.py`
 and `upgrade_steps.py` are tracked (`git ls-files`), landed by dOrderedCharter and dSafePassage after
-scout C read the base, where none existed. `python tools/codebase-map/reuse_lookup.py "register an existing keyed list file as an append-only or shrink-only population"`
-ranked `key`, `population` (`tools/govkit/refusal_join.py`), `derive_kit_file` and `read_key`, none of
-which registers a population; it agrees with source. Scout C's row names PLAY-dOrderedCharter-20 S4 for
+scout C read the base, where none existed. `python tools/codebase-map/reuse_lookup.py "register an existing keyed list file as an append-only or shrink-only population"`,
+re-run at `86dac0fcc`, ranked `key`, `keys`, `population` (`tools/govkit/refusal_join.py`),
+`write_fixture_files` and `derive_kit_file`, none of which registers a population; it agrees with source. Scout C's row names PLAY-dOrderedCharter-20 S4 for
 the legacy list; source says S8 (§8 F3).
 
 Recall terms used: `python tools/memory-recall/query.py "how are the positional references and the legacy instruction list registered as ledger populations" --terms "positional references keyed list legacy instruction unpinned facts producer hits step rows append-only ledger registration"`

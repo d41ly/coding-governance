@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-52 — the scalar-pin seed reads every root conf the working tree holds, so a fresh install seeds its pin before its first commit
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-53 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md) | journal | TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md) | journal | TOOL-dWitnessedBar-53 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
@@ -26,12 +27,13 @@
 The round-1 spec audit of units 40 to 51
 (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md`)
 confirmed finding **id 1 at HIGH**, in its item **H1**, which it shares with id 13
-(`TOOL-dWitnessedBar-53`). `TOOL-dWitnessedBar-46` S2 has the memory-tree adopter seed
-`conf-scalar-pins` at the end of `--scaffold`, measuring "the tree's tracked root confs". At that
-moment `.memory-tree.conf` has been copied from the example by the adopter's seed-and-stop
-(`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:97-101`) and is untracked: the scaffold stages
-only `git add "$M"` (`:844`, `:846`), and `:850` tells the user to commit the conf later. The seed
-writes an armed, empty population. Being absent-only, it is rewritten neither by a rerun nor by the
+(`TOOL-dWitnessedBar-53`). `TOOL-dWitnessedBar-46` S2, landed at `028b97364`, has the memory-tree
+adopter seed `conf-scalar-pins` at the end of `--scaffold`, measuring "the tree's tracked root confs".
+At that moment `.memory-tree.conf` has been copied from the example by the adopter's seed-and-stop
+(`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:98-102`) and is untracked: the scaffold stages
+only `git add "$M"` (`:869`, `:871`), and `:875` tells the user to commit the conf later. The seed
+writes an armed, empty population. Written only where its home is absent or unarmed
+(`tools/lib/legacy_ledger.py#seed_population`), it is rewritten neither by a rerun nor by the
 `--seed-pins` row unit 46 S2 runs at each update. Once the conf is committed,
 `ratchet (keys, not a scalar)` reds on each scalar pin the conf assigns, the example's
 `ROW_DUPLICATE_PIN="0"` among them, the defect unit 46 exists to close. This unit takes the report's
@@ -46,9 +48,10 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
   repository ignores is not. The conf walk of `tools/memory-tree/ratchet.py#measure_scalar_pins`, which
   at `49f5d3ff6` takes the paths `read_tracked_paths(root)` lists that `ROOT_CONF_RE` matches, takes
   `root_confs(root)` instead; `read_tracked_paths` stays for its other caller, the widen check of
-  `#run_never_gains`. `keys-not-scalar --measure`, the seed of unit 46 S2, reaches it there. Where
-  TOOL-dWitnessedBar-17, at this unit's order, has made that walk one reader shared with its
-  `measure-cutoffs`, `root_confs` sits behind the shared reader. Observed by AC1 and AC2.
+  `#run_never_gains`. `keys-not-scalar --measure`, the seed of unit 46 S2, reaches it there.
+  TOOL-dWitnessedBar-17, which builds before this unit at order 11, makes that walk one reader its
+  `measure-cutoffs` shares (its §4 "The cutoffs"); `root_confs` sits behind that shared reader.
+  Observed by AC1 and AC2.
 - **S2** — The leg reads the same set. `keys-not-scalar` without `--measure`, the check of
   `TOOL-dWitnessedBar-14` S11, measures through the same `measure_scalar_pins` call as its seed
   (`tools/memory-tree/ratchet.py#run_keys_not_scalar`, landed at `49f5d3ff6`), so S1's one change
@@ -85,18 +88,23 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
 ### Evidence
 
 - `cp "$HERE/.memory-tree.conf.example" "$ROOT/.memory-tree.conf"` with no `git add`, then an exit
-  asking for an edit (`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:97-101`), the
-  `seed-and-stop` outcome the descriptor accepts (`tools/memory-tree/kit.toml@19c9d3690e0a:150-153`).
-  The scaffold's only stagings are `git add "$M"` (`adopt-memory-tree.sh@d56ac45b165c:844`, `:846`);
-  its next-step line is `git add $M/ .memory-tree.conf && commit` (`:850`).
+  asking for an edit (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:98-102`), the
+  `seed-and-stop` outcome the descriptor accepts (`tools/memory-tree/kit.toml@aca25b09b5ce:150-153`).
+  The scaffold seeds `conf-scalar-pins` through `#seed_scalar_pins` (`adopt-memory-tree.sh@fbbf1499d9a4:868`),
+  and its only stagings follow, `git add "$M"` (`:869`, `:871`); its next-step line is
+  `git add $M/ .memory-tree.conf && commit` (`:875`).
 - The adopter met this class once already: the `method-carriers.txt` seed reads
   `{ git ls-files; find . -type f ... }` because "`git ls-files` is EMPTY here and a tracked-only seed
-  writes a header and nothing else" (`adopt-memory-tree.sh@d56ac45b165c:801-806`).
+  writes a header and nothing else" (`adopt-memory-tree.sh@fbbf1499d9a4:824-829`).
 - The example conf assigns `ROW_DUPLICATE_PIN="0"`
-  (`tools/memory-tree/.memory-tree.conf.example@7159dd975131:325`), the one scalar count among its
-  five `*_PIN=` lines, PINNED 2026-11-19 at `045405ff8` by
+  (`tools/memory-tree/.memory-tree.conf.example@815710c14c4b:325`), the one scalar count among its
+  five `*_PIN=` lines, PINNED 2026-11-19 at `86dac0fcc` by
   `grep -nE '^[A-Z_]+_PIN=' tools/memory-tree/.memory-tree.conf.example`. `TOOL-dWitnessedBar-17` S3,
-  at this unit's order, removes every one of those lines from that file (§8 F2).
+  which builds before this unit, removes every one of those lines from that file (§8 F2).
+- The defect, probed in a scratch target built as AC1's fixture. The scaffold printed
+  `armed conf-scalar-pins 0` (PINNED 2026-11-19 at `86dac0fcc`). After `git add -A && git commit`, with
+  the home removed, `python tools/memory-tree/legacy_ledger.py seed --population conf-scalar-pins`
+  printed `armed conf-scalar-pins 6`, the example's pins and the plant (PINNED 2026-11-19 at `86dac0fcc`).
 - `read_registrations` reads tracked descriptors only (`tools/lib/legacy_ledger.py#read_registrations`,
   TOOL-dWitnessedBar-13 §8 F7), and `govkit apply` stages every file it lands before any adopter runs
   (`tools/govkit/govkit.py#_cmd_apply`, its STAGE block). So at a governed install the seed sees the
@@ -106,9 +114,9 @@ fix: the seed reads the root confs present in the working tree, tracked or not. 
 - The read, probed 2026-11-19 at `045405ff8`: in gov's tree
   `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'` lists the confs
   `git ls-files -- '.*.conf'` lists, five each (PINNED 2026-11-19 at `045405ff8`, and again at
-  `2b0490b8d`); in a scratch `git init` it lists an untracked root
+  `2b0490b8d` and `86dac0fcc`); in a scratch `git init` it lists an untracked root
   `.x.conf`, and neither a nested `sub/.y.conf` nor a root conf named in `.git/info/exclude`.
-- The landed measure: unit 14 (`49f5d3ff6`) walks each tracked root conf in
+- The landed measure: unit 14 (`49f5d3ff6`), unchanged in this respect at `86dac0fcc`, walks each tracked root conf in
   `tools/memory-tree/ratchet.py#measure_scalar_pins`, through `#read_tracked_paths` filtered by
   `ROOT_CONF_RE`, and `#run_keys_not_scalar` calls that one function for both the seed and the leg.
 - The policy kit spells the same pathspec over the tracked set only:
@@ -137,13 +145,13 @@ root_confs --as py.function` at the pass.
 ### Migration
 
 None for gov: every root conf of gov's tree is tracked, so the set is the tracked set, the confs of
-§4 Evidence (five, PINNED 2026-11-19 at `2b0490b8d`).
+§4 Evidence (five, PINNED 2026-11-19 at `86dac0fcc`).
 
 ### Rollout
 
 Live at landing, one step after `TOOL-dWitnessedBar-46`. `TOOL-dWitnessedBar-17` shares this unit's
-order and writes the example conf AC1's fixture is made from; the fixture's planted pin (§8 F2) keeps
-AC1 observable whichever of the two lands first.
+order, builds before it, and drains the example conf AC1's fixture is made from; the fixture's planted
+pin (§8 F2) keeps AC1 observable over the drained example.
 
 ### Files touched (estimate)
 
@@ -152,7 +160,7 @@ AC1 observable whichever of the two lands first.
 ### Alternatives rejected
 
 - **Seed after the first commit.** The adopter never commits, by design
-  (`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:850`), so the seed would move
+  (`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:875`), so the seed would move
   to a step nobody runs and the population would start unarmed.
 - **Seed from the conf the adopter has just written.** It names one file where the leg reads every root
   conf; the two sets would differ on the first adopter carrying a second conf.
@@ -253,17 +261,23 @@ New arm: tools/memory-tree/ratchet.py · covers AC2 AC3 · the plants `untracked
   widen-check caller; `root_confs` sits behind the walk unit 17 shares with `measure-cutoffs`;
   `ratchet selftest` and `ratchet (keys, not a scalar)`, now in the manifest, join the leg line; the
   conf count is re-pinned, unchanged.
+- rev-5 · 2026-11-19 · §1 · S1 · §4 Evidence, Migration, Rollout, Alternatives rejected · §10 ·
+  re-grounded at `86dac0fcc` by brief 2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief over
+  units 16 and 46 as landed: the adopter, descriptor and example-conf citations re-pinned at their
+  moved lines, unit 46's seed cited at `#seed_scalar_pins`, and the defect recorded as probed in AC1's
+  fixture; unit 17 builds before this unit, so S1 and the rollout drop "whichever lands first"; the
+  pin and conf counts re-pinned, unchanged. No Scope intent or criterion moved.
 
 ## 10. Reuse audit
 
 The seam is the adopter's own working-tree fallback for the `method-carriers.txt` seed
-(`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:801-806`), the one place this repo already met
+(`tools/memory-tree/adopt-memory-tree.sh@fbbf1499d9a4:824-829`), the one place this repo already met
 the tracked-only-seed class, expressed as one `git ls-files` call with `--others --exclude-standard` so
 the leg and the seed share it; the call it replaces is the conf walk of
 `tools/memory-tree/ratchet.py#measure_scalar_pins`, landed by unit 14 at `49f5d3ff6`.
 `python tools/codebase-map/reuse_lookup.py "seed measure untracked root
-conf before first commit"`, re-run at `2b0490b8d`, ranked `before`, `seed` (test helpers), `repo_root`,
-`load_conf` and `parse_conf`; none lists a working tree's root confs. A `git grep` for the pathspec
+conf before first commit"`, re-run at `86dac0fcc`, ranked `before`, `seed` (test helpers), `repo_root`,
+`load_conf`, `parse_conf` and `write_commit`; none lists a working tree's root confs. A `git grep` for the pathspec
 found `tools/policy/policy.py#derive_legacy_homes`, which lists the tracked root confs for the policy
 kit's legacy-home conversion; §8 F3 records why this unit does not share it. No existing seam fits
 beyond the adopter's fallback.
