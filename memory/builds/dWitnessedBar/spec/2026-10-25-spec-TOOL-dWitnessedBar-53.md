@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-53 — every population an uncommitted scaffold seeds equals its seed after the first commit, held by a suite arm
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-52 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-18 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md) | journal | TOOL-dWitnessedBar-52 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 
 <!-- /gen:spec-records -->
@@ -105,8 +107,8 @@ it arms. It repairs `TOOL-dWitnessedBar-46`.
 - Probed in a scratch target built as S1 builds it. The scaffold printed `armed conf-scalar-pins 0` (PINNED 2026-11-19 at `86dac0fcc`).
   A following `seed --all` printed `present` for 8 populations (PINNED 2026-11-19 at `86dac0fcc`),
   of which 7 are unit 16's read-back registrations (PINNED 2026-11-19 at `86dac0fcc`).
-  After the commit, with those homes removed, the re-seed armed `conf-scalar-pins` with 6 rows
-  (PINNED 2026-11-19 at `86dac0fcc`) and left every read-back population unarmed, so
+  After the commit, with those homes removed, the re-seed armed `conf-scalar-pins` with 6 rows (PINNED 2026-11-19 at `86dac0fcc`)
+  and left every read-back population unarmed, so
   `method-carriers`' 4 saved rows compared unequal (PINNED 2026-11-19 at `86dac0fcc`).
   There the read-back argv ran its `{prefix}` literally; once TOOL-dWitnessedBar-17 S9 resolves it, a
   read-back over a removed home prints `dead probe` (`tools/memory-tree/convert_registry.py#cmd_read_back`)
@@ -273,6 +275,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the
   home, so P is the scaffold's own `armed` lines and each is re-seeded by `--population` (F4, §3); the
   kit copy follows unit 46's landed arm; suite, adopter and floor citations re-pinned; unit 17 builds
   first. AC2, AC3 and the arm line stand.
+- rev-6 · 2026-11-19 · §2 · rewrapped the probe sentence so its PINNED mark sits on the `6 rows` fact's own line,
+  per brief 2026-11-19-prompt-TOOL-dWitnessedBar-53-pin-spec-writer; nothing else moved.
 
 ## 10. Reuse audit
 
