@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0133@231564d8 whole
 
