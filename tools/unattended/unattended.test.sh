@@ -13082,6 +13082,8 @@ init_su_fixture() {
   # origin holding no claim. Unset, the conf declares no RUN_CLAIMS and nothing below is spent.
   if [ -n "${SU_CLAIMS:-}" ]; then
     git --git-dir="$su_origin" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$su_origin" update-ref --stdin
+    # ...and the clone's feed with them, as `remove_claim_refs` clears it (TOOL-dPlacedRequest-28).
+    rm -f "$(run_su_git rev-parse --path-format=absolute --git-common-dir)/gov-feed.log" "$(run_su_git rev-parse --path-format=absolute --git-common-dir)/gov-feed.seq"
     printf 'RUN_CLAIMS="on"\n' >> "$su_dir/.unattended.conf"
     run_su_git commit -qam "conf: the run claim on" --no-verify
   fi
@@ -17490,7 +17492,14 @@ GH_BOUND=5400   # mkconf's RESUME_STALE_BOUND, read back below; the holder's qua
 GH_EXPIRY=86400
 derive_claim_now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 derive_claim_ago() { date -u -d "@$(( $(date -u +%s) - $1 ))" +%Y-%m-%dT%H:%M:%SZ; }
-remove_claim_refs() { git --git-dir="$ORIGIN" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$ORIGIN" update-ref --stdin; }
+# THE FIXTURE'S FEED GOES WITH ITS REFS (TOOL-dPlacedRequest-28): every create now reads the newest
+# commit the clone's feed holds for its ref, so a feed an earlier arm left would parent a fresh arm's
+# create on that arm's commit, or refuse it over that arm's tombstone. An arm that means a deletion
+# outside the kit deletes the one ref with `update-ref -d` and keeps the feed.
+remove_claim_refs() {
+  git --git-dir="$ORIGIN" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$ORIGIN" update-ref --stdin
+  rm -f "$TMP/.git/gov-feed.log" "$TMP/.git/gov-feed.seq"
+}
 seed_claim() { # slug · session · keepalive · status · beat-utc (empty omits the line) · [node] · [host]
   local t c m
   m=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s' \
@@ -18846,11 +18855,13 @@ write_lease_policy() { # the policy file's text -> committed, pushed and fetched
       && git fetch -q origin )
 }
 read_lease_field() { git --git-dir="$LF/origin.git" log -1 --format=%B "refs/gov/leases/$1" -- 2>/dev/null | sed -n "s/^$2: //p"; }
+# LF_CLONE names the clone whose feed sights the commit, `$LF/c1` unset (TOOL-dPlacedRequest-28 plants
+# in the claim fixture's own tree, its origin `$LF/origin.git` once LF is ORIGIN_DIR).
 seed_lease_at() { # tail · slug · kind · fleet tag · session · status · beat-utc · epoch -> the commit, planted on the fixture's origin
   local t c
   t=$(git --git-dir="$LF/origin.git" mktree </dev/null)
   c=$(git --git-dir="$LF/origin.git" commit-tree "$t" -m "$(printf 'gov-claim %s\n\nslug: %s\nnode: other\nhost: h\nsession: %s\nkeepalive: absent\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -' "$1" "$2" "$5" "$6" "$7" "$7" "$8" "$3" "$4")")
-  git --git-dir="$LF/origin.git" update-ref "refs/gov/leases/$1" "$c"; add_claim_sighting "$LF/c1" "refs/gov/leases/$1" "$t" "$c" "$7"
+  git --git-dir="$LF/origin.git" update-ref "refs/gov/leases/$1" "$c"; add_claim_sighting "${LF_CLONE:-$LF/c1}" "refs/gov/leases/$1" "$t" "$c" "$7"
   printf '%s\n' "$c"
 }
 # ---- AC17 first, over a policy file whose FIRST revision does not parse: no valid revision precedes
@@ -20176,6 +20187,105 @@ same "DPR16 AC3 ...and the tombstone is unmoved" "$(read_claim_field tRun status
 remove_claim_refs; reset_tree
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-28 — EVERY CREATE READS THE FEED FIRST. Over the lease fixture's clone, each
+# lease planted by `seed_lease_at`, sighted by a `--claims` read and deleted on the origin outside the
+# kit: the sourced `read_feed_lease_tip` prints nothing, `tombstone <commit>` and `<commit> 4` (AC4);
+# an offer over the deleted unit tombstone exits 1 naming the feed commit, the origin holding no ref
+# (AC1), and the acquire reads it the same (AC4); an offer over the deleted `released` lease at epoch 4
+# writes epoch 5 on the feed's commit (AC2), and one over a ref no feed line names is the parentless
+# create at epoch 1 (AC3); offline, a create over the tombstone exits 1 and queues nothing. In the
+# claim fixture's tree: the driver's preflight create over a deleted `released` lease is parented on
+# the feed's commit at epoch 5 (AC5), a staged `write_claim` with the read cut building the parentless
+# epoch-1 commit, the RED it exists for; `--preflight` over a deleted tombstone fails check 107 and the
+# holder's `--resume` check 108 (AC6); the status column prints its one line, the beat column nothing,
+# and the settle names no retry. RED, observed at the close, is the base driver, whose offer and
+# driver creates read no feed. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK
+# DOES NOT DRIVE: `--take-over` over a feed tombstone, whose column shares the preflight's arm.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+fr_t=$(seed_lease_at tFix/unit/TOOL-tFix-2 tFix unit b s-o landed "$(derive_claim_now)" 3)
+fr_r=$(seed_lease_at tFix/unit/TOOL-tFix-3 tFix unit b s-o released "$(derive_claim_now)" 4)
+( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
+git --git-dir="$LF/origin.git" update-ref -d refs/gov/leases/tFix/unit/TOOL-tFix-2
+git --git-dir="$LF/origin.git" update-ref -d refs/gov/leases/tFix/unit/TOOL-tFix-3
+fr_why="the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
+same "DPR28 AC4 the reader prints nothing, tombstone <commit> and <commit> 4" \
+  "$( cd "$LF/c1" && GOVFEED_DIR=""; for fr_u in 9 2 3; do printf '[%s]' "$(read_feed_lease_tip "refs/gov/leases/tFix/unit/TOOL-tFix-$fr_u")"; done )" \
+  "[][tombstone $fr_t][$fr_r 4]"
+fr_out=$(run_lease_arm offer unit tFix TOOL-tFix-2 --to b); fr_rc=$?
+same "DPR28 AC1 an offer over a deleted unit tombstone exits 1, the origin holding no such ref" \
+  "$fr_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/leases/tFix/unit/TOOL-tFix-2 | grep -c .)" "1 0"
+hit  "$fr_out" "lease refused — tombstone · tFix/unit/TOOL-tFix-2 · $fr_why"
+fr_out=$(run_lease_arm acquire unit tFix TOOL-tFix-2); fr_rc=$?
+same "DPR28 AC4 the acquire over it exits 1 too" "$fr_rc" "1"
+hit  "$fr_out" "lease refused — tombstone · tFix/unit/TOOL-tFix-2 · $fr_why"
+run_lease_arm offer unit tFix TOOL-tFix-3 --to b >/dev/null
+same "DPR28 AC2 an offer over a deleted released lease writes epoch 5, released, offer b, on the feed's commit" \
+  "$(read_lease_field tFix/unit/TOOL-tFix-3 epoch) $(read_lease_field tFix/unit/TOOL-tFix-3 status) $(read_lease_field tFix/unit/TOOL-tFix-3 offer) $(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tFix/unit/TOOL-tFix-3^)" \
+  "5 released b $fr_r"
+run_lease_arm offer unit tFix TOOL-tFix-4 --to b >/dev/null
+same "DPR28 AC3 an offer of a ref no feed line names is the parentless create at epoch 1" \
+  "$(read_lease_field tFix/unit/TOOL-tFix-4 epoch) [$(git --git-dir="$LF/origin.git" log -1 --format=%P refs/gov/leases/tFix/unit/TOOL-tFix-4 --)]" "1 []"
+mv "$LF/origin.git" "$LF/away.git"; fr_out=$(run_lease_arm acquire unit tFix TOOL-tFix-2); fr_rc=$?; mv "$LF/away.git" "$LF/origin.git"
+same "DPR28 S2 offline, a create over the tombstone exits 1 and queues nothing" "$fr_rc $(cat "$LF/c1/.git/gov-queue.log" 2>/dev/null | grep -c .)" "1 0"
+hit  "$fr_out" "lease refused — tombstone · tFix/unit/TOOL-tFix-2 · $fr_why"
+rm -rf "$LF"
+# ---- AC5: the driver's own preflight create, sourced, over a deleted released build lease at epoch 4;
+# ---- then the same create through a staged write_claim whose read is cut: parentless, epoch 1.
+arm_claim_fixture
+for fr_stage in "" 's/ft=\$(read_feed_lease_tip "\$ref")/ft=""/'; do
+  remove_claim_refs
+  fr_r=$(LF=$ORIGIN_DIR LF_CLONE=. seed_lease_at tRun/build tRun build b s-o released "$(derive_claim_now)" 4)
+  bash "$SCRIPT" --claims >/dev/null 2>&1; git --git-dir="$ORIGIN" update-ref -d refs/gov/leases/tRun/build
+  fr_rc=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
+    [ -z "$fr_stage" ] || eval "$(declare -f write_claim | sed "$fr_stage")"
+    read_claims strict >/dev/null 2>&1; check_claim_writable tRun preflight k1 s1 k1 >/dev/null 2>&1
+    write_claim tRun live k1 strict >/dev/null 2>&1; echo "$?" )
+  if [ -z "$fr_stage" ]; then
+    same "DPR28 AC5 the driver's create returns 0 on the feed's commit at epoch 5" \
+      "$fr_rc $(git --git-dir="$ORIGIN" rev-parse refs/gov/leases/tRun/build^) $(read_claim_field tRun epoch)" "0 $fr_r 5"
+  else
+    same "DPR28 AC5 RED: with the read cut it builds the parentless commit at epoch 1" \
+      "$fr_rc [$(git --git-dir="$ORIGIN" log -1 --format=%P refs/gov/leases/tRun/build --)] $(read_claim_field tRun epoch)" "0 [] 1"
+  fi
+done
+# ---- AC6: the preflight over a deleted build tombstone fails check 107, the origin holding no lease.
+remove_claim_refs
+fr_t=$(LF=$ORIGIN_DIR LF_CLONE=. seed_lease_at tRun/build tRun build b s-o landed "$(derive_claim_now)" 5)
+bash "$SCRIPT" --claims >/dev/null 2>&1; git --git-dir="$ORIGIN" update-ref -d refs/gov/leases/tRun/build
+fr_why="the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
+out=$(run --preflight tRun --keepalive-id k1); rc=$?
+same "DPR28 AC6 --preflight over a deleted tombstone exits 1, the origin holding no tRun lease" \
+  "$rc $(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "1 0"
+hit  "$out" "UNATTENDED check 107 FAILED — this slug's lease is a tombstone in this node's feed, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written: tRun · tombstone · $fr_why"
+# ---- the status and beat columns, and the settle, over the same feed tombstone: one line, none, no retry.
+fr_out=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
+  for fr_m in "status soft" "beat quiet"; do
+    read_claims soft >/dev/null 2>&1; check_claim_writable tRun ${fr_m% *} k1 s1 k1 >/dev/null 2>&1
+    write_claim tRun released k1 "${fr_m#* }" 2>&1; printf 'rc %s;' "$?"
+  done )
+same "DPR28 S2 the status column prints its one line and the beat nothing, each returning 3" \
+  "$fr_out" "unattended: claim not written — tRun · $fr_why"$'\n'"rc 3;rc 3;"
+fr_rel=$(mktemp); printf '## Run facts\n\nkeepalive: k1\nsession: s1\n' >"$fr_rel"
+fr_out=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
+  write_settle_claim tRun "$fr_rel" landed first 2>&1 )
+rm -f "$fr_rel"
+same "DPR28 S2 the settle over it prints the one line and names no retry" "$fr_out" "unattended: claim not written — tRun · $fr_why"
+same "DPR28 S2 ...and the origin still holds no tRun lease" "$(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "0"
+# ---- AC6, the holder column: the run's own claim replaced by a tombstone, sighted and deleted; its
+# ---- --resume fails check 108 naming the feed commit.
+build_claim_held
+fr_t=$(LF=$ORIGIN_DIR LF_CLONE=. seed_lease_at tRun/build tRun build b s-o landed "$(derive_claim_now)" 5)
+bash "$SCRIPT" --claims >/dev/null 2>&1; git --git-dir="$ORIGIN" update-ref -d refs/gov/leases/tRun/build
+out=$(run --resume tRun --keepalive-id k1); rc=$?
+same "DPR28 AC6 the holder's --resume over a deleted tombstone exits 1, the origin holding no tRun lease" \
+  "$rc $(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "1 0"
+hit  "$out" "UNATTENDED check 108 FAILED — this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: tRun · tombstone · the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
+remove_claim_refs; reset_tree
+fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
@@ -22187,7 +22297,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RED-first observation is the close's.
 # RAISED 3755 -> 3763 by TOOL-dPlacedRequest-20's checklist pass: the offer block's 8 refusal and
 # window arms (3 `same`, 5 `hit`), off the diff's own lines; no skip branch. No suite ran.
-FLOOR_ASSERTIONS=3763
+# RAISED 3763 -> 3781 by TOOL-dPlacedRequest-28: the feed-first create block's 18 region-eight
+# assertions (13 `same`, the AC5 loop's two among them, one per pass, and 5 `hit`), off the diff's own lines;
+# no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3781
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22445,7 +22558,8 @@ FLOOR_SHARD_7=311
 # RAISED 955 -> 968 by TOOL-dPlacedRequest-41: the same 13 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
 # RAISED 968 -> 986 by TOOL-dPlacedRequest-20: the same 18 region-eight offer and cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 986 -> 994 by TOOL-dPlacedRequest-20's checklist pass: the same 8 region-eight refusal and window arms, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=994
+# RAISED 994 -> 1012 by TOOL-dPlacedRequest-28: the same 18 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1012
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
