@@ -67,8 +67,10 @@ then put that fingerprint in the anchor. An anchor is an HTML comment, invisible
 
 The second form is for a member graded for presence only, a role agent or a registry entry. Each
 member is anchored on exactly one page. A member no page documents yet is a row of
-`memory/project/docs-undocumented.txt`, `<id>` and a reason separated by a tab. The list only
-shrinks: the commit that documents a member removes its row, and a new member must be documented.
+`memory/project/docs-undocumented.txt`, a ledger row read through the ledger factory: `<id>`, a
+count of `1`, the commit the row was seeded at and its disposition, separated by tabs, under the
+ledger header on the file's first line. A row carries no reason. The list only shrinks: the commit
+that documents a member removes its row, and a new member must be documented.
 
 ## The unit line
 

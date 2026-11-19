@@ -44,6 +44,13 @@ role = "project-owned"
 include = ["drift_signals.py"]
 role = "project-owned"
 
+# drift's two populations, its pins and its baselines (TOOL-dWitnessedBar-16 S8), are this repo's
+# project layer as `drift_signals.py` is: withheld from installs, an adopter's own made by its
+# `[[upgrade]]` steps from the `PINS` and `BASELINES` dicts its layer held.
+[[files]]
+include = ["drift-pins.txt", "drift-baselines.txt"]
+role = "project-owned"
+
 [[files]]
 include = ["drift_signals.template.py"]
 role = "seed"
@@ -139,7 +146,7 @@ id = "drift-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = true
-why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
+why = "The drift-pins population ships no row and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
 # TOOL-aScouredKit-30. NO SIBLING PATH IN ANY ARGV HERE, and the reason is a constraint rather than
@@ -169,3 +176,46 @@ ceiling = 300
 [[lf_pin]]
 pattern = ".claude/skills/drift-audit/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+# drift's own pins and baselines, its project layer's `PINS` and `BASELINES` dicts until this unit.
+
+[[ledger]]
+population = "drift-pins"
+leg = "drift-audit records"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "drift-pins"]
+key = "key"
+fields = ["signal"]
+drain = "key"
+direction = "ceiling"
+home = "tools/drift-audit/drift-pins.txt"
+
+[[ledger]]
+population = "drift-baselines"
+leg = "drift-audit records"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "drift-baselines"]
+key = "record"
+fields = ["signal", "id"]
+drain = "key"
+direction = "shrink-only"
+home = "tools/drift-audit/drift-baselines.txt"
+
+# An adopter's own `PINS` and `BASELINES` dicts become its two files at its next update.
+
+[[upgrade]]
+id = "drift-audit/drift-pins-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "tools/drift-audit/drift-pins.txt"]
+surfaces = ["file:tools/drift-audit/drift-pins.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "drift-audit/drift-baselines-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "tools/drift-audit/drift-baselines.txt"]
+surfaces = ["file:tools/drift-audit/drift-baselines.txt"]
+needs-target = false

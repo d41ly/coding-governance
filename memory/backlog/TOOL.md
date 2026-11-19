@@ -711,3 +711,4 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-38](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-24 | 2026-10-25 | THE INTERPRETER-FLOOR ARM HAS THREE OWNERS ON PAPER.… |
 | [TOOL-dWitnessedBar-39](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-20 | 2026-10-25 | TOOL-dGroundRules-7 S2 TO S4 CHANGE ONCE TOOL-dWitnessedBar-20 LANDS.… |
 | [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS (DERIVED) ENFORCE NOTHING THE RULE CAN NAME.… |
+| [TOOL-dWitnessedBar-99](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | FIVE REGISTRIES STAY IN THEIR GRAMMAR. TOOL-dWitnessedBar-16 §8 F16… |

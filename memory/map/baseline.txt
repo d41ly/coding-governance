@@ -1,0 +1,34 @@
+# ledger · baseline · key key kind,key · direction shrink-only · drain key
+gate-legs	branch-guard self-test	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	build-index selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	check-arms selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	check-wiring self-test	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	corpus-ids selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	drift-audit records	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	drift-audit selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	drift-audit wiring	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	gotchas selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	harness arms (fail branches armed or pinned)	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	kickoff-manifest ratchet	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	manifest-check self-test	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	pytest-guardrails self-test	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	python resolver (behaviour + inline parity + idiom ban)	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	run-gates canary	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	settings-merge selftest	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gate-legs	template size <=48KiB	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+kits	drift-audit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+kits	lib	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+kits	pytest-parallel-guardrails	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+kits	workflows	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+git-hooks	pre-commit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+rendered-skills	drift-audit	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	absence-assertion-over-whole-file-text.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	concurrency-is-not-a-budget.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	fixture-passes-by-finding-nothing.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	gate-green-by-accident-on-generated-bytes.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	grammar-bound-to-the-wrong-root.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	heredoc-escape-reaches-the-regex.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	pin-copied-from-another-corpus.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	subprocess-resolves-a-different-shell.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	two-answers-to-one-question.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+gotcha-classes	vacuous-selector-empty-population.md	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

@@ -166,6 +166,9 @@ SLOT_CANON = (
 # population is legal and is ANNOUNCED on every run, because a rule binding nothing that reports
 # `clean` is the vacuous-selector class this repo names.
 CONTRACT_REGISTRY = "project/readme-contract.txt"
+# Its ledger key since TOOL-dWitnessedBar-16 S7: a row is `<path> TAB <binding>`, the binding one of these.
+CONTRACT_FIELDS = ("path", "binding")
+CONTRACT_BINDINGS = ("bound", "exempt")
 
 # TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
 # spec's status header and its first numbered section, which is the one place in a spec that hygiene
@@ -318,6 +321,9 @@ def write_text(path: str, text: str) -> None:
 import backlog  # noqa: E402  a sibling of this file, reached by the path insert above
 # A spec's declared write set and consumed siblings, read by the build-order render (TOOL-dGroundRules-25).
 import design_lib  # noqa: E402  a sibling of this file, reached by the path insert above
+# The ledger factory this kit carries (TOOL-dWitnessedBar-13): the contract registry and the stale-header
+# waiver are its populations, read through `read_rows` and graded against the base by `compare_to_base`.
+import legacy_ledger as LL  # noqa: E402  a sibling of this file, reached by the path insert above
 
 
 def load_conf(root: str) -> dict:
@@ -1291,13 +1297,12 @@ def read_stale_header_waiver(root: str, m: str, tracked: list) -> dict:
             f"nobody created is a decision nobody made, and defaulting it to empty would silently "
             f"disarm the distinction it exists to keep."
         )
-    rows = {}
-    for line in read_text(full).split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        path, _, why = line.partition(" ")
-        rows[path.strip()] = why.strip()
+    # A LEDGER POPULATION keyed by `path` (TOOL-dWitnessedBar-16 S4), read through the factory; a row's
+    # reason is the conversion record's, never the row's. A row the factory refuses tolerates nothing.
+    keyed, bad = LL.read_rows(full, 1)
+    if bad:
+        raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
+    rows = {key[0]: "" for key in keyed}
     stale = sorted(p for p in rows if p not in tracked)
     if stale:
         raise Problem(
@@ -2609,50 +2614,58 @@ def read_contract_registry(root: str, conf: dict) -> set:
     not depend on a file unit 3 had not written; this is the handover, and it is stated in both specs
     rather than left as two specs disagreeing.
     """
-    bound, _exempt, _pin = read_contract_rows(root, conf)
+    bound, _exempt = read_contract_rows(root, conf)
     return bound
 
 
 def read_contract_rows(root: str, conf: dict) -> tuple:
-    """`(bound, exempt, declared_pin)` from the declared registry. An absent file REFUSES."""
+    """`(bound, exempt)`, the paths of each binding, from the declared registry. An absent file REFUSES.
+
+    A LEDGER POPULATION since TOOL-dWitnessedBar-16 S7, keyed by `path` and `binding`, read through
+    the factory's `read_rows`; its `exempt-pin:` line retired, the shrink of the exempt rows graded
+    against the base instead (`check_contract_registry`). TRANSITIONAL (§8 F15, until S12's pass): a
+    home whose first line is no ledger header is read through `convert_registry.read_legacy_rows`, the
+    one legacy table the conversion reads, in memory, and never written back.
+    """
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
     full = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
     if not os.path.exists(full):
         raise Problem(f"{rel} is absent; the heading canon and the slot budgets would then bind "
                       f"nothing and report clean, which is coverage of nothing")
-    bound, exempt, pin = set(), {}, None
-    for n, raw in enumerate(read_text(full).split("\n"), 1):
-        s = raw.strip()
-        if not s or s.startswith("#"):
-            continue
-        if s.startswith("exempt-pin:"):
-            v = s.split(":", 1)[1].strip()
-            if not v.isdigit():
-                raise Problem(f"{rel}:{n}: exempt-pin is `{v}`, which is not a count")
-            pin = int(v)
-            continue
-        if s.startswith("!"):
-            path, _sep, why = s[1:].partition(" - ")
-            path = path.strip()
-            if not why.strip():
-                raise Problem(f"{rel}:{n}: exempt row `{path}` carries no reason; an exemption whose "
-                              f"reason lives elsewhere is one nobody can drain")
-            exempt[path] = why.strip()
-            continue
-        if " " in s:
-            raise Problem(f"{rel}:{n}: `{s}` is neither a bare bound path, an `!`-prefixed exempt "
-                          f"row with a reason, nor an `exempt-pin:` line")
-        bound.add(s)
-    if pin is None:
-        raise Problem(f"{rel}: no `exempt-pin:` line; the exempt list is shrink-only and a list with "
-                      f"no pin cannot report that it stopped shrinking")
-    return bound, exempt, pin
+    try:
+        LL.parse_header(read_text(full).split("\n", 1)[0])
+        keyed, bad = LL.read_rows(full, len(CONTRACT_FIELDS))
+        if bad:
+            raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
+    except ValueError:
+        import convert_registry  # noqa: PLC0415  the transitional read, deleted by S12's pass
+        try:
+            keyed = convert_registry.read_legacy_rows(root, rel)[3]
+        except convert_registry.Refusal as exc:
+            raise Problem(f"{rel}: {exc}") from None
+    bound, exempt = set(), set()
+    for path, binding in keyed:
+        if binding not in CONTRACT_BINDINGS:
+            raise Problem(f"{rel}: the row for `{path}` binds `{binding}`, which is neither "
+                          f"{' nor '.join(CONTRACT_BINDINGS)}")
+        (bound if binding == "bound" else exempt).add(path)
+    return bound, exempt
+
+
+def _render_contract_fixture(rows: list, lead: str = "") -> str:
+    """A contract registry in the ledger grammar for the self-test: the header the memory-tree
+    descriptor's `[[ledger]]` table renders, `lead`'s comment lines, then one row per `(path, binding)`."""
+    reg = LL.Registration("readme-contract", (), "site", CONTRACT_FIELDS, "hunk", "declared-set", CONTRACT_REGISTRY, "")
+    return (LL.render_header(reg) + "\n" + lead
+            + "".join("\t".join([p, b, "1", "abcdef12", "seeded"]) + "\n" for p, b in rows))
 
 
 def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
-    """Both directions, plus the equality pin. Every failure names the row or the path."""
+    """Both directions, plus the exempt rows' shrink against the base. Every failure names the row or the path."""
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
-    bound, exempt, pin = read_contract_rows(root, conf)
+    bound, exempt = read_contract_rows(root, conf)
+    for both in sorted(bound & exempt):
+        raise Problem(f"{rel} declares `{both}` both bound and exempt, so neither row says which it is")
     named, have = bound | set(exempt), set(tracked)
     # FORWARD — a tracked build README nothing names cannot silently escape the contract.
     for miss in sorted(have - named):
@@ -2662,11 +2675,22 @@ def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
     for dead in sorted(named - have):
         raise Problem(f"{rel} carries a row for `{dead}`, which is not a tracked build README; a "
                       f"stale row silently widens the surface it was written to narrow")
-    # The pin is an EQUALITY in both directions: above the count is permanent slack after a drain.
-    if pin != len(exempt):
-        raise Problem(f"{rel}: exempt-pin is {pin} and the measured exempt count is {len(exempt)}; "
-                      f"the pin is an equality, because a pin left above the count after a drain is "
-                      f"slack nothing reports")
+    # THE EXEMPT ROWS ONLY SHRINK (TOOL-dWitnessedBar-16 S7, §8 F4), the retired `exempt-pin:` line's
+    # job: an `exempt` row the base's rows did not hold is a new exemption, read through the factory's
+    # `compare_to_base` as a shrink-only population's gain. A bound row may be added freely, so a gained
+    # `bound` key is no finding. Where the compare answers None (no base, no home at the base, or a
+    # legacy base home) the shrink is UNGRADED and says why. WHAT IT DOES NOT CHECK: a path whose row
+    # moved from bound to exempt in a commit the base already holds.
+    reg = LL.Registration("readme-contract", (), "site", CONTRACT_FIELDS, "hunk", "shrink-only", rel,
+                          "build README slot contract")
+    findings, why = LL.compare_to_base(root, reg)
+    if findings is None:
+        print(f"build-index: UNGRADED the exempt rows' shrink against the base — {why}", file=sys.stderr)
+        return
+    for name, key in findings:
+        if name == "gained" and key[1] == "exempt":
+            raise Problem(f"{rel}: `{key[0]}` is a new exemption — the base's rows did not hold it "
+                          f"exempt, and the exempt rows only shrink; bind it, or conform the README")
 
 
 def scan_canon(lines: list, first_open: int) -> list:
@@ -4453,16 +4477,19 @@ def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: s
 
 
 def add_contract_row(root: str, conf: dict, rel: str) -> None:
-    """Append `rel` to the registry as a BOUND row. The exempt list and its pin are NOT touched.
+    """Append `rel` to the registry as a BOUND ledger row, at HEAD's sha. The exempt rows are NOT touched.
 
     Bound and not exempt, because an exemption is not coverage and a brand-new README has no
     history to be grandfathered for — it is written by this very function, to the canon's shape.
     """
     path = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
     text = read_text(path)
-    if any(line.strip() == rel for line in text.split("\n")):
+    if any(line.split("\t")[:2] == [rel, "bound"] for line in text.split("\n")):
         return
-    write_text(path, text.rstrip("\n") + "\n" + rel + "\n")
+    sha, why = LL.read_head_sha(root)
+    if not sha:
+        raise Problem(f"{CONTRACT_REGISTRY}: {why}, so the bound row for {rel} has no sha to carry")
+    write_text(path, text.rstrip("\n") + "\n" + "\t".join([rel, "bound", "1", sha, "seeded"]) + "\n")
 
 
 def cmd_new_build(root: str, conf: dict, args: dict) -> int:
@@ -6423,7 +6450,7 @@ def cmd_selftest() -> int:
         _bconf = _fixture(_bt, spec_status="OPEN")
         _brd = "memory/builds/tOne/README.md"
         write_text(os.path.join(_bt, "memory", CONTRACT_REGISTRY),
-                   "exempt-pin: 0\n" + _brd + "\n")
+                   _render_contract_fixture([(_brd, "bound")]))
         _bdir = os.path.join(base, "bumpdata"); os.makedirs(_bdir)
         write_text(os.path.join(_bdir, SLOT_LIMITS),
                    "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
@@ -6517,7 +6544,7 @@ def cmd_selftest() -> int:
             lambda: read_contract_registry(t16, conf16))
         os.makedirs(os.path.join(t16, "memory", "project"), exist_ok=True)
         write_text(os.path.join(t16, "memory", CONTRACT_REGISTRY),
-                   "# a comment\nexempt-pin: 0\nmemory/builds/tOne/README.md\n")
+                   _render_contract_fixture([("memory/builds/tOne/README.md", "bound")], "# a comment\n"))
         arm("a registry row binds its path and comments are skipped",
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
@@ -6563,18 +6590,27 @@ def cmd_selftest() -> int:
         os.path.exists(reg18) and os.remove(reg18)
         arm("an absent registry refuses, replacing unit 1's empty set", "is absent",
             lambda: check_contract_registry(t18, conf18, trk18))
-        arm("a registry with no pin refuses", "no `exempt-pin:` line",
-            build_reg_check("memory/builds/tOne/README.md\n"))
+        # The registry is a ledger population (TOOL-dWitnessedBar-16 S7): its `exempt-pin:` line and the
+        # reason refusal retired with the old grammar, and the exempt rows' shrink is the base compare's.
         arm("a tracked README named by no row refuses", "names neither a bound nor an exempt row",
-            build_reg_check("exempt-pin: 0\n"))
+            build_reg_check(_render_contract_fixture([])))
         arm("a row naming a path that is not a tracked README refuses", "stale row silently widens",
-            build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
-        arm("an exempt row with no reason refuses", "carries no reason",
-            build_reg_check("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
-        arm("the pin ABOVE the measured count refuses, not only below", "the pin is an equality",
-            build_reg_check("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
-        arm("a bound row and a matching pin pass", "None",
-            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound"),
+                                                      ("memory/builds/ghost/README.md", "bound")])))
+        arm("a row binding neither bound nor exempt refuses", "which is neither bound nor exempt",
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "pinned")])))
+        arm("a path declared both bound and exempt refuses", "both bound and exempt",
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound"),
+                                                      ("memory/builds/tOne/README.md", "exempt")])))
+        arm("a row the factory refuses refuses", "the count is not a positive integer",
+            build_reg_check(_render_contract_fixture([]) + "memory/builds/tOne/README.md\tbound\tx\tabcdef12\tseeded\n"))
+        arm("a bound row passes", "None",
+            lambda: str(build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound")]))()))
+        # THE TRANSITIONAL READ (§8 F15): a home in the old grammar reads through the conversion's own
+        # legacy table until S12's pass deletes that read, and this arm with it.
+        arm("a legacy home reads through the transitional read", "{'memory/builds/tOne/README.md'}",
+            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")() or
+                        read_contract_rows(t18, conf18)[0]))
         # TOOL-aRepatriatedFork-21: the population is builds/<slug>/README.md and nothing deeper.
         _pop = ["memory/builds/tOne/README.md", "memory/builds/tOne/build/legacy/README.md",
                 "memory/builds/tOne/spec/x.md", "memory/archive/README.md", ""]
@@ -7610,7 +7646,9 @@ def cmd_selftest() -> int:
             lambda: _read_waiver("# only comments\n\n"))
         arm("a MISSING waiver registry REFUSES", "absent", lambda: _read_waiver(None))
         arm("a waiver row naming an untracked path REFUSES", "outlived",
-            lambda: _read_waiver("memory/builds/ghost/README.md   gone\n"))
+            lambda: _read_waiver("memory/builds/ghost/README.md\t1\tabcdef12\tseeded\n"))
+        arm("a waiver row the ledger factory refuses REFUSES", "not the key's fields",
+            lambda: _read_waiver("memory/builds/x/README.md   a reason in the old grammar\n"))
 
         # TOOL-dDerivedDocket-6 — the two BACKLOG verbs, read through `backlog.py` and expanded by
         # this module's own `_expand_ids`. THE DARK ARM IS FIRST and is the one that matters here: a
@@ -8017,7 +8055,7 @@ def cmd_selftest() -> int:
         _f17 = dict(CORE)
         _f17[foo_rel] = _render_backlog_file("aFoo", [ask2, "- matches no declared row shape"])
         _f17["memory/" + STALE_HEADER_WAIVER] = \
-            "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n"
+            "memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n"
         _f17["memory/builds/aBar/README.md"] = ("---\nslug: aBar\nthis line has no colon\n---\n"
                                                 "\n# aBar\n\n" + MARK_OPEN + "\n"
                                                 + MARK_CLOSE + "\n")
@@ -8396,7 +8434,7 @@ def cmd_selftest() -> int:
             # has somewhere to land — and the arm can say it landed on stderr and not in the rows.
             "memory/builds/aBar/README.md": "---\nslug: aBar\nthis line has no colon\n---\n",
             "memory/" + STALE_HEADER_WAIVER:
-                "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n",
+                "memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n",
         }
         _c7 = _build_backlog_fixture(et, _ac7, cutoff=_cut)
         _rc7, _so7, _se7 = _read_asks_run(et, _c7, ["--all", "--tsv"])
@@ -8618,8 +8656,7 @@ def cmd_selftest() -> int:
                     _render_backlog_spec("EXMP-aFoo-90"),
                 "memory/builds/aFoo/BACKLOG.md": _render_backlog_file("aFoo", asks),
                 "memory/" + CONTRACT_REGISTRY:
-                    "# the fixture registry\nexempt-pin: 1\n"
-                    "!" + _SC_HOME + " - a fixture home build with no authored half\n",
+                    _render_contract_fixture([(_SC_HOME, "exempt")], "# the fixture registry\n"),
             }
 
         def _build_sc_ask(seq, text, clauses=(_SEEN_HERE, _ACCEPT), pointer=""):
@@ -8650,10 +8687,10 @@ def cmd_selftest() -> int:
         arm("the `ids:` line is the RENDER's, which owns it — empty on a build no id names yet",
             "[ids:]", lambda: "[" + [x for x in _sc_fm if x.startswith("ids:")][0] + "]")
         arm("the README is BOUND by the contract registry, never exempted into it",
-            f"{_sc_rel}\n",
-            lambda: "\n".join(x for x in read_text(
+            f"{_sc_rel}\tbound\n",
+            lambda: "\n".join("\t".join(x.split("\t")[:2]) for x in read_text(
                 os.path.join(sc, "memory", CONTRACT_REGISTRY)).split("\n")
-                if x.strip() == _sc_rel) + "\n")
+                if x.split("\t")[0] == _sc_rel) + "\n")
         arm("the scaffold writes no grant key, so the build it opens can grant nothing", "False",
             lambda: str(any(x.startswith("may:") for x in _sc_text.split("\n"))))
         _rc10c, _out10c = _read_mode(cmd_check, sc, load_conf(sc))
@@ -9375,7 +9412,7 @@ def check_folder_slots(root: str, conf: dict, slug: str) -> dict:
     tracked = extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m)
     bound = set()
     try:
-        bound, exempt, _pin = read_contract_rows(root, conf)
+        bound, exempt = read_contract_rows(root, conf)
         if rel not in bound and rel not in exempt:
             out["mine"].append(("registry", f"{m}/{CONTRACT_REGISTRY} names neither a bound nor an "
                                             f"exempt row for `{rel}`"))

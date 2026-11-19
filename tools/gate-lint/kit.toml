@@ -185,3 +185,67 @@ stage = ["step.test"]
 [gate_leg.gov]
 chunk = "selftests"
 ceiling = 300
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "encoding-posture-sites"
+leg = "encoding posture (text IO names its encoding)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "encoding-posture-sites"]
+key = "site"
+fields = ["path", "arm"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/encoding-posture-sites.txt"
+
+[[ledger]]
+population = "fork-ceilings"
+leg = "spawn budget (forks per hot entrypoint)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "fork-ceilings"]
+key = "key"
+fields = ["id", "bash", "base", "setup", "command"]
+verbatim = ["base"]
+drain = "key"
+direction = "ceiling"
+home = "memory/project/fork-ceilings.txt"
+
+[[ledger]]
+population = "location-probe-waivers"
+leg = "shell hygiene (a location probe asked from a moved directory)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "location-probe-waivers"]
+key = "site"
+fields = ["path", "probe"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/location-probe-waivers.txt"
+
+[[ledger]]
+population = "spawn-idiom-sites"
+leg = "shell hygiene (a fork spent on builtin work)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "spawn-idiom-sites"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/spawn-idiom-sites.txt"
+
+[[ledger]]
+population = "substitution-fed-loops"
+leg = "shell hygiene (a loop fed by a command substitution)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "substitution-fed-loops"]
+key = "site"
+fields = ["path", "delimiter"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/substitution-fed-loops.txt"
+
+[[ledger]]
+population = "temp-name-sites"
+leg = "shell hygiene (a fixed-name temp renamed into place)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "temp-name-sites"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/temp-name-sites.txt"

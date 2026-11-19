@@ -604,21 +604,21 @@ arm "PG5 AC5 the skip fixture's summary counts its one skipped citation" 0 "$d" 
 # 6 — a waiver with a reason silences the hit and the count is printed
 d=$base/waived; scratch "$d"
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|`'"${PFX}nope.sh"'` exists|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
-printf ''"${PFX}nope.sh"'\tdeliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf ''"${PFX}nope.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a waived hit with a reason passes" 0 "$d" "waiver(s)"
 
 # 7 — a waiver nothing produces any more REDS: a stale exception cannot hide a live hit
 d=$base/stale; scratch "$d"
-printf ''"${PFX}gone.sh"'\tno spec names this\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf ''"${PFX}gone.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a stale waiver REDS" 1 "$d" "STALE WAIVER"
 
-# 8 — a waiver row with no reason REDS
+# 8 — a waiver row the ledger factory refuses REDS: it waives nothing (TOOL-dWitnessedBar-16)
 d=$base/noreason; scratch "$d"
-printf ''"${PFX}nope.sh"'\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf ''"${PFX}nope.sh"'\tdeliberate, in the old grammar\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
-arm "a waiver carrying no reason REDS" 1 "$d" "STALE WAIVER"
+arm "a waiver row in the old grammar REDS" 1 "$d" "STALE WAIVER"
 
 # 9 — REFUSALS. An empty population is not a pass.
 d=$base/nospec; scratch "$d"
@@ -1074,7 +1074,7 @@ git -C "$d" reset -q --hard "$clean"
 printf '%s\n' "$GUARD_LEGS" > "$d/${PFX}gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
 write_files_touched '### Files touched (estimate)' '`'"${PFX}x/thing.sh"'`'
-printf 'guarded leg <- '"${PFX}x/thing.sh"'\t[guards] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'guarded leg <- '"${PFX}x/thing.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a [guards] waiver row keyed on the composite token clears the hit and is counted" 0 "$d" "1 waiver(s)"
 sed -i 's|^guarded leg <- '"${PFX}x/thing.sh"'\t|guarded leg\t|' "$d/memory/project/spec-token-waivers.txt"
@@ -1136,13 +1136,13 @@ GIT_COMMITTER_DATE=2026-08-31T12:00:00 git -C "$d" commit -qm ac1 --no-verify
 clean=$(git -C "$d" rev-parse HEAD)
 
 # AC6 — a waiver row keyed on the token, reason opening `[bar]`, clears the hit and is counted.
-printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a [bar] waiver row keyed on the token clears the hit and is counted" 0 "$d" "1 waiver(s)"
 git -C "$d" reset -q --hard "$clean"
 
 # AC7 — a [bar] row naming a token no spec carries REDS as stale, like any other row.
-printf 'GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] no spec names this\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a [bar] waiver row nothing produces REDS as stale" 1 "$d" "STALE WAIVER"
 git -C "$d" reset -q --hard "$clean"
@@ -1152,7 +1152,7 @@ git -C "$d" reset -q --hard "$clean"
 # 2026-09-20, so the gate refused a cutoff nobody re-set; `--pickaxe-regex -S` reads the occurrence
 # count, which a requote or a move leaves at one. The waiver row keeps the graded run at exit 0, so
 # the two outcomes differ in rc and not only in text. Observed RED-first on the `-G` checker.
-printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 sed -i 's|^SPEC_DIRECT_CUTOFF="2026-09-01"$|SPEC_DIRECT_CUTOFF=2026-09-01|' "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 GIT_COMMITTER_DATE=2026-09-20T12:00:00 git -C "$d" commit -qm requote --no-verify
@@ -1399,7 +1399,7 @@ write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
   '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
 write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 OPEN \
   '## 4. Design' '' 'It reads the flag this unit was handed.'
-printf 'EXMP-tOne-1>EXMP-tOne-2:--frob\t[handoff] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'EXMP-tOne-1>EXMP-tOne-2:--frob\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a waiver row keyed on the edge clears that hit and is counted" 0 "$d" "1 waiver(s)"
 sed -i 's|It reads the flag|It reads `--frob`, the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-2.md"
@@ -1619,7 +1619,7 @@ git -C "$d" reset -q --hard "$clean"
 #      on the bare string, used by the path hit, must not also swallow the claims refusal of it.
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|`'"${PFX}nope.sh"'` exists|' "$spec"
 sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `'"${PFX}nope.sh"'`.\n\n## 6. Acceptance criteria|' "$spec"
-printf ''"${PFX}nope.sh"'\t[path] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf ''"${PFX}nope.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "R1 a [path] waiver on the bare string does not swallow a claims refusal of it" 1 "$d" '[claims] `claims <- '"${PFX}nope.sh"'`'
 git -C "$d" reset -q --hard "$clean"
@@ -1627,7 +1627,7 @@ git -C "$d" reset -q --hard "$clean"
 # R1 — ...and a claims hit keeps no `[path]` row alive: with the path hit gone, the row reads stale
 #      while a claims sentence still names the string, under a row of its own that waives it.
 sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `'"${PFX}nope.sh"'`.\n\n## 6. Acceptance criteria|' "$spec"
-printf ''"${PFX}nope.sh"'\t[path] no path hit is left\nclaims <- '"${PFX}nope.sh"'\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf ''"${PFX}nope.sh"'\t1\tabcdef12\tseeded\nclaims <- '"${PFX}nope.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "R1 a [path] row whose path hit is gone reads stale though a claims sentence names the string" 1 "$d" 'STALE WAIVER `'"${PFX}nope.sh"'` — no spec produces this hit any more'
 git -C "$d" reset -q --hard "$clean"
@@ -1635,7 +1635,7 @@ git -C "$d" reset -q --hard "$clean"
 # R1 — ...and the remedy the fold documents works: the composite token, the only row, waives the
 #      claims hit it names, so the run is green and --list reports the hit as WAIVED (round 2, F3).
 sed -i 's|^## 6. Acceptance criteria$|## 4. Design\n\n`memory/map/features/runlog.md` claims `'"${PFX}nope.sh"'`.\n\n## 6. Acceptance criteria|' "$spec"
-printf 'claims <- '"${PFX}nope.sh"'\t[claims] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'claims <- '"${PFX}nope.sh"'\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 # The VERDICT comes from a plain run, because --list exits 0 and returns before any stale row prints;
 # --list is read only for the WAIVED row, which proves the hit exists and was waived rather than missed.
@@ -1805,12 +1805,12 @@ check_carries_restored "the unbound plant"
 sed -i "s/@$HA1 whole/@deadbeef whole/" "$A1"
 arm "a pin that is not the view's hash REDS as [carries] stale, naming both hashes" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\` — pins cl-dAlpha-0001@deadbeef, and the clause's text in the view hashes $HA1"
 # AC16 — the composite row waives that hit; a row keyed on the bare spec path does not.
-printf 'carries <- stale:cl-dAlpha-0001\t[carries] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'carries <- stale:cl-dAlpha-0001\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 arm "a waiver row keyed carries <- stale:<clause> takes the hit and the checker exits 0" 0 "$d" "1 waiver(s)"
 ARM_ARGS=(--list)
 arm "--list reads the waived hit as WAIVED [carries]" 0 "$d" "WAIVED [carries] $CSPEC/$CCUT-spec-TOOL-dAlpha-1.md :: carries <- stale:cl-dAlpha-0001"
 ARM_ARGS=()
-printf '# waivers\n%s\t[path] deliberate, for this arm\n' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" > "$d/memory/project/spec-token-waivers.txt"
+printf '# waivers\n%s\t1\tabcdef12\tseeded\n' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" > "$d/memory/project/spec-token-waivers.txt"
 arm "a waiver row keyed on the bare spec path does not take a carries hit" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\`"
 printf '# waivers\n' > "$d/memory/project/spec-token-waivers.txt"
 # AC15 — blank, the stale pin still planted, grades no carry; a malformed date refuses.
@@ -2238,7 +2238,7 @@ arm "TOOL-dFoldedAudit-4 a spec dated the day before is counted and not graded" 
 d=$base/su-off; seed_supersede "$d" '' "$SU_PROSE"
 arm "TOOL-dFoldedAudit-4 a blank key turns the join off and still counts the carrier" 0 "$d" "SPEC_SUPERSEDE_CUTOFF blank (arm off) · 1 live spec(s) carry it" "[supersede]"
 d=$base/su-waiver; seed_supersede "$d" 2026-09-02 "$SU_PROSE"
-printf 'supersede <- line 13\t[supersede] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'supersede <- line 13\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 arm "TOOL-dFoldedAudit-4 a waiver row beside a hit does not silence it" 1 "$d" '[supersede] `supersede <- line 13`' "STALE WAIVER"
 arm "TOOL-dFoldedAudit-4 the join's line prints with the text --dispatch filters on" 1 "$d" "supersede join · 1 live spec(s) at/after SPEC_SUPERSEDE_CUTOFF 2026-09-02 · 1 hit(s) · 0 pre-cutoff live spec(s) carry it and are not graded · of 1 live spec(s) · "
 ARM_ARGS=(--list)
@@ -2286,7 +2286,7 @@ printf '\n```\n- The suite arm labels `FH2 AC1`.\n```\n' >> "$d/$ls_spec"
 arm "FH48 AC9 a fenced bullet is unread" 0 "$d" "arm-labels join · 0 label(s) in 0 spec(s)" "[arm-labels]"
 git -C "$d" reset -q --hard "$albase"
 write_arm_label "$ls_spec" x.test.sh AC1 'FH2 AC1'
-printf 'arm-labels <- %s FH2 AC1\tdeliberate, for this arm\n' "$ls_spec" >> "$d/memory/project/spec-token-waivers.txt"
+printf 'arm-labels <- %s FH2 AC1\t1\tabcdef12\tseeded\n' "$ls_spec" >> "$d/memory/project/spec-token-waivers.txt"
 arm "FH48 AC9 a waiver row reaches a hit" 0 "$d" "1 label(s) in 1 spec(s)" "STALE WAIVER"
 git -C "$d" reset -q --hard "$albase"
 
@@ -2297,7 +2297,7 @@ git -C "$d" reset -q --hard "$albase"
 d=$base/onespec; scratch "$d"
 printf 'SPEC_AC_ORDER_CUTOFF="%s"\nSPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" "$HCUT" > "$d/.memory-tree.conf"
 sed -i 's|^`real leg`\.|`imaginary leg`.|' "$d/$SPECDIR/$HCUT-spec-TOOL-tOne-1.md"
-printf 'imaginary leg\tonly the tracked spec produces this, for the --spec arms\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'imaginary leg\t1\tabcdef12\tseeded\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 os_spec="$SPECDIR/$HCUT-spec-EXMP-tOne-5.md"
 write_handoff_spec "$d" "$os_spec" EXMP-tOne-5 DEFERRED \

@@ -197,6 +197,32 @@ resolve_index_generator() {
   esac
 }
 
+# A LEDGER'S RECORD KEYS AT A REVISION, read through the memory-tree kit's ledger factory, this kit's
+# required sibling (TOOL-dWitnessedBar-16 S4): the waiver registries of the pass-order and brief-recorded
+# legs are ledger populations, keyed by unit, and no leg here parses their grammar itself.
+# `read_record_keys <rev> <repo-relative path>` prints each row's first key field, one per line; a row
+# the factory refuses is named on stderr and never waives. An absent blob prints nothing, the empty set.
+# -> 0, or 2 with a named refusal where no launcher or no factory resolves, since an empty answer would
+# read as nothing waived.
+read_record_keys() {
+  local py="" here d top
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] || { printf '%s\n' "lib-unattended: read_record_keys found no python launcher, so $2 was not read" >&2; return 2; }
+  here=$(dirname -- "${BASH_SOURCE[0]}")
+  d=$(resolve_kit_dir "$py" memory-tree legacy_ledger.py "$here") || { printf '%s\n' "lib-unattended: read_record_keys found no memory-tree ledger factory, so $2 was not read" >&2; return 2; }
+  top=$(git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
+  GIT show "$1:$2" 2>/dev/null | "$py" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+rows, bad = LL._parse_rows(sys.stdin.read().split("\n"), 1, ("sha", "disposition"), ())
+for entry in bad:
+    print("%s: %s" % (sys.argv[2], LL.render_malformed(entry)), file=sys.stderr)
+for key in rows:
+    print(key[0])' "$top/$d" "$2" | tr -d '\r'
+  return "${PIPESTATUS[1]}"
+}
+
 # The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
 # generator's `--write` mode. Both the driver and the gate leg print it, so it is spelled once, here.
 # -> the hint text; a miss says what was not found, never a guess.

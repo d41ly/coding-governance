@@ -37,8 +37,9 @@ never a list somebody maintains: a scan that graded a hand-kept set goes quiet o
 arrives without being added to it. The clean line prints the graded file count, and an empty
 population prints its zero and exits 1, because a green run over nothing reads as coverage.
 
-THE REGISTRY is a shrink-only declaration of the sites that predate the gate, one row per
-`<path>\t<arm>\t<count>\t<reason>`, keyed on the ARM and never on a line number — a line-keyed
+THE REGISTRY is a shrink-only declaration of the sites that predate the gate, a ledger population
+read through the factory (TOOL-dWitnessedBar-16): one row per
+`<path>\t<arm>\t<count>\t<sha>\t<disposition>`, keyed on the ARM and never on a line number — a line-keyed
 registry reds on unrelated edits, and a gate whose steady state is red gets bypassed. Set equality
 in both directions: a measured site with no row fails, a row the scan no longer finds fails, and a
 count may fall with its sites and may not rise. The argument is OPTIONAL: omitted, the run grades
@@ -56,7 +57,7 @@ import tempfile
 # The baseline ledger factory, this kit's own inline copy (TOOL-dWitnessedBar-13 S9): the registry's
 # rows are read by `read_rows` and graded by `compare_counts`, and the two adapters below keep this
 # scanner's signatures, messages and four-field grammar.
-from legacy_ledger import compare_counts, read_rows
+from legacy_ledger import compare_counts, read_rows, render_malformed
 
 ARMS = ("file-io", "subprocess")
 # method -> the positional slot its `encoding` argument occupies:
@@ -167,39 +168,16 @@ def build_measured(hits: list[tuple[str, int, int, str, str]]) -> dict[tuple[str
     return measured
 
 
-def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites, plus every malformed row. A row is `path TAB arm TAB count TAB reason`.
-
-    A thin adapter over the factory's `read_rows` with the `("reason",)` tail (TOOL-dWitnessedBar-13
-    S9). The factory's line-number refusal is skipped on both key fields, because the closed arm set
-    is the stricter test here and the one whose words this registry has always printed; each line the
-    factory read or refused is then graded in line order, the arm first, as before.
-    """
-    rows, refused = read_rows(path, 2, tail=("reason",), verbatim=(0, 1))
-    graded = sorted([(number, None, row) for _count, _tail, number, row in rows.values()] + refused)
-    declared: dict[tuple[str, str], int] = {}
-    malformed: list[str] = []
-    for number, kind, row in graded:
-        if kind == "fields":
-            malformed.append(f"line {number}: not <path> TAB <arm> TAB <count> TAB <reason>: {row}")
-            continue
-        fields = row.split("\t")
-        rel, arm, count = fields[0].strip(), fields[1].strip(), fields[2].strip()
-        if arm not in ARMS:
-            malformed.append(f"line {number}: {arm!r} is not an arm ({', '.join(ARMS)}) — the key is "
-                             f"the ARM, never a line number, because a line number moves on an "
-                             f"unrelated edit: {row}")
-        elif kind == "count":
-            malformed.append(f"line {number}: count {count!r} is not a positive integer: {row}")
-        elif kind == "duplicate":
-            malformed.append(f"line {number}: ({rel}, {arm}) is declared twice: {row}")
-        else:
-            declared[(rel, arm)] = int(count)
-    return declared, malformed
-
-
 def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites for the OPTIONAL registry argument; a supplied path that does not resolve raises."""
+    """The declared sites for the OPTIONAL registry argument, plus every malformed row; a supplied path
+    that does not resolve raises.
+
+    THE REGISTRY IS A LEDGER POPULATION (TOOL-dWitnessedBar-16 S4), read through the factory's
+    `read_rows`: `path TAB arm TAB count TAB sha TAB disposition`, a row's reason the conversion
+    record's or its widen record's. The factory's line-number refusal is skipped on both key fields,
+    because the closed arm set is the stricter test here and the one whose words this registry has
+    always printed; each line the factory read or refused is graded in line order, the arm first.
+    """
     if arg is None:
         return {}, []
     path = pathlib.Path(arg)
@@ -207,7 +185,27 @@ def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], li
         raise OSError(f"no registry at {path} — the argument was SUPPLIED and does not resolve to a "
                       f"file, which is a typo and not a posture; OMIT it to grade against an empty "
                       f"declaration")
-    return read_registry(path)
+    rows, refused = read_rows(path, 2, verbatim=(0, 1))
+    graded = sorted([(number, None, row) for _count, _tail, number, row in rows.values()] + refused)
+    declared: dict[tuple[str, str], int] = {}
+    malformed: list[str] = []
+    for number, kind, row in graded:
+        if kind == "fields":
+            malformed.append(f"line {number}: not <path> TAB <arm> TAB <count> TAB <sha> TAB <disposition>: {row}")
+            continue
+        fields = row.split("\t")
+        rel, arm = fields[0].strip(), fields[1].strip()
+        if arm not in ARMS:
+            malformed.append(f"line {number}: {arm!r} is not an arm ({', '.join(ARMS)}) — the key is "
+                             f"the ARM, never a line number, because a line number moves on an "
+                             f"unrelated edit: {row}")
+        elif kind == "duplicate":
+            malformed.append(f"line {number}: ({rel}, {arm}) is declared twice: {row}")
+        elif kind is not None:
+            malformed.append(render_malformed((number, kind, row)))
+        else:
+            declared[(rel, arm)] = rows[(rel, arm)][0]
+    return declared, malformed
 
 
 def check_registry(measured: dict[tuple[str, str], int],
@@ -278,12 +276,12 @@ def run_selftest() -> int:
     check("a count that no longer matches fails", len(check_registry(measured, {("a.py", "file-io"): 2})), 1)
     with tempfile.TemporaryDirectory() as scratch:
         reg = pathlib.Path(scratch) / "reg.txt"
-        reg.write_text("# a comment\na.py\tfile-io\t1\tpredates the gate\n", encoding="utf-8")
-        check("a well-formed row parses", read_registry(reg), ({("a.py", "file-io"): 1}, []))
-        reg.write_text("a.py\t153\t1\tkeyed on a line number\n", encoding="utf-8")
-        check("a line-numbered key is refused as malformed", len(read_registry(reg)[1]), 1)
+        reg.write_text("# a comment\na.py\tfile-io\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        check("a well-formed row parses", resolve_declaration(str(reg)), ({("a.py", "file-io"): 1}, []))
+        reg.write_text("a.py\t153\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        check("a line-numbered key is refused as malformed", len(resolve_declaration(str(reg))[1]), 1)
         reg.write_text("a.py\tfile-io\t1\n", encoding="utf-8")
-        check("a row with no reason is refused as malformed", len(read_registry(reg)[1]), 1)
+        check("a row with no sha and disposition is refused as malformed", len(resolve_declaration(str(reg))[1]), 1)
         check("an absent argument resolves to an empty declaration", resolve_declaration(None), ({}, []))
         try:
             resolve_declaration(str(pathlib.Path(scratch) / "nosuch.txt"))

@@ -19,7 +19,11 @@ compare and rename carry. It mints no count compare of its own. A leg prints its
 each finding's population and key, and exits 0 green, 1 on a finding, 2 on a refusal. With no compare
 base a base leg prints `unresolved`, never green. A population the base holds nowhere, neither at its
 home nor under its header at another path, is `new at <sha12>` with its row count and is graded no
-further by `never gains`, `seed laundering` and `rename` (§8 F10). A live leg with nothing to grade
+further by `never gains`, `seed laundering` and `rename` (§8 F10). A population whose base file at its
+home opens with no ledger header is a legacy home its own pass regrammared in place: it is
+`regrammared at <sha12>` with its row count and graded no further by those three legs either
+(TOOL-dWitnessedBar-16 S11); what that does not check is the legacy rows against the converted ones,
+which the conversion record holds. A live leg with nothing to grade
 prints one `unarmed · <leg> · <why>` line, no pass line, and exits 0 (§8 F9); the runner prints that
 exit 0 as passed, so `unarmed` is read in the leg's output and in `--list`, never in the bar.
 
@@ -163,6 +167,20 @@ def check_new_at_base(root, reg, sha):
     return True
 
 
+def check_regrammared_at_base(root, reg, sha):
+    """True where the base `sha` holds a file at the registration's home whose first line is no ledger
+    header (`parse_header` refuses it): a legacy home the conversion's own pass regrammared in place
+    (TOOL-dWitnessedBar-16 S11). A base home opening with a ledger header is graded as before."""
+    rc, text = LL._run_git(root, "show", "%s:./%s" % (sha, reg.home))
+    if rc != 0:
+        return False
+    try:
+        LL.parse_header(text.split("\n", 1)[0])
+    except ValueError:
+        return True
+    return False
+
+
 def parse_widen_keys(value):
     """The keys a widen record's `Keys` field holds: each backticked span's TAB fields, or the whole value."""
     spans = re.findall(r"`([^`]+)`", value) or [value]
@@ -254,6 +272,9 @@ def run_never_gains(root):
     for reg in regs:
         if sha and check_new_at_base(root, reg, sha):
             print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
+            continue
+        if sha and check_regrammared_at_base(root, reg, sha):
+            print_line(leg, reg.population, "regrammared at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
         findings, why_not = LL.compare_to_base(root, reg)
         if findings is None:
@@ -382,6 +403,9 @@ def run_seed_laundering(root):
         if sha and check_new_at_base(root, reg, sha):
             print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
+        if sha and check_regrammared_at_base(root, reg, sha):
+            print_line(leg, reg.population, "regrammared at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
+            continue
         base, why_not = read_base_rows(root, reg, sha, why)
         try:
             work, bad = LL.read_ledger(root, reg) if base is not None else ({}, [])
@@ -434,6 +458,9 @@ def run_rename(root):
             continue
         if check_new_at_base(root, reg, sha):
             print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
+            continue
+        if check_regrammared_at_base(root, reg, sha):
+            print_line(leg, reg.population, "regrammared at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
         try:
             rows, applied = LL.carry_renames(root, reg, sha)
@@ -905,6 +932,26 @@ def run_plant_home_moved(top, results):
                      ["unresolved"], ["new at"])
 
 
+def run_plant_regrammared(top, results):
+    """S11 (TOOL-dWitnessedBar-16): a registration whose home the base holds in a legacy grammar reads
+    `regrammared at` with its row count under `never gains` and `seed laundering`, never `unresolved`;
+    the same home whose base opens with a ledger header is graded, and its gained key reds."""
+    write_fixture_repo(top, [], {"pop/rows.txt": "a\tthe legacy grammar, a reason column\n"})
+    write_files(top, {"kit/kit.toml": 'id = "fix"\n\n' + render_table(),
+                      "pop/rows.txt": render_rows([(("a",), 1, SHA_A, "seeded"), (("b",), 1, SHA_A, "seeded")])})
+    check_plant_case(results, "regrammared", "never gains over a legacy base home", top, ["never-gains"], 0,
+                     ["regrammared at", "2 rows"], ["unresolved"])
+    check_plant_case(results, "regrammared", "seed laundering over it", top, ["seed-laundering"], 0,
+                     ["regrammared at"], ["unresolved"])
+    run_git_in(top, "add", "-A")
+    run_git_in(top, "commit", "-q", "-m", "the base home regrammared")
+    run_git_in(top, "update-ref", "refs/remotes/origin/main", "HEAD")
+    write_files(top, {"pop/rows.txt": render_rows([(("a",), 1, SHA_A, "seeded"), (("b",), 1, SHA_A, "seeded"),
+                                                   (("c",), 1, SHA_A, "seeded")])})
+    check_plant_case(results, "regrammared", "a ledger-headed base home is graded, not regrammared", top,
+                     ["never-gains"], 1, ["gained · c"], ["regrammared at"])
+
+
 PLANTS = {
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
     "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
@@ -913,6 +960,7 @@ PLANTS = {
     "laundering": run_plant_laundering, "rename": run_plant_rename, "key-number": run_plant_key_number,
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
     "new-population": run_plant_new_population, "home-moved": run_plant_home_moved,
+    "regrammared": run_plant_regrammared,
 }
 
 

@@ -874,10 +874,16 @@ def parse_registry(root: str, m: str) -> list:
 
 
 def parse_waiver(root: str, m: str) -> list:
+    """The waived ids: a ledger population keyed by `id` (TOOL-dWitnessedBar-16 S4), read through the
+    factory this kit carries, each row's reason the conversion record's. A refused row is a Problem."""
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as the kit's other siblings are)
     p = os.path.join(root, m, WAIVER)
     if not os.path.isfile(p):
         return []
-    return [l.strip() for l in read(p).split("\n") if l.strip() and not l.lstrip().startswith("#")]
+    rows, bad = LL.read_rows(p, 1)
+    if bad:
+        raise Problem(f"{m}/{WAIVER}: {LL.render_malformed(bad[0])}")
+    return [key[0] for key in rows]
 
 
 # ------------------------------------------------------------------------------------------- checks
@@ -1449,7 +1455,7 @@ def cmd_selftest() -> int:
         c3 = _scratch(t3, extra={"memory/README.md": "# r\n\nContext lives in ARCH-tGhost-9 upstream.\n"})
         arm("check 14 catches a cited-never-defined id", "ARCH-tGhost-9 is cited but never defined",
             lambda: "\n".join(checks(walk(t3, c3))))
-        _w(t3, "memory/project/id-orphan-waiver.txt", "# waived\nARCH-tGhost-9\n")
+        _w(t3, "memory/project/id-orphan-waiver.txt", "# waived\nARCH-tGhost-9\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=t3); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=t3)
         c3b = dict(c3); c3b["ORPHAN_ID_PIN"] = "1"
         arm("a waived orphan passes", None, lambda: checks(walk(t3, c3b)))
@@ -1457,7 +1463,7 @@ def cmd_selftest() -> int:
         arm("the waiver pin is shrink-only", "pinned at 0 (shrink-only)",
             lambda: "\n".join(checks(walk(t3, c3c))))
         t4 = os.path.join(base, "stale"); os.makedirs(t4)
-        c4 = _scratch(t4, extra={"memory/project/id-orphan-waiver.txt": "ARCH-tOne-1\n"})
+        c4 = _scratch(t4, extra={"memory/project/id-orphan-waiver.txt": "ARCH-tOne-1\t1\tabcdef12\tseeded\n"})
         c4["ORPHAN_ID_PIN"] = "1"
         arm("a waiver row that now resolves is stale", "which now resolves — stale row",
             lambda: "\n".join(checks(walk(t4, c4))))
@@ -1478,7 +1484,7 @@ def cmd_selftest() -> int:
             lambda: _measure_lines(tN, cN)[0])
         # The waiver is not a citation: a row whose id only the waiver and an archive cite is stale.
         # The 869209ed engine read the waiver's own row as a citation and passed this.
-        _w(tN, "memory/project/id-orphan-waiver.txt", "ARCH-tPast-7\n")
+        _w(tN, "memory/project/id-orphan-waiver.txt", "ARCH-tPast-7\t1\tabcdef12\tseeded\n")
         run("git", "add", "-A", cwd=tN); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=tN)
         cN["ORPHAN_ID_PIN"] = "1"
         arm("a waiver row no present-tense file cites is stale", "which no present-tense file cites — stale row",

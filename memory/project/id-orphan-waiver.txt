@@ -1,5 +1,2 @@
-# id-orphan-waiver.txt — ids cited but never defined, deliberately. Shrink-only (ORPHAN_ID_PIN).
-# EMPTY, and that is its working state rather than its retirement. The five grandfathered builds
-# that lived here left it the way the rows said they would: each gained a family-qualified H1 id in
-# its own spec (TOOL-aTetheredRecord-1), so every one now resolves and the pin fell 5 -> 0.
-# A row returns here only for an id that is cited, cannot be defined, and carries the reason why.
+# ledger · id-orphan-waiver · key record id · direction shrink-only · drain key
+# unarmed · dead probe · 7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45

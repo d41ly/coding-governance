@@ -205,8 +205,13 @@ hits=$( { git grep -nE "$RE" -- ':(exclude)memory/*' \
 # "does this text still appear somewhere" would be strictly weaker and would waive nothing while
 # reporting green.
 #
-# A LINE WITH NO TAB IS A COMMENT, never a leading `#`: a waived line's own text may begin with one
-# and two rows on this tree point at `#` comment lines.
+# THE REGISTRY IS A LEDGER POPULATION (TOOL-dWitnessedBar-16 S4), `dead-path-waivers`, a declared set
+# keyed by <path> and <line-text>, read through gov's ledger factory: `<path> TAB <line-text> TAB
+# <count> TAB <sha> TAB <disposition>`. The ordinal left the key: the count holds how many identical
+# lines of that text the row waives, its occurrences 1 to <count>, so N identical carriers are one row
+# of count N. A row's reason is the conversion record's, never the row's, and a row the factory
+# refuses is MALFORMED, never a silently absent waiver. An absent registry waives nothing and spawns
+# no python.
 #
 # ENVIRON, NEVER `awk -v`. A `-v` assignment expands backslash sequences, so a waived line holding a
 # literal `\n` -- there is one on this tree, the STATUS.md size fixture -- compares unequal to itself
@@ -215,32 +220,52 @@ hits=$( { git grep -nE "$RE" -- ':(exclude)memory/*' \
 # rather than a wrong verdict.
 waived_rows=""; malformed=""; unresolved=""
 if [ -f "$WAIVERS" ]; then
-  while IFS= read -r _row || [ -n "$_row" ]; do
-    case "$_row" in *"$TABC"*) ;; *) continue ;; esac
+  # shellcheck source=lib/resolve-python.sh
+  . "$_self_dir/lib/resolve-python.sh" 2>/dev/null || { echo "dead-paths: no resolve-python.sh in $_self_dir/lib, and $WAIVERS is read through the ledger factory -- REFUSING"; exit 2; }
+  # shellcheck source=lib/refuse-wrong-shell.sh
+  . "$_self_dir/lib/refuse-wrong-shell.sh" 2>/dev/null || { echo "dead-paths: no refuse-wrong-shell.sh in $_self_dir/lib -- REFUSING"; exit 2; }
+  refuse_wrong_shell || exit 2
+  _py=$(resolve_python) || { echo "dead-paths: no usable python, and $WAIVERS is read through the ledger factory -- REFUSING"; exit 2; }
+  _wout=$("$_py" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+rows, bad = LL.read_rows(sys.argv[2], 2, verbatim=(1,))
+for entry in bad:
+    print("BAD\t" + LL.render_malformed(entry).replace("\t", " "))
+for (path, text), (count, _tail, _number, _row) in sorted(rows.items(), key=lambda kv: kv[1][2]):
+    print("ROW\t%s\t%d\t%s" % (path, count, text))' "$_self_dir/lib" "$WAIVERS" | tr -d '\r'; exit "${PIPESTATUS[0]}") \
+    || { echo "dead-paths: the ledger factory in $_self_dir/lib did not read $WAIVERS -- REFUSING"; exit 2; }
+  while IFS= read -r _row; do
+    case "$_row" in
+      BAD"$TABC"*) malformed="$malformed${_row#BAD"$TABC"}
+"; continue ;;
+      ROW"$TABC"*) _row=${_row#ROW"$TABC"} ;;
+      *) continue ;;
+    esac
     _wpath=${_row%%"$TABC"*}; _rest=${_row#*"$TABC"}
     case "$_wpath" in *"{prefix}"*) _wpath=$(resolve_prefix_sh "$_wpath" "${SELF_PRE%/}") ;; esac
-    _word=${_rest%%"$TABC"*}; _rest=${_rest#*"$TABC"}
-    _wtext=${_rest%"$TABC"*}
-    case "$_word" in ''|*[!0-9]*) malformed="$malformed$_wpath:<ordinal [$_word] is not a positive integer>
-"; continue ;; esac
-    [ "$_word" -ge 1 ] 2>/dev/null || { malformed="$malformed$_wpath:<ordinal $_word is below 1>
-"; continue; }
+    _count=${_rest%%"$TABC"*}; _wtext=${_rest#*"$TABC"}
     if [ ! -f "$_wpath" ]; then
       unresolved="$unresolved$_wpath:<file is gone>
 "; continue
     fi
-    _hitline=$(NEEDLE="$_wtext" ORD="$_word" awk '
-        BEGIN { t = ENVIRON["NEEDLE"]; want = ENVIRON["ORD"] + 0; n = 0 }
-        { s = $0; sub(/\r$/, "", s); sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s)
-          if (s == t) { n++; if (n == want) { print NR; exit } } }
-        END { }' "$_wpath")
-    if [ -z "$_hitline" ]; then
-      unresolved="$unresolved$_wpath:<no occurrence $_word of that text>
+    _word=0
+    while [ "$_word" -lt "$_count" ]; do
+      _word=$((_word + 1))
+      _hitline=$(NEEDLE="$_wtext" ORD="$_word" awk '
+          BEGIN { t = ENVIRON["NEEDLE"]; want = ENVIRON["ORD"] + 0; n = 0 }
+          { s = $0; sub(/\r$/, "", s); sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s)
+            if (s == t) { n++; if (n == want) { print NR; exit } } }
+          END { }' "$_wpath")
+      if [ -z "$_hitline" ]; then
+        unresolved="$unresolved$_wpath:<no occurrence $_word of that text>
 "; continue
-    fi
-    waived_rows="$waived_rows$_wpath:$_hitline
+      fi
+      waived_rows="$waived_rows$_wpath:$_hitline
 "
-  done < "$WAIVERS"
+    done
+  done <<<"$_wout"
 fi
 waived_rows=$(printf '%s' "$waived_rows" | grep -c . >/dev/null 2>&1 && printf '%s' "$waived_rows" | sed '/^$/d' || true)
 waived_n=$(printf '%s\n' "$waived_rows" | grep -c . || true)

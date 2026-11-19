@@ -1701,17 +1701,23 @@ def check_claim_canary():
 
 
 def read_waivers(root):
+    """-> (the waived tokens, each refused row's malformed line), or None for an absent registry. A
+    LEDGER POPULATION keyed by `token` (TOOL-dWitnessedBar-16 S4), read through the memory-tree kit's
+    ledger factory, its token verbatim; a row's reason is the conversion record's or its widen
+    record's, never the row's. A row the factory refuses waives nothing and reds as a stale waiver."""
     p = root / WAIVERS
     if not p.exists():
         return None
-    rows = {}
-    for line in p.read_bytes().decode("utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        tok, _, why = line.partition("\t")
-        rows[tok.strip()] = why.strip()
-    return rows
+    try:
+        kit = str(resolve_kit_dir("memory-tree", "legacy_ledger.py", HERE))
+    except LookupError as exc:
+        print(f"spec-tokens: REFUSING — {WAIVERS} is read through the ledger factory and {exc}")
+        raise SystemExit(2) from None
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import legacy_ledger as LL  # noqa: PLC0415  the factory, found where this install put it
+    rows, bad = LL.read_rows(p, 1, verbatim=(0,))
+    return {key[0] for key in rows}, [LL.render_malformed(entry) for entry in bad]
 
 
 def read_size_ceilings(tooldir, root):
@@ -2378,6 +2384,8 @@ def main(argv):
     hw_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_HIGHWATER_NAME
 
     waivers = read_waivers(root)
+    if waivers is not None:
+        waivers, waiver_bad = waivers
     if waivers is None:
         print(f"spec-tokens: REFUSING — {WAIVERS} is absent; a registry nobody created is a "
               "decision nobody made")
@@ -2541,10 +2549,9 @@ def main(argv):
 
     stale = []
     # Under --spec a row no NAMED spec produces is not stale: some other spec may produce it.
-    for tok, why in (waivers.items() if named_specs is None else ()):
-        if not why:
-            stale.append(("WAIVER", tok, "carries no reason"))
-        elif tok not in seen_waived:
+    stale += [("WAIVER", line, "is not a ledger row, so it waives nothing") for line in waiver_bad]
+    for tok in (sorted(waivers) if named_specs is None else ()):
+        if tok not in seen_waived:
             stale.append(("WAIVER", tok, "no spec produces this hit any more"))
     stale += sz_stale
 

@@ -1,0 +1,7 @@
+# ledger · drift-pins · key key signal · direction ceiling · drain key
+readme_mechanism_drift	4	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+source_cited_ids_resolving_to_no_record	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+run_records_nonterminal_but_merged	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+backlog_asks_unlabelled	447	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+cutoff_keys_armed	39	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+dossiers_older_than_their_paths	26	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

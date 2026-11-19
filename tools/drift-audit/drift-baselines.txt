@@ -1,0 +1,3 @@
+# ledger · drift-baselines · key record signal,id · direction shrink-only · drain key
+non_terminal_specs_cited_by_product_source	TOOL-aBatchedLintel-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+closed_specs_with_no_product_commit	TOOL-aMooredAnchor-1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

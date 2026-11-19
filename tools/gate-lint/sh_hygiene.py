@@ -119,8 +119,9 @@ who did not write it:
     fragment such as `msg="a; b=$(cmd)"`. It costs a registry row and never a wrong verdict about
     behaviour, and the population this landed against was checked by hand and holds none.
 
-THE REGISTRY is a shrink-only declaration of the sites that predate the gate, one row per
-`<path>\t<delimiter>\t<count>\t<reason>`, keyed on the delimiter and NEVER on a line number — a
+THE REGISTRY is a shrink-only declaration of the sites that predate the gate, a ledger population
+read through the factory (TOOL-dWitnessedBar-16): one row per
+`<path>\t<delimiter>\t<count>\t<sha>\t<disposition>`, keyed on the delimiter and NEVER on a line number — a
 line-keyed registry reds on unrelated edits, and a gate whose steady state is red gets bypassed.
 Set equality in both directions: a measured site with no row fails, and a row the scan no longer
 finds fails, so draining a site forces its row out instead of leaving a widened exemption behind.
@@ -146,7 +147,7 @@ import tempfile
 # The baseline ledger factory, this kit's own inline copy (TOOL-dWitnessedBar-13 S9): the registry's
 # rows are read by `read_rows` and graded by `compare_counts`, and the two adapters below keep this
 # scanner's signatures, messages and four-field grammar.
-from legacy_ledger import compare_counts, read_rows
+from legacy_ledger import compare_counts, read_rows, render_malformed
 
 # A command substitution, arithmetic expansion excluded — `$((` is not a fork.
 SUBSTITUTION = re.compile(r"\$\((?!\()|`")
@@ -404,48 +405,17 @@ def build_measured(findings: dict[str, list[tuple[str, int, str]]]) -> dict[tupl
     return measured
 
 
-def read_registry(path: pathlib.Path, shape: tuple = DELIMITER_SHAPE,
-                  reasons: dict | None = None) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites, plus every malformed row. A row is `path TAB delim TAB count TAB reason`.
+def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE) -> tuple[dict[tuple[str, str], int], list[str]]:
+    """The declared sites for the OPTIONAL registry argument, plus every malformed row, or a refusal.
 
-    `shape` is the key's pattern with the two phrases a malformed key is refused in; its default is
-    the loop scan's, byte-identically. `reasons`, when given, is filled with each row's reason, which
-    the probe mode prints for every waived site.
+    THE REGISTRY IS A LEDGER POPULATION (TOOL-dWitnessedBar-16 S4), read through the factory's
+    `read_rows`: `path TAB key TAB count TAB sha TAB disposition`, the key `shape`'s pattern, the
+    pattern with the two phrases a malformed key is refused in. A row's reason is the conversion
+    record's or its widen record's, never the row's. The factory's line-number refusal is skipped on
+    both key fields, because `shape` is the stricter test here and the one whose words this registry
+    has always printed; each line the factory read or refused is graded in line order, the shape first.
 
-    A thin adapter over the factory's `read_rows` with the `("reason",)` tail (TOOL-dWitnessedBar-13
-    S9). The factory's line-number refusal is skipped on both key fields, because `shape` is the
-    stricter test here and the one whose words this registry has always printed; each line the
-    factory read or refused is then graded in line order, the shape first, as before.
-    """
-    pattern, label, keyname = shape
-    rows, refused = read_rows(path, 2, tail=("reason",), verbatim=(0, 1))
-    graded = sorted([(number, None, row) for _count, _tail, number, row in rows.values()] + refused)
-    declared: dict[tuple[str, str], int] = {}
-    malformed: list[str] = []
-    for number, kind, row in graded:
-        if kind == "fields":
-            malformed.append(f"line {number}: not <path> TAB <delimiter> TAB <count> TAB <reason>: {row}")
-            continue
-        fields = row.split("\t")
-        rel, delim, count = fields[0].strip(), fields[1].strip(), fields[2].strip()
-        if not pattern.match(delim):
-            malformed.append(
-                f"line {number}: {delim!r} is not {label} — the key is the {keyname}, "
-                f"never a line number, because a line number moves on an unrelated edit: {row}")
-        elif kind == "count":
-            malformed.append(f"line {number}: count {count!r} is not a positive integer: {row}")
-        elif kind == "duplicate":
-            malformed.append(f"line {number}: ({rel}, {delim}) is declared twice: {row}")
-        else:
-            declared[(rel, delim)] = int(count)
-            if reasons is not None:
-                reasons[(rel, delim)] = rows[(rel, delim)][1][0]
-    return declared, malformed
-
-
-def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE,
-                        reasons: dict | None = None) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites for the OPTIONAL registry argument, or a refusal. Three states.
+    Three states.
 
     ABSENT is the posture this scanner ships in, and it used to be the one state it refused. An
     empty declaration grades every measured site as undeclared, which is byte-identically what an
@@ -463,7 +433,29 @@ def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE,
         raise OSError(f"no registry at {path} — the argument was SUPPLIED and does not resolve to "
                       f"a file, which is a typo and not a posture; OMIT it to grade against an "
                       f"empty declaration")
-    return read_registry(path, shape, reasons)
+    pattern, label, keyname = shape
+    rows, refused = read_rows(path, 2, verbatim=(0, 1))
+    graded = sorted([(number, None, row) for _count, _tail, number, row in rows.values()] + refused)
+    declared: dict[tuple[str, str], int] = {}
+    malformed: list[str] = []
+    for number, kind, row in graded:
+        fields = row.split("\t")
+        if kind == "fields":
+            malformed.append(f"line {number}: not <path> TAB <{keyname.lower()}> TAB <count> TAB <sha> TAB "
+                             f"<disposition>: {row}")
+            continue
+        rel, key = fields[0].strip(), fields[1].strip()
+        if not pattern.match(key):
+            malformed.append(
+                f"line {number}: {key!r} is not {label} — the key is the {keyname}, "
+                f"never a line number, because a line number moves on an unrelated edit: {row}")
+        elif kind == "duplicate":
+            malformed.append(f"line {number}: ({rel}, {key}) is declared twice: {row}")
+        elif kind is not None:
+            malformed.append(render_malformed((number, kind, row)))
+        else:
+            declared[(rel, key)] = rows[(rel, key)][0]
+    return declared, malformed
 
 
 def check_registry(measured: dict[tuple[str, str], int],
@@ -582,9 +574,8 @@ def run_probe_scan(args: list[str]) -> int:
     if not root.is_dir():
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
-    reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, PROBE_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(args[0] if args else None, PROBE_KEY_SHAPE)
         found, scanned = scan_probe_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -597,9 +588,9 @@ def run_probe_scan(args: list[str]) -> int:
         print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
     print_probe_populations(found, scanned)
     measured = build_probe_measured(found)
-    # A WAIVED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
+    # A WAIVED SITE IS NAMED ON EVERY RUN, green included; its reason is the record its row cites.
     for key in sorted(set(measured) & set(declared)):
-        print(f"sh-hygiene: waived — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+        print(f"sh-hygiene: waived — {key[0]}: `{key[1]}` × {declared[key]}")
     explained: dict[tuple[str, str], str] = {}
     for rel, line, key, remedy in found["bare"]:
         explained.setdefault((rel, key), f"{rel}: the location probe `{key}` is asked bare and no "
@@ -935,9 +926,8 @@ def run_spawn_scan(args: list[str]) -> int:
     if not root.is_dir():
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
-    reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, SPAWN_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(args[0] if args else None, SPAWN_KEY_SHAPE)
         found, product, suites = scan_spawn_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -955,7 +945,7 @@ def run_spawn_scan(args: list[str]) -> int:
         del declared[key]
     measured = build_spawn_measured(found)
     for key in sorted(set(measured) & set(declared)):
-        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]}")
     explained = {key: f"{key[0]}: {count} `{key[1]}` site(s) and no registry row declares them — convert "
                       f"each to the no-fork form, or declare the row with its reason"
                  for key, count in measured.items()}
@@ -1192,9 +1182,8 @@ def run_temp_scan(args: list[str]) -> int:
     if not root.is_dir():
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
-    reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, TEMP_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(args[0] if args else None, TEMP_KEY_SHAPE)
         found, scanned = scan_temp_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1206,9 +1195,9 @@ def run_temp_scan(args: list[str]) -> int:
     if not args:
         print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
     print_temp_populations(found, scanned)
-    # A REGISTERED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
+    # A REGISTERED SITE IS NAMED ON EVERY RUN, green included; its reason is the record its row cites.
     for key in sorted(declared):
-        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]} — {reasons[key]}")
+        print(f"sh-hygiene: registered — {key[0]}: `{key[1]}` × {declared[key]}")
     measured = build_temp_measured(found)
     listing: dict[tuple[str, str], str] = {}
     for rel, line, source in found["fixed"]:
@@ -1374,18 +1363,18 @@ def run_selftest() -> int:
          len(check_registry(measured, {("a.sh", "HIT"): 2})), 1)
     with tempfile.TemporaryDirectory() as scratch:
         reg = pathlib.Path(scratch) / "reg.txt"
-        reg.write_text("# a comment\na.sh\tHIT\t1\tpredates the gate\n", encoding="utf-8")
-        rows, bad = read_registry(reg)
+        reg.write_text("# a comment\na.sh\tHIT\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        rows, bad = resolve_declaration(str(reg))
         test("a well-formed row parses", rows, {("a.sh", "HIT"): 1})
         test("a well-formed row is not malformed", bad, [])
-        reg.write_text("a.sh\t153\t1\tkeyed on a line number\n", encoding="utf-8")
-        _rows, bad = read_registry(reg)
+        reg.write_text("a.sh\t153\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        _rows, bad = resolve_declaration(str(reg))
         test("a line-numbered key is refused as malformed", len(bad), 1)
         reg.write_text("a.sh\tHIT\t1\n", encoding="utf-8")
-        _rows, bad = read_registry(reg)
-        test("a row with no reason is refused as malformed", len(bad), 1)
-        reg.write_text("a.sh\tHIT\tzero\twhy\n", encoding="utf-8")
-        _rows, bad = read_registry(reg)
+        _rows, bad = resolve_declaration(str(reg))
+        test("a row with no sha and disposition is refused as malformed", len(bad), 1)
+        reg.write_text("a.sh\tHIT\tzero\tabcdef12\tseeded\n", encoding="utf-8")
+        _rows, bad = resolve_declaration(str(reg))
         test("a non-numeric count is refused as malformed", len(bad), 1)
 
         # ---- the OPTIONAL argument, in all three of its states ---------------------------------
@@ -1393,7 +1382,7 @@ def run_selftest() -> int:
         # from the empty-file case — they produce the same declaration, which is the whole claim.
         test("an absent argument resolves to an empty declaration, not a refusal",
              resolve_declaration(None), ({}, []))
-        reg.write_text("a.sh\tHIT\t1\tpredates the gate\n", encoding="utf-8")
+        reg.write_text("a.sh\tHIT\t1\tabcdef12\tseeded\n", encoding="utf-8")
         test("an argument naming a file is read through the same parser",
              resolve_declaration(str(reg)), ({("a.sh", "HIT"): 1}, []))
         try:
@@ -1458,19 +1447,19 @@ def run_selftest() -> int:
             reg = tree / "reg.txt"
             key = '-C "$d" --show-prefix'
             outcomes = []
-            for rows in (f"a.sh\t{key}\t1\tread by no hook\nhook\t{key}\t1\tthe hook's own\n",
-                         f"a.sh\t{key}\t1\tread by no hook\nhook\t{key}\t1\tthe hook's own\n"
-                         f"gone.sh\t{key}\t1\ta drained site\n",
-                         f"a.sh\t{key}\t2\tread by no hook\nhook\t{key}\t1\tthe hook's own\n",
-                         f"a.sh\t153\t1\tkeyed on a line\nhook\t{key}\t1\tthe hook's own\n"):
+            for rows in (f"a.sh\t{key}\t1\tabcdef12\tseeded\nhook\t{key}\t1\tabcdef12\tseeded\n",
+                         f"a.sh\t{key}\t1\tabcdef12\tseeded\nhook\t{key}\t1\tabcdef12\tseeded\n"
+                         f"gone.sh\t{key}\t1\tabcdef12\tseeded\n",
+                         f"a.sh\t{key}\t2\tabcdef12\tseeded\nhook\t{key}\t1\tabcdef12\tseeded\n",
+                         f"a.sh\t153\t1\tabcdef12\tseeded\nhook\t{key}\t1\tabcdef12\tseeded\n"):
                 reg.write_text(rows, encoding="utf-8")
                 said = io.StringIO()
                 with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
                     code = run_probe_scan([str(reg), str(tree), ":!*.test.sh"])
                 outcomes.append((code, said.getvalue()))
             test("a registry row for each bare site is green", outcomes[0][0], 0, say=True)
-            test("and a waived site prints its reason on that green run",
-                 "read by no hook" in outcomes[0][1], True, say=True)
+            test("and a waived site is named on that green run",
+                 f"waived — a.sh: `{key}` × 1" in outcomes[0][1], True, say=True)
             test("a row whose site is gone is a finding", (outcomes[1][0], "no longer finds" in outcomes[1][1]),
                  (1, True), say=True)
             test("a count that disagrees is a finding", (outcomes[2][0], "the scan measures" in outcomes[2][1]),
@@ -1486,7 +1475,7 @@ def run_selftest() -> int:
             # ONE FINDING PER DRIFTED KEY: the temp mode's count-mismatch line carries the key's site
             # lines, so a key declared 2 and measured 1 is one finding, never two (TOOL-dRedressedBar-26).
             temp_reg = tree / "temp-reg.txt"
-            temp_reg.write_text("t.sh\tfixed-temp\t2\tdrifted\n", encoding="utf-8")
+            temp_reg.write_text("t.sh\tfixed-temp\t2\tabcdef12\tseeded\n", encoding="utf-8")
             said = io.StringIO()
             with contextlib.redirect_stdout(said), contextlib.redirect_stderr(io.StringIO()):
                 code = run_temp_scan([str(temp_reg), str(tree), ":!*.test.sh"])
@@ -1551,13 +1540,13 @@ def run_selftest() -> int:
                 subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
             reg = tree / "reg.txt"
             outcomes = []
-            for rows in ("a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
-                         "b.test.sh\tpath-subst\t1\ta suite\n",
-                         "a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n",
-                         "a.sh\tpure-fn-subst\t2\tpredates\na.sh\tpath-subst\t1\tpredates\n"
-                         "b.test.sh\tpath-subst\t1\ta suite\n",
-                         "a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
-                         "b.test.sh\tpath-subst\t1\ta suite\na.sh\tepoch-date\t1\twaived\n"):
+            for rows in ("a.sh\tpure-fn-subst\t1\tabcdef12\tseeded\na.sh\tpath-subst\t1\tabcdef12\tseeded\n"
+                         "b.test.sh\tpath-subst\t1\tabcdef12\tseeded\n",
+                         "a.sh\tpure-fn-subst\t1\tabcdef12\tseeded\na.sh\tpath-subst\t1\tabcdef12\tseeded\n",
+                         "a.sh\tpure-fn-subst\t2\tabcdef12\tseeded\na.sh\tpath-subst\t1\tabcdef12\tseeded\n"
+                         "b.test.sh\tpath-subst\t1\tabcdef12\tseeded\n",
+                         "a.sh\tpure-fn-subst\t1\tabcdef12\tseeded\na.sh\tpath-subst\t1\tabcdef12\tseeded\n"
+                         "b.test.sh\tpath-subst\t1\tabcdef12\tseeded\na.sh\tepoch-date\t1\tabcdef12\tseeded\n"):
                 reg.write_text(rows, encoding="utf-8")
                 said = io.StringIO()
                 with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
@@ -1575,8 +1564,8 @@ def run_selftest() -> int:
             (tree / "c.sh").write_bytes(b"t=$(date +%s)\n")
             subprocess.run(["git", "add", "-A"], cwd=str(tree), capture_output=True, check=True)
             said = io.StringIO()
-            reg.write_text("a.sh\tpure-fn-subst\t1\tpredates\na.sh\tpath-subst\t1\tpredates\n"
-                           "b.test.sh\tpath-subst\t1\ta suite\n", encoding="utf-8")
+            reg.write_text("a.sh\tpure-fn-subst\t1\tabcdef12\tseeded\na.sh\tpath-subst\t1\tabcdef12\tseeded\n"
+                           "b.test.sh\tpath-subst\t1\tabcdef12\tseeded\n", encoding="utf-8")
             with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
                 code = run_spawn_scan([str(reg), str(tree), ":!*.test.sh"])
             test("a product epoch-date site reds naming the file, line, class and the remedy",

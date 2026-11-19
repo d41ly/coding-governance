@@ -1109,17 +1109,42 @@ class MapTree:
     baseline: dict[str, tuple[str, ...]]
 
 
+# THE TWO SHRINK-ONLY LISTS ARE LEDGER POPULATIONS (TOOL-dWitnessedBar-16 S6), read and written through
+# the memory-tree kit's ledger factory this kit requires, in their own directory under `.txt` names
+# because a TAB row is not TOML: `baseline.txt` keyed by inventory and key, `affordance-exempt.txt` by
+# the dossier it graces. Each shape is its `[[ledger]]` table's in this kit's descriptor, whose header
+# the factory's reader compares; a home holding no row is its header and the factory's unarmed line.
+BASELINE_FILE = "baseline.txt"
+AFFORDANCE_FILE = "affordance-exempt.txt"
+
+
+def derive_list_registration(name: str):
+    """The `Registration` shape of one of the two lists, homed at its file name under the map root."""
+    if name == BASELINE_FILE:
+        return LL.Registration("baseline", (), "key", ("kind", "key"), "key", "shrink-only", name, "")
+    return LL.Registration("affordance-exempt", (), "key", ("seam",), "key", "shrink-only", name, "")
+
+
+def render_list_rows(name: str, keys, sha: str) -> str:
+    """One of the two lists in the ledger grammar: its header, then one `seeded` row per key at `sha`,
+    or, holding no key, its header and the factory's unarmed dead-probe line."""
+    reg = derive_list_registration(name)
+    rows = sorted(set(keys))
+    if not rows:
+        return "%s\n%sdead probe · %s\n" % (LL.render_header(reg), LL.UNARMED_LEAD, sha)
+    return LL.render_header(reg) + "\n" + "".join("\t".join([*k, "1", sha, "seeded"]) + "\n" for k in rows)
+
+
 def parse_baseline(
-    text: str, inventory_ids: tuple[str, ...], *, source: str = "baseline.toml"
+    text: str, inventory_ids: tuple[str, ...], *, source: str = BASELINE_FILE
 ) -> dict[str, tuple[str, ...]]:
-    try:
-        data = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as exc:
-        raise MapError(f"{source}: toml parse error: {exc}") from exc
-    unknown = set(data) - set(inventory_ids)
+    rows, bad = LL._parse_rows(text.split("\n"), 2, ("sha", "disposition"), ())
+    if bad:
+        raise MapError(f"{source}: {LL.render_malformed(bad[0])}")
+    unknown = {inv for inv, _key in rows} - set(inventory_ids)
     if unknown:
         raise MapError(f"{source}: unknown inventory keys {sorted(unknown)}")
-    return {k: _require_str_list(data.get(k, []), k, source) for k in inventory_ids}
+    return {k: tuple(sorted(key for inv, key in rows if inv == k)) for k in inventory_ids}
 
 
 def load_map_tree(
@@ -1159,7 +1184,7 @@ def load_map_tree(
     if len(names) != len(set(names)):
         raise MapError(f"duplicate feature names across dossiers: {names}")
 
-    baseline_path = map_dir / "baseline.toml"
+    baseline_path = map_dir / BASELINE_FILE
     baseline = (
         parse_baseline(baseline_path.read_text(encoding="utf-8"), inventory_ids)
         if baseline_path.is_file()
@@ -1324,43 +1349,26 @@ def parse_affordance(text: str) -> Affordance:
     return Affordance(seams=tuple(seams), is_none=is_none, heading_present=True)
 
 
-def load_affordance_exempt(root: Path | None = None, *, source: str = "affordance-exempt.toml") -> frozenset[str]:
+def load_affordance_exempt(root: Path | None = None, *, source: str = AFFORDANCE_FILE) -> frozenset[str]:
     """The shrink-only affordance grace list — feature names that predate the `## Reuse
-    affordance` section and are skipped by the graced presence check. Absent file = no grace
-    (every dossier must carry the section — the fresh-repo default). Fail-closed on a malformed
-    file: a wrong shape must break the gate, never silently un-exempt (or over-exempt) the fleet."""
-    path = map_root(root) / "affordance-exempt.toml"
+    affordance` section and are skipped by the graced presence check, read through the ledger
+    factory. Absent file, or one holding no row, = no grace (every dossier must carry the section —
+    the fresh-repo default). Fail-closed on a malformed row: a wrong shape must break the gate, never
+    silently un-exempt (or over-exempt) the fleet."""
+    path = map_root(root) / AFFORDANCE_FILE
     if not path.is_file():
         return frozenset()
-    try:
-        data = tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError as exc:
-        raise MapError(f"{source}: toml parse error: {exc}") from exc
-    names = data.get("exempt")
-    if set(data) - {"exempt"} or not isinstance(names, list) or not all(isinstance(n, str) and n for n in names):
-        raise MapError(f"{source}: expected exactly `exempt = [<feature>...]` of non-empty strings")
-    return frozenset(names)
+    rows, bad = LL.read_rows(path, 1)
+    if bad:
+        raise MapError(f"{source}: {LL.render_malformed(bad[0])}")
+    return frozenset(key[0] for key in rows)
 
 
-def render_affordance_exempt(names) -> str:
-    """Hand-rendered TOML for the shrink-only affordance grace list (sorted, deduped) — the same
-    stdlib-has-no-writer pattern as render_baseline. Seeded from existing dossiers at adoption
-    (`gen_map.py --seed-affordance-baseline`); only shrinks thereafter."""
-    lines = [
-        "# affordance-exempt.toml — the shrink-only affordance grace list (codebase-map kit).",
-        "# Dossiers here predate the '## Reuse affordance' section; the graced presence check skips",
-        "# them. SHRINK-ONLY: a new dossier is NEVER added, a touch drops entries (map_diff",
-        "# attribution), and a dossier that gains the section is removed. Seeded at adoption.",
-        "",
-    ]
-    uniq = sorted(set(names))
-    if not uniq:
-        lines.append("exempt = []")
-    else:
-        lines.append("exempt = [")
-        lines.extend(f"  {json.dumps(n, ensure_ascii=False)}," for n in uniq)
-        lines.append("]")
-    return "\n".join(lines) + "\n"
+def render_affordance_exempt(names, sha: str) -> str:
+    """The shrink-only affordance grace list in the ledger grammar (sorted, deduped), each row seeded
+    at `sha`; with no name, its header and the factory's unarmed dead-probe line. Seeded from existing
+    dossiers at adoption (`gen_map.py --seed-affordance-baseline`); only shrinks thereafter."""
+    return render_list_rows(AFFORDANCE_FILE, [(n,) for n in names], sha)
 
 
 def affordance_offenders(dossier_texts: dict[str, str], exempt) -> list[str]:
@@ -1436,18 +1444,15 @@ if str(MEMORY_TREE_DIR) not in sys.path:
     sys.path.append(str(MEMORY_TREE_DIR))
 
 import coverage_join as _coverage_join  # noqa: E402
+import legacy_ledger as LL  # noqa: E402  the ledger factory, the memory-tree kit's copy (TOOL-dWitnessedBar-16)
 from coverage_join import Coverage, compute_coverage, drop_touched_exemptions, resolve_compare_base  # noqa: E402,F401
 
 
 def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str]] | None, str]:
-    """The two-argument form an older gate copy calls: memory-tree's `derive_baseline_additions` over
-    this map's `baseline.toml`, a working file that does not parse raised as `MapError`, as before."""
-    path = map_root(root) / "baseline.toml"
-    rel = path.relative_to(root).as_posix()
-    try:
-        return _coverage_join.derive_baseline_additions(root, base, rel)
-    except tomllib.TOMLDecodeError as exc:
-        raise MapError(f"{rel}: toml parse error: {exc}") from exc
+    """The two-argument form an older gate copy calls: memory-tree's `derive_baseline_additions`
+    adapter over this map's `baseline.txt` (TOOL-dWitnessedBar-16 §8 F8)."""
+    rel = (map_root(root) / BASELINE_FILE).relative_to(root).as_posix()
+    return _coverage_join.derive_baseline_additions(root, base, rel)
 
 
 # The step gate's `module-export` class (PLAY-dOrderedCharter-31 S3): the names this module re-exports from the
@@ -1663,25 +1668,12 @@ def render_cards_md(tree: MapTree, inventory_ids: tuple[str, ...], map_rel: str 
     return text
 
 
-def render_baseline(baseline: dict[str, list[str]], inventory_ids: tuple[str, ...]) -> str:
-    """Hand-rendered TOML (stdlib has no writer): sorted string arrays per inventory."""
-    lines = [
-        "# baseline.toml — the shrink-only ratchet baseline (codebase-map kit).",
-        "# Items inventoried from code but not yet claimed by a dossier or FOUNDATION.md.",
-        "# This file only SHRINKS: claim an item, delete its line. New keys belong in a",
-        "# dossier, not here — the coverage gate refuses a key the baseline at the branch's",
-        "# base did not carry; this seed is the one write with no base to compare against.",
-        "",
-    ]
-    for inv_id in inventory_ids:
-        keys = sorted(baseline.get(inv_id, []))
-        if not keys:
-            lines.append(f"{inv_id} = []")
-            continue
-        lines.append(f"{inv_id} = [")
-        lines.extend(f"  {json.dumps(k, ensure_ascii=False)}," for k in keys)
-        lines.append("]")
-    return "\n".join(lines) + "\n"
+def render_baseline(baseline: dict[str, list[str]], inventory_ids: tuple[str, ...], sha: str) -> str:
+    """The shrink-only ratchet baseline in the ledger grammar: one `<inventory> TAB <key>` row per item
+    inventoried from code and not yet claimed by a dossier or FOUNDATION.md, each seeded at `sha`. It
+    only SHRINKS: claim an item, delete its row; the coverage gate refuses a key the baseline at the
+    branch's base did not carry, and this seed is the one write with no base to compare against."""
+    return render_list_rows(BASELINE_FILE, [(i, k) for i in inventory_ids for k in baseline.get(i, [])], sha)
 
 
 # ======================================================================================

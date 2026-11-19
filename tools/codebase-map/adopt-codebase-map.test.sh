@@ -431,7 +431,9 @@ fi
 # exists, a dossier lacking the section is planted and committed, and the next adopt must leave the
 # list byte-identical: a re-seed would grace the planted offender. The scaffolding run writes the list,
 # since the seed admits a home whose directory exists (TOOL-dWitnessedBar-47), and arm 8 owns that
-# first write; this arm asserts the file, not which run wrote it.
+# first write; this arm asserts the file, not which run wrote it. A list holding no row is UNARMED and
+# the factory re-seeds an unarmed home (TOOL-dWitnessedBar-16 §8 F18), so the scaffold carries one
+# section-less dossier, `early`, and the list the third adopt seeds is armed with it.
 # ---------------------------------------------------------------------------------------------
 KD=$(mkrepo "$TMP/a7" "${FPFX%/}")
 MT=$("$PY" -c 'import sys
@@ -439,23 +441,26 @@ sys.path.insert(0, sys.argv[1])
 import map_lib
 print(map_lib.MEMORY_TREE_DIR.as_posix())' "$KIT" 2>&1 | tr -d '\r')
 cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
-aff="$TMP/a7/memory/map/affordance-exempt.toml"
+aff="$TMP/a7/memory/map/affordance-exempt.txt"
 (cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # creates the conf, exits 1 by design
 (cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true   # scaffolds the map tree
+mkdir -p "$TMP/a7/memory/map/features"
+printf '# early\n\n```toml\nfeature = "early"\ntitle = "early"\nstatus = "shipped"\nstreams = []\ndecisions = []\npaths = { globs = ["src/*.py"] }\n\n[claims]\nmods = []\n```\n' \
+  > "$TMP/a7/memory/map/features/early.md"
 git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm scaffold --no-verify
 out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
 if [ ! -d "$(dirname "$KD")/memory-tree" ]; then bad "7 re-adopt: the memory-tree kit was not found beside the kit under test: $MT"
-elif [ ! -f "$aff" ]; then bad "7 re-adopt: no affordance-exempt.toml after the scaffold was committed"; printf '%s\n' "$out" | sed 's/^/      /'
+elif [ ! -f "$aff" ] || ! grep -q "^early" "$aff"; then bad "7 re-adopt: no armed affordance-exempt.txt after the scaffold was committed"; printf '%s\n' "$out" | sed 's/^/      /'
 else
   cp "$aff" "$TMP/a7-aff.before"
   printf '# planted\n\n```toml\nfeature = "planted"\ntitle = "planted"\nstatus = "shipped"\nstreams = []\ndecisions = []\npaths = { globs = ["src/*.py"] }\n\n[claims]\nmods = []\n```\n' \
     > "$TMP/a7/memory/map/features/planted.md"
   git -C "$TMP/a7" add -A && git -C "$TMP/a7" commit -qm planted --no-verify
   out=$(cd "$TMP/a7" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1)
-  if ! printf '%s' "$out" | grep -q "^present memory/map/affordance-exempt.toml"; then
+  if ! printf '%s' "$out" | grep -q "^present memory/map/affordance-exempt.txt"; then
     bad "7 re-adopt: the seed did not report the grace list present"; printf '%s\n' "$out" | sed 's/^/      /'
   elif ! cmp -s "$TMP/a7-aff.before" "$aff" || grep -q planted "$aff"; then
-    bad "7 re-adopt: the second adopt re-seeded affordance-exempt.toml over a planted violation"
+    bad "7 re-adopt: the second adopt re-seeded affordance-exempt.txt over a planted violation"
   else
     good "7 re-adopt leaves the affordance grace list byte-identical with a planted violation present"
   fi
@@ -465,23 +470,26 @@ fi
 # arm 8 (TOOL-dWitnessedBar-47 AC1) — a fresh install seeds before its first commit. One adopt, the
 # conf copied first as arm 4's documented path does, on a `git init` target with nothing committed and
 # the memory-tree kit beside this one, as arm 7 carries it: the map directory the scaffold has just
-# made holds no tracked file, and the seed must still write affordance-exempt.toml there. Red when the
-# seed's home test asks for a tracked file in the directory again.
+# made holds no tracked file, and the seed must still write affordance-exempt.txt there. Red when the
+# seed's home test asks for a tracked file in the directory again. A fresh scaffold holds no section-less
+# dossier, so the list is the factory's one unarmed dead-probe line and the adopt still exits 0
+# (TOOL-dWitnessedBar-16 §8 F18): an empty list written armed is the one `ratchet (populated)` reds.
 # WHAT THIS DOES NOT CHECK: a map directory the scaffold failed to make, which the seed reports
 # `unarmed ... no directory` and the resolver suite's part 2o observes.
 # ---------------------------------------------------------------------------------------------
 KD=$(mkrepo "$TMP/a8" "${FPFX%/}")
 cp -r "$MT" "$(dirname "$KD")/memory-tree" 2>/dev/null
 cp "$KD/.codebase-map.conf.example" "$TMP/a8/.codebase-map.conf"
-aff="$TMP/a8/memory/map/affordance-exempt.toml"
+aff="$TMP/a8/memory/map/affordance-exempt.txt"
 out=$(cd "$TMP/a8" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?
 if git -C "$TMP/a8" rev-parse -q --verify HEAD >/dev/null 2>&1; then bad "8 fresh-install: the target holds a commit, so the arm proves nothing"
 elif [ "$rc" != 0 ] || [ ! -f "$aff" ]; then
-  bad "8 fresh-install: one adopt on an uncommitted target did not write affordance-exempt.toml (rc=$rc)"; printf '%s\n' "$out" | sed 's/^/      /'
-elif ! printf '%s' "$out" | grep -q "^armed memory/map/affordance-exempt.toml"; then
-  bad "8 fresh-install: the list exists but the seed did not report it armed"; printf '%s\n' "$out" | sed 's/^/      /'
+  bad "8 fresh-install: one adopt on an uncommitted target did not write affordance-exempt.txt (rc=$rc)"; printf '%s\n' "$out" | sed 's/^/      /'
+elif ! printf '%s' "$out" | grep -q "^unarmed memory/map/affordance-exempt.txt dead probe" \
+    || [ "$(grep -c . "$aff")" != 1 ] || ! grep -q "^# unarmed · dead probe · " "$aff"; then
+  bad "8 fresh-install: the list is not the one unarmed dead-probe line"; printf '%s\n' "$out" | sed 's/^/      /'
 else
-  good "8 fresh-install seeds affordance-exempt.toml before the target's first commit"
+  good "8 fresh-install seeds affordance-exempt.txt, unarmed, before the target's first commit"
 fi
 
 [ "$fails" = 0 ] || { printf '%s arm(s) FAILED\n' "$fails"; exit 1; }

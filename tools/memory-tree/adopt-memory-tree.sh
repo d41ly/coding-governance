@@ -764,8 +764,11 @@ esac
 
 # readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
 # registry is a refusal and an empty one reds the adopter's first run on the FORWARD assertion.
-# Every row carries its reason inline and the pin equals the count, so the file the adopter receives
-# already satisfies both directions and the equality.
+# It is a LEDGER POPULATION (TOOL-dWitnessedBar-16 S7): its first line is the header the memory-tree
+# descriptor's `[[ledger]]` table renders, and each row is `<path> TAB <binding> TAB 1 TAB <sha> TAB
+# seeded`, the sha HEAD's or, before the adopter's first commit, forty zeros, as the factory's seed
+# stamps. An `exempt` row the base did not hold is refused, so the exemptions only shrink.
+_seed_sha=$(git rev-parse --verify --quiet HEAD 2>/dev/null) || _seed_sha=0000000000000000000000000000000000000000
 #
 # EVERY PROBE HERE IS TERMINATED. A no-match `grep` exits 1, and under `set -eu` that aborts the whole
 # scaffold silently — which is exactly what happened: this block landed unterminated, the script died
@@ -775,16 +778,15 @@ _rc=$({ git ls-files 2>/dev/null || true; find . -type f -not -path './.git/*' 2
       | sort -u | grep -E "^$M/builds/[^/]+/README\.md$" || true)
 _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 {
+  printf '# ledger \xc2\xb7 readme-contract \xc2\xb7 key site path,binding \xc2\xb7 direction declared-set \xc2\xb7 drain hunk\n'
   printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.\n'
   printf '# Asserted BOTH ways: a tracked build README named by no row refuses, and a row naming a\n'
-  printf '# path that is not one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and\n'
-  printf '# carries its reason after " - ". `exempt-pin:` is an EQUALITY with the measured count.\n'
-  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds\n'
-  printf '# nothing on day one and the leg says so on every run. Convert a row to bound when you\n'
-  printf '# conform that README.\n\n'
-  printf 'exempt-pin: %s\n\n' "$_rn"
+  printf '# path that is not one refuses. A `bound` row binds; an `exempt` row exempts, and one the\n'
+  printf '# base did not hold refuses. SEEDED at adoption (%s rows): every build README present\n' "$_rn"
+  printf '# starts EXEMPT, so the contract binds nothing on day one and the leg says so on every\n'
+  printf '# run. Rewrite a row to bound when you conform that README.\n'
   printf '%s\n' "$_rc" | grep . | while IFS= read -r f; do
-    printf '!%s - predates the contract in this tree; drains when its build is conformed\n' "$f"
+    printf '%s\texempt\t1\t%s\tseeded\n' "$f" "$_seed_sha"
   done || true
 } > "$M/project/readme-contract.txt"
 
@@ -793,10 +795,10 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is
 # measured from THEIR tree with the same predicate the leg uses, so gov's paths never travel.
 {
+  printf '# ledger \xc2\xb7 method-carriers \xc2\xb7 key site path \xc2\xb7 direction declared-set \xc2\xb7 drain hunk\n'
   printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
-  printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
-  printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
-  printf '# <path>:<line> - that keying is what unpinned the install-prefix waiver registry.\n'
+  printf '# One ledger row each, keyed on PATH alone, never <path>:<line> - that keying is what\n'
+  printf '# unpinned the install-prefix waiver registry (TOOL-dWitnessedBar-16).\n'
   printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
   # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
   # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds
@@ -812,7 +814,7 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
       *.test.sh) continue ;;
     esac
     if grep -qF 'BUILD-METHOD.md' "$f" 2>/dev/null; then
-      printf '%s \xc2\xb7 declared at adoption; replace this with why it points at the method\n' "$f"
+      printf '%s\t1\t%s\tseeded\n' "$f" "$_seed_sha"
     fi
   done
 } > "$M/project/method-carriers.txt"
