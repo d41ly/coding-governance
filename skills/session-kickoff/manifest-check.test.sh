@@ -1382,6 +1382,13 @@ run_card "pockets: a refusing verb still writes the card" "$R" 0 - --card --writ
 check_eq "pockets: the refusal is one skipped: line, immediately above recent —" \
   "pockets — skipped: pockets: refused · a stub refusal|recent —" \
   "$(awk '/^recent —/{print prev "|" $0; exit} {prev=$0}' "$R/.git/orientation/$NONCE-t81b.md")"
+printf 'import time\ntime.sleep(5)\n' > "$pk_mod"
+export CARD_POCKETS_BOUND=1
+run_card "pockets: a verb past the bound still writes the card" "$R" 0 - --card --write --session "$NONCE-t81c"
+check_eq "pockets: a verb past the bound is one skipped: line naming the bound" \
+  "pockets — skipped: the pockets verb did not answer within 1s" \
+  "$(grep -m1 '^pockets — ' "$R/.git/orientation/$NONCE-t81c.md")"
+unset CARD_POCKETS_BOUND
 
 # PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
 # load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
@@ -2286,7 +2293,7 @@ hl_h30=$(date -u -d "@$((HLNOW - 108000))" +%Y-%m-%dT%H:%M:%S+00:00)
 printf '%s\tcheck-wiring\thookspath-set\tcore.hooksPath -> .githooks · mode session\n%s\trun-gates\tretry-passed\tx after a 3s timeout\n%s\treap\ttree-killed\ttarget 1 killed 1 survivors 0 unsignalable 0\n%s\tthree\tfields\n' \
   "$hl_h1" "$hl_h1" "$hl_h30" "$hl_h1" > "$HLOG"
 run_card "AGH8 AC7 --card --write over a seeded health log" "$CWT" 0 - --card --write --session "$NONCE-h7"
-check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above recent —" \
+check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above the pockets section" \
   "health — 2 in the last 24h of 3 logged · check-wiring hookspath-set ×1 · run-gates retry-passed ×1 · 1 unreadable" \
   "$(awk '/^(## pockets$|pockets — skipped: |recent —)/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
 rm -f "$HLOG"
@@ -2359,9 +2366,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # the block; no suite ran in the pass, the card's awk was probed alone over the stand-in's row.
 # +2: TOOL-dPlacedRequest-16 AC15's two `released` seeds, one run_card and one check_eq, counted off the
 # block; no suite ran in the pass, the card's awk was probed alone over nine rows.
-# +4: TOOL-dPlacedRequest-9 AC5's `## pockets` block, two run_card and two check_eq calls, counted off the
-# block; no suite ran in the pass, the card write was probed alone over a scratch fixture.
-FLOOR_ASSERTIONS=356
+# +6: TOOL-dPlacedRequest-9 AC5's `## pockets` block, three run_card and three check_eq calls, counted off
+# the block; no suite ran in the pass, each card write was probed alone over a scratch fixture.
+FLOOR_ASSERTIONS=358
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

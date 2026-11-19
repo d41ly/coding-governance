@@ -1163,6 +1163,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_bad_deploy",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_bypass_never",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -1308,6 +1313,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "arm_duplicate",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_editorial_behind",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -1346,6 +1356,11 @@
       "id": "arm_envelope_unregistered",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "arm_escape",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "arm_evil_merge",
@@ -1608,6 +1623,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_not_utf8",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
       "id": "arm_old_render",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -1674,6 +1694,11 @@
     },
     {
       "id": "arm_pockets_level",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "arm_pockets_refused",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
@@ -6324,6 +6349,11 @@
     },
     {
       "id": "check_fx_quiet",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
+    },
+    {
+      "id": "check_fx_refused",
       "kind": "function",
       "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
@@ -11251,6 +11281,11 @@
       "id": "derive_fx_composition",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "derive_fx_env",
+      "kind": "function",
+      "file": "tools/govkit/steps/kickoff_facts_to_overlay.py"
     },
     {
       "id": "derive_fx_long",

@@ -12,7 +12,7 @@ composes through `tools/playbook/overlay.py#derive_slot_units` with the selector
 `skills/session-kickoff/manifest-check.sh#print_rekeyed_card` before each one's cap check. The
 kickoff-manifest descriptor gains the `[[upgrade]]` row `kickoff-manifest/facts-to-overlay`, its program
 `tools/govkit/steps/kickoff_facts_to_overlay.py` with `cmd_up`, `cmd_down`, `cmd_witness` and the
-fixture's eleven plants (PINNED), each run by `tools/govkit/selftest.py#check_kickoff_facts_step`.
+fixture's sixteen plants (PINNED), each run by `tools/govkit/selftest.py#check_kickoff_facts_step`.
 Gov's own manifest first had its two value-less bullets rewritten to cite the unattended Skill's path,
 then the step's `up` moved every bullet of its section B into the overlay: 36 bullets (DERIVED), 15 of
 them `block` units (DERIVED), none refused (DERIVED). The re-stamp came first, so the before-image
@@ -56,6 +56,15 @@ engine over those fixtures and over a scratch clone of this worktree.
 - AC9 — `appended —` — the plant `card-cap` printed `ok` for a written card holding every unit line,
   an append under a cap four unit lines below that card (DERIVED) exiting 0 with its `appended —` line,
   the line above `recent —` counting at least one unit left out, and the card within the cap.
+
+The bug-class checklist over the pass commit named the refusal branches no arm reached; each gained
+a fixture plant, observed `ok` by the same CLI, each writing nothing: `escape`, an answer leaving the
+target, exit 1 (PINNED); `bad-deploy`, a descriptor that does not parse, exit 1 (PINNED); `not-utf8`,
+exit 1 (PINNED); `duplicate`, an overlay already holding a fact's tag, the writer's exit 2 (PINNED);
+and `pockets-refused`, a refused overlay read giving the verb's one line at exit 1 (PINNED) and a
+malformed argv at exit 2 (PINNED). The card's bound gained its suite arm, a stub outliving
+`CARD_POCKETS_BOUND=1` (PINNED), probed alone over a scratch repository, printing the
+`pockets — skipped:` line that names the bound. The fixture's git runs with no global or system config.
 
 Owed at the close, by the main loop: the `govkit selftest` leg's `check_kickoff_facts_step`, and the
 `manifest-check self-test` leg's new pockets block and the arms that moved with it (`AGH8 AC7`,

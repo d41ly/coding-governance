@@ -3920,7 +3920,7 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
 
 
 def check_kickoff_facts_step() -> None:
-    """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9 — the step's `--fixture --plant <case>` for every
+    """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
     case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
     exit 0 and no FAIL line is the case held. The cases are read from the step's own usage refusal, so a
     joining plant arms its own case here."""
@@ -3929,8 +3929,8 @@ def check_kickoff_facts_step() -> None:
                            text=True, encoding="utf-8", errors="replace", timeout=120)
     found = _re.search(r"the plants are (.+)$", probe.stderr, _re.M)
     cases = found[1].split(", ") if found else []
-    check("[dPR-9] LIVENESS the step names its fixture's plants, eleven of them", probe.returncode == 2
-          and len(cases) == 11, probe.stdout + probe.stderr)
+    check("[dPR-9] LIVENESS the step names its fixture's plants, sixteen of them", probe.returncode == 2
+          and len(cases) == 16, probe.stdout + probe.stderr)
     for case in cases:
         p = subprocess.run([sys.executable, "-I", str(step_py), "--fixture", "--plant", case], capture_output=True,
                            text=True, encoding="utf-8", errors="replace", timeout=900)

@@ -336,8 +336,16 @@ def derive_kickoff_home() -> pathlib.Path:
     return GOV.parent / doc["home"] if doc.get("home_root_relative") else GOV / doc["home"]
 
 
+def derive_fx_env() -> dict:
+    """This process's environment less the variables that would point git at another repository, and
+    with no global or system git config, so no runner's hooks path or template reaches the fixture."""
+    env = {k: v for k, v in os.environ.items() if k not in GIT_LEAKS and k != "CARD_CAP_BYTES"}
+    env.update(GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
+    return env
+
+
 def run_fx_git(t: pathlib.Path, *args) -> str:
-    env = {k: v for k, v in os.environ.items() if k not in GIT_LEAKS}
+    env = derive_fx_env()
     return subprocess.run(["git", "-C", str(t), *args], capture_output=True, text=True, encoding="utf-8",
                           errors="replace", env=env, check=True).stdout
 
@@ -400,18 +408,17 @@ def write_fx_units(t: pathlib.Path, rows) -> None:
 
 def run_fx_step(t: pathlib.Path, verb: str) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, "-I", str(pathlib.Path(__file__).resolve()), verb, str(t)],
-                          capture_output=True, text=True, encoding="utf-8", errors="replace")
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", env=derive_fx_env())
 
 
 def run_fx_pockets(t: pathlib.Path, *args) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, "-I", str(t / WRITE_HOME / "instruction_units.py"), "pockets",
                            "--root", str(t), *args], capture_output=True, text=True, encoding="utf-8",
-                          errors="replace", cwd=str(t))
+                          errors="replace", cwd=str(t), env=derive_fx_env())
 
 
 def run_fx_card(t: pathlib.Path, verb: str, body: str | None = None, cap: int | None = None):
-    env = {k: v for k, v in os.environ.items() if k not in GIT_LEAKS}
-    env.pop("CARD_CAP_BYTES", None)
+    env = derive_fx_env()
     if cap is not None:
         env["CARD_CAP_BYTES"] = str(cap)
     engine = derive_kickoff_home() / "manifest-check.sh"
@@ -614,9 +621,59 @@ def arm_card_cap(base, add):
         f"cap {cap}")
 
 
+def check_fx_refused(add, label, t, want, needle):
+    """One refusal arm: `up` exits `want` naming `needle` on its standard error, and writes nothing."""
+    up = run_fx_step(t, "up")
+    add(f"{label}: up exits {want} naming why, and writes nothing",
+        up.returncode == want and needle in up.stderr and check_fx_quiet(t), up.stdout + up.stderr)
+
+
+def arm_escape(base, add):
+    t = build_fact_fixture(base)
+    (t / DEPLOY).write_text("[answers]\nmanifest_path = \"../outside.md\"\n", encoding="utf-8", newline="\n")
+    write_fx_commit(t, "an answer leaving the target")
+    check_fx_refused(add, "[S5] a manifest_path leaving the target", t, 1, "no step may write it")
+
+
+def arm_bad_deploy(base, add):
+    t = build_fact_fixture(base)
+    (t / DEPLOY).write_text("[answers\n", encoding="utf-8", newline="\n")
+    write_fx_commit(t, "a descriptor that does not parse")
+    check_fx_refused(add, "[S5] a deploy.toml that does not parse", t, 1, "does not parse")
+
+
+def arm_not_utf8(base, add):
+    t = build_fact_fixture(base)
+    (t / FX_MANIFEST).write_bytes(b"## \xa7B\n\n- a \xff byte\n")
+    write_fx_commit(t, "a manifest that is not UTF-8")
+    check_fx_refused(add, "[S5] a manifest that is not UTF-8", t, 1, "is not UTF-8")
+
+
+def arm_duplicate(base, add):
+    t = build_fact_fixture(base)
+    write_fx_units(t, derive_fx_rows(1, 60))
+    write_fx_commit(t, "an overlay already holding f01")
+    check_fx_refused(add, "[S5] an overlay already holding a fact's tag", t, 2, "already holds")
+
+
+def arm_pockets_refused(base, add):
+    t = build_fact_fixture(base)
+    (t / OVERLAY).write_text('[[unit]]\ntag = "repo.barred"\nlevel = 1\ntype = "constraint"\nscope = ["reader.card"]\n'
+                             'text = "Holds `x`."\nenforced-by = "none — a fixture"\n', encoding="utf-8", newline="\n")
+    write_fx_commit(t, "an overlay the reader refuses")
+    p = run_fx_pockets(t, "--all")
+    add("[S3] a refused overlay read exits 1 with one line naming it",
+        p.returncode == 1 and len(p.stdout.splitlines()) == 1 and p.stdout.startswith("pockets: refused · "),
+        p.stdout + p.stderr)
+    bad = run_fx_pockets(t, "--room", "x")
+    add("[S3] a malformed argv exits 2", bad.returncode == 2, bad.stdout[:200] + bad.stderr)
+
+
 PLANTS = {"up": arm_up, "pockets-level": arm_pockets_level, "pockets-cap": arm_pockets_cap, "card": arm_card,
           "card-no-playbook": arm_card_no_playbook, "refused": arm_refused, "template": arm_template,
-          "no-answer": arm_no_answer, "no-kit": arm_no_kit, "down": arm_down, "card-cap": arm_card_cap}
+          "no-answer": arm_no_answer, "no-kit": arm_no_kit, "down": arm_down, "card-cap": arm_card_cap,
+          "escape": arm_escape, "bad-deploy": arm_bad_deploy, "not-utf8": arm_not_utf8, "duplicate": arm_duplicate,
+          "pockets-refused": arm_pockets_refused}
 
 
 def run_fixture(plant=None) -> tuple[list, int]:
