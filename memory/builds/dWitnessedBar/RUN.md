@@ -62,3 +62,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T05:16:33Z dispatch · item d08ded6f TOOL-dWitnessedBar-27 · reason .lexicon.conf
 
 2026-11-19T05:27:30Z brief · item TOOL-dWitnessedBar-48 · reason beeab759b0ef memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-48-build-brief.md
+
+2026-11-19T05:28:54Z dispatch · item a30a2646 TOOL-dWitnessedBar-48 · reason tools/memory-tree/row_grammar.py tools/run-gates/measure_legs.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-48-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-19T05:34:05Z draw · re-dispatch · TOOL-dWitnessedBar-48 · 6/180 · 20261119T053405Z-b3b13f
+
+2026-11-19T05:34:05Z dispatch · item a30a2646 TOOL-dWitnessedBar-48 · reason .lexicon.conf memory/map/generated/symbols.json
