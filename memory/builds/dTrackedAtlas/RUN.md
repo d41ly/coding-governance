@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e818d4faf8f388a55f836b34ee8e69ad35882776
-phase: REVIEWING
+witness: 812bd05192c4dfa66bceca8cf5767bff78214d35
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -87,3 +87,8 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T07:19:41Z brief · item TOOL-dTrackedAtlas-11 · reason a777dd37070b memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-11-build-brief.md
 
 2026-11-19T07:20:05Z dispatch · item 4391b145 TOOL-dTrackedAtlas-11 · reason memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-11-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-11.md
+2026-11-19T07:39:13Z draw · review-round · dTrackedAtlas · 3/12 · 20261119T073913Z-f86025
+
+2026-11-19T07:39:14Z review · item dTrackedAtlas · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 7 · CONVERGED · highs 4 · minors 10 · to units · disposition promote
+
+2026-11-19T07:39:21Z rescope · item add TOOL-dTrackedAtlas-12 · reason closing review round 2 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-8-9-10-11-diff-review-round2.md) CONVERGED exit: its 2 MEDIUM and 3 LOW items (7 findings) batched into one promoted unit

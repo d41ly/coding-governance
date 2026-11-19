@@ -19,6 +19,7 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-pin-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 | [2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md](../reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) | diff-review | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
+| [2026-11-19-review-TOOL-dTrackedAtlas-8-9-10-11-diff-review-round2.md](../reviews/2026-11-19-review-TOOL-dTrackedAtlas-8-9-10-11-diff-review-round2.md) | diff-review | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 |
 
 <!-- /gen:spec-records -->
 
