@@ -64,7 +64,7 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** INPROGRESS · 9 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12 TOOL-dTrackedAtlas-13
 ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrackedAtlas-17 TOOL-dTrackedAtlas-18 TOOL-dTrackedAtlas-19
 
@@ -74,7 +74,7 @@ ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrac
 | [TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas](spec/2026-11-19-spec-TOOL-dTrackedAtlas-1.md) | 1 | 1 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area](spec/2026-11-19-spec-TOOL-dTrackedAtlas-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one](spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 2 | SPECCED | rev-7 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 2 | INPROGRESS | rev-7 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-8 — the fork scan passes no tree-derived text through shell source](spec/2026-11-19-spec-TOOL-dTrackedAtlas-8.md) | 5 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-9 — a landing counts only on the default branch's first-parent line, never a run branch's prepared merge](spec/2026-11-19-spec-TOOL-dTrackedAtlas-9.md) | 6 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-10 — the page's staleness digest covers the merge history the landed predicate reads](spec/2026-11-19-spec-TOOL-dTrackedAtlas-10.md) | 7 | 1 | CLOSED | rev-1 | 2026-11-19 |

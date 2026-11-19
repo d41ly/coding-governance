@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** SPECCED · rev-7 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · closes TOOL-dTrackedAtlas-7
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · closes TOOL-dTrackedAtlas-7
 
 <!-- gen:spec-records -->
 

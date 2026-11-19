@@ -24,8 +24,8 @@ parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 92959104c9aa81de99744f95f609f7f5a37b08c4
-phase: SPECCING
+witness: 8229afe6d4128280bc20f84d5e3ebb1e2fcf426e
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -119,3 +119,8 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T09:34:32Z resume · item dTrackedAtlas · reason held · keepalive 5ea16741 · manual
 
 2026-11-19T09:46:09Z rescope · item add TOOL-dTrackedAtlas-18 · reason the owner, 2026-11-19: re-pin the schedule; closes ask TOOL-dTrackedAtlas-6, the packets and the chain-packet door
+
+2026-11-19T09:47:25Z brief · item TOOL-dTrackedAtlas-4 · reason 6e58a9bddecc memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md
+2026-11-19T09:47:51Z draw · re-dispatch · TOOL-dTrackedAtlas-4 · 4/12 · 20261119T094751Z-bb18a1
+
+2026-11-19T09:47:51Z dispatch · item 8229afe6 TOOL-dTrackedAtlas-4 · reason memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json .claude/settings.json memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md memory/map/features/closed-loop-atlas.md memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md tools/loop/loop.toml memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md
