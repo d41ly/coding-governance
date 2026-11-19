@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-63 — the round-7 promotions' minors: every inventory row names its base, the sweep places its own criteria, one run-fact clause, a CR the arm can see, and criteria that read what they amend
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -137,7 +137,8 @@ direction" is 61 S4's.
   criteria it restates.
 - No change to which keys `read_claims` reads or to its completeness check: S12 widens the bare
   branch alone, which only the walk's keys reach.
-- No edit to `TOOL-dPlacedRequest-34`: it sits 82 bytes under 48128, and S13 reads 57 AC2 instead.
+- No edit to `TOOL-dPlacedRequest-34`: it measured 47185 bytes at its rev-12, PINNED 2026-11-19,
+  under 48128, and S13 reads 57 AC2 instead.
 - No sequencing in the run that builds this unit: that run plans its roster before this pass, so
   S10 corrects the record only.
 - No driver knob for the arm: §8 F2.
@@ -348,7 +349,7 @@ The oracle fixtures are units 52's and 54's under `%TEMP%` with a short name.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test`
 
 New arm: tools/unattended/unattended.test.sh · covers AC8 AC12 · the CRLF row staged against the lifted function without its CR strip under `awk -v BINMODE=3`, and the tab row against a bare branch matching spaces only · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
@@ -374,6 +375,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC12 · the CRLF row 
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-7 promotions' 12
   MEDIUM and 9 LOW findings.
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
+- rev-3 · 2026-11-19 · §3 · §7 · folds
+  `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 2 (H1), the claim that unit 34 sits
+  under 48128 is re-pinned on the disposal's dated measurement, 47185 bytes at its rev-12. §7 also
+  names `scratch-guard self-test` and `tier2-review self-test`, the legs the spec-token guard join names
+  for `tools/unattended/unattended.sh` in Files touched.
 
 ## 10. Reuse audit
 

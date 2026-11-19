@@ -32,3 +32,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 ## Parked
 
 2026-11-19T04:43:32Z review · item dPlacedRequest-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 25 · folded 34 · promoted 0 · disposition fold
+2026-11-19T05:52:49Z budget · frozen · 63 unit(s) · 130
+2026-11-19T05:52:49Z draw · review-round · dPlacedRequest-spec-set-r2 · 1/130 · 20261119T055249Z-5f4e9a
+
+2026-11-19T05:52:49Z review · item dPlacedRequest-spec-set-r2 · reason verdict CLEAN · blockers 0 · round-highs 4 · round-minors 25 · CONVERGED · highs 4 · minors 25 · folded 29 · promoted 0 · disposition fold

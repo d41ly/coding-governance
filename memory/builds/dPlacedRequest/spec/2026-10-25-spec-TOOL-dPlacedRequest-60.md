@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-60 — unit 57's read of 34 AC59 stops at the end of that bullet
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -43,8 +43,8 @@ order 29, so it sits at order 30: 57 AC2 reads the AC59 bullet and nothing after
 ## 3. Non-goals (OUT)
 
 - No change to 57 AC2's read of 44 AC1: 44 has an AC2, so that range closes.
-- No edit to `TOOL-dPlacedRequest-34`: the red case is a scratch copy, and 34 sits 82 bytes under
-  its 48128 ceiling.
+- No edit to `TOOL-dPlacedRequest-34`: the red case is a scratch copy, and 34 measured 47185 bytes at
+  its rev-12, PINNED 2026-11-19, under its 48128 ceiling.
 - No lint over criterion extraction ranges: the closing review's left-shift decides one
   (BUILD-METHOD M8).
 - No second direction of the defect: a §9 line quoting a sha is finding 6's item in unit 61.
@@ -74,7 +74,9 @@ line and `## 7. Gates`, so the blank line closes the range.
   ends at AC59. The unbounded range printed 60 lines and S1's read printed 3. A scratch copy of 34
   with a §9 line naming `TOOL-dPlacedRequest-44` appended gave 1 hit for the name through the
   unbounded range and 0 through S1's read. PINNED at that date.
-- Unit 34 measured 48046 bytes on 2026-10-25, 82 under 48128. PINNED at that date.
+- Unit 34 measured 48046 bytes on 2026-10-25, 55953 at its rev-11 and 47185 at its rev-12 on
+  2026-11-19, after the cut the disposal of `2026-11-19-review-dPlacedRequest-spec-audit-round-1`
+  made. Each PINNED at its date.
 
 ### Files touched (estimate)
 
@@ -134,6 +136,9 @@ No new arm: the read is a criterion's command, observed by this unit's probes.
   finding 16 (HIGH, item H1, whose defect finding 6 of item L3 also reports).
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
+- rev-4 · 2026-11-19 · §3 · §4 Evidence · folds
+  `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 2 (H1), the claim that unit 34 sits
+  under 48128 is re-pinned on the disposal's dated measurement, 47185 bytes at its rev-12.
 
 ## 10. Reuse audit
 

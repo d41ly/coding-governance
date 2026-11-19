@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
 
 <!-- /gen:spec-records -->
 
@@ -49,18 +50,21 @@ deleted claim-push lock had (charter rule `[reuse]`).
   same bytes. The one edit is `read_proc_token`'s read of `${PROCFS_ROOT:-/proc}`, so a carrier with
   no driver reads `/proc`. Every node lock passes the stem `node`, so its events read
   `node-lock-broken` and `node-guard-cleared`; the event's log path in a carrier with no `ROOT` is
-  `TOOL-dPlacedRequest-36`'s, and the hold it passes is `TOOL-dPlacedRequest-37`'s `NODE_LOCK_BOUND`.
-  **Readers:** by name: `write_dir_lock`, `check_dir_lock_stale`, `remove_dir_lock`,
-  `write_dir_lock_pid`, `read_proc_token` and `check_proc_gone`, spelled by
-  `tools/unattended/unattended.sh` (the definitions, `write_claim`'s take, `init_spec_token_check`'s
-  take and release, and the process-ledger readers) and `tools/unattended/unattended.test.sh` (the
-  GH32, GH36 and GH37 blocks); each keeps its name and signature, so the move changes no reader.
-  by value: the `claim-push-*` and `spec-tokens-*` health events, spelled by `tools/unattended/README.md`,
-  unchanged because the factory's event text is unchanged. Observed by AC5, AC6 and AC7.
-- **S2** — Both node locks are taken through it. `add_feed_event`'s `gov-feed.lock`
-  (`TOOL-dPlacedRequest-13` §4 step 1) and the queue's new `gov-queue.lock`, each in the common dir,
-  each taken as `write_dir_lock <lock dir> <token> "$NODE_LOCK_BOUND" node` and retried every 50 ms
-  for up to 5 s; the feed keeps its rule that a lock it cannot take is a
+  `TOOL-dPlacedRequest-36`'s, and the hold it passes is `NODE_LOCK_BOUND`, which S2 mints.
+  **Readers:** rebuilt against the tree `TOOL-dPlacedRequest-11` leaves at order 1. by name:
+  `write_dir_lock`, `check_dir_lock_stale`, `remove_dir_lock`, `write_dir_lock_pid`,
+  `read_proc_token` and `check_proc_gone`, spelled by `tools/unattended/unattended.sh` (the
+  definitions, `init_spec_token_check`'s take and release, the process-ledger readers, and the two node
+  locks of S2) and `tools/unattended/unattended.test.sh` (the GH37 blocks, which drive the factory under
+  a test stem); each keeps its name and signature, so the move changes no reader. `write_claim`'s take
+  is gone with unit 11 S6. by value: `tools/unattended/README.md`'s health-event sentence, which spells
+  the `spec-tokens-*` pair after unit 11 S7 and gains the `node-lock-broken` and `node-guard-cleared`
+  pair here. Observed by AC5, AC6 and AC7.
+- **S2** — Both node locks are taken through it. `gov_feed_sh` assigns `NODE_LOCK_BOUND=10` at its
+  top, minted here, and `TOOL-dPlacedRequest-37` guards it against a driver name. `add_feed_event`'s
+  `gov-feed.lock` (`TOOL-dPlacedRequest-13` §4 step 1) and the queue's new `gov-queue.lock`, each in
+  the common dir, are each taken as `write_dir_lock <lock dir> <token> "$NODE_LOCK_BOUND" node` and
+  retried every 50 ms for up to 5 s; the feed keeps its rule that a lock it cannot take is a
   `feed: NOTE -` line and rc 0. Observed by AC3 and AC6.
 - **S3** — Appended once. `add_gov_queue <ref> <cached tip> <commit>` takes `gov-queue.lock`; a line
   whose `ref` and cached tip equal the new one already queues the write, so it appends nothing and the
@@ -93,7 +97,7 @@ deleted claim-push lock had (charter rule `[reuse]`).
 - **consumes-from** `TOOL-dPlacedRequest-13` — the `gov_feed_sh` block and `add_feed_event`'s `gov-feed.lock`, which the factory joins and replaces; without the block the factory has no shared home
 - **hands-off** `TOOL-dPlacedRequest-34` — `write_dir_lock` and the queue line, which that unit's items for findings 36 and 57 observe and extend
 - **hands-off** `TOOL-dPlacedRequest-36` — `write_dir_lock`'s two health events, which that unit writes through the lock's common dir and `health_log_sh`
-- **hands-off** `TOOL-dPlacedRequest-37` — the `until` deadline, which that unit takes from `NODE_LOCK_BOUND`, never `REMOTE_BOUND`
+- **hands-off** `TOOL-dPlacedRequest-37` — `NODE_LOCK_BOUND`, minted by S2, and the `until` deadline it sets, which that unit's arm guards so no take reads `REMOTE_BOUND`
 - **hands-off** `TOOL-dPlacedRequest-38` — the `gov_feed_sh` lock functions, which that unit's parity-leg arm runs per inline copy under `set -u`
 - **hands-off** `TOOL-dPlacedRequest-39` — `remove_dir_lock`, which that unit's contained append calls from its `EXIT` trap
 - **hands-off** `TOOL-dPlacedRequest-41` — `add_gov_queue`'s dedupe and `write_gov_queue`'s order, which that unit narrows to a record compare and chains per ref
@@ -109,8 +113,10 @@ deleted claim-push lock had (charter rule `[reuse]`).
   retakes the lock, and records `<stem>-lock-broken`, or `<stem>-guard-cleared` for a guard older than
   a minute; `check_dir_lock_stale` reads `until`, else the age, else every recorded process gone;
   `remove_dir_lock` checks the owner token (`tools/unattended/unattended.sh#write_dir_lock`,
-  `#check_dir_lock_stale`, `#remove_dir_lock`, blob `875eaadf`). Its callers today are `write_claim`
-  (stem `claim-push`) and `init_spec_token_check` (stem `spec-tokens`).
+  `#check_dir_lock_stale`, `#remove_dir_lock`, blob `875eaadf`). At that blob its callers are
+  `write_claim` (stem `claim-push`) and `init_spec_token_check` (stem `spec-tokens`); after
+  `TOOL-dPlacedRequest-11` S6 at order 1, `init_spec_token_check` alone, and this unit adds the two
+  node locks.
 - `TOOL-dPlacedRequest-11` S6 deletes `write_claim`'s take of `claim-push.lock` and the lander's wait,
   and keeps the factory; `TOOL-dPlacedRequest-13` §4 step 1 re-specifies an unguarded break for the
   feed, which S2 replaces with the factory.
@@ -139,14 +145,16 @@ write_gov_queue
 |---|---|---|
 | `gov-queue.lock` | node-local directory | none |
 | `node-lock-broken`, `node-guard-cleared` | health events, the factory's stem `node` | none |
+| `NODE_LOCK_BOUND` | block constant in `gov_feed_sh` | none |
+| `queued — already` | output line | none |
 
 Moved, not minted: the `write_dir_lock` family, `read_proc_token` and `check_proc_gone`, into
 `gov_feed_sh` under their own names.
-| `queued — already` | output line | none |
 
 ### Files touched (estimate)
 
-- `tools/lib/gov-feed.sh`: the factory moved in, and the feed's lock taken through it
+- `tools/lib/gov-feed.sh`: the factory moved in, `NODE_LOCK_BOUND`, and the feed's lock taken
+  through it
 - `tools/unattended/unattended.sh`: the factory's definitions moved into the inline block,
   `add_gov_queue` and `write_gov_queue`
 - `tools/run-gates/post-merge.sh`: the inline block, carried
@@ -154,6 +162,7 @@ Moved, not minted: the `write_dir_lock` family, `read_proc_token` and `check_pro
 - `tools/unattended/STOPS.template.md`: section 7's offline queue sentence names the lock and the
   dedupe
 - `memory/guides/UNATTENDED-STOPS.md`: its render
+- `tools/unattended/README.md`: the health-event sentence gains the `node-*` pair
 
 ### Alternatives rejected
 
@@ -196,9 +205,13 @@ The fixture is `TOOL-dPlacedRequest-1` AC7's scratch clone and bare origin, `RUN
   `yield`.
   Red when: a push another flush already landed is reported as lost.
 - **AC3** — When a probe holds `gov-queue.lock` with a live `until` and calls `add_gov_queue`, the call
-  exits 2 within 6 s printing `gov-queue.lock` and the file is unchanged; with the lock removed after
-  1 s by a background `rm`, the call appends one line.
-  Red when: an append runs without the lock.
+  exits 2 within 6 s printing `gov-queue.lock` and the file is unchanged. When the probe instead wraps
+  `write_dir_lock`, the original kept under another name by `eval` of `declare -f`, so each call
+  appends one line to a scratch count file and the wrapper removes the planted lock once the first
+  call has returned busy, the call appends one line to `gov-queue.log` and the count file holds at
+  least two lines.
+  Red when: an append runs without the lock, or a build that tries once and exits busy appends,
+  which the count's one line shows.
 - **AC4** — When a probe overrides `write_gov_ref` with a stub that appends a second line to
   `gov-queue.log` while the first line is pushed, `write_gov_queue` resolves the first line and
   the file then holds exactly the second.
@@ -212,12 +225,14 @@ The fixture is `TOOL-dPlacedRequest-1` AC7's scratch clone and bare origin, `RUN
   `grep -n 'gov-feed.lock' gov-feed.sh` names it only as `write_dir_lock`'s or `remove_dir_lock`'s
   argument.
   Red when: a copy drifts, or the feed keeps a lock of its own.
-- **AC7** — When `grep -c '^write_dir_lock()' tools/unattended/unattended.sh` runs it prints 1, the
-  definition inside the inline block; `git grep -nE '(write|remove)_node[_]lock|check_node[_]lock_stale' -- tools`
+- **AC7** — When `grep -c '^write_dir_lock()' tools/unattended/unattended.sh` runs it prints 1, and
+  the `awk` cut of `unattended.sh` from `# >>> gov_feed_sh` to `# <<< gov_feed_sh`, piped to the same
+  `grep -c`, prints 1, so the one definition sits inside the inline block; `git grep -nE '(write|remove)_node[_]lock|check_node[_]lock_stale' -- tools`
   prints nothing; and `awk '/^## 9\./{s=1} /^## 10\./{s=0} !s && /(write|remove)_node[_]lock|check_node[_]lock_stale/'`
   over `memory/builds/dPlacedRequest/spec/*.md`, which skips each revision log's history, prints
   nothing.
-  Red when: the tree holds a second lock factory, or a spec still names one.
+  Red when: the tree holds a second lock factory, the definition stays outside the block, or a spec
+  still names one.
 
 ## 7. Gates
 
@@ -251,6 +266,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   finding 15 (H3) and findings 16 and 33 (H4): S1 moves the shared `write_dir_lock` family into
   `gov_feed_sh` instead of minting a second factory from bodies the base no longer holds, every node
   lock passes the stem `node`, and AC7 observes one definition and no spec naming another. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-6 · 2026-11-19 · §2 S1, S2 · §3 Edges · §4 Evidence, Inventory, Files touched · §6 AC3, AC7 ·
+  folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 1 (M1), S2 mints
+  `NODE_LOCK_BOUND=10` at this unit's own order, so its takes expand no empty hold, and the hands-off
+  to TOOL-dPlacedRequest-37 names the guard; finding 3 (M2), AC3's retry half releases the lock on the
+  call's own busy return and counts at least two attempts; finding 4 (L1), S1's Readers and §4
+  Evidence are rebuilt against the tree unit 11 leaves; finding 5 (L2), the `queued — already` row
+  joins the Inventory table; finding 6 (L3), AC7 cuts the block and finds the definition inside it.
 
 ## 10. Reuse audit
 
