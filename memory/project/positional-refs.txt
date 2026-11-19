@@ -37736,12 +37736,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:280
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:293-318
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md	x.py:120
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	check-memory-hygiene.sh:1470-1490
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	corpus_ids.py:235
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	test_codebase_map.py:237
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	tools/codebase-map/reuse_lookup.py:117
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	tools/drift-audit/drift_report.py:2158
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	tools/drift-audit/drift_signals.template.py:234
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-18.md	tools/x.py:120
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-18.md	x.py:120
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md	tools/check-template-size.sh:2
@@ -37876,17 +37870,8 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md	tools/unattended/unattended.sh:13834-13839
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md	tools/unattended/unattended.sh:875
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md	tools/unattended/unattended.sh:9590-9591
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md	tools/memory-tree/adopt-memory-tree.sh:645-650
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md	tools/memory-tree/adopt-memory-tree.sh:694
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-52.md	tools/memory-tree/adopt-memory-tree.sh:97-98
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	BUILD-METHOD M6
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	BUILD-METHOD M8
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	check-memory-hygiene.test.sh:4370
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	check-memory-hygiene.test.sh:4370-4371
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/adopt-memory-tree.sh:694
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2415-2426
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2421-2426
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2425-2426
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	tools/unattended/unattended.sh:9513-9516
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	tools/unattended/unattended.sh:9517
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	unattended.sh:9583-9592
