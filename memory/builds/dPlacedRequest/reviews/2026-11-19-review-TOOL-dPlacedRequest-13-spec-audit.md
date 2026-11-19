@@ -221,7 +221,7 @@ Intensity full, raw 32, confirmed 29, refuted 3, merged 0, unverified 0 (0 uncer
 #### L4. AC7's grep matches the factory comment that S6 keeps (id 7, low; finder graded medium, skeptic low)
 
 - **Where:** `2026-10-25-spec-TOOL-dPlacedRequest-11.md`, S6 and §6 AC7.
-- **What is wrong:** The factory's header comment (`tools/unattended/unattended.sh@875eaadf:2647`, `:2677`) matches AC7's regex. S6 says the factory is "neither deleted nor edited here", and header line 2662 calls `until` the field "the lander's wait reads".
+- **What is wrong:** The factory's header comment (`tools/unattended/unattended.sh@875eaadf:2647`, `:2677`) matches AC7's regex. S6 says the factory is "neither deleted nor edited here", and header line 2662 calls `until` the field "the lander's wait reads". (DERIVED)
 - **Consequence:** Either AC7 stays red, or the builder edits text that S6 says is kept. Unit 24 then moves that block verbatim with the stale claims in it. The skeptic graded this low because a builder will most likely just edit the comment.
 - **Fix (skeptic judged it SOUND):** In S6, name the factory header comment (`unattended.sh@875eaadf:2646-2677`) as edited by this unit: drop the `write_claim`/claim-push sentence and the lander's-wait clause, and keep the spec-tokens caller. List the edit in Files touched. Alternatively, narrow AC7's regex to `claim-push\.lock` and state which comment lines may remain.
 - **Left-shift gate:** None beyond the class checklist entry. Disposition: class:amendment-leaves-its-other-half-standing.
