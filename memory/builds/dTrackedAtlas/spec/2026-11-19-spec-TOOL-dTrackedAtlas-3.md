@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one
 
-**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 3
+**Status:** SPECCED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,9 @@
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-4 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-3-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-build-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -39,8 +41,8 @@ regeneration of `TOOL-dTrackedAtlas-4` has an exit code to read.
 ## 3. Non-goals (OUT)
 
 - The functions this unit touches are the generator's `main` and its module docstring, and it adds
-  the constant `STAMP_SCHEMA` and six names: `StampError`, `git`, `input_digest`, `stamp_page`,
-  `read_stamp` and `check_page` (§4 "Inventory"). In the template it touches one statement, the
+  the constant `STAMP_SCHEMA` and six names: `StampError`, `read_git`, `derive_input_digest`,
+  `build_stamp`, `read_stamp` and `check_page` (§4 "Inventory"). In the template it touches one statement, the
   one assigning the text of the `#derived` element. It edits no other function, no other data key
   and no view, so `derive`, `derive_actual`, `corpus` and the template's `footer` stay as
   `TOOL-dTrackedAtlas-2` leaves them.
@@ -82,8 +84,15 @@ tree, and it cannot be recomputed at a ref without deriving the whole page.
 `data["state"]`, and reads dClosedLoop's records and the as-built view from the working tree while
 the chain state is read at `--ref`; its §4 leaves to this unit any check that the two agree. The
 stamp is that check: its `commit` is `data["state"]["commit"]`, and its `dirty` list compares the
-working tree with that commit. `git` loads `TOOL-dTrackedAtlas-1`'s module from that unit's
+working tree with that commit. `read_git` loads `TOOL-dTrackedAtlas-1`'s module from that unit's
 `STATE_PATH` on first use, for `GIT_TIMEOUT` alone, so importing the generator still loads nothing.
+The git helper may read `GIT_TIMEOUT` from the module at `STATE_PATH`, as `derive_actual` loads that
+module today
+(`memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py@a587c887a29c32753eccc707ddfef820a8dae0b1:721`),
+and the constant is unit 1's
+(`memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py@f24d90e258239b3b2d4acbf304393de200030557:64`).
+That is a use of `TOOL-dTrackedAtlas-1`'s interface, not a second derivation: the bound has one
+owning source.
 
 ### The input set
 
@@ -104,14 +113,14 @@ builds, so 27 inputs, and `git ls-tree -r` over them lists 7459 entries.
 
 ### The stamp
 
-Built by `stamp_page(data)` in `main`'s `--out` branch, after the data is derived and before the
+Built by `build_stamp(data)` in `main`'s `--out` branch, after the data is derived and before the
 splice, and stored as `data["stamp"]`:
 
 | Field | Value |
 |---|---|
 | `schema` | `1` |
 | `commit` | `data["state"]["commit"]`, the 40-hex commit `--ref` resolved to |
-| `digest` | `input_digest(commit, inputs)`: the 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>` |
+| `digest` | `derive_input_digest(commit, inputs)`: the 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>` |
 | `inputs` | the input set above |
 | `dirty` | sorted, the union of `git diff --name-only -z <commit> -- <inputs>` and `git ls-files --others --exclude-standard -z -- <inputs>` |
 
@@ -175,9 +184,9 @@ answer is still stale.
 |---|---|---|
 | `STAMP_SCHEMA` | constant | `1` |
 | `StampError` | exception | a git call failed or timed out, or the ref does not resolve |
-| `git(*args)` | function | the stdout bytes of `git <args>` run in `REPO` under the derivation's `GIT_TIMEOUT`; raises `StampError` naming the call |
-| `input_digest(commit, inputs)` | function | the 64-hex digest the stamp table defines |
-| `stamp_page(data)` | function | the stamp dict, from the derived data's `state` and git |
+| `read_git(*args)` | function | the stdout bytes of `git <args>` run in `REPO` under the derivation's `GIT_TIMEOUT`; raises `StampError` naming the call |
+| `derive_input_digest(commit, inputs)` | function | the 64-hex digest the stamp table defines |
+| `build_stamp(data)` | function | the stamp dict, from the derived data's `state` and git |
 | `read_stamp(page)` | function | `(stamp, None)`, or `(None, reason)` for an unstamped page |
 | `check_page(page, ref)` | function | prints the answer and returns the exit code of the table |
 
@@ -330,6 +339,11 @@ suite arm is added or moved, so no arm line is declared.
 - rev-2 · 2026-11-19 · §5 · the pass legs' reds after `390c2bc05`, folded from
   2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: AC8's page-size figure is pinned on its
   line. No design change.
+- rev-3 · 2026-11-19 · §3 · §4 · the lexicon's verb pin, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold: `git`, `input_digest` and `stamp_page` are
+  renamed `read_git`, `derive_input_digest` and `build_stamp`, each leading with a declared verb, and
+  §4 "Where it lands" states that the git helper reads unit 1's `GIT_TIMEOUT` through `STATE_PATH`.
+  No design change.
 
 ## 9. Reuse audit
 

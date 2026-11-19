@@ -64,11 +64,11 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 |---|---|---|---|---|---|
 | [TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas](spec/2026-11-19-spec-TOOL-dTrackedAtlas-1.md) | 1 | 1 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area](spec/2026-11-19-spec-TOOL-dTrackedAtlas-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one](spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md) | 3 | 1 | SPECCED | rev-2 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | SPECCED | rev-2 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one](spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md) | 3 | 1 | SPECCED | rev-3 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | SPECCED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 3 record folder(s).
+Records: 22 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

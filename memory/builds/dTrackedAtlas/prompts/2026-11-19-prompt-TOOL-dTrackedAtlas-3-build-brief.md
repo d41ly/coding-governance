@@ -2,10 +2,11 @@
 
 # Build brief — TOOL-dTrackedAtlas-3: the page knows what it was generated from, and `--check` reds a stale one
 
-Build `memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md` (rev-2, READY) as written: the
+Build `memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-3.md` (rev-3, READY) as written: the
 generator and template edits and the acceptance ledger its Files touched names. The spec is the design; diverge
-only by returning `diverged: true` with the section and the reason. Units 1 and 2 are CLOSED: consume unit 1's derivation
-through `memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py#derive` only.
+only by returning `diverged: true` with the section and the reason. Units 1 and 2 are CLOSED: use unit 1 only through its module's
+interface (its `derive` and the constants it exports, such as `GIT_TIMEOUT`), never by re-deriving a build's state.
+The spec is rev-3: its new function names were renamed to declared verbs after the first dispatch diverged.
 
 - Unit 1's pass legs redded on three things this pass must not repeat: every figure typed before a unit word in
   the ledger carries a pin on its line (a sha, a `path:line`, PINNED or DERIVED) or sits in a code span; every

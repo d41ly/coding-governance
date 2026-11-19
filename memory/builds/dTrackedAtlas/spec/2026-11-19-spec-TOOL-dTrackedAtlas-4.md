@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
+**Status:** SPECCED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -250,10 +251,10 @@ start, so the group takes effect in sessions started after the checkout carries 
 | `GIT_BOUND_S`, `CHECK_BOUND_S`, `GEN_BOUND_S`, `RUN_BOUND_S` | constants | `300`, `300`, `1500`, `2400` |
 | `ROUNDS` | constant | `3` |
 | `readConf()` | function | `{regenerate, page}`, or `null` for no usable conf |
-| `sidecars(page)` | function | the six paths of §4 "The page's folder", the pid's two included |
+| `deriveSidecars(page)` | function | the six paths of §4 "The page's folder", the pid's two included |
 | `runHook(input)` | function | the fast path; returns 0 |
 | `runRunner()` | function | the runner; returns 0, or 1 after a failed regeneration |
-| `regenerate(root, tip, py, paths)` | function | the regeneration steps; returns the log line's outcome and reason |
+| `runRegeneration(root, tip, py, paths)` | function | the regeneration steps; returns the log line's outcome and reason |
 
 ### What it does not check
 
@@ -429,6 +430,10 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   2026-11-19-prompt-TOOL-dTrackedAtlas-1-3-spec-writer: the figures of the Bounds table, the
   checklist, AC1, AC2, AC7 and F1 (b) that are constants or thresholds this spec declares now sit
   in code spans, and the checkout cost is marked DERIVED from §4's measurement. No design change.
+- rev-3 · 2026-11-19 · §4 · the lexicon's verb pin, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold: the inventory's `sidecars` and `regenerate` are
+  renamed `deriveSidecars` and `runRegeneration`, each leading with a declared verb. No design
+  change.
 
 ## 10. Reuse audit
 
