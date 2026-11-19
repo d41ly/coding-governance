@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-42 — an offline lease create reads the feed first, as every create on an empty parent does
 
-**Status:** DEFERRED · rev-3 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-3 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
