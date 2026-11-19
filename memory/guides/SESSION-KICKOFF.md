@@ -6,7 +6,7 @@
 last-audit: 2026-11-19T20:31:35+02:00 @ 7427edeb40c3841c5515c064496d07d76e533b70
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e689f82a9f90a424247ec4f815568af36ce48190
+last-body-change: eeb00707b9362d6ff7f52c9476a30b819d095c9a
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -96,7 +96,7 @@ lives where each bullet points.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json, which `tools/run-gates/leg_factory.py --write` renders from the kit descriptors and govkit's registry — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; a bar refuses while one is stale. TOOL-aPrimedIndex-2, -3
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem

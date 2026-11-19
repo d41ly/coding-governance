@@ -330,7 +330,8 @@ _PY=$(resolve_python) || exit 2
 # `ratchet (keys, not a scalar)` leg grades, through the registration this kit's descriptor carries and
 # this kit's copy of the ledger factory. `seed` writes only an absent or unarmed home, so a second run
 # leaves an armed one byte-identical. Two callers: the end of `--scaffold`, and `--seed-pins`, which a
-# `[[regenerate]]` row runs at every `govkit update`, because an update never reaches `--scaffold`.
+# `[[regenerate]]` row runs at every `govkit update` unless GOVKIT_RERENDER=0 is exported, because an
+# update never reaches `--scaffold`.
 # A FAILED SEED DOES NOT STOP EITHER CALLER: its home records the failure or stays absent, and the leg
 # reds naming the command to run (S3). A kit left untracked registers nothing, so that seed refuses
 # here and the command it prints is the one to run once the kit is committed.
