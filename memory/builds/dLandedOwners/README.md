@@ -69,7 +69,7 @@ ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedO
 | [TOOL-dLandedOwners-6 — the two legs the close's bar read red: the policy-fixtures guard covers its import closure, and the unscanned-readers row stops reading as a spec citation](spec/2026-11-19-spec-TOOL-dLandedOwners-6.md) | 5 | 2 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

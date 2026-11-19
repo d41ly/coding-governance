@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-build-TOOL-dLandedOwners-1-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-1-ledger.md) | journal | — |
+| [2026-11-20-build-TOOL-dLandedOwners-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dLandedOwners-1-agent-ledger.md) | journal | TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedOwners-4 TOOL-dLandedOwners-6 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md) | journal | — |
