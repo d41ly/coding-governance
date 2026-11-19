@@ -7,10 +7,22 @@ Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py [--ref <rev>] [--clai
            the record corpus, the view map, the chain state or the as-built view, expect exit 1; cases:
            kind-unplaced, kind-ghost-tag, edge-status, hop-edge, edges-split, instruments-decision, view-unread,
            state-dropped, asbuilt-dropped
+       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --page <page.html> [--ref <rev>]
+           answer whether the tree at --ref (default HEAD) has moved an input the page was stamped with:
+           exit 0 current; 1 stale, dirty, unstamped or absent; 2 a misuse, a ref that does not resolve or a
+           failed git call, with one `atlas: cannot check:` line on stderr
 
 The template beside this file is the page without its data. A run splices the derived data into a copy
 written to --out, never into the template, so the repository keeps the template and this generator while
 the page, which embeds every record, stays out of it. --check derives everything and writes nothing.
+
+--out stamps the page (TOOL-dTrackedAtlas-3): the data's `stamp` holds the commit the chain state was read
+at, the tracked inputs (dClosedLoop's README, build and reviews folders, .memory-tree.conf,
+TOOL-dTrackedAtlas-1's module and one folder per chain build), the SHA-256 of `git ls-tree -r -z` over
+them at that commit, and the inputs the working tree differs in. --check --page derives nothing: it hashes
+the stamped inputs at --ref and compares, so a page reads stale only when an input moved, never because
+the commit did. It does not see run claims, the code under tools/ the derivation reuses, or a hand edit
+to the page.
 
 The page shows the chain's actual state (TOOL-dTrackedAtlas-2): TOOL-dTrackedAtlas-1's state document of every
 chain build, read through git at --ref (default HEAD), and the as-built view's clauses, read from the working
@@ -28,6 +40,7 @@ import fnmatch
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -135,6 +148,7 @@ CORPUS_PLANTS = ("instruments-decision", "view-unread")
 # refusals run (TOOL-dTrackedAtlas-2).
 ACTUAL_PLANTS = ("state-dropped", "asbuilt-dropped")
 STATE_PATH = REPO / "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py"
+STAMP_SCHEMA = 1
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
@@ -778,7 +792,150 @@ def derive_actual(data, ref="HEAD", claims=True, plant=None):
     return data
 
 
+class StampError(Exception):
+    """A git call failed or timed out, or the ref does not resolve."""
+
+
+def read_git(*args):
+    """The stdout bytes of `git <args>` run in REPO under TOOL-dTrackedAtlas-1's GIT_TIMEOUT, which is loaded from
+    STATE_PATH on first use; StampError naming the call when it fails, cannot start or outlives the bound."""
+    if not hasattr(read_git, "timeout"):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
+        build_state = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(build_state)
+        read_git.timeout = build_state.GIT_TIMEOUT
+    call = "git " + " ".join(args[:args.index("--")] if "--" in args else args)
+    try:
+        done = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, timeout=read_git.timeout)
+    except subprocess.TimeoutExpired:
+        raise StampError(f"{call} gave no answer within {read_git.timeout} s") from None
+    except OSError as e:
+        raise StampError(f"{call} did not start: {e}") from None
+    if done.returncode:
+        said = done.stderr.decode("utf-8", "replace").strip()[:200]
+        raise StampError(f"{call} failed: {said or f'exit {done.returncode}, nothing on stderr'}")
+    return done.stdout
+
+
+def derive_input_digest(commit, inputs):
+    """The 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>`; `-z` keeps it independent
+    of core.quotePath."""
+    return hashlib.sha256(read_git("ls-tree", "-r", "-z", commit, "--", *inputs)).hexdigest()
+
+
+def build_stamp(data):
+    """The page's stamp (TOOL-dTrackedAtlas-3): the commit the chain state was read at, the tracked inputs the page
+    derives from, their digest at that commit, and the inputs the working tree differs in. StampError when the
+    state carries no 40-hex commit or a git call fails."""
+    state = data.get("state") or {}
+    commit = state.get("commit")
+    if not (isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit)):
+        raise StampError(f"the chain state carries no 40-hex commit, but {commit!r}")
+    fixed = [(BUILD / "README.md").relative_to(REPO).as_posix(), HERE.relative_to(REPO).as_posix() + "/",
+             REVIEWS.relative_to(REPO).as_posix() + "/", (REPO / ".memory-tree.conf").relative_to(REPO).as_posix(),
+             STATE_PATH.relative_to(REPO).as_posix()]
+    builds = [(BUILD.parent / b["slug"]).relative_to(REPO).as_posix() + "/" for b in state.get("builds", [])]
+    inputs = sorted(set(fixed + builds))
+    dirty = set()
+    for listing in (read_git("diff", "--name-only", "-z", commit, "--", *inputs),
+                    read_git("ls-files", "--others", "--exclude-standard", "-z", "--", *inputs)):
+        dirty.update(p for p in listing.decode("utf-8", "replace").split("\0") if p)
+    return {"schema": STAMP_SCHEMA, "commit": commit, "digest": derive_input_digest(commit, inputs),
+            "inputs": inputs, "dirty": sorted(dirty)}
+
+
+def read_stamp(page):
+    """`(stamp, None)` for a page whose data carries a stamp passing every field's rule, else `(None, reason)`: no
+    data marker, data that does not parse, no stamp, or a field outside its rule. This is the read boundary."""
+    try:
+        body = Path(page).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        return None, f"the page does not read as UTF-8 text: {e}"
+    if MARK not in body:
+        return None, "no data marker"
+    try:
+        data = json.loads(body.split(MARK, 1)[1].split("</script>", 1)[0])
+    except ValueError as e:
+        return None, f"its data does not parse: {e}"
+    stamp = data.get("stamp") if isinstance(data, dict) else None
+    if not isinstance(stamp, dict):
+        return None, "its data carries no stamp"
+    rules = {
+        "schema": lambda v: type(v) is int and v == STAMP_SCHEMA,
+        "commit": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None,
+        "digest": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None,
+        "inputs": lambda v: isinstance(v, list) and bool(v) and all(
+            isinstance(p, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", p) and ".." not in p.split("/")
+            for p in v),
+        "dirty": lambda v: isinstance(v, list) and all(isinstance(p, str) for p in v),
+    }
+    for field, rule in rules.items():
+        if not rule(stamp.get(field)):
+            return None, f"the stamp's {field} field fails its rule:{json.dumps(stamp.get(field))[:80]}"
+    return stamp, None
+
+
+def check_page(page, ref="HEAD"):
+    """Print whether the tree at `ref` has moved an input `page` was stamped with, and return the exit code: 0
+    current, 1 stale, dirty, unstamped or absent, 2 when it cannot answer. Reads the page and git, writes nothing
+    and derives nothing. The order is absent, unstamped, the ref and the digest at it, dirty, stale, current."""
+    def cannot(reason):
+        print(f"atlas: cannot check: {reason}", file=sys.stderr)
+        return 2
+
+    if ref.startswith("-"):
+        return cannot(f"--ref takes a revision, not {ref}")
+    if not Path(page).is_file():
+        print(f"atlas: absent — no page at {page}")
+        return 1
+    stamp, reason = read_stamp(page)
+    if stamp is None:
+        print(f"atlas: unstamped — {page}: {reason}")
+        return 1
+    try:
+        try:
+            at = read_git("rev-parse", "--verify", "-q", f"{ref}^{{commit}}").decode().strip()
+        except StampError as e:
+            return cannot(f"{ref} resolves to no commit: {e}")
+        digest = derive_input_digest(at, stamp["inputs"])
+        c12, r12 = stamp["commit"][:12], at[:12]
+        if stamp["dirty"]:
+            print(f"atlas: dirty — {page}: generated with {len(stamp['dirty'])} uncommitted input(s), "
+                  f"first {stamp['dirty'][0]}")
+            return 1
+        if digest == stamp["digest"]:
+            print(f"atlas: current — {page}: inputs {digest[:12]} at {ref} ({r12}) match the stamp of {c12}")
+            return 0
+        print(f"atlas: stale — {page}: the inputs stamped at {c12} moved by {ref} ({r12})")
+        try:
+            read_git("cat-file", "-e", f"{stamp['commit']}^{{commit}}")
+        except StampError:
+            print(f"  the stamp's commit {c12} is not in this repository")
+            return 1
+        moved = [ln.partition("\t") for ln in read_git(
+            "log", "--first-parent", "--format=%H%x09%s", f"{stamp['commit']}..{at}", "--", *stamp["inputs"]
+        ).decode("utf-8", "replace").splitlines() if ln]
+        for h, _, subject in moved[:20]:
+            print(f"  {h[:12]} {subject}")
+        if len(moved) > 20:
+            print(f"  and {len(moved) - 20} more")
+        return 1
+    except StampError as e:
+        return cannot(str(e))
+
+
 def main(argv):
+    if "--page" in argv:
+        at = argv.index("--page") + 1
+        page = argv[at] if at < len(argv) else ""
+        has_ref = "--ref" in argv and argv.index("--ref") + 1 < len(argv)
+        mixed = [o for o in ("--plant", "--out", "--claims") if o in argv]
+        if "--check" not in argv or mixed or not page or page.startswith("-") or ("--ref" in argv and not has_ref):
+            print(f"atlas: cannot check: --page takes a page path and runs with --check and an optional --ref alone"
+                  f"{', not ' + ' '.join(mixed) if mixed else ''}", file=sys.stderr)
+            return 2
+        return check_page(page, argv[argv.index("--ref") + 1] if has_ref else "HEAD")
     ref = argv[argv.index("--ref") + 1] if "--ref" in argv else "HEAD"
     claims = argv[argv.index("--claims") + 1] if "--claims" in argv else "cache"
     if claims not in ("cache", "none"):
@@ -795,6 +952,10 @@ def main(argv):
     if "--out" not in argv:
         sys.exit(__doc__)
     out = Path(argv[argv.index("--out") + 1])
+    try:
+        data["stamp"] = build_stamp(data)
+    except StampError as e:
+        sys.exit(f"atlas: cannot stamp the page: {e}")
     # Every "<" is escaped, so no record text can open a comment or close the script that carries it.
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     page = TEMPLATE.read_text(encoding="utf-8")

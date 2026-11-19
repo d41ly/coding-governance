@@ -2305,7 +2305,7 @@ tr[data-medge].on td { background: var(--accent-soft); }
   }
   $$('.tab').forEach(function (t) { t.addEventListener('click', function () { goView(t.getAttribute('data-view')); }); });
   window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
-  $('#derived').textContent = plural(D.records.length, 'record') + ' · latest revision ' + D.latest + ' · digest ' + D.digest;
+  $('#derived').textContent = plural(D.records.length, 'record') + ' · latest revision ' + D.latest + ' · digest ' + D.digest + ' · generated from ' + D.stamp.commit.slice(0, 12) + ' · inputs ' + D.stamp.digest.slice(0, 12) + (D.stamp.dirty.length ? ' · ' + plural(D.stamp.dirty.length, 'uncommitted input') : '');
   function sizeTop() { document.documentElement.style.setProperty('--top-h', $('.top').offsetHeight + 'px'); }
   window.addEventListener('resize', sizeTop); sizeTop();
   var start = location.hash.slice(1) || memo('atlas.view') || 'overview';
