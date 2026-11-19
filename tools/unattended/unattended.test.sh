@@ -18843,6 +18843,23 @@ la_n=$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)
 la_out=$(LA_USER=nobody-here run_lease_arm acquire build tNo); la_rc=$?
 same "DPR1 AC8 a node with no fleet row exits 2 and the origin is unchanged" "$la_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "2 $la_n"
 hit  "$la_out" "fleet.toml"
+# ---- THE VERB'S OWN REFUSALS (refusal-branch-with-no-arm): each argument or table refusal exits 2 with
+# ---- its own line and writes nothing, so collapsing any one of them reds its row.
+la_n=$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)
+for la_row in "bogus build tFix|the act is acquire, renew, release, take-over or flush" \
+    "acquire build|--lease <act> <kind> <name> [<sub>]" \
+    "acquire nope tFix|the lease kind is build, unit or run" \
+    "acquire build tFix --witness HEAD|--witness names a renewal's witness" \
+    "release build tFix|a release names its status with --as" \
+    "renew build tFix --as landed|--as names a release's status" \
+    "renew build tFix --witness|--witness takes a value" \
+    "renew build tFix --bogus x|--lease takes --witness <sha> or --as <status>" \
+    "flush extra|--lease flush takes no argument" \
+    "renew build tNone|holds no lease to renew"; do
+  la_out=$(run_lease_arm ${la_row%%|*}); la_rc=$?
+  same "DPR1 the refusal of [${la_row%%|*}] exits 2" "$la_rc" "2"; hit "$la_out" "${la_row#*|}"
+done
+same "DPR1 ...and none of them wrote" "$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .)" "$la_n"
 # ---- AC11 and AC12: an open question to tFix witnesses a renewal at every renew; an expired one renews
 # ---- nothing and keeps the prior witness; with no stub, or a sha the clone lacks, it exits 2.
 la_q=$(git -C "$LF/c1" commit-tree -m question "$(git -C "$LF/c1" rev-parse 'HEAD^{tree}')")
@@ -20922,7 +20939,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # in the GH12 loop; counted off the diff's own lines, no suite ran, and its RED-first observation is
 # the close's. And 4 in region one: the `--lease` parity row's 3 `same` lines and its verb's turn in
 # the every-verb-is-a-row loop, so 3510.
-FLOOR_ASSERTIONS=3510
+# RAISED 3510 -> 3531 by TOOL-dPlacedRequest-1, at its bug-class checklist: the verb's ten argument and
+# table refusals, one `same` and one `hit` per row of a ten-row loop, and one `same` that none wrote,
+# all in region eight; counted off the diff's own lines, no suite ran.
+FLOOR_ASSERTIONS=3531
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21166,7 +21186,8 @@ FLOOR_SHARD_7=311
 # RAISED 638 -> 668 by TOOL-dPlacedRequest-13: the same 30 region-eight change feed assertions, see FLOOR_ASSERTIONS.
 # RAISED 668 -> 673 by TOOL-dPlacedRequest-13: the same 5 region-eight `--feed` refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 673 -> 744 by TOOL-dPlacedRequest-1: the same 71 region-eight lease assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=744
+# RAISED 744 -> 765 by TOOL-dPlacedRequest-1: the same 21 region-eight `--lease` refusal assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=765
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

@@ -12,11 +12,12 @@ suite or bar ran in this pass; the arms the spec's §7 declares and their RED-fi
 owed at the close.
 
 **Evidences:** TOOL-dPlacedRequest-1
-- AC1 — `--lease acquire build tFix`, `--lease acquire unit tFix TOOL-tFix-2` and `--lease acquire run
-  maintain 2026-10` each exited 0, and the origin held `refs/gov/leases/tFix/build`,
+- AC1 — `--lease acquire build tFix`, `--lease acquire unit tFix TOOL-tFix-2` and
+  `--lease acquire run maintain 2026-10` each exited 0, and the origin held `refs/gov/leases/tFix/build`,
   `refs/gov/leases/tFix/unit/TOOL-tFix-2` and `refs/gov/leases/run/maintain/2026-10`, each message
-  opening `gov-claim <tail>` with epoch 1, its kind and `fleet-tag: a` (DERIVED). `--lease acquire build
-  'a b'` printed `lease not written — 'a b' is not a legal one-segment ref name` and exited 2 (DERIVED);
+  opening `gov-claim <tail>` with epoch 1, its kind and `fleet-tag: a` (DERIVED).
+  `--lease acquire build 'a b'` printed `lease not written — 'a b' is not a legal one-segment ref name`
+  and exited 2 (DERIVED);
   every ref is built by `tools/unattended/unattended.sh#derive_lease_ref`.
 - AC2 — over a planted stale lease of tag `b`, `--lease take-over build tSt` by session s2 exited 0 at
   epoch 2, its parent the planted tip (DERIVED); `--lease acquire build tSt` by s3 under `agent5`
@@ -38,8 +39,8 @@ owed at the close.
   (DERIVED).
 - AC6 — with branch `other` declaring `tools/zkit/a.sh` and this build's spec `tools/zkit/b.sh`, the
   acquisition printed `origin/other … 1 shared: tools/zkit/a.sh (declared)` under the default
-  `kit-dirs` and `no shared path` under `files` (DERIVED); under `leases = "refuse"` it printed `lease
-  refused — overlap` and exited 1 (DERIVED); with the path made equal under `builds` it printed one
+  `kit-dirs` and `no shared path` under `files` (DERIVED); under `leases = "refuse"` it printed
+  `lease refused — overlap` and exited 1 (DERIVED); with the path made equal under `builds` it printed one
   finding, `origin/other … shares a path with this run`, and branch `two`, touching only
   `memory/builds/tTwo/`, drew no finding (DERIVED). The reduction is
   `tools/unattended/unattended.sh#check_cross_run_overlap`.
@@ -55,8 +56,10 @@ owed at the close.
   `tools/playbook/render_playbook.py#read_fleet_tag` answers `a` for `daily-agent` and refuses
   `nobody`, exit 1, naming `fleet.toml` (DERIVED).
 - AC9 — `--lease acquire build tNew` in a second clone, whose fetch of the lease namespace a shim
-  answered with nothing, after the first clone created it, printed `lease refused — epoch-fence ·
-  tNew/build · lost the race on the lease: [rejected] (stale info)`, exit 1 (DERIVED).
+  answered with nothing, after the first clone created it, printed
+  `lease refused — epoch-fence · tNew/build · lost the race on the lease: [rejected] (stale info)`,
+  exit 1 (DERIVED). The verb's ten argument refusals each exit 2 printing their own line, observed over
+  the same clone and armed in the suite's lease block (DERIVED).
 - AC10 — `grep -n` over `tools/unattended/STOPS.template.md` found `refs/gov/leases/<slug>/build`,
   `--lease`, `leases.renewal` and `epoch-fence` inside section 7, and AC1's `--claims` rows held 5
   TAB fields (DERIVED).
