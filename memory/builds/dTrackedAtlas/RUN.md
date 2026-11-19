@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2e5147a2ef4389b44980f71aca2874f91a105bf4
-phase: REVIEWING
+witness: 18af33dafb409fbcd19a32db4fb56454bed5f594
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -61,3 +61,13 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T05:59:19Z decision · item brief item 5: the page regenerates on node d after a landing — TOOL-dTrackedAtlas-4 is built and held outside the repository, and its hook needs a [[hook]] stage row in tools/loop/loop.toml (spec rev-5, fork F3) · reason options: (a) add the one loop.toml row, lifting the run's no-tools/ rule and owing a GATE_SELFTESTS=1 bar the owner ruled out; (b) wire the hook in an untracked settings file, M3 veto 2; (c) land without the hook group, failing AC8, veto 1; (d) park. No option survives the vetoes under the mandate, so the unit is carried forward against TOOL-dTrackedAtlas-7 and the owner picks; the spec recommends (a)
 
 2026-11-19T05:59:20Z rescope · item defer TOOL-dTrackedAtlas-4 · reason waits on TOOL-dTrackedAtlas-7: its hook's stage claim needs a tools/ edit this run may not make (spec rev-5, fork F3)
+
+2026-11-19T06:20:59Z review · item dTrackedAtlas · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 4 · round-minors 3
+
+2026-11-19T06:21:54Z rescope · item add TOOL-dTrackedAtlas-8 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) H1 HIGH: scan_forks sources tree-derived text as shell code; promoted
+
+2026-11-19T06:21:54Z rescope · item add TOOL-dTrackedAtlas-9 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) H2 HIGH: a run branch's prepared landing merge reads as a landing; promoted
+
+2026-11-19T06:21:55Z rescope · item add TOOL-dTrackedAtlas-10 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) H3 HIGH (findings 3 and 5): the page digest omits the merge history the landed predicate reads; promoted
+
+2026-11-19T06:21:56Z rescope · item add TOOL-dTrackedAtlas-11 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) M1, L1, L2: owed pane observations under CLOSED specs, valued options with no value, a stale ledger owed line; batched into one unit

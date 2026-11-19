@@ -5,7 +5,7 @@ opened: 2026-11-19
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7
+ids: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11
 ---
 
 # dTrackedAtlas — the Closed Loop Atlas states the project's and the chain's actual state, and knows when it is stale
@@ -55,11 +55,15 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 | 2 | `TOOL-dTrackedAtlas-2` | the Atlas renders the actual state: a view per chain build, and per comparison area the landed builds that moved "today" past the 2026-10-14 baseline, the as-built view beside v2's `[chain]` |
 | 3 | `TOOL-dTrackedAtlas-3` | the page embeds its generation commit and input digest, and `--check` reds a page the tree has moved past |
 | 4 | `TOOL-dTrackedAtlas-4` | the page regenerates on node d after a landing onto main, a switch whose default is on |
+| 5 | `TOOL-dTrackedAtlas-8` | the fork scan passes no tree-derived text through shell source (closing review H1, promoted) |
+| 6 | `TOOL-dTrackedAtlas-9` | a landing counts only on the default branch's first-parent line, never a run branch's prepared merge (closing review H2, promoted) |
+| 7 | `TOOL-dTrackedAtlas-10` | the page's staleness digest covers the merge history the landed predicate reads (closing review H3, promoted) |
+| 8 | `TOOL-dTrackedAtlas-11` | the closing review's minors: the owed pane observations recorded, one reader for valued options, the stale ledger line cleared (M1, L1, L2, promoted) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
-ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7
+ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -70,7 +74,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on](spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md) | 4 | 1 | DEFERRED | rev-6 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 33 bound to this build, across 3 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
