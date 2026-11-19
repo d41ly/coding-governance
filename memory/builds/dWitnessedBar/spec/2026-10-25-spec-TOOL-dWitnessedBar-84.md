@@ -18,6 +18,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-88 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-62 |
 | [2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 |
 
 <!-- /gen:spec-records -->
