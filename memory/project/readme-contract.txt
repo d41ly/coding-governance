@@ -248,3 +248,4 @@ memory/builds/aHastenedSweep/README.md
 memory/builds/aTrimmedWait/README.md
 memory/builds/dTrackedAtlas/README.md
 memory/builds/dSweptScratch/README.md
+memory/builds/dSettledStage/README.md

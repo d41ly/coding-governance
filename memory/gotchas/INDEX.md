@@ -69,6 +69,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [doc-names-an-argument-the-code-never-reads](doc-names-an-argument-the-code-never-reads.md) | class | 1 |  | a descriptor or comment names a caller argument by a spelling the code does not read, so an adopter who follows it passes a key that is silently ignored and the run falls back to the default |
 | [empty-field-collapses-unless-it-is-last](empty-field-collapses-unless-it-is-last.md) | class | 4 |  | `IFS=$'\t' read -r a b c d` collapses a run of tabs because tab is IFS whitespace, so a field that can be empty silently shifts every field after it and the branch reading them is dead |
 | [fail-count-reads-a-pattern-the-row-never-prints](fail-count-reads-a-pattern-the-row-never-prints.md) | class | 3 |  | a fails column counts one line shape, and a row whose script prints its failures in another shape always reads 0, so two different reds compare equal |
+| [failed-stage-reads-as-nothing-staged](failed-stage-reads-as-nothing-staged.md) | class | 4 |  | a stager that never reads the exit status of its `git add` reads a stage that failed as a stage that held nothing new, so its caller skips the commit or the fold without a word and goes on to push |
 | [fallback-drain-strands-its-witnesses](fallback-drain-strands-its-witnesses.md) | class | 1 |  | a fallback stands in until a mechanism lands and is drained when it does, but the drain is global while the mechanism exists only on some adapters, and the witnesses written under the fallback stop being read |
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixed-base-assumes-one-commit-per-pass](fixed-base-assumes-one-commit-per-pass.md) | class | 3 |  | a diff scope spelled as a relative rev is right only while every pass makes exactly one commit, and nothing enforces that, so a two-commit pass is graded on its last commit alone |
@@ -188,6 +189,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-172 record(s): 169 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+173 record(s): 170 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

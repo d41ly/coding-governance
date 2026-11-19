@@ -178,6 +178,7 @@ shell hygiene (a fixed-name temp renamed into place)	repo	product
 shell hygiene (a fork spent on builtin work)	repo	product
 shell hygiene (a location probe asked from a moved directory)	repo	product
 shell hygiene (a loop fed by a command substitution)	repo	product
+shell hygiene (a stage committed with no staged-diff test)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations
