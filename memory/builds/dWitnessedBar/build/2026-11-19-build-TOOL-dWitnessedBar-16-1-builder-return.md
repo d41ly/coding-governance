@@ -12,7 +12,7 @@ DIVERGENCE: I checked the spec against the code before writing anything (rev-9 a
 - a join that the survivor file still carries the recorded signature (`names the survivor X, which no longer carries its signature`)
 - the replay line (`lacks its replay field`)
 
-The ledger row is key fields, count, sha and disposition, so none of these survive the conversion. S5 only moves "reasons" to the conversion record. That makes S4's "keeping its messages and its exit codes" false for this reader. The survivor join, which is a real gate, quietly goes away, and so do the check-arms selftest cases that plant rows lacking a survivor or a replay (check-arms.py:1617-1633, on the §7 leg `check-arms selftest`). §5 risks does not mention any of this. The spec has to choose one of two things:
+The ledger row is key fields, count, sha and disposition, so none of these survive the conversion. S5 only moves "reasons" to the conversion record. That makes S4's "keeping its messages and its exit codes" false for this reader. The survivor join, which is a real gate, quietly goes away, and so do the check-arms selftest cases that plant rows lacking a survivor or a replay (tools/memory-tree/check-arms.py@36e38fb2:1617-1633, on the §7 leg `check-arms selftest`). §5 risks does not mention any of this. The spec has to choose one of two things:
 - (a) the survivor file, its signature and the replay become key fields, held verbatim, with R1-R4 moved to the record; or
 - (b) the survivor join and its four messages are declared retired, with the check-arms arms removed and a §5 risk line saying so.
 
