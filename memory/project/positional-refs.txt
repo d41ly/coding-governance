@@ -25698,9 +25698,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260-2262
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:8884
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:641-643
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:645-655
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	tools/unattended/unattended.sh:671-677
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:645-700
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:2112-2113
