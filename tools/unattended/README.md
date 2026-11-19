@@ -279,10 +279,9 @@ A relaunch appends one `run-resumed` line, a launch that failed one `resume-fail
 live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
-`claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
-`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`), and
-`spec-tokens-lock-broken` or `spec-tokens-guard-cleared` for a dispatch's `spec-tokens.<slug>.lock` the same way
-(`TOOL-aPiecewiseGrade-6`). The line format is the
+`spec-tokens-lock-broken` when it breaks a stale `spec-tokens.<slug>.lock` a dispatch took, under that
+lock's guard, or `spec-tokens-guard-cleared` when it removes a guard a crashed writer left
+(`TOOL-aGraftedHelix-37`, `TOOL-aPiecewiseGrade-6`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

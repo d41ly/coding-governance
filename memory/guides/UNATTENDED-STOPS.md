@@ -187,10 +187,12 @@ announced, and declines the take-over.
 
 **The claim on the remote** is where two NODES learn of each other, which the lease cannot do
 because it lives on the run's own branch. Where `RUN_CLAIMS` is `on` (absent or blank is `off`), the
-ref `refs/gov/runs/<slug>` on the remote the landing push goes to names a parentless commit over the
+ref `refs/gov/runs/<slug>` on the remote the landing push goes to names a commit over the
 empty tree whose message is `gov-claim <slug>`, a blank line, and eight `key: value` lines: `slug`,
 `node`, `host`, `session`, `keepalive`, `status` (`live`, `held`, `landed` or `aborted`),
-`lease-utc` and `beat-utc`. Every write is a compare-and-swap, `--force-with-lease` on the sha the
+`lease-utc` and `beat-utc`. Each claim commit's parent is the ref's previous tip, so the claim's
+history is its parent chain, every holder and beat in order; a create is the one parentless commit.
+Every write is a compare-and-swap, `--force-with-lease` on the sha the
 same call read, empty for a create, and leaves the ref in place; a terminal claim is taken over by
 the slug's next run and never deleted. `--claims` lists every claim. The beat renewing it is a
 remote fact and never restages the record, so nothing above changes. It stops an accidental second

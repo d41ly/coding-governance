@@ -293,31 +293,6 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
   echo race
 }
 
-# THE CLAIM-PUSH LOCK (TOOL-aGraftedHelix-36 S10). A run-claim writer in this git dir takes the
-# directory `claim-push.lock` before it tests this script's marker, and holds it across its push,
-# whose pre-push hook clears both verdict files this script reads. The marker is touched FIRST and
-# this waits SECOND, so a claim push already past its marker test finishes, and its hook's clear
-# lands, before the verdict files are cleared for this push. The bound is the deadline the writer
-# records in the lock's `until`, never a copy of its kit's constant, under CLAIM_WAIT_CEILING for a
-# lock that carries none or one further out. Always 0: an expired or ceiling-bound lock is announced
-# and passed, never cleared here, because the writer clears a stale lock on its next take.
-# WHAT THIS DOES NOT CHECK: a writer in ANOTHER git dir, whose hook clears that git dir's files.
-CLAIM_WAIT_CEILING=120
-check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir or its bound passed
-  local lk="$gd/claim-push.lock" u t0 now why=""
-  t0=$EPOCHSECONDS; now=$t0
-  while [ -d "$lk" ]; do
-    u=""; { read -r u <"$lk/until"; } 2>/dev/null || :
-    case "$u" in *[!0-9]*) u="" ;; esac
-    if [ -n "$u" ] && [ "$u" -le "$now" ]; then why="whose deadline passed"; break; fi
-    if [ $(( now - t0 )) -ge "$CLAIM_WAIT_CEILING" ]; then why="after the ${CLAIM_WAIT_CEILING}s ceiling"; break; fi
-    sleep 1; now=$EPOCHSECONDS
-  done
-  [ "$now" = "$t0" ] || echo "push-main: waited $(( now - t0 ))s for a claim push in flight in this git dir" >&2
-  [ -z "$why" ] || echo "push-main: proceeding past a claim-push lock $why: $lk" >&2
-  return 0
-}
-
 # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
 # existence: a bare touched file is satisfied by any previous landing, which is the
 # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
@@ -1218,9 +1193,9 @@ cmd_land() {
     # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
     # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
     # files answer different questions and live in different places on purpose. Touched BEFORE the
-    # clear and held until the verdict files are read (TOOL-aGraftedHelix-36 S10).
+    # clear and held until the verdict files are read. A claim push from this git dir is not waited
+    # on: the hook clears the verdict files only on a default-branch push (TOOL-dPlacedRequest-11).
     touch "$marker"
-    check_claim_push_clear
     # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
     # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
     rm -f "$refusal" "$barfile" "$allowfile"
@@ -1399,10 +1374,9 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
-  # The marker first, then the wait for a claim push in flight, then the clear (TOOL-aGraftedHelix-36
-  # S10); the marker stays until the verdict files have been read.
+  # The marker first, then the clear; the marker stays until the verdict files have been read. No
+  # claim push is waited on (TOOL-dPlacedRequest-11).
   touch "$marker"
-  check_claim_push_clear
   rm -f "$refusal" "$barfile" "$allowfile"
   echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
   # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on

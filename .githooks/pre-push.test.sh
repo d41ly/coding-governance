@@ -345,6 +345,32 @@ case "$msg" in
   *) bad "8 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
 esac
 
+# case 8b — THE VERDICT FILES' CLEAR RUNS ONLY ON A DEFAULT-BRANCH PUSH (TOOL-dPlacedRequest-11 S4).
+#           A lander's three files are planted and a non-default ref is pushed, as a claim beat
+#           landing mid-bar pushes one: all three must be left byte-identical. Then a default-branch
+#           push with a red bar must still clear them before it writes its own: the refusal reads
+#           `gate-red` and the planted allow record is gone. Both under `env -u GOV_REMOTE -u
+#           GOV_DEFAULT_BRANCH`, so the observed origin/HEAD case 8 set decides, never an exported
+#           value. RED with the clear restored above the ref loop: the non-default push removes all
+#           three. WHAT THIS DOES NOT CHECK: a pre-loop `default-branch` refusal on a non-default
+#           push, which still overwrites the refusal file (§3 of the unit's spec).
+c8b_gd=$(git rev-parse --git-dir)
+git checkout -q feature; git commit -q --allow-empty -m c8b
+printf 'gate-red\tplanted\n' > "$c8b_gd/pre-push-refusal"; printf 'bar\tplanted\n' > "$c8b_gd/pre-push-bar"
+printf 'allow\tplanted\n' > "$c8b_gd/pre-push-allow"
+c8b_h0=$(cat "$c8b_gd/pre-push-refusal" "$c8b_gd/pre-push-bar" "$c8b_gd/pre-push-allow" | git hash-object --stdin)
+env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH GOV_GATE_CMD="bash $red" git push -q origin feature >/dev/null 2>&1; c8b_rc=$?
+c8b_h1=$(cat "$c8b_gd/pre-push-refusal" "$c8b_gd/pre-push-bar" "$c8b_gd/pre-push-allow" 2>/dev/null | git hash-object --stdin)
+[ "$c8b_rc" = 0 ] && [ "$c8b_h0" = "$c8b_h1" ] \
+  && ok "8b a non-default push leaves the three verdict files byte-identical" \
+  || bad "8b a non-default push moved the verdict files or failed: rc=$c8b_rc"
+git checkout -q main; git commit -q --allow-empty -m c8b-main
+env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH GOV_GATE_CMD="bash $red" git push -q origin main >/dev/null 2>&1; c8b_rc=$?
+c8b_tok=$(cut -f1 "$c8b_gd/pre-push-refusal" 2>/dev/null)
+[ "$c8b_rc" != 0 ] && [ "$c8b_tok" = gate-red ] && [ ! -e "$c8b_gd/pre-push-allow" ] \
+  && ok "8b a default-branch push still clears the planted files before its own verdict" \
+  || bad "8b a default-branch push did not clear the planted allow record, or wrote no gate-red: rc=$c8b_rc token=$c8b_tok allow=$([ -e "$c8b_gd/pre-push-allow" ] && echo present || echo absent)"
+
 # case 9 — THE RED IS ATTRIBUTED AGAINST THE LANDING BASE (TOOL-dDerivedDocket-23 AC7). The runner is
 #          handed GATE_ATTRIBUTE = the REMOTE sha git feeds the hook on stdin, never the local one: a
 #          red attributed against the tree that has it reads every red as inherited. The hook is

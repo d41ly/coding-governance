@@ -17835,12 +17835,13 @@ out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC3 a hook-refused claim push preflighted"; st=1; }
 hit  "$out" "UNATTENDED check 109 FAILED"
 miss "$out" "UNATTENDED check 108 FAILED"
-hit  "$out" "the pre-push hook refused it: default-branch"
+hit  "$out" "a pre-push refusal was recorded during this push: default-branch"
 hit  "$out" "git remote set-head origin -a"
 same "AC3 ...and nothing reached the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "0"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC3 a hook-refused claim push wrote the run-state file"; st=1; }
-# ---- AC5: a refusal file an EARLIER push left is removed before the claim push, so a push that
-# ---- never reached the hook is check 109 with git's exit and no token.
+# ---- AC5: a refusal file an EARLIER push left is older than the claim write's stamp, so a push that
+# ---- never reached the hook is check 109 with git's exit and no token, and the file is left in
+# ---- place, since another push's verdict may be in it (TOOL-dPlacedRequest-11 S5).
 build_hooked_fixture
 printf 'gate-red\tpre-push: merge bar RED - push blocked\n' > "$GK_GD/pre-push-refusal"
 cat > "$GK_BIN/git" <<EOF
@@ -17854,7 +17855,7 @@ hit  "$out" "UNATTENDED check 109 FAILED"
 hit  "$out" "git push exited 128"
 miss "$out" "gate-red"
 miss "$out" "set-head"
-n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC5 the stale refusal file survived the claim push"; st=1; }
+n=$((n+1)); [ -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC5 the claim write removed a refusal file it did not write"; st=1; }
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC5 a push that never ran wrote the run-state file"; st=1; }
 git config --unset core.hooksPath; git remote set-head origin -d 2>/dev/null
 remove_claim_refs; rm -rf "$GK_HOOKS" "$GK_BIN"; rm -f "$GK_GD/pre-push-refusal"; reset_tree
@@ -18551,8 +18552,8 @@ if in_shard 8; then
 # no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
 # fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
 # sees it. RED against a driver copy routing the unread claim into a CAS with an empty expected sha.
-# AC6 (M3): a claim push waits while push-main holds `push-main-active` in this git dir, so a beat
-# landing mid-bar cannot clear the verdict files the lander trusts. AC7 to AC11 (M4,
+# AC6 (M3, inverted by TOOL-dPlacedRequest-11): a claim push renews while push-main holds
+# `push-main-active` in this git dir and leaves the verdict files as it found them. AC7 to AC11 (M4,
 # TOOL-aBranchedMandate-9): a --preflight refusal after its claim write leaves the tree as it found it
 # and writes a claim it CREATED `aborted`, one it renewed left with a line. AC12: the post-claim
 # `return 1` sits in that one restoring branch. AC15 (M6): a soft claim read meets check 24 as one
@@ -18583,39 +18584,20 @@ same "GH32 AC18 the unread holder call's git log names no push" "$(grep -c ' pus
 same "GH32 AC18 ...the claim ref is unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
 same "GH32 AC18 ...and the call exits 0, the read announced and the lease recorded" "$rc" "0"
 remove_claim_refs; reset_tree
-# ---- AC6: a due beat over a live run waits while push-main holds its marker in this git dir.
+# ---- AC6 (TOOL-dPlacedRequest-11): a due beat over a live run renews while push-main holds its marker
+# ---- in this git dir, takes no lock, and leaves the planted refusal file byte-identical. RED against
+# ---- a driver whose claim write still tests the marker: it skips the beat and the ref stays unmoved.
 build_claim_held
 seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
 gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
 : > "$gu_gd/push-main-active"; printf 'gate-red\tthe bar went red\n' > "$gu_gd/pre-push-refusal"
 gu_rf=$(git hash-object "$gu_gd/pre-push-refusal")
 out=$(run --beat tRun)
-hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: push-main is landing from this git dir, so a claim push now would clear its verdict files: "
+hit  "$out" "unattended: beat — tRun · renewed "
 same "GH32 AC6 the beat prints one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
 same "GH32 AC6 ...leaves pre-push-refusal byte-identical" "$(git hash-object "$gu_gd/pre-push-refusal" 2>/dev/null)" "$gu_rf"
-same "GH32 AC6 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
-same "GH36 AC14 a write the marker refused leaves no claim-push lock" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
+same "GH32 AC6 ...and the new claim tip is parented on the one it read" "$(git --git-dir="$ORIGIN" rev-parse -q --verify "refs/gov/runs/tRun^" 2>/dev/null)" "$gu_sha"
 rm -f "$gu_gd/push-main-active" "$gu_gd/pre-push-refusal"
-remove_claim_refs; reset_tree
-# ---- TOOL-aGraftedHelix-36 AC14 (L1): a claim push takes `claim-push.lock` in its git dir before it
-# ---- tests push-main's marker, so a live lock another writer holds skips the beat, naming the lock,
-# ---- and a lock whose deadline passed is cleared, taken and released. RED against the parent's driver,
-# ---- which tested the marker alone and pushed beside a held lock.
-build_claim_held
-seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
-gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
-mkdir -p "$gu_gd/claim-push.lock"; echo "$(( $(date +%s) + 60 ))" > "$gu_gd/claim-push.lock/until"
-out=$(run --beat tRun)
-hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: a claim push from this git dir is in flight; retry once it ends: "
-hit  "$out" "claim-push.lock"
-same "GH36 AC14 a live lock leaves one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
-same "GH36 AC14 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
-echo "$(( $(date +%s) - 5 ))" > "$gu_gd/claim-push.lock/until"
-out=$(run --beat tRun)
-hit  "$out" "unattended: beat — tRun · renewed "
-same "GH36 AC14 an expired lock is cleared and the claim renewed" "$([ "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" = "$gu_sha" ] && echo unmoved || echo moved)" "moved"
-same "GH36 AC14 ...and no lock directory remains" "$([ -e "$gu_gd/claim-push.lock" ] && echo left || echo none)" "none"
-rm -rf "$gu_gd/claim-push.lock"
 remove_claim_refs; reset_tree
 # ---- TOOL-aGraftedHelix-37: breaking a stale `claim-push.lock` is a step ONE writer wins. The three
 # ---- lock functions are EXTRACTED from the shipped driver and driven over plain directories, never a
@@ -20518,7 +20500,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # plus main's 29 since 5d48501da (TOOL-aPiecewiseGrade-6) = 3406. Main raised no FLOOR_SHARD_<n>
 # since 5d48501da, so each keeps this branch's figure.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 3348 at 5d48501da, plus main's 58, plus this branch's 2 (TOOL-dDeclaredLoop-21) = 3408.
-FLOOR_ASSERTIONS=3408
+# LOWERED 3408 -> 3400 by TOOL-dPlacedRequest-11: the claim-push lock left the driver, so the GH36
+# AC14 block's 7 region-eight assertions and the GH32 AC6 arm's lock line went, and the inverted AC6
+# arm keeps its 4 (1 `hit`, 3 `same`) where it had 5; counted off the diff's own lines, no suite ran.
+FLOOR_ASSERTIONS=3400
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20757,7 +20742,8 @@ FLOOR_SHARD_4=436
 FLOOR_SHARD_5=293
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
-FLOOR_SHARD_8=646
+# LOWERED 646 -> 638 by TOOL-dPlacedRequest-11: the same 8 region-eight lock assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=638
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

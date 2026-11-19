@@ -2383,9 +2383,11 @@ observe_anchor() {
 # while the run lives, given a terminal status when it ends, and read before a run starts, is taken
 # over, dispatches a pass or closes. A live claim another session holds refuses a second driver.
 #
-# THE RECORD: `refs/gov/runs/<slug>` names a parentless commit over the empty tree whose message is
+# THE RECORD: `refs/gov/runs/<slug>` names a commit over the empty tree whose message is
 # `gov-claim <slug>`, a blank line, then eight `key: value` lines - slug, node, host, session,
-# keepalive, status, lease-utc, beat-utc. The verdicts, the table of who may write and the call
+# keepalive, status, lease-utc, beat-utc. Each commit's parent is the ref's previous tip, the sha the
+# write read, so `git log` of the ref lists every holder and beat in order; a create is the one
+# parentless commit (TOOL-dPlacedRequest-11). The verdicts, the table of who may write and the call
 # sites are the stops guide's section 7, rendered from STOPS.template.md; this file implements them.
 #
 # DARK BY DEFAULT: nothing below runs while RUN_CLAIMS is `off`; `--claims` then prints `claims: off`.
@@ -2643,9 +2645,8 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   return 0
 }
 
-# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory at its second caller (TOOL-aPiecewiseGrade-6):
-# `write_claim` takes `claim-push.lock` for `REMOTE_BOUND` plus 10 s with the event stem `claim-push`,
-# and the spec-token start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6): the spec-token
+# start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
 # stem `spec-tokens`. `write_dir_lock` takes the lock with
 # `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
 # make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
@@ -2658,8 +2659,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
 # released. `remove_dir_lock`
 # clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
-# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
-# one field the lander's wait reads.
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
 # WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
 # one at once while a third takes a fresh guard between them can admit two breakers; that needs a
 # writer to die or stall for a minute inside the break, then four writers in one git dir in one
@@ -2674,7 +2674,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
 # file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
 # foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
-# rule alone, so the claim-push lock, which writes none, keeps its verdicts.
+# rule alone.
 # WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
 # installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
 # no token reads live, so its lock waits for the deadline.
@@ -2728,35 +2728,102 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
   return 0
 }
 
-# ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read: `git push --porcelain
-# --force-with-lease=<ref>:<that sha>`, EMPTY for a create. The porcelain status line decides the
-# outcome, never the exit alone: `!` with `(stale info)` or `(fetch first)` is LOST, the ref moved
-# between this call's read and its write; any other `!`, no status line, or the bound firing is NOT
-# COMPLETED and carries git's reason or the exit, so a pre-push refusal is never reported as a race.
-# Every write leaves the ref on the remote, a terminal one included. The commit has a FIXED identity,
-# so a clone with none configured still writes and the claim publishes no address the run's commits
-# do not already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder`
-# check 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
+# >>> gov_ref_sh — canonical copy: gov-ref.sh in gov's lib dir (byte-identical; gated)
+# I1 AND I2, ONE WRITER FOR EVERY GOVERNANCE REF (TOOL-dPlacedRequest-11): a run claim, the bar-red
+# ref and every later register, request and card ref are written here, never by a hand copy.
+# `build_gov_commit` builds the commit over the empty tree under the fixed `gov-claim` identity,
+# parented on the tip its caller read, so `git log <ref>` on the remote lists every write in order; a
+# create, whose tip read is empty, is the one parentless commit. It prints nothing and returns 1 when
+# git cannot build it. `write_gov_ref` pushes `--porcelain --force-with-lease=<ref>:<expected>`, the
+# expected sha EMPTY for a create, and the porcelain line whose second field ends in `:<ref>` decides,
+# never the exit alone: `!` with `(stale info)` or `(fetch first)` is 1, LOST; any other `!`, no status
+# line, or the bound firing (124) is 2, NOT COMPLETED; any other flag is 0. The cause is in
+# GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
+# `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
+# expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
+# which admits an empty source only when `remove_gov_ref` is its caller.
+# THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
+# bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
+# pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
+# writes, empty to read no token.
+# NO REFUSAL TOKEN IS THIS PUSH'S CAUSE. The refusal file is one per git dir and nothing here removes
+# it, so another push from the same git dir can write it while this call runs: a token newer than the
+# stamp this call created just before its push is appended on rc 2 as an ADVISORY only. The
+# `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
+# The stamp is a scratch file of its own, never the push's output file, which git writes after the
+# hook ran and so would read every token as stale.
+# WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
+# omitted; a token another push wrote during this call reads as fresh and is printed beside this
+# push's own cause, never as it.
+build_gov_commit() { # tip read or empty · message -> prints the commit; rc 1 when git cannot build it
+  local t c
+  local -a p=()
+  [ -z "$1" ] || p=(-p "$1")
+  t=$(git mktree </dev/null 2>/dev/null) && [ -n "$t" ] || return 1
+  c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
+    git commit-tree "$t" "${p[@]}" -m "$2" 2>/dev/null) && [ -n "$c" ] || return 1
+  printf '%s\n' "$c"
+}
+write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
+  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd=""
+  GOVREF_WHY=""
+  if [ -z "$src" ] && [ "${FUNCNAME[1]:-}" != remove_gov_ref ]; then GOVREF_WHY="no source"; return 2; fi
+  s=$(mktemp) || { GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  f=$(mktemp) || { rm -f "$s"; GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  "$GOVREF_RUNNER" "$f" push --porcelain "--force-with-lease=$ref:$exp" "$GOVREF_REMOTE" "$src:$ref" && rc=0 || rc=$?
+  line=""
+  while IFS= read -r l; do
+    case "$l" in ?$'\t'*":$ref"$'\t'*) line=${l%$'\r'} ;; esac
+  done <"$f"
+  if [ "$rc" = 124 ]; then GOVREF_WHY="the push was killed by this kit's own bound"; rc=2
+  elif [ -z "$line" ]; then GOVREF_WHY="git push exited $rc and printed no status line for $ref"; rc=2
+  elif [ "${line:0:1}" != '!' ]; then rc=0
+  else
+    case "$line" in
+      *"(stale info)"*|*"(fetch first)"*) GOVREF_WHY="lost the race on the lease: ${line##*$'\t'}"; rc=1 ;;
+      *) GOVREF_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
+    esac
+  fi
+  if [ "$rc" = 2 ]; then
+    [ -z "${GOVREF_GITDIR:-}" ] || rf="$GOVREF_GITDIR/pre-push-refusal"
+    if [ -n "$rf" ] && [ "$rf" -nt "$s" ]; then
+      { IFS=$'\t' read -r tok _ <"$rf"; } 2>/dev/null || :
+      GOVREF_WHY="$GOVREF_WHY · a pre-push refusal was recorded during this push: ${tok:-an empty refusal file}"
+    fi
+    hd=$(git symbolic-ref -q "refs/remotes/$GOVREF_REMOTE/HEAD" 2>/dev/null) || hd=""
+    [ -n "$hd" ] || GOVREF_WHY="$GOVREF_WHY · default-branch · fix once: git remote set-head $GOVREF_REMOTE -a"
+  fi
+  rm -f "$s" "$f"
+  [ "$rc" = 0 ] || return "$rc"
+  return 0
+}
+remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
+  GOVREF_WHY=""
+  [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
+  write_gov_ref "$1" "$2" ""
+}
+# <<< gov_ref_sh
+
+# ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read, through the one writer
+# above: `build_gov_commit` parents the commit on that sha, EMPTY for a create, and `write_gov_ref`
+# pushes it with `--force-with-lease=<ref>:<that sha>` and decides by the porcelain status line:
+# LOST when the ref moved between this call's read and its write, NOT COMPLETED with git's reason, the
+# bound or the missing line otherwise, so a pre-push refusal is never reported as a race. Every write
+# leaves the ref on the remote, a terminal one included. The commit has a FIXED identity, so a clone
+# with none configured still writes and the claim publishes no address the run's commits do not
+# already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder` check
+# 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
 # THE PUSH NAMES THE REMOTE, `CR_NAME`, never its URL (TOOL-aGraftedHelix-10). Given a name, the
 # tracked pre-push hook observes `<name>/HEAD` as the default branch, the pushed ref is not that
 # branch, and the hook exits `skip-nondefault`, or runs the branch bar a repository declares as
 # `GOV_BRANCH_GATE_CMD`. Given a URL it observes nothing and, with GOV_DEFAULT_BRANCH unset, refuses
-# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is a
-# `default-branch` refusal and NOT COMPLETED, its message carrying `git remote set-head <name> -a`,
-# which the hook prints only to the stderr this push discards. The hook's refusal file is removed
-# before the push, as push-main removes it, so a token read after it came from THIS push's hook -
-# which holds only because no claim push runs while push-main holds `push-main-active` in the same
-# git dir (TOOL-aGraftedHelix-32): that hook clears both verdict files the lander trusts on every
-# run, so a beat landing mid-bar would erase the landing's verdict. THE TWO WRITERS ARE SERIALISED
-# BY A LOCK AND THE MARKER (TOOL-aGraftedHelix-36 S10): this function takes the directory
-# `claim-push.lock` in the same git dir BEFORE it tests the marker, writes its deadline into the
-# lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
-# live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
-# can no longer pass a moment before the lander clears its verdict files. The take, the break of a
-# stale lock and the release are `write_dir_lock` and `remove_dir_lock`, whose header
-# states their limits (TOOL-aGraftedHelix-37).
-# WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
-# can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
+# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is NOT
+# COMPLETED, its message carrying `git remote set-head <name> -a` from the writer's own read.
+# NO LOCK AND NO MARKER TEST (TOOL-dPlacedRequest-11 S6): the hook clears the verdict files the lander
+# trusts only on a push that carries the default branch, so a beat landing mid-bar leaves them as it
+# found them, and the claim write neither waits on push-main nor is refused by it. A refusal token
+# the hook recorded during this push is an advisory beside the cause, never the cause, because
+# another push from the same git dir may have written it.
 # THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
 # with no session, or a Workflow child under another one, never rewrites it. Handed the run-state
 # file, the write copies its `session`, `host` and `lease-utc` (the keepalive argument is the
@@ -2764,14 +2831,9 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # harness's session and host with the one lease stamp the caller also hands `write_lease`. `node` is
 # the claim's own on the `mine` row, this user's elsewhere.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" own="" busy=""
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg
   WC_WHY=""; WC_BEAT=$(read_utc_now)
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
-  [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
-  if [ -n "$RUNLOG_GITDIR" ]; then
-    lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
-    write_dir_lock "$lk" "$own" "$(( REMOTE_BOUND + 10 ))" claim-push || { lk=""; busy=1; }
-  fi
   if [ -n "$rel" ]; then
     fact "$rel" session >/dev/null; sid=$_fact; fact "$rel" host >/dev/null; host=$_fact; fact "$rel" lease-utc >/dev/null; lease=$_fact; lease="${lease:-absent}"
   else
@@ -2780,39 +2842,13 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
   msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
     "$slug" "$slug" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT")
-  if [ -n "$busy" ]; then
-    WC_WHY="a claim push from this git dir is in flight; retry once it ends: $RUNLOG_GITDIR/claim-push.lock"; rc=2
-  elif [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
-    WC_WHY="push-main is landing from this git dir, so a claim push now would clear its verdict files: $RUNLOG_GITDIR/push-main-active"; rc=2
-  elif ! d=$(mktemp); then
-    WC_WHY="cannot create a scratch file to bound the push"; rc=2
-  elif ! t=$(GIT mktree </dev/null) || ! c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid GIT commit-tree "$t" -m "$msg" 2>/dev/null); then
+  if ! c=$(build_gov_commit "$CW_SHA" "$msg"); then
     WC_WHY="the claim commit could not be built in this clone"; rc=2
   else
-    [ -z "$rf" ] || rm -f "$rf"
-    observe_remote "$d" push --porcelain "--force-with-lease=$CLAIM_NS/$slug:$CW_SHA" "$CR_NAME" "$c:$CLAIM_NS/$slug" && rc=0 || rc=$?
-    line=""
-    while IFS= read -r l; do
-      case "$l" in ?$'\t'*":$CLAIM_NS/$slug"$'\t'*) line=${l%$'\r'} ;; esac
-    done <"$d"
-    flag=${line:0:1}
-    if [ "$rc" = 124 ]; then WC_WHY="the push was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; rc=2
-    elif [ -z "$line" ]; then WC_WHY="git push exited $rc and printed no status line for the claim: $CR_URL"; rc=2
-    elif [ "$flag" != '!' ]; then rc=0
-    else
-      case "$line" in
-        *"(stale info)"*|*"(fetch first)"*) WC_WHY="the push was rejected: ${line##*$'\t'}"; rc=1 ;;
-        *) WC_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
-      esac
-    fi
-    if [ "$rc" = 2 ] && [ -n "$rf" ] && [ -f "$rf" ]; then
-      IFS=$'\t' read -r tok _ <"$rf" || :
-      WC_WHY="$WC_WHY · the pre-push hook refused it: ${tok:-an empty refusal file}"
-      [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
-    fi
+    GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+    write_gov_ref "$CLAIM_NS/$slug" "$CW_SHA" "$c" && rc=0 || rc=$?
+    WC_WHY=$GOVREF_WHY
   fi
-  [ -z "$lk" ] || remove_dir_lock "$lk" "$own"
-  [ -z "${d:-}" ] || rm -f "$d"
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
     # TOOL-aGraftedHelix-8); the claim's own row, read before the write, is the detail.

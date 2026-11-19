@@ -405,6 +405,7 @@ needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
+gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -464,6 +465,9 @@ read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 # policy command each carry it inline.
 # read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
 # guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
+# gov_ref_sh (TOOL-dPlacedRequest-11 S1, S2) is the one compare-and-swap writer of a governance ref
+# and its parented commit: the unattended driver's claim write and post-merge's bar-red ref each carry
+# it inline, and part 2n below holds the canonical to its failed-build contract.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -901,6 +905,35 @@ except ValueError as e:
 [ "$rk_got" = "live new stray
 raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
   || bad "the canonical resolve_retired_kits breaks its contract: ${rk_got//$'\n'/ | }"; ok
+
+# ---- 2n. THE GOVERNANCE REF WRITER, A FAILED BUILD (TOOL-dPlacedRequest-11 AC10) --------------------
+# Parity holds the driver's and post-merge's copies to the canonical; this holds the canonical to the
+# rule that a commit git could not build is never pushed as an empty source, which would delete the
+# lease-protected ref. A scratch clone writes a create and a parented second tip, then a `git`
+# function failing only `commit-tree` builds the third: the build returns 1 and prints nothing, the
+# write returns 2 `no source`, and the origin still names the second tip, whose parent is the first.
+# WHAT THIS DOES NOT CHECK: the porcelain reading, the lease or the hook's token, which the unattended
+# suite and the pre-push suite drive through their own callers.
+gr="$TMP/gov-ref"; mkdir -p "$gr"
+gr_got=$(cd "$gr" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@x \
+  GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$gr/no-hooks" bash -c '
+  . "$1"
+  git init -q --bare origin.git && git init -q work && cd work || exit 2
+  git remote add origin ../origin.git
+  run_plain() { local o=$1; shift; git "$@" >"$o" 2>/dev/null; }
+  GOVREF_RUNNER=run_plain; GOVREF_REMOTE=origin; GOVREF_GITDIR=""
+  c1=$(build_gov_commit "" m1) && write_gov_ref refs/gov/runs/tFix "" "$c1" || echo "create failed"
+  c2=$(build_gov_commit "$c1" m2) && write_gov_ref refs/gov/runs/tFix "$c1" "$c2" || echo "second failed"
+  git() { case "$1" in commit-tree) return 1 ;; esac; command git "$@"; }
+  c3=$(build_gov_commit "$c2" m3); echo "build=$? c=[$c3]"
+  unset -f git
+  write_gov_ref refs/gov/runs/tFix "$c2" "$c3"; echo "write=$? why=[$GOVREF_WHY]"
+  [ "$(git -C ../origin.git rev-parse refs/gov/runs/tFix)" = "$c2" ] && echo tip=second
+  [ "$(git -C ../origin.git rev-parse refs/gov/runs/tFix^)" = "$c1" ] && echo parent=first' _ "$HERE/gov-ref.sh" 2>&1 | tr -d '\r')
+[ "$gr_got" = "build=1 c=[]
+write=2 why=[no source]
+tip=second
+parent=first" ] || bad "the canonical gov_ref_sh pushed a failed build, or built no parented tip: ${gr_got//$'\n'/ | }"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

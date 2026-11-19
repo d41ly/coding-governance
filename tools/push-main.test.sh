@@ -254,36 +254,6 @@ if bash "$lander" >/dev/null 2>&1; then ok "2 push-main lands (marker + green ga
 #      refusal that never happened.
 [ -f "$gitdir/pre-push-refusal" ] && bad "2c a stale refusal token survived a successful push" || ok "2c a successful push leaves no refusal token"
 
-# 2d — a claim push in flight in this git dir holds the lander until its recorded deadline, then it
-#      lands (TOOL-aGraftedHelix-36 S10). RED with the wait cut: it pushes at once beside the lock.
-#      LOAD-INDEPENDENT (TOOL-aClassedKnob-2): a deadline 3s out expired before a loaded host's lander
-#      reached it. The deadline is now far, under the 120s ceiling, and a releaser removes the lock 3s
-#      after the lander's marker appears — the lander touches it immediately before it waits, so the
-#      lock is still held when it first looks. The verdict reads the lander's own announcements.
-git commit -q --allow-empty -m c2d
-mkdir "$gitdir/claim-push.lock"; echo "$(( $(date +%s) + 100 ))" > "$gitdir/claim-push.lock/until"
-( for _i in $(seq 1 1000); do [ -e "$gitdir/push-main-active" ] && break; sleep 0.1; done
-  sleep 3; rm -rf "$gitdir/claim-push.lock" ) & rel2d=$!
-out2d=$(bash "$lander" 2>&1); rc2d=$?
-wait "$rel2d"
-case "$out2d" in
-  *"proceeding past a claim-push lock"*) bad "2d the lander passed the lock instead of waiting for its release: $out2d" ;;
-  *"waited "*"s for a claim push in flight in this git dir"*) [ "$rc2d" = 0 ] \
-    && ok "2d a live claim-push lock holds the lander until it is released, then it lands" || bad "2d rc=$rc2d: $out2d" ;;
-  *) bad "2d the lander did not wait for a live claim-push lock: $out2d" ;;
-esac
-# 2e — an expired lock is announced and passed at once.
-git commit -q --allow-empty -m c2e
-mkdir -p "$gitdir/claim-push.lock"; echo "$(( $(date +%s) - 5 ))" > "$gitdir/claim-push.lock/until"
-out2e=$(bash "$lander" 2>&1); rc2e=$?
-case "$out2e" in
-  *"waited "*) bad "2e the lander waited on an expired claim-push lock: $out2e" ;;
-  *"proceeding past a claim-push lock whose deadline passed"*) [ "$rc2e" = 0 ] \
-    && ok "2e an expired claim-push lock is announced and passed, and the push lands" || bad "2e rc=$rc2e $out2e" ;;
-  *) bad "2e an expired claim-push lock was not announced: $out2e" ;;
-esac
-rm -rf "$gitdir/claim-push.lock"
-
 # 3 — reconcile-before-gate
 git -C "$tmp/racer" pull -q; git -C "$tmp/racer" commit -q --allow-empty -m ahead; git -C "$tmp/racer" push -q origin main
 git commit -q --allow-empty -m c3

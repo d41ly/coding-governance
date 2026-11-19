@@ -1764,7 +1764,7 @@ the definition's check refuses is refused the same way.
   `boundary` each in a scratch repository.
 
 The check trusts `draws` and `waits` as written, so a wrong mark hides a loop. It does not see a wait
-outside the flow, such as the lander's wait on a claim lock, which the loop kit's README lists.
+outside the flow, one that lives in code with a deadline of its own.
 
 ## How to use it
 

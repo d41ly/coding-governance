@@ -3053,6 +3053,21 @@
       "file": "tools/unattended/stop-guard.test.sh"
     },
     {
+      "id": "build_gov_commit",
+      "kind": "function",
+      "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "build_gov_commit",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "build_gov_commit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -5511,11 +5526,6 @@
       "id": "check_claim_canary",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
-    },
-    {
-      "id": "check_claim_push_clear",
-      "kind": "function",
-      "file": "tools/push-main.sh"
     },
     {
       "id": "check_claim_writable",
@@ -23818,6 +23828,21 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "remove_gov_ref",
+      "kind": "function",
+      "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "remove_gov_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "remove_gov_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "remove_group_residue",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -31343,6 +31368,11 @@
       "file": "tools/loop/claims.py"
     },
     {
+      "id": "run_worktree_remote",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
       "id": "run_worktree_remove",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -36411,6 +36441,21 @@
       "id": "write_gov_files",
       "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "tools/lib/gov-ref.sh"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_grade_spec",

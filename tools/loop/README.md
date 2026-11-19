@@ -747,12 +747,9 @@ python <prefix>/loop/termination.py --fixture --plant stage-self-loop
 
 ### The waits outside the composition
 
-The check grades the waits a composition declares. These waits live in code, each with a deadline of
-its own, and the check does not grade them:
-
-| Wait | Its deadline |
-|---|---|
-| the lander's wait on another session's claim lock | the lander's `CLAIM_WAIT_CEILING`, 120 seconds PINNED |
+The check grades the waits a composition declares. A wait that lives in code, with a deadline of its
+own, is not graded. None is listed: the lander's wait on a claim push went with
+`TOOL-dPlacedRequest-11`, which left the lander nothing to wait on.
 
 ## The factories, `factories.py`
 

@@ -41,3 +41,11 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T06:46:56Z review · item dPlacedRequest-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 18 · folded 20 · promoted 0 · disposition fold
 
 2026-11-19T06:50:21Z dispatch · item 88f3b413 TOOL-dPlacedRequest-11 · reason tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/README.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh tools/loop/README.md help/loop.md .githooks/pre-push .githooks/pre-push.test.sh tools/govkit/subject-pins.tsv memory/map/generated
+
+2026-11-19T06:52:34Z brief · item TOOL-dPlacedRequest-11 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T07:10:11Z draw · re-dispatch · TOOL-dPlacedRequest-11 · 3/130 · 20261119T071011Z-12b13f
+
+2026-11-19T07:10:11Z dispatch · item 9fdc501a TOOL-dPlacedRequest-11 · reason memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-11-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-11.md
+2026-11-19T07:11:48Z draw · re-dispatch · TOOL-dPlacedRequest-11 · 4/130 · 20261119T071148Z-067a23
+
+2026-11-19T07:11:48Z dispatch · item 9fdc501a TOOL-dPlacedRequest-11 · reason memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-11-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-11.md .githooks/pre-push .githooks/pre-push.test.sh help/loop.md memory/guides/UNATTENDED-STOPS.md tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/loop/README.md tools/push-main.sh tools/push-main.test.sh tools/run-gates/post-merge.sh tools/unattended/README.md tools/unattended/STOPS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/govkit/subject-pins.tsv memory/map/generated
