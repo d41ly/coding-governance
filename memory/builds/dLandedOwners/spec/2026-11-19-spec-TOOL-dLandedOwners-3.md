@@ -9,6 +9,7 @@
 | [2026-11-19-build-TOOL-dLandedOwners-3-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-3-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-3-build-brief.md) | research | — |
+| [2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md](../reviews/2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md) | diff-review | TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 |
 
 <!-- /gen:spec-records -->
 

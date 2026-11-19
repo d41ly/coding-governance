@@ -12,6 +12,7 @@
 | [2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-2-ledger-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-ledger-fold.md) | research | — |
+| [2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md](../reviews/2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md) | diff-review | TOOL-dLandedOwners-1 TOOL-dLandedOwners-3 |
 
 <!-- /gen:spec-records -->
 

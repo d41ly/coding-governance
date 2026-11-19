@@ -61,7 +61,7 @@ ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
 | [TOOL-dLandedOwners-3 — a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage](spec/2026-11-19-spec-TOOL-dLandedOwners-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

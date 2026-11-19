@@ -15,6 +15,7 @@
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-divergence-1.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-divergence-1.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-2 |
+| [2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md](../reviews/2026-11-19-review-TOOL-dLandedOwners-1-3-closing-diff-round1.md) | diff-review | TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 |
 
 <!-- /gen:spec-records -->
 
