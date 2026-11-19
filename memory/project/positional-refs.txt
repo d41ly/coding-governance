@@ -37736,10 +37736,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:280
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:293-318
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md	x.py:120
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	drift_report.py:3587
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	drift_report.py:781
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	tools/drift-audit/drift_report.py:781
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	tools/drift-audit/drift_report.py:781-790
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	check-memory-hygiene.sh:1470-1490
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	corpus_ids.py:235
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md	test_codebase_map.py:237
@@ -37854,8 +37850,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	tools/unattended/unattended.sh:9545-9592
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	unattended.sh:9566-9568
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	unattended.sh:9592
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md	tools/memory-tree/check-memory-hygiene.sh:716-743
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md	tools/memory-tree/check-memory-hygiene.sh:733-738
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md	BUILD-METHOD M6
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-49.md	BUILD-METHOD M6
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md	run-gates.sh:2982
@@ -37893,22 +37887,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2415-2426
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2421-2426
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-53.md	tools/memory-tree/check-memory-hygiene.test.sh:2425-2426
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	check-brief-recorded.sh:188
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	check-pass-order.sh:130
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	check-unattended.sh:361
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	govkit.py:2436-2464
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	govkit.py:2455
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	govkit.py:2469-2477
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	govkit.py:2470
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	lib-unattended.sh:849
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	lib-unattended.sh:876
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	regen.py:48
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/govkit/govkit.py:2470
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/govkit/selftest.py:4340-4341
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/run-gates/regen.py:140-146
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/run-gates/regen.py:48
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/unattended/lib-unattended.sh:883-886
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md	tools/unattended/unattended.sh:750
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	tools/unattended/unattended.sh:9513-9516
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	tools/unattended/unattended.sh:9517
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md	unattended.sh:9583-9592
