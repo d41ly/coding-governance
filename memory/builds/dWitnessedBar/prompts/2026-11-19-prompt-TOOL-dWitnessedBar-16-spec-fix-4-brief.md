@@ -21,7 +21,7 @@ pass 2 can build S12 and leave every pass-1 red green, the one carried `conf-sca
 1. Read pass 2's return, `build/2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return.md`, whole. Pass 1 is landed
    (`87bc9f615`, `6c989def1`), so this revision describes the change from the tree as it stands.
 2. Respell S10's `[[upgrade]]` argv so the leg passes and the landed step runner still runs gov's tracked program:
-   the return names a gov step program on a path no kit segment matches (as `review_rounds.py` sits) as the
+   the return names a gov step program on a path no kit segment matches (as `tools/govkit/steps/review_rounds.py` sits) as the
    gate-clean route. Name the program, its path in Files touched and the argv every upgrade row carries.
 3. Move the four `[[ledger]]` homes under gov's tool root (`drift-pins.txt`, `drift-baselines.txt`,
    `dead-path-waivers.txt`, `playbook-kit-waivers.txt`) to homes outside it, or state another route the landed
@@ -59,4 +59,4 @@ The status header keeps its status. The write grant is
 
 ### Reuse
 
-The spec's §10 seam; `tools/govkit/review_rounds.py` as the landed precedent for a gov program off any kit path.
+The spec's §10 seam; `tools/govkit/steps/review_rounds.py` as the landed precedent for a gov program off any kit path.
