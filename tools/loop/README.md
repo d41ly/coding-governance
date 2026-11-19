@@ -1,4 +1,4 @@
-<!-- gov:kit loop@1.1 -->
+<!-- gov:kit loop@1.2 -->
 # loop — the loop's definition: the gov steps, and where each workflow sits in them
 
 A governed build runs one loop: Plan, Design, Build, Test, Deploy. This kit is where that loop is

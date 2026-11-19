@@ -34430,6 +34430,8 @@ memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-6.md	tools
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:182-190
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:308-330
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/check-recall.py:203
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md	BUILD-METHOD M3
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md	BUILD-METHOD M3
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-10-deviation-9.md	BUILD-METHOD M4
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-11-deviation-10.md	BUILD-METHOD M4
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md	BUILD-METHOD M4

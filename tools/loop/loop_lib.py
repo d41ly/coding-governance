@@ -143,7 +143,7 @@ import sys
 import tempfile
 import tomllib
 
-KIT_LOOP_VERSION = "1.1"
+KIT_LOOP_VERSION = "1.2"
 
 DEFINITION = "loop.toml"
 #: The shrink-only list of actor witnesses beside the definition, `<site>\t<witness>\t<build>` per row.
