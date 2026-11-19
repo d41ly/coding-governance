@@ -20550,6 +20550,28 @@ rq_out=$(run_request_arm --request "$LF/r2.md"); rq_rc=$?
 same "DPR19 S3 the re-run records the kept request" \
   "$rq_rc $(git --git-dir="$LF/origin.git" for-each-ref "refs/gov/requests/$rq_k2" | grep -c .)" "0 1"
 hit  "$rq_out" "request — $rq_k2 · recorded"
+# ---- TOOL-dPlacedRequest-30 — A COLLISION IS REFUSED, NEVER MERGED. A text differing from req.md only in
+# ---- its ISO date keys alike: exit 2 `collision`, the stored copy byte for byte req.md, the `.typed`
+# ---- lines and the ref unmoved (AC1). req.md again, its CRLF copy, a BOM-and-CRLF copy and a re-wrapped
+# ---- copy are the same words: each exit 0 `already recorded`, the stored copy unchanged (AC2). RED,
+# ---- observed at the close: the first-copy rule takes the date pair as recorded, and a raw `cmp -s`
+# ---- refuses the CRLF, BOM and re-wrapped copies. WHAT THIS DOES NOT DRIVE: a non-ASCII whitespace copy.
+rq_typed=$(grep -c '' "$LF/c1/.git/requests/$rq_key.typed")
+printf 'Fix the lander push, zq-request-marker-7, on 2026-11-20\n' > "$LF/date.md"
+rq_out=$(run_request_arm --request "$LF/date.md"); rq_rc=$?
+same "DPR30 AC1 a request differing only in its date exits 2, the copy, .typed and ref unmoved" \
+  "$rq_rc $(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs) $(grep -c '' "$LF/c1/.git/requests/$rq_key.typed") $(git --git-dir="$LF/origin.git" rev-parse "refs/gov/requests/$rq_key")" \
+  "2 identical $rq_typed $rq_tip"
+hit  "$rq_out" "request not written — $rq_key · collision: a different text keys alike, the stored copy is"
+printf 'Fix the lander push, zq-request-marker-7, on 2026-11-19\r\n' > "$LF/crlf.md"
+printf '\357\273\277Fix the lander push, zq-request-marker-7, on 2026-11-19\r\n' > "$LF/bom.md"
+printf 'Fix the lander\npush, zq-request-marker-7,\non 2026-11-19\n' > "$LF/wrap.md"
+for rq_c in req crlf bom wrap; do
+  rq_out=$(run_request_arm --request "$LF/$rq_c.md"); rq_rc=$?
+  same "DPR30 AC2 the same words again ($rq_c) exit 0 already recorded, the stored copy unchanged" \
+    "$rq_rc ${rq_out%% refs/*} $(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs)" \
+    "0 request — $rq_key · already recorded identical"
+done
 rm -rf "$LF"
 
 # ==================================================================================================
@@ -22647,7 +22669,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3874 -> 3882 by TOOL-dPlacedRequest-29: the re-fence block's 8 region-eight assertions (8
 # `same`, its refusal arms among them), off the diff's own lines; no skip branch. No suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3882
+# RAISED 3882 -> 3888 by TOOL-dPlacedRequest-30: the collision arm's 6 region-eight assertions (5
+# `same`, its AC2 loop's four among them, one per pass, and 1 `hit`), off the diff's own lines; no skip
+# branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3888
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22912,7 +22937,8 @@ FLOOR_SHARD_7=311
 # RAISED 1060 -> 1068 by TOOL-dPlacedRequest-15: the same 8 region-eight fence read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1068 -> 1105 by TOOL-dPlacedRequest-19: the same 37 region-eight request record assertions, see FLOOR_ASSERTIONS.
 # RAISED 1105 -> 1113 by TOOL-dPlacedRequest-29: the same 8 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1113
+# RAISED 1113 -> 1119 by TOOL-dPlacedRequest-30: the same 6 region-eight collision assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1119
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

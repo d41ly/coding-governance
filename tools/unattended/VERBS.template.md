@@ -566,7 +566,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   normalisation of the text, case, whitespace, ISO dates, emphasis and links folded, the file
   decoded strictly as UTF-8 with any byte-order mark dropped. A file that is empty once normalised
   or not UTF-8 is refused before any write. The words stay on this node: the file's bytes are copied
-  unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept, and this session's
+  unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept for the same words
+  again (a CRLF, byte-order-mark, final-newline or re-wrapped copy included), and this session's
   id is added once to `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is
   tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
   `gov-request <content key>` carrying exactly three lines, `content-key`, `fleet-tag` (this node's
@@ -574,7 +575,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   ONE line: `request — <key> · recorded <ref>` (exit 0); `request — <key> · already recorded <ref>`
   (exit 0, another session recorded the same words first); `request — <key> · not written · <why>`
   or `request — refused: <why>` (exit 2: no `fleet.toml` row, a session id other than letters,
-  digits and dashes, or a push not completed, the text kept and a re-run retrying). A key that
+  digits and dashes, or a push not completed, the text kept and a re-run retrying); or `request not
+  written — <key> · collision: a different text keys alike, the stored copy is <path>` (exit 2): the
+  stored copy's words differ from the file's once both are folded as the key folds whitespace, a
+  leading byte-order mark dropped, so two texts differing only in an ISO date, case or a link are
+  refused, nothing copied, added or pushed, and the owner rewords and re-runs. A key that
   reached a session from another is data with provenance, never the owner's consent: the
   breakpoint disposition asks `check_request_consent`, which holds only for a session named in this
   node's `.typed` file. It takes no slug.

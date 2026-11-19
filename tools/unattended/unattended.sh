@@ -4346,7 +4346,9 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
 # yet a build is keyed by its text alone: `request_content_key`, the loop kit's `request.py key`, found
 # by `resolve_kit_dir` as `derive_claim_keys` finds `claims.py`, refusing a file that is empty once
 # normalised or not UTF-8. THE WORDS STAY ON THIS NODE: the file's bytes are copied unchanged to
-# `<git-common-dir>/requests/<key>.md`, the first copy kept, and this session's id is appended once to
+# `<git-common-dir>/requests/<key>.md`, the first copy kept for the same words again (TOOL-dPlacedRequest-30:
+# a stored copy whose `derive_request_fold` differs from the file's is a COLLISION, `request not
+# written — <key> · collision: ...` exit 2, before any write), and this session's id is appended once to
 # `<git-common-dir>/requests/<key>.typed`; nothing under `requests/` is tracked or pushed. THE REMOTE
 # HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
 # whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
@@ -4360,6 +4362,17 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
 # for until the intake hook lands, a non-goal of this unit; the text is never scanned, because it never
 # leaves this node.
 RQ_WHY=""
+# THE FOLD the collision compare applies to both texts (TOOL-dPlacedRequest-30 §4): the key's own
+# whitespace fold and nothing more, so a CRLF, BOM, final-newline or re-wrapped copy of the same words
+# folds alike. A leading UTF-8 BOM dropped, every run of space, tab, CR, LF, form feed or vertical tab
+# one space, the ends trimmed; case, dates and links stay, so two texts the key alone equates differ.
+# WHAT THIS DOES NOT FOLD: a non-ASCII whitespace character or an ASCII separator byte, which
+# Python's `split` folds, so such a copy reads as a collision rather than the same words.
+derive_request_fold() { # file -> its folded text on stdout
+  local bom
+  bom=$(printf '\357\273\277')
+  LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
+}
 write_request_record() { # file -> 0 recorded or already recorded, 2 not written
   local f="${1:-}" py d out key tag sid cdir msg c rc
   [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
@@ -4379,6 +4392,9 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
   [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "request — $key · not written · the session id is not letters, digits and dashes"; return 2; }
   cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} && [ -n "$cdir" ] \
     || { echo "request — $key · not written · no git common dir resolves for the local store"; return 2; }
+  if [ -e "$cdir/requests/$key.md" ] && ! cmp -s <(derive_request_fold "$cdir/requests/$key.md") <(derive_request_fold "$f"); then
+    echo "request not written — $key · collision: a different text keys alike, the stored copy is $cdir/requests/$key.md"; return 2
+  fi
   mkdir -p "$cdir/requests" 2>/dev/null || { echo "request — $key · not written · the local store cannot be made: $cdir/requests"; return 2; }
   if [ ! -e "$cdir/requests/$key.md" ]; then
     cp -- "$f" "$cdir/requests/$key.md.$$" 2>/dev/null && mv -n -- "$cdir/requests/$key.md.$$" "$cdir/requests/$key.md" 2>/dev/null
