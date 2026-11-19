@@ -118,7 +118,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg](spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md) | 5 | 2 | CLOSED | rev-8 | 2026-11-19 |
 | [TOOL-dWitnessedBar-61 — the seed stamps the null SHA when HEAD is unborn, so a before-first-commit seed writes rows the ledger reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-61.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dWitnessedBar-22 — the `tests=` and `enforces=` edge fields on legs](spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md) | 6 | 2 | INPROGRESS | rev-5 | 2026-11-19 |
-| [TOOL-dWitnessedBar-47 — a seed home is admitted when its directory exists, so a fresh install seeds before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-47.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-19 |
+| [TOOL-dWitnessedBar-47 — a seed home is admitted when its directory exists, so a fresh install seeds before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-47.md) | 6 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
 | [TOOL-dWitnessedBar-19 — the leg's `purpose` field in `gate-legs.json`, every leg reviewed](spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces](spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md) | 8 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says](spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md) | 9 | 2 | DEFERRED | rev-8 | 2026-11-19 |
