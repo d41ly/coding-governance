@@ -25826,12 +25826,7 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/roles/handoff.py:166
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3389
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3404
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:216
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:363-364
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:555
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/govkit/entries/kickoff-manifest.kit.toml:6-9
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/roles/roles_lib.py:36-40
 memory/builds/dPolishedVitrine/README.md	BUILD-METHOD M4
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	BUILD-METHOD M4
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	run-gates.evidence.test.sh:643
@@ -38215,7 +38210,6 @@ memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md	BUILD-METHOD M6
 memory/gotchas/arm-literal-strands-on-message-edit.md	check-unattended.test.sh:714
 memory/gotchas/fold-text-is-unreviewed-surface.md	BUILD-METHOD M8
 memory/guides/BUILD-METHOD.md	HYGIENE check 5
-memory/guides/SESSION-KICKOFF.md	BUILD-METHOD M2
 memory/guides/UNATTENDED-ASKS.md	BUILD-METHOD M2
 memory/map/features/build-method.md	kit-dogfood-parity.test.sh:30
 memory/map/features/build-method.md	tools/memory-tree/adopt-memory-tree.sh:59

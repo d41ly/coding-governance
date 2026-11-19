@@ -17,8 +17,7 @@ overlay's order:
 ```text
 ## pockets
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest.
-- A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default.
-- … (+34) — instruction_units.py pockets --all
+- … (+35) — instruction_units.py pockets --all
 recent —
 ```
 
