@@ -839,6 +839,10 @@ derive_self_rel() {
 # that conf, at the repo root, assigns KEY exactly that value. memory-tree's backlog rows carry one,
 # because the backlog is GENERATED only under `BACKLOG_MODE=builds`; under the default it is authored,
 # is correctly a shared record, and an unconditional row refused every adopter's conf at load.
+# OR `when = "exists:<path>"` (TOOL-dWitnessedBar-54 S1): it applies only when that path exists under
+# the repo root, its `{prefix}`, `{kit}`, `{memory_root}` and `{map_root}` resolved as `regen.py`'s
+# `resolve_argv` resolves them, `{prefix}` being this reader's tool root or `.`. A `when` of neither
+# shape, or one left holding a token, is named on stderr and skipped, as `regen.py` refuses it.
 #
 # WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
 # grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
@@ -888,10 +892,24 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
     while IFS=$'\t' read -r _rg_d _rg_p _rg_g _rg_w; do
       _rg_d=${_rg_d#"$_rg_root/"}; _rg_krel=${_rg_d%/kit.toml}
       [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
-      if [ -n "$_rg_w" ]; then
-        _rg_kv=${_rg_w#*:}
-        [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue
-      fi
+      case "$_rg_w" in
+        "") ;;
+        exists:?*)
+          _rg_kv=${_rg_w#exists:}
+          _rg_kv=${_rg_kv//\{prefix\}/${_rg_tool:-.}}; _rg_kv=${_rg_kv//\{kit\}/$_rg_krel}
+          _rg_kv=${_rg_kv//\{memory_root\}/$_rg_mem}; _rg_kv=${_rg_kv//\{map_root\}/$_rg_map}
+          case "$_rg_kv" in
+            *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] when with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+          esac
+          [ -e "$_rg_root/$_rg_kv" ] || continue ;;
+        *:*=*)
+          _rg_kv=${_rg_w#*:}
+          case "${_rg_w%%:*}:${_rg_kv%%=*}" in
+            :*|*:) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+          esac
+          [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue ;;
+        *) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+      esac
       [ -n "$_rg_map" ] || _rg_p=${_rg_p//\{map_root\}\//}
       _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
       _rg_p=${_rg_p//\{kit\}/$_rg_krel}

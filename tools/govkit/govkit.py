@@ -2382,7 +2382,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          exists in its kit.
     #          The path is graded AS THE READER RESOLVES IT (closing review r1, M9): the three tokens are
     #          removed and any brace left is a row the reader skips, whatever its case or balance. A
-    #          `when` is `<conf file>:<KEY>=<value>`, the one shape the reader evaluates.
+    #          `when` is `<conf file>:<KEY>=<value>` or `exists:<path>`, the two shapes the readers
+    #          evaluate (TOOL-dWitnessedBar-54 S2).
     #          AND THE ROWS THEMSELVES ARE THE ONES THE SHELL READER SEES (closing review r2, M2). The reader
     #          is a column-0, double-quote-only awk in `resolve_generated_indexes`; a single-quoted or
     #          indented value parses in tomllib and is mangled or dropped there, so its rows - ported line
@@ -2408,6 +2409,26 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
             rows.append((cur["p"], cur["g"], cur["w"]))
         return rows
     _gen_tokens = {"memory_root", "map_root", "kit"}
+    # An `exists:<path>` when (TOOL-dWitnessedBar-54 S2) is graded by run-gates' `regen.py`, the reader
+    # that runs it: its path is admitted when `regen.resolve_argv` leaves no token in it, so the three
+    # readers share regen's TOKENS rather than a third list. No regen to load refuses every such row.
+    # Imported HERE: the function-local import further down makes `importlib` local to all of it.
+    import importlib.util
+    _rg_home = (descs.get("run-gates", ({}, ""))[0].get("home") or "").rstrip("/")
+    _rg_spec = importlib.util.spec_from_file_location("gov_regen", str(root / _rg_home / "regen.py")) \
+        if _rg_home and (root / _rg_home / "regen.py").is_file() else None
+    _regen = importlib.util.module_from_spec(_rg_spec) if _rg_spec and _rg_spec.loader else None
+    if _regen is not None:
+        _rg_spec.loader.exec_module(_regen)
+
+    def _check_exists_refused(w):
+        if _regen is None or not w:
+            return True
+        try:
+            _regen.resolve_argv([w], {t: "x" for t in _regen.TOKENS}, "when")
+        except _regen.Refusal:
+            return True
+        return False
     _n_gen = 0
     for eid, (d, _dpath) in sorted(descs.items()):
         _gtoml = [(str(_r.get("path") or ""), str(_r.get("generator") or ""), str(_r.get("when") or ""))
@@ -2422,13 +2443,17 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
             _gp, _gg = str(_gr.get("path") or ""), str(_gr.get("generator") or "")
             _gleft = re.sub(r"\{(memory_root|map_root|kit)\}", "", _gp)
             _gw = _gr.get("when")
-            _gwbad = _gw is not None and not re.fullmatch(r"[^:\s]+:[A-Z_][A-Z0-9_]*=\S+", str(_gw))
+            _gwbad = _gw is not None and (
+                _check_exists_refused(str(_gw)[len("exists:"):]) if str(_gw).startswith("exists:")
+                else not re.fullmatch(r"[^:\s]+:[A-Z_][A-Z0-9_]*=\S+", str(_gw)))
             _gsrc = (root / _dpath).parent / _gg if _gg else None
             if not _gp or not _gg or "{" in _gleft or "}" in _gleft or _gwbad \
                     or not (_gsrc and _gsrc.is_file()) or not str(_gr.get("why") or "").strip():
                 r.fail(f"entry '{eid}' [[generated]] row {_gp or '(no path)'}: needs a path whose only "
                        f"tokens are {sorted(_gen_tokens)} (left after them: '{_gleft}'), a generator "
                        f"file beside the descriptor (got '{_gg}'), a when shaped <conf>:<KEY>=<value> "
+                       f"or exists:<path>, its path non-empty with no token outside run-gates' "
+                       f"regen.TOKENS{'' if _regen is not None else ' (no regen.py to read them from)'}, "
                        f"if any (got {_gw!r}), and a why")
     r.note(f"generated outputs: {_n_gen} [[generated]] row(s) declared across the descriptors")
 

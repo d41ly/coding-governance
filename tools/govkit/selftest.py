@@ -1757,6 +1757,86 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           (r4.stdout + r4.stderr)[-1500:])
 
 
+def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """TOOL-dWitnessedBar-54 S3 — a `[[generated]]` row's `when` has three readers: run-gates'
+    `regen.check_when` through `build_items`, the unattended kit's `resolve_generated_indexes`, and
+    selfcheck 6c. One row per form is planted in a COPY of gov's run-gates descriptor; regen and the
+    shell reader must keep the same rows, and selfcheck must refuse exactly the rows regen refuses.
+    regen reads each row ALONE, because one refused row refuses its whole descriptor there. WHAT IT
+    DOES NOT CHECK: a fourth reader of the key, which this arm holds only once it joins it."""
+    rk = KIT_NAMES["run-gates"]
+    kit_rel = f"{PFX}{rk}"
+    desc = gcopy / kit_rel / "kit.toml"
+    conf = gcopy / "w54.conf"
+    keep = desc.read_bytes()
+    forms = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
+             "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt",
+             "unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:"}
+    conf.write_text("W54=on\n", encoding="utf-8", newline="\n")
+    # AC2 rides the same selfcheck run: the leg factory's own row, its `when` emptied to `exists:`.
+    factory_when = 'when = "exists:{prefix}/govkit/govkit.py"'
+    check("[dWB-54 AC2] LIVENESS the run-gates descriptor carries the factory row's when once",
+          keep.decode("utf-8").count(factory_when) == 1, f"no single match in {desc.name}")
+    desc.write_text(keep.decode("utf-8").replace(factory_when, 'when = "exists:"', 1) + "".join(
+        f'\n[[generated]]\npath = "{{kit}}/w54-{lbl}.out"\ngenerator = "leg_factory.py"\n'
+        f'why = "the when-form parity fixture"\nwrite = ["python", "{{kit}}/leg_factory.py", "--write"]\n'
+        f'check = ["python", "{{kit}}/leg_factory.py", "--check"]\nstage = 1\nwhen = "{w}"\n'
+        for lbl, w in forms.items()), encoding="utf-8", newline="\n")
+    try:
+        import tomllib  # noqa: PLC0415
+        spec = importlib.util.spec_from_file_location("w54_regen", gcopy / kit_rel / "regen.py")
+        rg = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rg)
+        planted = [r for r in tomllib.loads(desc.read_text(encoding="utf-8")).get("generated", [])
+                   if "/w54-" in str(r.get("path"))]
+        by_regen = {}
+        for row in planted:
+            lbl = row["path"].split("/w54-", 1)[1].removesuffix(".out")
+            try:
+                kept = rg.build_items(gcopy, PFX.rstrip("/"), [(kit_rel, {"generated": [row]})], [])
+                by_regen[lbl] = "kept" if kept else "skipped"
+            except rg.Refusal:
+                by_regen[lbl] = "refused"
+        check("[dWB-54 S3] LIVENESS regen read every planted when form", set(by_regen) == set(forms),
+              str(by_regen))
+        argv = govkit_module().resolve_shell_argv(
+            ["bash", "-c", f'. ./{PFX}{KIT_NAMES["unattended"]}/lib-unattended.sh && '
+             'resolve_generated_indexes "$PWD" "" memory'])
+        sh = subprocess.run(argv, cwd=str(gcopy), capture_output=True, text=True, encoding="utf-8",
+                            errors="replace", timeout=120)
+        # A skip line names the descriptor and the `when`, not the row, and the staged factory row
+        # shares the empty-path row's `when`: so a form counts as refused only on one line per row.
+        named = [ln for ln in sh.stderr.splitlines() if "[[generated]] when" in ln]
+        by_shell = {lbl: "kept" if f"{kit_rel}/w54-{lbl}.out:" in sh.stdout else
+                    "refused" if sum(ln.endswith(f"skipped: {w}") for ln in named)
+                    == 1 + (w == "exists:") else "skipped" for lbl, w in forms.items()}
+        sc = run_selfcheck(gcopy)
+        by_selfcheck = {lbl: "refused" if f"[[generated]] row {{kit}}/w54-{lbl}.out:" in sc.stdout
+                        else "admitted" for lbl in forms}
+
+        def extract_labels(says: dict, verdict: str) -> set:
+            return {lbl for lbl, v in says.items() if v == verdict}
+        check("[dWB-54 AC3] regen keeps the conf-true and present-path rows only",
+              extract_labels(by_regen, "kept") == {"conf-true", "present"}, str(by_regen))
+        check("[dWB-54 AC3] the shell reader keeps the rows regen keeps",
+              extract_labels(by_shell, "kept") == extract_labels(by_regen, "kept"),
+              f"shell {by_shell} vs regen {by_regen}\n{sh.stderr[-800:]}")
+        check("[dWB-54 AC3] the shell reader names on stderr exactly the rows regen refuses",
+              extract_labels(by_shell, "refused") == extract_labels(by_regen, "refused"),
+              f"shell {by_shell} vs regen {by_regen}\n{sh.stderr[-800:]}")
+        check("[dWB-54 AC3] selfcheck refuses the unknown-token and empty-path rows only, as regen does",
+              sc.returncode != 0 and extract_labels(by_selfcheck, "refused")
+              == extract_labels(by_regen, "refused") == {"unknown-token", "empty-path"},
+              f"selfcheck {by_selfcheck} vs regen {by_regen}")
+        check("[dWB-54 AC2] selfcheck refuses the factory row's empty exists: when, naming both forms",
+              any("entry 'run-gates' [[generated]] row {kit}/../gate-legs.json:" in ln
+                  and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
+                  for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+    finally:
+        desc.write_bytes(keep)
+        conf.unlink(missing_ok=True)
+
+
 def check_update_safety(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-17 AC1-AC11, AC14, AC15 — the eight `update` mechanics, over scratch
     govs whose `govkit.py` is a copy of `GOVKIT` taken at build time. Asserted on bytes, index
@@ -7494,7 +7574,7 @@ user_skills = "/tmp/gk-fake-skills"
                 ("indented key", 'generator = "gotchas.py"', '  generator = "gotchas.py"',
                  "rows read by the unattended kit's shell reader"),
                 ("when with no conf part", 'when = ".memory-tree.conf:BACKLOG_MODE=builds"',
-                 'when = "BACKLOG_MODE=builds"', "a when shaped <conf>:<KEY>=<value>")):
+                 'when = "BACKLOG_MODE=builds"', "a when shaped <conf>:<KEY>=<value> or exists:<path>")):
             _m6 = mkeep.replace(_old, _new)
             check(f"[aWP r2] LIVENESS the staged memory-tree descriptor really carries a {_lbl}",
                   _m6 != mkeep, "the replace matched nothing in the memory-tree descriptor")
@@ -7504,6 +7584,7 @@ user_skills = "/tmp/gk-fake-skills"
                   r6m.returncode != 0 and "entry 'memory-tree' [[generated]] row" in r6m.stdout
                   and _want in r6m.stdout, r6m.stdout[-1200:] + r6m.stderr[-300:])
             mk.write_text(mkeep, encoding="utf-8")
+        check_when_forms_agree(gcopy, _run_selfcheck)
 
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
         tc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-testsuite-counts.kit.toml"
