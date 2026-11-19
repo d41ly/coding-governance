@@ -17884,6 +17884,14 @@ same "--feed print --from 3 replays the whole events from seq 3" "$(printf '%s\n
 out=$(GOVFEED_DIR=$fd_feed run --feed check); rc=$?
 same "--feed check exits 1 on a torn line" "$rc" "1"
 hit  "$out" "torn 4	refs/gov/runs/tTen	runs"
+# ...and the verb's own refusals, each exit 2 naming what it took: a rebuild over the live feed, a
+# replay whose start is no sequence number or whose flag is unknown, and an unknown subverb.
+out=$(GOVFEED_DIR=$fd_feed run --feed rebuild); rc=$?
+same "--feed rebuild over a live feed exits 2" "$rc" "2"
+hit  "$out" "feed: a feed is present, so nothing was rebuilt over it: $fd_feed/gov-feed.log"
+hit  "$(GOVFEED_DIR=$fd_feed run --feed print --from)" "feed: a replay starts at a sequence number, not none"
+hit  "$(GOVFEED_DIR=$fd_feed run --feed print later)" "unattended: --feed print takes --from <seq> or nothing: later"
+hit  "$(GOVFEED_DIR=$fd_feed run --feed bogus)" "unattended: --feed takes check [<file>], rebuild or print [--from <seq>]: bogus"
 git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
 remove_claim_refs; rm -rf "$fd_feed" "$fd_two" "$fd_two.block" "$fd_two.cut" "$fd_two.ctr"; reset_tree
 
@@ -20612,7 +20620,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3400 -> 3430 by TOOL-dPlacedRequest-13: the change feed block's 29 `same` and 1 `hit` lines in
 # region eight, every one unconditional, counted off the diff's own lines; no suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=3430
+# RAISED 3430 -> 3435 by TOOL-dPlacedRequest-13, at its bug-class checklist: the `--feed` verb's own
+# refusal arms, 1 `same` and 4 `hit` lines in region eight, every one unconditional, counted off the
+# diff's own lines; no suite ran.
+FLOOR_ASSERTIONS=3435
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20853,7 +20864,8 @@ FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
 # LOWERED 646 -> 638 by TOOL-dPlacedRequest-11: the same 8 region-eight lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 638 -> 668 by TOOL-dPlacedRequest-13: the same 30 region-eight change feed assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=668
+# RAISED 668 -> 673 by TOOL-dPlacedRequest-13: the same 5 region-eight `--feed` refusal assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=673
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
