@@ -1,15 +1,36 @@
 # **Serves:** research PLAY-dClosedLoop-1
 """Derive the Closed Loop Atlas from dClosedLoop's records, and write the publishable page.
 
-Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --out <page.html>
-       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
+Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py [--ref <rev>] [--claims cache|none] --out <page.html>
+       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py [--ref <rev>] [--claims cache|none] --check
        python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --plant <case>   damage the memory view's sources,
-           the record corpus or the view map, expect exit 1; cases: kind-unplaced, kind-ghost-tag, edge-status,
-           hop-edge, edges-split, instruments-decision, view-unread
+           the record corpus, the view map, the chain state or the as-built view, expect exit 1; cases:
+           kind-unplaced, kind-ghost-tag, edge-status, hop-edge, edges-split, instruments-decision, view-unread,
+           state-dropped, asbuilt-dropped
+       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --page <page.html> [--ref <rev>]
+           answer whether the tree at --ref (default HEAD) has moved an input the page was stamped with:
+           exit 0 current; 1 stale, dirty, unstamped or absent; 2 a misuse, a ref that does not resolve or a
+           failed git call, with one `atlas: cannot check:` line on stderr
 
 The template beside this file is the page without its data. A run splices the derived data into a copy
 written to --out, never into the template, so the repository keeps the template and this generator while
 the page, which embeds every record, stays out of it. --check derives everything and writes nothing.
+
+--out stamps the page (TOOL-dTrackedAtlas-3): the data's `stamp` holds the commit the chain state was read
+at, the tracked inputs (dClosedLoop's README, build and reviews folders, .memory-tree.conf,
+TOOL-dTrackedAtlas-1's module and one folder per chain build), the SHA-256 of `git ls-tree -r -z` over
+them at that commit, and the inputs the working tree differs in. --check --page derives nothing: it hashes
+the stamped inputs at --ref, with each chain build's landing merges read against the stamp's default_ref
+(TOOL-dTrackedAtlas-10), and compares, so a page reads stale when an input or a landing it shows moved,
+never because the commit alone did. It does not see run claims, the code under tools/ the derivation
+reuses, a hand edit to the page, or whether the default-branch ref is current with its remote, since
+nothing is fetched.
+
+The page shows the chain's actual state (TOOL-dTrackedAtlas-2): TOOL-dTrackedAtlas-1's state document of every
+chain build, read through git at --ref (default HEAD), and the as-built view's clauses, read from the working
+tree as every record is. --claims cache (the default) reads the claim cache `unattended.sh --claims` fills, so a
+live claim's staleness can change between two renders at one ref; --claims none reads no claim, and only then is
+the page byte-identical across runs at one ref. The 2026-10-14 measurements stay on the page as the baseline.
 
 Nothing the records hold may leave the atlas without a refusal:
 - every table it reads parses whole, and each population is counted against the raw lines that carry it;
@@ -21,6 +42,7 @@ import fnmatch
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -124,6 +146,32 @@ MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "
 # Plants on the record corpus and the view map, each stopping the run with its own refusal (the answers fold's
 # closing review: run A's L4, run B's M4).
 CORPUS_PLANTS = ("instruments-decision", "view-unread")
+# Plants on the chain state and the as-built view, each damaging data in memory inside `derive_actual` before its
+# refusals run (TOOL-dTrackedAtlas-2).
+ACTUAL_PLANTS = ("state-dropped", "asbuilt-dropped")
+STATE_PATH = REPO / "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py"
+STAMP_SCHEMA = 2
+# Each stamp field's rule, the one table the page's writer and its reader both check through `check_stamp`
+# (TOOL-dTrackedAtlas-12), so `--out` refuses a stamp `--check --page` would call unstamped.
+STAMP_RULES = {
+    "schema": lambda v: type(v) is int and v == STAMP_SCHEMA,
+    "commit": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None,
+    "default_ref": lambda v: isinstance(v, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", v) is not None,
+    "landings": lambda v: isinstance(v, dict) and bool(v) and all(
+        isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9._-]+", k) and isinstance(shas, list) and all(
+            isinstance(s, str) and re.fullmatch(r"[0-9a-f]{40}", s) for s in shas)
+        for k, shas in v.items()),
+    "digest": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None,
+    "inputs": lambda v: isinstance(v, list) and bool(v) and all(
+        isinstance(p, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", p) and ".." not in p.split("/")
+        for p in v),
+    "dirty": lambda v: isinstance(v, list) and all(isinstance(p, str) for p in v),
+}
+# The advice TOOL-dTrackedAtlas-1's StateError ends with, an option the Atlas does not take, and the remedy each
+# relaying branch names in its place (TOOL-dTrackedAtlas-12).
+STATE_ADVICE = "pass --default-ref <rev>"
+DERIVE_REMEDY = "fetch the default branch, or name it with GOV_REMOTE and GOV_DEFAULT_BRANCH"
+CHECK_REMEDY = "fetch the default branch the stamp names, or regenerate the page"
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
@@ -308,8 +356,8 @@ def plant_memory(src, plant):
         swap("plan", "| `follows` | none |", "| `follows`, `answered-by-typo` | none |")
     elif plant == "edges-split":
         swap("plan", "\n| `implements` |", "\n\n| `implements` |")
-    elif plant and plant not in CORPUS_PLANTS:
-        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS + CORPUS_PLANTS)}")
+    elif plant and plant not in CORPUS_PLANTS + ACTUAL_PLANTS:
+        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS + CORPUS_PLANTS + ACTUAL_PLANTS)}")
     return src
 
 
@@ -697,8 +745,297 @@ def derive(plant=None):
     }
 
 
+def load_build_state():
+    """TOOL-dTrackedAtlas-1's module at STATE_PATH, loaded on first use and cached: the one loader `derive_actual`,
+    `read_git` and `read_landings` share (TOOL-dTrackedAtlas-10)."""
+    if not hasattr(load_build_state, "module"):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        load_build_state.module = module
+    return load_build_state.module
+
+
+def render_state_error(error, remedy):
+    """The text of `error`, TOOL-dTrackedAtlas-1's StateError, with a trailing STATE_ADVICE, an option the Atlas does
+    not take, rewritten as `remedy`; any other text unchanged (TOOL-dTrackedAtlas-12)."""
+    said = str(error)
+    if said.endswith(STATE_ADVICE):
+        return said[:-len(STATE_ADVICE)] + remedy
+    return said
+
+
+def derive_actual(data, ref="HEAD", claims=True, plant=None):
+    """`data`, `derive`'s result, with the chain's actual state added (TOOL-dTrackedAtlas-2): `state`, the state
+    document of TOOL-dTrackedAtlas-1's `derive` at `ref`, whole; `asBuilt`, the as-built view's rows per chain build;
+    `baseline`, the measured dates and the design keys; and each area's `landed` and `measured`.
+
+    The chain state is read at `ref` through git; dClosedLoop's records and the as-built view are read from the
+    working tree, as `derive` reads everything. A state document or a view whose builds differ from `data["chain"]`
+    is a refusal. What it does not check: that a landed build closed every gap it owns, that the working tree and
+    `ref` describe one commit, and that the view is current with its deviation records."""
+    build_state = load_build_state()
+    kit = str(REPO / "tools/memory-tree")
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import design_lib
+
+    chain = [c["build"] for c in data["chain"]]
+
+    def check_builds(name, held, same):
+        """Refuse, naming each side, when `held` is not the chain's builds."""
+        if same:
+            return
+        lacks = [b for b in chain if b not in held] or ["none"]
+        extra = [b for b in held if b not in chain] or ["none"]
+        sys.exit(f"atlas: {name} lacks {', '.join(lacks)} and holds {', '.join(extra)} the chain does not")
+
+    try:
+        state = build_state.derive(ref, root=str(REPO), claims=claims, detail=True)
+    except build_state.StateError as e:
+        sys.exit(f"atlas: chain state: {render_state_error(e, DERIVE_REMEDY)}")
+    except build_state.ChainError as e:
+        sys.exit(f"atlas: chain state: {e}")
+    anchor = state["landed"][-1] if state["landed"] else None
+    if plant in ACTUAL_PLANTS and anchor is None:
+        sys.exit(f"atlas: plant {plant}: its anchor is gone")
+    if plant == "state-dropped":
+        state["builds"] = [b for b in state["builds"] if b["slug"] != anchor]
+        state["landed"] = [s for s in state["landed"] if s != anchor]
+    held = [b["slug"] for b in state["builds"]]
+    check_builds("the chain state", held, held == chain)
+
+    try:
+        keys = design_lib.read_design_keys(str(REPO), design_lib.read_design_conf(str(REPO)))
+        if keys is None:
+            sys.exit("atlas: the design keys are blank, so there is no as-built view to read")
+        rows = design_lib.read_design_view(keys["DESIGN_VIEW"], root=str(REPO))
+    except design_lib.DesignRefusal as e:
+        sys.exit(f"atlas: as-built view: {e}")
+    if plant == "asbuilt-dropped":
+        rows = [r for r in rows if r[0] != anchor]
+    viewed = list(dict.fromkeys(r[0] for r in rows))
+    check_builds("the as-built view", viewed, set(viewed) == set(chain))
+    as_built = {b: [] for b in chain}
+    for build, cid, body, _, since in rows:
+        as_built[build].append({"clause": cid, "text": body, "since": since})
+
+    owner = {g["id"]: g["owner"] for g in data["gaps"]}
+    dated = {r["path"]: r["date"] for r in data["records"]}
+    for a in data["areas"]:
+        owners = {owner[g] for g in a["gaps"]}
+        a["landed"] = [b for b in chain if b in state["landed"] and b in owners]
+        a["measured"] = sorted({dated[s["path"]] for s in a["today"]})
+    measured = sorted({d for a in data["areas"] for d in a["measured"]})
+    data["state"] = state
+    data["baseline"] = {"measured": [measured[0], measured[-1]], "design": keys["DESIGN_BASELINE"],
+                        "view": keys["DESIGN_VIEW"]}
+    data["asBuilt"] = as_built
+    return data
+
+
+class StampError(Exception):
+    """A git call failed or timed out, the ref does not resolve, or a stamp fails a rule of STAMP_RULES."""
+
+
+def check_stamp(stamp, fields=None):
+    """The reason `the stamp's <field> field fails its rule:<value>` for the first field of `fields` (None: every
+    field of STAMP_RULES, in the table's order) whose rule `stamp.get(field)` fails, else None (TOOL-dTrackedAtlas-12).
+    """
+    for field in STAMP_RULES if fields is None else fields:
+        if not STAMP_RULES[field](stamp.get(field)):
+            return f"the stamp's {field} field fails its rule:{json.dumps(stamp.get(field))[:80]}"
+    return None
+
+
+def read_git(*args):
+    """The stdout bytes of `git <args>` run in REPO under TOOL-dTrackedAtlas-1's GIT_TIMEOUT, read through
+    `load_build_state`; StampError naming the call when it fails, cannot start or outlives the bound."""
+    timeout = load_build_state().GIT_TIMEOUT
+    call = "git " + " ".join(args[:args.index("--")] if "--" in args else args)
+    try:
+        done = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise StampError(f"{call} gave no answer within {timeout} s") from None
+    except OSError as e:
+        raise StampError(f"{call} did not start: {e}") from None
+    if done.returncode:
+        said = done.stderr.decode("utf-8", "replace").strip()[:200]
+        raise StampError(f"{call} failed: {said or f'exit {done.returncode}, nothing on stderr'}")
+    return done.stdout
+
+
+def read_landings(commit, builds, default_ref, default_commit=None):
+    """{slug: [merge sha, ...]}, oldest first, for each slug of `builds`: the landing candidates TOOL-dTrackedAtlas-1's
+    `derive_landings` reads at `commit` on the first-parent line of `default_commit`, which is `default_ref` resolved
+    now when not passed (TOOL-dTrackedAtlas-10). StampError carrying the text of the module's StateError, its advice
+    rewritten as CHECK_REMEDY by `render_state_error` (TOOL-dTrackedAtlas-12)."""
+    build_state = load_build_state()
+    memory_root = BUILD.parent.parent.relative_to(REPO).as_posix()
+    try:
+        if default_commit is None:
+            _, default_commit = build_state.resolve_default_ref(str(REPO), default_ref)
+        found = build_state.derive_landings(str(REPO), commit, default_commit, memory_root, tuple(builds))
+    except build_state.StateError as e:
+        raise StampError(render_state_error(e, CHECK_REMEDY)) from None
+    return {b: [sha for sha, _, _ in found[b]] for b in builds}
+
+
+def derive_input_digest(commit, inputs, default_ref, landings):
+    """The 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>`, a NUL byte, and the compact
+    sorted JSON of `default_ref` and `landings` (TOOL-dTrackedAtlas-10), so a landing merge that moves no input file
+    still moves the digest; `-z` keeps it independent of core.quotePath."""
+    history = json.dumps({"default_ref": default_ref, "landings": landings},
+                         sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(read_git("ls-tree", "-r", "-z", commit, "--", *inputs) + b"\0" + history).hexdigest()
+
+
+def build_stamp(data):
+    """The page's stamp (TOOL-dTrackedAtlas-3): the commit the chain state was read at, the tracked inputs the page
+    derives from, the default-branch ref and each chain build's landing candidates (TOOL-dTrackedAtlas-10), their
+    digest at that commit, and the inputs the working tree differs in. StampError when the state's commit or
+    default_ref fails its STAMP_RULES row before any git call, its default_commit fails the commit row, a git call
+    fails, or the stamp it would return fails a row, so it never writes a stamp `read_stamp` refuses
+    (TOOL-dTrackedAtlas-12)."""
+    state = data.get("state") or {}
+    commit, default_ref, default_commit = state.get("commit"), state.get("default_ref"), state.get("default_commit")
+    reason = check_stamp({"commit": commit, "default_ref": default_ref}, ("commit", "default_ref"))
+    if reason:
+        raise StampError(reason)
+    if not STAMP_RULES["commit"](default_commit):
+        raise StampError(f"the chain state carries no 40-hex default_commit, but {default_commit!r}")
+    fixed = [(BUILD / "README.md").relative_to(REPO).as_posix(), HERE.relative_to(REPO).as_posix() + "/",
+             REVIEWS.relative_to(REPO).as_posix() + "/", (REPO / ".memory-tree.conf").relative_to(REPO).as_posix(),
+             STATE_PATH.relative_to(REPO).as_posix()]
+    slugs = [b["slug"] for b in state.get("builds", [])]
+    builds = [(BUILD.parent / b).relative_to(REPO).as_posix() + "/" for b in slugs]
+    inputs = sorted(set(fixed + builds))
+    landings = read_landings(commit, slugs, default_ref, default_commit)
+    dirty = set()
+    for listing in (read_git("diff", "--name-only", "-z", commit, "--", *inputs),
+                    read_git("ls-files", "--others", "--exclude-standard", "-z", "--", *inputs)):
+        dirty.update(p for p in listing.decode("utf-8", "replace").split("\0") if p)
+    stamp = {"schema": STAMP_SCHEMA, "commit": commit, "default_ref": default_ref, "landings": landings,
+             "digest": derive_input_digest(commit, inputs, default_ref, landings), "inputs": inputs,
+             "dirty": sorted(dirty)}
+    reason = check_stamp(stamp)
+    if reason:
+        raise StampError(reason)
+    return stamp
+
+
+def read_stamp(page):
+    """`(stamp, None)` for a page whose data carries a stamp passing every field's rule, else `(None, reason)`: no
+    data marker, data that does not parse, no stamp, or a field outside its rule. This is the read boundary."""
+    try:
+        body = Path(page).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        return None, f"the page does not read as UTF-8 text: {e}"
+    if MARK not in body:
+        return None, "no data marker"
+    try:
+        data = json.loads(body.split(MARK, 1)[1].split("</script>", 1)[0])
+    except ValueError as e:
+        return None, f"its data does not parse: {e}"
+    stamp = data.get("stamp") if isinstance(data, dict) else None
+    if not isinstance(stamp, dict):
+        return None, "its data carries no stamp"
+    reason = check_stamp(stamp)
+    return (None, reason) if reason else (stamp, None)
+
+
+def check_page(page, ref="HEAD"):
+    """Print whether the tree at `ref` has moved an input `page` was stamped with, or a landing it shows, read
+    against the stamp's default_ref resolved now (TOOL-dTrackedAtlas-10), and return the exit code: 0 current, 1
+    stale, dirty, unstamped or absent, 2 when it cannot answer. Reads the page and git, writes nothing and derives
+    nothing. The order is absent, unstamped, the ref and the digest at it, dirty, stale, current."""
+    def print_refusal(reason):
+        print(f"atlas: cannot check: {reason}", file=sys.stderr)
+        return 2
+
+    if not Path(page).is_file():
+        print(f"atlas: absent — no page at {page}")
+        return 1
+    stamp, reason = read_stamp(page)
+    if stamp is None:
+        print(f"atlas: unstamped — {page}: {reason}")
+        return 1
+    try:
+        try:
+            at = read_git("rev-parse", "--verify", "-q", f"{ref}^{{commit}}").decode().strip()
+        except StampError as e:
+            return print_refusal(f"{ref} resolves to no commit: {e}")
+        landings = read_landings(at, sorted(stamp["landings"]), stamp["default_ref"])
+        digest = derive_input_digest(at, stamp["inputs"], stamp["default_ref"], landings)
+        c12, r12 = stamp["commit"][:12], at[:12]
+        if stamp["dirty"]:
+            print(f"atlas: dirty — {page}: generated with {len(stamp['dirty'])} uncommitted input(s), "
+                  f"first {stamp['dirty'][0]}")
+            return 1
+        if digest == stamp["digest"]:
+            print(f"atlas: current — {page}: inputs {digest[:12]} at {ref} ({r12}) match the stamp of {c12}")
+            return 0
+        print(f"atlas: stale — {page}: the inputs stamped at {c12} moved by {ref} ({r12})")
+        for b in sorted(landings):
+            if landings[b] != stamp["landings"][b]:
+                print(f"  landings of {b} moved: {landings[b][-1][:12] if landings[b] else 'none'}")
+        try:
+            read_git("cat-file", "-e", f"{stamp['commit']}^{{commit}}")
+        except StampError:
+            print(f"  the stamp's commit {c12} is not in this repository")
+            return 1
+        moved = [ln.partition("\t") for ln in read_git(
+            "log", "--first-parent", "--format=%H%x09%s", f"{stamp['commit']}..{at}", "--", *stamp["inputs"]
+        ).decode("utf-8", "replace").splitlines() if ln]
+        for h, _, subject in moved[:20]:
+            print(f"  {h[:12]} {subject}")
+        if len(moved) > 20:
+            print(f"  and {len(moved) - 20} more")
+        return 1
+    except StampError as e:
+        return print_refusal(str(e))
+
+
+VALUED_OPTIONS = ("--page", "--ref", "--claims", "--plant", "--out")
+
+
+def read_options(argv):
+    """({option: value} for each option of VALUED_OPTIONS present in argv, None), or
+    (None, "<option> takes a value") for the first option of VALUED_OPTIONS, in that tuple's order,
+    that is the last argument or whose next argument starts with "-". An option present more than once
+    reads its first occurrence. This is the one place in the generator that indexes argv."""
+    values = {}
+    for option in VALUED_OPTIONS:
+        if option not in argv:
+            continue
+        at = argv.index(option) + 1
+        if at >= len(argv) or argv[at].startswith("-"):
+            return None, f"{option} takes a value"
+        values[option] = argv[at]
+    return values, None
+
+
 def main(argv):
-    data = derive(argv[argv.index("--plant") + 1] if "--plant" in argv else None)
+    values, reason = read_options(argv)
+    if "--page" in argv:
+        if reason:
+            print(f"atlas: cannot check: {reason}", file=sys.stderr)
+            return 2
+        mixed = [o for o in ("--plant", "--out", "--claims") if o in argv]
+        if "--check" not in argv or mixed:
+            print(f"atlas: cannot check: --page takes a page path and runs with --check and an optional --ref alone"
+                  f"{', not ' + ' '.join(mixed) if mixed else ''}", file=sys.stderr)
+            return 2
+        return check_page(values["--page"], values.get("--ref", "HEAD"))
+    if reason:
+        sys.exit(f"atlas: {reason}")
+    ref = values.get("--ref", "HEAD")
+    claims = values.get("--claims", "cache")
+    if claims not in ("cache", "none"):
+        sys.exit(f"atlas: --claims takes cache or none, not {claims}")
+    plant = values.get("--plant")
+    data = derive_actual(derive(plant), ref, claims == "cache", plant)
     if "--check" in argv:
         n = sum(len(r["sections"]) for r in data["records"])
         print(f"atlas: derived — {len(data['records'])} records, {n} sections, {len(data['decisions'])} decision sections, "
@@ -706,7 +1043,11 @@ def main(argv):
         return 0
     if "--out" not in argv:
         sys.exit(__doc__)
-    out = Path(argv[argv.index("--out") + 1])
+    out = Path(values["--out"])
+    try:
+        data["stamp"] = build_stamp(data)
+    except StampError as e:
+        sys.exit(f"atlas: cannot stamp the page: {e}")
     # Every "<" is escaped, so no record text can open a comment or close the script that carries it.
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     page = TEMPLATE.read_text(encoding="utf-8")

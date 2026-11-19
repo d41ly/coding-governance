@@ -14526,6 +14526,8 @@ memory/builds/dTracedLedger/build/2026-10-14-build-TOOL-dTracedLedger-1-research
 memory/builds/dTracedLedger/build/2026-10-14-build-TOOL-dTracedLedger-1-research-check-23-reds.md	37 rows
 memory/builds/dTracedLedger/build/2026-10-14-build-TOOL-dTracedLedger-1-research-check-23-reds.md	8 rows
 memory/builds/dTracedLedger/spec/2026-10-14-spec-TOOL-dTracedLedger-1.md	36 rows
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md	600 s
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md	600 s
 memory/builds/dTrueNorth/RUN.md	330 records
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-1-ledger.md	0 rows
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-1-ledger.md	509 rows
