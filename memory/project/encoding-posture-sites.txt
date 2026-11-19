@@ -30,4 +30,4 @@ tools/memory-recall/query.py	subprocess	1	forked recall source, never sent to an
 tools/memory-recall/selftest.py	subprocess	13	project-owned kit self-test, withheld from adopters
 tools/memory-recall/test_recall_floor.py	subprocess	4	project-owned recall floor, withheld from adopters
 tools/process-monitor/selftest.py	file-io	1	project-owned kit self-test, withheld from adopters
-tools/process-monitor/selftest.py	subprocess	2	project-owned kit self-test, withheld from adopters
+tools/process-monitor/selftest.py	subprocess	1	project-owned kit self-test, withheld from adopters

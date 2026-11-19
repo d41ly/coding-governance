@@ -33,7 +33,7 @@ the close, and so does every suite the section names.
   `tools/policy/policy-mirror.js`. Every copy equalled its canonical. The one-byte red half, and the
   suite's own run of the rows and of section `2j`, are owed to the close.
 - AC7 — `scan_bare_bash` — called with the worktree root at the pass tip, it returned `[]`. Before the
-  sites were rewritten, the same call listed 15 lines: the seven PATH loops, `tools/govkit/selftest.py`'s
+  sites were rewritten, the same call listed 15 lines (DERIVED, that scan's output): the seven PATH loops, `tools/govkit/selftest.py`'s
   two name loops and its `["bash", …]` launch, govkit's membership test, `tools/loop/factories.py`'s
   and `tools/policy/check_policy.py`'s `or "bash"` fall-backs, `stop-guard.js`'s spawn, and the scan's
   own name tuple. It was then called over a fixture repository holding

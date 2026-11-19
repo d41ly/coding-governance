@@ -11,7 +11,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The spec's base is `cdfbd1cf`; the run's is `9e21ac76`. Since then dGroundRules landed `tools/lib/resolve_bash.py`
   with its `resolve_bash_py` block, so S1 is the in-place rewrite §8 F1 names, not a new file. Copies of that block
   also sit in `tools/policy/check_policy.py`, `tools/loop/loop_witness.py` and `tools/playbook/render_playbook.py`,
-  and govkit's resolver now lives in `tools/govkit/upgrade_steps.py:369` (TOOL-dSafePassage-35 S24), which the spec
+  and govkit's resolver now lives in `tools/govkit/upgrade_steps.py@a814a6ae:369` (TOOL-dSafePassage-35 S24), which the spec
   already names. Re-derive the site list with the S6 query at this base rather than trusting §4's table line numbers.
 - The spec is rev-5, revised at the main loop over the first builder's divergence
   (`build/2026-11-19-build-TOOL-dWitnessedBar-26-1-builder-return.md`): the probe is `uname -s` first, every candidate
