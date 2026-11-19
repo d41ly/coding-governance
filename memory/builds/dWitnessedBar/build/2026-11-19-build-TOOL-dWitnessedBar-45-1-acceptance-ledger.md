@@ -14,15 +14,15 @@ its commands probed one by one outside the suite; it still owes its RED-first ob
 main loop makes at the close, and so does every leg that section names.
 
 **Evidences:** TOOL-dWitnessedBar-45
-- AC1 — `regen.py --list` — exited 0 printing `regen: skipped · run-gates · [[generated]]
-  {kit}/../gate-legs.json · its when exists:{prefix}/govkit/govkit.py does not hold` and `1 declared`;
-  `regen.py --check` exited 0, its one item, the pass-leg field, fresh. In gov's tree `build_items`
+- AC1 — `regen.py --list` — exited 0 printing the factory's row skipped, `[[generated]]` and
+  `{kit}/../gate-legs.json` followed by `its when exists:{prefix}/govkit/govkit.py does not hold`,
+  and `1 declared`; `regen.py --check` exited 0, its one item, the pass-leg field, fresh. In gov's tree `build_items`
   over the tracked descriptors still made the factory's write an item, the `when` holding there.
   `check_when` refused `exists:`, `exists:{bogus}/x`, `nonsense` and `.unattended.conf:KEY`, and read
   the conf form as before.
 - AC2 — `import leg_factory` — `python -c "import leg_factory"` in the target's kit dir exited 0;
-  `leg_factory.py --write` exited 2 printing `leg-factory: refused · no govkit kit holding govkit.py in
-  this install: looked in` the receipt and the two probe paths, with no traceback; `--check`, `--list`
+  `leg_factory.py --write` exited 2 printing `no govkit kit holding govkit.py in this install` and
+  `looked in` with the receipt and the two probe paths, and no traceback; `--check`, `--list`
   and `new` exited 2 the same way. `--sources` does not exist yet: TOOL-dWitnessedBar-28 adds it.
 - AC3 — `fresh: not graded here — no govkit` — `run_conform` over the target printed it,
   `enforces: not graded here — no govkit` and `conform · green`, exit 0, over the three untouched
