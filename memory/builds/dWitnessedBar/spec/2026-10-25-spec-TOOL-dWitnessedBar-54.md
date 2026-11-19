@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-54 — the `exists:` spelling of a generated row's `when` reaches its other two readers, and the three readers are held to agree
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md) | journal | TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-45 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief.md) | journal | TOOL-dWitnessedBar-46 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-54-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-54-build-brief.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 
 <!-- /gen:spec-records -->
