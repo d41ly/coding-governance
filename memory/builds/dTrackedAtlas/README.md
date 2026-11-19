@@ -83,7 +83,7 @@ ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrac
 | [TOOL-dTrackedAtlas-18 — the schedule instrument re-pinned in every chain packet and in the chain-packet door](spec/2026-11-19-spec-TOOL-dTrackedAtlas-18.md) | 11 | 2 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 53 bound to this build, across 4 record folder(s).
+Records: 54 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
