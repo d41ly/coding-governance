@@ -42,3 +42,16 @@ line up to its `GIT log` substitution, and the two matched byte for byte, em das
   under a `Pass: none` commit.
 - The gates the spec's section 7 names, and the `spec tokens` check the brief asks for, which a role
   pass may not run.
+
+**Observed at the close (main loop, 2026-11-20):** through the probe unit 1's acceptance ledger records,
+with the two edits this unit's section 6 names, against driver copies made from
+`tools/unattended/unattended.sh` at 288af33d7 in the session scratchpad. The suite is held by the
+owner's standing instruction, so the probe stands in for region 8. Every hash below is a fixture
+repository's, DERIVED at observation.
+- GREEN — the built driver with the suite at 288af33d7: no `FAIL` line, `STATUS 0`, the read hash present.
+- RED — the hash substitution deleted from the skip line (one line, the break confirmed by `grep -c`):
+  `FAIL the skip line`, the actual line ending `at ` against an expected line ending in the read hash, `STATUS 1`.
+- RED — the substitution pointed at `README`: `FAIL the skip line`, the two lines ending in
+  different hashes, `STATUS 1`.
+- The gap, at the suite as of 922413ff1 over the blanked driver: `STATUS 0`, so the prefix-only arm
+  passed the break this unit's arm fails.
