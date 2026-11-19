@@ -33,6 +33,14 @@ suite or bar ran in this pass.
   with stubbed `same`, `hit` and `mutate`, read 7 assertions green over this tree, 7 counted on its (DERIVED)
   skip branch; over a scratch carrier with S3's test cut it red AC3 and its `mutate`, and over one
   whose bound reads `REMOTE_BOUND` it red AC1, AC3 and its `mutate`.
+- The bug-class checklist over the pass commit selected 54 classes. One needed a change: the (DERIVED)
+  arm's scratch commit could inherit a machine's commit hooks or signing, so it now passes
+  `--no-verify` and `commit.gpgsign=false`, as the suite's other fixture commits do; the block, sourced
+  alone again, read 7 assertions green. The rest needed none: the new refusal branch has its arm (DERIVED)
+  (AC3), the fixture reaches each rule (`rc=0` and the NOTE on the shipped cut, the unset name on
+  each staged one), the staged reds are the base's own spellings under a `mutate` that reds a no-op,
+  counts are `grep -c` over files and never over a captured variable, and every git call unsets
+  `GIT_DIR` or runs under `env -i`.
 
 ## Owed at the close
 

@@ -19529,7 +19529,7 @@ if nl_rel=$(resolve_kit_dir "$_rkd_py" run-gates post-merge.sh "$HERE" 2>/dev/nu
   cp "$nl_d/gf.sh" "$nl_d/red1.sh"; cp "$nl_d/gf.sh" "$nl_d/red3.sh"
   mutate "$nl_d/red1.sh" 's/^NODE_LOCK_BOUND=10$/NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))/'
   mutate "$nl_d/red3.sh" '/no EPOCHSECONDS, bash 5/d'
-  (unset GIT_DIR GIT_WORK_TREE; git init -q "$nl_d/r" && git -C "$nl_d/r" -c user.name=t -c user.email=t@t.test commit -q --allow-empty -m nl)
+  (unset GIT_DIR GIT_WORK_TREE; git init -q "$nl_d/r" && git -C "$nl_d/r" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -q --allow-empty -m nl --no-verify)
   nl_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$nl_d/r" rev-parse --path-format=absolute --git-common-dir)
   nl_h=$(unset GIT_DIR GIT_WORK_TREE; git -C "$nl_d/r" rev-parse HEAD)
   nl_take='set -u; . "$NL_GF"; write_dir_lock "$NL_C/gov-feed.lock" t1 "$NODE_LOCK_BOUND" node; echo rc=$?'
