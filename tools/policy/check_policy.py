@@ -18,8 +18,9 @@ rows, `arm_summaries` grades the list as `policy.py lists --check` does, `arm_di
 loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11),
 and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
 `arm_reader_coverage` reds a catalogue key whose owner build has landed, every spec in its build
-folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads
-(TOOL-dGroundRules-8); it grades nothing until an owner lands, and announces so. The mirror's
+folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads,
+by a literal or by the name of a module constant (TOOL-dGroundRules-8, TOOL-dLandedOwners-2); it
+grades nothing until an owner lands, and announces so. The mirror's
 three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governance/policy.json` that
 differs from its render at HEAD, or is absent where HEAD carries the policy file or a mirror, and
 announces otherwise (TOOL-dGroundRules-21 S15); `arm_mirror_landed` reds a key the policy file at
@@ -452,7 +453,16 @@ READER_SHAPES = (
     # the reader CLI's get: policy.py get k, "$kit/policy.py" get "k" | ...
     ((".sh", ".githooks/"),
      re.compile(r"policy\.py[\"']?[ \t]+get[ \t]+([\"']?)([^\s'\"]+?)\1(?=[ \t;)|&]|$)")),
+    # a key passed by the name of a module constant: resolve(KEY), read(root, resolve(root, KEY)) and
+    # f(rev=KEY), each argument a name MODULE_CONSTANT binds in the same file. Zero-width, so an outer
+    # call never consumes an inner call's name; `args` runs to the first `(`, `)` or end of line
+    # (TOOL-dLandedOwners-2)
+    ((".py",),
+     re.compile(r"(?<![\w.$])(?=[A-Za-z_][\w.]*\((?P<args>[^()\n]*))")),
 )
+# a module constant: a column-0 line binding one name to one string literal, `KEY = "flow.adapt"`, an
+# optional comment after it; group 1 the name, group 3 the literal's text (TOOL-dLandedOwners-2)
+MODULE_CONSTANT = re.compile(r"^([A-Za-z_]\w*)[ \t]*=[ \t]*(['\"])((?:(?!\2)[^\n\\])*)\2[ \t]*(?:#.*)?$", re.M)
 READER_SKIPPED = re.compile(r"(?:^|/)(?:[^/]*\.test\.(?:sh|js)|selftest[^/]*\.py|test_[^/]*\.py)$")
 # a `*` or `<name>` segment: a quoted segment, which may hold `.` and an interpolated name, or one
 # run of no quote, space, `.`, `(` or `)` (TOOL-dGroundRules-21 S27)
@@ -632,7 +642,9 @@ def scan_reader_keys(repo, kit=KIT):
     """-> every key text a call of READER_SHAPES passes in the tracked code of `repo`, read from disk:
     `git ls-files` with a row's suffix or under its directory, outside the memory root and `help/`,
     never a `*.test.sh`, `*.test.js`, `selftest*.py` or `test_*.py`, nor this module at `kit`'s path,
-    whose fixtures name keys without consuming them. A line opening `#` or `//` is a comment."""
+    whose fixtures name keys without consuming them. A line opening `#` or `//` is a comment. A row
+    naming an `args` group reads each argument that is a name, or `<keyword>=<name>`, as every text
+    MODULE_CONSTANT binds that name to in the same file, never its own match (TOOL-dLandedOwners-2)."""
     own = (policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip() + Path(__file__).name
     skip = (read_memory_root(repo) + "/", "help/")
     spelled = set()
@@ -645,11 +657,22 @@ def scan_reader_keys(repo, kit=KIT):
             text = Path(repo, f).read_text(encoding="utf-8", errors="replace") if shapes else ""
         except OSError:
             continue
+        consts = {}  # name -> every text a module constant binds it to in this file
+        if f.endswith(".py"):
+            for m in MODULE_CONSTANT.finditer(text):
+                consts.setdefault(m[1], set()).add(m[3])
         for line in text.splitlines():
-            if not line.lstrip().startswith(("#", "//")):
-                # a joined key's text is its literal with the name spliced in as `{name}"`
-                spelled.update(m[2] + ("{" + m[3] + "}\"" if m.re.groups == 4 else "")
-                               for rx in shapes for m in rx.finditer(line))
+            if line.lstrip().startswith(("#", "//")):
+                continue
+            for rx in shapes:
+                for m in rx.finditer(line):
+                    if "args" in m.re.groupindex:
+                        for piece in m["args"].split(","):
+                            # a name, or `<keyword>=<name>`; group 1 the name
+                            arg = re.fullmatch(r"(?:[A-Za-z_]\w*[ \t]*=[ \t]*)?([A-Za-z_]\w*)", piece.strip())
+                            spelled.update(consts.get(arg[1], ()) if arg else ())
+                    else:  # a joined key's text is its literal with the name spliced in as `{name}"`
+                        spelled.add(m[2] + ("{" + m[3] + "}\"" if m.re.groups == 4 else ""))
     return spelled
 
 
@@ -2852,6 +2875,17 @@ RC_CASES = {
                      {"consumer.sh": 'python policy.py get "fixture.$name"\n'}, None, 1),
     "pattern-only-sibling": ([("fixture.*", RC_OWNER), ("fixture.exact", RC_OWNER)], "CLOSED", "CLOSED",
                              {"consumer.sh": "python policy.py get fixture.exact\n"}, "fixture.*", 2),
+    # a module constant passed by name to a nested call, and three shapes that must not read it: the
+    # name only in a message tuple, a name bound in another file, a binding inside a function
+    # (TOOL-dLandedOwners-2)
+    "reader-constant": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                        {"consumer.py": 'KEY = "fixture.planted"\n\n\ndef read_value(root):\n'
+                                        "    value = read(root, resolve(root, KEY))\n    return value\n"}, None, 1),
+    "constant-unread": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                        {"consumer.py": 'KEY = "fixture.planted"\nprint("%s" % (KEY,))\n',
+                         "other.py": "value = resolve(KEY)\n",
+                         "local.py": 'def read_value():\n    key = "fixture.planted"\n    return resolve(key)\n'},
+                        RC_KEY, 1),
 }
 
 

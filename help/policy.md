@@ -153,10 +153,12 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   `DEFERRED` counts as landed. A spec run, which carries every unit `DEFERRED`, does not: at its base
   the build still had an open ask and a roster unit with no spec. Your working tree never counts:
   only what is committed on the default branch does.
-- **A reader** is a line of tracked code that passes the key to the policy reader, in one of two
+- **A reader** is a line of tracked code that passes the key to the policy reader, in one of three
   shapes: a call whose first argument is the key in quotes, such as `resolve("budgets.enforce")` in
-  Python or `mirror.get('budgets.enforce')` in JavaScript, or `policy.py get budgets.enforce` in a
-  shell script or a git hook. A comment, a test file, a help page, the memory tree, the JSON mirror
+  Python or `mirror.get('budgets.enforce')` in JavaScript; `policy.py get budgets.enforce` in a
+  shell script or a git hook; or, in Python, a call passing the name of a module constant that holds
+  the key, such as `resolve(KEY)` in a file whose line `KEY = "budgets.enforce"` starts at column 0.
+  That call may sit inside another call's arguments, and may pass the name as `key=KEY`. A comment, a test file, a help page, the memory tree, the JSON mirror
   and the catalogue never count. For a key with a `*` or `<name>` part, such as `budgets.*`, a
   variable in that part counts too: `policy.py get "budgets.$cap"`, or a quoted part holding the
   variable, `resolve(f'budgets."{cap}"')`.
@@ -167,8 +169,11 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   owners: <builds>`, and while no owner build has landed,
   `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes.
 - **What it does not see:** a reader in another language, or one that builds the key's name at run
-  time from pieces, reds as unread; a call that only mentions the key, in a message say, counts as a
-  reader.
+  time from pieces, reds as unread. So does a key passed through a constant from another file, a
+  variable set inside a function, a constant in JavaScript or shell, a name inside a tuple or a loop
+  rather than a call's arguments, or a call whose arguments span lines. A call that only mentions the
+  key, in a message say, counts as a reader, and so does any call that passes the constant's name,
+  `print(KEY)` included.
 
 ## Who may change the policy file
 

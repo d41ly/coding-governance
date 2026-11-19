@@ -1,11 +1,12 @@
 # TOOL-dLandedOwners-2 — the reader scan reads a key passed to a reader through a module constant
 
-**Status:** INPROGRESS · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dLandedOwners-2-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-2-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-1 TOOL-dLandedOwners-3 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-1 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-2-1-spec-writer.md) | journal | — |

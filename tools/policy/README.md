@@ -353,7 +353,9 @@ cannot be read must not loosen anything. `read_spec_audit_switch` in the unatten
 the precedent for all three.
 
 The call shapes, one per language, each passing the key as a literal so reader coverage,
-`scan_reader_keys` in `check_policy.py`, counts it; a key passed through a variable reads as unread:
+`scan_reader_keys` in `check_policy.py`, counts it. A Python call may instead pass the name of a
+module constant, `resolve(KEY)` under a column-0 `KEY = "pass.fast-legs"` in the same file; a key
+passed through any other variable reads as unread:
 
 | Asker | Call | Policy kit found by |
 |---|---|---|
@@ -497,11 +499,18 @@ missing file, a failed import or a conf declaring no `FAMILIES` is a refusal. It
 landing this clone has not fetched, reads a merge touching `RUN.md` with a run's base for another
 reason as that run's landing, lists no run record rotated outside the driver, and under
 `BACKLOG_MODE="shards"` reads every run as build-kind. A key is READ where a tracked file passes it to a reader in one of
-the two shapes of `READER_SHAPES`, one row each: a call whose first argument is the key as a string
+the shapes of `READER_SHAPES`, one row each: a call whose first argument is the key as a string
 literal (`resolve("k")`, `mirror.get('k')`, the literal free to hold the other quotes) in a `.py`,
 `.js`, `.mjs` or `.cjs` file, a key joined around a name inside a quoted segment
-(`resolve('budgets."' + name + '"')`, read as `budgets."{name}"`), and `policy.py get k`, the key
-optionally quoted, in a `.sh` file or under `.githooks/`. A comment line never reads. A key with a `*`
+(`resolve('budgets."' + name + '"')`, read as `budgets."{name}"`), `policy.py get k`, the key
+optionally quoted, in a `.sh` file or under `.githooks/`, and, in a `.py` file, a call passing the
+name of a module constant, `resolve(KEY)` (TOOL-dLandedOwners-2). That row matches zero-width at
+every call opening, so a call nested in another call's arguments is read on its own, and each
+argument that is a name or `<keyword>=<name>` reads as every text `MODULE_CONSTANT`, a column-0
+`NAME = "text"` line, binds that name to in the same file; the row's own match never reads. A
+constant from another file, a function-local variable, a name in a tuple or a `for` loop, and a call
+whose arguments span lines read as unread, and a constant passed to a call that is no reader,
+`print(KEY)`, reads as a reader. A comment line never reads. A key with a `*`
 or `<name>` segment reads where that segment is spelled as one quoted segment, which may hold `.` and
 an interpolated name (`f'budgets."{cap}"'`), or as one run with no quote, space, `.`, `(` or `)`,
 `"budgets.$cap"` say, unless the text spells another catalogue key exactly (TOOL-dGroundRules-21
@@ -636,17 +645,20 @@ source-mode update writes. `derive_census_tree` must answer `source` at that too
 the list not graded; with the registry deleted the derivation must refuse naming the receipt; and
 with two registries in the window it must raise the search's own Refusal naming both.
 
-`reader-coverage` is one outcome case over eleven repositories, each a kit copy whose catalogue holds
+`reader-coverage` is one outcome case over thirteen repositories, each a kit copy whose catalogue holds
 the planted key `fixture.planted`, a spec under `memory/builds/bPlanted/spec/` and the case's planted
 files, pushed to a bare remote; it judges `check_reader_coverage` by the key it reds and the count it
 grades, printing `case <name>: red|green`. Red: `landed-no-reader` (the spec `CLOSED` at the landed
 revision, no consumer), `not-a-reader` (the key named only in a `.md` file, a `*.test.sh`, a `.py`
 comment line, a copy of `check_policy.py`, the JSON mirror and the catalogue), `history-not-tree`
-(`CLOSED` landed, `OPEN` in the working tree) and `pattern-only-sibling` (`fixture.*` red while the
-only call names its sibling `fixture.exact`). Green: `unlanded` (`OPEN` landed), `no-build` (owner
+(`CLOSED` landed, `OPEN` in the working tree), `pattern-only-sibling` (`fixture.*` red while the
+only call names its sibling `fixture.exact`) and `constant-unread` (TOOL-dLandedOwners-2: a column-0
+`KEY` named only in a message tuple, `resolve(KEY)` in a file binding no `KEY`, and a function-local
+`key` passed to a call). Green: `unlanded` (`OPEN` landed), `no-build` (owner
 `bAbsent`, no build folder) and `tree-not-history` (`OPEN` landed, `CLOSED` in the working tree), each
 grading nothing and printing the announce line; `reader-python`, `reader-cli` and `reader-js`, one
-shape each; and `pattern-read` (`policy.py get "fixture.$name"` reads `fixture.*`).
+shape each; `pattern-read` (`policy.py get "fixture.$name"` reads `fixture.*`); and `reader-constant`
+(a column-0 `KEY` passed to a call nested in another call's arguments).
 
 `reader-coverage-carried` (TOOL-dLandedOwners-1) is one outcome case over five repositories, each a
 kit copy whose catalogue holds `fixture.planted` owned by `bPlanted` with no consumer, a
