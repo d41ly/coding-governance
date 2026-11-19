@@ -118,7 +118,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-12 — create-only decision and problem registers on the remote](spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md) | 8 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-42 — an offline lease create reads the feed first, as every create on an empty parent does](spec/2026-10-25-spec-TOOL-dPlacedRequest-42.md) | 8 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically](spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md) | 9 | 2 | CLOSED | rev-6 | 2026-11-19 |
-| [TOOL-dPlacedRequest-19 — the project-level request record: pushed by its content key, its text kept where it was typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md) | 10 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
+| [TOOL-dPlacedRequest-19 — the project-level request record: pushed by its content key, its text kept where it was typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md) | 10 | 2 | INPROGRESS | rev-7 | 2026-11-19 |
 | [TOOL-dPlacedRequest-29 — the lander's fence survives its own holder's write: a same-holder move re-fences and retries](spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged](spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-31.md) | 11 | 2 | DEFERRED | rev-4 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 202 bound to this build, across 4 record folder(s).
+Records: 204 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
