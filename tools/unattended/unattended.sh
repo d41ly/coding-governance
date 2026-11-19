@@ -44,6 +44,7 @@
 #   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
+#   unattended.sh --lease fence build <slug>                       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -4141,6 +4142,46 @@ write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refu
   done
   [ "$n" != 0 ] || [ "$rc" != 0 ] || echo "lease — prune · nothing to prune"
   return "$rc"
+}
+
+# --lease fence build <slug>, THE FENCE READ (TOOL-dPlacedRequest-15 S2): what an effect push of this
+# build carries so a holder replaced between its read and its push lands nothing. ONE bounded read of
+# the leases, the `lease` column deciding whether this session holds the build lease, and ONE line.
+# Held (`mine`): a beat built by `build_gov_commit` on the tip read, the record copied with a fresh
+# `beat-utc` and `renews: no`, its `witness` unchanged, so it renews nothing; it pushes nothing and
+# prints `fence — <lease ref> <tip> <beat>`, exit 0, the caller pushing the beat atomically beside its
+# effect under `--force-with-lease=<lease ref>:<tip>`. `RUN_CLAIMS` off, or no build lease on the
+# remote: `fence — none · <why>`, exit 0. A failed read is `offline`; any other row is the verb's
+# refusal line, its cause the column's, else `offered` for an open offer and `live-holder` for a
+# released lease or a same-session one under another fleet tag, exit 1. A shape or a fleet tag it
+# cannot derive is `lease not written`, exit 2, which the lander refuses as an unparsed read.
+# WHAT THIS DOES NOT CHECK: that the lease is still this session's at the push, which is the
+# compare-and-swap's, nor that the queue is flushed, since the fence writes nothing.
+write_fence_beat() { # slug -> one line; 0 a fence or none, 1 refused, 2 not written
+  local slug="$1" ref tail tag sid rc cause body beat
+  [ "$RUN_CLAIMS" = on ] || { echo "fence — none · leases are off"; return 0; }
+  derive_lease_ref build "$slug" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it holds no lease: $tag"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  read_claims quiet || { echo "lease refused — offline · $tail · $CL_WHY"; return 1; }
+  check_claim_writable "$slug" lease "$tag" "$sid" fence; rc=$?
+  case "$CW_CLS:$CW_KIND" in none:*|*:-|*:) echo "fence — none · no lease on the remote"; return 0 ;; esac
+  if [ "$rc" != 0 ] || [ "$CW_CLS" != mine ]; then
+    cause=$CW_CAUSE
+    case "$rc:$CW_CLS" in 1:*) ;; *:offered) cause=offered ;; *) cause=live-holder ;; esac
+    echo "lease refused — $cause · $tail · ${CW_WHO#* · }"; return 1
+  fi
+  body=$(GIT cat-file commit "$CW_SHA" 2>/dev/null | FB_UTC=$(read_utc_now) awk '
+    { sub(/\r$/, "") }
+    !b { if ($0 == "") b = 1; next }
+    /^beat-utc: / && !u { print "beat-utc: " ENVIRON["FB_UTC"]; u = 1; next }
+    /^renews: / && !r { print "renews: no"; r = 1; next }
+    { print }
+    END { if (!u) print "beat-utc: " ENVIRON["FB_UTC"]; if (!r) print "renews: no" }')
+  [ -n "$body" ] && beat=$(build_gov_commit "$CW_SHA" "$body") \
+    || { echo "lease not written — the fence beat could not be built on $tail at $CW_SHA in this clone"; return 2; }
+  echo "fence — $ref $CW_SHA $beat"
 }
 
 # --register, TWO CREATE-ONLY REGISTERS ON THE REMOTE (TOOL-dPlacedRequest-12). A decision is
@@ -18278,6 +18319,11 @@ while [ $# -gt 0 ]; do
                       if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                         echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
                       else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = fence ]; then
+                      # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" != 2 ] || [ "${LV_POS[0]}" != build ]; then
+                        echo "lease not written — --lease fence takes build <slug> and nothing else"; _rl_rc=2
+                      else write_fence_beat "${LV_POS[1]}"; _rl_rc=$?; fi
                     elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                       echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id> or run <cadence> <period>"; _rl_rc=2
                     else

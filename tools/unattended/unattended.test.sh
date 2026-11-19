@@ -20453,6 +20453,34 @@ rg_out=$(run_register_arm decision tFix entry.claim F2 "$LF/a.txt"); rg_rc=$?
 same "DPR12 AC7 with the switch off it prints register — off, exits 2 and the origin gains no ref" \
   "$rg_out|$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "register — off|2 unchanged"
 rm -rf "$LF"
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-15 — THE FENCE READ, `--lease fence build <slug>`, over the lease fixture: no
+# lease on the remote and the switch off each print one `fence — none` line, exit 0; a lease this
+# session holds prints `fence — <ref> <tip> <beat>`, the beat a commit on the tip whose record
+# carries `renews: no` and the tip's witness, the origin unmoved because the fence pushes nothing; a
+# lease another session holds is refused `live-holder`, exit 1; any other shape exits 2. RED, observed
+# at the close, is the base driver, which has no `fence` act. Waived by README rule 8.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+fb_out=$(run_lease_arm fence build tFix); fb_rc=$?
+same "DPR15 AC5 no lease on the remote prints one fence — none line, exit 0" "$fb_rc|$fb_out" "0|fence — none · no lease on the remote"
+run_lease_arm acquire build tFix >/dev/null
+fb_tip=$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tFix/build)
+fb_out=$(run_lease_arm fence build tFix); fb_rc=$?
+fb_beat=${fb_out##* }
+same "DPR15 S2 a held lease prints its ref, the tip read and a beat, exit 0" "$fb_rc|${fb_out% *}" "0|fence — refs/gov/leases/tFix/build $fb_tip"
+same "DPR15 S2 ...the beat is a commit on the tip, renews: no, the tip's witness, the origin unmoved" \
+  "$(git -C "$LF/c1" rev-parse "$fb_beat^") $(git -C "$LF/c1" log -1 --format=%B "$fb_beat" | sed -n 's/^renews: //p') $(git -C "$LF/c1" log -1 --format=%B "$fb_beat" | sed -n 's/^witness: //p') $(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tFix/build)" \
+  "$fb_tip no $(read_lease_field tFix/build witness) $fb_tip"
+fb_out=$(LA_SID=s2 run_lease_arm fence build tFix); fb_rc=$?
+same "DPR15 AC5 a lease another session holds is refused live-holder, exit 1" "$fb_rc|${fb_out%% · node*}" "1|lease refused — live-holder · tFix/build"
+fb_out=$(run_lease_arm fence unit tFix u1); fb_rc=$?
+same "DPR15 S2 a fence of anything but build <slug> exits 2" "$fb_rc|$fb_out" "2|lease not written — --lease fence takes build <slug> and nothing else"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
+fb_out=$(run_lease_arm fence build tFix); fb_rc=$?
+same "DPR15 AC5 with the switch off it prints one fence — none line, exit 0" "$fb_rc|$fb_out" "0|fence — none · leases are off"
+rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -22476,7 +22504,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3820 -> 3829 by TOOL-dPlacedRequest-42: the offline create block's 9 region-eight assertions
 # (8 `same`, 1 `hit`, its loop over three cases run as written), off the diff's own lines; no skip
 # branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3829
+# RAISED 3829 -> 3835 by TOOL-dPlacedRequest-15: the fence read block's 6 region-eight assertions
+# (6 `same`), off the diff's own lines; no skip branch. No suite ran, and its RED-first observation
+# is the close's.
+FLOOR_ASSERTIONS=3835
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22738,7 +22769,8 @@ FLOOR_SHARD_7=311
 # RAISED 1015 -> 1035 by TOOL-dPlacedRequest-12: the same 20 region-eight register assertions, see FLOOR_ASSERTIONS.
 # RAISED 1035 -> 1051 by TOOL-dPlacedRequest-12's checklist pass: the same 16 region-eight refusal arms, see FLOOR_ASSERTIONS.
 # RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1060
+# RAISED 1060 -> 1066 by TOOL-dPlacedRequest-15: the same 6 region-eight fence read assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1066
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

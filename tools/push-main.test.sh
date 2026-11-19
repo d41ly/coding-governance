@@ -1621,4 +1621,140 @@ else
   echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
 
+# 42-49 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
+#      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside
+#      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of it,
+#      leases on, and clone A's session `sA` holding the build lease `fx` under fleet tag `a`. Clone B
+#      takes the lease over as fleet tag `b`, same session, which the `lease` column reads `same`.
+#      A planted fence read stands in a stub driver committed at the same place. Staged against the
+#      base lander, which pushes one ref and reads no fence: 42 moves no lease, 43 lands, 44 to 47
+#      land, and 48 lands the attended `--slug`, which the base refuses outright.
+#      WHAT THIS DOES NOT CHECK: a real remote's `--atomic` (the spec's AC1, at the build run), and
+#      the change-feed census over this lander, which the lib dir's own suite reads.
+_fn_k=$(cd "$HERE" && for d in */; do [ -f "$d/unattended.sh" ] && [ -f "$d/lib-unattended.sh" ] && { printf '%s' "${d%/}"; break; }; done)
+FX="$tmp/fx"
+write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 when the lease could not be acquired
+  rm -rf "$FX"; mkdir -p "$FX"
+  git init -q --template= --bare -b main "$FX/o.git"
+  git init -q --template= -b main "$FX/a"
+  ( cd "$FX/a" || exit 1
+    mkdir -p "./${KIT_REL}unattended" .githooks memory/builds/fx
+    cp "$HERE/push-main.sh" "$lander"
+    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "$HERE/$_fn_k/unattended.sh" > "${KIT_REL}unattended/unattended.sh"
+    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nexit 0\n' \
+      "$FX" "$FX" "$FX" "${KIT_REL}unattended/unattended.sh" > .githooks/pre-push
+    printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
+      'GATE_CMD="true"' 'GATE_WALL="21600"' 'RESUME_SCHEDULE="off"' 'RESUME_SCHEDULE_DELAY=1800' 'RESUME_SCHEDULE_LIMIT=6' \
+      'GATE_BOUND=3600' 'UNIT_STALL_BOUND=1800' 'RESUME_STALE_BOUND=5400' > .unattended.conf
+    echo x > memory/builds/fx/README.md
+    git config core.hooksPath .githooks
+    git add -A && git commit -q -m base && git remote add origin "$FX/o.git" \
+      && git push -q --no-verify origin main && git remote set-head origin -a >/dev/null ) || return 1
+  git clone -q "$FX/o.git" "$FX/b" && git -C "$FX/b" config core.hooksPath .githooks || return 1
+  ( cd "$FX/a" && bash "${KIT_REL}unattended/unattended.sh" --lease acquire build fx 2>&1 ) | grep -q '^lease — fx/build · create'
+}
+read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fx/build)"; }
+run_fence_land() { ( cd "$FX/a" && bash "$lander" "$@" 2>&1 ); }
+write_fence_stub() { # stub driver body -> committed in clone A, the branch prepared again
+  printf '#!/usr/bin/env bash\n%s\n' "$1" > "$FX/a/${KIT_REL}unattended/unattended.sh"
+  git -C "$FX/a" commit -qam "TOOL-fx-9: a planted fence read"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+}
+_fn_u=${USERNAME-}; _fn_sid=${CLAUDE_CODE_SESSION_ID-}; _fn_gct=${GOV_GATE_CMD_TEST-}
+export GOV_RUNLOG=0 USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sA; unset GOV_GATE_CMD_TEST GATE_PUSH_BASE
+if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
+  # 42 — AC4: a fenced landing moves the branch and the lease together, the beat on the tip read,
+  #      `renews: no`, and clone A's feed holds one event for the lease at the beat.
+  tip42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  out42=$(run_fence_land --land --slug fx); rc42=$?
+  b42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  g42="$rc42 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && echo main) $([ "$b42" != "$tip42" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$b42^")" = "$tip42" ] && echo beat) $(git --git-dir="$FX/o.git" log -1 --format=%B "$b42" | sed -n 's/^renews: //p') $(grep -c "refs/gov/leases/fx/build.*$b42" "$FX/a/.git/gov-feed.log" 2>/dev/null)"
+  [ "$g42" = "0 main beat no 1" ] && ok "42 a fenced landing pushes the branch and a beat parented on the tip read, renews: no, one feed event" \
+    || bad "42 the fenced landing did not move the branch and the lease together, or the feed missed the beat: [$g42] $out42"
+  # 43 — AC2: clone B takes the lease over inside A's hook, after the fence read; A's atomic push lands
+  #      nothing and the lander exits 1 naming `fenced`, the branch unchanged and the lease B's.
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  m43=$(git --git-dir="$FX/o.git" rev-parse main); : > "$FX/take-once"
+  out43=$(run_fence_land --land --slug fx); rc43=$?
+  g43="$rc43 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m43" ] && echo unchanged) $(git --git-dir="$FX/o.git" log -1 --format=%B refs/gov/leases/fx/build | sed -n 's/^fleet-tag: //p')"
+  case "$g43|$out43" in
+    "1 unchanged b|"*"push-main: fenced — the lease"*) ok "43 a lease taken over after the fence read lands nothing: exit 1, fenced, the branch unchanged, the lease B's" ;;
+    *) bad "43 a lease taken over mid-push did not refuse as fenced with the branch unchanged: [$g43] $out43" ;;
+  esac
+  # 44 — AC5: against the lease B now holds, the fence read refuses `live-holder` and nothing moves.
+  t44=$(read_fence_tips); out44=$(run_fence_land --land --slug fx); rc44=$?
+  case "$rc44 $([ "$(read_fence_tips)" = "$t44" ] && echo unchanged)|$out44" in
+    "1 unchanged|"*"lease refused — live-holder · fx/build"*) ok "44 a lease another holds refuses the landing live-holder and pushes nothing" ;;
+    *) bad "44 a lease clone B holds did not refuse the landing: $out44" ;;
+  esac
+  # 45 — AC6: a remote that advertises no `--atomic` refuses the fenced push, `unfenced`, never a fallback.
+  ( cd "$FX/b" && USERNAME=agent5 bash "${KIT_REL}unattended/unattended.sh" --lease release build fx >/dev/null 2>&1 )
+  ( cd "$FX/a" && bash "${KIT_REL}unattended/unattended.sh" --lease acquire build fx >/dev/null 2>&1 )
+  git --git-dir="$FX/o.git" config receive.advertiseAtomic false
+  t45=$(read_fence_tips); out45=$(run_fence_land --land --slug fx); rc45=$?
+  git --git-dir="$FX/o.git" config --unset receive.advertiseAtomic
+  case "$rc45 $([ "$(read_fence_tips)" = "$t45" ] && echo unchanged)|$out45" in
+    "1 unchanged|"*"push-main: unfenced — the remote refused the atomic push"*) ok "45 a remote without atomic pushes refuses the fenced landing as unfenced, the branch and the lease unchanged" ;;
+    *) bad "45 a remote without atomic pushes did not refuse as unfenced with nothing moved: $out45" ;;
+  esac
+  # 46 — AC9: a driver exiting 2 with nothing, and one exiting 0 with two fence lines, refuse unparsed.
+  cp "$FX/a/${KIT_REL}unattended/unattended.sh" "$FX/real-driver"
+  t46=$(read_fence_tips)
+  write_fence_stub 'exit 2'; out46=$(run_fence_land --land --slug fx); rc46=$?
+  write_fence_stub 'echo "fence — none · leases are off"; echo "fence — none · leases are off"'
+  out46b=$(run_fence_land --land --slug fx); rc46b=$?
+  case "$rc46 $rc46b $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out46|$out46b" in
+    "1 1 unchanged|"*"push-main: fence read unparsed — exit 2 · (empty)"*"|"*"push-main: fence read unparsed — exit 0 · fence — none"*)
+      ok "46 an empty odd-exit fence read and a two-line one each refuse unparsed, nothing pushed" ;;
+    *) bad "46 an unparsed fence read landed or was not named: $out46 | $out46b" ;;
+  esac
+  # 47 — AC3: a fence line whose beat IS its tip, the unchanged re-push no remote checks, refuses first.
+  lt47=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt47 $lt47\""
+  out47=$(run_fence_land --land --slug fx); rc47=$?
+  case "$rc47 $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out47" in
+    "1 unchanged|"*"IS the lease tip, an unchanged lease ref the remote never checks"*) ok "47 check_fence_beat refuses a beat equal to the tip before any push" ;;
+    *) bad "47 a fence beat equal to its tip was not refused before the push: $out47" ;;
+  esac
+  # 48 — AC5 and AC7: leases off, the driver prints one `fence — none` line and the landing is a
+  #      single-ref push; the attended `--slug` fences as --land does, and no argument reads no fence.
+  cp "$FX/real-driver" "$FX/a/${KIT_REL}unattended/unattended.sh"
+  sed -i 's/^RUN_CLAIMS="on"/RUN_CLAIMS="off"/' "$FX/a/.unattended.conf"
+  git -C "$FX/a" commit -qam "TOOL-fx-9: leases off"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out48=$(run_fence_land --land --slug fx); rc48=$?
+  case "$rc48 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb48" ] && echo unmoved)|$out48" in
+    "0 unmoved|"*"push-main: fence — none · leases are off"*"landed main"*) ok "48 with leases off the landing reads fence — none and pushes the branch alone" ;;
+    *) bad "48 a landing with leases off was refused or moved the lease: $out48" ;;
+  esac
+  ( cd "$FX/a" && git checkout -q main && git fetch -q origin && git reset -q --hard origin/main \
+      && sed -i 's/^RUN_CLAIMS="off"/RUN_CLAIMS="on"/' .unattended.conf && git commit -qam "TOOL-fx-9: leases on" \
+      && git commit -q --allow-empty -m "TOOL-fx-3: attended" )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out48b=$(run_fence_land --slug fx); rc48b=$?
+  nb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-4: attended plain"
+  out48c=$(run_fence_land); rc48c=$?
+  case "$rc48b $rc48c $([ "$(git --git-dir="$FX/o.git" rev-parse "$nb48^")" = "$lb48" ] && echo fenced) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$nb48" ] && echo unmoved) $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse main)" ] && echo main)|$out48b|$out48c" in
+    "0 0 fenced unmoved main|"*"push-main: fence — refs/gov/leases/fx/build"*"|"*)
+      case "$out48c" in *"fence"*) bad "48 the attended landing with no argument read a fence: $out48c" ;;
+        *) ok "48 the attended --slug fences on the build's lease, and no argument lands with no fence read" ;; esac ;;
+    *) bad "48 the attended --slug was refused or did not fence, or no argument moved the lease: $out48b | $out48c" ;;
+  esac
+  # 49 — S6: an attended `--slug` outside the build-folder grammar refuses at exit 2 before any read.
+  out49=$(run_fence_land --slug 'a b'); rc49=$?
+  case "$rc49|$out49" in
+    "2|push-main: --slug <slug>, a build-folder name"*) ok "49 an attended --slug outside the build-folder grammar exits 2" ;;
+    *) bad "49 a malformed attended --slug was not refused at exit 2: $out49" ;;
+  esac
+else
+  echo "  skip — 42-49 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
+fi
+unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
+[ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

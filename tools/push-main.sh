@@ -14,7 +14,8 @@
 # USAGE
 #   push-main.sh                             the attended landing: from the primary tree, with the
 #                                            default branch checked out, pushing that branch.
-#   push-main.sh --prepare  --slug <slug>    merge THIS branch onto the tip the remote advertises,
+#   push-main.sh            --slug <slug>    the attended landing, fenced on that build's lease.
+#   push-main.sh --prepare  --slug <slug>   merge THIS branch onto the tip the remote advertises,
 #                                            in place, and move the branch to that merge.
 #   push-main.sh --land     --slug <slug>    push that prepared merge, and nothing else, as the
 #                                            default branch.
@@ -48,6 +49,19 @@
 # recording the start in `<common-dir>/gate-post-merge.start`; `ci` says remote CI owns it. What
 # this does NOT check: whether that bar ever finished, or what it published.
 #
+# THE FENCED PUSH (TOOL-dPlacedRequest-15). Given `--slug`, under `--land` or the attended landing,
+# each attempt first asks the unattended driver beside this lander for the fence, `--lease fence
+# build <slug>`, once and before it clears the hook's verdict files. A fence line names the lease
+# ref, the tip the driver read and a beat parented on it; the push then carries the branch and the
+# beat in ONE `git push --atomic` under `--force-with-lease=<lease ref>:<tip>`, so a holder replaced
+# between that read and the push lands nothing, and the landed beat joins this node's change feed.
+# `fence — none` (leases off, no lease on the remote) and no driver beside this lander push as before;
+# a `lease refused` line, a beat that is the tip or not parented on it, and any read that is no
+# well-formed line refuse, exit 1, nothing pushed. A fenced push that fails with the default branch
+# unchanged reads the lease once: moved is `fenced`, the lease lost; unmoved is `unfenced`, the remote
+# refused the atomic push, which never falls back to an unfenced one. What this does NOT check: the
+# remote's support for `--atomic` before the bar runs, so such a remote spends a bar to say `unfenced`.
+#
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
 # shares. A run that is never on it therefore had to leave its own tree to land, and its landing
@@ -72,6 +86,7 @@ set -u
 # one observable change to the no-flag contract. It reaches only an invocation that passed something.
 MODE=""
 SLUG=""
+SLUG_SET=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --prepare|--land|--carry|--prepared)
@@ -85,25 +100,23 @@ while [ "$#" -gt 0 ]; do
         echo "push-main: --slug needs the build slug as its value." >&2
         exit 2
       fi
-      SLUG=$2; shift 2 ;;
+      SLUG=$2; SLUG_SET=1; shift 2 ;;
     --slug=*)
       echo "push-main: spell the slug as two words, '--slug <slug>': $1" >&2
       exit 2 ;;
     *)
-      echo "push-main: unrecognised argument '$1' — the flags are --prepare, --land, --carry and --prepared, each with --slug <slug>; no argument at all is the attended landing." >&2
+      echo "push-main: unrecognised argument '$1' — the flags are --prepare, --land, --carry and --prepared, each with --slug <slug>; no argument at all is the attended landing, and '--slug <slug>' alone is the attended landing fenced on that build's lease." >&2
       exit 2 ;;
   esac
 done
-if [ -z "$MODE" ] && [ -n "$SLUG" ]; then
-  echo "push-main: --slug names a build but no flag says what to do with it — add --prepare, --land, --carry or --prepared." >&2
-  exit 2
-fi
-if [ -n "$MODE" ]; then
+# THE ATTENDED LANDING TAKES `--slug` TOO (TOOL-dPlacedRequest-15 S6): with it the landing fences on
+# that build's lease, and without it the landing names no build and covers no lease.
+if [ -n "$MODE" ] || [ -n "$SLUG_SET" ]; then
   # The SAME grammar the memory tree enforces on a build-folder name, because that is what a slug
-  # is; it reaches a commit message, so it is validated before it gets there.
+  # is; it reaches a commit message and a lease ref, so it is validated before it gets there.
   case "$SLUG" in
     *[!A-Za-z0-9-]* | "" | [!A-Za-z]*)
-      echo "push-main: --$MODE needs --slug <slug>, a build-folder name: a letter, then letters, digits or dashes: '$SLUG'" >&2
+      echo "push-main: ${MODE:+--$MODE needs }--slug <slug>, a build-folder name: a letter, then letters, digits or dashes: '$SLUG'" >&2
       exit 2 ;;
   esac
 fi
@@ -261,8 +274,8 @@ export GIT_SSH_COMMAND
 # channel, or a push that died before the hook ran, writes none. The push's own output is never an
 # input here (the attended push says why, S2). Every class but `race` has already said why on
 # stderr; a caller retries on `race` and exits 1 otherwise.
-derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
-  local tok msg
+derive_push_failure() {  # -> refused | unreachable | unchanged | fenced | unfenced | race on stdout
+  local tok msg lt
   tok=""; msg=""
   [ -f "$refusal" ] && IFS=$'\t' read -r tok msg < "$refusal"
   case "$tok" in
@@ -288,7 +301,20 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | race on stdout
   git fetch "$remote" "$def" 2>/dev/null || true
   if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then
     echo "push-main: the push failed, $remote/$def is unchanged and reachable, and the hook left no verdict — the remote refused it or the hook predates its refusal channel; read the push output above." >&2
-    echo unchanged; return 0
+    # A FENCED PUSH READS ITS LEASE ONCE, here and only here (TOOL-dPlacedRequest-15 S4): moved from
+    # the tip the fence read is `fenced`, unmoved is `unfenced`; a read that fails stays `unchanged`.
+    [ -n "$FENCE_REF" ] || { echo unchanged; return 0; }
+    if ! lt=$(git ls-remote "$remote" "$FENCE_REF" 2>/dev/null); then
+      echo "push-main: the lease $FENCE_REF could not be read after the fenced push failed, so whether it was taken is unknown; nothing landed." >&2
+      echo unchanged; return 0
+    fi
+    lt=${lt%%[[:space:]]*}
+    if [ "$lt" != "$FENCE_TIP" ]; then
+      echo "push-main: fenced — the lease $FENCE_REF was taken after the fence read it at ${FENCE_TIP:0:8} and is now ${lt:-deleted}, so the atomic push landed nothing; end the run with --abort $SLUG --code claim-lost." >&2
+      echo fenced; return 0
+    fi
+    echo "push-main: unfenced — the remote refused the atomic push while the lease $FENCE_REF still reads ${FENCE_TIP:0:8}, so nothing landed; a remote without atomic pushes cannot fence a landing, and leases stay off there: RUN_CLAIMS=\"off\" in .unattended.conf lands unfenced again." >&2
+    echo unfenced; return 0
   fi
   echo race
 }
@@ -441,6 +467,461 @@ run_post_merge() {  # -> 0 always; one stderr line whenever the landed tip decla
   fi
   return 0
 }
+
+# ---- THE FENCE, read once per attempt and pushed atomically — TOOL-dPlacedRequest-15 -------------
+# The fence read's result: the lease ref, the tip the driver read and the beat on it, or all three
+# empty for no fence. Set by `read_fence_line` and read by the push and by `derive_push_failure`.
+FENCE_REF=""; FENCE_TIP=""; FENCE_BEAT=""
+
+# `check_fence_beat <tip> <beat>` holds the beat to the one shape the remote checks: a commit other
+# than the tip whose first parent is the tip. A beat equal to the tip re-pushes an unchanged lease
+# ref, for which git sends no command, so nothing would compare it; it is refused before any push.
+check_fence_beat() {  # tip · beat -> 0 when the beat is parented on the tip and is not it; else its line and 1
+  local p
+  if [ "$1" = "$2" ]; then
+    echo "push-main: the fence beat ${2:0:8} IS the lease tip, an unchanged lease ref the remote never checks, so the landing would carry no fence; nothing was pushed." >&2
+    return 1
+  fi
+  p=$(git rev-parse --verify --quiet "$2^" 2>/dev/null) || p=""
+  [ "$p" = "$1" ] && return 0
+  echo "push-main: the fence beat ${2:0:8} has ${p:-no parent here} as its first parent, not the lease tip ${1:0:8}, so it does not stand on the tip the fence read; nothing was pushed." >&2
+  return 1
+}
+
+# `read_fence_line` asks the unattended driver beside this lander, `--lease fence build <slug>`, and
+# parses its result in ONE place, failing closed. No `--slug`, or no driver beside this lander, is no
+# fence, and so is exit 0 with one `fence — none · …` line. Exit 0 with one `fence — <lease ref> <tip>
+# <beat>` line is a fence, each field checked and the beat held by `check_fence_beat`. Exit 1 with
+# one `lease refused — …` line refuses. Anything else, an empty, multi-line or odd-exit read included,
+# refuses as unparsed: only a missing driver means no fence. A driver beside this lander that no
+# python finds refuses too, as `run_gov_first` does.
+read_fence_line() {  # -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, its line printed
+  local got rc dir out rest fr ft fb kit=unattended anchor=unattended.sh
+  FENCE_REF=""; FENCE_TIP=""; FENCE_BEAT=""
+  [ -n "$SLUG" ] || return 0
+  got=$(resolve_lander_kit "$kit" "$anchor"); rc=$?
+  if [ "$rc" = 1 ]; then
+    if [ -f "$self_dir/$kit/$anchor" ] || [ -f "$self_dir/../$kit/$anchor" ]; then
+      echo "push-main: the fence read did not run — an unattended driver is beside this lander and no usable python launcher finds it, so the landing of '$SLUG' cannot be fenced; nothing was pushed." >&2
+      return 1
+    fi
+    rc=2
+  fi
+  if [ "$rc" != 0 ]; then
+    echo "push-main: fence — none · no unattended driver beside this lander, so no lease is fenced" >&2
+    return 0
+  fi
+  dir=${got#*$'\t'}
+  out=$("${BASH:-bash}" "$top/$dir/$anchor" --lease fence build "$SLUG"); rc=$?
+  out=${out//$'\r'/}
+  case "$rc:$out" in
+    *$'\n'*) ;;
+    "0:fence — none · "?*)
+      echo "push-main: $out" >&2
+      return 0 ;;
+    "0:fence — "*)
+      rest=${out#"fence — "}; fr=${rest%% *}; rest=${rest#* }; ft=${rest%% *}; fb=${rest#* }
+      if [ "$fr" = "refs/gov/leases/$SLUG/build" ] && [[ $ft =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]] && [[ $fb =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
+        echo "push-main: $out" >&2
+        check_fence_beat "$ft" "$fb" || return 1
+        FENCE_REF=$fr; FENCE_TIP=$ft; FENCE_BEAT=$fb
+        return 0
+      fi ;;
+    "1:lease refused — "?*)
+      echo "push-main: the fence refused the landing of '$SLUG', so nothing was pushed — $out" >&2
+      return 1 ;;
+  esac
+  rest=${out%%$'\n'*}
+  echo "push-main: fence read unparsed — exit $rc · ${rest:-(empty)}" >&2
+  return 1
+}
+
+# `write_effect_push <refspec>` is the landing's one push. With no fence it is the single-ref push
+# both paths always made; with one, the refspec and the beat go in ONE `--atomic` push whose lease is
+# the fence's tip, and once it lands the beat joins this node's change feed (TOOL-dPlacedRequest-13).
+# Its output is SHOWN and never read (S2); a failure is classified by `derive_push_failure`.
+write_effect_push() {  # refspec -> git's exit
+  local rc
+  if [ -z "$FENCE_REF" ]; then
+    git push "$remote" "$1" >&2
+    return
+  fi
+  git push --atomic "--force-with-lease=$FENCE_REF:$FENCE_TIP" "$remote" "$1" "$FENCE_BEAT:$FENCE_REF" >&2 && rc=0 || rc=$?
+  [ "$rc" != 0 ] || add_feed_event "$FENCE_REF" "$FENCE_BEAT"
+  return "$rc"
+}
+
+# The change feed's appender and the health log's, inlined byte-identical from the lib dir's
+# canonical copies (TOOL-dPlacedRequest-13, -36), as every writer of a governance ref carries them.
+# >>> gov_feed_sh — canonical copy: gov-feed.sh in gov's lib dir (byte-identical; gated)
+# THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
+# feed's log and the offline queue's, is read and written only under a lock directory beside it in
+# the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
+# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold:
+# a pinned literal, because a holder does local file work alone and never pushes while it holds.
+NODE_LOCK_BOUND=10
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
+# block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
+# lock with `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
+# or none and a directory older than two minutes - and only by the writer that takes the guard
+# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
+# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
+# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
+# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
+# it removes it and reports busy, never taking it in the same call, and the next call breaks the
+# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
+# released. `write_dir_lock_wait` is the one retrying take: it calls `write_dir_lock` every 50 ms
+# until it takes or its ceiling in seconds passes, read on the whole-second clock. `remove_dir_lock`
+# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
+# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
+# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
+# writer to die or stall for a minute inside the break, then four writers in one git dir in one
+# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
+# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
+# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
+# A writer in another git dir takes another lock. Each event goes through the `health_log_sh` block
+# every carrier holds beside this one (TOOL-dPlacedRequest-36), to `resolve_health_log` of `ROOT`
+# where the driver sets it, so its spec-tokens lock in the sidecar dir logs to the repository's log,
+# else of the lock's parent, which for a node lock is the common dir: no unset name under `set -u`.
+# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
+# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
+# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
+# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
+# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
+# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
+# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
+# rule alone. The procfs read is `${PROCFS_ROOT:-/proc}`: the driver sets PROCFS_ROOT from its fixture
+# seam, and a carrier with no driver reads `/proc`.
+# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
+# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
+# no token reads live, so its lock waits for the deadline.
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "${PROCFS_ROOT:-/proc}/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
+check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
+  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
+  case "$lu" in *[!0-9]*) lu="" ;; esac
+  for f in "$1"/pid.*; do
+    [ -f "$f" ] || continue
+    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
+    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
+    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
+      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
+    n=$((n + 1))
+  done
+  [ "$n" -le 0 ] || return 0
+  if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
+  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
+}
+write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
+  read_proc_token "$3"
+  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
+  return 0
+}
+write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
+  local lk="$1" g="$1.break" broke=""
+  if ! mkdir "$lk" 2>/dev/null; then
+    check_dir_lock_stale "$lk" || return 1
+    if ! mkdir "$g" 2>/dev/null; then
+      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        rm -rf "$g"
+        add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-guard-cleared" "$g"
+      fi
+      return 1
+    fi
+    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    rm -rf "$lk"
+    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
+    broke=1
+  fi
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  if [ -n "$broke" ]; then
+    rmdir "$g" 2>/dev/null
+    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"
+  fi
+  return 0
+}
+write_dir_lock_wait() { # lock dir · owner token · seconds it may hold · health-event stem · seconds to wait -> 0 taken, 1 busy
+  local end=$(( EPOCHSECONDS + ${5:-0} ))
+  until write_dir_lock "$1" "$2" "$3" "$4"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || return 1
+    sleep 0.05
+  done
+  return 0
+}
+remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
+  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
+  return 0
+}
+# I4, THE CHANGE FEED (TOOL-dPlacedRequest-13): `<git-common-dir>/gov-feed.log`, node-local and never
+# pushed, one LF-terminated line per governance ref write this node made or saw, six TAB fields:
+# seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
+# `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
+# and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
+# commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
+# APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
+# equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
+# event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
+# than the larger of the counter `gov-feed.seq` and the last all-digit first field of the log, so a
+# lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
+# torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
+# returns 0, as the health log's appender does: the governance write already landed.
+# THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# `EXIT` trap, armed once the lock is taken, calls `remove_dir_lock` with this call's token. So an
+# abort inside it, an unbound name under a carrier's `set -u`, a function no carrier defines or a
+# failed write, ends the subshell alone: the append prints `feed: NOTE - <ref>: the append exited
+# <rc>` and returns 0, and no lock is left for the next writer to wait out. The subshell sets no
+# global a caller reads. WHAT THIS DOES NOT CHECK: an abort between the take and the trap's arming
+# leaves the lock to its deadline; an abort after the line is written reads as a NOTE all the same.
+# THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
+# and this is the one take a carrier with no driver reaches, so where it is unset the append prints
+# one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
+# THE CACHE `refs/gov/remote/<tail>` mirrors `refs/gov/<tail>` on the remote: what this node fetched
+# and, through `write_gov_ref`, what it wrote. `add_feed_sightings` appends, oldest first, the unseen
+# first-parent chain of every cached ref whose tip is not the commit of the feed's newest line for
+# that ref, stopping at that commit or at the first commit not authored `gov-claim`, appended as a
+# lone event, so a ref another node set back to a commit an older line holds is sighted again.
+# `derive_feed_events` is the same walk with no feed to stop at; `check_feed` holds a feed to it per
+# ref git still holds (`missing`, `duplicate` for two consecutive events of one ref with one blob and
+# commit, `extra` on a ref whose tip is a `gov-claim` commit, `order`, `torn`), and `write_feed`
+# writes it as a fresh feed where none is present.
+# GOVFEED_DIR names the common dir; unset, the first call resolves it once for the process.
+# WHAT THIS DOES NOT CHECK: two breakers the guard's own blind spots (above) admit can both append, which
+# gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
+# ref's events from before a deletion of it are outside every chain git holds and are not compared;
+# a retry made after another event of its ref landed appends again, an event that did happen.
+add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
+  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so this write of %s is not in the feed\n' "$ref" >&2; return 0; }
+  k=${ref#refs/gov/}; k=${k%%/*}
+  if [ -z "$c" ]; then
+    c=0000000000000000000000000000000000000000
+  else
+    r=$(git rev-parse "$c^{commit}" "$c^{tree}" 2>/dev/null) || r=""
+    r=${r//$'\r'/}; c=${r%%$'\n'*}; t=${r#*$'\n'}
+    [ "${#c}:${#t}" = 40:40 ] || c=""
+    case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
+  fi
+  tok="$BASHPID.$RANDOM"
+  ( write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    trap 'remove_dir_lock "$d/gov-feed.lock" "$tok"' EXIT
+    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
+        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+        $2 == ev[1] { p = $4 "\t" $5 }
+        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
+      exit 0
+    fi
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
+    elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
+      rm -f "$d/gov-feed.seq.$$" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
+  return 0
+}
+derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
+  local pre="${1%/}/" feed="${2:-}" rows r t g s
+  rows=$(git for-each-ref --format='%(refname) %(objectname)' "$pre" 2>/dev/null | FEED_FILE="$feed" FEED_PRE="$pre" awk '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") < 5) continue
+              newest[x[2]] = x[5] } }
+    { sub(/\r$/, ""); g = "refs/gov/" substr($1, length(ENVIRON["FEED_PRE"]) + 1)
+      if ((g in newest) && newest[g] == $2) next
+      print $2, g, (g in newest ? newest[g] : "-") }')
+  [ -n "$rows" ] || return 0
+  printf '%s\n' "$rows" | while read -r t g s; do
+    git log --first-parent --format='%H %T %an' "$t" 2>/dev/null | awk -v ref="$g" -v stop="$s" '
+      { sub(/\r$/, "") }
+      $1 == stop { exit }
+      { a = $0; sub(/^[^ ]+ [^ ]+ /, "", a); n++; h[n] = $1; tr[n] = $2; if (a != "gov-claim") exit }
+      END { k = ref; sub(/^refs\/gov\//, "", k); sub(/\/.*$/, "", k)
+            for (i = n; i >= 1; i--) printf "%s\t%s\t%s\t%s\n", ref, k, tr[i], h[i] }'
+  done
+  return 0
+}
+add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cached ref appended oldest first
+  local pre="${1:-refs/gov/remote/}" r k t c
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -n "${GOVFEED_DIR%$'\r'}" ] || return 0
+  while IFS=$'\t' read -r r k t c; do
+    [ -z "$c" ] || add_feed_event "$r" "$c"
+  done < <(derive_feed_events "$pre" "${GOVFEED_DIR%$'\r'}/gov-feed.log")
+  return 0
+}
+check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
+  local pre="${1%/}/" f="${2:-}" dv au
+  if [ -z "$f" ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  fi
+  dv=$(derive_feed_events "$pre")
+  au=$(git for-each-ref --format='%(refname) %(authorname)' "$pre" 2>/dev/null)
+  FEED_FILE="$f" FEED_PRE="$pre" FEED_DV="$dv" FEED_AU="$au" awk '
+    BEGIN {
+      np = length(ENVIRON["FEED_PRE"])
+      m = split(ENVIRON["FEED_AU"], a, "\n")
+      for (i = 1; i <= m; i++) { ln = a[i]; sub(/\r$/, "", ln); if (ln == "") continue
+        r = ln; sub(/ .*$/, "", r); au = ln; sub(/^[^ ]* /, "", au)
+        g = "refs/gov/" substr(r, np + 1); held[g] = 1; if (au == "gov-claim") chain[g] = 1 }
+      m = split(ENVIRON["FEED_DV"], a, "\n")
+      for (i = 1; i <= m; i++) { if (split(a[i], x, "\t") != 4) continue
+        dn[x[1]]++; ds[x[1], dn[x[1]]] = x[4]; inch[x[1] SUBSEP x[4]] = 1 }
+      f = ENVIRON["FEED_FILE"]; bad = 0
+      while ((getline ln < f) > 0) {
+        sub(/\r$/, "", ln)
+        if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        k = x[4] SUBSEP x[5]
+        if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
+        last[x[2]] = k
+        if (!(x[2] in held)) continue
+        if ((x[2] SUBSEP x[5]) in inch) { fn[x[2]]++; fs[x[2], fn[x[2]]] = x[5]; got[x[2] SUBSEP x[5]] = 1 }
+        else if (x[2] in chain) { print "extra " x[2] " " x[5]; bad = 1 }
+      }
+      for (g in dn) {
+        j = 0; off = ""
+        for (i = 1; i <= dn[g]; i++) {
+          c = ds[g, i]
+          if (!((g SUBSEP c) in got)) { print "missing " g " " c; bad = 1; continue }
+          j++; if (off == "" && fs[g, j] != c) off = fs[g, j]
+        }
+        if (off != "") { print "order " g " " off; bad = 1 }
+      }
+      exit bad }'
+}
+write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
+  local pre="${1%/}/" d now n=0 l
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: no git common dir resolves here, so no feed was rebuilt\n'; return 2; }
+  if [ -e "$d/gov-feed.log" ]; then printf 'feed: a feed is present, so nothing was rebuilt over it: %s\n' "$d/gov-feed.log"; return 2; fi
+  TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$d/gov-feed.log.$$" \
+    && printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq" && mv -f "$d/gov-feed.log.$$" "$d/gov-feed.log" \
+    || { rm -f "$d/gov-feed.log.$$" "$d/gov-feed.seq.$$"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  printf 'feed: rebuilt %s event(s) from %s into %s\n' "$n" "$pre" "$d/gov-feed.log"
+  return 0
+}
+print_feed() {       # [seq] -> every event whose seq is at or after it, in file order
+  local from="${1:-0}" d
+  case "$from" in ""|*[!0-9]*) printf 'feed: a replay starts at a sequence number, not %s\n' "$from"; return 2 ;; esac
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -f "$d/gov-feed.log" ] || return 0
+  awk -F'\t' -v from="$from" 'NF == 6 && $1 ~ /^[0-9]+$/ && $1 + 0 >= from + 0' "$d/gov-feed.log"
+}
+# THE OBSERVER CLOCK, I8 (TOOL-dPlacedRequest-17): the one reader of a first sighting. Per
+# `ref TAB commit` pair on stdin, in order, the `seen-utc` of the oldest feed line of that ref and
+# commit, or `-` where the feed holds none, has none of that shape, or cannot be read. Every lease
+# deadline is now minus that stamp, both read on this node's clock, never the holder's `beat-utc`.
+read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` per pair
+  local f=""
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -z "${GOVFEED_DIR%$'\r'}" ] || f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  FEED_FILE="$f" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+              if (!((x[2] SUBSEP x[5]) in seen)) seen[x[2], x[5]] = x[6] } }
+    { sub(/\r$/, ""); print (($1 SUBSEP $2) in seen ? seen[$1, $2] : "-") }'
+}
+# <<< gov_feed_sh
+# >>> health_log_sh — canonical copy: health-log.sh in gov's lib dir (byte-identical; gated)
+# I3, THE HEALTH LOG (TOOL-aGraftedHelix-8): `<git-common-dir>/health.log`, one LF-terminated UTF-8
+# line per automatic self-heal, four TAB-separated fields: utc (`YYYY-MM-DDTHH:MM:SS+00:00`), source
+# and event (each `^[a-z][a-z0-9-]*$`), and a detail whose TAB, CR and LF are each folded to one space
+# and which is cut to 240 characters. At HEALTH_LOG_CAP_LINES lines the appender first keeps the
+# newest half, through a temp file and a rename, then appends. `derive_health_log <common-dir>` prints
+# the path and spawns nothing; `resolve_health_log <repo-dir>` asks git once and prints it, or fails
+# printing nothing; `add_health_event <log> <source> <event> <detail>` is the only writer. A refused
+# token, an empty path or a failed write prints ONE `health: NOTE -` line on stderr and returns 0: it
+# never fails its caller. WHAT IT DOES NOT DO: serialize concurrent writers (a trim racing an append
+# can lose that line; ponytail: one rename, a lock file if a lost line is ever observed); validate
+# what a detail means; or tell a repository with no writer installed from one where nothing healed.
+HEALTH_LOG_CAP_LINES=500
+derive_health_log() { printf '%s/health.log\n' "$1"; }
+resolve_health_log() {
+  local _hl_c
+  _hl_c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  _hl_c=${_hl_c%$'\r'}
+  [ -n "$_hl_c" ] || return 1
+  derive_health_log "$_hl_c"
+}
+add_health_event() {
+  local _hl_log=${1:-} _hl_src=${2:-} _hl_ev=${3:-} _hl_d=${4:-} _hl_why="" _hl_n=0 _hl_t
+  local _hl_a=abcdefghijklmnopqrstuvwxyz
+  case "$_hl_src" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="source '$_hl_src' is not a lowercase token" ;; esac
+  case "$_hl_ev" in ''|[!$_hl_a]*|*[!$_hl_a'0123456789-']*) _hl_why="event '$_hl_ev' is not a lowercase token" ;; esac
+  [ -n "$_hl_log" ] || _hl_why="no log path resolved"
+  if [ -z "$_hl_why" ]; then
+    _hl_d=${_hl_d//$'\t'/ }; _hl_d=${_hl_d//$'\r'/ }; _hl_d=${_hl_d//$'\n'/ }; _hl_d=${_hl_d:0:240}
+    _hl_t=$(date -u +%Y-%m-%dT%H:%M:%S+00:00 2>/dev/null) || _hl_t=""
+    [ -n "$_hl_t" ] || _hl_why="date printed no UTC stamp"
+  fi
+  if [ -z "$_hl_why" ] && [ -f "$_hl_log" ]; then
+    _hl_n=$(wc -l < "$_hl_log" 2>/dev/null) || _hl_n=0
+    _hl_n=${_hl_n//[!0-9]/}
+    if [ "${_hl_n:-0}" -ge "$HEALTH_LOG_CAP_LINES" ]; then
+      { tail -n $((HEALTH_LOG_CAP_LINES / 2)) "$_hl_log" > "$_hl_log.trim.$$" && mv -f "$_hl_log.trim.$$" "$_hl_log"; } 2>/dev/null \
+        || { rm -f "$_hl_log.trim.$$" 2>/dev/null; _hl_why="the trim to the newest $((HEALTH_LOG_CAP_LINES / 2)) lines failed"; }
+    fi
+  fi
+  if [ -z "$_hl_why" ]; then
+    { printf '%s\t%s\t%s\t%s\n' "$_hl_t" "$_hl_src" "$_hl_ev" "$_hl_d" >> "$_hl_log"; } 2>/dev/null && return 0
+    _hl_why="the append failed"
+  fi
+  printf 'health: NOTE - %s: %s; nothing written\n' "${_hl_log:-(no path)}" "$_hl_why" >&2
+  return 0
+}
+# <<< health_log_sh
 
 # ---- THE IN-PLACE LANDING (TOOL-dDerivedDocket-2) -----------------------------------------------
 # Nothing below reads or writes the LOCAL default branch, with one exception that is the point of
@@ -1190,30 +1671,36 @@ cmd_land() {
       exit 1
     fi
     check_carry_set "$R" || exit 1
-    # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
-    # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
-    # files answer different questions and live in different places on purpose. Touched BEFORE the
-    # clear and held until the verdict files are read. A claim push from this git dir is not waited
-    # on: the hook clears the verdict files only on a default-branch push (TOOL-dPlacedRequest-11).
-    touch "$marker"
-    # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
-    # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
-    rm -f "$refusal" "$barfile" "$allowfile"
-    echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
-    # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
-    # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
-    # THE SHA PUSHED, NOT THE PREPARED ONE (TOOL-aPrimedIndex-10): under in-place the close commits its
-    # records on the prepared merge, so HEAD is what the hook vets and names in its allow record.
-    pushed=$(git rev-parse --verify HEAD)
-    git push "$remote" "HEAD:refs/heads/$def" >&2
-    rc=$?
-    if [ "$rc" -eq 0 ]; then
-      check_push_allow "$pushed" "$R" || exit 4
-      write_lander_marker || exit 1
-      run_post_merge
-      cls=landed
+    # THE FENCE READ, once per attempt and before the verdict files are cleared (TOOL-dPlacedRequest-15
+    # S3): a refusal has printed its line and pushes nothing, and the case below exits 1 on it.
+    if ! read_fence_line; then
+      cls=refused
     else
-      cls=$(derive_push_failure)
+      # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
+      # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
+      # files answer different questions and live in different places on purpose. Touched BEFORE the
+      # clear and held until the verdict files are read. A claim push from this git dir is not waited
+      # on: the hook clears the verdict files only on a default-branch push (TOOL-dPlacedRequest-11).
+      touch "$marker"
+      # The hook's verdict and the bar it vetted are cleared before every push, as the attended path
+      # clears them, so a file an earlier push's hook wrote cannot be read as this one's answer.
+      rm -f "$refusal" "$barfile" "$allowfile"
+      echo "push-main: gating + pushing ${t:0:8} to $def (attempt $attempt/$max)..." >&2
+      # HEAD, never refs/heads/<def>: the local default branch is shared by every build on this node,
+      # and publishing it is the defect these flags close. Its output is SHOWN and never read (S2).
+      # THE SHA PUSHED, NOT THE PREPARED ONE (TOOL-aPrimedIndex-10): under in-place the close commits its
+      # records on the prepared merge, so HEAD is what the hook vets and names in its allow record.
+      pushed=$(git rev-parse --verify HEAD)
+      write_effect_push "HEAD:refs/heads/$def"
+      rc=$?
+      if [ "$rc" -eq 0 ]; then
+        check_push_allow "$pushed" "$R" || exit 4
+        write_lander_marker || exit 1
+        run_post_merge
+        cls=landed
+      else
+        cls=$(derive_push_failure)
+      fi
     fi
     rm -f "$marker"
     if [ "$cls" = landed ]; then
@@ -1231,7 +1718,8 @@ cmd_land() {
         cmd_prepare || exit $?
         attempt=$((attempt + 1)) ;;
       *)
-        # refused, unreachable or unchanged: derive_push_failure has said which, and why.
+        # refused, unreachable, unchanged, fenced or unfenced: derive_push_failure has said which,
+        # and why; or a fence read refused, which read_fence_line has said.
         exit 1 ;;
     esac
   done
@@ -1374,26 +1862,33 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
-  # The marker first, then the clear; the marker stays until the verdict files have been read. No
-  # claim push is waited on (TOOL-dPlacedRequest-11).
-  touch "$marker"
-  rm -f "$refusal" "$barfile" "$allowfile"
-  echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
-  # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
-  # its words let any leg that printed `connection` report a red bar as an unreachable remote
-  # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
-  pushed=$(git rev-parse --verify "refs/heads/$def")
-  was=$(git rev-parse -q --verify "refs/remotes/$remote/$def") || was=""
-  git push "$remote" "$def" >&2
-  rc=$?
-  if [ "$rc" -eq 0 ]; then
-    check_push_allow "$pushed" "$was" || exit 4
-    write_lander_marker || exit 1
-    run_post_merge
-    cls=landed
+  # THE FENCE READ under `--slug`, once per attempt and before the clear (TOOL-dPlacedRequest-15 S3,
+  # S6); with no slug it reads nothing and the push below is today's. A refusal pushes nothing.
+  if ! read_fence_line; then
+    cls=refused
   else
-    # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.
-    cls=$(derive_push_failure)
+    # The marker first, then the clear; the marker stays until the verdict files have been read. No
+    # claim push is waited on (TOOL-dPlacedRequest-11).
+    touch "$marker"
+    rm -f "$refusal" "$barfile" "$allowfile"
+    echo "push-main: gating + pushing $def (attempt $attempt/$max)..." >&2
+    # THE PUSH'S OUTPUT IS SHOWN, NEVER READ (S2). It carries the bar's own output, so classifying on
+    # its words let any leg that printed `connection` report a red bar as an unreachable remote
+    # (TOOL-aHonedRuleset-10), and any leg that printed `rejected` fake a race and re-run the bar.
+    # A fenced push names the branch in full, since a second refspec rides beside it.
+    pushed=$(git rev-parse --verify "refs/heads/$def")
+    was=$(git rev-parse -q --verify "refs/remotes/$remote/$def") || was=""
+    if [ -n "$FENCE_REF" ]; then write_effect_push "refs/heads/$def:refs/heads/$def"; else write_effect_push "$def"; fi
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
+      check_push_allow "$pushed" "$was" || exit 4
+      write_lander_marker || exit 1
+      run_post_merge
+      cls=landed
+    else
+      # The hook's verdict first, then a probe, then ancestry: derive_push_failure, shared with --land.
+      cls=$(derive_push_failure)
+    fi
   fi
   rm -f "$marker"
   if [ "$cls" = landed ]; then
