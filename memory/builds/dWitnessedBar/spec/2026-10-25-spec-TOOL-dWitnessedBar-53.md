@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-53 — every population an uncommitted scaffold seeds equals its seed after the first commit, held by a suite arm
 
-**Status:** DEFERRED · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -25,7 +25,8 @@ The round-1 spec audit of units 40 to 51
 confirmed finding **id 13 at HIGH**, in its item **H1**, which it shares with id 1
 (`TOOL-dWitnessedBar-52`). Id 13 grounds the defect in both readers: `TOOL-dWitnessedBar-46` S2 for the
 seed, and `TOOL-dWitnessedBar-14` S11 with its table row ("live, over the tracked root confs") for the
-leg. Built as written, every fresh adopter gets a false red on the shipped leg, and no criterion of
+leg, landed at `49f5d3ff6` as `tools/memory-tree/ratchet.py#measure_scalar_pins` over
+`#read_tracked_paths`. Built as written, every fresh adopter gets a false red on the shipped leg, and no criterion of
 either unit can see it: unit 46's AC2 stages the conf before it scaffolds and commits before it looks,
 and the hygiene suite's own scaffold arm commits before it looks
 (`tools/memory-tree/check-memory-hygiene.test.sh@f740dd4cc9f1:2758-2759`). Unit 52 changes the read;
@@ -49,7 +50,7 @@ it arms. It repairs `TOOL-dWitnessedBar-46`.
   `python tools/memory-tree/ratchet.py keys-not-scalar` exits 0 before the commit and after it, naming
   the planted `FOO_PIN` row both times. Observed by AC2.
 - **S4** — The floor follows the arm. The suite's `FLOOR_ASSERTIONS` (785, PINNED 2026-11-19 at
-  `045405ff8`, `tools/memory-tree/check-memory-hygiene.test.sh@f740dd4cc9f1:5037`) rises from
+  `2b0490b8d`, `tools/memory-tree/check-memory-hygiene.test.sh@f740dd4cc9f1:5037`) rises from
   its value at the pass's parent by the assertions this arm adds, with a dated
   `RAISED <old> -> <new> by TOOL-dWitnessedBar-53` comment beside it, as the rows above it carry.
   Observed by AC3.
@@ -80,15 +81,16 @@ it arms. It repairs `TOOL-dWitnessedBar-46`.
 - The suite's existing scaffold writes a stand-in conf and commits in the same subshell, before any
   assertion (`tools/memory-tree/check-memory-hygiene.test.sh@f740dd4cc9f1:2747-2759`); its sibling arm
   copies the kit into the target with `cp -r "$HERE" "$B/$(dirname -- "$KIT_REL")/"` (`:2786-2788`).
-- `FLOOR_ASSERTIONS=785` (PINNED 2026-11-19 at `045405ff8`) and its `-ge` check
+- `FLOOR_ASSERTIONS=785` (PINNED 2026-11-19 at `2b0490b8d`, the suite's blob unchanged since `045405ff8`) and its `-ge` check
   (`tools/memory-tree/check-memory-hygiene.test.sh@f740dd4cc9f1:5037-5038`), with the dated `RAISED` and `MERGED` comments above it.
 - `read_registrations` reads tracked descriptors only (`tools/lib/legacy_ledger.py#read_registrations`,
   TOOL-dWitnessedBar-13 §8 F7), so the arm stages its kit copy, the state `govkit apply` leaves
   (`tools/govkit/govkit.py#_cmd_apply`, its STAGE block). The conf stays unstaged, the state the
   adopter's seed-and-stop leaves (`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:97-101`).
-- At `045405ff8` memory-tree's copy of the factory carries no CLI: "The CLI lives on the canonical copy
-  only" (`tools/memory-tree/legacy_ledger.py@3864e2423bf3:9`). Unit 15 S5 runs `seed` from that copy,
-  the contract this arm consumes.
+- Memory-tree's copy of the factory carries the `seed` CLI alone since unit 15 landed it at
+  `53d61e754` ("Of the canonical's CLI this copy carries `seed` alone",
+  `tools/memory-tree/legacy_ledger.py@f24d2c103253:10`, its `--all` form at `:16`), the contract this
+  arm consumes; at `045405ff8` that copy carried no CLI.
 - Unit 15 §4: `seed` over a present armed home prints `present <population>` and writes nothing; over an
   absent home it seeds.
 - The example conf's one scalar pin, `ROW_DUPLICATE_PIN="0"`
@@ -215,6 +217,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC2 · the
   `read_registrations` reads tracked descriptors only, and runs `seed` from memory-tree's copy, unit 15
   S5's contract; unit 46's AC2 now stages the conf; the arm plants `FOO_PIN` because unit 17 S3 drains
   the example's pins at this order (F3); the compare's dropped SHA column names unit 61's null SHA.
+- rev-4 · 2026-11-19 · §1 · S4 · §4 Evidence · §10 · re-grounded at `2b0490b8d` by brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief: the leg's tracked-only read is cited where
+  unit 14 landed it; memory-tree's factory copy now carries the `seed` CLI (unit 15, `53d61e754`); the
+  floor is re-pinned, unchanged, over an unchanged suite blob. The arm, its ACs and its edges stand.
 
 ## 10. Reuse audit
 
@@ -223,7 +229,7 @@ The seam is the suite's existing scaffold block
 into the target (`:2786-2788`), and unit 15's `seed --all`, which lists and re-seeds every registered
 population; the arm composes the two with one commit between them.
 `python tools/codebase-map/reuse_lookup.py "an adopter seed equal before and after the first commit"`,
-re-run at `045405ff8`, ranked `before`, `seed`, `adopt`, `write_commit` and `build_commit`, each a test
+re-run at `2b0490b8d`, ranked `before`, `seed`, `adopt`, `write_commit` and `build_commit`, each a test
 helper or a commit builder and none a compare across a first commit, so no existing seam fits beyond
 the two named.
 

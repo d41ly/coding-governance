@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** INPROGRESS · rev-9 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-10 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -22,6 +22,7 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md) | journal | TOOL-dWitnessedBar-14 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md) | journal | TOOL-dWitnessedBar-46 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md) | journal | — |
@@ -61,7 +62,9 @@ retrofit.md below, each of its lines cited at that blob).
   grammar, key fields then count, SHA and disposition, written through `write_rows`, every row
   `seeded` at the build run's base SHA. The key fields are the registry's own key columns per §4 "The
   populations", never a line number; the count is its count column, else `1`, and a `ceiling` row's
-  ceiling. Observed by AC2.
+  ceiling. Each header names the fields §4's table spells, and each registration lists in `verbatim`
+  the fields that table marks, so every row at the base reads through
+  `tools/lib/legacy_ledger.py#_parse_rows` (§4 "Field names"). Observed by AC2.
 - **S3** — Each registered. One `[[ledger]]` table per population, in the descriptor of the kit whose
   check reads it, carrying every one of `LEDGER_FIELDS` (`tools/lib/legacy_ledger.py#_check_table`):
   the direction its header declares, its `leg` and a `seed` argv among them; the three read
@@ -72,7 +75,33 @@ retrofit.md below, each of its lines cited at that blob).
   nothing (`tools/lib/legacy_ledger.py#seed_population`). Observed by AC1.
 - **S4** — Each reader re-pointed. Every reader §4's table names reads rows through the factory's
   `read_rows` and grades through `compare_counts` and `compare_to_base`, keeping its messages and its
-  exit codes; no reader keeps a parser of the old grammar. Observed by AC3 and AC4.
+  exit codes; no reader keeps a parser of the old grammar. That promise is narrowed where the row
+  grammar forces it. First, a message that grades or prints a row's reason retires with the reason
+  column (§8 F1, F12). By a grep for a reason refusal over §4's readers at `2b0490b8d`, those are:
+  `check-arms.py#check_refusal_sites`' refusal of an empty reason or `REASON-OWED`, and the
+  ` — <reason>` tail of its `waived` line; `check-spec-tokens.py`'s `carries no reason` waiver
+  finding; `gen_build_index.py`'s exempt row that `carries no reason`; and the reason refusals and
+  every-run reason prints of `sh_hygiene.py` and `encoding_posture.py`. Each suite arm that stages one
+  retires with it, and `check-arms.py#cmd_emit_pin` prints key fields and a count with no
+  placeholder. Second, a message naming a row's ordinal or occurrence is restated over its key and
+  count, since the ordinal leaves the key (§4). Third, `check-arms.py#check_retirements`' refusal
+  `does not open <decision id> · RETIRES` becomes the factory's `render_malformed` line for a row
+  with too few fields, and a refusal that its `unit` field is not a decision id. Every other message
+  of that reader holds, the survivor join and the `lacks its <field> field` refusals included, each
+  firing on an empty key field (§8 F12). `check-arms.py#parse_pin` keeps its legacy read of a tracked
+  sidecar `unarmed-branches.txt`, which S1's rule does not find and TOOL-dWitnessedBar-51 S17
+  converts (§3 Edges). Observed by AC3 and AC4.
+  **Readers:** by name: a git grep over `tools/` at 2b0490b8d finds `REASON-OWED` in
+  `tools/memory-tree/check-arms.py` (its module docstring, `REASON_OWED`, `check_refusal_sites`,
+  `cmd_emit_pin` and the `cmd_selftest` arm staging it), in `tools/memory-tree/README.md` and in
+  `tools/memory-tree/.memory-tree.conf.example`'s `ARMS_REFUSALS` comment; it finds `carries no reason`
+  in `tools/check-spec-tokens.py` (`main`) and in `tools/memory-tree/gen_build_index.py`
+  (`read_contract_rows` and a `cmd_selftest` arm), the other hits being refusals of other rows; and it
+  finds the `· RETIRES` row opening in `tools/memory-tree/check-arms.py` (`check_retirements` and a
+  `cmd_selftest` fixture) and the
+  README's "Retiring a refusal" grammar, every other `RETIRES` hit being prose about another
+  retirement · by value: each former reason, which the conversion record holds keyed as its row (S5);
+  NO VALUE READERS for `REASON-OWED`, a placeholder that never held a reason.
 - **S5** — The former reasons. A registry row's reason column has no field in I4's row, so the pass
   writes every former reason, keyed as its row now is, into the conversion record
   `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-16-registry-conversion.md`, and
@@ -199,37 +228,62 @@ The pass re-derives the set at its base and re-reads each header; a disagreement
 | `memory/map/affordance-exempt.toml` | shrink-only | key · seam | 1 | `map_lib.load_affordance_exempt`, `gen_map.py`, `map_diff.py` | codebase-map |
 | `memory/map/baseline.toml` | shrink-only | key · kind, key | 1 | `map_lib.parse_baseline`, `gen_map.py`, `owed_rows.derive_owed_rows` | codebase-map |
 | `memory/project/brief-recorded-waiver.txt` | shrink-only | record · unit | 1 | `tools/unattended/check-brief-recorded.sh` | unattended |
-| `memory/project/corpus-path-unresolved.txt` | shrink-only | site · citing path, cited path | 1 | `corpus_ids.py` | memory-tree |
+| `memory/project/corpus-path-unresolved.txt` | shrink-only | site · path, cited | 1 | `corpus_ids.py` | memory-tree |
 | `memory/project/curation-debt.txt` | shrink-only | site · path | 1 | `check-memory-hygiene.sh` | memory-tree |
 | `memory/project/docs-undocumented.txt` | shrink-only | key · id | 1 | `tools/govkit/docs_leg.py#read_legacy_rows` | registry |
 | `memory/project/encoding-posture-sites.txt` | shrink-only | site · path, arm | its count | `encoding_posture.py` `read_registry`, `check_registry` | gate-lint |
-| `memory/project/fork-ceilings.txt` | ceiling | key · id, bash, base, setup, command | the ceiling | `tools/gate-lint/fork-count.sh` | gate-lint |
+| `memory/project/fork-ceilings.txt` | ceiling | key · id, bash, base (verbatim), setup, command | the ceiling | `tools/gate-lint/fork-count.sh` | gate-lint |
 | `memory/project/id-orphan-waiver.txt` | shrink-only | record · id | 1 | `corpus_ids.py` | memory-tree |
 | `memory/project/legacy-files.txt` | declared-set | site · path | 1 | `check-memory-hygiene.sh`, `gen_build_index.py` | memory-tree |
 | `memory/project/location-probe-waivers.txt` | shrink-only | site · path, probe | its count | `sh_hygiene.py` `read_registry`, `check_registry` | gate-lint |
 | `memory/project/method-carriers.txt` | declared-set | site · path | 1 | `check-method-carriers.sh` | memory-tree |
 | `memory/project/pass-order-waiver.txt` | shrink-only | record · unit | 1 | `tools/unattended/check-pass-order.sh` | unattended |
 | `memory/project/readme-contract.txt` | declared-set | site · path, binding | 1 | `gen_build_index.py` | memory-tree |
-| `memory/project/refusal-retirements.txt` | append-only | record · unit, path, check | 1 | `check-arms.py` | memory-tree |
+| `memory/project/refusal-retirements.txt` | append-only | record · unit, path, check, r1, r2, r3, r4, survivor, signature, replay; verbatim all but unit, path and survivor (§8 F12) | 1 | `check-arms.py` | memory-tree |
 | `memory/project/spawn-idiom-sites.txt` | shrink-only | site · path, class | its count | `sh_hygiene.py` | gate-lint |
-| `memory/project/spec-token-waivers.txt` | shrink-only | key · token | 1 | `tools/check-spec-tokens.py#read_waivers` | registry |
+| `memory/project/spec-token-waivers.txt` | shrink-only | key · token (verbatim) | 1 | `tools/check-spec-tokens.py#read_waivers` | registry |
 | `memory/project/stale-header-waiver.txt` | shrink-only | site · path | 1 | `gen_build_index.py` | memory-tree |
 | `memory/project/substitution-fed-loops.txt` | shrink-only | site · path, delimiter | its count | `sh_hygiene.py`, `tools/govkit/refusal_join.py` | gate-lint |
 | `memory/project/temp-name-sites.txt` | shrink-only | site · path, class | its count | `sh_hygiene.py` | gate-lint |
 | `memory/project/testsuite-count-waivers.txt` | shrink-only | site · path | 1 | `tools/check-testsuite-counts.sh` | registry |
-| `memory/project/trace-waiver.txt` | shrink-only | site · spec path, subject | 1 | `drift_report.py`, `check-memory-hygiene.sh` | memory-tree |
+| `memory/project/trace-waiver.txt` | shrink-only | site · path, subject | 1 | `drift_report.py`, `check-memory-hygiene.sh` | memory-tree |
 | `memory/project/transition-audit.txt` | append-only | record · sha | 1 | `tools/memory-tree/transition_audit.py#read_registry` | memory-tree |
-| `memory/project/unarmed-branches.txt` | shrink-only | site · gate, check, signature | branches of that signature | `check-arms.py` | memory-tree |
-| `tools/agent-cap-restatement-waivers.txt` | shrink-only | key · matched text | 1 | `tools/check-agent-cap-restatement.sh` | registry |
-| `tools/dead-path-waivers.txt` | declared-set | site · path, line text | lines of that text | `tools/check-dead-paths.sh` | registry |
+| `memory/project/unarmed-branches.txt` | shrink-only | site · path, check (verbatim), signature (verbatim) | branches of that signature | `check-arms.py` | memory-tree |
+| `tools/agent-cap-restatement-waivers.txt` | shrink-only | key · text (verbatim) | 1 | `tools/check-agent-cap-restatement.sh` | registry |
+| `tools/dead-path-waivers.txt` | declared-set | site · path, text (verbatim) | lines of that text | `tools/check-dead-paths.sh` | registry |
 | `tools/lexicon/lexicon-suffix-waivers.txt` | declared-set | key · name | 1 | `tools/lexicon/lexicon.py#load_waivers` | lexicon |
 | `tools/lexicon/lexicon-verb-waivers.txt` | declared-set | key · name | 1 | `lexicon.py` `load_waivers` | lexicon |
-| `tools/playbook-kit-waivers.txt` | declared-set | key · kit dir | 1 | `tools/check-playbook-parity.sh` | registry |
+| `tools/playbook-kit-waivers.txt` | declared-set | key · kit | 1 | `tools/check-playbook-parity.sh` | registry |
 
 Totals: 19 shrink-only, 2 append-only, 7 declared-set, 1 ceiling (DERIVED from the table). Two registries key a row by an
 ordinal (`unarmed-branches.txt`'s and `dead-path-waivers.txt`'s), a position among equal rows; the
 ordinal leaves the key and the count holds how many there are, as "a code site's key is path, rule and
 identifier" (retrofit.md:236-240) and I4's refusal of a numeric key field require.
+
+### Field names
+
+The table's fields are the header's field names as written. `tools/lib/legacy_ledger.py#_check_table`
+admits a name matching `[A-Za-z0-9_-]+` and refuses a `site` table whose fields lack `path`, so a
+registry's column takes the name the table gives it:
+
+| Home | Column | Field |
+|---|---|---|
+| `corpus-path-unresolved.txt` | citing file · cited path | `path` · `cited` |
+| `trace-waiver.txt` | spec path · unit id | `path` · `subject` |
+| `unarmed-branches.txt` | gate · `fail` number, or `exit` or `status` · signature | `path` · `check` · `signature` |
+| `dead-path-waivers.txt` | path · line text | `path` · `text` |
+| `agent-cap-restatement-waivers.txt` | matched text | `text` |
+| `playbook-kit-waivers.txt` | kit directory | `kit` |
+| `refusal-retirements.txt` | decision id · gate · check number · R1 to R4 · survivor file · its signature · replay line | `unit` · `path` · `check` · `r1` to `r4` · `survivor` · `signature` · `replay` |
+
+A field is `verbatim` when it holds a bare integer or quoted text, never a path, id or name, because
+`LINE_NUMBER_RE` in that file refuses a non-verbatim key field reading as a line number. At
+`2b0490b8d` (DERIVED by a probe running `_check_table` over each header and `LINE_NUMBER_RE` over each
+row) that refusal would hit fork-ceilings' `base` on every row, both `tools/hooks/agent-cap.js:<n>`
+tokens of `spec-token-waivers.txt`, and each `refusal-retirements.txt` `check`. Shape 1 of
+`unarmed-branches.txt` keys `check` by a bare `fail` number, as the sidecar
+`tools/unattended/unarmed-branches.txt` does. The central file's rows at `2b0490b8d` are all shape 2. corpus-path-unresolved's `absent|moved:DEST` column and refusal-retirements' signature head,
+sites and `supersedes` clause go to the conversion record beside their keys, as S5's reasons do.
 
 ### The conversion
 
@@ -335,6 +389,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/migrate_backlog.py`
 - `tools/memory-tree/check-arms.py`
+- `tools/memory-tree/README.md` (its "Retiring a refusal" row grammar, restated as the ledger row, and its `REASON-OWED` prose)
+- `tools/memory-tree/.memory-tree.conf.example` (its `ARMS_REFUSALS` comment)
 - `tools/memory-tree/check-method-carriers.sh`
 - `tools/memory-tree/transition_audit.py`
 - `tools/memory-tree/adopt-memory-tree.sh`
@@ -399,7 +455,11 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   factory's refusal.
 - observability — the conversion record's before and after counts per population.
 - risks — a reader whose message quoted a reason now has none to quote; the record keeps it, said in
-  S5. The two ordinal registries' low water falls once, said in §4 "Drift".
+  S5. The reason refusals S4 names retire, so a new row's reason is held by its widen record and no
+  longer printed on every run (§8 F12). The two ordinal registries' low water falls once, said in
+  §4 "Drift". A `refusal-retirements.txt` row's survivor is a key field of an append-only
+  population, so recording a new survivor rewrites a base row, which `never gains` reds as
+  `removed` at that pass; the header's `APPEND-ONLY` already forbade that edit, which no reader graded.
 - testing — AC1 to AC12 by probes, fixtures and scratch clones; the arms in §7 are observed RED then
   GREEN by the main loop at the close.
 - migration — §4 and S10.
@@ -421,8 +481,13 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   Red when: a row is dropped or merged into another key, so the conversion drains debt it never fixed.
 - **AC3** — When each reader of §4's table runs on the landed tree (its leg's argv), it exits as it did
   at the pass's start, and `git grep -n "def read_registry" -- tools/gate-lint tools/memory-tree`
-  prints nothing: the adapters unit 13 S9 left and `transition_audit.read_registry` are gone.
-  Red when: a reader keeps its own parser, so two grammars are read for one population.
+  prints nothing: the adapters unit 13 S9 left and `transition_audit.read_registry` are gone. When a
+  scratch clone rewrites the `signature` field of one converted `refusal-retirements.txt` row to text
+  its survivor lacks, `python tools/memory-tree/check-arms.py --check` exits 1 printing `which no
+  longer carries its signature`; with that row's `replay` field emptied it exits 1 printing `lacks its
+  replay field`.
+  Red when: a reader keeps its own parser, so two grammars are read for one population, or the
+  survivor join left with the row grammar.
 - **AC4** — When a scratch clone adds one row to `memory/project/spawn-idiom-sites.txt` for a site the
   scan does not find, the `shell hygiene (a fork spent on builtin work)` leg's argv exits 1 naming it;
   when a scratch clone adds a new spawn-idiom site, it exits 1 naming the undeclared site.
@@ -448,8 +513,9 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   `merge: rows`, and the same holds for every converted home.
   Red when: a home lacks the line, so two concurrent drains conflict on the whole file.
 - **AC10** — When `python convert_registry.py up <adopter> --home memory/project/unarmed-branches.txt`
-  runs on a scratch adopter holding today's legacy file, the file takes the ledger grammar with one row per
-  `gate, check, signature` and the count of its ordinals, and the dropped reasons are printed; `witness`
+  runs on a scratch adopter holding today's legacy file, the file takes the ledger grammar under the
+  header `# ledger · <population> · key site path,check,signature · direction shrink-only · drain
+  <drain>`, with one row per `path, check, signature` and the count of its ordinals, and the dropped reasons are printed; `witness`
   then exits 0; `convert` run again exits 0 and writes nothing; `down` restores the legacy bytes.
   Red when: a second run re-dates the rows, the `seed laundering` case, or `down` leaves the ledger.
   fixture: a scratch adopter under `%TEMP%/<short-name>` holding a copy of today's file.
@@ -487,7 +553,7 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   field, which respells I4; (c) `#` comment lines above each row, which `write_rows` does not keep, so
   the first widen erases them. RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, the row retrofit.md
   states, with nothing lost; a later reason belongs to a widen record or an ask the disposition names.
-  widens: none · relaxes: none
+  widens: none · relaxes: the reason refusals and every-run reason prints S4 names (rev-10, F12)
 - **F2 — How does a TOML registry take a TAB grammar?** Options: (a) rename in its own directory to
   `.txt`; (b) keep the `.toml` name over non-TOML rows. (b) leaves a file whose name lies about its
   grammar to every TOML reader. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3; a rename inside the
@@ -568,6 +634,25 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   here. RESOLVED (agent, 2026-11-19, delegated): (a); should the main loop fold (b) into unit 14 while
   it is open, S11 and AC12 leave this spec. widens: none · relaxes: unit 14 S14's `unresolved` for a
   base home holding no ledger header
+- **F12 — What does a reader keep of a field it grades that is neither a key column nor a count?**
+  The first builder's return (`2026-11-19-build-TOOL-dWitnessedBar-16-1-builder-return`) found
+  `tools/memory-tree/check-arms.py#check_retirements` grading each row's R1 to R4, its survivor
+  file, the survivor's signature join and its replay. Rev-9's key `unit, path, check` dropped all of
+  them, and the `check-arms selftest` arms in `check-arms.py#cmd_selftest` plant a row whose survivor
+  lacks its signature, or which lacks its survivor or replay. The same reader, and others S4 names,
+  also grade or print a row's reason. Options: (a) every such field into the record by F1, the
+  survivor join and its arms retiring with a §5 risk line; (b) survivor, signature and replay as
+  verbatim key fields, R1 to R4 into the record, retiring the four `lacks its R<k> field` refusals;
+  (c) every field `check_retirements` grades as a key field, R1 to R4 included, verbatim where
+  §4 "Field names" marks it, with reasons still in the record by F1; (d) reasons as key fields too.
+  (d) fails AC3 and AC4, veto 1: a counted reader's scan measures keys that carry no reason, so
+  `compare_counts` would read every row `unmeasured` and every site `undeclared`. (a) retires the
+  survivor join, which is the only check that a retired refusal still refuses somewhere, and it
+  narrows a §7 leg's arms. (c) keeps every message of that reader but the one about grammar (S4).
+  It needs no scan, because `refusal-retirements.txt` is a record population that `check_retirements`
+  joins and never counts. It edits nothing, because the population is append-only. RESOLVED (agent,
+  2026-11-19, delegated): (c), the most feature-rich survivor; reasons stay F1's. widens: none ·
+  relaxes: the reason refusals S4 names, retired with F1's reason column
 
 ## 9. Revision log
 
@@ -612,6 +697,12 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
 - rev-9 · 2026-11-19 · S1 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer: the
   population rule's citation restores cl-dClosedLoop-0354's carried token byte for byte, unpinned, so
   the coverage join matches it; the other blob pins stay; nothing else moved.
+- rev-10 · 2026-11-19 · S2 · S4 · §4 The populations, Field names (new), Files touched · §5 · AC3 ·
+  AC10 · §8 F1 F12 (new) · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer, over the
+  first builder's divergence at `9b69042ee`. Every header field is named so its `[[ledger]]` table
+  registers under `_check_table`, with `verbatim` fields declared. `refusal-retirements.txt` keys every
+  field `check_retirements` grades (F12). S4 is narrowed in words for reason, ordinal and grammar
+  messages, and for the sidecar left to unit 51. No Goal or Scope intent moved.
 
 ## 10. Reuse audit
 
