@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly
 
-**Status:** DEFERRED · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
