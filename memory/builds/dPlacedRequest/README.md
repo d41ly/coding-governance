@@ -105,7 +105,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-23 — a strict claim read stays strict: `leases.offline` never reaches the preflight, a take-over or the close](spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly](spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md) | 4 | 2 | CLOSED | rev-8 | 2026-11-19 |
 | [TOOL-dPlacedRequest-25 — a write that opens a holder's tenure renews the lease](spec/2026-10-25-spec-TOOL-dPlacedRequest-25.md) | 4 | 2 | CLOSED | rev-3 | 2026-11-19 |
-| [TOOL-dPlacedRequest-16 — a lease never deleted: a release is a hand-over or a terminal tombstone, the epoch rises for life, and only a run's tombstone is ever pruned](spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md) | 5 | 2 | INPROGRESS | rev-7 | 2026-11-19 |
+| [TOOL-dPlacedRequest-16 — a lease never deleted: a release is a hand-over or a terminal tombstone, the epoch rises for life, and only a run's tombstone is ever pruned](spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md) | 5 | 2 | INPROGRESS | rev-8 | 2026-11-19 |
 | [TOOL-dPlacedRequest-26 — the renewing-beat walk stops at the current holder's tenure](spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-36 — the node-lock factory writes its health events through the lock's own common dir](spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md) | 5 | 2 | DEFERRED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-37 — the node lock's deadline is the block's own bound, never the driver's `REMOTE_BOUND`](spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md) | 5 | 2 | DEFERRED | rev-6 | 2026-11-19 |
@@ -162,17 +162,17 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 180 bound to this build, across 4 record folder(s).
+Records: 182 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 
-Ids whose spec moved past its audited revision: TOOL-dPlacedRequest-10@rev-3 TOOL-dPlacedRequest-12@rev-3 TOOL-dPlacedRequest-13@rev-6 TOOL-dPlacedRequest-14@rev-4 TOOL-dPlacedRequest-15@rev-4 TOOL-dPlacedRequest-17@rev-3 TOOL-dPlacedRequest-18@rev-3 TOOL-dPlacedRequest-19@rev-4
-TOOL-dPlacedRequest-2@rev-7 TOOL-dPlacedRequest-21@rev-6 TOOL-dPlacedRequest-23@rev-2 TOOL-dPlacedRequest-24@rev-5 TOOL-dPlacedRequest-25@rev-2 TOOL-dPlacedRequest-26@rev-2 TOOL-dPlacedRequest-27@rev-1 TOOL-dPlacedRequest-28@rev-2 TOOL-dPlacedRequest-29@rev-2 TOOL-dPlacedRequest-30@rev-4
-TOOL-dPlacedRequest-31@rev-3 TOOL-dPlacedRequest-32@rev-3 TOOL-dPlacedRequest-33@rev-6 TOOL-dPlacedRequest-35@rev-2 TOOL-dPlacedRequest-36@rev-4 TOOL-dPlacedRequest-37@rev-4 TOOL-dPlacedRequest-38@rev-4 TOOL-dPlacedRequest-39@rev-3 TOOL-dPlacedRequest-4@rev-5 TOOL-dPlacedRequest-40@rev-2
-TOOL-dPlacedRequest-41@rev-2 TOOL-dPlacedRequest-42@rev-2 TOOL-dPlacedRequest-46@rev-3 TOOL-dPlacedRequest-47@rev-4 TOOL-dPlacedRequest-48@rev-7 TOOL-dPlacedRequest-5@rev-5 TOOL-dPlacedRequest-50@rev-3 TOOL-dPlacedRequest-56@rev-5 TOOL-dPlacedRequest-58@rev-3 TOOL-dPlacedRequest-59@rev-4
-TOOL-dPlacedRequest-6@rev-3 TOOL-dPlacedRequest-64@rev-2 TOOL-dPlacedRequest-7@rev-5 TOOL-dPlacedRequest-8@rev-4 TOOL-dPlacedRequest-9@rev-3.
+Ids whose spec moved past its audited revision: TOOL-dPlacedRequest-10@rev-3 TOOL-dPlacedRequest-12@rev-3 TOOL-dPlacedRequest-13@rev-6 TOOL-dPlacedRequest-14@rev-4 TOOL-dPlacedRequest-15@rev-4 TOOL-dPlacedRequest-16@rev-6 TOOL-dPlacedRequest-17@rev-3 TOOL-dPlacedRequest-18@rev-3
+TOOL-dPlacedRequest-19@rev-4 TOOL-dPlacedRequest-2@rev-7 TOOL-dPlacedRequest-21@rev-6 TOOL-dPlacedRequest-23@rev-2 TOOL-dPlacedRequest-24@rev-5 TOOL-dPlacedRequest-25@rev-2 TOOL-dPlacedRequest-26@rev-2 TOOL-dPlacedRequest-27@rev-1 TOOL-dPlacedRequest-28@rev-2 TOOL-dPlacedRequest-29@rev-2
+TOOL-dPlacedRequest-30@rev-4 TOOL-dPlacedRequest-31@rev-3 TOOL-dPlacedRequest-32@rev-3 TOOL-dPlacedRequest-33@rev-6 TOOL-dPlacedRequest-35@rev-2 TOOL-dPlacedRequest-36@rev-4 TOOL-dPlacedRequest-37@rev-4 TOOL-dPlacedRequest-38@rev-4 TOOL-dPlacedRequest-39@rev-3 TOOL-dPlacedRequest-4@rev-5
+TOOL-dPlacedRequest-40@rev-2 TOOL-dPlacedRequest-41@rev-2 TOOL-dPlacedRequest-42@rev-2 TOOL-dPlacedRequest-46@rev-3 TOOL-dPlacedRequest-47@rev-4 TOOL-dPlacedRequest-48@rev-7 TOOL-dPlacedRequest-5@rev-5 TOOL-dPlacedRequest-50@rev-3 TOOL-dPlacedRequest-56@rev-5 TOOL-dPlacedRequest-58@rev-3
+TOOL-dPlacedRequest-59@rev-4 TOOL-dPlacedRequest-6@rev-3 TOOL-dPlacedRequest-64@rev-2 TOOL-dPlacedRequest-7@rev-5 TOOL-dPlacedRequest-8@rev-4 TOOL-dPlacedRequest-9@rev-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
