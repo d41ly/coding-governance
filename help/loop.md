@@ -846,6 +846,8 @@ and its run record at the default branch's tracking ref. The card asks for the k
 `claims —` rows end ` · key ` and the key's first eight characters after `k1:`, or ` · key -` where
 the driver is older than the flag and prints five fields.
 
+Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
+
 - **Key some sources:** `python tools/loop/claims.py key commit=<sha> base=<sha>` prints one key; <!-- usage: script:tools/loop/claims.py#key d36ca5b8 -->
   `key --stdin` prints one key per input line, the line's sources separated by TABs.
 

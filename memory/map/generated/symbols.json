@@ -718,6 +718,36 @@
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
+      "id": "add_feed_event",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "add_feed_event",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "add_feed_event",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "add_fixture_commit",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6033,6 +6063,21 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_feed",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "check_feed",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "check_feed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -10843,6 +10888,21 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "derive_feed_events",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_feed_events",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_feed_events",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_fetch_url",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -14041,6 +14101,16 @@
       "id": "fanoutFindings",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.js"
+    },
+    {
+      "id": "fd_get",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "fd_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "field",
@@ -17891,6 +17961,21 @@
       "id": "print_failure",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_gaps",
@@ -31833,6 +31918,11 @@
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
+      "id": "scan_feed_writers",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
       "id": "scan_file",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -36251,6 +36341,21 @@
       "id": "write_fake_launcher",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_file",

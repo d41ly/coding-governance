@@ -17785,6 +17785,112 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-13 — THE CHANGE FEED. One subshell drives the `gov_feed_sh` block the driver
+# carries, sourced above with it, over the suite's bare origin and a second clone of it: GOVFEED_DIR
+# names a fresh scratch dir, so no earlier arm's claim write is in the feed, and the cache namespace is
+# cleared first. It prints one `key=value` line per observation and the arms below assert them. The
+# staged reds run inside it: the key check cut from a copy of the block (AC2), a feed line deleted
+# and one doubled (AC4), and a copy whose `seq` reads the counter alone (AC10). WHAT THIS BLOCK DOES
+# NOT DRIVE: the lock's contention and stale-break paths, post-merge's bar-red write through the same
+# bytes, and the sightings `read_claims` takes, which call the function this block drives directly.
+# ==================================================================================================
+fd_feed=$(mktemp -d); fd_two=$(mktemp -d)
+git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
+remove_claim_refs
+awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" > "$fd_two.block"
+fd_out=$( (
+  GOVFEED_DIR=$fd_feed; F="$fd_feed/gov-feed.log"
+  fd_run() { local o=$1; shift; git "$@" >"$o" 2>/dev/null; }
+  GOVREF_RUNNER=fd_run; GOVREF_REMOTE=origin; GOVREF_GITDIR=""
+  c1=$(build_gov_commit "" f1); write_gov_ref refs/gov/runs/tFeed "" "$c1"
+  c2=$(build_gov_commit "$c1" f2); write_gov_ref refs/gov/runs/tFeed "$c1" "$c2"
+  echo "ac1.lines=$(grep -c . "$F")"
+  echo "ac1.seq=$(cut -f1 "$F" | tr '\n' ' ')"
+  echo "ac1.kind=$(cut -f3 "$F" | sort -u | tr '\n' ' ')"
+  echo "ac1.blob=$(cut -f4 "$F" | sort -u | tr '\n' ' ')"
+  [ "$(cut -f5 "$F" | tr '\n' ' ')" = "$c1 $c2 " ] && echo "ac1.commits=ok"
+  [ "$(git rev-parse refs/gov/remote/runs/tFeed)" = "$c2" ] && echo "ac1.cache=second"
+  c3=$(build_gov_commit "$c1" f3); write_gov_ref refs/gov/runs/tFeed "$c1" "$c3"; echo "ac1.lost=$?"
+  echo "ac1.after-lost=$(grep -c . "$F")"
+  add_feed_event refs/gov/runs/tFeed "$c2"; echo "ac2.retry=$(grep -c . "$F")"
+  sed 's/ && grep -qF -- .*gov-feed.log"; then/ \&\& false; then/' "$fd_two.block" > "$fd_two.cut"
+  ( . "$fd_two.cut"; add_feed_event refs/gov/runs/tFeed "$c2" ); echo "ac2.cut=$(grep -c . "$F")"
+  head -n 2 "$F" > "$F.t" && mv "$F.t" "$F"; printf '2\n' > "$fd_feed/gov-feed.seq"
+  d1=""; d2=""
+  read -r d1 d2 < <(cd "$fd_two" && git init -q && git remote add origin "$ORIGIN" \
+    && git fetch -q origin '+refs/gov/runs/*:refs/gov/remote/runs/*' && GOVFEED_DIR="$fd_two/.git" \
+    && t=$(git rev-parse refs/gov/remote/runs/tFeed) \
+    && d1=$(build_gov_commit "$t" f4) && write_gov_ref refs/gov/runs/tFeed "$t" "$d1" \
+    && d2=$(build_gov_commit "$d1" f5) && write_gov_ref refs/gov/runs/tFeed "$d1" "$d2" && echo "$d1 $d2")
+  git fetch -q origin '+refs/gov/runs/*:refs/gov/remote/runs/*'
+  add_feed_sightings refs/gov/remote/; echo "ac3.lines=$(grep -c . "$F")"
+  [ -n "$d2" ] && [ "$(cut -f5 "$F" | tail -n 2 | tr '\n' ' ')" = "$d1 $d2 " ] && echo "ac3.order=ok"
+  add_feed_sightings refs/gov/remote/; echo "ac3.again=$(grep -c . "$F")"
+  cp "$F" "$fd_feed/copy.log"; rm -f "$F" "$fd_feed/gov-feed.seq"
+  write_feed refs/gov/remote/ >/dev/null; echo "ac4.rebuild=$?"
+  write_feed refs/gov/remote/ >/dev/null; echo "ac4.over-live=$?"
+  [ "$(cut -f2-5 "$F")" = "$(cut -f2-5 "$fd_feed/copy.log")" ] && echo "ac4.equal=ok"
+  check_feed refs/gov/remote/ "$fd_feed/copy.log" >/dev/null; echo "ac4.check=$?"
+  sed 2d "$fd_feed/copy.log" > "$fd_feed/drop.log"; o=$(check_feed refs/gov/remote/ "$fd_feed/drop.log"); echo "ac4.drop=$? $(grep -c "^missing refs/gov/runs/tFeed $c2$" <<<"$o")"
+  sed 2p "$fd_feed/copy.log" > "$fd_feed/dup.log"; o=$(check_feed refs/gov/remote/ "$fd_feed/dup.log"); echo "ac4.dup=$? $(grep -c "^duplicate refs/gov/runs/tFeed $c2$" <<<"$o")"
+  cp "$fd_feed/copy.log" "$F"; printf '4\n' > "$fd_feed/gov-feed.seq"
+  [ "$(print_feed 3)" = "$(sed -n '3,4p' "$fd_feed/copy.log")" ] && echo "ac6.print=ok"
+  git update-ref -d refs/gov/remote/runs/tFeed
+  check_feed refs/gov/remote/ "$F" >/dev/null; echo "ac5.check=$?"; echo "ac5.kept=$(grep -c 'refs/gov/runs/tFeed' "$F")"
+  head -n 2 "$fd_feed/copy.log" > "$F"; : > "$fd_feed/gov-feed.seq"
+  e1=$(build_gov_commit "" g1); add_feed_event refs/gov/runs/tTen "$e1"
+  echo "ac10.empty=$(tail -n 1 "$F" | cut -f1) $(cat "$fd_feed/gov-feed.seq")"
+  printf '1\n' > "$fd_feed/gov-feed.seq"
+  e2=$(build_gov_commit "$e1" g2); add_feed_event refs/gov/runs/tTen "$e2"; echo "ac10.planted=$(tail -n 1 "$F" | cut -f1)"
+  cp "$F" "$fd_feed/ten.log"; printf '1\n' > "$fd_feed/gov-feed.seq"
+  sed 's/n=\$(( (10#\$s > 10#\$l ? 10#\$s : 10#\$l) + 1 ))/n=$(( 10#$s + 1 ))/' "$fd_two.block" > "$fd_two.ctr"
+  e3=$(build_gov_commit "$e2" g3); ( . "$fd_two.ctr"; add_feed_event refs/gov/runs/tTen "$e3" ); echo "ac10.counter-only=$(tail -n 1 "$F" | cut -f1)"
+  cp "$fd_feed/ten.log" "$F"; printf '4\n' > "$fd_feed/gov-feed.seq"
+  l=$(tail -n 1 "$F"); k=$(printf '%s' "$l" | cut -f1-3); truncate -s -$(( ${#l} + 1 - ${#k} )) "$F"
+  e4=$(build_gov_commit "$e2" g4); add_feed_event refs/gov/runs/tTen "$e4"
+  [ "$(tail -n 1 "$F" | cut -f1)" -gt "$(head -n -1 "$F" | cut -f1 | sort -n | tail -n 1)" ] && [ "$(tail -n 1 "$F" | cut -f5)" = "$e4" ] && echo "ac10.own-line=ok"
+  o=$(check_feed refs/gov/remote/ "$F"); echo "ac10.torn=$? $(grep -c "^torn $k$" <<<"$o")"
+) 2>&1 )
+fd_get() { sed -n "s/^$1=//p" <<<"$fd_out"; }
+same "TOOL-dPlacedRequest-13 AC1 two writes append two lines" "$(fd_get ac1.lines)" "2"
+same "AC1 ...seq 1 and 2" "$(fd_get ac1.seq)" "1 2 "
+same "AC1 ...kind runs" "$(fd_get ac1.kind)" "runs "
+same "AC1 ...blob the empty tree" "$(fd_get ac1.blob)" "4b825dc642cb6eb9a060e54bf8d69288fbee4904 "
+same "AC1 ...each naming its commit" "$(fd_get ac1.commits)" "ok"
+same "AC1 ...and the cache ref names the second" "$(fd_get ac1.cache)" "second"
+same "AC1 a third write loses its compare-and-swap" "$(fd_get ac1.lost)" "1"
+same "AC1 ...and appends nothing" "$(fd_get ac1.after-lost)" "2"
+same "AC2 a retried event appends nothing" "$(fd_get ac2.retry)" "2"
+same "AC2 ...and with the key check cut it appends (staged)" "$(fd_get ac2.cut)" "3"
+same "AC3 a sighting adds the other clone's two writes" "$(fd_get ac3.lines)" "4"
+same "AC3 ...oldest first" "$(fd_get ac3.order)" "ok"
+same "AC3 ...and a second sighting adds nothing" "$(fd_get ac3.again)" "4"
+same "AC4 the rebuild writes the derived feed" "$(fd_get ac4.rebuild)" "0"
+same "AC4 ...and refuses over a live feed" "$(fd_get ac4.over-live)" "2"
+same "AC4 ...equal to the live feed but for seq and seen-utc" "$(fd_get ac4.equal)" "ok"
+same "AC4 the live feed checks clean" "$(fd_get ac4.check)" "0"
+same "AC4 a dropped line is missing (staged)" "$(fd_get ac4.drop)" "1 1"
+same "AC4 a doubled line is a duplicate (staged)" "$(fd_get ac4.dup)" "1 1"
+same "AC6 a replay from seq 3 prints 3 and 4" "$(fd_get ac6.print)" "ok"
+same "AC5 a pruned ref's events check clean" "$(fd_get ac5.check)" "0"
+same "AC5 ...and stay in the feed" "$(fd_get ac5.kept)" "4"
+same "AC10 an empty counter beside two lines appends seq 3 and writes 3" "$(fd_get ac10.empty)" "3 3"
+same "AC10 a counter planted 1 appends seq 4" "$(fd_get ac10.planted)" "4"
+same "AC10 a copy reading the counter alone repeats a seq (staged)" "$(fd_get ac10.counter-only)" "2"
+same "AC10 an append after a torn line lands on a line of its own" "$(fd_get ac10.own-line)" "ok"
+same "AC10 ...and the check names the torn line" "$(fd_get ac10.torn)" "1 1"
+out=$(GOVFEED_DIR=$fd_feed run --feed print --from 3)
+same "--feed print --from 3 replays the whole events from seq 3" "$(printf '%s\n' "$out" | cut -f1 | tr '\n' ' ')" "3 5 "
+out=$(GOVFEED_DIR=$fd_feed run --feed check); rc=$?
+same "--feed check exits 1 on a torn line" "$rc" "1"
+hit  "$out" "torn 4	refs/gov/runs/tTen	runs"
+git for-each-ref --format='delete %(refname)' refs/gov/remote | git update-ref --stdin
+remove_claim_refs; rm -rf "$fd_feed" "$fd_two" "$fd_two.block" "$fd_two.cut" "$fd_two.ctr"; reset_tree
+
+fi
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-aGraftedHelix-10 — THE CLAIM PUSH THROUGH THE TRACKED PRE-PUSH HOOK. Every other arm here runs
 # hookless with GOV_DEFAULT_BRANCH=main exported, which is how a claim pushed to the URL passed this
 # suite and was refused on node a, where the variable is unset
@@ -20503,7 +20609,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # LOWERED 3408 -> 3400 by TOOL-dPlacedRequest-11: the claim-push lock left the driver, so the GH36
 # AC14 block's 7 region-eight assertions and the GH32 AC6 arm's lock line went, and the inverted AC6
 # arm keeps its 4 (1 `hit`, 3 `same`) where it had 5; counted off the diff's own lines, no suite ran.
-FLOOR_ASSERTIONS=3400
+# RAISED 3400 -> 3430 by TOOL-dPlacedRequest-13: the change feed block's 29 `same` and 1 `hit` lines in
+# region eight, every one unconditional, counted off the diff's own lines; no suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=3430
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20743,7 +20852,8 @@ FLOOR_SHARD_5=293
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
 # LOWERED 646 -> 638 by TOOL-dPlacedRequest-11: the same 8 region-eight lock assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=638
+# RAISED 638 -> 668 by TOOL-dPlacedRequest-13: the same 30 region-eight change feed assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=668
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

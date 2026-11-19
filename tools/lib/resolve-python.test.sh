@@ -406,6 +406,7 @@ run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref
+gov_feed_sh|$ROOT/$KIT_REL/gov-feed.sh|$KIT_REL/gov-feed
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -917,7 +918,7 @@ raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
 gr="$TMP/gov-ref"; mkdir -p "$gr"
 gr_got=$(cd "$gr" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@x \
   GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$gr/no-hooks" bash -c '
-  . "$1"
+  . "$1"; . "$2"
   git init -q --bare origin.git && git init -q work && cd work || exit 2
   git remote add origin ../origin.git
   run_plain() { local o=$1; shift; git "$@" >"$o" 2>/dev/null; }
@@ -929,11 +930,42 @@ gr_got=$(cd "$gr" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t
   unset -f git
   write_gov_ref refs/gov/runs/tFix "$c2" "$c3"; echo "write=$? why=[$GOVREF_WHY]"
   [ "$(git -C ../origin.git rev-parse refs/gov/runs/tFix)" = "$c2" ] && echo tip=second
-  [ "$(git -C ../origin.git rev-parse refs/gov/runs/tFix^)" = "$c1" ] && echo parent=first' _ "$HERE/gov-ref.sh" 2>&1 | tr -d '\r')
+  [ "$(git -C ../origin.git rev-parse refs/gov/runs/tFix^)" = "$c1" ] && echo parent=first' _ "$HERE/gov-ref.sh" "$HERE/gov-feed.sh" 2>&1 | tr -d '\r')
 [ "$gr_got" = "build=1 c=[]
 write=2 why=[no source]
 tip=second
 parent=first" ] || bad "the canonical gov_ref_sh pushed a failed build, or built no parented tip: ${gr_got//$'\n'/ | }"; ok
+
+# ---- 2o. THE FEED WRITER CENSUS (TOOL-dPlacedRequest-13 S9, AC7, AC9, AC11) ------------------------
+# Parity holds the carriers' `gov_feed_sh` copies to the canonical; this holds every governance ref
+# writer to the feed. The population is every tracked `*.sh` and hook less the suites, read by the
+# canonical census in one awk: a lease-carrying push sits in a function that calls a name on
+# FEED_WRITER_HELPER_FNS, and no push of a `refs/gov/` ref goes without a lease. A clean reading
+# means it looked: a planted writer that never appends, a plain governance push beside an append,
+# and a pusher through a helper the list no longer names each print their line, and a stale list
+# entry prints its name. WHAT THIS DOES NOT CHECK: a ref spelled through a variable on a plain push,
+# a push across `\`-continued lines, or a writer in Python.
+fw_pop=$(cd "$ROOT" && git ls-files -- '*.sh' '.githooks/*' ':!*.test.sh' | tr '\n' ' ')
+fw_n=$(set -- $fw_pop; echo $#)
+[ "$fw_n" -gt 10 ] || bad "the feed writer census read $fw_n files — the population collapsed"; ok
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop 2>&1 | tr -d '\r')
+[ -z "$fw_got" ] || bad "a governance ref writer skips the change feed: ${fw_got//$'\n'/ | }"; ok
+fw="$TMP/feed-writers"; mkdir -p "$fw"
+printf '%s\n' 'plant_writer() {' '  git push --porcelain "--force-with-lease=refs/gov/runs/x:$1" origin "$2:refs/gov/runs/x"' '}' > "$fw/plant.sh"
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/plant.sh" 2>&1 | tr -d '\r')
+[ "$fw_got" = "$fw/plant.sh:2" ] || bad "the census passed a planted writer that never appends to the feed: ${fw_got//$'\n'/ | }"; ok
+printf '%s\n' 'mail_writer() {' '  add_feed_event refs/gov/mail/fx/a/s1 "$c"' '  git push origin "$c:refs/gov/mail/fx/a/s1"' '}' > "$fw/plain.sh"
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/plain.sh" 2>&1 | tr -d '\r')
+[ "$fw_got" = "$fw/plain.sh:3" ] || bad "the census passed a plain push of a governance ref beside an append: ${fw_got//$'\n'/ | }"; ok
+printf '%s\n' 'my_join() {' '  add_feed_event "$1" "$2"' '}' 'join_writer() {' '  git push --porcelain "--force-with-lease=$1:$2" origin "$3:$1"' '  my_join "$1" "$3"' '}' > "$fw/helper.sh"
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_WRITER_HELPER_FNS="$FEED_WRITER_HELPER_FNS my_join" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
+[ -z "$fw_got" ] || bad "the census read a pusher through a declared helper as a hit: ${fw_got//$'\n'/ | }"; ok
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
+[ "$fw_got" = "$fw/helper.sh:5" ] || bad "the census passed a pusher through a helper the list does not name: ${fw_got//$'\n'/ | }"; ok
+fw_got=$(cd "$ROOT" && . "$HERE/gov-feed.sh" && FEED_WRITER_HELPER_FNS="$FEED_WRITER_HELPER_FNS my_join no_such_fn" && scan_feed_writers $fw_pop "$fw/helper.sh" 2>&1 | tr -d '\r')
+[ "$fw_got" = "FEED_WRITER_HELPER_FNS names no_such_fn(), which is no function of the files read" ] \
+  || bad "the census passed a stale helper entry: ${fw_got//$'\n'/ | }"; ok
+blk gov_feed_sh "$HERE/gov-feed.sh" | grep -q scan_feed_writers && bad "the census ships inside the gov_feed_sh block every carrier copies"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

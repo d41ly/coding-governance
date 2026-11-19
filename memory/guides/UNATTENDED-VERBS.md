@@ -514,6 +514,16 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
   `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
   missing record; `RUN_CLAIMS` off is a skip naming the switch.
+- `--feed` — this node's change feed, `<git-common-dir>/gov-feed.log`: one line per governance ref
+  write the node made or saw, six TAB fields, `seq`, ref, kind, the commit's tree (`-` on a
+  deletion), the commit (40 zeros on a deletion) and `seen-utc`. Every write through the one
+  compare-and-swap writer appends once, and every claim read appends the cached commits it has not
+  seen, oldest first. `--feed check [<file>]` holds the feed, or `<file>`, to what the governance
+  refs this clone holds under `refs/gov/remote/` derive: exit 1 with one `missing`, `duplicate`,
+  `extra`, `order` or `torn` line per finding, 0 otherwise. `--feed rebuild` writes the derived feed
+  where none is present, `seq` from 1, and exits 2 naming one that is. `--feed print [--from <seq>]`
+  replays every event at or after `<seq>`, in file order. It takes no slug and reads no remote;
+  `UNATTENDED-STOPS.md` §7 is what the feed records.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

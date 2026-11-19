@@ -121,6 +121,7 @@ unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
+unattended.sh --feed check  # local
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 unattended.sh --trigger <slug> --subject <s> --cause <cause> --pin <path>
 unattended.sh --recommend <slug> --stage <s>

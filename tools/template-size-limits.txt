@@ -239,7 +239,11 @@ memory/guides/UNATTENDED-PROTOCOL.md	68288
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the render measures 11015
 # CR-stripped, every raise above kept, and the row is that figure, with no headroom. A run's raise, on
 # the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-20).
-.claude/skills/unattended/SKILL.md	11015
+# RAISED 11015 -> 11051, 2026-11-19, by TOOL-dPlacedRequest-13: the `--feed check` line the fenced verb
+# list gains, which the kit gate's check 26 requires of every declared verb, so it is a block the gate
+# reads and no prose coming back. The render measures 11051 CR-stripped, and the row is that figure,
+# with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-13).
+.claude/skills/unattended/SKILL.md	11051
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
