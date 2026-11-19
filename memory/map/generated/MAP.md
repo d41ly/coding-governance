@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 200 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 209 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -144,6 +144,15 @@ Inventories: gate-legs: 200 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `pytest-guardrails self-test` | baseline |
 | `python reads (a name never bound, an import outside its guard)` | run-gates |
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
+| `ratchet (both ways)` | memory-tree-hygiene |
+| `ratchet (key shape)` | memory-tree-hygiene |
+| `ratchet (keys, not a scalar)` | memory-tree-hygiene |
+| `ratchet (never gains)` | memory-tree-hygiene |
+| `ratchet (populated)` | memory-tree-hygiene |
+| `ratchet (rename)` | memory-tree-hygiene |
+| `ratchet (seed laundering)` | memory-tree-hygiene |
+| `ratchet (unarmed)` | memory-tree-hygiene |
+| `ratchet selftest` | memory-tree-hygiene |
 | `recall floor` | memory-recall |
 | `recall floor arms` | memory-recall |
 | `receipt sync (installed files match the receipt)` | run-gates |

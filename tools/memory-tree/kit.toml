@@ -709,3 +709,155 @@ stage = "closing-review"
 role = "main"
 command = "python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>"
 when = "before any review, for the bug classes a diff can hit"
+
+# THE SCALAR PINS (TOOL-dWitnessedBar-14 S11): every `*_PIN` key a tracked root `.<name>.conf` assigns a
+# scalar count, held keyed by conf and key so a converter drains it and a tenth pin reds as a gain. The
+# seed is the leg's own measurement, run at the repository root by the ledger factory's seed run.
+[[ledger]]
+population = "conf-scalar-pins"
+leg = "ratchet (keys, not a scalar)"
+seed = ["python", "tools/memory-tree/ratchet.py", "keys-not-scalar", "--measure"]
+key = "key"
+fields = ["conf", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/conf-scalar-pins.txt"
+
+# THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb
+# of `ratchet.py`; `untouched quiet` and `merge` are plants of `ratchet selftest`, and the touch join is
+# `build.scope`'s, printed unarmed by `ratchet.py --list`.
+
+[[gate_leg]]
+name = "ratchet (never gains)"
+tag = "leg.memory-tree.ratchet-never-gains"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a population's growth past its base"
+argv = ["python3", "{kit}/ratchet.py", "never-gains"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (both ways)"
+tag = "leg.memory-tree.ratchet-both-ways"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades its own populations both ways at HEAD"
+argv = ["python3", "{kit}/ratchet.py", "both-ways"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (unarmed)"
+tag = "leg.memory-tree.ratchet-unarmed"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an unarmed population that reads armed"
+argv = ["python3", "{kit}/ratchet.py", "unarmed"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (populated)"
+tag = "leg.memory-tree.ratchet-populated"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an armed population holding no row"
+argv = ["python3", "{kit}/ratchet.py", "populated"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (seed laundering)"
+tag = "leg.memory-tree.ratchet-seed-laundering"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a baseline row re-dated or re-seeded"
+argv = ["python3", "{kit}/ratchet.py", "seed-laundering"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (rename)"
+tag = "leg.memory-tree.ratchet-rename"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a renamed file's rows left uncarried"
+argv = ["python3", "{kit}/ratchet.py", "rename"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (keys, not a scalar)"
+tag = "leg.memory-tree.ratchet-keys-not-a-scalar"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a scalar count pin in a root conf"
+argv = ["python3", "{kit}/ratchet.py", "keys-not-scalar"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet (key shape)"
+tag = "leg.memory-tree.ratchet-key-shape"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a number where a ledger key holds a label"
+argv = ["python3", "{kit}/ratchet.py", "key-shape"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet selftest"
+tag = "leg.memory-tree.ratchet-selftest"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "self-tests the ratchet pack's plants red and green"
+argv = ["python3", "{kit}/ratchet.py", "--fixture"]
+subject = "kit"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 300

@@ -505,9 +505,11 @@ BIND_HEAD_LINES = 12
 # commands re-run at a commit, written by a stand-in or an executor and never by a door. `transition`
 # (TOOL-dDeclaredLoop-3 S2) is a build's stage move, written by the loop kit's transition writer alone.
 # `recommendation` (TOOL-dDeclaredLoop-22 S1) is a stage exit's review recommendation, a command's score or a
-# role's reason, written through the factory's door by the unattended driver's `--recommend`.
+# role's reason, written through the factory's door by the unattended driver's `--recommend`. `widen`
+# (TOOL-dWitnessedBar-14 S5) is a population's growth admitted with its reason, written through
+# `write_record` by the ratchet pack's `ratchet.py widen` alone.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
-                      "transition", "recommendation")
+                      "transition", "recommendation", "widen")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

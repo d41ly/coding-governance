@@ -171,3 +171,15 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T12:47:35Z draw · re-dispatch · TOOL-dWitnessedBar-14 · 24/180 · 20261119T124735Z-c5b9b4
 
 2026-11-19T12:47:35Z dispatch · item b76d360b TOOL-dWitnessedBar-14 · reason memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md memory/map/features/memory-tree-hygiene.md memory/project/conf-scalar-pins.txt tools/gate-legs.json tools/govkit/subject-pins.tsv tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/build_records.py tools/memory-tree/kit.toml tools/memory-tree/ratchet.py tools/memory-tree/tree_lib.py memory/map/generated/symbols.json .lexicon.conf memory/guides/SESSION-KICKOFF.md .memory-tree.conf .gitattributes memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-14-2-acceptance-ledger.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-14-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-19T13:04:10Z draw · re-dispatch · TOOL-dWitnessedBar-14 · 25/180 · 20261119T130410Z-4f80f7
+
+2026-11-19T13:04:10Z dispatch · item 53307674 TOOL-dWitnessedBar-14 · reason memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json
+2026-11-19T13:06:54Z draw · re-dispatch · TOOL-dWitnessedBar-14 · 26/180 · 20261119T130654Z-52c499
+
+2026-11-19T13:06:54Z dispatch · item 53307674 TOOL-dWitnessedBar-14 · reason memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-14-deviation-143.md
+2026-11-19T13:09:09Z draw · re-dispatch · TOOL-dWitnessedBar-14 · 27/180 · 20261119T130909Z-1c07e3
+
+2026-11-19T13:09:09Z dispatch · item 53307674 TOOL-dWitnessedBar-14 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+2026-11-19T13:12:02Z draw · re-dispatch · TOOL-dWitnessedBar-14 · 28/180 · 20261119T131202Z-0bc51b
+
+2026-11-19T13:12:02Z dispatch · item 53307674 TOOL-dWitnessedBar-14 · reason memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-14-deviation-143.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md .gitattributes .memory-tree.conf memory/HYGIENE.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-14-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md memory/guides/SESSION-KICKOFF.md memory/map/features/memory-tree-hygiene.md memory/project/conf-scalar-pins.txt tools/gate-legs.json tools/govkit/subject-pins.tsv tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/build_records.py tools/memory-tree/kit.toml tools/memory-tree/ratchet.py tools/memory-tree/tree_lib.py memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md

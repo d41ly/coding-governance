@@ -203,6 +203,44 @@ git ships `ours` as a merge STRATEGY, not a driver, so the attribute needs one p
 `check-wiring.sh` reports the unset driver `UNWIRED`, sets it under `--fix` and `--session`, and never
 overwrites a value already set.
 
+## The ratchet pack — a population grows only through a widen record
+
+`ratchet.py` (TOOL-dWitnessedBar-14) grades every population a `[[ledger]]` table registers, one leg
+per row of retrofit's `[ratchet]` table, each reading through `legacy_ledger.py` and none counting on
+its own:
+
+| Leg | Verb | Refuses |
+|---|---|---|
+| `ratchet (never gains)` | `never-gains` | a key gained, a count raised or a ceiling exceeded against the compare base, an append-only base row edited or removed, and a `widened:` row `retrofit.widen` does not admit |
+| `ratchet (both ways)` | `both-ways` | for each registration whose `leg` names it, a measured key with no row or a row its seed no longer finds; one naming another leg prints `graded by <leg>` |
+| `ratchet (unarmed)` | `unarmed` | a `seed = []` registration, or a home recording a failed seed, whose home still holds rows |
+| `ratchet (populated)` | `populated` | an armed home holding no row; no seen-red record admits one yet |
+| `ratchet (seed laundering)` | `seed-laundering` | a base row re-dated or its disposition rewritten, or removed while its seed still measures it |
+| `ratchet (rename)` | `rename` | a `git mv` of a file holding `site` rows left keyed on the old path |
+| `ratchet (keys, not a scalar)` | `keys-not-scalar` | a `*_PIN` key a tracked root `.<name>.conf` assigns that `conf-scalar-pins` does not hold |
+| `ratchet (key shape)` | `key-shape` | a key field holding a number where its kind holds a label |
+| `ratchet selftest` | `--fixture` | every plant of `--fixture --plant <case>`, `untouched quiet` and `merge` among them |
+
+With no compare base a base leg prints `unresolved` and reds. A population the base holds nowhere,
+neither its home nor its header at another path, prints `new at <sha12>` with its row count. A leg
+with nothing to grade prints one `unarmed · <leg> · <why>` line and exits 0, which the runner shows
+as passed: read `unarmed` in the leg's output or in `ratchet.py --list`, which also prints the touch
+join `unarmed · build.scope (dScopedBuild)`.
+
+**The widen route.** A raise is admitted only with its reason on record:
+
+```bash
+python <prefix>/memory-tree/ratchet.py widen <population> --key "$(printf '%s\t%s' <field> <field>)" --reason "<why>" --unit <id>
+```
+
+The key is the row's key fields joined by one TAB, as the ledger row spells them.
+
+writes `<memory root>/builds/<build>/build/<date>-build-<id>-widen-<n>.md` (`Population`, `Keys`,
+`Reason`, `Caused-by`) and the row `widened:<record stem>` at HEAD's sha. Commit the record with the
+row: `never gains` admits a widened row only where that record is tracked, names the population and
+the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
+admits only a record the compare base already tracks. A widened row's count is not checked.
+
 ## Backlog modes — authored shards and per-build asks
 
 Where an ask lives, and who decides its status, is one conf key. This section is the author-facing
