@@ -542,6 +542,7 @@ Cite ids, never line numbers.
 | [TOOL-dIndexedDesign-28](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-14 | 2026-10-28 | THE ### Bug classes FIELD DOES NOT READ THE SCOUT.… |
 | [TOOL-dIndexedDesign-29](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | ROW F6 READS NO FEATURE-LEVEL RE-ENTRY. TOOL-dDeclaredLoop-13's row F6… |
 | [TOOL-dIndexedDesign-30](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | TWO DECLARED-DIRECTION CLASSIFIERS. PLAY-dOrderedCharter-36 S5 specs a… |
+| [TOOL-dLandedOwners-5](../builds/dLandedOwners/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | DDECLAREDLOOP'S PENDING REVIEW CYCLE ROW READS STALE NOW THAT ITS BUILD… |
 | [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-1 | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
 | [TOOL-dLinkedLibrary-28](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-2 | 2026-10-26 | THE HOUSE INDEX HAS TWO SPECCED HOMES. TOOL-aScoutedSeam-1 S10 specs a… |

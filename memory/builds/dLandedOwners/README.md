@@ -4,7 +4,7 @@ node: d
 opened: 2026-11-19
 streams: tooling
 roster: TOOL
-ids: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
+ids: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedOwners-4 TOOL-dLandedOwners-5
 ---
 
 # dLandedOwners — the policy kit counts a carried-forward build run as landed, and its reader scan sees every real reader
@@ -47,11 +47,12 @@ None.
 | 1 | `TOOL-dLandedOwners-1` | the landed-owner predicate counts a build run that landed with units carried forward as landed |
 | 2 | `TOOL-dLandedOwners-2` | the reader scan reads a key passed to a reader through a module constant |
 | 3 | `TOOL-dLandedOwners-3` | a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage |
+| 4 | `TOOL-dLandedOwners-4` | the closing review's promoted findings: the kit threaded to every resolver, failing cases for each landed-predicate arm, the withheld list checked, one git-read refusal and the docs aligned (M1-M5, L1-L4, promoted) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-11-19 · streams tooling
-ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
+**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
+ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedOwners-4 TOOL-dLandedOwners-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -59,15 +60,16 @@ ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3
 | [TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward](spec/2026-11-19-spec-TOOL-dLandedOwners-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dLandedOwners-2 — the reader scan reads a key passed to a reader through a module constant](spec/2026-11-19-spec-TOOL-dLandedOwners-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-19 |
 | [TOOL-dLandedOwners-3 — a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage](spec/2026-11-19-spec-TOOL-dLandedOwners-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-19 |
+| [TOOL-dLandedOwners-4 — the closing review's promoted findings: the kit threaded to every resolver, a failing case for each landed-predicate arm, every withheld file checked, one git-read refusal and the docs aligned](spec/2026-11-19-spec-TOOL-dLandedOwners-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3.
+Ids no `spec-audit` record has ever named: TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedOwners-4.
 
-Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -77,6 +79,7 @@ Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry
 | 1 | `TOOL-dLandedOwners-1` | no |
 | 2 | `TOOL-dLandedOwners-2` | no |
 | 3 | `TOOL-dLandedOwners-3` | no |
+| 4 | `TOOL-dLandedOwners-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
