@@ -165,3 +165,5 @@ skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED l
 skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb A — session A names neither	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED limb B — the session in a tree with no card file did not print ok	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/lib/refuse-wrong-shell.sh	exit	exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
+tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
