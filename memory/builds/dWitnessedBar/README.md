@@ -112,7 +112,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-27 — a wrong-shell refusal at every entry point](spec/2026-10-25-spec-TOOL-dWitnessedBar-27.md) | 2 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dWitnessedBar-48 — the bash query sees any candidate list holding a bare `bash`, and the row-grammar resolver becomes an adapter](spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-49 — the bash query sees a PATH lookup of `bash`, and the recall selftest resolves its bash through the block](spec/2026-10-25-spec-TOOL-dWitnessedBar-49.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-19 |
-| [TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`](spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-11-19 |
+| [TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`](spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md) | 3 | 2 | INPROGRESS | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-50 — the wrong-shell population is a stated predicate, the commit hook among its members](spec/2026-10-25-spec-TOOL-dWitnessedBar-50.md) | 3 | 2 | INPROGRESS | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-15 — `test.seed` at every check's registration](spec/2026-10-25-spec-TOOL-dWitnessedBar-15.md) | 4 | 2 | DEFERRED | rev-8 | 2026-11-19 |
 | [TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg](spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md) | 5 | 2 | DEFERRED | rev-6 | 2026-11-19 |
@@ -120,9 +120,9 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-22 — the `tests=` and `enforces=` edge fields on legs](spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-47 — a seed home is admitted when its directory exists, so a fresh install seeds before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-47.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dWitnessedBar-19 — the leg's `purpose` field in `gate-legs.json`, every leg reviewed](spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-19 |
-| [TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces](spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-05 |
-| [TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says](spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md) | 9 | 2 | DEFERRED | rev-6 | 2026-10-26 |
-| [TOOL-dWitnessedBar-45 — the leg factory runs in a tree with no govkit: its generated row stays gov's, and its adopter verbs import no govkit](spec/2026-10-25-spec-TOOL-dWitnessedBar-45.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces](spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md) | 8 | 2 | DEFERRED | rev-6 | 2026-11-19 |
+| [TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says](spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md) | 9 | 2 | DEFERRED | rev-7 | 2026-11-19 |
+| [TOOL-dWitnessedBar-45 — the leg factory runs in a tree with no govkit: its generated row stays gov's, and its adopter verbs import no govkit](spec/2026-10-25-spec-TOOL-dWitnessedBar-45.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes](spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md) | 10 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dWitnessedBar-46 — what an adopter receives of the ratchet pack: the scalar-pin leg over its own seeded pins, and the rest kept gov's](spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md) | 10 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-54 — the `exists:` spelling of a generated row's `when` reaches its other two readers, and the three readers are held to agree](spec/2026-10-25-spec-TOOL-dWitnessedBar-54.md) | 10 | 2 | DEFERRED | rev-3 | 2026-10-25 |

@@ -37735,15 +37735,7 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-gates.sh:224-226
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:280
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md	tools/run-gates/run-selftests.sh:293-318
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md	tools/govkit/entries/push-main.kit.toml:79
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md	tools/govkit/govkit.py:2785-2948
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md	tools/govkit/govkit.py:2805-2948
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md	tools/run-gates/run-gates.sh:2764
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md	tools/run-gates/run-gates.sh:2791
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md	x.py:120
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md	tools/codebase-map/map_lib.py:1530
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md	tools/drift-audit/drift_report.py:411
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md	tools/drift-audit/drift_signals.py:446
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	drift_report.py:3587
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	drift_report.py:781
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md	tools/drift-audit/drift_report.py:781
@@ -37862,8 +37854,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	tools/unattended/unattended.sh:9545-9592
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	unattended.sh:9566-9568
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md	unattended.sh:9592
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-45.md	tools/run-gates/kit.toml:18
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-45.md	tools/run-gates/regen.py:108-122
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md	tools/memory-tree/check-memory-hygiene.sh:716-743
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md	tools/memory-tree/check-memory-hygiene.sh:733-738
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md	BUILD-METHOD M6

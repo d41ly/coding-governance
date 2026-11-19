@@ -7,7 +7,7 @@
 DIVERGENCE: I checked rev-3 of memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md against the tree at 5e569d9c9 before writing anything. It can't be built as written. The spec writer needs to settle the points below; I've listed them all here so one revision covers them.
 
 (1) S10, AC2, AC4 and section 4's function table: `compare <population>` has no measurement source. AC2 needs "a site measured that no row declares" and AC4 needs "no drain". But `compare_counts(measured, declared, direction)` takes `measured` as input, and nothing in the spec says where the CLI gets it. The only candidate is running the registration's `seed` argv. How that argv runs is designed by other units:
-- TOOL-dWitnessedBar-15 section 4: the stdout row grammar, the 600 s bound, `dead probe:` liveness.
+- TOOL-dWitnessedBar-15 section 4: the stdout row grammar, the 600 s bound (PINNED, unit 15 section 4), `dead probe:` liveness.
 - TOOL-dWitnessedBar-51 S32: head `python`/`python3` runs as sys.executable, head `bash` runs through resolve_bash_py, `{prefix}`/`{kit}` resolve via tools/run-gates/regen.py#resolve_argv, and the cwd is the repo root.
 Building it here would design what those units own, or build a weaker version that they then re-specify. Section 4 needs to name the source: either `compare` runs `seed` through a named function whose contract is stated or shared with unit 15, or it reads measured rows from a named input.
 
@@ -61,6 +61,6 @@ The main one is that the `compare` command has no defined way to get the counts 
 
 **What didn't run:** no fixture or probe of new code ran, because I wrote none, so none stands in for any gate. No gate, suite or bar ran. Nothing was committed, so `gotchas.py --for-diff` had no commit to read and didn't run. Nothing timed out or was skipped.
 
-**Still owed at the close, once a revised spec is built:** RED-first observation of the spec's two new arms: tools/lib/resolve-python.test.sh (the `legacy_ledger_py` parity row and section 2o; AC1-4, AC7, AC9, AC10) and tools/memory-tree/merge-rows.test.sh (the ledger cases; AC5, AC6). Plus the section 7 legs: shell-hygiene selftest, the two scanner legs, the python resolver, the row-keyed merge driver replay, the row-driver view refusal, the check-wiring self-test and memory hygiene.
+**Still owed at the close, once a revised spec is built:** RED-first observation of the spec's two new arms: tools/lib/resolve-python.test.sh (the `legacy_ledger_py` parity row and section 2o; AC1-4, AC7, AC9, AC10) and tools/memory-tree/merge-rows.test.sh (the ledger cases; AC5, AC6). Plus the legs section 7 lists: shell-hygiene selftest, the two scanner legs, the python resolver, the row-keyed merge driver replay, the row-driver view refusal, the check-wiring self-test and memory hygiene.
 
 **Tree state:** unchanged. RUN.md was already staged by the main loop's `--dispatch`, and the four untracked prompt files belong to TOOL-dWitnessedBar-11 and -14. The spec stays INPROGRESS.
