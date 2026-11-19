@@ -2685,13 +2685,19 @@ def scan_bare_bash(root):
     (TOOL-dWitnessedBar-26 §4 "The query"). Python is read by `ast`: shape 1, a call whose first
     argument is a list or tuple literal opening with `bash` or `bash.exe` (`resolve_shell_argv`, which
     refuses, aside), or an `or` whose last operand is that name; shape 2, a list or tuple literal holding
-    both names, the PATH loop the block alone may spell. JavaScript is read by a regex: shape 3, `spawn`,
+    the name `bash` beside another bash candidate, a constant ending `bash.exe`, the constant `/bin/bash`
+    or a call reading `GOV_BASH` (TOOL-dWitnessedBar-48 S2), the candidate list the block alone may
+    spell; a literal that is the right operand of an `in` or `not in` is a membership test and spawns
+    nothing, so shape 2 skips it (S3). JavaScript is read by a regex: shape 3, `spawn`,
     `spawnSync`, `execFile` or `execFileSync` with that name first, or an `||` or `??` falling back to it.
     A language with no tracked file read is a line too, and so is a `*.py` `ast` cannot parse, so an
     empty or unread population is never a pass.
     WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable, a conditional whose `else` is
     `"bash"`, and a name bound to `"bash"` and launched later."""
     names = profile_bar.BASH_NAMES
+    # Shape 2's constants are derived from BASH_NAMES or compared alone, never spelled in one literal
+    # beside the name, because such a literal in this file is its own shape 2 hit.
+    bare, exe = min(names, key=len), max(names, key=len)
     js_rx = re.compile(r"""\b(?:spawn|spawnSync|execFile|execFileSync)\(\s*(['"`])bash(?:\.exe)?\1"""
                        r"""|(?:\|\||\?\?)\s*(['"`])bash(?:\.exe)?\2""")
     listed = subprocess.run(["git", "ls-files", "-z", "--", "*.py", "*.js"], cwd=root, capture_output=True,
@@ -2718,11 +2724,19 @@ def scan_bare_bash(root):
         if ext == ".js":
             hits += ["%s:%d: shape 3" % (rel, i) for i, ln in enumerate(lines, 1) if i in outside and js_rx.search(ln)]
             continue
+        src = "\n".join(lines)
         try:
-            tree = ast.parse("\n".join(lines))
+            tree = ast.parse(src)
         except (SyntaxError, ValueError) as exc:
             hits.append("%s: not read, %s" % (rel, exc))
             continue
+        tested = {id(c) for n in ast.walk(tree) if isinstance(n, ast.Compare)
+                  for op, c in zip(n.ops, n.comparators) if isinstance(op, (ast.In, ast.NotIn))}
+
+        def check_other_bash(e):
+            if isinstance(e, ast.Constant) and isinstance(e.value, str):
+                return e.value.endswith(exe) or e.value == "/bin/bash"
+            return isinstance(e, ast.Call) and "GOV_BASH" in (ast.get_source_segment(src, e) or "")
         for n in ast.walk(tree):
             shape = ""
             if isinstance(n, ast.Call) and n.args:
@@ -2736,8 +2750,9 @@ def scan_bare_bash(root):
             elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant) \
                     and n.values[-1].value in names:
                 shape = "shape 1"
-            elif isinstance(n, (ast.List, ast.Tuple)) \
-                    and set(names) <= {e.value for e in n.elts if isinstance(e, ast.Constant)}:
+            elif isinstance(n, (ast.List, ast.Tuple)) and id(n) not in tested \
+                    and any(isinstance(e, ast.Constant) and e.value == bare for e in n.elts) \
+                    and any(check_other_bash(e) for e in n.elts):
                 shape = "shape 2"
             if shape and n.lineno in outside:
                 hits.append("%s:%d: %s" % (rel, n.lineno, shape))

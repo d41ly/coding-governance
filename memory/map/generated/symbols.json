@@ -32155,6 +32155,11 @@
     {
       "id": "scan_bash",
       "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -38461,6 +38466,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "wrong_shell_at",

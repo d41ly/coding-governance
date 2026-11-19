@@ -83,6 +83,102 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
     unfenced_lines,
 )
 
+# TOOL-dWitnessedBar-48: the one bash rule, carried inline; `cmd_selftest`'s `resolve_shell_ere` is
+# its adapter, and `resolve-python.test.sh` in the gov lib dir reds this copy once it drifts.
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 CHECK = 20
 # Check 24 rides this module for the same reason 13-20 do: it walks ROW DOCUMENTS, and the row
 # grammar lives here. TOOL-cSpliceWarden-6.
@@ -1931,34 +2027,32 @@ def cmd_selftest():
         # two copies free to drift — and the drift is silent in the worst direction, since a narrower
         # Python side simply scans less and still prints a clean count. The shell PRINTS its ERE and
         # this arm asserts the two agree over a tree holding one of every shape.
-        shell_used = []
+        shell_used, shell_refused = [], []
 
         def resolve_shell_ere(sh, cwd):
-            """The shell's own ERE, or None. Every candidate is RUN — being on PATH is not evidence.
-            The candidate that answered is kept in `shell_used`, so the home comparison below asks
-            the SAME shell rather than probing again.
-
-            On Windows `bash` resolves to the WSL launcher, which tries to boot a VM and returns
-            UTF-16 "the timeout period expired" at rc=1. That is the MS-Store-python3 shape one
-            interpreter over, and it is why this probes rather than assuming.
+            """The shell's own ERE, or None. An adapter over the `resolve_bash_py` block above
+            (TOOL-dWitnessedBar-48): it runs the block's `found` bash and no candidate of its own, so
+            WSL's launcher, which a bare `bash` reaches on Windows, is refused by the block's rule. The
+            bash that answered is kept in `shell_used`, so the home comparison below asks the SAME
+            shell rather than probing again; on the block's refusal its text is kept in
+            `shell_refused` and this returns None, the "no ERE" contract.
             """
-            cands = [os.environ.get("GOV_BASH", ""), "bash",
-                     "C:/Program Files/Git/bin/bash.exe", "/bin/bash", "sh"]
-            for c in cands:
-                if not c:
-                    continue
-                try:
-                    r = subprocess.run([c, sh, "--print-rotated-archive-ere"], cwd=cwd,
-                                       capture_output=True, text=True, encoding="utf-8", timeout=60)
-                except (OSError, subprocess.TimeoutExpired):
-                    continue
-                if r.returncode != 0:
-                    continue
-                out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
-                # The print modes sit below an observability echo, so the ERE is the LAST line.
-                if out and out[-1].startswith("^"):
-                    shell_used.append(c)
-                    return out[-1]
+            found, _tried, refusal = scan_bash(sh)
+            if not found:
+                shell_refused.append(refusal)
+                return None
+            try:
+                r = subprocess.run([found, sh, "--print-rotated-archive-ere"], cwd=cwd,
+                                   capture_output=True, text=True, encoding="utf-8", timeout=60)
+            except (OSError, subprocess.TimeoutExpired):
+                return None
+            if r.returncode != 0:
+                return None
+            out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
+            # The print modes sit below an observability echo, so the ERE is the LAST line.
+            if out and out[-1].startswith("^"):
+                shell_used.append(found)
+                return out[-1]
             return None
 
         def check_readers_agree():
@@ -1972,9 +2066,10 @@ def cmd_selftest():
                 # PRINTED, not merely returned. `arm()` prints the label alone on success, so a skip
                 # returned as a passing value is indistinguishable from a verified one — which is the
                 # whole objection to a silent skip.
-                print("arm SKIP  the cross-reader join did NOT run: no candidate shell executed "
+                print("arm SKIP  the cross-reader join did NOT run: no resolved bash executed "
                       "`--print-rotated-archive-ere` on this node. The two readers were NOT compared. "
-                      "Set GOV_BASH to a usable bash to exercise it.")
+                      "Set GOV_BASH to a usable bash to exercise it."
+                      + (" " + shell_refused[-1] if shell_refused else ""))
                 return ("JOIN-OK SKIPPED — announced above; this arm verified nothing")
             rx = re.compile(ere.replace("$M", "memory"))
             tracked = [x for x in run("git", "ls-files", "--", "memory/", cwd=t11).split("\n") if x]
