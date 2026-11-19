@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
