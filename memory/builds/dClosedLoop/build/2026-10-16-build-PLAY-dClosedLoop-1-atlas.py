@@ -20,9 +20,11 @@ the page, which embeds every record, stays out of it. --check derives everything
 at, the tracked inputs (dClosedLoop's README, build and reviews folders, .memory-tree.conf,
 TOOL-dTrackedAtlas-1's module and one folder per chain build), the SHA-256 of `git ls-tree -r -z` over
 them at that commit, and the inputs the working tree differs in. --check --page derives nothing: it hashes
-the stamped inputs at --ref and compares, so a page reads stale only when an input moved, never because
-the commit did. It does not see run claims, the code under tools/ the derivation reuses, or a hand edit
-to the page.
+the stamped inputs at --ref, with each chain build's landing merges read against the stamp's default_ref
+(TOOL-dTrackedAtlas-10), and compares, so a page reads stale when an input or a landing it shows moved,
+never because the commit alone did. It does not see run claims, the code under tools/ the derivation
+reuses, a hand edit to the page, or whether the default-branch ref is current with its remote, since
+nothing is fetched.
 
 The page shows the chain's actual state (TOOL-dTrackedAtlas-2): TOOL-dTrackedAtlas-1's state document of every
 chain build, read through git at --ref (default HEAD), and the as-built view's clauses, read from the working
@@ -148,7 +150,7 @@ CORPUS_PLANTS = ("instruments-decision", "view-unread")
 # refusals run (TOOL-dTrackedAtlas-2).
 ACTUAL_PLANTS = ("state-dropped", "asbuilt-dropped")
 STATE_PATH = REPO / "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py"
-STAMP_SCHEMA = 1
+STAMP_SCHEMA = 2
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
@@ -722,6 +724,18 @@ def derive(plant=None):
     }
 
 
+def load_build_state():
+    """TOOL-dTrackedAtlas-1's module at STATE_PATH, loaded on first use and cached: the one loader `derive_actual`,
+    `read_git` and `read_landings` share (TOOL-dTrackedAtlas-10)."""
+    if not hasattr(load_build_state, "module"):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        load_build_state.module = module
+    return load_build_state.module
+
+
 def derive_actual(data, ref="HEAD", claims=True, plant=None):
     """`data`, `derive`'s result, with the chain's actual state added (TOOL-dTrackedAtlas-2): `state`, the state
     document of TOOL-dTrackedAtlas-1's `derive` at `ref`, whole; `asBuilt`, the as-built view's rows per chain build;
@@ -731,10 +745,7 @@ def derive_actual(data, ref="HEAD", claims=True, plant=None):
     working tree, as `derive` reads everything. A state document or a view whose builds differ from `data["chain"]`
     is a refusal. What it does not check: that a landed build closed every gap it owns, that the working tree and
     `ref` describe one commit, and that the view is current with its deviation records."""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
-    build_state = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(build_state)
+    build_state = load_build_state()
     kit = str(REPO / "tools/memory-tree")
     if kit not in sys.path:
         sys.path.insert(0, kit)
@@ -797,19 +808,14 @@ class StampError(Exception):
 
 
 def read_git(*args):
-    """The stdout bytes of `git <args>` run in REPO under TOOL-dTrackedAtlas-1's GIT_TIMEOUT, which is loaded from
-    STATE_PATH on first use; StampError naming the call when it fails, cannot start or outlives the bound."""
-    if not hasattr(read_git, "timeout"):
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
-        build_state = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(build_state)
-        read_git.timeout = build_state.GIT_TIMEOUT
+    """The stdout bytes of `git <args>` run in REPO under TOOL-dTrackedAtlas-1's GIT_TIMEOUT, read through
+    `load_build_state`; StampError naming the call when it fails, cannot start or outlives the bound."""
+    timeout = load_build_state().GIT_TIMEOUT
     call = "git " + " ".join(args[:args.index("--")] if "--" in args else args)
     try:
-        done = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, timeout=read_git.timeout)
+        done = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, timeout=timeout)
     except subprocess.TimeoutExpired:
-        raise StampError(f"{call} gave no answer within {read_git.timeout} s") from None
+        raise StampError(f"{call} gave no answer within {timeout} s") from None
     except OSError as e:
         raise StampError(f"{call} did not start: {e}") from None
     if done.returncode:
@@ -818,31 +824,58 @@ def read_git(*args):
     return done.stdout
 
 
-def derive_input_digest(commit, inputs):
-    """The 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>`; `-z` keeps it independent
-    of core.quotePath."""
-    return hashlib.sha256(read_git("ls-tree", "-r", "-z", commit, "--", *inputs)).hexdigest()
+def read_landings(commit, builds, default_ref, default_commit=None):
+    """{slug: [merge sha, ...]}, oldest first, for each slug of `builds`: the landing candidates TOOL-dTrackedAtlas-1's
+    `derive_landings` reads at `commit` on the first-parent line of `default_commit`, which is `default_ref` resolved
+    now when not passed (TOOL-dTrackedAtlas-10). StampError carrying the text of the module's StateError."""
+    build_state = load_build_state()
+    memory_root = BUILD.parent.parent.relative_to(REPO).as_posix()
+    try:
+        if default_commit is None:
+            _, default_commit = build_state.resolve_default_ref(str(REPO), default_ref)
+        found = build_state.derive_landings(str(REPO), commit, default_commit, memory_root, tuple(builds))
+    except build_state.StateError as e:
+        raise StampError(str(e)) from None
+    return {b: [sha for sha, _, _ in found[b]] for b in builds}
+
+
+def derive_input_digest(commit, inputs, default_ref, landings):
+    """The 64-hex SHA-256 of the raw stdout of `git ls-tree -r -z <commit> -- <inputs>`, a NUL byte, and the compact
+    sorted JSON of `default_ref` and `landings` (TOOL-dTrackedAtlas-10), so a landing merge that moves no input file
+    still moves the digest; `-z` keeps it independent of core.quotePath."""
+    history = json.dumps({"default_ref": default_ref, "landings": landings},
+                         sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(read_git("ls-tree", "-r", "-z", commit, "--", *inputs) + b"\0" + history).hexdigest()
 
 
 def build_stamp(data):
     """The page's stamp (TOOL-dTrackedAtlas-3): the commit the chain state was read at, the tracked inputs the page
-    derives from, their digest at that commit, and the inputs the working tree differs in. StampError when the
-    state carries no 40-hex commit or a git call fails."""
+    derives from, the default-branch ref and each chain build's landing candidates (TOOL-dTrackedAtlas-10), their
+    digest at that commit, and the inputs the working tree differs in. StampError when the state carries no 40-hex
+    commit, no string default_ref or no 40-hex default_commit, or a git call fails."""
     state = data.get("state") or {}
     commit = state.get("commit")
     if not (isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit)):
         raise StampError(f"the chain state carries no 40-hex commit, but {commit!r}")
+    default_ref, default_commit = state.get("default_ref"), state.get("default_commit")
+    if not isinstance(default_ref, str):
+        raise StampError(f"the chain state carries no string default_ref, but {default_ref!r}")
+    if not (isinstance(default_commit, str) and re.fullmatch(r"[0-9a-f]{40}", default_commit)):
+        raise StampError(f"the chain state carries no 40-hex default_commit, but {default_commit!r}")
     fixed = [(BUILD / "README.md").relative_to(REPO).as_posix(), HERE.relative_to(REPO).as_posix() + "/",
              REVIEWS.relative_to(REPO).as_posix() + "/", (REPO / ".memory-tree.conf").relative_to(REPO).as_posix(),
              STATE_PATH.relative_to(REPO).as_posix()]
-    builds = [(BUILD.parent / b["slug"]).relative_to(REPO).as_posix() + "/" for b in state.get("builds", [])]
+    slugs = [b["slug"] for b in state.get("builds", [])]
+    builds = [(BUILD.parent / b).relative_to(REPO).as_posix() + "/" for b in slugs]
     inputs = sorted(set(fixed + builds))
+    landings = read_landings(commit, slugs, default_ref, default_commit)
     dirty = set()
     for listing in (read_git("diff", "--name-only", "-z", commit, "--", *inputs),
                     read_git("ls-files", "--others", "--exclude-standard", "-z", "--", *inputs)):
         dirty.update(p for p in listing.decode("utf-8", "replace").split("\0") if p)
-    return {"schema": STAMP_SCHEMA, "commit": commit, "digest": derive_input_digest(commit, inputs),
-            "inputs": inputs, "dirty": sorted(dirty)}
+    return {"schema": STAMP_SCHEMA, "commit": commit, "default_ref": default_ref, "landings": landings,
+            "digest": derive_input_digest(commit, inputs, default_ref, landings), "inputs": inputs,
+            "dirty": sorted(dirty)}
 
 
 def read_stamp(page):
@@ -864,6 +897,11 @@ def read_stamp(page):
     rules = {
         "schema": lambda v: type(v) is int and v == STAMP_SCHEMA,
         "commit": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{40}", v) is not None,
+        "default_ref": lambda v: isinstance(v, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", v) is not None,
+        "landings": lambda v: isinstance(v, dict) and bool(v) and all(
+            isinstance(k, str) and re.fullmatch(r"[A-Za-z0-9._-]+", k) and isinstance(shas, list) and all(
+                isinstance(s, str) and re.fullmatch(r"[0-9a-f]{40}", s) for s in shas)
+            for k, shas in v.items()),
         "digest": lambda v: isinstance(v, str) and re.fullmatch(r"[0-9a-f]{64}", v) is not None,
         "inputs": lambda v: isinstance(v, list) and bool(v) and all(
             isinstance(p, str) and re.fullmatch(r"[A-Za-z0-9._][A-Za-z0-9._/-]*", p) and ".." not in p.split("/")
@@ -877,9 +915,10 @@ def read_stamp(page):
 
 
 def check_page(page, ref="HEAD"):
-    """Print whether the tree at `ref` has moved an input `page` was stamped with, and return the exit code: 0
-    current, 1 stale, dirty, unstamped or absent, 2 when it cannot answer. Reads the page and git, writes nothing
-    and derives nothing. The order is absent, unstamped, the ref and the digest at it, dirty, stale, current."""
+    """Print whether the tree at `ref` has moved an input `page` was stamped with, or a landing it shows, read
+    against the stamp's default_ref resolved now (TOOL-dTrackedAtlas-10), and return the exit code: 0 current, 1
+    stale, dirty, unstamped or absent, 2 when it cannot answer. Reads the page and git, writes nothing and derives
+    nothing. The order is absent, unstamped, the ref and the digest at it, dirty, stale, current."""
     def print_refusal(reason):
         print(f"atlas: cannot check: {reason}", file=sys.stderr)
         return 2
@@ -898,7 +937,8 @@ def check_page(page, ref="HEAD"):
             at = read_git("rev-parse", "--verify", "-q", f"{ref}^{{commit}}").decode().strip()
         except StampError as e:
             return print_refusal(f"{ref} resolves to no commit: {e}")
-        digest = derive_input_digest(at, stamp["inputs"])
+        landings = read_landings(at, sorted(stamp["landings"]), stamp["default_ref"])
+        digest = derive_input_digest(at, stamp["inputs"], stamp["default_ref"], landings)
         c12, r12 = stamp["commit"][:12], at[:12]
         if stamp["dirty"]:
             print(f"atlas: dirty — {page}: generated with {len(stamp['dirty'])} uncommitted input(s), "
@@ -908,6 +948,9 @@ def check_page(page, ref="HEAD"):
             print(f"atlas: current — {page}: inputs {digest[:12]} at {ref} ({r12}) match the stamp of {c12}")
             return 0
         print(f"atlas: stale — {page}: the inputs stamped at {c12} moved by {ref} ({r12})")
+        for b in sorted(landings):
+            if landings[b] != stamp["landings"][b]:
+                print(f"  landings of {b} moved: {landings[b][-1][:12] if landings[b] else 'none'}")
         try:
             read_git("cat-file", "-e", f"{stamp['commit']}^{{commit}}")
         except StampError:
