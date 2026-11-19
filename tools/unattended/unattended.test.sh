@@ -19396,7 +19396,8 @@ if in_shard 8; then
 # ==================================================================================================
 LF=$(mktemp -d); write_lease_fixture
 qa_d="$LF/c1/.git"; qa_c=$(git -C "$LF/c1" rev-parse HEAD)
-# ---- AC1: the second offline acquire of one ref and cached tip prints `queued — already`, one line.
+# ---- AC1: the second offline acquire of one ref, built on its queued acquire since TOOL-dPlacedRequest-41,
+# ---- prints `queued — already`, one line.
 mv "$LF/origin.git" "$LF/away.git"
 run_lease_arm acquire build tOff >/dev/null; qa_rc1=$?
 qa_out=$(run_lease_arm acquire build tOff); qa_rc=$?
@@ -19637,6 +19638,71 @@ done
 same "DPR39 a busy lock prints the lock-busy NOTE alone, runs on, and leaves the holder's lock" "$ca_b" "after 1 0 other"
 same "DPR39 RED: a busy take exiting 4 reads as an abort, not as busy" "$ca_b4" "after 0 1 other"
 rm -rf "$ca_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-41 — A SECOND OFFLINE WRITE TO A QUEUED LEASE CHAINS ON THE QUEUED COMMIT. Over
+# the lease fixture's clone, whose online acquire of tOn stamps the last fetch, its origin then
+# renamed away: a re-run acquire of tOff is `queued — already`, one line (AC3); a release after it
+# queues a second line whose expected tip and parent are the first's commit (AC1); tOn's release and
+# re-acquire chain a take; the restored origin's flush lands each ref in its last act's state, the
+# release on the acquire, and empties the queue (AC2); and tOy's acquire and release flushed over a
+# foreign commit planted on the origin both yield, two `lease-yielded` events, the foreign commit
+# kept and the queue empty (AC4). RED, observed at the close, is a copy whose cached read never reads
+# the queued commit, so every offline write is built on the cached tip, the ref-and-cached-tip key's
+# base: tOff's release finds no lease, tOn's acquire yields to its release, and neither origin ref
+# ends in its last act's state. The copy takes its library and kit directory from this checkout, so
+# its fleet tag and policy resolve. Waived by README rule 8 with the rest of this suite. WHAT THIS
+# BLOCK DOES NOT DRIVE: two offline writers racing one ref's hold, and a hold outliving
+# `NODE_LOCK_BOUND`.
+# ==================================================================================================
+LF=$(mktemp -d); ch_copy=$(mktemp -d); ch_d="$LF/c1/.git"
+ch_src=$(<"$SCRIPT")
+ch_cut='KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'
+ch_src=${ch_src/"$ch_cut"/"KIT_DIR=\"$HERE\""}
+ch_cut='  if [ "$pol" = cached ] && [ -n "${CL_QUEUED#*'
+printf '%s\n' "${ch_src/"$ch_cut"/'  if false && [ -n "${CL_QUEUED#*'}" >"$ch_copy/tip.sh"
+same "DPR41 the scratch copy carries its two staged lines" \
+  "$(grep -c "^KIT_DIR=\"$HERE\"\$" "$ch_copy/tip.sh") $(grep -c '^  if false && \[ -n "${CL_QUEUED#\*' "$ch_copy/tip.sh")" "1 1"
+for ch_v in green red; do
+  ch_drv=$SCRIPT; [ "$ch_v" = green ] || ch_drv="$ch_copy/tip.sh"
+  write_lease_fixture; rm -f "$ch_d/health.log"
+  SCRIPT=$ch_drv run_lease_arm acquire build tOn >/dev/null
+  mv "$LF/origin.git" "$LF/away.git"
+  SCRIPT=$ch_drv run_lease_arm acquire build tOff >/dev/null
+  ch_out=$(SCRIPT=$ch_drv run_lease_arm acquire build tOff)
+  ch_n3=$(grep -c '' "$ch_d/gov-queue.log")
+  ch_rel=$(SCRIPT=$ch_drv run_lease_arm release build tOff --as withdrawn)
+  ch_q=$(awk -F'\t' '$1 == "refs/gov/leases/tOff/build"' "$ch_d/gov-queue.log")
+  ch_c1=$(printf '%s\n' "$ch_q" | sed -n '1p' | cut -f3); ch_c2=$(printf '%s\n' "$ch_q" | sed -n '2p' | cut -f3)
+  ch_ac1="$(printf '%s\n' "$ch_q" | grep -c .) $([ -n "$ch_c2" ] && [ "$(printf '%s\n' "$ch_q" | sed -n '2p' | cut -f2)" = "$ch_c1" ] && echo tip || echo no-tip) $([ -n "$ch_c2" ] && [ "$(git -C "$LF/c1" rev-parse "$ch_c2^" 2>/dev/null)" = "$ch_c1" ] && echo parent || echo no-parent)"
+  SCRIPT=$ch_drv run_lease_arm release build tOn >/dev/null
+  SCRIPT=$ch_drv run_lease_arm acquire build tOn >/dev/null
+  SCRIPT=$ch_drv run_lease_arm acquire build tOy >/dev/null
+  SCRIPT=$ch_drv run_lease_arm release build tOy --as withdrawn >/dev/null
+  mv "$LF/away.git" "$LF/origin.git"
+  ch_t=$(git --git-dir="$LF/origin.git" mktree </dev/null)
+  ch_fc=$(git --git-dir="$LF/origin.git" commit-tree "$ch_t" -m "gov-claim tOy/build")
+  git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tOy/build "$ch_fc"
+  ch_fl=$(SCRIPT=$ch_drv run_lease_arm flush); ch_frc=$?
+  ch_ac2="$ch_frc $(read_lease_field tOff/build status) $([ "$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tOff/build^ 2>/dev/null)" = "$ch_c1" ] && echo parent || echo no-parent) $(read_lease_field tOn/build status) $(read_lease_field tOn/build epoch) $(grep -c '' "$ch_d/gov-queue.log")"
+  ch_ac4="$(printf '%s\n' "$ch_fl" | grep -c '^lease — tOy/build · yield · ') $(grep -c 'lease-yielded' "$ch_d/health.log" 2>/dev/null) $([ "$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tOy/build)" = "$ch_fc" ] && echo foreign || echo moved)"
+  if [ "$ch_v" = green ]; then
+    same "DPR41 AC3 a re-run offline acquire leaves one queue line" "$ch_n3" "1"
+    hit  "$ch_out" "lease — queued — already · tOff/build"
+    hit  "$ch_rel" "lease — tOff/build · queued · epoch 1"
+    same "DPR41 AC1 the release queues a second line on the acquire: its expected tip and its parent" "$ch_ac1" "2 tip parent"
+    same "DPR41 AC2 the flush exits 0, tOff withdrawn on the acquire, tOn live at epoch 2, the queue empty" "$ch_ac2" "0 withdrawn parent live 2 0"
+    hit  "$ch_fl" "lease — tOy/build · yield · epoch 1 · an earlier queued write of it yielded"
+    same "DPR41 AC4 both tOy lines yield, two lease-yielded events, the foreign commit kept" "$ch_ac4" "2 2 foreign"
+  else
+    same "DPR41 AC1 RED: the cached-tip copy refuses the release, which appends no line" "${ch_ac1%% *}" "$ch_n3"
+    hit  "$ch_rel" "lease not written — tOff/build holds no lease to release"
+    same "DPR41 AC2 RED: the cached-tip copy leaves tOff live and tOn released, the queue empty" "$ch_ac2" "0 live no-parent released 1 0"
+  fi
+done
+rm -rf "$LF" "$ch_copy"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -21915,7 +21981,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3709 -> 3724 by TOOL-dPlacedRequest-39: the contained append block's 15 region-eight
 # assertions (7 `same`, 1 `hit`, 7 `mutate`), off the diff's own lines; it has no skip branch, it
 # cuts the driver's own block. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3724
+# RAISED 3724 -> 3735 by TOOL-dPlacedRequest-41: the offline chain block's 11 region-eight
+# assertions (7 `same`, 4 `hit`), off the diff's own lines; it has no skip branch. No suite ran, and
+# its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3735
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22170,7 +22239,8 @@ FLOOR_SHARD_7=311
 # RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
 # RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
 # RAISED 940 -> 955 by TOOL-dPlacedRequest-39: the same 15 region-eight contained append assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=955
+# RAISED 955 -> 966 by TOOL-dPlacedRequest-41: the same 11 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=966
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

@@ -2395,7 +2395,7 @@ LEASE_NS="refs/gov/leases"
 LEASE_CACHE="refs/gov/remote/leases"
 LEASE_REF=""
 CR_NAME=""; CR_URL=""
-CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
+CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""; CL_QUEUED=""; GQ_HOLD=""; GQ_DIR=""
 CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
 CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""
 WC_WHY=""; WC_BEAT=""; WC_EPOCH=""
@@ -2447,8 +2447,11 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # TOOL-dPlacedRequest-16: `released` joins the status set with the verdict `released`, a hand-over
 # any mode takes; and the walk's renewing beat leaves as a NINETEENTH field, `beat-sha`, after the
 # eighteen above, so the draw's hold is aged over the same beat with no second walk.
+# TOOL-dPlacedRequest-41 S1: a `cached` read handed CL_QUEUED, `<ref> TAB <commit>`, the newest
+# queued commit of the one ref an offline write is about to build on, reads that commit's record in
+# place of the ref's cached tip, one `git cat-file`, and moves no ref: the commit stays a local object.
 read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
-  local pol="$1" d rc lf alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local pol="$1" d rc lf qr alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
   # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
   # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
@@ -2495,6 +2498,13 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
       || rm -f "${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID"
   fi
   GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" "$LEASE_CACHE/" >"$d/refs" 2>/dev/null
+  if [ "$pol" = cached ] && [ -n "${CL_QUEUED#*$'\t'}" ]; then
+    qr=${CL_QUEUED%%$'\t'*}; qr="$LEASE_CACHE/${qr#"$LEASE_NS"/}"
+    { CL_REF="$qr" awk '/^\001/ { split(substr($0, 2), a, "\t"); skip = (a[1] == ENVIRON["CL_REF"]) } !skip' "$d/refs"
+      printf '\001%s\t%s\n' "$qr" "${CL_QUEUED#*$'\t'}"
+      GIT cat-file commit "${CL_QUEUED#*$'\t'}" 2>/dev/null | awk 'b { print; next } /^\r?$/ { b = 1 }'
+    } >"$d/refs.q" && mv -f "$d/refs.q" "$d/refs"
+  fi
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
   CL_TIPS="$d/tips" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" -v rfe="$CLAIM_NS/" -v lfe="$LEASE_NS/" '
@@ -3257,7 +3267,8 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # `derive_lease_renews` over the epoch read (empty on a create), the epoch written, the policy and that
 # verdict, so a write that opens a tenure renews (TOOL-dPlacedRequest-25). WL_QUEUE builds the commit and queues it
 # through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
-# WC_WHY `already` where a line already queues the ref and tip, rc 2 `gov-queue.lock busy` on its lock.
+# WC_WHY `already` where the queued commit it was built on holds its record less the stamp keys
+# (TOOL-dPlacedRequest-41 S2), rc 2 `gov-queue.lock busy` on its lock.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
   local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
@@ -3660,9 +3671,7 @@ read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
 # printing `yield` with a `lease-yielded` health event, and a write that did not complete keeps it.
 # Every later compare-and-swap writer of this build applies `leases.offline` through these two.
 # UNDER THE NODE LOCK (TOOL-dPlacedRequest-24): both take `gov-queue.lock` in the common dir through
-# `write_dir_lock_wait`, waiting 5 s. An append whose ref and cached tip a line already queues appends
-# nothing and returns 3, since a re-run offline acquire builds a new commit on the same tip; a busy
-# lock returns 2 with nothing queued. A flush reads the lines under the lock and releases it, pushes
+# `write_dir_lock_wait`, waiting 5 s; a busy lock returns 2 with nothing queued. A flush reads the lines under the lock and releases it, pushes
 # with no lock held, then retakes it and rewrites the file now less exactly the lines it resolved, so
 # a line appended during the pushes stays; a busy lock skips the flush with one `queue: NOTE -` line.
 # Two flushes racing one line cannot both resolve it as lost: git reports a push whose remote ref is
@@ -3671,29 +3680,66 @@ read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
 # WHAT THIS DOES NOT CHECK: a flush whose second take is refused leaves its resolved lines queued, so
 # the next flush pushes them again: a written one then prints `flushed` again, and a lost one yields
 # again.
-add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not, 2 gov-queue.lock busy, 3 already queued
-  local d now tok rc=0
+# THE CHAIN (TOOL-dPlacedRequest-41). An offline write to a ref the queue already holds is built on
+# that ref's newest queued commit, never on the cached tip: `write_gov_queue_hold` takes the lock for
+# the whole offline write, from its read of `read_gov_queue_head` through its append, and
+# `read_claims cached` reads that commit's record as an online write reads the remote tip's, so the
+# new commit's parent and its line's expected tip are that commit. `add_gov_queue`, under that hold,
+# appends nothing and returns 3 where the write was built on the ref's newest queued commit and its
+# record, less the stamp keys `beat-utc`, `last-fetch` and `renews`, equals that commit's: a re-run
+# offline acquire renews its own queued acquire, while a release, a renew with a new witness or a
+# take-over chains. Called without the hold, it takes the lock itself. The flush pushes a ref's lines
+# oldest first: a line after a kept line of its ref is kept unpushed, and a line after a yielded one
+# yields with it, its own `yield` and `lease-yielded` event, since its expected tip never reached the
+# remote. WHAT THIS DOES NOT CHECK: an offline write that outlives the lock's own `NODE_LOCK_BOUND`,
+# whose hold a waiter may then break as stale.
+read_gov_queue_head() { # ref · queue file -> the ref's newest queued commit on stdout, nothing where none
+  [ -f "$2" ] || return 0
+  GQ_REF="$1" awk -F'\t' '{ sub(/\r$/, "") } $1 == ENVIRON["GQ_REF"] && $3 != "" { c = $3 } END { if (c != "") print c }' "$2" 2>/dev/null
+  return 0
+}
+write_gov_queue_hold() { # -> 0 with GQ_HOLD and GQ_DIR, the queue's lock held; 1 the common dir does not resolve or the lock is busy
+  local d tok="$BASHPID.$RANDOM"
+  GQ_HOLD=""
   d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
   d=${d%$'\r'}; [ -n "$d" ] || return 1
-  tok="$BASHPID.$RANDOM"
-  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 2
-  if [ -f "$d/gov-queue.log" ] && GQ_KEY="$1"$'\t'"${2:--}" awk -F'\t' '
-      BEGIN { split(ENVIRON["GQ_KEY"], k, "\t") }
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 1
+  GQ_DIR=$d; GQ_HOLD=$tok
+  return 0
+}
+remove_gov_queue_hold() { # -> WL_QUEUE cleared and the hold `write_gov_queue_hold` took released
+  WL_QUEUE=""
+  [ -z "$GQ_HOLD" ] || remove_dir_lock "$GQ_DIR/gov-queue.lock" "$GQ_HOLD"
+  GQ_HOLD=""
+  return 0
+}
+add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not, 2 gov-queue.lock busy, 3 already queued
+  local d now tok="" rc=0 hd
+  d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  d=${d%$'\r'}; [ -n "$d" ] || return 1
+  if [ -z "$GQ_HOLD" ] || [ "$GQ_DIR" != "$d" ]; then
+    tok="$BASHPID.$RANDOM"
+    write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 2
+  fi
+  hd=$(read_gov_queue_head "$1" "$d/gov-queue.log")
+  if [ -n "$hd" ] && [ "$hd" = "${2:-}" ] && GIT log --no-walk=unsorted --format='%x01%B' "$hd" "$3" 2>/dev/null | awk '
       { sub(/\r$/, "") }
-      $1 == k[1] && $2 == k[2] { hit = 1; exit }
-      END { exit !hit }' "$d/gov-queue.log" 2>/dev/null; then
+      /^\001/ { n++; sub(/^\001/, "") }
+      /^$/ || /^(beat-utc|last-fetch|renews): / { next }
+      { r[n] = r[n] "\n" $0 }
+      END { exit !(n == 2 && r[1] == r[2]) }'; then
     rc=3
   else
     TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
     printf '%s\t%s\t%s\t%s\n' "$1" "${2:--}" "$3" "$now" >>"$d/gov-queue.log" 2>/dev/null || rc=1
   fi
-  remove_dir_lock "$d/gov-queue.lock" "$tok"
+  [ -z "$tok" ] || remove_dir_lock "$d/gov-queue.lock" "$tok"
   return "$rc"
 }
 write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept or the lock busy; GQ_PUSHED
   local d f l ref tip c utc rc kept=0 ep tok n m lf s bd="" now
   local -a q=()
-  local -A rs=()
+  local -A rs=() gk=()
   GQ_PUSHED=""
   d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || d=""
   d=${d%$'\r'}; f="$d/gov-queue.log"
@@ -3712,11 +3758,19 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
     [ "$tip" != - ] || tip=""
     m=$(GIT log -1 --format=%B "$c" 2>/dev/null | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^last-fetch: / && f == "" { f = substr($0, 13) } END { print e "\t" f }')
     ep=${m%%$'\t'*}; lf=${m#*$'\t'}; lf=${lf%$'\r'}
+    # THE CHAIN (TOOL-dPlacedRequest-41 S3): a line after a kept line of its ref stays unpushed, and a
+    # line after a yielded one yields, since the tip it was queued on never reached the remote.
+    case "${gk["$ref"]:-}" in
+      kept) kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: an earlier queued write of it stays queued"; continue ;;
+      yield) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · an earlier queued write of it yielded, so the tip it was queued on never reached the remote"
+             add_health_event "$(resolve_health_log "$ROOT")" unattended lease-yielded "$ref"
+             n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue ;;
+    esac
     # THE QUEUED CLAIM'S AGE (TOOL-dPlacedRequest-16 S6): a write whose `last-fetch` is `-`, unparsable
     # or older than `leases.queued-claim-days` is refused `epoch-fence` and leaves the queue, so no
     # queued claim outlives a tombstone it would race; a refused bound keeps the line.
     if [ -z "$bd" ]; then
-      read_lease_bound prune >/dev/null || { kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: leases.queued-claim-days refused: $LP_VALUE"; continue; }
+      read_lease_bound prune >/dev/null || { kept=1; gk["$ref"]=kept; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: leases.queued-claim-days refused: $LP_VALUE"; continue; }
       bd=$LB_VALUE; TZ=UTC printf -v now '%(%s)T' -1
     fi
     s=""; [[ $lf =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] && s=$(date -u -d "$lf" +%s 2>/dev/null)
@@ -3730,9 +3784,9 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
     write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
     case "$rc" in
       0) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · flushed · epoch ${ep:--}" ;;
-      1) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · $GOVREF_WHY"
+      1) GQ_PUSHED=1; gk["$ref"]=yield; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · $GOVREF_WHY"
          add_health_event "$(resolve_health_log "$ROOT")" unattended lease-yielded "$ref" ;;
-      *) kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: $GOVREF_WHY"; continue ;;
+      *) kept=1; gk["$ref"]=kept; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: $GOVREF_WHY"; continue ;;
     esac
     n=${rs["$l"]:-0}; rs["$l"]=$((n + 1))
   done
@@ -3818,7 +3872,12 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
           echo "lease — $tail · follow-leases · epoch $CW_EPOCH"; return 0
         fi
         echo "lease refused — offline · $tail · $ow"; return 1 ;;
-      *) read_claims cached || { echo "lease not written — $CL_WHY"; return 2; }
+      # THE CHAIN (TOOL-dPlacedRequest-41 S1): the hold spans the read of the ref's newest queued
+      # commit, which stands for its cached tip, through the append.
+      *) write_gov_queue_hold || { echo "lease not written — gov-queue.lock busy"; return 2; }
+         CL_QUEUED="$ref"$'\t'"$(read_gov_queue_head "$ref" "$GQ_DIR/gov-queue.log")"
+         read_claims cached; rc=$?; CL_QUEUED=""
+         [ "$rc" = 0 ] || { remove_gov_queue_hold; echo "lease not written — $CL_WHY"; return 2; }
          WL_QUEUE=1 ;;
     esac
   else
@@ -3828,19 +3887,19 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     hd=$(GIT symbolic-ref -q "refs/remotes/$CR_NAME/HEAD" 2>/dev/null) || hd=""
     ASHA=""; [ -z "$hd" ] || ASHA=$(GIT rev-parse --verify --quiet "$hd^{commit}" 2>/dev/null) || ASHA=""
     case "$kind" in run) check_cross_run_overlap "" acquire ;; *) check_cross_run_overlap "$name" acquire ;; esac \
-      || { echo "lease refused — overlap · $tail · $OV_WHY"; WL_QUEUE=""; return 1; }
+      || { echo "lease refused — overlap · $tail · $OV_WHY"; remove_gov_queue_hold; return 1; }
   fi
   check_claim_writable "$lname" lease "$tag" "$sid" "$la"; rc=$?
   case "$rc" in
     0) ;;
-    1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+ · stale, so --lease take-over takes it}"; WL_QUEUE=""; return 1 ;;
-    3) echo "lease not written — $tail holds no lease to $act"; WL_QUEUE=""; return 2 ;;
-    *) echo "lease not written — the claim table declined $tail"; WL_QUEUE=""; return 2 ;;
+    1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+ · stale, so --lease take-over takes it}"; remove_gov_queue_hold; return 1 ;;
+    3) echo "lease not written — $tail holds no lease to $act"; remove_gov_queue_hold; return 2 ;;
+    *) echo "lease not written — the claim table declined $tail"; remove_gov_queue_hold; return 2 ;;
   esac
   # A DRAW'S HOLD, WRITTEN BY ITS OWN HOLDER, stays `held`, and its one release is `--as landed`.
   if [ -n "$CW_DRAW" ] && { [ "$CW_CLS" = mine ] || [ "$CW_CLS" = same ]; }; then
     if [ "$act" != release ]; then st=held
-    elif [ "$st" != landed ]; then echo "lease not written — a draw's hold is released --as landed"; WL_QUEUE=""; return 2; fi
+    elif [ "$st" != landed ]; then echo "lease not written — a draw's hold is released --as landed"; remove_gov_queue_hold; return 2; fi
   fi
   # THE EPOCH FOR LIFE (S5): a create of a ref the remote does not hold reads the newest commit this
   # node's feed holds for it, one awk and one cat-file.
@@ -3852,7 +3911,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
       fe=$(printf '%s\n' "$fm" | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^kind: / && k == "" { k = substr($0, 7) } /^status: / && s == "" { s = substr($0, 9) } END { print e " " k " " s }')
       case "${fe#* }" in
         "build landed"|"build withdrawn"|"unit landed"|"unit withdrawn")
-          echo "lease refused — tombstone · $tail · the remote no longer holds it, and this node's feed last saw its tombstone $fc"; WL_QUEUE=""; return 1 ;;
+          echo "lease refused — tombstone · $tail · the remote no longer holds it, and this node's feed last saw its tombstone $fc"; remove_gov_queue_hold; return 1 ;;
       esac
       CW_SHA=$fc
       case "${fe%% *}" in ""|*[!0-9]*) CW_EPOCH=0 ;; *) CW_EPOCH=$((10#${fe%% *})) ;; esac
@@ -3867,7 +3926,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
     case "$rc" in
       0) wk=$LW_VERDICT ;;
       1) wk="" ;;
-      *) echo "lease not written — $LW_VERDICT"; WL_QUEUE=""; return 2 ;;
+      *) echo "lease not written — $LW_VERDICT"; remove_gov_queue_hold; return 2 ;;
     esac
   fi
   case "$wk" in
@@ -3880,7 +3939,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   write_claim "$lname" "$st" absent quiet "" ""; rc=$?
   WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_VERDICT=""; WL_WITNESS=""
   if [ -n "$WL_QUEUE" ]; then
-    WL_QUEUE=""
+    remove_gov_queue_hold
     [ "$rc:$WC_WHY" != 0:already ] || { echo "lease — queued — already · $tail"; return 0; }
     [ "$rc" = 0 ] && { echo "lease — $tail · queued · epoch $WC_EPOCH"; return 0; }
     echo "lease not written — $WC_WHY"; return 2
