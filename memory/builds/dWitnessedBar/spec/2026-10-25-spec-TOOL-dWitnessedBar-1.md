@@ -22,6 +22,7 @@
 | [2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md](../build/2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md) | research | — |
 | [2026-11-05-build-TOOL-dWitnessedBar-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dWitnessedBar-1-crosscheck-returns.md) | research | TOOL-dWitnessedBar-21 |
 | [2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-21 |
+| [2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
