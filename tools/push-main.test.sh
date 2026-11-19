@@ -1628,7 +1628,10 @@ fi
 #      takes the lease over as fleet tag `b`, same session, which the `lease` column reads `same`.
 #      A planted fence read stands in a stub driver committed at the same place. Staged against the
 #      base lander, which pushes one ref and reads no fence: 42 moves no lease, 43 lands, 44 to 47
-#      land, and 48 lands the attended `--slug`, which the base refuses outright.
+#      land, and 48 lands the attended `--slug`, which the base refuses outright. The hook also runs,
+#      once, a planted script from clone B: 52 and 53 (TOOL-dPlacedRequest-29) plant a lease commit
+#      there, over a fixture made again after 51 took the driver away. Staged against
+#      TOOL-dPlacedRequest-15's lander, which classifies both `fenced`: 52 exits 1 and lands nothing.
 #      WHAT THIS DOES NOT CHECK: a real remote's `--atomic` (the spec's AC1, at the build run), and
 #      the change-feed census over this lander, which the lib dir's own suite reads.
 _fn_k=$(cd "$HERE" && for d in */; do [ -f "$d/unattended.sh" ] && [ -f "$d/lib-unattended.sh" ] && { printf '%s' "${d%/}"; break; }; done)
@@ -1641,8 +1644,8 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 whe
     mkdir -p "./${KIT_REL}$_fn_k" .githooks memory/builds/fx
     cp "$HERE/push-main.sh" "$lander"
     printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "$HERE/$_fn_k/unattended.sh" > "${KIT_REL}$_fn_k/unattended.sh"
-    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nexit 0\n' \
-      "$FX" "$FX" "$FX" "${KIT_REL}$_fn_k/unattended.sh" > .githooks/pre-push
+    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nif [ -f "%s/plant-once" ]; then mv -f "%s/plant-once" "%s/plant-ran"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && bash "%s/plant-ran" >&2 ); fi\nexit 0\n' \
+      "$FX" "$FX" "$FX" "${KIT_REL}$_fn_k/unattended.sh" "$FX" "$FX" "$FX" "$FX" "$FX" > .githooks/pre-push
     printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
       'GATE_CMD="true"' 'GATE_WALL="21600"' 'RESUME_SCHEDULE="off"' 'RESUME_SCHEDULE_DELAY=1800' 'RESUME_SCHEDULE_LIMIT=6' \
       'GATE_BOUND=3600' 'UNIT_STALL_BOUND=1800' 'RESUME_STALE_BOUND=5400' > .unattended.conf
@@ -1772,8 +1775,48 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
     "0 unmoved|"*"push-main: fence — none · no unattended driver beside this lander"*"landed main"*) ok "51 with no driver beside the lander the --slug landing reads no fence and lands the branch alone" ;;
     *) bad "51 a lander with no driver beside it refused or moved the lease: $out51" ;;
   esac
+  if write_fence_fixture; then
+    # 52 — TOOL-dPlacedRequest-29 AC1: inside the first push's hook, clone B pushes the lease one
+    #      commit on, parented on the tip and carrying its record: this holder's own beat at the same
+    #      epoch. The atomic push fails its compare-and-swap, the re-fence reads `refenced`, and the
+    #      retry lands without re-preparing: the branch at the prepared merge, the lease the landing's
+    #      beat parented on the planted commit.
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    m52=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out52=$(run_fence_land --land --slug fx); rc52=$?
+    p52=$(cat "$FX/planted" 2>/dev/null); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+    g52="$rc52 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && [ "$(git -C "$FX/a" rev-parse HEAD^1)" = "$m52" ] && echo main) $([ -n "$p52" ] && [ "$l52" != "$p52" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$l52^")" = "$p52" ] && echo beat)"
+    case "$g52|$out52" in
+      *"re-preparing"*) bad "52 a same-holder lease move re-prepared the landing: [$g52] $out52" ;;
+      "0 main beat|"*"push-main: the lease moved under this holder's own write; re-fencing on ${p52:0:8} (attempt 2/"*"landed main"*)
+        ok "52 a lease moved by its own holder's beat inside the hook is refenced and the retry lands, the lease the landing's beat on the planted commit" ;;
+      *) bad "52 a same-holder lease move was not refenced and landed: [$g52] $out52" ;;
+    esac
+    # 53 — TOOL-dPlacedRequest-29 AC2: the planted commit raises the epoch under another session, a
+    #      take-over; the re-fence is refused, the landing exits 1 `fenced` and the branch is unmoved.
+    git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    m53=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'e=$(git log -1 --format=%B refs/plant/tip | sed -n "s/^epoch: //p")' \
+      'git log -1 --format=%B refs/plant/tip | sed -e "s/^epoch: .*/epoch: $((e + 1))/" -e "s/^session: .*/session: sB/" | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out53=$(run_fence_land --land --slug fx); rc53=$?
+    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$(cat "$FX/planted" 2>/dev/null)" ] && echo planted)"
+    case "$g53|$out53" in
+      *"re-fencing on"*) bad "53 a take-over at the epoch plus one was retried as the holder's own write: [$g53] $out53" ;;
+      "1 unchanged planted|"*"push-main: fenced — the lease"*) ok "53 a take-over at the epoch plus one under another session refuses the landing fenced, the branch unmoved" ;;
+      *) bad "53 a take-over at the epoch plus one did not refuse as fenced with the branch unmoved: [$g53] $out53" ;;
+    esac
+  else
+    bad "52-53 the fenced-push fixture, made once above, could not be made again"
+  fi
 else
-  echo "  skip — 42-51 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
+  echo "  skip — 42-53 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
 fi
 unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
 [ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"

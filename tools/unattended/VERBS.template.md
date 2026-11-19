@@ -534,6 +534,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   commit on the tip with a fresh `beat-utc` and `renews: no` that the lander pushes with `--atomic`
   under `--force-with-lease=<lease ref>:<tip>` beside the branch; `fence — none · <why>` (exit 0)
   with `RUN_CLAIMS` off or no lease on the remote; or the `lease refused` line above (exit 1).
+  `--lease fence build <slug> --after <tip>` is the re-fence the lander asks for when its fenced
+  push failed on a lease tip that moved from `<tip>`, the full sha its fence read: the fence line on
+  the new tip only where this session holds the lease, `<tip>` is on the new tip's first-parent
+  chain and the new tip's `epoch` is `<tip>`'s; a later epoch, a tip off that chain, leases off and
+  no lease on the remote are each `lease refused — epoch-fence` (exit 1), a foreign holder keeping
+  its own cause word. `--after` on any other act, or no full sha, exits 2.
   Dark behind `RUN_CLAIMS` like every claim; `UNATTENDED-STOPS.md` §7 is the grammar, the record,
   the epoch and the four `leases.*` keys.
 - `--register` — two create-only registers on the remote, each entry ONE parentless commit written
@@ -1292,7 +1298,9 @@ Under `primary`, run `LANDER --slug <slug>` from the primary tree; under `in-pla
 nothing after the push. The slug fences the push on the build's lease (`--lease fence` above): the
 lander exits 1 pushing nothing on a `lease refused` line or a fence read it cannot parse, `fenced`
 when the lease was taken after the read, so end the run `--abort <slug> --code claim-lost`, and
-`unfenced` when the remote refuses `--atomic`. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
+`unfenced` when the remote refuses `--atomic`. A lease moved by this holder's own write at the same
+epoch, the tick's `--beat` during the bar among them, is `refenced` by `--lease fence --after`: the
+lander retries within its attempt bound without re-preparing, on a fence read from the new tip. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
 gate greps the run-state file for the flag. Reconcile from the remote's own default branch onto the
 run branch: on a `--prepare` conflict, `git merge <remote>/<default-branch>`, resolve, commit and
 prepare again. After ANY merge of the remote's default branch into the run branch, mid-build

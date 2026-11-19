@@ -61,6 +61,11 @@
 # unchanged reads the lease once: moved is `fenced`, the lease lost; unmoved is `unfenced`, the remote
 # refused the atomic push, which never falls back to an unfenced one. What this does NOT check: the
 # remote's support for `--atomic` before the bar runs, so such a remote spends a bar to say `unfenced`.
+# A MOVE BY THIS HOLDER'S OWN WRITE IS `refenced` (TOOL-dPlacedRequest-29): a lease that moved is first
+# re-read with `--lease fence build <slug> --after <the tip read>`, and a fence line there, this
+# session's lease at the same epoch on a tip descending from the one read, retries the push within
+# the same attempt bound and without re-preparing, the next attempt's fence read fencing on the new
+# tip; only a refusal, a later epoch or another holder, is `fenced`.
 #
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
@@ -273,9 +278,9 @@ export GIT_SSH_COMMAND
 # hook did not claim. An absent verdict is the cue to probe, never a pass: a hook that predates the
 # channel, or a push that died before the hook ran, writes none. The push's own output is never an
 # input here (the attended push says why, S2). Every class but `race` has already said why on
-# stderr; a caller retries on `race` and exits 1 otherwise.
-derive_push_failure() {  # -> refused | unreachable | unchanged | fenced | unfenced | race on stdout
-  local tok msg lt
+# stderr; a caller retries on `race` and `refenced` and exits 1 otherwise.
+derive_push_failure() {  # -> refused | unreachable | unchanged | refenced | fenced | unfenced | race on stdout
+  local tok msg lt fr ft
   tok=""; msg=""
   [ -f "$refusal" ] && IFS=$'\t' read -r tok msg < "$refusal"
   case "$tok" in
@@ -302,7 +307,8 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | fenced | unfen
   if git merge-base --is-ancestor "$remote/$def" HEAD 2>/dev/null; then
     echo "push-main: the push failed, $remote/$def is unchanged and reachable, and the hook left no verdict — the remote refused it or the hook predates its refusal channel; read the push output above." >&2
     # A FENCED PUSH READS ITS LEASE ONCE, here and only here (TOOL-dPlacedRequest-15 S4): moved from
-    # the tip the fence read is `fenced`, unmoved is `unfenced`; a read that fails stays `unchanged`.
+    # the tip the fence read is `refenced` where the driver re-fences on it and `fenced` otherwise
+    # (TOOL-dPlacedRequest-29 S2), unmoved is `unfenced`; a read that fails stays `unchanged`.
     [ -n "$FENCE_REF" ] || { echo unchanged; return 0; }
     if ! lt=$(git ls-remote "$remote" "$FENCE_REF" 2>/dev/null); then
       echo "push-main: the lease $FENCE_REF could not be read after the fenced push failed, so whether it was taken is unknown; nothing landed." >&2
@@ -310,7 +316,14 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | fenced | unfen
     fi
     lt=${lt%%[[:space:]]*}
     if [ "$lt" != "$FENCE_TIP" ]; then
-      echo "push-main: fenced — the lease $FENCE_REF was taken after the fence read it at ${FENCE_TIP:0:8} and is now ${lt:-deleted}, so the atomic push landed nothing; end the run with --abort $SLUG --code claim-lost." >&2
+      # The re-fence runs in this function's own subshell, so the FENCE_ names it sets die with it;
+      # the next attempt's fence read is the one its push carries (S3).
+      fr=$FENCE_REF; ft=$FENCE_TIP
+      if read_fence_line "$ft" && [ -n "$FENCE_REF" ]; then
+        echo "push-main: the lease moved under this holder's own write; re-fencing on ${FENCE_TIP:0:8} (attempt $((attempt + 1))/$max)" >&2
+        echo refenced; return 0
+      fi
+      echo "push-main: fenced — the lease $fr was taken after the fence read it at ${ft:0:8} and is now ${lt:-deleted}, so the atomic push landed nothing; end the run with --abort $SLUG --code claim-lost." >&2
       echo fenced; return 0
     fi
     echo "push-main: unfenced — the remote refused the atomic push while the lease $FENCE_REF still reads ${FENCE_TIP:0:8}, so nothing landed; a remote without atomic pushes cannot fence a landing, and leases stay off there: RUN_CLAIMS=\"off\" in .unattended.conf lands unfenced again." >&2
@@ -494,8 +507,9 @@ check_fence_beat() {  # tip · beat -> 0 when the beat is parented on the tip an
 # <beat>` line is a fence, each field checked and the beat held by `check_fence_beat`. Exit 1 with
 # one `lease refused — …` line refuses. Anything else, an empty, multi-line or odd-exit read included,
 # refuses as unparsed: only a missing driver means no fence. A driver beside this lander that no
-# python finds refuses too, as `run_gov_first` does.
-read_fence_line() {  # -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, its line printed
+# python finds refuses too, as `run_gov_first` does. Handed the tip a failed push fenced on, it asks
+# `--after <tip>`, the re-fence `derive_push_failure` reads (TOOL-dPlacedRequest-29 S2).
+read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, its line printed
   local got rc dir out rest fr ft fb kit=unattended anchor=unattended.sh
   FENCE_REF=""; FENCE_TIP=""; FENCE_BEAT=""
   [ -n "$SLUG" ] || return 0
@@ -512,7 +526,7 @@ read_fence_line() {  # -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all
     return 0
   fi
   dir=${got#*$'\t'}
-  out=$("${BASH:-bash}" "$top/$dir/$anchor" --lease fence build "$SLUG"); rc=$?
+  out=$("${BASH:-bash}" "$top/$dir/$anchor" --lease fence build "$SLUG" ${1:+--after "$1"}); rc=$?
   out=${out//$'\r'/}
   case "$rc:$out" in
     *$'\n'*) ;;
@@ -1717,6 +1731,10 @@ cmd_land() {
         echo "push-main: push rejected — $remote/$def advanced during the gate; re-preparing onto the new tip and re-gating..." >&2
         cmd_prepare || exit $?
         attempt=$((attempt + 1)) ;;
+      refenced)
+        # THIS HOLDER'S OWN WRITE MOVED THE LEASE (TOOL-dPlacedRequest-29 S3): the default branch did
+        # not move, so the prepared merge stands; the next attempt's fence read fences on the new tip.
+        attempt=$((attempt + 1)) ;;
       *)
         # refused, unreachable, unchanged, fenced or unfenced: derive_push_failure has said which,
         # and why; or a fence read refused, which read_fence_line has said.
@@ -1898,6 +1916,9 @@ while [ "$attempt" -le "$max" ]; do
   case "$cls" in
     race)
       echo "push-main: push rejected — $remote/$def advanced during the gate; re-reconciling and re-gating..." >&2
+      attempt=$((attempt + 1)) ;;
+    refenced)
+      # TOOL-dPlacedRequest-29 S3: the lease moved under this holder's own write; nothing to reconcile.
       attempt=$((attempt + 1)) ;;
     *)
       exit 1 ;;

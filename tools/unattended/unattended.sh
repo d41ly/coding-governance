@@ -44,7 +44,7 @@
 #   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit, cadence run or request, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
-#   unattended.sh --lease fence build <slug>                       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing
+#   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
@@ -4184,20 +4184,43 @@ write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refu
 # cannot derive is `lease not written`, exit 2, which the lander refuses as an unparsed read.
 # WHAT THIS DOES NOT CHECK: that the lease is still this session's at the push, which is the
 # compare-and-swap's, nor that the queue is flushed, since the fence writes nothing.
-write_fence_beat() { # slug -> one line; 0 a fence or none, 1 refused, 2 not written
-  local slug="$1" ref tail tag sid rc cause body beat
-  [ "$RUN_CLAIMS" = on ] || { echo "fence — none · leases are off"; return 0; }
+# THE RE-FENCE, `--after <tip>` (TOOL-dPlacedRequest-29 S1): the lander's read after a fenced push
+# failed with the lease tip moved from <tip>, the full sha its fence read. The same one read, and the
+# fence line on the NEW tip only where this session holds the lease (`mine`), <tip> is on the new
+# tip's first-parent chain, and the new tip's `epoch` is <tip>'s: a move by this holder's own write.
+# A later epoch, a tip off that chain, leases off and no lease on the remote are each `lease refused
+# — epoch-fence`, exit 1; a foreign holder keeps its own cause word. The lander reads a fence line
+# as `refenced` and retries, anything else as `fenced`.
+write_fence_beat() { # slug · [--after tip] -> one line; 0 a fence or none, 1 refused, 2 not written
+  local slug="$1" after="${2:-}" ref tail tag sid rc cause body beat ae
+  if [ -n "$after" ] && ! [[ $after =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
+    echo "lease not written — --after takes the full sha of the lease tip a fence read: $after"; return 2
+  fi
+  [ "$RUN_CLAIMS" = on ] || [ -n "$after" ] || { echo "fence — none · leases are off"; return 0; }
   derive_lease_ref build "$slug" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
   ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  [ "$RUN_CLAIMS" = on ] || { echo "lease refused — epoch-fence · $tail · leases are off, so no lease re-fences"; return 1; }
   tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it holds no lease: $tag"; return 2; }
   sid=${CLAUDE_CODE_SESSION_ID:-absent}
   read_claims quiet || { echo "lease refused — offline · $tail · $CL_WHY"; return 1; }
   check_claim_writable "$slug" lease "$tag" "$sid" fence; rc=$?
-  case "$CW_CLS:$CW_KIND" in none:*|*:-|*:) echo "fence — none · no lease on the remote"; return 0 ;; esac
+  case "$CW_CLS:$CW_KIND" in
+    none:*|*:-|*:)
+      [ -z "$after" ] || { echo "lease refused — epoch-fence · $tail · no lease on the remote"; return 1; }
+      echo "fence — none · no lease on the remote"; return 0 ;;
+  esac
   if [ "$rc" != 0 ] || [ "$CW_CLS" != mine ]; then
     cause=$CW_CAUSE
     case "$rc:$CW_CLS" in 1:*) ;; *:offered) cause=offered ;; *) cause=live-holder ;; esac
     echo "lease refused — $cause · $tail · ${CW_WHO#* · }"; return 1
+  fi
+  if [ -n "$after" ]; then
+    ae=$(GIT cat-file commit "$after" 2>/dev/null | awk '{ sub(/\r$/, "") } !b { if ($0 == "") b = 1; next } /^epoch: / { e = substr($0, 8); exit } END { print e }')
+    case "$ae" in ""|*[!0-9]*) ae=- ;; *) ae=$((10#$ae)) ;; esac
+    if [ "$ae" != "$CW_EPOCH" ] || ! GIT rev-list --first-parent "$CW_SHA" -- 2>/dev/null \
+      | AF_TIP="$after" awk '{ sub(/\r$/, "") } $0 == ENVIRON["AF_TIP"] { f = 1 } END { exit !f }'; then
+      echo "lease refused — epoch-fence · $tail · ${CW_WHO#* · }"; return 1
+    fi
   fi
   body=$(GIT cat-file commit "$CW_SHA" 2>/dev/null | FB_UTC=$(read_utc_now) awk '
     { sub(/\r$/, "") }
@@ -18425,18 +18448,20 @@ while [ $# -gt 0 ]; do
     # cadence lease is named by its kind and segments, and `flush` names none.
     --lease)        refuse_waive_unless_preflight --lease
                     shift; LV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; LV_TO=""; _rl_rc=""
+                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; LV_TO=""; LV_AFTER=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
-                        --witness|--as|--for|--to)
+                        --witness|--as|--for|--to|--after)
                           if [ $# -lt 2 ] || [ -z "$2" ]; then echo "lease not written — $1 takes a value"; _rl_rc=2; break; fi
-                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; --to) LV_TO=$2 ;; *) LV_FOR=$2 ;; esac
+                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; --to) LV_TO=$2 ;; --after) LV_AFTER=$2 ;; *) LV_FOR=$2 ;; esac
                           shift 2 ;;
-                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status>, --for draw or --to <fleet tag>[/<session>], not $1"; _rl_rc=2; break ;;
+                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status>, --for draw, --to <fleet tag>[/<session>] or a fence's --after <tip>, not $1"; _rl_rc=2; break ;;
                         *) LV_POS+=("$1"); shift ;;
                       esac
                     done
                     if [ -n "$_rl_rc" ]; then :
+                    elif [ -n "$LV_AFTER" ] && [ "$LV_ACT" != fence ]; then
+                      echo "lease not written — --after belongs to --lease fence alone"; _rl_rc=2
                     elif [ "$LV_ACT" = flush ]; then
                       if [ "${#LV_POS[@]}" -gt 0 ] || [ -n "$LV_TO" ]; then echo "lease not written — --lease flush takes no argument"; _rl_rc=2
                       else run_lease_verb flush; _rl_rc=$?; fi
@@ -18446,10 +18471,11 @@ while [ $# -gt 0 ]; do
                         echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
                       else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
                     elif [ "$LV_ACT" = fence ]; then
-                      # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line.
+                      # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line; TOOL-dPlacedRequest-29
+                      # S1 - `--after <tip>`, the re-fence after a fenced push failed on a moved tip.
                       if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" != 2 ] || [ "${LV_POS[0]}" != build ]; then
-                        echo "lease not written — --lease fence takes build <slug> and nothing else"; _rl_rc=2
-                      else write_fence_beat "${LV_POS[1]}"; _rl_rc=$?; fi
+                        echo "lease not written — --lease fence takes build <slug> [--after <tip>] and nothing else"; _rl_rc=2
+                      else write_fence_beat "${LV_POS[1]}" "$LV_AFTER"; _rl_rc=$?; fi
                     elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                       echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id>, run <cadence> <period> or request <content key>"; _rl_rc=2
                     else

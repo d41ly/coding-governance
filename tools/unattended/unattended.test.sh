@@ -20575,16 +20575,42 @@ same "DPR15 S2 ...the beat is a commit on the tip, renews: no, the tip's witness
 fb_out=$(LA_SID=s2 run_lease_arm fence build tFix); fb_rc=$?
 same "DPR15 AC5 a lease another session holds is refused live-holder, exit 1" "$fb_rc|${fb_out%% · node*}" "1|lease refused — live-holder · tFix/build"
 fb_out=$(run_lease_arm fence unit tFix u1); fb_rc=$?
-same "DPR15 S2 a fence of anything but build <slug> exits 2" "$fb_rc|$fb_out" "2|lease not written — --lease fence takes build <slug> and nothing else"
+same "DPR15 S2 a fence of anything but build <slug> exits 2" "$fb_rc|$fb_out" "2|lease not written — --lease fence takes build <slug> [--after <tip>] and nothing else"
 fb_out=$(run_lease_arm fence build 'a b'); fb_rc=$?
 same "DPR15 S2 a slug that is no legal segment exits 2 before any read" "$fb_rc|${fb_out%% — *}" "2|lease not written"
 mv "$LF/origin.git" "$LF/away.git"
 fb_out=$(run_lease_arm fence build tFix); fb_rc=$?
 mv "$LF/away.git" "$LF/origin.git"
 same "DPR15 S2 a read that fails is refused offline, exit 1" "$fb_rc|${fb_out%% · the remote*}" "1|lease refused — offline · tFix/build"
+# ---- TOOL-dPlacedRequest-29 AC3 - THE RE-FENCE, `--after <tip>`: the beat above pushed onto the
+# ---- lease by its own holder re-fences on it; an epoch-plus-one tip by the same session, and a
+# ---- parentless tip carrying the same record, which the tip read does not precede, are refused
+# ---- `epoch-fence`, exit 1. RED, observed at the close, is the fence act without `--after`, which
+# ---- refuses the flag outright. Waived by README rule 8, its clean reading owed with PLAY-dClosedLoop-14.
+fa_old=$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tFix/build)
+git -C "$LF/c1" push -q --no-verify origin "$fb_beat:refs/gov/leases/tFix/build" 2>/dev/null
+fa_out=$(run_lease_arm fence build tFix --after "$fa_old"); fa_rc=$?
+same "DPR29 AC3 a same-holder beat on the tip read re-fences on the new tip, exit 0" "$fa_rc|${fa_out% *}" "0|fence — refs/gov/leases/tFix/build $fb_beat"
+fa_up=$(git --git-dir="$LF/origin.git" log -1 --format=%B "$fb_beat" | awk '/^epoch: / { print "epoch: " substr($0, 8) + 1; next } { print }' \
+  | git --git-dir="$LF/origin.git" commit-tree "$fb_beat^{tree}" -p "$fb_beat")
+git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tFix/build "$fa_up"
+fa_out=$(run_lease_arm fence build tFix --after "$fb_beat"); fa_rc=$?
+same "DPR29 AC3 an epoch-plus-one tip by the same session is refused epoch-fence, exit 1" "$fa_rc|${fa_out%% · node*}" "1|lease refused — epoch-fence · tFix/build"
+fa_off=$(git --git-dir="$LF/origin.git" log -1 --format=%B "$fb_beat" | git --git-dir="$LF/origin.git" commit-tree "$fb_beat^{tree}")
+git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tFix/build "$fa_off"
+fa_out=$(run_lease_arm fence build tFix --after "$fa_old"); fa_rc=$?
+same "DPR29 AC3 a same-epoch tip the read one does not precede is refused epoch-fence, exit 1" "$fa_rc|${fa_out%% · node*}" "1|lease refused — epoch-fence · tFix/build"
+fa_out=$(run_lease_arm fence build tNone --after "$fa_old"); fa_rc=$?
+same "DPR29 S1 a re-fence over no lease on the remote is refused epoch-fence, exit 1" "$fa_rc|$fa_out" "1|lease refused — epoch-fence · tNone/build · no lease on the remote"
+fa_out=$(run_lease_arm fence build tFix --after "${fa_old:0:12}"); fa_rc=$?
+same "DPR29 S1 an --after that is no full sha exits 2 before any read" "$fa_rc|${fa_out%%: *}" "2|lease not written — --after takes the full sha of the lease tip a fence read"
+fa_out=$(run_lease_arm renew build tFix --after "$fa_old"); fa_rc=$?
+same "DPR29 S1 --after on any act but fence exits 2" "$fa_rc|$fa_out" "2|lease not written — --after belongs to --lease fence alone"
 sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
 fb_out=$(run_lease_arm fence build tFix); fb_rc=$?
 same "DPR15 AC5 with the switch off it prints one fence — none line, exit 0" "$fb_rc|$fb_out" "0|fence — none · leases are off"
+fa_out=$(run_lease_arm fence build tFix --after "$fa_old"); fa_rc=$?
+same "DPR29 S1 with the switch off a re-fence is refused epoch-fence, exit 1" "$fa_rc|$fa_out" "1|lease refused — epoch-fence · tFix/build · leases are off, so no lease re-fences"
 rm -rf "$LF"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -22616,7 +22642,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (22 `same` and 15 `hit`, its checklist pass's refusal and offline arms among them), off the diff's own
 # lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3874
+# RAISED 3874 -> 3881 by TOOL-dPlacedRequest-29: the re-fence block's 7 region-eight assertions (7
+# `same`, its refusal arms among them), off the diff's own lines; no skip branch. No suite ran, and
+# its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3881
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22880,7 +22909,8 @@ FLOOR_SHARD_7=311
 # RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1060 -> 1068 by TOOL-dPlacedRequest-15: the same 8 region-eight fence read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1068 -> 1105 by TOOL-dPlacedRequest-19: the same 37 region-eight request record assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1105
+# RAISED 1105 -> 1112 by TOOL-dPlacedRequest-29: the same 7 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1112
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
