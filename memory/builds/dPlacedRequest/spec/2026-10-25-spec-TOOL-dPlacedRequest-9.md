@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads
 
-**Status:** INPROGRESS · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0127@4f0c1452 whole
 
@@ -19,6 +19,8 @@
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-9-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-9-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-9-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-9-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-9-divergence-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-9-divergence-2-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-9-divergence-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-9-divergence-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
@@ -102,21 +104,37 @@ them.
   `tools/govkit/upgrade_steps.py#check_contained`, so a value leaving the target is refused with
   exit 1 and nothing written. With no `deploy.toml`, no `manifest_path` answer, no file at it or no
   `## §B` heading in it, `up` says there is nothing to move and exits 0, writing nothing and no
-  before-image, as `tools/govkit/steps/adopter_rules_to_overlay.py#cmd_up` does for a missing key.
-  `down` then finds no before-image and exits 0 restoring nothing, as
-  `tools/govkit/steps/adopter_rules_to_overlay.py#cmd_down` does, and `witness` exits 0 naming the
-  absent answer. Otherwise `up` builds S1's rows and grades each with `check_statement`
-  (PLAY-dOrderedCharter-12 S2) and the candidate overlay with `read_overlay(target, candidate=…)`,
-  whose row check holds each row to the schema (PLAY-dOrderedCharter-20 S1), as the adopter-rules
-  step's `cmd_up` grades its own. It writes the before-image through `write_before_image`, the
-  overlay text `derive_overlay_text` returns (PLAY-dOrderedCharter-32 S8), and last the manifest,
-  its run of top-level §B bullets rewritten to the one bullet S6 names, so the witness changes last.
-  A row either check refuses aborts the step: both files stay byte-identical and the refusal names
-  the bullet's position and the finding. `down` restores both files from the before-image;
-  `witness` holds when §B holds only the S6 bullet and every `repo.kickoff.` row's text was a §B
-  bullet. Gov runs the step first, on its own tree (P38). Observed by AC1, AC6 and AC7.
-- **S6** — The manifest after the move. §B keeps one bullet,
-  `- The orientation facts are level-2 units the card prints under ## pockets; change one with tools/playbook/instructions_edit.py.`
+  before-image, as `tools/govkit/steps/adopter_rules_to_overlay.py#cmd_up` does for a missing key;
+  `down` then restores nothing, and `witness` exits 0 naming the absent answer.
+  `up` resolves the write command's place through `tools/govkit/upgrade_steps.py#resolve_kit_dir`
+  for the playbook kit's `instructions_edit.py`, the target as `here`. A refusal, or a directory
+  outside the target, leaves no kit to write or read the units: nothing to move, exit 0, and
+  `witness` exits 0 naming it.
+  Otherwise `up` builds S1's rows and grades each alone, with `check_statement`
+  (PLAY-dOrderedCharter-12 S2) and with `read_overlay(target, candidate=…)` over that row by itself,
+  whose `tools/playbook/instruction_units.py#check_unit_row` holds it to the schema and its budget
+  (PLAY-dOrderedCharter-20 S1). A bullet either refuses stays in §B as guide text, named on its own
+  line by position and finding (§8 F6); a passing one keeps its position as `<nn>`. The candidate of
+  every passing row is graded whole, as the adopter-rules step's `cmd_up` grades its own; its
+  refusal exits 1, both files byte-identical. `up` writes the before-image through
+  `write_before_image`, the overlay text `derive_overlay_text` returns (PLAY-dOrderedCharter-32 S8)
+  where a row passed, and last the manifest, its top-level §B bullets rewritten to the S6 bullet and
+  then the bullets that stayed, so the witness changes last; it exits 0. It knows the S6 bullet by
+  every byte up to its semicolon and never converts it. `down` restores both files byte for byte
+  from the before-image, each moved bullet back beside the ones that stayed. `witness` holds when §B
+  carries the S6 bullet plus only bullets `up` would refuse, and every `repo.kickoff.` row's text was
+  a §B bullet.
+  Gov runs the step first, on its own tree (P38), after its pass gives a value to gov's two §B
+  bullets that carry none, so its run refuses none (PINNED, 2026-11-19 at `eb28fd672`). Having no
+  bold label, they are named by opening: "An unattended run is bound by directives"
+  (`memory/guides/SESSION-KICKOFF.md@5afa045407:61`) and "An unattended run declares a mode"
+  (`memory/guides/SESSION-KICKOFF.md@5afa045407:62`). The template keeps its placeholder bullets,
+  which stay as guide text. Observed by AC1, AC6 and AC7.
+- **S6** — The manifest after the move. §B opens with one bullet,
+  `- The orientation facts are level-2 units the card prints under ## pockets; change one with <path>.`,
+  then any bullet that stayed (S5). `<path>` is the target-relative path S5 resolves, so gov's reads
+  `tools/playbook/instructions_edit.py`; the step file spells no kit path, which the
+  `install-prefix (shipped surface)` leg bans and which is wrong at any other prefix.
   Two sentences are rewritten to the command a new fact takes,
   `instructions_edit.py propose add --manifest overlay`, whose `propose` takes a write verb before
   the row flags (`tools/playbook/instructions_edit.py#main`, PLAY-dOrderedCharter-15 S2), written on
@@ -135,7 +153,8 @@ them.
   `deploy.toml` answering `manifest_path`, a policy file, and stub playbook and kickoff kits, and
   runs the case. The stub playbook kit's tracked `instruction_units.py` forwards its argv to gov's
   own module, so `resolve_kit_file` finds it in the fixture tree and the real verb reads the
-  fixture's units. Observed by AC1 to AC7, and AC9.
+  fixture's units. The stub kit, at `playbook/` in the fixture, also tracks a stub
+  `instructions_edit.py`, which S5's resolver probes for. Observed by AC1 to AC7, and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -212,6 +231,8 @@ each PINNED on 2026-11-19 at `1508879be`:
 | top-level bullets of gov's §B, before the first `###` | 36 | PINNED: `awk` over `memory/guides/SESSION-KICKOFF.md` |
 | their bytes, one newline each | 7084 | PINNED: the same `awk`, `LC_ALL=C` |
 | of them past the `line` budget, so `block` units | 15 | PINNED: the same `awk` |
+| of them `check_statement` refuses | 2 | PINNED at `eb28fd672`: `check_statement` over each S1 row |
+| the template's §B bullets, and of them refused | 5 and 4 | PINNED: the same probe over the template |
 | cards under this node's git common dir `orientation/` | 58 | PINNED: `wc -c` over each |
 | the largest of them, in bytes | 7777 | PINNED: the same `wc -c` |
 | its startup part, in bytes | 2220 | PINNED: `CARD_PARTS_AWK` with `want=startup` |
@@ -233,9 +254,9 @@ as absent, not as none declared.
 Every bullet converts as a `constraint`. The manifest's own rule is "a pointer or a trap, never a
 procedure" (`memory/guides/SESSION-KICKOFF.md@5afa045407:47`), and a `pointer` names no whole document
 (PLAY-dOrderedCharter-12 S2) while most bullets do; a `constraint` carries a value in its text and
-names its enforcer, which `enforced-by` states as none. A bullet `check_statement` refuses as a
-constraint aborts the step (S5), so the gov pass fixes the bullet's text and re-runs the step; no
-bullet is left behind half-moved.
+names its enforcer, which `enforced-by` states as none. A bullet either of S5's checks refuses
+stays in §B as guide text (§8 F6): the step runs in every adopter's update, and
+`tools/govkit/upgrade_steps.py#run_step_walk` stops at an `up` that exits non-zero.
 
 ### Inventory
 
@@ -245,7 +266,7 @@ bullet is left behind half-moved.
 | `pockets`, with its `--room` and `--all` flags | verb of `instruction_units.py` | none |
 | `run_pockets` | the verb's runner | `py.function` |
 | `derive_pockets_block` | shell function | `sh.function` |
-| `CARD_POCKETS_BOUND` | shell constant, `${CARD_POCKETS_BOUND:-5}`, its env override for a slow-stub arm as `CARD_MAP_BOUND`'s is | none declared |
+| `CARD_POCKETS_BOUND` | shell constant `${CARD_POCKETS_BOUND:-5}`, env-overridable as `CARD_MAP_BOUND` is | none declared |
 | `check_kickoff_facts_step` | govkit self-test function | `py.function` |
 | `kickoff-manifest/facts-to-overlay` | upgrade step id | none |
 | `tools/govkit/steps/kickoff_facts_to_overlay.py` | module | none declared for files |
@@ -255,10 +276,10 @@ bullet is left behind half-moved.
 ### Migration
 
 The step is the migration: gov's §B moves at the build pass, an adopter's at its next `govkit
-update`. Its down restores the manifest and the overlay byte-identical. Any overlay edit, a
-`[[unit]]` row's included, stales the policy mirror `.governance/policy.json`, its staleness key
-holding the overlay's blob id, and the guard refuses a staged mirror while the overlay's staged blob
-differs from `HEAD`'s (PLAY-dOrderedCharter-32 S7, §5). So gov's pass commits the step's two files
+update`. Its down restores the manifest and the overlay byte-identical. Any overlay edit stales the
+policy mirror `.governance/policy.json`, whose staleness key holds the overlay's blob id, and the
+guard refuses a staged mirror while the overlay's staged blob
+differs from `HEAD`'s (PLAY-dOrderedCharter-32 S7, §5). So gov's pass commits the step's writes
 first, then regenerates the mirror by `policy.py mirror --write` in its own commit; on an adopter, the
 landing regenerates it, as PLAY-dOrderedCharter-32 §5 states. The step itself never writes the mirror.
 
@@ -274,31 +295,36 @@ landed gains its section at its next append or re-key, since both fit it afresh.
 - `tools/playbook/readers.toml`: `reader.card`
 - `tools/govkit/entries/kickoff-manifest.kit.toml`: the `[[upgrade]]` row
 - `tools/govkit/steps/kickoff_facts_to_overlay.py`
-- `tools/govkit/selftest.py`: `check_kickoff_facts_step`, called from `main` beside its neighbours
-  `check_fanout_step`, `check_review_rounds_step` and `check_receipt_schema`, which prove
-  `fanout_cap.py`, `review_rounds.py` and `receipt_schema_4.py`; it runs the new step's
-  `--fixture --plant <case>` under `-I` for every case, as `check_step_gate_fixture` runs
-  `step_gate.py --fixture`, so the `govkit selftest` leg runs the arm the step's `New arm:` line
-  declares
+- `tools/govkit/selftest.py`: `check_kickoff_facts_step`, called from `main` beside
+  `check_fanout_step`; it runs the step's `--fixture --plant <case>` under `-I` for every case, as
+  `check_step_gate_fixture` runs `step_gate.py --fixture`
 - `skills/session-kickoff/manifest-check.sh`: `derive_pockets_block`, `CARD_POCKETS_BOUND`, and the
   calls in `write_card`, `add_card_body` and `print_rekeyed_card`
-- `skills/session-kickoff/manifest-check.test.sh`: the arm the gates section declares
+- `skills/session-kickoff/manifest-check.test.sh`: the arm the gates section declares, and the
+  arms whose readings move with S4, updated on purpose:
+  - `AGH8 AC7` and `AGH8 AC8` read `health —` as the line above `recent —`; they read it above the
+    section's first line instead.
+  - `K2 AC4` caps the card at its size plus 8 bytes (PINNED, the arm's literal), so its body now
+    refits; it keeps its refusal with a body past that cap with no section, and AC9 observes the refit.
+  - The map-block stub `instruction_units.py` prints for any argv, so its lines would land in the
+    section; it prints for the `map` verb alone.
 - `skills/session-kickoff/MANIFEST-TEMPLATE.md`: the write-back sentence of its ratchet section
 - `skills/session-kickoff/SKILL.md`: the repair sentence of Step 2b; the installed skill is its
   machine-scoped link
-- `help/upgrade-steps.md`: its section on what this release's steps do to a repository gains the
-  step's bullet, and the count that section opens with, five moves today (PINNED, 2026-11-19), moves
-  to six
-- `memory/guides/SESSION-KICKOFF.md`: §B, written by the step's `up`
+- `help/upgrade-steps.md`: the step's bullet in its section on this release's steps, whose opening
+  count moves from five (PINNED, 2026-11-19) to six
+- `memory/guides/SESSION-KICKOFF.md`: two §B bullets rewritten first (S5), then §B, written by the
+  step's `up`, and its `last-audit` re-stamp, since the unit edits two watched paths
 - `.governance/instructions.toml`: the `repo.kickoff.` rows, written by the step's `up`
+- `.governance/steps/kickoff-manifest/facts-to-overlay.before.json`: gov's `up`'s image, tracked as
+  the adopter-rules step's is
 - `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
   after the step's commit, never by the step
 - `help/orientation-card.md`: new, the card's page, with its `## pockets` section
 - `help/README.md`: the index line for that page
-- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
-  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
-  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
-  only
+- `memory/map/generated/`: regenerated by `gen_map.py --write` in this unit's pass wherever its diff
+  mints, renames or deletes a function, so `gen_map.py --check` exits 0; `TOOL-dPlacedRequest-34`
+  S38 is the final re-check only
 
 ### Alternatives rejected
 
@@ -317,22 +343,24 @@ landed gains its section at its next append or re-key, since both fit it afresh.
 
 - security — the overlay is a guarded file: only the step door writes it (PLAY-dOrderedCharter-32
   S8), and an agent's new fact is a proposal the owner applies (S6).
-- perf / scale — one bounded subprocess each time a card is composed, at its write, append or
-  re-key; the verb reads the composition once.
+- perf / scale — one bounded subprocess per card composition, at its write, append or re-key; the
+  verb reads the composition once.
 - error / empty / loading states — no playbook kit, a refused policy read or a timeout each prints
   `pockets — skipped: <why>` where it fits; no selected unit prints `- none declared`; a room too
-  small for the heading and the closing line prints no section; a refused bullet aborts the step
-  with both files unchanged; no `manifest_path` answer is nothing to move, exit 0.
+  small for the heading and the closing line prints no section; a refused bullet stays in §B, exit
+  0; a refused overlay exits 1, nothing written; no answer or no playbook kit is nothing to move.
 - observability — the step names each refused bullet by position and finding; the closing line
   counts the units left out and names the verb that prints them all.
-- risks — an adopter manifest whose §B bullets fail `check_statement` keeps them until fixed, and
-  its card says `none declared`; the witness reports it. A long kickoff body shrinks the section,
-  never the body.
+- risks — a §B bullet that fails `check_statement`, as the template's placeholders do, stays as
+  guide text, off the card; the witness holds, so the update goes on. A long kickoff body shrinks
+  the section, never the body.
 - testing — S7's plants, red and green.
 - migration — the step, with its down.
 - user docs — `help/orientation-card.md`, a new page indexed in `help/README.md`, names the card's
   `## pockets` section, its room and the verb; TOOL-dPlacedRequest-2 adds the build card's sections
-  to it. `help/upgrade-steps.md` gains the step's bullet.
+  to it. `help/upgrade-steps.md` gains the step's bullet. A page writes the verb as
+  `instruction_units.py pockets --all`, not starting with `python`, as `help/charter.md@f4c57abbd6:27`
+  does, so `tools/govkit/usage.toml` owes no row.
 
 ## 6. Acceptance criteria
 
@@ -341,9 +369,11 @@ landed gains its section at its next append or re-key, since both fit it afresh.
   `repo.kickoff.f01` to `repo.kickoff.f03` at `level = 2` with `scope = ["reader.card"]`, each `text`
   equal to its bullet, and §B holds only the S6 bullet.
   Red when: a bullet is left in §B, copied rather than moved, or a row's text differs from its bullet.
-- **AC2** — When `grep -n 'reader.card' readers.toml` runs in the playbook kit's directory, it prints the member's
-  row, and `python gov_tag.py show reader.card` resolves it to that row.
-  Red when: the selector is absent, so no unit can name the card as its reader.
+- **AC2** — When `grep -n -A1 '^tag = "reader.card"$' tools/playbook/readers.toml` runs, it prints
+  the member's `tag` line, then a `why = ` line naming the orientation card.
+  Red when: the selector is absent or carries no `why`, so no unit names the card.
+  cost: `gov_tag.py show reader.card` is not used: it did not return within 120 s (PINNED,
+  2026-11-19, the builder's bound in run `wf_4c8e34a0-0cf`) on this node.
 - **AC3** — When `python instruction_units.py pockets --root <fixture> --all` runs after AC1's plant
   has committed `up`'s write, it prints `## pockets` and three `- ` lines in tag order; run over the
   same write left uncommitted, it prints `- none declared`; with the plant `pockets-level`, a fourth
@@ -362,12 +392,16 @@ landed gains its section at its next append or re-key, since both fit it afresh.
   --session t1` in the fixture tree, the card holds `## pockets` and its lines immediately before
   `recent —`; with the plant `card-no-playbook`, the card holds `pockets — skipped:` and still writes.
   Red when: the section lands after the READY anchor, or a failed read refuses the card.
-- **AC6** — When the plant `refused` holds a bullet `check_statement` refuses, `up` exits 1 naming
-  the bullet's position, and `git status --porcelain` in the fixture prints nothing. When the plant
-  `no-answer` holds a `deploy.toml` with no `manifest_path` answer, `up`, `down` and `witness` each
-  exit 0, `up` saying there is nothing to move, and `git status --porcelain` prints nothing.
-  Red when: a refused bullet half-moves the section, or a target with no answer is refused or
-  written.
+- **AC6** — When the plant `refused` runs `up` over three bullets, the second refused, `up` exits 0
+  printing one line naming position 2; with the write committed, the overlay at `HEAD` holds
+  `repo.kickoff.f01` and `repo.kickoff.f03` alone, §B holds the S6 bullet then the refused one, and
+  `witness` exits 0; `down` restores the manifest byte for byte. With the plant `template`, over the
+  §B of `skills/session-kickoff/MANIFEST-TEMPLATE.md`, `up` and `witness` each exit 0. With the plant
+  `no-answer` (no `manifest_path` answer) or `no-kit` (no stub `instructions_edit.py`), `up`, `down`
+  and `witness` each exit 0 and `git status --porcelain` prints nothing.
+  Red when: a refused bullet stops the step, moves or is lost, or a target with no answer or no kit
+  is refused or written.
+  figure: the bullet count and position are PINNED fixture literals.
 - **AC7** — When the plant `down` runs `up` then `down`, both files equal their before-image byte for
   byte, and `witness` exits 1 after the down and 0 after the up; the fixture holds no policy mirror,
   and neither verb writes one, nor does `witness` read one.
@@ -392,9 +426,9 @@ landed gains its section at its next append or re-key, since both fit it afresh.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness` · `policy fixtures`
+`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness` · `policy fixtures` · `upgrade-walk` · `install-prefix (shipped surface)` · `docs`
 
-New arm: tools/govkit/steps/kickoff_facts_to_overlay.py · covers AC1 AC3 AC4 AC6 AC7 AC9 · the step's `--fixture` cases, run by the `govkit selftest` leg through `check_kickoff_facts_step` in `tools/govkit/selftest.py`, the failing case staged by the `refused` plant · none
+New arm: tools/govkit/steps/kickoff_facts_to_overlay.py · covers AC1 AC3 AC4 AC6 AC7 AC9 · the step's `--fixture` cases, run by the `govkit selftest` leg through `check_kickoff_facts_step` in `tools/govkit/selftest.py`, the failing case staged by restoring rev-5's abort on a refused bullet, which reds the `refused` and `template` plants · none
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a stub playbook module printing a `## pockets` block that names the `--room` it was passed, the failing case a stub that exits 2 · none
 
@@ -431,6 +465,18 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a stub p
   stays the only figure (one fact), no card is ever refused for its pockets, and (a) fails again as
   cards grow, (c) drops the facts the goal puts on the card, (d) is rejected in §4 already.
   widens: none · relaxes: none
+- **F6 — What does `up` do with a §B bullet `check_statement` refuses, when the shipped template's
+  own bullets are refused and the step runs in every adopter's update walk?** Options: (a) the
+  refused bullet stays in §B as guide text, the bullets that pass move to level-2 units, and `up`
+  exits 0 naming each refusal on its own line; the witness holds when §B carries the facts bullet
+  plus only refused bullets; (b) `up` exits 0, moves nothing and names each refusal, the witness
+  holding while any refusal stands; (c) keep the abort and plant release-0's §B into convertible
+  bullets, which still stops every template-seeded adopter's update. Recommendation: (a).
+  RESOLVED (agent, 2026-11-19, delegated): (a), rung 3; an update
+  never stops on prose the adopter wrote, every fact that can be a unit becomes one, and the walk's
+  `applied` case holds on release-0. The same reason keeps a bullet the row check refuses alone,
+  such as one past the `block` budget's 600 bytes (PINNED, 2026-11-19, `BUDGET_BYTES`).
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -457,6 +503,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a stub p
   touched gains `tools/govkit/selftest.py` and `help/upgrade-steps.md`; S5 reads the
   `manifest_path` answer itself and treats its absence as nothing to move; line citations become
   `path#symbol` or blob-pinned.
+- rev-6 · 2026-11-19 · §2 S5 S6 S7 · §4 · §5 · §6 AC2 AC6 · §7 · §8 F6 · §10 · folds
+  `2026-11-19-prompt-TOOL-dPlacedRequest-9-divergence-2-brief`, the main loop's rulings on the
+  builder's second DIVERGENCE in run `wf_4c8e34a0-0cf`, which committed nothing: F6 keeps a refused
+  bullet in §B, `up` exiting 0; gov first rewrites its two value-less bullets; S6's bullet resolves
+  the write command's path; Files touched gains the image and the moving arms; AC2 greps the row.
 
 ## 10. Reuse audit
 
@@ -480,7 +531,10 @@ section to a remaining room, so no existing seam fits the fit either; the card's
 `write_card`, `add_card_body` and `print_rekeyed_card` are where it is called. `python
 tools/memory-recall/query.py` returned scout B's row, the brief's I14 and the memory plan's
 `[pockets]` row, and at rev-5 scout A's card-path row and the divergence brief; none disagrees
-with source.
+with source. At rev-6 the write command's path reuses `tools/govkit/upgrade_steps.py#resolve_kit_dir`,
+which the adopter-rules step's `load_overlay` calls, and recall returned TOOL-dSafePassage-5's
+`upgrade-walk` leg, which agrees.
 
 Recall terms used: `python tools/memory-recall/query.py "how does the orientation card read the kickoff manifest facts as instruction units" --terms "kickoff manifest pockets level-2 instruction units card render_card read_block getval registry SESSION-KICKOFF"`
 and, at rev-5, `python tools/memory-recall/query.py "how is a card section bounded by the room the card cap leaves" --terms "CARD_CAP_BYTES pockets room append refused card cap section render_card write_card add_card_body print_rekeyed_card"`
+and, at rev-6, `python tools/memory-recall/query.py "how does an upgrade step treat adopter prose a check refuses without stopping the update walk" --terms "upgrade step refused bullet check_statement witness walk stops release-0 template placeholders resolve_kit_dir before-image"`

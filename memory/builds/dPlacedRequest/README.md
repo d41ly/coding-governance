@@ -123,7 +123,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged](spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md) | 11 | 2 | CLOSED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-31.md) | 11 | 2 | CLOSED | rev-4 | 2026-11-19 |
 | [TOOL-dPlacedRequest-32 — an absent session is no identity: no consent, and no lease held on session alone](spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md) | 11 | 2 | CLOSED | rev-5 | 2026-11-19 |
-| [TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads](spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md) | 11 | 2 | INPROGRESS | rev-5 | 2026-11-19 |
+| [TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads](spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md) | 11 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build](spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md) | 12 | 2 | DEFERRED | rev-9 | 2026-11-19 |
 | [TOOL-dPlacedRequest-40 — the id-less refusal gates the holder acts by name and lets every other lease act run](spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`](spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md) | 13 | 2 | DEFERRED | rev-7 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 214 bound to this build, across 4 record folder(s).
+Records: 216 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
