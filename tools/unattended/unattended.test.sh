@@ -19509,6 +19509,61 @@ else
   n=$((n+7))
   echo "  SKIP the node lock's carrier event arms: no run-gates kit resolves beside this one, so no post-merge carrier is cut; their 7 assertions are counted, not run"
 fi
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-37 — A NODE LOCK'S DEADLINE IS THE BLOCK'S OWN BOUND. The `gov_feed_sh` block is
+# cut from the run-gates kit's post-merge carrier and sourced under `env -i` and `set -u`, no
+# REMOTE_BOUND set, over a scratch repository's common dir: a take passing the block's own bound exits
+# 0 and writes an `until` ten seconds past the clock, within one (AC1); with `EPOCHSECONDS` unset the
+# append prints one `feed: NOTE -` line naming it, exits 0, and leaves no log and no lock (AC3). RED
+# for AC1 is a copy whose constant reads the driver's bound, the claim-push body's sum: it aborts on
+# the unset name and takes nothing. RED for AC3 is a copy with the test cut: it aborts on the unset
+# clock. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: AC2's
+# grep over the canonical cut, the lander's copy, which TOOL-dPlacedRequest-15 adds, and the driver's
+# queue takes, which read the clock unguarded.
+# ==================================================================================================
+if nl_rel=$(resolve_kit_dir "$_rkd_py" run-gates post-merge.sh "$HERE" 2>/dev/null) && [ -n "$nl_rel" ]; then
+  nl_d=$(mktemp -d)
+  nl_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$nl_rel/post-merge.sh"
+  awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$nl_src" >"$nl_d/gf.sh"
+  cp "$nl_d/gf.sh" "$nl_d/red1.sh"; cp "$nl_d/gf.sh" "$nl_d/red3.sh"
+  mutate "$nl_d/red1.sh" 's/^NODE_LOCK_BOUND=10$/NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))/'
+  mutate "$nl_d/red3.sh" '/no EPOCHSECONDS, bash 5/d'
+  (unset GIT_DIR GIT_WORK_TREE; git init -q "$nl_d/r" && git -C "$nl_d/r" -c user.name=t -c user.email=t@t.test commit -q --allow-empty -m nl)
+  nl_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$nl_d/r" rev-parse --path-format=absolute --git-common-dir)
+  nl_h=$(unset GIT_DIR GIT_WORK_TREE; git -C "$nl_d/r" rev-parse HEAD)
+  nl_take='set -u; . "$NL_GF"; write_dir_lock "$NL_C/gov-feed.lock" t1 "$NODE_LOCK_BOUND" node; echo rc=$?'
+  nl_feed='set -u; unset EPOCHSECONDS; . "$NL_GF"; GOVFEED_DIR=$NL_C add_feed_event refs/gov/runs/tFix "$NL_H"; echo rc=$?'
+  # ---- AC1: a fresh take with no driver name set; its `until` against the clock read around it.
+  for nl_v in gf red1; do
+    rm -rf "$nl_c/gov-feed.lock" "$nl_c/gov-feed.lock.break"
+    nl_t0=$EPOCHSECONDS
+    nl_o=$(env -i PATH="$PATH" NL_GF="$nl_d/$nl_v.sh" NL_C="$nl_c" bash -c "$nl_take" 2>"$nl_d/$nl_v.err")
+    nl_t1=$EPOCHSECONDS; nl_u=""; { read -r nl_u <"$nl_c/gov-feed.lock/until"; } 2>/dev/null || :
+    case "$nl_u" in
+      ""|*[!0-9]*) nl_b=no-until ;;
+      *) if [ "$nl_u" -ge $((nl_t0 + 9)) ] && [ "$nl_u" -le $((nl_t1 + 11)) ]; then nl_b=in-bound; else nl_b="until=$nl_u"; fi ;;
+    esac
+    case "$nl_v" in gf) nl_gf1="${nl_o:-no-rc} $nl_b" ;; *) nl_red1="${nl_o:-no-rc} $nl_b" ;; esac
+  done
+  same "DPR37 AC1 a take with no REMOTE_BOUND exits 0 and its until is the clock plus 10, within 1" "$nl_gf1" "rc=0 in-bound"
+  same "DPR37 AC1 RED: the copy whose bound reads the driver's name takes no lock" "$nl_red1" "no-rc no-until"
+  hit  "$(cat "$nl_d/red1.err")" "REMOTE_BOUND: unbound variable"
+  # ---- AC3: the append with EPOCHSECONDS unset, run inside the scratch repository.
+  for nl_v in gf red3; do
+    rm -rf "$nl_c/gov-feed.lock" "$nl_c/gov-feed.log" "$nl_c/gov-feed.seq"
+    nl_o=$(cd "$nl_d/r" && env -i PATH="$PATH" NL_GF="$nl_d/$nl_v.sh" NL_C="$nl_c" NL_H="$nl_h" bash -c "$nl_feed" 2>"$nl_d/$nl_v.err")
+    nl_r="${nl_o:-no-rc} $(grep -c '^feed: NOTE -' "$nl_d/$nl_v.err") $(grep -c '^feed: NOTE - .*EPOCHSECONDS' "$nl_d/$nl_v.err")"
+    nl_r="$nl_r $([ -e "$nl_c/gov-feed.log" ] && echo log || echo no-log) $([ -e "$nl_c/gov-feed.lock" ] && echo lock || echo no-lock)"
+    case "$nl_v" in gf) nl_gf3=$nl_r ;; *) nl_red3=$nl_r ;; esac
+  done
+  same "DPR37 AC3 an append with no EPOCHSECONDS prints one NOTE naming it, exits 0, writes no log and takes no lock" "$nl_gf3" "rc=0 1 1 no-log no-lock"
+  same "DPR37 AC3 RED: the copy with the test cut aborts its carrier and prints no NOTE" "$nl_red3" "no-rc 0 0 no-log no-lock"
+  rm -rf "$nl_d"
+else
+  n=$((n+7))
+  echo "  SKIP the node lock's deadline arms: no run-gates kit resolves beside this one, so no post-merge carrier is cut; their 7 assertions are counted, not run"
+fi
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 8; then
@@ -21782,7 +21837,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3695 -> 3702 by TOOL-dPlacedRequest-36: the carrier event block's 7 region-eight assertions
 # (5 `same`, 1 `hit`, 1 `mutate`), or the same 7 counted on its skip branch, off the diff's own
 # lines; no suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3702
+# RAISED 3702 -> 3709 by TOOL-dPlacedRequest-37: the deadline block's 7 region-eight assertions
+# (4 `same`, 1 `hit`, 2 `mutate`), or the same 7 counted on its skip branch, off the diff's own
+# lines; no suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3709
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22035,7 +22093,8 @@ FLOOR_SHARD_7=311
 # RAISED 812 -> 914 by TOOL-dPlacedRequest-16: the same 102 region-eight lease-never-deleted and cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 914 -> 926 by TOOL-dPlacedRequest-26: the same 12 region-eight tenure walk assertions, see FLOOR_ASSERTIONS.
 # RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=933
+# RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=940
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

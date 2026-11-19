@@ -147,6 +147,9 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
 # torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
 # returns 0, as the health log's appender does: the governance write already landed.
+# THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
+# and this is the one take a carrier with no driver reaches, so where it is unset the append prints
+# one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
 # THE CACHE `refs/gov/remote/<tail>` mirrors `refs/gov/<tail>` on the remote: what this node fetched
 # and, through `write_gov_ref`, what it wrote. `add_feed_sightings` appends, oldest first, the unseen
 # first-parent chain of every cached ref whose tip is not the commit of the feed's newest line for
@@ -163,6 +166,7 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # a retry made after another event of its ref landed appends again, an event that did happen.
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
   local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
   [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so this write of %s is not in the feed\n' "$ref" >&2; return 0; }
