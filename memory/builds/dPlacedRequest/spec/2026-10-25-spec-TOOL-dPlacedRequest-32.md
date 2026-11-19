@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-32 — an absent session is no identity: no consent, and no lease held on session alone
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
