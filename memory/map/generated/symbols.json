@@ -9393,6 +9393,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_list_ids",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "cmd_list_unbound",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -11178,6 +11183,16 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "derive_fixture_ledger",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "derive_fixture_list",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "derive_fixture_row",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
@@ -11281,6 +11296,11 @@
       "id": "derive_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_gate_legacy",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
     },
     {
       "id": "derive_gate_runner",
@@ -11778,6 +11798,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_legacy_path",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "derive_legs_path",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -12256,6 +12281,11 @@
       "id": "derive_proc_state",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_producer_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "derive_project_name",
@@ -13351,6 +13381,11 @@
       "id": "derive_turnstile_wait",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_unarmed_list",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "derive_unit_class",
@@ -15303,6 +15338,11 @@
       "file": "tools/govkit/steps/registry_to_ledger.py"
     },
     {
+      "id": "load_converter",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "load_corpus",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -15446,6 +15486,11 @@
       "id": "load_ledger",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "load_ledger",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "load_leg_names",
@@ -18708,6 +18753,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "print_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "print_scaffold_recipe",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20588,6 +20638,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_facts_list",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
+    },
+    {
       "id": "read_fenced_row",
       "kind": "function",
       "file": "tools/loop/adapt.py"
@@ -20953,6 +21008,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "read_gov_registration",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
       "id": "read_gov_text",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
@@ -21081,6 +21141,11 @@
       "id": "read_held_reds",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_held_rows",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "read_history_groups",
@@ -21704,6 +21769,11 @@
     },
     {
       "id": "read_list",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_list_registration",
       "kind": "function",
       "file": "tools/playbook/positional.py"
     },
@@ -31423,6 +31493,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_legacy_list",
+      "kind": "function",
+      "file": "tools/playbook/instruction_units.py"
+    },
+    {
       "id": "run_legacy_lists",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -31476,6 +31551,11 @@
       "id": "run_list",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "run_list",
+      "kind": "function",
+      "file": "tools/playbook/positional.py"
     },
     {
       "id": "run_list",
@@ -31844,6 +31924,11 @@
     },
     {
       "id": "run_plant_append_edited",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_append_removed",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -38056,6 +38141,11 @@
       "id": "write_extract",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_facts_list",
+      "kind": "function",
+      "file": "tools/playbook/writing_practice.py"
     },
     {
       "id": "write_failmode_spec",

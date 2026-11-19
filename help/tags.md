@@ -72,8 +72,8 @@ again; past that wait it exits 2 saying the index is locked.
   from nothing; `python tools/playbook/gov_tag.py --gc` deletes the rows of extractor code no live
   worktree carries any more, printing `tag-index — collected: <n> rows of <m> versions`, and refuses
   when a worktree's registry cannot be read; `python tools/playbook/gov_tag.py --list-positional`
-  prints one `<path>` TAB `<ref>` row per positional reference, the rows
-  `memory/project/positional-refs.txt` keeps; and
+  prints one `<path>` TAB `<ref>` row per positional reference, the keys
+  `memory/project/positional-refs.txt` keeps as ledger rows; and
   `python tools/playbook/gov_tag.py --fixture --plant scope` runs one planted case in a scratch
   repository. <!-- usage: script:tools/playbook/gov_tag.py 6cb6638a -->
 
@@ -112,7 +112,15 @@ tag-shaped word that is not a citation, quote it another way, with doubled backt
   not graded for it` and is never red; at a repository that installed the kit, which holds no chain
   registry of its own, that is every owner. See "Where a purpose is read" below.
 - **positional** — a positional reference the list `memory/project/positional-refs.txt` does not
-  hold, or a row the tree no longer cites; an absent list is red. Where the list's folder,
+  hold, or a row the tree no longer cites; an absent list is red. The list is a ledger population,
+  `positional-refs`: a header line naming it, then one row per reference, its key fields (the citing
+  path and the reference) then the count, the SHA it was seeded at and its disposition, TAB-separated.
+  A reference ending in a line number is kept as written. A list a newly installed repository is given holds
+  the header and an `# unarmed` line, no row. The producer list `positional-producers.txt` beside it
+  holds its rows the same way, keyed by path and line text; a hit is kept there through
+  `python tools/memory-tree/ratchet.py widen positional-producers`, whose widen record holds its reason.
+  The writing practice's `unpinned-facts.txt` (keyed by path and fact) and the render gate's
+  `instructions-legacy.txt` (keyed by path), both under `memory/project/`, are ledger rows too. Where the list's folder,
   `<MEMORY_ROOT>/project/`, is absent too, as at a repository with no memory tree adopted, the arm
   prints `tags: positional · unarmed: <MEMORY_ROOT>/project is absent, so no memory tree is adopted
   here` and is never red.

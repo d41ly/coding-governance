@@ -38,13 +38,14 @@ to = "{prefix}/playbook/{relpath}"
 # install. These are `root_relative` rules pointing at the REAL files rather than copies, so there is
 # one source of truth and nothing to keep in step; gov itself has no copy beside the engine and reads
 # its own tree, which is the fall-through `declaration_paths()` documents.
-# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The core's pending list and the legacy list name
-# gov's own files and records, so no adopter receives them. The two positional lists live in gov's
-# `<MEMORY_ROOT>/project/`, outside this kit (PLAY-dOrderedCharter-72). The write mode writes an empty
-# `core-pending.txt` here and an empty `positional-refs.txt` in the target's memory project folder where a
-# target lacks them, since an absent list is a red; the legacy list and the producer list read absent as empty.
+# GOV'S OWN LISTS STAY HOME (PLAY-dOrderedCharter-70 S10). The core's pending list names gov's own files
+# and records, so no adopter receives it. The positional lists and the legacy list live in gov's
+# `<MEMORY_ROOT>/project/`, outside this kit (PLAY-dOrderedCharter-72, TOOL-dWitnessedBar-18 §8 F7). The
+# write mode writes an empty `core-pending.txt` here, and the `positional-refs` ledger with no row, its
+# header and the factory's unarmed line, in the target's memory project folder where a target lacks them,
+# since an absent list is a red; the legacy list and the producer list read absent as empty.
 [[files]]
-include = ["core-pending.txt", "instructions-legacy.txt"]
+include = ["core-pending.txt"]
 role = "project-owned"
 
 [[files]]
@@ -162,6 +163,29 @@ stage = 1
 
 [check]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
+
+# THE POSITIONAL LIST, a ledger population (TOOL-dWitnessedBar-18 S1): the one list this kit writes into
+# a target, so its registration ships here; `verbatim = ["ref"]` keeps a file:line reference as written
+# (§8 F1). Its seed is the positional arm's own measurement.
+[[ledger]]
+population = "positional-refs"
+leg = "tags (the resolver's checks)"
+seed = ["python", "{prefix}/playbook/positional.py", "list"]
+key = "site"
+fields = ["path", "ref"]
+verbatim = ["ref"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/positional-refs.txt"
+
+# An adopter's list converts at its next update (TOOL-dWitnessedBar-18 §4 Migration).
+[[upgrade]]
+id = "playbook-render/positional-refs-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/positional-refs.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/positional-refs.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/positional-refs.txt"]
+surfaces = ["file:memory/project/positional-refs.txt"]
+needs-target = false
 
 [[gate_leg]]
 tag = "leg.playbook-render.playbook-render-wiring"

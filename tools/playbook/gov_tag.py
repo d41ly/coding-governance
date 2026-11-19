@@ -598,6 +598,12 @@ def build_tags_fixture(top: pathlib.Path, plant: str) -> pathlib.Path:
         # PLAY-dOrderedCharter-26: present and empty, so the arm is unarmed; under the memory root (dOC-72)
         "memory/project/positional-refs.txt": "",
     }
+    if plant.startswith("positional-"):  # TOOL-dWitnessedBar-18 S5: both lists as gov registers them, no row
+        import positional as pos
+        files[instruction_units.derive_tool_rel("govkit", "registry.toml")] = pos.derive_fixture_ledger(
+            ["positional-refs", "positional-producers"])
+        files["memory/project/positional-refs.txt"] = pos.derive_fixture_list("positional-refs", [])
+        files["memory/project/positional-producers.txt"] = pos.derive_fixture_list("positional-producers", [])
     if plant in PURPOSE_PLANTS:
         old, new = PURPOSE_PLANTS[plant]
         files[f"{kit}/namespaces.toml"] = files[f"{kit}/namespaces.toml"].replace(old, new, 1)
@@ -1258,7 +1264,7 @@ def run_positional_plant(root, top, plant, say, check) -> int:
     list_path = pos.derive_list_path(root, mem)
 
     def read_rows():
-        return pos.read_list(list_path) or []
+        return pos.read_list(root, list_path) or []
     if plant in ("positional-no-tree", "positional-absent"):  # PLAY-dOrderedCharter-78 S5
         gone = list_path.parent.glob("*") if plant == "positional-no-tree" else [list_path]
         write_commit(root, {p.relative_to(root).as_posix(): None for p in gone}, "the list removed")
@@ -1269,7 +1275,8 @@ def run_positional_plant(root, top, plant, say, check) -> int:
         write_commit(root, {POS_CODE: POS_MOD, "AGENTS.md": "# Charter\n\nsee HYGIENE check 5\n",
                             guide: GUIDE + f"\nsee {derive_cite(1)}, {derive_cite('2-3')} and {derive_cite(1)} again\n",
                             "memory/guides/BETA.md": f"# Beta\n\nread BUILD-METHOD M5, and {derive_cite(1)}\n",
-                            "memory/project/positional-refs.txt": "AGENTS.md\tHYGIENE check 5\n"}, "citations")
+                            "memory/project/positional-refs.txt": pos.derive_fixture_list(
+                                "positional-refs", ["AGENTS.md\tHYGIENE check 5"])}, "citations")
         pos.run_seed(root, mem)
         want = {"AGENTS.md\tHYGIENE check 5", f"{guide}\t{derive_cite(1)}", f"{guide}\t{derive_cite('2-3')}",
                 f"memory/guides/BETA.md\t{derive_cite(1)}", "memory/guides/BETA.md\tBUILD-METHOD M5"}
