@@ -446,15 +446,15 @@ def read_home_state(path):
 
 
 def check_home_admitted(root, home):
-    """The refusal for a home whose parent directory holds no tracked file, or "" for one whose does: the
-    hygiene check's structure check has admitted a directory that holds one (§8 F3). WHAT IT DOES NOT
-    CHECK: a file name the structure check refuses inside an admitted directory."""
+    """The refusal `no directory <parent>` for a home whose parent directory does not exist in the working
+    tree, or "" for one whose does, tracked files or none (TOOL-dWitnessedBar-47): an adopter seeds into
+    a directory it has just created, before anything in the target is committed, and `seed` never
+    creates one. WHAT IT DOES NOT CHECK: a file name the hygiene check's structure check refuses inside
+    an existing directory, which is written and reds at that check's next run, never silently."""
     parent = pathlib.PurePosixPath(home.replace("\\", "/")).parent.as_posix()
-    rc, out = _run_git(root, "ls-files", "-z", "--", parent)
-    lead = "" if parent == "." else parent + "/"
-    if rc == 0 and any(p.startswith(lead) and "/" not in p[len(lead):] for p in out.split("\0") if p):
+    if pathlib.Path(root, parent).is_dir():
         return ""
-    return "home directory %s holds no tracked file, so the hygiene check has not admitted it" % parent
+    return "no directory %s" % parent
 
 
 def run_seed_argv(argv, root):

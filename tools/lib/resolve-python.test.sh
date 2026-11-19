@@ -1260,12 +1260,18 @@ out=$(run_ll seed --population fx-seed)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-seed 3" <<<"$out" && ! grep -q '^# unarmed' "$LL_SEEDED"; } \
   || bad "2o seed AC4: the repaired seed did not re-arm the unarmed home: ${out//$'\n'/ | }"; ok
 run_ll_reset
-# AC5 — a home in a directory that holds no tracked file is never written.
-mkdir -p "$LLR/nodir"; build_ll_seeded fx-nodir nodir/fx-nodir.txt "$LL_SEEDARGV" >> "$LLR/tools/fx/kit.toml"
+# AC5, moved to an absent directory by TOOL-dWitnessedBar-47 (its AC3) — a home under a directory that
+# does not exist is never written and the directory is never created; with the directory made and
+# nothing in it tracked, the same home is seeded, as an adopter seeds into a directory it has just made.
+build_ll_seeded fx-nodir nodir/fx-nodir.txt "$LL_SEEDARGV" >> "$LLR/tools/fx/kit.toml"
 out=$(run_ll seed --population fx-nodir)
-{ [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed fx-nodir home directory nodir holds no tracked file" <<<"$out" \
-  && [ ! -e "$LLR/nodir/fx-nodir.txt" ]; } \
-  || bad "2o seed AC5: a home in an unadmitted directory was written or read armed: ${out//$'\n'/ | }"; ok
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed fx-nodir no directory nodir" <<<"$out" && [ ! -e "$LLR/nodir" ]; } \
+  || bad "2o seed AC5: a home under an absent directory was written, read armed, or its directory created: ${out//$'\n'/ | }"; ok
+mkdir -p "$LLR/nodir"
+out=$(run_ll seed --population fx-nodir)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-nodir 3" <<<"$out" && [ -f "$LLR/nodir/fx-nodir.txt" ] \
+  && [ -z "$(git -C "$LLR" ls-files -- nodir)" ]; } \
+  || bad "2o seed 47 AC3: a home under an existing directory holding no tracked file was not seeded: ${out//$'\n'/ | }"; ok
 run_ll_reset
 # AC6 — `seed = []` under the default, under a landed `refuse`, and with no policy kit resolving.
 out=$(run_ll seed --all)
@@ -1326,6 +1332,25 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "c${T}1${T}${ll_uhead}${T}widened:R1" "$LL_UHOME" \
   && head -3 "$LL_UHOME" | cmp -s - "$LL/p.before"; } \
   || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
+
+# ---- 2o, the fresh adopt (TOOL-dWitnessedBar-47 AC1) ---------------------------------------------
+# A third fixture, a `git init` with nothing committed holding this repo's drift-audit kit, its seeded
+# drift_signals.py removed, and the memory-tree kit beside it, whose copy the adopter seeds through,
+# plus the minimum .memory-tree.conf stub the adopter names. One adopt must seed drift_signals.py into
+# the kit directory it was copied to, which holds no tracked file. Red when the seed's home test asks
+# for a tracked file in the home's directory again. WHAT THIS DOES NOT CHECK: the rendered Skill, the
+# drift-audit kit's own leg.
+LLD="$LL/fresh"; LL_DRIFT=drift-audit; LL_MTREE=memory-tree
+mkdir -p "$LLD/tools" && git init -q "$LLD" && git -C "$LLD" config core.autocrlf false \
+  && cp -r "$ROOT/${PFX}$LL_DRIFT" "$ROOT/${PFX}$LL_MTREE" "$LLD/tools/" \
+  && rm -f "$LLD/tools/$LL_DRIFT/drift_signals.py" \
+  && printf 'MEMORY_ROOT=memory\nDISCIPLINES="fx"\n' > "$LLD/.memory-tree.conf" \
+  || bad "2o fresh adopt: the uncommitted drift-audit fixture could not be built"; ok
+out=$( (cd "$LLD" && GOV_PYTHON="$REALPY" bash "tools/$LL_DRIFT/adopt-drift-audit.sh") 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=0 ] && [ -f "$LLD/tools/$LL_DRIFT/drift_signals.py" ] \
+  && grep -qxF "drift-audit: armed tools/$LL_DRIFT/drift_signals.py" <<<"$out" \
+  && ! git -C "$LLD" rev-parse -q --verify HEAD >/dev/null 2>&1; } \
+  || bad "2o fresh adopt AC1: one drift-audit adopt on an uncommitted target did not seed drift_signals.py: ${out//$'\n'/ | }"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
