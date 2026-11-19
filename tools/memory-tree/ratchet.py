@@ -25,7 +25,9 @@ home opens with no ledger header is a legacy home its own pass regrammared in pl
 (TOOL-dWitnessedBar-16 S11); what that does not check is the legacy rows against the converted ones,
 which the conversion record holds. A live leg with nothing to grade
 prints one `unarmed · <leg> · <why>` line, no pass line, and exits 0 (§8 F9); the runner prints that
-exit 0 as passed, so `unarmed` is read in the leg's output and in `--list`, never in the bar.
+exit 0 as passed, so `unarmed` is read in the leg's output and in `--list`, never in the bar. The one
+exception is `keys-not-scalar`, the leg an adopter receives: an unarmed `conf-scalar-pins` exits 1
+naming the seed command (TOOL-dWitnessedBar-46 S3).
 
 A RAISE IS ADMITTED ONLY THROUGH A WIDEN RECORD. `widen` is the door: it reads `retrofit.widen`, writes
 the next `<date>-build-<unit>-widen-<n>.md` of the build the unit id names through the record factory's
@@ -491,9 +493,21 @@ def measure_scalar_pins(root):
     return counts
 
 
+def render_seed_command(root):
+    """The command that seeds `conf-scalar-pins` from this kit's copy of the ledger factory, its path
+    spelled from `root` (TOOL-dWitnessedBar-46 S3)."""
+    try:
+        kit = pathlib.Path(os.path.relpath(KIT, root)).as_posix()
+    except ValueError:  # another drive on Windows
+        kit = KIT.as_posix()
+    return "python %s/legacy_ledger.py seed --population %s" % (kit, SCALAR_POPULATION)
+
+
 def run_keys_not_scalar(root, measure=False):
     """`ratchet (keys, not a scalar)`: the measured pins against `conf-scalar-pins` at HEAD through
-    `compare_counts`; `--measure` prints the measurement, the population's seed."""
+    `compare_counts`; `--measure` prints the measurement, the population's seed. An absent, unarmed or
+    unregistered `conf-scalar-pins` is never green: it exits 1 printing `unarmed conf-scalar-pins` and
+    the seed command (TOOL-dWitnessedBar-46 S3), so an adopter's failed seed reds rather than passes."""
     measured = measure_scalar_pins(root)
     if measure:
         for (conf, key), n in sorted(measured.items()):
@@ -503,8 +517,9 @@ def run_keys_not_scalar(root, measure=False):
     regs, why = derive_leg_population(LL.read_registrations(root), "keys-not-scalar")
     state = LL.read_home_state(pathlib.Path(root, regs[0].home)) if regs else ""
     if state != "armed":
-        print_line("unarmed", leg, why if not regs else "%s home %s" % (SCALAR_POPULATION, state))
-        return 0
+        print_line(leg, "unarmed %s" % SCALAR_POPULATION, why if not regs else "its home is %s" % state,
+                   "seed it: %s" % render_seed_command(root))
+        return 1
     reg = regs[0]
     declared, bad = LL.read_ledger(root, reg)
     if bad:

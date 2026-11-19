@@ -225,7 +225,32 @@ With no compare base a base leg prints `unresolved` and reds. A population the b
 neither its home nor its header at another path, prints `new at <sha12>` with its row count. A leg
 with nothing to grade prints one `unarmed · <leg> · <why>` line and exits 0, which the runner shows
 as passed: read `unarmed` in the leg's output or in `ratchet.py --list`, which also prints the touch
-join `unarmed · build.scope (dScopedBuild)`.
+join `unarmed · build.scope (dScopedBuild)`. `keys-not-scalar` is the exception: an absent, unarmed
+or unregistered `conf-scalar-pins` exits 1 printing `unarmed conf-scalar-pins` and the seed command
+(TOOL-dWitnessedBar-46 S3), because it is the leg an adopter receives.
+
+**What an adopter receives** (TOOL-dWitnessedBar-46). A leg ships when every input it reads at an
+adopter ships with the kit or is seeded there:
+
+| Leg | Reads at an adopter | Ships |
+|---|---|---|
+| `ratchet (keys, not a scalar)` | the adopter's root confs and its seeded `conf-scalar-pins` | yes |
+| `ratchet selftest` | its own scratch repositories | yes, held as a kit self-test |
+| `ratchet (never gains)` | every registered population and the base remote; `retrofit.widen` | no, `[[exempt_leg]]` |
+| `ratchet (both ways)` | every registration's seed run at HEAD | no |
+| `ratchet (unarmed)` | every registered home | no |
+| `ratchet (populated)` | every population and the seen-red records | no |
+| `ratchet (seed laundering)` | every population at the base | no |
+| `ratchet (rename)` | the base range | no |
+| `ratchet (key shape)` | every population | no |
+
+The seven gov-only legs are `[[exempt_leg]]` rows of govkit's registry, tagged `leg.gov.<slug>`. The
+adopter seeds `conf-scalar-pins` from its own confs with `legacy_ledger.py seed --population
+conf-scalar-pins`, at the end of `adopt-memory-tree.sh --scaffold` and through `--seed-pins`, which a
+`[[regenerate]]` row runs at every `govkit update`; a home already armed is left as it is. The seed is
+the registration's own argv, `python tools/memory-tree/ratchet.py keys-not-scalar --measure`, run at
+the repository root, so an adopter whose kits sit under another prefix, or where `python` does not
+resolve, reads `unarmed conf-scalar-pins` until that argv resolves there.
 
 **The widen route.** A raise is admitted only with its reason on record:
 

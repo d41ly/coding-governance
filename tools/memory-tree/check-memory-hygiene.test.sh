@@ -2805,6 +2805,46 @@ n=$((n+1))
 _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$HERE/build-readme-slot-limits.txt" 2>/dev/null || echo 0)
 [ "$_src_valued" -gt 0 ] || { echo "FAIL adopt --scaffold blanked the SOURCE kit's ceilings; the only write in that script may land under \$ROOT and this one did not"; st=1; }
 
+# ---- TOOL-dWitnessedBar-46 AC2 AC3 AC4 — THE ADOPTER'S SCALAR PINS. A tree made from the EXAMPLE conf,
+# ---- the kit staged as `govkit apply` leaves it, is scaffolded and committed; `ratchet (keys, not a
+# ---- scalar)` then holds every `*_PIN` the example assigns, reds `unarmed` with its home removed, and
+# ---- is green again after `--seed-pins`, whose second run leaves the home byte-identical. The kit sits
+# ---- where the registration's seed argv names it, read from the descriptor rather than spelled here.
+n=$((n+1))
+P=$TMP/scalar-pins
+_sk=$(sed -n 's/^seed = \["python", "\([^"]*\)\/ratchet\.py", "keys-not-scalar".*/\1/p' "$HERE/kit.toml")
+_npins=$(grep -cE '^[A-Z_]+_PIN=' "$HERE/.memory-tree.conf.example")
+mkdir -p "$P/$_sk"
+cp -r "$HERE/." "$P/$_sk/" 2>/dev/null; rm -rf "$P/$_sk/__pycache__"
+( cd "$P" && git init -q --template= . && git config core.autocrlf false &&
+  cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && git add -A &&
+  bash "$_sk/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 &&
+  git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL AC2 the example-made tree did not scaffold and commit"; st=1; }
+run_scalar_leg() { ( cd "$P" && "$_PY" "$_sk/ratchet.py" keys-not-scalar 2>&1 ); }
+_ko=$(run_scalar_leg); _krc=$?
+_held=$(printf '%s\n' "$_ko" | grep -c ' · held · \.memory-tree\.conf	[A-Z_]*_PIN	' || true)
+{ [ "$_krc" = 0 ] && [ "$_held" = "$_npins" ] && [ "$_npins" -gt 0 ] \
+  && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	ROW_DUPLICATE_PIN	'; } \
+  || { echo "FAIL AC2 keys-not-scalar over the example-made tree exited $_krc holding $_held of $_npins pins: $_ko"; st=1; }
+_h3=$(cd "$P" && bash "$SCRIPT" 2>&1)
+{ [ -f "$P/memory/project/conf-scalar-pins.txt" ] && ! printf '%s\n' "$_h3" | grep -q 'memory/project/conf-scalar-pins\.txt'; } \
+  || { echo "FAIL AC2 the seeded conf-scalar-pins.txt is absent or check 3 names it"; st=1; }
+n=$((n+1))
+rm -f "$P/memory/project/conf-scalar-pins.txt"
+_ko=$(run_scalar_leg); _krc=$?
+{ [ "$_krc" = 1 ] && printf '%s\n' "$_ko" | grep -q 'unarmed conf-scalar-pins' \
+  && printf '%s\n' "$_ko" | grep -q 'legacy_ledger\.py seed --population conf-scalar-pins'; } \
+  || { echo "FAIL AC3 keys-not-scalar over an absent conf-scalar-pins exited $_krc, not 1 naming the seed: $_ko"; st=1; }
+n=$((n+1))
+( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
+cp "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" 2>/dev/null
+_ko=$(run_scalar_leg); _krc=$?
+{ grep -q '^\.memory-tree\.conf	ROW_DUPLICATE_PIN	' "$P/memory/project/conf-scalar-pins.txt" 2>/dev/null && [ "$_krc" = 0 ]; } \
+  || { echo "FAIL AC4 --seed-pins did not reseed the home, or keys-not-scalar then exited $_krc: $_ko"; st=1; }
+( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
+cmp -s "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" \
+  || { echo "FAIL AC4 a second --seed-pins rewrote an armed conf-scalar-pins home"; st=1; }
+
 # ---- TOOL-aRoutedQuill-5 AC5 + AC6 — the two routed keys the adopter APPENDS, derived from the tree
 # ---- it runs in. The fixture tracks two product directories, a dot-directory and the memory root,
 # ---- so a candidate that keeps either of the last two, or drops either of the first, reds.
