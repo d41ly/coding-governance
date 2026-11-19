@@ -495,17 +495,31 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
-- `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
-  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by
-  slug. `--with-key` adds a sixth field, the claim's key, a `k1:` key over its claim ref and its run
-  record's blob at the default branch's tracking ref (`k1:?` where that record is absent; `-` where
-  python or the loop kit does not resolve), and only that form spends the key's one python spawn; a
-  driver released before the flag ignores it and prints five;
+- `--claims` — every run claim and lease on the remote, one TAB-separated row each: name, node or
+  fleet tag, status, beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or
+  `unknown`, sorted by name. The name is the slug of a build lease or a legacy claim and the tail
+  of a unit or cadence lease; the second field is a lease's `fleet-tag` and a legacy
+  `refs/gov/runs/<slug>` claim's `node`. `--with-key` adds a sixth field, the claim's key, a `k1:`
+  key over its ref, `refs/gov/leases/<tail>` or the legacy one, and its run
+  record's blob at the default branch's tracking ref (`k1:?` where that record is absent or the lease
+  is a cadence run's; `-` where python or the loop kit does not resolve), and only that form spends
+  the key's one python spawn; a driver released before the flag ignores it and prints five;
   `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
   an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
-  'refs/gov/runs/*'` still shows a leftover one. It takes no slug and decides nothing about who
+  'refs/gov/*'` still shows a leftover one. It takes no slug and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
+- `--lease` — one lease of a build, a unit or a cadence run: `--lease acquire|renew|release|take-over
+  build <slug>`, `unit <slug> <id>` or `run <cadence> <period>`, `--witness <sha>` on a renewal and
+  `--as landed|aborted|withdrawn` on a release; `--lease flush` pushes this node's queued offline
+  writes. Each reads the remote's leases, derives its row through the stops guide's `lease` column,
+  writes by compare-and-swap and prints ONE line: `lease — <tail> · <act> · epoch <n>` (exit 0),
+  `lease refused — <cause> · <tail> · <holder>` (exit 1; `live-holder`, `tombstone`, `epoch-fence`,
+  `overlap` or `offline`), or `lease not written — <why>` (exit 2: a bad segment, a level
+  `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
+  that records no transition and is no open question). An acquisition runs the overlap probe first.
+  Dark behind `RUN_CLAIMS` like every claim; `UNATTENDED-STOPS.md` §7 is the grammar, the record,
+  the epoch and the four `leases.*` keys.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,

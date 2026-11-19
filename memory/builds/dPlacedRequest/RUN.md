@@ -55,3 +55,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T07:39:45Z brief · item TOOL-dPlacedRequest-13 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-19T08:04:18Z dispatch · item 4b9a1d04 TOOL-dPlacedRequest-1 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/playbook/render_playbook.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh help/loop.md memory/map/generated tools/govkit/subject-pins.tsv memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-1-1-acceptance-ledger.md
+
+2026-11-19T08:07:38Z brief · item TOOL-dPlacedRequest-1 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

@@ -2080,6 +2080,33 @@ check_eq "AGH2 AC6 HEAD, every branch and every remote-tracking ref are unchange
 check_eq "AGH2 AC6 liveness: the read reached the remote, its seven claims are in the driver's private cache and nowhere else" \
   "7" "$(git -C "$CCLONE" for-each-ref refs/gov/ | grep -c .)"
 
+# TOOL-dPlacedRequest-1 AC15 AC18 — a LEASE row beside seed_claim's legacy rows: a build lease of tLease
+# whose fleet-tag is `a` and whose node is n2, and the legacy zLive whose node is n1. The driver prints
+# field 2 as the lease's fleet tag and the legacy claim's node, five fields each, and `--with-key` keys
+# the lease over refs/gov/leases/tLease/build, never over the runs namespace. RED against a reader
+# printing the node of a lease, or a key derived over refs/gov/runs/tLease. The lease is removed after,
+# so every count below is the seven legacy claims'.
+seed_lease() { # slug · fleet tag
+  local b c
+  b=$(date -u -d "@$CLNOW" +%Y-%m-%dT%H:%M:%SZ)
+  c=$(printf 'gov-claim %s/build\n\nslug: %s\nnode: n2\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -\n' "$1" "$1" "$b" "$b" "$2" \
+    | GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test git -C "$CLB" commit-tree "$CLET") \
+    && git -C "$CLB" update-ref "refs/gov/leases/$1/build" "$c"
+}
+seed_lease tLease a
+cl_two=$(cd "$CWT" && bash "$CLDRV" --claims 2>/dev/null | awk -F'\t' '$1 == "tLease" || $1 == "zLive" { print $1 " " NF " " $2 }' | tr -d '\r' | sort | tr '\n' ' ')
+check_eq "DPR1 AC15 the lease row's field 2 is its fleet tag and the legacy row's its node, five fields each" \
+  "tLease 5 a zLive 5 n1 " "$cl_two"
+cl_lk=$(cd "$CWT" && bash "$CLDRV" --claims --with-key 2>/dev/null | awk -F'\t' '$1 == "tLease" { print NF " " $6 }' | tr -d '\r')
+cl_sha=$(git -C "$CLB" rev-parse refs/gov/leases/tLease/build)
+cl_py=$(cd "$CWT" && resolve_python 2>/dev/null)
+cl_want=$(cd "$CWT" && printf 'refs/gov/leases/tLease/build@%s\trunstate=?\n' "$cl_sha" | "$cl_py" tools/loop/claims.py key --stdin 2>/dev/null | tr -d '\r')
+cl_runs=$(cd "$CWT" && printf 'refs/gov/runs/tLease@%s\trunstate=?\n' "$cl_sha" | "$cl_py" tools/loop/claims.py key --stdin 2>/dev/null | tr -d '\r')
+check_eq "DPR1 AC18 the lease row is six fields keyed over refs/gov/leases/tLease/build, never the runs namespace" \
+  "6 $cl_want differs" "$cl_lk $([ "$cl_want" != "$cl_runs" ] && echo differs)"
+git -C "$CLB" update-ref -d refs/gov/leases/tLease/build
+git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/leases/ | git -C "$CCLONE" update-ref --stdin
+
 # AC10 and S7 — the replay reads no remote: with the remote broken, the stored head prints
 # unchanged, and a replay that finds no card writes one whose cell made no read.
 git -C "$CCLONE" remote set-url origin "$TMP/nope.git"

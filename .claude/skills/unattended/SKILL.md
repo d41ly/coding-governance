@@ -119,6 +119,7 @@ unattended.sh --plan <slug> --paths
 unattended.sh --check-specs <slug> <unit-id>...
 unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
+unattended.sh --lease acquire build <slug>
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --feed check  # local

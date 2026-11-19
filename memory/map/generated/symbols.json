@@ -763,6 +763,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "add_gov_queue",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "add_health_event",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -6693,6 +6698,21 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_lease_segment",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_lease_transition",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_lease_witness",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11506,6 +11526,11 @@
       "id": "derive_leaf_changes",
       "kind": "function",
       "file": "tools/policy/guard.py"
+    },
+    {
+      "id": "derive_lease_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_leg_argv",
@@ -20238,6 +20263,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_fleet_tag",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -20953,9 +20983,24 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
+      "id": "read_lease_field",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_lease_hash",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_lease_policy",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_lease_renewal",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_leaves",
@@ -22978,6 +23023,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_su_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_su_sum",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -23298,6 +23348,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "read_transition_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_transition_records",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
@@ -23306,6 +23361,11 @@
       "id": "read_transition_rows",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "read_transition_witness",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_transitions",
@@ -26541,6 +26601,11 @@
       "id": "resolve_extractor_module",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
+    },
+    {
+      "id": "resolve_fleet_tag",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "resolve_floor_interpreter",
@@ -30028,6 +30093,16 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_lease_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_lease_verb",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "run_leg",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -32651,6 +32726,26 @@
       "id": "seed_landing",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "seed_lease",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "seed_lease",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_lease_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_lease_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "seed_lines",
@@ -36548,6 +36643,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "write_gov_queue",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_gov_ref",
       "kind": "function",
       "file": "tools/lib/gov-ref.sh"
@@ -36756,6 +36856,21 @@
       "id": "write_lease",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_lease_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_lease_policy",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_lease_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_ledger",

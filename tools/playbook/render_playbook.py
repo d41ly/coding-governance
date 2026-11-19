@@ -592,6 +592,19 @@ def check_user_clash(user: str, held: list[tuple[str, str]]) -> str:
     return ''
 
 
+def read_fleet_tag(path: Path, user: str, host: str = '') -> str:
+    """The tag of the fleet row naming `user`, matched as every reader matches it: the user alone,
+    case-folded (`check_user_clash`). `host` only names the node in the refusal. TOOL-dPlacedRequest-1
+    S11: the unattended driver's `resolve_fleet_tag` asks this, so a lease names a fleet tag and
+    `read_fleet` stays the registry's one reader. Refuses naming the registry when no row matches."""
+    u = user.strip().lower()
+    for row in read_fleet(path):
+        if u and row['user'].strip().lower() == u:
+            return row['tag']
+    raise Refusal(f'no row of {FLEET_NAME} at {path.as_posix()} names user {user!r} '
+                  f'(host {host or "<none>"}), so this node carries no fleet tag')
+
+
 def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
     """The target's `[nodes.<tag>]` tables, graded against the fleet's tags and NODE_KEYS."""
     try:
@@ -2699,6 +2712,19 @@ def run_selftest() -> int:
           and 'INSTALLED' in installed,
           'a claim takes the lowest free letter, once per identity, never in an installed copy',
           f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
+    # TOOL-dPlacedRequest-1 AC8: `--fleet-tag` names the row of the user, case-folded, and a user no row
+    # names is a refusal naming the registry, never a guessed tag.
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        tag_got = read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1].upper(), 'H')
+        try:
+            read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here', 'H')
+            tag_miss = 'no refusal'
+        except Refusal as e:
+            tag_miss = str(e)
+    check_arm(tag_got == fleet_rows[1][0] and FLEET_NAME in tag_miss and 'nobody-here' in tag_miss,
+              '--fleet-tag names the user\'s row and refuses a user no row names, naming the registry',
+              f'got {tag_got!r} miss {tag_miss!r}')
     arm_fixture('a legacy drop_blocks member with no fence is noted with the descriptor\'s why',
                 trailer_desc + '\n[[block]]\nname = "node-table"\nlegacy = "v3"\nwhy = "WHY-X"\n',
                 'plain\n', 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
@@ -3744,6 +3770,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--answers', nargs='+', metavar='KEY')
     # TOOL-aDistilledCharter-2: a new node claims its tag once, in gov's own checkout.
     ap.add_argument('--claim-node', action='store_true')
+    ap.add_argument('--fleet-tag', action='store_true')
     ap.add_argument('--user', default='')
     ap.add_argument('--host', default='')
     ap.add_argument('--projects-root', default='')
@@ -3790,6 +3817,13 @@ def main(argv: list[str]) -> int:
         except Refusal as e:
             print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
             return 1
+    if a.fleet_tag:
+        try:
+            print(read_fleet_tag(Path(__file__).resolve().parent / FLEET_NAME, a.user, a.host))
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        return 0
     if a.claim_node:
         try:
             tag = write_fleet_claim(Path(__file__).resolve().parent, a.user, a.host,

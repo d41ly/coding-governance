@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** INPROGRESS · rev-9 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-67
+**Status:** CLOSED · rev-9 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-67
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -29,6 +29,7 @@
 | [2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md) | research | TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 |
 | [2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 |
 | [2026-11-05-build-TOOL-dPlacedRequest-1-reground-returns.md](../build/2026-11-05-build-TOOL-dPlacedRequest-1-reground-returns.md) | research | TOOL-dPlacedRequest-5 |
+| [2026-11-19-build-TOOL-dPlacedRequest-1-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md) | research | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md) | journal | — |
