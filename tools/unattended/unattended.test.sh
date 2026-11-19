@@ -17200,11 +17200,17 @@ run_render_helper() { # conf key value · helper [· mode] -> the helper's outpu
       # the commit runs no hook the machine declares globally
       mkdir -p "$lu_g/lu-hooks"
       export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$lu_g/lu-hooks"
+      # A failed-stage mode fails the one call the driver's GIT wrapper makes for it, through a
+      # `git` shim on PATH that hands every other call to the real git, as the tw5 arm's shim does.
+      # A function override would add a shell definition, and the lexicon pins those.
       case "$lu_mode" in
-        addfail)  GIT() { case "$1 ${2:-}" in "add -A") return 1 ;; esac
-                          git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; } ;;
-        difffail) GIT() { [ "$*" != "diff --cached --quiet" ] || return 128
-                          git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; } ;;
+        addfail|difffail)
+          mkdir -p "$lu_g/lu-shim"
+          printf '#!/usr/bin/env bash\ncase "%s $*" in\n  "addfail -c %s -c %s add -A "*) exit 1 ;;\n  "difffail -c %s -c %s diff --cached --quiet") exit 128 ;;\nesac\nexec "%s" "$@"\n' \
+            "$lu_mode" "$GIT_PIN_REPLACE" "$GIT_PIN_GRAFTADV" "$GIT_PIN_REPLACE" "$GIT_PIN_GRAFTADV" \
+            "$(command -v git)" > "$lu_g/lu-shim/git"
+          # the shell's own spelling of the directory: git's `C:/...` would split PATH at its colon
+          chmod +x "$lu_g/lu-shim/git"; PATH="$(cd "$lu_g/lu-shim" && pwd):$PATH" ;;
       esac
     fi
     lu_head=$(git rev-parse HEAD)
