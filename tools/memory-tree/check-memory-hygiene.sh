@@ -671,7 +671,7 @@ for tag, path in (("L", sys.argv[2]), ("D", sys.argv[3])):
     for entry in bad:
         print("%s\t%s" % (tag, LL.render_malformed(entry).replace("\t", " ")))
     for key in rows:
-        print("%s\t%s" % (tag, key[0]))' "$HERE" "$M/project/legacy-files.txt" "$M/project/curation-debt.txt" | tr -d '\r') \
+        print("%s\t%s" % (tag, key[0]))' "$HERE" "$M/project/legacy-files.txt" "$M/project/curation-debt.txt" | tr -d '\r'; exit "${PIPESTATUS[0]}") \
   || { echo "HYGIENE — cannot run: the ledger factory did not read legacy-files.txt and curation-debt.txt"; exit 2; }
 LEGACY=""; DEBT=""
 while IFS=$'\t' read -r _t _l; do

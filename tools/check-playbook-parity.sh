@@ -379,7 +379,11 @@ rows, bad = LL.read_rows(sys.argv[2], 1)
 for entry in bad:
     print(entry[2].replace("\t", " "))
 for key in rows:
-    print(key[0])' "$LL_DIR" "$WAIVERS" | tr -d '\r' | sort -u)
+    print(key[0])' "$LL_DIR" "$WAIVERS" | tr -d '\r'; exit "${PIPESTATUS[0]}") || {
+  printf 'PLAYBOOK-PARITY: cannot run — the ledger factory at %s did not read %s\n' "$LL_DIR" "$WAIVERS"
+  exit 2
+}
+waived=$(printf '%s\n' "$waived" | sort -u)
 
 # The match is an anchored PATH SEGMENT, case-sensitive — `tools/<kit>/` or a backticked `<kit>/` —
 # never a bare substring. A substring search scores the kit `lib` many times over the trio — every
