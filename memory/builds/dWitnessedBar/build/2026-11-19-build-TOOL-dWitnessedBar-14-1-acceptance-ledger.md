@@ -31,7 +31,7 @@ spec section 7 (`ratchet selftest`, its failing cases staged by `gain`, `gain-re
   `fix-pop · empty · reads unarmed, no seen-red reader`, no seen-red record in the fixture.
 - AC5 — `laundering` — a re-dated row, a disposition turned back to `seeded` and a re-dated null-SHA row
   exit 1 naming `alpha`, `beta` and `nul`; a row drained because its seed no longer measures it exits 0;
-  a row removed while its seed still measures it exits 1. Deviation 143 records the seed run.
+  a row removed while its seed still measures it exits 1. Deviation 143 records (DERIVED) the seed run.
 - AC6 — `rename` — a staged `git mv src/x.sh src/y.sh` with its rows re-keyed exits 0; the rows left
   on the old path exit 1 printing `rename src/x.sh -> src/y.sh`.
 - AC7 — `keys-not-scalar` — on the built tree, before the leg was a manifest row, it exited 0 printing
