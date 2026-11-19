@@ -6,6 +6,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py) | research | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-1-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
