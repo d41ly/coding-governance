@@ -247,8 +247,9 @@ adopter ships with the kit or is seeded there:
 The seven gov-only legs are `[[exempt_leg]]` rows of govkit's registry, tagged `leg.gov.<slug>`. The
 adopter seeds `conf-scalar-pins` from its own confs with `legacy_ledger.py seed --population
 conf-scalar-pins`, at the end of `adopt-memory-tree.sh --scaffold` and through `--seed-pins`, which a
-`[[regenerate]]` row runs at every `govkit update`; a home already armed is left as it is. The seed is
-the registration's own argv, `python tools/memory-tree/ratchet.py keys-not-scalar --measure`, run at
+`[[regenerate]]` row runs at every `govkit update` unless GOVKIT_RERENDER=0 is exported; a home already
+armed is left as it is. The seed is the registration's own argv, `ratchet.py keys-not-scalar --measure`
+in the memory-tree kit, run at
 the repository root, so an adopter whose kits sit under another prefix, or where `python` does not
 resolve, reads `unarmed conf-scalar-pins` until that argv resolves there.
 
