@@ -165,6 +165,7 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 
 [[gate_leg]]
 tag = "leg.playbook-render.playbook-render-wiring"
+tests = ["feature.playbook"]
 name = "playbook render wiring"
 subject = "repo"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
@@ -177,6 +178,7 @@ stage = ["step.test"]
 # substituted verbatim into a markdown table row.
 [[gate_leg]]
 tag = "leg.playbook-render.playbook-render-selftest"
+tests = ["feature.playbook"]
 name = "playbook render selftest"
 subject = "kit"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]

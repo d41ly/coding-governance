@@ -11638,6 +11638,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_leg_unarmed",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
+    },
+    {
       "id": "derive_legacy_homes",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -21181,6 +21186,11 @@
       "id": "read_leg_argv",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_leg_edges",
+      "kind": "function",
+      "file": "tools/playbook/edge_grammar.py"
     },
     {
       "id": "read_leg_usage",

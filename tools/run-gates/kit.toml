@@ -180,6 +180,7 @@ means = "adopted"
 # not written here; the number that used to sit in this sentence was wrong one commit later.
 [[gate_leg]]
 tag = "leg.run-gates.run-gates-wiring"
+tests = ["feature.run-gates"]
 name = "run-gates wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
@@ -200,6 +201,7 @@ stage = ["step.test"]
 # in a comment is the copy that rots.
 [[gate_leg]]
 tag = "leg.run-gates.receipt-sync-installed-files-match-the-receipt"
+tests = ["feature.run-gates"]
 name = "receipt sync (installed files match the receipt)"
 subject = "repo"
 argv = ["python", "{kit}/check-receipt.py"]
@@ -214,6 +216,7 @@ stage = ["step.test"]
 # this kit would make every live spec touching it name the leg, and the self-test costs about a second.
 [[gate_leg]]
 tag = "leg.run-gates.held-halves-selftest"
+tests = ["feature.run-gates"]
 name = "held-halves selftest"
 subject = "kit"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]

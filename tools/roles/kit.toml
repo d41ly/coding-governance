@@ -99,6 +99,8 @@ ok = true
 # on the adopter's bar before a handoff refuses at run time.
 [[gate_leg]]
 tag = "leg.roles.roles-catalogue"
+tests = ["feature.roles"]
+enforces = ["principle.p16"]
 name = "roles catalogue"
 subject = "repo"
 argv = ["python", "{kit}/check_roles.py"]
@@ -111,6 +113,7 @@ stage = ["step.test"]
 # governing doc moves with nobody touching this kit.
 [[gate_leg]]
 tag = "leg.roles.roles-render-wiring"
+tests = ["feature.roles"]
 name = "roles render wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-roles.sh", "--check"]
@@ -120,6 +123,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.roles.roles-render-selftest"
+tests = ["feature.roles"]
 name = "roles render selftest"
 subject = "kit"
 argv = ["python", "{kit}/render_agents.py", "--selftest"]

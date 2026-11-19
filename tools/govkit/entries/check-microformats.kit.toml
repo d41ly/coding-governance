@@ -45,6 +45,7 @@ the gate IS the check. Running it over a target's own charter is what the gate l
 # cross-entry argv check reds. Gov's own root template is the fallback where that kit holds none.
 [[gate_leg]]
 tag = "leg.check-microformats.micro-format-definitions"
+tests = ["feature.playbook"]
 name = "micro-format definitions"
 subject = "repo"
 argv = ["bash", "{prefix}/check-microformats.sh"]
@@ -52,6 +53,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.check-microformats.micro-format-gate-selftest"
+tests = ["feature.playbook"]
 name = "micro-format gate selftest"
 subject = "kit"
 argv = ["bash", "{prefix}/check-microformats.test.sh"]

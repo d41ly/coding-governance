@@ -93,6 +93,7 @@ means = "adopted"
 # once, which would give every run of a build one start and red the leg on a history it cannot see.
 [[gate_leg]]
 tag = "leg.runlog.runlog-record-schema"
+tests = ["feature.runlog"]
 name = "runlog record schema"
 subject = "repo"
 argv = ["python", "{kit}/runlog.py", "check-records"]
@@ -105,6 +106,7 @@ stage = ["step.test"]
 # or its template is edited, with nobody touching the adopter.
 [[gate_leg]]
 tag = "leg.runlog.runlog-skill-wiring"
+tests = ["feature.runlog"]
 name = "runlog skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]

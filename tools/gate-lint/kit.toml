@@ -61,6 +61,7 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 # file that just broke.
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution"
+tests = ["feature.gate-lint"]
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py"]
@@ -75,6 +76,8 @@ stage = ["step.test"]
 # because they ship to every adopter (TOOL-dRemeasuredRender-1).
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-location-probe-asked-from-a-moved"
+tests = ["feature.gate-lint"]
+enforces = ["practice.portable.paths"]
 name = "shell hygiene (a location probe asked from a moved directory)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
@@ -91,6 +94,7 @@ stage = ["step.test"]
 # this repository's own entrypoints and fixtures, so it is an `[[exempt_leg]]` in the deployer registry.
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-fork-spent-on-builtin-work"
+tests = ["feature.gate-lint"]
 name = "shell hygiene (a fork spent on builtin work)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--spawn-idioms"]
@@ -105,6 +109,8 @@ stage = ["step.test"]
 # row does: a suite's temps live in its own scratch dir.
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-fixed-name-temp-renamed-into-place"
+tests = ["feature.gate-lint"]
+enforces = ["practice.portable.temp-files"]
 name = "shell hygiene (a fixed-name temp renamed into place)"
 subject = "repo"
 argv = ["python3", "{kit}/sh_hygiene.py", "--temp-names"]
@@ -117,6 +123,7 @@ stage = ["step.test"]
 # guard names the kit dir the scanner lives in, so it runs when the thing it grades moves.
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-selftest"
+tests = ["feature.gate-lint"]
 name = "shell-hygiene selftest"
 subject = "kit"
 argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]

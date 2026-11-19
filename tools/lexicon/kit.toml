@@ -163,6 +163,7 @@ ok = true
 # must never be the only thing between a raised pin and a verdict.
 [[gate_leg]]
 tag = "leg.lexicon.lexicon-naming-predicates"
+tests = ["feature.lexicon"]
 name = "lexicon naming predicates"
 subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
@@ -172,6 +173,7 @@ stage = ["step.test"]
 
 [[gate_leg]]
 tag = "leg.lexicon.lexicon-wiring"
+tests = ["feature.lexicon"]
 name = "lexicon wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]

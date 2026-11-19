@@ -243,7 +243,8 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=20
+FLOOR_ASSERTIONS=21
+# Raised 20 -> 21 by TOOL-dWitnessedBar-22, which adds G11, the `tests`-to-claims compare.
 # Raised 19 -> 20 by TOOL-dWitnessedBar-12, which adds G10, the leg tags' shape and uniqueness arm.
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
 # Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
@@ -631,6 +632,51 @@ if not legs:
 if bad:
     print("gov-canary: " + "\ngov-canary: ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G11. A LEG'S `tests` AND THE DOSSIERS' CLAIMS AGREE, BOTH WAYS --------------------------------
+# TOOL-dWitnessedBar-22 S5: the feature a leg tests is declared once, on its row, as `tests`; each
+# dossier under the map's `features/` still claims its legs in `[claims] gate-legs` until dTotalRecall
+# derives that list from the edge. Until then the two spellings are compared in both directions: a leg
+# whose `tests` names `feature.<f>` is claimed by the dossier whose `feature` is <f>, and a leg a dossier
+# claims names that dossier's feature in `tests`. The dossiers are read through the map's own
+# `load_map_tree`, so the population is exactly the one the map gates parse, and never edited.
+#
+# WHAT THIS DOES NOT CHECK: a `tests` target outside `feature.*`, which no dossier claims; the claims of
+# `FOUNDATION.md`, which is no feature; or that a claim names the right feature.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, pathlib, sys
+root, legs_file = pathlib.Path(sys.argv[1]), sys.argv[2]
+sys.path.insert(0, str(root / sys.argv[3]))
+try:
+    import map_extractors as ext, map_lib as m
+    legs = json.load(open(legs_file, encoding="utf-8"))
+    tree = m.load_map_tree(ext.inventory_ids(), root=root,
+                           decision_id_re=getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+except Exception as e:
+    print("gov-canary: the tests compare cannot read the manifest or the dossiers: %s" % e); sys.exit(1)
+source = {d.feature: d.source for d in tree.dossiers}
+claims = {}
+for d in tree.dossiers:
+    for nm in d.claims.get("gate-legs", ()):
+        claims.setdefault(nm, set()).add(d.feature)
+# LIVENESS: a map whose dossiers claim no leg compares nothing, and would pass in silence.
+if not claims:
+    print("gov-canary: no dossier under the map claims a leg, so the tests compare graded nothing"); sys.exit(1)
+bad = []
+for l in legs:
+    nm = l.get("name", "?")
+    said = {t[len("feature."):] for t in l.get("tests") or () if isinstance(t, str) and t.startswith("feature.")}
+    for f in sorted(said - claims.get(nm, set())):
+        bad.append("leg %r carries tests feature.%s, " % (nm, f)
+                   + ("and %s does not claim it" % source[f] if f in source else "and no dossier declares that feature"))
+    for f in sorted(claims.get(nm, set()) - said):
+        bad.append("%s claims leg %r, whose tests does not name feature.%s" % (source[f], nm, f))
+if bad:
+    print("gov-canary: " + "\ngov-canary: ".join(bad)); sys.exit(1)
+' "$ROOT" "$LEGS_FILE" "${PFX}codebase-map"; then
   fail=1
 fi
 

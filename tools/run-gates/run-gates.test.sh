@@ -309,7 +309,8 @@ fail=0
 # 450 -> 456, TOOL-aMeasuredDrag-12: arm 1m's four, arm 1m2's one and arm 1m3's one, none gated.
 # Counted off the arms; this pass runs no suite.
 # 456 -> 457, TOOL-dWitnessedBar-12: arm 1a's `tag` control. Not gated. Counted by reading.
-FLOOR_ASSERTIONS=457
+# 457 -> 458, TOOL-dWitnessedBar-22: arm 1a's `tests` control. Not gated. Counted by reading.
+FLOOR_ASSERTIONS=458
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -349,7 +350,7 @@ n=0
 # THE MANIFEST'S ONE KEY SET (TOOL-dWitnessedBar-12 S4). Arm 1a and `keyset_probe` both take it as an
 # argument, so a key cannot be admitted by one and refused by the other, and owed_rows.py reads this
 # line. A row key a later unit adds is added here once, with its control pair in arm 1a.
-LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag"
+LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag tests"
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
 # Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
@@ -919,6 +920,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tags":"leg.gov.a"}]' > "$ctl/t
 if keyset_probe "$ctl/tg.json" && ! keyset_probe "$ctl/tgtypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`tag\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `tests` (TOOL-dWitnessedBar-22 S3), by the same two halves, in `LEG_KEYS`: the features a leg
+# tests, beside the `enforces` a row carries with it, and the near-miss is the singular a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tests":["feature.a"],"enforces":["principle.p1"]}]' > "$ctl/ts.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"test":["feature.a"],"enforces":["principle.p1"]}]' > "$ctl/tstypo.json"
+if keyset_probe "$ctl/ts.json" && ! keyset_probe "$ctl/tstypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`tests\` and \`enforces\` and FAIL a near-miss of \`tests\`; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

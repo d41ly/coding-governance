@@ -79,6 +79,7 @@ means = "adopted"
 
 [[gate_leg]]
 tag = "leg.process-monitor.process-monitor-wiring"
+tests = ["feature.process-monitor"]
 name = "process-monitor wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]

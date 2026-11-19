@@ -2762,6 +2762,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
         manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
         manifest_tag = {leg.get("name"): leg.get("tag") for leg in _legs_json}
+        manifest_edges = {k: {leg.get("name"): leg.get(k) for leg in _legs_json} for k in ("tests", "enforces")}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -2851,6 +2852,15 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                                f"{leg.get('tag')!r} while <prefix>/gate-legs.json says "
                                f"{manifest_tag.get(nm)!r} — the descriptor and the manifest "
                                f"disagree about the leg's tag")
+                    # AND ABOUT ITS EDGES (TOOL-dWitnessedBar-22 S6), presence included: `tests` and
+                    # `enforces` are declared on the leg's row in both spellings, and neither travels,
+                    # so a list on one side alone is a disagreement nothing else reads.
+                    for _ek, _em in manifest_edges.items():
+                        if leg.get(_ek) != _em.get(nm):
+                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with {_ek} "
+                                   f"{leg.get(_ek)!r} while <prefix>/gate-legs.json says "
+                                   f"{_em.get(nm)!r} — the descriptor and the manifest "
+                                   f"disagree about the leg's {_ek} edge")
                     # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
                     # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
                     # descriptor and a manifest that disagree key one leg two ways. A descriptor that

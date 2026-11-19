@@ -26,7 +26,8 @@ whose `pin` is `tag` (`amends`, `supersedes`), a pinned id only on one whose `pi
 
 THE SITES, one adapter each: a record's header (`**Serves:**` through `tree_lib.read_bindings`,
 `**Caused-by:**`, `**Made-by:**`), a record's section (`**Edges:**`), an instruction unit's row (`edges`,
-`scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), code (a `gov:note` line's `refs=` segment), a commit's trailers
+`scope`, `required-by`, `enforced-by`, read through the registry's `parse_unit_rows`), a leg row of the leg manifest
+(`gate-legs.json`: its `tests` and `enforces` lists, sourced at its `tag`, TOOL-dWitnessedBar-22), code (a `gov:note` line's `refs=` segment), a commit's trailers
 (the `[[trailer]]` table; a `serves` value is edges only when every target passes the grammar, and a
 prose or `none` value is counted unread, never an edge and never a refusal), a work order's `gov:handoff` marker (`unit=` and `build=`) and a spec's
 `**Carries:**` line (through `design_lib.parse_binding_lines`, its one parser).
@@ -39,8 +40,11 @@ view hashes to its pin (`derive_clause_hash`), the baseline's included.
 Every line opens `edges:`. Exit 0 green, 1 red or a malformed edge line, 2 an unreadable registry.
 What it does not check: an edge's source against its row's `from`, since no source namespace (record,
 commit, act) is registered; an `id#tag` target, `unarmed` until dTotalRecall arms the record namespace;
-an id whose class is not registered, `unarmed`; and a `serves` target no spec defines, which check 21
-reds, so `--check` counts it as unresolved and adds no second verdict.
+an id whose class is not registered, `unarmed`; a `serves` target no spec defines, which check 21
+reds, so `--check` counts it as unresolved and adds no second verdict; and two leg-row marks, each
+`unarmed` and counted on an `edges: leg rows` line: a `tests` target whose namespace no registry row
+holds, until its build registers it, and an `enforces` target of the rule-member form
+`practice.<practice>.<rule>`, which the tag index holds no row for and `core meta-check` grades.
 """
 from __future__ import annotations
 
@@ -84,6 +88,12 @@ PIN_OF = {"pinned-tag": "tag", "pinned-id": "clause"}
 HEADER_RE = re.compile(r"^\*\*(Caused-by|Made-by):\*\*[ \t]+(\S.*?)[ \t]*$")
 NOTE_RE = re.compile(r"^[ \t]*(?:#+|//|--|;|/?\*+|<!--)[ \t]*gov:note[ \t].*?[ \t]refs=(.*?)[ \t]*(?:-->|\*/)?[ \t]*$")
 UNIT_FIELDS = (("scope", "instructs", False), ("required-by", "instructs", True), ("enforced-by", "enforces", True))
+#: the leg manifest's file name, and the row keys its site reads as edges of the type each names
+LEG_MANIFEST = "gate-legs.json"
+LEG_EDGE_KEYS = ("tests", "enforces")
+#: each leg-row mark's `edges: leg rows` wording, keyed by the edge type it marks
+LEG_UNARMED = {"tests": "tests target(s) unarmed until their namespace is registered",
+               "enforces": "enforces target(s) unarmed, practice rules core meta-check grades"}
 
 
 class EdgeError(RuntimeError):
@@ -338,6 +348,47 @@ def read_unit_edges(text, path) -> list[dict]:
     return edges
 
 
+def read_leg_edges(text, path) -> list[dict]:
+    """The leg manifest's rows (TOOL-dWitnessedBar-22): per row, each of `tests` and `enforces` it carries
+    non-empty as one edge sourced at the row's `tag` (never its `name`), at the line of the first
+    `"tag": "<the tag>"` in `text`. A text that does not parse as JSON, a key that is not a list of
+    strings, a row carrying either key with no `tag` and a malformed target are each a line of one
+    EdgeRefusal. Reads no registry: `check_edges` marks the targets it leaves `unarmed`."""
+    import json
+    try:
+        rows = json.loads(text)
+    except ValueError as exc:
+        raise EdgeRefusal(f"edges: {path}: 1 leg row(s) refused:\n  {path}:{getattr(exc, 'lineno', 1)}: "
+                          f"does not parse as JSON: {getattr(exc, 'msg', exc)}") from None
+    if not isinstance(rows, list):
+        raise EdgeRefusal(f"edges: {path}: 1 leg row(s) refused:\n  {path}:1: holds a JSON {type(rows).__name__}, "
+                          "not the list of leg rows")
+    edges, bad = [], []
+    for i, row in enumerate(rows, 1):
+        keys = [k for k in LEG_EDGE_KEYS if isinstance(row, dict) and k in row]
+        if not keys:
+            continue
+        tag, at = row.get("tag"), f"leg row {i} ({row.get('name', '?')})"
+        m = re.search(rf'"tag"[ \t]*:[ \t]*{re.escape(json.dumps(tag))}', text) if isinstance(tag, str) and tag else None
+        if m is None:
+            bad.append(f"{path}:1: {at} carries {' and '.join(keys)} and no `tag` to source its edges at")
+            continue
+        n = text.count("\n", 0, m.start()) + 1
+        for k in keys:
+            vals = row[k]
+            if not isinstance(vals, list) or not all(isinstance(v, str) for v in vals):
+                bad.append(f"{path}:{n}: {at} {k} is {vals!r}, not a list of strings")
+            elif vals:
+                edges.append({"path": path, "line": n, "type": k, "targets": list(vals), "site": "leg", "source": tag})
+    try:
+        check_site_targets(edges, path)
+    except EdgeRefusal as exc:
+        bad += [ln.strip() for ln in str(exc).splitlines()[1:]]
+    if bad:
+        raise EdgeRefusal(f"edges: {path}: {len(bad)} leg row(s) refused:\n" + "\n".join(f"  {b}" for b in bad))
+    return edges
+
+
 def read_change_edges(text, path) -> list[dict]:
     """A change record's `Promoted-from` field as a `promoted-from` edge at `instructions.edit`, the site its
     row names as its one writer."""
@@ -415,7 +466,9 @@ def read_trailer_edges(root, base, keys) -> tuple[list[dict], int]:
 def check_edges(edges, types, namespaces, classes=None) -> list[str]:
     """The closed set's reds over parsed edges, one line each; `namespaces` the registry's rows, `classes`
     its native classes. An id target matching no class, where the row's `to` names a word no row
-    registers yet, is noted `unarmed` on its edge rather than red."""
+    registers yet, is noted `unarmed` on its edge rather than red; so, at the leg-row site, are a
+    `tests` target whose namespace no row registers and an `enforces` target of the rule-member form
+    `practice.<practice>.<rule>`, which `core meta-check` grades (TOOL-dWitnessedBar-22)."""
     classes = classes or {}
     registered = {r["ns"]: r["role"] for r in namespaces}
     inverses = {r["inverse"]: t for t, r in types.items()}
@@ -451,10 +504,26 @@ def check_edges(edges, types, namespaces, classes=None) -> list[str]:
                     ok = True
             else:
                 ok = ns in registered and ("any" in to or ns in to or ("selects" in to and registered[ns] == "selects"))
+                if e.get("site") == "leg" and form == "tag" and (
+                        kind == "tests" and ns not in registered
+                        or kind == "enforces" and ns == "practice" and t.count(".") == 2):
+                    if t not in e.setdefault("unarmed", []):
+                        e["unarmed"].append(t)
+                    ok = True
             if not ok:
                 reds.append(f"edges: {at} · {kind}={t} · is outside {kind}'s to [{', '.join(to)}]"
                             + ("" if ns is None or ns in registered else f"; namespace '{ns}' is not registered"))
     return reds
+
+
+def derive_leg_unarmed(edges) -> list[str]:
+    """One `edges: leg rows` line per leg-row mark `check_edges` left on `edges`, counted by the type it
+    marks, for each kind whose count is not zero."""
+    counts = dict.fromkeys(LEG_UNARMED, 0)
+    for e in edges:
+        if e.get("site") == "leg" and e["type"] in counts:
+            counts[e["type"]] += len(e.get("unarmed", ()))
+    return [f"edges: leg rows · {n} {LEG_UNARMED[k]}" for k, n in counts.items() if n]
 
 
 def read_text_history(root, path, extract, digest) -> dict:
@@ -576,8 +645,9 @@ def read_tree_edges(root, base) -> tuple[list, list]:
     """Every edge of the tree at `root`: `(edges, refusals)`, the refusals one line per malformed line.
     Markdown under MEMORY_ROOT is read for headers, sections, carries, markers and a change record's field;
     every unit manifest
-    `derive_manifest_kind` names for units; every non-Markdown file naming a note for its refs; and the trailers of `base..HEAD`."""
-    from instruction_units import CHANGE_RECORD_RE, derive_kit_prefix, derive_manifest_kind
+    `derive_manifest_kind` names for units; the leg manifest `derive_tool_rel` names for its rows; every
+    non-Markdown file naming a note for its refs; and the trailers of `base..HEAD`."""
+    from instruction_units import CHANGE_RECORD_RE, derive_kit_prefix, derive_manifest_kind, derive_tool_rel
     tree_lib, _ = ti.load_memory_tree()
     import design_lib
     conf = design_lib.read_design_conf(root)
@@ -588,12 +658,12 @@ def read_tree_edges(root, base) -> tuple[list, list]:
     grep = subprocess.run(["git", "-C", str(root), "grep", "-l", "-I", "-F", "gov:note", "--", ".", ":!*.md"],
                           capture_output=True, text=True, encoding="utf-8", errors="replace")
     notes = set(grep.stdout.splitlines()) if grep.returncode == 0 else set()
-    prefix = derive_kit_prefix()
+    prefix, legs = derive_kit_prefix(), derive_tool_rel(LEG_MANIFEST)
     edges, bad = [], []
     for rel in tracked:
         md = rel.endswith(".md") and rel.startswith(m + "/")
         unit = derive_manifest_kind(rel, prefix) is not None
-        if not (md or unit or rel in notes):
+        if not (md or unit or rel == legs or rel in notes):
             continue
         try:
             text = (root / rel).read_bytes().decode("utf-8").replace("\r\n", "\n")
@@ -612,6 +682,8 @@ def read_tree_edges(root, base) -> tuple[list, list]:
                     edges += read_change_edges(text, rel)
             elif unit:
                 edges += read_unit_edges(text, rel)
+            elif rel == legs:
+                edges += read_leg_edges(text, rel)
             else:
                 edges += read_note_refs(text, rel)
         except (EdgeRefusal, design_lib.DesignRefusal) as exc:
@@ -666,7 +738,9 @@ def run_check(root, base) -> int:
     print(f"edges: trailers · {base[:12] if base else 'none'}..HEAD · "
           + (", ".join(f"{k}: {v}" for k, v in sorted(trailers.items())) or "none read")
           + f" · {unread} serves value(s) unread, prose or none")
-    print(f"edges: targets · {counts['resolved']} resolved, {counts['unresolved']} serves unresolved "
+    for line in derive_leg_unarmed(edges):
+        print(line)
+    print(f"edges: targets ·{counts['resolved']} resolved, {counts['unresolved']} serves unresolved "
           f"(check 21's verdict), {counts['unarmed']} unarmed")
     print(f"edges: {'RED' if reds else 'green'} · {len(edges)} edge(s), {len(reds)} red")
     return 1 if reds else 0
@@ -712,8 +786,10 @@ def derive_inverse_edges(edges, types=None) -> list[tuple]:
 
 
 def read_site_edges(path, text) -> list[dict]:
-    """One file's edges by its kind: a code file's note refs, a Markdown file's header, sections and
-    carries lines."""
+    """One file's edges by its kind: a leg manifest's rows, a code file's note refs, a Markdown file's
+    header, sections and carries lines."""
+    if pathlib.PurePath(str(path)).name == LEG_MANIFEST:
+        return read_leg_edges(text, path)
     if not str(path).endswith(".md"):
         return read_note_refs(text, path)
     return read_header_edges(text, path) + read_section_edges(text, path) + read_carries_edges(text, path)
@@ -737,7 +813,7 @@ def run_parse(path, text, ns_path=None, rc=None) -> int:
     if rc and not reds:
         rc["verbose"] = True
         reds, _counts = run_resolve(edges, rc, lenient=())
-    for r in reds:
+    for r in reds + derive_leg_unarmed(edges):
         print(r)
     if not reds:
         for target, inverse, source in derive_inverse_edges(edges, types):
@@ -777,7 +853,15 @@ PLANTS = {
     "bad-section": ("# Fixture\n\n## [x] A section\n\n**Edges:** implements=doc.build-method#\n", None),
     "bad-block": ("# Fixture\n\n## [x] A section\n\n**Edges:** tests=kit.y implements=kit.z\n", None),
     "bad-note-refs": ("# gov:note layer.memory — x → y refs=a b\n", None),
+    # TOOL-dWitnessedBar-22 AC4: a leg row's `tests` target in a namespace the shipped registry does not hold
+    "leg-unregistered": ('[{"name": "x y", "tag": "leg.x.y", "argv": ["true"], "tests": ["feature.x"]}]\n', None),
 }
+#: the parse plants whose site is not `site.md`, each its file name
+PLANT_SITES = {"bad-note-refs": "site.py", "leg-unregistered": LEG_MANIFEST}
+#: TOOL-dWitnessedBar-22's leg manifest for a resolve plant: one row, `TESTS` and `ENFORCES` its lists,
+#: its `"tag"` on line 4; braces doubled for the `str.format` every resolve plant's text passes through
+LEG_PLANT = ('[\n  {{\n    "name": "x y",\n    "tag": "leg.x.y",\n    "argv": ["true"],\n'
+             '    "tests": TESTS,\n    "enforces": ENFORCES\n  }}\n]\n')
 #: §4's plants that resolve, each its site's name and text over the fixture repository; `{unit}` is the
 #: first revision's unit pin and `{clause}` the clause's baseline pin
 RESOLVE_PLANTS = {
@@ -789,6 +873,11 @@ RESOLVE_PLANTS = {
     "resolve-clause": ("site.md", "**Edges:** carries-clause=cl-dAlpha-0001\n"),
     "resolve-pinned-clause": ("spec.md", "# PLAY-dOrderedCharter-28 — x\n\n**Carries:** cl-dAlpha-0001@{clause} whole\n"),
     "clause-no-rev": ("spec.md", "# PLAY-dOrderedCharter-28 — x\n\n**Carries:** cl-dAlpha-0001@00000000 whole\n"),
+    # TOOL-dWitnessedBar-22 AC3 and AC7: a leg row's two edges resolved, and a rule-member `enforces` target marked
+    "leg-resolved": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", '["layer.memory"]')
+                     .replace("ENFORCES", '["practice.land"]')),
+    "leg-rule-member": (LEG_MANIFEST, LEG_PLANT.replace("TESTS", "[]")
+                        .replace("ENFORCES", '["practice.land", "practice.land.paths"]')),
 }
 #: PLAY-dOrderedCharter-49 S26: the commit plant's trailer values, each `(Pass: value, edges it yields)`; a prose
 #: value and `none` are counted unread, an id is one edge
@@ -804,7 +893,7 @@ def build_edges_fixture(top, plant) -> tuple[pathlib.Path, pathlib.Path]:
     from gov_tag import derive_fixture_row
     text, role = PLANTS[plant]
     top = pathlib.Path(top)
-    site, reg = top / ("site.py" if plant == "bad-note-refs" else "site.md"), top / "namespaces.toml"
+    site, reg = top / PLANT_SITES.get(plant, "site.md"), top / "namespaces.toml"
     site.write_text(text, encoding="utf-8", newline="")
     extra = derive_fixture_row("feature", "fixture_tags:extract_declared", role) if role else ""
     reg.write_text((KIT_DIR / "namespaces.toml").read_text(encoding="utf-8") + extra, encoding="utf-8", newline="")

@@ -966,11 +966,16 @@ turn a leg into a pass or a skip.
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
-Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`.
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
 
 Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.<name>` tag in the
 leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
-the canary's one key set is `LEG_KEYS` in `run-gates.test.sh`.
+the canary's one key set is `LEG_KEYS` in `run-gates.test.sh`. `tests` lists the features a leg
+tests (`feature.<f>`) and `enforces` the principles and practices it enforces; both are edges from
+the row's `tag`, read by the playbook kit's edge check (`edge_grammar.py --check`), declared on a claimed
+leg's descriptor row too, where govkit's selfcheck 7h holds the two equal, and neither travels into
+an adopter's manifest. The gov canary compares `tests` with the map dossiers' `gate-legs` claims in
+both directions (TOOL-dWitnessedBar-22).
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class
