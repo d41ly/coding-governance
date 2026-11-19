@@ -14938,11 +14938,6 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
-      "id": "ll_commit",
-      "kind": "function",
-      "file": "tools/lib/resolve-python.test.sh"
-    },
-    {
       "id": "lmland",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -37656,6 +37651,11 @@
       "id": "write_live_run",
       "kind": "function",
       "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "write_ll_commit",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "write_ln_dod_records",
