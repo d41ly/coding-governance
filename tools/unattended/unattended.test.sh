@@ -20461,9 +20461,10 @@ rm -rf "$LF"
 # ref and the feed naming its commit, and a second write is parented on the first; each refusal exits 2
 # writing nothing, the form, the slug, the message file, two remotes and an absent origin among them;
 # with the switch off it prints `card-ref — off`, exits 0, and a logging `git` stub first on PATH logs
-# no fetch and no push (AC5). RED for AC5, observed at the close, is a verb that reads the remote before
-# it tests the switch. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT
-# DRIVE: a lost compare-and-swap, which needs a second writer between the verb's read and its push.
+# no fetch and no push (AC5), and both once the switch is on. RED for AC5, observed at the close, is a
+# verb that reads the remote before it tests the switch. Waived by README rule 8 with the rest of this
+# suite. WHAT THIS BLOCK DOES NOT DRIVE: a lost compare-and-swap, which needs a second writer between
+# the verb's read and its push; a read killed by the bound; a commit git cannot build.
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 printf 'gov-card tFix\n\nstep: unrecorded\nsession: s1\n\ncard — tFix\n' > "$LF/m.txt"; : > "$LF/empty.txt"
@@ -20507,6 +20508,9 @@ cr_out=$( cd "$LF/c1" && PATH="$cr_sd:$PATH" GOV_RUNLOG=0 bash "$SCRIPT" --card-
 same "DPR33 AC5 with the switch off it prints card-ref — off and exits 0" "$cr_rc|$cr_out" "0|card-ref — off"
 same "DPR33 AC5 ...the stubbed git logged a call, so the stub was on PATH" "$([ -s "$LF/stub/git.log" ] && echo logged || echo empty)" "logged"
 same "DPR33 AC5 ...and no fetch and no push" "$(grep -cE '(^| )(fetch|push)( |$)' "$LF/stub/git.log")" "0"
+sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' "$LF/c1/.unattended.conf"; : > "$LF/stub/git.log"
+( cd "$LF/c1" && PATH="$cr_sd:$PATH" GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" >/dev/null 2>&1 )
+same "DPR33 AC5 liveness: the same stub under the switch on logs the fetch and the push" "$(grep -cE '(^| )(fetch|push)( |$)' "$LF/stub/git.log")" "2"
 rm -rf "$LF"
 
 # ==================================================================================================
@@ -22892,10 +22896,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `same`, its AC4 loop's five acts folded into one and its checklist pass's unnamed-act arm among
 # them, and 1 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-# RAISED 3915 -> 3936 by TOOL-dPlacedRequest-33: the card-ref block's 21 region-eight assertions (15
+# RAISED 3915 -> 3937 by TOOL-dPlacedRequest-33: the card-ref block's 22 region-eight assertions (16
 # `same`, its refusal loop's five among them, one per pass, and 6 `hit`), off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3936
+FLOOR_ASSERTIONS=3937
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23164,8 +23168,8 @@ FLOOR_SHARD_7=311
 # RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
 # RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
 # RAISED 1138 -> 1146 by TOOL-dPlacedRequest-40: the same 8 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
-# RAISED 1146 -> 1167 by TOOL-dPlacedRequest-33: the same 21 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1167
+# RAISED 1146 -> 1168 by TOOL-dPlacedRequest-33: the same 22 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1168
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

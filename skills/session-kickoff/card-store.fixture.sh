@@ -22,7 +22,7 @@ set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
 CHECK="$HERE/manifest-check.sh"
-PLANTS="render publish publish-off publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
+PLANTS="render publish publish-off publish-unwritten publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice"
@@ -159,6 +159,21 @@ case "$PLANT" in
     print_card_held "AC2 RUN_CLAIMS on: the bare remote holds $REF" "$([ -n "$c1" ]; echo $?)"
     print_card_held "AC2 gov-feed.log holds its line" "$(tr -d '\r' < "$R/.git/gov-feed.log" 2>/dev/null | awk -F'\t' -v r="$REF" -v c="$c1" '$2 == r && $5 == c { f = 1 } END { exit !f }'; echo $?)"
     print_card_held "AC2 the cache ref names the same commit" "$([ "$(git -C "$R" rev-parse --verify -q "refs/gov/remote/${REF#refs/gov/}")" = "$c1" ]; echo $?)" ;;
+  publish-unwritten)
+    # TOOL-dPlacedRequest-33 S2's other unwritten answers: no conf, no driver, and a driver refusal relayed.
+    mv "$R/.unattended.conf" "$S/conf.kept"
+    run_card_append
+    print_card_held "S2 no .unattended.conf: the remote-ref store is named unwritten" "$(grep -qx 'card — remote-ref not written: no .unattended.conf in this tree' "$OUT"; echo $?)"
+    mv "$S/conf.kept" "$R/.unattended.conf"
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file unattended unattended.sh); [ -n "$f" ] || { echo "card-store: no driver resolves in $R"; exit 2; }
+    mv "$f" "$S/driver.kept"
+    run_card_append
+    print_card_held "S2 no driver: the remote-ref store is named unwritten" "$(grep -qx 'card — remote-ref not written: no unattended driver resolves in this tree' "$OUT"; echo $?)"
+    mv "$S/driver.kept" "$f"
+    git -C "$R" remote add second "$O"
+    run_card_append
+    print_card_held "S2 the driver's refusal is relayed: two remotes, check 24" "$(grep -qx 'card — remote-ref not written: the clone does not declare exactly one remote, check 24' "$OUT"; echo $?)"
+    print_card_held "S2 none of the three wrote a ref, and the cache reads local" "$([ -z "$(git -C "$O" for-each-ref refs/gov/builds)" ] && grep -qx '# card-ref local' "$R/.git/orientation/tFix.md"; echo $?)" ;;
   publish-hung)
     # TOOL-dPlacedRequest-33 AC3: a driver that never answers `--card-ref`, its `--claims` answering off.
     # The clock is the append's excess over a control append whose stub driver answers at once, so the

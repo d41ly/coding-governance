@@ -79,6 +79,12 @@ default:
 | `local-clone` | `<git common dir>/orientation/<slug>.md` | a cache, its first line `# card-ref <commit>`, trusted only while that commit is the ref's |
 | `build-folder` | a `card` record in the build's `build/` folder | a snapshot, committed alone, as `card.snapshot` says |
 
+The `remote-ref` store is written by the unattended driver, `--card-ref write`, and only while your
+`.unattended.conf` sets `RUN_CLAIMS="on"`. With the switch off, or no `.unattended.conf`, the append
+prints `card — remote-ref not written:` and the reason, writes nothing to the remote, and still writes
+the other two stores; the cache's first line then reads `# card-ref local`. A driver that does not
+answer within the card's fetch bound is named the same way, and the append goes on.
+
 `card.snapshot` is `terminal-only` by default, so the build folder gets one record when the build
 ends. With `every-transition` it gets a record at every stage move and at the `READY` publish too.
 Snapshots need a clean index: if anything is staged, the snapshot is skipped and named.

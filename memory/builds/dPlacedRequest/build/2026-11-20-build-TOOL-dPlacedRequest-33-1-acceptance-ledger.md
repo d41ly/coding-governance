@@ -50,9 +50,26 @@ path, or by a probe calling the driver over a scratch bare origin and one clone 
 **Owed at the close.** The two `New arm:` lines of section 7. The fixture's `publish-off` and
 `publish-hung` plants, which `skills/session-kickoff/manifest-check.test.sh` now runs beside the
 existing five, RED-first against `TOOL-dPlacedRequest-2`'s inline publish. The region-eight block
-`TOOL-dPlacedRequest-33` in `tools/unattended/unattended.test.sh`, 21 assertions (DERIVED: 15 `same`, 6
+`TOOL-dPlacedRequest-33` in `tools/unattended/unattended.test.sh`, 22 assertions (DERIVED: 16 `same`, 6
 `hit`), RED-first for AC5 against a verb that reads the remote before it tests the switch; the suite is
-waived for this build's landing by README rule 8. The floors rose by the same 21 (DERIVED):
+waived for this build's landing by README rule 8. The floors rose by the same 22 (DERIVED):
 `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`. The kit gate's check 26 joins the new verb to the Skill's verb
 list, so `.claude/skills/unattended/SKILL.md`'s size row rose by the 55 bytes (DERIVED) of that line,
 under the run-raise terms of `tools/template-size-limits.txt`; its decision row is the main loop's.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit `be32c5006` selected 60
+classes (DERIVED: 54 by an anchor and 6 universal). Three needed a change.
+refusal-branch-with-no-arm: the engine's three new unwritten answers, no `.unattended.conf`, no
+driver, and a driver refusal relayed, had no arm, so the fixture gained the plant `publish-unwritten`
+(held: each answer named, no ref on the bare remote, the cache at `# card-ref local`), which the kickoff
+suite now runs too. fixture-passes-by-finding-nothing, liveness-negative-from-another-population: AC5's
+count of 0 (PINNED) `fetch` or `push` lines is now paired with the same stub under the switch on, which
+logs 2 (PINNED), so the suite block holds 22 assertions (DERIVED) where it held 21.
+shipped-checker-edit-is-an-adopter-contract-change, with the charter's docs rule: the engine ships to
+adopters and its `remote-ref` store now writes only behind `RUN_CLAIMS`, so `help/orientation-card.md`
+says so beside its store table. The rest named nothing in this diff: the engine's driver call and the
+verb's read write to files, never through a pipe or a command substitution of the bounded process;
+the CR counts of the committed blobs, read with `tr -cd '\r'` rather than `grep -c`, are 0 (PINNED);
+the Skill line was inserted after a key that occurs once in each copy. Not driven by any arm: a lost
+compare-and-swap, which needs two writers between one read and its push, as the fixture's header
+already says; the verb's read killed by its bound; a commit git cannot build.

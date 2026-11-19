@@ -2323,8 +2323,9 @@ run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR b
 # clone: the publish and its parented second write (AC2), the follow at a move and at a terminal one
 # (AC4), the lookup on a second clone whose stale cache is not trusted — the failing case — (AC6),
 # R7's refusal of a route to an ended build (AC9) and a terminal follow run twice leaving one record
-# (AC13); and TOOL-dPlacedRequest-33's two, the publish under RUN_CLAIMS off writing no ref and under
-# it on writing one the feed names (its AC1, AC2), and a driver that never answers bounded (its AC3).
+# (AC13); and TOOL-dPlacedRequest-33's three, the publish under RUN_CLAIMS off writing no ref and under
+# it on writing one the feed names (its AC1, AC2), no conf, no driver and a driver refusal each named
+# unwritten (its S2), and a driver that never answers bounded (its AC3).
 # A plant counts only when it exits 0 and printed a held line. The fixture is gov's and ships
 # to no adopter (the deployer registry exempts it), so a copy of this suite with no fixture beside
 # its checker says so and runs no fixture arm.
@@ -2343,7 +2344,7 @@ if [ -f "$cs_fx" ]; then
     || { echo "FAIL TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1)); }
 fi
 [ -f "$cs_fx" ] || echo "skip TOOL-dPlacedRequest-2 the card-store plants: no card-store.fixture.sh beside $CHECK, gov's fixture, which ships to no adopter"
-for cs_plant in publish publish-off publish-hung follow-rerender lookup terminal-route close-follow-twice; do
+for cs_plant in publish publish-off publish-unwritten publish-hung follow-rerender lookup terminal-route close-follow-twice; do
   [ -f "$cs_fx" ] || break
   TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" > "$TMP/cs.out" 2>&1; cs_rc=$?
   if [ "$cs_rc" = 0 ] && grep -q ' · held$' "$TMP/cs.out" && ! grep -q ' · MISSED$' "$TMP/cs.out"; then
