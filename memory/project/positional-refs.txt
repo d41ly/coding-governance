@@ -37761,10 +37761,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md	tools/
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md	tools/roles/check_roles.py:90-91
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md	tools/roles/kit.toml:36-40
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md	tools/roles/workflows.toml:71-78
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md	sh_hygiene.py:1659-1667
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md	tools/gate-lint/kit.toml:61-108
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md	tools/govkit/registry.toml:678-680
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md	tools/govkit/registry.toml:679
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	tools/run-gates/run-gates.sh:2387
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	tools/run-gates/run-gates.sh:2617-2623
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md	tools/run-gates/run-gates.sh:3481

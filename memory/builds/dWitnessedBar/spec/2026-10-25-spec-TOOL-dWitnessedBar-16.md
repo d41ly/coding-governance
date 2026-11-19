@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md) | journal | TOOL-dWitnessedBar-14 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
@@ -29,7 +30,7 @@
 ## 1. Goal
 
 gov tolerates its debt in registries of at least six grammars, and drift tracks six of them by a
-hand-typed list (gap-test-14, gap-test-15; six PINNED 2026-11-19 at `98e33d71c`, `SHRINK_ONLY`'s keys). This unit converts every registry the population rule
+hand-typed list (gap-test-14, gap-test-15; six PINNED 2026-11-19 at `05245bf0e`, `SHRINK_ONLY`'s keys). This unit converts every registry the population rule
 finds, in place and in its own home, onto the ledger factory's row grammar, registers each with the
 direction its own header declares (`shrink-only` debt, `append-only` history, `declared-set` or
 `ceiling`), re-points every reader onto the factory, and retires drift's hand-typed `SHRINK_ONLY`,
@@ -41,7 +42,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-final-reviews-instruments.md:1087-1090`) finds at the build run's base: `memory/project/*.txt` at
   depth two, every tracked `tools/**/*waivers*.txt`, `memory/map/baseline.toml` and
   `memory/map/affordance-exempt.toml`. 28 at `19d6aae6` (PINNED, 2026-10-25), one more than the clause
-  counts: deviation 161. 32 at `98e33d71c` (PINNED, 2026-11-19), four landed since:
+  counts: deviation 161. 32 at `05245bf0e` (PINNED, 2026-11-19), four landed since `19d6aae6`:
   `docs-undocumented.txt` (TOOL-dSafePassage-13), this unit's 29th, and three dOrderedCharter keyed
   lists §3 leaves to TOOL-dWitnessedBar-18 (§8 F7). Observed by AC1.
 - **S2** — Each converted in place: its header rendered from its registration and its rows in I4's
@@ -51,7 +52,8 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   ceiling. Observed by AC2.
 - **S3** — Each registered. One `[[ledger]]` table per population, in the descriptor of the kit whose
   check reads it, with the direction its header declares, its `leg` and a `seed` argv; the three read
-  by kit-less gov tools, and the `docs` leg's list, register in `tools/govkit/registry.toml` (§8 F3).
+  by kit-less gov tools, the `docs` leg's list (§8 F3) and the lists of two entry descriptors (§8 F9)
+  register in `tools/govkit/registry.toml`.
   `test.seed` (I5), TOOL-dWitnessedBar-15 S1's `python legacy_ledger.py seed --population <name>`, runs
   at each registration, finds the population present and arms it. Observed by AC1.
 - **S4** — Each reader re-pointed. Every reader §4's table names reads rows through the factory's
@@ -65,7 +67,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   `memory/map/affordance-exempt.txt`, in their own directory, because a TAB row is not TOML; every
   reader of the old names is re-pointed, check 3's admitted names included (§8 F2). Observed by AC5
   and AC11.
-  **Readers:** by name: a git grep for the two names over `tools/` at 98e33d71c finds
+  **Readers:** by name: a git grep for the two names over `tools/` at 05245bf0e finds
   `tools/codebase-map/map_lib.py` (`load_map_tree`, `load_affordance_exempt`,
   `render_affordance_exempt`, `render_baseline`, `derive_baseline_additions`),
   `tools/codebase-map/gen_map.py` (`_seed_baseline`, `_seed_affordance_baseline`),
@@ -74,7 +76,9 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   (its check 3 case), `tools/run-gates/owed_rows.py` (`derive_owed_rows` and its `FIXTURE`, the
   leg-removed population of PLAY-dOrderedCharter-50 S2), and comments in
   `tools/codebase-map/map_extractors.template.py`, `tools/drift-audit/drift_signals.template.py` and
-  `tools/unattended/check-unattended.sh`; the carriers outside `tools/` (`.gitattributes`, `AGENTS.md`
+  `tools/unattended/check-unattended.sh`, and prose in `tools/codebase-map/README.md` and
+  `tools/memory-tree/HYGIENE.template.md`; a `tools/check-spec-tokens.test.sh` fixture string is
+  outside the population; the carriers outside `tools/` (`.gitattributes`, `AGENTS.md`
   through `.governance/instructions.toml`, `WIRE-INTO-PROJECT.md`) and the codebase-map gate's copies
   are TOOL-dWitnessedBar-51 S5's · by value: `tools/codebase-map/map_lib.py#parse_baseline`, re-pointed
   to the factory's rows; the never-gains compare `tools/lib/coverage_join.py#derive_baseline_additions`
@@ -88,7 +92,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   `tools/memory-tree/adopt-memory-tree.sh` (its `readme-contract.txt` seed),
   `tools/policy/check_policy.py` (the fixture `derive_readme_slot_plant`) and
   `tools/govkit/check_runbook_parity.py` (the comment at `:45`), found by a git grep for the line's key
-  at 98e33d71c ·
+  at 05245bf0e; check 3's case keeps the name ·
   by value: `gen_build_index.py`'s equality of the pin with the measured exempt count, replaced by the
   base compare.
 - **S8** — Drift's hand-typed index retired. `SHRINK_ONLY` becomes the registrations whose direction
@@ -98,7 +102,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   is derived from an empty registration list; and the six `RATCHETS` rows naming `drift_signals.py`'s
   own keys retire, a raised `drift-pins` row being the `ratchet` pack's widen case. `derive_low_waters`
   keeps every list's low water. Observed by AC7 and AC8.
-  **Readers:** by name: a git grep for the four names at 98e33d71c finds `tools/drift-audit/drift_report.py`
+  **Readers:** by name: a git grep for the four names at 05245bf0e finds `tools/drift-audit/drift_report.py`
   (its module docstring, `load_project_layer`, `build_baseline_findings`, `build_live_backlog_rows`,
   `build_cutoff_keys_armed`, `Ctx`, `main`), `tools/drift-audit/drift_signals.py` (`SHRINK_ONLY`,
   `DECLARED_EMPTY`, `PINS`, `BASELINES`, `RATCHETS`), `tools/drift-audit/drift_signals.template.py`
@@ -137,7 +141,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
 
 ### Edges
 
-- **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`: the row grammar, `read_rows`, `write_rows`, `compare_counts`, `compare_to_base` and `check_ledger`, without which no registry has a grammar to convert onto
+- **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`: the row grammar, `read_rows`, `write_rows`, `compare_counts`, `compare_to_base` and merge-rows' `check_ledger`, without which no registry has a grammar to convert onto
 - **consumes-from** `TOOL-dWitnessedBar-15` — `test.seed`, run at each registration, which finds the converted population present and arms it
 - **consumes-from** `TOOL-dWitnessedBar-14` — `retrofit.widen` and its widen route, the only way a converted population grows, and its ceiling arm, which takes over the retired `RATCHETS` rows' raise-needs-a-reason rule
 - **hands-off** `TOOL-dWitnessedBar-17` — `RATCHETS` with its `drift_signals.py` rows retired and drift reading pins from the `drift-pins` population, on which the conf pins' rows move
@@ -151,7 +155,7 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
 
 Directions read from each file's header (registry_directions.py's table, final-reviews-instruments.md
 :1063-1079, plus `temp-name-sites.txt:1-12` and `docs-undocumented.txt`'s `SHRINK-ONLY` header).
-Measured at `19d6aae6` (PINNED, 2026-10-25), re-read at `98e33d71c` (PINNED, 2026-11-19), where no
+Measured at `19d6aae6` (PINNED, 2026-10-25), re-read at `05245bf0e` (PINNED, 2026-11-19), where no
 header of the 28 changed its direction; the pass re-derives the set at its base and re-reads each
 header, and a disagreement is a fork for the pass.
 
@@ -177,11 +181,11 @@ header, and a disagreement is a fork for the pass.
 | `memory/project/stale-header-waiver.txt` | shrink-only | site · path | 1 | `gen_build_index.py` | memory-tree |
 | `memory/project/substitution-fed-loops.txt` | shrink-only | site · path, delimiter | its count | `sh_hygiene.py`, `tools/govkit/refusal_join.py` | gate-lint |
 | `memory/project/temp-name-sites.txt` | shrink-only | site · path, class | its count | `sh_hygiene.py` | gate-lint |
-| `memory/project/testsuite-count-waivers.txt` | shrink-only | site · path | 1 | `tools/check-testsuite-counts.sh` | its entry descriptor |
+| `memory/project/testsuite-count-waivers.txt` | shrink-only | site · path | 1 | `tools/check-testsuite-counts.sh` | registry |
 | `memory/project/trace-waiver.txt` | shrink-only | site · spec path, subject | 1 | `drift_report.py`, `check-memory-hygiene.sh` | memory-tree |
 | `memory/project/transition-audit.txt` | append-only | record · sha | 1 | `tools/memory-tree/transition_audit.py#read_registry` | memory-tree |
 | `memory/project/unarmed-branches.txt` | shrink-only | site · gate, check, signature | branches of that signature | `check-arms.py` | memory-tree |
-| `tools/agent-cap-restatement-waivers.txt` | shrink-only | key · matched text | 1 | `tools/check-agent-cap-restatement.sh` | its entry descriptor |
+| `tools/agent-cap-restatement-waivers.txt` | shrink-only | key · matched text | 1 | `tools/check-agent-cap-restatement.sh` | registry |
 | `tools/dead-path-waivers.txt` | declared-set | site · path, line text | lines of that text | `tools/check-dead-paths.sh` | registry |
 | `tools/lexicon/lexicon-suffix-waivers.txt` | declared-set | key · name | 1 | `tools/lexicon/lexicon.py#load_waivers` | lexicon |
 | `tools/lexicon/lexicon-verb-waivers.txt` | declared-set | key · name | 1 | `lexicon.py` `load_waivers` | lexicon |
@@ -234,8 +238,8 @@ pass.
 
 gov's tree converts in this unit's commit. An adopter converts at its next `govkit update` through the
 `[[upgrade]]` rows of each kit it holds (memory-tree, codebase-map, gate-lint, unattended, lexicon and
-drift-audit); a registry its kits never seeded has no row and nothing to convert. The four
-registry-registered populations are gov's own and owe no step. The step's `down` is the reversal.
+drift-audit) and the two entries of §8 F9; a registry its kits never seeded has no row and nothing to
+convert. F3's four registry-registered populations are gov's own and owe no step. The step's `down` is the reversal.
 
 ### Rollout
 
@@ -282,6 +286,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/codebase-map/adopt-codebase-map.sh`
 - `tools/codebase-map/kit.toml`
 - `tools/codebase-map/selftest.py`
+- `tools/codebase-map/README.md`
+- `tools/memory-tree/HYGIENE.template.md` (rendered to `memory/HYGIENE.md`)
 - `tools/lib/coverage_join.py`, with its copies `tools/memory-tree/coverage_join.py` and `tools/gate-lint/coverage_join.py` (§8 F8)
 - `tools/memory-tree/check-memory-hygiene.sh`
 - `tools/memory-tree/corpus_ids.py`
@@ -356,7 +362,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   main loop at the close.
 - migration — §4 and S10.
 - user docs — `tools/drift-audit/README.md` replaces its `SHRINK_ONLY`, `PINS` and `BASELINES` rows;
-  `tools/memory-tree/README.md` names the ledger grammar; `help/docs-leg.md`, the one page under
+  `help/docs-leg.md`, the one page under
   `help/` that spells a row of this unit's populations at `98e33d71c` (`docs-undocumented.txt`'s `<id>` TAB reason), takes the ledger row.
 
 ## 6. Acceptance criteria
@@ -366,7 +372,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   unit 18 is the `home` of exactly one registration, `python legacy_ledger.py read <population>` reads each, and each population's
   direction equals its §4 row.
   Red when: a registry the rule finds has no registration, so it is graded by no engine.
-  figure: the set is DERIVED at observation; 28 is PINNED at `19d6aae6`, 32 PINNED at `98e33d71c`.
+  figure: the set is DERIVED at observation; 28 is PINNED at `19d6aae6`, 32 PINNED at `05245bf0e`.
 - **AC2** — When the conversion record's before and after tables are compared with
   `python legacy_ledger.py read <population>` for each population, every legacy row's key appears once,
   with its count, and every former reason appears beside its key in the record.
@@ -442,7 +448,7 @@ New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PIN
   `[[exempt_leg]]` rows that declare those tools' legs, which unit 13's
   `read_registrations` must also read; (b) the memory-tree descriptor, which does not own those checks;
   (c) new entry descriptors, which add three kits. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3,
-  the registration beside the leg it gates; unit 13 rev-4 S2 reads `registry.toml`. On 2026-11-19 the
+  the registration beside the leg it gates; `tools/lib/legacy_ledger.py#read_registrations` reads it. On 2026-11-19 the
   `docs` leg's `docs-undocumented.txt` joins them by the same rule: `docs` is an `[[exempt_leg]]` row
   and no descriptor ships the list. widens: none · relaxes: none
 - **F4 — What holds `readme-contract.txt`'s exemptions to shrinking once `exempt-pin:` retires?**
@@ -481,6 +487,12 @@ New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PIN
   project-owned `test_codebase_map.py` inside its window. RESOLVED (agent, 2026-11-19, delegated): (a),
   the one survivor of vetoes 1 and 3; parity holds, every copy of the block moving together.
   widens: none · relaxes: none
+- **F9 — Where do the two entry descriptors' lists register?** The landed `read_registrations`
+  reads no `tools/govkit/entries/*.kit.toml`. Options: (a) the govkit registry, F3's rule, each entry
+  keeping S10's row (`tools/govkit/upgrade_steps.py#read_steps` reads entries); (b) widen the reader,
+  unit 13's (§3, veto 1); (c) each entry a `kit.toml`, a new install layout (veto 2); (d) a `kit.toml`
+  whose checks read neither list. RESOLVED (agent, 2026-11-19, delegated): (a), over (d) by reuse of
+  F3's seam. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -509,12 +521,16 @@ New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PIN
   stay unit 18's, F7); moved citations re-cited by symbol; S6 to S8's readers re-derived; S10 on the
   landed `[[upgrade]]` grammar; the baseline compare per F8; `help/docs-leg.md` owed; the leg line
   re-joined. No Goal or Scope intent moved.
+- rev-7 · 2026-11-19 · §1 S1 S3 S6 S7 S8 §3 §4 §5 AC1 §8 F3 F9 §10 · re-grounded at `05245bf0e` by brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief: the entry lists register in the govkit
+  registry (F9); S6 gains two prose carriers; unit 13's landed README and adapters re-cited.
 
 ## 10. Reuse audit
 
 The seam extended is the ledger factory (`tools/lib/legacy_ledger.py`, unit 13), whose `read_rows`
-and `compare_counts` replace the two count-ratchet copies `tools/gate-lint/sh_hygiene.py#read_registry` and
-`tools/gate-lint/encoding_posture.py#read_registry` and every other registry parser §4 names; drift's
+and `compare_counts` the adapters `tools/gate-lint/sh_hygiene.py#read_registry` and
+`tools/gate-lint/encoding_posture.py#read_registry` already call (unit 13 S9), and which replace every
+other registry parser §4 names; drift's
 `signal_shrink_only` and `tools/drift-audit/drift_report.py#derive_low_waters` are kept and
 re-fed from the registrations. S10's step programs follow `tools/govkit/steps/review_rounds.py`'s
 shape over `upgrade_steps.py`'s before-image helpers, minting no second step runner. `python tools/codebase-map/reuse_lookup.py "convert waiver and exemption registry files to one keyed row grammar and re-point their readers"`

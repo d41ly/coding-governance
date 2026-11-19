@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-24 — the portability leg pack: every P37 rule on a leg, each arm seen red on a planted case
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 14 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 14 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0362@46f28632 whole
 
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief.md) | journal | TOOL-dWitnessedBar-20 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -23,31 +24,37 @@
 ## 1. Goal
 
 P37's portable practice (PLAY-dOrderedCharter-30) pairs each of its eight rules with a leg, and three
-of the eight are pending on this build: line endings, quoting and language roles. Encoding has a
-Python-only leg that no adopter receives, line endings are pinned per directory while 80 of 150
-tracked `.py` files check out CRLF (PINNED, `git ls-files --eol -- '*.py'` at `cdfbd1cf`), the floor
-is tested by no real interpreter, and the PowerShell scan is on no leg (gap-tool-13, gap-tool-15,
-gap-tool-21, gap-test-09). This unit lands the `portability` pack: one leg per rule, each arm seen red
-on a planted case, its debt held on ledger populations.
+of the eight are pending on this build: line endings, quoting and language roles
+(`tools/playbook/core-pending.txt`). Encoding has a Python-only leg that no adopter receives, line
+endings are pinned per directory while 153 of 245 tracked `.py` files check out CRLF on this node
+(PINNED 2026-11-19, `git ls-files --eol -- '*.py'` at `05245bf0e`), the floor is tested by no
+interpreter at the floor over the tree, and the PowerShell scan is on no leg (gap-tool-13,
+gap-tool-15, gap-tool-21, gap-test-09). This unit lands the `portability` pack: one leg per rule, each
+arm seen red on a planted case, its debt held on ledger populations.
 
 ## 2. Scope (IN)
 
-- **S1** — The pack. Every leg of §4 "The arms" carries `pack` `portability` (I1, I2), a `tag`
-  `leg.<owner-seg>.<name-seg>` (unit 12) and an `enforces` naming its rule tag
-  `practice.portable.<rule>` (unit 22, PLAY-dOrderedCharter-30 S3), declared through the leg factory
+- **S1** — The pack. Every leg of §4 "The arms" carries `pack` `portability` (I1, I2), a `tag` by
+  TOOL-dWitnessedBar-12's rule (§8 F10), and an `enforces` naming its rule tag
+  `practice.portable.<rule>` (PLAY-dOrderedCharter-30 S3), the key PLAY-dOrderedCharter-7 S2 landed and
+  TOOL-dWitnessedBar-22 reads as an edge. Each is declared through the leg factory
   `tools/run-gates/leg_factory.py` (I3, unit 11) and rendered into `tools/gate-legs.json`. Observed by
   AC12.
 - **S2** — The line-ending class leg. `tools/gate-lint/eol_class.py` grades every tracked
   execution-sensitive file, the class of §4 "Line endings", and `.gitattributes` gains one class line
   per member pattern. Observed by AC1 and AC2.
 - **S3** — The Python encoding arm moved in. `encoding_posture.py`'s leg leaves the deployer registry's
-  `[[exempt_leg]]` table (`tools/govkit/registry.toml:678-680`) and becomes a `[[gate_leg]]` of
-  `tools/gate-lint/kit.toml` in the pack, its adopter argv naming no registry, as the four `shell
-  hygiene` rows do, and gov's argv with `memory/project/encoding-posture-sites.txt` under its
-  `[gate_leg.gov]` sub-table (TOOL-dWitnessedBar-11 S1). Observed by AC3.
-  **Readers:** by name: `tools/govkit/registry.toml`, the row, read after unit 11 by the leg factory
-  that renders every declaration · by value: NO VALUE READERS — the row's `why` text is read by no
-  code, and the factory keys a declaration by its `name`, which survives on the new row.
+  `[[exempt_leg]]` table (its row at `tools/govkit/registry.toml@aec2b8e3d547:787`) and becomes a
+  `[[gate_leg]]` of `tools/gate-lint/kit.toml` in the pack. Its adopter argv names no registry, as the
+  four `shell hygiene` rows do, and gov's argv with `memory/project/encoding-posture-sites.txt` sits
+  under its `[gate_leg.gov]` sub-table (TOOL-dWitnessedBar-11 S1). Observed by AC3.
+  **Readers:** by name: `tools/govkit/govkit.py`, whose selfcheck 7h reads every `[[exempt_leg]]`
+  row of `tools/govkit/registry.toml`, and after unit 11 the leg factory, which renders every
+  declaration · by value: NO VALUE READERS — the row's `why` text is read by no code, and every
+  reader keyed on the leg, `tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`,
+  `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/pass-leg-evidence.txt`, keys it by its
+  `name`, which survives on the new row; measured on 2026-11-19 by `git grep -l "encoding posture (text
+  IO" -- ':!memory/'`.
 - **S4** — The stdout arm. `encoding_posture.py --stdout` reds a tracked Python entry point that prints
   without first making its stdout UTF-8. Observed by AC4.
 - **S5** — The JavaScript arm. `encoding_posture.py --js` reds a tracked JavaScript text read, write or
@@ -58,35 +65,39 @@ on a planted case, its debt held on ledger populations.
   Observed by AC7.
 - **S8** — The quoting arm. `sh_hygiene.py --quoting` reds a heredoc that writes a source file and a
   tab-IFS read. Observed by AC8.
-- **S9** — The bare-shell-name arm. A pack leg runs unit 26's repo-wide query `scan_bare_bash(root)`
-  over tracked Python and JavaScript, through a flag `--bare-bash <root>` this unit adds to
-  `tools/run-gates/measure_legs.py`, which prints each site and exits 1 on any. Observed by AC9.
-- **S10** — The interpreter-floor arm. `tools/gate-lint/floor_census.py` runs a real interpreter at the
-  floor TOOL-dSafePassage-11 declares, compiling every tracked Python file under it, and runs the
-  feature census. Observed by AC10.
+- **S9** — The bare-shell-name arm. A pack leg runs unit 26's repo-wide query
+  `tools/run-gates/measure_legs.py#scan_bare_bash` over tracked Python and JavaScript, through a flag
+  `--bare-bash <root>` this unit adds to `tools/run-gates/measure_legs.py`, which prints each site and
+  exits 1 on any. Observed by AC9.
+- **S10** — The interpreter-floor arm. A `census` verb of `tools/lib/python_floor.py`, the floor's
+  module, runs a real interpreter at the floor TOOL-dSafePassage-11 declares, found by that module's
+  `resolve_floor_interpreter`, compiles every tracked Python file under it through the module's
+  `CHILD`, and runs the feature census (§8 F8). Observed by AC10.
 - **S11** — The shell-role ledger. `sh_hygiene.py --shell-role` holds each tracked shell file's code
   lines on a `shrink-only` population, so shell outside a shim only shrinks. Observed by AC11.
 - **S12** — The PowerShell leg. `ps-hygiene.py`'s self-test becomes a pack leg (gap-test-09's
   PowerShell half). Observed by AC12.
 - **S13** — The populations. Each new debt population of §4 "The arms" is one `[[ledger]]` table in
-  `tools/gate-lint/kit.toml`, the registration the ledger factory `tools/lib/legacy_ledger.py` reads
-  (I4, TOOL-dWitnessedBar-13 S2), naming its `leg`, its `seed` the scanner's mode with `--measure`,
-  which prints each key's fields then its count, TAB-separated, and its home under `memory/project/`;
-  each home is added to `PROJECT_REGISTRY_EXTRA` (`.memory-tree.conf:917`), and `test.seed` (I5) seeds
-  it at registration. Observed by AC13.
+  `tools/gate-lint/kit.toml`, the registration the ledger factory reads through
+  `tools/lib/legacy_ledger.py#read_registrations` (I4, TOOL-dWitnessedBar-13 S2), naming its `leg`, its
+  `seed` the scanner's mode with `--measure`, which prints each key's fields then its count,
+  TAB-separated, and its home under `memory/project/`. Each home is added to `PROJECT_REGISTRY_EXTRA`
+  (`.memory-tree.conf@17effb7cf8fa:956`), and `test.seed` (I5) seeds it at registration. Observed by
+  AC13.
 - **S14** — The pending rows. The three `practice.portable.*` rows PLAY-dOrderedCharter-30 S3 left in
   `tools/playbook/core-pending.txt` (line-endings, quoting, language-roles) leave it, each now enforced
   by a pack leg. Observed by AC12.
-  **Readers:** by name: READER NOT IN TREE — `tools/playbook/core.py meta-check` and
-  `core-pending.txt` land with dOrderedCharter's build run, before this unit · by value:
-  `core.py meta-check`, which reds a pending row whose tag a leg's `enforces` names.
+  **Readers:** by name: `tools/playbook/core.py`, whose `read_pending` reads the list for its
+  `meta-check` verb · by value: `tools/playbook/core.py`'s `meta-check`, which reds a pending row
+  whose item is enforced now, so the rows leave in the commit that lands their legs.
 - **S15** — The kit README. `tools/gate-lint/README.md` names every leg the kit declares, the pack, and
   the PowerShell scan leg an adopter tracking `.ps1` adds. NOT OBSERVED — prose, read by the closing
   review.
 
 ## 3. Non-goals (OUT)
 
-- The floor's declaration, the resolver's refusal below it and the preflight: TOOL-dSafePassage-11's.
+- The floor's declaration, the resolver's refusal below it, the preflight and the step's down:
+  TOOL-dSafePassage-11's, landed in `tools/lib/python_floor.py` and `tools/lib/python-floor.sh`.
 - A TOML 1.0 arm: the owner's AP-31 answer drops it (`away-pass.md:479`), though TOOL-dSafePassage-11
   §3 names it this build's (§8 F6).
 - The resolver itself and the replacement of bare-bash launch sites: unit 26's. This unit adds the leg
@@ -95,19 +106,20 @@ on a planted case, its debt held on ledger populations.
   (`research-compatibility.md:148`). The class lines sit beside them.
 - Draining the carried sites: each population shrinks by the units that touch them.
 - A PowerShell scan leg in gov: gov tracks no `.ps1`, and the scan refuses an empty population (§8 F4).
-- gap-test-09's two other halves, the stale held-leg figure in `tools/run-gates/README.md:98` and the
-  eight unguarded held legs: TOOL-dWitnessedBar-5 S8, the held-legs unit (§8 F7).
+- gap-test-09's two other halves, the stale held-leg figure in
+  `tools/run-gates/README.md@b17bcb8b8f6a:100` and the eight unguarded held legs:
+  TOOL-dWitnessedBar-5 S8, the held-legs unit (§8 F7).
 - The platform runner adapters `research-compatibility.md:143` lists: unit 9's product-test contract.
 
 ### Edges
 
-- **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`, the factory each new population registers through and its count ratchet `encoding_posture.py` and `sh_hygiene.py` already call after unit 13
-- **consumes-from** `TOOL-dWitnessedBar-12` — `tag`, the row key and the `leg` and `pack` tag forms every pack leg carries, its `pack.portability` member the one this pack's `pack` value yields
-- **consumes-from** `TOOL-dWitnessedBar-22` — `enforces`, the row key each pack leg names its rule tag in
+- **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`, the factory each new population registers through and its count ratchet `encoding_posture.py` and `sh_hygiene.py` already call through gate-lint's inline copy (`compare_counts`, `read_rows`)
+- **consumes-from** `TOOL-dWitnessedBar-12` — `tag`, the row key and the `leg` and `pack` tag forms every pack leg carries, its `pack.portability` member the one this pack's `pack` value yields, and the tag rule each new leg takes
+- **consumes-from** `TOOL-dWitnessedBar-22` — `enforces` read as an edge, and selfcheck 7h's join of each leg's descriptor and manifest `enforces` lists, which every pack leg's two rows satisfy
 - **consumes-from** `TOOL-dWitnessedBar-11` — `leg_factory.py`, which renders each pack leg from its declaration into the manifest
 - **consumes-from** `TOOL-dWitnessedBar-15` — `test.seed`, which seeds each new population at registration and records a failed seed unarmed
 - **consumes-from** `TOOL-dWitnessedBar-26` — `scan_bare_bash`, the repo-wide query behind `test_no_bare_bash_argv` that the bare-shell-name leg runs
-- **consumes-from** external — TOOL-dSafePassage-11's floor declaration `tools/lib/python-floor.txt`; PLAY-dOrderedCharter-30's rule tags and pending rows; PLAY-dOrderedCharter-7's `core.py meta-check`
+- **consumes-from** external — TOOL-dSafePassage-11's floor module `tools/lib/python_floor.py` with `read_floor`, `resolve_floor_interpreter` and `CHILD`, and its declaration `tools/lib/python-floor.txt`; PLAY-dOrderedCharter-30's rule tags and pending rows; PLAY-dOrderedCharter-7's `core.py meta-check`
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 1, 7, 8, 11, 16, 25 and 40: the shell-role widen rows later units owe, written by that unit's pass from a derived set; the self-test legs' `enforces`; the five homes in check 3's named list; the flagged `New arm:` lines; the legs' tags; and the line-ending claim, each a scope item of that unit
 - **hands-off** `TOOL-dWitnessedBar-57` — the `portability` legs and the five homes, observed by the resolver and ledger minors batch on unit 51's AC35 and S13 (ids 22, 38)
 
@@ -127,18 +139,25 @@ on a planted case, its debt held on ledger populations.
 | `practice.portable.quoting` | `shell hygiene (a quoting hazard)` | `sh_hygiene.py --quoting` | `quoting-sites.txt` |
 | `practice.portable.launch` | `shell hygiene (a loop fed by a command substitution)` and `shell hygiene (a fork spent on builtin work)`, joined | unchanged | unit 16's |
 | `practice.portable.launch` | `portability (a bare shell name launched)` | `measure_legs.py --bare-bash .` | none: unit 26 replaces every site |
-| `practice.portable.interpreter-floor` | `portability (the interpreter floor, run for real)` | `floor_census.py <floor file> .` | none |
+| `practice.portable.interpreter-floor` | `portability (the interpreter floor, run for real)` | `python_floor.py census` | none |
 | `practice.portable.language-roles` | `portability (shell lines only shrink)` | `sh_hygiene.py --shell-role` | `shell-role.txt` |
-| none | `powershell hygiene selftest` and `shell-hygiene selftest`, joined | `ps-hygiene.py --selftest` | none |
+| none | `powershell hygiene selftest`, new, and `shell-hygiene selftest`, joined | `ps-hygiene.py --selftest` | none |
 
-Each new leg's tag is `leg.gate-lint.<seg>`, `<seg>` the mode word (`eol-class`, `encoding-stdout`,
-`encoding-js`, `path-literals`, `quoting`, `floor`, `shell-role`, `ps-selftest`), and
-`leg.run-gates.bare-shell` for the leg over unit 26's query. Each adopter leg is a `[[gate_leg]]` of
-`tools/gate-lint/kit.toml` whose argv passes no registry and grades against an empty declaration, the
-posture the `shell hygiene` rows set (`tools/gate-lint/kit.toml:61-108`); gov's own argv, passing its
+Three joined legs already carry their rule tag in `enforces` in `tools/gate-legs.json` on 2026-11-19:
+the encoding leg `practice.portable.encoding`, the location-probe leg `practice.portable.paths` and the
+temp-name leg `practice.portable.temp-files`. The `python resolver (behaviour + inline parity + idiom
+ban)` leg carries `practice.portable.launch` and `practice.portable.interpreter-floor` and stays out
+of the pack: it tests the resolver, and the pack's legs grade the tree.
+
+Each new leg's tag follows TOOL-dWitnessedBar-12 §4 "The tag rule": `leg.gate-lint.<folded name>` for a
+row of `tools/gate-lint/kit.toml`, and `leg.gov.<folded name>` for the floor and bare-shell legs, cut
+at `TAG_MAX_BYTES` (§8 F10). Each adopter leg is a `[[gate_leg]]` of `tools/gate-lint/kit.toml` whose
+argv passes no registry and grades against an empty declaration, the posture the four `shell hygiene`
+rows set (the first at `tools/gate-lint/kit.toml@61946391f2f6:62`). Gov's own argv, passing its
 population's home, sits under the row's `[gate_leg.gov]` sub-table (TOOL-dWitnessedBar-11 S1). The
 floor and bare-shell legs are `[[exempt_leg]]` rows of `tools/govkit/registry.toml`, which carry the
-whole leg row after unit 11, because the floor file and unit 26's query live in gov-internal paths.
+whole leg row after unit 11: the floor module lives in gov's `tools/lib/`, which ships nothing, and
+the bare-shell query grades launches against the resolver blocks gov's kits carry (§8 F9).
 
 | Population | `key` | `fields` | `drain` | `seed` |
 |---|---|---|---|---|
@@ -155,25 +174,30 @@ Every one is `direction = "shrink-only"`.
 The class is a tracked file whose extension is `sh`, `py`, `js`, `json` or `toml`, or an extensionless
 tracked file whose first line is a `#!` line (the hooks under `.githooks/`), the class
 `research-compatibility.md:120` names. For each, `eol_class.py` reads `git check-attr eol` and the
-index column of `git ls-files --eol`: red when the attribute does not resolve `lf` or the index holds
-`crlf`. Reading attributes and the index, never the worktree, is what makes the leg the class: a
-checkout under `core.autocrlf=true` writes CRLF into the worktree of every file the attribute does not
-pin. `.gitattributes` gains `*.py text eol=lf`, `*.js text eol=lf`, `*.json text eol=lf` and
-`*.toml text eol=lf` beside its existing `*.sh text eol=lf` (`.gitattributes:5`); the committed blobs
-are already LF under `* text=auto` (`.gitattributes:2`), so no blob changes and each worktree
-re-checks out LF on its next checkout. An extensionless member is pinned by its own path line.
+index column of `git ls-files --eol`, both with `-z`: red when the attribute does not resolve `lf` or
+the index holds `crlf`. Reading attributes and the index, never the worktree, is what makes the leg
+the class: a checkout under `core.autocrlf=true` writes CRLF into the worktree of every file the
+attribute does not pin. `.gitattributes` gains `*.py text eol=lf`, `*.js text eol=lf`,
+`*.json text eol=lf` and `*.toml text eol=lf` beside its existing `*.sh text eol=lf`
+(`.gitattributes@1e72794df280:5`). The committed blobs are already LF under `* text=auto`
+(`.gitattributes@1e72794df280:2`): all 245 tracked `.py` read `i/lf` (PINNED 2026-11-19, the same
+command), so no blob changes and each worktree re-checks out LF on its next checkout. An extensionless
+member is pinned by its own path line.
 
 ### Encoding
 
 `--stdout`: a tracked `*.py` with an `if __name__ == "__main__":` block that calls `print` or writes
 `sys.stdout`, and holds neither a `sys.stdout.reconfigure(encoding=...)` call nor a write to
-`sys.stdout.buffer`, is one site, keyed `<path>` `stdout`. Measured at `cdfbd1cf`: 70 entry points
-under `tools/`, `skills/` and `.githooks/`, 27 of them reconfigured (PINNED; the seed re-derives it).
-It does not check that the reconfigure precedes the first print, nor a print reached through an
-imported module. `--js`: a call to `readFileSync`, `writeFileSync`, `appendFileSync`, `spawnSync`,
-`execFileSync` or `execSync` whose argument list, read across lines to its closing parenthesis,
-names neither `'utf8'`, `'utf-8'` nor an `encoding` key, keyed `<path>` `js-io`. It reads tokens, not a
-JavaScript syntax tree, so a call through an alias is a miss, said in the scanner's docstring.
+`sys.stdout.buffer`, is one site, keyed `<path>` `stdout`. Measured 2026-11-19 at `05245bf0e` over
+`git ls-files -- 'tools/*.py' 'skills/*.py' '.githooks/*.py'`, a line-level probe and not the arm:
+144 files hold a `__main__` guard (PINNED 2026-11-19), 132 of them print, and 72 of those name a reconfigure or a buffer
+write (PINNED; the seed re-derives the population). The arm does not check that the reconfigure
+precedes the first print, nor a print reached through an imported module. `--js`: a call to
+`readFileSync`, `writeFileSync`, `appendFileSync`, `spawnSync`, `execFileSync` or `execSync` whose
+argument list, read across lines to its closing parenthesis, names neither `'utf8'`, `'utf-8'` nor an
+`encoding` key, keyed `<path>` `js-io`. It reads tokens, not a JavaScript syntax tree, so a call
+through an alias is a miss, said in the scanner's docstring. The docstring's "WHAT THIS DOES NOT
+CHECK" list, which names stdout encoding today, is rewritten to match.
 
 ### Paths, quoting and roles
 
@@ -184,27 +208,31 @@ target ends `.sh`, `.py` or `.js` (`heredoc-source`, "no source written through 
 research-compatibility.md's P-quote row. `--shell-role`: one row per tracked shell file, the class of
 §4 "Line endings" less the `py`, `js`, `json` and `toml` members, its count the file's non-blank,
 non-comment lines; the population is `shrink-only`, so a grown or new shell file reds unless the
-factory's widen route records it (§8 F3).
+factory's widen route records it (§8 F3). Each mode joins `tools/gate-lint/sh_hygiene.py#main`'s flag
+dispatch beside `--location-probes`, `--spawn-idioms` and `--temp-names`.
 
 ### The floor
 
-`floor_census.py <floor file> <root>` reads the floor's `<major>.<minor>` from its argument, finds an
-interpreter at exactly that version by running each candidate (`py -<floor>`, `python<floor>`, then
-`uv python find <floor>`) and accepting the first whose `sys.version_info[:2]` equals it, since a
-candidate that answers `command -v` may not run (the charter's Toolchain fact). It then compiles every
-tracked `*.py` under that interpreter and runs the feature census, an AST scan of a declared table of
-version-bound imports and attributes (the census `night-pass-instruments.md:35761` carries), red on a
-feature added after the floor or removed at or before it, printing each feature's count. No
-interpreter at the floor is red, naming the floor and the install command TOOL-dSafePassage-11 S4
-names: a floor arm that skips is the gap-tool-21 it closes (§8 F5).
+`python <prefix>/lib/python_floor.py census` reads the floor through the module's `read_floor` and
+finds an interpreter at exactly that version through its `resolve_floor_interpreter`, which runs each
+candidate (`python<X.Y>`, `py -<X.Y>`, then `uv python find <X.Y>`) and accepts the first whose
+isolated probe reports it, since a candidate that answers `command -v` may not run (the charter's
+Toolchain fact). It then compiles every tracked `*.py` under that interpreter through the module's
+`CHILD`, and runs the feature census, an AST scan of a declared table of version-bound imports and
+attributes (the census `night-pass-instruments.md:35761` carries). It is red on a feature added after
+the floor or removed at or before it, printing each feature's count. No interpreter at the floor is
+red, naming the floor and the install command TOOL-dSafePassage-11 S4 names, where the module's `down`
+falls back to a static mode: a floor arm that skips is the gap-tool-21 it closes (§8 F5).
 
 ### Inventory
 
-Minted: `eol_class.py`, `floor_census.py`; the modes `--stdout`, `--js`, `--path-literals`, `--quoting`
-and `--shell-role`, each with `--measure`; the flag `--bare-bash`; five `[[ledger]]` tables; the site keys `stdout`, `js-io`, `backslash-path`, `heredoc-source` and
-`tab-ifs-read`; the nine leg names and tags above; the populations `encoding-stdout-sites.txt`,
+Minted: `eol_class.py`; the `census` verb of `python_floor.py`; the modes `--stdout`, `--js`,
+`--path-literals`, `--quoting` and `--shell-role`, each with `--measure`; the flag `--bare-bash`; five
+`[[ledger]]` tables; the site keys `stdout`, `js-io`, `backslash-path`, `heredoc-source` and
+`tab-ifs-read`; the nine leg names above and their tags; the populations `encoding-stdout-sites.txt`,
 `encoding-js-sites.txt`, `path-literal-sites.txt`, `quoting-sites.txt` and `shell-role.txt`. Naming
-cells: each function and flag is asked of `python tools/lexicon/lexicon.py --suggest <name>` at the pass.
+cells: each function and flag is asked of `python tools/lexicon/lexicon.py --suggest <name>` at the
+pass.
 
 ### Migration
 
@@ -221,11 +249,12 @@ grow `tools/run-gates/run-gates.sh` and `.githooks/pre-push`) carry a widen row 
 ### Files touched (estimate)
 
 - `tools/gate-lint/eol_class.py`
-- `tools/gate-lint/floor_census.py`
 - `tools/gate-lint/encoding_posture.py`
 - `tools/gate-lint/sh_hygiene.py`
 - `tools/gate-lint/kit.toml`
 - `tools/gate-lint/README.md`
+- `tools/lib/python_floor.py` (the `census` verb)
+- `tools/lib/resolve-python.test.sh` (the census arm beside the floor's own)
 - `tools/run-gates/measure_legs.py` (the `--bare-bash` flag)
 - `tools/govkit/registry.toml`
 - `tools/gate-legs.json` (rendered by the leg factory, never edited)
@@ -244,12 +273,15 @@ grow `tools/run-gates/run-gates.sh` and `.githooks/pre-push`) carry a widen row 
   so moving the scanners would re-point every reader of their paths for no behaviour (§8 F1).
 - **A bare-shell scan of this unit's own.** Unit 26's query already finds every bare-bash launch over
   Python and JavaScript; a second scan of the same class is the `[reuse]` refusal.
+- **A floor scanner of this unit's own in `tools/gate-lint/`.** The floor module already resolves an
+  interpreter at the floor and compiles a population under it; a second resolver is the `[reuse]`
+  refusal (§8 F8).
 
 ## 5. Production-readiness checklist
 
 - security — no new write path; the scanners read tracked blobs and write only through the factory.
-- perf / scale — each arm is one `git ls-files` and one parse per file; the floor arm compiles about 150
-  files in one interpreter process.
+- perf / scale — each arm is one `git ls-files` and one parse per file; the floor arm compiles 245
+  files (PINNED 2026-11-19, `git ls-files -- '*.py' | wc -l`) in one interpreter process.
 - error / empty / loading states — an empty population prints its zero and exits 1, as both scanners
   already do; no interpreter at the floor is red with the install command.
 - observability — each leg prints its graded count; the census prints one line per feature.
@@ -301,10 +333,11 @@ named file committed; `<empty>` is an empty registry file.
   `resolve_bash_py`-guarded launches it exits 0.
   Red when: the flag reads `measure_legs.py` alone, as `test_no_bare_bash_argv` did before unit 26
   widened it.
-- **AC10** — When `python floor_census.py <floor> <repo>` runs with a floor file holding `3.99`, it exits
-  1 naming `3.99` and the install command; with the declared floor and a scratch repository holding a
-  syntax error in `b.py`, it exits 1 naming `b.py`; with `from locale import getdefaultlocale` in
-  `c.py`, it exits 1 naming the feature `removal 3.15`.
+- **AC10** — When `python <lib>/python_floor.py census` runs in a scratch repository whose lib
+  directory holds a copy of `python_floor.py` and a `python-floor.txt` reading `3.99`, it exits 1
+  naming `3.99` and the install command; with the declared floor and a tracked `b.py` holding a syntax
+  error, it exits 1 naming `b.py`; with `from locale import getdefaultlocale` in a tracked `c.py`, it
+  exits 1 naming the feature `removal 3.15`.
   Red when: the arm parses under the running interpreter, so the `3.99` floor reads green.
   cost: needs an interpreter at the declared floor on the node (AP-31: every node runs 3.15).
 - **AC11** — When `python sh_hygiene.py --shell-role <ledger> <repo>` runs over a scratch repository
@@ -325,13 +358,13 @@ named file committed; `<empty>` is an empty registry file.
 
 `encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a location probe asked from a moved directory)` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a fixed-name temp renamed into place)` · `shell-hygiene selftest` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `policy fixtures`
 
-The nine new legs of §4 are not in the manifest at this spec's base, so they are named in prose; the
-guards join's broad `tools/` guard is excluded by the checker's floor.
+The nine new legs of §4 are not in the manifest at HEAD on 2026-11-19, so they are named in prose; the
+guards join's broad `tools/` and `tools/lib/` guards are excluded by the checker's floor.
 
 New arm: tools/gate-lint/sh_hygiene.py --selftest · covers AC6 AC8 AC11 · the `--path-literals`, `--quoting` and `--shell-role` predicates each staged to accept their planted site · none
 New arm: tools/gate-lint/encoding_posture.py --selftest · covers AC4 AC5 · the `--stdout` and `--js` predicates staged to accept their planted site · none
 New arm: tools/gate-lint/eol_class.py --selftest · covers AC1 · the attribute read swapped for a worktree read · none
-New arm: tools/gate-lint/floor_census.py --selftest · covers AC10 · the floor interpreter swapped for the running one · none
+New arm: tools/lib/resolve-python.test.sh · covers AC10 · the census verb's interpreter swapped for the running one · none
 
 ## 8. Open questions
 
@@ -342,12 +375,12 @@ New arm: tools/gate-lint/floor_census.py --selftest · covers AC10 · the floor 
   S12 defines a pack as a row value. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, tie-broken
   by reuse of the seam S12 sets. widens: none · relaxes: none
 - **F2 — Does the encoding leg ship to adopters, against the ruling recorded at
-  `tools/govkit/registry.toml:679`?** That ruling (TOOL-aRepatriatedFork-3 §8 F2) kept it gov-only
-  because an adopter's first pull would red until it seeded a registry. Options: (a) ship it, the
-  adopter's population seeded by `test.seed` at the update; (b) keep it exempt. (b) fails the clause's
-  "moved in" and leaves gap-tool-15 open. RESOLVED (agent, 2026-10-25, delegated): (a), rung 1,
-  gap-tool-15 and the clause; the ruling's cause is what `test.seed` removes. widens: none · relaxes:
-  none
+  `tools/govkit/registry.toml@aec2b8e3d547:788`?** That ruling (TOOL-aRepatriatedFork-3 §8 F2) kept it
+  gov-only because an adopter's first pull would red until it seeded a registry. Options: (a) ship it,
+  the adopter's population seeded by `test.seed` at the update; (b) keep it exempt. (b) fails the
+  clause's "moved in" and leaves gap-tool-15 open. RESOLVED (agent, 2026-10-25, delegated): (a), rung
+  1, gap-tool-15 and the clause; the ruling's cause is what `test.seed` removes. widens: none ·
+  relaxes: none
 - **F3 — What does the shell-role ledger count?** Options: (a) each shell file's code lines, so shell
   outside a shim only shrinks (research-compatibility.md's P-role row); (b) shell files only, so a new
   file is refused and growth inside one is free. (a) costs a widen row on every shell growth, this
@@ -378,6 +411,27 @@ New arm: tools/gate-lint/floor_census.py --selftest · covers AC10 · the floor 
   which guards each held leg or declares its reason and replaces the README's typed figure; this unit
   carries the PowerShell half its clause names (S12). No interface passes between the two units, so
   neither declares an edge to the other. widens: none · relaxes: none
+- **F8 — Where does the interpreter-floor arm live, now that the floor's module is landed?** Options:
+  (a) `tools/gate-lint/floor_census.py`, with its own interpreter search, as rev-4 wrote; (b) a
+  `census` verb of `tools/lib/python_floor.py`, reusing `read_floor`, `resolve_floor_interpreter` and
+  `CHILD`. (a) is a second resolver of one fact, and ships to every adopter a file whose floor
+  declaration and leg are gov's alone. RESOLVED (agent, 2026-11-19, delegated): (b), rung 1, the
+  charter's `[reuse]` rule over `tools/lib/python_floor.py` as TOOL-dSafePassage-11 landed it, its
+  arm in `tools/lib/resolve-python.test.sh` beside the floor's own. widens: none · relaxes: none
+- **F9 — Why is the bare-shell leg gov's own, when `tools/run-gates/measure_legs.py` ships?** Rev-4
+  gave "unit 26's query lives in a gov-internal path", which is untrue: the run-gates descriptor ships
+  its directory as engine. Options: (a) keep the `[[exempt_leg]]` row, on the reason that the query
+  grades launches against the `resolve_bash_py` and `resolve_bash_js` blocks gov's kits carry, which an
+  adopter's own code need not use; (b) a shipped `[[gate_leg]]` of the run-gates descriptor. (b) reds
+  every adopter that launches `bash` by name, with no population to carry its sites. RESOLVED (agent,
+  2026-11-19, delegated): (a), rung 3, the option that keeps the decision rev-4 made and reds no
+  adopter for a block it was never given. widens: none · relaxes: none
+- **F10 — Which tag does each new leg take?** Rev-4 spelled them by mode word, and
+  `leg.run-gates.bare-shell` for a registry-exempt leg. TOOL-dWitnessedBar-12 §4 "The tag rule", rev-6,
+  lands first (order 5) and gives every new leg `leg.<owner>.<folded name>`, `<owner>` the descriptor's
+  `id` or `gov` for an exempt row. Options: (a) unit 12's rule; (b) the mode words. (b) is the drift
+  TOOL-dWitnessedBar-51 S42 and its AC35 red. RESOLVED (agent, 2026-11-19, delegated): (a), rung 1,
+  unit 12's "a new leg is given its tag by the same rule". widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -392,18 +446,31 @@ New arm: tools/gate-lint/floor_census.py --selftest · covers AC10 · the floor 
 - rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-lint/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing
   else moved.
+- rev-5 · 2026-11-19 · §1 to §10 · re-grounded on the tree at `05245bf0e`, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief: the CRLF, stdout and file counts re-pinned;
+  the registry, gate-lint, attribute, conf and README lines blob-pinned; `enforces` named as landed by
+  PLAY-dOrderedCharter-7; S14's readers landed; the floor arm becomes `python_floor.py census` (§8 F8);
+  the bare-shell exemption's reason corrected (§8 F9); the tags follow unit 12's rule (§8 F10).
 
 ## 10. Reuse audit
 
 The seams extended are `tools/gate-lint/encoding_posture.py` and `tools/gate-lint/sh_hygiene.py`, whose
-flag dispatch (`sh_hygiene.py:1659-1667`) and registry reader each new mode joins; the leg factory and
-row keys of units 11, 12 and 22; the ledger factory of unit 13; and unit 26's bare-bash query. `python
+flag dispatch (`tools/gate-lint/sh_hygiene.py#main`) and registry reader each new mode joins; the leg
+factory and row keys of units 11, 12 and 22; the ledger factory of unit 13, which both scanners
+already call through gate-lint's inline copy; unit 26's bare-bash query
+`tools/run-gates/measure_legs.py#scan_bare_bash`; and the floor module `tools/lib/python_floor.py`,
+whose `read_floor`, `resolve_floor_interpreter` and `CHILD` the census verb calls. `python
 tools/codebase-map/reuse_lookup.py "scan tracked files for a portability hazard against a shrink-only
 registry of sites"` ranked `scan` in `tools/gate-lint/ps-hygiene.py` and `tracked` in
 `tools/govkit/govkit.py`, generic stems; it named neither scanner's mode dispatch, which reading the
-sources found. "no existing seam fits" the line-ending class leg or the floor arm: `git grep -n eol --
-tools/gate-lint` and `grep -n floor tools/lib/resolve-python.sh` return nothing at `cdfbd1cf`, as scout
-B measured. The recall probe returned the brief's row, scout B's row, v2:1760 and
-PLAY-dOrderedCharter-30 §3; scout B's "80 of 150 at `w/crlf`" agreed with source.
+sources found. For the line-ending class leg, `tools/govkit/govkit.py#eol_population` reads `eol` over
+every tracked path with `check-attr --stdin -z`, and the deployer's renormalize step reads the index
+through `ls-files --eol -z`; both are the deployer's, which `tools/gate-lint/kit.toml`'s `requires =
+[]` cannot reach, so "no existing seam fits" the shipped leg, and `eol_class.py` takes both reads'
+recorded lessons, `-z` and git's own pattern resolution. The floor arm's "no seam" claim of rev-4,
+`grep -n floor tools/lib/resolve-python.sh` empty at `cdfbd1cf`, no longer holds: `python_floor.py`
+landed with TOOL-dSafePassage-11 (§8 F8). The recall probe returned the brief's row, scout B's row,
+v2:1760 and PLAY-dOrderedCharter-30 §3; scout B's "80 of 150 at `w/crlf`" agreed with source at
+`cdfbd1cf`, and §1 re-pins it.
 
-Recall terms used: `python tools/memory-recall/query.py "what legs make up the portability pack and which rules are still pending" --terms "portability pack line-endings encoding stdout JavaScript quoting shell-role interpreter-floor census sh_hygiene encoding_posture"`
+Recall terms used: `python tools/memory-recall/query.py "what legs make up the portability pack and which rules are still pending" --terms "portability pack line-endings encoding stdout JavaScript quoting shell-role interpreter-floor census sh_hygiene encoding_posture python_floor"`
