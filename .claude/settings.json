@@ -89,6 +89,16 @@
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/process-monitor/procmon-hook.js\""
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [

@@ -1,0 +1,5 @@
+// **Serves:** research TOOL-dTrackedAtlas-4
+{
+  "atlas.regenerate": "on",
+  "atlas.page": "C:/projects/coding-governance-atlas/closed-loop-atlas.html"
+}

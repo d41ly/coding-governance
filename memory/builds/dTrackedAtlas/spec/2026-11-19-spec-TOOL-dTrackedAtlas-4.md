@@ -1,11 +1,14 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · closes TOOL-dTrackedAtlas-7
+**Status:** CLOSED · rev-7 · 2026-11-19 · node d · Tier-2 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4 · closes TOOL-dTrackedAtlas-7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-4-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js](../build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js) | research | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json](../build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.json) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
