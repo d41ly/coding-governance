@@ -60,7 +60,7 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 | 7 | `TOOL-dTrackedAtlas-10` | the page's staleness digest covers the merge history the landed predicate reads (closing review H3, promoted) |
 | 8 | `TOOL-dTrackedAtlas-11` | the closing review's minors: the owed pane observations recorded, one reader for valued options, the stale ledger line cleared (M1, L1, L2, promoted) |
 | 9 | `TOOL-dTrackedAtlas-12` | the closing review's round-2 minors: one stamp-rules table for writer and reader, the Atlas takes the `--default-ref` it advises, the dead `--ref` guard removed, and the pane observations re-recorded (M1, M2, L1, L2, L3, promoted) |
-| 10 | `TOOL-dTrackedAtlas-18` | the schedule instrument re-pinned, in every chain packet and in the chain-packet door, on the owner's word (ask TOOL-dTrackedAtlas-6) |
+| 10 | `TOOL-dTrackedAtlas-18` | the schedule instrument re-pinned, in every chain packet and in the chain-packet door, on the owner's word |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
