@@ -147,6 +147,14 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
 # torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
 # returns 0, as the health log's appender does: the governance write already landed.
+# THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# `EXIT` trap, armed once the lock is taken, calls `remove_dir_lock` with this call's token. So an
+# abort inside it, an unbound name under a carrier's `set -u`, a function no carrier defines or a
+# failed write, ends the subshell alone: the append prints `feed: NOTE - <ref>: the append exited
+# <rc>` and returns 0, and no lock is left for the next writer to wait out. The subshell sets no
+# global a caller reads. WHAT THIS DOES NOT CHECK: an abort between the take and the trap's arming
+# leaves the lock to its deadline; an abort after the line is written reads as a NOTE all the same.
 # THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
 # and this is the one take a carrier with no driver reaches, so where it is unset the append prints
 # one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
@@ -165,7 +173,7 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
-  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok
+  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
   [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
@@ -180,32 +188,37 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
   fi
   tok="$BASHPID.$RANDOM"
-  write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
-    || { printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2; return 0; }
-  if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
-      BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
-      $2 == ev[1] { p = $4 "\t" $5 }
-      END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
-    remove_dir_lock "$d/gov-feed.lock" "$tok"; return 0
-  fi
-  if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
-  s=${s%$'\r'}
-  case "$s" in ""|*[!0-9]*) s=0 ;; esac
-  l=0
-  if [ -s "$d/gov-feed.log" ]; then
-    l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
-    case "$l" in ""|*[!0-9]*) l=0 ;; esac
-    [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
-  fi
-  n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
-  TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-  if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
-    printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
-  elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
-    rm -f "$d/gov-feed.seq.$$" 2>/dev/null
-    printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
-  fi
-  remove_dir_lock "$d/gov-feed.lock" "$tok"
+  ( write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    trap 'remove_dir_lock "$d/gov-feed.lock" "$tok"' EXIT
+    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
+        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+        $2 == ev[1] { p = $4 "\t" $5 }
+        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
+      exit 0
+    fi
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
+    elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
+      rm -f "$d/gov-feed.seq.$$" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first

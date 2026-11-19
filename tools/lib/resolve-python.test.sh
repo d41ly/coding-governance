@@ -544,6 +544,7 @@ fc_got=$(cd "$ROOT" && check_feed_copies "${fc_pop[@]}"); fc_rc=$?
 # ...and each red FIRES on a plant: the bound reading the driver's REMOTE_BOUND (AC1), the base's bare
 # `$ROOT` inside a `$( )` that exits 0, a release through no command, a release that is no call, and
 # an empty population (AC3). Each plant reds when its line is not in the canonical, so none is a no-op.
+# The two release plants edit the append's EXIT trap, its one release since TOOL-dPlacedRequest-39.
 fp="$TMP/feed-plants"; mkdir -p "$fp"
 write_feed_plant 'NODE_LOCK_BOUND=10' 'NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))' "$fp/bound.sh" || bad "the bound plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/bound.sh"); fc_rc=$?
@@ -552,10 +553,11 @@ write_feed_plant '    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")
   '    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"' "$fp/root.sh" || bad "the ROOT plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/root.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/root.sh: "*"ROOT: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose break reads an unset ROOT (rc $fc_rc): $fc_got" ;; esac
-write_feed_plant '  remove_dir_lock "$d/gov-feed.lock" "$tok"' '  release_feed_lock "$d/gov-feed.lock" "$tok"' "$fp/cmd.sh" || bad "the command plant matched no line of the canonical gov_feed_sh"; ok
+fc_rel=$'    trap \'remove_dir_lock "$d/gov-feed.lock" "$tok"\' EXIT'
+write_feed_plant "$fc_rel" "${fc_rel/remove_dir_lock/release_feed_lock}" "$fp/cmd.sh" || bad "the command plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/cmd.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/cmd.sh: "*"command not found") ok ;; *) bad "the carrier arm passed a copy that calls no command (rc $fc_rc): $fc_got" ;; esac
-write_feed_plant '  remove_dir_lock "$d/gov-feed.lock" "$tok"' '  :' "$fp/held.sh" || bad "the release plant matched no line of the canonical gov_feed_sh"; ok
+write_feed_plant "$fc_rel" '    :' "$fp/held.sh" || bad "the release plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/held.sh"); fc_rc=$?
 [ "$fc_rc|$fc_got" = "1|$fp/held.sh: a gov-feed.lock directory remains after the calls" ] || bad "the carrier arm passed a copy that leaves its lock (rc $fc_rc): $fc_got"; ok
 fc_got=$(check_feed_copies); fc_rc=$?

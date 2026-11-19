@@ -19517,8 +19517,9 @@ fi
 # 0 and writes an `until` ten seconds past the clock, within one (AC1); with `EPOCHSECONDS` unset the
 # append prints one `feed: NOTE -` line naming it, exits 0, and leaves no log and no lock (AC3). RED
 # for AC1 is a copy whose constant reads the driver's bound, the claim-push body's sum: it aborts on
-# the unset name and takes nothing. RED for AC3 is a copy with the test cut: it aborts on the unset
-# clock. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: AC2's
+# the unset name and takes nothing. RED for AC3 is a copy with the test cut: its append aborts on the
+# unset clock inside TOOL-dPlacedRequest-39's subshell, so the carrier runs on and the one NOTE names
+# the append's exit, never the clock. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: AC2's
 # grep over the canonical cut, the lander's copy, which TOOL-dPlacedRequest-15 adds, and the driver's
 # queue takes, which read the clock unguarded.
 # ==================================================================================================
@@ -19558,7 +19559,7 @@ if nl_rel=$(resolve_kit_dir "$_rkd_py" run-gates post-merge.sh "$HERE" 2>/dev/nu
     case "$nl_v" in gf) nl_gf3=$nl_r ;; *) nl_red3=$nl_r ;; esac
   done
   same "DPR37 AC3 an append with no EPOCHSECONDS prints one NOTE naming it, exits 0, writes no log and takes no lock" "$nl_gf3" "rc=0 1 1 no-log no-lock"
-  same "DPR37 AC3 RED: the copy with the test cut aborts its carrier and prints no NOTE" "$nl_red3" "no-rc 0 0 no-log no-lock"
+  same "DPR37 AC3 RED: the copy with the test cut aborts its contained append, whose NOTE names the exit and not the clock" "$nl_red3" "rc=0 1 0 no-log no-lock"
   rm -rf "$nl_d"
 else
   n=$((n+7))
@@ -19566,6 +19567,60 @@ else
 fi
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-39 — A FEED APPEND THAT ABORTS NEVER TAKES ITS CARRIER DOWN. The `gov_feed_sh`
+# block the driver carries is cut and sourced under `env -i` and `set -u` inside a scratch repository,
+# and `add_feed_event refs/gov/bar-red` runs with a marker echoed after it. AC1: a copy with
+# `: "$GOVFEED_PLANT_UNSET"` planted on the line after the trap's arming prints bash's unbound-name
+# line, one `feed: NOTE - refs/gov/bar-red: the append exited 1` line and the marker, and leaves no
+# `gov-feed.lock`. AC2: the unplanted cut appends one line with `seq` 1, and a retry appends none.
+# RED for AC1 is the planted copy with its subshell turned into a brace group, the uncontained body:
+# the abort ends the carrier and the marker never prints; and the planted copy with its trap cut: the
+# carrier runs on but the lock stays held. RED for AC2 is a copy whose key check falls through: the
+# retry appends a second line. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK
+# DOES NOT DRIVE: an abort between the take and the trap's arming, which leaves the lock to its
+# deadline; the lock-busy NOTE, which the TOOL-dPlacedRequest-13 arms leave undriven too.
+# ==================================================================================================
+ca_d=$(mktemp -d)
+awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" >"$ca_d/cut.sh"
+cp "$ca_d/cut.sh" "$ca_d/plant.sh"; cp "$ca_d/cut.sh" "$ca_d/keyless.sh"
+mutate "$ca_d/plant.sh" '/^    trap .remove_dir_lock "\$d\/gov-feed.lock" "\$tok". EXIT$/a\    : "$GOVFEED_PLANT_UNSET"'
+cp "$ca_d/plant.sh" "$ca_d/unheld.sh"; cp "$ca_d/plant.sh" "$ca_d/untrapped.sh"
+mutate "$ca_d/unheld.sh" 's/^  ( write_dir_lock_wait/  { write_dir_lock_wait/'
+mutate "$ca_d/unheld.sh" 's/^    exit 0 ) || rc=\$?$/    exit 0; } || rc=$?/'
+mutate "$ca_d/untrapped.sh" '/^    trap .remove_dir_lock "\$d\/gov-feed.lock" "\$tok". EXIT$/d'
+mutate "$ca_d/keyless.sh" 's/^      exit 0$/      :/'
+(unset GIT_DIR GIT_WORK_TREE; git init -q "$ca_d/r" && git -C "$ca_d/r" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -q --allow-empty -m ca --no-verify)
+ca_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ca_d/r" rev-parse --path-format=absolute --git-common-dir); ca_c=${ca_c%$'\r'}
+ca_h=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ca_d/r" rev-parse HEAD)
+ca_call='set -u; . "$1"; add_feed_event refs/gov/bar-red "$2"; echo after'
+# ---- AC1: the planted abort, then its two staged reds.
+for ca_v in plant unheld untrapped; do
+  rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>"$ca_d/$ca_v.err")
+  ca_r="${ca_o:-no-after} $(grep -c '^feed: NOTE - refs/gov/bar-red: the append exited 1$' "$ca_d/$ca_v.err")"
+  ca_r="$ca_r $([ -e "$ca_c/gov-feed.lock" ] && echo lock || echo no-lock)"
+  case "$ca_v" in plant) ca_p=$ca_r ;; unheld) ca_u=$ca_r ;; *) ca_t=$ca_r ;; esac
+done
+same "DPR39 AC1 a planted abort inside the append prints one NOTE and the marker and leaves no lock" "$ca_p" "after 1 no-lock"
+hit  "$(cat "$ca_d/plant.err")" "GOVFEED_PLANT_UNSET: unbound variable"
+same "DPR39 AC1 RED: the uncontained body ends its carrier, no marker and no NOTE" "${ca_u% *}" "no-after 0"
+same "DPR39 AC1 RED: the contained body with its trap cut runs on but holds the lock" "$ca_t" "after 1 lock"
+# ---- AC2: a clean append, its retry, and the retry through a copy whose key check falls through.
+for ca_v in cut keyless; do
+  rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>/dev/null)
+  ca_r="$ca_o $(grep -c . "$ca_c/gov-feed.log") $(cut -f1 "$ca_c/gov-feed.log")"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>/dev/null)
+  ca_r="$ca_r / $ca_o $(grep -c . "$ca_c/gov-feed.log")"
+  case "$ca_v" in cut) ca_k=$ca_r ;; *) ca_x=$ca_r ;; esac
+done
+same "DPR39 AC2 a clean append writes one line with seq 1, and its retry appends none" "$ca_k" "after 1 1 / after 1"
+same "DPR39 AC2 RED: a copy whose key check falls through appends the retry" "${ca_x##* }" "2"
+rm -rf "$ca_d"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
@@ -21840,7 +21895,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3702 -> 3709 by TOOL-dPlacedRequest-37: the deadline block's 7 region-eight assertions
 # (4 `same`, 1 `hit`, 2 `mutate`), or the same 7 counted on its skip branch, off the diff's own
 # lines; no suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3709
+# RAISED 3709 -> 3720 by TOOL-dPlacedRequest-39: the contained append block's 11 region-eight
+# assertions (5 `same`, 1 `hit`, 5 `mutate`), off the diff's own lines; it has no skip branch, it
+# cuts the driver's own block. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3720
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22094,7 +22152,8 @@ FLOOR_SHARD_7=311
 # RAISED 914 -> 926 by TOOL-dPlacedRequest-26: the same 12 region-eight tenure walk assertions, see FLOOR_ASSERTIONS.
 # RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
 # RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=940
+# RAISED 940 -> 951 by TOOL-dPlacedRequest-39: the same 11 region-eight contained append assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=951
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
