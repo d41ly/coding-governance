@@ -2696,7 +2696,12 @@ CLAIM_MODES="preflight take-over holder status beat lease"
 # the settle's retry, which writes only a `mine` claim still `held` or `live` (TOOL-aGraftedHelix-36).
 # TOOL-dPlacedRequest-1 S6 - THE `lease` MODE, the `--lease` verbs' column, called as `<name> lease
 # <fleet tag> <session> <act>`: a lease is `mine` when its fleet tag and session are this node's and
-# this harness's, `same session` when only the session is, and `foreign` otherwise. rc 0 writes with
+# this harness's, `same session` when only the session is, and `foreign` otherwise.
+# TOOL-dPlacedRequest-32 S3 - AN ABSENT SESSION IS NO IDENTITY: the session handed in is `mine` only
+# where it and the record's are both present, neither empty nor `absent`, and equal. With either absent
+# a lease is `mine` only through a keepalive present on both and equal, and this column is handed
+# none, a `--lease` write recording `keepalive: absent`, so two id-less sessions of one node read each
+# other's lease `foreign`. A run claim's keepalive identity is the run columns' rows below, unchanged. rc 0 writes with
 # CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, and `offered` or `terminal` for
 # TOOL-dPlacedRequest-20 below, CW_HINT `take-over` on a stale
 # acquire) and prints nothing, the verb printing its own line; rc 3 is `none` under renew or release.
@@ -2756,7 +2761,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     elif [ "$c_status" = released ]; then cls=foreign-released
     elif { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; } && { [ "$c_status" = landed ] || [ "$c_status" = withdrawn ]; }; then cls=foreign-tombstone
     elif [ "$mode" = lease ]; then
-      if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
+      if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ] && [ -n "$sid" ] && [ "$sid" != absent ]; then cls=mine
       elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
       else cls="foreign-$c_verdict"; fi
     elif [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
@@ -3964,9 +3969,16 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # TOOL-dPlacedRequest-19 S4: the kind `request <content key>` writes `kind: request` and `slug: -`
 # through the default arm below; an acquire of it first reads its record's existence, refused
 # `no-record` (exit 1) where the remote holds none, and its overlap probe names no build, as a run's.
+# TOOL-dPlacedRequest-32 S4: with no session, CLAUDE_CODE_SESSION_ID unset, empty or `absent`, the verb
+# prints `lease not written — no session: ...` and exits 2 before any read, because a `--lease` write
+# records `keepalive: absent` and so no keepalive identifies its holder either. The driver's run
+# claim, which carries the run's keepalive, is written by the run columns and keeps their rules.
 run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
   local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la ot os odl=""
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
+  case "${CLAUDE_CODE_SESSION_ID:-absent}" in
+    absent) echo "lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder"; return 2 ;;
+  esac
   if [ "$act" = flush ]; then
     read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }
     write_gov_queue; rc=$?
@@ -4350,8 +4362,8 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
 # a stored copy whose `derive_request_fold` differs from the file's is a COLLISION, `request not
 # written — <key> · collision: ...` exit 2, before any write), and `<session><TAB><blob>` is appended once
 # to `<git-common-dir>/requests/<key>.typed`, the blob `git hash-object` of the bytes THIS session
-# submitted (TOOL-dPlacedRequest-31), a hash that does not answer refused as the append is; nothing
-# under `requests/` is tracked or pushed. THE REMOTE
+# submitted (TOOL-dPlacedRequest-31), a hash that does not answer refused as the append is, and no
+# line at all with no session (TOOL-dPlacedRequest-32); nothing under `requests/` is tracked or pushed. THE REMOTE
 # HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
 # whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
 # `fleet-tag` (this node's, as `resolve_fleet_tag` reads it from `fleet.toml`) and `session` (letters,
@@ -4403,9 +4415,13 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
     rm -f -- "$cdir/requests/$key.md.$$"
     [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; return 2; }
   fi
-  blob=$(GIT hash-object -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
-    && { grep -qxF -- "$sid"$'\t'"$blob" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\t%s\n' "$sid" "$blob" >>"$cdir/requests/$key.typed"; } \
-    || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; return 2; }
+  # NO SESSION, NO CONSENT (TOOL-dPlacedRequest-32 S2): an id-less session's record keeps `session:
+  # absent` as provenance, and `.typed` gains no line, since `absent` would name every id-less session.
+  if [ "$sid" != absent ]; then
+    blob=$(GIT hash-object -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
+      && { grep -qxF -- "$sid"$'\t'"$blob" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\t%s\n' "$sid" "$blob" >>"$cdir/requests/$key.typed"; } \
+      || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; return 2; }
+  fi
   msg=$(printf 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid")
   resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
   c=$(build_gov_commit "" "$msg") || { echo "request — $key · not written, the text kept · the commit could not be built in this clone"; return 2; }
@@ -4451,10 +4467,16 @@ check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read;
 # hash-object` reads from `<git-common-dir>/requests/<key>.md` NOW, so a stored copy replaced after the
 # fact, or a line written for other words, is no consent; a line of any other shape never matches.
 # -> 0 consent; 1 printing one `request — <key> · relayed` line otherwise, a malformed key, no common
-# dir and a missing stored copy included.
+# dir and a missing stored copy included. NO SESSION IS NO CONSENT (TOOL-dPlacedRequest-32 S2):
+# CLAUDE_CODE_SESSION_ID unset, empty or `absent` returns 1 printing `request — <key> · no session:
+# ...` before any read, so a planted `absent` line consents for nobody.
 # WHAT THIS DOES NOT CHECK: that the session typed the words rather than relayed them into `--request`.
 check_request_consent() { # content key -> 0 this session typed it here, 1 relayed
   local key="${1:-}" cdir now="" sid="${CLAUDE_CODE_SESSION_ID:-absent}"
+  if [ "$sid" = absent ]; then
+    echo "request — ${key:--} · no session: the harness exposed none, so nothing here is consent"
+    return 1
+  fi
   cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || cdir=""
   cdir=${cdir%$'\r'}
   [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && now=$(GIT hash-object -- "$cdir/requests/$key.md" 2>/dev/null) || now=""

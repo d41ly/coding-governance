@@ -229,8 +229,16 @@ can force or delete the ref.
 
 **The lease verbs**, `--lease acquire|renew|release|take-over` over `build <slug>`, `unit <slug>
 <id>`, `run <cadence> <period>` or `request <content key>`, and `--lease flush`, read the remote's leases and decide by the
-`lease` column below. A lease is `mine` when its `fleet-tag` and `session` are this node's and this
-harness's, `same session` when its `session` alone is. A refusal names one cause: `live-holder`, a
+`lease` column below. **The session** is `CLAUDE_CODE_SESSION_ID`; unset, empty and the literal
+`absent` are one value, no session, which a record writes as `session: absent` for provenance and
+which identifies nobody. A lease is `mine` when its `fleet-tag` is this node's and its `session` and
+this harness's are both present and equal; with either absent it is `mine` only through a keepalive
+present on both and equal, which a run claim carries and a `--lease` write, recording `keepalive:
+absent`, does not, so two id-less sessions of one node never share a lease. It is `same session` when
+its `session` alone is this harness's present session. With no session the lease verbs print `lease
+not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder`
+and exit 2, reading and writing nothing; the driver's run claim, which carries the run's keepalive,
+keeps the run columns' rules below. A refusal names one cause: `live-holder`, a
 foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or unit tombstone or a
 foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how

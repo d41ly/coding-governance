@@ -19759,7 +19759,8 @@ if in_shard 8; then
 # `offered`, the tip unmoved (AC3); c2's lands at epoch 2 with no offer left (AC4); an offer over that
 # live lease is refused `live-holder` (AC1); c1 takes an offer its feed first saw 301 s ago, and is
 # refused one its feed cannot hold at all, GOVFEED_DIR naming a file (AC5); an offer to `b/s1`
-# refuses c2 under `s2`, `absent` and no session and lands under `s1` (AC9); and c1's take, replayed
+# refuses c2 under `s2` `offered`, under `absent` and no session `no session` (TOOL-dPlacedRequest-32),
+# and lands under `s1` (AC9); and c1's take, replayed
 # from a read the fetch shim keeps stale after c2 took the lease, is refused `epoch-fence`, each epoch
 # once on the origin (AC6); and a policy setting `leases.offer-seconds` to 60 is the window written
 # (AC7). The refusal arms beside them: an offer with no `--to` and an acquire with one exit 2, a
@@ -19828,8 +19829,8 @@ same "DPR20 AC5 an unsighted offer holds its tip" "$(read_offer_tip u4)" "$of_t0
 run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u6 --to b/s1 >/dev/null
 of_t0=$(read_offer_tip u6); of_rc=""
 for of_s in s2 absent -; do of_out=$(run_offer_arm "$LF/c2" agent5 "$of_s" acquire unit tFix u6); of_rc="$of_rc$? $(printf '%s\n' "$of_out" | grep -c '^lease refused — offered · tFix/unit/u6 · b/s1$') "; done
-same "DPR20 AC9 sessions s2, absent and none are refused offered, the tip unmoved" \
-  "$(read_lease_field tFix/unit/u6 offer) $of_rc$([ "$(read_offer_tip u6)" = "$of_t0" ] && echo unmoved || echo moved)" "b/s1 1 1 1 1 1 1 unmoved"
+same "DPR20 AC9 session s2 is refused offered, and absent and none exit 2 as no session (TOOL-dPlacedRequest-32), the tip unmoved" \
+  "$(read_lease_field tFix/unit/u6 offer) $of_rc$([ "$(read_offer_tip u6)" = "$of_t0" ] && echo unmoved || echo moved)" "b/s1 1 1 2 0 2 0 unmoved"
 of_out=$(run_offer_arm "$LF/c2" agent5 s1 acquire unit tFix u6)
 hit  "$of_out" "lease — tFix/unit/u6 · take · epoch 2"
 same "DPR20 AC9 the named session's take carries no offer" "$(read_lease_field tFix/unit/u6 offer)" "-"
@@ -20605,6 +20606,81 @@ rmdir "$rq_t" && mv "$rq_t.kept" "$rq_t"
 same "DPR31 S1 a .typed that cannot be appended to exits 2" "$rq_rc" "2"
 hit  "$rq_out" "request — $rq_k2 · not written · this session could not be added to"
 rm -rf "$LF"
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-32 — AN ABSENT SESSION IS NO IDENTITY. Over a fresh lease fixture: `--lease
+# acquire build tFix` with CLAUDE_CODE_SESSION_ID unset, then `absent`, exits 2 printing `no session`
+# before any read, no ref and no last fetch (AC3); `--request` under each records the remote `session:
+# absent`, keeps the words and appends no `.typed` line, and `check_request_consent` there, over a
+# planted `absent` line naming the stored copy, returns 1 printing `no session` (AC1, AC2), where a
+# present session's request still consents; a lease of tag `a` whose session and keepalive are
+# `absent` reads `foreign-live` in the `lease` mode with the session unset, `absent` or present, its
+# own present session having read it `mine` before the plant (AC4). In the claim fixture's tree:
+# `--preflight tFresh` with the session unset over a build lease of session `absent` and keepalive k2
+# renews it `mine` at epoch 1, and under keepalive k3 fails check 107 (AC5). RED, observed at the
+# close: the `lease` mode's `mine` row with its two session guards cut reads AC4's plant `mine`, and
+# the base driver's `.typed` append and predicate consent on the planted line. Waived by README rule 8
+# with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: an empty CLAUDE_CODE_SESSION_ID, which
+# the driver's `:-absent` folds as it folds an unset one, and `--lease flush` with no session, which
+# shares the acquire's refusal site.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+ns_rc=""
+for ns_s in - absent; do
+  ns_out=$(run_offer_arm "$LF/c1" daily-agent "$ns_s" acquire build tFix)
+  ns_rc="$ns_rc$? $(printf '%s\n' "$ns_out" | grep -cxF 'lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder') "
+done
+same "DPR32 AC3 an unset and an absent session each exit 2 printing no session: no ref, no last fetch" \
+  "$ns_rc$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | grep -c .) $([ -e "$LF/c1/.git/gov-last-fetch" ] && echo stamped || echo unread)" "2 1 2 1 0 unread"
+ns_n=0
+for ns_s in - absent; do
+  ns_n=$((ns_n+1)); printf 'Retire the id-less fence %s, zq-idless-marker-32\n' "$ns_n" > "$LF/ns$ns_n.md"
+  if [ "$ns_s" = - ]; then ns_env=(-u CLAUDE_CODE_SESSION_ID); else ns_env=(CLAUDE_CODE_SESSION_ID=absent); fi
+  ns_out=$( cd "$LF/c1" && env "${ns_env[@]}" USERNAME=daily-agent GOV_RUNLOG=0 bash "$SCRIPT" --request "$LF/ns$ns_n.md" 2>&1 ); ns_rc=$?
+  ns_key=$(printf '%s\n' "$ns_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+  same "DPR32 AC1 AC2 session $ns_s: --request exits 0, the record names session absent, the words kept, no .typed line" \
+    "$ns_rc ${#ns_key} $(git --git-dir="$LF/origin.git" log -1 --format=%B "refs/gov/requests/$ns_key" -- 2>/dev/null | sed -n 's/^session: //p') $([ -f "$LF/c1/.git/requests/$ns_key.md" ] && echo kept || echo lost) $([ -e "$LF/c1/.git/requests/$ns_key.typed" ] && echo typed || echo untyped)" \
+    "0 12 absent kept untyped"
+  printf 'absent\t%s\n' "$(git -C "$LF/c1" hash-object -- "$LF/c1/.git/requests/$ns_key.md")" >> "$LF/c1/.git/requests/$ns_key.typed"
+  ns_got=$( cd "$LF/c1" && if [ "$ns_s" = - ]; then unset CLAUDE_CODE_SESSION_ID; else export CLAUDE_CODE_SESSION_ID=absent; fi && set +u && . "$SCRIPT" >/dev/null 2>&1
+    ns_o=$(check_request_consent "$ns_key"); printf '%s|%s' "$ns_o" "$?" )
+  same "DPR32 AC1 AC2 session $ns_s: consent over a planted absent line naming the stored copy is refused, no session" \
+    "$ns_got" "request — $ns_key · no session: the harness exposed none, so nothing here is consent|1"
+done
+printf 'Retire the present fence, zq-idless-marker-32\n' > "$LF/nsp.md"
+ns_out=$(RQ_SID=qN run_request_arm --request "$LF/nsp.md")
+ns_key=$(printf '%s\n' "$ns_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+ns_got=$( cd "$LF/c1" && export CLAUDE_CODE_SESSION_ID=qN && set +u && . "$SCRIPT" >/dev/null 2>&1
+  ns_o=$(check_request_consent "$ns_key"); printf '%s|%s' "$ns_o" "$?" )
+same "DPR32 AC1 control: a present session's request still consents in that session" "${#ns_key} $ns_got" "12 |0"
+LA_SID=s9 run_lease_arm acquire build tFix >/dev/null
+ns_got=$( cd "$LF/c1" && export CLAUDE_CODE_SESSION_ID=s9 && set +u && . "$SCRIPT" >/dev/null 2>&1; load_driver_conf >/dev/null 2>&1
+  read_claims quiet >/dev/null 2>&1; check_claim_writable tFix lease a s9 acquire >/dev/null 2>&1; printf '%s' "$CW_CLS" )
+same "DPR32 AC4 control: s9's own lease reads mine in s9" "$ns_got" "mine"
+ns_t=$(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tFix/build)
+ns_m=$(git --git-dir="$LF/origin.git" log -1 --format=%B "$ns_t" -- | sed 's/^session: s9$/session: absent/')
+ns_c=$(git --git-dir="$LF/origin.git" commit-tree "$(git --git-dir="$LF/origin.git" mktree </dev/null)" -p "$ns_t" -m "$ns_m")
+git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tFix/build "$ns_c"
+ns_got=$( for ns_s in - absent s9; do
+  ( cd "$LF/c1" && if [ "$ns_s" = - ]; then unset CLAUDE_CODE_SESSION_ID; else export CLAUDE_CODE_SESSION_ID=$ns_s; fi && set +u && . "$SCRIPT" >/dev/null 2>&1
+    load_driver_conf >/dev/null 2>&1; read_claims quiet >/dev/null 2>&1
+    check_claim_writable tFix lease a "${CLAUDE_CODE_SESSION_ID:-absent}" acquire >/dev/null 2>&1; printf '%s ' "$CW_CLS" ); done )
+same "DPR32 AC4 a lease of tag a, session and keepalive absent, reads foreign-live unset, absent and in s9" \
+  "$(read_lease_field tFix/build session) $(read_lease_field tFix/build keepalive) $ns_got" "absent absent foreign-live foreign-live foreign-live "
+rm -rf "$LF"
+for ns_k in k2 k3; do
+  arm_claim_fixture
+  seed_lease tFresh absent a live "$(derive_claim_now)" k2
+  ns_r0=$(read_claim_ref tFresh)
+  ns_out=$( unset CLAUDE_CODE_SESSION_ID; run --preflight tFresh --keepalive-id "$ns_k" ); ns_rc=$?
+  ns_got="$ns_rc $([ "$(read_claim_ref tFresh)" = "$ns_r0" ] && echo same || echo moved) $(read_claim_field tFresh epoch) $(read_claim_field tFresh session)"
+  case "$ns_k" in
+    k2) same "DPR32 AC5 --preflight with the session unset renews the lease of its keepalive mine: epoch 1, session absent" "$ns_got" "0 moved 1 absent" ;;
+    *)  same "DPR32 AC5 ...and under another keepalive the absent session is no identity: refused, the lease unmoved" "$ns_got" "1 same 1 absent"
+        hit  "$ns_out" "UNATTENDED check 107 FAILED — another session holds this slug's claim on the remote" ;;
+  esac
+done
+remove_claim_refs; reset_tree
 
 # ==================================================================================================
 # TOOL-dPlacedRequest-15 — THE FENCE READ, `--lease fence build <slug>`, over the lease fixture: no
@@ -22707,7 +22783,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3888 -> 3896 by TOOL-dPlacedRequest-31: the consent arm's 8 region-eight assertions (7 `same`
 # and 1 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first observation is
 # the close's.
-FLOOR_ASSERTIONS=3896
+# RAISED 3896 -> 3907 by TOOL-dPlacedRequest-32: the id-less session block's 11 region-eight assertions
+# (10 `same`, its two loops' six among them, one per pass, and 1 `hit`), off the diff's own lines; no
+# skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3907
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22974,7 +23053,8 @@ FLOOR_SHARD_7=311
 # RAISED 1105 -> 1113 by TOOL-dPlacedRequest-29: the same 8 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
 # RAISED 1113 -> 1119 by TOOL-dPlacedRequest-30: the same 6 region-eight collision assertions, see FLOOR_ASSERTIONS.
 # RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1127
+# RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1138
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
