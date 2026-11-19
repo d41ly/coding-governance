@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-36 — the node-lock factory writes its health events through the lock's own common dir
 
-**Status:** INPROGRESS · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

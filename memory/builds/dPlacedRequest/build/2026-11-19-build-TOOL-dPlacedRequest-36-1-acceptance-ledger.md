@@ -30,6 +30,10 @@ under the node's short temp path. The staged red is a copy of the feed cut whose
   driver's spec-tokens events stay in the repository's log.
 - `bash -n` read all 4 changed shell files clean; `gen_map.py --write` added post-merge's three (DERIVED)
   appender functions to `memory/map/generated/symbols.json`, and `--check` then exited 0 (DERIVED).
+- The bug-class checklist over the pass commit selected 55 classes; none needed a change. The arm's (DERIVED)
+  fixture shows it reached the rule (the lock's owner reads `t1`, the staged copy prints the unset
+  name), its staged break is the base's own spelling under a `mutate` that reds a no-op, its git
+  calls unset `GIT_DIR`, and its floor counts the 7 increments the suite's counter takes. (DERIVED)
 
 ## Owed at the close
 
