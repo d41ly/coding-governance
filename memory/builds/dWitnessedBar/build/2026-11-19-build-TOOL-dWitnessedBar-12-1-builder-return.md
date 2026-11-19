@@ -22,7 +22,7 @@ For the dispatcher, not the spec: the declared write set (RUN.md line 107) leave
 What still holds against the tree at base c05abd81:
 - 198 manifest rows with 0 tags; 70 `[[gate_leg]]` rows in 27 descriptors; 128 `[[exempt_leg]]` rows.
 - The tag rule gives 198 unique tags, 6 cut, and only `leg.policy-kit.policy-check` needs F9's suffix. Both readings of the cut rule give identical tags.
-- Both `KNOWN` literals are at run-gates.test.sh:409 and :830 with the 15 keys; `read_known_copies` and its "two KNOWN copies that differ" case exist; the four `*_FLOOR_RUN_GATES` constants exist; `KIT_RUN_GATES_VERSION=1.50`; `REGISTRY_FIELDS`, `ROW_TAG_KEYS`, `extract_command` and the 15 namespace rows match what the spec says.
+- Both `KNOWN` literals are at tools/run-gates/run-gates.test.sh@20bb181a:409 and :830 with the 15 keys; `read_known_copies` and its "two KNOWN copies that differ" case exist; the four `*_FLOOR_RUN_GATES` constants exist; `KIT_RUN_GATES_VERSION=1.50`; `REGISTRY_FIELDS`, `ROW_TAG_KEYS`, `extract_command` and the 15 namespace rows match what the spec says.
 
 Nothing was written, staged or committed. The brief was already recorded (a9485773206b).
 
