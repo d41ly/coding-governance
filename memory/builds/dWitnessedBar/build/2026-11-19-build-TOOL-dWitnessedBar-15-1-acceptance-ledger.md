@@ -37,7 +37,7 @@ leg that section names.
   registration declaring seed = [] is refused: q`; with the policy kit removed and committed it
   printed `unarmed q no seed`, exit 0, and one stderr line naming `retrofit.unseeded` and the three
   places the lookup tried. A policy file with no valid revision exited 2 with the reader's own
-  `policy: refused · .governance/policy.toml:2 · …` line. `grep -c 'retrofit\.unseeded'
+  `policy: refused · .governance/policy.toml@430e6833:2 · …` line. `grep -c 'retrofit\.unseeded'
   help/policy.md` printed 1, the consumer list's new bullet.
 - AC7 — `affordance-exempt.toml` — over the scratch target, the adopt after the scaffold was committed
   wrote `affordance-exempt.toml` with `exempt = []`; with a dossier lacking the `## Reuse affordance`

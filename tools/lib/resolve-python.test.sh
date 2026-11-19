@@ -1218,8 +1218,8 @@ build_ll_seeded() { # population home seed-literal -> one [[ledger]] table with 
 LL_SEEDARGV="['$LL_EXE', 'fxseed.py']"
 { build_ll_seeded fx-seed memory/project/fx-seed.txt "$LL_SEEDARGV"; build_ll_seeded q memory/project/q.txt '[]'; } >> "$LLR/tools/fx/kit.toml"
 printf 'a\nb\n' > "$LLR/seed-keys.txt"
-ll_commit() { git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m "$1"; }
-ll_commit "seed fixture" || bad "2o seed: the seed fixture could not be committed"; ok
+write_ll_commit() { git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m "$1"; }
+write_ll_commit "seed fixture" || bad "2o seed: the seed fixture could not be committed"; ok
 LL_SEEDED="$LLR/memory/project/fx-seed.txt"
 ll_head=$(git -C "$LLR" rev-parse HEAD)
 # AC1 — a first seed writes the header and both rows, each with HEAD's sha and `seeded`.
@@ -1228,10 +1228,10 @@ out=$(run_ll seed --population fx-seed)
   && [ "$(head -1 "$LL_SEEDED")" = "$(build_ll_ledger fx-seed key name shrink-only)" ] \
   && grep -qxF "a${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED" && grep -qxF "b${T}1${T}${ll_head}${T}seeded" "$LL_SEEDED"; } \
   || bad "2o seed AC1: a first seed did not print armed fx-seed 2 and write two rows stamped $ll_head seeded: ${out//$'\n'/ | }"; ok
-ll_commit "seeded" || bad "2o seed: the seeded home could not be committed"; ok
+write_ll_commit "seeded" || bad "2o seed: the seeded home could not be committed"; ok
 # AC2 — an offence the seed would now measure, committed: a rerun leaves the armed home byte-identical.
 cp "$LL_SEEDED" "$LL/fx-seed.before"
-printf 'a\nb\nc\n' > "$LLR/seed-keys.txt"; ll_commit "planted c" || bad "2o seed: the planted key could not be committed"; ok
+printf 'a\nb\nc\n' > "$LLR/seed-keys.txt"; write_ll_commit "planted c" || bad "2o seed: the planted key could not be committed"; ok
 ll_head2=$(git -C "$LLR" rev-parse HEAD)
 out=$(run_ll seed --population fx-seed)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "present fx-seed" <<<"$out" && cmp -s "$LL/fx-seed.before" "$LL_SEEDED"; } \
@@ -1272,13 +1272,13 @@ out=$(run_ll seed --all)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" && grep -qxF "present fx-seed" <<<"$out"; } \
   || bad "2o seed AC6: seed --all did not print unarmed q no seed and exit 0: ${out//$'\n'/ | }"; ok
 mkdir -p "$LLR/.governance"; printf '[retrofit]\nunseeded = "refuse"\n' > "$LLR/.governance/policy.toml"
-{ ll_commit "refuse" && git -C "$LLR" push -q origin HEAD:main 2>/dev/null && git -C "$LLR" fetch -q origin; } \
+{ write_ll_commit "refuse" && git -C "$LLR" push -q origin HEAD:main 2>/dev/null && git -C "$LLR" fetch -q origin; } \
   || bad "2o seed AC6: the refuse policy could not be landed on the fixture's remote"; ok
 out=$(run_ll seed --all)
 { [ "${out##*$'\n'}" = rc=2 ] && grep -q "retrofit.unseeded is refuse.*: .*\bq\b" <<<"$out" && ! grep -q '^armed\|^present' <<<"$out"; } \
   || bad "2o seed AC6: retrofit.unseeded = refuse let a seed = [] registration through: ${out//$'\n'/ | }"; ok
-mkdir -p "$LL/nokit/lib"; cp "$HERE"/*.py "$HERE"/*.txt "$LL/nokit/lib/" 2>/dev/null
-out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$LL/nokit/lib/legacy_ledger.py" seed --population q) 2>"$LL/nokit.err" | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+NK="$LL/nokit/lib"; mkdir -p "$NK"; cp "$HERE"/*.py "$HERE"/*.txt "$NK/" 2>/dev/null
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$NK/legacy_ledger.py" seed --population q) 2>"$LL/nokit.err" | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "unarmed q no seed" <<<"$out" \
   && [ "$(grep -c 'retrofit.unseeded' "$LL/nokit.err")" = 1 ] && grep -q 'no policy kit' "$LL/nokit.err"; } \
   || bad "2o seed AC6: with no policy kit the read was not the default with one stderr line naming retrofit.unseeded: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LL/nokit.err")"; ok
