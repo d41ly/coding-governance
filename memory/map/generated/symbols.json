@@ -23013,6 +23013,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "read_root_confs",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "read_root_dir",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -31893,6 +31898,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "run_plant_ignored_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_plant_key_number",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -31939,6 +31949,11 @@
     },
     {
       "id": "run_plant_untouched_quiet",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_untracked_conf",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -39216,6 +39231,11 @@
       "id": "write_sc_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "write_scalar_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "write_scenario",
