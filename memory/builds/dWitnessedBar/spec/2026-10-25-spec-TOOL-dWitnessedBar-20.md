@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-20 — the legacy-homes list converted into a ledger population keyed by conf and key
 
-**Status:** INPROGRESS · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 13 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 13 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0358@a04b8b39 whole
 
@@ -17,6 +17,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-20-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-20-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-20-reground-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-20-2-build-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-20-2-build-brief.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-20-spec-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-20-spec-fix-brief.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-20-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-20-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
@@ -56,13 +57,18 @@ population shares (the recut's M4; gap-test-14's "27 registries in at least 6 gr
   `tools/govkit/fixtures/retired_edits.py#build_retired_gov` and
   `tools/govkit/fixtures/stale_edges.py#IGNORE`. The `policy fixtures` leg's `[[exempt_leg]]` row in
   `tools/govkit/registry.toml` gains the guard `memory/project/legacy-homes.txt`, because its
-  `legacy-homes-present` case reads the list, which its `{prefix}/policy/` guard no longer covers;
-  `tools/gate-legs.json` is re-rendered by `tools/run-gates/leg_factory.py --write`. Observed by AC1,
+  `legacy-homes-present` case reads the list, which its `{prefix}/policy/` guard no longer covers. It
+  gains `{prefix}/memory-tree/legacy_ledger.py` and `{prefix}/memory-tree/coverage_join.py` too:
+  `run_census_source_receipt` loads the factory in-process and `build_legacy_repo` copies it, and
+  `tools/policy/check_policy.py#check_guard_trace` reds a traced read no guard covers (`backlog.py`
+  is guarded already). `tools/gate-legs.json` is re-rendered by `tools/run-gates/leg_factory.py
+  --write`. Observed by AC1,
   AC2 and AC10.
   **Readers:** by name: `tools/policy/policy.py` (`check_legacy_graded`, `check_legacy_homes`,
   `read_base_pairs`, `write_legacy_homes`, `LEGACY_HEADER` and `LEGACY_WITHHELD`) and
-  `tools/policy/check_policy.py` (`arm_legacy_homes` through `check_legacy_graded`, the fixture's
-  `build_legacy_repo`, `run_legacy_homes`, `run_legacy_main_dropped`, `run_legacy_present` and
+  `tools/policy/check_policy.py` (`arm_legacy_homes` and `run_census_source_receipt` through
+  `check_legacy_graded`, the fixture's `build_legacy_repo`, `run_legacy_homes`,
+  `run_legacy_main_dropped`, `run_legacy_present` and
   `run_legacy_withheld_install`, and the module docstring's case notes), re-pointed by S4, S5 and S8;
   `tools/policy/kit.toml` and the three kit copies above, re-pointed here; `tools/policy/README.md`
   and `help/policy.md`, which state the row and the path in prose, re-pointed by S10 and S9. Outside
@@ -75,8 +81,9 @@ population shares (the recut's M4; gap-test-14's "27 registries in at least 6 gr
   `git grep -n legacy-homes -- memory/builds/dSafePassage/spec` finds TOOL-dSafePassage-1, which names
   the list only to say it holds neither of that unit's keys, and TOOL-dSafePassage-103, which names
   the arm and the kit's copy of the list among that unit's source reads and reads no row. Both halves
-  measured on 2026-11-20 by `git grep -n "legacy-homes\|LEGACY_LIST\|LEGACY_HEADER\|legacy_homes" --
-  ':!memory/'`, each hit read.
+  measured on 2026-11-20 by `git grep -n
+  "legacy-homes\|LEGACY_LIST\|LEGACY_HEADER\|legacy_homes\|check_legacy_graded" -- ':!memory/'`, each
+  hit read; `check_legacy_graded` adds `run_census_source_receipt` and no further reader.
 - **S3** — The seed argv. `python tools/policy/policy.py lists --derive legacy-homes` prints one
   `<conf>TAB<key>TAB1` line per row `derive_legacy_homes` yields, sorted: the key's fields then the
   count, the seed output the factory reads (TOOL-dWitnessedBar-15 §4 "The rule"), from the derivation
@@ -104,15 +111,19 @@ population shares (the recut's M4; gap-test-14's "27 registries in at least 6 gr
   key, its catalogue path derived by `tools/policy/policy.py#derive_catalogue_rel`. Where
   `compare_to_base` answers no findings and a reason, that reason prints as one `legacy homes:` note
   and the both-ways half still grades (§8 F6). The `unmarked` report (TOOL-dGroundRules-7 S3) stays,
-  read from the derivation. `check_legacy_graded` keeps its name and both callers, `cmd_lists` and
-  `arm_legacy_homes`, and its rule becomes §4 "Reaching the factory"'s. `LEGACY_WITHHELD` still opens
+  read from the derivation. `check_legacy_graded` keeps its name and its callers, `cmd_lists`,
+  `arm_legacy_homes` and `run_census_source_receipt`, and its rule becomes §4 "Reaching the
+  factory"'s. `LEGACY_WITHHELD` still opens
   `the list is gov's own` and drops its `ORDER [project-owned]` clause, since no plan holds that row
   now. `read_base_pairs` and `LEGACY_HEADER` are deleted, since `compare_to_base` reads the base and
   `render_header` renders the header. Observed by AC4, AC5 and AC7.
   **Readers:** by name: `tools/policy/policy.py` (`check_legacy_homes` and `write_legacy_homes`) and
-  `tools/policy/check_policy.py` (`build_legacy_repo`), re-pointed here and by S8 · by value: NO VALUE
-  READERS — no code outside those three callers compares, counts or derives from either value,
-  measured on 2026-11-20 by `git grep -n "read_base_pairs\|LEGACY_HEADER" -- ':!memory/'`.
+  `tools/policy/check_policy.py` (`build_legacy_repo`), re-pointed here and by S8; callers of
+  `check_legacy_graded`, `tools/policy/policy.py` (`cmd_lists`) and `tools/policy/check_policy.py`
+  (`arm_legacy_homes`, unchanged, and `run_census_source_receipt`, expecting it true beside a
+  source-mode receipt, its tree re-pointed by S8, §8 F8) · by value: NO VALUE READERS — no code
+  outside those callers compares, counts or derives from those names, measured on 2026-11-20 by
+  `git grep -n "read_base_pairs\|LEGACY_HEADER\|check_legacy_graded" -- ':!memory/'`.
 - **S6** — The mark derived, never stored. A row's mark, `owner-policy`, `mechanic` or `unmarked`, is
   read from `derive_legacy_homes` and its table `GATE_ENV_MARKS`, the one declaration of it, and
   `policy.py lists --marks legacy-homes` prints `<conf>TAB<key>TAB<mark>` for a reader that wants it.
@@ -128,8 +139,9 @@ population shares (the recut's M4; gap-test-14's "27 registries in at least 6 gr
   factory's three files, as §4 "The fixture" says. `legacy-homes-present` asserts that gov's registry
   registers `legacy-homes` with its home a file, and that this kit's directory holds no
   `legacy-homes.txt`; `legacy-homes-withheld-install` asserts the plan holds no row naming
-  `legacy-homes.txt` and the applied target no such file. Observed by AC4, AC5, AC6, AC7, AC9 and
-  AC10.
+  `legacy-homes.txt` and the applied target no such file. `census-source-receipt` keeps every
+  expectation, and its tree gains what the new rule reads (§4 "The fixture", §8 F8). Observed by
+  AC4, AC5, AC6, AC7, AC9, AC10 and AC11.
 - **S9** — The help page. The section "The policy that still lives elsewhere" of `help/policy.md`
   (TOOL-dGroundRules-7 S6) states the list's home `memory/project/legacy-homes.txt`, the ledger row,
   where the mark is read now, and that a new legacy key is refused unless the ledger's widen route
@@ -139,8 +151,10 @@ population shares (the recut's M4; gap-test-14's "27 registries in at least 6 gr
   `legacy-homes.txt`, since the list is no kit file now; its `lists` text under "The CLIs" and "The legacy
   policy homes", its `arm_legacy_homes` rows under "The arms" and "Each arm in an adopter", and its
   case notes under "The size caps" state the ledger row at `memory/project/legacy-homes.txt`, the
-  `--derive` and `--marks` flags, and the census rule of §4 "Reaching the factory". NOT OBSERVED —
-  prose, read by the closing review.
+  `--derive` and `--marks` flags, and the census rule of §4 "Reaching the factory". Its
+  `census-source-receipt` paragraph there states that the case's tree tracks the registry and holds
+  the list's home, so `check_legacy_graded` answers true. NOT OBSERVED — prose, read by the closing
+  review.
 
 ## 3. Non-goals (OUT)
 
@@ -235,7 +249,9 @@ resolve.
 and the `[[ledger]]` registration whose `population` is `legacy-homes` at `repo`, read by
 `read_registrations`, or None where none names it; a refused registration is a `Refusal`.
 `check_legacy_graded(repo, kit)` holds where `derive_census_tree` answers `source`, a registration is
-found, and its home is a file. The census is asked first and the factory loads only past it, so an
+found, and its home is a file. `read_registrations` reads tracked files alone, so a tree whose
+registry is untracked registers nothing and is not graded. The census is asked first and the
+factory loads only past it, so an
 install, whose census answers `adopter`, never needs the factory (§8 F5). `source` is the narrowing
 the move forces: the registration lives in gov's govkit registry alone (§8 F4), whose presence is what
 `tools/policy/policy.py#derive_registry_tree` reads as `source`, so an `unadopted` tree holds no
@@ -271,6 +287,11 @@ registration's seed argv against the kit copy. `widened` types the `growth` case
 disposition `widened:<record>`. `drain-merge` configures `merge.rows.driver` and the attribute in the
 scratch repository, drains a different key on each of two branches, and merges them. `withheld`
 deletes the list at its home, the shape every tree but gov's holds.
+
+`run_census_source_receipt` keeps its scenarios and expectations. After writing the registry it runs
+`git add` on it and writes an empty file at the `home` of `policy.read_legacy_registration(t)`'s
+registration, read from the scratch tree so the guard trace sees no read of gov's descriptors (§8
+F8). Its refusing scenarios refuse at the census first.
 
 ### Inventory
 
@@ -337,8 +358,9 @@ new guard, and on unit 14's `ratchet` legs, which grade every registered populat
 - observability — `lists --check` prints each finding under `legacy homes:`; `--marks` prints the marks.
 - risks — a branch editing the old grammar conflicts once at the conversion (§4 Migration); the seed
   argv's `python` head runs from `PATH` until TOOL-dWitnessedBar-51 S32.
-- testing — the fixture cases of S8, run by the `legacy-homes`, `legacy-homes-present` and
-  `legacy-homes-withheld-install` cases; the suite arm in §7 is observed RED then GREEN by the main loop
+- testing — the fixture cases of S8, run by the `legacy-homes`, `legacy-homes-present`,
+  `legacy-homes-withheld-install` and `census-source-receipt` cases; the suite arm in §7 is observed
+  RED then GREEN by the main loop
   at the close.
 - migration — one move and regrammar, keys preserved, as §4 Migration states.
 - user docs — `help/policy.md`'s section "The policy that still lives elsewhere", S9.
@@ -396,6 +418,11 @@ new guard, and on unit 14's `ratchet` legs, which grade every registered populat
   legacy-homes-present` or of `--fixture legacy-homes-withheld-install` carries `WRONG:`.
   Red when: the list or its home stays under the tool root, so the registration spells a kit path an
   adopter's install resolves to nothing, or the case that reds a deleted list never runs on its edit.
+- **AC11** — When `python tools/policy/check_policy.py --fixture census-source-receipt` runs on the
+  built tree, no line carries `WRONG:`, its `source-mode receipt` line's expected cell ends `True)`,
+  and its `adopter receipt` line's reads `('adopter', False)`.
+  Red when: the case's registry stays untracked or its home unwritten, so `check_legacy_graded`
+  answers false beside the source-mode receipt.
 
 ## 7. Gates
 
@@ -473,6 +500,15 @@ New arm: tools/policy/check_policy.py · covers AC4 AC5 AC6 AC7 AC9 · the `--fi
   path and `policy.py` reads it from there. The move empties the kit's withholding rule, which is
   deleted ([yagni]), and narrows the graded rule to a `source` census (§4 "Reaching the factory").
   widens: none · relaxes: none
+- **F8 — What does `census-source-receipt` expect of `check_legacy_graded` under the new rule?** Its
+  tree holds gov's registry untracked and no home, so the rule answers false where
+  TOOL-dSafePassage-103's case expects true. Options: (a) expect false beside the source-mode
+  receipt; (b) track the registry and write the home, so it stays true. (a) removes no text, rewriting
+  the expectation, docstring and README paragraph, and leaves `graded` false in every scenario, an
+  unmovable probe [gate] refuses as coverage; (b) still observes that a source-mode receipt leaves
+  the list graded and an adopter's does not. RESOLVED (agent, 2026-11-20,
+  delegated): (b), by M3's most feature-rich rule, under [gate]. Observed by AC11. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -505,6 +541,11 @@ New arm: tools/policy/check_policy.py · covers AC4 AC5 AC6 AC7 AC9 · the `--fi
   `.memory-tree.conf` and `tools/gate-legs.json`; units 15 and 17,
   whose `seed` and `{prefix}` resolution this unit calls, are CLOSED and declare no edge back, so
   their reliance is stated in S3, §3 and §10 rather than as edges.
+- rev-5 · 2026-11-20 · S2 · S5 · S8 · S10 · §4 · §5 · AC11 (new) · §8 F8 (new) · per brief
+  2026-11-20-prompt-TOOL-dWitnessedBar-20-spec-fix-brief: `run_census_source_receipt` is named as
+  a caller of `check_legacy_graded`, and the S2 sweep re-run with that name finds no other reader;
+  the case tracks its registry and writes the home so `graded` stays true (§8 F8); the `policy
+  fixtures` guard gains `legacy_ledger.py` and `coverage_join.py`, which the fixture reads in-process.
 
 ## 10. Reuse audit
 
