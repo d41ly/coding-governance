@@ -76,6 +76,9 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # beside it; the unattended driver finds it by `resolve_kit_dir` for `--request` and refuses the verb
 # naming it where it does not resolve. Its leg, `loop request fixtures`, is gov's own [[exempt_leg]], no
 # row here.
+# The code seed (TOOL-dPlacedRequest-8): loop_lib.py's `resolve_item_seed` runs the unattended driver's
+# `--path-tokens`, found by `resolve_kit_dir`, so it takes no edge, the driver's kit requiring this one,
+# and prints `unarmed` where the driver does not resolve; its plants ride the `loop definition` leg.
 # The position engine (TOOL-dDeclaredLoop-7): position.py reads commits, acceptance records and the
 # front matter through the memory-tree kit under the edge above, the run facts through the policy kit
 # by `read_policy_kit`, and each unit's M2 state from the unattended driver's `--plan`, found by

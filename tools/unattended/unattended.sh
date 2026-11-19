@@ -56,6 +56,7 @@
 #   unattended.sh --version                                        # the kit version, then exit
 #   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
 #   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
+#   unattended.sh --path-tokens [--files-touched <rev> <spec> ...]  # the path tokens of stdin, or the specs' Files touched paths at <rev>; writes nothing
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -134,7 +135,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --feed --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --feed --overlaps --path-tokens --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -5441,7 +5442,8 @@ OV_WHY=""
 # concatenated, so each spec's status header is what opens its record. A token is a path when it is
 # one word of path characters holding a `/` or ending in an extension: prose spans in the section
 # such as a function name or an id are not paths. Its status is git's, so an unreadable ref is
-# counted as unreadable rather than as clean.
+# counted as unreadable rather than as clean. The token test is `read_path_tokens`, the one rule
+# (TOOL-dPlacedRequest-8 S5): this function hands it the section's lines and nothing else.
 read_files_touched() { # rev · file of spec paths -> one declared path per line
   local _rf_ps=() _rf_p
   while IFS= read -r _rf_p; do
@@ -5453,14 +5455,35 @@ read_files_touched() { # rev · file of spec paths -> one declared path per line
     { sub(/\r$/, "") }
     /^\*\*Status:\*\* / { term = ($2 == "CLOSED" || $2 == "WONTDO"); ft = 0; next }
     /^#/ { ft = ($0 ~ /^### Files touched/); next }
-    ft && !term {
-      s = $0
+    ft && !term { print }' | read_path_tokens
+  return "${PIPESTATUS[0]}"
+}
+# `read_path_tokens` - THE ONE PATH-TOKEN RULE (TOOL-dPlacedRequest-8 S5): each backticked span of
+# the text on stdin, read line by line, that is one word of letters, digits, dot, underscore, slash
+# and dash holding a `/` or ending in an extension. A backslash, a space or a colon is no such word,
+# so a span holding one is prose and never a path. `read_files_touched` and `--path-tokens` call it.
+read_path_tokens() { # stdin text -> one path token per line, in text order
+  awk '
+    { sub(/\r$/, ""); s = $0
       while (match(s, /`[^`]+`/)) {
         t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
         if (t ~ /^[A-Za-z0-9._\/-]+$/ && (t ~ /\// || t ~ /\.[A-Za-z0-9]+$/)) print t
       }
     }'
-  return "${PIPESTATUS[0]}"
+}
+# `print_path_tokens <rev> <spec>...` - `--path-tokens --files-touched`: the specs' declared paths at
+# <rev>, exactly as `read_files_touched` reads them, through a scratch file holding the spec list, so
+# a terminal spec and a path not ending `.md` print nothing. 2 with one `path-tokens not read` line
+# where no scratch file is made, or git cannot read <rev> or a spec at it.
+print_path_tokens() { # rev · spec... -> one declared path per line
+  local _pt_rev="$1" _pt_list _pt_rc
+  shift
+  _pt_list=$(mktemp) || { echo "path-tokens not read — cannot create a scratch file for the spec list"; return 2; }
+  printf '%s\n' "$@" > "$_pt_list"
+  read_files_touched "$_pt_rev" "$_pt_list"; _pt_rc=$?
+  rm -f "$_pt_list"
+  [ "$_pt_rc" = 0 ] || { echo "path-tokens not read — git cannot read $_pt_rev or a spec at it: exit $_pt_rc"; return 2; }
+  return 0
 }
 check_cross_run_overlap() { # slug · [acquire] -> 0; 1 with OV_WHY under `leases: refuse` at an acquisition
   local slug="$1" acq="${2:-}" anc="${ASHA:-}" rem d now ref sha ct age secs n=0 a=0 u=0 s=0 _co_q _co_g _co_ps=() gran=files fin=0 tr=""
@@ -18619,6 +18642,15 @@ while [ $# -gt 0 ]; do
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
                     usage; RUNLOG_CLEAN=1; exit 0 ;;
     --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
+    # TOOL-dPlacedRequest-8 S5 - the one path-token rule as a read-only verb; no slug, because it reads
+    # text or the specs it is handed and no build. The loop kit's seed resolver calls it.
+    --path-tokens)  refuse_waive_unless_preflight --path-tokens
+                    if [ "${2:-}" = --files-touched ]; then
+                      if [ $# -lt 4 ]; then echo "path-tokens not read — the form is --path-tokens --files-touched <rev> <spec> [<spec> ...]"; _rl_rc=2
+                      else shift 2; print_path_tokens "$@"; _rl_rc=$?; fi
+                    elif [ $# = 1 ]; then read_path_tokens; _rl_rc=0
+                    else echo "path-tokens not read — --path-tokens takes --files-touched <rev> <spec> [<spec> ...] or nothing: ${2:-}"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
     # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above

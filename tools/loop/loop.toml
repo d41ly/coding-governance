@@ -125,6 +125,10 @@
 #              a `measured` entry with `measured-by`, a path HEAD holds, and `measured-line`, a line it
 #              holds whole; an item carrying one routes the outcome `finding` (TOOL-dDeclaredLoop-29).
 #              No gov row carries it: upstream.py beside this file grades and joins it.
+#   seed       optional, "none" when absent: what the item's `code` slot is computed from, one of the
+#              `seed` row's order in item-schema.toml beside this file, "write-set", "question-paths"
+#              or "scope-paths", on a role item alone (TOOL-dPlacedRequest-8); loop_lib.py's
+#              `check_item_seeds` grades it and `resolve_item_seed` turns it into paths
 #   draws      optional, an inline table from an outcome to the rework budget's cause its route draws, one
 #              of budget.py's CAUSES: the route is a counted edge (TOOL-dDeclaredLoop-33)
 #   waits      optional, the outcomes on which the item waits on another party; an item with an owner
@@ -1271,6 +1275,7 @@ routes = { drafted = "item.plan.place", research = "item.plan.research", owner-q
 tag = "item.plan.research"
 step = "step.plan"
 actor = "role:gov-researcher"
+seed = "question-paths"
 needs = ["item.plan.record"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -1371,6 +1376,7 @@ routes = { additive = "item.design.unit-spec", breaking = "item.design.decompose
 tag = "item.design.inventory"
 step = "step.design"
 actor = "role:gov-architect"
+seed = "scope-paths"
 needs = ["item.design.input"]
 outcomes = ["inventoried"]
 witness = { class = "history", by = "the inventory joined to every built unit" }
@@ -1391,6 +1397,7 @@ routes = { found = "item.design.decompose" }
 tag = "item.design.decompose"
 step = "step.design"
 actor = "role:gov-architect"
+seed = "scope-paths"
 needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
 outcomes = ["decomposed", "fact-fork", "goal-fork"]
 witness = { class = "history", by = "the roster and interface schema check, every raised feature fork joined to its fork record" }
@@ -1401,6 +1408,7 @@ routes = { decomposed = "item.design.overlaps", fact-fork = "item.design.researc
 tag = "item.design.research"
 step = "step.design"
 actor = "role:gov-researcher"
+seed = "question-paths"
 needs = ["item.design.decompose"]
 outcomes = ["answered"]
 witness = { class = "history", by = "the research record's schema check" }
@@ -1434,6 +1442,7 @@ routes = { grouped = "item.design.unit-spec" }
 tag = "item.design.unit-spec"
 step = "step.design"
 actor = "role:gov-spec-writer"
+seed = "write-set"
 needs = [["item.design.input", "item.design.overlaps", "item.design.streams"]]
 outcomes = ["authored", "feature-fork"]
 witness = { class = "history", by = "the format check on the spec at its SHA, every raised fork joined to its fork record" }
@@ -1457,6 +1466,7 @@ routes = { scored = "item.design.reason", review = "stand-in:{prefix}/workflows/
 tag = "item.design.reason"
 step = "step.design"
 actor = "role:gov-spec-writer"
+seed = "scope-paths"
 needs = ["item.design.recommend"]
 allowance = "none"
 outcomes = ["review", "no-review"]
@@ -1525,6 +1535,7 @@ on-deadline = "refused"
 tag = "item.build.unit-pass"
 step = "step.build"
 actor = "role:gov-builder"
+seed = "write-set"
 needs = ["item.build.unit-lease"]
 outcomes = ["committed", "spec-wrong", "interface-change", "fork"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -1549,6 +1560,7 @@ draws = { fail = "fix-pass" }
 tag = "item.build.fix-pass"
 step = "step.build"
 actor = "role:gov-builder"
+seed = "write-set"
 needs = [["item.build.acceptance", "item.build.reuse-check", "item.test.attribute", "item.test.seen-red"]]
 outcomes = ["committed"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -1573,6 +1585,7 @@ draws = { next-pass = "fix-pass", refused = "fix-pass" }
 tag = "item.build.revert-pass"
 step = "step.build"
 actor = "role:gov-builder"
+seed = "write-set"
 needs = ["item.build.scope"]
 outcomes = ["reverted", "descoped"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
@@ -1659,6 +1672,7 @@ routes = { recorded = "transition" }
 tag = "item.build.resolve"
 step = "step.build"
 actor = "role:gov-builder"
+seed = "write-set"
 needs = ["item.test.merge"]
 outcomes = ["resolved", "interface-clash"]
 witness = { class = "history", by = "the resolution commit, resolved by the executor, and the routing record" }
@@ -1723,6 +1737,7 @@ routes = { nondeterministic = "item.test.flakes", own = "item.test.attribute", c
 tag = "item.test.attribute"
 step = "step.test"
 actor = "role:gov-tester"
+seed = "write-set"
 needs = ["item.test.route"]
 outcomes = ["code-miss", "spec-wrong"]
 witness = { class = "history", by = "a computed join: every such red has one judgment, and the artifact its route names exists" }
@@ -1772,6 +1787,7 @@ routes = { scored = "item.test.reason", review = "stand-in:{prefix}/workflows/ti
 tag = "item.test.reason"
 step = "step.test"
 actor = "role:gov-tester"
+seed = "write-set"
 needs = ["item.test.recommend"]
 outcomes = ["review", "no-review"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
@@ -2029,6 +2045,7 @@ routes = { fold = "item.review.fold", unit = "transition", ask = "stand-in:{pref
 tag = "item.review.fold"
 step = "none"
 actor = "role:gov-spec-writer"
+seed = "write-set"
 needs = ["item.review.dispose"]
 outcomes = ["next-round", "released", "at-bound"]
 witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }

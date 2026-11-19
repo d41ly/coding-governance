@@ -1198,6 +1198,30 @@ hit "$out" "unattended: overlap probe UNAVAILABLE — refs/remotes/origin/HEAD i
 miss "$out" "no shared path"
 git push -q origin --delete side 2>/dev/null; git update-ref -d refs/remotes/origin/side 2>/dev/null
 reset_tree
+# ---- TOOL-dPlacedRequest-8 AC7: `--path-tokens`, THE ONE PATH-TOKEN RULE as a read-only verb. A fixture
+# ---- spec whose Files touched holds one path token and two prose spans: `--files-touched` prints the
+# ---- path alone, the same lines `read_files_touched` prints for it, and the stdin form prints a text's
+# ---- path tokens and none of its prose. Staged red by dropping the `/`-or-extension half of
+# ---- read_path_tokens' test, which prints the span `two-words`.
+pt_spec=memory/builds/tPt/spec/2026-11-20-spec-X-tPt-1.md
+add_overlap_commit "$pt_spec" "$(printf '# X-tPt-1 — pt\n\n**Status:** OPEN · rev-1 · 2026-11-20 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/pt.sh`, through `read_path_tokens` and `two-words`\n\n## 5. next\n\n- `src/after.sh`\n')"
+pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --files-touched HEAD "$pt_spec" 2>/dev/null); pt_rc=$?
+printf '%s\n' "$pt_spec" > .git/pt-list
+pt_ref=$(load_driver_conf >/dev/null 2>&1 && read_files_touched HEAD .git/pt-list)
+same "DPR8 AC7 --path-tokens --files-touched exits 0" "$pt_rc" "0"
+same "DPR8 AC7 --path-tokens --files-touched prints the declared path alone" "$pt_out" "src/pt.sh"
+same "DPR8 AC7 --path-tokens --files-touched prints what read_files_touched prints" "$pt_out" "$pt_ref"
+pt_out=$(printf 'is `src/a.sh` racing `src/b.sh`, or `read_path_tokens` and `two words.md`?\n' | GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens 2>/dev/null); pt_rc=$?
+same "DPR8 AC7 --path-tokens prints the path tokens of stdin" "$pt_rc $pt_out" "0 $(printf 'src/a.sh\nsrc/b.sh')"
+pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --files-touched HEAD 2>/dev/null); pt_rc=$?
+same "DPR8 --path-tokens --files-touched with no spec exits 2 naming the form" "$pt_rc $pt_out" "2 path-tokens not read — the form is --path-tokens --files-touched <rev> <spec> [<spec> ...]"
+pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --frob </dev/null 2>/dev/null); pt_rc=$?
+same "DPR8 --path-tokens with another flag exits 2 naming it" "$pt_rc $pt_out" "2 path-tokens not read — --path-tokens takes --files-touched <rev> <spec> [<spec> ...] or nothing: --frob"
+pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --files-touched HEAD memory/builds/tPt/spec/absent.md 2>/dev/null); pt_rc=$?
+same "DPR8 --path-tokens --files-touched over a spec git cannot read exits 2" "$pt_rc" "2"
+hit "$pt_out" "path-tokens not read — git cannot read HEAD or a spec at it: exit "
+rm -f .git/pt-list
+reset_tree
 
 # ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
 # ---- self-authored case in its purest form - the run invented the build that authorizes it.
@@ -2513,6 +2537,7 @@ claims | : | --claims
 lease | : | --lease acquire build tRun
 beat | : | --beat tRun
 overlaps | : | --overlaps
+path-tokens | : | --path-tokens --files-touched HEAD memory/builds/tRun/README.md
 no conf, rc 2 | rm -f .unattended.conf | --status tRun
 a conf holding declare, rc 2 | printf 'declare LANDER_MODE=\"bogus\"\\n' >> .unattended.conf | --status tRun
 a malformed GATE_BOUND, rc 2 | printf 'GATE_BOUND=\"soon\"\\n' >> .unattended.conf | --status tRun
@@ -22899,7 +22924,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3915 -> 3937 by TOOL-dPlacedRequest-33: the card-ref block's 22 region-eight assertions (16
 # `same`, its refusal loop's five among them, one per pass, and 6 `hit`), off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3937
+# RAISED 3937 -> 3949 by TOOL-dPlacedRequest-8: the `--path-tokens` block's 8 region-one assertions (7
+# `same`, its refusal arms among them, and 1 `hit`) and the verb's 4 region-one parity assertions (the
+# row's 3 and its declared-verb line's 1), off the diff's own lines; no skip branch. No suite ran, and
+# its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3949
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23049,7 +23078,8 @@ PROLOGUE_ARMS=20
 # RAISED 734 -> 737 by TOOL-aTrimmedWait-13: the same 3 region-one parity-row assertions, see FLOOR_ASSERTIONS.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 734, plus main's 3, plus this branch's 1 = 738.
 # RAISED 738 -> 742 by TOOL-dPlacedRequest-1: the same 4 region-one `--lease` parity assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=742
+# RAISED 742 -> 754 by TOOL-dPlacedRequest-8: the same 12 region-one `--path-tokens` assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=754
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

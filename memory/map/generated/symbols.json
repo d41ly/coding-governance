@@ -6788,6 +6788,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "check_item_seeds",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "check_journal",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -8271,6 +8276,11 @@
       "id": "check_scratch_guard",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_seed_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "check_selected",
@@ -18523,6 +18533,11 @@
       "file": "tools/unattended/pass-tree.sh"
     },
     {
+      "id": "print_path_tokens",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_pb_out",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -22153,6 +22168,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_path_tokens",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_pauses",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -23151,6 +23171,11 @@
       "id": "read_section_rows",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_seed_values",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_serves_ids",
@@ -27398,6 +27423,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "resolve_item_seed",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
       "id": "resolve_job_backend",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -28821,6 +28851,11 @@
       "id": "resolve_runlog_dirs",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_seed_path",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "resolve_selection",
@@ -31656,6 +31691,11 @@
       "id": "run_seed",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "run_seed_command",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "run_select",
@@ -38526,6 +38566,11 @@
       "id": "write_second_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "write_seed_plant",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "write_session",

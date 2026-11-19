@@ -1012,6 +1012,9 @@ routes = { done = "item.test.exit" }
   `supersedes`.
 - `inputs` and `routes` are open, and adding widens them. An `amends` writes `routes` whole, so every
   changed route reads as a widening, with gov's old table as a narrowing beside it.
+- `seed` and `map` are open along their order of values, a later value widening: `seed` runs `none`,
+  `write-set`, `question-paths`, `scope-paths`, and `map` runs `none`, `base`. `unfolds` is open, and
+  adding widens it. An absent `seed` or `map` reads `none`, an absent `unfolds` reads empty.
 - `step`, `witness` and `outcomes` are fixed by a principle, and `actor`, `allowance`, `returns` and
   `owner` are fixed because they declare no direction. Patching one is refused, naming the field and
   what fixes it.
@@ -1072,6 +1075,44 @@ version, so after a bump an input still pinned at the old version is refused unt
 compares each row with the record table and reads no earlier revision, so that edit is the review's to
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
+
+## The code an item is handed: its seed
+
+A role's work order will carry a `code` slot, the code its item touches. Which code is computed from
+the item's `seed`, one of four values, from the narrowest neighbourhood to the broadest:
+
+- `none`, the default and every non-role item's: no code is handed.
+- `write-set`: the paths the unit's spec declares under `### Files touched`, read from the spec at your
+  last commit. The builder, tester and spec-writer items take it.
+- `question-paths`: the backticked paths in the question a researcher was asked.
+- `scope-paths`: the paths of the design's scope. No plan record carries a scope yet, so this one prints
+  `unarmed — scope-paths: no plan record carries a scope; dRankedPlan's plan.record arms it`, never an
+  empty list. The architect's items and the design's reasoning item take it.
+
+`python tools/loop/loop_lib.py --check` prints one `loop: seed <tag> · <value>` line per item and a
+`loop: seeds` count, and refuses a value outside those four and a seed other than `none` on an item
+whose actor is not a role, naming the item and the value.
+
+**Resolve an item's seed:** the definition's reader takes a `seed` command,
+`loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]`, run from inside your
+repository. It prints one path per line, relative to the repository, with forward slashes, a leading
+`./` and a trailing `/` dropped and each path once, in the order first seen; or the one `unarmed`
+line naming the source and why. `write-set` takes `--build` and `--unit` and finds the spec whose
+heading names that unit; `question-paths` takes `--question`. A missing one exits 2 naming it, as do an
+item no row declares and a unit with no spec, or two. Where the unattended kit is not installed,
+`write-set` and `question-paths` print `unarmed — <source>: no unattended driver resolves`. A spec at
+CLOSED or WONTDO declares nothing, and a path spelled with backslashes is prose, not a path. The paths
+are what was declared, not what was written. `--fixture --plant seed-bad`, `seed-write`, `seed-question`
+and `seed-scope` show a refusal and each source.
+
+**The one path-token rule.** Both sources read paths through the unattended driver, so one rule decides <!-- usage: verb:unattended.sh:--path-tokens 224a4705 -->
+what a path is: `bash tools/unattended/unattended.sh --path-tokens` prints each backticked span of the
+text on its standard input that is one word of letters, digits, dots, underscores, slashes and dashes
+holding a `/` or ending in an extension, one per line. With `--files-touched <rev> <spec> ...` it prints
+instead the paths each spec declares under `### Files touched` at that revision, exactly what the
+driver's own overlap and dispatch reads take, skipping a CLOSED or WONTDO spec. It writes nothing and
+exits 0, or 2 with one `path-tokens not read` line on a malformed call or a revision or spec git cannot
+read.
 
 ## Handing an item what its upstream items established
 

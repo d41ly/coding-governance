@@ -603,6 +603,14 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
   writes nothing and always exits 0; other than one remote, or no symref, is one UNAVAILABLE line.
+- `--path-tokens` — the one path-token rule, read-only: with no flag it prints each backticked span of
+  the text on stdin that is one word of letters, digits, dot, underscore, slash and dash holding a `/`
+  or ending in an extension, one per line; `--path-tokens --files-touched <rev> <spec> ...` prints
+  instead what the overlap and dispatch reads take from those specs, each `### Files touched` path at
+  `<rev>`, a CLOSED or WONTDO spec skipped. The loop kit's seed resolver calls it for an item's
+  `write-set` and `question-paths` (TOOL-dPlacedRequest-8). It takes no slug, writes nothing, and exits
+  0, or 2 with one `path-tokens not read` line on another flag, a missing spec, or a revision or spec
+  git cannot read.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
   `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a

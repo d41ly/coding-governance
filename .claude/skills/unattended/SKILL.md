@@ -124,6 +124,7 @@ unattended.sh --register problem <subject> <item> <file>
 unattended.sh --card-ref write <slug> --message <file>
 unattended.sh --request <file>
 unattended.sh --overlaps  # local
+unattended.sh --path-tokens --files-touched HEAD <spec>
 unattended.sh --beat <slug>
 unattended.sh --feed check  # local
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
