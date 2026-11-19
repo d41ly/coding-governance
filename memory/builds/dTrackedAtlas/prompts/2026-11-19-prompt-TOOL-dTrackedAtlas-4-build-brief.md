@@ -2,7 +2,7 @@
 
 # Build brief — TOOL-dTrackedAtlas-4: the page regenerates on node d after a landing, with nobody running it
 
-Build `memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md` (rev-3, READY) as written: the
+Build `memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-4.md` (rev-4, READY) as written: the
 hook script, its switch file, the one hook group in `.claude/settings.json`, and the acceptance ledger its Files
 touched names. The spec is the design; diverge only by returning `diverged: true` with the section and the reason.
 Units 1 to 3 are CLOSED: reach the page check only through the generator's CLI as unit 3's spec states it.

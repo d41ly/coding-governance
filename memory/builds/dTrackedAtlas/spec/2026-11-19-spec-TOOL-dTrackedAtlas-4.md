@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-4 — the Atlas page regenerates on node d after main moves, behind a switch whose default is on
 
-**Status:** SPECCED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
+**Status:** SPECCED · rev-4 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 4
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,8 @@
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold.md) | research | TOOL-dTrackedAtlas-3 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-4-spec-brief.md) | research | — |
 
@@ -356,9 +358,18 @@ runner means `node "$C/$REGEN" --run`. A first run writes the page at the clone'
   line and exits 0, and `$T/ta4none` still does not exist.
   Red when: the folder check is removed, where the runner's lock write fails on the absent folder
   and no such line prints.
-- **AC6** — When a landing appends `raise SystemExit(3)` to `$ATLAS` and the runner runs, it exits 1,
-  the log's last line names `failed`, the page is byte-identical to before, and no
-  `$H/regen-*` folder and no `$H/*.regen-*.html` file remain.
+- **AC6** — When a landing inserts the line `raise SystemExit(3)` into `$ATLAS` directly above its
+  one `if __name__ == "__main__":` line, with
+  `sed -i '/^if __name__ == "__main__":$/i raise SystemExit(3)' "$C/$ATLAS"` before the commit, and
+  the runner runs, it exits 1, the log's last line names `failed`, the page is byte-identical to
+  before, and no `$H/regen-*` folder and no `$H/*.regen-*.html` file remain. The planted line runs
+  after the module's top-level code and before `main` is called, so every run of that tree's
+  generator exits 3 with nothing on stdout: `"$PY" "$C/$ATLAS" --check --page "$P" --ref origin/main`
+  run in `$C` after the landing shows it. The runner's page check runs `$C`'s working copy, which
+  carries the line, so its answer is exit 3 with no `atlas: current` line, which §4 "The runner"
+  reads as not current, and the runner regenerates. The generation in the scratch checkout of the tip
+  carries the same line, so its `--out` step exits 3 before writing the temp page, and the runner
+  logs `failed` and leaves the page as it was.
   Red when: the scratch checkout's removal is skipped, where `$H/regen-<pid>` remains and
   `git -C "$C" worktree list` lists it.
 - **AC7** — When `$H/closed-loop-atlas.regen.lock` is written fresh by hand before a landing and the
@@ -435,6 +446,11 @@ own fixture settings. No suite arm is added or moved, so no arm line is declared
   2026-11-19-prompt-TOOL-dTrackedAtlas-3-name-fold: the inventory's `sidecars` and `regenerate` are
   renamed `deriveSidecars` and `runRegeneration`, each leading with a declared verb. No design
   change.
+- rev-4 · 2026-11-19 · §6 · AC6's planted break, folded from
+  2026-11-19-prompt-TOOL-dTrackedAtlas-4-ac6-fold: the line appended after the generator's closing
+  `sys.exit` never ran, so it is now inserted above the `if __name__` guard, and AC6 states what the
+  page check answers on that tree and why the runner then logs `failed`. No other criterion plants
+  code, and no section had the builder flip the status. No design change.
 
 ## 10. Reuse audit
 
