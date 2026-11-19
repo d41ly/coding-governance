@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** INPROGRESS · rev-13 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-13 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -20,6 +20,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-16-2-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-2-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-3-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-3-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-16-deviation-164.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-deviation-164.md) | deviation | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-41.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-41.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-42.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-42.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-registry-conversion.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-registry-conversion.md) | journal | — |

@@ -3,25 +3,25 @@
 (TOOL-dWitnessedBar-16).
 
     python <prefix>/memory-tree/convert_registry.py convert --home <home>
-    python <prefix>/memory-tree/convert_registry.py up|down|witness <target> --home <home>
     python <prefix>/memory-tree/convert_registry.py read-back <population>
 
-`convert` reads one file of a legacy grammar `LEGACY` names, by its file name, and writes its home in
-the ledger grammar through the factory's `write_rows`: the header rendered from the population's
-`[[ledger]]` table, then one row per key, its count, the sha `read_head_sha` names and `seeded`. A
-home holding no row is written as its header and the `# unarmed · dead probe · <sha>` line the
-factory's seed writes for a dead probe. Each former reason, which the row grammar has no field for,
-is printed `reason · <key> · <text>` for the conversion record. A home whose first line is already a
-ledger header is said so and nothing is written, so a second run never re-dates a row. The table names
-each legacy file's parser and the descriptor whose `[[ledger]]` table gives its shape, so the shape is
-read from that table and never typed here; the two map lists are written to their `.txt` sibling and
-the TOML removed, and drift's two populations are read from the `PINS` and `BASELINES` literals of
-the project layer `drift_signals.py` beside them.
+`convert` reads one file of a legacy grammar `LEGACY` names, keyed by the ledger home's file name,
+and writes that home in the ledger grammar through the factory's `write_rows`: the header rendered
+from the population's `[[ledger]]` table, then one row per key, its count, the sha `read_head_sha`
+names and `seeded`. A home holding no row is written as its header and the `# unarmed · dead probe ·
+<sha>` line the factory's seed writes for a dead probe. Each former reason, which the row grammar has
+no field for, is printed `reason · <key> · <text>` for the conversion record. A home whose first line
+is already a ledger header is said so and nothing is written, so a second run never re-dates a row.
+The table names each legacy file's parser and where it reads: the home itself, the two map homes
+their TOML sibling, which the conversion removes, and drift's two the project layer whose `PINS` and
+`BASELINES` literals the caller names (`convert` names none, so it refuses those two). It names no
+descriptor: a population's `[[ledger]]` table is found through the factory's `read_registrations`
+over the checkout holding this program, so the shape is read from that table and never typed here,
+and `<entry>`, the step id's head, is the `id` of the descriptor that table sits in.
 
-`up`, `down` and `witness` are the `[[upgrade]]` step over `<target>`: `up` writes the before-image
-through `upgrade_steps.write_before_image`, then the converted file; `down` restores it through
-`write_from_before_image`; `witness` exits 0 when the legacy file is absent or the home's first line
-is a ledger header. The step id is `<entry>/<population>-to-ledger`, `<entry>` the descriptor's own id.
+The `[[upgrade]]` step that converts an adopter's list, `up`, `down` and `witness` over `<target>`,
+is gov's step program `<gov>/govkit/steps/registry_to_ledger.py`, which loads this module and calls
+`derive_after`, `write_after` and `read_legacy_entry` (TOOL-dWitnessedBar-16 S10, §8 F20).
 
 `read-back` is each registration's `seed`: it prints each row of the population's working home as its
 key fields and count, TAB-joined, the measured rows the factory's seed run parses; where the home
@@ -36,7 +36,7 @@ is refused, never guessed at.
 from __future__ import annotations
 
 import ast
-import importlib.util
+import dataclasses
 import os
 import pathlib
 import re
@@ -48,7 +48,6 @@ import tomllib
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
-TOOLS = KIT.parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
@@ -56,6 +55,10 @@ import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 SAY = "convert-registry"
 REASON_LEAD = "reason"
 DEAD_PROBE_REASON = "dead probe"
+# Where a legacy file sits, by the home it converts to: the home itself, its sibling of `SIBLING_SUFFIX`
+# (removed once converted), or the file the caller names (the step's `--from`).
+READS_HOME, READS_SIBLING, READS_NAMED = "home", "sibling", "named"
+SIBLING_SUFFIX = ".toml"
 
 
 class Refusal(Exception):
@@ -191,76 +194,91 @@ def read_lines_with(parse):
     return read
 
 
-# file name -> (descriptor under the tool root, population, reader, file it reads, file it writes):
-# the legacy grammars this program converts, the one table `convert` and S7's transitional read share.
+# ledger home's file name -> (population, reader, where its legacy file sits): the legacy grammars this
+# program converts. No descriptor is named: `derive_registration` finds each population's table.
 LEGACY = {
-    "baseline.toml": ("codebase-map/kit.toml", "baseline", read_toml_rows, "baseline.toml", "baseline.txt"),
-    "affordance-exempt.toml": ("codebase-map/kit.toml", "affordance-exempt", read_exempt_rows,
-                               "affordance-exempt.toml", "affordance-exempt.txt"),
-    "brief-recorded-waiver.txt": ("unattended/kit.toml", "brief-recorded-waiver", read_lines_with(parse_keyed_reason(1))),
-    "pass-order-waiver.txt": ("unattended/kit.toml", "pass-order-waiver", read_lines_with(parse_keyed_reason(1))),
-    "curation-debt.txt": ("memory-tree/kit.toml", "curation-debt", read_lines_with(parse_spaced_reason)),
-    "id-orphan-waiver.txt": ("memory-tree/kit.toml", "id-orphan-waiver", read_lines_with(parse_keyed_reason(1))),
-    "legacy-files.txt": ("memory-tree/kit.toml", "legacy-files", read_lines_with(parse_spaced_reason)),
-    "method-carriers.txt": ("memory-tree/kit.toml", "method-carriers", read_lines_with(parse_carrier)),
-    "readme-contract.txt": ("memory-tree/kit.toml", "readme-contract", read_lines_with(parse_contract)),
-    "refusal-retirements.txt": ("memory-tree/kit.toml", "refusal-retirements", read_lines_with(parse_retirement)),
-    "stale-header-waiver.txt": ("memory-tree/kit.toml", "stale-header-waiver", read_lines_with(parse_spaced_reason)),
-    "trace-waiver.txt": ("memory-tree/kit.toml", "trace-waiver", read_lines_with(parse_keyed_reason(2))),
-    "unarmed-branches.txt": ("memory-tree/kit.toml", "unarmed-branches", read_lines_with(parse_unarmed_branch)),
-    "encoding-posture-sites.txt": ("gate-lint/kit.toml", "encoding-posture-sites", read_lines_with(parse_counted_reason(2))),
-    "fork-ceilings.txt": ("gate-lint/kit.toml", "fork-ceilings", read_lines_with(parse_fork_ceiling)),
-    "location-probe-waivers.txt": ("gate-lint/kit.toml", "location-probe-waivers", read_lines_with(parse_counted_reason(2))),
-    "spawn-idiom-sites.txt": ("gate-lint/kit.toml", "spawn-idiom-sites", read_lines_with(parse_counted_reason(2))),
-    "substitution-fed-loops.txt": ("gate-lint/kit.toml", "substitution-fed-loops", read_lines_with(parse_counted_reason(2))),
-    "temp-name-sites.txt": ("gate-lint/kit.toml", "temp-name-sites", read_lines_with(parse_counted_reason(2))),
-    "docs-undocumented.txt": ("govkit/registry.toml", "docs-undocumented", read_lines_with(parse_keyed_reason(1))),
-    "spec-token-waivers.txt": ("govkit/registry.toml", "spec-token-waivers", read_lines_with(parse_keyed_reason(1))),
-    "dead-path-waivers.txt": ("govkit/registry.toml", "dead-path-waivers", read_lines_with(parse_dead_path)),
-    "playbook-kit-waivers.txt": ("govkit/registry.toml", "playbook-kit-waivers", read_lines_with(parse_spaced_reason)),
-    "drift-pins.txt": ("drift-audit/kit.toml", "drift-pins", read_pin_rows, "drift_signals.py", "drift-pins.txt"),
-    "drift-baselines.txt": ("drift-audit/kit.toml", "drift-baselines", read_baseline_rows,
-                            "drift_signals.py", "drift-baselines.txt"),
+    "baseline.txt": ("baseline", read_toml_rows, READS_SIBLING),
+    "affordance-exempt.txt": ("affordance-exempt", read_exempt_rows, READS_SIBLING),
+    "brief-recorded-waiver.txt": ("brief-recorded-waiver", read_lines_with(parse_keyed_reason(1)), READS_HOME),
+    "pass-order-waiver.txt": ("pass-order-waiver", read_lines_with(parse_keyed_reason(1)), READS_HOME),
+    "curation-debt.txt": ("curation-debt", read_lines_with(parse_spaced_reason), READS_HOME),
+    "id-orphan-waiver.txt": ("id-orphan-waiver", read_lines_with(parse_keyed_reason(1)), READS_HOME),
+    "legacy-files.txt": ("legacy-files", read_lines_with(parse_spaced_reason), READS_HOME),
+    "method-carriers.txt": ("method-carriers", read_lines_with(parse_carrier), READS_HOME),
+    "readme-contract.txt": ("readme-contract", read_lines_with(parse_contract), READS_HOME),
+    "refusal-retirements.txt": ("refusal-retirements", read_lines_with(parse_retirement), READS_HOME),
+    "stale-header-waiver.txt": ("stale-header-waiver", read_lines_with(parse_spaced_reason), READS_HOME),
+    "trace-waiver.txt": ("trace-waiver", read_lines_with(parse_keyed_reason(2)), READS_HOME),
+    "unarmed-branches.txt": ("unarmed-branches", read_lines_with(parse_unarmed_branch), READS_HOME),
+    "encoding-posture-sites.txt": ("encoding-posture-sites", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    "fork-ceilings.txt": ("fork-ceilings", read_lines_with(parse_fork_ceiling), READS_HOME),
+    "location-probe-waivers.txt": ("location-probe-waivers", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    "spawn-idiom-sites.txt": ("spawn-idiom-sites", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    "substitution-fed-loops.txt": ("substitution-fed-loops", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    "temp-name-sites.txt": ("temp-name-sites", read_lines_with(parse_counted_reason(2)), READS_HOME),
+    "docs-undocumented.txt": ("docs-undocumented", read_lines_with(parse_keyed_reason(1)), READS_HOME),
+    "spec-token-waivers.txt": ("spec-token-waivers", read_lines_with(parse_keyed_reason(1)), READS_HOME),
+    "dead-path-waivers.txt": ("dead-path-waivers", read_lines_with(parse_dead_path), READS_HOME),
+    "playbook-kit-waivers.txt": ("playbook-kit-waivers", read_lines_with(parse_spaced_reason), READS_HOME),
+    "drift-pins.txt": ("drift-pins", read_pin_rows, READS_NAMED),
+    "drift-baselines.txt": ("drift-baselines", read_baseline_rows, READS_NAMED),
 }
 
 
-def read_legacy_entry(home):
-    """-> (descriptor, population, reader, the path it reads, the home it writes) for `home`, by name."""
-    name = pathlib.PurePosixPath(home.replace("\\", "/")).name
-    if name not in LEGACY:
+def read_legacy_entry(home, source=None):
+    """-> (population, reader, the path it reads, the home it writes, whether the read file is removed)
+    for `home`, by its file name. `source` names the legacy file of a home that reads a named one, and
+    is refused for any other home, so a caller cannot point a list at a file its table does not name."""
+    path = pathlib.PurePosixPath(home.replace("\\", "/"))
+    if path.name not in LEGACY:
         raise Refusal("%s: no legacy grammar of that name is known (%s)" % (home, ", ".join(sorted(LEGACY))))
-    descriptor, population, reader, *names = LEGACY[name]
-    parent = pathlib.PurePosixPath(home.replace("\\", "/")).parent
-    reads, writes = names if names else (name, name)
-    return descriptor, population, reader, (parent / reads).as_posix(), (parent / writes).as_posix()
+    population, reader, where = LEGACY[path.name]
+    if where == READS_NAMED:
+        if not source:
+            raise Refusal("%s reads the legacy file its caller names, and none was named" % home)
+        reads = pathlib.PurePosixPath(source.replace("\\", "/")).as_posix()
+    elif source:
+        raise Refusal("%s reads %s, so it takes no named legacy file (%s)"
+                      % (home, "its own file" if where == READS_HOME else "its sibling", source))
+    else:
+        reads = (path.with_suffix(SIBLING_SUFFIX) if where == READS_SIBLING else path).as_posix()
+    return population, reader, reads, path.as_posix(), where == READS_SIBLING
 
 
-def derive_registration(descriptor, population, home):
-    """The `Registration` of `population` from its descriptor under the tool root, homed at `home`;
-    with the descriptor's own id, the `<entry>` a step id carries."""
-    path = TOOLS / descriptor
+def resolve_checkout():
+    """The work tree holding this program, whose descriptors register its populations."""
+    rc, out = LL._run_git(KIT, "rev-parse", "--show-toplevel")
+    if rc != 0 or not out.strip():
+        raise Refusal("%s is not inside a git work tree, so no [[ledger]] table can be read" % KIT)
+    return out.strip()
+
+
+def derive_registration(population, home):
+    """The `Registration` of `population`, read through the factory's `read_registrations` over the
+    checkout holding this program and homed at `home`; with the `id` of the descriptor its table sits
+    in, the `<entry>` a step id carries."""
+    checkout = resolve_checkout()
     try:
-        data = tomllib.loads(path.read_text(encoding="utf-8"))
+        regs = [r for r in LL.read_registrations(checkout) if r.population == population]
+    except ValueError as exc:
+        raise Refusal("a [[ledger]] registration is refused:\n%s" % exc) from None
+    if len(regs) != 1:
+        raise Refusal("%d [[ledger]] tables name %r at %s, not one" % (len(regs), population, checkout))
+    reg = regs[0]
+    source = pathlib.Path(checkout, reg.source)
+    try:
+        data = tomllib.loads(source.read_text(encoding="utf-8"))
     except (OSError, tomllib.TOMLDecodeError) as exc:
-        raise Refusal("%s: does not read as TOML: %s" % (path, exc)) from None
-    tables = [t for t in data.get("ledger", []) if isinstance(t, dict) and t.get("population") == population]
-    if len(tables) != 1:
-        raise Refusal("%s: %d [[ledger]] tables name %r, not one" % (descriptor, len(tables), population))
-    bad = LL._check_table(tables[0])
-    if bad:
-        raise Refusal("%s: [[ledger]] %r: %s" % (descriptor, population, "; ".join(bad)))
-    t = tables[0]
-    reg = LL.Registration(population, tuple(t["seed"]), t["key"], tuple(t["fields"]), t["drain"], t["direction"],
-                          home, t["leg"], tuple(t.get("verbatim", [])), descriptor)
-    return reg, data.get("id") or pathlib.PurePosixPath(descriptor).parent.name
+        raise Refusal("%s: does not read as TOML: %s" % (reg.source, exc)) from None
+    return dataclasses.replace(reg, home=home), data.get("id") or pathlib.PurePosixPath(reg.source).parent.name
 
 
-def read_legacy_rows(root, home):
-    """-> (registration, entry id, the path read, {key: (count, sha-less values)}, [(key, reason)]) of
-    the legacy file `LEGACY` names for `home` at `root`: an ordinal registry's equal keys merged, their
-    count the number of rows; any other repeated key refused, so no row is dropped or merged."""
-    descriptor, population, reader, reads, writes = read_legacy_entry(home)
-    reg, entry = derive_registration(descriptor, population, writes)
+def read_legacy_rows(root, home, source=None):
+    """-> (registration, entry id, the path read, {key: count}, [(key, reason)]) of the legacy file
+    `LEGACY` names for `home` at `root`: an ordinal registry's equal keys merged, their count the
+    number of rows; any other repeated key refused, so no row is dropped or merged."""
+    population, reader, reads, writes, _removed = read_legacy_entry(home, source)
+    reg, entry = derive_registration(population, writes)
     text = pathlib.Path(root, reads).read_bytes().decode("utf-8")
     try:
         parsed = reader(text, reads)
@@ -305,19 +323,20 @@ def check_ledger_header(path):
     return True
 
 
-def derive_after(root, home):
+def derive_after(root, home, source=None, sha_root=None):
     """-> ({root-relative path: bytes, or None for removed}, registration, entry id, reasons): what
-    converting `home` at `root` writes; {} where the home already reads as a ledger."""
-    descriptor, population, _reader, reads, writes = read_legacy_entry(home)
+    converting `home` at `root` writes; {} where the home already reads as a ledger or no legacy file
+    is there. The sha stamped is HEAD's at `sha_root`, `root` where none is given."""
+    population, _reader, reads, writes, removed = read_legacy_entry(home, source)
     if check_ledger_header(pathlib.Path(root, writes)) or not pathlib.Path(root, reads).is_file():
-        reg, entry = derive_registration(descriptor, population, writes)
+        reg, entry = derive_registration(population, writes)
         return {}, reg, entry, []
-    sha, why = LL.read_head_sha(root)
+    sha, why = LL.read_head_sha(sha_root or root)
     if not sha:
         raise Refusal("%s: %s, so no sha can be stamped" % (home, why))
-    reg, entry, reads, rows, reasons = read_legacy_rows(root, home)
+    reg, entry, reads, rows, reasons = read_legacy_rows(root, home, source)
     after = {writes: derive_converted_text(reg, rows, sha)}
-    if reads != writes and pathlib.PurePosixPath(reads).suffix == ".toml":
+    if removed:
         after[reads] = None
     return after, reg, entry, reasons
 
@@ -348,82 +367,6 @@ def cmd_convert(root, home):
     return 0
 
 
-def load_steps():
-    """The upgrade-step helpers in the deployer beside this kit, imported by their path."""
-    path = TOOLS / "govkit" / "upgrade_steps.py"
-    mod = sys.modules.get("upgrade_steps")
-    if mod is not None and getattr(mod, "__file__", None) and pathlib.Path(mod.__file__).resolve() == path:
-        return mod
-    if not path.is_file():
-        raise Refusal("no deployer at %s, so no before-image can be written" % path.parent)
-    spec = importlib.util.spec_from_file_location("upgrade_steps", path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["upgrade_steps"] = mod
-    spec.loader.exec_module(mod)
-    return mod
-
-
-def derive_step_id(home):
-    descriptor, population, _reader, _reads, writes = read_legacy_entry(home)
-    _reg, entry = derive_registration(descriptor, population, writes)
-    return "%s/%s-to-ledger" % (entry, population)
-
-
-def cmd_up(target, home):
-    steps = load_steps()
-    held = {}
-
-    def derive(before):
-        after, _reg, _entry, reasons = derive_after(target, home)
-        if before is not None and not after:
-            # A re-run over a completed up: the image's before bytes are the legacy file.
-            scratch = tempfile.mkdtemp(prefix="cr")
-            try:
-                for rel, data in before.items():
-                    if data is not None:
-                        pathlib.Path(scratch, rel).parent.mkdir(parents=True, exist_ok=True)
-                        pathlib.Path(scratch, rel).write_bytes(data)
-                sha, why = LL.read_head_sha(target)
-                if not sha:
-                    raise Refusal("%s: %s" % (home, why))
-                reg, _entry, reads, rows, reasons = read_legacy_rows(scratch, home)
-                after = {reg.home: derive_converted_text(reg, rows, sha)}
-                if reads != reg.home and pathlib.PurePosixPath(reads).suffix == ".toml":
-                    after[reads] = None
-            finally:
-                shutil.rmtree(scratch, ignore_errors=True)
-        held["reasons"] = reasons
-        return after
-
-    try:
-        after = steps.write_before_image(target, derive_step_id(home), derive)
-    except steps.Refusal as exc:
-        raise Refusal(str(exc)) from None
-    write_after(target, after)
-    print_reasons(held.get("reasons", []))
-    print("%s: up · %s" % (SAY, ("%s converted" % ", ".join(sorted(after))) if after else "nothing to convert"))
-    return 0
-
-
-def cmd_down(target, home):
-    steps = load_steps()
-    try:
-        restored = steps.write_from_before_image(target, derive_step_id(home))
-    except steps.Refusal as exc:
-        raise Refusal(str(exc)) from None
-    print("%s: down · restored %s" % (SAY, ", ".join(restored) or "nothing: no before-image, no up applied"))
-    return 0
-
-
-def cmd_witness(target, home):
-    _descriptor, _population, _reader, reads, writes = read_legacy_entry(home)
-    if not pathlib.Path(target, reads).is_file() or check_ledger_header(pathlib.Path(target, writes)):
-        print("%s: witness · %s reads as a ledger or holds no legacy file: applied" % (SAY, writes))
-        return 0
-    print("%s: witness · %s is in its legacy grammar: not applied" % (SAY, reads))
-    return 1
-
-
 def cmd_read_back(root, population):
     try:
         regs = [r for r in LL.read_registrations(root) if r.population == population]
@@ -444,7 +387,6 @@ def cmd_read_back(root, population):
 
 
 USAGE = ("usage: convert_registry.py convert --home <home>\n"
-         "       convert_registry.py up|down|witness <target> --home <home>\n"
          "       convert_registry.py read-back <population>")
 
 
@@ -473,9 +415,6 @@ def main(argv):
             root = resolve_root(os.getcwd())
             rel = pathlib.Path(os.path.relpath(pathlib.Path(os.getcwd(), home), root)).as_posix()
             return cmd_convert(root, rel)
-        if len(args) == 2 and args[0] in ("up", "down", "witness") and home:
-            target = pathlib.Path(args[1]).resolve()
-            return {"up": cmd_up, "down": cmd_down, "witness": cmd_witness}[args[0]](target, home)
         if len(args) == 2 and args[0] == "read-back" and home is None:
             return cmd_read_back(resolve_root(os.getcwd()), args[1])
     except (Refusal, OSError, UnicodeDecodeError) as exc:

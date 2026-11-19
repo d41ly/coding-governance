@@ -112,7 +112,7 @@ EVIDENCE_GLOBS: list[str] = []
 
 # --------------------------------------------------------------------------------------------
 # THE PINS are the rows of the `ceiling` population `drift-pins` (TOOL-dWitnessedBar-16 S8), its home
-# `drift-pins.txt` beside this layer: one row per signal, its count the pin, seeded at MEASURED
+# `memory/project/drift-pins.txt`: one row per signal, its count the pin, seeded at MEASURED
 # values and never guessed. A pin of 0 is no row, so the signal keeps its own tolerance of 0. A
 # raise is the `ratchet` pack's widen, which costs a widen record and its reason; each pin's
 # history, written here until this unit, is the conversion record's.
@@ -120,7 +120,7 @@ EVIDENCE_GLOBS: list[str] = []
 
 # --------------------------------------------------------------------------------------------
 # THE BASELINES are the rows of the `shrink-only` population `drift-baselines` (TOOL-dWitnessedBar-16
-# S8), its home `drift-baselines.txt` beside this layer: one row per (signal, offender id), the
+# S8), its home `memory/project/drift-baselines.txt`: one row per (signal, offender id), the
 # gateable signals bounded by WHICH offenders they hold rather than how many (TOOL-aMendedFleet-56).
 # A new id reds, a listed id that no longer offends reds until its row is deleted, and the set may
 # never gain an id against the base; a signal moved to `drift-pins` is pinned no higher than the

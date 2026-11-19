@@ -4,8 +4,8 @@ tools/check-microformats.sh	EOF	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seede
 tools/check-testsuite-counts.sh	EOF	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/check-wiring.sh	EOF	3	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/lib/resolve-python.test.sh	<<<	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-memory-hygiene.sh	<<<	8	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-tools/memory-tree/check-method-carriers.sh	EOF	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/memory-tree/check-memory-hygiene.sh	<<<	7	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+tools/memory-tree/check-method-carriers.sh	EOF	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/memory-tree/check-verdict-epoch.sh	EOF	2	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/memory-tree/merge-rows.test.sh	EOF	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/run-gates/adopt-run-gates.sh	EOF	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

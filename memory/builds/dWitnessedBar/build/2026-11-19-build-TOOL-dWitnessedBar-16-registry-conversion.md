@@ -92,7 +92,7 @@ TOOL-dFairHearing-39	late row: its --brief row is in RUN.md at 603b0aef0, the re
 
 ## dead-path-waivers
 
-- Home: `tools/dead-path-waivers.txt` · registered in `tools/govkit/registry.toml` · direction `declared-set`, key `site path,text`.
+- Home: `memory/project/dead-path-waivers.txt`, moved from `tools/` by pass 2 (§2 S14) · registered in `tools/govkit/registry.toml` · direction `declared-set`, key `site path,text`.
 - Before: 24 legacy row(s). After: 24 ledger row(s), counts summing to 24.
 - Former reasons, 24, one per keyed row (key, then reason, TAB-separated):
 
@@ -121,6 +121,31 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	the auto-memory index is the agent harness's own MEMORY.md, written outside this repository under the user's home, not the file of that name this repository once tracked
 {prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	a [[retired]] row's surfaces name what the retired entry shipped, so update withdraws the file from an adopter's tree that still holds it and the step gate witnesses the vanished member; a landed row is frozen (migration, PLAY-dOrderedCharter-80 S2)
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	a [[retired]] row's surfaces name what the retired entry shipped, so update withdraws the file from an adopter's tree that still holds it and the step gate witnesses the vanished member; a landed row is frozen (migration, PLAY-dOrderedCharter-80 S2)
+```
+
+- Pass 2 added 20 rows (DERIVED from the rows whose disposition is `carried:TOOL-dWitnessedBar-51`), each of count 1 at `773daf5611812b8953fbcaba094b4f005c796b3c`: the carriers of the two map `.toml` names that TOOL-dWitnessedBar-51 S5 respells (§2 S15). Each key, then the scope item that carries it, TAB-separated:
+
+```text
+.gitattributes	memory/map/baseline.toml text eol=lf	S5
+.gitattributes	memory/map/affordance-exempt.toml text eol=lf	S5
+.governance/instructions.toml	text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise."	S5
+AGENTS.md	- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.	S5
+WIRE-INTO-PROJECT.md	baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing	S5
+WIRE-INTO-PROJECT.md	— touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the	S5
+WIRE-INTO-PROJECT.md	`<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).	S5
+WIRE-INTO-PROJECT.md	commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing	S5
+memory/gotchas/assertion-between-two-derived-values.md	shape `ARMS_FLOORS` and `baseline.toml` already use.	S5
+memory/map/features/codebase-map.md	`baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed	S5
+memory/map/features/codebase-map.md	- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.toml`, so coverage	S5
+{prefix}/check-spec-tokens.test.sh	"  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`.\n")	S5
+{prefix}/codebase-map/test_codebase_map.py	- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not	S5
+{prefix}/codebase-map/test_codebase_map.py	f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"	S5
+{prefix}/codebase-map/test_codebase_map.py	added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())	S5
+{prefix}/codebase-map/test_codebase_map.py	"baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "	S5
+{prefix}/codebase-map/test_codebase_map.template.py	- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not	S5
+{prefix}/codebase-map/test_codebase_map.template.py	f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"	S5
+{prefix}/codebase-map/test_codebase_map.template.py	added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())	S5
+{prefix}/codebase-map/test_codebase_map.template.py	"baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "	S5
 ```
 
 ## docs-undocumented
@@ -485,14 +510,14 @@ verb:unattended.sh:--version	undocumented when the docs leg landed
 
 ## drift-baselines
 
-- Home: `tools/drift-audit/drift-baselines.txt` · registered in `tools/drift-audit/kit.toml` · direction `shrink-only`, key `record signal,id`.
+- Home: `memory/project/drift-baselines.txt`, moved from `tools/drift-audit/` by pass 2 (§2 S14) · registered in `tools/drift-audit/kit.toml` · direction `shrink-only`, key `record signal,id`.
 - Converted from the `BASELINES` dict of `tools/drift-audit/drift_signals.py` at `7dbe0c8d9d2c`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
 - After: 2 ledger row(s), counts summing to 2.
 - Former reasons: none; no row of the legacy file carried one.
 
 ## drift-pins
 
-- Home: `tools/drift-audit/drift-pins.txt` · registered in `tools/drift-audit/kit.toml` · direction `ceiling`, key `key signal`.
+- Home: `memory/project/drift-pins.txt`, moved from `tools/drift-audit/` by pass 2 (§2 S14) · registered in `tools/drift-audit/kit.toml` · direction `ceiling`, key `key signal`.
 - Converted from the `PINS` dict of `tools/drift-audit/drift_signals.py` at `7dbe0c8d9d2c`; each entry's history was the comment above it there, read at that sha. A pin of 0 wrote no row.
 - After: 6 ledger row(s), counts summing to 520.
 - Former reasons: none; no row of the legacy file carried one.
@@ -628,7 +653,7 @@ TOOL-aMendedFleet-39	misread: 725b14490 is the build's spec commit for units 39 
 
 ## playbook-kit-waivers
 
-- Home: `tools/playbook-kit-waivers.txt` · registered in `tools/govkit/registry.toml` · direction `declared-set`, key `key kit`.
+- Home: `memory/project/playbook-kit-waivers.txt`, moved from `tools/` by pass 2 (§2 S14) · registered in `tools/govkit/registry.toml` · direction `declared-set`, key `key kit`.
 - Before: 1 legacy row(s). After: 1 ledger row(s), counts summing to 1.
 - Former reasons, 1, one per keyed row (key, then reason, TAB-separated):
 

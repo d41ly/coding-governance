@@ -332,9 +332,12 @@ for (ident, ver, base, setup, cmd), (ceil, _tail, number, row) in sorted(rows.it
     printf '%s\n' "${out:-fork-count: REFUSING — the ledger factory beside this leg did not read $1}" >&2
     return 2
   fi
+  # A scratch FILE feeds the loop, never a here-string over the substitution's value: that is the
+  # stall `sh_hygiene.py` gates (TOOL-dWitnessedBar-16 S15). The caller's scratch root holds it.
+  printf '%s\n' "$out" > "$FC_WORK/budget-rows" || { echo "fork-count: the scratch root $FC_WORK took no write" >&2; return 2; }
   while IFS= read -r row; do
     [ -n "$row" ] && FC_ROWS+=("$row")
-  done <<<"$out"
+  done < "$FC_WORK/budget-rows"
   [ "${#FC_ROWS[@]}" -gt 0 ] || { echo "fork-count: the ceilings file declares no row, so this run graded NOTHING — a refusal and not a pass" >&2; return 2; }
   return 0
 }

@@ -34,7 +34,7 @@ its number means nothing. That column exists because the upstream adopter's conv
 a `collision_flags` signal structurally incapable of being non-zero, and every reader took the 0 as
 "converged" for thirteen days.
 
-Gateable signals carry a **shrink-only pin**, a row of `tools/drift-audit/drift-pins.txt`, seeded at measured
+Gateable signals carry a **shrink-only pin**, a row of `memory/project/drift-pins.txt`, seeded at measured
 values. Over the pin is a regression. At the pin means "still owed, drain it". Lower a pin whenever
 its population drops.
 

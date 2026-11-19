@@ -226,7 +226,7 @@ def read_drift_populations(root: pathlib.Path):
                          f"found:\n{exc}") from None
     named = {r.population: r for r in regs}
 
-    def rows(population):
+    def read_population(population):
         reg = named.get(population)
         if reg is None or not (root / reg.home).is_file():
             return {}
@@ -235,9 +235,9 @@ def read_drift_populations(root: pathlib.Path):
             raise DriftError(f"{reg.home}: {ledger.render_malformed(bad[0])}")
         return got
 
-    pins = {key[0]: row[0] for key, row in rows(PINS_POPULATION).items()}
+    pins = {key[0]: row[0] for key, row in read_population(PINS_POPULATION).items()}
     baselines: dict = {}
-    for sig, ident in rows(BASELINES_POPULATION):
+    for sig, ident in read_population(BASELINES_POPULATION):
         baselines.setdefault(sig, []).append(ident)
     return ledger, regs, pins, baselines
 

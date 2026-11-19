@@ -920,7 +920,7 @@ def check_refusal_sites(st: dict) -> tuple:
     keyed = derive_pin_index(st["rpinned"], "site", bad)
     items = [dict(s, key=(s["gate"], s["kind"], s["key_sig"])) for s in st["sites"]]
 
-    def unpinned(s):
+    def render_unpinned(s):
         why = (f" — and {s['test']} is missing, so nothing can arm it" if s["test_missing"]
                else " — an unmarked DELEGATED site: mark its block with `# arm-signature: <text its "
                     "callee prints>` and assert that text, or pin it" if not s["sig"] else "")
@@ -930,7 +930,7 @@ def check_refusal_sites(st: dict) -> tuple:
 
     scanned = {s["gate"] for s in st["sites"]}
     waived = [f"check-arms: waived {s['gate']}:{s['line']} {s['kind']}"
-              for s in check_pins(items, keyed, unpinned, scanned, bad)]
+              for s in check_pins(items, keyed, render_unpinned, scanned, bad)]
     armed = sum(1 for s in st["sites"] if s["armed"])
     census = (f"check-arms: refusal signature — {len(st['sites'])} site(s) in "
               f"{len({s['gate'] for s in st['sites']})} script(s): {armed} armed, {len(waived)} "
@@ -947,7 +947,7 @@ def cmd_check(root: str, conf: dict) -> int:
     pin_keys = derive_pin_index(pinned, "branch", bad)
     scanned = {g for g, _ in st["pairs"]}
 
-    def unpinned(b):
+    def render_unpinned(b):
         hint = (f" — a STRANDED prefix at {b['stranded'][0]}:{b['stranded'][1]} stops short of "
                 f"the signature; copy the whole row --report prints") if b["stranded"] else ""
         return (f"check-arms: {b['gate']}:{b['line']} check {b['num']} branch {b['ord']} has "
@@ -955,7 +955,7 @@ def cmd_check(root: str, conf: dict) -> int:
                 f"pinned in {m}/{PIN} or a sidecar beside the gate{hint}")
 
     check_pins([dict(b, key=(b["gate"], str(b["num"]), b["sig"])) for b in brs], pin_keys,
-               unpinned, scanned, bad)
+               render_unpinned, scanned, bad)
     graded = st["graded"]
     sites = st["sites"] if graded else []
     # The signature-2 line prints LAST of the report lines, after the budget's, so it stays the line
@@ -1599,7 +1599,7 @@ def cmd_selftest() -> int:
         barms = "hit 'alpha refusal message here'\nhit 'beta refusal message here'\nhit 'alpha refusal second site'\n"
         dlog = "# decisions\n\n- TOOL-tBudget-1 · a dated ceiling\n- TOOL-tBudget-12 · a longer id\n"
 
-        def rrow(g, s, unit="TOOL-tBudget-1", blank=()):
+        def render_retirement_row(g, s, unit="TOOL-tBudget-1", blank=()):
             """A retirement row in the ledger grammar (TOOL-dWitnessedBar-16 §8 F12), `blank` the field
             positions left empty."""
             f = [unit, g, "3", "records", "none", "survives", "not security-shaped", g, s, "check 2 FAILED"]
@@ -1662,25 +1662,25 @@ def cmd_selftest() -> int:
             f"{BF}:1 family dead matches no refusal site in {BG}", lambda: cmd_check(tb7, cb7))
 
         tb8, cb8 = build_budget_tree("b8", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                     rows=rrow(BG, "beta refusal message here"))
+                                     rows=render_retirement_row(BG, "beta refusal message here"))
         arm("AC1 control: a retirement row whose survivor carries its signature passes", "[rc=0]",
             lambda: cmd_check(tb8, cb8))
         tb9, cb9 = build_budget_tree("b9", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                     rows=rrow(BG, "gamma refusal never written"))
+                                     rows=render_retirement_row(BG, "gamma refusal never written"))
         arm("AC1: a retirement row whose survivor lacks its signature reds naming the row's id",
             f"(TOOL-tBudget-1) names the survivor {BG}, which no longer carries its signature",
             lambda: cmd_check(tb9, cb9))
         for field, at in (("survivor", 7), ("replay", 9)):
             tb, cb = build_budget_tree("b10" + field, f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                       rows=rrow(BG, "beta refusal message here", blank=(at,)))
+                                       rows=render_retirement_row(BG, "beta refusal message here", blank=(at,)))
             arm(f"AC2: a retirement row lacking its {field} field reds naming the field",
                 f"(TOOL-tBudget-1) lacks its {field} field", lambda tb=tb, cb=cb: cmd_check(tb, cb))
         tb11, cb11 = build_budget_tree("b11", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                       rows=rrow(BG, "beta refusal message here", unit="TOOL-tBudget-7"))
+                                       rows=render_retirement_row(BG, "beta refusal message here", unit="TOOL-tBudget-7"))
         arm("S2: a retirement row naming an id the decision log does not carry reds",
             "names TOOL-tBudget-7, which no DECISIONS.md row carries", lambda: cmd_check(tb11, cb11))
         tb12, cb12 = build_budget_tree("b12", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
-                                       rows=rrow(BG, "beta refusal message here", unit="a-retirement"))
+                                       rows=render_retirement_row(BG, "beta refusal message here", unit="a-retirement"))
         arm("a retirement row whose unit field is not a decision id reds",
             "names `a-retirement` in its unit field, which is not a decision id", lambda: cmd_check(tb12, cb12))
         tb13, cb13 = build_budget_tree("b13", f"{BG}:2:2026-10-12:TOOL-tBudget-1",
