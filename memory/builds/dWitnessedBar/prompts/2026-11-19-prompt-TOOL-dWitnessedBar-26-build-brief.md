@@ -13,18 +13,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   also sit in `tools/policy/check_policy.py`, `tools/loop/loop_witness.py` and `tools/playbook/render_playbook.py`,
   and govkit's resolver now lives in `tools/govkit/upgrade_steps.py:369` (TOOL-dSafePassage-35 S24), which the spec
   already names. Re-derive the site list with the S6 query at this base rather than trusting §4's table line numbers.
-- The spec is rev-4, re-grounded at `e4ac7c40c` on this tree: its sites table, Files touched and §7 already name
-  the landed copies, `policy-mirror.js`, govkit's selftest, and the existing section `2j` rewritten in place.
-- Three things its writer found and the spec does not settle, each yours to handle as a deviation record:
-  1. The block defines `resolve_bash` (`resolveBash`) while S5 has several adapters keep that same name
-     (`profile_bar`, `upgrade_steps`, `corpus_ids`, the lexicon and runlog selftests, `handoff`, `policy-mirror.js`).
-     Keep each adapter's public name and contract; rename nothing a caller imports.
-  2. AC7's empty scan cannot be reached at this pass: the `("bash", "bash.exe")` membership test at
-     `tools/govkit/upgrade_steps.py` is unit 51's to exclude (the spec's hands-off edge to TOOL-dWitnessedBar-51).
-     Record AC7 with the list the scan returns and name each remaining hit's owning unit.
-  3. Once S7 makes `resolve_shell_argv` raise, govkit selftest's `[dSP-91 L2]` arm, which expects
-     `tools/govkit/steps/python_floor.py` to fall back to a bare `bash`, reds until unit 51 S25 fixes that caller.
-     Do not fix it here; name it in the ledger.
+- The spec is rev-5, revised at the main loop over the first builder's divergence
+  (`build/2026-11-19-build-TOOL-dWitnessedBar-26-1-builder-return.md`): the probe is `uname -s` first, every candidate
+  after `GOV_BASH` is probed and reported (§8 F6), the block's function is `scan_bash` / `scanBash` so every adapter
+  keeps its own name (§8 F7), and `tools/govkit/steps/python_floor.py` is a site (§8 F8). The first builder's draft
+  canonical is at
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/u26/resolve_bash.draft.py`;
+  reuse what still fits rev-5.
+- AC7's empty scan may still be unreachable at this pass: the `("bash", "bash.exe")` membership test in
+  `tools/govkit/upgrade_steps.py` is unit 51's to exclude (the spec's hands-off edge to TOOL-dWitnessedBar-51). Record
+  AC7 with the list the scan returns and name each remaining hit's owning unit.
 - Verify each claim about current code against source before building on it, and hand a claim that no longer holds
   back as a divergence rather than building around it.
 

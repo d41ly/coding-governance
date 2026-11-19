@@ -108,7 +108,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dWitnessedBar-26 — one bash resolver in `tools/lib` with its JavaScript twin](spec/2026-10-25-spec-TOOL-dWitnessedBar-26.md) | 1 | 2 | INPROGRESS | rev-4 | 2026-11-19 |
+| [TOOL-dWitnessedBar-26 — one bash resolver in `tools/lib` with its JavaScript twin](spec/2026-10-25-spec-TOOL-dWitnessedBar-26.md) | 1 | 2 | INPROGRESS | rev-5 | 2026-11-19 |
 | [TOOL-dWitnessedBar-27 — a wrong-shell refusal at every entry point](spec/2026-10-25-spec-TOOL-dWitnessedBar-27.md) | 2 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-48 — the bash query sees any candidate list holding a bare `bash`, and the row-grammar resolver becomes an adapter](spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md) | 2 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-49 — the bash query sees a PATH lookup of `bash`, and the recall selftest resolves its bash through the block](spec/2026-10-25-spec-TOOL-dWitnessedBar-49.md) | 2 | 2 | DEFERRED | rev-3 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 222 bound to this build, across 4 record folder(s).
+Records: 225 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
