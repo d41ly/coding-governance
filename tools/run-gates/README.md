@@ -960,7 +960,20 @@ the load it was taken under. Say in that text what else was running.
 stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
 turn a leg into a pass or a skip.
 
-## The leg manifest is the kit dir's SIBLING
+## The leg manifest is the kit dir's SIBLING, and it is GENERATED
+
+Each leg is declared ONCE: a `[[gate_leg]]` row of its kit's descriptor when an adopter receives it,
+else an `[[exempt_leg]]` row of the deployer's registry carrying its whole row beside its `why`. Where
+gov's own run differs from what an adopter receives, gov's value sits under the row's
+`[gate_leg.gov]` sub-table, key by key; an empty list there removes the key from gov's row.
+`leg_factory.py --write` renders `<prefix>/gate-legs.json` from every declaration, `pass_leg` included
+through `pass_legs.py`'s own rule; `--check` names each leg the file holds differently, and
+`regen.py` runs it at stage 1; `--conform`, the `gate-leg conformance` leg, adds every field arm over
+every declaration. Never hand-edit the manifest. Declare a new leg with
+`python <prefix>/run-gates/leg_factory.py new <name> --kit <id> --argv <json> --subject <kit|repo>
+--purpose <text> --enforces <tag>`, or `--exempt <why>` in place of `--kit` for a registry row; the
+kinds register reaches the same verb as `python <prefix>/playbook/core.py new gate-leg <name> ...`
+(TOOL-dWitnessedBar-11).
 
 `<prefix>/gate-legs.json`, DERIVED from this kit's own location rather than spelled, so a one-segment
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
@@ -972,12 +985,12 @@ Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.
 leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
 the canary's one key set is `LEG_KEYS` in `run-gates.test.sh`. `tests` lists the features a leg
 tests (`feature.<f>`) and `enforces` the principles and practices it enforces; both are edges from
-the row's `tag`, read by the playbook kit's edge check (`edge_grammar.py --check`), declared on a claimed
-leg's descriptor row too, where govkit's selfcheck 7h holds the two equal, and neither travels into
-an adopter's manifest. The gov canary compares `tests` with the map dossiers' `gate-legs` claims in
+the row's `tag`, read by the playbook kit's edge check (`edge_grammar.py --check`), declared once, on the
+leg's one declaration, which renders the manifest row, and neither travels into an adopter's
+manifest. The gov canary compares `tests` with the map dossiers' `gate-legs` claims in
 both directions (TOOL-dWitnessedBar-22). `purpose` says what the leg is for: one line of 1 to 60
-characters, no two legs sharing one, declared on a claimed leg's descriptor row too, where selfcheck 7h
-holds the two equal and grades presence and shape over every manifest row; it travels into an
+characters, no two legs sharing one: its shape and uniqueness are `leg_factory.py --conform`'s
+`purpose` arm, and selfcheck 7h grades its presence until TOOL-dWitnessedBar-51 moves it; it travels into an
 adopter's manifest from run-gates 1.52, `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`

@@ -171,6 +171,11 @@ subject = "repo"
 purpose = "asserts the rendered charter region still matches"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+chunk = "wiring"
+ceiling = 300
 
 # THE ENGINE'S OWN ARMS, and an adopter receives them because they are about the ENGINE rather than
 # about gov: every fixture is written into a temp dir by the selftest itself, so there is no gov path
@@ -185,3 +190,21 @@ subject = "kit"
 purpose = "arms the charter render engine's own predicates"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/playbook/",
+  "{prefix}/memory-tree/import_walk.py",
+  "{prefix}/memory-tree/check-arms.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/coverage_join.py",
+  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/corpus_ids.py",
+  "{prefix}/lexicon/",
+  "{prefix}/govkit/entries/playbook.kit.toml",
+  "coding-governance-agents.template.md",
+]
+chunk = "selftests"
+ceiling = 300

@@ -608,8 +608,8 @@ fi
 # within 64 bytes. The one check that reds a duplicated leg tag (its section 8 F10): the resolver's
 # `check` keeps a tag's first definition, so two rows sharing one read green there.
 #
-# WHAT THIS DOES NOT CHECK: that a tag follows the rule from its row's owner and name, which 7h joins
-# against the descriptor only for a declared leg, nor a duplicate in any manifest but gov's own.
+# WHAT THIS DOES NOT CHECK: that a tag follows the rule from its row's owner and name, which only
+# `leg_factory.py new` applies, to a leg it writes, nor a duplicate in any manifest but gov's own.
 a=$((a+1))
 if ! "$PYBIN" -c '
 import json, re, sys

@@ -410,6 +410,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/pass_legs.py"
     },
     {
@@ -5808,6 +5813,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "check_declarations",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "check_declared_class",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -10843,6 +10853,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "derive_drift",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "derive_drift_composition",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -11578,6 +11593,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "derive_kit_spelling",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "derive_landed_counts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -11631,6 +11651,11 @@
       "id": "derive_leg_profile",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_leg_tag",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "derive_leg_turnstile",
@@ -12321,6 +12346,11 @@
       "id": "derive_repo_item",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
+    },
+    {
+      "id": "derive_repo_root",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "derive_repo_root",
@@ -15218,6 +15248,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "load_govkit",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "load_half",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -15306,6 +15341,11 @@
       "id": "load_owned_names",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "load_pass_legs",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "load_policy",
@@ -16171,6 +16211,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "main",
@@ -19873,6 +19918,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_declarations",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "read_declared",
       "kind": "function",
       "file": "tools/run-gates/adopt-run-gates.sh"
@@ -20111,6 +20161,11 @@
       "id": "read_ending",
       "kind": "function",
       "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "read_enforce_population",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "read_engine_conf_reader",
@@ -21143,6 +21198,11 @@
       "file": "tools/playbook/check_layers.py"
     },
     {
+      "id": "read_layout",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "read_lease_hash",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -21191,6 +21251,11 @@
       "id": "read_leg_edges",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "read_leg_keys",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "read_leg_usage",
@@ -21391,6 +21456,11 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "read_manifest",
@@ -25948,6 +26018,11 @@
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
+      "id": "render_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "render_map_line",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -26313,6 +26388,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "render_rows",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "render_rx_literal",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
@@ -26561,6 +26641,11 @@
       "id": "render_toml_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "render_toml_value",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "render_transition_conf",
@@ -27720,6 +27805,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -28833,6 +28923,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_row_tokens",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -29768,6 +29863,11 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "run_check",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "run_check_render",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -29871,6 +29971,11 @@
       "id": "run_condition",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "run_conform",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "run_constant_control",
@@ -30833,6 +30938,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "run_list",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "run_live",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -30986,6 +31096,11 @@
       "id": "run_new",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "run_new",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "run_new_in",
@@ -31795,6 +31910,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
     },
     {
@@ -32236,6 +32356,11 @@
       "id": "run_write",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "run_write",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "run_writer",
@@ -37103,6 +37228,11 @@
       "file": "tools/run-gates/adopt-run-gates.test.sh"
     },
     {
+      "id": "write_declaration",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "write_declarations",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
@@ -37286,6 +37416,11 @@
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "write_fixture",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "write_fixture_commit",
@@ -37748,6 +37883,11 @@
       "file": "tools/govkit/fixtures/stale_edges.py"
     },
     {
+      "id": "write_manifest_edit",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "write_memory_fixture",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -37926,6 +38066,11 @@
       "id": "write_plant_retag",
       "kind": "function",
       "file": "tools/loop/composition.py"
+    },
+    {
+      "id": "write_planted",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "write_planted",

@@ -2740,11 +2740,12 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"something gov did not ship, so that cell silently destroys it — the defect "
                f"DEPL-dCarriedReceipt-8 closed. A delta row routes to the three-way merge, always")
 
-    # ---- 7h: LEG correspondence, BOTH directions. The descriptors and
-    #          gov's own leg manifest are two spellings of one fact, and before this nothing asserted
-    #          they agree — the deployer's whole thesis, unapplied to the deployer. An exemption is
-    #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
-    #          refuses a leg that is BOTH claimed and exempted.
+    # ---- 7h: THE LEG MANIFEST'S READ, and the purpose presence arm it still holds. Each leg is
+    #          declared ONCE, as a descriptor's [[gate_leg]] row or a registry [[exempt_leg]] row,
+    #          and <prefix>/run-gates/leg_factory.py renders the manifest from them; its `--conform`
+    #          (the `gate-leg conformance` leg) grades the population both ways and every field, so
+    #          no comparison of two spellings is left here (TOOL-dWitnessedBar-11 S7). The read stays
+    #          because 7h2 and 7j4 below read `manifest`, `manifest_subject` and `manifest_chunk`.
     legs_path = resolve_tool_path(root, "gate-legs.json")
     if legs_path.is_file():
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
@@ -2756,223 +2757,24 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # legs — both run-gates canaries among them, which the runner itself calls the bar's own
         # liveness assertion — held off every bar while this file reported them running.
         manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
-        manifest_doc_reads = {leg.get("name"): leg.get("doc_reads") for leg in _legs_json}
-        manifest_impure = {leg.get("name"): leg.get("impure") for leg in _legs_json}
-        manifest_reads = {leg.get("name"): leg.get("reads") for leg in _legs_json}
-        manifest_ceiling = {leg.get("name"): leg.get("ceiling") for leg in _legs_json}
-        manifest_stage = {leg.get("name"): leg.get("stage") for leg in _legs_json}
-        manifest_tag = {leg.get("name"): leg.get("tag") for leg in _legs_json}
-        manifest_purpose = {leg.get("name"): leg.get("purpose") for leg in _legs_json}
-        manifest_edges = {k: {leg.get("name"): leg.get(k) for leg in _legs_json} for k in ("tests", "enforces")}
-        claimed_legs: dict[str, str] = {}
-        for eid, (d, _dpath) in descs.items():
-            for leg in d.get("gate_leg", []):
-                nm = leg.get("name")
-                if not nm:
-                    r.fail(f"entry '{eid}' declares a gate leg with no name")
-                    continue
-                if nm in claimed_legs:
-                    r.fail(f"leg '{nm}' is claimed by both '{claimed_legs[nm]}' and '{eid}'")
-                claimed_legs[nm] = eid
-                if nm not in manifest:
-                    r.fail(f"entry '{eid}' declares gate leg '{nm}', which is in no leg of "
-                           f"<prefix>/gate-legs.json — a descriptor and the manifest are two spellings "
-                           f"of one fact and this is the direction that deploys a leg a target's "
-                           f"runner will never match")
-                else:
-                    # AND THEY MUST AGREE ABOUT SUBJECT. The name check above proves the leg exists
-                    # in both; it says nothing about whether they agree on which side of the bar it
-                    # sits. A descriptor saying `kit` against a manifest saying `repo` deploys a leg
-                    # that is held in the target and run here, or the reverse — two spellings of one
-                    # fact, drifting exactly where nobody is reading. TOOL-dUnstalledConvoy-26.
-                    d_sub = leg.get("subject")
-                    m_sub = manifest_subject.get(nm)
-                    if d_sub is None:
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with no `subject` — a leg "
-                               f"that does not say whose subject it is cannot be held or run "
-                               f"deliberately, and defaulting it here would hide the omission. "
-                               f"The criterion is stated once, at the `subject` field declaration "
-                               f"in <prefix>/run-gates/run-gates.sh: ask what a FAILURE of this leg "
-                               f"MEANS, not what it tests")
-                    elif d_sub not in ("kit", "repo"):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with subject '{d_sub}', "
-                               f"which is outside the closed set kit|repo — an unrecognised value "
-                               f"would be defaulted by every reader to whichever side it assumed")
-                    elif m_sub is None:
-                        # THE ONE CASE THE FIRST DRAFT EXEMPTED, and it is the case that drifts
-                        # SILENTLY and then permanently. Guarding the comparison on
-                        # `m_sub is not None` meant a manifest row with no key never disagreed with
-                        # anything — while the runner defaults it to `repo` and the emitter ships
-                        # the DESCRIPTOR's value to every adopter. Reproduced end to end: gov runs
-                        # the leg on every bar and every adopter holds it forever, with this check
-                        # green. Worse, -29's ratchet reds once and its own remediation
-                        # (`selfcheck --write`) then pins the DERIVED default and the disagreement
-                        # is green for good. The sibling exempt-leg path already refused exactly
-                        # this; the two paths agree now.
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' and "
-                               f"<prefix>/gate-legs.json declares none — every reader defaults a "
-                               f"missing key to 'repo', so an omission here is a silent "
-                               f"disagreement that the subject pin will then make permanent")
-                    elif d_sub != m_sub:
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' while "
-                               f"<prefix>/gate-legs.json says '{m_sub}' — the descriptor and the "
-                               f"manifest disagree about whether this leg runs by default")
-                    # AND ABOUT DOC READS (TOOL-dThriftyLanding-4), presence included: a descriptor
-                    # that declares none ships a leg that runs on every adopter's doc push while gov
-                    # skips it, and the reverse ships a skip gov never exercised. Both sides are
-                    # resolved through gov's own ctx, so `{memory_root}/builds/` equals `memory/builds/`.
-                    _dctx = canonical_ctx(eid)
-                    d_dr = leg.get("doc_reads")
-                    m_dr = manifest_doc_reads.get(nm)
-                    _d = None if d_dr is None else [resolve_tokens(str(x), _dctx)[0] for x in d_dr]
-                    _m = None if m_dr is None else [resolve_tokens(str(x), _dctx)[0] for x in m_dr]
-                    if _d != _m:
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with doc_reads {_d!r} while "
-                               f"<prefix>/gate-legs.json says {_m!r} — the descriptor and the "
-                               f"manifest disagree about which doc paths this leg reads, so a doc-only "
-                               f"push skips it in one tree and runs it in the other")
-                    # AND ABOUT IMPURITY (TOOL-aRoutedQuill-12 S5), presence included: the row builder
-                    # copies a descriptor's `impure` into a target, so a manifest row carrying it that
-                    # its kit leg lacks ships a leg whose verdict a target's runner may cache on a tree.
-                    if leg.get("impure") != manifest_impure.get(nm):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with impure "
-                               f"{leg.get('impure')!r} while <prefix>/gate-legs.json says "
-                               f"{manifest_impure.get(nm)!r} — the descriptor and the manifest "
-                               f"disagree about whether a verdict cached on a tree may be reused")
-                    # AND ABOUT STAGE (TOOL-dDeclaredLoop-46 S4), presence included: the emitter
-                    # carries the descriptor's claim into adopters, so it must be the manifest's.
-                    if leg.get("stage") != manifest_stage.get(nm):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with stage "
-                               f"{leg.get('stage')!r} while <prefix>/gate-legs.json says "
-                               f"{manifest_stage.get(nm)!r} — the descriptor and the manifest "
-                               f"disagree about which step this leg serves")
-                    # AND ABOUT TAG (TOOL-dWitnessedBar-12 S6), presence included: the emitter carries
-                    # the descriptor's tag into adopters, so it must be the one gov's manifest declares.
-                    if leg.get("tag") != manifest_tag.get(nm):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with tag "
-                               f"{leg.get('tag')!r} while <prefix>/gate-legs.json says "
-                               f"{manifest_tag.get(nm)!r} — the descriptor and the manifest "
-                               f"disagree about the leg's tag")
-                    # AND ABOUT ITS EDGES (TOOL-dWitnessedBar-22 S6), presence included: `tests` and
-                    # `enforces` are declared on the leg's row in both spellings, and neither travels,
-                    # so a list on one side alone is a disagreement nothing else reads.
-                    for _ek, _em in manifest_edges.items():
-                        if leg.get(_ek) != _em.get(nm):
-                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with {_ek} "
-                                   f"{leg.get(_ek)!r} while <prefix>/gate-legs.json says "
-                                   f"{_em.get(nm)!r} — the descriptor and the manifest "
-                                   f"disagree about the leg's {_ek} edge")
-                    # AND ABOUT PURPOSE (TOOL-dWitnessedBar-19 S5, the agreement arm), presence
-                    # included: the emitter carries the descriptor's purpose into adopters, so it must
-                    # be the one gov's manifest declares.
-                    if leg.get("purpose") != manifest_purpose.get(nm):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with purpose "
-                               f"{leg.get('purpose')!r} while <prefix>/gate-legs.json says "
-                               f"{manifest_purpose.get(nm)!r} — the purpose agreement arm: the "
-                               f"descriptor and the manifest disagree about what the leg is for")
-                    # AND ABOUT THE READ CLASSES, where the descriptor declares them, as with ceiling
-                    # (TOOL-aSparedSpawn-13 S1): the classes decide what enters a leg's reuse key, so a
-                    # descriptor and a manifest that disagree key one leg two ways. A descriptor that
-                    # declares none is not compared: the manifest may declare classes the emitter
-                    # never carries, since an adopter row takes the legacy `impure` below instead.
-                    if "reads" in leg and leg.get("reads") != manifest_reads.get(nm):
-                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with reads "
-                               f"{leg.get('reads')!r} while <prefix>/gate-legs.json says "
-                               f"{manifest_reads.get(nm)!r} — the descriptor and the manifest "
-                               f"disagree about what this leg reads beyond its inputs")
-                    # AND ABOUT CEILING, where the descriptor declares one (DEPL-aBenchedProbe-2 S5):
-                    # the emitter carries the descriptor's value verbatim into adopters, so it must
-                    # be a positive int (a bool is an int to Python, and not a bound) equal to the
-                    # one gov's own bar runs under. A descriptor declaring none is not compared;
-                    # that is TOOL-aBoundedCeiling-13's remainder, not this clause.
-                    if "ceiling" in leg:
-                        d_ce, m_ce = leg.get("ceiling"), manifest_ceiling.get(nm)
-                        if (isinstance(d_ce, bool) or not isinstance(d_ce, int) or d_ce <= 0
-                                or d_ce != m_ce):
-                            r.fail(f"entry '{eid}' declares gate leg '{nm}' with ceiling {d_ce!r} "
-                                   f"while <prefix>/gate-legs.json says {m_ce!r} — a descriptor "
-                                   f"ceiling must be a positive integer equal to the manifest's, "
-                                   f"because the deployer writes it into every adopter's runner")
-                # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
-                # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
-                if re.search(r"\([^)]*\d[^)]*\)", nm):
-                    r.fail(f"entry '{eid}' declares leg name '{nm}', which carries a digit-bearing "
-                           f"parenthetical; the emitter writes this name into a target, where a "
-                           f"count nobody maintains is worse than no name at all")
 
-        exempt_legs: dict[str, str] = {}
-        for x in reg.get("exempt_leg", []):
-            nm, why = x.get("name"), str(x.get("why", "")).strip()
-            if not nm:
-                r.fail(f"an exempt_leg row carries no name: {x!r}")
-                continue
-            if not why:
-                r.fail(f"exempt_leg '{nm}' carries an empty reason — an exemption without one is an "
-                       f"omission wearing a label")
-            if nm not in manifest:
-                r.fail(f"exempt_leg '{nm}' names a leg that is no longer in the manifest — a stale "
-                       f"exemption silently widens the surface it was written to narrow")
-            if nm in claimed_legs:
-                r.fail(f"leg '{nm}' is exempted AND claimed by entry '{claimed_legs[nm]}' — an "
-                       f"exemption and a claim for one fact is the two-spellings class arriving "
-                       f"through the escape hatch built to prevent it")
-            # AND ITS SUBJECT IS READ HERE, because this is the only path that reaches it.
-            # An exempted leg is claimed by no descriptor, so every subject arm above — presence,
-            # closed set, descriptor-vs-manifest agreement — quantifies over a population these
-            # rows are not in. Without this the check silently covers less than its name claims,
-            # which is the exact wording TOOL-dUnstalledConvoy-26 S8 used and the exact item its
-            # build left unfinished. Read from the MANIFEST, since that is where an exempt leg's
-            # subject is written and where the runner reads it from.
-            _x_sub = manifest_subject.get(nm)
-            if _x_sub is None:
-                r.fail(f"exempt_leg '{nm}' is a leg in <prefix>/gate-legs.json that declares no "
-                       f"`subject` — an exempted leg is reachable by no descriptor, so this is the "
-                       f"only check that can see it, and a defaulted subject is a side of the bar "
-                       f"nobody chose")
-            elif _x_sub not in ("kit", "repo"):
-                r.fail(f"exempt_leg '{nm}' declares subject '{_x_sub}', outside the closed set "
-                       f"kit|repo — an unrecognised value is defaulted by every reader to whichever "
-                       f"side it assumed")
-            exempt_legs[nm] = why
-        for nm in sorted(manifest - set(claimed_legs) - set(exempt_legs)):
-            r.fail(f"gate leg '{nm}' is claimed by no descriptor and carried by no [[exempt_leg]] — "
-                   f"a new leg must red until a declaration says whether an adopter receives it")
-        r.note(f"legs: {len(manifest)} in the manifest · {len(claimed_legs)} claimed · "
-               f"{len(exempt_legs)} exempt")
-
-        # ---- 7h: THE LEG'S PURPOSE (TOOL-dWitnessedBar-19 S5), read from the MANIFEST as `subject`
-        #          is, so an [[exempt_leg]] leg is graded by the same arms as a claimed one; the
-        #          agreement arm sits with the descriptor comparisons above. PRESENCE admits no
-        #          exception: the review that derived every purpose left no leg underived, so no
-        #          pending population exists (S6), and a row with no purpose is a new leg that owes one.
-        #          WHAT THIS DOES NOT CHECK: whether the 60 characters say what the cited source says;
-        #          the review record's rows are read against their cites by a person.
-        _purpose_legs: dict[str, list[str]] = {}
+        # ---- 7h: THE LEG'S PURPOSE PRESENCE (TOOL-dWitnessedBar-19 S5) and its `purposes:` note, read
+        #          from the MANIFEST, so an [[exempt_leg]] leg is graded as a claimed one is. The shape
+        #          and the uniqueness of a purpose are `leg_factory.py --conform`'s `purpose` arm
+        #          (TOOL-dWitnessedBar-11 §8 F8); presence and this note stay here until
+        #          TOOL-dWitnessedBar-51 S8 moves presence to `--conform`. PRESENCE admits no exception:
+        #          the review that derived every purpose left no leg underived, so no pending population
+        #          exists (TOOL-dWitnessedBar-19 S6), and a row with no purpose is a new leg that owes one.
+        _purposes = 0
         for leg in _legs_json:
-            nm, pu = leg.get("name"), leg.get("purpose")
             if "purpose" not in leg:
-                r.fail(f"gate leg '{nm}' carries no `purpose` in <prefix>/gate-legs.json — the "
-                       f"purpose presence arm: a leg must say what it is for, in at most "
-                       f"{PURPOSE_MAX_CHARS} characters")
+                r.fail(f"gate leg '{leg.get('name')}' carries no `purpose` in <prefix>/gate-legs.json — "
+                       f"the purpose presence arm: a leg must say what it is for")
                 continue
-            if not isinstance(pu, str):
-                r.fail(f"gate leg '{nm}' carries purpose {pu!r}, which is not a string — the purpose "
-                       f"shape arm")
-                continue
-            if not pu or len(pu) > PURPOSE_MAX_CHARS or "\n" in pu or "\r" in pu or pu != pu.strip():
-                r.fail(f"gate leg '{nm}' carries purpose {pu!r} ({len(pu)} characters) — the purpose "
-                       f"shape arm: one line of 1 to {PURPOSE_MAX_CHARS} characters with no leading "
-                       f"or trailing space")
-            _purpose_legs.setdefault(pu, []).append(str(nm))
-        for pu, nms in sorted(_purpose_legs.items()):
-            if len(nms) > 1:
-                r.fail(f"gate legs {', '.join(repr(x) for x in nms)} share the purpose {pu!r} — the "
-                       f"purpose shape arm: two legs with one purpose say what a feature is for, "
-                       f"not what each leg is for")
+            _purposes += 1
         # `pending` is the exception list's size, which is empty while no pending population exists.
         _purpose_pending: set[str] = set()
-        r.note(f"purposes: {sum(len(v) for v in _purpose_legs.values())} declared · "
-               f"{len(_purpose_pending)} pending")
+        r.note(f"purposes: {_purposes} declared · {len(_purpose_pending)} pending")
 
         # ---- 7h2: THE SUBJECT RATCHET. TOOL-dUnstalledConvoy-29.
         #
@@ -2983,8 +2785,9 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         # subject cannot move without the move appearing in a diff somebody reviews. A green row here
         # is evidence that nobody flipped a value quietly, never that the value is correct.
         #
-        # PINNED OVER THE MANIFEST, not over the descriptors. 7h above already asserts the two agree
-        # in both directions, so pinning the manifest pins every descriptor leg transitively AND
+        # PINNED OVER THE MANIFEST, not over the descriptors. The leg factory's gate renders the
+        # manifest from every declaration and reds a stale one (`leg_factory.py --conform`), so pinning
+        # the manifest pins every descriptor leg transitively AND
         # covers the [[exempt_leg]] rows, which no descriptor claims and a descriptor-derived pin
         # would therefore leave free to move. The spec asked for the descriptors; this is the amended
         # answer and -29 rev-2 records why.
@@ -3049,7 +2852,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                        f"whose side of the bar nobody chose. Regenerate with "
                        f"`{regen}`")
             for nm in sorted(set(pinned) - set(live)):
-                r.fail(f"{pin_rel} pins '{nm}', which is in no leg of "
+                r.fail(f"{pin_rel} pins '{nm}', which names no leg of "
                        f"{legs_rel} — a stale pin row is a pin for nothing, and it hides "
                        f"the next leg that arrives under that name")
             for nm in sorted(set(live) & set(pinned)):
@@ -3513,8 +3316,9 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          right; a self-test whose file name matches none of the globs or that runs indirectly,
     #          e.g. through `sh -c`; that an exempt leg is cheap.
     #          TWO STAND-DOWNS (DEPL-aBenchedProbe-3). An absent manifest is a note, not a refusal,
-    #          because 7h grades no leg at all without one. The zero-graded and zero-shaped liveness
-    #          reds bind only while the manifest holds at least one row in chunk `selftests`; with
+    #          because the leg factory's gate has rendered no leg here without one. The zero-graded and
+    #          zero-shaped liveness reds bind only while the manifest holds at least one row in chunk
+    #          `selftests`; with
     #          none, a zero is TRUE rather than a broken predicate (7c2's rule), and the note says the
     #          reds stood down. On gov's tree, 7h2's chunk pins red every `selftests` chunk that
     #          vanishes from the manifest, so the case this gives up is covered there.
@@ -4514,8 +4318,9 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     row["purpose"] = leg["purpose"]
                 # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
                 # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
-                # gov-authored and selfcheck 7h grades its shape. No fallback to gov's manifest,
-                # which would bound every leg rather than the declaring ones. DEPL-aBenchedProbe-2.
+                # gov-authored and the leg factory's gate (`--conform`, its `ceiling` arm) grades its
+                # shape. No fallback to gov's manifest, which would bound every leg rather than the
+                # declaring ones. DEPL-aBenchedProbe-2.
                 _ce = leg.get("ceiling") if check_target_reads_subject(
                     target, deploy, descs, floor=CEILING_FLOOR_RUN_GATES) else None
                 if _ce is not None:
@@ -6111,9 +5916,6 @@ STAGE_FLOOR_RUN_GATES = (1, 49)
 # here, never a fifth constant. `tag`: 1.51, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-12 S5).
 # `purpose`: 1.52, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-19 S1).
 LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52)}
-# A leg's `purpose` is at most this many CHARACTERS, never bytes: the project map's line grammar,
-# `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3). Graded by selfcheck 7h.
-PURPOSE_MAX_CHARS = 60
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

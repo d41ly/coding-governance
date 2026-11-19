@@ -109,6 +109,14 @@ argv = ["python", "{gate_file}"]
 guard = []
 history_depth = "full"
 stage = ["step.build", "step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/codebase-map/test_codebase_map.py"]
+reads = { base = "its baseline is the one carried at the merge-base with the remote default branch (TOOL-aSparedSpawn-13 S3).", history = "it reads that baseline out of history (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [[hole]]
 id = "map-extractors"
@@ -145,6 +153,13 @@ purpose = "checks the installed map gate compares every artifact"
 argv = ["python", "{kit}/check_gate_coverage.py"]
 guard = ["{kit}/", ".codebase-map.conf"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/codebase-map/check_gate_coverage.py"]
+guard = ["{prefix}/codebase-map/", ".codebase-map.conf", "{prefix}/memory-tree/coverage_join.py"]
+chunk = "declarations"
+ceiling = 180
 
 [[lf_pin]]
 pattern = ".codebase-map.conf"

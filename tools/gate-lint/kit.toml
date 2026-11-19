@@ -69,6 +69,12 @@ argv = ["python3", "{kit}/sh_hygiene.py"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/sh_hygiene.py", "memory/project/substitution-fed-loops.txt"]
+guard = []
+chunk = "product"
+ceiling = 300
+
 # The location-probe ban, the scanner's second mode (TOOL-aGraftedHelix-45). `subject = "repo"` and
 # no guard for the loop scan's reason: it grades the repository's shell tree, and a new probe can
 # arrive in any file. The argv passes no registry, so an adopter's first run grades against an empty
@@ -85,6 +91,19 @@ purpose = "catches a location probe asked from a moved directory"
 argv = ["python3", "{kit}/sh_hygiene.py", "--location-probes"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+argv = [
+  "python3",
+  "{prefix}/gate-lint/sh_hygiene.py",
+  "--location-probes",
+  "memory/project/location-probe-waivers.txt",
+  ".",
+  ":!memory/",
+]
+guard = []
+chunk = "product"
+ceiling = 300
 
 # The spawn-idiom lint, the scanner's third mode (TOOL-aSparedSpawn-8). `subject = "repo"` and no guard
 # for the loop scan's reason: a fork spent on builtin work can arrive in any shell file. Its three
@@ -104,6 +123,20 @@ argv = ["python3", "{kit}/sh_hygiene.py", "--spawn-idioms"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+argv = [
+  "python3",
+  "{prefix}/gate-lint/sh_hygiene.py",
+  "--spawn-idioms",
+  "memory/project/spawn-idiom-sites.txt",
+  ".",
+  ":!*.test.sh",
+  ":!memory/",
+]
+guard = []
+chunk = "product"
+ceiling = 300
+
 # The temp-name lint, the scanner's fourth mode (TOOL-dRedressedBar-24). `subject = "repo"` and no guard
 # for the loop scan's reason: a temp written at a fixed name and renamed into place can arrive in any
 # shell file. The argv passes no registry, so an adopter's first run grades against an empty
@@ -121,6 +154,20 @@ argv = ["python3", "{kit}/sh_hygiene.py", "--temp-names"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+argv = [
+  "python3",
+  "{prefix}/gate-lint/sh_hygiene.py",
+  "--temp-names",
+  "memory/project/temp-name-sites.txt",
+  ".",
+  ":!*.test.sh",
+  ":!memory/",
+]
+guard = []
+chunk = "product"
+ceiling = 300
+
 # The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:
 # a suite that stages breaks into a copy of a scanner has a job only when that scanner's source
 # changes, and none at all in an adopter's repo that copy-installs the kit and never edits it. The
@@ -134,3 +181,7 @@ purpose = "stages breaks into a copy of the shell-hygiene scanner"
 argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 300

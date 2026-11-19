@@ -36,6 +36,12 @@ purpose = "arms the install-prefix ban red and green"
 argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
 guard = ["{prefix}/check-install-prefix.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+ceiling = 1670
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -53,3 +59,9 @@ purpose = "bans a kit path spelled in the shipped surface"
 argv = ["bash", "{prefix}/check-install-prefix.sh"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+signature = ["bash", "{prefix}/check-install-prefix.sh", "--offenders"]
+guard = []
+chunk = "product"
+ceiling = 2940

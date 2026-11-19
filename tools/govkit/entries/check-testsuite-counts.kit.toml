@@ -31,6 +31,12 @@ purpose = "requires every bar self-test to print an assertion count"
 argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/gate-legs.json"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 630
 
 [[gate_leg]]
 tag = "leg.check-testsuite-counts.testsuite-counts-self-test"
@@ -41,6 +47,12 @@ purpose = "arms each testsuite-counts refusal with a green control"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 350
 
 [check]
 # Declared absence, not silence. DEPL-aRepatriatedFork-14 S3: `check` redded at every target on the

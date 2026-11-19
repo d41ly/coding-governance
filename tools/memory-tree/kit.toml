@@ -197,6 +197,13 @@ guard = []
 history_depth = "full"
 stage = ["step.build", "step.test"]
 
+[gate_leg.gov]
+reads = { base = "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", clock = "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", history = "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)." }
+signature = ["bash", "{prefix}/memory-tree/check-memory-hygiene.sh", "--offenders"]
+guard = []
+chunk = "records"
+ceiling = 12720
+
 [[hole]]
 id = "memory-tree-taxonomy"
 kind = "authoring"
@@ -260,6 +267,12 @@ argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+reads = { base = "it grades from GATE_PUSH_BASE, else the mainline merge-base (TOOL-aSparedSpawn-13 S3).", history = "it walks `rev-list` and `git log` from that base to HEAD (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "declarations"
+ceiling = 300
+
 [[gate_leg]]
 tag = "leg.memory-tree.kit-dogfood-doc-parity"
 tests = ["feature.memory-tree-hygiene"]
@@ -269,6 +282,20 @@ purpose = "holds the memory-tree kit's shipped docs equal to live ones"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
 guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/", ".memory-tree.conf"]
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = [
+  "memory/HYGIENE.md",
+  "memory/TEMPLATE-SPEC.md",
+  "memory/guides/BUILD-METHOD.md",
+  "memory/guides/ANNOTATION-STYLE.md",
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  ".memory-tree.conf",
+]
+chunk = "declarations"
+ceiling = 300
 # `.memory-tree.conf` joined the guard under TOOL-dDerivedDocket-21: the suite names it, govkit
 # classes a declared `[config] file` as `root-conf`, and its selfcheck reds a guarded bar leg whose
 # argv names such a conf its guard lacks. The reasoning below holds for it unchanged.
@@ -291,6 +318,12 @@ purpose = "requires every pointer at the build method to be declared"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 1230
 
 [[gate_leg]]
 tag = "leg.memory-tree.build-readme-slot-contract"
@@ -302,6 +335,11 @@ argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "records"
+ceiling = 300
+
 [[gate_leg]]
 tag = "leg.memory-tree.build-index-selftest"
 name = "build-index selftest"
@@ -310,6 +348,18 @@ purpose = "self-tests the generated build index"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/check-spec-tokens.py",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+]
+chunk = "selftests"
+ceiling = 350
 
 [[gate_leg]]
 tag = "leg.memory-tree.corpus-ids-selftest"
@@ -320,6 +370,11 @@ argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 2690
+
 [[gate_leg]]
 tag = "leg.memory-tree.gotchas-selftest"
 name = "gotchas selftest"
@@ -328,6 +383,16 @@ purpose = "self-tests the bug-class index and its per-diff checklist"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+]
+chunk = "selftests"
+ceiling = 300
 
 [[gate_leg]]
 tag = "leg.memory-tree.row-grammar-selftest"
@@ -338,6 +403,12 @@ purpose = "self-tests the row-document grammar and id-collision check"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
 
 # The migration planner's suite. DECLARED HERE rather than exempted in the govkit registry (unit 11
 # fork F8): `migrate_backlog.py` ships to every memory-tree adopter and each of them runs `--plan` in
@@ -353,6 +424,11 @@ argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
+
 [[gate_leg]]
 tag = "leg.memory-tree.marker-contracts"
 tests = ["feature.row-grammar"]
@@ -364,6 +440,11 @@ guard = []
 doc_reads = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 1840
+
 [[gate_leg]]
 tag = "leg.memory-tree.harness-arms-fail-branches-armed-or-pinned"
 name = "harness arms (fail branches armed or pinned)"
@@ -372,6 +453,12 @@ purpose = "requires each harness fail branch to be armed or pinned"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [[gate_leg]]
 tag = "leg.memory-tree.check-arms-selftest"
@@ -381,6 +468,12 @@ purpose = "self-tests the harness arms meta-gate"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
 
 # TOOL-aRoutedQuill-3: every pushed commit touching ROUTED_PATHS names a unit specced before it. No
 # guard and no `doc_reads`: its subject is the commit history, which moves with nobody editing this
@@ -397,6 +490,11 @@ reads = { base = "it grades the commits past the GATE_PUSH_BASE the pre-push hoo
 guard = []
 history_depth = "full"
 stage = ["step.test"]
+enforces = ["practice.spec"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 3540
 
 [[gate_leg]]
 tag = "leg.memory-tree.routed-commits-selftest"
@@ -407,6 +505,17 @@ purpose = "self-tests the check that routed commits name a unit"
 argv = ["python3", "{kit}/routed_commits.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/unattended/lib-unattended.sh",
+  "{prefix}/policy/",
+]
+chunk = "selftests"
+ceiling = 660
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

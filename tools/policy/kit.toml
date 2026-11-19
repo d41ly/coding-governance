@@ -92,3 +92,8 @@ argv = ["python", "{kit}/check_policy.py"]
 guard = []
 ceiling = 120
 stage = ["step.test"]
+
+[gate_leg.gov]
+reads = { base = "its shrink-only list is compared with the one carried at the merge-base with the remote default branch (TOOL-dGroundRules-1).", history = "it reads that list out of history (TOOL-dGroundRules-1)." }
+guard = []
+chunk = "declarations"

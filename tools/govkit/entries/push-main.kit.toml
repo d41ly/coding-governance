@@ -75,6 +75,12 @@ purpose = "proves the lander and the pre-push marker gate"
 argv = ["bash", "{prefix}/push-main.test.sh"]
 guard = ["{prefix}/push-main.sh", ".githooks/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [".githooks/", "{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+ceiling = 580
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -92,9 +98,15 @@ purpose = "drives a real push through the pre-push hook"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
 # Carried into an adopter's manifest at run-gates 1.2 or later, kept where the adopter raised it, and
-# graded equal to gov's manifest by selfcheck 7h (DEPL-aBenchedProbe-2). The only descriptor leg with one.
+# graded a positive integer by the leg factory's `ceiling` arm (`leg_factory.py --conform`,
+# DEPL-aBenchedProbe-2). The only descriptor leg with one.
 ceiling = 1780
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [".githooks/", "{prefix}/lib/"]
+chunk = "selftests"
 
 # THE BAR HARNESS, which re-disables the hook's executed-word, option, working-copy and declared arms in a copy
 # on every run and observes the evasions land (TOOL-aRepatriatedFork-5, the owner's F2 ruling). It
@@ -108,6 +120,11 @@ purpose = "re-disables pre-push bar arms in a copy, sees evasions land"
 argv = ["python3", ".githooks/pre_push_bar_selftest.py"]
 guard = [".githooks/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 600
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's

@@ -76,6 +76,13 @@ history_depth = "full"
 red_after_land = true
 stage = ["step.build", "step.test"]
 
+[gate_leg.gov]
+argv = ["bash", "skills/session-kickoff/manifest-check.sh"]
+reads = { history = "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "records"
+ceiling = 640
+
 [[hole]]
 id = "manifest-section-b"
 kind = "authoring"

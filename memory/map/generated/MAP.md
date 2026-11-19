@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 198 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 200 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -48,6 +48,7 @@ Inventories: gate-legs: 198 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `extract-arms self-test` | run-gates |
 | `foreign-prefix parity (every self-test at three prefixes)` | install-prefix |
 | `format-guard self-test` | agent-cap |
+| `gate-leg conformance` | run-gates |
 | `gotchas selftest` | baseline |
 | `govkit acceptance matrix` | govkit |
 | `govkit refusal join` | govkit |
@@ -79,6 +80,7 @@ Inventories: gate-legs: 198 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `kit/dogfood doc parity` | memory-tree-hygiene |
 | `layer dependencies (the core never depends on an expansion)` | playbook |
 | `leg ceilings clear their evidenced maximum` | run-gates |
+| `leg-factory selftest` | run-gates |
 | `lexicon naming predicates` | lexicon |
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
