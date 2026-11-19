@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-52 — the scalar-pin seed reads every root conf the working tree holds, so a fresh install seeds its pin before its first commit
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-53 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-52-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-brief.md) | journal | TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-reground-brief.md) | journal | TOOL-dWitnessedBar-53 |
