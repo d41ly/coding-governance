@@ -246,3 +246,4 @@ memory/builds/aTwinnedPass/README.md
 memory/builds/aPiecewiseGrade/README.md
 memory/builds/aHastenedSweep/README.md
 memory/builds/aTrimmedWait/README.md
+memory/builds/dSettledStage/README.md
