@@ -23,3 +23,7 @@ imported by `python -I` scripts under the session scratchpad, and staged-break c
 - New arm `tools/gate-lint/sh_hygiene.py --selftest`, covering AC6: RED on each of the three staged breaks section 7 names, GREEN once restored, and its printed count against `FLOOR_ASSERTIONS`.
 - New arm `tools/gate-lint/sh_hygiene.py --stage-commits`, covering AC2 and AC3: the new leg RED over `<base>`, GREEN on this tree.
 - AC4's and AC7's leg-argv runs, and the gates section 7 names.
+
+**Observed at the close (main loop, 2026-11-19):** each RED ran in a clone under `%TEMP%` whose staged break was COMMITTED inside the clone, because the suite's fixtures clone the source repository's HEAD and never see a working-tree edit. Each GREEN ran in a clone at `8e2ad2e5a`, this build's last unit commit. Logs are in the session scratchpad.
+- `sh_hygiene.py --selftest` (AC6) — RED under each staged break, one at a time: the staged-test step read as a plain diff, the stager follow emptied, and the quote blanking skipped in `read_stage_events`, each failing only its own rows (DERIVED at observation). GREEN once restored, its printed count equal to the floor then in force (PINNED at blob `19e87517`).
+- `sh_hygiene.py --stage-commits` (AC2, AC3) — the leg's argv over a clone carrying the base `12764ec2` lander exits 1 naming `tools/push-main.sh` undeclared at its four lander sites (PINNED at blob `cd8cf562`); the same argv at `41e57fca5` exits 0 with the registry's rows matched.

@@ -40,3 +40,8 @@ a tree whose only change is an untracked file, which it staged. `bash -n` passed
 - New arm `tools/push-main.test.sh` 43, covering AC2: RED with the base 12764ec2 `write_merge_fold`
   restored, GREEN once restored.
 - The gates section 7 names, the `push-main self-test` and `harness arms` among them.
+
+**Observed at the close (main loop, 2026-11-19):** each RED ran in a clone under `%TEMP%` whose staged break was COMMITTED inside the clone, because the suite's fixtures clone the source repository's HEAD and never see a working-tree edit. Each GREEN ran in a clone at `8e2ad2e5a`, this build's last unit commit. Logs are in the session scratchpad.
+- Arm 42 (AC1) — `FAIL — 42` with the base `12764ec2` lander committed in the clone: `eol-dirty=1`, `eol-empty=1`, `clean=1`, then no `gating + pushing`. `ok — 42` at `8e2ad2e5a`.
+- Arm 43 (AC2) — `FAIL — 43` with the base `12764ec2` lander committed in the clone; `ok — 43` at `8e2ad2e5a`.
+- Inherited, not this build's: arms 37, 39 and 40 of `tools/push-main.test.sh` fail at the pristine base `12764ec21` as at `8e2ad2e5a` (DERIVED at observation). Arm 40's own plant step fails on node d at both (`plant-rc=1`). The suite is held, so the bar that landed `12764ec21` never ran it. Arm 26 fails at the base and passes at `8e2ad2e5a`, its mint commit's line-ending case being the class this build closes.

@@ -68,3 +68,8 @@ fold's own stage refusal and `eol-rc`.
 - New arm `tools/push-main.test.sh` 43, covering AC7: RED with `GIT_CONFIG_VALUE_0=false` in place
   of `true`, GREEN once restored.
 - AC6's leg-argv run, and the gates section 7 names.
+
+**Observed at the close (main loop, 2026-11-19):** each RED ran in a clone under `%TEMP%` whose staged break was COMMITTED inside the clone, because the suite's fixtures clone the source repository's HEAD and never see a working-tree edit. Each GREEN ran in a clone at `8e2ad2e5a`, this build's last unit commit. Logs are in the session scratchpad.
+- `sh_hygiene.py --selftest` (AC1 to AC4) — RED under each staged break, one at a time: the argument walk stepping one character, the git word narrowed to the `-c` and `-C` forms, and the stager closure cut to one pass, each failing only its own rows (DERIVED at observation). GREEN once restored, its printed count equal to `FLOOR_ASSERTIONS` (DERIVED at observation).
+- Arm 43's liveness (AC7) — `FAIL — 43` with `GIT_CONFIG_VALUE_0=false` committed in the clone's suite; `ok — 43` at `8e2ad2e5a`.
+- AC6's leg argv at `8e2ad2e5a` — exit 0 with the registry; exit 1 with an empty registry, naming each registered file; exit 1 with one row's count lowered, naming that file.

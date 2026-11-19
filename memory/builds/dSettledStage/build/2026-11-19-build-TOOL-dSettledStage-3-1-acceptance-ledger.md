@@ -45,3 +45,8 @@ function is minted, so the naming lexicon was not asked.
 - New arm `tools/push-main.test.sh` 45, covering AC2: RED with the helper and fold of 41e57fca5
   restored, GREEN once restored.
 - The gates section 7 names, the `push-main self-test` and `harness arms` among them.
+
+**Observed at the close (main loop, 2026-11-19):** each RED ran in a clone under `%TEMP%` whose staged break was COMMITTED inside the clone, because the suite's fixtures clone the source repository's HEAD and never see a working-tree edit. Each GREEN ran in a clone at `8e2ad2e5a`, this build's last unit commit. Logs are in the session scratchpad.
+- Arm 44 (AC1) — `FAIL — 44` with the `41e57fca5` lander committed in the clone: the landing reached the push over the locked stage. `ok — 44` at `8e2ad2e5a`.
+- Arm 45 (AC2) — `FAIL — 45` with the `41e57fca5` lander committed in the clone; `ok — 45` at `8e2ad2e5a`.
+- Inherited, not this build's: arms 37, 39 and 40 of `tools/push-main.test.sh` fail at the pristine base `12764ec21` as at `8e2ad2e5a` (DERIVED at observation). Arm 40's own plant step fails on node d at both (`plant-rc=1`). The suite is held, so the bar that landed `12764ec21` never ran it. Arm 26 fails at the base and passes at `8e2ad2e5a`, its mint commit's line-ending case being the class this build closes.
