@@ -542,14 +542,16 @@ root that is not a `fail <n> "…"` call: an adopter's `--check` that prints a r
 gate's delegated block that prints a module's capture. The module docstring states the predicate,
 the reason walk, the `# arm-signature:` marker and what it does not check; read it there.
 
-**To switch it on**, set the key, then run `python <kit>/check-arms.py --emit-pin`. Its refusal rows
-carry five fields, the last a reason written as `REASON-OWED`, which the gate refuses: replace each
-with why no arm reaches that site, and paste the rows into `<MEMORY_ROOT>/project/unarmed-branches.txt`.
+**To switch it on**, set the key, then run `python <kit>/check-arms.py --emit-pin`. It prints each
+unarmed key's fields and count, `<gate> TAB <exit|status> TAB <signature> TAB <count>`, the measured
+rows the ledger factory reads: `<MEMORY_ROOT>/project/unarmed-branches.txt` is a ledger population
+(TOOL-dWitnessedBar-16), so write each as a ledger row under its header, the sha and `seeded` after
+the count, and record why no arm reaches the site in the commit or a widen record, never on the row.
 A site your sibling suite already drives is better ARMED than waived: lengthen that arm's assertion
 to the whole signature `--report` prints, or, for a delegated block, add a marker naming the text the
 arm already asserts. Then re-run `--emit-floors` and paste its line, because every script holding a
-site is now a gate whose floor counts sites. Every waived row prints a `check-arms: waived` line on
-every run, so the leg's log grows by one line per row.
+site is now a gate whose floor counts sites. Every waived site prints a `check-arms: waived` line on
+every run, so the leg's log grows by one line per site.
 
 **Check 24's block now prints its capture on a green run**, as blocks 20, 27 and 28 already did. A
 tree with `ROTATION_MODE` unset gains one `check 24: ROTATION_MODE is UNDECLARED` line on every full
@@ -616,13 +618,19 @@ owns the gate, or monthly, whichever comes first, and always when a ceiling reds
 **The retirement commit**, one per batch: the site and its arm gone; any pin row gone; the floor in
 `ARMS_FLOORS` lowered with a comment naming the decision; one row per retired row in
 `<MEMORY_ROOT>/project/refusal-retirements.txt` (declare the name in `PROJECT_REGISTRY_EXTRA`); and NO
-tombstone — a new refusal policing the retired surface is the growth this review exists to stop. A row:
+tombstone — a new refusal policing the retired surface is the growth this review exists to stop. The
+registry is an `append-only` ledger population (TOOL-dWitnessedBar-16), every field the check grades a
+key field, TAB-separated, under the header its `[[ledger]]` table renders. A row:
 
-    <decision id> · RETIRES <gate> check <n> "<signature head>" (x<sites>) · R1 <stores read> · R2 <ids> · R3 <how it survives> · R4 <why not security-shaped> · survivor <file> "<signature>" · replay "<refusal line>" · supersedes <id>
+    <decision id> TAB <gate> TAB <check n> TAB <R1 stores read> TAB <R2 ids> TAB <R3 how it survives> TAB <R4 why not security-shaped> TAB <survivor file> TAB <its signature> TAB <replay line> TAB 1 TAB <sha> TAB seeded
 
-`--check` reds a row missing any of R1 to R4, its survivor or its replay; a survivor file that no
-longer carries its signature; and a decision id no `<MEMORY_ROOT>/DECISIONS.md` row carries. The
-replay is the line the surviving refusal printed when the changed program was run once after the batch.
+The retired signature's head, its site count and the row it supersedes are the batch's commit and
+record, never the row's. `--check` reds a row with too few fields, the factory's malformed line; a
+unit field that is no decision id; a row whose R1 to R4, survivor or replay field is empty; a survivor
+file that no longer carries its signature; and a decision id no `<MEMORY_ROOT>/DECISIONS.md` row
+carries. The replay is the line the surviving refusal printed when the changed program was run once
+after the batch. Recording a new survivor rewrites a key field of an append-only row, which the
+`ratchet (never gains)` leg reds as `removed`: that edit is a new row, never a rewrite.
 
 **The ceiling.** `REFUSAL_CEILINGS="<gate>:<count>:<date>:<decision id> …"`, beside `ARMS_FLOORS`, counts
 the census the floor's first number counts. Above it is red, and the remedy is the review, not the

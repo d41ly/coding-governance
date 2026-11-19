@@ -24,7 +24,7 @@ ROOT = m.repo_root()
 # --------------------------------------------------------------------------------------
 # EXTRACTORS — inventory id -> zero-arg callable returning sorted list[str] of keys.
 # The dict's KEYS are the project's inventory ids: every dossier's [claims] table must
-# carry exactly these keys, and baseline.toml may only use them.
+# carry exactly these keys, and baseline.txt's rows may only use them.
 #
 # Delete the examples and declare your own. An EMPTY dict fails the gate on purpose —
 # a map with no inventories enforces nothing.

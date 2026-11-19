@@ -133,7 +133,10 @@ there is no UNDECLARED third state, because every check below has to grade some 
 ## The grandfather ratchet
 
 The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
-set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
+set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file. Most are
+ledger populations (TOOL-dWitnessedBar-16): a header line rendered from the list's `[[ledger]]` table,
+then one TAB row per key, its count, its sha and its disposition, read through the ledger factory and
+never parsed by hand; a row's reason is the conversion record's or its widen record's, never the row's.
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check, from check 4's build-folder shape (a listed folder
   name or a listed build-root file) and from check 21's missing-Serves branch. Should not grow after
@@ -160,7 +163,7 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   path and reds it absent, and that kit's write mode writes it empty, so the project-registry
   whitelist admits it by name wherever that kit is adopted. Its rows are this tree's own.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
-  `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
+  `guides/BUILD-METHOD.md`, one ledger row keyed by `path` each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit
   ships none: an adopter's is scaffolded from their OWN measured population, because gov's rows would
   name paths their tree does not have.
@@ -906,8 +909,8 @@ names the base and how many there were:
 
 If the codebase-map kit is adopted with its `MAP_ROOT` a DIRECT child of this tree (e.g.
 `<MEMORY_ROOT>/map`), that subtree is sanctioned automatically (the scripts read
-`.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.toml`,
-`affordance-exempt.toml` (the codebase-map kit renders it; a gate that did not sanction it reds a
+`.codebase-map.conf`): allowed entries are `README.md`, `FOUNDATION.md`, `baseline.txt`,
+`affordance-exempt.txt` (the codebase-map kit renders it; a gate that did not sanction it reds a
 freshly-adopted map),
 `features/`, `generated/`; `README.md`,
 `FOUNDATION.md` and `features/*.md` carry check 6's size caps but are entry-budget exempt (check 7) —

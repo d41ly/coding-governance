@@ -390,6 +390,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
@@ -6773,6 +6778,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "check_ledger_header",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -7370,6 +7380,11 @@
     {
       "id": "check_pins",
       "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "check_pins",
+      "kind": "function",
       "file": "tools/playbook/positional.py"
     },
     {
@@ -7766,6 +7781,11 @@
       "id": "check_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_regrammared_at_base",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "check_relations",
@@ -9263,6 +9283,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_convert",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "cmd_doctor",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -9286,6 +9311,11 @@
       "id": "cmd_down",
       "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "cmd_emit_floors",
@@ -9448,6 +9478,11 @@
       "file": "tools/lib/legacy_ledger.py"
     },
     {
+      "id": "cmd_read_back",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "cmd_ready",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -9593,6 +9628,11 @@
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9621,6 +9661,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "cmd_write",
@@ -10303,6 +10348,11 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "derive_after",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "derive_age",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -10411,16 +10461,6 @@
       "id": "derive_baseline_additions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
-    },
-    {
-      "id": "derive_baseline_additions",
-      "kind": "function",
-      "file": "tools/gate-lint/coverage_join.py"
-    },
-    {
-      "id": "derive_baseline_additions",
-      "kind": "function",
-      "file": "tools/lib/coverage_join.py"
     },
     {
       "id": "derive_baseline_additions",
@@ -10763,6 +10803,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "derive_converted_text",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "derive_count",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -10801,6 +10846,11 @@
       "id": "derive_deciders",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_declared_empty",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "derive_default_branch",
@@ -11753,6 +11803,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "derive_list_registration",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "derive_list_rel",
       "kind": "function",
       "file": "tools/loop/guard.py"
@@ -12108,6 +12163,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "derive_pin_index",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "derive_pin_state",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -12326,6 +12386,11 @@
       "id": "derive_regimes",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_registration",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "derive_registry_path",
@@ -13026,6 +13091,11 @@
       "id": "derive_step_context",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "derive_step_id",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "derive_step_mode",
@@ -15318,6 +15388,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "load_ledger",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "load_leg_names",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -15501,6 +15576,11 @@
       "id": "load_steps",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "load_text",
@@ -16026,6 +16106,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "main",
@@ -17563,6 +17648,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "parse_carrier",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "parse_ceilings",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -17633,9 +17723,24 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "parse_contract",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "parse_counted_reason",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "parse_cpu_clock",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
+    },
+    {
+      "id": "parse_dead_path",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "parse_dossier",
@@ -17676,6 +17781,11 @@
       "id": "parse_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "parse_fork_ceiling",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "parse_front_matter",
@@ -17741,6 +17851,11 @@
       "id": "parse_key",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "parse_keyed_reason",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "parse_known_set",
@@ -17858,6 +17973,11 @@
       "file": "tools/policy/budgets.py"
     },
     {
+      "id": "parse_retirement",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "parse_row",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -17888,6 +18008,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "parse_spaced_reason",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "parse_spec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -17906,6 +18031,11 @@
       "id": "parse_status",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "parse_tab_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "parse_table_rows",
@@ -17946,6 +18076,11 @@
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "parse_unarmed_branch",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "parse_unit_rows",
@@ -18431,6 +18566,11 @@
       "id": "print_reap_targets",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "print_reasons",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "print_recipe",
@@ -19311,6 +19451,11 @@
       "id": "read_baseline_line",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_baseline_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "read_bash_conf_values",
@@ -20198,6 +20343,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_drift_populations",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_drive",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -20311,6 +20461,11 @@
       "id": "read_excluded_tags",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "read_exempt_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "read_exhausted_ending",
@@ -21263,6 +21418,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "read_layer_literal",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "read_layer_tags",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -21343,6 +21503,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "read_legacy_entry",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "read_legacy_fanout",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -21356,6 +21521,11 @@
       "id": "read_legacy_rows",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_legacy_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "read_legs",
@@ -21446,6 +21616,11 @@
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "read_lines_with",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "read_list",
@@ -22013,6 +22188,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_pin_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "read_pin_text",
       "kind": "function",
       "file": "tools/playbook/pins.py"
@@ -22218,6 +22398,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_population_at_base",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_populations",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -22413,6 +22598,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_record_keys",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "read_record_kind",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -22506,16 +22696,6 @@
       "id": "read_registrations",
       "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
-    },
-    {
-      "id": "read_registry",
-      "kind": "function",
-      "file": "tools/gate-lint/encoding_posture.py"
-    },
-    {
-      "id": "read_registry",
-      "kind": "function",
-      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "read_registry",
@@ -23630,6 +23810,11 @@
     {
       "id": "read_toml_rows",
       "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "read_toml_rows",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -24345,6 +24530,11 @@
     {
       "id": "refuse_wrong_shell",
       "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
       "file": "tools/govkit/census.test.sh"
     },
     {
@@ -24396,6 +24586,11 @@
       "id": "refuse_wrong_shell",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/check-method-carriers.sh"
     },
     {
       "id": "refuse_wrong_shell",
@@ -26093,6 +26288,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "render_list_rows",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "render_live",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -26266,6 +26466,11 @@
       "id": "render_pin_flags",
       "kind": "function",
       "file": "tools/loop/review_bounds.py"
+    },
+    {
+      "id": "render_pin_kind",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
     },
     {
       "id": "render_pin_rows",
@@ -28510,6 +28715,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/govkit/census.test.sh"
     },
     {
@@ -28561,6 +28771,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/memory-tree/check-method-carriers.sh"
     },
     {
       "id": "resolve_python",
@@ -29021,6 +29236,11 @@
       "id": "resolve_root",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
     },
     {
       "id": "resolve_root",
@@ -31549,6 +31769,11 @@
     },
     {
       "id": "run_plant_populated_empty_armed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_regrammared",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -37153,6 +37378,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "write_after",
+      "kind": "function",
+      "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "id": "write_aged_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -37236,6 +37466,11 @@
       "id": "write_base_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_baselines",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "write_before_image",
@@ -38323,6 +38558,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_pins",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "write_pk_conf",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -39290,6 +39530,11 @@
     {
       "id": "wrong_shell_at",
       "kind": "function",
+      "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
       "file": "tools/govkit/census.test.sh"
     },
     {
@@ -39366,6 +39611,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/check-method-carriers.sh"
     },
     {
       "id": "wrong_shell_at",

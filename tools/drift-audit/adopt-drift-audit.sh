@@ -388,7 +388,7 @@ if [ "$MODE" = "--check" ]; then
   exit 0
 fi
 
-# Seed the project layer ONCE. Never overwrite: PINS are measured project state, and re-seeding a
+# Seed the project layer ONCE. Never overwrite: its pins are measured project state, and re-seeding a
 # repo that already tuned them would silently reset every ratchet to the template's zeros. The
 # absent-only test is the ledger factory's unregistered form (TOOL-dWitnessedBar-15 S5), run from the
 # memory-tree kit's copy, found through drift_report's resolve_kit_dir: it copies the template only
@@ -423,6 +423,6 @@ cat <<EOF
 Next:
   1. Fill $KIT_REL/drift_signals.py — PRODUCT_GLOBS at minimum.
   2. Run:  python $KIT_REL/drift_report.py
-  3. Seed PINS at the values you just measured, not at zero, then re-run with --check (expect 0).
+  3. Seed drift-pins rows at the values you just measured, not at zero, then re-run with --check (expect 0).
   4. Wire the --check arm into your gate manifest so a regression reds.
 EOF

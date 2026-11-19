@@ -123,7 +123,12 @@ gated, content not); generated artifacts are byte-deterministic (POSIX keys, LF 
 timestamps) so the freshness gate cannot flap across platforms; convergence rides the
 design pass — substantial work touching an undossiered feature creates its dossier then.
 
-The affordance check is graced by a shrink-only `affordance-exempt.toml` (feature names),
+The baseline and the grace list are ledger populations (TOOL-dWitnessedBar-16): `baseline.txt`,
+one row per `<inventory> TAB <key>`, and `affordance-exempt.txt`, one row per graced dossier, each
+under the header its `[[ledger]]` table in this kit's descriptor renders and read through the
+memory-tree kit's ledger factory. A grace list holding no row is its header and the factory's
+`# unarmed · dead probe · <sha>` line, which a fresh scaffold with no section-less dossier is given.
+The affordance check is graced by the shrink-only `affordance-exempt.txt` (feature names),
 seeded from existing dossiers at adoption (`gen_map.py --seed-affordance-baseline`, wired into
 the adopter) so it never retro-reds the fleet; a NEW dossier is never exempt, so new work is
 always forced to record its reuse decision. The adopter seeds it through the memory-tree kit's

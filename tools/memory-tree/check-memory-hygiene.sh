@@ -405,15 +405,11 @@ case "${1:-}" in
     [ -n "${2:-}" ] || { echo "HYGIENE — cannot run: --print-live-index-home takes a stem"; exit 2; }
     resolve_live_index_home "$2"; exit 0 ;;
 esac
-LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
-DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
 # Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
 # call, and these run once per scanned file (minutes on a large adopter tree; a fork is ~50-100ms
 # under MSYS/Windows). Exact-key lookup is semantically identical (fixed string, whole line) and
 # costs zero processes. (Upstream: adopter ic ARCH-aFencedNamespace-3.)
 declare -A LEGACY_SET DEBT_SET
-while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
-while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "HYGIENE check $1 FAILED — $2"; fi; status=1; }
@@ -658,6 +654,33 @@ refuse_wrong_shell() {
 # <<< refuse_wrong_shell
 refuse_wrong_shell || exit 2
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
+# THE TWO GRANDFATHER LISTS, read through the ledger factory this kit carries (TOOL-dWitnessedBar-16 S4):
+# `legacy-files.txt` and `curation-debt.txt` are ledger populations keyed by `path`, one row per listed
+# file, so no line of either is parsed here. ONE python spawn reads both, and an absent list is an empty
+# one. A row the factory refuses is listed as its whole text, a path no tree tracks, so the stale-line
+# guard of check 5 or 6 names it rather than reading it as unlisted.
+_LD=$("$_PY" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+for tag, path in (("L", sys.argv[2]), ("D", sys.argv[3])):
+    try:
+        rows, bad = LL.read_rows(path, 1)
+    except FileNotFoundError:
+        continue
+    for entry in bad:
+        print("%s\t%s" % (tag, LL.render_malformed(entry).replace("\t", " ")))
+    for key in rows:
+        print("%s\t%s" % (tag, key[0]))' "$HERE" "$M/project/legacy-files.txt" "$M/project/curation-debt.txt" | tr -d '\r') \
+  || { echo "HYGIENE — cannot run: the ledger factory did not read legacy-files.txt and curation-debt.txt"; exit 2; }
+LEGACY=""; DEBT=""
+while IFS=$'\t' read -r _t _l; do
+  case "$_t" in
+    L) LEGACY="$LEGACY$_l"$'\n'; LEGACY_SET["$_l"]=1 ;;
+    D) DEBT="$DEBT$_l"$'\n'; DEBT_SET["$_l"]=1 ;;
+  esac
+done <<<"$_LD"
+LEGACY=${LEGACY%$'\n'}; DEBT=${DEBT%$'\n'}
 # TOOL-aWitnessedCrash-1: the crash witness. Bash 5.3 runs on past some runtime errors under
 # `set -u` (an unset map's `${#X[@]}` fails its command and the script continues), so the exit
 # status cannot see a check that stopped part-way. This engine's stderr is kept and replayed at
@@ -1048,7 +1071,7 @@ bm=""
 if [ -n "$MAP_SUB" ]; then
   m1=$(printf '%s\n' "$FILES" | grep "^$M/$MAP_SUB/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
   bm=$(printf '%s\n' "$m1" | grep . | while IFS= read -r e; do case "$e" in
-    F:README.md|F:FOUNDATION.md|F:baseline.toml|F:affordance-exempt.toml|D:features|D:generated) ;;
+    F:README.md|F:FOUNDATION.md|F:baseline.txt|F:affordance-exempt.txt|D:features|D:generated) ;;
     *) echo "$M/$MAP_SUB/${e#*:}";; esac; done)
 fi
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)

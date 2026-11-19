@@ -24,9 +24,12 @@ can still move over a non-empty population, and a dead probe prints DEAD PROBE i
 WHAT IS ENGINE AND WHAT IS PROJECT. The signal implementations are generic over any repo that
 follows the governance playbook (a memory tree, TEMPLATE-SPEC status headers, a per-node in-flight
 ledger, an agent auto-memory directory). Everything genuinely repo-shaped — which paths are product
-source, which lists promise to shrink, which hand-kept inventories mirror a generated one, and the
-PINS — lives in the project layer `drift_signals.py`, copied from `drift_signals.template.py` at
-adoption. Same split as codebase-map's `map_extractors.py`.
+source and which hand-kept inventories mirror a generated one — lives in the project layer
+`drift_signals.py`, copied from `drift_signals.template.py` at adoption. Same split as codebase-map's
+`map_extractors.py`. Three facts are no longer typed there (TOOL-dWitnessedBar-16 S8): the lists that
+promise to shrink are the `shrink-only` `[[ledger]]` registrations, read through the memory-tree kit's
+ledger factory; each signal's pin is a row of the `ceiling` population `drift-pins`; and each id set a
+gateable signal is bounded by is the rows of the `shrink-only` population `drift-baselines`.
 
 NO SECOND CONF. The corpus root and disciplines are read from `.memory-tree.conf`, which the
 memory-tree kit owns. This kit declares no conf of its own and takes no `--memory-root` flag: a
@@ -183,6 +186,71 @@ def parse_conf_text(text: str) -> dict[str, str]:
     return conf
 
 
+# THE POPULATIONS DRIFT READS (TOOL-dWitnessedBar-16 S8), through the memory-tree kit's ledger factory,
+# which this kit requires: every `shrink-only` registration is a list that promises to shrink, glossed
+# by its population name; `drift-pins` holds each signal's pin, a row of count 0 never written, so a
+# signal with no row keeps its own tolerance; `drift-baselines` holds the id set a gateable signal is
+# bounded by. A raised pin is the `ratchet` pack's widen case. WHAT THIS DOES NOT CHECK: a registration a
+# kit declares for a population no drift signal reads, which is the ratchet pack's to grade.
+PINS_POPULATION = "drift-pins"
+BASELINES_POPULATION = "drift-baselines"
+
+
+def load_ledger():
+    """The memory-tree kit's ledger factory, found through the sibling-kit resolver, never a spelled path."""
+    here = pathlib.Path(__file__).resolve().parent
+    try:
+        kit = resolve_kit_dir("memory-tree", "legacy_ledger.py", here)
+    except LookupError as exc:
+        raise DriftError(f"the memory-tree kit's ledger factory is not found, and drift reads its "
+                         f"shrink-only lists, pins and baselines through it: {exc}") from None
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    import legacy_ledger  # noqa: E402,PLC0415
+    return legacy_ledger
+
+
+def read_drift_populations(root: pathlib.Path):
+    """-> (the factory, every registration, {signal: pin}, {signal: [id, ...]}) at `root`; where no
+    memory-tree factory resolves, (None, [], {}, {}) with one stderr line saying so: no list is read
+    as shrinking, every gateable signal grades at its own tolerance, and that tree is not refused."""
+    try:
+        ledger = load_ledger()
+    except DriftError as exc:
+        print(f"drift-report: no shrink-only list, pin or baseline is read: {exc}", file=sys.stderr)
+        return None, [], {}, {}
+    try:
+        regs = ledger.read_registrations(root)
+    except ValueError as exc:
+        raise DriftError(f"a [[ledger]] registration is refused, so drift's populations cannot be "
+                         f"found:\n{exc}") from None
+    named = {r.population: r for r in regs}
+
+    def rows(population):
+        reg = named.get(population)
+        if reg is None or not (root / reg.home).is_file():
+            return {}
+        got, bad = ledger.read_ledger(root, reg)
+        if bad:
+            raise DriftError(f"{reg.home}: {ledger.render_malformed(bad[0])}")
+        return got
+
+    pins = {key[0]: row[0] for key, row in rows(PINS_POPULATION).items()}
+    baselines: dict = {}
+    for sig, ident in rows(BASELINES_POPULATION):
+        baselines.setdefault(sig, []).append(ident)
+    return ledger, regs, pins, baselines
+
+
+def derive_declared_empty(ctx) -> set:
+    """The signals empty BY DECLARATION: the project layer's `DECLARED_EMPTY`, and the shrink signal
+    wherever no `shrink-only` registration exists, derived and never typed (TOOL-dWitnessedBar-16 S8)."""
+    declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+    if not ctx.shrink_only:
+        declared.add("shrink_only_lists_not_shrinking")
+    return declared
+
+
 def load_project_layer(root: pathlib.Path):
     """Import the adopter's `drift_signals.py` from beside this file. Absence is a refusal."""
     here = pathlib.Path(__file__).resolve().parent
@@ -195,7 +263,7 @@ def load_project_layer(root: pathlib.Path):
     sys.path.insert(0, str(here))
     import drift_signals  # noqa: E402
 
-    for attr in ("PRODUCT_GLOBS", "SHRINK_ONLY", "HANDKEPT", "PINS"):
+    for attr in ("PRODUCT_GLOBS", "HANDKEPT"):
         if not hasattr(drift_signals, attr):
             raise DriftError(f"drift_signals.py is missing required attribute {attr}")
     return drift_signals
@@ -395,65 +463,70 @@ def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexic
 
 
 # --------------------------------------------------------------------------------------------
-# TOOL-aMendedFleet-56 S6 — BASELINES is shrink-only, read at the base like the two guards above.
+# TOOL-aMendedFleet-56 S6 — the baselines are shrink-only, read at the base like the two guards above,
+# and since TOOL-dWitnessedBar-16 S8 they and the pins are the populations `drift-baselines` and
+# `drift-pins`, read at the base through the ledger factory rather than as a project layer's literals.
 #
 # A pin bounds a COUNT, so a drained offender and a new one at an equal count read as no change; an
 # id set bounds the offenders themselves. This guard keeps the set from growing: an id the base's
 # set did not carry is a finding, and a FIRST seed may not exceed the pin the base held for that
 # signal. There is no escape: each signal has a remedy that is not an addition.
 #
-# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's BASELINES
-# held is graded, listed in the working set or not, so a signal leaving BASELINES for PINS may be
-# pinned no higher than the size of the set the base held. Deleting the set and pinning it at any
-# count used to pass, because only the working dict was walked and an empty one returned early.
-# ponytail: the base layer is read with `ast.literal_eval`, so a non-literal BASELINES or PINS at the
-# base is a finding rather than an evaluation; executing the base's code would be the upgrade.
-def build_baseline_findings(git: "Git", path: str, baselines: dict, pins: dict) -> list:
-    """Findings for every signal whose working `BASELINES` set is WEAKER than the base allows."""
-    base = git.run("show", f"{git.base_ref}:{path}")
-    if base.returncode != 0:
-        return []                          # the layer is new on this branch; nothing to compare
-    try:
-        tree = ast.parse(base.stdout)
-    except SyntaxError as exc:
-        return [f"{path}: the project layer at {git.base_ref} does not parse ({exc.msg}, line "
-                f"{exc.lineno}), so BASELINES cannot be compared against the base"]
-    nodes = {}
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            names = [t.id for t in node.targets if isinstance(t, ast.Name)]
-        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
-            names = [node.target.id]
-        else:
-            continue
-        for n in names:
-            if n in ("BASELINES", "PINS"):
-                nodes[n] = node.value      # the last assignment wins, as it does on import
-    was = {}
-    for n, v in nodes.items():
-        try:
-            was[n] = ast.literal_eval(v)
-        except ValueError:
-            return [f"{path}: {n} at {git.base_ref} is not a literal, so BASELINES cannot be "
-                    f"compared against the base"]
-    old_sets, old_pins = was.get("BASELINES") or {}, was.get("PINS") or {}
+# TOOL-aMendedFleet-110: nor is MOVING a signal out of the set. Every signal the base's baselines
+# held is graded, listed in the working set or not, so a signal leaving `drift-baselines` for
+# `drift-pins` may be pinned no higher than the size of the set the base held. Deleting the set and
+# pinning it at any count used to pass, because only the working set was walked.
+def read_population_at_base(git: "Git", ledger, reg):
+    """-> (the rows of `reg` at drift's base ref, None where the base holds no home; a finding, or "")."""
+    shown = git.run("show", f"{git.base_ref}:./{reg.home}")
+    if shown.returncode != 0:
+        return None, ""
+    at = tuple(i for i, f in enumerate(reg.fields) if f in reg.verbatim)
+    rows, bad = ledger._parse_rows(shown.stdout.split("\n"), len(reg.fields), ("sha", "disposition"), at)
+    if bad:
+        return None, (f"{reg.home}: at {git.base_ref} it does not parse ({ledger.render_malformed(bad[0])}), "
+                      f"so the baselines cannot be compared against the base")
+    return rows, ""
+
+
+def build_baseline_findings(git: "Git", ledger, regs, baselines: dict, pins: dict) -> list:
+    """Findings for every signal whose working `drift-baselines` set is WEAKER than the base allows."""
+    named = {r.population: r for r in regs}
+    breg, preg = named.get(BASELINES_POPULATION), named.get(PINS_POPULATION)
+    if breg is None or ledger is None:
+        return []
+    old_rows, why = read_population_at_base(git, ledger, breg)
+    if why:
+        return [why]
+    if old_rows is None:
+        return []                          # the population is new on this branch; nothing to compare
+    old_pins = {}
+    if preg is not None:
+        pin_rows, why = read_population_at_base(git, ledger, preg)
+        if why:
+            return [why]
+        old_pins = {key[0]: row[0] for key, row in (pin_rows or {}).items()}
+    old_sets: dict = {}
+    for sig, ident in old_rows:
+        old_sets.setdefault(sig, set()).add(ident)
+    path, pin_path = breg.home, preg.home if preg is not None else PINS_POPULATION
     out = []
     for sig, ids in sorted(baselines.items()):
         if sig in old_sets:
-            for i in sorted(set(ids) - set(old_sets[sig])):
-                out.append(f"{path}: BASELINES[{sig!r}] gained {i} against {git.base_ref}, which "
-                           f"WEAKENS it. The set is shrink-only and has no escape: remove the cause "
-                           f"that makes {i} an offender instead of listing it.")
+            for i in sorted(set(ids) - old_sets[sig]):
+                out.append(f"{path}: {sig!r} gained {i} against {git.base_ref}, which WEAKENS it. The "
+                           f"set is shrink-only and has no escape: remove the cause that makes {i} an "
+                           f"offender instead of listing it.")
         elif len(set(ids)) > old_pins.get(sig, 0):
-            out.append(f"{path}: BASELINES[{sig!r}] is seeded with {len(set(ids))} ids where the "
-                       f"base pins it at {old_pins.get(sig, 0)} in PINS, which WEAKENS it. Seed only "
-                       f"the offenders the base's pin already bounds.")
+            out.append(f"{path}: {sig!r} is seeded with {len(set(ids))} ids where the base pins it at "
+                       f"{old_pins.get(sig, 0)} in {PINS_POPULATION}, which WEAKENS it. Seed only the "
+                       f"offenders the base's pin already bounds.")
     for sig in sorted(set(old_sets) - set(baselines)):
-        size = len(set(old_sets[sig]))
+        size = len(old_sets[sig])
         if sig in pins and pins[sig] > size:
-            out.append(f"{path}: {sig!r} moved from BASELINES to PINS at {pins[sig]} where the "
-                       f"base's set held {size} ids at {git.base_ref}, which WEAKENS it. Pin it no "
-                       f"higher than {size}, the set's size, and drain from there.")
+            out.append(f"{pin_path}: {sig!r} moved from {BASELINES_POPULATION} to {PINS_POPULATION} at "
+                       f"{pins[sig]} where the base's set held {size} ids at {git.base_ref}, which "
+                       f"WEAKENS it. Pin it no higher than {size}, the set's size, and drain from there.")
     return out
 
 
@@ -736,10 +809,11 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10): a `BASELINES` list spelling this id
-        # would otherwise cite it, and a listed id could then never drain.
+        # THE LAYER IS NOT EVIDENCE (TOOL-aMendedFleet-56 S10), nor are drift's two population homes
+        # (TOOL-dWitnessedBar-16 S8): a baselines row spelling this id would otherwise cite it, and a
+        # listed id could then never drain.
         hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs,
-                          *([f":(exclude){ctx.layer_path}"] if ctx.layer_path else []))
+                          *[f":(exclude){p}" for p in ctx.not_evidence])
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -1138,12 +1212,13 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         elif not (ctx.root / posix).is_file():
             bad_declaration = "names a file that is not there, so nothing it would waive is waived"
     wpath = ctx.root / (declared or f"{ctx.memory_root}/project/trace-waiver.txt")
-    if not bad_declaration and wpath.is_file():
-        for raw_row in wpath.read_text(encoding="utf-8", errors="replace").splitlines():
-            if not raw_row.strip() or raw_row.lstrip().startswith("#"):
-                continue
-            cols = raw_row.split("\t")
-            waived[cols[0].strip()] = cols[-1].strip() if len(cols) > 1 else ""
+    # A ledger population keyed by spec path and unit id (TOOL-dWitnessedBar-16 S4), read through the
+    # factory; a row it refuses waives nothing and is carried as a finding of its own below.
+    refused_rows: list = []
+    if not bad_declaration and wpath.is_file() and ctx.ledger is not None:
+        keyed, refused_rows = ctx.ledger.read_rows(wpath, 2)
+        for spec_path, unit in keyed:
+            waived[spec_path] = unit
     used: set[str] = set()
 
     suspect, checked, unjudged, records_only = [], 0, 0, []
@@ -1193,6 +1268,11 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
             "note": "waives a spec that is absent, not terminal, traceable again, or declaring "
                     "records-only in its own status header",
+        })
+    for number, _kind, raw in refused_rows:
+        suspect.append({
+            "file": f"{wpath.name}:{number}", "id": "(refused waiver row)", "slug": "(refused waiver row)",
+            "closed": "", "note": f"not a ledger row, so it waives nothing: {raw.strip()[:120]}",
         })
     if bad_declaration:
         suspect.append({
@@ -2202,7 +2282,7 @@ def build_cutoff_keys_armed(ctx) -> dict:
                 if v.strip():
                     armed.append({"file": f, "key": k, "value": v})
     gateable = name in ctx.pins
-    note = [] if gateable else [{"note": "no budget declared: add a PINS entry"}]
+    note = [] if gateable else [{"note": f"no budget declared: add a {PINS_POPULATION} row"}]
     return {"signal": name, "value": len(armed), "of": of,
             "tolerance": ctx.pins.get(name, 0), "gateable": gateable,
             "live": of > 0, "detail": note + armed + skipped}
@@ -3616,9 +3696,10 @@ class Ctx:
         # cannot drift apart into two spellings of the same grammar.
         self.id_re = re.compile(_resolve_ident(root, fams))
         self.anchors = _resolve_anchors(root, fams)
-        self.shrink_only = dict(proj.SHRINK_ONLY)
+        # TOOL-dWitnessedBar-16 S8: the shrink-only lists, the pins and the baselines are populations.
+        self.ledger, self.registrations, self.pins, self.baselines = read_drift_populations(root)
+        self.shrink_only = {r.home: r.population for r in self.registrations if r.direction == "shrink-only"}
         self.handkept = list(proj.HANDKEPT)
-        self.pins = dict(proj.PINS)
         # The project layer itself, so a signal can ask for a declaration the kit does
         # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
         self.proj = proj
@@ -3629,6 +3710,8 @@ class Ctx:
                 root.resolve()).as_posix()
         except (AttributeError, TypeError, ValueError):
             self.layer_path = None
+        homes = [r.home for r in self.registrations if r.population in (PINS_POPULATION, BASELINES_POPULATION)]
+        self.not_evidence = ([self.layer_path] if self.layer_path else []) + homes
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
         # TOOL-aMendedFleet-53. The auto-memory directory signal 5 audits; BLANK or undeclared is
         # NOT ASKED, so an older adopter's project layer keeps importing.
@@ -4305,17 +4388,13 @@ def main(argv: list[str] | None = None) -> int:
         # --check, which is the run an adopter is told to make first.
         lookback = _read_lookback(proj)
         # TOOL-aMendedFleet-56 S1 and S4: an optional id set per gateable signal, refused before any
-        # signal runs when its shape is wrong or a PINS entry bounds the same signal.
-        baselines = getattr(proj, "BASELINES", None) or {}
-        if not isinstance(baselines, dict) or not all(
-                isinstance(v, (list, tuple)) and all(isinstance(i, str) for i in v)
-                for v in baselines.values()):
-            raise DriftError("drift_signals.py declares BASELINES that is not a dict from a signal "
-                             "name to a list of offender id strings")
-        both = sorted(set(baselines) & set(proj.PINS))
+        # signal runs when a pin bounds the same signal. Both are populations since TOOL-dWitnessedBar-16.
+        _ledger, _regs, pins_now, baselines = read_drift_populations(root)
+        both = sorted(set(baselines) & set(pins_now))
         if both:
-            raise DriftError(f"{', '.join(both)} is declared in both PINS and BASELINES; a signal "
-                             f"takes ONE bound, a count or an id set, so delete one of the two")
+            raise DriftError(f"{', '.join(both)} is declared in both {PINS_POPULATION} and "
+                             f"{BASELINES_POPULATION}; a signal takes ONE bound, a count or an id set, so "
+                             f"delete one of the two")
         dead_limit, dead_filed = _read_dead_keys(proj)
     except DriftError as exc:
         print(f"drift-report: {exc}", file=sys.stderr)
@@ -4365,7 +4444,7 @@ def main(argv: list[str] | None = None) -> int:
     # carries. A record that is not live judges nothing, so both stay empty and DEAD reports it.
     stray = sorted(set(baselines) - {s["signal"] for s in out if s["gateable"]})
     if stray:
-        print(f"drift-report: BASELINES names {', '.join(stray)}, which this report does not "
+        print(f"drift-report: {BASELINES_POPULATION} names {', '.join(stray)}, which this report does not "
               f"produce as a gateable signal; an id set bounds only a gateable one, so delete the "
               f"entry", file=sys.stderr)
         return 2
@@ -4390,11 +4469,10 @@ def main(argv: list[str] | None = None) -> int:
     # is enumerated in the project layer, never inferred.
     ratchets, over, dead = [], [], []
     if args.check or args.offenders:
-        declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
+        declared = derive_declared_empty(ctx)
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
         ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
-        if ctx.layer_path:
-            ratchets += build_baseline_findings(ctx.git, ctx.layer_path, baselines, proj.PINS)
+        ratchets += build_baseline_findings(ctx.git, ctx.ledger, ctx.registrations, baselines, ctx.pins)
         over = [s for s in out if s["gateable"] and s["live"] and (
             bool(s["new"] or s["stale"]) if "baseline" in s else s["value"] > s["pin"])]
         dead = [s for s in out if s["gateable"] and not s["live"] and s["signal"] not in declared]
@@ -4439,7 +4517,7 @@ def main(argv: list[str] | None = None) -> int:
                 status = f"not asked — {note or 'this repo does not adopt what the signal reads'}"
             elif not s["live"]:
                 k = s["dead_readings"]
-                if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()):
+                if s["signal"] in derive_declared_empty(ctx):
                     status = "empty by declaration — nothing to measure here yet"
                 elif not s["gateable"] and k is not None and k >= dead_limit:
                     # TOOL-aMendedFleet-90 S3. A gateable dead record keeps its status: `--check` reds it.
@@ -4484,22 +4562,22 @@ def main(argv: list[str] | None = None) -> int:
             # `--check`, so its stdout stays one JSON document; the write never moves the verdict.
             utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             write_drift_history(resolve_history_path(root), build_history_rows(
-                out, set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()), utc, head_sha, base_ref,
+                out, derive_declared_empty(ctx), utc, head_sha, base_ref,
                 base_sha.stdout.strip()))
         # The populations are computed above, once, for this mode and `--offenders` alike.
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         for s in over:
             if "baseline" in s:
-                print(f"\ndrift-report: {s['signal']} = {s['value']} against BASELINES "
-                      f"({s['baseline']} listed in {ctx.layer_path}) — this set is shrink-only",
+                print(f"\ndrift-report: {s['signal']} = {s['value']} against {BASELINES_POPULATION} "
+                      f"({s['baseline']} listed) — this set is shrink-only",
                       file=sys.stderr)
                 for i in s["new"]:
                     print(f"  new   {i} — an offender the set does not list: remove its cause, "
                           f"never list it", file=sys.stderr)
                 for i in s["stale"]:
-                    print(f"  stale {i} — listed but no longer an offender: delete its line from "
-                          f"BASELINES['{s['signal']}']", file=sys.stderr)
+                    print(f"  stale {i} — listed but no longer an offender: delete its row from "
+                          f"{BASELINES_POPULATION}", file=sys.stderr)
                 continue
             print(f"\ndrift-report: {s['signal']} = {s['value']} (pin {s['pin']}) — this list is shrink-only",
                   file=sys.stderr)

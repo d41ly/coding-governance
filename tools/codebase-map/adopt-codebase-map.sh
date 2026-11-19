@@ -343,8 +343,13 @@ else
   "$PY" "$HERE/gen_map.py" --scaffold || exit 1
 fi
 
-# Seed the affordance grace list ONCE: a fresh scaffold gets `exempt = []`; a repo re-adopting from a
-# pre-affordance kit version gets its existing dossiers graced — green by construction either way.
+# Seed the affordance grace list ONCE: a repo re-adopting from a pre-affordance kit version gets its
+# existing dossiers graced — green by construction. The list is a ledger population at
+# `affordance-exempt.txt` (TOOL-dWitnessedBar-16 S6), and a fresh scaffold with no section-less dossier
+# gets the factory's unarmed line: the seed prints `dead probe:`, the factory writes
+# `# unarmed · dead probe · <sha>` and exits 1, and that one `unarmed <home> dead probe` line is the
+# non-zero exit accepted here (§8 F18). WHAT THIS DOES NOT CHECK: an unarmed list is re-seeded by the
+# next adopt, which graces any section-less dossier added since.
 # NOT re-seeded when present: the list is shrink-only, so re-seeding a repo with a real (non-exempt)
 # violation would mask it. The absent-only test is the ledger factory's unregistered form
 # (TOOL-dWitnessedBar-15 S5), run from the memory-tree kit's copy, found through this kit's own
@@ -357,8 +362,16 @@ except Exception as exc:
     sys.exit(str(exc))
 print(map_lib.MEMORY_TREE_DIR.as_posix())' "$HERE" 2>&1) || { echo "codebase-map: the memory-tree kit's legacy_ledger.py was not found: $LL_DIR"; exit 2; }
 [ -f "$LL_DIR/legacy_ledger.py" ] || { echo "codebase-map: no legacy_ledger.py in the memory-tree kit at $LL_DIR, so the affordance list cannot be seeded"; exit 2; }
-"$PY" "$LL_DIR/legacy_ledger.py" seed --home "${MAP_ROOT:-memory/map}/affordance-exempt.toml" \
-  -- "$PY" "$HERE/gen_map.py" --seed-affordance-baseline --out '{out}' || exit 1
+_aff=$("$PY" "$LL_DIR/legacy_ledger.py" seed --home "${MAP_ROOT:-memory/map}/affordance-exempt.txt" \
+  -- "$PY" "$HERE/gen_map.py" --seed-affordance-baseline --out '{out}'); _aff_rc=$?
+_aff=${_aff//$'\r'/}
+printf '%s\n' "$_aff"
+if [ "$_aff_rc" != 0 ]; then
+  case "${_aff##*$'\n'}" in
+    "unarmed "*"affordance-exempt.txt dead probe") ;;
+    *) echo "codebase-map: the affordance grace list was not seeded, and only a dead probe is admitted unarmed"; exit 1 ;;
+  esac
+fi
 
 GATE="${GATE_FILE:-tests/test_codebase_map.py}"
 if [ -f "$GATE" ]; then

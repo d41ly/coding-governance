@@ -361,7 +361,25 @@ if [ ! -f "$WAIVERS" ]; then
   exit 1
 fi
 
-waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
+# THE REGISTRY IS A LEDGER POPULATION (TOOL-dWitnessedBar-16 S4), `playbook-kit-waivers`, a declared set
+# keyed by <kit>, read through the memory-tree kit's ledger factory, found by the same resolver: one
+# `<kit> TAB <count> TAB <sha> TAB <disposition>` row per waived kit, its reason the conversion record's.
+# A row the factory refuses is listed as its whole text, a kit no tree ships, so it reds as stale.
+LL_DIR=""
+[ -n "${_pp_py:-}" ] && LL_DIR=$(resolve_kit_dir "$_pp_py" memory-tree legacy_ledger.py "$_self_dir" 2>/dev/null)
+if [ -z "$LL_DIR" ]; then
+  printf 'PLAYBOOK-PARITY: cannot run — no python or no memory-tree ledger factory resolves, and %s is read through it\n' "$WAIVERS"
+  exit 2
+fi
+waived=$("$_pp_py" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+rows, bad = LL.read_rows(sys.argv[2], 1)
+for entry in bad:
+    print(entry[2].replace("\t", " "))
+for key in rows:
+    print(key[0])' "$LL_DIR" "$WAIVERS" | tr -d '\r' | sort -u)
 
 # The match is an anchored PATH SEGMENT, case-sensitive — `tools/<kit>/` or a backticked `<kit>/` —
 # never a bare substring. A substring search scores the kit `lib` many times over the trio — every

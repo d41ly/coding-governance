@@ -7854,9 +7854,12 @@ if [ -f "$STC" ]; then
   mkdir -p "./${PFX}" memory/project
   cp "$STC" ${PFX}check-spec-tokens.py
   # The checker's spec filename date is the memory-tree kit's one pattern (TOOL-dTrueNorth-16 S32), so
-  # its design_lib.py and the tree_lib.py that imports sit beside it, where the checker loads them.
+  # its design_lib.py and the tree_lib.py that imports sit beside it, where the checker loads them,
+  # and so does the ledger factory its waiver registry is read through, with the two modules that
+  # imports (TOOL-dWitnessedBar-16).
   mkdir -p "./${PFX}memory-tree"
-  cp "$HERE/../$MT_KIT/design_lib.py" "$HERE/../$MT_KIT/tree_lib.py" "./${PFX}memory-tree/"
+  cp "$HERE/../$MT_KIT/design_lib.py" "$HERE/../$MT_KIT/tree_lib.py" "$HERE/../$MT_KIT/legacy_ledger.py" \
+    "$HERE/../$MT_KIT/backlog.py" "$HERE/../$MT_KIT/coverage_join.py" "./${PFX}memory-tree/"
   printf '[{"name":"g"}]\n' > ${PFX}gate-legs.json
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
   printf 'SPEC_DIRECT_CUTOFF="2026-08-01"\n' > .memory-tree.conf
@@ -8193,7 +8196,7 @@ if [ -f "$STC" ]; then
   miss "$o" "$sd_admit"
   printf '%s\n' "$sd_clean" > "$sd_spec"
   # TOOL-aSmoothedDispatch-8 AC3 stale: a stale waiver row beside a foreign-only red refuses.
-  printf 'no-spec-makes-this\tdeliberate, for this arm\n' >> memory/project/spec-token-waivers.txt
+  printf 'no-spec-makes-this\t1\tabcdef12\tseeded\n' >> memory/project/spec-token-waivers.txt
   rm -f .git/unattended/spec-tokens.tRun.key
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "$sd_refuse"
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
@@ -15224,7 +15227,7 @@ else
     printf 'MEMORY_ROOT=memory\nDISCIPLINES="tool"\nFAMILIES="tool:EXMP"\nBACKLOG_MODE="builds"\nASK_CUTOFF="2026-06-01"\n' \
       > .memory-tree.conf
     mkdir -p memory/project memory/builds/aFoo/spec memory/builds/aBar memory/builds/tRun
-    printf 'memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n' \
+    printf 'memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n' \
       > memory/project/stale-header-waiver.txt
     printf -- '---\nslug: aBar\nthis line has no colon\n---\n' > memory/builds/aBar/README.md
     for _s in aFoo tRun; do

@@ -819,7 +819,7 @@ rm -rf "$T"
 # ---- stale and REDS; a row only in the working tree waives nothing, because the leg reads HEAD.
 write_waiver() { # fixture root · commit? -> writes the one-row registry naming the fixture's unit
   ( cd "$1" && mkdir -p memory/project \
-    && printf 'ARCH-tBrief-1\tbuilt without a recorded brief\n' > memory/project/brief-recorded-waiver.txt \
+    && printf 'ARCH-tBrief-1\t1\tabcdef12\tseeded\n' > memory/project/brief-recorded-waiver.txt \
     && if [ "$2" = commit ]; then git add -A >/dev/null && git commit -q -m "records: waive" --no-verify; fi ) >/dev/null 2>&1
 }
 T=$(mkfixture norow); write_waiver "$T" commit
@@ -916,7 +916,7 @@ rm -rf "$T"
 # ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted (rev-2)
 T=$(seed_brange_fixture)
 ( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
-  && printf 'ARCH-tBR-1\tbuilt without a recorded brief, landed as-is\n' > memory/project/brief-recorded-waiver.txt \
+  && printf 'ARCH-tBR-1\t1\tabcdef12\tseeded\n' > memory/project/brief-recorded-waiver.txt \
   && git add -A >/dev/null && git commit -q -m "waive ARCH-tBR-1" --no-verify && git push -q origin main \
   && write_br_build 2 row ) >/dev/null 2>&1
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?

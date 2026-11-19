@@ -669,7 +669,7 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waiver control: the fixture REDS with no registry" "$rc" "1"
 # COMMITTED, because the registry is read from the graded commit. An arm leaving it untracked
 # would exercise the uncommitted path H3 closed, and would pass either way.
-( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tthe control arm waives it\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'waive it' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waived violation: green" "$rc" "0"
@@ -678,12 +678,12 @@ has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
 # one that only ever matches the last line. The shipped registry has two rows and waived NOTHING
 # until the id list was flattened, while the single-row arm above passed throughout — the instance
 # was covered and the class was not.
-( cd "$T" && printf 'ARCH-tOrder-2\ta row BEFORE the real one\nARCH-tOrder-1\tthe unit that actually violates\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && printf 'ARCH-tOrder-2\t1\tabcdef12\tseeded\nARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'two rows' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "MULTI-row waiver: a row that is not the last still waives its unit" "$o" "BUILT at"
 has   "MULTI-row waiver: the stale sibling is still named" "$o" "ARCH-tOrder-2"
-( cd "$T" && printf 'ARCH-tOrder-99\tnothing matches this\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && printf 'ARCH-tOrder-99\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'stale row' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "STALE waiver row: REDS" "$rc" "1"
@@ -759,7 +759,7 @@ rm -rf "$T"
 # ---- H3: an UNCOMMITTED waiver must not waive. Otherwise the waiver works for whoever wrote it and
 # ---- its stale-row red can never fire for anybody else, because the file is not in the pushed tree.
 T=$(mkfixture norun build-first)
-( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tnever committed\n' > memory/project/pass-order-waiver.txt )
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H3: an UNCOMMITTED waiver does not waive" "$rc" "1"
 rm -rf "$T"
@@ -893,7 +893,7 @@ rm -rf "$T"
 # ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted
 T=$(seed_range_fixture)
 ( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
-  && printf 'ARCH-tRange-1\tbuilt before its spec, landed as-is\n' > memory/project/pass-order-waiver.txt \
+  && printf 'ARCH-tRange-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
   && git add -A >/dev/null && git commit -q -m "waive ARCH-tRange-1" --no-verify && git push -q origin main \
   && write_range_spec 2 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-2 authored" --no-verify \
   && printf 'two\n' > ${PFX}p2.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-2: build the thing" --no-verify ) >/dev/null 2>&1

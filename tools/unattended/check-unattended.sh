@@ -1557,7 +1557,7 @@ fi
 # watching it stay green.
 #
 # The names stay in ONE place, the driver. What is pinned is a shrink-only COUNT — the shape
-# `ARMS_FLOORS` and `baseline.toml` already use: deleting a core member drops the count below the
+# `ARMS_FLOORS` and the map's `baseline.txt` already use: deleting a core member drops the count below the
 # floor and reds, adding one is free, and RAISING the floor is a deliberate edit that says why. The
 # project layer can reach neither number, which is the property F3 asked for.
 [ -n "$CORE_FLOOR" ] \

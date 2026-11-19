@@ -363,10 +363,10 @@ REFUSAL_CEILINGS=""
 
 # check-arms.py - its SECOND discovery signature. `graded` reads every tracked *.sh outside the
 # memory root for refusal sites, an `exit 1` or `status=1` that is not a `fail <n> "…"` call, and
-# grades each one: armed by its sibling suite, or pinned with a reason the gate prints. BLANK = off,
-# and off prints one line counting the sites it does not grade; any other value is refused. Ships
-# BLANK because turning it on reds every unarmed exit in your scripts. To adopt it, set it, run
-# `check-arms.py --emit-pin`, write each REASON-OWED row's reason, then re-run `--emit-floors`.
+# grades each one: armed by its sibling suite, or pinned, each waived site named on every run. BLANK
+# = off, and off prints one line counting the sites it does not grade; any other value is refused.
+# Ships BLANK because turning it on reds every unarmed exit in your scripts. To adopt it, set it, run
+# `check-arms.py --emit-pin`, write its measured rows into the pin ledger, then re-run `--emit-floors`.
 ARMS_REFUSALS=""
 
 # ACCEPTANCE_LEDGER_CUTOFF — the date from which a CLOSED Tier-2 spec owes an acceptance ledger: one

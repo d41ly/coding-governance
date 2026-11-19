@@ -1872,7 +1872,7 @@ grep -qF 'memory/archive/DECISIONS.2026-08-01.md' <<<"$outnr" \
 # AC6 — the stale-line guard is HELD when neither list is staged, even with a dead entry on disk.
 git reset -q && git checkout -q -- "$D/spec/2026-08-01-spec-tFixture-4.md"
 cp memory/project/legacy-files.txt "$TMP/legacy.keep"
-printf '# legacy\nmemory/project/gone-forever.md\n' > memory/project/legacy-files.txt
+printf '# legacy\nmemory/project/gone-forever.md\t1\tabcdef12\tseeded\n' > memory/project/legacy-files.txt
 printf 'y\n' >> "$D/spec/2026-08-01-spec-tFixture-4.md"
 git add "$D/spec/2026-08-01-spec-tFixture-4.md"
 outnl=$(bash "$SCRIPT" --staged 2>/dev/null)
@@ -1925,7 +1925,7 @@ git config core.autocrlf false; git config user.email t@t.test; git config user.
 _u6base=$(git rev-parse HEAD)
 # AC1 (M1) — dropping a grandfather row is a staged edit that makes a committed name wrong.
 printf '# free\n' > "$D/build/free-notes.md"
-printf '# legacy\n%s\n' "$D/build/free-notes.md" > memory/project/legacy-files.txt
+printf '# legacy\n%s\t1\tabcdef12\tseeded\n' "$D/build/free-notes.md" > memory/project/legacy-files.txt
 git add -A >/dev/null 2>&1; git commit -q -m u6legacy --no-verify
 printf '# legacy\n' > memory/project/legacy-files.txt
 git add memory/project/legacy-files.txt
@@ -1939,7 +1939,7 @@ grep -qF 'grades the whole tree on this commit' <<<"$outu1" \
 git reset -q --hard "$_u6base"
 # AC2 (M2) — a rename of a listed file, with the list itself unstaged, runs the stale-line guard.
 printf '# old\n' > "$D/build/legacy-old.md"
-printf '# legacy\n%s\n' "$D/build/legacy-old.md" > memory/project/legacy-files.txt
+printf '# legacy\n%s\t1\tabcdef12\tseeded\n' "$D/build/legacy-old.md" > memory/project/legacy-files.txt
 git add -A >/dev/null 2>&1; git commit -q -m u6rename --no-verify
 git mv "$D/build/legacy-old.md" "$D/build/2026-08-01-build-tFixture-90.md"
 outu2=$(bash "$SCRIPT" --staged 2>/dev/null)
@@ -2245,7 +2245,7 @@ printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:A
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
 # ---- is silent for exactly the same file. Listed -> silent; the line removed -> the same file reds.
 n=$((n+1))
-printf '# legacy\n%s\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
+printf '# legacy\n%s\t1\tabcdef12\tseeded\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
 git add -A >/dev/null 2>&1; git commit -q -m legacy --no-verify
 outl=$(bash "$SCRIPT" 2>/dev/null)
 awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$outl" \
@@ -2264,8 +2264,8 @@ awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5
 # ---- nothing ever says why. Each list gets a dead line AND a live one in the same run: the live one
 # ---- must stay unreported, or the guard is merely "the list is non-empty".
 n=$((n+1))
-printf '# legacy\n%s\nmemory/project/gone-forever.md\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
-printf '# debt\nmemory/backlog/ARCH.md\nmemory/project/also-gone.md\n' > memory/project/curation-debt.txt
+printf '# legacy\n%s\t1\tabcdef12\tseeded\nmemory/project/gone-forever.md\t1\tabcdef12\tseeded\n' "$D/spec/units/scratch-notes.md" > memory/project/legacy-files.txt
+printf '# debt\nmemory/backlog/ARCH.md\t1\tabcdef12\tseeded\nmemory/project/also-gone.md\t1\tabcdef12\tseeded\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m stale --no-verify
 outst=$(bash "$SCRIPT" 2>/dev/null)
 grep -qF 'legacy-files.txt lists paths that no longer exist (stale-line guard)' <<<"$outst" \
@@ -2299,7 +2299,7 @@ cblock "$outst" 6 \
 # ---- SILENT on a listed ARCH.md, which is equally true of a file earning nothing, so resting this
 # ---- arm on it would rest it on a property that arm never established. Measured: it earns none.
 n=$((n+1))
-printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
+printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\t1\tabcdef12\tseeded\nmemory/builds/tRunOk/README.md\t1\tabcdef12\tseeded\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m stalerow --no-verify
 outsr=$(bash "$SCRIPT" 2>/dev/null)
 # THE WHOLE LITERAL SIGNATURE, not a readable prefix. `check-arms.py` reads a branch's signature up
@@ -2340,7 +2340,7 @@ grep -qF '#rows ' <<<"$outsr" \
 # ---- The stale-LINE guard must stay silent too: the path IS still tracked, so neither guard owns
 # ---- this state and a run that names it under either one is naming the wrong defect.
 n=$((n+1))
-printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\n' > memory/project/curation-debt.txt
+printf '# debt\nmemory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md\t1\tabcdef12\tseeded\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m debtworktree --no-verify
 rm memory/builds/tRunBig/RUN.LANDED.b2c3d4e5.md      # NOT `git rm` — still in the index
 outwt=$(bash "$SCRIPT" 2>/dev/null)
@@ -4253,7 +4253,7 @@ bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declar
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 · a decision\n' > memory/DECISIONS.md
   for r in legacy-files.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt stale-header-waiver.txt; do : > "memory/project/$r"; done
-  printf 'memory/backlog/BRAND.md\n' > memory/project/curation-debt.txt
+  printf 'memory/backlog/BRAND.md\t1\tabcdef12\tseeded\n' > memory/project/curation-debt.txt
   # ONE seq, reused, for the reason the check-6 cap fixtures above give: building each line with its
   # own command substitution costs this suite minutes.
   BMR=$(printf 'y%.0s' $(seq 1 230))

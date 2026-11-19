@@ -283,10 +283,43 @@ def _side_branch_commit(r: pathlib.Path) -> str:
     return sha
 
 
-def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
+# THE POPULATIONS (TOOL-dWitnessedBar-16 S8). The shrink-only lists, the pins and the baselines are
+# `[[ledger]]` registrations and their homes, read through the memory-tree kit's ledger factory, so a
+# fixture carries that factory beside its drift kit, as an install does, and a descriptor registering
+# them. `write_pins` and `write_baselines` write the two homes in the ledger grammar; a pin of 0 is no
+# row, and an empty home is the header alone.
+PINS_HOME = f"{ROOT_PFX}{KIT_NAME}/drift-pins.txt"
+BASELINES_HOME = f"{ROOT_PFX}{KIT_NAME}/drift-baselines.txt"
+FIXTURE_LEDGERS = (
+    'id = "drift-audit"\n\n'
+    '[[ledger]]\npopulation = "shrinkme"\nleg = "l"\nseed = []\nkey = "key"\nfields = ["entry"]\n'
+    'drain = "key"\ndirection = "shrink-only"\nhome = "shrinkme.txt"\n\n'
+    '[[ledger]]\npopulation = "drift-pins"\nleg = "l"\nseed = []\nkey = "key"\nfields = ["signal"]\n'
+    f'drain = "key"\ndirection = "ceiling"\nhome = "{PINS_HOME}"\n\n'
+    '[[ledger]]\npopulation = "drift-baselines"\nleg = "l"\nseed = []\nkey = "record"\n'
+    f'fields = ["signal", "id"]\ndrain = "key"\ndirection = "shrink-only"\nhome = "{BASELINES_HOME}"\n')
+
+
+def write_pins(r: pathlib.Path, pins: dict) -> None:
+    """The fixture's `drift-pins` home, one row per non-zero pin."""
+    rows = "".join(f"{sig}\t{n}\tabcdef12\tseeded\n" for sig, n in sorted(pins.items()) if n)
+    (r / PINS_HOME).write_text("# ledger · drift-pins · key key signal · direction ceiling · drain key\n" + rows,
+                               encoding="utf-8", newline="\n")
+
+
+def write_baselines(r: pathlib.Path, sets: dict) -> None:
+    """The fixture's `drift-baselines` home, one row per (signal, id)."""
+    rows = "".join(f"{sig}\t{i}\t1\tabcdef12\tseeded\n" for sig, ids in sorted(sets.items()) for i in ids)
+    (r / BASELINES_HOME).write_text(
+        "# ledger · drift-baselines · key record signal,id · direction shrink-only · drain key\n" + rows,
+        encoding="utf-8", newline="\n")
+
+
+def make_repo(tmp: pathlib.Path, name: str = "repo", ledger: bool = True) -> pathlib.Path:
     # `name` exists so a second arm can build a SECOND fixture rather than thread itself through
     # `test_signals_can_move`'s eight mutations — that sequence ends by unlinking the project layer,
-    # so anything appended to it would run against a repo that refuses to report at all.
+    # so anything appended to it would run against a repo that refuses to report at all. `ledger`
+    # False builds the tree with no memory-tree kit at all, which the straggler arm's first half needs.
     r = tmp / name
     # DERIVED from the conf this fixture is about to write, never a literal layout. The previous
     # line spelled `memory/tooling/builds/<x>/spec` — the pre-flatten shape — so an arm named
@@ -358,6 +391,13 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
 
     for f in ("drift_report.py", "drift_signals.template.py"):
         (r / KIT_NAME / f).write_bytes((KIT / f).read_bytes())
+    if ledger:
+        mt = r / "memory-tree"
+        mt.mkdir()
+        for f in ("legacy_ledger.py", "backlog.py", "coverage_join.py"):
+            (mt / f).write_bytes((KIT.parent / "memory-tree" / f).read_bytes())
+        (r / KIT_NAME / "kit.toml").write_text(FIXTURE_LEDGERS, encoding="utf-8", newline="\n")
+        (r / ".gitignore").write_text("__pycache__/\n", encoding="utf-8", newline="\n")
     (r / KIT_NAME / "drift_signals.py").write_text(
         # PRODUCT_GLOBS is deliberately WIDER than TRACE_GLOBS here. The narrowing is the whole
         # point of TRACE_GLOBS -- in the shipping repo it drops `.claude/` and the kickoff
@@ -374,15 +414,14 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         # `conf/` stays outside it, so an engine that read PRODUCT_GLOBS here would
         # be caught rather than passing by coincidence.
         "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']\n"
-        "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
+        # The shrink-only list and the pins are populations the descriptor above registers; the pin
+        # home stays ABSENT here, so the pin-semantics arm below writes the first row, and seeding a
+        # pin here would silently turn that arm into a no-op.
         "HANDKEPT = []\n"
-        # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
-        # this literal, and seeding a pin here would silently turn that arm into a no-op.
-        "PINS = {}\n"
         # HANDKEPT is empty here, as it is in the shipped template — so the signal it feeds is empty
         # BY DECLARATION, not blind, and must be named as such or `--check` reds this fixture for
-        # modelling the adopter default faithfully. SHRINK_ONLY is populated above, so it is NOT
-        # declared: leaving it in this set after populating it is how an exemption becomes a hole.
+        # modelling the adopter default faithfully. A shrink-only list is registered above, so the
+        # engine does NOT declare that signal empty: the declaration is derived, never typed.
         "DECLARED_EMPTY = {'handkept_inventories_disagreeing_with_source'}\n",
         encoding="utf-8", newline="\n")
 
@@ -931,9 +970,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
           f"lines={olines[:5]} red={sorted(red_now)}")
     check("--offenders carries no line locator in any key",
           not any(re.search(r":\d+(:|$)", ln) or '"line"' in ln for ln in olines), f"{olines[:5]}")
-    sig.write_text(sig.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
-        encoding="utf-8", newline="\n")
+    write_pins(r, {'non_terminal_specs_cited_by_product_source': 1})
     at = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check greens once the pin is seeded at the measured value", at.returncode == 0,
           f"rc={at.returncode} stderr={at.stderr.strip()[:200]}")
@@ -1341,7 +1378,7 @@ def test_backlog_stragglers(tmp: pathlib.Path) -> None:
     remote-tracking ref and the arm names it.
     """
     print("backlog stragglers (not asked without the relocation engine; falsifiable with it)")
-    r = make_repo(tmp, name="stragglers")
+    r = make_repo(tmp, name="stragglers", ledger=False)
 
     s = read_one_signal(r, "backlog_stragglers")
     check("no memory-tree kit: backlog_stragglers is NOT ASKED, not a clean zero",
@@ -2100,7 +2137,7 @@ def test_baselines(tmp: pathlib.Path) -> None:
     state and demands red, and the clean state and the equal-seed arm demand green, so a guard that
     refused every edit fails here as surely as one that refused none.
     """
-    print("BASELINES (an equal-count swap, a drain and a growth each red)")
+    print("baselines (an equal-count swap, a drain and a growth each red)")
     r = make_repo(tmp, name="baselines")
     sig = r / KIT_NAME / "drift_signals.py"
     app = r / "src" / "app.py"
@@ -2111,12 +2148,12 @@ def test_baselines(tmp: pathlib.Path) -> None:
         "**Status:** SPECCED · rev-1 · 2026-01-01 · node a · Tier-2 · base 0000000\n",
         encoding="utf-8", newline="\n")
     app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
-    # The layer sits INSIDE the evidence globs, as it does in this repo, so the drain arm also proves
-    # that a list spelling an id is not a citation of it (S10).
+    # The kit dir, which holds the baselines home, sits INSIDE the evidence globs, as it does in this
+    # repo, so the drain arm also proves that a list spelling an id is not a citation of it (S10).
     layer = sig.read_text(encoding="utf-8").replace(
         "EVIDENCE_GLOBS = ['src', ", "EVIDENCE_GLOBS = ['src', '" + KIT_NAME + "', ")
-    seeded = layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1']}\n"
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    sig.write_text(layer, encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1']})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "seed the baseline", "--no-verify"], r)
 
@@ -2147,63 +2184,60 @@ def test_baselines(tmp: pathlib.Path) -> None:
 
     # --- GROWTH against a committed base that lists the signal ---------------------------------
     app.write_text("# implements TOOL-aThing-1 and TOOL-aOther-1\n", encoding="utf-8", newline="\n")
-    sig.write_text(seeded.replace("['TOOL-aThing-1']", "['TOOL-aThing-1', 'TOOL-aOther-1']"),
-                   encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1', 'TOOL-aOther-1']})
     grown = run_check()
     check("baselines: a set gaining an id against its base reds as a weakened ratchet",
           grown.returncode == 1 and "RATCHET WEAKENED" in grown.stderr
           and "gained TOOL-aOther-1" in grown.stderr, f"rc={grown.returncode} {grown.stderr.strip()[-300:]}")
 
     # --- the FIRST seed is bounded by the pin the base held ------------------------------------
-    pinned = layer.replace("PINS = {}", "PINS = {'" + name + "': 1}")
-    sig.write_text(pinned, encoding="utf-8", newline="\n")
+    write_baselines(r, {})
+    write_pins(r, {name: 1})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "a pin at the base", "--no-verify"], r)
-    sig.write_text(layer + "BASELINES = {'" + name + "': ['TOOL-aThing-1', 'TOOL-aOther-1']}\n",
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {})
+    write_baselines(r, {name: ['TOOL-aThing-1', 'TOOL-aOther-1']})
     over = run_check()
     check("baselines: a first seed above the base's pin reds",
           over.returncode == 1 and "seeded with 2 ids where the base pins it at 1" in over.stderr,
           f"rc={over.returncode} {over.stderr.strip()[-300:]}")
     app.write_text("# implements TOOL-aThing-1\n", encoding="utf-8", newline="\n")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_baselines(r, {name: ['TOOL-aThing-1']})
     equal = run_check()
     check("baselines: a first seed at the base's pin is green", equal.returncode == 0,
           f"rc={equal.returncode} {equal.stderr.strip()[-300:]}")
 
     # --- ONE bound per signal -------------------------------------------------------------------
-    sig.write_text(seeded.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {name: 1})
     both = run([sys.executable, REPORT_REL, "--check"], r)
-    check("baselines: a signal in both PINS and BASELINES is refused with exit 2 before any line",
-          both.returncode == 2 and not both.stdout.strip() and "PINS and BASELINES" in both.stderr,
+    check("baselines: a signal in both drift-pins and drift-baselines is refused with exit 2 before any line",
+          both.returncode == 2 and not both.stdout.strip() and "drift-pins and drift-baselines" in both.stderr,
           f"rc={both.returncode} out={both.stdout[:120]!r} {both.stderr.strip()[-200:]}")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_pins(r, {})
 
     # --- TOOL-aMendedFleet-110: a MOVE out of BASELINES into PINS is graded against the base ----
     # The seeded set becomes the base first: the arms above end on a base that pins the signal.
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "the seeded set is the base", "--no-verify"], r)
-    sys.path.insert(0, str(KIT))
-    import drift_report as dr
-    moved = dr.build_baseline_findings(
-        dr.Git(r, "HEAD"), f"{ROOT_PFX}{KIT_NAME}/drift_signals.py",
-        {"closed_specs_with_no_product_commit": []}, {name: 2})
-    check("baselines: a set moved to PINS above the base's size is one finding naming it",
+    fx = load_fixture_report(r)
+    ledger, regs, _pins, _sets = fx.read_drift_populations(r)
+    moved = fx.build_baseline_findings(fx.Git(r, "HEAD"), ledger, regs,
+                                       {"closed_specs_with_no_product_commit": []}, {name: 2})
+    check("baselines: a set moved to drift-pins above the base's size is one finding naming it",
           len(moved) == 1 and f"{name!r} moved" in moved[0] and "WEAKENS" in moved[0], repr(moved))
-    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 2}"),
-                   encoding="utf-8", newline="\n")
+    write_baselines(r, {})
+    write_pins(r, {name: 2})
     emptied = run_check()
-    check("baselines: no BASELINES and the signal pinned above the base's size reds",
+    check("baselines: no baseline row and the signal pinned above the base's size reds",
           emptied.returncode == 1 and "RATCHET WEAKENED" in emptied.stderr
           and f"{name!r} moved" in emptied.stderr,
           f"rc={emptied.returncode} {emptied.stderr.strip()[-300:]}")
-    sig.write_text(layer.replace("PINS = {}", "PINS = {'" + name + "': 1}"),
-                   encoding="utf-8", newline="\n")
+    write_pins(r, {name: 1})
     at_size = run_check()
     check("baselines: a move pinned at the base set's size is green", at_size.returncode == 0,
           f"rc={at_size.returncode} {at_size.stderr.strip()[-300:]}")
-    sig.write_text(seeded, encoding="utf-8", newline="\n")
+    write_pins(r, {})
+    write_baselines(r, {name: ['TOOL-aThing-1']})
 
 
 def test_shrink_low_water(tmp: pathlib.Path) -> None:
@@ -2942,9 +2976,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     check("report-only: the fixture's report-only signal has a value to pin",
           value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
 
-    proj.write_text(proj.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'" + name + "': " + str(value) + "}"),
-        encoding="utf-8", newline=NL)
+    write_pins(r, {name: value})
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
 
@@ -3138,13 +3170,11 @@ def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
     got = report(r).get(name, {})
     check("cutoffs: armed and exported count, blank, commented and untracked do not",
           (got.get("value"), got.get("of"), got.get("live")) == (2, 4, True), f"row {got}")
-    check("cutoffs: with no PINS entry the row is report-only and says no budget is declared",
+    check("cutoffs: with no drift-pins row the row is report-only and says no budget is declared",
           got.get("gateable") is False and "no budget" in str((got.get("detail") or [{}])[0]),
           f"row {got}")
-    proj = r / KIT_NAME / "drift_signals.py"
-    proj.write_text(proj.read_text(encoding="utf-8").replace(
-        "PINS = {}", "PINS = {'" + name + "': 2}"), encoding="utf-8", newline=NL)
-    check("cutoffs: a PINS entry makes it gateable", report(r).get(name, {}).get("gateable") is True)
+    write_pins(r, {name: 2})
+    check("cutoffs: a drift-pins row makes it gateable", report(r).get(name, {}).get("gateable") is True)
     with (r / ".other.conf").open("a", encoding="utf-8", newline=NL) as fh:
         fh.write('G_CUTOFF="2026-04-04"' + NL)
     out = run([sys.executable, REPORT_REL, "--check"], r)

@@ -5,7 +5,7 @@ Run from the ADOPTING repo's root (`<kit>` is this kit's install prefix; --help 
     python <kit>/gen_map.py --scaffold        # one-time: map tree + seeded baseline
     python <kit>/gen_map.py --write           # (re)render generated/ to disk
     python <kit>/gen_map.py --check           # byte-compare (LF-normalized); exit 1
-    python <kit>/gen_map.py --seed-baseline   # rewrite baseline.toml from unclaimed
+    python <kit>/gen_map.py --seed-baseline   # rewrite baseline.txt from unclaimed
     python <kit>/gen_map.py --seed-affordance-baseline [--out <path>]  # grace today's dossiers (adopt)
     python <kit>/gen_map.py --seed-affordances --top 10 # worklist: undeclared hot seams
 
@@ -87,7 +87,7 @@ globs = [
 
 Claim here only what is genuinely shared substrate (sanitization boundaries, shared transport
 seams, ops tooling, the registries themselves). Feature-shaped items belong in
-`features/<feature>.md` dossiers. Everything else waits in `baseline.toml` (shrink-only).
+`features/<feature>.md` dossiers. Everything else waits in `baseline.txt` (shrink-only).
 """
 
 _README = """# {map_root} — the self-verifying codebase map
@@ -98,8 +98,8 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
 
 ## Layout
 - `FOUNDATION.md` — shared-substrate claims (same contract as a dossier).
-- `baseline.toml` — shrink-only ratchet baseline (backfill inventory; never add new keys).
-- `affordance-exempt.toml` — shrink-only grace list for dossiers predating `## Reuse affordance`
+- `baseline.txt` — shrink-only ratchet baseline, a ledger population (backfill inventory; never add new keys).
+- `affordance-exempt.txt` — shrink-only grace list, a ledger population, for dossiers predating `## Reuse affordance`
   (seeded at adoption; a new dossier is never graced, a touch drops entries).
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
@@ -163,21 +163,26 @@ def _seed_baseline() -> None:
     inventories = ext.all_inventories()
     tree = m.load_map_tree(IDS, decision_id_re=ID_RE)
     cov = cj.compute_coverage(inventories, m.owners_of(tree), {k: () for k in IDS})
-    _write(m.map_root() / "baseline.toml", m.render_baseline(cov.unclaimed, IDS))
+    sha, why = m.LL.read_head_sha(m.repo_root())
+    if not sha:
+        raise m.MapError(f"--seed-baseline: {why}, so the seeded rows have no sha to carry")
+    _write(m.map_root() / m.BASELINE_FILE, m.render_baseline(cov.unclaimed, IDS, sha))
     print(f"baseline: {sum(len(v) for v in cov.unclaimed.values())} unclaimed keys")
 
 
 def _seed_affordance_baseline(out: str | None = None) -> None:
-    """Seed affordance-exempt.toml from the EXISTING dossiers lacking the `## Reuse affordance`
+    """Seed affordance-exempt.txt from the EXISTING dossiers lacking the `## Reuse affordance`
     section — the mirror of --seed-baseline. Makes adoption/re-adoption green by construction:
     today's dossiers are graced, new ones are not. Shrink-only thereafter (never adds a dossier
     that has the section — it's not an offender). With `out`, the path the ledger factory's
-    `seed --home` hands it, the list is written there instead: that factory has already found the
-    home absent or unarmed, and moves the file into place only when this run is live."""
-    exempt_path = m.map_root() / "affordance-exempt.toml"
+    `seed --home` hands it, the list is written there in the ledger grammar instead: that factory
+    has already found the home absent or unarmed, and moves the file into place only when this run
+    is live. With `out` and no offender it prints a `dead probe:` line and writes nothing, so the
+    factory writes its own unarmed line (TOOL-dWitnessedBar-16 §8 F18)."""
+    exempt_path = m.map_root() / m.AFFORDANCE_FILE
     if out is None and exempt_path.exists():
         print(
-            f"affordance-exempt.toml already seeded ({exempt_path}) - refusing to re-seed. "
+            f"affordance-exempt.txt already seeded ({exempt_path}) - refusing to re-seed. "
             "Re-seeding would re-grace section-less dossiers added since adoption (masking real "
             "offenders); the list is shrink-only - hand-remove entries, never regenerate."
         )
@@ -186,7 +191,13 @@ def _seed_affordance_baseline(out: str | None = None) -> None:
     features_dir = m.map_root() / "features"
     texts = {d.feature: (features_dir / f"{d.feature}.md").read_text(encoding="utf-8") for d in tree.dossiers}
     exempt = m.affordance_offenders(texts, frozenset())  # every dossier without a block → graced
-    _write(Path(out) if out is not None else exempt_path, m.render_affordance_exempt(exempt))
+    if out is not None and not exempt:
+        print(f"dead probe: no dossier lacks the '## Reuse affordance' section, so {m.AFFORDANCE_FILE} graces nothing")
+        return
+    sha, why = m.LL.read_head_sha(m.repo_root())
+    if not sha:
+        raise m.MapError(f"--seed-affordance-baseline: {why}, so the seeded rows have no sha to carry")
+    _write(Path(out) if out is not None else exempt_path, m.render_affordance_exempt(exempt, sha))
     print(f"affordance-exempt: {len(exempt)} dossier(s) graced")
 
 

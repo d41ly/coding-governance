@@ -11,7 +11,7 @@ FIVE POPULATIONS, each read from <rev> against the working tree:
                 in the codebase map. Its ceiling-evidence.txt row only a measured bar run writes, so it
                 prints as a `deferred —` line and leaves the exit unchanged.
   leg removed   a name at <rev> absent now. Owes that no row of subject-pins.tsv, the map's
-                baseline.toml or selftest-budgets.txt names it.
+                baseline.txt or selftest-budgets.txt names it.
   key           every key of every gate-legs.json row. Owes membership in `LEG_KEYS`, the one key set
                 of run-gates.test.sh.
   path deleted  `git diff --diff-filter=D <rev>`, renames read as a delete. Owes that no row of the
@@ -168,7 +168,7 @@ def derive_owed_rows(root: pathlib.Path, base: str, kits: dict) -> tuple:
     # ponytail: gov's memory root spelled once; this probe runs in no other tree.
     waivers = [root / "memory" / "project" / n
                for n in ("spawn-idiom-sites.txt", "testsuite-count-waivers.txt", "unarmed-branches.txt")]
-    for p in (legs_p, G.derive_registry_path(root), map_p / "baseline.toml"):
+    for p in (legs_p, G.derive_registry_path(root), map_p / m.BASELINE_FILE):
         if not p.is_file():
             raise Refused(f"{rel(p)} is absent, which is a refusal and never an empty population")
     legs = json.loads(legs_p.read_text(encoding="utf-8"))
@@ -202,7 +202,7 @@ def derive_owed_rows(root: pathlib.Path, base: str, kits: dict) -> tuple:
             if nm not in ceilings:
                 deferred.append((rel(ceiling_p), nm))
     if removed:
-        held = ((pins_p, pins), (map_p / "baseline.toml", set(tree.baseline.get("gate-legs", ()))),
+        held = ((pins_p, pins), (map_p / m.BASELINE_FILE, set(tree.baseline.get("gate-legs", ()))),
                 (budgets_p, read_first_column(budgets_p)))
         for path, rows in held:
             owed += [(rel(path), f"drop the row naming {nm}") for nm in removed if nm in rows]
@@ -276,10 +276,13 @@ FIXTURE = {
     "kits/<rg>/run-gates.test.sh": 'LEG_KEYS="name argv subject"\n',
     "kits/<rg>/selftest-budgets.txt": "old leg\t60\t\tfixture\n",
     "kits/<rg>/ceiling-evidence.txt": "fx leg\t1.0\t1\ta\t2026-11-04\trunner\n",
-    "memory/map/baseline.toml": "gate-legs = []\n",
+    # The map baseline and the arms pins are ledger populations (TOOL-dWitnessedBar-16): the first row of
+    # each is its header, and a pins row is `<path> TAB <check> TAB <signature> TAB <count> TAB <sha> TAB
+    # <disposition>`, whose first field `read_first_column` reads as the path in either grammar.
+    "memory/map/baseline.txt": "# ledger · baseline · key key kind,key · direction shrink-only · drain key\n",
     "memory/project/spawn-idiom-sites.txt": "# none\n",
     "memory/project/testsuite-count-waivers.txt": "# none\n",
-    "memory/project/unarmed-branches.txt": "kits/fx/gone.sh\texit\t1\ta fixture\tno arm\n",
+    "memory/project/unarmed-branches.txt": "kits/fx/gone.sh\texit\ta fixture\t1\tabcdef12\tseeded\n",
 }
 
 

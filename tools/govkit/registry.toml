@@ -2423,3 +2423,48 @@ ceiling = 300
 subject = "kit"
 enforces = ["practice.gate"]
 stage = ["step.test"]
+
+# The kit-less gov tools' lists (TOOL-dWitnessedBar-16 §8 F3), registered beside the `[[exempt_leg]]` rows
+# that declare their legs; gov's own, so they owe no upgrade step.
+
+[[ledger]]
+population = "docs-undocumented"
+leg = "docs"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "docs-undocumented"]
+key = "key"
+fields = ["id"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/docs-undocumented.txt"
+
+[[ledger]]
+population = "spec-token-waivers"
+leg = "spec tokens (a spec's own names resolve)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "spec-token-waivers"]
+key = "key"
+fields = ["token"]
+verbatim = ["token"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/spec-token-waivers.txt"
+
+[[ledger]]
+population = "dead-path-waivers"
+leg = "dead-path carriers (deleted files still named)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "dead-path-waivers"]
+key = "site"
+fields = ["path", "text"]
+verbatim = ["text"]
+drain = "hunk"
+direction = "declared-set"
+home = "tools/dead-path-waivers.txt"
+
+[[ledger]]
+population = "playbook-kit-waivers"
+leg = "playbook parity selftest"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "playbook-kit-waivers"]
+key = "key"
+fields = ["kit"]
+drain = "key"
+direction = "declared-set"
+home = "tools/playbook-kit-waivers.txt"

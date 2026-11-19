@@ -398,7 +398,10 @@ if GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
   # only if it is also the last — so a ONE-ROW registry works and a two-row one silently waives
   # nothing. Found by running the wired leg over the real tree, which has two rows, AFTER a self-test
   # arm carrying one row had passed: the instance was covered and the class was not.
-  waived_ids=$(GIT show "HEAD:$WAIVER_FILE" 2>/dev/null | sed -e 's/#.*//' -e 's/[[:space:]].*$//' | grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' || true)
+  # Read through the ledger factory (TOOL-dWitnessedBar-16): one `<unit> TAB <count> TAB <sha> TAB <disposition>`
+  # row per waived unit, its reason in the conversion record and never on the row.
+  waived_ids=$(read_record_keys HEAD "$WAIVER_FILE") || exit 2
+  waived_ids=$(grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' <<<"$waived_ids" || true)
   waived_ids=$(echo $waived_ids)
 fi
 

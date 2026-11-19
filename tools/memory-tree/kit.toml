@@ -723,6 +723,158 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/project/conf-scalar-pins.txt"
 
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "curation-debt"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "curation-debt"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/curation-debt.txt"
+
+[[ledger]]
+population = "id-orphan-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "id-orphan-waiver"]
+key = "record"
+fields = ["id"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/id-orphan-waiver.txt"
+
+[[ledger]]
+population = "legacy-files"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "legacy-files"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/legacy-files.txt"
+
+[[ledger]]
+population = "method-carriers"
+leg = "method carriers (every pointer declared)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "method-carriers"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/method-carriers.txt"
+
+[[ledger]]
+population = "readme-contract"
+leg = "build README slot contract"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "readme-contract"]
+key = "site"
+fields = ["path", "binding"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/readme-contract.txt"
+
+[[ledger]]
+population = "refusal-retirements"
+leg = "harness arms (fail branches armed or pinned)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "refusal-retirements"]
+key = "record"
+fields = ["unit", "path", "check", "r1", "r2", "r3", "r4", "survivor", "signature", "replay"]
+verbatim = ["check", "r1", "r2", "r3", "r4", "signature", "replay"]
+drain = "none"
+direction = "append-only"
+home = "memory/project/refusal-retirements.txt"
+
+[[ledger]]
+population = "stale-header-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "stale-header-waiver"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/stale-header-waiver.txt"
+
+[[ledger]]
+population = "trace-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "trace-waiver"]
+key = "site"
+fields = ["path", "subject"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/trace-waiver.txt"
+
+[[ledger]]
+population = "unarmed-branches"
+leg = "harness arms (fail branches armed or pinned)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "unarmed-branches"]
+key = "site"
+fields = ["path", "check", "signature"]
+verbatim = ["check", "signature"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/unarmed-branches.txt"
+
+# Each list this kit's adopter seeds converts at the adopter's next update (TOOL-dWitnessedBar-16 S10).
+[[upgrade]]
+id = "memory-tree/curation-debt-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/curation-debt.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/curation-debt.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/curation-debt.txt"]
+surfaces = ["file:memory/project/curation-debt.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/id-orphan-waiver-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+surfaces = ["file:memory/project/id-orphan-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/legacy-files-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/legacy-files.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/legacy-files.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/legacy-files.txt"]
+surfaces = ["file:memory/project/legacy-files.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/method-carriers-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/method-carriers.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/method-carriers.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/method-carriers.txt"]
+surfaces = ["file:memory/project/method-carriers.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/readme-contract-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/readme-contract.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/readme-contract.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/readme-contract.txt"]
+surfaces = ["file:memory/project/readme-contract.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/stale-header-waiver-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+surfaces = ["file:memory/project/stale-header-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/unarmed-branches-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+surfaces = ["file:memory/project/unarmed-branches.txt"]
+needs-target = false
+
 # THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb
 # of `ratchet.py`; `untouched quiet` and `merge` are plants of `ratchet selftest`, and the touch join is
 # `build.scope`'s, printed unarmed by `ratchet.py --list`.

@@ -44,6 +44,7 @@ PFX="${KIT_REL:+$KIT_REL/}"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE_SRC="$ROOT/${PFX}check-dead-paths.sh"
+LIB_SRC="$ROOT/${PFX}lib"
 [ -f "$GATE_SRC" ] || { echo "dead-paths.test: no gate at $GATE_SRC"; exit 2; }
 
 FLOOR_ASSERTIONS=24
@@ -79,6 +80,11 @@ mkrepo() {
   ( cd "$d" && git init -q && git config core.autocrlf false \
       && git config user.email t@t && git config user.name t ) || return 1
   cp "$GATE_SRC" "$d/${PFX}check-dead-paths.sh"
+  # The gate reads its waivers through gov's ledger factory (TOOL-dWitnessedBar-16), so the factory, the
+  # three modules it imports and the launcher travel beside it, as they sit in gov's lib dir.
+  mkdir -p "$d/${PFX}lib"
+  cp "$LIB_SRC/resolve-python.sh" "$LIB_SRC/refuse-wrong-shell.sh" "$LIB_SRC/legacy_ledger.py" "$LIB_SRC/coverage_join.py" \
+    "$LIB_SRC/compare_base.py" "$LIB_SRC/resolve_kit_dir.py" "$d/${PFX}lib/"
   printf 'placeholder catalogue\n' > "$d/parallel-coding-governance.domain-rules.md"
   printf 'the old product template\n' > "$d/parallel-coding-governance.template.md"
   printf 'an old backlog\n' > "$d/memory/BACKLOG.md"
@@ -163,10 +169,11 @@ arm "red: a carrier naming a basename RENAMED away outside memory/" 1 "DELETED o
 reset_base 'the adopter keeps its backlog in BACKLOG.md'
 arm "green: a basename renamed away from under memory/ is not a needle" 0 "no undeclared carrier" -- run "$BASE"
 
-# ---- 4. waivers — keyed by TEXT and an occurrence ORDINAL (TOOL-dHonouredPark-3) ------------------
-# A row is `<path>\t<ordinal>\t<line-text>\t<reason>`. Tab-separated rows are unreadable written
+# ---- 4. waivers — keyed by TEXT, a COUNT of identical lines (TOOL-dHonouredPark-3, TOOL-dWitnessedBar-16)
+# A row is the ledger's `<path>\t<line-text>\t<count>\t<sha>\t<disposition>`; its reason, the helper's
+# fourth argument, is the record's and never the row's. Tab-separated rows are unreadable written
 # inline, so one helper writes them and the arms below read as what they assert.
-wrow() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"; }
+wrow() { printf '%s\t%s\t%s\tabcdef12\tseeded\n' "$1" "$3" "$2"; }
 CARRIER='see parallel-coding-governance.domain-rules.md for the checklists'
 
 reset_base "$CARRIER"
@@ -210,25 +217,24 @@ reset_base "$CARRIER" "$CARRIER"
 arm "red: two identical carriers, one row — the second is unwaived" 1 "names a path this repo DELETED" -- run "$BASE"
 
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence'; wrow README.md 2 "$CARRIER" 'second occurrence, its own reason'; } > "$BASE/${PFX}dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'both occurrences'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
-arm "green: two identical carriers, two rows at ordinals 1 and 2" 0 "2 declared waiver(s)" -- run "$BASE"
+arm "green: two identical carriers, one row of count 2" 0 "2 declared waiver(s)" -- run "$BASE"
 
-# THE RESIDUAL, armed rather than argued away. An IDENTICAL line above a waived carrier DOES move the
-# ordinal — the one drift the new key keeps, named in the registry header as the case it exists for.
-reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'pinned to the second occurrence'; } > "$BASE/${PFX}dead-path-waivers.txt"
+# A count above the identical lines present is a row that waives more than is there, and reds as an
+# occurrence that resolves to nothing rather than as a silent slack.
+reset_base "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'one more than is there'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
-arm "red: an IDENTICAL line above a waived carrier renumbers it" 1 "names a path this repo DELETED" -- run "$BASE"
+arm "red: a count above the identical lines present is stale" 1 "no occurrence 2 of that text" -- run "$BASE"
 
-# A MALFORMED ordinal is its own refusal, distinct from a stale row: line numbers were unique by
-# construction and an occurrence index is not, so the property has to be asserted rather than
-# inherited.
+# A MALFORMED count is its own refusal, distinct from a stale row: the factory refuses a count that is
+# not a positive integer, and the gate names the row rather than reading it as absent.
 for bad in 0 zero '' -1; do
   reset_base "$CARRIER"
-  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'ordinal is not a positive integer'; } > "$BASE/${PFX}dead-path-waivers.txt"
+  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'count is not a positive integer'; } > "$BASE/${PFX}dead-path-waivers.txt"
   ( cd "$BASE" && git add -A )
-  arm "red: ordinal [$bad] is MALFORMED, not stale" 1 "MALFORMED waiver row" -- run "$BASE"
+  arm "red: count [$bad] is MALFORMED, not stale" 1 "MALFORMED waiver row" -- run "$BASE"
 done
 
 # A row naming a file that is not there resolves to nothing and is stale BY THAT REASON. Without this

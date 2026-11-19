@@ -189,3 +189,44 @@ stage = "reuse"
 role = "gov-reuse-scout"
 command = 'python <prefix>/codebase-map/reuse_lookup.py "<behaviour>"'
 when = "a new behaviour about to be designed"
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "affordance-exempt"
+leg = "codebase-map coverage + freshness"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "affordance-exempt"]
+key = "key"
+fields = ["seam"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/map/affordance-exempt.txt"
+
+[[ledger]]
+population = "baseline"
+leg = "codebase-map coverage + freshness"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "baseline"]
+key = "key"
+fields = ["kind", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/map/baseline.txt"
+
+# The two map lists this kit's adopter seeds take their `.txt` names at the adopter's next update.
+
+[[upgrade]]
+id = "codebase-map/affordance-exempt-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/map/affordance-exempt.toml"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/map/affordance-exempt.toml"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/map/affordance-exempt.toml"]
+surfaces = ["file:memory/map/affordance-exempt.toml"]
+needs-target = false
+
+[[upgrade]]
+id = "codebase-map/baseline-to-ledger"
+up = ["python", "{gov}/memory-tree/convert_registry.py", "up", "{target}", "--home", "memory/map/baseline.toml"]
+down = ["python", "{gov}/memory-tree/convert_registry.py", "down", "{target}", "--home", "memory/map/baseline.toml"]
+witness = ["python", "{gov}/memory-tree/convert_registry.py", "witness", "{target}", "--home", "memory/map/baseline.toml"]
+surfaces = ["file:memory/map/baseline.toml"]
+needs-target = false

@@ -348,7 +348,11 @@ fixture() {
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
   printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks   not adopter-facing as a kit.\n%s   planted as the lens-array bound owner, not a kit under test.\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
+  printf '# waivers\nhooks\t1\tabcdef12\tseeded\n%s\t1\tabcdef12\tseeded\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
+  # The gate reads that registry through the memory-tree kit's ledger factory (TOOL-dWitnessedBar-16),
+  # so the factory and the two modules it imports sit in the fixture's memory-tree kit, as installed.
+  cp "$ROOT/${PFX}${MT_KIT}/legacy_ledger.py" "$ROOT/${PFX}${MT_KIT}/backlog.py" \
+    "$ROOT/${PFX}${MT_KIT}/coverage_join.py" "$d/${FX}${MT_KIT}/"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
   # redded on a missing owning source from the day that row landed, because this fixture built no
@@ -493,10 +497,10 @@ arm "AC5 a derivation missing its sentinel reds" red \
 # --- AC6 · both waiver-drain arms ----------------------------------------------------------------------
 arm "AC6a a waiver for a kit that is gone reds as stale" red \
   "a waiver row names a kit that no longer exists, so the row excuses nothing and is stale" \
-  sh -c 'printf "ghostkit  gone\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "ghostkit\t1\tabcdef12\tseeded\n" >> '"${PFX}playbook-kit-waivers.txt"''
 arm "AC6b a waiver for a kit the playbook DOES name reds" red \
   "a waiver row names a kit the playbook DOES document, so the row excuses nothing" \
-  sh -c 'printf "memory-tree  redundant\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "memory-tree\t1\tabcdef12\tseeded\n" >> '"${PFX}playbook-kit-waivers.txt"''
 
 # --- AC9 · the registry absent: red and STOP, never create one -------------------------------------------
 arm "AC9 an absent waiver registry reds and stops" red \

@@ -498,3 +498,26 @@ down = ["python", "{gov}/govkit/steps/review_rounds.py", "down", "{target}"]
 witness = ["python", "{gov}/govkit/steps/review_rounds.py", "witness", "{target}"]
 surfaces = ["conf-key:.unattended.conf#REVIEW_ROUNDS"]
 needs-target = false
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "brief-recorded-waiver"
+leg = "brief-recorded"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "brief-recorded-waiver"]
+key = "record"
+fields = ["unit"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/brief-recorded-waiver.txt"
+
+[[ledger]]
+population = "pass-order-waiver"
+leg = "pass-order history"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "pass-order-waiver"]
+key = "record"
+fields = ["unit"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/pass-order-waiver.txt"

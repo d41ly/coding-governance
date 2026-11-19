@@ -34,12 +34,13 @@ its number means nothing. That column exists because the upstream adopter's conv
 a `collision_flags` signal structurally incapable of being non-zero, and every reader took the 0 as
 "converged" for thirteen days.
 
-Gateable signals carry a **shrink-only pin** in `{{KIT_DIR}}/drift_signals.py`, seeded at measured
+Gateable signals carry a **shrink-only pin**, a row of `{{KIT_DIR}}/drift-pins.txt`, seeded at measured
 values. Over the pin is a regression. At the pin means "still owed, drain it". Lower a pin whenever
 its population drops.
 
-Signals are declared where they belong: the five implementations are the kit's; `PRODUCT_GLOBS`,
-`SHRINK_ONLY`, `HANDKEPT` and `PINS` are this repo's, in `drift_signals.py`. The corpus root comes
+Signals are declared where they belong: the five implementations are the kit's; `PRODUCT_GLOBS`
+and `HANDKEPT` are this repo's, in `drift_signals.py`, and its pins, baselines and shrink-only lists
+are ledger populations, read through the memory-tree kit's ledger factory. The corpus root comes
 from `.memory-tree.conf` — there is deliberately no second place to state it.
 
 **In the audit that produced this kit, Tier 0 alone produced the blocker, the vacuous-metric lead and

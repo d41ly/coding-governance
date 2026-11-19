@@ -3499,7 +3499,10 @@ def derive_readme_slot_plant(cap):
               "<!-- /gen:build-index -->\n")
     readme_rel = "memory/builds/tOne/README.md"
     return {"files": {".memory-tree.conf": "MEMORY_ROOT=memory\n", readme_rel: readme,
-                      "memory/project/readme-contract.txt": f"exempt-pin: 0\n{readme_rel}\n"},
+                      # A ledger population since TOOL-dWitnessedBar-16 S7: its header, then one bound row.
+                      "memory/project/readme-contract.txt":
+                          "# ledger \u00b7 readme-contract \u00b7 key site path,binding \u00b7 direction declared-set "
+                          f"\u00b7 drain hunk\n{readme_rel}\tbound\t1\tabcdef12\tseeded\n"},
             "argv": [sys.executable, derive_enforcer_path(cap), "--check-format"],
             "warn": f"BUDGET WARN — readme-slot · {readme_rel} `{heads[0][0]}` · {v + 1} bytes over {v}",
             "refuse": "over its declared ceiling"}
