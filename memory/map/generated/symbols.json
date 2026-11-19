@@ -725,6 +725,11 @@
     {
       "id": "add_feed_event",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "add_feed_event",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -741,6 +746,11 @@
       "id": "add_feed_event",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "add_feed_sightings",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "add_feed_sightings",
@@ -3205,6 +3215,11 @@
     {
       "id": "build_gov_commit",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "build_gov_commit",
+      "kind": "function",
       "file": "tools/lib/gov-ref.sh"
     },
     {
@@ -5553,6 +5568,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "check_card_terminal",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "check_card_unchanged",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -5940,6 +5960,11 @@
     {
       "id": "check_dir_lock_stale",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "check_dir_lock_stale",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -6211,6 +6236,11 @@
       "id": "check_fanout_step",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_feed",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "check_feed",
@@ -7596,6 +7626,11 @@
       "id": "check_probe_scrubbed",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_proc_gone",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "check_proc_gone",
@@ -10608,6 +10643,11 @@
       "file": "tools/loop/claims.py"
     },
     {
+      "id": "derive_card_verdict",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -11146,6 +11186,11 @@
       "id": "derive_farm_row",
       "kind": "function",
       "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "derive_feed_events",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_feed_events",
@@ -12536,6 +12581,11 @@
       "id": "derive_requires_closure",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_resume_lines",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_retired_rows",
@@ -16583,6 +16633,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "measure_card_records",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "measure_census",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -18208,6 +18263,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "print_card_held",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "print_chain_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18306,6 +18366,11 @@
       "id": "print_failure",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
+    },
+    {
+      "id": "print_feed",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "print_feed",
@@ -19658,6 +19723,41 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "read_card",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_card_build",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_card_fixture_verdict",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "read_card_policy",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_card_record",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_card_ref",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_card_stored",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "read_carries_coverage",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -20561,6 +20661,11 @@
       "id": "read_first_passes",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_first_seen",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "read_first_seen",
@@ -22390,6 +22495,11 @@
     {
       "id": "read_proc_token",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_proc_token",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -22581,6 +22691,11 @@
       "id": "read_red_fix",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_ref_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
       "id": "read_refs",
@@ -24395,6 +24510,11 @@
     {
       "id": "remove_dir_lock",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "remove_dir_lock",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -24436,6 +24556,11 @@
       "id": "remove_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "remove_gov_ref",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "remove_gov_ref",
@@ -25321,6 +25446,11 @@
       "id": "render_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_build_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "render_by_design",
@@ -26623,6 +26753,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveKickoffChecker",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveKitDir",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -26866,6 +27001,11 @@
       "id": "resolve_build_anchor",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "resolve_build_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "resolve_cache_dir",
@@ -27291,6 +27431,11 @@
       "id": "resolve_kickoff_checker",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_kickoff_engine",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "resolve_kit_descriptor",
@@ -29458,9 +29603,24 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "run_card_append",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "run_card_engine",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "run_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "run_card_git",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_case",
@@ -33508,6 +33668,11 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "set_card_policy",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "set_cf_tree",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -36628,6 +36793,11 @@
       "file": "tools/loop/budget.py"
     },
     {
+      "id": "write_build_card",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "write_c42_conf",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -36663,14 +36833,39 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "write_card_body",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
       "id": "write_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "write_card_fixture",
+      "kind": "function",
+      "file": "skills/session-kickoff/card-store.fixture.sh"
+    },
+    {
+      "id": "write_card_follow",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "write_card_follow",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "write_card_plant",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "write_card_snapshot",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_card_tree",
@@ -36885,6 +37080,11 @@
     {
       "id": "write_dir_lock",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "write_dir_lock",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -36910,6 +37110,11 @@
     {
       "id": "write_dir_lock_pid",
       "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "write_dir_lock_pid",
+      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -36926,6 +37131,11 @@
       "id": "write_dir_lock_pid",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_dir_lock_wait",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_dir_lock_wait",
@@ -37056,6 +37266,11 @@
       "id": "write_fake_launcher",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "write_feed",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_feed",
@@ -37306,6 +37521,11 @@
       "id": "write_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_gov_ref",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_gov_ref",

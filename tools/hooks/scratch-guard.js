@@ -692,15 +692,91 @@ function resolveCommonDir(hit) {
   }
 }
 
-/** The card's bytes, or `text: null` when none exists, with `shown` its one comparable spelling; a non-id-shaped session id is never joined into a path. */
-function readCard(commonDir, sessionId) {
+/** The bound on the kickoff checker's `--card --path` answer, in milliseconds. */
+const CARD_PATH_BOUND_MS = 10000
+
+/**
+ * The kickoff checker `manifest-check.sh`, the one reader of where a card lives (TOOL-dPlacedRequest-2
+ * S10): the kit resolver from this hook's own directory, else the ONE file of that name the hook's
+ * own repository tracks, then the one `cwd`'s repository tracks — gov homes that kit under `skills/`,
+ * where no probe walks, as the roles kit's `resolve_card_path` finds it. null when none answers.
+ */
+function resolveKickoffChecker(cwd) {
   const fs = require('fs')
   const path = require('path')
+  const { spawnSync } = require('child_process')
+  try {
+    return path.join(require('./agent-cap.js').resolveKitDir('session-kickoff', 'manifest-check.sh', __dirname), 'manifest-check.sh')
+  } catch { /* the next rung */ }
+  for (const dir of [__dirname, cwd]) {
+    const hit = dir ? resolveToplevel(dir) : null
+    if (!hit) continue
+    let r
+    try {
+      r = spawnSync('git', ['ls-files', '--', 'manifest-check.sh', '*/manifest-check.sh'], { cwd: hit.toplevel, encoding: 'utf8', timeout: 20000, windowsHide: true })
+    } catch { continue }
+    const hits = r && r.status === 0 ? String(r.stdout || '').split(/\r?\n/).filter(Boolean) : []
+    if (hits.length === 1 && fs.existsSync(path.join(hit.toplevel, hits[0]))) return path.join(hit.toplevel, hits[0])
+  }
+  return null
+}
+
+/**
+ * The card's bytes, or `text: null` when none exists, with `shown` its one comparable spelling. The
+ * path is the kickoff checker's `--card --path --session <sid>` answer, run from the common dir's
+ * work tree with stdin closed and a bound, so this hook never derives it beside the checker; each
+ * bash candidate is RUN, Git for Windows' own first on Windows, where PATH's `bash` can be the WSL
+ * launcher. A checker that resolves nowhere or does not answer reads as no card, `shown` naming why.
+ * `checker` overrides the resolved one, for the self-test's stub. A non-id-shaped session id is
+ * never passed on.
+ */
+function readCard(commonDir, sessionId, checker) {
+  const fs = require('fs')
+  const path = require('path')
+  const { spawnSync } = require('child_process')
   const sid = String(sessionId)
-  const card = { path: path.join(commonDir, 'orientation', sid + '.md'), text: null }
-  card.shown = buildComparablePath(card.path)
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) return card
-  try { card.text = fs.readFileSync(card.path, 'utf8') } catch { /* absent */ }
+  const card = { path: null, text: null, shown: '' }
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) {
+    card.shown = `(no card: the session id ${JSON.stringify(sid)} is not id-shaped)`
+    return card
+  }
+  const cwd = path.basename(commonDir) === '.git' ? path.dirname(commonDir) : commonDir
+  const engine = checker === undefined ? resolveKickoffChecker(cwd) : checker
+  if (!engine) {
+    card.shown = '(no card: no kickoff checker manifest-check.sh resolves to answer --card --path)'
+    return card
+  }
+  const bashes = [process.env.GOV_BASH || '']
+  if (process.platform === 'win32') bashes.push('C:/Program Files/Git/bin/bash.exe', 'C:/Program Files/Git/usr/bin/bash.exe')
+  bashes.push('bash')
+  let why = 'no bash ran it'
+  for (const bash of bashes.filter((b, i, all) => b && all.indexOf(b) === i)) {
+    let r
+    try {
+      r = spawnSync(bash, [engine, '--card', '--path', '--session', sid], { cwd, encoding: 'utf8', input: '', timeout: CARD_PATH_BOUND_MS, windowsHide: true })
+    } catch (e) { why = String((e && e.message) || e); continue }
+    const out = r && !r.error && r.status === 0 ? String(r.stdout || '').trim().split(/\r?\n/)[0] : ''
+    if (!out) {
+      why = r && r.error ? String(r.error.message || r.error) : `exit ${r ? r.status : '?'}: ${String((r && (r.stdout || r.stderr)) || '').trim().split(/\r?\n/)[0]}`
+      continue
+    }
+    // An MSYS bash prints /c/…, folded here; any other POSIX spelling on Windows, a /tmp/… mount say,
+    // is asked of the same bash's cygpath, and kept as printed where that does not answer.
+    const m = process.platform === 'win32' ? /^\/([A-Za-z])\/(.*)$/.exec(out) : null
+    let native = m ? `${m[1]}:/${m[2]}` : out
+    if (!m && process.platform === 'win32' && out.startsWith('/')) {
+      try {
+        const c = spawnSync(bash, ['-c', 'cygpath -m -- "$1"', '_', out], { encoding: 'utf8', input: '', timeout: CARD_PATH_BOUND_MS, windowsHide: true })
+        const w = c && c.status === 0 ? String(c.stdout || '').trim() : ''
+        if (/^[A-Za-z]:\//.test(w)) native = w
+      } catch { /* kept as printed */ }
+    }
+    card.path = native
+    card.shown = buildComparablePath(card.path)
+    try { card.text = fs.readFileSync(card.path, 'utf8') } catch { /* absent */ }
+    return card
+  }
+  card.shown = `(no card: the kickoff checker's --card --path did not answer: ${why})`
   return card
 }
 

@@ -23,6 +23,13 @@
 #                                         # cited path, range and id for EXISTENCE in two spawns,
 #                                         # annotate each miss `UNVERIFIED — <token>`, store it
 #   manifest-check.sh --card --check --session <sid>      # the same check over the stored card
+#   manifest-check.sh --card --path --build <slug>        # the build card's cache path, touch nothing
+#   manifest-check.sh --card --publish --build <slug> --session <sid>   # the build card, from the
+#                                         # session's card, written to each store card.store selects
+#   manifest-check.sh --card --follow --build <slug> --to <state> [--terminal]   # the build card
+#                                         # re-published at a stage move, as card.follows says
+#   manifest-check.sh --card --lookup --build <slug> --session <sid>    # the build card read back from
+#                                         # its first store that answers, re-keyed into the session's card
 #   manifest-check.sh --brief-skeleton    # the brief record's skeleton and the card's `## route`
 #                                         # skeleton; like --task-skeleton, it needs no repository
 #     A body carrying `## route` is held to the route rules beside `check_card_route`: every unit,
@@ -184,21 +191,43 @@ done
 # argument as a manifest path. `--card` alone is a refusal, not a default: a verb the caller did not
 # name is a card the caller did not ask for. Without `--card`, `--write` and its siblings still fall
 # through to that catch-all exactly as they did before this block existed.
-CARD=""; CARD_VERB=""; CARD_SID=""; _rest=(); _want_sid=0
+# The build card's verbs (TOOL-dPlacedRequest-2) take `--build <slug>`, and the follow `--to <state>`
+# and `--terminal`; each value is held to its grammar here, before it is joined into a ref or a path.
+CARD=""; CARD_VERB=""; CARD_SID=""; CARD_BUILD=""; CARD_STEP=""; CARD_TERMINAL=0; _rest=(); _want=""
 for _a in "$@"; do [ "$_a" = --card ] && CARD=1; done
 for _a in "$@"; do
-  if [ "$_want_sid" = 1 ]; then CARD_SID="$_a"; _want_sid=0; continue; fi
+  case "$_want" in
+    sid) CARD_SID="$_a"; _want=""; continue ;;
+    build) CARD_BUILD="$_a"; _want=""; continue ;;
+    to) CARD_STEP="$_a"; _want=""; continue ;;
+  esac
   case "$CARD$_a" in
     1--card) ;;
-    1--write|1--replay|1--path|1--append|1--check) CARD_VERB="${_a#--}" ;;
-    1--session) _want_sid=1 ;;
+    1--write|1--replay|1--path|1--append|1--check|1--publish|1--follow|1--lookup) CARD_VERB="${_a#--}" ;;
+    1--session) _want=sid ;;
     1--session=*) CARD_SID="${_a#--session=}" ;;
+    1--build) _want=build ;;
+    1--to) _want=to ;;
+    1--terminal) CARD_TERMINAL=1 ;;
     *) _rest+=("$_a") ;;
   esac
 done
 set -- ${_rest[@]+"${_rest[@]}"}
 if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
-  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append or --check"; exit 2
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append, --check, --publish, --follow or --lookup"; exit 2
+fi
+if [ -n "$CARD" ]; then
+  case "$CARD_VERB:${CARD_BUILD:+b}" in
+    publish:|follow:|lookup:) echo "MANIFEST env ERROR — --card --$CARD_VERB needs --build <slug>"; exit 2 ;;
+    write:b|replay:b|append:b|check:b) echo "MANIFEST env ERROR — --build is the build card's flag, and --card --$CARD_VERB takes none"; exit 2 ;;
+  esac
+  [ -z "$CARD_BUILD" ] || [[ $CARD_BUILD =~ ^[A-Za-z0-9]+$ ]] \
+    || { echo "MANIFEST env ERROR — --build '$CARD_BUILD' is not a build slug, [A-Za-z0-9]+, and is not joined into a ref or a path"; exit 2; }
+  if [ "$CARD_VERB" = follow ]; then
+    [[ $CARD_STEP =~ ^[a-z0-9][a-z0-9-]*$ ]] || { echo "MANIFEST env ERROR — --card --follow needs --to <state>, one word, and was given '$CARD_STEP'"; exit 2; }
+  elif [ -n "$CARD_STEP" ] || [ "$CARD_TERMINAL" = 1 ]; then
+    echo "MANIFEST env ERROR — --to and --terminal are --card --follow's flags"; exit 2
+  fi
 fi
 
 CALLER_PWD=$PWD
@@ -334,6 +363,11 @@ if [ -n "$CARD" ]; then
   CARD_DIR=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) \
     || { echo "MANIFEST env ERROR — cannot resolve the git common dir, so the card has no home"; exit 2; }
   CARD_DIR="$CARD_DIR/orientation"
+  # The build card's cache path is keyed by the build, so it needs no session (TOOL-dPlacedRequest-2 S10).
+  [ "$CARD_VERB:${CARD_BUILD:+b}" = path:b ] && { printf '%s/%s.md\n' "$CARD_DIR" "$CARD_BUILD"; exit 0; }
+  # A follow runs from the loop kit's transition writer, which holds no session: the card names the
+  # harness's session where one is in the environment, else `none`.
+  [ "$CARD_VERB" != follow ] || [ -n "$CARD_SID" ] || CARD_SID=${CLAUDE_CODE_SESSION_ID:-none}
   read_session_id
   CARD_FILE="$CARD_DIR/$CARD_SID.md"
   [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
@@ -911,11 +945,20 @@ derive_pockets_block() {
 # map; then the stored card, re-keyed by `print_rekeyed_card`, then ONE `now —` line computed here and
 # never stored — a second replay must print one, not two. The line names this tree's toplevel and how
 # its keys read. A missing card is written fresh under the replay's own name in its header.
+# THE RESUME (TOOL-dPlacedRequest-2 S7): a stored card whose `## route` names a build is first re-keyed
+# from that build's card by `resolve_build_card`, and its `card —` line, the route re-check and the
+# `resume —` and `partial —` lines print after the card, before the `now —` line.
 REPLAY_KEYS=""
 print_replay() {
+  local build="" said="" keep
   derive_map_block
   if [ -f "$CARD_FILE" ]; then
+    build=$(read_card_build "$CARD_FILE")
+    [ -z "$build" ] || said=$(resolve_build_card "$build")
+    keep=$CARD_TMP
     print_rekeyed_card
+    CARD_TMP=$keep
+    [ -z "$build" ] || { printf '%s\n' "$said"; derive_resume_lines "$build"; }
   else
     write_card replay
     REPLAY_KEYS=$(awk '{ sub(/\r$/, "") } sub(/^keys — skipped: /, "keys skipped: ") { print; exit }
@@ -1009,6 +1052,415 @@ render_envelope_sh() {
   printf '[/%s]\n' "$1"
 }
 # <<< envelope_sh
+
+# The governance ref's one compare-and-swap writer and the change feed every write joins, INLINED
+# byte-identically from the canonical copies named on their marker lines and gated by the
+# resolve-python self-test's parity table (TOOL-dPlacedRequest-2 S2): the build card's ref is
+# written through `write_gov_ref` alone, never by a hand copy.
+# >>> gov_ref_sh — canonical copy: gov-ref.sh in gov's lib dir (byte-identical; gated)
+# I1 AND I2, ONE WRITER FOR EVERY GOVERNANCE REF (TOOL-dPlacedRequest-11): a run claim, the bar-red
+# ref and every later register, request and card ref are written here, never by a hand copy.
+# `build_gov_commit` builds the commit over the empty tree under the fixed `gov-claim` identity,
+# parented on the tip its caller read, so `git log <ref>` on the remote lists every write in order; a
+# create, whose tip read is empty, is the one parentless commit. It prints nothing and returns 1 when
+# git cannot build it. `write_gov_ref` pushes `--porcelain --force-with-lease=<ref>:<expected>`, the
+# expected sha EMPTY for a create, and the porcelain line whose second field ends in `:<ref>` decides,
+# never the exit alone: `!` with `(stale info)` or `(fetch first)` is 1, LOST; any other `!`, no status
+# line, or the bound firing (124) is 2, NOT COMPLETED; any other flag is 0. The cause is in
+# GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
+# `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
+# expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
+# which admits an empty source only when `remove_gov_ref` is its caller.
+# THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
+# bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
+# pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
+# writes, empty to read no token.
+# NO REFUSAL TOKEN IS THIS PUSH'S CAUSE. The refusal file is one per git dir and nothing here removes
+# it, so another push from the same git dir can write it while this call runs: a token newer than the
+# stamp this call created just before its push is appended on rc 2 as an ADVISORY only. The
+# `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
+# The stamp is a scratch file of its own, never the push's output file, which git writes after the
+# hook ran and so would read every token as stale.
+# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it sets this node's cache ref
+# `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, then calls `add_feed_event`
+# from the `gov_feed_sh` block every carrier of this one carries beside it. A lost or uncompleted
+# write appends nothing.
+# WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
+# omitted; a token another push wrote during this call reads as fresh and is printed beside this
+# push's own cause, never as it.
+build_gov_commit() { # tip read or empty · message -> prints the commit; rc 1 when git cannot build it
+  local t c
+  local -a p=()
+  [ -z "$1" ] || p=(-p "$1")
+  t=$(git mktree </dev/null 2>/dev/null) && [ -n "$t" ] || return 1
+  c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
+    git commit-tree "$t" "${p[@]}" -m "$2" 2>/dev/null) && [ -n "$c" ] || return 1
+  printf '%s\n' "$c"
+}
+write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
+  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd=""
+  GOVREF_WHY=""
+  if [ -z "$src" ] && [ "${FUNCNAME[1]:-}" != remove_gov_ref ]; then GOVREF_WHY="no source"; return 2; fi
+  s=$(mktemp) || { GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  f=$(mktemp) || { rm -f "$s"; GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  "$GOVREF_RUNNER" "$f" push --porcelain "--force-with-lease=$ref:$exp" "$GOVREF_REMOTE" "$src:$ref" && rc=0 || rc=$?
+  line=""
+  while IFS= read -r l; do
+    case "$l" in ?$'\t'*":$ref"$'\t'*) line=${l%$'\r'} ;; esac
+  done <"$f"
+  if [ "$rc" = 124 ]; then GOVREF_WHY="the push was killed by this kit's own bound"; rc=2
+  elif [ -z "$line" ]; then GOVREF_WHY="git push exited $rc and printed no status line for $ref"; rc=2
+  elif [ "${line:0:1}" != '!' ]; then rc=0
+  else
+    case "$line" in
+      *"(stale info)"*|*"(fetch first)"*) GOVREF_WHY="lost the race on the lease: ${line##*$'\t'}"; rc=1 ;;
+      *) GOVREF_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
+    esac
+  fi
+  if [ "$rc" = 2 ]; then
+    [ -z "${GOVREF_GITDIR:-}" ] || rf="$GOVREF_GITDIR/pre-push-refusal"
+    if [ -n "$rf" ] && [ "$rf" -nt "$s" ]; then
+      { IFS=$'\t' read -r tok _ <"$rf"; } 2>/dev/null || :
+      GOVREF_WHY="$GOVREF_WHY · a pre-push refusal was recorded during this push: ${tok:-an empty refusal file}"
+    fi
+    hd=$(git symbolic-ref -q "refs/remotes/$GOVREF_REMOTE/HEAD" 2>/dev/null) || hd=""
+    [ -n "$hd" ] || GOVREF_WHY="$GOVREF_WHY · default-branch · fix once: git remote set-head $GOVREF_REMOTE -a"
+  fi
+  rm -f "$s" "$f"
+  [ "$rc" = 0 ] || return "$rc"
+  if [ -n "$src" ]; then git update-ref "refs/gov/remote/${ref#refs/gov/}" "$src" 2>/dev/null
+  else git update-ref -d "refs/gov/remote/${ref#refs/gov/}" 2>/dev/null; fi \
+    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${ref#refs/gov/}" >&2
+  add_feed_event "$ref" "$src"
+  return 0
+}
+remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
+  GOVREF_WHY=""
+  [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
+  write_gov_ref "$1" "$2" ""
+}
+# <<< gov_ref_sh
+# >>> gov_feed_sh — canonical copy: gov-feed.sh in gov's lib dir (byte-identical; gated)
+# THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
+# feed's log and the offline queue's, is read and written only under a lock directory beside it in
+# the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
+# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold:
+# a pinned literal, because a holder does local file work alone and never pushes while it holds.
+NODE_LOCK_BOUND=10
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
+# block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
+# lock with `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
+# or none and a directory older than two minutes - and only by the writer that takes the guard
+# `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
+# makes it again and writes both files before it releases the guard; a re-read finding the lock live,
+# or a re-make losing to a plain `mkdir`, releases the guard and reports busy. So no breaker removes
+# a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
+# it removes it and reports busy, never taking it in the same call, and the next call breaks the
+# lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
+# released. `write_dir_lock_wait` is the one retrying take: it calls `write_dir_lock` every 50 ms
+# until it takes or its ceiling in seconds passes, read on the whole-second clock. `remove_dir_lock`
+# clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
+# WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
+# one at once while a third takes a fresh guard between them can admit two breakers; that needs a
+# writer to die or stall for a minute inside the break, then four writers in one git dir in one
+# window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
+# it pushes, and its own release can land between a breaker's re-read and its removal. Both the
+# deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
+# A writer in another git dir takes another lock. Each event goes through the `health_log_sh` block
+# every carrier holds beside this one (TOOL-dPlacedRequest-36), to `resolve_health_log` of `ROOT`
+# where the driver sets it, so its spec-tokens lock in the sidecar dir logs to the repository's log,
+# else of the lock's parent, which for a node lock is the common dir: no unset name under `set -u`.
+# THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
+# `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
+# writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
+# space. `check_dir_lock_stale` also reads a lock stale when it holds at least one such file and every
+# one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
+# file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
+# foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
+# rule alone. The procfs read is `${PROCFS_ROOT:-/proc}`: the driver sets PROCFS_ROOT from its fixture
+# seam, and a carrier with no driver reads `/proc`.
+# WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
+# installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
+# no token reads live, so its lock waits for the deadline.
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "${PROCFS_ROOT:-/proc}/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
+check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
+  local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
+  case "$lu" in *[!0-9]*) lu="" ;; esac
+  for f in "$1"/pid.*; do
+    [ -f "$f" ] || continue
+    p=""; t=""; w=""; e=""; { read -r p t w e <"$f"; } 2>/dev/null || :
+    case "$p" in ""|*[!0-9]*) n=-1; break ;; esac
+    [ "$w" = "${HOSTNAME:-}:${OSTYPE:-}" ] && check_proc_gone "$p" "$t" \
+      && { [ -z "$e" ] || [ -e "$e" ] || [ ! -d "${e%/*}" ]; } || { n=-1; break; }
+    n=$((n + 1))
+  done
+  [ "$n" -le 0 ] || return 0
+  if [ -n "$lu" ]; then [ "$lu" -lt "$EPOCHSECONDS" ]; return; fi
+  [ -n "$(find "$1" -maxdepth 0 -mmin +2 2>/dev/null)" ]
+}
+write_dir_lock_pid() { # lock dir · role · pid, or - for pending · end file, optional -> <lock>/pid.<role> written; always 0
+  read_proc_token "$3"
+  printf '%s %s %s %s\n' "$3" "$PT_TOKEN" "${HOSTNAME:-}:${OSTYPE:-}" "${4:-}" >"$1/pid.$2" 2>/dev/null || :
+  return 0
+}
+write_dir_lock() { # lock dir · owner token · seconds it may hold · health-event stem -> 0 taken, 1 busy
+  local lk="$1" g="$1.break" broke=""
+  if ! mkdir "$lk" 2>/dev/null; then
+    check_dir_lock_stale "$lk" || return 1
+    if ! mkdir "$g" 2>/dev/null; then
+      if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        rm -rf "$g"
+        add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-guard-cleared" "$g"
+      fi
+      return 1
+    fi
+    if ! check_dir_lock_stale "$lk"; then rmdir "$g" 2>/dev/null; return 1; fi
+    rm -rf "$lk"
+    mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
+    broke=1
+  fi
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
+  printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  if [ -n "$broke" ]; then
+    rmdir "$g" 2>/dev/null
+    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"
+  fi
+  return 0
+}
+write_dir_lock_wait() { # lock dir · owner token · seconds it may hold · health-event stem · seconds to wait -> 0 taken, 1 busy
+  local end=$(( EPOCHSECONDS + ${5:-0} ))
+  until write_dir_lock "$1" "$2" "$3" "$4"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || return 1
+    sleep 0.05
+  done
+  return 0
+}
+remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
+  local o=""; { read -r o <"$1/owner"; } 2>/dev/null || :
+  [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
+  return 0
+}
+# I4, THE CHANGE FEED (TOOL-dPlacedRequest-13): `<git-common-dir>/gov-feed.log`, node-local and never
+# pushed, one LF-terminated line per governance ref write this node made or saw, six TAB fields:
+# seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
+# `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
+# and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
+# commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
+# APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
+# equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
+# event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
+# than the larger of the counter `gov-feed.seq` and the last all-digit first field of the log, so a
+# lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
+# torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
+# returns 0, as the health log's appender does: the governance write already landed.
+# THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# `EXIT` trap, armed once the lock is taken, calls `remove_dir_lock` with this call's token. So an
+# abort inside it, an unbound name under a carrier's `set -u`, a function no carrier defines or a
+# failed write, ends the subshell alone: the append prints `feed: NOTE - <ref>: the append exited
+# <rc>` and returns 0, and no lock is left for the next writer to wait out. The subshell sets no
+# global a caller reads. WHAT THIS DOES NOT CHECK: an abort between the take and the trap's arming
+# leaves the lock to its deadline; an abort after the line is written reads as a NOTE all the same.
+# THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
+# and this is the one take a carrier with no driver reaches, so where it is unset the append prints
+# one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
+# THE CACHE `refs/gov/remote/<tail>` mirrors `refs/gov/<tail>` on the remote: what this node fetched
+# and, through `write_gov_ref`, what it wrote. `add_feed_sightings` appends, oldest first, the unseen
+# first-parent chain of every cached ref whose tip is not the commit of the feed's newest line for
+# that ref, stopping at that commit or at the first commit not authored `gov-claim`, appended as a
+# lone event, so a ref another node set back to a commit an older line holds is sighted again.
+# `derive_feed_events` is the same walk with no feed to stop at; `check_feed` holds a feed to it per
+# ref git still holds (`missing`, `duplicate` for two consecutive events of one ref with one blob and
+# commit, `extra` on a ref whose tip is a `gov-claim` commit, `order`, `torn`), and `write_feed`
+# writes it as a fresh feed where none is present.
+# GOVFEED_DIR names the common dir; unset, the first call resolves it once for the process.
+# WHAT THIS DOES NOT CHECK: two breakers the guard's own blind spots (above) admit can both append, which
+# gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
+# ref's events from before a deletion of it are outside every chain git holds and are not compared;
+# a retry made after another event of its ref landed appends again, an event that did happen.
+add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
+  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so this write of %s is not in the feed\n' "$ref" >&2; return 0; }
+  k=${ref#refs/gov/}; k=${k%%/*}
+  if [ -z "$c" ]; then
+    c=0000000000000000000000000000000000000000
+  else
+    r=$(git rev-parse "$c^{commit}" "$c^{tree}" 2>/dev/null) || r=""
+    r=${r//$'\r'/}; c=${r%%$'\n'*}; t=${r#*$'\n'}
+    [ "${#c}:${#t}" = 40:40 ] || c=""
+    case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
+  fi
+  tok="$BASHPID.$RANDOM"
+  ( write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    trap 'remove_dir_lock "$d/gov-feed.lock" "$tok"' EXIT
+    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
+        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+        $2 == ev[1] { p = $4 "\t" $5 }
+        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
+      exit 0
+    fi
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
+    elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
+      rm -f "$d/gov-feed.seq.$$" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
+  return 0
+}
+derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
+  local pre="${1%/}/" feed="${2:-}" rows r t g s
+  rows=$(git for-each-ref --format='%(refname) %(objectname)' "$pre" 2>/dev/null | FEED_FILE="$feed" FEED_PRE="$pre" awk '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") < 5) continue
+              newest[x[2]] = x[5] } }
+    { sub(/\r$/, ""); g = "refs/gov/" substr($1, length(ENVIRON["FEED_PRE"]) + 1)
+      if ((g in newest) && newest[g] == $2) next
+      print $2, g, (g in newest ? newest[g] : "-") }')
+  [ -n "$rows" ] || return 0
+  printf '%s\n' "$rows" | while read -r t g s; do
+    git log --first-parent --format='%H %T %an' "$t" 2>/dev/null | awk -v ref="$g" -v stop="$s" '
+      { sub(/\r$/, "") }
+      $1 == stop { exit }
+      { a = $0; sub(/^[^ ]+ [^ ]+ /, "", a); n++; h[n] = $1; tr[n] = $2; if (a != "gov-claim") exit }
+      END { k = ref; sub(/^refs\/gov\//, "", k); sub(/\/.*$/, "", k)
+            for (i = n; i >= 1; i--) printf "%s\t%s\t%s\t%s\n", ref, k, tr[i], h[i] }'
+  done
+  return 0
+}
+add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cached ref appended oldest first
+  local pre="${1:-refs/gov/remote/}" r k t c
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -n "${GOVFEED_DIR%$'\r'}" ] || return 0
+  while IFS=$'\t' read -r r k t c; do
+    [ -z "$c" ] || add_feed_event "$r" "$c"
+  done < <(derive_feed_events "$pre" "${GOVFEED_DIR%$'\r'}/gov-feed.log")
+  return 0
+}
+check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
+  local pre="${1%/}/" f="${2:-}" dv au
+  if [ -z "$f" ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  fi
+  dv=$(derive_feed_events "$pre")
+  au=$(git for-each-ref --format='%(refname) %(authorname)' "$pre" 2>/dev/null)
+  FEED_FILE="$f" FEED_PRE="$pre" FEED_DV="$dv" FEED_AU="$au" awk '
+    BEGIN {
+      np = length(ENVIRON["FEED_PRE"])
+      m = split(ENVIRON["FEED_AU"], a, "\n")
+      for (i = 1; i <= m; i++) { ln = a[i]; sub(/\r$/, "", ln); if (ln == "") continue
+        r = ln; sub(/ .*$/, "", r); au = ln; sub(/^[^ ]* /, "", au)
+        g = "refs/gov/" substr(r, np + 1); held[g] = 1; if (au == "gov-claim") chain[g] = 1 }
+      m = split(ENVIRON["FEED_DV"], a, "\n")
+      for (i = 1; i <= m; i++) { if (split(a[i], x, "\t") != 4) continue
+        dn[x[1]]++; ds[x[1], dn[x[1]]] = x[4]; inch[x[1] SUBSEP x[4]] = 1 }
+      f = ENVIRON["FEED_FILE"]; bad = 0
+      while ((getline ln < f) > 0) {
+        sub(/\r$/, "", ln)
+        if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        k = x[4] SUBSEP x[5]
+        if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
+        last[x[2]] = k
+        if (!(x[2] in held)) continue
+        if ((x[2] SUBSEP x[5]) in inch) { fn[x[2]]++; fs[x[2], fn[x[2]]] = x[5]; got[x[2] SUBSEP x[5]] = 1 }
+        else if (x[2] in chain) { print "extra " x[2] " " x[5]; bad = 1 }
+      }
+      for (g in dn) {
+        j = 0; off = ""
+        for (i = 1; i <= dn[g]; i++) {
+          c = ds[g, i]
+          if (!((g SUBSEP c) in got)) { print "missing " g " " c; bad = 1; continue }
+          j++; if (off == "" && fs[g, j] != c) off = fs[g, j]
+        }
+        if (off != "") { print "order " g " " off; bad = 1 }
+      }
+      exit bad }'
+}
+write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
+  local pre="${1%/}/" d now n=0 l
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: no git common dir resolves here, so no feed was rebuilt\n'; return 2; }
+  if [ -e "$d/gov-feed.log" ]; then printf 'feed: a feed is present, so nothing was rebuilt over it: %s\n' "$d/gov-feed.log"; return 2; fi
+  TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$d/gov-feed.log.$$" \
+    && printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq" && mv -f "$d/gov-feed.log.$$" "$d/gov-feed.log" \
+    || { rm -f "$d/gov-feed.log.$$" "$d/gov-feed.seq.$$"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  printf 'feed: rebuilt %s event(s) from %s into %s\n' "$n" "$pre" "$d/gov-feed.log"
+  return 0
+}
+print_feed() {       # [seq] -> every event whose seq is at or after it, in file order
+  local from="${1:-0}" d
+  case "$from" in ""|*[!0-9]*) printf 'feed: a replay starts at a sequence number, not %s\n' "$from"; return 2 ;; esac
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -f "$d/gov-feed.log" ] || return 0
+  awk -F'\t' -v from="$from" 'NF == 6 && $1 ~ /^[0-9]+$/ && $1 + 0 >= from + 0' "$d/gov-feed.log"
+}
+# THE OBSERVER CLOCK, I8 (TOOL-dPlacedRequest-17): the one reader of a first sighting. Per
+# `ref TAB commit` pair on stdin, in order, the `seen-utc` of the oldest feed line of that ref and
+# commit, or `-` where the feed holds none, has none of that shape, or cannot be read. Every lease
+# deadline is now minus that stamp, both read on this node's clock, never the holder's `beat-utc`.
+read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` per pair
+  local f=""
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -z "${GOVFEED_DIR%$'\r'}" ] || f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  FEED_FILE="$f" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+              if (!((x[2] SUBSEP x[5]) in seen)) seen[x[2], x[5]] = x[6] } }
+    { sub(/\r$/, ""); print (($1 SUBSEP $2) in seen ? seen[$1, $2] : "-") }'
+}
+# <<< gov_feed_sh
 
 # The card file (PLAY-dOrderedCharter-8 S2, S3): the stored card rendered into `<CARD_TREE>/.claude/
 # orientation-card.md` inside its level-1 envelope, the values of the playbook kit's `doc.orientation-card`
@@ -1492,7 +1944,23 @@ CARD_READY_RE='^\(- \)\{0,1\}READY — '
 # reader; R4 reads one spec file per unit line. Sets CARD_ROUTE=1 when the body carries a route.
 # WHAT THIS DOES NOT CHECK: the brief's content, a routed unit's status (the write gate's question,
 # asked at write time), or that the owner said go — existence and pairing only.
-CARD_ROUTE=0
+# R7 (TOOL-dPlacedRequest-2 S9), `check_card_terminal`: a route whose build's LOCAL card ref reads a step
+# its follow marked terminal — the message's third line `step: <state> · terminal` — is refused, since
+# that build has ended. It reads the ref this node holds and fetches nothing, so a terminal follow on
+# another node is seen once a publish or a lookup here has fetched it.
+check_card_terminal() { # body file -> R7's verdict line, or nothing
+  local at b step
+  at=$(LC_ALL=C awk '/^[[:space:]]*## route[[:space:]]*$/ { inr = 1; next } inr && (/^## / || /^(- )?READY — /) { inr = 0 }
+    inr && /^- build: [A-Za-z0-9]+$/ { print NR "\t" substr($0, 10); exit }' "$1")
+  [ -n "$at" ] || return 0
+  b=${at#*$'\t'}
+  step=$(git log -1 --format=%B "refs/gov/builds/$b/card" -- 2>/dev/null | sed -n '3s/^step: //p' | tr -d '\r')
+  case "$step" in
+    *" · terminal") printf 'R7\t%s\t- build: %s\tthe build %s has ended: its card ref refs/gov/builds/%s/card reads step %s, which its follow marked terminal, so a route to it does not land' \
+      "${at%%$'\t'*}" "$b" "$b" "$b" "${step% · terminal}" ;;
+  esac
+}
+CARD_ROUTE=0; CARD_APPEND_READY=0
 check_card_route() {
   local body="$1" nready="$2" n memroot verdict rule ln line why where="" self=${0##*/}
   CARD_ROUTE=0
@@ -1544,6 +2012,7 @@ check_card_route() {
   if [ -z "$verdict" ] && [ "$nready" = 0 ] && grep "$CARD_READY_RE" "$CARD_TMP/tail" | grep -q 'READY — none yet$'; then
     verdict=$(printf 'R6\t-\t-\tthe card still reads READY — none yet: no kickoff has appended to it, and a route lands only on an oriented card')
   fi
+  [ -n "$verdict" ] || verdict=$(check_card_terminal "$body")
   [ -n "$verdict" ] || return 0
   IFS=$'\t' read -r rule ln line why <<<"$verdict"
   [ "$ln" = - ] || where="line $ln: $line — "
@@ -1633,7 +2102,7 @@ add_card_body() {
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID before appending to it"; exit 2; }
   tr -d '\r' > "$body"
   grep -v "${CARD_READY_RE}none yet\$" "$body" > "$body.x"; mv "$body.x" "$body"
-  nready=$(grep -c "$CARD_READY_RE" "$body"); nready=${nready:-0}
+  nready=$(grep -c "$CARD_READY_RE" "$body"); nready=${nready:-0}; CARD_APPEND_READY=$nready
   [ "$nready" -le 1 ] || { echo "MANIFEST env ERROR — the body carries $nready READY lines; one card holds one kickoff, so exactly one is accepted and nothing was appended"; exit 2; }
   check_card_citations "$body"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended"; exit 1; }
@@ -1707,14 +2176,426 @@ check_card() {
   exit 0
 }
 
+# ---- the build card (TOOL-dPlacedRequest-2) ------------------------------------------------------
+# A build's card, kept per build so a new session, another node or a resumed one finds it. THREE
+# STORES, `card.store` selecting any non-empty subset and every write going to each selected store and
+# no other: `remote-ref`, the ref refs/gov/builds/<slug>/card on `origin`, the truth, one commit per
+# write built by `build_gov_commit` on the tip read and written by `write_gov_ref` with that tip as its
+# expected value, so it joins the change feed; its message is `gov-card <slug>`, a blank line, `step:
+# <state>` (` · terminal` after it at a terminal follow, which R7 reads), `session: <sid>`, a blank line
+# and the card, every line after the fifth. `local-clone`, the cache <common dir>/orientation/<slug>.md,
+# its first line `# card-ref <the ref's commit, or local>`, trusted only while that equals the ref. And
+# `build-folder`, a `card` record of the record factory committed alone in the session's own tree, its
+# anchor the loop kit's `resolve_build_anchor`, written as `card.snapshot` says. The ref is read by one
+# bounded fetch into refs/gov/builds/<slug>/card and the feed's cache ref beside it, its sightings
+# appended to the feed. A lost compare-and-swap re-reads the tip, re-renders once on it and writes
+# again. Every store's failure is its own `card —` line and never changes the caller's exit.
+# THE FIVE POLICY KEYS are read by `read_card_policy`, one literal `get` line per key, the shape the
+# policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
+# WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
+# card, which the lease and the claim decide; a remote other than `origin`.
+CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each read or push of the card ref may take; the env override is the fixture's
+# A session idle longer than this is recommended a fresh start: the prompt cache's five-minute lifetime,
+# PINNED 2026-10-25 and unverified against the platform's documentation in this tree.
+RESUME_IDLE_S=300
+CARD_REF_TIP=""; CARD_REF_WHY=""; CARD_STORED_STEP=""; CARD_STORED_FROM=""; CARD_REC=""; CARD_REC_STEP=""
+
+read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resume.partial -> its value on stdout, a set's members one per line; 1 and the refusal on stdout
+  local def pk d py out v n=0
+  case "${1:-}" in
+    card.follows) def=re-render-at-transition ;;
+    card.store) def="remote-ref build-folder local-clone" ;;
+    card.snapshot) def=terminal-only ;;
+    resume.context) def=fresh-when-idle ;;
+    resume.partial) def=continue-item ;;
+    *) printf "read_card_policy reads card.follows, card.store, card.snapshot, resume.context or resume.partial, and was asked for '%s'\n" "${1:-}"
+       return 1 ;;
+  esac
+  pk=$(resolve_kit_file policy policy.py)
+  if [ -z "$pk" ] || ! py=$(resolve_python 2>/dev/null); then
+    printf 'card: NOTE - no policy kit resolves beside this kit, so %s takes its catalogue default %s\n' "$1" "$def" >&2
+    printf '%s\n' $def
+    return 0
+  fi
+  d=${pk%/*}
+  case "$1" in
+    card.follows) out=$("$py" "$d/policy.py" get card.follows 2>&1) ;;
+    card.store) out=$("$py" "$d/policy.py" get card.store 2>&1) ;;
+    card.snapshot) out=$("$py" "$d/policy.py" get card.snapshot 2>&1) ;;
+    resume.context) out=$("$py" "$d/policy.py" get resume.context 2>&1) ;;
+    resume.partial) out=$("$py" "$d/policy.py" get resume.partial 2>&1) ;;
+  esac || { printf '%s\n' "${out:-policy.py get $1 exited non-zero}"; return 1; }
+  out=${out//$'\r'/}
+  for v in $out; do
+    n=$((n + 1))
+    case "$1:$v" in
+      card.follows:re-render-at-transition|card.follows:card-per-step|card.follows:fixed-at-start) ;;
+      card.store:remote-ref|card.store:build-folder|card.store:local-clone) ;;
+      card.snapshot:terminal-only|card.snapshot:every-transition) ;;
+      resume.context:fresh-when-idle|resume.context:always-resume|resume.context:always-fresh) ;;
+      resume.partial:continue-item|resume.partial:restart-item|resume.partial:ask-owner) ;;
+      *) printf "%s answered '%s', which is outside the closed set this engine branches on\n" "$1" "$v"; return 1 ;;
+    esac
+  done
+  case "$1:$n" in
+    *:0) printf '%s answered no value\n' "$1"; return 1 ;;
+    card.store:*|*:1) ;;
+    *) printf '%s answered %s values, and takes one\n' "$1" "$n"; return 1 ;;
+  esac
+  printf '%s\n' $out
+}
+
+# GOVREF_RUNNER for the card ref: the push, bounded as the fetch below is.
+run_card_git() { # outfile · git args… -> git's exit, 124 when the bound fired; its stdout in the file
+  local o=$1; shift
+  timeout -k 2 "$CARD_FETCH_BOUND" git "$@" </dev/null >"$o" 2>/dev/null
+}
+
+# The one read of the remote: one bounded fetch of the card ref into the local ref and the feed's cache
+# ref, then the feed's sightings. Sets CARD_REF_TIP (empty where the remote holds no card, the local ref
+# then removed) or CARD_REF_WHY; 1 when the remote did not answer.
+read_card_ref() { # slug -> 0 the remote answered, 1 not
+  local ref="refs/gov/builds/$1/card" o="$CARD_TMP/fetch" rc
+  CARD_REF_TIP=""; CARD_REF_WHY=""
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { CARD_REF_WHY="this node has no working timeout -k, so the read would be unbounded and none ran"; return 1; }
+  timeout -k 2 "$CARD_FETCH_BOUND" git fetch --no-tags origin "+$ref:$ref" "+$ref:refs/gov/remote/${ref#refs/gov/}" \
+    </dev/null >/dev/null 2>"$o.err"; rc=$?
+  if [ "$rc" = 0 ]; then
+    CARD_REF_TIP=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null | tr -d '\r')
+    add_feed_sightings refs/gov/remote/
+    return 0
+  fi
+  if [ "$rc" != 124 ] && [ "$rc" != 137 ] && grep -qi "couldn't find remote ref" "$o.err" 2>/dev/null; then
+    git update-ref -d "$ref" 2>/dev/null
+    return 0
+  fi
+  case "$rc" in
+    124|137) CARD_REF_WHY="the remote did not answer within ${CARD_FETCH_BOUND}s" ;;
+    *) CARD_REF_WHY="git fetch exited $rc: $(tr -d '\r' < "$o.err" 2>/dev/null | grep -m1 . | head -c 160)" ;;
+  esac
+  return 1
+}
+
+# A stored build card's text, from the first store that holds one: the local ref (as the last read left
+# it), the cache, the newest `card` record. Written to the file; sets CARD_STORED_STEP and CARD_STORED_FROM.
+read_card_stored() { # slug · outfile -> 0 a card was found, 1 none
+  local ref="refs/gov/builds/$1/card" cache="$CARD_DIR/$1.md"
+  CARD_STORED_STEP=""; CARD_STORED_FROM=""
+  if git rev-parse --verify -q "$ref^{commit}" >/dev/null 2>&1; then
+    git log -1 --format=%B "$ref" -- 2>/dev/null | tr -d '\r' | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }' > "$2"
+    CARD_STORED_STEP=$(git log -1 --format=%B "$ref" -- 2>/dev/null | sed -n '3s/^step: \([^ ]*\).*/\1/p' | tr -d '\r')
+    CARD_STORED_FROM=ref
+  elif [ -f "$cache" ]; then
+    tail -n +2 "$cache" | tr -d '\r' > "$2"
+    CARD_STORED_FROM=cache
+  elif read_card_record "$1"; then
+    awk '/^~~~~$/ { if (f++) exit; next } f' "$CARD_REC" | tr -d '\r' > "$2"
+    CARD_STORED_STEP=$CARD_REC_STEP; CARD_STORED_FROM=record
+  else
+    return 1
+  fi
+  [ -n "$CARD_STORED_STEP" ] || CARD_STORED_STEP=$(sed -n '1s/^card — [^ ]* · step \([^ ]*\) .*/\1/p' "$2")
+  return 0
+}
+
+# The newest `card` record of the build in the session's own tree, by its `<n>`: CARD_REC and CARD_REC_STEP.
+read_card_record() { # slug -> 0 found, 1 none
+  local memroot
+  CARD_REC=""; CARD_REC_STEP=""
+  memroot=$(read_memory_root) && [ -n "$memroot" ] || return 1
+  CARD_REC=$(for f in "$CARD_TREE/$memroot/builds/$1/build/"*-card-*.md; do [ -f "$f" ] && printf '%s\n' "$f"; done \
+    | LC_ALL=C awk '{ n = $0; sub(/^.*\//, "", n) }
+        n ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}-build-.+-card-[0-9]+\.md$/ { sub(/^.*-card-/, "", n); sub(/\.md$/, "", n)
+          if (n + 0 > best) { best = n + 0; p = $0 } }
+        END { if (p != "") print p }')
+  [ -n "$CARD_REC" ] || return 1
+  CARD_REC_STEP=$(sed -n 's/^- \*\*Step:\*\* \([^ ]*\).*/\1/p' "$CARD_REC" | head -n 1 | tr -d '\r')
+  return 0
+}
+
+# The build card's text: one header line, the startup cells `render_card` re-renders here with the
+# `## pockets` section fitted to the cap, and the tail file — the `## task`, `## route` and other body
+# sections and the READY line. Refused past CARD_CAP_BYTES, as `write_card` refuses.
+render_build_card() { # slug · step · tail file · writer verb -> the card on stdout; 1 and the refusal on stdout
+  local out="$CARD_TMP/bc.render" bytes
+  {
+    printf 'card — %s · step %s · published %s · by %s\n' "$1" "$2" "$(date +%Y-%m-%dT%H:%M:%S%z)" "$CARD_SID"
+    render_card "$4" | awk -v want=startup "$CARD_PARTS_AWK" | tail -n +2
+    cat "$3"
+  } | derive_pockets_block > "$out"
+  bytes=$(wc -c < "$out" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    printf 'card — not written: the build card is %s bytes, over the %s-byte cap (CARD_CAP_BYTES)\n' "$bytes" "$CARD_CAP_BYTES"
+    return 1
+  fi
+  cat "$out"
+}
+
+# The build card written to each store `card.store` selects. The tail comes from the session's card
+# (`session`), the stored build card (`stored`) or is `READY — none yet` alone (`none`); an empty step is
+# the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
+write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
+  local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/builds/$1/card" card="$CARD_TMP/bc.card"
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark=""
+  [ "$term" != 1 ] || mark=" · terminal"
+  stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
+  stores=" $(printf '%s ' $stores)"
+  case "$stores" in *" remote-ref "*) remote=1 ;; esac
+  if [ "$remote" = 1 ] && ! read_card_ref "$slug"; then
+    printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2
+  fi
+  tip=$CARD_REF_TIP
+  for try in 1 2; do
+    case "$mode" in
+      session) awk -v want=tail "$CARD_PARTS_AWK" "$CARD_FILE" > "$tail" ;;
+      stored) if read_card_stored "$slug" "$CARD_TMP/bc.stored"; then awk -v want=tail "$CARD_PARTS_AWK" "$CARD_TMP/bc.stored" > "$tail"
+              else printf 'READY — none yet\n' > "$tail"; fi ;;
+      none) printf 'READY — none yet\n' > "$tail" ;;
+    esac
+    if [ -z "$2" ]; then
+      step=unrecorded
+      ! read_card_stored "$slug" "$CARD_TMP/bc.stored" || [ -z "$CARD_STORED_STEP" ] || step=$CARD_STORED_STEP
+    fi
+    render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
+    [ "$remote" = 1 ] || break
+    msg=$(printf 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(cat "$card")")
+    c=$(build_gov_commit "$tip" "$msg") || { printf 'card — remote-ref not written: git could not build the commit\n'; remote=2; break; }
+    GOVREF_RUNNER=run_card_git GOVREF_REMOTE=origin GOVREF_GITDIR=$(git rev-parse --absolute-git-dir 2>/dev/null | tr -d '\r') \
+      write_gov_ref "$ref" "$tip" "$c"; rc=$?
+    if [ "$rc" = 0 ]; then
+      git update-ref "$ref" "$c" 2>/dev/null
+      oid=$c
+      printf 'card — %s · step %s · remote-ref %s\n' "$slug" "$step" "${c:0:8}"
+      break
+    elif [ "$rc" = 1 ] && [ "$try" = 1 ] && read_card_ref "$slug" && [ "$CARD_REF_TIP" != "$tip" ]; then
+      tip=$CARD_REF_TIP
+      continue
+    elif [ "$rc" = 1 ]; then
+      printf 'card — remote-ref not written: lost to %s\n' "${CARD_REF_TIP:0:8}"; remote=2; break
+    fi
+    printf 'card — remote-ref not written: %s\n' "$GOVREF_WHY"; remote=2; break
+  done
+  case "$stores" in
+    *" local-clone "*)
+      if mkdir -p "$CARD_DIR" 2>/dev/null && { printf '# card-ref %s\n' "$oid"; cat "$card"; } > "$CARD_DIR/$slug.md.$$" \
+          && mv -f "$CARD_DIR/$slug.md.$$" "$CARD_DIR/$slug.md"; then
+        printf 'card — %s · step %s · local-clone %s\n' "$slug" "$step" "$CARD_DIR/$slug.md"
+      else
+        rm -f "$CARD_DIR/$slug.md.$$" 2>/dev/null; printf 'card — local-clone not written: cannot write %s\n' "$CARD_DIR/$slug.md"
+      fi ;;
+  esac
+  case "$stores:$snap" in
+    *" build-folder "*:1) write_card_snapshot "$slug" "$step" "${oid/#local/none}" "$card" ;;
+  esac
+  return 0
+}
+
+# The `card` record, through the record factory's `write_record` (no door), its anchor the loop kit's
+# `resolve_build_anchor`, committed ALONE in the session's own tree: a staged index refuses it, named,
+# and a commit git refuses leaves no file behind.
+CARD_SNAPSHOT_PY='import pathlib, sys
+sys.path[:0] = sys.argv[1:3]
+from build_records import write_record
+from loop_transition import resolve_build_anchor
+root = pathlib.Path(sys.argv[3]).absolute()
+build, step, ref, card = sys.argv[4:8]
+anchor = resolve_build_anchor(build, root)
+if anchor is None:
+    sys.exit("no spec H1 under the build defines a unit, so the record has no anchor")
+text = pathlib.Path(card).read_text(encoding="utf-8").replace("\r", "").rstrip("\n").split("\n")
+try:
+    print(write_record(root, build, anchor, "card", step, [("Build", build), ("Step", step), ("Ref", ref)],
+                       lines=["~~~~", *text, "~~~~"]))
+except (ValueError, OSError) as e:
+    sys.exit(str(e))'
+write_card_snapshot() { # slug · step · ref commit or none · card file -> one card — line; 0 always
+  local br lt py rel why
+  br=$(resolve_kit_file memory-tree build_records.py); lt=$(resolve_kit_file loop loop_transition.py)
+  [ -n "$br" ] || { printf 'card — build-folder not written: no memory-tree build_records.py resolves in this tree\n'; return 0; }
+  [ -n "$lt" ] || { printf 'card — build-folder not written: no loop kit resolves the build anchor\n'; return 0; }
+  py=$(resolve_python 2>/dev/null) || { printf 'card — build-folder not written: no Python resolves on this node\n'; return 0; }
+  git -C "$CARD_TREE" diff --cached --quiet 2>/dev/null \
+    || { printf 'card — build-folder not written: the index of %s holds staged changes, and a snapshot is committed alone\n' "$CARD_TREE"; return 0; }
+  rel=$("$py" -c "$CARD_SNAPSHOT_PY" "${br%/*}" "${lt%/*}" "$CARD_TREE" "$1" "$2" "$3" "$4" 2>&1) \
+    || { why=$(printf '%s\n' "$rel" | tr -d '\r' | grep -m1 . | head -c 200); printf 'card — build-folder not written: %s\n' "$why"; return 0; }
+  rel=${rel//$'\r'/}; rel=${rel##*$'\n'}
+  if git -C "$CARD_TREE" add -- "$rel" 2>/dev/null && git -C "$CARD_TREE" commit -q -m "card snapshot($1): $2" >/dev/null 2>&1; then
+    printf 'card — %s · step %s · build-folder %s · commit %s\n' "$1" "$2" "$rel" "$(git -C "$CARD_TREE" rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r')"
+  else
+    git -C "$CARD_TREE" reset -q -- "$rel" 2>/dev/null; rm -f "$CARD_TREE/$rel"
+    printf 'card — build-folder not written: git could not commit %s\n' "$rel"
+  fi
+  return 0
+}
+
+# The follow at a stage move (S4): `card.follows` decides what is re-published, `card.snapshot` whether
+# the move writes a `card` record. A terminal move always publishes; a terminal move whose state the
+# newest record already names writes no second record.
+write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 always
+  local follows snapshot snap=0 mode=stored
+  follows=$(read_card_policy card.follows) || { printf 'card — skipped: card.follows refused: %s\n' "${follows%%$'\n'*}"; return 0; }
+  if [ "$follows" = fixed-at-start ] && [ "$3" = 0 ]; then
+    printf 'card — %s · step %s · fixed-at-start: nothing written\n' "$1" "$2"; return 0
+  fi
+  [ "$follows" != card-per-step ] || mode=none
+  snapshot=$(read_card_policy card.snapshot) || { printf 'card — skipped: card.snapshot refused: %s\n' "${snapshot%%$'\n'*}"; return 0; }
+  if [ "$3" = 1 ] || [ "$snapshot" = every-transition ]; then snap=1; fi
+  if [ "$3" = 1 ] && read_card_record "$1" && [ "$CARD_REC_STEP" = "$2" ]; then
+    printf 'card — snapshot kept: %s already recorded\n' "$2"; snap=0
+  fi
+  write_build_card "$1" "$2" "$mode" follow "$snap" "$3"
+}
+
+# The verdict on a cached card against the ref (TOOL-dDeclaredLoop-8 S3's words): the loop kit's
+# `claims.py verdict` where it resolves, its rule otherwise — `evidence` with no ref read, `fresh` when
+# the cache's `# card-ref` equals the ref's commit, `re-derived` when it does not.
+derive_card_verdict() { # cached card-ref or empty · the ref's commit or empty -> fresh, re-derived or evidence
+  local ck py v
+  ck=$(resolve_kit_file loop claims.py)
+  if [ -n "$ck" ] && py=$(resolve_python 2>/dev/null) \
+      && v=$("$py" "$ck" verdict --stored "${1:-?}" --class history ${2:+--recomputed "$2"} 2>/dev/null); then
+    printf '%s\n' "${v%$'\r'}"; return 0
+  fi
+  if [ -z "$2" ]; then echo evidence; elif [ "$1" = "$2" ]; then echo fresh; else echo re-derived; fi
+}
+
+# The lookup (S6): the build card from the first selected store that answers — the ref, the cache
+# while its `# card-ref` equals the ref, the newest record — then re-keyed into the session's card: its
+# own header and the startup cells re-rendered here, the build card's tail kept.
+resolve_build_card() { # slug -> one card — line; 0 always
+  local slug=$1 stores cache="$CARD_DIR/$1.md" cref="" verdict="" what="" from="$CARD_TMP/bc.found" tip="" bytes
+  stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
+  stores=" $(printf '%s ' $stores)"
+  [ ! -f "$cache" ] || cref=$(sed -n '1s/^# card-ref //p' "$cache" | tr -d '\r')
+  case "$stores" in
+    *" remote-ref "*)
+      if read_card_ref "$slug" && [ -n "$CARD_REF_TIP" ]; then
+        tip=$CARD_REF_TIP
+        verdict=$(derive_card_verdict "$([ -z "${stores##*" local-clone "*}" ] && printf '%s' "$cref")" "$tip")
+        if [ "$verdict" = fresh ]; then
+          tail -n +2 "$cache" | tr -d '\r' > "$from"; what="cache trusted"
+        else
+          verdict=re-derived
+          git log -1 --format=%B "refs/gov/builds/$slug/card" -- 2>/dev/null | tr -d '\r' \
+            | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }' > "$from"
+          what="read the ref"
+          case "$stores" in
+            *" local-clone "*) { printf '# card-ref %s\n' "$tip"; cat "$from"; } > "$cache.$$" && mv -f "$cache.$$" "$cache" && what="cache rewritten" ;;
+          esac
+        fi
+      fi ;;
+  esac
+  if [ -z "$verdict" ]; then
+    case "$stores" in *" local-clone "*) [ -f "$cache" ] && { tail -n +2 "$cache" | tr -d '\r' > "$from"; what="read the cache"; verdict=evidence; } ;; esac
+  fi
+  if [ -z "$verdict" ]; then
+    case "$stores" in *" build-folder "*) read_card_record "$slug" && { awk '/^~~~~$/ { if (f++) exit; next } f' "$CARD_REC" | tr -d '\r' > "$from"; what="read the snapshot ${CARD_REC##*/}"; verdict=evidence; } ;; esac
+  fi
+  if [ -z "$verdict" ]; then
+    printf 'card — none published for %s%s\n' "$slug" "${CARD_REF_WHY:+ · the remote did not answer: $CARD_REF_WHY}"; return 0
+  fi
+  # A session that holds a card keeps its header line, as the replay's re-key does, since the scratch
+  # guard reads the writer verb on it; the replay's own render reads no remote.
+  {
+    render_card "$([ "$CARD_VERB" = replay ] && echo replay || echo lookup)" | awk -v want=startup "$CARD_PARTS_AWK" \
+      | { IFS= read -r hd; if [ -f "$CARD_FILE" ]; then head -n 1 "$CARD_FILE" | tr -d '\r'; else printf '%s\n' "$hd"; fi; cat; }
+    awk -v want=tail "$CARD_PARTS_AWK" "$from"
+  } | derive_pockets_block > "$CARD_TMP/bc.rekeyed"
+  bytes=$(wc -c < "$CARD_TMP/bc.rekeyed" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    what="$what · not re-keyed: $bytes bytes, over the $CARD_CAP_BYTES-byte cap"
+  elif mkdir -p "$CARD_DIR" && cat "$CARD_TMP/bc.rekeyed" > "$CARD_FILE"; then
+    what="$what · re-keyed into $CARD_SID.md"
+  else
+    what="$what · not re-keyed: cannot write $CARD_FILE"
+  fi
+  printf 'card — %s · %s · ref %s · %s\n' "$slug" "$verdict" "${tip:0:8}" "$what"
+  [ -n "$tip" ] || [ -z "$CARD_REF_WHY" ] || printf 'card — the remote did not answer: %s\n' "$CARD_REF_WHY"
+}
+
+# The route's build on a card or body: its one `- build:` line under `## route`, or nothing.
+read_card_build() { # file -> the slug, or nothing
+  LC_ALL=C awk '{ sub(/\r$/, "") } /^[[:space:]]*## route[[:space:]]*$/ { inr = 1; next } inr && (/^## / || /^(- )?READY — /) { inr = 0 }
+    inr && /^- build: [A-Za-z0-9]+$/ { print substr($0, 10); exit }' "$1"
+}
+
+# The resume (S7), after the replay's lookup: the route re-checked over the re-keyed card, then the
+# `resume —` line under resume.context and the `partial —` line under resume.partial. `always-resume`
+# holds only while the card-import fixture's recorded verdict, KICK-dKeptSession-12's
+# `read_card_fixture_verdict`, answers `pass`; while no such reader is defined it reads `red: no recorded
+# run`, that unit's own reason. The entry file is not consulted. The `partial —` line names the act the
+# kickoff skill's resume paragraph states; the replay performs none of them.
+derive_resume_lines() { # slug -> the route —, resume — and partial — lines; 0 always
+  local out rc rule ctx rec part act v mtime idle n tx=$CARD_TRANSCRIPT
+  out=$( CARD_TMP="$CARD_TMP/rc" && mkdir -p "$CARD_TMP" && check_card_citations "$CARD_FILE" >/dev/null 2>&1 \
+         && extract_card_parts "$CARD_FILE" && check_card_route "$CARD_FILE" 1 2>&1 ); rc=$?
+  rule=ok
+  [ "$rc" = 0 ] || rule=$(printf '%s\n' "$out" | sed -n 's/.*route \(R[0-9]\)[ :].*/\1/p' | head -n 1)
+  printf 'route — re-checked · %s\n' "${rule:-unchecked: the check exited $rc}"
+  if ctx=$(read_card_policy resume.context); then
+    rec="fresh recommended: transcript absent"
+    if [ -n "$tx" ] && [ -f "$tx" ] && mtime=$(stat -c %Y -- "$tx" 2>/dev/null) && [[ $mtime =~ ^[0-9]+$ ]]; then
+      idle=$(( EPOCHSECONDS - mtime ))
+      if [ "$idle" -gt "$RESUME_IDLE_S" ]; then rec="fresh recommended: idle ${idle}s past ${RESUME_IDLE_S}s"
+      else rec="resume recommended: idle ${idle}s within ${RESUME_IDLE_S}s"; fi
+    fi
+    case "$ctx" in
+      always-fresh) printf 'resume — fresh recommended (resume.context: always-fresh)\n' ;;
+      fresh-when-idle) printf 'resume — %s (resume.context: fresh-when-idle)\n' "$rec" ;;
+      always-resume)
+        v="red: no recorded run"
+        if declare -F read_card_fixture_verdict >/dev/null; then
+          v=$(read_card_fixture_verdict 2>/dev/null | head -n 1 | tr -d '\r'); v=${v:-red: the reader printed nothing}
+        fi
+        if [ "$v" = pass ]; then printf 'resume — resume recommended (resume.context: always-resume)\n'
+        else printf 'resume — %s (resume.context: always-resume read as fresh-when-idle · card-import fixture red: %s)\n' "$rec" "${v#red: }"; fi ;;
+    esac
+  else
+    printf 'card — skipped: resume.context refused: %s\n' "${ctx%%$'\n'*}"
+  fi
+  if part=$(read_card_policy resume.partial); then
+    n=$(git -C "$CARD_TREE" status --porcelain 2>/dev/null | wc -l | tr -d '[:space:]')
+    case "$part" in
+      continue-item) act="kept, the item continues, its witness still owed" ;;
+      restart-item) act="commit the work to partial/$1/${CARD_SID:0:8}, then restore the tree to HEAD" ;;
+      ask-owner) act="ask the owner, or park it under a mandate" ;;
+    esac
+    printf 'partial — %s uncommitted path(s) · resume.partial: %s · %s\n' "${n:-0}" "$part" "$act"
+  else
+    printf 'card — skipped: resume.partial refused: %s\n' "${part%%$'\n'*}"
+  fi
+  return 0
+}
+
 if [ -n "$CARD" ]; then
+  case "$CARD_VERB" in
+    replay|publish|follow|lookup)
+      CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
+      trap 'rm -rf "$CARD_TMP"' EXIT ;;
+  esac
   case "$CARD_VERB" in
     write)  write_card write; write_card_file ;;
     replay) print_replay; write_card_file ;;
     append|check)
       CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
       trap 'rm -rf "$CARD_TMP"' EXIT
-      if [ "$CARD_VERB" = append ]; then add_card_body; write_card_file; else check_card; fi ;;
+      if [ "$CARD_VERB" = append ]; then
+        add_card_body; write_card_file
+        # The publish at READY (S3): a body landing a real READY line and a route publishes its build's card.
+        if [ "$CARD_APPEND_READY" = 1 ] && [ "$CARD_ROUTE" = 1 ] && _b=$(read_card_build "$CARD_TMP/body") && [ -n "$_b" ]; then
+          if _s=$(read_card_policy card.snapshot); then
+            write_build_card "$_b" "" session append "$([ "$_s" = every-transition ] && echo 1 || echo 0)" 0
+          else printf 'card — skipped: card.snapshot refused: %s\n' "${_s%%$'\n'*}"; fi
+        fi
+      else check_card; fi ;;
+    publish)
+      [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so there is no card to publish"; exit 2; }
+      if _s=$(read_card_policy card.snapshot); then
+        write_build_card "$CARD_BUILD" "" session publish "$([ "$_s" = every-transition ] && echo 1 || echo 0)" 0
+      else printf 'card — skipped: card.snapshot refused: %s\n' "${_s%%$'\n'*}"; fi ;;
+    follow) write_card_follow "$CARD_BUILD" "$CARD_STEP" "$CARD_TERMINAL" ;;
+    lookup) resolve_build_card "$CARD_BUILD"; write_card_file ;;
   esac
   exit 0
 fi

@@ -211,6 +211,15 @@ confirms. Quote that answer under the brief's `## Owner confirmation`; its skele
 append its `## route`.
 On go, a code build continues in `/build` where the project ships it.
 
+**Resume.** A replayed card whose `## route` names a build is first re-keyed from that build's card,
+then the replay prints `route — re-checked · <verdict>`, a `resume —` line (resume.context) and
+`partial — <n> uncommitted path(s) · resume.partial: <value>`. Take that value's act before any new
+work: `continue-item` keeps the work and continues the routed item, its witness still owed;
+`restart-item` commits the work to the side branch `partial/<slug>/<sid8>` (`<sid8>` the session id's
+first eight characters) and only then restores the tree to `HEAD`, so nothing is lost; `ask-owner`
+asks the owner what to do with it, or, under a mandate, parks the item with the paths named. A
+re-check other than `ok` is a route that no longer holds: kick off again.
+
 ## Step 5b — the unattended hand-back (only inside a run actually started as one)
 
 **Default is the stop above.** This step fires only when the project adopts an unattended-run kit

@@ -2316,6 +2316,26 @@ printf 'a lone CR (0x0D) here:%bX
 commit_all "$R" "embed a CR"
 run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --"
 
+# ---- TOOL-dPlacedRequest-2: the build card, through card-store.fixture.sh beside this checker ------
+# Each plant builds its own scratch repository and bare remote and removes them, so these arms share
+# nothing with the card clone above: the publish and its parented second write (AC2), the follow at a
+# move and at a terminal one (AC4), the lookup on a second clone whose stale cache is not trusted —
+# the failing case — (AC6), R7's refusal of a route to an ended build (AC9) and a terminal follow run
+# twice leaving one record (AC13). A plant counts only when it exits 0 and printed a held line. The
+# fixture is gov's and ships to no adopter (the deployer registry exempts it), so a copy of this suite
+# with no fixture beside its checker says so and runs none of these arms.
+cs_fx="$(dirname "$CHECK")/card-store.fixture.sh"
+[ -f "$cs_fx" ] || echo "skip TOOL-dPlacedRequest-2 the card-store plants: no card-store.fixture.sh beside $CHECK, gov's fixture, which ships to no adopter"
+for cs_plant in publish follow-rerender lookup terminal-route close-follow-twice; do
+  [ -f "$cs_fx" ] || break
+  cs_out=$(TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" 2>&1); cs_rc=$?
+  if [ "$cs_rc" = 0 ] && printf '%s\n' "$cs_out" | grep -q ' · held$' && ! printf '%s\n' "$cs_out" | grep -q ' · MISSED$'; then
+    echo "ok   TOOL-dPlacedRequest-2 the card-store plant $cs_plant holds"; pass=$((pass+1))
+  else
+    echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; printf '%s\n' "$cs_out" | sed 's/^/    /'; fail=$((fail+1))
+  fi
+done
+
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
 leaked=$(ls "$real_common/orientation" 2>/dev/null | grep -c "^$NONCE-" || true)
@@ -2368,7 +2388,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # block; no suite ran in the pass, the card's awk was probed alone over nine rows.
 # +6: TOOL-dPlacedRequest-9 AC5's `## pockets` block, three run_card and three check_eq calls, counted off
 # the block; no suite ran in the pass, each card write was probed alone over a scratch fixture.
-FLOOR_ASSERTIONS=358
+# +5: TOOL-dPlacedRequest-2's build card block, one check per card-store plant, counted off the block;
+# no suite ran in the pass, each plant was run alone over its own scratch remote.
+FLOOR_ASSERTIONS=363
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

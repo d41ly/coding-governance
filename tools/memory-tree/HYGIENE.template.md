@@ -659,8 +659,9 @@ carry it too:
   `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
   records") · `transition` (one build stage move, in the grammar under "Transition records") ·
   `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
-  records"). The nine after `research` are the typed kinds: each record is named
-  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
+  records") · `card` (a build's orientation card at one step, its snapshot, fields `Build`, `Step` and
+  `Ref` and the card's text in one `~~~~` fenced block). The ten after `research` are the typed
+  kinds: each record is named `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,

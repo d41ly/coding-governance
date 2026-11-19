@@ -1726,6 +1726,25 @@ run_sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":
 check_sub_context "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
 SG_PROJECT="$SG_CWD_FIX"
 
+# ---- TOOL-dPlacedRequest-2 AC10: readCard asks the kickoff checker's --card --path, never derives it ----
+# A stub checker answering a planted card's path is read; one that exits 1 printing nothing reads as
+# no card, named — the failing case, a checker that does not answer read as a card. readCard's third
+# argument is the checker, so no resolver is involved; the source holds the call and no join of its own.
+sg_cc="$TMP/cardcheck"; mkdir -p "$sg_cc"
+printf 'card — the stub card\n' > "$sg_cc/stub-card.md"
+# The stub prints its own directory as its bash spells it, a /tmp/… mount on Windows among them.
+printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$(cd "$(dirname "$0")" && pwd)/stub-card.md"' > "$sg_cc/answers.sh"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$sg_cc/silent.sh"
+sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null" : c.text.trim())' "$HOOK" "$SGFIX/.git" "$sg_cc/answers.sh" 2>&1)
+[ "$sg_got" = "card — the stub card" ] && { echo "ok   AC10 readCard reads the path the checker answers"; pass=$((pass+1)); } \
+  || { echo "FAIL AC10 readCard reads the path the checker answers: $sg_got"; fail=$((fail+1)); }
+sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : "read")' "$HOOK" "$SGFIX/.git" "$sg_cc/silent.sh" 2>&1)
+case "$sg_got" in "null · (no card: the kickoff checker's --card --path did not answer"*) echo "ok   AC10 a checker that does not answer reads as no card, named"; pass=$((pass+1)) ;;
+  *) echo "FAIL AC10 a checker that does not answer reads as no card, named: $sg_got"; fail=$((fail+1)) ;; esac
+if grep -q "'--card', '--path'" "$HOOK" && [ "$(grep -c "'orientation', sid" "$HOOK")" = 0 ]; then
+  echo "ok   AC10 the hook asks --card --path and joins no card path of its own"; pass=$((pass+1))
+else echo "FAIL AC10 the hook asks --card --path and joins no card path of its own"; fail=$((fail+1)); fi
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1767,8 +1786,10 @@ n=$((pass+fail))
 # counted by hand under the same rule.
 # 390 = 388 + the 2 policy-file rows of TOOL-dDeclaredLoop-2 above, at dDeclaredLoop's reconcile of origin/main
 # 4e6ac5f7c, counted by hand under the same rule.
+# 393 = 390 + the 3 readCard rows TOOL-dPlacedRequest-2 added for its AC10 (the stub's path read, the
+# silent checker read as no card, the source's one call), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=390
+FLOOR_ASSERTIONS=393
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

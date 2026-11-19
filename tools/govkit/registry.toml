@@ -377,6 +377,10 @@ path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
 
 [[exempt]]
+path = "skills/session-kickoff/card-store.fixture.sh"
+why = "gov's own fixture for the build card, deliberately not shipped. Each case copies the memory-tree and loop kits out of the tree it sits in into a scratch repository and drives the engine beside it against a bare remote; the kickoff self-test's arm runs it where it sits beside the checker and says so where it does not. TOOL-dPlacedRequest-2 S12."
+
+[[exempt]]
 path = "skills/session-kickoff/card-compaction.fixture.sh"
 why = "gov's own live fixture for the orientation card file, deliberately not shipped. It drives two headless `claude` sessions and a compaction, minutes of model time and API tokens, so the main loop runs it live and no target receives it: a target has no build whose card it would prove. PLAY-dOrderedCharter-8 S1; exempted by PLAY-dOrderedCharter-77 S7."
 

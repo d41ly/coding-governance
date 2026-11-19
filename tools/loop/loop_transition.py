@@ -376,7 +376,8 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     """Record one build move in the repository at `root`, an absolute path: `(move fields, the commit's
     sha or None, [record paths], the line or None, [order lines])`, the order lines `loop: order · <path>`
     per `item-ended` order or one `loop: composition · unread · <why>`, after a `loop: scenario · unread`
-    line where the scenario composition is unarmed. TransitionRefused where no row holds the move;
+    line where the scenario composition is unarmed, then the build card follow's `card —` lines
+    (`write_card_follow`, TOOL-dPlacedRequest-2 S4). TransitionRefused where no row holds the move;
     ValueError on a value, witness, index, policy read, tag resolver or scenario conflict refused, writing
     no record; LookupError where a kit it reads does not resolve."""
     from composition import PINNED, derive_composition_revision, read_step_composition, write_ended_orders
@@ -531,7 +532,55 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
         if prior is not None:
             newest.write_bytes(prior)
         raise
+    # the build's card follows the move, its last step (TOOL-dPlacedRequest-2 S4); the move stands whatever it prints
+    said += write_card_follow(root, build, to, to in read_transition_rows(data, where)["terminal"])
     return move, commit, wrote, render_transition_line(move) if "micro-format" in chosen else None, said
+
+
+#: The kickoff engine the card follow runs, homed as the roles kit's handoff finds it (TOOL-dPlacedRequest-2 S4).
+KICKOFF_HOME, KICKOFF_ENGINE = "session-kickoff", "manifest-check.sh"
+#: The follow's bound in seconds: the engine's own reads and its push are each bounded inside it.
+CARD_FOLLOW_BOUND_S = 120
+
+
+def resolve_kickoff_engine(root):
+    """The kickoff engine, an optional sibling: through the inline kit resolver from this kit, else the ONE
+    file of that name `root` tracks, since gov homes that kit under `skills/`, where no probe walks. None
+    when neither answers, or the index names two."""
+    from loop_lib import resolve_kit_dir
+    try:
+        return resolve_kit_dir(KICKOFF_HOME, KICKOFF_ENGINE, KIT) / KICKOFF_ENGINE
+    except LookupError:
+        pass
+    rc, out = read_git(root, "ls-files", "--", KICKOFF_ENGINE, "*/" + KICKOFF_ENGINE)
+    hits = [ln for ln in out.splitlines() if ln.strip()] if rc == 0 else []
+    return pathlib.Path(root, hits[0]) if len(hits) == 1 and pathlib.Path(root, hits[0]).is_file() else None
+
+
+def write_card_follow(root, build, state, terminal):
+    """The build card follows a recorded move: `manifest-check.sh --card --follow --build <build> --to <state>`,
+    `--terminal` where the state is in the `terminal` set, run in `root` with stdin closed and a bound. ->
+    its printed lines, or one `card — skipped:` line where no engine or bash resolves or the run does not
+    answer. Never raises: the move stands whatever the card does."""
+    import subprocess
+    from loop_witness import read_clean_env, resolve_bash
+    engine = resolve_kickoff_engine(root)
+    if engine is None:
+        return ["card — skipped: no kickoff engine"]
+    bash = resolve_bash(engine.as_posix())
+    if bash is None:
+        return ["card — skipped: no bash runs the kickoff engine %s" % engine.as_posix()]
+    argv = [bash, engine.as_posix(), "--card", "--follow", "--build", build, "--to", state]
+    try:
+        p = subprocess.run(argv + ["--terminal"] * bool(terminal), cwd=str(root), stdin=subprocess.DEVNULL,
+                           capture_output=True, encoding="utf-8", errors="replace", timeout=CARD_FOLLOW_BOUND_S,
+                           env=read_clean_env())
+    except (OSError, subprocess.SubprocessError) as e:
+        return ["card — skipped: the follow did not answer: %s" % e]
+    lines = [ln for ln in p.stdout.splitlines() if ln.strip()]
+    if p.returncode != 0 and not lines:
+        lines = ["card — skipped: the follow exited %d: %s" % (p.returncode, (p.stderr.strip() or "no output").split("\n")[0])]
+    return lines
 
 
 # ------------------------------------------------------------------------------------------ the check

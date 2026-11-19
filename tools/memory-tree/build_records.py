@@ -88,6 +88,12 @@ exactly where `Signals` stands. The door also refuses an `Answers` naming no rec
 build; every refusal exits 1, writing nothing. `--fixture --plant recommendation` stages a score record, the
 reason answering it, each refusal and their bindings.
 
+THE CARD KIND (TOOL-dPlacedRequest-2 S8): `<date>-build-<anchor id>-card-<n>.md`, a build's orientation card
+at one step, its snapshot, the anchor the transition kind's: `Build`, `Step` (one word), `Ref` (the card ref's
+commit, eight to forty hex digits, or `none`), then the card's text in one `~~~~` fenced block. `read_card`
+is its reader, which refuses each of those shapes and a record holding no fenced block. It has no `new`
+door: the kickoff engine's snapshot calls `write_record`.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
@@ -185,6 +191,10 @@ KINDS = {
     "recommendation": {
         "required": ("Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"),
         "closed": (("Score", RECOMMEND_SCORES), ("Binds", RECOMMEND_BINDS)),
+    },
+    "card": {
+        "required": ("Build", "Step", "Ref"),
+        "closed": (),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
@@ -642,6 +652,31 @@ def read_transition(path, text):
 
     fields, bad, name = read_record(path, text, "transition", check_fields=check_fields)
     return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+# -------------------------------------------------------------------------------- the card kind
+def read_card(path, text):
+    """One card record: its fields under their own names, `card` the text of its fenced block, and `id`,
+    `path`, `build`, `n` and `malformed`. Its own rules: `Build` a slug, `Step` one word, `Ref` `none` or eight
+    to forty hex digits, and one `~~~~` fenced block after the fields."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    fences = [i for i, ln in enumerate(lines) if ln == "~~~~"]
+    card = "\n".join(lines[fences[0] + 1:fences[1]]) if len(fences) >= 2 else None
+
+    def check_fields(fields):
+        bad = [] if card is not None else [("card", "is missing: the record holds the card's text in one ~~~~ fenced block")]
+        if "Build" in fields and not SLUG.fullmatch(fields["Build"]):
+            bad.append(("Build", f"{fields['Build']} is not a build slug"))
+        if "Step" in fields and not re.fullmatch(SEG, fields["Step"]):
+            bad.append(("Step", f"{fields['Step']} is not one word"))
+        if "Ref" in fields and not re.fullmatch(r"none|[0-9a-f]{8,40}", fields["Ref"]):
+            bad.append(("Ref", f"{fields['Ref']} is neither none nor eight to forty hex digits"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "card", check_fields=check_fields)
+    return {**fields, "card": card, "id": pathlib.PurePosixPath(path).stem, "path": path,
             "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
             "malformed": bad}
 
@@ -1198,6 +1233,8 @@ def main(argv):
         bad = read_transition(rel, text)["malformed"]
     elif kind == "recommendation":
         bad = read_recommendation(rel, text)["malformed"]
+    elif kind == "card":
+        bad = read_card(rel, text)["malformed"]
     else:
         bad = read_exception(rel, text)["malformed"]
     for ln in text.replace("\r\n", "\n").split("\n"):
