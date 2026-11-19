@@ -202,11 +202,12 @@ blank line, and sixteen `key: value` lines: `slug`, `node`, `host`, `session`, `
 `offer`, `offer-deadline` and `last-fetch`, the first two an offer's target and window (below), `-`
 on every other write, and `last-fetch` this node's last fetch on a queued write, `-` on every other. A lease outside a run writes
 `keepalive: absent`. **The epoch** is 1 on a create, the read epoch plus one on a take of a foreign
-lease, and the read epoch on every other write; every create of a ref the remote no longer holds,
-which this node's feed names (a `--lease` acquire, take-over, draw or offer, a queued create, and the
-driver's own claim writes alike), is parented on the newest commit the feed holds for it at its
+lease, and the read epoch on every other write; every create on an empty parent, of a ref the remote
+no longer holds or, offline, of one neither a queued line nor a cached tip names, which this node's
+feed names (a `--lease` acquire, take-over, draw or offer, a queued create, and the driver's own
+claim writes alike), is parented on the newest commit the feed holds for it at its
 epoch plus one, so a lease's epoch rises for its whole life. Where that commit is a build or unit
-tombstone the create writes nothing: the `--lease` verbs refuse it `tombstone` and exit 1, the
+tombstone the create writes and queues nothing: the `--lease` verbs refuse it `tombstone` and exit 1, the
 preflight and take-over columns fail check 107 and the holder column check 108, each naming
 `tombstone` and the feed commit, and a status write announces it, exit unchanged. Each commit's
 parent is the ref's previous tip, so the lease's history is its parent chain, every holder and beat

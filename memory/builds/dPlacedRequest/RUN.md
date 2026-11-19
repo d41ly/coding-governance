@@ -147,3 +147,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T15:55:55Z dispatch · item 2125460b TOOL-dPlacedRequest-12 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-12-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
 
 2026-11-19T16:08:32Z dispatch · item 9047d651 TOOL-dPlacedRequest-42 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-42.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-42-1-acceptance-ledger.md
+
+2026-11-19T16:10:09Z brief · item TOOL-dPlacedRequest-42 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

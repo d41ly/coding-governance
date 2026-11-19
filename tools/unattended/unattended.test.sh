@@ -20300,6 +20300,54 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-42 — AN OFFLINE CREATE ON AN EMPTY PARENT READS THE FEED FIRST. Over a fresh lease
+# fixture per case, the build lease of tFix planted by `seed_lease_at`, sighted by a `--claims` read,
+# deleted on the origin outside the kit, a second `--claims` fetching with `--prune` so the cache ref
+# is gone, and the origin renamed away; then `--lease acquire build tFix` runs offline, where no queued
+# line and no cache ref names the ref. Over a build tombstone it exits 1 printing `tombstone` and the
+# queue log stays empty (AC1); over a `released` lease at epoch 4 it queues one line, its expected tip
+# empty, whose commit reads epoch 5 on the feed's commit (AC2); over a ref the feed never named it
+# queues the parentless epoch-1 create (AC3). Each is observed by what the verb does, never by a
+# spelling of the call. RED, observed at the close, is the offline branch staged to read no feed
+# (`write_claim`'s feed read skipped where WL_QUEUE is set), which queues the parentless epoch-1 create
+# over the tombstone and the released lease alike. Waived by README rule 8 with the rest of this suite.
+# WHAT THIS BLOCK DOES NOT DRIVE: the flush of the queued line, TOOL-dPlacedRequest-24's and -41's.
+# ==================================================================================================
+LF=$(mktemp -d)
+for fo_case in tombstone released unnamed; do
+  write_lease_fixture; fo_c=""
+  case "$fo_case" in
+    tombstone) fo_c=$(seed_lease_at tFix/build tFix build b s-o landed "$(derive_claim_now)" 3) ;;
+    released) fo_c=$(seed_lease_at tFix/build tFix build b s-o released "$(derive_claim_now)" 4) ;;
+  esac
+  ( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
+  [ -z "$fo_c" ] || git --git-dir="$LF/origin.git" update-ref -d refs/gov/leases/tFix/build
+  ( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
+  same "DPR42 $fo_case: the pruning fetch leaves no cache ref for the lease" \
+    "$(git -C "$LF/c1" for-each-ref refs/gov/remote/leases/tFix | grep -c .)" "0"
+  mv "$LF/origin.git" "$LF/away.git"; fo_out=$(run_lease_arm acquire build tFix); fo_rc=$?; mv "$LF/away.git" "$LF/origin.git"
+  fo_q=$(cat "$LF/c1/.git/gov-queue.log" 2>/dev/null)
+  fo_qc=$(printf '%s' "$fo_q" | awk -F'\t' 'NF { n++; e = $2; c = $3 } END { print n + 0 " " (e == "" ? "none" : e) " " c }')
+  fo_qn=${fo_qc%% *}; fo_qe=${fo_qc#* }; fo_qe=${fo_qe%% *}; fo_qk=${fo_qc##* }
+  case "$fo_case" in
+    tombstone)
+      same "DPR42 AC1 offline, an acquire over a deleted, pruned build tombstone exits 1 and queues nothing" "$fo_rc $fo_qn" "1 0"
+      hit  "$fo_out" "lease refused — tombstone · tFix/build · the remote no longer holds it, and this node's feed last saw its tombstone $fo_c" ;;
+    released)
+      same "DPR42 AC2 offline, an acquire over a deleted, pruned released lease queues one line, its expected tip empty" "$fo_rc $fo_qn $fo_qe" "0 1 -"
+      same "DPR42 AC2 ...whose commit reads epoch 5 on the feed's commit" \
+        "$(git -C "$LF/c1" log -1 --format=%B "$fo_qk" -- 2>/dev/null | sed -n 's/^epoch: //p') $(git -C "$LF/c1" rev-parse -q --verify "$fo_qk^" 2>/dev/null)" "5 $fo_c" ;;
+    unnamed)
+      same "DPR42 AC3 offline, an acquire of a ref no feed line names queues one line, its expected tip empty" "$fo_rc $fo_qn $fo_qe" "0 1 -"
+      same "DPR42 AC3 ...whose commit reads epoch 1 and has no parent" \
+        "$(git -C "$LF/c1" log -1 --format=%B "$fo_qk" -- 2>/dev/null | sed -n 's/^epoch: //p') [$(git -C "$LF/c1" log -1 --format=%P "$fo_qk" -- 2>/dev/null)]" "1 []" ;;
+  esac
+done
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-12 — THE CREATE-ONLY DECISION AND PROBLEM REGISTERS. Over the lease fixture's
 # origin, its clone c1 under session rA and a second clone c2 under rB, both under RUN_CLAIMS on: the
 # sourced encoder prints each subject of the spec's table, every ref legal (AC1), and two texts never
@@ -22422,7 +22470,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # observation is the close's.
 # RAISED 3804 -> 3820 by TOOL-dPlacedRequest-12's checklist pass: the register block's 16 region-eight
 # refusal arms (8 `same` and 8 `hit`), off the diff's own lines; no skip branch.
-FLOOR_ASSERTIONS=3820
+# RAISED 3820 -> 3829 by TOOL-dPlacedRequest-42: the offline create block's 9 region-eight assertions
+# (8 `same`, 1 `hit`, its loop over three cases run as written), off the diff's own lines; no skip
+# branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3829
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22683,7 +22734,8 @@ FLOOR_SHARD_7=311
 # RAISED 994 -> 1015 by TOOL-dPlacedRequest-28: the same 21 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1015 -> 1035 by TOOL-dPlacedRequest-12: the same 20 region-eight register assertions, see FLOOR_ASSERTIONS.
 # RAISED 1035 -> 1051 by TOOL-dPlacedRequest-12's checklist pass: the same 16 region-eight refusal arms, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1051
+# RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1060
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
