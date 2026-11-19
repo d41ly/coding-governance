@@ -3215,11 +3215,6 @@
     {
       "id": "build_gov_commit",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "build_gov_commit",
-      "kind": "function",
       "file": "tools/lib/gov-ref.sh"
     },
     {
@@ -24560,11 +24555,6 @@
     {
       "id": "remove_gov_ref",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "remove_gov_ref",
-      "kind": "function",
       "file": "tools/lib/gov-ref.sh"
     },
     {
@@ -29616,11 +29606,6 @@
       "id": "run_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
-    },
-    {
-      "id": "run_card_git",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_case",
@@ -36873,6 +36858,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "write_card_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_card_snapshot",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -37531,11 +37521,6 @@
       "id": "write_gov_queue_hold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "write_gov_ref",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_gov_ref",
