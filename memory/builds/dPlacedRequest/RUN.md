@@ -30,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 
 ## Parked
+
+2026-11-19T04:43:32Z review · item dPlacedRequest-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 25 · folded 34 · promoted 0 · disposition fold

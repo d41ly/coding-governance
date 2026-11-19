@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-11 — one compare-and-swap writer for every governance ref, each commit parented on the tip it read, and no lock the lander holds
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 1 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 1 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0129@30a0ceda whole
 
@@ -15,6 +15,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -52,35 +53,47 @@ build adds five more callers of it.
   (`main_local` non-empty), so a push of a `refs/gov/*` ref, or of any other non-default ref, leaves
   `pre-push-refusal`, `pre-push-bar` and `pre-push-allow` as it found them. A default-branch push
   still clears all three before anything writes one. Observed by AC4 and AC5.
-- **S5** — `write_gov_ref` leaves `pre-push-refusal` in place. It names the hook's refusal in
-  `GOVREF_WHY` only on rc 2 and only when that file is newer than the scratch file the call created
-  just before its push (`[ "$rf" -nt "$scratch" ]`), so a stale token is never read as this push's.
-  `GOVREF_GITDIR` names the git dir; empty, it attributes nothing. Observed by AC4 and AC6.
-- **S6** — The lander lock leaves both kits. `write_claim` no longer tests push-main's marker, and the
-  lock, its break and its wait are deleted. **Readers:** by name: READER NOT IN TREE: `write_claim_push_lock`, `check_claim_push_lock_stale` and `remove_claim_push_lock`, which TOOL-aPiecewiseGrade-6 renamed to the shared `write_dir_lock`, `check_dir_lock_stale` and `remove_dir_lock` on 2026-11-16, so no tracked reader spells the old names; `tools/unattended/unattended.sh`
-  spells `write_claim_push_lock`, `check_claim_push_lock_stale`, `remove_claim_push_lock`,
-  `claim-push.lock`, `claim-push-lock-broken` and `claim-push-guard-cleared`;
-  `tools/unattended/unattended.test.sh` spells the three functions and `claim-push.lock` in its GH32
-  AC6, GH36 AC14 and GH37 blocks; `tools/push-main.sh` spells `check_claim_push_clear`,
-  `CLAIM_WAIT_CEILING` and `claim-push.lock`; `tools/push-main.test.sh` spells `claim-push.lock` in
-  its 2d and 2e arms; `tools/unattended/README.md` spells `claim-push-lock-broken` and
-  `claim-push-guard-cleared`. by value: NO VALUE READERS — no file other than the two health-event
-  writers counts those two events, and `skills/session-kickoff/manifest-check.sh` counts health-log
-  lines without reading an event name. Observed by AC7.
-- **S7** — The records name the parent: the claim block's header (`unattended.sh:2077`) and the stops
-  guide's section 7 (`tools/unattended/STOPS.template.md:189`, rendered to
+- **S5** — `write_gov_ref` leaves `pre-push-refusal` in place and never names a token as this push's
+  cause. The file is one per git dir, and with S6's lock gone another push from the same git dir can
+  write it while this call runs, so a token newer than the scratch file the call created just before
+  its push (`[ "$rf" -nt "$scratch" ]`) is advisory only: on rc 2 `GOVREF_WHY` appends
+  ` · a pre-push refusal was recorded during this push: <token>`. The cause `GOVREF_WHY` names is this
+  push's own porcelain reason. The `default-branch` hint, ` · default-branch · fix once: git remote
+  set-head <remote> -a`, is added only from this call's own read: the push was declined and
+  `git symbolic-ref -q refs/remotes/<remote>/HEAD` prints nothing. `GOVREF_GITDIR` names the git dir;
+  empty, it reads no token. Observed by AC4, AC6 and AC9.
+- **S6** — The lander lock leaves both kits. Deleted: `write_claim`'s take and release of
+  `claim-push.lock` (`tools/unattended/unattended.sh#write_claim`, its `write_dir_lock … claim-push`
+  and `remove_dir_lock` lines) with its `busy` branch, `write_claim`'s `push-main-active` test, the
+  lander's wait (`tools/push-main.sh#check_claim_push_clear`, `CLAIM_WAIT_CEILING` and their two calls),
+  and the arms that observe that take and that wait. Kept, and neither deleted nor edited here: the
+  shared `write_dir_lock`, `check_dir_lock_stale`, `remove_dir_lock` and `write_dir_lock_pid`
+  (`tools/unattended/unattended.sh#write_dir_lock`), which `init_spec_token_check` takes and releases
+  for `spec-tokens.<slug>.lock` and `TOOL-dPlacedRequest-24` S1 moves into `gov_feed_sh`.
+  **Readers:** rebuilt from `git grep -n 'claim-push' -- ':!memory'` on 2026-11-19 at
+  `unattended.sh` blob `875eaadf`, `unattended.test.sh` blob `72d9634c`, `push-main.sh` blob
+  `cd8cf562` and `README.md` blob `1ab759b7`. by name: `tools/unattended/unattended.sh` spells `claim-push.lock`
+  in `write_claim`'s take, its `busy` message, and the comments above `write_claim` and the shared
+  factory; `tools/push-main.sh` spells it in `check_claim_push_clear` and its comment;
+  `tools/push-main.test.sh` spells it in arms 2d and 2e, deleted; `tools/unattended/unattended.test.sh`
+  spells it in the GH32 AC6 arm, inverted, the GH36 AC14 block, deleted, and the GH37 blocks and
+  TOOL-aPiecewiseGrade-6's AC14 loop, which drive the shared factory with `claim-push` as a test stem
+  and stay; `tools/unattended/README.md` spells `claim-push-lock-broken` and
+  `claim-push-guard-cleared` in its health-event sentence, which S7 rewrites. by value: NO VALUE
+  READERS — the factory composes `<stem>-lock-broken` and `<stem>-guard-cleared` and no file counts
+  those two events, and `skills/session-kickoff/manifest-check.sh` counts health-log lines without
+  reading an event name. Observed by AC7.
+- **S7** — The records name the parent: the claim block's header (`unattended.sh:2077` at the pinned
+  base) and the stops guide's section 7 (`tools/unattended/STOPS.template.md:189`, rendered to
   `memory/guides/UNATTENDED-STOPS.md`) say each claim commit's parent is the ref's previous tip and a
-  create is the one parentless commit, and `tools/unattended/README.md:249-251` drops the two lock
-  events. **Readers:** by name: `tools/unattended/README.md` (:250-251) and
-  `tools/unattended/unattended.sh` (:2338, :2351) spell `claim-push-lock-broken` and
-  `claim-push-guard-cleared`, and `tools/unattended/unattended.test.sh` (:16251, :16257) asserts both;
-  S6 deletes the two writers and their arms with the lock. by value: NO VALUE READERS — no file other
-  than the two health-event writers counts those two events, and
+  create is the one parentless commit, and `tools/unattended/README.md`'s health-event sentence drops
+  the two `claim-push` events and keeps the `spec-tokens` pair. **Readers:** by name:
+  `tools/unattended/README.md` spells `claim-push-lock-broken` and `claim-push-guard-cleared` in that
+  sentence, and `tools/unattended/unattended.test.sh`'s GH37 blocks assert both as the factory's
+  output under the test stem `claim-push`, which they keep. by value: NO VALUE READERS — no file other
+  than the factory's event call writes those two events, and
   `skills/session-kickoff/manifest-check.sh` counts health-log lines without reading an event name.
   Observed by AC7.
-- **S8** — The parity row `gov_ref_sh|$ROOT/$KIT_REL/gov-ref.sh|$KIT_REL/gov-ref` in `PARITY_ROWS` of
-  `tools/lib/resolve-python.test.sh`, so a drifted inline copy reds the `python resolver` leg as
-  `health_log_sh` does. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -136,9 +149,9 @@ the scratch worktree. The writer:
 3. Reads the one porcelain line ending in `:<ref>` and decides as both copies decide today: the bound
    firing (rc 124), no status line, or a `!` line without `(stale info)` or `(fetch first)` is 2; a `!`
    line with either is 1; any other flag is 0.
-4. On 2, appends ` · the pre-push hook refused it: <token>` when the refusal file is newer than the
-   scratch file, and the `git remote set-head <name> -a` hint on a `default-branch` token, as
-   `write_claim` does at `:2438-2441`.
+4. On 2, appends ` · a pre-push refusal was recorded during this push: <token>` when the refusal
+   file is newer than the scratch file, an advisory only (S5), and the `default-branch` hint with
+   `git remote set-head <name> -a` when `git symbolic-ref -q refs/remotes/<name>/HEAD` prints nothing.
 5. Removes the scratch file. rc 0 leaves through one exit, the seam `TOOL-dPlacedRequest-13` hooks.
 
 `build_gov_commit` runs `git mktree </dev/null`, then `commit-tree <tree> [-p <tip>] -m <message>`
@@ -194,15 +207,17 @@ for an adopter whose switch is off, as today. The hook change ships to every pus
 
 - `tools/lib/gov-ref.sh`: the canonical block, new
 - `tools/lib/resolve-python.test.sh`: the `gov_ref_sh` parity row
-- `tools/unattended/unattended.sh`: the inline block, `write_claim` as an adapter, the lock and the
-  marker test deleted, the header at `:2077`, `KIT_UNATTENDED_VERSION` moved
-- `tools/unattended/unattended.test.sh`: the GH32 AC6 arm inverted, the GH36 AC14 and GH37 lock blocks
-  deleted, `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` moved by the diff's count
+- `tools/unattended/unattended.sh`: the inline block, `write_claim` as an adapter, its lock take and
+  the marker test deleted, the shared `write_dir_lock` family kept, the header at `:2077`; the kit
+  version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
+- `tools/unattended/unattended.test.sh`: the GH32 AC6 arm inverted, the GH36 AC14 block deleted, the
+  GH37 blocks kept, `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` moved by the diff's count
 - `tools/unattended/STOPS.template.md`: section 7's record sentence
 - `memory/guides/UNATTENDED-STOPS.md`: its render
 - `tools/unattended/README.md`: the health-event sentence
 - `tools/run-gates/post-merge.sh`: the inline block, `write_red_ref` as an adapter
-- `tools/run-gates/run-gates.sh`: `KIT_RUN_GATES_VERSION` moved, post-merge being a shipped byte
+- `tools/run-gates/post-merge.sh` is a shipped byte of the run-gates kit, whose version is minted by
+  the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
 - `tools/push-main.sh`: `check_claim_push_clear`, `CLAIM_WAIT_CEILING` and their two calls deleted
 - `tools/push-main.test.sh`: arms 2d and 2e deleted
 - `.githooks/pre-push`: the clear moved
@@ -267,20 +282,27 @@ for an adopter whose switch is off, as today. The hook change ships to every pus
 - **AC7** — When `grep -n 'claim-push.lock\|check_claim_push_clear\|CLAIM_WAIT_CEILING\|push-main-active'`
   runs over `unattended.sh` and `push-main.sh`, it finds no line in `unattended.sh` and only the
   marker's own lines in `push-main.sh`, and `grep -n 'parentless' STOPS.template.md` finds only the
-  sentence naming a create as the one parentless commit.
-  Red when: a lock, a wait or the marker test survives, or the guide still calls every claim parentless.
+  sentence naming a create as the one parentless commit. `grep -n 'write_dir_lock' tools/unattended/unattended.sh`
+  still finds the line defining `write_dir_lock()` and the take `write_dir_lock "$ST_LOCK"`.
+  Red when: a lock, a wait or the marker test survives, the guide still calls every claim parentless,
+  or the shared factory or its spec-tokens take is deleted with the claim-push lock.
 - **AC8** — When `awk` cuts each block from its `# >>> gov_ref_sh` line to its `# <<< gov_ref_sh` line
   in `gov-ref.sh`, `unattended.sh` and `post-merge.sh`, `cmp` finds the three cuts equal, and
   `grep -c '^gov_ref_sh|' resolve-python.test.sh` prints 1.
   Red when: the row is absent, so a drifted copy passes.
+- **AC9** — When `GOVREF_RUNNER` names a stub that writes `gate-red` into
+  `$GOVREF_GITDIR/pre-push-refusal` and exits 124, so the token lands after the call's scratch file
+  exists, `write_gov_ref` returns 2 and `GOVREF_WHY` carries `a pre-push refusal was recorded during
+  this push: gate-red`, no `the pre-push hook refused it`, and no `git remote set-head`.
+  Red when: a token another push wrote during this call is reported as this push's refusal.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `pre-push self-test` · `pre-push run-log line` · `push-main self-test` · `measure-legs selftest` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `unattended kit gate` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `pre-push self-test` · `pre-push run-log line` · `push-main self-test` · `measure-legs selftest` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `unattended kit gate` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `gov_ref_sh` row's parity loop, staged by a one-byte edit of the post-merge copy · none
 New arm: .githooks/pre-push.test.sh · covers AC4 AC5 · a non-default push over planted verdict files, staged by restoring the clear above the ref loop · none
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC4 · the GH32 AC6 arm inverted to a beat that renews while `push-main-active` exists and leaves `pre-push-refusal` byte-identical, staged by restoring the marker test in `write_claim` · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` fall by the deleted lock arms, counted off the diff
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC4 · the GH32 AC6 arm inverted to a beat that renews while `push-main-active` exists and leaves `pre-push-refusal` byte-identical, staged by restoring the marker test in `write_claim` · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` fall by the deleted lock arms, counted off the diff · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and AC1 and AC4's probes are the observation at landing
 New arm: tools/push-main.test.sh · covers none · arms 2d and 2e deleted with the wait they observed, no staged break · none
 
 ## 8. Open questions
@@ -301,7 +323,9 @@ New arm: tools/push-main.test.sh · covers none · arms 2d and 2e deleted with t
   a hook shipped verbatim, which veto 2 discards outside the grant's clause; (c) drops the
   `default-branch` hint today's callers print. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. A
   token the hook writes in the same filesystem tick as the scratch file reads as stale and is omitted,
-  which loses a hint and never misattributes one. widens: none · relaxes: none
+  which loses a hint. A token another push from the same git dir writes during this call reads as
+  fresh, which the `-nt` test cannot tell from this push's own, so rev-4 prints every fresh token as
+  an advisory and never as this push's cause (S5). widens: none · relaxes: none
 - **F4 — Where does `build_gov_commit` live?** (a) In the shared block; (b) in the driver beside
   `write_claim`. Units 12, 19, 21 and 2 build gov commits in files the scouts place outside the driver,
   and a probe sources the shared file whole. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3,
@@ -317,6 +341,13 @@ New arm: tools/push-main.test.sh · covers none · arms 2d and 2e deleted with t
   hands-off to TOOL-dPlacedRequest-14.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-33,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-11-19 · §2 S5, S6, S7 · §4 The block, Files touched · §6 AC6, AC7, AC9 · §7 · §8 F3 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`:
+  findings 16 and 33 (H4), S6 deletes only `write_claim`'s take of `claim-push.lock`, its `busy`
+  branch, the marker test and the lander's wait, keeps the shared `write_dir_lock` family the
+  spec-tokens lock takes, rebuilds its Readers from `git grep`, and AC7 observes the factory kept;
+  finding 24 (H6), the kit versions are the lander's to mint; finding 32 (M9), a fresh refusal token
+  is advisory and never this push's cause, the set-head hint comes from this call's own read, and AC9
+  plants a concurrent token; finding 4 (M3), the unattended.test.sh arm cites README rule 8. §7 also names `scratch-guard self-test`, `tier2-review self-test`, `policy fixtures`, the leg(s) the spec-token guard join names for this spec's Files touched.
 
 ## 10. Reuse audit
 

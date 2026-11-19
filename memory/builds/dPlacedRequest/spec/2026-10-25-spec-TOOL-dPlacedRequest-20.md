@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-71
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-71
 
 **Carries:** cl-dClosedLoop-0138@b6141505 whole
 **Carries:** node:policy-key.leases.offer-seconds
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -39,8 +40,11 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
   tag `resolve_fleet_tag`'s registry does not hold is refused before any read.
   `--to <fleet tag>/<session>` offers to one session: it writes `offer: <fleet tag>/<session>`, its
   session half held by TOOL-dPlacedRequest-1's `check_lease_segment` before any read, and S2 classes
-  the lease `offered` for every other session, the named node's included, until the deadline.
-  Observed by AC1, AC2, AC9.
+  the lease `offered` for every other session, the named node's included, until the deadline. A
+  session half that is empty or the literal `absent` exits 2 naming `--to` before any read, because
+  the identity rule TOOL-dPlacedRequest-32 S1 states makes either value no session, so it names no
+  one; this unit applies that rule itself, since it builds before unit 32. Observed by AC1, AC2,
+  AC9.
 - **S2** — The `offered` class: `CLAIM_READS` (`tools/unattended/unattended.sh:2219`) gains `offered`,
   derived for the `lease` mode TOOL-dPlacedRequest-1 adds when the record's `offer` names neither this
   node's fleet tag nor that tag, `/` and this harness's session, and
@@ -89,6 +93,8 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
 - **consumes-from** external — dGroundRules' catalogue row for `leases.offer-seconds` and its reader `python tools/policy/policy.py get <key>`, which the chain builds before this build's build run
 - **hands-off** `TOOL-dPlacedRequest-28` — `write_lease_offer`'s absent-lease branch, which that unit routes through `read_feed_lease_tip`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-34` — S1's `--to <fleet tag>/<session>` form, which that unit's S49 own-tag refusal admits when the session half names another session on the caller's own node
+- **hands-off** `TOOL-dPlacedRequest-32` — `me`'s session half and the `--to` refusal, which apply that unit's S1 identity rule, unset, empty and `absent` one value meaning no session, here first because this unit builds at order 6, so that unit's rule covers the offer read when it lands
 
 ## 4. Design
 
@@ -129,7 +135,9 @@ The offer test sits before the identity rows of the class derivation, in the `le
 offer   = record's `offer`; `-` or empty is no offer
 window  = record's `offer-deadline`; not a whole number reads as expired
 open    = check_deadline_passed <lease ref> <tip> <window> returns 1 or 2
-me      = resolve_fleet_tag's tag, and me/<session> with the session CLAUDE_CODE_SESSION_ID
+me      = resolve_fleet_tag's tag, and me/<session> only when the rule TOOL-dPlacedRequest-32 S1
+          states finds a session, applied here first: CLAUDE_CODE_SESSION_ID unset, empty or `absent` is none, and forms no
+          <tag>/<session>
 offered = offer present, offer equal to neither form of me, and open
 ```
 
@@ -159,7 +167,7 @@ check reads that as red.
 
 | Identifier | Kind | Where |
 |---|---|---|
-| `offer` | an act of the `--lease` verb, with `--to <fleet tag>` | `tools/unattended/unattended.sh` |
+| `offer` | an act of the `--lease` verb, with `--to <fleet tag>[/<session>]` | `tools/unattended/unattended.sh` |
 | `write_lease_offer` | function | `tools/unattended/unattended.sh` |
 | `offered` | claim-read class and refusal cause | `CLAIM_READS`, the refusal line |
 | `offer`, `offer-deadline` | record keys, given behaviour here (I6 declares them) | the lease record |
@@ -235,15 +243,18 @@ is the observation.
 - **AC7** — When `python policy.py get leases.offer-seconds` runs in the built tree it prints `300`,
   and `--lease offer` writes `offer-deadline: 300`.
   Red when: the window is typed in the driver rather than read through `read_lease_bound offer`.
-- **AC8** — When `grep -n "offered" tools/unattended/STOPS.template.md` and
-  `grep -n "lease offer" tools/unattended/VERBS.template.md` run, each finds its row.
-  Red when: either guide omits the class or the act.
+- **AC8** — When `grep -n "offered" tools/unattended/STOPS.template.md`,
+  `grep -n "lease offer" tools/unattended/VERBS.template.md` and
+  `grep -nF -- "--to <fleet tag>/<session>" tools/unattended/VERBS.template.md` run, each finds its row.
+  Red when: either guide omits the class or the act, or the verbs guide omits the session form.
 - **AC9** — When clone A runs `unattended.sh --lease offer unit fx u1 --to b/s1`, the remote record
   reads `offer: b/s1`; clone B then running `--lease acquire unit fx u1` under
   `CLAUDE_CODE_SESSION_ID=s2` within the window prints `lease refused — offered` and leaves the tip
-  unmoved, and under `s1` it lands with `offer: -`; `--to 'b/s 1'` exits 2 before any remote read.
-  Red when: another session on the named node takes the unit before the window passes, or the record
-  names the node alone.
+  unmoved, and under `s1` it lands with `offer: -`; `--to 'b/s 1'`, `--to b/absent` and `--to b/`
+  each exit 2 before any remote read. Over the offer to `b/s1`, clone B under
+  `CLAUDE_CODE_SESSION_ID=absent`, and again with it unset, prints `lease refused — offered`.
+  Red when: another session on the named node takes the unit before the window passes, the record
+  names the node alone, or a caller with no session matches an offer to a session.
 
 ## 7. Gates
 
@@ -287,6 +298,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 AC9 �
   `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: `--to <fleet tag>/<session>` offers to one
   session, every other session on the named node included reading `offered` until the deadline; §7
   gains the two legs the spec-token guard join names.
+- rev-5 · 2026-11-19 · §2 S1 · §3 Edges · §4 The class derivation, Inventory · §6 AC8, AC9 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 22
+  (H5), a hands-off to TOOL-dPlacedRequest-34 S49 names the own-node session offer its own-tag refusal
+  must admit; findings 3, 18 and 29 (M2), the caller's session half follows TOOL-dPlacedRequest-32 S1's
+  rule, a `--to` whose session half is empty or `absent` exits 2, the hands-off edge to
+  TOOL-dPlacedRequest-32 is added in build order, the Inventory row spells the session form, and AC8 and AC9 observe
+  both.
 
 ## 10. Reuse audit
 

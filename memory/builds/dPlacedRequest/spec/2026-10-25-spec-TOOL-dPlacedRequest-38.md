@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-38 — the parity leg runs every inline `gov_feed_sh` copy under `set -u` with nothing from its carrier
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -52,7 +53,7 @@ copy of the block in an empty environment under `set -u`, so a block reading a c
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-24` — `write_node_lock`, `remove_node_lock` and the `gov_feed_sh` block's lock, which this arm executes per copy; without the factory the arm has nothing to exercise
+- **consumes-from** `TOOL-dPlacedRequest-24` — `write_dir_lock`, `remove_dir_lock` and the `gov_feed_sh` block's lock, which this arm executes per copy; without the factory the arm has nothing to exercise
 - **hands-off** `TOOL-dPlacedRequest-49` — the carrier arm and §5, which that unit's items for findings 10, 18, 27, 29, 35 and 39 commit, time, sequence, scope and fix
 - **hands-off** `TOOL-dPlacedRequest-52` — the carrier arm's population and §3's carriage non-goal, which that unit's items for findings 6 and 18 make the one carriage check
 
@@ -64,9 +65,9 @@ copy of the block in an empty environment under `set -u`, so a block reading a c
 for f in $(git grep -l '^# >>> gov_feed_sh'):
   blk gov_feed_sh "$f" > feed.cut ; blk health_log_sh health-log.sh > health.cut
   env -i PATH="$PATH" HOME="$HOME" bash -c 'set -u; . health.cut; . feed.cut
-      write_node_lock "$c/gov-feed.lock" t1 && remove_node_lock "$c/gov-feed.lock" t1
+      write_dir_lock "$c/gov-feed.lock" t1 "$NODE_LOCK_BOUND" node && remove_dir_lock "$c/gov-feed.lock" t1
       plant "$c/gov-feed.lock" with until = EPOCHSECONDS - 1
-      write_node_lock "$c/gov-feed.lock" t2 && remove_node_lock "$c/gov-feed.lock" t2
+      write_dir_lock "$c/gov-feed.lock" t2 "$NODE_LOCK_BOUND" node && remove_dir_lock "$c/gov-feed.lock" t2
       add_feed_event refs/gov/bar-red <commit>' 2> err
   rc != 0, or err holds "unbound variable" or "command not found", or $c/gov-feed.lock exists
       -> bad "$f: <first line of err>"
@@ -109,9 +110,9 @@ take, such as the guard-cleared branch, escapes it, and the guard-cleared path i
 The fixture is a scratch directory holding hand-written carrier files, each a copy of the canonical
 `gov_feed_sh` block with the edit named, and the probe is S1's loop body run over them.
 
-- **AC1** — When the probe runs over a scratch carrier whose `write_node_lock` carries the verbatim
-  claim-push body (`tools/unattended/unattended.sh:2331-2354`), it prints that file and
-  `REMOTE_BOUND: unbound variable`, and exits 1.
+- **AC1** — When the probe runs over a scratch carrier whose `NODE_LOCK_BOUND` line reads
+  `NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))`, the hold `write_claim` passes the claim-push lock, it
+  prints that file and `REMOTE_BOUND: unbound variable`, and exits 1.
   Red when: a copy that aborts under `set -u` passes, the staged case being this very plant.
 - **AC2** — When the probe runs over a scratch carrier whose block reads only its own names, it prints
   nothing, exits 0, and no `gov-feed.lock` remains in the scratch common dir.
@@ -123,7 +124,7 @@ The fixture is a scratch directory holding hand-written carrier files, each a co
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
-New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · every inline `gov_feed_sh` copy run under `set -u` in an empty environment, staged by a scratch copy holding the verbatim claim-push body · none
+New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · every inline `gov_feed_sh` copy run under `set -u` in an empty environment, staged by a scratch copy whose bound reads the driver's `REMOTE_BOUND` · none
 
 ## 8. Open questions
 
@@ -138,6 +139,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · every inline 
   24 (HIGH, item H1, shared with findings 2, 13 and 32).
 - rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
+- rev-4 · 2026-11-19 · §3 Edges · §4 The arm · §6 AC1 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's, each take passing `"$NODE_LOCK_BOUND"` and the stem `node`; AC1's plant is a take that passes the driver's bound.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 |
 | [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -58,13 +59,13 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
   `TOOL-dPlacedRequest-44`'s §4 oracle, so the build carries one version-bump oracle and no
   `git diff` from the fixed base. Observed by AC3.
 - **S4** — finding 9 (M3). `TOOL-dPlacedRequest-39` AC1 and its §4 agree: the `EXIT` trap is armed
-  before `write_node_lock` runs (S6), so AC1's plant "directly after the lock take" sits under the
+  before `write_dir_lock` runs (S6), so AC1's plant "directly after the lock take" sits under the
   trap, and §4's sketch shows that order. Observed by AC4.
-- **S5** — finding 14 (M3), the skeptic's corrected fix. `write_node_lock` writes `owner` first and
+- **S5** — finding 14 (M3), the skeptic's corrected fix. `write_dir_lock` writes `owner` first and
   `until` second, on the first take and on the re-take after a break, so a taken lock always carries
-  its token and `remove_node_lock` can match it. Observed by AC5.
+  its token and `remove_dir_lock` can match it. Observed by AC5.
 - **S6** — finding 34 (M3). In `add_feed_event`'s subshell the `EXIT` trap is installed before
-  `write_node_lock` and acts only when `_fl_mine` is set; `write_node_lock` sets `_fl_mine=1` in the
+  `write_dir_lock` and acts only when `_fl_mine` is set; `write_dir_lock` sets `_fl_mine=1` in the
   same shell right after its own successful `mkdir`. The trap clears the lock directory when
   `_fl_mine` is set and `owner` is absent or reads this token. `TOOL-dPlacedRequest-39` S2 states the
   order, and its §3 "any such name, present or future" is narrowed to the windows the trap covers.
@@ -176,7 +177,7 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-2` — the card-store fixture, which S18 gives the `publish-late` plant
-- **consumes-from** `TOOL-dPlacedRequest-24` — `write_node_lock`, whose write order S5 sets
+- **consumes-from** `TOOL-dPlacedRequest-24` — `write_dir_lock`, whose write order S5 sets
 - **consumes-from** `TOOL-dPlacedRequest-33` — `--card-ref write`'s bound, which S1 names
 - **consumes-from** `TOOL-dPlacedRequest-34` — AC59, which S3 rewrites
 - **consumes-from** `TOOL-dPlacedRequest-36` — the Goal, S2, AC1 to AC3 and §4, which S7, S9, S24 and S30 amend
@@ -198,7 +199,7 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 add_feed_event ref commit           (caller's shell: dir, tree, as TOOL-dPlacedRequest-39)
   ( _fl_mine=
     trap '[ -n "$_fl_mine" ] && owner absent or == tok && rm -rf "$dir/gov-feed.lock"' EXIT
-    write_node_lock "$dir/gov-feed.lock" "$tok" || exit 3
+    write_dir_lock "$dir/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node || exit 3
         mkdir ok -> _fl_mine=1; owner <- tok; until <- EPOCHSECONDS + NODE_LOCK_BOUND
     key check, counter, append )
 ```
@@ -231,8 +232,9 @@ caller: overlaps | claims | card publish | card lookup each prints its own line 
   (`manifest-check.sh:220`, `:224`, `:228`); `CARD_FETCH_BOUND` has no value at the base, and
   `TOOL-dPlacedRequest-2`:79, `TOOL-dPlacedRequest-33`:47 and :100, and `TOOL-dPlacedRequest-34`:65
   spell it.
-- The claim-push body the factory inherits writes `until` then `owner` (`unattended.sh:2347-2348`), and
-  `check_claim_push_lock_stale` falls back to `-mmin +2` with no `until` (`:2329`).
+- The shared factory writes `until` then `owner` (`tools/unattended/unattended.sh#write_dir_lock`),
+  and `check_dir_lock_stale` falls back to `-mmin +2` with no `until` and no pid file
+  (`#check_dir_lock_stale`).
 - The take-over identity rows: `unattended.sh:2260-2263`; the `same` row needs a `prior-session` fact.
 - The parity loop's population: `resolve-python.test.sh:218`; its non-empty arm: `:221`.
 - `stop-guard.js:97` declares `LIVENESS_BOUND_MS`; `:106-114` is `runLiveness`.
@@ -293,11 +295,11 @@ block, each `RUN_CLAIMS=on` unless stated.
   prints 0, and AC59 there names `TOOL-dPlacedRequest-44`. Red when: two oracles answer one question.
 - **AC4** — When unit 39's AC1 probe runs as written over the built block, it prints `after` and no
   `gov-feed.lock` remains. Red when: the plant precedes the trap.
-- **AC5** — When `: "$GOVFEED_PLANT_UNSET"` is planted in a scratch cut of `write_node_lock` after its
+- **AC5** — When `: "$GOVFEED_PLANT_UNSET"` is planted in a scratch cut of `write_dir_lock` after its
   first write and the take runs under `set -u` in a subshell, the lock directory's `owner` reads the
   token. Red when: an abort leaves a lock with no owner.
 - **AC6** — When that plant sits between the `mkdir` and the first write and
-  `bash -c 'set -u; . cut.sh; add_feed_event refs/gov/bar-red "$h"; echo after'` runs, it prints
+  `bash -c 'set -u; . "$1"; add_feed_event refs/gov/bar-red "$2"; echo after' _ "$s/cut.sh" "$h"` runs, it prints
   `after`, no `gov-feed.lock` remains, and a second clean call appends one line. Red when: an abort
   inside the factory leaves the lock for two minutes.
 - **AC7** — When unit 36's restated AC3 runs over a scratch tree whose one carrier holds
@@ -358,7 +360,7 @@ block, each `RUN_CLAIMS=on` unless stated.
 - **AC28** — When `env -u CLAUDE_CODE_SESSION_ID bash unattended.sh --lease status build tFix` runs, it
   exits 0 and prints the status line. Red when: a scratch copy that leaves `status` off the exempt
   list refuses it.
-- **AC29** — When `grep -c 'node-lock-broken'` and `grep -c 'node-lock-guard-cleared'` run apart over
+- **AC29** — When `grep -c 'node-lock-broken'` and `grep -c 'node-guard-cleared'` run apart over
   `tools/unattended/README.md`, each prints at least 1. Red when: one combined count hides a miss.
 - **AC30** — When `grep -c 'aborts the carrier' 2026-10-25-spec-TOOL-dPlacedRequest-36.md` runs, it
   prints 0, and the Goal names `set -u`. Red when: the mechanism is misdescribed.
@@ -376,7 +378,7 @@ block, each `RUN_CLAIMS=on` unless stated.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `format-guard self-test` · `push-main self-test` · `run-selftests self-test`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `format-guard self-test` · `push-main self-test` · `run-selftests self-test` · `tier2-review self-test`
 
 New arm: tools/unattended/unattended.test.sh · covers AC5 AC6 AC11 AC12 AC25 AC26 AC28 · each item's plant, staged against the unit it amends · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 New arm: tools/lib/resolve-python.test.sh · covers AC8 AC10 AC20 AC32 · scratch carriers lacking the appender, reading `$ROOT` after the lock, and a quoting record, staged against unit 38's arm as written · none
@@ -408,6 +410,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC16 · a stub checker that
   and 12 LOW findings.
 - rev-2 · 2026-10-25 · header above §1, §6 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line binding this unit; AC16 and AC22 observe `readCard` and `derive_claims_line` over their stubs rather than naming the suites, which stay on their `New arm:` lines; AC17 cites the page this build creates by its basename; AC26's `Red when:` is joined onto one line.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
+- rev-4 · 2026-11-19 · §2 S4, S5, S6 · §3 Edges · §4 Evidence and the sketch · §6 AC5, AC29 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's: S5's write order and S6's `_fl_mine` land in that shared factory, and the guard event reads `node-guard-cleared` under the stem `node`. §7 also names `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched. §6 AC6 sources the cut by an argument path, `$s/cut.sh`, as the source join requires.
 
 ## 10. Reuse audit
 

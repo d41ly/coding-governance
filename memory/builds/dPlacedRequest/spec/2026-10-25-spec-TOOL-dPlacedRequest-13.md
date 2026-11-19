@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-66
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-66
 
 **Carries:** cl-dClosedLoop-0131@3532cbe6 whole
 
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -40,7 +41,8 @@ hooks `TOOL-dPlacedRequest-11`'s one writer, so every later writer joins it by c
   `tools/lib/gov-feed.sh` between `# >>> gov_feed_sh` and `# <<< gov_feed_sh`, inline byte-identical
   in `tools/unattended/unattended.sh` and `tools/run-gates/post-merge.sh` beside `gov_ref_sh`. Under
   the node-local lock `gov-feed.lock` it appends only when no line carries the key, so a retried
-  write appends nothing, and takes `seq` from the counter `gov-feed.seq`. Observed by AC1 and AC2.
+  write appends nothing, and takes `seq` from the counter `gov-feed.seq` reconciled with the log
+  (§4 "Appending once, in order"). Observed by AC1, AC2 and AC10.
 - **S3** — The join: `write_gov_ref`'s one success exit sets this node's cache ref
   `refs/gov/remote/<tail>` to what it wrote (or clears it when the write was a deletion), then calls
   `add_feed_event`.
@@ -116,8 +118,12 @@ caller set `GOVFEED_DIR`, reads the tree with one `git rev-parse <commit>^{tree}
 1. Takes `gov-feed.lock` by `mkdir`, retrying every 50 ms for up to 5 s; a lock whose directory is
    older than one minute was left by a crash and is removed and retaken.
 2. Looks for the key with one `grep -qF` over the file; found, it releases and returns 0.
-3. Reads `gov-feed.seq` with the `read` builtin, appends the line with `seq` one higher, writes the
-   counter, and releases the lock.
+3. Derives `seq` as one more than the larger of the counter, read from `gov-feed.seq` with the
+   `read` builtin, and the `seq` field of the log's last line. An empty, malformed or missing counter
+   reads 0, as does an empty log. It appends the line, then writes the counter to a temp file in the
+   common dir and renames it over `gov-feed.seq`, and releases the lock. A crash between the append
+   and the counter write, or a stale lock broken mid-section, leaves the counter behind the log, and
+   the next append's maximum skips past it, so no `seq` repeats or restarts.
 
 A failure to lock or write prints one `feed: NOTE -` line on stderr and returns 0, as the health log's
 appender never fails its caller (`health-log.sh:21-23`): the governance write already landed, and the
@@ -146,16 +152,28 @@ chain git holds, so only its current tip compares; its past events stay replayab
 
 `scan_feed_writers` reads each file with one `awk`: it tracks the enclosing `name() {` and its closing
 `}` at column 0, and flags a line carrying both `push` and `--force-with-lease` whose function body
-calls neither `add_feed_event` nor `write_gov_ref`. A comment line is skipped. Its population today
+calls neither `add_feed_event` nor `write_gov_ref`. In both limbs a comment line, whose first
+non-blank character is `#`, is skipped, and `push` matches only as a whole word (`\bpush\b`), so
+`pushes` in prose never matches. Its population today
 is two lines, both inside `write_gov_ref` once `TOOL-dPlacedRequest-11` lands; an empty population
 reds the arm, never passes it.
 
-The second limb flags a line carrying `push` and the literal `refs/gov/` and no `--force-with-lease`,
-whatever function holds it. Run over the shipped shell files and hooks at `6e9c6062`, it finds
-nothing: both pushes of a governance ref name it through a variable and carry a lease
-(`tools/unattended/unattended.sh@875eaadf:2793`, `tools/run-gates/post-merge.sh@a0462621:280`). Its
-live population is therefore empty, and its red is the planted push of AC9. It does not see a plain
-push whose ref is spelled through a variable, nor a push assembled across lines.
+The second limb flags a non-comment line carrying the word `push` and the literal `refs/gov/` and
+no `--force-with-lease`, whatever function holds it. Both pushes of a governance ref name it through
+a variable and carry a lease (`tools/unattended/unattended.sh@875eaadf:2793`,
+`tools/run-gates/post-merge.sh@a0462621:280`). Re-run on 2026-11-19 at `ceda38dae`:
+
+```
+git grep -n -E '\bpush\b' HEAD -- '*.sh' '.githooks/*' ':!*.test.sh' | grep 'refs/gov/' \
+  | grep -v -- '--force-with-lease' | grep -v -E '^[^:]+:[^:]+:[0-9]+:[[:space:]]*#'
+```
+
+printed nothing. The substring form with no comment skip prints `tools/run-gates/post-merge.sh:13`,
+a comment line reading "a RED pushes `<sha>:refs/gov/bar-red`", which is why the skip and the
+whole-word match bind this limb too. Its live population is therefore empty, and its red is the
+planted push of AC9. It does not see a plain push whose ref is spelled through a variable. A push
+assembled across `\`-continued lines is joined before either limb matches, by
+`TOOL-dPlacedRequest-34` S17.
 
 ### Inventory
 
@@ -191,10 +209,9 @@ is then written or fetched, while post-merge's bar-red write joins under any set
 - `tools/lib/resolve-python.test.sh`: the `gov_feed_sh` parity row and the census arm over every
   shipped shell file and hook
 - `tools/unattended/unattended.sh`: the inline blocks, the sighting call in `read_claims`, the `--feed`
-  verbs in the dispatch table beside `--claims` (`:14489`), `KIT_UNATTENDED_VERSION` moved
+  verbs in the dispatch table beside `--claims` (`:14489`); the kit version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
 - `tools/unattended/unattended.test.sh`: the feed arms
 - `tools/run-gates/post-merge.sh`: the inline blocks
-- `tools/run-gates/run-gates.sh`: `KIT_RUN_GATES_VERSION` moved
 - `tools/unattended/STOPS.template.md`: section 7 names the feed and its three verbs
 - `memory/guides/UNATTENDED-STOPS.md`: its render
 - `tools/govkit/subject-pins.tsv`, regenerated by `python tools/govkit/govkit.py selfcheck --write`
@@ -265,13 +282,18 @@ is then written or fetched, while post-merge's bar-red write joins under any set
   AC7 files it still prints nothing.
   Red when: a plain push of a governance ref passes the census, as it does when only lease-carrying
   lines are inspected or when its function's append excuses it.
+- **AC10** — When the probe empties `gov-feed.seq` beside a two-line feed and calls `add_feed_event`
+  for a new commit, the new line's `seq` is 3 and the counter reads 3; with the counter planted `1`,
+  the next append's `seq` is 4.
+  Red when: a lagging or empty counter repeats or restarts a `seq`, the staged case being a scratch
+  copy that reads the counter alone.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `unattended kit gate` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC7 AC8 AC9 · the `gov_feed_sh` parity row and the census over every shipped shell file, staged by a planted pushing function with no append · none
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the feed arms over the suite's bare origin, staged by cutting the key check and by deleting one feed line · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC10 · the feed arms over the suite's bare origin, staged by cutting the key check, by deleting one feed line and by a counter-only `seq` · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and the probes of AC1 to AC6 and AC10 are the observation at landing
 
 ## 8. Open questions
 
@@ -311,6 +333,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
   the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: `scan_feed_writers` also flags a
   plain push of a `refs/gov/` ref, red on a planted push of `refs/gov/mail/fx/a/s1`; §7 gains the
   three legs the spec-token guard join names.
+- rev-6 · 2026-11-19 · §2 S2 · §4 Appending once in order, The census, Files touched · §6 AC10 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`:
+  finding 35 (M11), `seq` is one more than the larger of the counter and the log's last `seq`,
+  and the counter is written by a temp file and a rename, observed by AC10; finding 13 (L4), the
+  comment skip and the whole-word `push` hold for both census limbs, re-run and recorded at
+  `ceda38dae`; finding 30 (L8), the second limb's cross-line limitation cites
+  TOOL-dPlacedRequest-34 S17's join; finding 24 (H6), the kit versions are the lander's to mint;
+  finding 4 (M3), the unattended.test.sh arm cites README rule 8.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-67
+**Status:** DEFERRED · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-67
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -50,6 +50,7 @@
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-5 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -113,8 +114,8 @@ announced (`:2141-2149`).
   declared wait (§4 "The question witness", §8 F9): under `progress` a renew whose `--witness` is the
   commit of a mail message of kind `question` addressed to the lease's build, `open` on this node and
   inside its declared deadline by `check_mail_deadline`, writes `renews: yes` even when it equals the
-  record's `witness`, and the same commit exits 2 once the question reads `expired`. Observed by AC4
-  and AC11.
+  record's `witness`; once the question reads `expired` or answered, the same commit renews nothing and
+  the write reads `renews: no` (§4 "The question witness"). Observed by AC4, AC11 and AC12.
 - **S9** — `leases.overlap` (`kit-dirs`, `files`, `builds`; default `kit-dirs`) and `leases` (`warn`,
   `refuse`; default `warn`) replace the probe's constant 0. `check_cross_run_overlap` reduces each
   path before its join, to its kit directory under `kit-dirs` and unchanged under `files`, and under
@@ -174,7 +175,7 @@ announced (`:2141-2149`).
 - **hands-off** external — KICK-dKeptSession-25 S4's beat, which passes a question's commit as `--witness` once `check_lease_witness` admits it, and re-plants AC11 on real mail
 - **hands-off** `TOOL-dPlacedRequest-23` — `run_lease_verb` and `leases.offline`'s offline branch, which that unit keeps out of every strict claim read
 - **hands-off** `TOOL-dPlacedRequest-24` — `add_gov_queue`, `write_gov_queue` and `gov-queue.log`, which that unit puts under a node lock and makes idempotent
-- **hands-off** `TOOL-dPlacedRequest-25` — the lease writer's `renews` decision, which that unit derives so a write opening a tenure renews
+- **hands-off** `TOOL-dPlacedRequest-25` — the lease writer's `renews` decision, which that unit derives so a write opening a tenure renews, and S8's question-witness branch: `check_lease_witness` answering `question` is that unit's third witness verdict, renewing under `progress` even when it equals the record's `witness`
 - **hands-off** `TOOL-dPlacedRequest-26` — the record's `epoch` and `renews` keys, which mark the tenure that unit's walk stops at
 - **hands-off** `TOOL-dPlacedRequest-29` — the record's `epoch`, `fleet-tag` and `session` and the `lease` mode, which decide that unit's same-holder re-fence
 - **hands-off** `TOOL-dPlacedRequest-32` — the `lease` mode's `mine` test and the `--lease` verbs, which that unit closes to an absent session
@@ -272,14 +273,27 @@ recorded by hand, and this is the interim v2:1159 journals.
 ### The question witness
 
 `check_lease_witness <slug> <sha>` is the one witness check `--lease renew` runs, and the no-write
-probe KICK-dKeptSession-25 §8 F7 (b) calls: it prints `transition`, `question` or why it admits
-neither, exiting 0, 0 or 2. It answers `question` when `declare -F` finds both `read_mailbox` and
+probe KICK-dKeptSession-25 §8 F7 (b) calls: it prints `transition`, `question`, `question-closed` or
+why it admits none, exiting 0, 0, 1 or 2. It applies its tests in one order. First, where `declare -F`
+finds both functions, it runs `read_mailbox <slug> soft`, whose fetch is the only remote read the check
+makes. Second, it resolves `<sha>` with `git rev-parse --verify --quiet <sha>^{commit}`, after that
+fetch, and a sha that does not resolve exits 2 whatever the mailbox printed. Third, it classifies the
+resolved commit: a transition of the build, read as the section above states, answers `transition`.
+Otherwise it answers `question` when `declare -F` finds both `read_mailbox` and
 `check_mail_deadline`, and `read_mailbox <slug> soft`, which prints only messages addressed to the
 build, prints a row of kind `question`, commit `<sha>` and state `open`. That reader prints
 `expired` for a row whose `check_mail_deadline` returned 0 (KICK-dKeptSession-24 S5), so an `open`
 row is inside its declared deadline on this node's clock. A `question` witness renews whatever the
 record's `witness` holds, so a wait renews at every beat; a `transition` witness keeps the
 differs-from-the-record rule. With either function absent, a question commit exits 2 as above.
+
+The beat's probe and `--lease renew` each run this check, in two processes, on two mailbox reads and
+two clocks, so a question can expire or be answered between them. The renew's own reading is the one
+that counts, and a closed question is no error. A commit that `read_mailbox` prints as a row of kind
+`question` to the build in any state but `open` answers `question-closed`, exit 1. On exit 1 the renew
+writes the record as a beat does: `renews` as `TOOL-dPlacedRequest-25`'s `derive_lease_renews` gives it
+for no witness, `no` under `progress`, and `witness` left at the record's value. The beat loses no
+record, and a closed question still renews nothing.
 
 ### The overlap reduction
 
@@ -330,7 +344,7 @@ its runs move onto build leases at their next claim write; an adopter's stay unt
 
 - `tools/unattended/unattended.sh`: the grammar, the reader's two namespaces and new fields, the
   epoch, the `lease` mode, the verbs, the four keys' reads, the overlap reduction, the offline queue,
-  the fleet tag, `KIT_UNATTENDED_VERSION` moved
+  the fleet tag; the kit version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
 - `tools/unattended/lib-unattended.sh`: `resolve_fleet_tag` beside `resolve_index_generator` (`:188`),
   through the same `resolve_kit_dir` call
 - `tools/unattended/unattended.test.sh`: the lease arms, and the claim fixtures moved to the lease ref
@@ -423,22 +437,33 @@ its runs move onto build leases at their next claim write; an adopter's stay unt
   `STOPS.template.md`, each is found in section 7, and `--claims` in the AC1 fixture prints rows of
   exactly five TAB fields.
   Red when: the guide omits the grammar or the verbs, or the row shape changes.
-- **AC11** — When the AC4 fixture's shell exports, by `export -f`, a stub `read_mailbox` printing one
-  row of kind `question` to `tFix`, state `open` and commit `Q`, and a stub `check_mail_deadline`, and
-  `--lease renew build tFix --witness Q` runs twice, both new records read `renews: yes` and
-  `witness: Q`; with the stub row's state `expired` the same renew exits 2, and with no stub exported
-  it exits 2 as AC4's non-transition witness does.
-  Red when: a held question renews only once, an expired question renews, or a question renews with
-  dKeptSession's functions absent.
+- **AC11** — When the AC4 fixture plants a commit `Q=$(git commit-tree -m question "$(git rev-parse
+  'HEAD^{tree}')")` carrying no transition, its shell exports, by `export -f`, a stub `read_mailbox`
+  printing one row of kind `question` to `tFix`, state `open` and commit `$Q`, and a stub
+  `check_mail_deadline`, and `--lease renew build tFix --witness "$Q"` runs twice, both new records read
+  `renews: yes` and `witness: $Q`. With the stub row's state `expired`, the same renew exits 0 and its
+  record reads `renews: no` with the record's prior `witness`. With no stub exported it exits 2 as AC4's
+  non-transition witness does. With a stub row naming a 40-hex sha the clone does not hold, and that
+  sha as `--witness`, the renew exits 2 and writes nothing.
+  Red when: a held question renews only once, an expired question renews, a question renews with
+  dKeptSession's functions absent, or an unresolvable sha passes because a stub row names it.
   fixture: the stubs stand in for KICK-dKeptSession-5's and KICK-dKeptSession-24's functions, which
   the tree does not hold. The ask's 30-hour wait past a 24-hour `leases.expiry-hours` is each beat's
   `renews: yes` read by TOOL-dPlacedRequest-17's verdict, which this unit does not build.
+- **AC12** — When the AC11 fixture's stub `read_mailbox` prints the row `open` on its first call and
+  `expired` on every later call, counted in a scratch file, and the beat's two calls run in order,
+  `check_lease_witness tFix "$Q"` and then `--lease renew build tFix --witness "$Q"`, the probe prints
+  `question` and exits 0, and the renew exits 0 with `renews: no`. A bounded direct probe outside the
+  waived suite repeats AC11's first two renews: it sources `unattended.sh` with the stubs exported in a
+  scratch clone and prints both records' `renews` lines.
+  Red when: the renew exits 2 and the beat writes no record, or the direct probe prints no
+  `renews: yes`.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `playbook render selftest` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `routed-commits selftest` · `govkit selftest` · `govkit refusal join` · `tier2-review self-test` · `policy fixtures`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 · the lease arms over the suite's bare origin, staged by planting each policy value and by cutting the epoch increment · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 · the lease arms over the suite's bare origin, staged by planting each policy value and by cutting the epoch increment · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and AC12's direct probe is the observation at landing
 New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` flag's selftest case, staged by a user no row names · none
 
 ## 8. Open questions
@@ -521,6 +546,13 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   Inventory · §6 AC11 · §7 · §8 F9 · §10 · adopts ask TOOL-dPlacedRequest-67 per the brief
   `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: an open `question` to the build inside its
   deadline witnesses a renewal (F9 resolved (a)); §7 gains the two legs the spec-token guard join names.
+- rev-7 · 2026-11-19 · §2 S8 · §3 Edges · §4 The question witness, Files touched · §6 AC11, AC12 · §7 ·
+  §10 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: findings 1 and 23 (item H1), the hands-off to TOOL-dPlacedRequest-25 names the
+  question-witness branch; finding 24 (H6), the kit version is the lander's to mint; finding 4 (M3), the
+  unattended.test.sh arm cites README rule 8 and AC12 adds a direct probe; finding 11 (M5), the check
+  resolves the sha after the mailbox fetch and before it classifies, and AC11 plants `Q`; finding 12
+  (L3), a question closed between the probe and the renew answers `question-closed` and writes
+  `renews: no`; finding 14 (L5), §10 quotes where the probe found `check_mail_deadline`.
 
 ## 10. Reuse audit
 
@@ -538,7 +570,8 @@ so the claim block above is the seam. Scout A's row 1 holds against source, with
 dispatch line for `--claims` is `:14489`, not `:14490`. `python tools/memory-recall/query.py "how are
 run claims written and how would they migrate to leases"` returned scout A's rows 1 and 6, the brief's
 unit rows and coordination.md:54; none disagrees with source. The question witness (rev-6) extends
-that witness check as `check_lease_witness`; `git grep -n check_mail_deadline` at `6e9c6062` finds
-it only in dKeptSession's records.
+that witness check as `check_lease_witness`; `git grep -l check_mail_deadline` at `6e9c6062` finds
+it in no file under tools/ or skills/, only in build records: four dKeptSession files, two
+dWellOiledMachine records and this build's `BACKLOG.md`.
 
 Recall terms used: lease epoch take-over refs/gov/leases run claim migrate fleet tag overlap offline renewal progress

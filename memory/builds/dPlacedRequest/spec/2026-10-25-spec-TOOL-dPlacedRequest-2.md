@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-65 TOOL-dPlacedRequest-70 TOOL-dPlacedRequest-73
+**Status:** DEFERRED · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-65 TOOL-dPlacedRequest-70 TOOL-dPlacedRequest-73
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card
@@ -25,6 +25,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -99,8 +100,9 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   hook payload's `transcript_path` was last written more than `RESUME_IDLE_S = 300` seconds before
   the replay; `always-resume` recommends resuming, and reads as `fresh-when-idle` unless the
   card-import fixture's recorded verdict, read by `read_card_fixture_verdict` (KICK-dKeptSession-12
-  S2), answers `pass`, printing that override with the reader's reason (v2:1177,
-  `cl-dClosedLoop-0150`). While `declare -F` finds no such reader, as until dKeptSession lands, the
+  S2), answers `pass`, printing the override in KICK-dKeptSession-12 S3's own line,
+  `(resume.context: always-resume read as fresh-when-idle · card-import fixture red: <why>)`, `<why>`
+  the reader's reason (v2:1177, `cl-dClosedLoop-0150`). While `declare -F` finds no such reader, as until dKeptSession lands, the
   verdict reads `red: no recorded run` (§8 F5). The entry file `CLAUDE.md` is not consulted;
   `always-fresh` always recommends a fresh session. The
   `partial —` line names the value's act, which `skills/session-kickoff/SKILL.md`'s resume paragraph
@@ -130,17 +132,18 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   checker that does not answer reads as no card, named. Observed by AC10.
 - **S11** — The five keys, each read once per verb through dGroundRules' `policy.py get` (I24) by
   `read_card_policy <key>`, a bounded call resolved as an optional sibling; until that reader lands,
-  each reads v2's catalogue default. Their catalogue rows land through TOOL-dDeclaredLoop-6 S4's
-  `python tools/playbook/core.py new policy-key <name> … --owner dPlacedRequest`, each with its v2
-  values and default. A refused read prints `card — skipped: <key> refused` and writes the session
+  each reads v2's catalogue default. Their five rows already exist in `tools/policy/catalogue.toml`,
+  owner `dPlacedRequest`, landed by TOOL-dGroundRules-1 at `c9bd97720`; this unit adds no row through
+  the policy-key factory and edits a row in place only where a value differs from v2. A refused read prints `card — skipped: <key> refused` and writes the session
   card only, as today. `READER_SHAPES` in `tools/policy/check_policy.py` gains one row for `.sh`
   files and `.githooks/`, a `read_card_policy <key>` or `read_lease_policy <key>` call
   (TOOL-dPlacedRequest-1 S12's reader), the two function names spelled literally, in the shape of its
   `policy.py get` row, so `scan_reader_keys` returns each key so read and the reader-coverage arm
-  counts it (§4 Alternatives rejected). Observed by AC11 and AC14.
+  counts it (§4 Alternatives rejected). Observed by AC11, AC14 and AC15.
 - **S12** — The fixture, `bash skills/session-kickoff/card-store.fixture.sh --plant <case>`: a
   scratch repository and a bare remote in the system temp directory, a stub policy kit answering the
-  planted values, and the case's observation printed, exit 0 when it holds. Observed by AC1 to AC12.
+  planted values, and the case's observation printed, exit 0 when it holds. Its plants include
+  `close-follow-twice`, which AC13 runs. Observed by AC1 to AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -168,6 +171,7 @@ fresh session recommended by `resume.context` and partial work handled by `resum
 - **hands-off** `TOOL-dPlacedRequest-33` — the `remote-ref` store's publish and follow, which that unit routes through the driver's `--card-ref write`, dark behind `RUN_CLAIMS`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 - **hands-off** `TOOL-dPlacedRequest-49` — `skills/session-kickoff/card-store.fixture.sh`, which that unit's item for finding 3 gives the `publish-late` plant
+- **hands-off** external — KICK-dKeptSession-12 S3, the switch S7 builds with that unit's own override line, which that unit finds present instead of building it; filed as an ask on dKeptSession
 
 ## 4. Design
 
@@ -240,7 +244,7 @@ transition the loop kit records.
 
 ### Files touched (estimate)
 
-- `skills/session-kickoff/manifest-check.sh`: the verbs, and the inline `gov_ref_sh` and `gov_feed_sh` blocks; `KIT_MANIFEST_VERSION` moved
+- `skills/session-kickoff/manifest-check.sh`: the verbs, and the inline `gov_ref_sh` and `gov_feed_sh` blocks; the kit version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
 - `tools/lib/resolve-python.test.sh`: the two parity rows gain the kickoff engine's copies
 - `skills/session-kickoff/manifest-check.test.sh`: the arms the §7 line declares
 - `skills/session-kickoff/card-store.fixture.sh`
@@ -250,11 +254,15 @@ transition the loop kit records.
 - `tools/memory-tree/build_records.py`: the `card` kind row
 - `tools/memory-tree/tree_lib.py`: `card` in `TYPED_RECORD_KINDS`
 - `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `card` in the closed kind list
-- `tools/policy/catalogue.toml`: five rows, through the factory
+- `tools/policy/catalogue.toml`: the five `card.*` and `resume.*` rows exist; edited in place only
+  where a value differs from v2
 - `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
 - `help/orientation-card.md`: the build card's stores, the follow and the resume lines
-- `tools/policy/check_policy.py`: the `read_card_policy <key>` row of `READER_SHAPES`, and the
-  policy kit's version where the `kit epoch` leg asks for it
+- `tools/policy/check_policy.py`: the `read_card_policy <key>` or `read_lease_policy <key>` row of
+  `READER_SHAPES`, and the policy kit's version where the `kit epoch` leg asks for it
+- `help/policy.md`: "A reader" names the third shape, a shell `read_card_policy <key>` or
+  `read_lease_policy <key>` call, beside the two it lists
+- `tools/policy/README.md`: the `READER_SHAPES` paragraph names its third row
 
 ### Alternatives rejected
 
@@ -286,7 +294,7 @@ transition the loop kit records.
 - testing — S12's plants, red and green.
 - migration — none.
 - user docs — `help/orientation-card.md`, TOOL-dPlacedRequest-9's page, gains the build card's
-  sections.
+  sections; `help/policy.md` and `tools/policy/README.md` name the third reader shape S11 adds.
 
 ## 6. Acceptance criteria
 
@@ -321,7 +329,9 @@ transition the loop kit records.
   `read_card_fixture_verdict` exported by `export -f` printing `pass`, the `resume —` line recommends
   fresh, resume and fresh; with `context-fixture-red`, `always-resume`, the card import line present
   in `CLAUDE.md` and the stub printing `red: no recorded run`, it
-  recommends fresh and names the override with that reason, and with no stub exported it does the same.
+  recommends fresh and prints `(resume.context: always-resume read as fresh-when-idle · card-import
+  fixture red: no recorded run)`, KICK-dKeptSession-12 S3's line, and with no stub exported it does
+  the same.
   Red when: a value is ignored, `always-resume` holds while the verdict is not `pass`, or the import
   line moves the recommendation.
   fixture: the stub stands in for KICK-dKeptSession-12's reader, which the tree does not hold.
@@ -337,10 +347,12 @@ transition the loop kit records.
   `readCard`'s call, and `grep -c "'orientation', sid" tools/hooks/scratch-guard.js` prints `0`.
   Red when: the hook derives the card path itself beside the checker's.
 - **AC11** — When `python -c "import tomllib, sys; print(sorted(r['name'] for r in tomllib.load(open(sys.argv[1], 'rb'))['key'] if r.get('owner') == 'dPlacedRequest' and r['name'].split('.')[0] in ('card', 'resume')))" catalogue.toml`
-  runs in the policy kit's directory, it prints the five keys, and `git grep -n "read_card_policy card.store" -- skills/session-kickoff/manifest-check.sh`
-  finds the read.
-  Red when: a key has no row, or is read in a shape the reader-coverage arm does not count.
-  fixture: the catalogue is dGroundRules', untracked until it builds.
+  runs in the policy kit's directory, it prints the five keys, a guard on rows the base already holds.
+  The half the unit moves: `python -c "import sys; sys.path.insert(0, sys.argv[1]); import check_policy; k = check_policy.scan_reader_keys(sys.argv[2]); print(sorted(x for x in k if x.startswith(sys.argv[3])))" tools/policy . card.`, run at the repository root over the built tree, prints a list holding `card.follows`,
+  `card.snapshot` and `card.store`, where at the base it prints `[]`, and
+  `git grep -n "read_card_policy card.store" -- skills/session-kickoff/manifest-check.sh` finds the read.
+  Red when: a key is read in a shape the reader-coverage arm does not count.
+  fixture: none; the rows are tracked since `c9bd97720`.
 - **AC12** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over the
   `snapshot-terminal` plant's repository with its record committed, it prints an `S` row for the
   `-card-1.md` record with kind `card` and the anchor id, and no `A` row for it.
@@ -357,6 +369,9 @@ transition the loop kit records.
   the row lands the same probe prints `False False`.
   Red when: either planted read is not returned, so a key read through either reader reds as unread.
   fixture: a `git init` repository in the system temp directory, `reader.sh` committed; none today.
+- **AC15** — When `grep -n 'read_card_policy' help/policy.md tools/policy/README.md` runs, each file
+  prints a line naming the third reader shape.
+  Red when: the help page or the kit README still says a reader comes in two shapes.
 
 ## 7. Gates
 
@@ -421,6 +436,15 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   repeated terminal follow writes one `card` record; `READER_SHAPES` reads `read_card_policy <key>`,
   its red seen at `6e9c6062`, and, a discovery adopted by this build run, `read_lease_policy <key>`
   too; §7 gains the two legs the spec-token guard join names.
+- rev-7 · 2026-11-19 · §2 S7, S11, S12 · §3 Edges · §4 Files touched · §5 · §6 AC7, AC11, AC15 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`:
+  finding 19 (M6), a hands-off to KICK-dKeptSession-12 S3 names the switch this unit builds, its ask
+  filed on dKeptSession, and S7 and AC7 pin that unit's override line; finding 25 (M7), help/policy.md
+  and tools/policy/README.md join the write set naming the third reader shape, the §5 user-docs line
+  names them, and AC15 greps the page; finding 26 (M8), the five `card.*` and `resume.*` rows already
+  exist at `c9bd97720`, so S11 drops the factory step, and AC11 reads `scan_reader_keys` over the built
+  tree; finding 8 (L2), S12 reads AC1 to AC13 and lists the `close-follow-twice` plant; finding 20
+  (L6), the check_policy.py bullet names both readers; finding 24 (H6), the kit version is the
+  lander's to mint.
 
 ## 10. Reuse audit
 

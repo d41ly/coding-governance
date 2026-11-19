@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0133@231564d8 whole
 
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -49,7 +50,11 @@ headless P2(b) and P2(c′)).
   parent is the tip, then pushes
   `git push --atomic "--force-with-lease=<lease ref>:<tip>" <remote> <branch refspec> <beat>:<lease ref>`
   in place of today's single-ref push (`tools/push-main.sh:978`, `:1128`). On `none` it pushes as
-  today; on `refused` it exits 1 and pushes nothing. Observed by AC2, AC3, AC4, AC5.
+  today; on `refused` it exits 1 and pushes nothing. Every other result refuses: an exit other than 0
+  or 1, empty output, more than one line, an exit 0 whose one line is not a well-formed `fence —`
+  line, or an exit 1 whose line is not a `lease refused —` line. The lander then exits 1, pushes
+  nothing, and prints `push-main: fence read unparsed — exit <rc> · <first line or (empty)>`. Only a
+  missing driver reads as `none`. Observed by AC2, AC3, AC4, AC5 and AC9.
 - **S4** — The fenced failure: when a fenced push fails and the existing classifier
   `derive_push_failure` (`tools/push-main.sh:262`) reads `unchanged`, the lander reads the lease ref
   once with `git ls-remote`: moved from the tip read is `fenced`, the lease lost and nothing landed;
@@ -130,6 +135,17 @@ headless P2(b) and P2(c′)).
                              -> fence — refs/gov/leases/<slug>/build <tip> <beat>
 ```
 
+The lander parses that result in one place, and the parse fails closed:
+
+```
+driver missing                                 -> none, land as today
+exit 0, one line `fence — none · …`            -> none, land as today
+exit 0, one line `fence — <ref> <tip> <beat>`  -> fenced push, each field checked
+exit 1, one line `lease refused — …`           -> exit 1, nothing pushed
+anything else                                  -> push-main: fence read unparsed — exit <rc> · <first line>
+                                                  exit 1, nothing pushed
+```
+
 The read is the holder check and the compare-and-swap's expected value in one: nothing re-reads the
 tip between them. A take-over after the read is caught by the remote, which compares the lease ref
 with `<tip>` inside the atomic push, after the hook's bar has run.
@@ -199,7 +215,8 @@ by then, because git runs the pre-push hook before it sends.
   `ls-remote` on a failed fenced push, and one feed append after a landing.
 - error / empty / loading states — no unattended kit beside the lander, the switch off and no lease
   ref each read `none` and land as today; an unreadable lease refuses, so an outage never lands an
-  unfenced effect under a lease.
+  unfenced effect under a lease; a crashed, empty, multi-line or odd-exit fence read refuses too,
+  since only a missing driver means no fence.
 - observability — the fence line is printed before the push; `fenced` and `unfenced` name the lease,
   the tip read and the tip found.
 - risks — a remote that refuses `--atomic` turns every leased landing into `unfenced` after a full
@@ -257,12 +274,18 @@ the observation.
 - **AC8** — When `grep -n "lease fence" tools/unattended/VERBS.template.md` and
   `grep -n "LANDER --slug" tools/unattended/VERBS.template.md` run, each finds its line.
   Red when: either is missing.
+- **AC9** — When the lander finds beside it a stub driver whose `--lease fence` exits 2 printing
+  nothing, and clone A lands under lease `fx`, the lander exits 1 printing `fence read unparsed — exit
+  2`, and the bare remote's default branch and lease tip are both unchanged; a stub exiting 0 with two
+  `fence —` lines is refused the same way.
+  Red when: an unparsed fence read lands unfenced, the planted case being a lander that reads any
+  non-fence output as `none`.
 
 ## 7. Gates
 
-`push-main self-test` · `unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates`
+`push-main self-test` · `unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test`
 
-New arm: tools/push-main.test.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 · a take-over planted inside the stub hook, an unchanged-lease fence line, a fenced landing, no lease, a remote with `receive.advertiseAtomic false` and the attended `--slug`, staged against the base lander, which pushes one ref · the suite's assertion count raised by the arms added
+New arm: tools/push-main.test.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 AC9 · a take-over planted inside the stub hook, an unchanged-lease fence line, a fenced landing, no lease, a remote with `receive.advertiseAtomic false` and the attended `--slug`, staged against the base lander, which pushes one ref · the suite's assertion count raised by the arms added
 New arm: tools/unattended/unattended.test.sh · covers AC5 · the `fence` act over the switch off, no lease, a held lease and a foreign one, staged against the base driver, which has no such act · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
@@ -297,6 +320,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the `fence` act ov
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
   consumes-from TOOL-dPlacedRequest-36, consumes-from TOOL-dPlacedRequest-37, hands-off
   TOOL-dPlacedRequest-40.
+- rev-5 · 2026-11-19 · §2 S3 · §4 The fence read · §5 · §6 AC9 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 34 (M10): a fence read
+  matching none of its three outcomes refuses, the lander exiting 1 with nothing pushed and printing
+  the driver's exit code and first line, and only a missing driver reads `none`; AC9 plants a driver
+  that exits 2 with empty output. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 
 ## 10. Reuse audit
 

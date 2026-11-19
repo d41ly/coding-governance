@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-19 — the project-level request record: pushed by its content key, its text kept where it was typed
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0137@39b3ef9d whole
 
@@ -16,6 +16,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,10 @@ P40; the owner's CL-4 and FR-1).
   `tools/loop/request.py` returns the first 12 hex digits of SHA-256 over the UTF-8 bytes of
   `derive_content_key(text)`, imported from the memory-tree kit's `row_grammar.py` (`tools/memory-tree/row_grammar.py:1475`), resolved with
   `resolve_kit_dir`; an empty normalised text is refused. `python request.py key <file>` prints it.
-  It keys the text alone, so an absent intake keys a request the same way (I11). Observed by AC1.
+  It reads the file as bytes and decodes them strictly as `utf-8-sig`, so a leading byte-order mark
+  never reaches the key and no platform default decoding is ever used; an undecodable byte exits 2
+  printing `request — refused: <file> is not UTF-8 at byte <n>`. It keys the text alone, so an absent
+  intake keys a request the same way (I11). Observed by AC1 and AC7.
 - **S2** — The local text: `unattended.sh --request <file>` copies the file's bytes unchanged to
   `<git-common-dir>/requests/<content key>.md`, keeping the first copy when one exists, and appends
   this session's id once to `<git-common-dir>/requests/<content key>.typed`. Nothing under
@@ -180,7 +184,8 @@ the function that derives it is `derive_request_content_key`, which every reader
   is denied unless this session recorded the words here.
 - perf / scale — one Python start for the key, one commit and one push per request; one bounded read
   per claim.
-- error / empty / loading states — an empty request is refused before any write; an unreachable
+- error / empty / loading states — an empty request, or one that is not UTF-8, is refused before any
+  write; an unreachable
   remote keeps the text local and exits 2; a missing loop kit refuses `--request` naming it.
 - observability — every outcome is one `request —` line naming the key; a refused consent names the
   key and says relayed.
@@ -226,13 +231,17 @@ landing (README rule 8), so each driver probe below is the observation.
   `grep -n "refs/gov/leases/request/" tools/unattended/STOPS.template.md` run, each finds its row, and
   the stops guide names the reserved slug `request`.
   Red when: either guide omits the verb, the lease form or the reservation.
+- **AC7** — When `python request.py key` runs over a file holding `Fix the lander` and over a copy
+  prefixed with the bytes `EF BB BF`, it prints one key for both; over a file holding the byte `E9`
+  alone after `Fix`, it exits 2 printing `not UTF-8` and writes nothing.
+  Red when: a BOM-saved request gets a second key, or a cp1252 file is keyed under a guessed decoding.
 
 ## 7. Gates
 
-`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates`
+`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test`
 
 New arm: tools/unattended/unattended.test.sh · covers AC2 AC3 AC4 AC5 · the marker absent from every remote object, a repeated request, a claim by a second clone and a relayed consent, staged against the base driver, which has no request verb · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
-New arm: tools/loop/selftest.py · covers AC1 · the normalised pair keyed alike and the empty text refused, staged against a key over the raw bytes · none
+New arm: tools/loop/selftest.py · covers AC1 AC7 · the normalised pair keyed alike and the empty text refused, staged against a key over the raw bytes · none
 
 ## 8. Open questions
 
@@ -266,6 +275,9 @@ New arm: tools/loop/selftest.py · covers AC1 · the normalised pair keyed alike
   TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-5 · 2026-11-19 · §2 S1 · §5 · §6 AC7 · §7 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1` finding 37 (M12): the file is read as bytes and
+  decoded strictly as `utf-8-sig`, so a byte-order mark keys alike and an undecodable byte is refused
+  by name; AC7 observes both. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
 
 ## 10. Reuse audit
 

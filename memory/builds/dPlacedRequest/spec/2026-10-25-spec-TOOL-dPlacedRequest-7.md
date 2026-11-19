@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-69
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-69
 
 **Carries:** cl-dClosedLoop-0125@4e0727e5 whole
 **Carries:** node:item.probe.trigger
@@ -35,6 +35,7 @@
 | [2026-10-26-prompt-TOOL-dPlacedRequest-7-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-7-2-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -123,8 +124,9 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   dBoundRoles puts the outcome on the role templates, no role returns it, so probes are placed, never
   raised (flow-steps.md:672). Observed by AC9.
 - **S9** — The keys, each read through dGroundRules' `policy.py get` (I24), with v2's catalogue
-  default until that reader lands, their rows added through TOOL-dDeclaredLoop-6 S4's
-  `python tools/playbook/core.py new policy-key … --owner dPlacedRequest` (v2:1248-1251):
+  default until that reader lands. Their four rows already exist in `tools/policy/catalogue.toml`,
+  owner `dPlacedRequest`, landed by TOOL-dGroundRules-1 at `c9bd97720`; this unit adds no row through
+  the policy-key factory and edits a row in place only where a value differs from v2 (v2:1248-1251):
   `probe.points`, a set of item tags in `review.breakpoints`' grammar, its row's `allowed` a
   `{ type = "set", item = … }` table (TOOL-dGroundRules-1 §4) with `empty = "allowed"` and default
   `[]`, v2's `none`, so PLAY-dOrderedCharter-36 S4 reads it as tag-valued and TOOL-dDeclaredLoop-26
@@ -265,7 +267,8 @@ observations; no role raises one until dBoundRoles lands the outcome on the temp
 - `tools/memory-tree/tree_lib.py`: `probe` and `probe-trigger` in `TYPED_RECORD_KINDS`
 - `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: both kinds in the closed kind list
 - `tools/playbook/core-pending.txt`: the stale `principle.p31` row, where it holds one
-- `tools/policy/catalogue.toml`: four rows, through the factory
+- `tools/policy/catalogue.toml`: the four `probe.*` rows exist; edited in place only where a value
+  differs from v2
 - `.governance/policy.json`: the mirror, regenerated in its own commit
 - `tools/gate-legs.json`: the leg `loop probe fixtures`, argv `python {prefix}/loop/probe.py --fixture`, `enforces = ["principle.p31"]`
 - `tools/govkit/subject-pins.tsv`, regenerated by `python tools/govkit/govkit.py selfcheck --write`
@@ -342,12 +345,14 @@ observations; no role raises one until dBoundRoles lands the outcome on the temp
   Red when: a role item cannot ask for a test.
 - **AC10** — When `python -c "import tomllib, sys; print(sorted(r['name'] for r in tomllib.load(open(sys.argv[1], 'rb'))['key'] if r['name'].startswith('probe.')))" catalogue.toml`
   runs in the policy kit's directory, it prints `probe.experiment.authority`, `probe.observations`,
-  `probe.points` and `probe.raise`, and `git grep -n "probe.raise" -- probe.py`, run in the loop kit's
-  directory, finds a literal-key read; the same read of the `probe.points` row prints its `allowed`
-  `type` as `set` and its `default` as `[]`.
-  Red when: a key has no row, is read in a shape the reader-coverage arm does not count, or
-  `probe.points` is not a set row, so `read_tag_policy` does not read it as tag-valued.
-  fixture: the catalogue is dGroundRules', untracked until it builds.
+  `probe.points` and `probe.raise`, and the same read of the `probe.points` row prints its `allowed`
+  `type` as `set` and its `default` as `[]`, both a guard on rows the base already holds. The half the
+  unit moves: `python -c "import sys; sys.path.insert(0, sys.argv[1]); import check_policy; k = check_policy.scan_reader_keys(sys.argv[2]); print(sorted(x for x in k if x.startswith(sys.argv[3])))" tools/policy . probe.`, run at the repository root over the built tree, prints a list holding the four keys, where at the
+  base it prints `[]`, and `git grep -n "probe.raise" -- probe.py`, run in the loop kit's directory,
+  finds a literal-key read.
+  Red when: a key is read in a shape the reader-coverage arm does not count, or `probe.points` is not a
+  set row, so `read_tag_policy` does not read it as tag-valued.
+  fixture: none; the rows are tracked since `c9bd97720`.
 - **AC11** — When `grep -n "probe.observations" loop.md` runs in `help/`, it finds the probe section
   naming the two ways in and the four keys.
   Red when: the program lands and the page does not say how a probe opens.
@@ -358,10 +363,13 @@ observations; no role raises one until dBoundRoles lands the outcome on the temp
   runs the cases or the core meta-check reds it.
 - **AC13** — When `python loop_lib.py --check` runs in the loop kit's directory after the rows land,
   the lines for `item.probe.design` and `item.probe.judge-claimed` read `role:gov-tester · pending ·
-  the roles kit holds no gov-tester role`, the line `item.test.attribute` prints at `6e9c6062`, and
-  `grep -c 'actor = "role:tester"' loop.toml` prints `0`.
-  Red when: a probe row spells `role:tester`, a slot no build ships, so it stays pending once
-  dWitnessedBar's `gov-tester` role lands.
+  the roles kit holds no gov-tester role`, the line `item.test.attribute` prints at `6e9c6062`, the
+  line for `item.probe.experiment` reads `role:gov-researcher` with no `pending`, since
+  `tools/roles/agents/gov-researcher.agent.md` ships the role, and
+  `grep -c 'actor = "role:tester"' loop.toml` and `grep -c 'actor = "role:researcher"' loop.toml` each
+  print `0`.
+  Red when: a probe row spells `role:tester` or `role:researcher`, a slot no build ships, so it stays
+  pending once dWitnessedBar's `gov-tester` role lands or for ever.
 
 ## 7. Gates
 
@@ -409,6 +417,11 @@ New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step` and `role-
   a discovery adopted by this build run, `item.probe.experiment`'s actor is respelled
   `role:gov-researcher`, the role the tree ships; §7 gains the five legs the spec-token guard join
   names.
+- rev-6 · 2026-11-19 · §2 S9 · §4 Files touched · §6 AC10, AC13 · folds `2026-11-19-review-dPlacedRequest-spec-audit-round-1`: finding 5 (M4), AC13 reads the
+  `item.probe.experiment` line as `role:gov-researcher` with no `pending` and refuses a row left at
+  `role:researcher`; finding 26 (M8), the four `probe.*` rows already exist at `c9bd97720`, so S9
+  drops the factory step and edits a row in place only where it differs from v2, and AC10's
+  catalogue conjunct reads `scan_reader_keys` over the built tree, which the unit moves.
 
 ## 10. Reuse audit
 

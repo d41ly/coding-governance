@@ -571,6 +571,15 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | LOW | TOOL-dPlacedRequest-2 | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
 | [TOOL-dPlacedRequest-71](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-20 | 2026-10-26 | AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1… |
 | [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-2 | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
+| [TOOL-dPlacedRequest-74](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
+| [TOOL-dPlacedRequest-75](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-76](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS rule-stated-with-no-check-that-fails EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-77](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-78](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS decision-re-derived-by-a-second-process EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-79](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS retirement-inventory-misses-readers-by-value EARNED A GATE AT… |
+| [TOOL-dPlacedRequest-80](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-guards-one-question-two-answers EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-81](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-folded-field-leaves-its-row-shape-docs-behind EARNED A GATE… |
+| [TOOL-dPlacedRequest-82](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
