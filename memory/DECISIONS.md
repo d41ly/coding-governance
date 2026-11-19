@@ -141,6 +141,7 @@
 - **TOOL-aSmoothedDispatch-2** - **the driver's refusal ceiling rises 323 -> 324 for unit 2's refusal of a `--writes` list emptied by dropping the run-state file, under TOOL-aSparedSpawn-14's rule, as TOOL-aSweptBar-6 raised it 318 -> 319**: owner, 2026-11-10, "Raise to 324". Detail `builds/aSmoothedDispatch/`.
 - **TOOL-aSmoothedDispatch-22** - **the spec-token checker keeps TOOL-dPavedRoad-1's `--spec`; TOOL-aSmoothedDispatch-5's one-path, live-only `--spec` is retired at the reconcile with main**: owner, 2026-11-11, "Keep main's --spec". Coexists-with PLAY-dDerivedDocket-1. Detail `builds/aSmoothedDispatch/`.
 - TOOL-dPlacedRequest-13 · the unattended Skill's size row is raised 11015 -> 11051 (DERIVED, the CR-stripped render at 8080a9c61) under the run-raise terms in tools/template-size-limits.txt: the `unattended.sh --feed check` line that check 26 of the unattended kit gate requires of the declared `--feed` verb takes the render to 11051, and the row is that figure with no headroom (TOOL-aOrientedCast-23).
+- TOOL-dPlacedRequest-1 · the unattended Skill's size row is raised 11051 -> 11094 (DERIVED, the CR-stripped render at 71f85d59f) under the run-raise terms in tools/template-size-limits.txt: the `unattended.sh --lease acquire build <slug>` line that check 26 of the unattended kit gate requires of the declared `--lease` verb takes the render to 11094, and the row is that figure with no headroom (TOOL-aOrientedCast-23).
 
 ## DEPL — deployer
 
