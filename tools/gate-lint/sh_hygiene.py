@@ -15,12 +15,15 @@ THE FIFTH CLASS, `--stage-commits` (TOOL-dSettledStage-2). A commit placed after
 nothing between them testing that the stage left a diff. Staging can normalise a dirty file back to
 its committed bytes, a tree dirty by line endings alone, and then the commit fails on an empty stage:
 landing 12764ec21 aborted before its bar that way. A git event is `add`, `commit`, `commit-tree`,
-`diff` or `diff-index` after `git` or `GIT` and any run of `-c <word>` and `-C <word>`, read where the
-line with its quoted text blanked leaves it as code, a `$( )` inside double quotes kept as code. In one
-scope, the innermost function holding the line or the top level, a commit after a stage with a
-`--cached` or `--staged` diff between them is admitted, and after a stage with none is `unchecked`,
-the one gated class. A call to a same-file function whose body stages is a stage, followed at once by
-a test when that body tests its stage after its last `git add`. A commit with no stage above it in
+`diff` or `diff-index` after `git` or `GIT` and any run of the literal global options git reads before
+its verb: `-c <word>`, `-C <word>`, `-p`, `-P`, `--<name>` or `--<name>=<word>`, and `--git-dir`,
+`--work-tree`, `--namespace` or `--config-env` with a separate `<word>` (TOOL-dSettledStage-4). It is
+read where the line with its quoted text blanked leaves it as code, a `$( )` inside double quotes kept
+as code, and its arguments step over every `$( … )` in them. In one scope, the innermost function
+holding the line or the top level, a commit after a stage with a `--cached` or `--staged` diff
+between them is admitted, and after a stage with none is `unchecked`, the one gated class. A call to
+a same-file function whose body stages, directly or through another stager, is a stage, followed at
+once by a test when that body ends with its stage tested. A commit with no stage above it in
 its scope is unpaired, and one carrying `--allow-empty` is empty-ok; both are counted and printed,
 never gated. The registry counts sites per (path, `unchecked-stage`) and shrinks only. What the mode
 does not check is `STAGE_BOUNDARY`, named on `run_stage_scan` beside the mode it bounds.
@@ -245,7 +248,9 @@ PROBE_CLASSES = [
 #: boundary arm and the two one-line-per-key rows, 33 executed, every one unconditional.
 #: RAISED 125 -> 151 by TOOL-dSettledStage-2: the stage-commit arms, the 15 fixture rows, the 10-row
 #: boundary arm and the registry arm, 26 executed, every one unconditional, counted off the arms.
-FLOOR_ASSERTIONS = 151
+#: RAISED 151 -> 165 by TOOL-dSettledStage-4: the 13 new stage fixture rows and the one new boundary
+#: row, 14 executed, every one unconditional, counted off the arms.
+FLOOR_ASSERTIONS = 165
 
 
 def check_substitution(text: str) -> bool:
@@ -1268,10 +1273,15 @@ def run_temp_scan(args: list[str]) -> int:
 
 # ---- the UNCHECKED-STAGE class, `--stage-commits` -----------------------------------------------
 # An event: a git word — `git` or `GIT` not after a word character, `$`, `.` or `-`, through any run of
-# `-c <word>` and `-C <word>` — then a verb as a whole word. Group 1 is the verb. Matched on the code
-# half, and kept only where the blanked line leaves the git word and the verb as written.
-STAGE_EVENT = re.compile(r"(?<![\w$.-])(?:git|GIT)(?:[ \t]+-[cC][ \t]+" + PROBE_WORD + r")*[ \t]+"
-                         r"(add|commit-tree|commit|diff-index|diff)(?![\w-])")
+# the literal global options git reads before its verb — `-c <word>`, `-C <word>`, the bare `-p` and
+# `-P`, a long option `--<name>` or `--<name>=<word>`, and the four that take a separate argument,
+# `--git-dir`, `--work-tree`, `--namespace` and `--config-env`, each then one `<word>` — then a verb
+# as a whole word. Group 1 is the verb. Matched on the code half, and kept only where the blanked
+# line leaves the git word and the verb as written. An option behind an expansion or in quotes is
+# not read, and neither is the event: a `STAGE_BOUNDARY` row.
+STAGE_EVENT = re.compile(r"(?<![\w$.-])(?:git|GIT)(?:[ \t]+-[cC][ \t]+" + PROBE_WORD + r"|[ \t]+-[pP]"
+                         r"|[ \t]+--(?:git-dir|work-tree|namespace|config-env)[ \t]+" + PROBE_WORD
+                         + r"|" + _PROBE_FLAG + r")*[ \t]+(add|commit-tree|commit|diff-index|diff)(?![\w-])")
 # A registry key is the one class, so a line number is refused as malformed.
 STAGE_KEY = re.compile(r"\Aunchecked-stage\Z")
 STAGE_KEY_SHAPE = (STAGE_KEY, "the class `unchecked-stage`", "CLASS")
@@ -1296,6 +1306,8 @@ STAGE_BOUNDARY = [
     ("a stage and a test in two repositories",
      "git -C a add -A\ngit -C b diff --cached --quiet || git -C b commit -q -m x", "admitted"),
     ("a git verb behind a variable", "git add -A\n$GITCMD commit -q -m x", "unread"),
+    ("a git global option behind an expansion or in quotes", "git add -A\ngit $GIT_OPTS commit -q -m x",
+     "unread"),
     ("a commit inside a quoted string or under eval", 'git add -A\neval "git commit -q -m x"', "unread"),
     ("a git verb split across a line continuation", "git add -A\ngit -c a=b \\\n  commit -q -m x", "unread"),
     ("a merge conclusion", "git merge --no-commit -q side\ngit add -A\ngit commit -q -m m", "unchecked"),
@@ -1315,7 +1327,10 @@ def read_stage_events(code: str) -> list[tuple[int, str, str]]:
     `diff-index` whose arguments carry `--cached` or `--staged`, whatever its output form; and `diff`
     for any other. An event counts only where `build_blanked(code, keep_substitutions=True)` leaves its
     git word and its verb unblanked, so text inside quotes is data and a `"$(git … )"` is code. Its
-    arguments run to the next unquoted `;`, `&`, `|` or `)`.
+    arguments are a walk over that blank from the verb's end: a `$(` is stepped over with the
+    substitution `read_substitution` reads and its closing `)`, and the first other `;`, `&`, `|` or
+    `)` ends them, else the line's end. So the `)` of a quoted `"$(date)"` does not end them, and the
+    `)` of a `$( … )` holding the event does.
     """
     blank = build_blanked(code, keep_substitutions=True)
     events = []
@@ -1323,41 +1338,79 @@ def read_stage_events(code: str) -> list[tuple[int, str, str]]:
         start, verb_at, verb_end, verb = match.start(), match.start(1), match.end(1), match.group(1)
         if blank[start:start + 3] != code[start:start + 3] or blank[verb_at:verb_end] != verb:
             continue
-        stop = re.search(r"[;&|)]", blank[verb_end:])
-        args = code[verb_end:verb_end + stop.start() if stop else len(code)]
+        k = verb_end
+        while k < len(blank) and blank[k] not in ";&|)":
+            k += 2 + len(read_substitution(blank, k)) + 1 if blank.startswith("$(", k) else 1
+        args = code[verb_end:min(k, len(code))]
         if verb.startswith("diff"):
             verb = "test" if re.search(r"(?<![\w-])--(?:cached|staged)(?![\w-])", args) else "diff"
         events.append((verb_at, "commit" if verb.startswith("commit") else verb, args))
     return events
 
 
-def read_stage_helpers(code_lines: list[tuple[int, str, str]]) -> dict[str, bool]:
-    """The stagers one source defines, `{name: checked}`: a function whose body holds an `add` event.
+def read_stage_calls(code: str, helpers: dict[str, bool]) -> list[tuple[int, str, str]]:
+    """The calls on one code half to a name in `helpers`, `[(column, "call", name)]`, in column order.
 
-    It is CHECKED when its body holds a staged test after its last `add` event, so a call to it is a
-    stage followed at once by a test. Its body is `read_function_bodies`', so a later definition of
-    the name wins.
+    A call is the name as a whole word, unblanked on the `keep_substitutions` blank, not after `$`,
+    `.`, `/` or `-`, not before `=`, `+=` or `[`, and not the name on its own `FUNCTION_DEF`
+    definition line. An empty `helpers` reads no call.
     """
+    if not helpers:
+        return []
+    calls = re.compile(r"(?<![\w$./-])(" + "|".join(re.escape(name) for name in sorted(helpers))
+                       + r")(?![\w./-]|\+?=|\[)")
+    blank = build_blanked(code, keep_substitutions=True)
+    head = FUNCTION_DEF.match(code)
+    found = []
+    for call in calls.finditer(code):
+        if blank[call.start():call.end()] != call.group(1):
+            continue
+        if head and head.start(2) == call.start():
+            continue
+        found.append((call.start(), "call", call.group(1)))
+    return found
+
+
+def read_stage_helpers(code_lines: list[tuple[int, str, str]]) -> dict[str, bool]:
+    """The stagers one source defines, `{name: checked}`: a function whose body stages, directly
+    through an `add` event or through a call to another stager.
+
+    The set closes transitively. Every body from `read_function_bodies` is re-walked until the mapping
+    stops changing, at most one pass more than there are functions, so a call cycle cannot loop it.
+    A pass walks each body's events and its calls to the stagers known so far in line and column
+    order with `scan_stage_file`'s `[staged, tested]` state: an `add` sets `[True, False]`, a call
+    `[True, checked]` for the callee, and a staged test sets tested to staged. A body that ends staged
+    is a stager, CHECKED when it ends tested, so a call to it is a stage followed at once by a test.
+    A later definition of a name wins, and a cycle with no `add` in it stages nothing.
+    """
+    bodies = read_function_bodies(code_lines)
     helpers: dict[str, bool] = {}
-    for name, body in read_function_bodies(code_lines).items():
-        last_add, last_test = -1, -1
-        for order, (_column, kind, _args) in enumerate(
-                event for line in body.split("\n") for event in read_stage_events(line)):
-            if kind == "add":
-                last_add = order
-            elif kind == "test":
-                last_test = order
-        if last_add >= 0:
-            helpers[name] = last_test > last_add
+    for _pass in range(len(bodies) + 1):
+        known: dict[str, bool] = {}
+        for name, body in bodies.items():
+            state = [False, False]
+            for line in body.split("\n"):
+                for _column, kind, args in sorted(read_stage_events(line) + read_stage_calls(line, helpers),
+                                                  key=lambda event: event[0]):
+                    if kind == "add":
+                        state[:] = [True, False]
+                    elif kind == "call":
+                        state[:] = [True, helpers[args]]
+                    elif kind == "test":
+                        state[1] = state[0]
+            if state[0]:
+                known[name] = state[1]
+        if known == helpers:
+            break
+        helpers = known
     return helpers
 
 
 def scan_stage_file(text: str) -> dict[str, list[tuple[int, str]]]:
     """Classify every commit in one shell source: `{class: [(line, code), ...]}`, by `STAGE_CLASSES`.
 
-    A commit is a `commit` or `commit-tree` event. A stage is an `add` event, or a call to a stager: its
-    name as a whole word, unblanked, not after `$`, `.`, `/` or `-`, not before `=`, `+=` or `[`, and
-    not the name on its own definition line. The events of one scope — the innermost function whose
+    A commit is a `commit` or `commit-tree` event. A stage is an `add` event, or a call to a stager,
+    as `read_stage_calls` reads one. The events of one scope — the innermost function whose
     `read_function_spans` span holds the line, else the top level — are read in line and column order.
     A commit carrying `--allow-empty` is `empty-ok`; one with no stage above it in its scope is
     `unpaired`; one after a stage with a staged test between them is `admitted`; any other is
@@ -1366,24 +1419,13 @@ def scan_stage_file(text: str) -> dict[str, list[tuple[int, str]]]:
     code_lines = read_code_lines(text)
     helpers = read_stage_helpers(code_lines)
     spans = read_function_spans(code_lines)
-    calls = (re.compile(r"(?<![\w$./-])(" + "|".join(re.escape(name) for name in sorted(helpers))
-                        + r")(?![\w./-]|\+?=|\[)") if helpers else None)
     found: dict[str, list[tuple[int, str]]] = {key: [] for key, _m, _l in STAGE_CLASSES}
     states: dict[int, list[bool]] = {}
     for i, (number, code, _comment) in enumerate(code_lines):
         # [staged, tested]: a stage seen above in this scope, and a staged test since the last stage.
         state = states.setdefault(max((start for start, end in spans if start <= i <= end), default=-1),
                                   [False, False])
-        events = read_stage_events(code)
-        if calls:
-            blank = build_blanked(code, keep_substitutions=True)
-            head = FUNCTION_DEF.match(code)
-            for call in calls.finditer(code):
-                if blank[call.start():call.end()] != call.group(1):
-                    continue
-                if head and head.start(2) == call.start():
-                    continue
-                events.append((call.start(), "call", call.group(1)))
+        events = read_stage_events(code) + read_stage_calls(code, helpers)
         for _column, kind, args in sorted(events, key=lambda event: event[0]):
             if kind == "add":
                 state[:] = [True, False]
@@ -1446,10 +1488,13 @@ def run_stage_scan(args: list[str]) -> int:
     with `--name-only` and never read; and a stage and a test in two repositories, `-C a` and `-C b`,
     since the event reader does not compare the repositories its git words name.
 
-    UNREAD, no commit counted, so each is a MISS: a git verb behind a variable, `$GITCMD commit`; a
-    commit inside a quoted string or under eval; a git verb split across a line continuation, whose
-    verb is on a line this reader does not join; and Python inside a shell string, or a commit in any
-    other language, which no shell predicate reads and which has no shell example.
+    UNREAD, no commit counted, so each is a MISS: a git verb behind a variable, `$GITCMD commit`;
+    a git global option behind an expansion or in quotes, `git $GIT_OPTS commit` or
+    `git "--no-pager" commit`, since the git word reads only the literal options `-c`, `-C`, `-p`, `-P`,
+    `--<name>[=<word>]` and `--git-dir`, `--work-tree`, `--namespace` or `--config-env` with a separate
+    word; a commit inside a quoted string or under eval; a git verb split across a line continuation,
+    whose verb is on a line this reader does not join; and Python inside a shell string, or a commit in
+    any other language, which no shell predicate reads and which has no shell example.
 
     UNCHECKED, the mode's two known false reds, each a registry row: a merge conclusion, which commits
     a merge in progress on an empty stage; and a first commit in a fresh repository, whose stage holds
@@ -1950,6 +1995,24 @@ def run_selftest() -> int:
         ("name-only test", 'git add -A\n[ -n "$(git diff --cached --name-only)" ] && git commit -m x\n', (0, 1, 0, 0)),
         ("diff-index", "git add -A\ngit diff-index --quiet --cached HEAD || git commit -m x\n", (0, 1, 0, 0)),
         ("a variable named as a stager", "stage() {\n  git add -A\n}\nstage=1\ngit commit -q -m x\n", (0, 0, 1, 0)),
+        # TOOL-dSettledStage-4: a quoted substitution's `)` ends no argument list, every literal global
+        # option before the verb is read, and the stager set closes over calls.
+        ("a quoted substitution before --allow-empty", 'git add -A\ngit commit -q -m "$(date)" --allow-empty\n',
+         (0, 0, 0, 1)),
+        ("a quoted substitution before --cached",
+         'git add -A\ngit diff "$(echo x)" --cached --quiet || git commit -m x\n', (0, 1, 0, 0)),
+        ("-p", "git add -A\ngit -p commit -q -m x\n", (1, 0, 0, 0)),
+        ("-P", "git add -A\ngit -P commit -q -m x\n", (1, 0, 0, 0)),
+        ("--no-pager", "git add -A\ngit --no-pager commit -q -m x\n", (1, 0, 0, 0)),
+        ("--git-dir=", "git --git-dir=.git add -A\ngit --git-dir=.git commit -q -m x\n", (1, 0, 0, 0)),
+        ("--git-dir apart", "git add -A\ngit --git-dir .git commit -q -m x\n", (1, 0, 0, 0)),
+        ("--work-tree apart", "git add -A\ngit --work-tree . commit -q -m x\n", (1, 0, 0, 0)),
+        ("--namespace apart", "git add -A\ngit --namespace n commit -q -m x\n", (1, 0, 0, 0)),
+        ("--config-env apart", "git add -A\ngit --config-env core.pager=HOME commit -q -m x\n", (1, 0, 0, 0)),
+        ("a two-hop unchecked stager", "s1() { git add -A; }\ns2() { s1; }\ns2\ngit commit -q -m x\n", (1, 0, 0, 0)),
+        ("a two-hop checked stager", "s1() {\n  git add -A\n  ! git diff --cached --quiet\n}\ns2() {\n  s1\n}\n"
+                                     "if s2; then git commit -q -m x; fi\n", (0, 1, 0, 0)),
+        ("a call cycle with no stage", "a() { b; }\nb() { a; }\na\ngit commit -q -m x\n", (0, 0, 1, 0)),
     ]
     for label, text, want in stage_cases:
         seen_stage = scan_stage_file(text)

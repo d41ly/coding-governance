@@ -1720,7 +1720,10 @@ fi
 #      stages, and run on a detached merge in a fresh repository. The dates are pinned years before
 #      the fixture, so a rewrite of the merge cannot reproduce its sha in the same second. The real
 #      change is the control: a helper that never stages fails it. Red at the base lander 12764ec2,
-#      whose fold commits a new merge over HEAD's own tree.
+#      whose fold commits a new merge over HEAD's own tree. The liveness echoes, arm 42's spelling,
+#      prove this git builds the shape (TOOL-dSettledStage-4): `eol-empty=1` when staging the
+#      line-ending rewrite leaves the stage empty, after which the shape is rebuilt, and `eol-dirty=1`
+#      when status names f.txt right before the fold. With no CRLF checkout the arm reds.
 out43=$(
   for f in write_staged_change write_merge_fold; do
     eval "$(sed -n "/^$f() {/,/^}/p" "$lander")"
@@ -1736,7 +1739,11 @@ out43=$(
   export GIT_CONFIG_VALUE_0=true
   rm f.txt; git checkout -q -- f.txt
   printf 'one\ntwo\n' > f.txt
+  git add -A 2>/dev/null; git diff --cached --quiet && echo eol-empty=1; git reset -q
+  rm f.txt; git checkout -q -- f.txt
+  printf 'one\ntwo\n' > f.txt
   export GIT_COMMITTER_DATE='2001-01-01T00:00:00Z' GIT_AUTHOR_DATE='2001-01-01T00:00:00Z'
+  [ -n "$(git status --porcelain -- f.txt)" ] && echo eol-dirty=1
   t=$M; write_merge_fold "$P1" "$P2" "msg" 2>/dev/null; echo "eol-rc=$?"
   [ "$(git rev-parse HEAD)" = "$M" ] && echo eol-head=same
   printf 'changed\n' > f.txt
@@ -1745,7 +1752,7 @@ out43=$(
     && [ "$(git rev-parse HEAD^2)" = "$P2" ] && [ "$(git show HEAD:f.txt)" = changed ] && echo real-moved=1
 )
 _l43=0
-for w43 in eol-rc=0 eol-head=same real-rc=0 real-moved=1; do
+for w43 in eol-dirty=1 eol-empty=1 eol-rc=0 eol-head=same real-rc=0 real-moved=1; do
   [[ $'\n'$out43$'\n' == *$'\n'"$w43"$'\n'* ]] || _l43=1
 done
 [ "$_l43" = 0 ] \

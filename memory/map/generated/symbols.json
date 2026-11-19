@@ -22798,6 +22798,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_stage_calls",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_stage_events",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"

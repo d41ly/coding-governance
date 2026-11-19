@@ -206,13 +206,18 @@ A fifth class. A commit placed after a `git add` with nothing between them testi
 left a diff. Staging can normalise a dirty file back to its committed bytes, a tree dirty by line
 endings alone, and the commit then fails on an empty stage: a landing in the kit's home repository
 aborted before its bar that way. A git event is `add`, `commit`, `commit-tree`, `diff` or `diff-index`
-after `git` or `GIT` and any run of `-c <word>` and `-C <word>`. It is read only where the line with
+after `git` or `GIT` and any run of the literal global options git reads before its verb: `-c <word>`,
+`-C <word>`, `-p`, `-P`, `--<name>` or `--<name>=<word>`, and `--git-dir`, `--work-tree`,
+`--namespace` or `--config-env` with a separate `<word>`. It is read only where the line with
 its quoted text blanked leaves the git word and the verb as code, a `$( )` inside double quotes kept
-as code, so `echo "git commit"` is data and `"$(git diff --cached)"` is read. Within one scope, the
+as code, so `echo "git commit"` is data and `"$(git diff --cached)"` is read. An event's arguments
+run to the first `;`, `&`, `|` or `)` past every `$( … )` in them, so `-m "$(date)" --allow-empty`
+carries its `--allow-empty`. Within one scope, the
 innermost function holding the line or the top level, events are read in line and column order. A
 staged test is a `diff` or `diff-index` whose arguments carry `--cached` or `--staged`. A stage is a
-`git add`, or a call to a STAGER, a function of the same file whose body runs `git add`; a stager whose
-body tests its stage after its last `git add` is checked, and a call to it is a stage followed at once
+`git add`, or a call to a STAGER, a function of the same file whose body runs `git add` directly or
+through another stager; the set closes over calls, a call cycle with no `git add` staging nothing. A
+stager whose body ends with its stage tested is checked, and a call to it is a stage followed at once
 by a test. A commit after a stage with a staged test between them is admitted, one with no test is
 `unchecked`, the one gated class, one with no stage above it in its scope is unpaired, and one
 carrying `--allow-empty` is empty-ok; the last two are counted and printed, never gated.
@@ -231,7 +236,8 @@ What it does NOT check is one table in the scanner, `STAGE_BOUNDARY`: `run_stage
 this section name each row, and the selftest runs each row's example and finds its label in both.
 Unpaired, so a miss: a stage in another scope; a stager in a sourced library; and a commit that stages
 with -a. Admitted, so a miss: a staged test whose answer does not gate the commit; and a stage and a
-test in two repositories. Unread, no commit counted, so a miss: a git verb behind a variable; a commit
+test in two repositories. Unread, no commit counted, so a miss: a git verb behind a variable;
+a git global option behind an expansion or in quotes, `git $GIT_OPTS commit`; a commit
 inside a quoted string or under eval; a git verb split across a line continuation; and Python inside a
 shell string, or a commit in any other language. Unchecked, the mode's two known false reds, each a
 registry row: a merge conclusion, which commits on an empty stage; and a first commit in a fresh

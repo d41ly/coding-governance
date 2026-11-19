@@ -1,11 +1,12 @@
 # TOOL-dSettledStage-4 — the stage scan reads past a quoted substitution, every git global option and a stager's wrappers, and arm 43 proves its shape
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dSettledStage-4-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-4-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-3-promotion-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-3-promotion-brief.md) | research | TOOL-dSettledStage-3 |
 
 <!-- /gen:spec-records -->
