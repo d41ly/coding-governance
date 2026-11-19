@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-66
 
 **Carries:** cl-dClosedLoop-0131@3532cbe6 whole
 
@@ -65,8 +65,11 @@ hooks `TOOL-dPlacedRequest-11`'s one writer, so every later writer joins it by c
   event at or after `seq`, in file order. Observed by AC6.
 - **S9** — The census, `scan_feed_writers <file>…`: every line of a shipped shell file that pushes
   with `--force-with-lease` must sit in a function whose body calls `add_feed_event` or
-  `write_gov_ref`; each other one prints `<file>:<line>`. The lib test runs it over every shipped
-  shell file and hook, and the parity row `gov_feed_sh` holds the copies. Observed by AC7 and AC8.
+  `write_gov_ref`; each other one prints `<file>:<line>`. It also prints every line, in any
+  function, that pushes a `refs/gov/` ref without `--force-with-lease`, since such a push is no
+  compare-and-swap write and skips the census KICK-dKeptSession-23 relies on. The lib test runs it
+  over every shipped shell file and hook, and the parity row `gov_feed_sh` holds the copies. Observed
+  by AC7, AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -146,6 +149,13 @@ chain git holds, so only its current tip compares; its past events stay replayab
 calls neither `add_feed_event` nor `write_gov_ref`. A comment line is skipped. Its population today
 is two lines, both inside `write_gov_ref` once `TOOL-dPlacedRequest-11` lands; an empty population
 reds the arm, never passes it.
+
+The second limb flags a line carrying `push` and the literal `refs/gov/` and no `--force-with-lease`,
+whatever function holds it. Run over the shipped shell files and hooks at `6e9c6062`, it finds
+nothing: both pushes of a governance ref name it through a variable and carry a lease
+(`tools/unattended/unattended.sh@875eaadf:2793`, `tools/run-gates/post-merge.sh@a0462621:280`). Its
+live population is therefore empty, and its red is the planted push of AC9. It does not see a plain
+push whose ref is spelled through a variable, nor a push assembled across lines.
 
 ### Inventory
 
@@ -248,12 +258,19 @@ is then written or fetched, while post-merge's bar-red write joins under any set
   line in `gov-feed.sh`, `unattended.sh` and `post-merge.sh`, `cmp` finds the three cuts equal, and
   `grep -c '^gov_feed_sh|' resolve-python.test.sh` prints 1.
   Red when: the row is absent, so a drifted copy passes.
+- **AC9** — When `scan_feed_writers` runs over a scratch shell file whose function calls
+  `add_feed_event` and pushes `refs/gov/mail/fx/a/s1` with a plain `git push origin
+  "$c:refs/gov/mail/fx/a/s1"`, it prints that file's line; with
+  `--force-with-lease=refs/gov/mail/fx/a/s1:` added to the same line it prints nothing, and over the
+  AC7 files it still prints nothing.
+  Red when: a plain push of a governance ref passes the census, as it does when only lease-carrying
+  lines are inspected or when its function's append excuses it.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `unattended kit gate` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `unattended kit gate` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
-New arm: tools/lib/resolve-python.test.sh · covers AC7 AC8 · the `gov_feed_sh` parity row and the census over every shipped shell file, staged by a planted pushing function with no append · none
+New arm: tools/lib/resolve-python.test.sh · covers AC7 AC8 AC9 · the `gov_feed_sh` parity row and the census over every shipped shell file, staged by a planted pushing function with no append · none
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the feed arms over the suite's bare origin, staged by cutting the key check and by deleting one feed line · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 
 ## 8. Open questions
@@ -290,6 +307,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
   promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-39.
+- rev-5 · 2026-11-19 · §2 S9 · §4 The census · §6 AC9 · §7 · adopts ask TOOL-dPlacedRequest-66 per
+  the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: `scan_feed_writers` also flags a
+  plain push of a `refs/gov/` ref, red on a planted push of `refs/gov/mail/fx/a/s1`; §7 gains the
+  three legs the spec-token guard join names.
 
 ## 10. Reuse audit
 

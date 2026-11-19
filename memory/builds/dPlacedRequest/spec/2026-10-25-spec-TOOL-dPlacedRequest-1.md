@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-67
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -48,6 +48,7 @@
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 |
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-5 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -108,7 +109,12 @@ announced (`:2141-2149`).
   record's `witness`; any other write, a beat included, writes
   `renews: no`. `activity` renews on every write, `fixed` only at acquisition, and `none` writes
   `renews: -`, which `TOOL-dPlacedRequest-17` reads as a lease that never expires. Until
-  dWellOiledMachine's progress ledger lands, the transition record is the only witness. Observed by AC4.
+  dWellOiledMachine's progress ledger lands, the transition record is the only witness, but for a
+  declared wait (§4 "The question witness", §8 F9): under `progress` a renew whose `--witness` is the
+  commit of a mail message of kind `question` addressed to the lease's build, `open` on this node and
+  inside its declared deadline by `check_mail_deadline`, writes `renews: yes` even when it equals the
+  record's `witness`, and the same commit exits 2 once the question reads `expired`. Observed by AC4
+  and AC11.
 - **S9** — `leases.overlap` (`kit-dirs`, `files`, `builds`; default `kit-dirs`) and `leases` (`warn`,
   `refuse`; default `warn`) replace the probe's constant 0. `check_cross_run_overlap` reduces each
   path before its join, to its kit directory under `kit-dirs` and unchanged under `files`, and under
@@ -164,6 +170,8 @@ announced (`:2141-2149`).
 - **hands-off** `TOOL-dPlacedRequest-21` — `refs/gov/leases/<slug>/build` and the refusal causes, which `entry.claim` routes, and the offline queue it applies
 - **hands-off** `TOOL-dPlacedRequest-4` — `refs/gov/leases/<slug>/build`, the lease `placement.check` reads for `continue` and `amend`
 - **hands-off** external — dKeptSession's presets cannot set `leases` beside a `leases.*` key in one TOML file (TOOL-dGroundRules-1 §8 F5), and its mailbox posts overlaps and take-overs
+- **consumes-from** external — dKeptSession, a child build: `read_mailbox` (KICK-dKeptSession-5 S6, S7) and `check_mail_deadline` (KICK-dKeptSession-24 S3, S5), which arm the question witness; until both land a question commit is no witness (§8 F9)
+- **hands-off** external — KICK-dKeptSession-25 S4's beat, which passes a question's commit as `--witness` once `check_lease_witness` admits it, and re-plants AC11 on real mail
 - **hands-off** `TOOL-dPlacedRequest-23` — `run_lease_verb` and `leases.offline`'s offline branch, which that unit keeps out of every strict claim read
 - **hands-off** `TOOL-dPlacedRequest-24` — `add_gov_queue`, `write_gov_queue` and `gov-queue.log`, which that unit puts under a node lock and makes idempotent
 - **hands-off** `TOOL-dPlacedRequest-25` — the lease writer's `renews` decision, which that unit derives so a write opening a tenure renews
@@ -252,13 +260,26 @@ its catalogue default all three channels until dGroundRules' reader lands (TOOL-
 commit adds a `-transition-<n>.md` record under the build's `build/` folder whose `**Build:**` names
 it, read with `git diff-tree --no-commit-id --name-only -r <sha>` and `git show <sha>:<path>` (§8 F8).
 With `micro-format` alone nothing is stored, so no commit witnesses and `progress` renews nothing. A
-sha that does not resolve or records no transition of the build exits 2. A beat (`--beat`, `write_claim_beat`, `:2469`) and every holder write
+sha that does not resolve, or that records no transition of the build and is no question witness
+(below), exits 2. A beat (`--beat`, `write_claim_beat`, `:2469`) and every holder write
 the driver makes without a new witness write `renews: no`; they still move `beat-utc`, which the
 liveness verdict reads until `TOOL-dPlacedRequest-17` replaces it. The driver passes the newest
 commit on the run's branch that records a transition of the build, read as above, as its witness
 when one exists. Until dWellOiledMachine's
 executor writes transitions at item boundaries, a run lease therefore renews only when a transition is
 recorded by hand, and this is the interim v2:1159 journals.
+
+### The question witness
+
+`check_lease_witness <slug> <sha>` is the one witness check `--lease renew` runs, and the no-write
+probe KICK-dKeptSession-25 §8 F7 (b) calls: it prints `transition`, `question` or why it admits
+neither, exiting 0, 0 or 2. It answers `question` when `declare -F` finds both `read_mailbox` and
+`check_mail_deadline`, and `read_mailbox <slug> soft`, which prints only messages addressed to the
+build, prints a row of kind `question`, commit `<sha>` and state `open`. That reader prints
+`expired` for a row whose `check_mail_deadline` returned 0 (KICK-dKeptSession-24 S5), so an `open`
+row is inside its declared deadline on this node's clock. A `question` witness renews whatever the
+record's `witness` holds, so a wait renews at every beat; a `transition` witness keeps the
+differs-from-the-record rule. With either function absent, a question commit exits 2 as above.
 
 ### The overlap reduction
 
@@ -284,6 +305,7 @@ build calls when its read fails.
 | `check_lease_segment` | shell function | `check`, OK |
 | `resolve_fleet_tag` | shell function | `resolve`, OK |
 | `read_lease_policy` | shell function | `read`, OK |
+| `check_lease_witness` | shell function | `check`, OK |
 | `run_lease_verb`, the verb's body, `write_lease` being the run-state lease's (`:7979`) | shell function | `run`, OK |
 | `add_gov_queue`, `write_gov_queue` | shell functions | `add` and `write`, OK |
 | `--lease`, `--lease flush` | driver verbs | none |
@@ -401,12 +423,22 @@ its runs move onto build leases at their next claim write; an adopter's stay unt
   `STOPS.template.md`, each is found in section 7, and `--claims` in the AC1 fixture prints rows of
   exactly five TAB fields.
   Red when: the guide omits the grammar or the verbs, or the row shape changes.
+- **AC11** — When the AC4 fixture's shell exports, by `export -f`, a stub `read_mailbox` printing one
+  row of kind `question` to `tFix`, state `open` and commit `Q`, and a stub `check_mail_deadline`, and
+  `--lease renew build tFix --witness Q` runs twice, both new records read `renews: yes` and
+  `witness: Q`; with the stub row's state `expired` the same renew exits 2, and with no stub exported
+  it exits 2 as AC4's non-transition witness does.
+  Red when: a held question renews only once, an expired question renews, or a question renews with
+  dKeptSession's functions absent.
+  fixture: the stubs stand in for KICK-dKeptSession-5's and KICK-dKeptSession-24's functions, which
+  the tree does not hold. The ask's 30-hour wait past a 24-hour `leases.expiry-hours` is each beat's
+  `renews: yes` read by TOOL-dPlacedRequest-17's verdict, which this unit does not build.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `playbook render selftest` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `routed-commits selftest` · `govkit selftest` · `govkit refusal join`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `playbook render selftest` · `govkit acceptance matrix` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `routed-commits selftest` · `govkit selftest` · `govkit refusal join` · `tier2-review self-test` · `policy fixtures`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 · the lease arms over the suite's bare origin, staged by planting each policy value and by cutting the epoch increment · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 · the lease arms over the suite's bare origin, staged by planting each policy value and by cutting the epoch increment · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` flag's selftest case, staged by a user no row names · none
 
 ## 8. Open questions
@@ -454,6 +486,17 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   which TOOL-dDeclaredLoop-12 S4 bars after TOOL-dGroundRules-1 §4 Evidence. (a) restates which channel is the source, held to that table by
   AC4's `["log"]` plant; (b) waits on a parent change for a read two `git` calls make. RESOLVED
   (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
+- **F9 — The question witness (S8) rests on dKeptSession, a child build landing after this unit; how
+  is it built here?** `read_mailbox` (KICK-dKeptSession-5 S6), `check_mail_deadline`
+  (KICK-dKeptSession-24 S3) and the `question` kind are neither in the tree nor minted by this build
+  or a parent. Options: (a) the branch built here, armed only when `declare -F` finds both functions,
+  observed on exported stubs (AC11), inert until dKeptSession lands; (b) S8 left at the transition
+  rule and the ask returned, KICK-dKeptSession-25 extending `check_lease_witness` in its own pass, as
+  KICK-dKeptSession-12 §8 F3 builds its switch in this build's code; (c) a mail reader minted here, a
+  second reader of KICK-dKeptSession-5's records. (c) writes one grammar twice; (b) leaves the
+  adopted ask unbuilt; KICK-dKeptSession-25 §8 F7 (b)'s probe expects the check here. RESOLVED
+  (agent, 2026-11-19, delegated): (a), rung 3; it calls the child's mints by name only and is inert
+  until dKeptSession lands, so no veto trips. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -474,6 +517,10 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 2: the witness is a
   recorded transition on the channel `transitions.record` makes the source, the log record where
   `trailer` is not selected.
+- rev-6 · 2026-11-19 · §2 S8 · §3 Edges · §4 The witness under `progress`, The question witness,
+  Inventory · §6 AC11 · §7 · §8 F9 · §10 · adopts ask TOOL-dPlacedRequest-67 per the brief
+  `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: an open `question` to the build inside its
+  deadline witnesses a renewal (F9 resolved (a)); §7 gains the two legs the spec-token guard join names.
 
 ## 10. Reuse audit
 
@@ -490,6 +537,8 @@ lives on the run's own branch and is what the claim exists to complement); none 
 so the claim block above is the seam. Scout A's row 1 holds against source, with one correction: the
 dispatch line for `--claims` is `:14489`, not `:14490`. `python tools/memory-recall/query.py "how are
 run claims written and how would they migrate to leases"` returned scout A's rows 1 and 6, the brief's
-unit rows and coordination.md:54; none disagrees with source.
+unit rows and coordination.md:54; none disagrees with source. The question witness (rev-6) extends
+that witness check as `check_lease_witness`; `git grep -n check_mail_deadline` at `6e9c6062` finds
+it only in dKeptSession's records.
 
 Recall terms used: lease epoch take-over refs/gov/leases run claim migrate fleet tag overlap offline renewal progress

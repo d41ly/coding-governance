@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-68
 
 **Carries:** cl-dClosedLoop-0123@626c316e whole
 **Carries:** node:policy-key.placement
@@ -68,11 +68,17 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
   observations: <n>
   placer: agent | declared | owner
   check: pending | pass | refused <why> | recorded <why>
+  reenters: <unit id>#<F-id>
   ```
 
   `reason` and `evidence` pass `render_redacted` (`tools/runlog/runlog_lib.py:553`) and are cut to 240 bytes
   each, so a value that reaches the remote through the claim commit carries no secret and no request text
-  past that cap. The newest block is the placement; earlier blocks are the loop's history. Observed by AC5.
+  past that cap. The newest block is the placement; earlier blocks are the loop's history. The
+  `reenters:` line is optional: a block that re-enters a decided item, an owner's late answer placed as
+  an `amend` (TOOL-dFurnishedOrders-16 S8), carries it, and `read_placement` reads a block without it,
+  or with `reenters: none`, as `none`. `place_request` writes one only when its caller passes the item,
+  refusing a value not shaped `<unit id>#F<digits>` before any write; `check` keeps the line, and
+  `record` prints it after `disposition` when it is not `none`. Observed by AC5 and AC12.
 - **S5** — `placement.check`, read as S2 reads `placement`, default `refuse` (v2:1171). `check` re-evaluates
   the newest block against the facts each disposition rests on (orientation.md:157-163, the table in §4)
   and writes its verdict into that block's `check:` line. Under `refuse` a failed fact prints
@@ -149,6 +155,7 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
 - **hands-off** `TOOL-dPlacedRequest-21` — `disposition`, the lines `placement.py record` prints for the claim commit
 - **hands-off** `TOOL-dPlacedRequest-3` — `disposition`, the verbs `place` and `check` the placing items name as their bodies
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** external — TOOL-dFurnishedOrders-16 S8's `place --late`, the one caller that passes `place_request` a `reenters:` item, and its S10, which finds the line present
 
 ## 4. Design
 
@@ -186,7 +193,7 @@ scout return ──place──▶ <git-common-dir>/requests/<key>.placement  (bl
 | `STAND_INS` | table, `tools/loop/placement.py` |
 | `check_prompt_placement` | bash function, `tools/unattended/unattended.sh` |
 | `## Placement` | prompt-record section |
-| `placed-utc`, `build`, `playbook`, `placer`, `check` | placement record keys, beside I18's `disposition` and `reason` |
+| `placed-utc`, `build`, `playbook`, `placer`, `check`, `reenters` | placement record keys, beside I18's `disposition` and `reason` |
 | `held-owner`, `observations-unverified` | `check` answers |
 
 Each function name is put to `python tools/lexicon/lexicon.py --suggest <name> --as py.function` (and
@@ -292,12 +299,18 @@ at the first preflight after landing; a run already past its first preflight is 
   `loop placement fixtures` carries `enforces` holding `principle.p22`, and its argv names
   `placement.py --fixture`.
   Red when: the leg carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
+- **AC12** — When `python placement.py --fixture --plant late-answer` appends, through `place_request`,
+  a block reading `disposition: amend` and `reenters: TOOL-tFix-1#F2`, as an owner's late answer is
+  placed, `read_placement` returns that item, a passing `check` keeps the line, and `record` prints
+  `reenters: TOOL-tFix-1#F2` after `disposition`; a block written without the line reads `none` and
+  `record` prints AC8's four lines; `reenters: TOOL-tFix-1` is refused and no block is written.
+  Red when: the block cannot carry the line, `check` loses it, or a malformed item is written.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `govkit acceptance matrix`
+`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
-New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC5 AC6 AC7 AC8 AC9 · the `loop placement fixtures` leg's plants, its failing case staged by `continue-closed` with the check reading the return's text · none
+New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC5 AC6 AC7 AC8 AC9 AC12 · the `loop placement fixtures` leg's plants, its failing case staged by `continue-closed` with the check reading the return's text · none
 New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode preflight case whose `## Placement` block reads `continue`, its failing case staged by removing `check_prompt_placement`'s call · none
 
 ## 8. Open questions
@@ -343,6 +356,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode p
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 31: the leg
   `loop placement fixtures` carries `enforces`, P22's, whose v2 `[enforcement]` row names
   `cl-dClosedLoop-0123`.
+- rev-5 · 2026-11-19 · §2 S4 · §3 Edges · §4 Inventory · §6 AC12 · §7 · adopts ask
+  TOOL-dPlacedRequest-68 per the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: the
+  placement block carries an optional `reenters: <unit id>#<F-id>` line, written by
+  TOOL-dFurnishedOrders-16 S8's late answer and observed on the `late-answer` plant; §7 gains the
+  three legs the spec-token guard join names.
 
 ## 10. Reuse audit
 

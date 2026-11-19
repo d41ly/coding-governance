@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-65 TOOL-dPlacedRequest-70 TOOL-dPlacedRequest-73
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card
@@ -72,7 +72,10 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   `step <state>` and `READY — none yet` alone, so the next step orients afresh; `fixed-at-start`
   re-publishes nothing, except at a terminal state. Every value publishes at a terminal state. With
   no kickoff engine resolved the writer prints `card — skipped: no kickoff engine` and its transition
-  stands. Observed by AC4.
+  stands. A `--terminal` follow whose `<state>` the build's newest `card` record already names in its
+  `Step` field, read as S6's lookup reads the snapshot, writes no second `card` record and prints
+  `card — snapshot kept: <state> already recorded`, so a close that follows before `--unlease` and
+  the writer's own follow at that transition leave one terminal record. Observed by AC4 and AC13.
 - **S5** — The snapshot. Under `card.snapshot` (v2:1174), `terminal-only`, the default, writes a
   `card` record at the `--terminal` follow only, and `every-transition` at every follow and at the
   READY publish. The record is committed alone, subject `card snapshot(<slug>): <state>`, in the
@@ -94,9 +97,12 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   `resume.context` (v2:1177) and `partial — <n> uncommitted path(s) · resume.partial: <value>` under
   `resume.partial` (v2:1176). `fresh-when-idle`, the default, recommends a fresh session when the
   hook payload's `transcript_path` was last written more than `RESUME_IDLE_S = 300` seconds before
-  the replay; `always-resume` recommends resuming, and reads as `fresh-when-idle` while gov's entry
-  file `CLAUDE.md` carries no `@.claude/orientation-card.md` line, printing that override
-  (v2:1177, `cl-dClosedLoop-0150`); `always-fresh` always recommends a fresh session. The
+  the replay; `always-resume` recommends resuming, and reads as `fresh-when-idle` unless the
+  card-import fixture's recorded verdict, read by `read_card_fixture_verdict` (KICK-dKeptSession-12
+  S2), answers `pass`, printing that override with the reader's reason (v2:1177,
+  `cl-dClosedLoop-0150`). While `declare -F` finds no such reader, as until dKeptSession lands, the
+  verdict reads `red: no recorded run` (§8 F5). The entry file `CLAUDE.md` is not consulted;
+  `always-fresh` always recommends a fresh session. The
   `partial —` line names the value's act, which `skills/session-kickoff/SKILL.md`'s resume paragraph
   states: `continue-item` keeps the work and continues the routed item, its witness still owed;
   `restart-item` commits the work to a side branch `partial/<slug>/<sid8>` and restores the tree to
@@ -127,7 +133,11 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   each reads v2's catalogue default. Their catalogue rows land through TOOL-dDeclaredLoop-6 S4's
   `python tools/playbook/core.py new policy-key <name> … --owner dPlacedRequest`, each with its v2
   values and default. A refused read prints `card — skipped: <key> refused` and writes the session
-  card only, as today. Observed by AC11.
+  card only, as today. `READER_SHAPES` in `tools/policy/check_policy.py` gains one row for `.sh`
+  files and `.githooks/`, a `read_card_policy <key>` or `read_lease_policy <key>` call
+  (TOOL-dPlacedRequest-1 S12's reader), the two function names spelled literally, in the shape of its
+  `policy.py get` row, so `scan_reader_keys` returns each key so read and the reader-coverage arm
+  counts it (§4 Alternatives rejected). Observed by AC11 and AC14.
 - **S12** — The fixture, `bash skills/session-kickoff/card-store.fixture.sh --plant <case>`: a
   scratch repository and a bare remote in the system temp directory, a stub policy kit answering the
   planted values, and the case's observation printed, exit 0 when it holds. Observed by AC1 to AC12.
@@ -154,6 +164,7 @@ fresh session recommended by `resume.context` and partial work handled by `resum
 - **hands-off** `TOOL-dPlacedRequest-3` — `refs/gov/builds/<slug>/card`, published at READY and resolved through `manifest-check.sh --card --path`, the path reader `entry.orient` names as its body
 - **consumes-from** external — dDeclaredLoop, built before this build run: `write_transition` (TOOL-dDeclaredLoop-3 S5), the `terminal` set (TOOL-dDeclaredLoop-15 S1), `claims.py`'s verdict (TOOL-dDeclaredLoop-8 S3), the policy-key factory (TOOL-dDeclaredLoop-6 S4)
 - **consumes-from** external — dOrderedCharter's `write_card_file` (PLAY-dOrderedCharter-8 S2), record factory (PLAY-dOrderedCharter-7 S7) and `TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42 S1); dGroundRules' `policy.py get`
+- **consumes-from** external — dKeptSession, a child build: `read_card_fixture_verdict` (KICK-dKeptSession-12 S2), the switch S7 reads; until it lands the verdict reads red (§8 F5)
 - **hands-off** `TOOL-dPlacedRequest-33` — the `remote-ref` store's publish and follow, which that unit routes through the driver's `--card-ref write`, dark behind `RUN_CLAIMS`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 - **hands-off** `TOOL-dPlacedRequest-49` — `skills/session-kickoff/card-store.fixture.sh`, which that unit's item for finding 3 gives the `publish-late` plant
@@ -242,8 +253,16 @@ transition the loop kit records.
 - `tools/policy/catalogue.toml`: five rows, through the factory
 - `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
 - `help/orientation-card.md`: the build card's stores, the follow and the resume lines
+- `tools/policy/check_policy.py`: the `read_card_policy <key>` row of `READER_SHAPES`, and the
+  policy kit's version where the `kit epoch` leg asks for it
 
 ### Alternatives rejected
+
+- **A `READER_SHAPES` row for every `read_<name>_policy <key>` wrapper.** Run over the tree's shell
+  files at `6e9c6062`, that predicate matches `read_gate_policy "$_gr"`
+  (`tools/unattended/unattended.sh@875eaadf:11939`), whose argument is a revision, and no wrapper
+  passing a key; the row names the two readers this build mints, the `read_card_policy` instance
+  TOOL-dRankedPlan-7 S7 expects present at its base among them.
 
 - **The card in the run claim's message.** The claim carries eight keys
   (`tools/unattended/unattended.sh:2411-2412`) for a run, not a build, and mixing the two records
@@ -298,10 +317,14 @@ transition the loop kit records.
   the cache.
   Red when: a lookup trusts a cache whose `# card-ref` differs from the ref, or another node finds no card.
 - **AC7** — When the plants `context-idle`, `context-always-resume` and `context-always-fresh` replay
-  over a transcript last written 1800 seconds earlier, the `resume —` line recommends fresh, resume
-  and fresh; with `context-no-import`, `always-resume` and no import line in `CLAUDE.md`, it
-  recommends fresh and names the override.
-  Red when: a value is ignored, or `always-resume` holds while the import is unwired.
+  over a transcript last written 1800 seconds earlier, with no import line in `CLAUDE.md` and a stub
+  `read_card_fixture_verdict` exported by `export -f` printing `pass`, the `resume —` line recommends
+  fresh, resume and fresh; with `context-fixture-red`, `always-resume`, the card import line present
+  in `CLAUDE.md` and the stub printing `red: no recorded run`, it
+  recommends fresh and names the override with that reason, and with no stub exported it does the same.
+  Red when: a value is ignored, `always-resume` holds while the verdict is not `pass`, or the import
+  line moves the recommendation.
+  fixture: the stub stands in for KICK-dKeptSession-12's reader, which the tree does not hold.
 - **AC8** — When the plants `partial-continue`, `partial-restart` and `partial-ask` replay over a
   tree with two uncommitted paths, the `partial —` line reads `2 uncommitted path(s)` and names its
   value, and `grep -n "partial/<slug>/<sid8>" skills/session-kickoff/SKILL.md` finds the restart act.
@@ -323,12 +346,23 @@ transition the loop kit records.
   `-card-1.md` record with kind `card` and the anchor id, and no `A` row for it.
   Red when: the kind is missing from `TYPED_RECORD_KINDS`, so the factory refuses at import or the
   record reads malformed.
+- **AC13** — When the plant `close-follow-twice` runs `--card --follow --build tFix --to withdrawn
+  --terminal` twice, as a close's own follow and the transition writer's follow do, the build folder
+  holds one `card` record whose `Step` reads `withdrawn`, and the second follow prints
+  `card — snapshot kept: withdrawn already recorded`.
+  Red when: the second follow writes a second `card` record naming the same terminal state.
+- **AC14** — When `python -c "import sys; sys.path.insert(0, sys.argv[1]); import check_policy; k = check_policy.scan_reader_keys(sys.argv[2]); print('card.store' in k, 'leases.renewal' in k)" tools/policy <repo>`
+  runs over a scratch repository whose one tracked file `reader.sh` reads two keys only as
+  `read_card_policy card.store` and `read_lease_policy leases.renewal`, it prints `True True`; before
+  the row lands the same probe prints `False False`.
+  Red when: either planted read is not returned, so a key read through either reader reds as unread.
+  fixture: a `git init` repository in the system temp directory, `reader.sh` committed; none today.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
+`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `routed-commits selftest` · `policy fixtures`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 AC4 AC6 AC9 · the publish, follow, lookup and R7 arms over a scratch bare remote, the failing case a lookup trusting a stale cache · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 AC4 AC6 AC9 AC13 · the publish, follow, lookup and R7 arms over a scratch bare remote, the failing case a lookup trusting a stale cache · none
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against a stub checker, the failing case a checker that does not answer read as a card · none
 
@@ -352,6 +386,18 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   carrier and the clause names `resume.partial`. RESOLVED (agent, 2026-10-25, delegated): covered,
   rung 3.
   grants: PLAY-dClosedLoop-3 the resume paragraph's three resume.partial acts in skills/session-kickoff/SKILL.md
+- **F5 — S7's switch is `read_card_fixture_verdict`, minted by KICK-dKeptSession-12 in dKeptSession,
+  a child build landing after this unit; what does this unit build?** The reader is neither in the
+  tree nor minted by this build or a parent. Options: (a) S7 calls the reader when `declare -F` finds
+  it and reads its absence as `red: no recorded run`, KICK-dKeptSession-12 S2's own reason, so
+  `always-resume` reads `fresh-when-idle` until a pass is recorded, observed on an exported stub
+  (AC7); (b) S7 builds no override, KICK-dKeptSession-12 S3 building the switch in this code as its
+  §8 F3 says, so `always-resume` resumes unguarded until then; (c) a verdict reader minted here, a
+  second reader of KICK-dKeptSession-12's verdict file. (c) writes one rule twice; (b) leaves AC7
+  observing nothing of the switch. Recommendation (a), the reading `cl-dClosedLoop-0150` gives a
+  fixture that never passed. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3; the absent reader
+  reads as KICK-dKeptSession-12 S2's own `red: no recorded run`, so the switch is observable now and
+  no veto trips. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -368,6 +414,13 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 5: the record serves as
   `card`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list, its binding observed; no
   `new card` door is claimed.
+- rev-6 · 2026-11-19 · §2 S4, S7, S11 · §3 Edges · §4 Files touched, Alternatives rejected · §6 AC7,
+  AC13, AC14 · §7 · §8 F5 · adopts asks TOOL-dPlacedRequest-65, TOOL-dPlacedRequest-70 and
+  TOOL-dPlacedRequest-73 per the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: the
+  card-import fixture's verdict is S7's switch, the import line not consulted (F5 resolved (a)); a
+  repeated terminal follow writes one `card` record; `READER_SHAPES` reads `read_card_policy <key>`,
+  its red seen at `6e9c6062`, and, a discovery adopted by this build run, `read_lease_policy <key>`
+  too; §7 gains the two legs the spec-token guard join names.
 
 ## 10. Reuse audit
 
@@ -383,5 +436,7 @@ orientation card to a remote ref and cache it by object id"` ranked name stems (
 `build_commit`, `render_cards_md`), none a card store, so no existing seam holds the per-build key.
 `python tools/memory-recall/query.py` returned scout B's row, KICK-aReplayedCard-1 (partly superseded
 by TOOL-aGraftedHelix-2) and TOOL-dDeclaredLoop-8's scout row; the last is the re-key S6 reuses.
+S11's reader row extends `tools/policy/check_policy.py#READER_SHAPES`, the one shape table
+`scan_reader_keys` reads, whose comment makes a new shape one row.
 
 Recall terms used: `python tools/memory-recall/query.py "where does a build's orientation card live across sessions and nodes" --terms "orientation card refs/gov/builds card.store card.snapshot card.follows resume.context resume.partial cache object id"`

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-71
 
 **Carries:** cl-dClosedLoop-0138@b6141505 whole
 **Carries:** node:policy-key.leases.offer-seconds
@@ -36,16 +36,21 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
   `write_gov_ref <lease ref> <tip read> <commit>`, keeping the epoch it read; an absent lease is a
   create at epoch 1. It is legal on an absent lease and on a `released` one; a `live` or `held` lease
   refuses `live-holder`, a terminal one `terminal`, each on TOOL-dPlacedRequest-1's refusal line, and a
-  tag `resolve_fleet_tag`'s registry does not hold is refused before any read. Observed by AC1, AC2.
+  tag `resolve_fleet_tag`'s registry does not hold is refused before any read.
+  `--to <fleet tag>/<session>` offers to one session: it writes `offer: <fleet tag>/<session>`, its
+  session half held by TOOL-dPlacedRequest-1's `check_lease_segment` before any read, and S2 classes
+  the lease `offered` for every other session, the named node's included, until the deadline.
+  Observed by AC1, AC2, AC9.
 - **S2** — The `offered` class: `CLAIM_READS` (`tools/unattended/unattended.sh:2219`) gains `offered`,
-  derived for the `lease` mode TOOL-dPlacedRequest-1 adds when the record's `offer` names another fleet
-  tag and `check_deadline_passed <lease ref> <tip> <offer-deadline>` returns 1, not yet. `acquire` and
+  derived for the `lease` mode TOOL-dPlacedRequest-1 adds when the record's `offer` names neither this
+  node's fleet tag nor that tag, `/` and this harness's session, and
+  `check_deadline_passed <lease ref> <tip> <offer-deadline>` returns 1, not yet. `acquire` and
   `take-over` reading `offered` print `lease refused — offered · <tail> · <target tag>` and write
   nothing; the `status` mode announces it, and `beat` declines it as it declines every foreign class.
-  Observed by AC3.
-- **S3** — The named node and the expired offer: for the node the offer names, and for every node once
-  `check_deadline_passed` returns 0, the offer is ignored and the lease classes as the `released` lease
-  it is. An acquisition writes `offer: -` and `offer-deadline: -`, so an acquired lease carries no
+  Observed by AC3 and AC9.
+- **S3** — The named node and the expired offer: for the node, or the node's session, the offer
+  names, and for every node once `check_deadline_passed` returns 0, the offer is ignored and the
+  lease classes as the `released` lease it is. An acquisition writes `offer: -` and `offer-deadline: -`, so an acquired lease carries no
   stale offer. A record whose `offer` reads `-` carries no offer. Observed by AC4, AC5.
 - **S4** — The unsighted offer: when `check_deadline_passed` returns 2, the feed has not seen the tip,
   and the offer holds, its window opening at this node's first sighting. A window that is not a whole
@@ -79,7 +84,7 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-1` — the lease grammar `refs/gov/leases/<slug>/build` and its unit and run forms, the `--lease` verb and its `lease` mode, the record's `offer`, `offer-deadline` and `epoch` keys, `resolve_fleet_tag` and the refusal line; without it there is no lease to offer
+- **consumes-from** `TOOL-dPlacedRequest-1` — the lease grammar `refs/gov/leases/<slug>/build` and its unit and run forms, the `--lease` verb and its `lease` mode, the record's `offer`, `offer-deadline` and `epoch` keys, `resolve_fleet_tag`, `check_lease_segment` and the refusal line; without it there is no lease to offer
 - **consumes-from** `TOOL-dPlacedRequest-17` — `read_first_seen` behind `check_deadline_passed`, and `read_lease_bound offer`, the observer clock an offer's window is judged on and the window itself; without it the deadline would be judged on the reader's raw clock, which clause 0135 forbids
 - **consumes-from** external — dGroundRules' catalogue row for `leases.offer-seconds` and its reader `python tools/policy/policy.py get <key>`, which the chain builds before this build's build run
 - **hands-off** `TOOL-dPlacedRequest-28` — `write_lease_offer`'s absent-lease branch, which that unit routes through `read_feed_lease_tip`
@@ -108,7 +113,7 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
 | Key | Value | Written by |
 |---|---|---|
 | `status` | `released` | `--lease offer` |
-| `offer` | the target node's fleet tag, one registered tag | `--lease offer` |
+| `offer` | the target node's fleet tag, one registered tag, or that tag, `/` and one session | `--lease offer` |
 | `offer-deadline` | an integer number of seconds, `read_lease_bound offer` at the write | `--lease offer` |
 | `epoch` | the epoch read, unchanged; 1 on a create | `--lease offer` |
 
@@ -124,8 +129,13 @@ The offer test sits before the identity rows of the class derivation, in the `le
 offer   = record's `offer`; `-` or empty is no offer
 window  = record's `offer-deadline`; not a whole number reads as expired
 open    = check_deadline_passed <lease ref> <tip> <window> returns 1 or 2
-offered = offer present, offer != resolve_fleet_tag's tag, and open
+me      = resolve_fleet_tag's tag, and me/<session> with the session CLAUDE_CODE_SESSION_ID
+offered = offer present, offer equal to neither form of me, and open
 ```
+
+The session is the one the driver's claim test reads (`tools/unattended/unattended.sh@875eaadf:2585`),
+so an offer to `b/s1` holds the lease from session `s2` on node `b` as from node `a`, and a caller
+with no session matches only a whole-node offer.
 
 `offered` routes `acquire` and `take-over` to the refusal line, `status` to its announce line and
 `beat` to its silent decline. A malformed window frees the lease rather than holding it for ever,
@@ -228,12 +238,18 @@ is the observation.
 - **AC8** — When `grep -n "offered" tools/unattended/STOPS.template.md` and
   `grep -n "lease offer" tools/unattended/VERBS.template.md` run, each finds its row.
   Red when: either guide omits the class or the act.
+- **AC9** — When clone A runs `unattended.sh --lease offer unit fx u1 --to b/s1`, the remote record
+  reads `offer: b/s1`; clone B then running `--lease acquire unit fx u1` under
+  `CLAUDE_CODE_SESSION_ID=s2` within the window prints `lease refused — offered` and leaves the tip
+  unmoved, and under `s1` it lands with `offer: -`; `--to 'b/s 1'` exits 2 before any remote read.
+  Red when: another session on the named node takes the unit before the window passes, or the record
+  names the node alone.
 
 ## 7. Gates
 
-`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates`
+`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 · the offered class and its per-cell row, an expired and an unsighted offer and a replayed stale take, staged against the base driver, which has no offer act · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 AC9 · the offered class and its per-cell row, an expired and an unsighted offer and a replayed stale take, staged against the base driver, which has no offer act · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -266,6 +282,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 · th
   `recall floor arms`, the legs `memory/guides/UNATTENDED-STOPS.md` in Files touched trips.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-28,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-11-19 · §2 S1, S2, S3 · §3 Edges · §4 The offer record, The class derivation · §6 AC9
+  · §7 · adopts ask TOOL-dPlacedRequest-71 per the brief
+  `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: `--to <fleet tag>/<session>` offers to one
+  session, every other session on the named node included reading `offered` until the deadline; §7
+  gains the two legs the spec-token guard join names.
 
 ## 10. Reuse audit
 

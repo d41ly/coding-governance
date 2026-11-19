@@ -563,14 +563,14 @@ Cite ids, never line numbers.
 | [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
 | [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
 | [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dPlacedRequest-65](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE RESUME OVERRIDE READS THE IMPORT LINE, NOT THE FIXTURE.… |
-| [TOOL-dPlacedRequest-66](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEED CENSUS SEES ONLY LEASE-SHAPED PUSHES. TOOL-dPlacedRequest-13… |
-| [TOOL-dPlacedRequest-67](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | A DECLARED WAIT DOES NOT RENEW ITS LEASE. Under leases.renewal:… |
-| [TOOL-dPlacedRequest-68](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16… |
-| [TOOL-dPlacedRequest-69](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item… |
-| [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
-| [TOOL-dPlacedRequest-71](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1… |
-| [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
+| [TOOL-dPlacedRequest-65](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-2 | 2026-10-26 | THE RESUME OVERRIDE READS THE IMPORT LINE, NOT THE FIXTURE.… |
+| [TOOL-dPlacedRequest-66](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | LOW | TOOL-dPlacedRequest-13 | 2026-10-26 | THE FEED CENSUS SEES ONLY LEASE-SHAPED PUSHES. TOOL-dPlacedRequest-13… |
+| [TOOL-dPlacedRequest-67](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | HIGH | TOOL-dPlacedRequest-1 | 2026-10-26 | A DECLARED WAIT DOES NOT RENEW ITS LEASE. Under leases.renewal:… |
+| [TOOL-dPlacedRequest-68](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-4 | 2026-10-26 | THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16… |
+| [TOOL-dPlacedRequest-69](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | LOW | TOOL-dPlacedRequest-7 | 2026-10-26 | THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item… |
+| [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | LOW | TOOL-dPlacedRequest-2 | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
+| [TOOL-dPlacedRequest-71](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-20 | 2026-10-26 | AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1… |
+| [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-2 | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |

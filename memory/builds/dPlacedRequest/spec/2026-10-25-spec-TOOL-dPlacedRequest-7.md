@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-69
 
 **Carries:** cl-dClosedLoop-0125@4e0727e5 whole
 **Carries:** node:item.probe.trigger
@@ -59,7 +59,10 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   `.judge-claimed` and `.return` (I17), each with the actor, needs, witness, outcomes and routes of
   flow-steps.md:632-639, as §4's table states, and `step = "none"`. `check_program`'s admission of
   `step = "none"`, which TOOL-dDeclaredLoop-50 S3 grants rows whose tag's middle segment is `review`,
-  reads the tuple `PROGRAM_SEGMENTS = ("review", "probe")` in `tools/loop/loop_lib.py`. Observed by AC1.
+  reads the tuple `PROGRAM_SEGMENTS = ("review", "probe")` in `tools/loop/loop_lib.py`. The tester's
+  two items spell their actor `role:gov-tester`, the slot the Test rows already spell
+  (`tools/loop/loop.toml@b6651f21:1725`) and TOOL-dWitnessedBar-23 S7 writes. Observed by AC1 and
+  AC13.
 - **S2** — The stand-ins, flow-steps.md:666-675, as `[[stand-in]]` rows (TOOL-dDeclaredLoop-13's
   table, read by `read_stand_ins`): `item.probe.design` and `item.probe.judge-claimed` owned by
   dWitnessedBar's tester, `item.probe.experiment` by dBoundRoles' `experiment` shape, each routing
@@ -184,11 +187,11 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
 |---|---|---|---|---|
 | `item.probe.trigger` | `command:probe.py trigger` | none | the `probe-trigger` record | opened → `item.probe.pin`; not-opened → the asker's next item |
 | `item.probe.pin` | `command:probe.py pin` | `item.probe.trigger` | the head's commit, before any run | verification, reproduction → `item.probe.design`; experiment → `item.probe.experiment` |
-| `item.probe.design` | `role:tester` | `item.probe.pin` | the method's schema check | done → `item.probe.run` |
-| `item.probe.experiment` | `role:researcher` | `item.probe.pin` | the method's schema check | done → `item.probe.run`; beyond-authority → owner item |
+| `item.probe.design` | `role:gov-tester` | `item.probe.pin` | the method's schema check | done → `item.probe.run` |
+| `item.probe.experiment` | `role:gov-researcher` | `item.probe.pin` | the method's schema check | done → `item.probe.run`; beyond-authority → owner item |
 | `item.probe.run` | `executor` | `item.probe.design` or `item.probe.experiment` | the `run` lines by hash | done → `item.probe.judge`; unrunnable → `item.probe.return` |
 | `item.probe.judge` | `command:probe.py judge` | `item.probe.run` | the computed verdict | judged → `item.probe.return`; claimed → `item.probe.judge-claimed` |
-| `item.probe.judge-claimed` | `role:tester` | `item.probe.judge` | the judgment's schema check, held as claimed | done → `item.probe.return` |
+| `item.probe.judge-claimed` | `role:gov-tester` | `item.probe.judge` | the judgment's schema check, held as claimed | done → `item.probe.return` |
 | `item.probe.return` | `command:probe.py return` | `item.probe.judge` | the `probe` record | returned → the asker's re-entry; claimed, unrunnable → owner item |
 
 "Owner item" is the route `stand-in:tools/unattended/unattended.sh`, its `--park` under a mandate and
@@ -353,10 +356,16 @@ observations; no role raises one until dBoundRoles lands the outcome on the temp
   `enforces` holding `principle.p31`.
   Red when: the leg row is absent, names another command, or carries no `enforces`, so the bar never
   runs the cases or the core meta-check reds it.
+- **AC13** — When `python loop_lib.py --check` runs in the loop kit's directory after the rows land,
+  the lines for `item.probe.design` and `item.probe.judge-claimed` read `role:gov-tester · pending ·
+  the roles kit holds no gov-tester role`, the line `item.test.attribute` prints at `6e9c6062`, and
+  `grep -c 'actor = "role:tester"' loop.toml` prints `0`.
+  Red when: a probe row spells `role:tester`, a slot no build ships, so it stays pending once
+  dWitnessedBar's `gov-tester` role lands.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `routed-commits selftest` · `playbook render selftest` · `policy fixtures` · `scratch-guard self-test`
 
 New arm: tools/loop/probe.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the `loop probe fixtures` leg running every `--fixture` case, its failing case staged by `run-refuted` against a predicted `confirmed` · none
 
@@ -394,6 +403,12 @@ New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step` and `role-
   rows 45, 46 and 48: `probe.points` is a set row defaulting to `[]`; both kinds serve as themselves,
   joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list, with no factory door claimed; the leg
   carries `enforces`.
+- rev-5 · 2026-11-19 · §2 S1 · §4 The items · §6 AC13 · §7 · adopts ask TOOL-dPlacedRequest-69 per
+  the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: the item table spells the
+  tester's actor `role:gov-tester`, as `tools/loop/loop.toml` and TOOL-dWitnessedBar-23 S7 do; and,
+  a discovery adopted by this build run, `item.probe.experiment`'s actor is respelled
+  `role:gov-researcher`, the role the tree ships; §7 gains the five legs the spec-token guard join
+  names.
 
 ## 10. Reuse audit
 
