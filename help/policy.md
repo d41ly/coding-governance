@@ -144,10 +144,15 @@ reads is a setting you can change to no effect, so `python tools/policy/check_po
 reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no reader
 ```
 
-- **Landed** means: on the default branch as `policy.py get` reads it, the build's folder
+- **Landed** means: on the default branch as `policy.py get` reads it, either the build's folder
   `memory/builds/<owner>/spec/` holds at least one spec and every spec there is `CLOSED` or
-  `WONTDO`. A build whose specs are still `DEFERRED` or open has not landed, and your working tree
-  never counts: only what is committed on the default branch does.
+  `WONTDO`, or a build run of it landed. A build run landed when one of the build's run records,
+  `RUN.md` or a rotated `RUN.LANDED.<8 hex>.md`, carries a `base:` that names a commit, the run at
+  that base was a build run rather than a spec run, and a merge on the default branch touched the
+  build's `RUN.md` with that same base. So a build run that landed with a unit carried forward as
+  `DEFERRED` counts as landed. A spec run, which carries every unit `DEFERRED`, does not: at its base
+  the build still had an open ask and a roster unit with no spec. Your working tree never counts:
+  only what is committed on the default branch does.
 - **A reader** is a line of tracked code that passes the key to the policy reader, in one of two
   shapes: a call whose first argument is the key in quotes, such as `resolve("budgets.enforce")` in
   Python or `mirror.get('budgets.enforce')` in JavaScript, or `policy.py get budgets.enforce` in a

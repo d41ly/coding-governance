@@ -457,43 +457,175 @@ READER_SKIPPED = re.compile(r"(?:^|/)(?:[^/]*\.test\.(?:sh|js)|selftest[^/]*\.py
 # a `*` or `<name>` segment: a quoted segment, which may hold `.` and an interpolated name, or one
 # run of no quote, space, `.`, `(` or `)` (TOOL-dGroundRules-21 S27)
 PATTERN_SEGMENT = r"(?:\"[^\"\n]*\"|[^'\"`\s.()]+)"
+# The memory-tree modules the run-record half of `derive_landed_builds` loads beside `tree_lib`:
+# `design_lib` because `gen_build_index` imports it at module scope (TOOL-dLandedOwners-1).
+RUN_READER_MODULES = ("gen_build_index", "backlog", "row_grammar", "design_lib")
+RUN_RECORD = re.compile(r"^RUN(?:\.LANDED\.[0-9a-f]{8})?\.md$")  # a build's run record, live or rotated
+
+
+def load_tree_lib_or_refuse(kit=KIT):
+    """`load_tree_lib(kit)`, its miss a Refusal naming where the resolver looked (TOOL-dGroundRules-21 S26)."""
+    try:
+        return load_tree_lib(kit)
+    except (LookupError, ImportError) as exc:
+        raise policy.Refusal("kit.toml", 0, f"requires memory-tree, which does not resolve: {exc}") from None
+
+
+def load_run_readers(kit=KIT):
+    """-> (gen_build_index, backlog, row_grammar) from the memory-tree kit `resolve_kit_dir` finds from
+    `kit`. The directory must hold `<module>.py` for each of RUN_READER_MODULES before anything is
+    imported, since an import answers from `sys.modules` or from anywhere on the import path and so
+    never misses in a process that loaded them once. A missing file, or an import that fails, is the
+    Refusal `load_tree_lib`'s miss raises (TOOL-dLandedOwners-1 S4)."""
+    try:
+        lib = resolve_kit_dir("memory-tree", "tree_lib.py", kit)
+        absent = [m for m in RUN_READER_MODULES if not Path(lib, f"{m}.py").is_file()]
+        if absent:
+            raise LookupError(f"{Path(lib).as_posix()} holds no {absent[0]}.py")
+        if str(lib) not in sys.path:
+            sys.path.insert(0, str(lib))
+        import backlog
+        import gen_build_index
+        import row_grammar
+    except (LookupError, ImportError) as exc:
+        raise policy.Refusal("kit.toml", 0, f"requires memory-tree, which does not resolve: {exc}") from None
+    return gen_build_index, backlog, row_grammar
+
+
+def read_run_base(text):
+    """The first `base:` value of a run record's `## Run facts` section, else None."""
+    section = text.split("\n## Run facts", 1)[1].split("\n## ", 1)[0] if "\n## Run facts" in text else ""
+    m = re.search(r"^base:[ \t]*(.*?)[ \t]*$", section, flags=re.M)
+    return (m[1] or None) if m else None
+
+
+def derive_run_kind(repo, build, base, conf, families):
+    """-> "spec" or "build": README rule 1 at `base`, a commit the caller has resolved, as the
+    dClosedLoop instrument's `derive_run_kind` and `unattended.sh#check_spec_run` read it. "spec" when
+    `<memory root>/builds/<build>/BACKLOG.md` holds an id-led row whose id's slug is `build` and no
+    status row disposes of that id, AND the README's `roster:units` pair holds a row whose first id no
+    spec under the build's `spec/` defines; else "build". `conf` is the memory-tree conf as parsed,
+    `families` its prefixes. A git read that fails is a Refusal naming it (TOOL-dLandedOwners-1 S3)."""
+    tree_lib = load_tree_lib_or_refuse()
+    gbi, backlog, row_grammar = load_run_readers()
+    m = conf["MEMORY_ROOT"].strip("/")
+    folder = f"{m}/builds/{build}"
+    try:
+        listed = tree_lib.read_git_output(repo, ("ls-tree", "-r", "--name-only", base, "--", f"{folder}/spec/"))
+        specs = [p for p in listed.decode("utf-8", "replace").split("\n") if p.endswith(".md")]
+        texts = tree_lib.read_blobs_at(repo, [(base, p) for p in (f"{folder}/README.md", f"{folder}/BACKLOG.md", *specs)])
+    except OSError as exc:
+        raise policy.Refusal(".memory-tree.conf", 0, f"the run base {base[:8]} of {build} does not read: {exc}") from None
+    try:
+        rowre, grammar = row_grammar.derive_row_re(conf), backlog.build_grammar(families)
+        id_re = gbi.build_roster_id_re(set(families))
+    except (gbi.Problem, row_grammar.Problem) as exc:
+        raise policy.Refusal(".memory-tree.conf", 0, str(exc)) from None
+    asks, disposed = [], set()
+    for ln in (texts[(base, f"{folder}/BACKLOG.md")] or "").split("\n"):
+        hit = rowre.match(ln)
+        if hit:
+            asks.append(hit[1])
+            continue
+        row = backlog.extract_row(ln, grammar)
+        if row is not None and row.cls == "status" and row.verb in tree_lib.TERMINAL:
+            disposed.add(row.target)
+    if not any(a not in disposed and a.split("-")[1] == build for a in asks):
+        return "build"
+    roster, inside = [], False
+    for ln in (texts[(base, f"{folder}/README.md")] or "").split("\n"):
+        if ln.strip() == gbi.PLAN_OPEN:
+            inside = True
+        elif ln.strip() == gbi.PLAN_CLOSE:
+            break
+        elif inside and ln.startswith("|"):
+            ids = gbi.extract_roster_ids(ln, id_re)
+            if ids:
+                roster.append(ids[0][0])
+    hits = (tree_lib.parse_spec_h1(p, texts[(base, p)] or "", m, families) for p in specs)
+    defined = {h[1] for h in hits if h}
+    return "spec" if any(u not in defined for u in roster) else "build"
+
+
+def derive_landed_builds(repo, builds, kit=KIT):
+    """-> the members of `builds` landed at the landed revision L `policy.py get` reads, the memory root
+    and FAMILIES read from L's `.memory-tree.conf` (TOOL-dLandedOwners-1). A build has landed when
+    either half holds. (1) Its folder `<memory root>/builds/<build>/spec/` holds at least one spec and
+    every spec's status header carries a token in tree_lib's TERMINAL. (2) For a build (1) leaves
+    unlanded that holds a run record at L, `RUN.md` or a rotated `RUN.LANDED.<8 hex>.md`: one record's
+    `base:` names a commit, `derive_run_kind` answers "build" there, and a merge on L's first-parent
+    history touches the build's `RUN.md` with the `RUN.md` at that merge carrying the same base, the
+    dTrackedAtlas build-state instrument's landing. An empty `builds` answers `set()` with no git call.
+    The landed revision's Refusal passes through; `tree_lib` is reached through the inlined
+    `resolve_kit_dir` from `kit`, so a miss is a Refusal naming where the resolver looked, never "no
+    build landed" (TOOL-dGroundRules-21 S26), and half 2 refuses as `load_run_readers` does. A git read
+    that fails, or a conf declaring no FAMILIES when half 2 runs, is a Refusal naming it.
+
+    It does not see a landing this clone has not fetched; it reads a merge touching RUN.md with a run's
+    base for another reason as that run's landing; it lists no record rotated outside the driver; and
+    under BACKLOG_MODE="shards" no build folder holds a BACKLOG, so every run reads build-kind."""
+    builds = sorted({str(b) for b in builds})
+    if not builds:  # an ls-tree with no pathspec would list the whole revision
+        return set()
+    sha, _how = policy.derive_landed_revision(repo)
+    tree_lib = load_tree_lib_or_refuse(kit)
+    try:
+        text = tree_lib.read_blobs_at(repo, [(sha, ".memory-tree.conf")])[(sha, ".memory-tree.conf")]
+        conf = tree_lib.parse_conf(text or "", {"MEMORY_ROOT": "memory", "FAMILIES": ""})
+        root = conf["MEMORY_ROOT"].strip("/")
+        listed = tree_lib.read_git_output(repo, ("ls-tree", "-r", "--name-only", sha, "--",
+                                                 *(f"{root}/builds/{b}/spec/" for b in builds)))
+        specs = [p for p in listed.decode("utf-8", "replace").split("\n") if p.endswith(".md")]
+        texts = tree_lib.read_blobs_at(repo, [(sha, p) for p in specs])
+        landed = set()
+        for b in builds:
+            mine = [p for p in specs if p.startswith(f"{root}/builds/{b}/spec/")]
+            tokens = [next((m["token"] for m in map(tree_lib.HDR_RE.match, (texts[(sha, p)] or "").split("\n")) if m), None)
+                      for p in mine]
+            if tokens and all(t in tree_lib.TERMINAL for t in tokens):
+                landed.add(b)
+        rest = [b for b in builds if b not in landed]
+        listed = tree_lib.read_git_output(repo, ("ls-tree", "--name-only", sha, "--",
+                                                 *(f"{root}/builds/{b}/" for b in rest))) if rest else b""
+        runs = [p for p in listed.decode("utf-8", "replace").split("\n") if RUN_RECORD.match(p.rsplit("/", 1)[-1])]
+        if not runs:
+            return landed
+        _gbi, _backlog, row_grammar = load_run_readers(kit)
+        try:
+            families = row_grammar.derive_families(conf)
+        except row_grammar.Problem as exc:
+            raise policy.Refusal(".memory-tree.conf", 0, f"the run records at {sha[:8]} cannot be read: {exc}") from None
+        records = tree_lib.read_blobs_at(repo, [(sha, p) for p in runs])
+        bases = {}  # build -> the bases its run records carry
+        for p in runs:
+            base = read_run_base(records[(sha, p)] or "")
+            if base:
+                bases.setdefault(p.split("/")[-2], set()).add(base)
+        merges = {b: tree_lib.read_git_output(repo, ("log", "--first-parent", "--merges", "--format=%H", sha, "--",
+                                                     f"{root}/builds/{b}/RUN.md")).decode("utf-8").split()
+                  for b in bases}
+        at = tree_lib.read_blobs_at(repo, [(h, f"{root}/builds/{b}/RUN.md") for b in merges for h in merges[b]])
+        landing = {b: bases[b] & {read_run_base(at[(h, f"{root}/builds/{b}/RUN.md")] or "") for h in merges[b]}
+                   for b in merges}  # build -> each run base a landing merge's RUN.md carries
+        wanted = sorted(set().union(*landing.values()))
+        # a base that names no commit lands nothing: unchecked, its README would read empty and answer "build"
+        found = tree_lib.read_git_output(repo, ("cat-file", "--batch-check"),
+                                         "".join(f"{x}^{{commit}}\n" for x in wanted).encode("utf-8")) if wanted else b""
+        commits = {x for x, ln in zip(wanted, found.decode("utf-8", "replace").split("\n"))
+                   if ln.split(" ")[1:2] == ["commit"]}
+    except OSError as exc:
+        raise policy.Refusal(".memory-tree.conf", 0, f"the landed builds at {sha[:8]} do not read: {exc}") from None
+    for b in sorted(landing):
+        if any(derive_run_kind(repo, b, x, conf, families) == "build" for x in sorted(landing[b] & commits)):
+            landed.add(b)
+    return landed
 
 
 def derive_landed_owners(repo, kit=KIT):
-    """-> the catalogue owners whose build has landed: at the landed revision `policy.py get` reads,
-    the build folder `<memory root>/builds/<owner>/spec/` holds at least one spec and every spec's
-    status header carries a token in tree_lib's TERMINAL, the memory root read from that revision's
-    `.memory-tree.conf`. The landed revision's Refusal passes through. `tree_lib` is reached as the
-    recall kit reaches it, through the inlined `resolve_kit_dir` from `kit`'s own location, the
-    memory-tree kit named in this kit's `requires`, so a miss is a Refusal naming where the resolver
-    looked, never "no build landed" (TOOL-dGroundRules-21 S26). A git read that fails is a Refusal
-    naming it."""
+    """-> the catalogue owners whose build has landed: `derive_landed_builds` over the catalogue's
+    owners, its Refusals passing through (TOOL-dLandedOwners-1 S2)."""
     rows = policy.load_catalogue(kit)
-    sha, _how = policy.derive_landed_revision(repo)
-    try:
-        tree_lib = load_tree_lib(kit)
-    except (LookupError, ImportError) as exc:
-        raise policy.Refusal("kit.toml", 0, f"requires memory-tree, which does not resolve: {exc}") from None
-    owners = sorted({str(r["owner"]) for r in rows if r.get("owner")})
-    if not owners:  # an ls-tree with no pathspec would list the whole revision
-        return set()
-    try:
-        conf = tree_lib.read_blobs_at(repo, [(sha, ".memory-tree.conf")])[(sha, ".memory-tree.conf")]
-        root = tree_lib.parse_conf(conf or "", {"MEMORY_ROOT": "memory"})["MEMORY_ROOT"].strip("/")
-        listed = tree_lib.read_git_output(repo, ("ls-tree", "-r", "--name-only", sha, "--",
-                                                 *(f"{root}/builds/{o}/spec/" for o in owners)))
-        specs = [p for p in listed.decode("utf-8", "replace").split("\n") if p.endswith(".md")]
-        texts = tree_lib.read_blobs_at(repo, [(sha, p) for p in specs])
-    except OSError as exc:
-        raise policy.Refusal(".memory-tree.conf", 0, f"the landed builds at {sha[:8]} do not read: {exc}") from None
-    landed = set()
-    for owner in owners:
-        mine = [p for p in specs if p.startswith(f"{root}/builds/{owner}/spec/")]
-        tokens = [next((m["token"] for m in map(tree_lib.HDR_RE.match, (texts[(sha, p)] or "").split("\n")) if m), None)
-                  for p in mine]
-        if tokens and all(t in tree_lib.TERMINAL for t in tokens):
-            landed.add(owner)
-    return landed
+    return derive_landed_builds(repo, {str(r["owner"]) for r in rows if r.get("owner")}, kit)
 
 
 def scan_reader_keys(repo, kit=KIT):
@@ -2836,6 +2968,98 @@ def run_reader_quoted(name):
     return print_checks(name, checks)
 
 
+# `reader-coverage-carried` (TOOL-dLandedOwners-1): a build run that landed with a unit carried forward.
+RC_FOLDER = "memory/builds/bPlanted"
+RC_UNIT_SPEC = RC_FOLDER + "/spec/2026-10-23-spec-TOOL-bPlanted-{}.md"
+RC_UNIT_HEADER = "# TOOL-bPlanted-{} — a planted spec\n\n**Status:** {} · rev-1 · 2026-10-23 · node d · Tier-1 · base 0123abcd\n"
+RC_ROSTER = ("# bPlanted\n\n<!-- roster:units -->\n\n| # | Unit |\n|---|---|\n| 1 | `TOOL-bPlanted-1` |\n"
+             "| 2 | `TOOL-bPlanted-2` |\n\n<!-- /roster:units -->\n")
+RC_ASK = "- TOOL-bPlanted-9 · filed 2026-10-23 · build every roster unit of this build from its spec\n"
+RC_CONF = 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n'
+RC_RUN = "# bPlanted - run state\n\n## Run facts\nbase: {}\n"
+# sub-case -> the count of keys graded, or the text the Refusal must name where it refuses
+RC_CARRIED = {"carried-landed": 1, "spec-run-landed": 0, "run-unlanded": 0, "base-unresolved": 0,
+              "kit-modules-absent": "gen_build_index.py"}
+
+
+def build_carried_repo(t, case):
+    """`case`'s repository at `t`/r: a kit copy whose catalogue holds RC_KEY owned by RC_OWNER and no
+    consumer, a `.memory-tree.conf` declaring FAMILIES, the build README's `roster:units` pair at the
+    base commit B on main, then a branch `run` committing `RUN.md` with `base: <B>` and the spec edits,
+    merged into main with `--no-ff` (`run-unlanded` fast-forwarded) and pushed to one bare remote; then
+    `tree_lib.py` and each of RUN_READER_MODULES (`kit-modules-absent` `tree_lib.py` alone) copied
+    untracked beside the kit copy from the memory-tree kit `resolve_kit_dir` finds. -> the kit copy."""
+    repo = t / "r"
+    own = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    kit = repo / own
+    spec_run = case == "spec-run-landed"
+    files = {(kit / policy.CATALOGUE).relative_to(repo).as_posix():
+             f'[[key]]\nname = "{RC_KEY}"\nallowed = ["a"]\ndefault = "a"\nowner = "{RC_OWNER}"\n\n',
+             ".memory-tree.conf": RC_CONF, f"{RC_FOLDER}/README.md": RC_ROSTER,
+             RC_UNIT_SPEC.format(1): RC_UNIT_HEADER.format(1, "OPEN")}
+    if spec_run:
+        files[f"{RC_FOLDER}/BACKLOG.md"] = "# bPlanted backlog\n\n" + RC_ASK
+    else:
+        files[RC_UNIT_SPEC.format(2)] = RC_UNIT_HEADER.format(2, "OPEN")
+
+    def write_files(plants):
+        for rel, text in plants.items():
+            Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
+            Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
+        run_fixture_git(repo, "add", "-A")
+
+    run_fixture_git(t, "init", "-q", "--bare", "b.git")
+    repo.mkdir(parents=True)
+    run_fixture_git(repo, "init", "-q")
+    run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
+    write_files(files)
+    run_fixture_git(repo, "commit", "-q", "-m", "the run's base")
+    base = "e" * 40 if case == "base-unresolved" else run_fixture_git(repo, "rev-parse", "HEAD")
+    run_fixture_git(repo, "checkout", "-q", "-b", "run")
+    write_files({f"{RC_FOLDER}/RUN.md": RC_RUN.format(base),
+                 RC_UNIT_SPEC.format(1): RC_UNIT_HEADER.format(1, "DEFERRED" if spec_run else "CLOSED"),
+                 RC_UNIT_SPEC.format(2): RC_UNIT_HEADER.format(2, "DEFERRED")})
+    run_fixture_git(repo, "commit", "-q", "-m", "the run")
+    run_fixture_git(repo, "checkout", "-q", "main")
+    run_fixture_git(repo, "merge", "-q", *(("--ff-only",) if case == "run-unlanded" else ("--no-ff", "-m", "land the run")), "run")
+    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    lib = resolve_kit_dir("memory-tree", "tree_lib.py", KIT)
+    (kit.parent / lib.name).mkdir(parents=True, exist_ok=True)
+    for module in ("tree_lib", *(() if case == "kit-modules-absent" else RUN_READER_MODULES)):
+        shutil.copyfile(lib / f"{module}.py", kit.parent / lib.name / f"{module}.py")
+    return kit
+
+
+def run_reader_carried(name):
+    """`check_reader_coverage` over one repository per RC_CARRIED sub-case, printing `case <name>: red|green`:
+    `carried-landed` must grade RC_KEY and red it; `spec-run-landed`, `run-unlanded` and `base-unresolved`
+    must grade nothing and print the announce line; `kit-modules-absent` must refuse, naming the
+    memory-tree kit and `gen_build_index.py`."""
+    checks = []
+    for case, want in RC_CARRIED.items():
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            kit = build_carried_repo(t, case)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                n, findings = check_reader_coverage(t / "r", kit=kit)
+            told = "so this arm checked nothing at" in out.getvalue()
+            ok = n == want and (told or n) and (
+                len(findings) == 1 and f": {RC_KEY} (owner {RC_OWNER}, landed at " in findings[0] if n else not findings)
+            checks.append((f"case {case}: {'red' if findings else 'green'}", "check_reader_coverage", bool(ok),
+                           f"graded {n} · " + ("; ".join(findings) or out.getvalue().strip().replace("\n", " · "))))
+        except subprocess.CalledProcessError as exc:
+            checks.append((f"case {case}: not built", "the fixture's git", False,
+                           f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
+        except policy.Refusal as exc:
+            ok = isinstance(want, str) and "memory-tree" in exc.why and want in exc.why
+            checks.append((f"case {case}: refused", "check_reader_coverage", ok, str(exc)))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
 # ---- the agent limit (TOOL-dGroundRules-10) ------------------------------------------------------
 
 LIMIT_POLICY = "[runtime]\nagents-in-flight = {n}\n"
@@ -4960,6 +5184,7 @@ CASES = [
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
     ("reader-coverage-relocated", None, run_reader_relocated),  # the kits at a tool root unlike gov's
     ("reader-quoted-pattern", None, run_reader_quoted),  # a pattern key read through a quoted segment
+    ("reader-coverage-carried", None, run_reader_carried),  # a build run landed with a unit carried forward
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
     *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch

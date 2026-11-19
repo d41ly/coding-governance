@@ -449,7 +449,7 @@ branch with a live phase all pass it, and the push-time bar does not re-judge au
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root, `help/` and the self-tests | a file READING `policy.json`: a line, not a comment or a Python docstring, spelling `readFileSync`, `open(`, `cat` or `git show` followed on the line by the name, `arm_single_reader`'s row for the mirror (TOOL-dGroundRules-21 S18, S20) |
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the compare base | each `lists --check` report on the legacy homes; a refused read. With no list in this kit it is not graded and says so |
-| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, read with the memory-tree kit's `tree_lib`, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26) |
+| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision and, for an owner whose specs are not all terminal, its run records, their bases and the landing merges, read with the memory-tree kit's `tree_lib`, `gen_build_index`, `backlog` and `row_grammar` (`derive_landed_builds`), the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26) |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file READING the template-size limits file by the same read shape, or naming `LIMITS_NAME`, `arm_single_reader`'s row for that file: `budgets.py` is its one reader (TOOL-dGroundRules-21 S20, S29) |
 | `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, which holds the deployer's registry, its `installed` path in an adopter whose receipt names its `kit`, and nowhere in a tree holding neither, which announces it), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
 
@@ -479,11 +479,24 @@ value is the `legacy:` or `default:` value handed in, as the enforcer read it. T
 enforcers take the branch they take with no policy kit when no Python launcher resolves, and say so
 once. help/size-caps.md is the user's page.
 
-`arm_reader_coverage` (TOOL-dGroundRules-8) grades a key once its owner build has LANDED: at the
-landed revision `policy.py get` reads, the build folder `<memory root>/builds/<owner>/spec/` holds at
-least one spec and every spec's status header is terminal, read with the memory-tree kit's
-`tree_lib` (`HDR_RE`, `TERMINAL`, `read_blobs_at`, `parse_conf`). A build whose spec run landed its
-units `DEFERRED` has not landed. A key is READ where a tracked file passes it to a reader in one of
+`arm_reader_coverage` (TOOL-dGroundRules-8) grades a key once its owner build has LANDED, as
+`derive_landed_builds` reads it at the landed revision L `policy.py get` reads (TOOL-dLandedOwners-1).
+A build has landed when either half holds. (1) The build folder `<memory root>/builds/<owner>/spec/`
+holds at least one spec and every spec's status header is terminal, read with the memory-tree kit's
+`tree_lib` (`HDR_RE`, `TERMINAL`, `read_blobs_at`, `parse_conf`). (2) For a build (1) leaves
+unlanded, one of its run records at L, `RUN.md` or a rotated `RUN.LANDED.<8 hex>.md`, carries a
+`base:` in its `## Run facts` that names a commit, `derive_run_kind` answers `build` at that base,
+and a merge on L's first-parent history touches the build's `RUN.md` with the `RUN.md` at that merge
+carrying the same base: the dTrackedAtlas build-state instrument's landing. `derive_run_kind` is
+README rule 1, the test `unattended.sh`'s `check_spec_run` applies: `spec` when the base's
+`BACKLOG.md` holds an open ask of the build and the README's `roster:units` pair a unit no spec
+defines, else `build`. So a build run that carried a unit forward `DEFERRED` has landed, and a spec
+run, which carries every unit `DEFERRED`, has not. Half 2 loads `RUN_READER_MODULES` lazily, at the
+first build that reaches it, after checking that the memory-tree directory holds each one's `.py`; a
+missing file, a failed import or a conf declaring no `FAMILIES` is a refusal. It does not see a
+landing this clone has not fetched, reads a merge touching `RUN.md` with a run's base for another
+reason as that run's landing, lists no run record rotated outside the driver, and under
+`BACKLOG_MODE="shards"` reads every run as build-kind. A key is READ where a tracked file passes it to a reader in one of
 the two shapes of `READER_SHAPES`, one row each: a call whose first argument is the key as a string
 literal (`resolve("k")`, `mirror.get('k')`, the literal free to hold the other quotes) in a `.py`,
 `.js`, `.mjs` or `.cjs` file, a key joined around a name inside a quoted segment
@@ -634,6 +647,18 @@ only call names its sibling `fixture.exact`). Green: `unlanded` (`OPEN` landed),
 `bAbsent`, no build folder) and `tree-not-history` (`OPEN` landed, `CLOSED` in the working tree), each
 grading nothing and printing the announce line; `reader-python`, `reader-cli` and `reader-js`, one
 shape each; and `pattern-read` (`policy.py get "fixture.$name"` reads `fixture.*`).
+
+`reader-coverage-carried` (TOOL-dLandedOwners-1) is one outcome case over five repositories, each a
+kit copy whose catalogue holds `fixture.planted` owned by `bPlanted` with no consumer, a
+`.memory-tree.conf` declaring `FAMILIES`, and `tree_lib.py` with each of `RUN_READER_MODULES` copied
+untracked beside it. The base commit B on main holds the build README's `roster:units` pair; a branch
+`run` commits `RUN.md`, `base: <B>`, with the spec edits, merged into main with `--no-ff` and pushed.
+It judges `check_reader_coverage`, printing `case <name>: red|green`: `carried-landed` (units 1 and 2
+specced at B, unit 1 `CLOSED` and unit 2 `DEFERRED` on `run`) grades 1 key and reds it;
+`spec-run-landed` (an open ask and unit 2 unspecced at B, both `DEFERRED` on `run`), `run-unlanded`
+(`run` fast-forwarded, so no merge touches `RUN.md`) and `base-unresolved` (the `base:` forty `e`
+characters) grade nothing and print the announce line; `kit-modules-absent` (`tree_lib.py` alone
+beside the kit copy) refuses, naming the memory-tree kit and `gen_build_index.py`.
 
 The minors batch's cases (TOOL-dGroundRules-21), each an outcome case: `adopter-suite` runs
 `adopt-policy.test.sh`, a pass only at exit 0 with its closing count naming an arm passed and none

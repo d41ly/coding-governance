@@ -1,11 +1,12 @@
 # TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward
 
-**Status:** INPROGRESS · rev-3 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
+**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dLandedOwners-1-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-1-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-3-spec-writer.md) | journal | — |

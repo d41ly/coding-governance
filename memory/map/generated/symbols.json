@@ -2613,6 +2613,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "build_carried_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_carry",
       "kind": "function",
       "file": "tools/push-main.test.sh"
@@ -11393,6 +11398,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_landed_builds",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_landed_counts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -12306,6 +12316,11 @@
       "id": "derive_run_eras",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_run_kind",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_run_starts",
@@ -15173,6 +15188,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "load_run_readers",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "load_scenarios",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -15229,6 +15249,11 @@
     },
     {
       "id": "load_tree_lib",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "load_tree_lib_or_refuse",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -22361,6 +22386,11 @@
       "id": "read_rule_tags",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_run_base",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "read_run_commits",
@@ -30506,6 +30536,11 @@
       "id": "run_raw",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "run_reader_carried",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_reader_coverage",
