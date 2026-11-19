@@ -42,9 +42,10 @@ and `hit` printers.
   `check_claim_writable tFix lease a <session> acquire` read `foreign-live` with the session unset,
   `absent` and `s9`. With the row's two session guards cut in process by `sed` over `declare -f`, its one
   site, the same read with the session unset was `mine`: the base row's literal comparison.
-- AC5 — over that lease re-planted with `keepalive: k2`, the sourced `check_claim_writable tFix preflight k2
-  absent k2` with the session unset returned 0 (PINNED), class `mine`, act `renew`; under keepalive `k3` it
-  returned 1 (PINNED), class `foreign-live`. The full `--preflight tFresh` reading is the suite arm's, owed below.
+- AC5 — the column `--preflight tFix` reads: over that lease re-planted with `keepalive: k2`, the sourced
+  `check_claim_writable tFix preflight k2 absent k2` with the session unset returned 0 (PINNED), class
+  `mine`, act `renew`; under keepalive `k3` it returned 1 (PINNED), class `foreign-live`. The full
+  `--preflight` reading, which the suite arm drives as `--preflight tFresh`, is owed below.
 - AC6 — `grep -n 'CLAUDE_CODE_SESSION_ID' tools/unattended/STOPS.template.md` prints the section 7 lines
   naming it as the session source and stating that unset, empty and `absent` are no session; `cmp` of the
   template and `memory/guides/UNATTENDED-STOPS.md` reads identical.
@@ -60,3 +61,27 @@ predicate, which consent on the planted line. The existing `DPR20 AC9` assertion
 an acquire of an offered lease under `absent` or no session now exits 2 `no session` rather than 1
 `offered`. The suite is waived for this build's landing by README rule 8. The floors rose by the same 11
 (DERIVED): `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 54 classes (DERIVED: 48
+by an anchor, 6 universal). Two needed a change. criterion-asserts-what-its-own-command-cannot-show: AC6's
+`grep -n` printed the section 7 line naming the source while the absent rule sat on the next line, so the
+paragraph was rewrapped and the one line `grep` prints now states both; the refusal line's code span, which
+wrapped, now sits whole on one line too, and the render was copied again. two-answers-to-one-question: the
+verbs guide's `--lease` row enumerates its exit-2 causes and lacked `no session`, and its `--request` row
+said nothing of an id-less session, so both rows now state the rule, the write set re-declared to add
+`tools/unattended/VERBS.template.md` and its render `memory/guides/UNATTENDED-VERBS.md`, copied byte for
+byte; the driver's comments, section 7 and `help/loop.md` state the same rule. The rest needed none.
+refusal-branch-with-no-arm: the three branches this pass adds, the `--lease` refusal, the consent
+predicate's `no session` return and the skipped `.typed` append, are each reached by the new block (AC3, and
+`DPR20 AC9` for a unit lease; AC1 and AC2). fixture-passes-by-finding-nothing: AC3's empty origin is paired
+with the refusal line counted once per pass, AC4's `foreign-live` with `mine` read by the lease's own session
+before the plant, and the consent refusals with a present session's request consenting.
+guard-above-a-fold-makes-its-fallback-dead: the refusal above the `lease` column leaves its `absent` clauses
+in the `same` row and the offer test reachable only through `--lease fence`, which runs outside
+`tools/unattended/unattended.sh#run_lease_verb`; `DPR20 AC9`'s `absent` and no-session passes, now refused
+first, never discriminated the offer test's clause, since `b/s1` differs from `b/absent` with or without it.
+a-spelling-change-strands-its-readers: the consent predicate gains a second refusal line; no caller parses
+the line, the return code being its contract. topology-sweep: a patch build's draw wraps
+`tools/unattended/unattended.sh#run_lease_verb`, so an id-less driver's draw is now refused, naming `no
+session`, through the draw's existing refusal path, the risk the spec's checklist accepts. The codebase map was regenerated and came out unchanged, since this
+unit mints, renames and deletes no function.

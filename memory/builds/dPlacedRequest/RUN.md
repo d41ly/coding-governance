@@ -182,3 +182,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T18:28:32Z dispatch · item ae49ec18 TOOL-dPlacedRequest-32 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-32-1-acceptance-ledger.md help/loop.md
 
 2026-11-19T18:33:20Z brief · item TOOL-dPlacedRequest-32 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T18:45:22Z draw · fix-pass · TOOL-dPlacedRequest-32 · 16/130 · 20261119T184522Z-e3dd15
+
+2026-11-19T18:45:22Z dispatch · item cf01fc77 TOOL-dPlacedRequest-32 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-32-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md

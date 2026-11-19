@@ -522,8 +522,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   writes by compare-and-swap and prints ONE line: `lease — <tail> · <act> · epoch <n>` (exit 0),
   `lease refused — <cause> · <tail> · <holder>` (exit 1; `live-holder`, `tombstone`, `epoch-fence`,
   `overlap`, `offline`, or an offer's `offered`, naming its target, and `terminal`), or
-  `lease not written — <why>` (exit 2: a bad segment, a level
-  `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
+  `lease not written — <why>` (exit 2: no session, `CLAUDE_CODE_SESSION_ID` unset, empty or
+  `absent`, before any read; a bad segment, a level `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
   that records no transition and is no open question). An acquisition runs the overlap probe first.
   An acquisition of a request lease first reads `refs/gov/requests/<content key>` alone, one bounded
   `ls-remote` that fetches nothing: a remote holding no such record refuses it `no-record` (exit 1)
@@ -584,7 +584,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   breakpoint disposition asks `check_request_consent`, which holds only for a session whose line in
   this node's `.typed` file names the blob the stored copy hashes to now: consent is bound to the
   stored words, so a copy replaced after the fact, or a line written for other words, is no consent.
-  It takes no slug.
+  With no session, `CLAUDE_CODE_SESSION_ID` unset, empty or `absent`, the record names `session:
+  absent` as provenance, `.typed` gains no line, and the predicate prints `request — <key> · no
+  session` and holds for nobody. It takes no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
