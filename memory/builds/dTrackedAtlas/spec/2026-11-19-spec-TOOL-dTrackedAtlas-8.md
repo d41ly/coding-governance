@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-8 — the fork scan passes no tree-derived text through shell source
 
-**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · records-only · order 5
 
 <!-- gen:spec-records -->
 

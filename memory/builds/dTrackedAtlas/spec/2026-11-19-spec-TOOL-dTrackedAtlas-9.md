@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-9 — a landing counts only on the default branch's first-parent line, never a run branch's prepared merge
 
-**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · records-only · order 6
 
 <!-- gen:spec-records -->
 

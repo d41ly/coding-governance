@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-3 — the page carries the commit and input digest it was generated from, and `--check` reds a stale one
 
-**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 3
+**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · records-only · order 3
 
 <!-- gen:spec-records -->
 

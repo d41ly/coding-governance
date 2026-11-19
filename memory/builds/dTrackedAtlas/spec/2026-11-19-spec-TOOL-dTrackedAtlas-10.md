@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-10 — the page's staleness digest covers the merge history the landed predicate reads
 
-**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 7
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · records-only · order 7
 
 <!-- gen:spec-records -->
 

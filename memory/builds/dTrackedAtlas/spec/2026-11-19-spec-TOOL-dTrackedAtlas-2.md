@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-2 — the Atlas renders the actual state of each chain build and each area
 
-**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · records-only · order 2
 
 <!-- gen:spec-records -->
 

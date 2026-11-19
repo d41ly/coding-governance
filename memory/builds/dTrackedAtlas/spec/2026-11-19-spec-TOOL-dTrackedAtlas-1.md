@@ -1,6 +1,6 @@
 # TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas
 
-**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 1
+**Status:** CLOSED · rev-3 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · records-only · order 1
 
 <!-- gen:spec-records -->
 
