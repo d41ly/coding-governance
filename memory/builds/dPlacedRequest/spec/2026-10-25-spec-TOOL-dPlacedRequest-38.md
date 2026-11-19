@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-38 — the parity leg runs every inline `gov_feed_sh` copy under `set -u` with nothing from its carrier
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

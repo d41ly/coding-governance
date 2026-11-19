@@ -21,22 +21,31 @@ sourced alone with the suite's own `blk`, `ok` and `bad`, `TMP` under the sessio
 - AC1 — over a plant whose bound line reads `NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))`, the function
   printed one line, that plant's path, then the cut's `REMOTE_BOUND: unbound variable`, and returned (DERIVED)
   `rc=1`; no `gov-feed.lock` remained in the scratch common dir. (DERIVED)
-- AC2 — over a plant that is the canonical cut unchanged, the function printed nothing and returned
-  `rc=0`; the err file held 0 bytes, the common dir held `gov-feed.log` and `gov-feed.seq` and no (DERIVED)
-  lock, the feed held 1 line for `refs/gov/bar-red`, and `health.log` held 1 `node-lock-broken` (DERIVED)
+- AC2 — over the canonical cut unchanged, no `gov-feed.lock` remained, the function printed nothing,
+  returned `rc=0`, and its err file held 0 bytes; the common dir held `gov-feed.log` and (DERIVED)
+  `gov-feed.seq`, the feed held 1 line for `refs/gov/bar-red`, and `health.log` held 1 `node-lock-broken` (DERIVED)
   line, so the stale break and the append both ran.
-- AC3 — with no file, the function printed `no inline copy of 'gov_feed_sh' found — the carrier arm
-  would be judging an empty population` and returned `rc=1`. (DERIVED)
+- AC3 — with no file, the function printed one line opening `no inline copy of 'gov_feed_sh'` and
+  naming the empty population, and returned `rc=1`. (DERIVED)
 - The tree — the population was 3 files, the canonical `tools/lib/gov-feed.sh`, (DERIVED)
   `tools/run-gates/post-merge.sh` and `tools/unattended/unattended.sh`; all 3 ran alone green after (DERIVED)
-  TOOL-dPlacedRequest-36 and TOOL-dPlacedRequest-37. The whole section read `st=0` over 10 (DERIVED)
-  assertions: the tree, 4 plants each with its no-op guard, and the empty population. (DERIVED)
+  TOOL-dPlacedRequest-36 and TOOL-dPlacedRequest-37. At the pass commit the whole section read `st=0` (DERIVED)
+  over 10 assertions: the tree, 4 plants each with its no-op guard, and the empty population. (DERIVED)
 - The plants — besides AC1's bound, the base's bare `$ROOT` in the break's health append before
   TOOL-dPlacedRequest-36 reds on `ROOT: unbound variable` though its `$( )` exits 0, a final release
   renamed to no command reds on `command not found`, and a final release replaced by `:` reds on the
   lock left behind; a plant line in no canonical returned 1 from `write_feed_plant`.
 - Map — the pass minted 2 functions the symbol extractor reads, so `gen_map.py --write` regenerated (DERIVED)
   `memory/map/generated/symbols.json`, adding exactly those 2 ids. (DERIVED)
+- The bug-class checklist over the pass commit selected 29 classes. Two needed a change. The (DERIVED)
+  function's guard for a scratch repository git cannot make, and `write_feed_plant`'s refusal of a
+  line in no canonical, had no arm: each now has one, a `git` function failing every call and a plant
+  line in no block, and the section read `st=0` over 12 assertions; with each arm's input replaced (DERIVED)
+  by one that does not trigger it, both arms printed their `FAIL` line. The AC3 bullet above wrapped
+  a code span across a line, which check 23 reads as no token, and was rewrapped. The rest needed
+  none: every plant reaches its rule and is the base's own spelling (the driver's `REMOTE_BOUND`, the
+  bare `$ROOT` before TOOL-dPlacedRequest-36), the AC2 run proved the break and the append ran, and
+  the assertion count is the suite's own counter over the cut section.
 
 ## Owed at the close
 
