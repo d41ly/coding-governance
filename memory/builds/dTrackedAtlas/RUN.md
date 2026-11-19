@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 812bd05192c4dfa66bceca8cf5767bff78214d35
-phase: SPECCING
+witness: 3b741f6ad35d9290da930a10bd5d8e4b97957140
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -92,3 +92,7 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T07:39:14Z review · item dTrackedAtlas · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 0 · round-minors 7 · CONVERGED · highs 4 · minors 10 · to units · disposition promote
 
 2026-11-19T07:39:21Z rescope · item add TOOL-dTrackedAtlas-12 · reason closing review round 2 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-8-9-10-11-diff-review-round2.md) CONVERGED exit: its 2 MEDIUM and 3 LOW items (7 findings) batched into one promoted unit
+
+2026-11-19T07:59:50Z brief · item TOOL-dTrackedAtlas-12 · reason 1afbd4d85f93 memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-12-build-brief.md
+
+2026-11-19T08:00:17Z dispatch · item 3b741f6a TOOL-dTrackedAtlas-12 · reason memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-12-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md
