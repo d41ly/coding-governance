@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 3 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 3 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0351@d6eaa553 whole
 **Carries:** node:system.retrofit
@@ -16,6 +16,8 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -24,8 +26,9 @@
 
 Give every population a check tolerates one primitive: a ledger file per population, registered with
 its key kind, drain, direction and home, read and compared by one factory, carried across a rename
-and merged by row. Today gov holds 28 registries in at least six grammars and writes the count
-ratchet twice, in `sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
+and merged by row. Gov held 28 registries in at least six grammars (scout C's census, PINNED at
+`cdfbd1cf`; unit 16 re-derives its population) and writes the count ratchet twice, in
+`sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
 
 ## 2. Scope (IN)
 
@@ -41,9 +44,11 @@ ratchet twice, in `sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
   is that function's output, never a typed list. Observed by AC1 and AC9.
 - **S3** — Each ledger file opens with a header line rendered from its registration, which the
   reader compares with the registration both ways. Observed by AC1.
-- **S4** — The both-ways arm calls `compute_coverage` and the base is `resolve_compare_base`, both
-  imported from PLAY-dOrderedCharter-19 S9's `coverage_join` module (D3). The factory adds the count
-  compare and the direction predicates around them. Observed by AC2 and AC3.
+- **S4** — The both-ways arm calls `compute_coverage`, PLAY-dOrderedCharter-19 S9's `coverage_join`
+  block (`tools/lib/coverage_join.py#compute_coverage`), and the base is `resolve_compare_base`,
+  TOOL-dGroundRules-21 S7's `compare_base_py` block (`tools/lib/compare_base.py#resolve_compare_base`),
+  each imported and never copied into the factory's block (D3). The factory adds the count compare and
+  the direction predicates around them. Observed by AC2 and AC3.
 - **S5** — Rename carry: `carry_renames(root, reg, base)` re-keys every `site` row whose path
   `git diff -M --name-status <base>..HEAD` renamed, keeping count, SHA and disposition; a rename
   alone is neither a gain nor a drain. Observed by AC4.
@@ -55,16 +60,18 @@ ratchet twice, in `sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
 - **S7** — `merge-rows.test.sh` runs its append-collision case, "disjoint appends", on a planted
   ledger conflict, and a concurrent-drain case beside it. Observed by AC5 and AC6.
 - **S8** — The copy-install route: inline module copies `tools/memory-tree/legacy_ledger.py` and
-  `tools/gate-lint/legacy_ledger.py`, plus `tools/gate-lint/coverage_join.py` carrying PLAY-dOrderedCharter-19 S9's block,
-  each held by a `PARITY_ROWS` row of `tools/lib/resolve-python.test.sh`, which also gains a
-  behaviour section `2l` for the factory. Observed by AC7.
+  `tools/gate-lint/legacy_ledger.py`, plus `tools/gate-lint/coverage_join.py` carrying the
+  `coverage_join`, `remote_ladder_py` and `compare_base_py` blocks as `tools/memory-tree/coverage_join.py`
+  does, each block held by its `PARITY_ROWS` row of `tools/lib/resolve-python.test.sh`: one new row,
+  `legacy_ledger_py`, and the three existing rows, which find the gate-lint copy by its marker. The
+  suite also gains a behaviour section `2o` for the factory. Observed by AC7.
 - **S9** — The count ratchet's second instance: `check_registry` and `read_registry` in
   `tools/gate-lint/sh_hygiene.py` and `tools/gate-lint/encoding_posture.py` become thin adapters over
   the factory's `read_rows` and `compare_counts`, each keeping its messages and its four-field
   `reason` grammar until TOOL-dWitnessedBar-16 converts its registry. Observed by AC8.
 - **S10** — A CLI on the canonical file, `python legacy_ledger.py read|compare|carry <population>`,
   run in the repository it is invoked from, printing one finding per line and exiting 1 on any
-  finding, 0 on none, 2 on a refusal. It is how a pass and section `2l` observe the factory.
+  finding, 0 on none, 2 on a refusal. It is how a pass and section `2o` observe the factory.
   Observed by AC1, AC2, AC3 and AC4.
 - **S11** — The line-number refusal's declared exception: a registration's `verbatim = [<field>]`
   names key fields whose text is the tracked subject, such as a `file:line` positional reference, so
@@ -73,13 +80,17 @@ ratchet twice, in `sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
 
 ## 3. Non-goals (OUT)
 
-- Converting any of gov's 28 registries, the pins or the cutoffs, and the readers those conversions
-  owe: TOOL-dWitnessedBar-16, -17, -18 and -20.
+- Converting any of gov's registries, the pins or the cutoffs, and the readers those conversions
+  owe: TOOL-dWitnessedBar-16, -17, -18 and -20. The policy kit's shrink-only legacy-homes list,
+  landed after `cdfbd1cf`, is unit 20's.
 - `test.seed`, the seed verb and unarmed reporting: TOOL-dWitnessedBar-15.
 - The `ratchet` pack's legs, the widen records and `retrofit.widen`: TOOL-dWitnessedBar-14. This
   unit names what a direction refuses; the pack decides what a refusal costs.
 - The touch join and a hunk drain: `build.scope`'s, dScopedBuild's.
-- Moving `compute_coverage` and `resolve_compare_base`: PLAY-dOrderedCharter-19 S9's (D3).
+- Moving or changing `compute_coverage` and `resolve_compare_base`: landed by PLAY-dOrderedCharter-19
+  S9 (`9cb93347d`) and TOOL-dGroundRules-21 S7 (`f6674a6a2`) (D3).
+- The merge driver's table class, `check_manifest` and `resolve_tables`, which keeps its precedence
+  in `merge` unchanged.
 - A second merge driver, or a new `.gitattributes` line: no ledger exists at landing; each converting
   unit adds its file's `merge=rows` line.
 - The `ledger` record kind and the census kinds: dTotalRecall's.
@@ -106,9 +117,10 @@ ratchet twice, in `sh_hygiene.py` and `encoding_posture.py` (gap-test-14).
   portability arms' registries
 - **hands-off** `TOOL-dWitnessedBar-28` — `legacy_ledger.py`, the `shrink-only` list of today's
   hand-added leg rows
-- **consumes-from** external — PLAY-dOrderedCharter-19 S9's `coverage_join` module with
-  `compute_coverage` and `resolve_compare_base`; without it the both-ways arm and the base have no
-  shared engine
+- **consumes-from** external — PLAY-dOrderedCharter-19 S9's `coverage_join` block with
+  `compute_coverage`, and TOOL-dGroundRules-21 S7's `compare_base_py` block with
+  `resolve_compare_base`, both landed; without them the both-ways arm and the base have no shared
+  engine
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 4, 52 and 54: `compare_counts`' ceiling rule, `compare_to_base`'s absent and legacy bases, and the ledger merge rule's remaining cases, each a scope item of that unit
 
 ## 4. Design
@@ -134,7 +146,7 @@ tables of `<tool root>/govkit/registry.toml` where that file is tracked, and ret
 `Registration` per table, refusing a table missing a field, a value outside its closed set, a
 `verbatim` entry not in its `fields`, or two tables with one `home` wherever each sits. The govkit
 registry is the home for a population no descriptor owns: govkit carries no `kit.toml`, and
-`load_registry` (`tools/govkit/govkit.py:247`) reads only its own tables, so a `[[ledger]]` table
+`load_registry` (`tools/govkit/govkit.py#load_registry`) reads only its own tables, so a `[[ledger]]` table
 beside them changes nothing it reads. A repository with no tracked govkit registry, which is every
 copy-installed adopter, registers through its descriptors alone. `seed` may be `[]`, a check with no seed, which TOOL-dWitnessedBar-15 reports
 unarmed; whether a `home` is one the target's hygiene check admits is that unit's seed-time test.
@@ -188,7 +200,13 @@ returns `None` with the reason, which a caller must print as unresolved and neve
 `check_ledger(path, lines)` is true when the first line of each of `%O`, `%A` and `%B` is a ledger
 header for one population; headers that disagree raise `StructureDrift`. A ledger's home is
 declared, not path-shaped, so the class reads the header the factory wrote rather than a path
-pattern (§8 F3). Under the class:
+pattern (§8 F3). In `merge` (`tools/memory-tree/merge-rows.py#merge`) the table class,
+`check_manifest`, returns before the row plane and the view/shard refusal runs next; `check_ledger` is
+asked after both, where `check_build_backlog` is, and selects the ledger key as `no_new_duplicates`'
+`ids` the way `measure_row_classes` is selected for a backlog. A ledger header matches neither
+`check_manifest`'s file name nor the two-line shape of `check_family_view`
+(`tools/memory-tree/backlog.py#check_family_view`), so neither earlier step takes a ledger. Under the
+class:
 
 - the row predicate is every line that is neither blank nor `#`, replacing `_ROW_RE`'s bullet test
   for that file;
@@ -200,17 +218,23 @@ pattern (§8 F3). Under the class:
   the written bytes.
 
 A ledger's `.gitattributes` line is `<home> merge=rows`, the attribute the authored indexes already
-carry, so `merge-rows.sh` and check-wiring's `check_merge_rows` (`tools/check-wiring.sh:1221`) need
-no second driver.
+carry, so `merge-rows.sh` and check-wiring's `check_merge_rows` (`tools/check-wiring.sh#check_merge_rows`)
+need no second driver.
 
 ### The copy-install route
 
 `tools/lib/` ships nothing, so two kits carry the block as a sibling module: memory-tree, whose
 `merge-rows.py` reads the header and key, and which codebase-map, drift-audit and the later
-converting kits already `require`; and gate-lint, which requires nothing (`tools/gate-lint/kit.toml:7`),
-for this unit's S9 adapters. gate-lint also carries PLAY-dOrderedCharter-19 S9's `coverage_join` block as a sibling module under that
-block's own parity row, rather than requiring memory-tree (§8 F2). Both kits' `include = "**"` file
-rules already install new files.
+converting kits already `require`; and gate-lint, which requires nothing
+(`tools/gate-lint/kit.toml@61946391f2f6:8`), for this unit's S9 adapters. gate-lint also carries a
+sibling `coverage_join.py` shaped as memory-tree's is, holding the `coverage_join`,
+`remote_ladder_py` and `compare_base_py` blocks under their existing parity rows, rather than
+requiring memory-tree (§8 F2); `resolve_compare_base` calls `resolve_remote`, so the ladder block
+travels with it. The imports sit outside the `legacy_ledger_py` block, so the block stays
+byte-identical: the canonical imports `compute_coverage` from `coverage_join` and
+`resolve_compare_base` from `compare_base`, both beside it in `tools/lib/`, and each kit copy imports
+both names from its kit's `coverage_join`. Both kits' `include = "**"` file rules already install new
+files.
 
 ### Inventory
 
@@ -218,8 +242,8 @@ Minted: `tools/lib/legacy_ledger.py`, its two inline copies, `tools/gate-lint/co
 block `legacy_ledger_py`, the `[[ledger]]` descriptor table and its govkit registry home, the
 `verbatim` registration key, the header grammar, `Registration`,
 `read_registrations`, `read_rows`, `write_rows`, `compare_counts`, `compare_to_base`,
-`carry_renames`, `check_ledger`, the `PARITY_ROWS` rows `legacy_ledger_py` and the gate-lint row of
-`coverage_join`, and section `2l`. Naming cells: each function is asked of the lexicon's
+`carry_renames`, `check_ledger`, the `PARITY_ROWS` row `legacy_ledger_py`, and section `2o`, the
+first free section of part 2 once unit 27's `2n` lands. Naming cells: each function is asked of the lexicon's
 `--suggest` under `--as py.function` at the pass.
 
 ### Migration
@@ -232,10 +256,12 @@ messages byte for byte, which their own self-test arms observe.
 - `tools/lib/legacy_ledger.py` (new)
 - `tools/memory-tree/legacy_ledger.py` (new, inline copy)
 - `tools/gate-lint/legacy_ledger.py` (new, inline copy)
-- `tools/gate-lint/coverage_join.py` (new, inline copy of PLAY-dOrderedCharter-19 S9's block)
+- `tools/gate-lint/coverage_join.py` (new, inline copies of the `coverage_join`, `remote_ladder_py`
+  and `compare_base_py` blocks)
 - `tools/lib/resolve-python.test.sh`
 - `tools/memory-tree/merge-rows.py`
 - `tools/memory-tree/merge-rows.test.sh`
+- `tools/memory-tree/README.md` (the merge driver section, §5's user docs line)
 - `tools/gate-lint/sh_hygiene.py`
 - `tools/gate-lint/encoding_posture.py`
 
@@ -247,6 +273,12 @@ messages byte for byte, which their own self-test arms observe.
   so the registration cannot live only inside the file it seeds.
 - **A sibling merge driver.** The shape audit's finding (`2026-10-18 shape-audit-b:570`): the
   row-keyed driver and its postconditions already exist, and a second driver duplicates them.
+- **The ledger through the table class.** `check_manifest`, `resolve_tables` and `TABLE_ENVELOPE`
+  (`tools/memory-tree/merge-rows.py#resolve_tables`, landed after `cdfbd1cf` by
+  PLAY-dOrderedCharter-15, -45 and -52) are a whole-file class with its own resolver and its own
+  read-back checks. A ledger there is that class's second instance, which owes a factory extracted
+  out of `resolve_tables`, and it leaves the four row-plane postconditions S6 extends; the row plane
+  with `check_build_backlog`'s `ids` selection serves the ledger as S6 states it.
 
 ## 5. Production-readiness checklist
 
@@ -257,7 +289,7 @@ messages byte for byte, which their own self-test arms observe.
   named; no base is unresolved, never green.
 - observability — every finding names population, key and direction.
 - risks — the TSV class must never catch a markdown index: `check_ledger` requires the header on all
-  three blobs, and the backlog class keeps its precedence.
+  three blobs, the table class still returns first, and the backlog class keeps its precedence.
 - testing — AC1 to AC10 by a pass; the arms of §7 at the close.
 - migration — none, as §4 says.
 - user docs — none under `help/`: no page describes registries; `tools/memory-tree/README.md`'s merge
@@ -295,7 +327,9 @@ messages byte for byte, which their own self-test arms observe.
   Red when: a copy-installed kit's copy drifts unseen.
 - **AC8** — When `python tools/gate-lint/sh_hygiene.py memory/project/substitution-fed-loops.txt`
   and `python tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt` run at
-  the pass tip, their stdout and exit codes equal those at the base `cdfbd1cf`.
+  the pass tip, their stdout and exit codes equal those of the same two commands at the commit the
+  pass builds over (the registries and the measured tree have moved since `cdfbd1cf`, so only the
+  pass's own parent isolates the adapters).
   Red when: an adapter changes a message, a verdict or the grammar it reads.
 - **AC9** — When `python legacy_ledger.py read <population>` runs in a fixture repo under `%TEMP%`
   whose only `[[ledger]]` table for that population sits in the fixture's govkit `registry.toml`,
@@ -314,7 +348,7 @@ messages byte for byte, which their own self-test arms observe.
 
 `shell-hygiene selftest` · `shell hygiene (a loop fed by a command substitution)` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `row-keyed merge driver replay` · `row-driver view refusal` · `check-wiring self-test` · `memory hygiene`
 
-New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 AC4 AC7 AC9 AC10 · the `legacy_ledger_py` parity row and section `2l` over a fixture registration, one in a govkit registry and one declaring `verbatim`, staged by one byte changed in the gate-lint copy, by the `shrink-only` predicate cut and by the `verbatim` skip widened to every field · that suite's assertion count, raised by the rows
+New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 AC4 AC7 AC9 AC10 · the `legacy_ledger_py` parity row and section `2o` over a fixture registration, one in a govkit registry and one declaring `verbatim`, staged by one byte changed in the gate-lint copy, by the `shrink-only` predicate cut and by the `verbatim` skip widened to every field · that suite's assertion count, raised by the rows
 New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-appends case on a planted ledger and the concurrent-drain case, staged by `check_ledger` returning false so the TSV rows reach the structure plane · that suite's case count
 
 ## 8. Open questions
@@ -344,12 +378,17 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
   `[core]` rule asks for, its removal unit 16's. widens: none · relaxes: none
 - **FACT-QUESTION · F5 — D3: is `compute_coverage` in `tools/lib` at the base?** Probe:
   `git grep -n "def compute_coverage" -- tools`. Observation at `cdfbd1cf`: only
-  `tools/codebase-map/map_lib.py:1404`, with `resolve_compare_base` at `:1502`; PLAY-dOrderedCharter-19
+  `tools/codebase-map/map_lib.py@b864fafffc90:1404`, with `resolve_compare_base` at
+  `tools/codebase-map/map_lib.py@b864fafffc90:1502`; PLAY-dOrderedCharter-19
   S9's move is DEFERRED to that build's run, which the chain runs before this build's build run.
   Liveness: the probe names `tools/lib/coverage_join.py` once S9 lands. RESOLVED (agent, 2026-10-25,
   delegated): cite S9 as the import, rung 2; the build run re-grounds on the landed module and, if S9
   is still absent there, stops this unit rather than copying `map_lib`'s functions. widens: none ·
-  relaxes: none
+  relaxes: none. Re-observed 2026-11-19 at `d08ded6f1`: S9 landed in `9cb93347d`, so the probe names
+  `tools/lib/coverage_join.py#compute_coverage` and memory-tree's copy; `resolve_compare_base` sits
+  in `tools/lib/compare_base.py#resolve_compare_base` (TOOL-dGroundRules-21 S7), also carried by
+  memory-tree's `coverage_join.py` and by `tools/policy/policy.py`. The stop clause does not fire, and
+  S4, S8 and §4 import from the two landed modules.
 
 ## 9. Revision log
 
@@ -357,23 +396,47 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC5 AC6 · the disjoint-
   scout C's row for cl-0351, `retrofit.md:187-283`, and the sources read at base `cdfbd1cf`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-19 · §1 §2 §3 §4 §5 §6 §7 §8 §10 · S4 S8 S10 AC8 F5 · re-grounded on the tree at
+  `d08ded6f1`: `resolve_compare_base` is imported from `tools/lib/compare_base.py`, and gate-lint's
+  `coverage_join.py` carries the three blocks memory-tree's does; the factory's behaviour section is
+  `2o`, since `2k` to `2m` are taken and unit 27 takes `2n`; one new parity row, the existing rows
+  finding the gate-lint copy by marker; `merge` now dispatches the table class first, named in §4,
+  §5 and Alternatives rejected; AC8 compares against the pass's parent, the registries having moved
+  since `cdfbd1cf`; citations re-pinned as `path#symbol` or blob-pinned; Files touched gains the
+  memory-tree README; per brief 2026-11-19-prompt-TOOL-dWitnessedBar-13-reground-brief.
 
 ## 10. Reuse audit
 
-The seams extended are the ones the clause and scout C name, each verified at `cdfbd1cf`: the count
-ratchet `read_registry` and `check_registry` at `tools/gate-lint/sh_hygiene.py:402` and `:462`, and
-their twin at `tools/gate-lint/encoding_posture.py:165` and `:205`; the both-ways engine
-`compute_coverage` (`tools/codebase-map/map_lib.py:1404`) and the base `resolve_compare_base`
-(`:1502`), through PLAY-dOrderedCharter-19 S9's move; the row-keyed driver
-`tools/memory-tree/merge-rows.py`, its class dispatch `check_build_backlog` (`:498`), its keyed
-census `measure_row_classes` (`:508`), its row predicate `_ROW_RE` (`:402`) and its wiring in `merge`
-(`:1283-1288`); and the inline-block gate `PARITY_ROWS` (`tools/lib/resolve-python.test.sh:168`).
-The lookup `python tools/codebase-map/reuse_lookup.py "a shrink-only keyed baseline of counted sites"`
-with the words `compared both ways` appended ranked `derive_baseline_additions` and `resolve_compare_base` as seams and otherwise
-generic `key` and `count` stems; it did not rank `read_registry`, which scout C and the clause found.
-One disagreement with scout C: it places `merge()`'s wiring at `:1279-1281`; at `cdfbd1cf` the
-class test and the postcondition calls are at `merge-rows.py:1283-1288`. The recall probe returned scout C's row, the
-systems-retrofit review naming `compute_coverage` as the engine, and the shape audit's finding that
-the driver exists; none disagreed with source.
+The seams extended are the ones the clause and scout C name, first verified at `cdfbd1cf` and
+re-verified at `d08ded6f1`: the count ratchet `tools/gate-lint/sh_hygiene.py#read_registry` and
+`tools/gate-lint/sh_hygiene.py#check_registry`, and their twin
+`tools/gate-lint/encoding_posture.py#read_registry` and `tools/gate-lint/encoding_posture.py#check_registry`,
+both files unchanged since `cdfbd1cf`; the both-ways engine `tools/lib/coverage_join.py#compute_coverage`
+and the base `tools/lib/compare_base.py#resolve_compare_base`, which PLAY-dOrderedCharter-19 S9 and
+TOOL-dGroundRules-21 S7 landed in `tools/lib/` with memory-tree's `coverage_join.py` carrying both;
+the row-keyed driver `tools/memory-tree/merge-rows.py`, its class dispatch
+`tools/memory-tree/merge-rows.py#check_build_backlog`, its keyed census
+`tools/memory-tree/merge-rows.py#measure_row_classes`, the `ids` parameter of
+`tools/memory-tree/merge-rows.py#no_new_duplicates` that selects it, its row predicate
+`tools/memory-tree/merge-rows.py#_ROW_RE` and its wiring in `tools/memory-tree/merge-rows.py#merge`;
+and the inline-block gate `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`, whose `coverage_join`,
+`compare_base_py` and `remote_ladder_py` rows already exist.
+
+Two seams landed after `cdfbd1cf` and are named, not extended. The driver's table class
+(`tools/memory-tree/merge-rows.py#check_manifest`, `tools/memory-tree/merge-rows.py#resolve_tables`)
+dispatches before the row plane; §4's Alternatives rejected says why the ledger does not ride it. The
+policy kit's shrink-only lists (`tools/policy/policy.py#check_list`) read their base through the
+same `resolve_compare_base`; the legacy-homes list is TOOL-dWitnessedBar-20's conversion, outside this
+unit.
+
+The lookup `python tools/codebase-map/reuse_lookup.py "a shrink-only keyed baseline of counted sites compared both ways"`,
+re-run at `d08ded6f1`, ranks `resolve_compare_base` (now in `tools/lib/compare_base.py`, memory-tree's
+`coverage_join.py` and `tools/policy/policy.py`) and `derive_baseline_additions` as seams and otherwise
+generic `key` and `count` stems; it does not rank `read_registry`, which scout C and the clause found.
+One disagreement with scout C, kept from rev-1: it places `merge()`'s wiring at
+`tools/memory-tree/merge-rows.py@b4a8ac18daa0:1279-1281`, where at `cdfbd1cf` the class test and the
+postcondition calls are at `tools/memory-tree/merge-rows.py@b4a8ac18daa0:1283-1288`. The recall probe,
+re-run at `d08ded6f1`, returns scout C's row, the systems-retrofit review naming `compute_coverage` as
+the engine, and the brief's item for this unit; none disagrees with source beyond the moves above.
 
 Recall terms used: `python tools/memory-recall/query.py "where is the count ratchet for a keyed registry and how are TSV rows merged" --terms "legacy ledger factory shrink-only registry count ratchet read_registry check_registry merge-rows row-keyed driver compute_coverage"`
