@@ -77,3 +77,49 @@ round 1 · finding 37 · MEDIUM · local · specs TOOL-dPlacedRequest-19 · unit
 round 1 · finding 38 · MEDIUM · local · specs TOOL-dPlacedRequest-12 · unit TOOL-dPlacedRequest-12 · rev 4
 round 1 · finding 39 · LOW · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 · unit TOOL-dPlacedRequest-34 · rev 11
 round 1 · finding 39 · LOW · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 · unit TOOL-dPlacedRequest-43 · rev 8
+round 2 · subject dPlacedRequest-spec-set-r2 · audited TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52
+round 2 · finding 1 · MEDIUM · local · specs TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-37 · unit TOOL-dPlacedRequest-24 · rev 6
+round 2 · finding 1 · MEDIUM · local · specs TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-37 · unit TOOL-dPlacedRequest-37 · rev 5
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-34 · rev 12
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-43 · rev 9
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-49 · rev 5
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-52 · rev 8
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-60 · rev 4
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-61 · rev 4
+round 2 · finding 2 · HIGH · local · specs TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-63 · rev 3
+round 2 · finding 3 · MEDIUM · local · specs TOOL-dPlacedRequest-24 · unit TOOL-dPlacedRequest-24 · rev 6
+round 2 · finding 4 · LOW · local · specs TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 · unit TOOL-dPlacedRequest-24 · rev 6
+round 2 · finding 4 · LOW · local · specs TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 · unit TOOL-dPlacedRequest-37 · rev 5
+round 2 · finding 4 · LOW · local · specs TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 · unit TOOL-dPlacedRequest-38 · rev 5
+round 2 · finding 5 · LOW · local · specs TOOL-dPlacedRequest-24 · unit TOOL-dPlacedRequest-24 · rev 6
+round 2 · finding 6 · LOW · local · specs TOOL-dPlacedRequest-24 · unit TOOL-dPlacedRequest-24 · rev 6
+round 2 · finding 7 · LOW · local · specs TOOL-dPlacedRequest-11 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 8 · MEDIUM · local · specs TOOL-dPlacedRequest-11 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 11 · LOW · local · specs TOOL-dPlacedRequest-37 · unit TOOL-dPlacedRequest-37 · rev 5
+round 2 · finding 12 · LOW · local · specs TOOL-dPlacedRequest-13 · unit TOOL-dPlacedRequest-13 · rev 7
+round 2 · finding 13 · LOW · local · specs TOOL-dPlacedRequest-11 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 14 · LOW · local · specs TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-43 · unit TOOL-dPlacedRequest-49 · rev 5
+round 2 · finding 14 · LOW · local · specs TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-43 · unit TOOL-dPlacedRequest-43 · rev 9
+round 2 · finding 15 · LOW · local · specs TOOL-dPlacedRequest-30 · unit TOOL-dPlacedRequest-30 · rev 5
+round 2 · finding 16 · MEDIUM · local · specs TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 16 · MEDIUM · local · specs TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 · unit TOOL-dPlacedRequest-2 · rev 8
+round 2 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-34 · unit TOOL-dPlacedRequest-13 · rev 7
+round 2 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-34 · unit TOOL-dPlacedRequest-34 · rev 12
+round 2 · finding 18 · MEDIUM · local · specs TOOL-dPlacedRequest-1 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 19 · MEDIUM · local · specs TOOL-dPlacedRequest-13 · unit TOOL-dPlacedRequest-13 · rev 7
+round 2 · finding 20 · MEDIUM · local · specs TOOL-dPlacedRequest-11 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 21 · MEDIUM · local · specs TOOL-dPlacedRequest-11 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 22 · MEDIUM · local · specs TOOL-dPlacedRequest-1 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 23 · MEDIUM · local · specs TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 · unit TOOL-dPlacedRequest-43 · rev 9
+round 2 · finding 23 · MEDIUM · local · specs TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 · unit TOOL-dPlacedRequest-49 · rev 5
+round 2 · finding 23 · MEDIUM · local · specs TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 · unit TOOL-dPlacedRequest-52 · rev 8
+round 2 · finding 24 · LOW · local · specs TOOL-dPlacedRequest-1 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 26 · HIGH · local · specs TOOL-dPlacedRequest-1 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 27 · HIGH · local · specs TOOL-dPlacedRequest-1 · unit TOOL-dPlacedRequest-1 · rev 8
+round 2 · finding 28 · HIGH · local · specs TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 · unit TOOL-dPlacedRequest-11 · rev 5
+round 2 · finding 28 · HIGH · local · specs TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 · unit TOOL-dPlacedRequest-16 · rev 6
+round 2 · finding 28 · HIGH · local · specs TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 · unit TOOL-dPlacedRequest-34 · rev 12
+round 2 · finding 29 · MEDIUM · local · specs TOOL-dPlacedRequest-16 · unit TOOL-dPlacedRequest-16 · rev 6
+round 2 · finding 30 · MEDIUM · local · specs TOOL-dPlacedRequest-13 · unit TOOL-dPlacedRequest-13 · rev 7
+round 2 · finding 31 · LOW · local · specs TOOL-dPlacedRequest-30 · unit TOOL-dPlacedRequest-30 · rev 5
+round 2 · finding 32 · LOW · local · specs TOOL-dPlacedRequest-2 · unit TOOL-dPlacedRequest-2 · rev 8
