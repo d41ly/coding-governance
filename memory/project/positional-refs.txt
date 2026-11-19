@@ -25667,17 +25667,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/roles/roles_lib.py:65
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/unattended/unattended.sh:2087
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	manifest-check.sh:310-314
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	runlog_lib.py:522
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	skills/session-kickoff/manifest-check.sh:311-315
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475-1479
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/roles/handoff.py:307
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/runlog/runlog_lib.py:522
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2285
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2396
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:3548
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	unattended.sh:3548
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	scratch-guard.js:667-671
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	skills/session-kickoff/manifest-check.sh:310-317
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	tools/memory-tree/tree_lib.py:27
