@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: tooling
 roster: TOOL
 ids: TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-17 TOOL-dIndexedDesign-18 TOOL-dIndexedDesign-19 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-21 TOOL-dIndexedDesign-22 TOOL-dIndexedDesign-23 TOOL-dIndexedDesign-24 TOOL-dIndexedDesign-25 TOOL-dIndexedDesign-26 TOOL-dIndexedDesign-27 TOOL-dIndexedDesign-28 TOOL-dIndexedDesign-29 TOOL-dIndexedDesign-30 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53
-spec-audit: 2026-10-21
 parents: dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary
 may: PLAY-dClosedLoop-3
 ---
