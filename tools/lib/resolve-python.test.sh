@@ -1285,6 +1285,48 @@ out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$NK/l
 [ "$(grep -c 'retrofit\.unseeded' "$ROOT/help/policy.md")" = 1 ] \
   || bad "2o seed AC6: help/policy.md does not name retrofit.unseeded on one line of its consumer list"; ok
 
+# ---- 2o, the unborn seed (TOOL-dWitnessedBar-61 AC1 AC2) ------------------------------------------
+# A second fixture, a commitless `git init` whose kit table, seed argv and home directory are staged and
+# never committed, so `rev-parse --verify -q HEAD` exits 1 printing nothing: the seed stamps the null SHA
+# and says so, a failed seed's unarmed line carries it, and once committed a rerun leaves the home
+# byte-identical while --widen stamps the new HEAD. Red when the seed takes its sha from a bare HEAD
+# read again. WHAT THIS DOES NOT CHECK: a git failure other than an unborn HEAD, which no fixture here
+# can stage without a broken repository.
+LLU="$LL/unborn"; LL_NULL=0000000000000000000000000000000000000000
+mkdir -p "$LLU/tools/fx" "$LLU/memory/project"
+git init -q "$LLU" && git -C "$LLU" config core.autocrlf false
+cp "$LLR/fxseed.py" "$LLU/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLU/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLU/seed-keys.txt"; : > "$LLU/memory/project/.keep"; git -C "$LLU" add -A
+LL_UHOME="$LLU/memory/project/p.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed p 2" <<<"$out" && [ "$(grep -c 'HEAD is unborn' <<<"$out")" = 1 ] \
+  && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LL_UHOME" && grep -qxF "b${T}1${T}${LL_NULL}${T}seeded" "$LL_UHOME"; } \
+  || bad "2o unborn AC1: a seed on an unborn HEAD did not print armed p 2 and HEAD is unborn with two null-SHA rows: ${out//$'\n'/ | }"; ok
+out=$(LLR="$LLU" run_ll read p)
+{ [ "${out##*$'\n'}" = rc=0 ] && [ "$(grep -c "${T}${LL_NULL}${T}seeded" <<<"$out")" = 2 ]; } \
+  || bad "2o unborn AC1: read_rows did not return the two null-SHA rows: ${out//$'\n'/ | }"; ok
+rm -f "$LL_UHOME"; printf 'fail\n' > "$LLU/seed-mode.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+ll_state=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import legacy_ledger as L; print(L.read_home_state(sys.argv[2]))' "$HERE" "$LL_UHOME" | tr -d '\r')
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -qxF "unarmed p exit 1" <<<"$out" && grep -qxF "# unarmed · exit 1 · $LL_NULL" "$LL_UHOME" \
+  && [ "$ll_state" = unarmed ]; } \
+  || bad "2o unborn AC1: a failed seed on an unborn HEAD did not leave an unarmed line carrying the null SHA, read unarmed: ${out//$'\n'/ | } / $ll_state"; ok
+rm -f "$LLU/seed-mode.txt"
+out=$(LLR="$LLU" run_ll seed --population p)
+grep -qxF "armed p 2" <<<"$out" || bad "2o unborn: the repaired seed did not re-arm the unborn home: ${out//$'\n'/ | }"; ok
+git -C "$LLU" add -A && git -C "$LLU" -c user.email=t@e -c user.name=t commit -q --no-verify -m first \
+  || bad "2o unborn AC2: the unborn fixture could not be committed"; ok
+cp "$LL_UHOME" "$LL/p.before"; ll_uhead=$(git -C "$LLU" rev-parse HEAD)
+out=$(LLR="$LLU" run_ll seed --population p)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "present p" <<<"$out" && ! grep -q 'HEAD is unborn' <<<"$out" \
+  && cmp -s "$LL/p.before" "$LL_UHOME"; } \
+  || bad "2o unborn AC2: a seed after the first commit re-dated the null-SHA home: ${out//$'\n'/ | }"; ok
+printf 'a\nb\nc\n' > "$LLU/seed-keys.txt"
+out=$(LLR="$LLU" run_ll seed --population p --widen R1)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "c${T}1${T}${ll_uhead}${T}widened:R1" "$LL_UHOME" \
+  && head -3 "$LL_UHOME" | cmp -s - "$LL/p.before"; } \
+  || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
+
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
 # both EXPLAIN the idiom they replace, and a predicate that fires on the prose documenting the fix is

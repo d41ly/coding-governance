@@ -8,7 +8,10 @@ that require this kit read and write their populations through it. Three names t
 imported outside it, so the block stays byte-identical: `compute_coverage` and `resolve_compare_base`
 from this kit's own `coverage_join.py`, and `resolve_kit_dir`, through which `seed` finds the policy
 kit, from `backlog.py`. Of the canonical's CLI this copy carries `seed` alone (TOOL-dWitnessedBar-15
-S5), run in the repository its working directory sits in, because an adopter seeds through this copy:
+S5), run in the repository its working directory sits in, because an adopter seeds through this copy.
+With no `--sha` it stamps HEAD's sha, or, where HEAD is unborn in a repository with no commit yet, the
+null SHA of forty `0`s, saying so on one line; a later seed never re-dates those rows
+(TOOL-dWitnessedBar-61):
 
     python <prefix>/memory-tree/legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]
     python <prefix>/memory-tree/legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)
@@ -64,15 +67,16 @@ class Registration:
     source: str = ""
 
 
-def _run_git(root, *args):
-    """-> (returncode, stdout) of one `git -C root` call, the inherited-directory variables dropped."""
+def _run_git(root, *args, with_stderr=False):
+    """-> (returncode, stdout) of one `git -C root` call, the inherited-directory variables dropped;
+    `with_stderr` adds its stderr as a third item."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     try:
         p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
                            encoding="utf-8", errors="surrogateescape", env=env)
     except OSError as exc:
-        return 127, str(exc)
-    return p.returncode, p.stdout
+        return (127, "", str(exc)) if with_stderr else (127, str(exc))
+    return (p.returncode, p.stdout, p.stderr) if with_stderr else (p.returncode, p.stdout)
 
 
 def check_home(home):
@@ -410,6 +414,25 @@ SEED_TIMEOUT = 600  # PINNED 2026-11-19: the `ceiling` of five rows of gate-legs
 UNARMED_LEAD = "# unarmed · "  # the home's state line: `# unarmed · <reason> · <sha>`
 DEAD_PROBE_LEAD = "dead probe:"  # a seed line saying its probe measured nothing
 UNSEEDED_DEFAULT = "unarmed"  # retrofit.unseeded's catalogue default, which holds where no policy kit resolves
+NULL_SHA = "0" * 40  # the sha a seed stamps where HEAD is unborn: the row was seeded before any commit
+UNBORN_LINE = "seed: HEAD is unborn, rows carry the null SHA"
+
+
+def read_head_sha(root):
+    """-> (sha, reason) of the commit `seed` stamps where no `--sha` is given (TOOL-dWitnessedBar-61):
+    HEAD's sha from `git rev-parse --verify --quiet HEAD`; `NULL_SHA` where that exits non-zero with
+    nothing printed, as it does on an unborn HEAD, in a repository with no commit yet; on any other
+    failure no sha and the reason `no HEAD: <its stderr line>`. The recall kit's `read_worktree_head`
+    and the overlay's `check_born` read an unborn HEAD the same way and neither is importable from this
+    block. WHAT IT DOES NOT CHECK: that a silent non-zero exit is an unborn HEAD rather than another
+    failure git reports without a line."""
+    rc, out, err = _run_git(root, "rev-parse", "--verify", "--quiet", "HEAD", with_stderr=True)
+    out, err = out.strip(), err.strip()
+    if rc == 0 and out:
+        return out, ""
+    if rc != 0 and not out and not err:
+        return NULL_SHA, ""
+    return None, "no HEAD: %s" % (err.splitlines() or ["git rev-parse exited %d" % rc])[0].strip()
 
 
 def read_home_state(path):
@@ -559,7 +582,9 @@ def run_seed_cli(args, cwd):
     """`seed --all | --population <name> [--widen <record>] [--sha <sha>]`, and the unregistered
     `seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)`: one line per population, exit
     0, or 1 when a seed left one unarmed by a failure, or 2 on a refusal. `seed = []` exits 0 under
-    `retrofit.unseeded: unarmed` and 2 under `refuse`, naming every such registration."""
+    `retrofit.unseeded: unarmed` and 2 under `refuse`, naming every such registration. With no `--sha`,
+    `read_head_sha` names the sha: on an unborn HEAD the null SHA, `UNBORN_LINE` printed once; on any
+    other failure each population is `unarmed` with that reason and nothing is written."""
     usage = ("usage: legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]\n"
              "       legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)")
     argv = None
@@ -591,20 +616,21 @@ def run_seed_cli(args, cwd):
         print("legacy_ledger: not inside a git work tree", file=sys.stderr)
         return 2
     root = top.strip()
-    sha = opts.get("--sha")
+    sha, no_head = opts.get("--sha"), ""
     if sha is None:
-        rc, head = _run_git(root, "rev-parse", "--verify", "-q", "HEAD")
-        if rc != 0 or not head.strip():
-            print("legacy_ledger: HEAD names no commit, so there is no sha to stamp; pass --sha",
-                  file=sys.stderr)
-            return 2
-        sha = head.strip()
-    if not SHA_RE.fullmatch(sha):
+        sha, no_head = read_head_sha(root)
+    if sha is not None and not SHA_RE.fullmatch(sha):
         print("legacy_ledger: --sha %r is not 8 to 40 lowercase hex digits" % sha, file=sys.stderr)
         return 2
+    unborn = "--sha" not in opts and sha == NULL_SHA
     try:
         if homed:
             home = pathlib.Path(os.path.relpath(pathlib.Path(cwd, opts["--home"]), root)).as_posix()
+            if no_head:
+                print("unarmed %s %s" % (home, no_head))
+                return 1
+            if unborn:
+                print(UNBORN_LINE)
             copy = str(pathlib.Path(cwd, opts["--copy"])) if "--copy" in opts else None
             line, ok = seed_home(root, home, sha, argv=argv, template=copy)
             print(line)
@@ -633,6 +659,12 @@ def run_seed_cli(args, cwd):
         if value != UNSEEDED_DEFAULT:
             print("legacy_ledger: retrofit.unseeded reads %r, outside unarmed | refuse" % value, file=sys.stderr)
             return 2
+    if no_head:
+        for reg in picked:
+            print("unarmed %s %s" % (reg.population, no_head if reg.seed else "no seed"))
+        return 1 if any(reg.seed for reg in picked) else 0
+    if unborn:
+        print(UNBORN_LINE)
     worst = 0
     for reg in picked:
         try:
