@@ -20691,13 +20691,14 @@ if in_shard 8; then
 # ago is pruned, exit 0, its ref gone (AC1); one line s1 queued with the origin renamed away is flushed,
 # exit 0, the queue empty and the lease on the origin (AC2); and over s1's held build lease `acquire`,
 # `take-over`, `renew`, `release --as withdrawn` and `offer --to b` each exit 2 printing `no session`,
-# the origin's refs unmoved, where s1's own renewal still writes (AC4). RED, observed at the close: a
-# scratch copy whose exempt list names `release` reads AC4's release refused `live-holder`, not `no
-# session`; a copy refusing every `--lease` act with no session at the verb's dispatch reds AC1, AC2
-# and AC3, the base driver AC2 alone, since its prune and fence run outside `run_lease_verb`. Waived by
-# README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: `status`, which no act
-# dispatch reaches until TOOL-dPlacedRequest-34 mints it, and an act on neither list, which the verb's
-# own act check refuses after the gate.
+# the origin's refs unmoved, where s1's own renewal still writes (AC4); an act on neither list, `seize`,
+# is refused `no session` with none and by the act check with one, so the default arm gates (S2). RED,
+# observed at the close: a scratch copy whose exempt list names `release` reads AC4's release refused
+# `live-holder`, not `no session`, and one whose default arm is exempt reads `seize` past the gate; a
+# copy refusing every `--lease` act with no session at the verb's dispatch reds AC1, AC2 and AC3, the
+# base driver AC2 alone, since its prune and fence run outside `run_lease_verb`. Waived by README rule
+# 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: `status`, which no act dispatch
+# reaches until TOOL-dPlacedRequest-34 mints it.
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 il_out=$(run_offer_arm "$LF/c1" daily-agent - fence build tFix); il_rc=$?
@@ -20721,6 +20722,10 @@ for il_a in "acquire build tFix" "take-over build tFix" "renew build tFix" "rele
 done
 same "DPR40 AC4 acquire, take-over, renew, release and offer each exit 2 printing no session, the origin unmoved" \
   "$il_rc$([ "$(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname) %(objectname)' refs/gov)" = "$il_refs" ] && echo unmoved || echo moved)" "2 1 2 1 2 1 2 1 2 1 unmoved"
+il_out=$(run_offer_arm "$LF/c1" daily-agent - seize build tFix); il_rc=$?
+il_o2=$(run_lease_arm seize build tFix); il_rc="$il_rc $?"
+same "DPR40 S2 an act on neither list is gated with no session, and meets the act check with one" \
+  "$il_rc $(printf '%s\n' "$il_out" | grep -c '^lease not written — no session: ') $(printf '%s\n' "$il_o2" | grep -cF "not 'seize'")" "2 2 1 1"
 il_out=$(run_lease_arm renew build tFix); il_rc=$?
 same "DPR40 AC4 control: s1's own renewal of the lease still writes" "$il_rc $(read_lease_field tFix/build session)" "0 s1"
 rm -rf "$LF"
@@ -22829,10 +22834,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3896 -> 3907 by TOOL-dPlacedRequest-32: the id-less session block's 11 region-eight assertions
 # (10 `same`, its two loops' six among them, one per pass, and 1 `hit`), off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-# RAISED 3907 -> 3914 by TOOL-dPlacedRequest-40: the id-less act block's 7 region-eight assertions (6
-# `same`, its AC4 loop's five acts folded into one, and 1 `hit`), off the diff's own lines; no skip
-# branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3914
+# RAISED 3907 -> 3915 by TOOL-dPlacedRequest-40: the id-less act block's 8 region-eight assertions (7
+# `same`, its AC4 loop's five acts folded into one and its checklist pass's unnamed-act arm among
+# them, and 1 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3915
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23100,8 +23106,8 @@ FLOOR_SHARD_7=311
 # RAISED 1113 -> 1119 by TOOL-dPlacedRequest-30: the same 6 region-eight collision assertions, see FLOOR_ASSERTIONS.
 # RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
 # RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
-# RAISED 1138 -> 1145 by TOOL-dPlacedRequest-40: the same 7 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1145
+# RAISED 1138 -> 1146 by TOOL-dPlacedRequest-40: the same 8 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1146
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

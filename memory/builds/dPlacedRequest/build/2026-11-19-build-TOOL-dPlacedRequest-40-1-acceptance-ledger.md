@@ -42,12 +42,32 @@ under stub `same` and `hit` printers. Every id-less call ran through `run_offer_
   exited 2 (PINNED) printing the `no session` line once, and the origin's `refs/gov` names and tips read
   identical before and after. The control: `s1`'s own `renew build tFix` exited 0 (PINNED) and the record
   still names `session: s1`, so the refusal is the absent session's and not the arguments'.
+- S2's default — an act on neither list, `seize build tFix`, exited 2 (PINNED) printing the `no session`
+  line with no session, and with session `s1` exited 2 (PINNED) naming the act check's `not 'seize'`, so
+  the default arm gates and the act check still answers behind it.
 
 **Owed at the close.** The `New arm:` line: the `TOOL-dPlacedRequest-40` block of region 8 of
 `tools/unattended/unattended.test.sh`, right after the `TOOL-dPlacedRequest-32` block behind a seam of its
-own, 7 assertions (DERIVED: 6 `same` and 1 `hit`). The probe above ran it green on this driver; that probe is
+own, 8 assertions (DERIVED: 7 `same` and 1 `hit`). The probe above ran it green on this driver; that probe is
 no suite reading. Its RED-first observation is the close's: a scratch copy whose exempt list names
-`release` reds AC4, its release refused `live-holder` rather than `no session`; a copy refusing every
-`--lease` act with no session at the verb's dispatch reds AC1, AC2 and AC3; the base driver reds AC2
-alone. The suite is waived for this build's landing by README rule 8. The floors rose by the same 7
-(DERIVED): `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+`release` reds AC4, its release refused `live-holder` rather than `no session`; one whose default arm is
+exempt reds the `seize` arm; a copy refusing every `--lease` act with no session at the verb's dispatch
+reds AC1, AC2 and AC3; the base driver reds AC2 alone. The suite is waived for this build's landing by
+README rule 8. The floors rose by the same 8 (DERIVED): `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 54 classes (DERIVED: 48
+by an anchor, 6 universal). One needed a change. refusal-branch-with-no-arm: the default arm of the act
+`case`, which gates an act on neither list, had no arm, so the block gained the `seize` assertion above and
+its header no longer lists the unnamed act as undriven. The rest needed none.
+guard-above-a-fold-makes-its-fallback-dead: the exempt arm's `prune`, `fence` and `status` are names no
+dispatch routes into `tools/unattended/unattended.sh#run_lease_verb` today, written because the spec puts
+both lists in that one `case`, and the ledger's opening says so rather than reading them as coverage; the
+act check after the gate stays live for a present session, as the `seize` arm shows.
+fixture-passes-by-finding-nothing: AC1's empty `refs/gov/leases/run` is paired with the `pruned` line, AC2's
+empty queue with the control that one line was queued and the lease reaching the origin, and AC4's
+refusals with `s1`'s own renewal writing. two-answers-to-one-question: the driver's comment, the stops
+guide, the verbs guide's `--lease` row and `help/loop.md` each name the holder acts; the stops guide also
+names `status` as the spec does, while the verbs row and the help page name only the acts a user can run
+today. line-count-reads-empty-capture-as-one: each count is an exact-line `grep -c` over a capture or a file,
+which reads 0 on an empty one. The codebase map was regenerated in the closing commit; this unit mints,
+renames and deletes no function.
