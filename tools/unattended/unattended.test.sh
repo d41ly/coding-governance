@@ -19253,6 +19253,74 @@ for oc_v in 82800:live 90000:stale; do
   oc_row=$(read_clock_row)
   same "DPR17 AC8 ...over a legacy chain sighted a minute ago, its opener first seen ${oc_v%%:*} s ago, still ${oc_v#*:}" "${oc_row%% *}" "${oc_v#*:}"
 done
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-26 — THE WALK STOPS AT THE HOLDER'S TENURE. Over the observer clock's fixture
+# above, each chain an epoch-1 `renews: yes` commit first seen 26 h ago beneath an epoch-2 tenure: a
+# take-over is aged from its own opener, never from the earlier holder's beat, and a tenure with no
+# renewing commit is aged from its opening commit. RED is a scratch copy of the driver whose walk
+# crosses the epoch change, which reads the take-over stale and the tenure's sighted opener the earlier
+# holder's. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a
+# holder re-taking its own lease at a higher epoch, which opens a tenure like any take.
+# ==================================================================================================
+tn_cut='while (c != "" && (c in ep) && ep[c] == e)'
+tn_red='while (c != "" && (c in ep))'
+printf '%s\n' "${oc_src/"$tn_cut"/"$tn_red"}" >"$oc_copy/cross.sh"
+same "DPR26 the scratch copy carries its one staged walk" "$(grep -c 'while (c != "" && (c in ep)) {' "$oc_copy/cross.sh")" "1"
+# ---- AC1: an epoch-1 renewal first seen 25 h ago under an epoch-2 take-over `renews: no` first seen a
+# ---- minute ago reads live, and a third session's take-over is refused live-holder.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); oc_b=$(add_lease_commit 2 no "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR26 AC1 a take-over over a renewal first seen 25 h ago reads live" "${oc_row%% *}" "live"
+tn_out=$(LA_SID=s3 LA_USER=agent5 run_lease_arm take-over build tOc); tn_rc=$?
+same "DPR26 AC1 ...a third session's take-over exits 1" "$tn_rc" "1"
+hit  "$tn_out" "lease refused — live-holder"
+oc_row=$(read_clock_row "$oc_copy/cross.sh")
+same "DPR26 AC1 RED: the copy whose walk crosses the epoch reads it stale" "${oc_row%% *}" "stale"
+# ---- AC2: the epoch-2 tenure's `renews: yes` commit first seen 25 h ago under a `renews: no` beat
+# ---- seen a minute ago reads stale; that renewing commit seen a minute ago, live.
+for tn_v in 90000:stale 60:live; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 93600)"); oc_b=$(add_lease_commit 2 yes "$(derive_claim_ago 90000)" "$oc_a")
+  oc_c=$(add_lease_commit 2 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 93600)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago "${tn_v%%:*}")"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR26 AC2 the tenure's renewing commit first seen ${tn_v%%:*} s ago reads ${tn_v#*:}" "${oc_row%% *}" "${tn_v#*:}"
+done
+# ---- AC3: an epoch-2 tenure of two `renews: no` commits is aged from its opener: first seen 25 h ago
+# ---- stale, a minute ago live, its feed line gone unknown. The crossing copy reads all three stale.
+tn_red=""
+for tn_v in 90000:stale 60:live gone:unknown; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 93600)"); oc_b=$(add_lease_commit 2 no "$(derive_claim_ago 90000)" "$oc_a")
+  oc_c=$(add_lease_commit 2 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 93600)"
+  [ "${tn_v%%:*}" = gone ] || add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago "${tn_v%%:*}")"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR26 AC3 a tenure with no renewing commit, its opener ${tn_v%%:*}, reads ${tn_v#*:}" "${oc_row%% *}" "${tn_v#*:}"
+  oc_row=$(read_clock_row "$oc_copy/cross.sh"); tn_red="$tn_red${oc_row%% *} "
+done
+same "DPR26 AC3 RED: the crossing copy ages every case by the earlier holder's beat" "$tn_red" "stale stale stale "
+# ---- AC4: a legacy `refs/gov/runs/tFix` chain with no `epoch`, its tip first seen a minute ago and its
+# ---- parent 25 h ago, is one tenure and reads live.
+remove_clock_refs
+oc_g=$(git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -m "$(printf 'gov-claim tFix\n\nslug: tFix\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$(derive_claim_ago 90000)" "$(derive_claim_ago 90000)")")
+oc_h=$(git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -p "$oc_g" -m "$(printf 'gov-claim tFix\n\nslug: tFix\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$(derive_claim_now)" "$(derive_claim_now)")")
+git --git-dir="$LF/origin.git" update-ref refs/gov/runs/tFix "$oc_h"
+add_claim_sighting "$LF/c1" refs/gov/runs/tFix "$OC_TREE" "$oc_g" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" refs/gov/runs/tFix "$OC_TREE" "$oc_h" "$(derive_claim_ago 60)"
+same "DPR26 AC4 a legacy chain with no epoch, its tip first seen a minute ago, reads live" \
+  "$( (cd "$LF/c1" && bash "$SCRIPT" --claims 2>/dev/null) | awk -F'\t' '$1 == "tFix" { print $5 }')" "live"
 rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -21655,7 +21723,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the diff's own lines: in region eight the lease-never-deleted block's 90 (its loops run as written)
 # and GC_CELLS' 12 new cells, one `same` each; in region six the settle arm's 3 over a tombstone. No
 # suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3683
+# RAISED 3683 -> 3695 by TOOL-dPlacedRequest-26: the tenure walk block's 12 region-eight assertions
+# (11 `same`, 1 `hit`, its loops run as written), every one unconditional, counted off the diff's own
+# lines; no suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3695
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21906,7 +21977,8 @@ FLOOR_SHARD_7=311
 # RAISED 796 -> 805 by TOOL-dPlacedRequest-24: the same 9 region-eight offline queue lock assertions, see FLOOR_ASSERTIONS.
 # RAISED 805 -> 812 by TOOL-dPlacedRequest-25: the same 7 region-eight tenure renewal assertions, see FLOOR_ASSERTIONS.
 # RAISED 812 -> 914 by TOOL-dPlacedRequest-16: the same 102 region-eight lease-never-deleted and cell assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=914
+# RAISED 914 -> 926 by TOOL-dPlacedRequest-26: the same 12 region-eight tenure walk assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=926
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

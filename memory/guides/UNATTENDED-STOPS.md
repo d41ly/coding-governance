@@ -279,7 +279,11 @@ first saw it. A claim's RENEWING BEAT is the newest commit of the tip's first-pa
 walk through its current tenure, the commits whose `epoch` is the tip's (an absent `epoch` reads 0),
 whose `renews` reads `yes` or is absent, else the tenure's opening commit whatever its `renews` says;
 a migrated lease's legacy commits beneath its opener never renew it, and a fence beat writing
-`renews: no` moves the tip and leaves the beat where it was. A `live` claim is `stale` once this node
+`renews: no` moves the tip and leaves the beat where it was. A lease is aged within its holder's
+tenure: a take or a take-over raises the epoch and opens a new one, so the walk stops at the first
+commit whose `epoch` differs and an earlier holder's beat never ages the new holder, and a tenure with
+no renewing commit is aged from its opening commit, `live` until `leases.expiry-hours` after the new
+holder's first write and `stale` after. A `live` claim is `stale` once this node
 first saw its renewing beat more than `leases.expiry-hours` ago, and never where that beat carries
 `renews: -`. An offer's deadline (`leases.offer-seconds`) and a tombstone's prune age
 (`leases.queued-claim-days`) are the same judgment. A clock stepped between a sighting and its
