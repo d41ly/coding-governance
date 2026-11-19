@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-47 — the bounded age walk never compares an unsighted commit with the threshold
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -128,7 +128,7 @@ planted feed and `leases.expiry-hours` 24.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · an emptied feed, an unsighted tip and a `-` sighting over planted chains, staged by a scratch copy whose `awk` compares unguarded · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
@@ -147,6 +147,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · an emptied
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edges to `TOOL-dPlacedRequest-50` and `TOOL-dPlacedRequest-52`, mirroring their consumes-from.
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
+- rev-5 · 2026-11-19 · §7 · names `scratch-guard self-test` and `tier2-review self-test`, the legs the spec-token guard join names for `tools/unattended/unattended.sh` under this spec's Files touched; the round-1 fold of `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` gave its siblings this repair and missed this spec.
 
 ## 10. Reuse audit
 
