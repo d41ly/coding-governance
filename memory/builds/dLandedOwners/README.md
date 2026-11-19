@@ -33,8 +33,12 @@ instrument the scan excludes. The owner's words are recorded under `prompts/`.
 ## Build-level rules
 
 - Attended, through `/build`; the owner chose the scope on 2026-11-19: "Predicate + scan".
-- Every unit is a shipped-kit edit under `tools/policy/`, so Tier-2.
-- No spec audit: the owner was not asked for one and the scope is three small mechanisms.
+- Every unit is a shipped-kit edit, so Tier-2: all four under `tools/policy/`, unit 2 also in `tools/loop/budget.py`,
+  unit 4 also in `tools/govkit/`.
+- No spec audit: the owner was not asked for one and the scope opened as three small mechanisms. Unit 4 is the
+  closing review's promoted findings, batched as the diff-exit rule orders.
+- Fork F1 of unit 1, the owner's pick (a): dDeclaredLoop's pending review cycle row is carried by ask
+  `TOOL-dLandedOwners-5`, and the held `loop termination` leg reads it stale until a later build bounds the cycle.
 
 ## Parked decisions
 
