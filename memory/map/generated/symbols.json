@@ -178,6 +178,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "GIT",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "GITLS",
       "kind": "function",
       "file": "tools/unattended/check-playbook.sh"
