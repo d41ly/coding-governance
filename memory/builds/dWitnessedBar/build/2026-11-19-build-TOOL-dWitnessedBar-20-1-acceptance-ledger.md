@@ -30,7 +30,7 @@ AC9 to AC11 name, and the RED-first observation of the `New arm:` line on `tools
 - AC7 — `case unmarked` — `lists --check` exits 1 with the one `has no mark in GATE_ENV_MARKS` report, and
   `lists --marks legacy-homes` prints the row `.githooks/gate-env.sh`, `GATE_PLANTED`, `unmarked`; the
   fixture run is owed.
-- AC8 — `legacy_ledger.py read legacy-homes` — run from `tools/lib/` it prints the 114 rows and exits 0
+- AC8 — `legacy_ledger.py read legacy-homes` — run from `tools/lib/` it prints the 114 rows and exits 0 (DERIVED from the builder's probe)
   (DERIVED); the `[[ledger]]` table in `tools/govkit/registry.toml` reads `direction = "shrink-only"`, and `grep
   -c '^\[\[ledger\]\]'` under `tools/policy/kit.toml` prints 0.
 - AC9 — `merge: rows` — `git check-attr merge -- legacy-homes.txt` under `memory/project/` prints it; the
