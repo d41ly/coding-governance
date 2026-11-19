@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0349@79373aa7 whole
 
@@ -20,6 +20,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-11-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-spec-writer.md) | journal | — |
@@ -79,28 +80,24 @@ extension kind (v2:967-971, NP-22 16/19 "Generated manifest").
   row, is listed in the review record `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-11-enforces-review.md`
   and is put to the owner in one ask row of `memory/builds/dWitnessedBar/BACKLOG.md`, written only when
   any leg is unreached. Observed by AC8.
-- **S7** — 7h's leg arms retired. The both-ways join, the field-agreement arms and the exempt-row
-  arms of `tools/govkit/govkit.py#selfcheck`'s `7h` block
-  (`tools/govkit/govkit.py@cf818f88cfd1:2764-2914`) leave govkit, with the `manifest_*` maps only
-  they read. Its manifest read, the `manifest`, `manifest_subject` and `manifest_chunk` maps
-  (`tools/govkit/govkit.py@cf818f88cfd1:2748-2758`), which 7h2 and 7j4 read, stays. Their
-  `tools/govkit/selftest.py` plants, found by the arms' refusal strings, move to the factory's
-  `--selftest`: the ceiling and `stage` runs of `check_benched_probe_arms`
-  (`tools/govkit/selftest.py@b19bf481bc8a:1730-1752`), the leg correspondence (`:7107-7134`), D3
-  (`:9277-9296`) and L1's subject plants (`:9630-9645`). The comments naming 7h, found by
-  `git grep -nP "\b7h(?![0-9a-z])"`, are re-worded to name the factory's gate: the selftest's at
-  `:1697`, `:1717`, `:1757`, `:9134`, `:9493` and `:9587`, govkit's in 7h2, 7j4 and
-  `write_gate_legs` (`tools/govkit/govkit.py@cf818f88cfd1:2925`, `:3455`, `:4446`),
-  `tools/govkit/entries/push-main.kit.toml@c88a77f4626d:89` and
-  `memory/map/features/govkit.md@1695323691b0:197`. Outside that population, prose naming another
-  check: `tools/govkit/refusal_join.py@59ae80a7869b:150`, whose "arm 7h" is DEPL-cMendedVintage-9's
-  reserved-prefix predicate outside the block, and the dated gotcha
-  `memory/gotchas/line-claim-matched-over-the-whole-output.md@152a6bf73c54:26`. Observed by AC9.
-  **Readers:** by name: `tools/govkit/selftest.py`, `tools/govkit/govkit.py`,
-  `tools/govkit/entries/push-main.kit.toml` and `memory/map/features/govkit.md`, at the lines above.
-  by value: 7h2 (`tools/govkit/govkit.py@cf818f88cfd1:2934-2935`) reads `manifest`,
-  `manifest_subject` and `manifest_chunk`, and 7j4 (`tools/govkit/govkit.py@cf818f88cfd1:3465`,
-  `:3472`) reads `manifest_chunk`, which the retained read still builds;
+- **S7** — 7h's leg arms retired. In `tools/govkit/govkit.py#selfcheck`'s `7h` block, the both-ways
+  join, the field-agreement arms, the exempt-row arms and the `legs:` note
+  (`tools/govkit/govkit.py@60b8fa0923ad:2767-2941`) leave govkit, with the eight `manifest_*` maps
+  only they read (`:2759-2766`). So do the purpose block's shape arm, its uniqueness half included
+  (`:2958-2971`), and `PURPOSE_MAX_CHARS` with its comment (`:6114-6116`), which move whole into the
+  factory's `purpose` arm (§8 F8). The manifest read stays, its `manifest`, `manifest_subject` and
+  `manifest_chunk` maps (`:2748-2758`) read by 7h2 and 7j4. The purpose block's presence arm and its
+  `purposes:` note (`:2950-2957`, `:2972-2975`) stay too, until TOOL-dWitnessedBar-51 S8 moves
+  presence to `--conform`; the presence message drops the bound it no longer owns. The
+  `tools/govkit/selftest.py` plants go as §4 "The plants" states (§8 F9), and every comment naming 7h
+  is kept or re-worded as §4 "The 7h population" states. Observed by AC4 and AC9.
+  **Readers:** by name: `tools/govkit/selftest.py`, `tools/govkit/govkit.py` (`PURPOSE_MAX_CHARS` at
+  `:2956`, `:2962` and `:2964`), `tools/govkit/entries/push-main.kit.toml`,
+  `tools/run-gates/README.md`, `tools/run-gates/run-gates.gov.test.sh` and
+  `memory/map/features/govkit.md`, at the lines §4 "The 7h population" lists.
+  by value: 7h2 (`tools/govkit/govkit.py@60b8fa0923ad:2995-2996`) reads `manifest`,
+  `manifest_subject` and `manifest_chunk`, and 7j4 (`:3526`, `:3533`) reads `manifest_chunk`, which
+  the retained read still builds; the presence arm reads the parsed manifest (`:2951`), which it keeps;
   `tools/run-gates/owed_rows.py` and `tools/playbook/practice_census.py` read only the
   `[[exempt_leg]]` rows' names, which the move keeps.
 - **S8** — The packs register through it. A leg any later unit adds, a `pack` leg included, is one
@@ -124,7 +121,7 @@ extension kind (v2:967-971, NP-22 16/19 "Generated manifest").
 
 - **consumes-from** `TOOL-dWitnessedBar-12` — the `tag` field and `LEG_KEYS`, which bound the keys a declaration may carry
 - **consumes-from** `TOOL-dWitnessedBar-22` — the `enforces` key and its target set, which S6 fills for every leg
-- **consumes-from** `TOOL-dWitnessedBar-19` — the `purpose` key on every row and its 7h arms, which S4 takes over as field arms
+- **consumes-from** `TOOL-dWitnessedBar-19` — the `purpose` key on every row and its 7h shape arm, which S4 takes over as the `purpose` arm; its presence arm stays in 7h (§8 F8)
 - **consumes-from** external — PLAY-dOrderedCharter-7's `tools/playbook/kinds.toml`, `principles.toml`, `core-pending.txt` and `core.py meta-check`, and PLAY-dOrderedCharter-1's `practices.toml`, landed by the chain before this build run
 - **hands-off** `TOOL-dWitnessedBar-14` — `leg_factory.py`, through which the `ratchet` pack's legs are declared
 - **hands-off** `TOOL-dWitnessedBar-10` — `leg_factory.py` and its generated rows, from which the pre-commit list is derived
@@ -133,7 +130,7 @@ extension kind (v2:967-971, NP-22 16/19 "Generated manifest").
 - **hands-off** `TOOL-dWitnessedBar-28` — `leg_factory.py`, which a repository's overlay leg rows feed as the `adopter` pack
 - **hands-off** `TOOL-dWitnessedBar-5` — `leg_factory.py`, whose `--conform` table gains unit 5's `held guard` arm and whose `--write` renders the guards that unit adds to held legs
 - **hands-off** `TOOL-dWitnessedBar-45` — `leg_factory.py`, its `[[generated]]` row and its verbs, which unit 45 makes runnable where govkit is absent (id 33)
-- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 3, 6, 7 and 24: the `purpose presence` arm, the landing compare and its two legs' rows, the self-test `enforces` rule, and the manifest order's uses, each a scope item of that unit
+- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 3, 6, 7 and 24: the `purpose presence` arm, which then retires 7h's presence arm, its note and plant h3 (§8 F8), the landing compare and its two legs' rows, the self-test `enforces` rule, and the manifest order's uses, each a scope item of that unit
 
 ## 4. Design
 
@@ -204,7 +201,7 @@ reorder changes no verdict.
 | ceiling | not a positive integer, a bool included | 7h |
 | reads | a class outside `history`, `base`, `clock`, `remote` | the runner's reader (`tools/run-gates/run-gates.sh@c828502568bf:2947`) |
 | name | absent, or a digit-bearing parenthetical | 7h, and 7h's AC1b |
-| purpose | unit 19's shape arm | 7h, unit 19 |
+| purpose | a present `purpose` not a string, empty, over `PURPOSE_MAX_CHARS` characters (`tools/govkit/govkit.py@60b8fa0923ad:6116`, never bytes), holding a line break or edged with space; two legs sharing one | unit 19's shape arm, its uniqueness half included (§8 F8) |
 | token | a target token left unresolved in gov's row | new, step 3 above |
 | derived | a declaration carrying `pass_leg`, which step 5 derives | new, §8 F7 |
 | enforces | an empty `enforces` on a leg that is no `leg` row of `core-pending.txt`; a tag no principle row, practice row or practice `rules` member `<tag>.<rule>` holds | new; PLAY-dOrderedCharter-7 S3 grades the same pair from the registry's side, over the population `tools/playbook/core.py#run_meta_check` builds |
@@ -215,6 +212,60 @@ it) have nothing left to compare: one declaration renders the row, and a differe
 gov means is spelled under `gov`, where a reviewer reads it. That is the fold, and the `fresh` arm is
 the both-ways join it leaves. 7h's stale-exemption arm, an `[[exempt_leg]]` naming no manifest leg,
 goes with it, since an exempt row now renders its own manifest row.
+
+`PURPOSE_MAX_CHARS` is a constant of `leg_factory.py`, read by the `purpose` arm and by `new`'s
+refusal of a `--purpose`; govkit keeps no copy and the factory imports nothing from govkit for it.
+
+### The plants
+
+Each plant of a retired arm in `tools/govkit/selftest.py@45513099a87c` is re-staged in
+`--selftest`'s scratch tree under the arm the table names, or stays (§8 F9). A `fresh` plant changes
+one declaration with no `--write`, and `--check` names the leg and that key.
+
+| Plant | Lines | Arm in `--selftest` |
+|---|---|---|
+| run 1's b, a descriptor ceiling of 1781; a1 and a2 stay, 7j4's | `:1723`, `:1730-1731` | `fresh`, key `ceiling` |
+| run 2, a ceiling of `true` | `:1734-1741` | `ceiling` |
+| runs d and e, a `stage` changed and dropped | `:1743-1756` | `fresh`, key `stage`, both cases |
+| run f, a `tag` | `:1757-1767` | `fresh`, key `tag` |
+| run g, `tests` and `enforces` | `:1768-1783` | `fresh`, keys `tests` and `enforces` |
+| run h1, 61 characters; h2, two legs sharing one | `:1784-1799` | `purpose`, both halves |
+| run h3, an exempt leg with no `purpose` | `:1793`, `:1800-1801` | stays in govkit's selftest, presence |
+| run i1, 60 multibyte characters, silent | `:1804-1816` | `purpose`, its silent case |
+| run i2, a drifted descriptor `purpose` | `:1812`, `:1817-1820` | `fresh`, key `purpose` |
+| the leg correspondence, a typo leg | `:7197-7201` | `fresh`, a leg added and one dropped |
+| the leg correspondence, a digit-bearing name | `:7203-7205` | `name` |
+| over gov, the join's positive halves and the leg note | `:7216-7223` | `--conform` exits 0 on the live tree; the note is §5's `legs:` line |
+| D3, `doc_reads` | `:9364-9384` | `fresh`, key `doc_reads`; its control, a `{memory_root}` value rendering equal, is silent |
+| L1, no subject and subject `Kit` | `:9717-9728` | `subject`, both cases |
+| L1, subject disagreeing | `:9730-9734` | `fresh`, key `subject` |
+
+### The 7h population
+
+`git grep -nP "\b7h(?![0-9a-z])" -- tools/` prints 34 lines at `4e5497fb7` (PINNED 2026-11-19), 18 at
+`5e569d9c9`; the new members are `govkit.py`'s `:2943` and `:6115`, the selftest's runs f to i,
+the README's two and the gov canary's one. Each line is kept or re-worded:
+
+| Lines | Fate |
+|---|---|
+| `tools/govkit/govkit.py@60b8fa0923ad:2743` | kept, re-worded to the manifest read and presence arm 7h keeps |
+| `:2943` | kept, re-worded to presence and the note, naming `--conform`'s `purpose` arm |
+| `:2986` (7h2), `:3516` (7j4), `:4517` (`write_gate_legs`) | re-worded to name the factory's gate |
+| `:6115` | deleted with `PURPOSE_MAX_CHARS` |
+| `tools/govkit/selftest.py@45513099a87c:1697`, `:1717` | re-worded to 7j4 alone |
+| `:1730` to `:1817`, sixteen lines (PINNED 2026-11-19) | leave with their plants, but `:1784` and `:1800`, kept for h3 |
+| `:1823` | kept: the retained read is still skipped with no manifest |
+| `:9221`, `:9580` | re-worded: 7j4's red alone, and the fixture keeps its spellings equal |
+| `:9364` | leaves with D3 |
+| `:9674` | re-worded to 7h2, where the pin write sits |
+| `tools/govkit/entries/push-main.kit.toml@8f3de7857398:95` | re-worded to the factory's `ceiling` arm |
+| `tools/run-gates/README.md@51907a654cb0:976` | re-worded: one declaration renders both rows |
+| `:979` | kept, re-worded: shape is `--conform`'s, presence 7h's until unit 51 |
+| `tools/run-gates/run-gates.gov.test.sh@d660e8c862b5:611` | re-worded: only `new` applies the tag rule, to a leg it writes |
+| `tools/govkit/refusal_join.py@59ae80a7869b:150` | kept: DEPL-cMendedVintage-9's reserved-prefix predicate, outside the block |
+
+Outside `tools/`, `memory/map/features/govkit.md@1695323691b0:197` is re-worded to the factory, and
+the dated gotcha `memory/gotchas/line-claim-matched-over-the-whole-output.md@152a6bf73c54:26` stays.
 
 ### The kind row
 
@@ -255,7 +306,8 @@ the rows against their cites.
 
 Minted: `tools/run-gates/leg_factory.py` with verbs `--write`, `--check`, `--conform`, `--list`, `new`
 and `--selftest`; the `[gate_leg.gov]` sub-table; the legs `gate-leg conformance` and `leg-factory
-selftest`; the `[[generated]]` row; the review record. Naming cells: each function is asked of
+selftest`; the `[[generated]]` row; the review record. `PURPOSE_MAX_CHARS` moves in from govkit
+(§8 F8). Naming cells: each function is asked of
 `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass. `.lexicon.conf`'s
 `CELLS:` block declares no cell for a command-line flag, so each of `new`'s flags spells the
 declaration key it sets, as `--argv` and `--purpose` do, with `--kit` naming the descriptor and
@@ -326,7 +378,17 @@ S6) for its two new legs.
 - `tools/runlog/kit.toml`
 - `tools/unattended/kit.toml`
 - `tools/workflows/kit.toml`
+- `tools/run-gates/run-gates.gov.test.sh`, its comment at `:611`; its guard `{prefix}/run-gates/` is
+  broad, carried by 8 legs (DERIVED by the spec-token checker's printed broad set), each on §7's line
+- `tools/run-gates/selftest-budgets.txt` (only when `leg-factory selftest` is a held leg, which owes
+  a budget row)
 - `memory/map/features/govkit.md`
+- `memory/map/features/run-gates.md`, whose `[claims] gate-legs` list gains the two new legs, as
+  the "leg added" population of `tools/run-gates/owed_rows.py` and the gov canary's join owe
+- `memory/map/generated/symbols.json`, regenerated for `leg_factory.py`'s functions
+- `memory/guides/SESSION-KICKOFF.md`, its `last-audit` re-stamped: its `watch:` line names
+  `tools/gate-legs.json`
+- `memory/builds/dWitnessedBar/RUN.md`, the run's row for this unit
 - `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-11-enforces-review.md`
 - `memory/builds/dWitnessedBar/BACKLOG.md` (only when S6 puts a leg to the owner)
 
@@ -352,10 +414,12 @@ S6) for its two new legs.
   `selfcheck` over the converted tree. The `gov` sub-table ships inside each descriptor as inert data
   (§4 "The declaration"). The `[[generated]]` row enrols the manifest in the unattended kit's
   generated indexes, the reason `tools/run-gates/kit.toml@4d1909b97cfa:155-156` gives for keeping
-  the authored manifest out of one; generated now, a run regenerates it. The retired arms take 20 `r.fail`
-  branches out of `selfcheck` (PINNED 2026-11-19 at `5e569d9c9`); `govkit refusal join` holds a
-  shrink-only floor, `BRANCH_PIN` in `tools/govkit/refusal_join.py`, of 335 against 504 branches
-  found (PINNED 2026-11-19), so the floor stays. Dispatch and report order change (§4, §8 F6). Under
+  the authored manifest out of one; generated now, a run regenerates it. The retired arms take 26 `r.fail`
+  branches out of `selfcheck`, 23 of the join and 3 of the purpose shape arm (PINNED 2026-11-19 at
+  `4e5497fb7`, over `tools/govkit/govkit.py@60b8fa0923ad:2767-2941` and `:2958-2971`); `govkit
+  refusal join` holds a shrink-only floor, `BRANCH_PIN` (`tools/govkit/refusal_join.py@59ae80a7869b:41`),
+  of 335 against 504 branches found (PINNED 2026-11-19 at `5e569d9c9`), so the floor stays.
+  Dispatch and report order change (§4, §8 F6). Under
   `core.bypass = never` the meta-check reds any leg whose `enforces` is non-empty and which carries a
   `guard` (PLAY-dOrderedCharter-7 S10), since a leg is core by the fact its `enforces` states (its §4
   Alternatives rejected). Once S6 gives every reached leg `enforces`, an adopter who sets `never` turns
@@ -390,9 +454,11 @@ S6) for its two new legs.
   cost: two scratch adopters and two apply runs, a few minutes.
 - **AC4** — When `python leg_factory.py --conform` runs in a scratch clone under each plant in turn, a
   subject `maybe`, one name declared in a descriptor and the registry, an `[[exempt_leg]]` with empty
-  `why`, a `{gate_file}` token with no `gov` override and an empty `enforces` on a leg no pending row
-  excuses, it exits 1 naming that leg and that arm, and exits 0 unplanted.
-  Red when: an arm is missing, so its plant passes.
+  `why`, a `{gate_file}` token with no `gov` override, an empty `enforces` on a leg no pending row
+  excuses, a `purpose` of 61 characters and two legs sharing one `purpose`, it exits 1 naming that
+  leg and that arm, and exits 0 unplanted and with a `purpose` of 60 characters, one multibyte.
+  Red when: an arm is missing, so its plant passes, or the bound counts bytes.
+  figure: 60 and 61 are PINNED by `PURPOSE_MAX_CHARS` (`tools/govkit/govkit.py@60b8fa0923ad:6116`).
 - **AC5** — When `python tools/playbook/core.py new gate-leg "demo leg" --kit gate-lint --argv '["python3","demo.py"]' --subject repo --purpose "a demo leg" --enforces practice.verify`
   runs in a scratch clone, `tools/gate-lint/kit.toml` gains one `[[gate_leg]]` row carrying the tag
   `leg.gate-lint.demo-leg`, the manifest gains one row, and `leg_factory.py --conform` exits 0;
@@ -415,9 +481,15 @@ S6) for its two new legs.
   Red when: a leg is given a guessed tag and is absent from the record, or a pending row stays for a
   leg that now carries one.
   figure: both counts DERIVED at observation.
-- **AC9** — When `git grep -n "is in no leg of" -- tools/govkit/govkit.py` runs, it prints nothing, and
-  `python tools/govkit/govkit.py selfcheck` on the landed tree exits 0 with 7h2 and 7j4 still grading.
-  Red when: 7h's join is left beside the factory's, two graders for one fact.
+- **AC9** — When `git grep -nE "is in no leg of|share the purpose|PURPOSE_MAX_CHARS" -- tools/govkit/govkit.py`
+  runs, it prints nothing; `python tools/govkit/govkit.py selfcheck` on the landed tree exits 0 with
+  7h2, 7j4 and 7h's purpose presence arm still grading and its `purposes:` note printed; and
+  `git grep -nP "\b7h(?![0-9a-z])" -- tools/` prints only the lines §4 "The 7h population" keeps,
+  in `tools/govkit/govkit.py`, govkit's selftest, `tools/govkit/refusal_join.py` and
+  `tools/run-gates/README.md`.
+  Red when: 7h's join or shape arm is left beside the factory's, two graders for one fact, or a
+  comment still names a 7h arm that is gone.
+  figure: the kept lines are PINNED by §4's table, seven at `4e5497fb7` (2026-11-19).
 - **AC10** — When `python core.py fixture --plant bypass-never` runs in `tools/playbook/`, it reds as
   PLAY-dOrderedCharter-7 AC10 states; and when `python core.py meta-check` runs in a scratch clone of
   the built tree that commits `core.bypass = "never"` into its `.governance/policy.toml`, which
@@ -437,9 +509,9 @@ S6) for its two new legs.
 The pass adds the legs `gate-leg conformance` and `leg-factory selftest`; they are named here and
 not on the leg line below, which the leg join reads against today's manifest.
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `core kinds` · `core meta-check` · `help reference pages` · `scratch-guard self-test` · `routed-commits selftest` · `edges (every declared edge parses, is registered and resolves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `run-gates turnstile` · `run-gates adopter e2e` · `profile-bar selftest` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `core kinds` · `core meta-check` · `help reference pages` · `scratch-guard self-test` · `routed-commits selftest` · `edges (every declared edge parses, is registered and resolves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` builds a scratch tree of two descriptors and a registry and plants each arm of §4 "The gate", plus a hand-edited manifest row · none
+New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` builds a scratch tree of two descriptors and a registry and plants each arm of §4 "The gate", a hand-edited manifest row, and the plants §4 "The plants" moves out of govkit's selftest · none
 
 ## 8. Open questions
 
@@ -469,7 +541,10 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   `awk 'NR>2914 && /claimed_legs|exempt_legs|manifest_[a-z_]+/' tools/govkit/govkit.py`: 7h2's
   `manifest_subject` and `manifest_chunk` (`tools/govkit/govkit.py@cf818f88cfd1:2934-2935`), 7j4's
   `manifest_chunk` (`tools/govkit/govkit.py@cf818f88cfd1:3465`, `:3472`), and two prose lines naming
-  the `{manifest_path}` token, which read nothing; the resolution stands.
+  the `{manifest_path}` token, which read nothing; the resolution stands. Re-observed at `4e5497fb7`
+  past the purpose block, as `awk 'NR>2975 && /claimed_legs|exempt_legs|manifest_[a-z_]+/'`: the same
+  readers (`tools/govkit/govkit.py@60b8fa0923ad:2995-2996`, `:3526`, `:3533`) and prose lines; the
+  presence arm that stays reads the parsed manifest (`:2951`), which the retained read builds.
 - **F5 — Under `core.bypass = never`, which legs are core once every leg carries `enforces`?**
   PLAY-dOrderedCharter-7 S10 reds any leg whose `enforces` is non-empty and which carries a `guard`,
   and its S3 reds a leg with no `enforces`, so after S6 `never` reds every guarded leg (§5 risks).
@@ -507,6 +582,27 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   declarations. (a) keeps the rule in `pass_legs.py` and every caller's command. RESOLVED (agent, 2026-11-19, delegated): (a), the most
   feature-rich survivor, reusing the seam `tools/run-gates/pass_legs.py#derive_pass_legs`; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-11-reground-brief. widens: none · relaxes: none
+- **F8 — Which arms of unit 19's purpose block leave govkit, and who grades presence until
+  TOOL-dWitnessedBar-51 S8 adds `purpose presence` to `--conform`?** The block
+  (`tools/govkit/govkit.py@60b8fa0923ad:2943-2975`) grades presence, shape and uniqueness over every
+  manifest row and prints a `purposes:` note. Uniqueness is the shape arm's half: unit 19 S5 says
+  "shape (S2, the uniqueness half included)", and its refusal (`:2969-2970`) names the shape arm.
+  Options: (a) shape, uniqueness included, moves to `--conform`'s `purpose` arm with
+  `PURPOSE_MAX_CHARS`, and presence and the note stay in 7h until unit 51 moves them; (b) all three
+  move now; (c) shape moves and presence is graded nowhere until unit 51. (b) takes the
+  `purpose presence` arm §3's hands-off gives unit 51 (veto 1). (c) drops the grader unit 19's AC4
+  observes, for a gap no order bounds. RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor
+  grading every arm exactly once; per brief 2026-11-19-prompt-TOOL-dWitnessedBar-11-spec-fix-brief.
+  The constant moves whole, since its only govkit readers are the shape arm (`:2962`, `:2964`) and
+  the presence message (`:2956`), which drops the bound. widens: none · relaxes: none
+- **F9 — What becomes of the selftest plants of the 7h arms the fold deletes?** The agreement arms
+  (runs b, d to g and i2, D3, L1's disagreement) grade a comparison that no longer exists. Options:
+  (a) delete them with their arms, `fresh` planted only by AC1's two cases; (b) re-stage each in
+  `--selftest` as a `fresh` plant on its own key, `--check` naming the leg and the key, as §4 "The
+  plants" maps. (b) observes S2's "how" for every key a deleted arm compared; (a) leaves a `fresh`
+  arm that names only some keys green. RESOLVED (agent, 2026-11-19, delegated): (b), the most
+  feature-rich survivor; per brief 2026-11-19-prompt-TOOL-dWitnessedBar-11-spec-fix-brief.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -540,6 +636,15 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   into gov's now-committed policy file; Files touched swaps the retired agent-instructions
   descriptor for the loop and policy ones; the leg line gains the core, reference-page, edges,
   scratch-guard and routed-commits legs; S7's readers re-found; citations re-pinned.
+- rev-7 · 2026-11-19 · §2 §3 §4 §5 §6 §7 §8 · S7 · AC4 AC9 · F4 F8 F9 · revised over the first
+  builder's divergence (`build/2026-11-19-build-TOOL-dWitnessedBar-11-1-builder-return.md`) at
+  `4e5497fb7`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-11-spec-fix-brief: S7 re-pins the
+  retired block over units 12, 22 and 19's arms; unit 19's shape arm, uniqueness included, and
+  `PURPOSE_MAX_CHARS` move to the factory's `purpose` arm while presence stays in 7h for unit 51
+  (F8); every retired arm's plant is mapped to its `--selftest` arm or kept (F9, §4 "The plants");
+  the 7h comment population, 34 lines (PINNED, §4 "The 7h population"), is listed by line (AC9); Files
+  touched gains the gov canary, the budgets file, the run-gates dossier, the symbol index, the
+  kickoff manifest and `RUN.md`; the leg line gains the run-gates legs the gov canary's guard trips.
 
 ## 10. Reuse audit
 
