@@ -131,7 +131,7 @@ def read_widen_policy(root):
     return value
 
 
-def count_rows(root, reg):
+def measure_rows(root, reg):
     """The rows a registration's working home holds, 0 for an absent home."""
     try:
         rows, _bad = LL.read_ledger(root, reg)
@@ -253,7 +253,7 @@ def run_never_gains(root):
     red = 0
     for reg in regs:
         if sha and check_new_at_base(root, reg, sha):
-            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % count_rows(root, reg))
+            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
         findings, why_not = LL.compare_to_base(root, reg)
         if findings is None:
@@ -380,7 +380,7 @@ def run_seed_laundering(root):
     red = 0
     for reg in regs:
         if sha and check_new_at_base(root, reg, sha):
-            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % count_rows(root, reg))
+            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
         base, why_not = read_base_rows(root, reg, sha, why)
         try:
@@ -433,7 +433,7 @@ def run_rename(root):
             red = 1
             continue
         if check_new_at_base(root, reg, sha):
-            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % count_rows(root, reg))
+            print_line(leg, reg.population, "new at %s" % sha[:12], "%d rows" % measure_rows(root, reg))
             continue
         try:
             rows, applied = LL.carry_renames(root, reg, sha)
@@ -812,13 +812,13 @@ def run_plant_populated_empty_armed(top, results):
 
 
 def run_plant_laundering(top, results):
-    def row(name, sha=SHA_A, disposition="seeded"):
+    def build_row(name, sha=SHA_A, disposition="seeded"):
         return ((name,), 1, sha, disposition)
-    base = [row("alpha"), row("beta", disposition="keep:ASK-1"), row("gamma"), row("nul", sha=LL.NULL_SHA)]
+    base = [build_row("alpha"), build_row("beta", disposition="keep:ASK-1"), build_row("gamma"), build_row("nul", sha=LL.NULL_SHA)]
     seed = render_seed("print('alpha\\t1'); print('beta\\t1'); print('nul\\t1')")
     write_fixture_repo(top, [render_table(seed=seed)], {"pop/rows.txt": render_rows(base)})
-    write_files(top, {"pop/rows.txt": render_rows([row("alpha", sha=SHA_B), row("beta"), row("gamma"),
-                                                   row("nul", sha=SHA_B)])})
+    write_files(top, {"pop/rows.txt": render_rows([build_row("alpha", sha=SHA_B), build_row("beta"), build_row("gamma"),
+                                                   build_row("nul", sha=SHA_B)])})
     check_plant_case(results, "laundering", "a re-dated row and a disposition turned back to seeded", top,
                      ["seed-laundering"], 1, ["re-dated · alpha", "disposition rewritten · beta", "re-dated · nul"])
     write_files(top, {"pop/rows.txt": render_rows([base[0], base[1], base[3]])})
@@ -830,14 +830,14 @@ def run_plant_laundering(top, results):
 
 
 def run_plant_rename(top, results):
-    def rows(path):
+    def render_case_rows(path):
         return render_rows([((path, "r1"), 1, SHA_A, "seeded")], key="site", fields=("path", "rule"))
     write_fixture_repo(top, [render_table(leg=LEGS["rename"], key="site", fields=("path", "rule"))],
-                       {"pop/rows.txt": rows("src/x.sh"), "src/x.sh": "".join("echo line %d\n" % n for n in range(20))})
+                       {"pop/rows.txt": render_case_rows("src/x.sh"), "src/x.sh": "".join("echo line %d\n" % n for n in range(20))})
     run_git_in(top, "mv", "src/x.sh", "src/y.sh")
-    write_files(top, {"pop/rows.txt": rows("src/y.sh")})
+    write_files(top, {"pop/rows.txt": render_case_rows("src/y.sh")})
     check_plant_case(results, "rename", "a staged git mv with its rows re-keyed", top, ["rename"], 0, ["pass"])
-    write_files(top, {"pop/rows.txt": rows("src/x.sh")})
+    write_files(top, {"pop/rows.txt": render_case_rows("src/x.sh")})
     check_plant_case(results, "rename", "the rows left on the old path", top, ["rename"], 1,
                      ["rename src/x.sh -> src/y.sh"])
 
@@ -863,20 +863,20 @@ def run_plant_untouched_quiet(top, results):
 def run_plant_merge(top, results):
     seed = render_seed("import os; [print(n + '\\t1') for n in sorted(os.listdir('off'))]")
     names = ("a", "b", "c")
-    def rows(keep):
+    def render_case_rows(keep):
         return render_rows([((n,), 1, SHA_A, "seeded") for n in keep])
     write_fixture_repo(top, [render_table(leg=LEGS["both-ways"], seed=seed)],
-                       {"pop/rows.txt": rows(names), ".gitattributes": "pop/rows.txt merge=rows\n",
+                       {"pop/rows.txt": render_case_rows(names), ".gitattributes": "pop/rows.txt merge=rows\n",
                         **{"off/" + n: "offence %s\n" % n for n in names}})
     run_git_in(top, "config", "merge.rows.driver", "bash '%s/merge-rows.sh' %%O %%A %%B %%P" % KIT.as_posix())
     for branch, drained in (("x", "a"), ("y", "b")):
         run_git_in(top, "checkout", "-q", "-b", branch, "main")
-        write_files(top, {"off/" + drained: None, "pop/rows.txt": rows([n for n in names if n != drained])})
+        write_files(top, {"off/" + drained: None, "pop/rows.txt": render_case_rows([n for n in names if n != drained])})
         run_git_in(top, "commit", "-q", "-a", "-m", "drain " + drained)
     run_git_in(top, "checkout", "-q", "x")
     try:
         run_git_in(top, "merge", "-q", "--no-edit", "y")
-        merged = pathlib.Path(top, "pop/rows.txt").read_bytes().decode("utf-8") == rows(["c"])
+        merged = pathlib.Path(top, "pop/rows.txt").read_bytes().decode("utf-8") == render_case_rows(["c"])
     except RuntimeError as exc:
         print("    | %s" % exc)
         merged = False
@@ -918,10 +918,10 @@ PLANTS = {
 
 def remove_tree(path):
     """Remove a fixture tree, read-only git objects included."""
-    def clear(func, p, _exc):
+    def remove_readonly(func, p, _exc):
         os.chmod(p, stat.S_IWRITE)
         func(p)
-    shutil.rmtree(path, onexc=clear)
+    shutil.rmtree(path, onexc=remove_readonly)
 
 
 def run_fixture(cases):

@@ -9803,11 +9803,6 @@
       "file": "tools/loop/budget.py"
     },
     {
-      "id": "count_rows",
-      "kind": "function",
-      "file": "tools/memory-tree/ratchet.py"
-    },
-    {
       "id": "counts",
       "kind": "function",
       "file": "tools/unattended/check-playbook.test.sh"
@@ -16821,6 +16816,11 @@
       "id": "measure_row_classes",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "measure_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "measure_rows",

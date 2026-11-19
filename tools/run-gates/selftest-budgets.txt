@@ -72,6 +72,7 @@ instruction edits selftest	160		one reading alone over the tree by the main loop
 instruction units selftest	250		one reading alone over the tree by the main loop at 51cd8b402, 161s, x1.5 floored at 60 (PLAY-dOrderedCharter-77 S14), its one red expectation a database is locked on the shared index another session held
 kit-placeholders self-test	60		worst of 7 readings 24s, x1.5
 leg-factory selftest	120		PINNED estimate, not a --selftest reading: thirty-odd plants, each one render of a four-leg scratch tree, and one --conform over gov's tree; the pass ran no --selftest. Re-price from the first measured run. TOOL-dWitnessedBar-11
+ratchet selftest	120		PINNED estimate from the pass's own --fixture run (16 cases, 35 checks, about a minute on node d); re-price from the first measured run. TOOL-dWitnessedBar-14
 lexicon selftest	590		worst of 9 readings 389s, x1.5
 line-length gate selftest	60		measured 8s on node a 2026-09-07 under run-selftests.sh at its exported width 8 (was 208s worst-of-8 before the port), x1.5 floored at this file 60s minimum
 loop computed witness	75		one reading alone over the tree by the main loop at 202e287fb, 50s, x1.5 floored at 60 (TOOL-dDeclaredLoop-17)
