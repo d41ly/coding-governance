@@ -19,11 +19,11 @@ its two `New arm:` lines, `tools/drift-audit/selftest.py` (AC7, AC8) and `ratche
   `memory/builds/dWitnessedBar/BACKLOG.md` holds TOOL-dWitnessedBar-99, `FIVE REGISTRIES STAY IN THEIR
   GRAMMAR`.
 - AC2 — `legacy_ledger.py read` — the conversion record's before and after counts match the factory's
-  read of each home; every legacy key appears once with its count (`unarmed-branches` 173 rows to 166
-  keys summing to 173; `readme-contract` 218 lines, its `exempt-pin:` line retired, to 217 rows), and
+  read of each home; every legacy key appears once with its count (`unarmed-branches` 173 rows (DERIVED) to 166
+  keys summing to 173; `readme-contract` 218 lines, its `exempt-pin:` line retired, to 217 rows (DERIVED)), and
   every former reason sits beside its key in the record.
 - AC3 — `def read_registry` — `git grep -n "def read_registry" -- tools/gate-lint` prints nothing.
-  `check_retirements` over the converted `refusal-retirements.txt` reads 5 rows with no problem; its
+  `check_retirements` over the converted `refusal-retirements.txt` reads 5 rows (DERIVED) with no problem; its
   signature and replay refusals are probed by the function, and the scratch-clone `--check` runs are
   owed to the close, the leg's argv being a gate.
 - AC4 — `shell hygiene (a fork spent on builtin work)` — `resolve_declaration` reads the converted
@@ -59,7 +59,7 @@ its two `New arm:` lines, `tools/drift-audit/selftest.py` (AC7, AC8) and `ratche
 - AC12 — `regrammared at` — `check_regrammared_at_base` over gov's tree reads every in-place home
   regrammared and the two map and two drift homes `new at`, as Rollout states; the `--fixture --plant
   regrammared` run is the `New arm:` the close observes RED then GREEN.
-- AC13 — `read-back` — `convert_registry.py read-back spawn-idiom-sites` prints 298 lines, each `path`,
+- AC13 — `read-back` — `convert_registry.py read-back spawn-idiom-sites` prints 298 lines (DERIVED), each `path`,
   `class` and count TAB-joined; `read-back id-orphan-waiver` prints one `dead probe:` line; F14's four
   homes read `unarmed` through `read_home_state`. The `ratchet.py populated` and `unarmed` legs are owed
   to the close.

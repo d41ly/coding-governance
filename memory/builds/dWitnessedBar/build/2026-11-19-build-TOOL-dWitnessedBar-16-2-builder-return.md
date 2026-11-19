@@ -18,7 +18,7 @@ The precedent is `conf-scalar-pins`, whose seed is the leg's own measurement (`r
 
 (3) S7 and AC6 convert `readme-contract.txt`. §3 Edges and TOOL-dWitnessedBar-51 S22 leave that file to a main-loop commit, and the brief requires every reader I change to "accept both the old and the converted file until then". Doing that means `gen_build_index.py#read_contract_rows` keeps a parser for the old grammar. S4 forbids that ("no reader keeps a parser of the old grammar"), AC3's Red-when fails on it, and no unit's spec removes that transitional read afterwards. The spec needs to name the transitional dual read and the unit and acceptance that remove it.
 
-Also noted, not blocking: after S6's rename, `tools/codebase-map/test_codebase_map.py:169` (unit 51 S5's) still passes `baseline.toml` to `derive_baseline_additions`. The F8 adapter then finds no registration, so the baseline's never-gains check reports UNGRADED rather than failing from this pass until unit 51 lands. §3 or §5 should state that gap.
+Also noted, not blocking: after S6's rename, `tools/codebase-map/test_codebase_map.py@15ab8d82:169` (unit 51 S5's) still passes `baseline.toml` to `derive_baseline_additions`. The F8 adapter then finds no registration, so the baseline's never-gains check reports UNGRADED rather than failing from this pass until unit 51 lands. §3 or §5 should state that gap.
 
 No path was changed and nothing was committed.
 
