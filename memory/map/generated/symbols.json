@@ -14103,16 +14103,6 @@
       "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
-      "id": "fd_get",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "fd_run",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
       "id": "field",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.test.sh"
@@ -20066,6 +20056,11 @@
       "id": "read_fact_slots",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_fd_field",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "read_fenced_row",
@@ -29351,6 +29346,11 @@
       "id": "run_fan",
       "kind": "function",
       "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "run_fd_git",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_fix_pass",
