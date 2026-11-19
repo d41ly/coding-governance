@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0127@4f0c1452 whole
 
