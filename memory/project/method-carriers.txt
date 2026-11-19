@@ -45,3 +45,4 @@ help/charter.md · the charter's help page names the method as the one held docu
 tools/playbook/documents.toml · the document registry declares the method's path and template source so its envelope renders, a path the renderer writes
 tools/playbook/instruction_units.py · the held-envelope constant and its fixture row name the method's path, and copy none of its text
 tools/loop/loop_witness.py · its self-test plants a stub BUILD-METHOD.md into a scratch tree; it names the method path as fixture data and restates no rule
+tools/govkit/registry.toml · an exempt leg's argv names the method's path as the file the template-size check measures, and copies none of its text
