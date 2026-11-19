@@ -167,7 +167,8 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   not landed yet; or, if the only code that uses the key sits where the check does not look, under
   the memory tree say, declare it in `tools/policy/unscanned-readers.txt`.
 - **A declared key** is one row of `unscanned-readers.txt`: `<key> <path> <reason>`, split on the
-  first two runs of spaces, so the path holds no space and the reason is the rest of the line. Lines
+  first two runs of whitespace, spaces or tabs, so the path holds no whitespace and the reason is the
+  rest of the line. Lines
   opening `#` and blank lines are skipped. A declared key is never counted as read. Instead every run
   prints its row after the summary line:
 
@@ -183,7 +184,9 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   your claim, there for anyone to read. The list is gov's own, and no install receives it.
 - **Every run says what it graded:** `reader coverage: graded <n> of <m> catalogue key(s); landed
   owners: <builds>`, and while no owner build has landed,
-  `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes.
+  `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes. A git read
+  the check makes that fails stops it with one finding naming the read:
+  `git <arguments> failed, so reader coverage cannot read the tree`.
 - **What it does not see:** a reader in another language, or one that builds the key's name at run
   time from pieces, reds as unread. So does a key passed through a constant from another file, a
   variable set inside a function, a constant in JavaScript or shell, a name inside a tuple or a loop

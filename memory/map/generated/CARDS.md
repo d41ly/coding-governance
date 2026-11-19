@@ -222,7 +222,7 @@ The policy file .governance/policy.toml, the policy kit's catalogue that is its 
 - decisions 1: `TOOL-dGroundRules-1`
 - gate-legs 2: `policy check`, `policy fixtures`
 - kits 1: `policy`
-- gotcha-classes 3: `check-grades-one-layer-of-a-layered-config.md`, `off-switch-leaves-new-output-standing.md`, `budget-row-not-remeasured-after-added-arms.md`
+- gotcha-classes 4: `check-grades-one-layer-of-a-layered-config.md`, `off-switch-leaves-new-output-standing.md`, `budget-row-not-remeasured-after-added-arms.md`, `kit-argument-dropped-at-an-inner-call.md`
 - globs 4: `tools/policy/**`, `.governance/policy.toml`, `.governance/policy.json`, `help/policy.md`
 
 ## process-monitor

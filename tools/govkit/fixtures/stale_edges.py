@@ -41,7 +41,9 @@ PLAYBOOK_KIT = ('id = "playbook"\nhome = "playbook"\nversion_from = { none = "fi
 #: the fixture's regenerate: one composition line, in the delta report's shape, naming the unit the drift names
 COMPOSE_LINE = f"  {'stale':<18} [{'gov:alpha':<13}] {UNIT}"
 COMPOSE = f"print({COMPOSE_LINE!r})\n"
-IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt")
+# the policy kit's withheld names, read from its kit.toml, applied to every kit this fixture copies
+IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", *govkit.derive_withheld_names(
+    govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR)))
 
 
 def build_stale_gov(tmp: pathlib.Path) -> pathlib.Path:

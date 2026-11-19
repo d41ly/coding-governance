@@ -452,7 +452,7 @@ branch with a live phase all pass it, and the push-time bar does not re-judge au
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root, `help/` and the self-tests | a file READING `policy.json`: a line, not a comment or a Python docstring, spelling `readFileSync`, `open(`, `cat` or `git show` followed on the line by the name, `arm_single_reader`'s row for the mirror (TOOL-dGroundRules-21 S18, S20) |
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the compare base | each `lists --check` report on the legacy homes; a refused read. With no list in this kit it is not graded and says so |
-| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision and, for an owner whose specs are not all terminal, its run records, their bases and the landing merges, read with the memory-tree kit's `tree_lib`, `gen_build_index`, `backlog` and `row_grammar` (`derive_landed_builds`), the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker (`derive_scanned_files`), and `unscanned-readers.txt` with `git ls-files` over its paths | each key whose owner build has landed that no call reads and no row of the list declares; a declared row the tree no longer supports, and a list line that is not a row, names no catalogue key or repeats one (TOOL-dLandedOwners-3); a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26) |
+| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision and, for an owner whose specs are not all terminal, its run records, their bases and the landing merges, read with the memory-tree kit's `tree_lib`, `gen_build_index`, `backlog` and `row_grammar` (`derive_landed_builds`), the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker (`derive_scanned_files`), and `unscanned-readers.txt` with `git ls-files` over its paths | each key whose owner build has landed that no call reads and no row of the list declares; a declared row the tree no longer supports, and a list line that is not a row, names no catalogue key or repeats one (TOOL-dLandedOwners-3); a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26); a git read of reader coverage that fails, a Refusal naming the read (TOOL-dLandedOwners-4) |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file READING the template-size limits file by the same read shape, or naming `LIMITS_NAME`, `arm_single_reader`'s row for that file: `budgets.py` is its one reader (TOOL-dGroundRules-21 S20, S29) |
 | `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, which holds the deployer's registry, its `installed` path in an adopter whose receipt names its `kit`, and nowhere in a tree holding neither, which announces it), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
 
@@ -494,9 +494,13 @@ carrying the same base: the dTrackedAtlas build-state instrument's landing. `der
 README rule 1, the test `unattended.sh`'s `check_spec_run` applies: `spec` when the base's
 `BACKLOG.md` holds an open ask of the build and the README's `roster:units` pair a unit no spec
 defines, else `build`. So a build run that carried a unit forward `DEFERRED` has landed, and a spec
-run, which carries every unit `DEFERRED`, has not. Half 2 loads `RUN_READER_MODULES` lazily, at the
-first build that reaches it, after checking that the memory-tree directory holds each one's `.py`; a
-missing file, a failed import or a conf declaring no `FAMILIES` is a refusal. It does not see a
+run, which carries every unit `DEFERRED`, has not. Half 2 loads the run readers, `RUN_READER_MODULES`,
+once per call, from the kit root it was given, at the first build that reaches it, after checking
+that the memory-tree directory holds each one's `.py`, and hands them with `tree_lib` to every
+`derive_run_kind` call, which resolves no kit of its own (TOOL-dLandedOwners-4); a missing file, a
+failed import or a conf declaring no `FAMILIES` is a refusal. A git read of reader coverage that
+fails, the scan's `rev-parse --show-prefix` and `ls-files` or the declared paths' `ls-files`, is a
+Refusal naming the read (`read_git_or_refuse`), never an empty tree. It does not see a
 landing this clone has not fetched, reads a merge touching `RUN.md` with a run's base for another
 reason as that run's landing, lists no run record rotated outside the driver, and under
 `BACKLOG_MODE="shards"` reads every run as build-kind. A key is READ where a tracked file passes it to a reader in one of
@@ -643,7 +647,8 @@ the not-graded line and no report (TOOL-dGroundRules-76). Each copy's list is se
 
 `legacy-homes-present` and `budgets-ships-join` (TOOL-dGroundRules-17) read only this kit and its
 source repository, so they hold on gov's tree. The first reds this kit's directory without
-`legacy-homes.txt`, or a `kit.toml` with no `project-owned` rule naming it: an absent list is an
+`legacy-homes.txt`, or a `kit.toml` whose `project-owned` rules do not include both lists the kit's
+code reads, `legacy-homes.txt` and `unscanned-readers.txt`, one check per list (TOOL-dLandedOwners-4): an absent list is an
 announcement in the arm, so this case is what reds a list deleted on gov's tree. The second reads
 `<tool-root>/govkit/registry.toml` and reds, naming the row, a census row whose
 `ships = false` disagrees either way with the registry's `[[exempt]]` paths, an exempt directory
@@ -697,7 +702,8 @@ reads the key too), `declared-untracked` (no instrument planted), `declared-scan
 `declared-twice` (the row twice); `declared-malformed` (the row with no reason) reds as the line that
 is not a row and as `has no reader`.
 
-`reader-coverage-carried` (TOOL-dLandedOwners-1) is one outcome case over five repositories, each a
+`reader-coverage-carried` (TOOL-dLandedOwners-1) is one outcome case over one repository per
+sub-case of `RC_CARRIED`, each a
 kit copy whose catalogue holds `fixture.planted` owned by `bPlanted` with no consumer, a
 `.memory-tree.conf` declaring `FAMILIES`, and `tree_lib.py` with each of `RUN_READER_MODULES` copied
 untracked beside it. The base commit B on main holds the build README's `roster:units` pair; a branch
@@ -707,7 +713,16 @@ specced at B, unit 1 `CLOSED` and unit 2 `DEFERRED` on `run`) grades 1 key and r
 `spec-run-landed` (an open ask and unit 2 unspecced at B, both `DEFERRED` on `run`), `run-unlanded`
 (`run` fast-forwarded, so no merge touches `RUN.md`) and `base-unresolved` (the `base:` forty `e`
 characters) grade nothing and print the announce line; `kit-modules-absent` (`tree_lib.py` alone
-beside the kit copy) refuses, naming the memory-tree kit and `gen_build_index.py`.
+beside the kit copy) refuses, naming the memory-tree kit, `gen_build_index.py` and the kit copy's
+memory-tree directory. Five more give each arm of the landed predicate a case that fails without it
+(TOOL-dLandedOwners-4): `kit-root-threaded`, `carried-landed`'s repository judged with
+`resolve_kit_dir` refusing every root but the kit copy's, grades 1 key and reds it, so a module
+resolved from any other root reads as a Refusal; `landing-other-base`, whose run record at L carries
+the landing merge itself while the only merge touching `RUN.md` carries B, grades nothing;
+`rotated-landed`, whose record at L is `RUN.LANDED.<B's first 8 hex>.md` alone, grades 1 key and
+reds it; `disposed-ask-landed` (an ask and the `WONTDO` row disposing of it at B, unit 2 unspecced,
+both units `DEFERRED` on `run`) and `roster-specced-landed` (an open ask at B with every roster unit
+specced) each grade 1 key and red it.
 
 The minors batch's cases (TOOL-dGroundRules-21), each an outcome case: `adopter-suite` runs
 `adopt-policy.test.sh`, a pass only at exit 0 with its closing count naming an arm passed and none
@@ -742,8 +757,10 @@ admit after `git remote set-head <remote> -a`. Neither denial may name `settings
 
 The second minors batch's cases (TOOL-dGroundRules-25), each an outcome case:
 `legacy-homes-withheld-install` runs `govkit.py plan` over a target the deployer is about to install,
-which must hold `legacy-homes.txt` as one `ORDER [project-owned]` row and as no write or `SIDE` row,
-then `apply`, after which the receipt holds this kit and the target no such file (S9);
+then `apply`, and checks every withheld file, each name the `project-owned` rules of `kit.toml`
+include (TOOL-dLandedOwners-4): the plan must hold each as one `ORDER [project-owned]` row and as no
+write or `SIDE` row, and after `apply` the target holds no file of that name; the receipt must hold
+this kit, and a `kit.toml` withholding nothing is a `WRONG` (S9);
 `census-default-adopter` installs this kit, its `requires` closure and `kickoff-manifest` with the
 answers that entry asks for and no `check-line-length`, and `arm_cap_census` must announce
 `kit check-line-length not installed`, grade `manifest-bytes` at the receipt's destination and find
@@ -790,7 +807,8 @@ absent from the snapshot's tool root, reds the case. This case's, `legacy-homes-
 `census-default-adopter`'s deployer runs all go through `run_govkit`, which refuses a snapshot root equal
 to the source's own, so no case can grade the tree under test's HEAD, and `govkit-source-root-refused`
 observes that refusal (TOOL-dGroundRules-27). Every file under the target's tool root must be a path the receipt records, and every engine or
-seed row of the receipt must be present, and no `legacy-homes.txt` installed (S5). The case then
+seed row of the receipt must be present, and no withheld file installed, each name the
+`project-owned` rules of `kit.toml` include (S5, TOOL-dLandedOwners-4). The case then
 runs the installed adopter, `adopt-policy.sh --scaffold`, which must exit 0 printing `mirror deferred`
 and write no mirror (TOOL-dGroundRules-31), and `--check` with the install staged; it
 commits the install, re-runs the memory-tree adopter, which seeds its conf and stops on its first run,

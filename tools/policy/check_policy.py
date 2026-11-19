@@ -17,8 +17,9 @@ list: `arm_schema` grades each file key with the value check, `arm_shape` audits
 rows, `arm_summaries` grades the list as `policy.py lists --check` does, `arm_direction` reds a
 loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11),
 and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
-`arm_reader_coverage` reds a catalogue key whose owner build has landed, every spec in its build
-folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads,
+`arm_reader_coverage` reds a catalogue key whose owner build has landed by `derive_landed_builds`
+(every spec's status header terminal, read at the landed revision, or a build-kind run record with a
+first-parent landing merge, TOOL-dLandedOwners-1), and that no call of READER_SHAPES in the tracked code reads,
 by a literal or by the name of a module constant (TOOL-dGroundRules-8, TOOL-dLandedOwners-2); it
 grades nothing until an owner lands, and announces so. A key whose consumer sits outside the scanned
 code is declared in this kit's authored `unscanned-readers.txt`, one row `<key> <path> <reason>`
@@ -156,7 +157,8 @@ answer the same under both, and the reader must refuse to answer it.
 
 WHAT SHIPS (TOOL-dGroundRules-17) adds two cases that read only this kit and its source repository,
 so they hold on gov's tree alone. `legacy-homes-present` reds this kit's directory without
-`legacy-homes.txt`, or a `kit.toml` with no `project-owned` rule naming it. `budgets-ships-join` reds a
+`legacy-homes.txt`, or a `kit.toml` whose `project-owned` rules do not name both it and
+`unscanned-readers.txt` (TOOL-dLandedOwners-4 S3). `budgets-ships-join` reds a
 census row whose `ships = false` disagrees with the deployer registry's `[[exempt]]` paths either way,
 naming the row, and a registry that exempts no census enforcer.
 
@@ -522,15 +524,17 @@ def read_run_base(text):
     return (m[1] or None) if m else None
 
 
-def derive_run_kind(repo, build, base, conf, families):
+def derive_run_kind(repo, build, base, conf, families, readers):
     """-> "spec" or "build": README rule 1 at `base`, a commit the caller has resolved, as the
     dClosedLoop instrument's `derive_run_kind` and `unattended.sh#check_spec_run` read it. "spec" when
     `<memory root>/builds/<build>/BACKLOG.md` holds an id-led row whose id's slug is `build` and no
     status row disposes of that id, AND the README's `roster:units` pair holds a row whose first id no
     spec under the build's `spec/` defines; else "build". `conf` is the memory-tree conf as parsed,
-    `families` its prefixes. A git read that fails is a Refusal naming it (TOOL-dLandedOwners-1 S3)."""
-    tree_lib = load_tree_lib_or_refuse()
-    gbi, backlog, row_grammar = load_run_readers()
+    `families` its prefixes. `readers` is `(tree_lib, gen_build_index, backlog, row_grammar)`, the
+    modules the caller loaded from its own kit root; this function resolves no kit, so the caller's
+    root is the only one read (TOOL-dLandedOwners-4 S1). A git read that fails is a Refusal naming it
+    (TOOL-dLandedOwners-1 S3)."""
+    tree_lib, gbi, backlog, row_grammar = readers
     m = conf["MEMORY_ROOT"].strip("/")
     folder = f"{m}/builds/{build}"
     try:
@@ -581,8 +585,10 @@ def derive_landed_builds(repo, builds, kit=KIT):
     dTrackedAtlas build-state instrument's landing. An empty `builds` answers `set()` with no git call.
     The landed revision's Refusal passes through; `tree_lib` is reached through the inlined
     `resolve_kit_dir` from `kit`, so a miss is a Refusal naming where the resolver looked, never "no
-    build landed" (TOOL-dGroundRules-21 S26), and half 2 refuses as `load_run_readers` does. A git read
-    that fails, or a conf declaring no FAMILIES when half 2 runs, is a Refusal naming it.
+    build landed" (TOOL-dGroundRules-21 S26), and half 2 refuses as `load_run_readers` does. Both loads
+    run once per call, from `kit`, and half 2 hands the four modules to every `derive_run_kind` call
+    (TOOL-dLandedOwners-4 S1). A git read that fails, or a conf declaring no FAMILIES when half 2 runs,
+    is a Refusal naming it.
 
     It does not see a landing this clone has not fetched; it reads a merge touching RUN.md with a run's
     base for another reason as that run's landing; it lists no record rotated outside the driver; and
@@ -613,7 +619,7 @@ def derive_landed_builds(repo, builds, kit=KIT):
         runs = [p for p in listed.decode("utf-8", "replace").split("\n") if RUN_RECORD.match(p.rsplit("/", 1)[-1])]
         if not runs:
             return landed
-        _gbi, _backlog, row_grammar = load_run_readers(kit)
+        gbi, backlog, row_grammar = load_run_readers(kit)
         try:
             families = row_grammar.derive_families(conf)
         except row_grammar.Problem as exc:
@@ -638,8 +644,9 @@ def derive_landed_builds(repo, builds, kit=KIT):
                    if ln.split(" ")[1:2] == ["commit"]}
     except OSError as exc:
         raise policy.Refusal(".memory-tree.conf", 0, f"the landed builds at {sha[:8]} do not read: {exc}") from None
+    readers = (tree_lib, gbi, backlog, row_grammar)  # loaded once above, from `kit`
     for b in sorted(landing):
-        if any(derive_run_kind(repo, b, x, conf, families) == "build" for x in sorted(landing[b] & commits)):
+        if any(derive_run_kind(repo, b, x, conf, families, readers) == "build" for x in sorted(landing[b] & commits)):
             landed.add(b)
     return landed
 
@@ -651,15 +658,27 @@ def derive_landed_owners(repo, kit=KIT):
     return derive_landed_builds(repo, {str(r["owner"]) for r in rows if r.get("owner")}, kit)
 
 
+def read_git_or_refuse(repo, *args):
+    """-> git's stdout for `args` run in `repo`, by `policy.run_git`; where that answers None, a
+    non-zero exit or an OSError, a Refusal naming the read, so reader coverage never grades a tree it
+    could not list. Empty output is valid and returned as it is (TOOL-dLandedOwners-4 S7)."""
+    out = policy.run_git(repo, *args)
+    if out is None:
+        raise policy.Refusal(Path(repo).as_posix(), 0,
+                             f"git {' '.join(args)} failed, so reader coverage cannot read the tree")
+    return out
+
+
 def derive_scanned_files(repo, kit=KIT):
     """-> the tracked paths of `repo` the reader scan opens: `git ls-files` over CODE_PATHSPECS with a
     READER_SHAPES row's suffix or under its directory, outside the memory root and `help/`, never a
     `*.test.sh`, `*.test.js`, `selftest*.py` or `test_*.py`, nor this module at `kit`'s path, whose
     fixtures name keys without consuming them. The one file selection `scan_reader_keys` reads and a
-    declared row's path is judged against (TOOL-dLandedOwners-3 S4)."""
-    own = (policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip() + Path(__file__).name
+    declared row's path is judged against (TOOL-dLandedOwners-3 S4). Both git reads go through
+    `read_git_or_refuse`, so a failed one is a Refusal (TOOL-dLandedOwners-4 S7)."""
+    own = read_git_or_refuse(kit, "rev-parse", "--show-prefix").strip() + Path(__file__).name
     skip = (read_memory_root(repo) + "/", "help/")
-    return [f for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0")
+    return [f for f in read_git_or_refuse(repo, "ls-files", "-z", "--", *CODE_PATHSPECS).split("\0")
             if f and not f.startswith(skip) and f != own and not READER_SKIPPED.search(f)
             and any(any(f.startswith(p) if p.endswith("/") else f.endswith(p) for p in files)
                     for files, _rx in READER_SHAPES)]
@@ -747,7 +766,8 @@ def check_reader_coverage(repo, landed=None, kit=KIT):
     not select; a declared key the scan reads, at an untracked path or at a scanned file is a finding
     (TOOL-dLandedOwners-3 S3), and so is each finding of the list's shape, graded or not. Prints the
     summary line on every run, and the announce line when it graded nothing. A Refusal reading the
-    landed revision passes through."""
+    landed revision passes through, and so does a git read of this check that fails, by
+    `read_git_or_refuse` (TOOL-dLandedOwners-4 S7)."""
     rows = policy.load_catalogue(kit)
     sha, _how = policy.derive_landed_revision(repo)
     owners = derive_landed_owners(repo, kit) if landed is None else set(landed)
@@ -757,7 +777,7 @@ def check_reader_coverage(repo, landed=None, kit=KIT):
     declared, findings = read_unscanned_readers(kit, names)
     paths = sorted({declared[str(r["name"])][1] for r in graded if str(r["name"]) in declared})
     scanned = set(derive_scanned_files(repo, kit)) if paths else set()
-    tracked = set((policy.run_git(repo, "--literal-pathspecs", "ls-files", "-z", "--", *paths) or "").split("\0")
+    tracked = set(read_git_or_refuse(repo, "--literal-pathspecs", "ls-files", "-z", "--", *paths).split("\0")
                   if paths else ())
     disposed = []
     for r in graded:
@@ -790,8 +810,8 @@ def arm_reader_coverage(repo, kit):
     """`check_reader_coverage` over the repository: its population the catalogue's keys whose owner
     has landed, so before any Owner build lands it is 0, which this arm announces, never a finding
     (TOOL-dGroundRules-21 S5), and so is a landed revision that does not resolve, before any landing
-    (TOOL-dGroundRules-25 S26). A Refusal, a landed build or memory-tree kit that does not read, is the
-    one finding."""
+    (TOOL-dGroundRules-25 S26). A Refusal, a landed build, a memory-tree kit or a git read of reader
+    coverage that does not read, is the one finding."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
@@ -1447,13 +1467,23 @@ def read_receipt_rows(t):
             if isinstance(r, dict)]
 
 
+def derive_withheld_names(kit):
+    """-> the file names `kit`'s `kit.toml` withholds from installs: each `include` of each `[[files]]`
+    rule whose `role` is `project-owned`, in rule order, a string include read as a one-name list
+    (TOOL-dLandedOwners-4 S3). A `kit.toml` that does not read raises as `open` and `tomllib` raise."""
+    rules = tomllib.loads(Path(kit, "kit.toml").read_text(encoding="utf-8")).get("files", [])
+    return [n for r in rules if r.get("role") == "project-owned"
+            for n in (r.get("include") if isinstance(r.get("include"), list) else [r.get("include")])]
+
+
 def run_fresh_target(name):
     """This kit installed by the deployer into a fresh target (TOOL-dGroundRules-24, -26): by
     `build_install_target`, then the deployer's `apply` through `run_govkit` with this kit's id and `run-gates`, and the closure
     of their `requires` read as registry ids (TOOL-dGroundRules-25 S6, S7). Every file under the
     target's tool root must be a receipt row's `path`, the deployer's `check` must print no `is in the
     receipt and not on disk` line (TOOL-dGroundRules-32 S18), the receipt's `gov_source` must be the
-    snapshot root (TOOL-dGroundRules-34 S29), and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
+    snapshot root (TOOL-dGroundRules-34 S29), and no withheld file, each name `derive_withheld_names`
+    reads, may be installed (S5, TOOL-dLandedOwners-4 S3). Then the installed `adopt-policy.sh`, found through
     its receipt row: `--scaffold`, exit 0 printing `mirror deferred` and writing no mirror, the
     install being staged (TOOL-dGroundRules-31); `--check` with the install staged; the install
     committed; `--scaffold` again, which renders the mirror once its inputs are committed, and the
@@ -1485,6 +1515,7 @@ def run_fresh_target(name):
              "arm_reader_coverage": re.compile(r"not graded · "),
              "arm_legacy_homes": re.compile(r"not graded · the list is gov's own")}
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
+    withheld = derive_withheld_names(KIT)
     ids, missed = derive_requires_closure([desc["id"], "run-gates"])
     wrong += missed
     root, rows, t, s = KIT.parent, None, None, None
@@ -1512,14 +1543,14 @@ def run_fresh_target(name):
             # TOOL-dGroundRules-32 S18: a receipt row missing from disk is the deployer's own check's to say.
             _rc, said = run_govkit(s, derive_source_top(), "check", "--target", t.as_posix())
             stray += [ln.strip() for ln in said.split("\n") if "is in the receipt and not on disk" in ln]
-            stray += [f"{f} is installed, and the list is gov's own, withheld from every install (S5)"
-                      for f in held if posixpath.basename(f) == policy.LEGACY_LIST]
+            stray += [f"{f} is installed, and kit.toml withholds it from every install (S5)"
+                      for f in held if posixpath.basename(f) in withheld]
             asserted += len(held) + 2
             wrong += stray
             if not stray:
                 print(f"policy-fixture: {name} · apply --kits {','.join(ids)} exited 0 into its target · the "
                       f"{len(held)} file(s) under {root.name}/ are each a receipt row's path, and govkit check "
-                      f"finds every receipt row on disk · no {policy.LEGACY_LIST} installed")
+                      f"finds every receipt row on disk · no withheld file installed: {', '.join(withheld)}")
             adopter = next((r["path"] for r in rows if r.get("kit") == desc["id"]
                             and str(r.get("path")).endswith("/adopt-policy.sh")), None)
             regen = next((r["path"] for r in rows if r.get("kit") == "run-gates"
@@ -1640,29 +1671,39 @@ PLAN_LINE = re.compile(r"^\s*(\S+)\s+\[([^\]]*)\]\s+(\S+)")  # a `plan` row: its
 def run_legacy_withheld_install(name):
     """`legacy-homes-withheld-install` (TOOL-dGroundRules-25 S9): the target `build_install_target`
     makes for this kit and its `requires` closure, the deployer's `plan` over it through `run_govkit`,
-    then `apply`. The plan
-    must hold the legacy-home list as one `ORDER [project-owned]` row and as no `write` or `SIDE`
-    row, and the applied target must hold no file of that name; a refused `apply` is a WRONG carrying
-    its output (TOOL-dGroundRules-32 S16)."""
+    then `apply`. For every withheld file, each name the `project-owned` rules of this kit's
+    `kit.toml` include (`derive_withheld_names`, TOOL-dLandedOwners-4 S3), the plan must hold exactly
+    one row ending `/<name>`, an `ORDER [project-owned]` row, and the applied target no file of that
+    name; the receipt must hold this kit and `apply` exit 0, each checked once. A refused `apply` is a
+    WRONG carrying its output (TOOL-dGroundRules-32 S16), and a `kit.toml` withholding nothing is one
+    WRONG, since the case would check nothing."""
     ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
+    withheld = derive_withheld_names(KIT)
     checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
+    if not withheld:
+        checks.append(("the descriptor", "kit.toml's project-owned includes", False,
+                       "kit.toml withholds nothing, so this case checks nothing"))
+        return print_checks(name, checks)
     t = s = None
     try:
         t, s = build_install_target(name, ids)
         args = ("--target", t.as_posix(), "--kits", ",".join(ids))
         rc, out = run_govkit(s, derive_source_top(), "plan", *args)
-        rows = [m.groups() for m in map(PLAN_LINE.match, out.split("\n")) if m and m[3].endswith("/" + policy.LEGACY_LIST)]
-        said = "; ".join(f"{k} [{r.strip()}] {d}" for k, r, d in rows) or "no row"
-        checks.append(("plan", f"exit 0, one ORDER [project-owned] row for {policy.LEGACY_LIST} and no write or SIDE row",
-                       rc == 0 and [(k, r.strip()) for k, r, _d in rows] == [("ORDER", "project-owned")], f"exit {rc} · {said}"))
+        for withheld_name in withheld:
+            rows = [m.groups() for m in map(PLAN_LINE.match, out.split("\n")) if m and m[3].endswith("/" + withheld_name)]
+            said = "; ".join(f"{k} [{r.strip()}] {d}" for k, r, d in rows) or "no row"
+            checks.append(("plan", f"exit 0, one ORDER [project-owned] row for {withheld_name} and no write or SIDE row",
+                           rc == 0 and [(k, r.strip()) for k, r, _d in rows] == [("ORDER", "project-owned")],
+                           f"exit {rc} · {said}"))
         rc, out = run_govkit(s, derive_source_top(), "apply", *args)
         # The install is read from its receipt, never from apply's exit alone: an adopter step that
         # refuses after the files land still leaves them, and an empty target would hold no list.
         installed = Path(t, RECEIPT_REL).is_file() and any(r.get("kit") == ids[0] for r in read_receipt_rows(t))
-        held = sorted(f.relative_to(t).as_posix() for f in t.rglob(policy.LEGACY_LIST))
-        checks.append(("apply", f"the receipt holds kit {ids[0]}'s rows and the target no {policy.LEGACY_LIST}",
-                       installed and not held, f"apply exit {rc} · receipt {'holds' if installed else 'LACKS'} "
-                       f"{ids[0]} · {held or 'none held'}"))
+        checks.append(("apply", f"the receipt holds kit {ids[0]}'s rows", installed,
+                       f"apply exit {rc} · receipt {'holds' if installed else 'LACKS'} {ids[0]}"))
+        for withheld_name in withheld:
+            held = sorted(f.relative_to(t).as_posix() for f in t.rglob(withheld_name))
+            checks.append(("apply", f"the target holds no {withheld_name}", not held, f"{held or 'none held'}"))
         checks.append(("apply", "exit 0 with DEPLOY_FULL's answers", rc == 0, f"exit {rc} · {out.strip().replace(chr(10), ' · ') if rc else 'ok'}"))
     except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
         checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
@@ -2907,20 +2948,23 @@ def run_legacy_present(name):
     """`legacy-homes-present` (TOOL-dGroundRules-17): this kit's own directory holds the legacy list,
     and its `kit.toml` withholds the list from installs by a `project-owned` rule naming it. Where the
     list is absent `arm_legacy_homes` announces itself not graded, so on gov's tree this case is what
-    reds a list deleted there; the leg running it is gov's alone."""
+    reds a list deleted there; the leg running it is gov's alone. The descriptor is checked once per
+    list the kit's readers open, `policy.LEGACY_LIST` and UNSCANNED_LIST, each among the names
+    `derive_withheld_names` reads: keyed on the readers' constants, not on the rule, so a rule edited
+    to drop a list reds here though the install case, driven from that rule, stops looking for it
+    (TOOL-dLandedOwners-4 S3)."""
     held = (KIT / policy.LEGACY_LIST).is_file()
     try:
-        rules = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8")).get("files", [])
+        withheld = derive_withheld_names(KIT)
         seen = "no such rule"
     except (OSError, tomllib.TOMLDecodeError) as exc:
-        rules, seen = [], f"kit.toml does not read: {exc}"
-    withheld = any(r.get("role") == "project-owned" and policy.LEGACY_LIST in
-                   (r.get("include") if isinstance(r.get("include"), list) else [r.get("include")]) for r in rules)
+        withheld, seen = [], f"kit.toml does not read: {exc}"
     return print_checks(name, [
         ("the list", f"{policy.LEGACY_LIST} in this kit's directory", held,
          f"{'present' if held else 'absent'} in {KIT.as_posix()}"),
-        ("the descriptor", f"a project-owned kit.toml rule naming {policy.LEGACY_LIST}", withheld,
-         "withheld from installs" if withheld else seen)])
+        *(("the descriptor", f"a project-owned kit.toml rule naming {listed}", listed in withheld,
+           "withheld from installs" if listed in withheld else seen)
+          for listed in (policy.LEGACY_LIST, UNSCANNED_LIST))])
 
 
 # ---- reader coverage (TOOL-dGroundRules-8) -----------------------------------------------------
@@ -3087,9 +3131,13 @@ RC_ROSTER = ("# bPlanted\n\n<!-- roster:units -->\n\n| # | Unit |\n|---|---|\n| 
 RC_ASK = "- TOOL-bPlanted-9 · filed 2026-10-23 · build every roster unit of this build from its spec\n"
 RC_CONF = 'MEMORY_ROOT="memory"\nFAMILIES="tooling:TOOL"\n'
 RC_RUN = "# bPlanted - run state\n\n## Run facts\nbase: {}\n"
-# sub-case -> the count of keys graded, or the text the Refusal must name where it refuses
+# the status row disposing of RC_ASK: backlog.py's `extract_row` reads it as class status, verb WONTDO
+RC_DISPOSAL = "- WONTDO · TOOL-bPlanted-9 · the ask is withdrawn\n"
+# sub-case -> the count of keys graded, or the text the Refusal must name where it refuses. The last
+# five each give one arm of the landed predicate a case that fails without it (TOOL-dLandedOwners-4).
 RC_CARRIED = {"carried-landed": 1, "spec-run-landed": 0, "run-unlanded": 0, "base-unresolved": 0,
-              "kit-modules-absent": "gen_build_index.py"}
+              "kit-modules-absent": "gen_build_index.py", "kit-root-threaded": 1, "landing-other-base": 0,
+              "rotated-landed": 1, "disposed-ask-landed": 1, "roster-specced-landed": 1}
 
 
 def build_carried_repo(t, case):
@@ -3098,18 +3146,25 @@ def build_carried_repo(t, case):
     base commit B on main, then a branch `run` committing `RUN.md` with `base: <B>` and the spec edits,
     merged into main with `--no-ff` (`run-unlanded` fast-forwarded) and pushed to one bare remote; then
     `tree_lib.py` and each of RUN_READER_MODULES (`kit-modules-absent` `tree_lib.py` alone) copied
-    untracked beside the kit copy from the memory-tree kit `resolve_kit_dir` finds. -> the kit copy."""
+    untracked beside the kit copy from the memory-tree kit `resolve_kit_dir` finds. -> the kit copy.
+
+    By sub-case (TOOL-dLandedOwners-4 S4 to S6): `spec-run-landed`, `roster-specced-landed` and
+    `disposed-ask-landed` hold `BACKLOG.md` with RC_ASK at B, the last with RC_DISPOSAL after it;
+    `spec-run-landed` and `disposed-ask-landed` hold no unit 2 spec at B and carry both units
+    `DEFERRED` on `run`. After the landing merge, `landing-other-base` commits `RUN.md` with `base:`
+    the merge itself, and `rotated-landed` renames `RUN.md` to `RUN.LANDED.<B's first 8 hex>.md`."""
     repo = t / "r"
     own = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit = repo / own
-    spec_run = case == "spec-run-landed"
+    unspecced = case in ("spec-run-landed", "disposed-ask-landed")  # unit 2 has no spec at B
     files = {(kit / policy.CATALOGUE).relative_to(repo).as_posix():
              f'[[key]]\nname = "{RC_KEY}"\nallowed = ["a"]\ndefault = "a"\nowner = "{RC_OWNER}"\n\n',
              ".memory-tree.conf": RC_CONF, f"{RC_FOLDER}/README.md": RC_ROSTER,
              RC_UNIT_SPEC.format(1): RC_UNIT_HEADER.format(1, "OPEN")}
-    if spec_run:
-        files[f"{RC_FOLDER}/BACKLOG.md"] = "# bPlanted backlog\n\n" + RC_ASK
-    else:
+    if case in ("spec-run-landed", "roster-specced-landed", "disposed-ask-landed"):
+        files[f"{RC_FOLDER}/BACKLOG.md"] = ("# bPlanted backlog\n\n" + RC_ASK
+                                            + (RC_DISPOSAL if case == "disposed-ask-landed" else ""))
+    if not unspecced:
         files[RC_UNIT_SPEC.format(2)] = RC_UNIT_HEADER.format(2, "OPEN")
 
     def write_files(plants):
@@ -3128,11 +3183,17 @@ def build_carried_repo(t, case):
     base = "e" * 40 if case == "base-unresolved" else run_fixture_git(repo, "rev-parse", "HEAD")
     run_fixture_git(repo, "checkout", "-q", "-b", "run")
     write_files({f"{RC_FOLDER}/RUN.md": RC_RUN.format(base),
-                 RC_UNIT_SPEC.format(1): RC_UNIT_HEADER.format(1, "DEFERRED" if spec_run else "CLOSED"),
+                 RC_UNIT_SPEC.format(1): RC_UNIT_HEADER.format(1, "DEFERRED" if unspecced else "CLOSED"),
                  RC_UNIT_SPEC.format(2): RC_UNIT_HEADER.format(2, "DEFERRED")})
     run_fixture_git(repo, "commit", "-q", "-m", "the run")
     run_fixture_git(repo, "checkout", "-q", "main")
     run_fixture_git(repo, "merge", "-q", *(("--ff-only",) if case == "run-unlanded" else ("--no-ff", "-m", "land the run")), "run")
+    if case == "landing-other-base":  # L's record carries the merge, the only landing merge's carries B
+        write_files({f"{RC_FOLDER}/RUN.md": RC_RUN.format(run_fixture_git(repo, "rev-parse", "HEAD"))})
+        run_fixture_git(repo, "commit", "-q", "-m", "the record names another base")
+    elif case == "rotated-landed":  # L holds the rotated record alone
+        run_fixture_git(repo, "mv", f"{RC_FOLDER}/RUN.md", f"{RC_FOLDER}/RUN.LANDED.{base[:8]}.md")
+        run_fixture_git(repo, "commit", "-q", "-m", "rotate the run record")
     run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
     lib = resolve_kit_dir("memory-tree", "tree_lib.py", KIT)
     (kit.parent / lib.name).mkdir(parents=True, exist_ok=True)
@@ -3145,15 +3206,36 @@ def run_reader_carried(name):
     """`check_reader_coverage` over one repository per RC_CARRIED sub-case, printing `case <name>: red|green`:
     `carried-landed` must grade RC_KEY and red it; `spec-run-landed`, `run-unlanded` and `base-unresolved`
     must grade nothing and print the announce line; `kit-modules-absent` must refuse, naming the
-    memory-tree kit and `gen_build_index.py`."""
+    memory-tree kit, `gen_build_index.py` and the kit copy's memory-tree directory as a POSIX path.
+    Of TOOL-dLandedOwners-4's five, `landing-other-base` must grade nothing and the other four grade
+    RC_KEY and red it; `kit-root-threaded` runs with the module's `resolve_kit_dir` swapped, for its
+    one `check_reader_coverage` call and restored in a `finally`, for `resolve_copy_only`, which
+    refuses every root but the kit copy's, so a load resolved from any other root is a Refusal and a
+    WRONG."""
+    global resolve_kit_dir
     checks = []
     for case, want in RC_CARRIED.items():
         t = Path(tempfile.mkdtemp(prefix="pol-"))
         try:
             kit = build_carried_repo(t, case)
+            copy = (kit.parent / resolve_kit_dir("memory-tree", "tree_lib.py", KIT).name).as_posix()
+            saved = resolve_kit_dir
+
+            def resolve_copy_only(home, anchor, here):
+                """`saved` from the kit copy alone: any other root is a LookupError naming it."""
+                if Path(here).absolute() != Path(kit).absolute():
+                    raise LookupError(f"{Path(here).absolute().as_posix()} is not the kit copy's root, "
+                                      f"{Path(kit).absolute().as_posix()}")
+                return saved(home, anchor, here)
+
             out = io.StringIO()
-            with contextlib.redirect_stdout(out):
-                n, findings = check_reader_coverage(t / "r", kit=kit)
+            try:
+                if case == "kit-root-threaded":
+                    resolve_kit_dir = resolve_copy_only
+                with contextlib.redirect_stdout(out):
+                    n, findings = check_reader_coverage(t / "r", kit=kit)
+            finally:
+                resolve_kit_dir = saved
             told = "so this arm checked nothing at" in out.getvalue()
             ok = n == want and (told or n) and (
                 len(findings) == 1 and f": {RC_KEY} (owner {RC_OWNER}, landed at " in findings[0] if n else not findings)
@@ -3163,7 +3245,7 @@ def run_reader_carried(name):
             checks.append((f"case {case}: not built", "the fixture's git", False,
                            f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
         except policy.Refusal as exc:
-            ok = isinstance(want, str) and "memory-tree" in exc.why and want in exc.why
+            ok = isinstance(want, str) and "memory-tree" in exc.why and want in exc.why and copy in exc.why
             checks.append((f"case {case}: refused", "check_reader_coverage", ok, str(exc)))
         finally:
             remove_repo(t)

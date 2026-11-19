@@ -51,7 +51,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedOwners-4 TOOL-dLandedOwners-5
 
 <!-- gen:build-units -->
@@ -60,10 +60,10 @@ ids TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 TOOL-dLandedO
 | [TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward](spec/2026-11-19-spec-TOOL-dLandedOwners-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dLandedOwners-2 — the reader scan reads a key passed to a reader through a module constant](spec/2026-11-19-spec-TOOL-dLandedOwners-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-19 |
 | [TOOL-dLandedOwners-3 — a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage](spec/2026-11-19-spec-TOOL-dLandedOwners-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-19 |
-| [TOOL-dLandedOwners-4 — the closing review's promoted findings: the kit threaded to every resolver, a failing case for each landed-predicate arm, every withheld file checked, one git-read refusal and the docs aligned](spec/2026-11-19-spec-TOOL-dLandedOwners-4.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-11-19 |
+| [TOOL-dLandedOwners-4 — the closing review's promoted findings: the kit threaded to every resolver, a failing case for each landed-predicate arm, every withheld file checked, one git-read refusal and the docs aligned](spec/2026-11-19-spec-TOOL-dLandedOwners-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

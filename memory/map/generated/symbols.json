@@ -13178,6 +13178,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_withheld_names",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_withheld_names",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_worktree_key",
       "kind": "function",
       "file": "tools/playbook/tag_index.py"
@@ -20311,6 +20321,11 @@
       "id": "read_git_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_git_or_refuse",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "read_git_output",

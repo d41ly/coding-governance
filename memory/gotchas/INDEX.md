@@ -106,6 +106,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [instrument-recorded-into-the-corpus-it-scans](instrument-recorded-into-the-corpus-it-scans.md) | class | 1 |  | a probe's source is recorded beside its results, the page it scans later embeds that record, and its literal pattern matches its own quotation, so a clean page reads as broken, or a broken one as clean |
 | [invariant-held-on-one-admission-path](invariant-held-on-one-admission-path.md) | class | 5 |  | an invariant one admission path enforces is silently absent on every other path into the same resource, and the spec that states it reads as covering them all |
 | [join-key-widened-by-a-shared-location](join-key-widened-by-a-shared-location.md) | class | 2 |  | a join keyed on WHERE something happened takes every place the subject ever touched, and one of those places is shared by every subject, so the key admits everyone's lines |
+| [kit-argument-dropped-at-an-inner-call](kit-argument-dropped-at-an-inner-call.md) | class | 4 |  | a function that takes a resolution root calls a helper that resolves again from its own default root, so the caller's root is honoured at one call and silently replaced at the next |
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
 | [line-claim-matched-over-the-whole-output](line-claim-matched-over-the-whole-output.md) | class | 2 |  | an arm that asserts a line names X tests two substrings over the whole output, so it passes when X appears on some other line and the line it means names something else |
 | [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
@@ -188,6 +189,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-172 record(s): 169 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+173 record(s): 170 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
