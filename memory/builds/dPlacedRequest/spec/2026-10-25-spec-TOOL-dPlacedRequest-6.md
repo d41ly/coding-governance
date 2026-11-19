@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-6 — the items' declarations of the `map` slot and their unfolds
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 14 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 14 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0124@b8ada8e4 whole
 
