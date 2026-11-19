@@ -63,7 +63,7 @@ blocks "done". The owner's prompt and the measurements are recorded under `promp
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node d · opened 2026-11-19 · streams tooling
+**Build status:** DEFERRED · 9 unit(s) · node d · opened 2026-11-19 · streams tooling
 ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-5 TOOL-dTrackedAtlas-6 TOOL-dTrackedAtlas-7 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12
 
 <!-- gen:build-units -->
@@ -77,7 +77,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-9 — a landing counts only on the default branch's first-parent line, never a run branch's prepared merge](spec/2026-11-19-spec-TOOL-dTrackedAtlas-9.md) | 6 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-10 — the page's staleness digest covers the merge history the landed predicate reads](spec/2026-11-19-spec-TOOL-dTrackedAtlas-10.md) | 7 | 1 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dTrackedAtlas-11 — the closing review's minors: one reader for valued options, the stale ledger line cleared, the owed pane looks recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-11.md) | 8 | 1 | CLOSED | rev-1 | 2026-11-19 |
-| [TOOL-dTrackedAtlas-12 — the closing review's round-2 minors: one stamp-rules table for writer and reader, a relayed refusal the Atlas can act on, one `--ref` rule, the pane reds re-recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md) | 9 | 1 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dTrackedAtlas-12 — the closing review's round-2 minors: one stamp-rules table for writer and reader, a relayed refusal the Atlas can act on, one `--ref` rule, the pane reds re-recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md) | 9 | 1 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
 Records: 51 bound to this build, across 4 record folder(s).

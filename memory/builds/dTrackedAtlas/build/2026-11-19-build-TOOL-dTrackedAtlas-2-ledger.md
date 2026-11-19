@@ -77,15 +77,11 @@ Recorded before the first edit, at `d9bbd1d4c`:
 
 Owed to the close: the plain bar; AC12 in the browser pane, with its red on the page at `9e21ac760`.
 
-## Observed at the close — AC12 in the browser pane (closing review M1, TOOL-dTrackedAtlas-11 S4)
-
-By the main loop, at `72a958aada71`, on a page written by `--out <scratch>/new.html --claims none` and served by
-`python -m http.server` through a temporary `.claude/launch.json`, deleted after.
-
-- Green: the Chain view's table holds one row per chain build, and six read landed with AC1's merges
-  `2511c1181`, `3c0318d95`, `3ada42ab1`, `9760fb746`, `0a760477e` and `9e21ac760`; dPlacedRequest and
-  dWitnessedBar read `can start`. In "Today vs target", the Build area's "Since the baseline" panel reads
-  `dTrueNorth · landed · 2511c1181 · merge: dTrueNorth — land onto origin/main at 271aa59d`. No leaf element of
-  the view reads `Today`.
-- Red: the page the generator wrote at `9e21ac760`, the page home's copy, opened at `#chain` in the same pane,
-  has no "Where each build stands" table and no "Since the baseline" panel.
+Owed to the close, and since observed by the main loop in the browser pane: AC12. Green at the close tip
+`2118c04ac4c9`, on its page served from scratch (`--out --claims none`, `git hash-object`
+`11f11aeed5cb`): the Chain view's table holds one row per chain build; six read landed with AC1's merges
+`2511c1181`, `3c0318d95`, `3ada42ab1`, `9760fb746`, `0a760477e` and `9e21ac760`; dPlacedRequest and dWitnessedBar
+read `can start`; the Build area's "Since the baseline" panel reads
+`dTrueNorth landed · 2511c1181 merge: dTrueNorth — land onto origin/main at 271aa59d`; no leaf of the view reads
+`Today`. Red on the page the generator at `9e21ac760` wrote with `--out` alone (`git hash-object`
+`0d66ebbbed8c`): no build-state table in the Chain view, and no "Since the baseline" panel for the Build area.

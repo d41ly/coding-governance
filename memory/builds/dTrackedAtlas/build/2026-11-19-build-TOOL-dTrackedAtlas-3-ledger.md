@@ -75,12 +75,10 @@ exit `1`, writing no page.
 Owed to the close: the plain bar, whose legs §6 names; AC8 in the browser pane, with its red on the page
 of the generator at `f1b02b3eb`.
 
-## Observed at the close — AC8 in the browser pane (closing review M1, TOOL-dTrackedAtlas-11 S4)
-
-By the main loop, at `72a958aada71`, on the same served page as ledger 2's close observation.
-
-- Green: the header's `#derived` line reads
-  `264 records · latest revision 2026-10-20 · digest 256d5cfc0b82 · generated from 72a958aada71 · inputs 0781a437382b`,
-  and `--check --page <scratch>/new.html --ref HEAD` printed `atlas: current` with exit `0`.
-- Red: the page home's copy, written at `9e21ac760`, shows `#derived` with no `generated from` field, and
-  `--check --page` on it printed `atlas: unstamped` with exit `1`.
+Owed to the close, and since observed by the main loop in the browser pane: AC8. Green at the close tip
+`2118c04ac4c9`, on its page (`git hash-object` `11f11aeed5cb`): `#derived` reads
+`264 records · latest revision 2026-10-20 · digest 256d5cfc0b82 · generated from 2118c04ac4c9 · inputs b225d5a03556`,
+and `--check --page` on it at `HEAD` printed `atlas: current` with exit `0`. Red on the page the generator at
+`f1b02b3eb` wrote with `--claims none --out` (`git hash-object` `cf12260418f2`): `#derived` reads
+`264 records · latest revision 2026-10-20 · digest 256d5cfc0b82`, with no `generated from` field, and the close
+tip's `--check --page` on it printed `atlas: unstamped` with exit `1`.
