@@ -4975,7 +4975,7 @@ same "the refused --landed wrote nothing" "$(sum)" "$before"
 # ---- for building one in a fixture is <prefix>/memory-recall/recall-opened.test.sh.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 git add -A && git commit -q -m runstate --no-verify
-OTHER=$(mktemp -d)/wt
+OP=$(mktemp -d); OTHER=$OP/wt   # the parent kept, so it is removed with the worktree below
 git worktree add -q -b other-tree "$OTHER" HEAD 2>/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' "$OTHER/memory/builds/tRun/RUN.md"
 out=$(run --landed tRun 2>&1)
@@ -4988,6 +4988,7 @@ out=$(run --landed tRun 2>&1)
 hit  "$out" "a run reaches LANDED only from LANDING"
 miss "$out" "an UNCOMMITTED LANDING is sitting in:"
 git worktree remove --force "$OTHER" 2>/dev/null; git branch -q -D other-tree 2>/dev/null
+rm -rf "$OP"
 reset_tree
 
 # ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
@@ -5452,6 +5453,7 @@ n=$((n+1)); [ -f "$arch" ]                     || { echo "FAIL rotation did not 
 n=$((n+1)); [ -f memory/builds/tRun/RUN.md ]   || { echo "FAIL rotation left no fresh run-state file"; st=1; }
 same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
 n=$((n+1)); cmp -s "$retired_copy" "$arch" || { echo "FAIL the archived bytes are not the retired record's"; st=1; }
+rm -f "$retired_copy"   # outside $TMP, which is the fixture repo, so its trap never takes it
 # BOTH SIDES IN THE INDEX. The leg's whole per-run population is `git ls-files`, so an unstaged
 # archive is invisible to every check the widened population gave it.
 n=$((n+1)); git ls-files --error-unmatch "$arch" >/dev/null 2>&1 || { echo "FAIL the archive is not staged, so the gate leg cannot see it"; st=1; }

@@ -41,7 +41,6 @@ import json
 import os
 import pathlib
 import re
-import shutil
 import sys
 import tempfile
 import tomllib
@@ -602,7 +601,7 @@ PLANTS = {"meaning-editorial": arm_meaning_editorial, "punctuation-editorial": a
 def run_fixture(plant=None) -> tuple[list, int]:
     """Each plant in a throwaway repository, the caller's git variables aside."""
     iu.load_memory_tree_path()
-    from deviation_join import set_env_aside
+    from deviation_join import remove_tree, set_env_aside
     from tree_lib import GIT_ENV_LEAKS
     out, failed = [], 0
     for name in [plant] if plant else list(PLANTS):
@@ -619,7 +618,7 @@ def run_fixture(plant=None) -> tuple[list, int]:
                     case.check(f"{name} ran to its end", False, f"{type(exc).__name__}: {exc}")
                 failed += case.failed
         finally:
-            shutil.rmtree(top, ignore_errors=True)
+            remove_tree(top)   # not ignore_errors: git's objects are read-only on Windows
     out.append(f"{SAY}: fixture · {'FAILED' if failed else 'green'} · {failed} expectation(s) failed")
     return out, 1 if failed else 0
 

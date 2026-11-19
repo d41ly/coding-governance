@@ -753,10 +753,11 @@ wtcfg="$wt/w/.git/config"
 wtgd="$wt/w/.git/worktrees/lw"
 if [ -d "$wtgd" ]; then
   git config --file "$wtcfg" core.bare false
-  ( cd "$wt" && GIT_DIR="$wtgd" sh -c 'd=$(mktemp -d); cd "$d" && git init -q .' ) >/dev/null 2>&1
+  # Each scratch repo under "$wt" (passed as $1), so the rm -rf "$wt" below removes it too.
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c 'd=$(mktemp -d "$1/s.XXXXXX"); cd "$d" && git init -q .' _ "$wt" ) >/dev/null 2>&1
   poisoned=$(git config --file "$wtcfg" --get core.bare)
   git config --file "$wtcfg" core.bare false
-  ( cd "$wt" && GIT_DIR="$wtgd" sh -c "unset $SCRUB; d=\$(mktemp -d); cd \"\$d\" && git init -q ." ) >/dev/null 2>&1
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c "unset $SCRUB; d=\$(mktemp -d \"\$1/s.XXXXXX\"); cd \"\$d\" && git init -q ." _ "$wt" ) >/dev/null 2>&1
   guarded=$(git config --file "$wtcfg" --get core.bare)
   if [ "$poisoned" != true ]; then
     bad "17 the fixture did not reproduce the injection, so this arm proves nothing (git behaviour changed?)"

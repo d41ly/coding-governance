@@ -7563,7 +7563,7 @@ def cmd_selftest() -> int:
             return None
 
         def _build_header(body: str) -> str:
-            d = tempfile.mkdtemp()
+            d = tempfile.mkdtemp(dir=base)   # under the block's TemporaryDirectory, removed with it
             p = os.path.join(d, "README.md")
             with open(p, "w", encoding="utf-8", newline="") as fh:
                 fh.write(body)
@@ -7595,7 +7595,7 @@ def cmd_selftest() -> int:
             lambda: str(bool(getattr(_derive_kind_exc(_good.replace("node: t", "  node: t")), "region", ""))))
 
         def _read_waiver(body: str | None):
-            d = tempfile.mkdtemp()
+            d = tempfile.mkdtemp(dir=base)   # under the block's TemporaryDirectory, removed with it
             os.makedirs(os.path.join(d, "memory", "project"), exist_ok=True)
             if body is not None:
                 with open(os.path.join(d, "memory", STALE_HEADER_WAIVER), "w",

@@ -22,7 +22,6 @@ import argparse
 import datetime
 import json
 import pathlib
-import shutil
 import sys
 import tempfile
 import tomllib
@@ -370,7 +369,7 @@ def main(argv=None) -> int:
     ap.add_argument("--policy", action="append", metavar="KEY=TAG")
     args = ap.parse_args(argv)
     iu.load_memory_tree_path()
-    from deviation_join import set_env_aside
+    from deviation_join import remove_tree, set_env_aside
     from tree_lib import GIT_ENV_LEAKS
     top = pathlib.Path(tempfile.mkdtemp(prefix="rowkind-"))
     try:
@@ -382,7 +381,7 @@ def main(argv=None) -> int:
             except (ValueError, OSError, iu.LevelError) as exc:
                 out, err, rc = [f"{SAY}: plant {args.plant} could not be built: {exc}"], [], 2
     finally:
-        shutil.rmtree(top, ignore_errors=True)
+        remove_tree(top)   # not ignore_errors: git's objects are read-only on Windows
     sys.stdout.buffer.write("".join(f"{ln}\n" for ln in out).encode("utf-8"))
     sys.stderr.buffer.write("".join(f"{ln}\n" for ln in err).encode("utf-8"))
     return rc

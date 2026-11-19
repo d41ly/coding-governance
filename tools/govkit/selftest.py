@@ -16706,7 +16706,9 @@ user_skills = "/tmp/gk-fake-skills"
         # and asserts the command SUCCEEDS, which is only meaningful because the same list through
         # argv is asserted to FAIL right after it.
         import tempfile as _tf4
-        _d4 = _tf4.mkdtemp()
+        # Under main's TemporaryDirectory: git's read-only objects survive the rmtree below on
+        # Windows, and that directory's own cleanup clears them.
+        _d4 = _tf4.mkdtemp(dir=td)
         _r4 = pathlib.Path(_d4)
         subprocess.run(["git", "init", "-q", str(_r4)], capture_output=True)
         subprocess.run(["git", "-C", str(_r4), "config", "user.email", "t@t"], capture_output=True)
