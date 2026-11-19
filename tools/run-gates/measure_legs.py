@@ -2690,6 +2690,10 @@ def scan_bare_bash(root):
     spell; a literal that is the right operand of an `in` or `not in` is a membership test and spawns
     nothing, so shape 2 skips it (S3). JavaScript is read by a regex: shape 3, `spawn`,
     `spawnSync`, `execFile` or `execFileSync` with that name first, or an `||` or `??` falling back to it.
+    Shape 4 is a PATH lookup of the name, which walks PATH with no launcher filter (TOOL-dWitnessedBar-49
+    S1): in Python a `shutil.which` call whose first argument is the constant `bash` or `bash.exe`, in
+    JavaScript a `which(` call with that string or an `execSync` or `execFileSync` running `where bash`
+    or `which bash`.
     A language with no tracked file read is a line too, and so is a `*.py` `ast` cannot parse, so an
     empty or unread population is never a pass.
     WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable, a conditional whose `else` is
@@ -2700,6 +2704,7 @@ def scan_bare_bash(root):
     bare, exe = min(names, key=len), max(names, key=len)
     js_rx = re.compile(r"""\b(?:spawn|spawnSync|execFile|execFileSync)\(\s*(['"`])bash(?:\.exe)?\1"""
                        r"""|(?:\|\||\?\?)\s*(['"`])bash(?:\.exe)?\2""")
+    js4_rx = re.compile(r"""\bwhich\(\s*['"]bash(?:\.exe)?['"]|exec(?:File)?Sync\(\s*['"](?:where|which) bash""")
     listed = subprocess.run(["git", "ls-files", "-z", "--", "*.py", "*.js"], cwd=root, capture_output=True,
                             timeout=60).stdout.decode("utf-8", "replace")
     hits, read = [], {".py": 0, ".js": 0}
@@ -2722,7 +2727,10 @@ def scan_bare_bash(root):
             if ln.startswith(marker + "<<< " + stem):
                 inside = False
         if ext == ".js":
-            hits += ["%s:%d: shape 3" % (rel, i) for i, ln in enumerate(lines, 1) if i in outside and js_rx.search(ln)]
+            for i, ln in enumerate(lines, 1):
+                shape = "shape 3" if js_rx.search(ln) else "shape 4" if js4_rx.search(ln) else ""
+                if shape and i in outside:
+                    hits.append("%s:%d: %s" % (rel, i, shape))
             continue
         src = "\n".join(lines)
         try:
@@ -2747,6 +2755,10 @@ def scan_bare_bash(root):
                 if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
                         and a0.elts[0].value in names and fname != "resolve_shell_argv":
                     shape = "shape 1"
+                elif fname == "which" and isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) \
+                        and f.value.id == "shutil" and isinstance(n.args[0], ast.Constant) \
+                        and n.args[0].value in names:
+                    shape = "shape 4"
             elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant) \
                     and n.values[-1].value in names:
                 shape = "shape 1"

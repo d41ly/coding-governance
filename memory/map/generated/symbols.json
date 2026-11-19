@@ -28488,6 +28488,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_selftest_bash",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "resolve_session_file",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -32146,6 +32151,11 @@
       "id": "scan_bash",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "scan_bash",
@@ -38426,6 +38436,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/memory-recall/adopt-memory-recall.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "wrong_shell_at",
