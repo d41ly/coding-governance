@@ -5,11 +5,11 @@
 No merge bar, gate or self-test suite ran in this pass. Each criterion was observed by the spec's own
 command from the worktree root, the page written to the run's scratch directory and never into the
 repository. Each red case was observed on the shape the criterion names: the generator and template as
-they stood at the unit's start (`d9bbd1d4c`), or a staged break in a scratch probe that compiles the
+they stood at the unit's start (`a47c438bb`), or a staged break in a scratch probe that compiles the
 generator's source with one substitution, under the generator's own path, and runs it in memory, so the
 tracked file was never edited to stage a red.
 
-Recorded before the first edit, at `d9bbd1d4c`:
+Recorded before the first edit, at `a47c438bb`:
 
 - AC9's probe printed `8bbf287e2f1ac362607683b2165ec614f40a2bb37de5c7e336f918b81226bc8c` and the keys
   `areas build chain consult contract contracts cycle decisions digest events gaps kitFates kits latest`
@@ -30,7 +30,7 @@ Recorded before the first edit, at `d9bbd1d4c`:
   `state.commit` `9e21ac760dc0a43d6ed007396922722ccee98d57`, `state.landed` dTrueNorth, dGroundRules,
   dSafePassage, dOrderedCharter, dFairHearing, dDeclaredLoop with `landing.sha` beginning `2511c1181`,
   `3c0318d95`, `3ada42ab1`, `9760fb746`, `0a760477e`, `9e21ac760`, and `state.startable` dPlacedRequest,
-  dWitnessedBar. Red: the page of the generator at `d9bbd1d4c` has no `state`, `asBuilt` or `baseline` key.
+  dWitnessedBar. Red: the page of the generator at `a47c438bb` has no `state`, `asBuilt` or `baseline` key.
 - AC2 — the same page: `landed` of `build` dTrueNorth, of `instruction` dSafePassage and dOrderedCharter,
   of `spine` dGroundRules, dOrderedCharter and dDeclaredLoop, of `plan` empty; `baseline.measured`
   `2026-10-14` and `2026-10-16`; `review`'s `measured` `2026-10-14` and `2026-10-15`. Red: a staged
@@ -41,11 +41,11 @@ Recorded before the first edit, at `d9bbd1d4c`:
   `[chain]` through `tools/memory-tree/design_lib.py#read_chain_clauses` gave `22` builds, `509` rows and
   `0` citing a record.
 - AC4 — `grep -c` over the edited template: `Today: an implicit loop` `0`, `Today, measured in` `0`,
-  `Today, as measured` `0`, `Baseline, measured in` `2`. Red: the template at `d9bbd1d4c` counted
+  `Today, as measured` `0`, `Baseline, measured in` `2`. Red: the template at `a47c438bb` counted
   `1`, `2`, `1` and `0`.
 - AC5 — `head -n 4 "$OUT"` printed `<!doctype html>`, `<meta charset="utf-8">`, the viewport line and
   `<title>Closed Loop Atlas</title>`; the `body {` rule reads `margin: 0`. Red: the template at
-  `d9bbd1d4c` opens with `<title>Closed Loop Atlas</title>`.
+  `a47c438bb` opens with `<title>Closed Loop Atlas</title>`.
 - AC6 — `--check --ref 9e21ac760 --claims none --plant state-dropped` exited `1` with
   `atlas: the chain state lacks dDeclaredLoop and holds none the chain does not`;
   `--plant asbuilt-dropped` exited `1` with
@@ -78,7 +78,7 @@ Recorded before the first edit, at `d9bbd1d4c`:
 Owed to the close: the plain bar; AC12 in the browser pane, with its red on the page at `9e21ac760`.
 
 Owed to the close, and since observed by the main loop in the browser pane: AC12. Green at the close tip
-`2118c04ac4c9`, on its page served from scratch (`--out --claims none`, `git hash-object`
+`2d8acb04e93b`, on its page served from scratch (`--out --claims none`, `git hash-object`
 `11f11aeed5cb`): the Chain view's table holds one row per chain build; six read landed with AC1's merges
 `2511c1181`, `3c0318d95`, `3ada42ab1`, `9760fb746`, `0a760477e` and `9e21ac760`; dPlacedRequest and dWitnessedBar
 read `can start`; the Build area's "Since the baseline" panel reads

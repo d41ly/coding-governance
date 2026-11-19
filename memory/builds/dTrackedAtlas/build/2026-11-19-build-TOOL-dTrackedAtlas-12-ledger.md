@@ -7,7 +7,7 @@ command in a `--shared` clone of the worktree at `%TEMP%/ta12fx`, set up as sect
 pass's generator committed there as the fixture commit `$T` and `refs/remotes/origin/main` and
 `refs/remotes/origin/HEAD` written in the clone alone. The four probes of section 5 sat in the run's scratch
 directory, and every page and probe output went there. Each red ran the generator before this unit, the blob
-`09b2b8f67` at the pass's base `b3f60b963`, put over the clone's copy with `git show` and restored with
+`09b2b8f67` at the pass's base `c6c533e64`, put over the clone's copy with `git show` and restored with
 `git checkout`; a staged break edited the clone's copy the same way. The clone was removed after, and the
 real repository's refs were never written.
 

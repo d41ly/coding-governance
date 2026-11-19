@@ -5,7 +5,7 @@
 No merge bar, gate or self-test suite ran in this pass. Each criterion was observed by the spec's own
 command in `$FX`, a `--shared` clone of the worktree at `%TEMP%/ta10fx`, from the clone's root, with
 `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` unset. The pass's generator was carried into the clone as one
-fixture commit on top of the pass's base `bc4fb14f0`, so `$T0` = `bb0566e38140` is the run branch's tip
+fixture commit on top of the pass's base `ffcceea59`, so `$T0` = `bb0566e38140` is the run branch's tip
 carrying this unit; the section 5 plant then made `$B` = `e65919010b17`. AC1 made `$M` = `0c418816ed34`,
 AC3 made `$P` = `d79d1016bbf8`, and AC4 moved the default branch to `f34cf076321e`. These shas name the
 removed clone's objects only. Every page, as `$S/<name>.html`, and every probe sat in the run's scratch
@@ -63,7 +63,7 @@ the staged function's value. No tracked file was edited to stage a red.
   ended in a traceback, `atlas_build_state.StateError: the default-branch ref refs/remotes/origin/main …`.
 - AC7 — over the pass's generator, `grep -c "spec_from_file_location"` printed `1` and
   `grep -c "TOOL-dTrackedAtlas-10"` printed `6`, one of them the module docstring's sentence of §4
-  "The module docstring". Red: the generator at `bc4fb14f0` printed `2` for the first grep, its two inline
+  "The module docstring". Red: the generator at `ffcceea59` printed `2` for the first grep, its two inline
   loaders; a staged copy of the pass's generator whose `read_landings` carries its own inline loader
   printed `2`, so the criterion's `1` refuses it, though not with the `3` the spec's red names, since the
   staged copy keeps `load_build_state` and drops the two old copies.

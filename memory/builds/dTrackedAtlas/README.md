@@ -81,7 +81,7 @@ ids TOOL-dTrackedAtlas-14 TOOL-dTrackedAtlas-15 TOOL-dTrackedAtlas-16 TOOL-dTrac
 | [TOOL-dTrackedAtlas-12 — the closing review's round-2 minors: one stamp-rules table for writer and reader, a relayed refusal the Atlas can act on, one `--ref` rule, the pane reds re-recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-12.md) | 9 | 1 | CLOSED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 51 bound to this build, across 4 record folder(s).
+Records: 45 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

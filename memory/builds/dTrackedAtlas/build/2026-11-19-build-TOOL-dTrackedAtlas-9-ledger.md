@@ -11,7 +11,7 @@ The clone was removed after AC6, and the real repository's refs were never writt
 capture and probe sat in the run's scratch directory.
 
 Each red was observed on the shape the criterion names: the derivation as it stood at the pass's start,
-`memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py` at `a899e9657`,
+`memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py` at `cb9f7431c`,
 run before any edit; or a staged break made by a scratch probe that loads the changed module by path and
 swaps one function before calling its `main`, so no tracked file was edited to stage a red.
 
@@ -21,7 +21,7 @@ swaps one function before calling its `main`, so no tracked file was edited to s
   (PINNED at `9e21ac760`). dWitnessedBar read `not-landed`, `landing` null, its `RUN.md` record's
   `landings` empty; `startable` was dPlacedRequest, dWitnessedBar. `default_ref` read
   `refs/remotes/origin/main` and `default_commit` `9e21ac760dc0a43d6ed007396922722ccee98d57`.
-  Red: the module at `a899e9657`, same command, read `7` landed (PINNED at `9e21ac760`), dWitnessedBar
+  Red: the module at `cb9f7431c`, same command, read `7` landed (PINNED at `9e21ac760`), dWitnessedBar
   `landed-carrying` with `landing.sha` `$P`.
 - AC2 — after `git update-ref refs/remotes/origin/main "$P"`, `--ref "$P" --claims none` read `7` landed
   (PINNED at `$P`), dWitnessedBar's `landing.sha` `$P`, `startable` dPlacedRequest alone, `default_commit`
@@ -38,7 +38,7 @@ swaps one function before calling its `main`, so no tracked file was edited to s
   dTrueNorth, dGroundRules, dSafePassage, dOrderedCharter, dFairHearing; dDeclaredLoop `not-landed`,
   `landing` null, `next.state` `startable`; `default_ref` `9e21ac760`, `default_commit`
   `9e21ac760dc0a43d6ed007396922722ccee98d57`. At `--ref b55a6494a` it read `landed` dTrueNorth,
-  dGroundRules, dSafePassage, and dFairHearing `not-landed`. Red: the module at `a899e9657`,
+  dGroundRules, dSafePassage, and dFairHearing `not-landed`. Red: the module at `cb9f7431c`,
   `--ref 5125f93ea --claims none`, read dDeclaredLoop `landed-carrying` with landing `67f1ffb18`, and at
   `--ref b55a6494a` read dFairHearing `landed` through `7b42f2c47`.
 - AC5 — `--ref 9e21ac760 --default-ref 9e21ac760 --claims none` read the six of unit 1's AC2, with
@@ -64,7 +64,7 @@ swaps one function before calling its `main`, so no tracked file was edited to s
 - AC8 — over the schedule, `grep -c "first-parent merge of --ref"` printed `0` and
   `grep -c "default branch's first-parent line"` printed `1`; over the derivation,
   `grep -c -- "--default-ref"` printed `8` and `grep -c "has not fetched"` printed `1`, from the module
-  docstring. Red: before the edit, at `a899e9657`, the four printed `1`, `0`, `0` and `0`.
+  docstring. Red: before the edit, at `cb9f7431c`, the four printed `1`, `0`, `0` and `0`.
 
 Owed to the close: the plain bar, whose legs section 6 names; `chain-packet self-test` keeps the
 CP3, CP4 and CP5 reds ask `TOOL-dTrackedAtlas-6` already owes under `GATE_SELFTESTS=1`, now at this

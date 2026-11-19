@@ -53,4 +53,4 @@ builds.
 
 Owed to the close: the plain bar; and `chain-packet self-test` reds CP3, CP4 and CP5 under `GATE_SELFTESTS=1`
 until the schedule instrument is re-pinned (section 7 F2, the one ask the main loop files).
-Cleared since: spec 1 rev-3's rename to `derive_predecessors` at `f24d90e25` cleared the `VERB_OFFENDER_PIN` item, since that name leads with the declared verb `derive`, so the lexicon owes nothing for this unit (TOOL-dTrackedAtlas-11).
+Cleared since: spec 1 rev-3's rename to `derive_predecessors` at `8d69e97b7` cleared the `VERB_OFFENDER_PIN` item, since that name leads with the declared verb `derive`, so the lexicon owes nothing for this unit (TOOL-dTrackedAtlas-11).

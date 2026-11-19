@@ -5,9 +5,9 @@
 No merge bar, gate or self-test suite ran in this pass. Each criterion was observed by the spec's own
 command in a scratch clone of the worktree at `%TEMP%/ta3fx`, from the clone's root, with the unit's
 generator and template carried in as one fixture commit, `e0bcd2298e37`, on top of the pass's base
-`f1b02b3eb`; every page went to the run's scratch directory, written `$S` below, and every generation
+`d0743a938`; every page went to the run's scratch directory, written `$S` below, and every generation
 passed `--claims none`. The clone was removed after. Each red was observed on the shape the criterion
-names: the page of the generator as it stood at `f1b02b3eb`, written `p-red.html`, or a staged break
+names: the page of the generator as it stood at `d0743a938`, written `p-red.html`, or a staged break
 run by a scratch probe that compiles the clone's generator with one substitution under the generator's
 own path and runs it in memory, so no tracked file was edited to stage a red.
 
@@ -28,7 +28,7 @@ own path and runs it in memory, so no tracked file was edited to stage a red.
   `dirty` `['memory/builds/dClosedLoop/README.md']` and the `digest` `7afb66d0f673`, AC2's at `HEAD`; the
   check exited `1` with `atlas: dirty — $S/p2.html: generated with 1 uncommitted input(s), first memory/builds/dClosedLoop/README.md`;
   `git checkout --` restored the file and `git status --short` printed nothing. With `R` resolving to
-  `f1b02b3eb0939b9f881a2a9e58690a7b6c5246fe`, `--ref "$R" --out "$S/p3.html"` stamped that `commit` and
+  `d0743a938cb6a822dd5b91d93d1799d2f416825d`, `--ref "$R" --out "$S/p3.html"` stamped that `commit` and
   `dirty` listing the template and the generator, and its check exited `1` with `atlas: dirty`. Red: a
   staged stamp whose `dirty` is always `[]` gave both pages an empty `dirty`; the README page's check
   exited `0` reading `atlas: current`, and the page at `R` read `atlas: current` under `--ref "$R"`.
@@ -73,12 +73,12 @@ and `  and 160 more`; `--page` without `--check`, with `--out` or `--claims`, wi
 exit `1`, writing no page.
 
 Owed to the close: the plain bar, whose legs §6 names; AC8 in the browser pane, with its red on the page
-of the generator at `f1b02b3eb`.
+of the generator at `d0743a938`.
 
 Owed to the close, and since observed by the main loop in the browser pane: AC8. Green at the close tip
-`2118c04ac4c9`, on its page (`git hash-object` `11f11aeed5cb`): `#derived` reads
-`264 records · latest revision 2026-10-20 · digest 256d5cfc0b82 · generated from 2118c04ac4c9 · inputs b225d5a03556`,
+`2d8acb04e93b`, on its page (`git hash-object` `11f11aeed5cb`): `#derived` reads
+`264 records · latest revision 2026-10-20 · digest 256d5cfc0b82 · generated from 2d8acb04e93b · inputs b225d5a03556`,
 and `--check --page` on it at `HEAD` printed `atlas: current` with exit `0`. Red on the page the generator at
-`f1b02b3eb` wrote with `--claims none --out` (`git hash-object` `cf12260418f2`): `#derived` reads
+`d0743a938` wrote with `--claims none --out` (`git hash-object` `cf12260418f2`): `#derived` reads
 `264 records · latest revision 2026-10-20 · digest 256d5cfc0b82`, with no `generated from` field, and the close
 tip's `--check --page` on it printed `atlas: unstamped` with exit `1`.
