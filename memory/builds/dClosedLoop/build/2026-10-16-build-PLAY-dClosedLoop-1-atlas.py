@@ -1,15 +1,22 @@
 # **Serves:** research PLAY-dClosedLoop-1
 """Derive the Closed Loop Atlas from dClosedLoop's records, and write the publishable page.
 
-Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --out <page.html>
-       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
+Usage: python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py [--ref <rev>] [--claims cache|none] --out <page.html>
+       python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py [--ref <rev>] [--claims cache|none] --check
        python 2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check --plant <case>   damage the memory view's sources,
-           the record corpus or the view map, expect exit 1; cases: kind-unplaced, kind-ghost-tag, edge-status,
-           hop-edge, edges-split, instruments-decision, view-unread
+           the record corpus, the view map, the chain state or the as-built view, expect exit 1; cases:
+           kind-unplaced, kind-ghost-tag, edge-status, hop-edge, edges-split, instruments-decision, view-unread,
+           state-dropped, asbuilt-dropped
 
 The template beside this file is the page without its data. A run splices the derived data into a copy
 written to --out, never into the template, so the repository keeps the template and this generator while
 the page, which embeds every record, stays out of it. --check derives everything and writes nothing.
+
+The page shows the chain's actual state (TOOL-dTrackedAtlas-2): TOOL-dTrackedAtlas-1's state document of every
+chain build, read through git at --ref (default HEAD), and the as-built view's clauses, read from the working
+tree as every record is. --claims cache (the default) reads the claim cache `unattended.sh --claims` fills, so a
+live claim's staleness can change between two renders at one ref; --claims none reads no claim, and only then is
+the page byte-identical across runs at one ref. The 2026-10-14 measurements stay on the page as the baseline.
 
 Nothing the records hold may leave the atlas without a refusal:
 - every table it reads parses whole, and each population is counted against the raw lines that carry it;
@@ -124,6 +131,10 @@ MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "
 # Plants on the record corpus and the view map, each stopping the run with its own refusal (the answers fold's
 # closing review: run A's L4, run B's M4).
 CORPUS_PLANTS = ("instruments-decision", "view-unread")
+# Plants on the chain state and the as-built view, each damaging data in memory inside `derive_actual` before its
+# refusals run (TOOL-dTrackedAtlas-2).
+ACTUAL_PLANTS = ("state-dropped", "asbuilt-dropped")
+STATE_PATH = REPO / "memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py"
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
             "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
@@ -308,8 +319,8 @@ def plant_memory(src, plant):
         swap("plan", "| `follows` | none |", "| `follows`, `answered-by-typo` | none |")
     elif plant == "edges-split":
         swap("plan", "\n| `implements` |", "\n\n| `implements` |")
-    elif plant and plant not in CORPUS_PLANTS:
-        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS + CORPUS_PLANTS)}")
+    elif plant and plant not in CORPUS_PLANTS + ACTUAL_PLANTS:
+        sys.exit(f"atlas: no plant {plant}; the cases are {', '.join(MEMORY_PLANTS + CORPUS_PLANTS + ACTUAL_PLANTS)}")
     return src
 
 
@@ -697,8 +708,85 @@ def derive(plant=None):
     }
 
 
+def derive_actual(data, ref="HEAD", claims=True, plant=None):
+    """`data`, `derive`'s result, with the chain's actual state added (TOOL-dTrackedAtlas-2): `state`, the state
+    document of TOOL-dTrackedAtlas-1's `derive` at `ref`, whole; `asBuilt`, the as-built view's rows per chain build;
+    `baseline`, the measured dates and the design keys; and each area's `landed` and `measured`.
+
+    The chain state is read at `ref` through git; dClosedLoop's records and the as-built view are read from the
+    working tree, as `derive` reads everything. A state document or a view whose builds differ from `data["chain"]`
+    is a refusal. What it does not check: that a landed build closed every gap it owns, that the working tree and
+    `ref` describe one commit, and that the view is current with its deviation records."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("atlas_build_state", STATE_PATH)
+    build_state = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(build_state)
+    kit = str(REPO / "tools/memory-tree")
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import design_lib
+
+    chain = [c["build"] for c in data["chain"]]
+
+    def check_builds(name, held, same):
+        """Refuse, naming each side, when `held` is not the chain's builds."""
+        if same:
+            return
+        lacks = [b for b in chain if b not in held] or ["none"]
+        extra = [b for b in held if b not in chain] or ["none"]
+        sys.exit(f"atlas: {name} lacks {', '.join(lacks)} and holds {', '.join(extra)} the chain does not")
+
+    try:
+        state = build_state.derive(ref, root=str(REPO), claims=claims, detail=True)
+    except (build_state.ChainError, build_state.StateError) as e:
+        sys.exit(f"atlas: chain state: {e}")
+    anchor = state["landed"][-1] if state["landed"] else None
+    if plant in ACTUAL_PLANTS and anchor is None:
+        sys.exit(f"atlas: plant {plant}: its anchor is gone")
+    if plant == "state-dropped":
+        state["builds"] = [b for b in state["builds"] if b["slug"] != anchor]
+        state["landed"] = [s for s in state["landed"] if s != anchor]
+    held = [b["slug"] for b in state["builds"]]
+    check_builds("the chain state", held, held == chain)
+
+    try:
+        keys = design_lib.read_design_keys(str(REPO), design_lib.read_design_conf(str(REPO)))
+        if keys is None:
+            sys.exit("atlas: the design keys are blank, so there is no as-built view to read")
+        rows = design_lib.read_design_view(keys["DESIGN_VIEW"], root=str(REPO))
+    except design_lib.DesignRefusal as e:
+        sys.exit(f"atlas: as-built view: {e}")
+    if plant == "asbuilt-dropped":
+        rows = [r for r in rows if r[0] != anchor]
+    viewed = list(dict.fromkeys(r[0] for r in rows))
+    check_builds("the as-built view", viewed, set(viewed) == set(chain))
+    as_built = {b: [] for b in chain}
+    for build, cid, body, _, since in rows:
+        as_built[build].append({"clause": cid, "text": body, "since": since})
+
+    owner = {g["id"]: g["owner"] for g in data["gaps"]}
+    dated = {r["path"]: r["date"] for r in data["records"]}
+    for a in data["areas"]:
+        owners = {owner[g] for g in a["gaps"]}
+        a["landed"] = [b for b in chain if b in state["landed"] and b in owners]
+        a["measured"] = sorted({dated[s["path"]] for s in a["today"]})
+    measured = sorted({d for a in data["areas"] for d in a["measured"]})
+    data["state"] = state
+    data["baseline"] = {"measured": [measured[0], measured[-1]], "design": keys["DESIGN_BASELINE"],
+                        "view": keys["DESIGN_VIEW"]}
+    data["asBuilt"] = as_built
+    return data
+
+
 def main(argv):
-    data = derive(argv[argv.index("--plant") + 1] if "--plant" in argv else None)
+    ref = argv[argv.index("--ref") + 1] if "--ref" in argv else "HEAD"
+    claims = argv[argv.index("--claims") + 1] if "--claims" in argv else "cache"
+    if claims not in ("cache", "none"):
+        sys.exit(f"atlas: --claims takes cache or none, not {claims}")
+    if ref.startswith("-"):
+        sys.exit(f"atlas: --ref takes a revision, not {ref}")
+    plant = argv[argv.index("--plant") + 1] if "--plant" in argv else None
+    data = derive_actual(derive(plant), ref, claims == "cache", plant)
     if "--check" in argv:
         n = sum(len(r["sections"]) for r in data["records"])
         print(f"atlas: derived — {len(data['records'])} records, {n} sections, {len(data['decisions'])} decision sections, "

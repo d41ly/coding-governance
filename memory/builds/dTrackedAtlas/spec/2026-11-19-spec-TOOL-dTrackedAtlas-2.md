@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-2-ledger.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-2-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-pin-fold.md) | research | TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-2-build-brief.md) | research | — |
