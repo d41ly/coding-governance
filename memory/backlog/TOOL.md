@@ -710,4 +710,4 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-37](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-28 | 2026-10-25 | PLAY-dOrderedCharter-36's KIND SCHEMA CANNOT SAY HOW A LEG WIDENS. It… |
 | [TOOL-dWitnessedBar-38](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-24 | 2026-10-25 | THE INTERPRETER-FLOOR ARM HAS THREE OWNERS ON PAPER.… |
 | [TOOL-dWitnessedBar-39](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-20 | 2026-10-25 | TOOL-dGroundRules-7 S2 TO S4 CHANGE ONCE TOOL-dWitnessedBar-20 LANDS.… |
-| [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS ENFORCE NOTHING THE RULE CAN NAME. TOOL-dWitnessedBar-11 S6… |
+| [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS (DERIVED) ENFORCE NOTHING THE RULE CAN NAME.… |

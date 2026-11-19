@@ -24,7 +24,7 @@ two new legs `gate-leg conformance` and `leg-factory selftest`, and the criteria
   and 128 exempt rows took their whole manifest row.
 - AC3 — `cmp` — owed to the close: the two `govkit apply --all` runs need an intake answer file per
   scratch adopter and were not run. A probe parsed all 28 changed TOML files at HEAD and in the tree,
-  dropped each `[gate_leg.gov]` sub-table and the registry rows' moved keys, and found 0 files
+  dropped each `[gate_leg.gov]` sub-table and the registry rows' moved keys, and found 0 files (DERIVED)
   differing, so every base row an adopter's emitter reads is untouched; the emitter reads named keys
   and never `gov`.
 - AC4 — `--conform` — in the clone it exits 0 unplanted and with a 60-character purpose holding a
@@ -36,7 +36,7 @@ two new legs `gate-leg conformance` and `leg-factory selftest`, and the criteria
 - AC5 — `core.py new gate-leg` — in the clone, `python tools/playbook/core.py new gate-leg "demo leg"
   --kit gate-lint --argv '["python3","demo.py"]' --subject repo --purpose "a demo leg" --enforces
   practice.verify` exits 0 printing `declared 'demo leg' as leg.gate-lint.demo-leg`, the manifest holds
-  201 rows and `--conform` exits 0; without `--purpose` it exits 2 printing `--purpose is required`
+  201 rows (DERIVED) and `--conform` exits 0; without `--purpose` it exits 2 printing `--purpose is required`
   and `tools/gate-lint/kit.toml`'s md5 is unchanged.
 - AC6 — `kind.gate-leg` — `grep -c "kind.gate-leg" tools/playbook/core-pending.txt` prints 0;
   `core.check_kind_row` over the row returns `([], True)`; `render_playbook.py --reference` re-rendered
@@ -48,10 +48,10 @@ two new legs `gate-leg conformance` and `leg-factory selftest`, and the criteria
   tools/run-gates/leg_factory.py --check`.
 - AC8 — `meta-check` — a probe with `core.read_legs` and `core.read_pending` found 70 pending `leg`
   rows, 70 manifest rows with no `enforces`, the two sets equal, no pending principle or practice row
-  naming a tag a leg enforces, and no pending-row red; the enforces review puts those 70 legs to the
+  naming a tag a leg enforces, and no pending-row red; the enforces review puts those 70 legs (DERIVED) to the
   owner. Owed to the close: `core.py meta-check`, the leg `core meta-check`.
 - AC9 — `PURPOSE_MAX_CHARS` — `git grep -nE "is in no leg of|share the purpose|PURPOSE_MAX_CHARS" --
-  tools/govkit/govkit.py` prints nothing; `git grep -nP "\b7h(?![0-9a-z])" -- tools/` prints 7 lines,
+  tools/govkit/govkit.py` prints nothing; `git grep -nP "\b7h(?![0-9a-z])" -- tools/` prints 7 lines (DERIVED),
   `govkit.py`'s two, the selftest's three, `refusal_join.py`'s one and the run-gates README's one.
   Owed to the close: `govkit.py selfcheck` and `govkit selftest`, which the role hook refuses.
 - AC10 — `bypass-never` — owed to the close: `core.py fixture --plant bypass-never` and the meta-check

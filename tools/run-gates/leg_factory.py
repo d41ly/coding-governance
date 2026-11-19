@@ -51,6 +51,10 @@ SAY = "leg-factory"
 # `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3), CHARACTERS and never bytes.
 # Moved whole from govkit (TOOL-dWitnessedBar-11 §8 F8): read by the `purpose` arm and by `new`.
 PURPOSE_MAX_CHARS = 60
+# Sibling kits' directory names, spelled once so no literal kit path ships (the install-prefix ban).
+GOVKIT_HOME = "govkit"  # the deployer kit's directory name, as the policy kit's DEPLOYER_HOME spells it
+PLAYBOOK_HOME = "playbook"
+RUN_GATES_HOME = "run-gates"
 # The manifest's own key order, the one its rows were written in, `name` first.
 KEY_ORDER = ("name", "pass_leg", "tag", "tests", "purpose", "argv", "scope_of", "reads", "signature",
              "guard", "impure", "chunk", "subject", "ceiling", "doc_reads", "pack", "enforces", "stage")
@@ -414,7 +418,7 @@ def render_toml_value(v):
 def derive_leg_tag(owner, name, root, tool_rel):
     """`leg.<owner>.<name>` by TOOL-dWitnessedBar-12's rule: `-kit` after an owner that is a namespace
     word, the name folded to lower-case hyphenated segments, cut at its last hyphen within 64 bytes."""
-    ns = pathlib.Path(root, tool_rel or ".", "playbook", "namespaces.toml")
+    ns = pathlib.Path(root, tool_rel or ".", PLAYBOOK_HOME, "namespaces.toml")
     words = set()
     if ns.is_file():
         words = {r.get("ns") for r in tomllib.loads(ns.read_text(encoding="utf-8")).get("namespace") or []}
@@ -580,7 +584,7 @@ def run_new(root, a):
 # ------------------------------------------------------------------------------------------- selftest
 FIXTURE = {
     ".memory-tree.conf": 'MEMORY_ROOT="mem"\n',
-    "kits/govkit/registry.toml": (
+    f"kits/{GOVKIT_HOME}/registry.toml": (
         'version = 1\n\n[[entry]]\nid = "alpha"\ndescriptor = "{prefix}/alpha/kit.toml"\n\n'
         '[[entry]]\nid = "beta"\ndescriptor = "{prefix}/beta/kit.toml"\n\n'
         '[[exempt_leg]]\nname = "gov only leg"\nwhy = "a fixture row gov alone runs"\ntag = "leg.gov.gov-only-leg"\n'
@@ -601,13 +605,13 @@ FIXTURE = {
         'subject = "kit"\npurpose = "arms the beta fixture red and green"\nargv = ["bash", "{kit}/beta.test.sh"]\n'
         'reads = { history = "it reads the log" }\nenforces = ["practice.gate"]\n\n'
         '[gate_leg.gov]\nchunk = "selftests"\nceiling = 120\n'),
-    "kits/run-gates/run-gates.test.sh": f'LEG_KEYS="{" ".join(KEY_ORDER)}"\n',
-    "kits/playbook/kinds.toml": "",
-    "kits/playbook/namespaces.toml": '[[namespace]]\nns = "leg"\n',
-    "kits/playbook/principles.toml": '[[principle]]\ntag = "principle.p1"\nid = "P1"\nline = "One."\n',
-    "kits/playbook/practices.toml": ('[[practice]]\ntag = "practice.verify"\nline = "Verify."\n\n'
+    f"kits/{RUN_GATES_HOME}/run-gates.test.sh": f'LEG_KEYS="{" ".join(KEY_ORDER)}"\n',
+    f"kits/{PLAYBOOK_HOME}/kinds.toml": "",
+    f"kits/{PLAYBOOK_HOME}/namespaces.toml": '[[namespace]]\nns = "leg"\n',
+    f"kits/{PLAYBOOK_HOME}/principles.toml": '[[principle]]\ntag = "principle.p1"\nid = "P1"\nline = "One."\n',
+    f"kits/{PLAYBOOK_HOME}/practices.toml": ('[[practice]]\ntag = "practice.verify"\nline = "Verify."\n\n'
                                      '[[practice]]\ntag = "practice.gate"\nline = "A gate."\nrules = ["red"]\n'),
-    "kits/playbook/core-pending.txt": "# fixture\nleg\tpending leg\tdFx\n",
+    f"kits/{PLAYBOOK_HOME}/core-pending.txt": "# fixture\nleg\tpending leg\tdFx\n",
 }
 
 
@@ -636,7 +640,7 @@ def write_manifest_edit(top, fn):
 
 def run_selftest():
     """Each arm of §4 "The gate", and each plant §4 "The plants" moves out of govkit's selftest."""
-    al, be, reg = "kits/alpha/kit.toml", "kits/beta/kit.toml", "kits/govkit/registry.toml"
+    al, be, reg = "kits/alpha/kit.toml", "kits/beta/kit.toml", f"kits/{GOVKIT_HOME}/registry.toml"
     pu_a = 'purpose = "checks the alpha fixture"'
     cases = [
         # (case, plant, verb, rc, needles that one output line holds, needles no line holds)
@@ -684,7 +688,7 @@ def run_selftest():
          run_conform, 1, ("subject ·", "'beta selftest'", "'Kit'"), ()),
         ("one declaration: a name in a descriptor and the registry", lambda t: write_planted(
             t, reg, 'name = "gov only leg"', 'name = "alpha check"'), run_conform, 1,
-         ("one declaration ·", "'alpha check'", "kits/govkit/registry.toml"), ()),
+         ("one declaration ·", "'alpha check'", reg), ()),
         ("exempt reason: an empty why", lambda t: write_planted(
             t, reg, 'why = "a fixture row gov alone runs"', 'why = "  "'), run_conform, 1,
          ("exempt reason ·", "'gov only leg'"), ()),

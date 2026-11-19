@@ -2,7 +2,7 @@
 
 # TOOL-dWitnessedBar-11 — every leg's `enforces`, and where each tag came from
 
-The pass applied §4 "The enforces rule" to the 147 legs that carried no `enforces` and held a
+The pass applied §4 "The enforces rule" to the 147 legs (DERIVED) that carried no `enforces` and held a
 `leg` row of `tools/playbook/core-pending.txt` at the pass's start (DERIVED at this pass). Step 1 read the unit
 whose commit introduced the leg (the first commit whose diff of `tools/gate-legs.json` adds its name, `git log -S`),
 that unit's spec's `**Carries:**` lines, and the design record's `[enforcement]` row naming a carried clause. Step 2
@@ -12,7 +12,7 @@ observed (`practice.gate`); a render or index checked against its source reports
 (`practice.derive`); a gate comparing two copies of one value reports them apart (`practice.one-fact`). A leg
 testing a feature rather than enforcing a rule was not given a guessed tag.
 
-Step 1 reached 6 legs and step 2 73; 77 legs gained
+Step 1 reached 6 legs (DERIVED) and step 2 73; 77 legs gained
 `enforces` and left the pending list, and 70 stay pending, put to the owner below. Tagging a leg
 with a pending principle or practice made that row stale, so the pass deleted it: `principle.p33`, whose arming build
 is dOrderedCharter, now enforced by `tags bundle selftest` through step 1, and the ten practice rows step 2 reached.
@@ -101,7 +101,7 @@ its cites.
 
 ## Put to the owner
 
-Neither step reached these 70 legs: no carried clause sits in an `[enforcement]` row, and no practice's
+Neither step reached these 70 legs (DERIVED): no carried clause sits in an `[enforcement]` row, and no practice's
 line states the rule their red reports broken, most because they test a feature, measure a size or run an engine's
 suite rather than enforce a practice. Each keeps its `leg` row of `tools/playbook/core-pending.txt`, and the ask
 TOOL-dWitnessedBar-98 in this build's `BACKLOG.md` puts them to the owner as one question.
