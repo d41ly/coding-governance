@@ -16,12 +16,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Two builders stopped at divergences, committing nothing; their returns are
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-1-builder-return.md` and
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-2-builder-return.md`. The spec is now
-  rev-8 (`e55c79c07`): a fresh scaffold writes neither waiver home (§8 F11), and `gen_map.py`'s
-  `--list-empty-decisions` seeds `dossier-decisions-empty`, graded by `ratchet (both ways)` (§8 F10). Read the rev-8
+  rev-9: a fresh scaffold writes neither waiver home (§8 F11), and `map_diff.py`'s
+  `--list-empty-decisions` seeds `dossier-decisions-empty`, graded by `ratchet (both ways)` (§8 F10, F12). Read the rev-9
   spec whole; it is the contract.
 - The second builder saved its rev-7 work, untracked and outside the repository:
   `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit17-wip/tracked.patch`
-  (`git apply`) and its `untracked/` tree beside it. It is a head start, not the contract: rev-8 changes the
+  (`git apply`) and its `untracked/` tree beside it. It is a head start, not the contract: rev-8 and rev-9 change the
   scaffold, the empty-decisions seed and its grading, and `tools/govkit/steps/conf_pins_to_ledger.py` is missing
   from the saved tree, so write it from the spec.
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
