@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included
 
-**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

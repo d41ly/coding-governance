@@ -49,12 +49,22 @@ deleted on the origin with `update-ref -d`.
   `--preflight` verb itself is observed by the suite's arm, which needs the run fixture.
 
 **Owed at the close.** The `New arm:` line of section 7: the region-8 block `TOOL-dPlacedRequest-28`
-in `tools/unattended/unattended.test.sh`, 18 assertions (DERIVED), RED-first against the base
+in `tools/unattended/unattended.test.sh`, 21 assertions (DERIVED), RED-first against the base
 driver, whose offer and driver creates read no feed; the block carries its own staged RED for AC5 beside
-it. The suite is waived for this build's landing by README rule 8. The block's `--preflight` and
-`--resume` arms observe AC6 through the verbs, which no probe here ran.
+it. The suite is waived for this build's landing by README rule 8. The block's `--preflight` and two
+`--resume` arms observe AC6 through the verbs, which no probe here ran, and the floors rose by the same
+21 (DERIVED). Also owed: the suite's run-claim arms after the feed clearing below, which no probe ran.
 
 **The fixture's feed.** Every create now reads the clone's feed, and the suite's claim fixture kept one feed
 across every arm, so `remove_claim_refs` and the SU fixture's claims branch now clear the feed with the refs;
 an arm meaning a deletion outside the kit deletes the one ref with `update-ref -d` and keeps it.
 `seed_lease_at` takes `LF_CLONE` for the clone whose feed sights the commit.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 52 classes (DERIVED).
+Two needed a change. refusal-branch-with-no-arm: the `take-over` alternative of `write_claim`'s
+return-3 arm had no arm, so the block now calls the sourced take-over column to its check 107; and
+`verb_resume`'s two holder writes were edited where one arm reached one, so a second `--resume` under
+another session, whose lease is not current, reaches the other. amendment-leaves-its-other-half-standing:
+section 7's offer paragraph still called an offer over an absent lease a create at epoch 1, so it now
+reads the feed as every create does, rendered byte for byte. A probe observed the take-over column's
+check 107 (PINNED) and return 3 (PINNED).

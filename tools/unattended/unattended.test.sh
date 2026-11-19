@@ -20200,10 +20200,11 @@ if in_shard 8; then
 # claim fixture's tree: the driver's preflight create over a deleted `released` lease is parented on
 # the feed's commit at epoch 5 (AC5), a staged `write_claim` with the read cut building the parentless
 # epoch-1 commit, the RED it exists for; `--preflight` over a deleted tombstone fails check 107 and the
-# holder's `--resume` check 108 (AC6); the status column prints its one line, the beat column nothing,
-# and the settle names no retry. RED, observed at the close, is the base driver, whose offer and
-# driver creates read no feed. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK
-# DOES NOT DRIVE: `--take-over` over a feed tombstone, whose column shares the preflight's arm.
+# holder's `--resume` check 108 under its own session and another's, its two holder writes (AC6); the
+# sourced take-over column fails check 107, the status column prints its one line, the beat column
+# nothing, and the settle names no retry. RED, observed at the close, is the base driver, whose offer
+# and driver creates read no feed. Waived by README rule 8 with the rest of this suite. WHAT THIS
+# BLOCK DOES NOT DRIVE: the `--take-over` verb itself, whose column the sourced call reaches.
 # ==================================================================================================
 LF=$(mktemp -d); write_lease_fixture
 fr_t=$(seed_lease_at tFix/unit/TOOL-tFix-2 tFix unit b s-o landed "$(derive_claim_now)" 3)
@@ -20269,6 +20270,11 @@ fr_out=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/d
   done )
 same "DPR28 S2 the status column prints its one line and the beat nothing, each returning 3" \
   "$fr_out" "unattended: claim not written — tRun · $fr_why"$'\n'"rc 3;rc 3;"
+fr_out=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
+  read_claims strict >/dev/null 2>&1; check_claim_writable tRun take-over k1 s1 k1 >/dev/null 2>&1
+  write_claim tRun live k1 strict 2>&1; printf 'rc %s' "$?" )
+same "DPR28 S2 the take-over column fails check 107 over it, returning 3" "$fr_out" \
+  "UNATTENDED check 107 FAILED — this slug's lease is a tombstone in this node's feed, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written: tRun · tombstone · $fr_why"$'\n'"rc 3"
 fr_rel=$(mktemp); printf '## Run facts\n\nkeepalive: k1\nsession: s1\n' >"$fr_rel"
 fr_out=$( export CLAUDE_CODE_SESSION_ID=s1; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
   write_settle_claim tRun "$fr_rel" landed first 2>&1 )
@@ -20284,6 +20290,11 @@ out=$(run --resume tRun --keepalive-id k1); rc=$?
 same "DPR28 AC6 the holder's --resume over a deleted tombstone exits 1, the origin holding no tRun lease" \
   "$rc $(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "1 0"
 hit  "$out" "UNATTENDED check 108 FAILED — this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: tRun · tombstone · the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
+# ---- ...and under another session, whose lease is not current, the holder's other write: check 108.
+out=$(CLAUDE_CODE_SESSION_ID=s-other run --resume tRun --keepalive-id k1); rc=$?
+same "DPR28 AC6 the holder's --resume under another session exits 1, the origin holding no tRun lease" \
+  "$rc $(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "1 0"
+hit  "$out" "UNATTENDED check 108 FAILED — this run's lease is a tombstone in this node's feed"
 remove_claim_refs; reset_tree
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -22297,10 +22308,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RED-first observation is the close's.
 # RAISED 3755 -> 3763 by TOOL-dPlacedRequest-20's checklist pass: the offer block's 8 refusal and
 # window arms (3 `same`, 5 `hit`), off the diff's own lines; no skip branch. No suite ran.
-# RAISED 3763 -> 3781 by TOOL-dPlacedRequest-28: the feed-first create block's 18 region-eight
-# assertions (13 `same`, the AC5 loop's two among them, one per pass, and 5 `hit`), off the diff's own lines;
+# RAISED 3763 -> 3784 by TOOL-dPlacedRequest-28: the feed-first create block's 21 region-eight
+# assertions (15 `same`, the AC5 loop's two among them, one per pass, and 6 `hit`), off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3781
+FLOOR_ASSERTIONS=3784
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22558,8 +22569,8 @@ FLOOR_SHARD_7=311
 # RAISED 955 -> 968 by TOOL-dPlacedRequest-41: the same 13 region-eight offline chain assertions, see FLOOR_ASSERTIONS.
 # RAISED 968 -> 986 by TOOL-dPlacedRequest-20: the same 18 region-eight offer and cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 986 -> 994 by TOOL-dPlacedRequest-20's checklist pass: the same 8 region-eight refusal and window arms, see FLOOR_ASSERTIONS.
-# RAISED 994 -> 1012 by TOOL-dPlacedRequest-28: the same 18 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1012
+# RAISED 994 -> 1015 by TOOL-dPlacedRequest-28: the same 21 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1015
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

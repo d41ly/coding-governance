@@ -20158,6 +20158,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_feed_lease_tip",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_fenced_row",
       "kind": "function",
       "file": "tools/loop/adapt.py"

@@ -351,7 +351,9 @@ the tag must be a row of `fleet.toml` and the session half a legal one-segment n
 empty nor `absent`, either of which names no session; each miss exits 2. The act writes `released`
 with `offer` the target and `offer-deadline` the window `leases.offer-seconds` gives at the write, in
 seconds and never a timestamp, by compare-and-swap on the tip it read: over a `released` lease at its
-epoch, over an absent one as a create at epoch 1. It refuses a `live` or `held` lease `live-holder`
+epoch, over an absent one as a create, which reads the feed as every create does: refused
+`tombstone` over a feed tombstone, at the feed commit's epoch plus one over any other, and at epoch 1
+where the feed names the ref nowhere. It refuses a `live` or `held` lease `live-holder`
 and a terminal one `terminal`. In the `lease` column alone, tested before every other row, a record
 whose `offer` is neither `-` nor this node's tag, nor that tag, `/` and this harness's session (an
 unset, empty or `absent` session forms none), reads `offered` while this node first saw its tip at
