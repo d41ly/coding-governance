@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-21 — a fix pass that keeps its check: its allowance less the red leg's own files and the acceptance commands' own files
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 27 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 27 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0359@5c408077 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-21-1-spec-reviewer.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-21-1-spec-reviewer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -197,7 +198,7 @@ module as an engine file.
 
 ## 7. Gates
 
-`unattended kit gate` · `pass-order history` · `brief-recorded` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `pass-order history` · `brief-recorded` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 AC5 AC6 · each plant of §4 run through `fix_keeps.py --fixture`, staged red by deleting the keeps refusal from `verb_dispatch` and the `fix-of` read from `check_commit_message` · none
 
@@ -239,6 +240,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 AC4 AC5 AC6 · each p
   check" (`:291`, `:382`), at base `cdfbd1cf`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; the `**Carries:**` line re-pinned to `5c408077`, deviation 211's amended text, with §8 F4; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains the legs `scratch-guard self-test` and
+  `tier2-review self-test`, whose guards §4's `tools/unattended/unattended.sh` trips, as the
+  spec-token checker's guards join named them at `c6df3e901`, by the brief
+  `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
+  that path; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -28,6 +28,7 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -283,8 +284,8 @@ catalogue default at R, `own-only`, which v2 chose (walk T1) and the step's `lan
 ## 6. Acceptance criteria
 
 - **AC1** — When
-  `bash -c '. lib-verdict.sh; for v in own-only own-mixed-contended every-red bogus; do for c in OWN MIXED CONTENDED INHERITED "DEAD PROBE" -; do printf "%s " "$(derive_red_blocks "$v" "$c")"; done; echo; done'`
-  runs in `tools/run-gates/`, it prints the four rows of §4's table, the `bogus` row equal to
+  `bash -c 'KITDIR=tools/run-gates; . "$KITDIR/lib-verdict.sh"; for v in own-only own-mixed-contended every-red bogus; do for c in OWN MIXED CONTENDED INHERITED "DEAD PROBE" -; do printf "%s " "$(derive_red_blocks "$v" "$c")"; done; echo; done'`
+  runs at the root, it prints the four rows of §4's table, the `bogus` row equal to
   `every-red`'s.
   Red when: `MIXED` passes under `own-mixed-contended`, or `DEAD PROBE` passes under any value.
 - **AC2** — When the runner's attribution pass runs over the fixture bar of §7's `run-gates canary`
@@ -324,7 +325,7 @@ catalogue default at R, `own-only`, which v2 chose (walk T1) and the step's `lan
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates evidence` · `pre-push self-test` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates evidence` · `pre-push self-test` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC2 · a fixture bar with one red leg attributed INHERITED under `GATE_VERDICT_BLOCKS` every-red, its row reading `block`, then a staged edit of `lib-verdict.sh` against R reading the red OWN by KF3 · none
 New arm: .githooks/pre-push.test.sh · covers AC4 · a planted push whose bar is red on one MIXED leg, refused under own-mixed-contended and admitted under own-only, the value read at R · none
@@ -390,6 +391,12 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
 - rev-4 · 2026-11-05 · §3 Edges · §4 The routes · AC5 · §8 F6 · F6 RESOLVED (owner) to (a), by the
   brief `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: `judge` runs `loop_lib.py items
   --tag`, the ask this build run files in dDeclaredLoop's `BACKLOG.md`; nothing else moved.
+- rev-5 · 2026-11-19 · §7 · AC1 · the leg line gains `scratch-guard self-test`, `routed-commits selftest`,
+  `tier2-review self-test` and `policy fixtures`, whose manifest guards hold the §4 paths
+  `tools/unattended/unattended.sh`, `tools/policy/legacy-homes.txt` and `tools/govkit/govkit.py`; and AC1,
+  run from the root, sources the new library through `$KITDIR` as `run-gates.sh:5097` sources its own, in
+  place of the bare name, which resolved against the working directory; per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

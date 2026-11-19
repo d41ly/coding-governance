@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-26 — one bash resolver in `tools/lib` with its JavaScript twin
 
-**Status:** INPROGRESS · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 1 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 1 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0364@2fbc8cf5 whole
 
@@ -15,7 +15,9 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-26-deviation-261.md](../build/2026-10-25-build-TOOL-dWitnessedBar-26-deviation-261.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-26-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-26-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-26-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-26-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-26-spec-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-26-spec-fix-brief.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -27,14 +29,19 @@ govkit's `resolve_bash` and keeping both their contracts, the only way a gov Pyt
 file finds a bash, so that no site can reach WSL's launcher through a bare `bash` or a PATH-only
 loop. Today eleven Python resolvers and one
 JavaScript spawn each spell their own rule, and three of them fall back to the bare name, which
-Windows resolves to System32's WSL launcher (gap-tool-20, AP-33).
+Windows resolves to System32's WSL launcher (gap-tool-20, AP-33). Since the base, the S28 block
+`tools/lib/resolve_bash.py#resolve_bash`, its three inline copies and
+`tools/policy/policy-mirror.js#resolveBash` have joined them, each ending in the bare `"bash"` candidate.
 
 ## 2. Scope (IN)
 
 - **S1** — The canonical Python block `# >>> resolve_bash_py` in `tools/lib/resolve_bash.py`: one
   function `resolve_bash(script="", host="")` returning `(found, tried, refusal)`, with the candidate
-  order and the acceptance rule of §4 "The rule". If TOOL-dGroundRules-25 S28 has landed the file,
-  its block is rewritten in place to this rule (§8 F1). Observed by AC1, AC2, AC3 and AC4.
+  order and the acceptance rule of §4 "The rule". TOOL-dGroundRules-25 S28 landed the file, its block
+  `resolve_bash(script)` returning a path or `None` in profile_bar's order
+  (`tools/lib/resolve_bash.py@da90b6e8:14`), so that block is rewritten in place to this rule (§8 F1).
+  The block also holds the tuple `BASH_NAMES`, the names step 3 tries in each PATH directory (§8 F5).
+  Observed by AC1, AC2, AC3 and AC4.
 - **S2** — The JavaScript twin, block `// >>> resolve_bash_js` in `tools/lib/resolve_bash.js`: one
   function `resolveBash({script, host})` returning `{found, tried, refusal}` under the same rule.
   Observed by AC5.
@@ -43,9 +50,12 @@ Windows resolves to System32's WSL launcher (gap-tool-20, AP-33).
   candidate, exit 0, or the refusal line and exit 2. Observed by AC1, AC2, AC3 and AC5.
 - **S4** — `tools/lib/resolve-python.test.sh` gains the rows `resolve_bash_py` and `resolve_bash_js`
   in `PARITY_ROWS`; its block extractor `blk` and its population grep read a `// >>> ` marker and
-  `*.js` files beside `# >>> ` and `*.sh`, `*.py`; a section `2j` runs both canonicals over one
-  truth table. Observed by AC6.
-- **S5** — Every site the query of S6 finds carries the `resolve_bash_py` (or `resolve_bash_js`)
+  `*.js` files beside `# >>> ` and `*.sh`, `*.py`; section `2j`, today TOOL-dGroundRules-82's arm
+  holding the canonical and `policy-mirror.js`'s `resolveBash` to the old order with its bare tail
+  (`tools/lib/resolve-python.test.sh@4f82d15f:724`), is rewritten in place to run both canonicals over
+  one truth table. Observed by AC6.
+- **S5** — Every site the query of S6 finds, every inline copy of the S28 block and
+  `tools/policy/policy-mirror.js#resolveBash` carries the `resolve_bash_py` (or `resolve_bash_js`)
   block inline and keeps its own name and failure contract as a thin adapter, per §4 "The sites".
   No adapter returns, spawns or argv-substitutes a bare `bash`. Observed by AC7 and AC8.
 - **S6** — The query is the arm: `test_no_bare_bash_argv` in `tools/run-gates/measure_legs.py` is
@@ -66,8 +76,10 @@ Windows resolves to System32's WSL launcher (gap-tool-20, AP-33).
 - Cygwin's bash on a Windows host: `uname -s` answering `CYGWIN` is refused, as the clause names only
   MINGW and MSYS (§8 F3). `tools/process-monitor/selftest.py`'s `resolve_launcher` admits it today.
 - The resolver's interpreter floor: dSafePassage's (TOOL-dSafePassage-11), per cl-0362.
-- Moving govkit's `resolve_bash` into `tools/govkit/upgrade_steps.py`: TOOL-dSafePassage-35 S24's.
-  This unit edits the function wherever it sits at the build run's base.
+- Moving govkit's `resolve_bash` into `tools/govkit/upgrade_steps.py`: TOOL-dSafePassage-35 S24's,
+  landed. `tools/govkit/upgrade_steps.py#resolve_bash` and `#resolve_shell_argv` hold both, and
+  `tools/govkit/govkit.py@cf818f88:146` binds each back by name, so this unit edits `upgrade_steps.py`
+  and leaves `govkit.py` as it is.
 - The deferred ask `TOOL-dSettledRoster-6` ("three resolve_bash copies"): this unit's landing answers
   it, and its disposition is the main loop's to file.
 - A row argv that names `bash` as data, such as `tools/run-gates/held_halves.py:129`'s WSL shim leg
@@ -80,8 +92,8 @@ Windows resolves to System32's WSL launcher (gap-tool-20, AP-33).
 - **hands-off** `TOOL-dWitnessedBar-27` — the `resolve_bash_py` block and its `resolve_bash_js` twin,
   into which unit 27 adds the wrong-shell predicate's call
 - **consumes-from** external — TOOL-dGroundRules-25 S28's `tools/lib/resolve_bash.py` and its inline
-  copy in `tools/policy/check_policy.py` where that build has landed them; absent, this unit creates
-  the file and the policy copy joins as data when dGroundRules lands
+  copies in `tools/policy/check_policy.py`, `tools/loop/loop_witness.py` and
+  `tools/playbook/render_playbook.py`, all landed before this unit's build
 - **hands-off** `TOOL-dWitnessedBar-48` — the `resolve_bash_py` block and `scan_bare_bash`, which unit 48 gives the row-grammar site and a wider shape 2 (id 27)
 - **hands-off** `TOOL-dWitnessedBar-49` — the `resolve_bash_py` block and `scan_bare_bash`, which unit 49 gives the memory-recall selftest site and a fourth shape (id 49)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 23, 42 and 43: shape 2's pinned count, and `resolve_shell_argv`'s nine callers once it raises, each a scope item of that unit
@@ -118,24 +130,30 @@ line and the remedy `set GOV_BASH to Git's bash`; the block never returns a bare
 
 ### The sites
 
-The query of S6 found these at `3f2b31b5` (scout C's table), each verified at `cdfbd1cf`:
+The query of S6 found these at `3f2b31b5` (scout C's table), each verified at `cdfbd1cf` and again at
+`c6df3e90`, where a moved line is cited blob-pinned; the S28 copies and the policy kit's JavaScript
+resolver, which the query does not find, are the last four rows:
 
 | Site | Today | Adapter contract kept |
 |---|---|---|
 | `tools/run-gates/profile_bar.py:282` `resolve_bash(script)` | candidates end in a bare `"bash"` | `(found, tried)`, `""` on refusal |
 | `tools/run-gates/regen.py:232` `resolve_bash(probe)` | delegates to profile_bar | unchanged, delegates |
-| `tools/govkit/govkit.py:1144` `resolve_bash()`, loop `:1185` | PATH only | memo `_BASH`, `Refusal(refusal)` |
-| `tools/govkit/govkit.py:1200` `resolve_shell_argv` | returns the bare argv on `Refusal` | raises `Refusal` (S7) |
-| `tools/memory-tree/corpus_ids.py:390`, loop `:421` | PATH only | `Problem(refusal)` |
+| `tools/govkit/upgrade_steps.py#resolve_bash`, loop `@89c3c58a:410` | PATH only | memo `_BASH`, `Refusal(refusal)` |
+| `tools/govkit/upgrade_steps.py#resolve_shell_argv` | returns the bare argv on `Refusal` | raises `Refusal` (S7) |
+| `tools/memory-tree/corpus_ids.py#resolve_bash`, loop `@b773508f:382` | PATH only | `Problem(refusal)` |
 | `tools/lexicon/selftest.py:49`, loop `:65` | PATH only, `test -f` probe | exit 2 naming the refusal, `script` its own file |
 | `tools/branch-reconcile/selftest.py:1037`, loop `:1041` | falls back to `"bash"` | exit 2 naming the refusal |
-| `tools/runlog/selftest.py:8092`, loop `:8100` | PATH only | `None`, memoised |
-| `tools/roles/handoff.py:225`, loop `:233` | existence only, no run | `None` |
+| `tools/runlog/selftest.py#resolve_bash`, loop `@642ae798:8124` | PATH only | `None`, memoised |
+| `tools/roles/handoff.py#resolve_bash`, loop `@12ca1202:319` | existence only, no run | `None` |
 | `tools/settings-merge.py:925`, loop `:932` | nested function, PATH only | `None` |
-| `tools/drift-audit/selftest.py:4328` `resolve_bash_shell` | tries a bare `bash` then `sh` | canonical first, then its own `[[ ]]` feature probe on the found bash; `None` |
+| `tools/drift-audit/selftest.py#resolve_bash_shell` | tries a bare `bash` then `sh` | canonical first, then its own `[[ ]]` feature probe on the found bash; `None` |
 | `tools/process-monitor/selftest.py:1133` `resolve_launcher` | bare `bash` first, accepts `CYGWIN` | `(found or None, tried)` |
-| `tools/unattended/stop-guard.js:111` `spawnSync('bash', …)` | the bare name | `resolveBash()`; a refusal is `ok: false`, the path a spawn error takes today |
-| `tools/policy/check_policy.py` (TOOL-dGroundRules-21 S14) | its S28 copy | as that unit writes it |
+| `tools/unattended/stop-guard.js@fce3251b:123` `spawnSync('bash', …)` | the bare name | `resolveBash()`; a refusal is `ok: false`, the path a spawn error takes today |
+| `tools/govkit/selftest.py@4b301417:4887` and `:4895`, the dSP-87 fixture's name loops; `:5910`, a `["bash", …]` launch | shape 2 and shape 1 hits, landed after the base | `:5910` launches through `govkit_module().resolve_bash()`, as `:3043` does; the two loops read `us.BASH_NAMES` (§8 F5) |
+| `tools/policy/check_policy.py@7427c61b:913`, its five calls `:946`, `:1296`, `:2259`, `:3344`, `:4781` | the S28 copy; `run_case_argv` at `:3344` falls back to the bare `"bash"` | the copy follows the canonical through its parity row; each call reads `found`, `None` where it is empty; `run_case_argv` returns `(None, <refusal>)`, the shape its `OSError` branch returns |
+| `tools/loop/loop_witness.py@5cb3abf1:106`, its calls `:243`, `:587`, `:694` | the S28 copy | the copy follows the canonical; each call reads `found`, `None` where it is empty |
+| `tools/playbook/render_playbook.py@34871ed5:138`, its call `:3446` | the S28 copy | the copy follows the canonical; the call reads `found`, `None` where it is empty |
+| `tools/policy/policy-mirror.js#resolveBash` | every PATH bash, Git's two paths, then the bare `"bash"`; memo `BASH` | carries the `resolve_bash_js` block; the memo stays, `null` on refusal, which `runShim` turns into its `PolicyRefusal` as today |
 
 The seven loops over `bash.exe` and `bash` are the govkit, corpus_ids, lexicon, branch-reconcile,
 runlog, handoff and settings-merge rows. A memo stays in the adapter, never in the block, so the
@@ -155,12 +173,15 @@ block is a pure function the truth table can call twice.
 `test_no_bare_bash_argv` asserts the list is empty and that at least one file of each language was
 read, so an empty population cannot pass. At `cdfbd1cf` shapes 1 and 3 find `stop-guard.js:111`
 only and shape 2 the seven loops (PINNED, measured 2026-10-25 with an `ast` probe over 150 tracked
-`*.py`); the arm re-derives them at every run.
+`*.py`); the arm re-derives them at every run. At `c6df3e90` the same probe also finds
+`tools/govkit/selftest.py@4b301417:4887` and `:4895` (shape 2) and `:5910` (shape 1), arms landed after
+the base, which §4 "The sites" lists (PINNED, measured 2026-11-19 over 278 tracked `*.py` and `*.js`).
 
 ### Inventory
 
 Minted: `tools/lib/resolve_bash.py`, `tools/lib/resolve_bash.js`, the blocks `resolve_bash_py` and
-`resolve_bash_js`, `resolveBash`, `scan_bare_bash`, the `PARITY_ROWS` rows, section `2j`. Naming
+`resolve_bash_js`, `resolveBash`, `BASH_NAMES`, `scan_bare_bash`, the `PARITY_ROWS` rows. Section `2j`
+is TOOL-dGroundRules-82's, rewritten, not minted. Naming
 cells: `scan_bare_bash` is asked of the lexicon's `--suggest` under `--as py.function`, and
 `resolveBash` under `--as js.function`, at the pass.
 
@@ -171,14 +192,15 @@ only bash was reached through the bare-name fall-back now refuses, which is the 
 
 ### Files touched (estimate)
 
-- `tools/lib/resolve_bash.py` (new, or rewritten if TOOL-dGroundRules-25 landed it)
+- `tools/lib/resolve_bash.py` (rewritten: TOOL-dGroundRules-25 S28 landed it)
 - `tools/lib/resolve_bash.js` (new)
 - `tools/lib/resolve-python.test.sh`
 - `tools/run-gates/profile_bar.py`
 - `tools/run-gates/regen.py`
 - `tools/run-gates/measure_legs.py`
-- `tools/govkit/govkit.py`
-- `tools/govkit/upgrade_steps.py` (where TOOL-dSafePassage-35 S24 moved the resolver)
+- `tools/govkit/upgrade_steps.py` (TOOL-dSafePassage-35 S24 moved the resolver here; `govkit.py` only
+  binds it back by name, so this unit does not write `govkit.py`)
+- `tools/govkit/selftest.py` (the query's hits there, and the dSP-94 arm S7 inverts)
 - `tools/memory-tree/corpus_ids.py`
 - `tools/lexicon/selftest.py`
 - `tools/branch-reconcile/selftest.py`
@@ -188,7 +210,10 @@ only bash was reached through the bare-name fall-back now refuses, which is the 
 - `tools/drift-audit/selftest.py`
 - `tools/process-monitor/selftest.py`
 - `tools/unattended/stop-guard.js`
-- `tools/policy/check_policy.py` (where dGroundRules landed it)
+- `tools/policy/check_policy.py` (the S28 copy and its calls)
+- `tools/policy/policy-mirror.js`
+- `tools/loop/loop_witness.py` (an S28 copy)
+- `tools/playbook/render_playbook.py` (an S28 copy)
 - `memory/gotchas/subprocess-resolves-a-different-shell.md`
 
 ### Alternatives rejected
@@ -240,9 +265,9 @@ only bash was reached through the bare-name fall-back now refuses, which is the 
   code equal `python resolve_bash.py`'s under the same staging, line for line.
   Red when: the twin orders, refuses or reports differently.
 - **AC6** — When the `resolve_bash_py` block is cut from `resolve_bash.py` and from
-  `tools/govkit/govkit.py` with the parity arm's `blk` awk range, and the `resolve_bash_js` block
-  from `resolve_bash.js` and `tools/unattended/stop-guard.js`, each pair is identical; with one byte
-  changed in either copy, the pair differs.
+  `tools/govkit/upgrade_steps.py` with the parity arm's `blk` awk range, and the `resolve_bash_js` block
+  from `resolve_bash.js`, `tools/unattended/stop-guard.js` and `tools/policy/policy-mirror.js`, each pair
+  is identical; with one byte changed in either copy, the pair differs.
   Red when: the extractor ignores the `// >>> ` marker, so the JavaScript copy is never compared.
 - **AC7** — When `scan_bare_bash` is called from `measure_legs.py` (imported with `tools/run-gates`
   on `sys.path`) with the repository root at the pass tip, it returns `[]`; with the root of a fixture
@@ -256,7 +281,7 @@ only bash was reached through the bare-name fall-back now refuses, which is the 
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `profile-bar selftest` · `corpus-ids selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `lexicon selftest` · `codebase-map kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `run-gates run-log line` · `pre-push run-log line` · `drift-audit selftest` · `process-monitor census selftest` · `settings-merge selftest` · `memory hygiene`
+`python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `profile-bar selftest` · `corpus-ids selftest` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `lexicon selftest` · `codebase-map kit selftest` · `branch-reconcile selftest` · `runlog selftest` · `run-gates run-log line` · `pre-push run-log line` · `drift-audit selftest` · `process-monitor census selftest` · `settings-merge selftest` · `memory hygiene` · `scratch-guard self-test` · `routed-commits selftest` · `playbook render selftest` · `policy fixtures`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `resolve_bash_py` and `resolve_bash_js` parity rows and section `2j`'s truth table, staged by one byte changed in the stop guard's copy and by the probe's `uname -s` test cut from the canonical · that suite's assertion count, raised by the rows
 New arm: tools/run-gates/measure_legs.py · covers AC7 · `test_no_bare_bash_argv` widened through `scan_bare_bash`, staged by a planted `spawnSync('bash', …)` in a tracked `.js` · none
@@ -286,6 +311,13 @@ New arm: tools/govkit/selftest.py · covers AC8 · the existing `GOV_BASH` refus
   exists. Liveness: on a POSIX git the path is `/usr/lib/git-core` and the derived file is absent, so
   the probe yields a negative. RESOLVED (agent, 2026-10-25, delegated): the third parent, rung 2.
   widens: none · relaxes: none
+- **F5 — How do the dSP-87 fixture's two name loops in `tools/govkit/selftest.py`, which plant and
+  filter `bash` and `bash.exe` as data, leave the S6 query's shape 2?** Options: (a) the block holds its
+  PATH names once, as `BASH_NAMES`, and the fixture reads `us.BASH_NAMES` off the step module, so it
+  plants exactly the names the resolver searches; (b) a per-line waiver comment the scan skips; (c) the
+  pair respelled so `ast` does not read it as one literal. (b) is an exemption a real resolver loop
+  could carry too, and (c) uses the query's blind spot on purpose. RESOLVED (agent, 2026-11-19,
+  delegated): (a), rung 3, tie-broken by one fact in one place. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -296,11 +328,19 @@ New arm: tools/govkit/selftest.py · covers AC8 · the existing `GOV_BASH` refus
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
+- rev-4 · 2026-11-19 · §1 §2 §3 §4 §6 §7 §8 §10 · re-grounded at `c6df3e90` for the run's refused
+  dispatch, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-26-spec-fix-brief: S1 settles F1's rewrite
+  of the landed S28 block; S4 rewrites the existing section `2j`; S5, the sites table and Files touched
+  gain the S28 copies in `check_policy.py`, `loop_witness.py` and `render_playbook.py`,
+  `policy-mirror.js`'s `resolveBash` and the query's new hits in `tools/govkit/selftest.py` (F5);
+  govkit's resolver is cited in `upgrade_steps.py` and `govkit.py` leaves Files touched, as it only
+  binds the names back; AC6 cuts the block from `upgrade_steps.py` and `policy-mirror.js`; the §7 leg
+  line gains the legs those paths' guards name.
 
 ## 10. Reuse audit
 
 The seam extended is the execution-based pair the clause names: `tools/run-gates/profile_bar.py:282`
-and `tools/govkit/govkit.py:1144`, plus the Git-derived and `uname -s` precedent at
+and `tools/govkit/govkit.py:1144` (at `c6df3e90`, `tools/govkit/upgrade_steps.py#resolve_bash`), plus the Git-derived and `uname -s` precedent at
 `tools/process-monitor/selftest.py:1133`, folded into the inline-block mechanism `PARITY_ROWS` of
 `tools/lib/resolve-python.test.sh:168-184`, which already holds two-language canonical pairs
 (`remote_ladder_py` and `remote_ladder_sh`). The lookup,

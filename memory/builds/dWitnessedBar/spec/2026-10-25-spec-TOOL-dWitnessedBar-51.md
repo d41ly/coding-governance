@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -21,6 +21,8 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-56 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 |
 
 <!-- /gen:spec-records -->
@@ -505,7 +507,7 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `run-gates canary` · `run-gates evidence` · `measure-legs selftest` · `pre-push self-test` · `push-main self-test` · `drift-audit selftest` · `runlog selftest` · `codebase-map kit selftest` · `codebase-map adopter e2e` · `dead-path carriers (deleted files still named)` · `check-arms selftest` · `harness arms (fail branches armed or pinned)` · `python resolver (behaviour + inline parity + idiom ban)` · `row-keyed merge driver replay` · `unattended protocol size` · `charter size` · `playbook render wiring` · `govkit selftest` · `govkit selfcheck` · `shell-hygiene selftest` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `codebase-map gate coverage` · `govkit acceptance matrix` · `playbook render selftest` · `run-gates gov canary` · `transition-audit arms` · `straggler-guard arms` · `govkit refusal join` · `run-selftests self-test` · `pre-push run-log line` · `run-gates run-log line`
+`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `run-gates canary` · `run-gates evidence` · `measure-legs selftest` · `pre-push self-test` · `push-main self-test` · `drift-audit selftest` · `runlog selftest` · `codebase-map kit selftest` · `codebase-map adopter e2e` · `dead-path carriers (deleted files still named)` · `check-arms selftest` · `harness arms (fail branches armed or pinned)` · `python resolver (behaviour + inline parity + idiom ban)` · `row-keyed merge driver replay` · `unattended protocol size` · `charter size` · `playbook render wiring` · `govkit selftest` · `govkit selfcheck` · `shell-hygiene selftest` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `codebase-map gate coverage` · `govkit acceptance matrix` · `playbook render selftest` · `run-gates gov canary` · `transition-audit arms` · `straggler-guard arms` · `govkit refusal join` · `run-selftests self-test` · `pre-push run-log line` · `run-gates run-log line` · `branch-guard self-test` · `policy fixtures` · `scratch-guard self-test` · `tier2-review self-test`
 
 The unattended kit's own suites are waived for this build's landing (README rule), so AC12 and AC18
 observe S15's driver call and S22's commit.
@@ -550,6 +552,10 @@ New arm: tools/run-gates/keep_tails.py · covers AC30 · a tail holding a fence,
 - rev-4 · 2026-10-26 · S7 · AC4 · re-grounded by
   `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 100: the two records serve
   as their own kinds, not `journal`.
+- rev-5 · 2026-11-19 · §7 · the leg line gains `branch-guard self-test`, `policy fixtures`,
+  `scratch-guard self-test` and `tier2-review self-test`, whose manifest guards hold the §4 paths
+  `tools/memory-tree/check-memory-hygiene.sh`, `AGENTS.md` and `tools/unattended/unattended.sh`, per
+  brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

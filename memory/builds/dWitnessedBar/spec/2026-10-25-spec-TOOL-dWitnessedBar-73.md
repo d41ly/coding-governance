@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-73 — the round-1 audit of units 66 and 67, its 23 minors batched: fixtures, populations, the hook guard, every key and filesystem call exercised, predicates and records
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-73-deviation-731.md](../build/2026-10-25-build-TOOL-dWitnessedBar-73-deviation-731.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-73-deviation-732.md](../build/2026-10-25-build-TOOL-dWitnessedBar-73-deviation-732.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md) | research | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-68-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-68-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 |
 
 <!-- /gen:spec-records -->
@@ -385,7 +386,7 @@ S3, S16, S18, S20 and S21 are answered in other units' ledgers at the close.
 
 ## 7. Gates
 
-`run-gates gov canary` · `run-gates canary` · `measure-legs selftest` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `install-prefix (shipped surface)` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest` · `memory-hygiene self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` · `drift-audit selftest` · `memory hygiene`
+`run-gates gov canary` · `run-gates canary` · `measure-legs selftest` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `install-prefix (shipped surface)` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest` · `memory-hygiene self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` · `drift-audit selftest` · `policy fixtures` · `memory hygiene`
 
 `run-gates canary` is S17's, the leg that grades `regen.py`. `install-prefix (shipped surface)` is
 S8's, and it has no guard, so it runs on every bar. Every leg here whose subject is `kit` or whose
@@ -428,6 +429,9 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC4 AC5 AC11 AC21 ·
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-82, TOOL-dWitnessedBar-83 and TOOL-dWitnessedBar-84, promoted by the
   round-1 spec audit of units 74 to 78; nothing else moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
+  moved.
 
 ## 10. Reuse audit
 

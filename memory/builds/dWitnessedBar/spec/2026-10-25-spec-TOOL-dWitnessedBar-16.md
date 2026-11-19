@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -378,8 +379,9 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   fixture: a scratch adopter under `%TEMP%/<short-name>` holding a copy of today's file.
 - **AC11** — When `python tools/run-gates/owed_rows.py --selftest` runs on the landed tree after the
   rename, it exits 0; and when a scratch clone removes from `tools/gate-legs.json` a leg whose name
-  `memory/map/baseline.txt` still lists and runs `python tools/run-gates/owed_rows.py --base HEAD`, it
-  exits 1 printing an `owed —` line naming `memory/map/baseline.txt` and the leg.
+  the renamed map baseline (S6's `baseline.txt` in `memory/map/`) still lists and runs
+  `python tools/run-gates/owed_rows.py --base HEAD`, it exits 1 printing an `owed —` line naming that
+  renamed file and the leg.
   Red when: the probe still reads the TOML name, so a removed leg's leftover baseline row owes nothing.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
 
@@ -388,7 +390,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 The `ratchet` pack's legs (unit 14) grade every converted population at the close; they are not on
 the leg line below, which the leg join reads against today's manifest.
 
-`memory hygiene` · `memory-hygiene self-test` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `playbook render selftest` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PINS and BASELINES fixtures re-pointed to registrations and the two populations, the failing case staged by a raised `drift-pins` row and a gained `drift-baselines` id · none
 
@@ -447,6 +449,11 @@ New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PIN
   `tools/run-gates/owed_rows.py`, whose leg-removed population names `memory/map/baseline.toml`
   (PLAY-dOrderedCharter-50 S2), and AC11 runs its `--selftest` and a leg-removed probe after the rename;
   the leg line gains `run-gates canary`, the leg that runs the probe's self-test; no fork moved.
+- rev-5 · 2026-11-19 · §6 AC11 · §7 · AC11 names the renamed map baseline in words, since the path S6
+  mints is untracked until the pass; the leg line gains `branch-guard self-test` and
+  `playbook render selftest`, whose manifest guards hold the §4 paths
+  `tools/memory-tree/check-memory-hygiene.sh` and `tools/lexicon/lexicon-suffix-waivers.txt`, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

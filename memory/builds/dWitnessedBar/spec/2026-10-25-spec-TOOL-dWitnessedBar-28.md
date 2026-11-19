@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0366@337938da whole
 
@@ -22,6 +22,7 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 |
 
 <!-- /gen:spec-records -->
@@ -363,7 +364,7 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `run-gates wiring` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `run-gates wiring` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC11 AC13 AC14 AC15 · each plant of §4 through `leg_factory.py --fixture`, staged red by removing the fixed-row check, the restored-leg line and the seen-red count · none
 New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule plants re-pointed at the composition, staged red by restoring the drift refusal · none
@@ -457,6 +458,10 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   the brief `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: the drift verb governs and a
   refused overlay row is held alone, each an ask filed in dOrderedCharter's `BACKLOG.md`; nothing
   else moved.
+- rev-5 · 2026-11-19 · §7 · the leg line gains the leg `policy fixtures`, whose guard §4's
+  `tools/playbook/row_checks.py` trips, as the spec-token checker's guards join named it at
+  `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
+  unchanged, as the unit writes that path; nothing else moved.
 
 ## 10. Reuse audit
 

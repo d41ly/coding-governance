@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-46 — what an adopter receives of the ratchet pack: the scalar-pin leg over its own seeded pins, and the rest kept gov's
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-46-deviation-461.md](../build/2026-10-25-build-TOOL-dWitnessedBar-46-deviation-461.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-46-deviation-462.md](../build/2026-10-25-build-TOOL-dWitnessedBar-46-deviation-462.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-54 |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-51 |
 
 <!-- /gen:spec-records -->
@@ -164,7 +165,7 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `govkit selftest` · `govkit acceptance matrix` · `run-gates canary` · `measure-legs selftest` · `recall floor arms` · `govkit refusal join` · `run-gates gov canary`
+`memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `policy fixtures` · `govkit selftest` · `govkit acceptance matrix` · `run-gates canary` · `measure-legs selftest` · `recall floor arms` · `govkit refusal join` · `run-gates gov canary`
 
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 · the scaffold arm runs `keys-not-scalar` over the example-made tree and then with its home removed, staged red by dropping the adopter's seed call · none
 
@@ -190,6 +191,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 · the
   TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units 40 to 51; nothing else moved.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `branch-guard self-test` and `policy fixtures`, whose
+  manifest guards hold the §4 paths `tools/memory-tree/check-memory-hygiene.sh` and
+  `tools/memory-tree/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
+  nothing else moved.
 
 ## 10. Reuse audit
 

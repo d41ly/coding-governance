@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-27 — a wrong-shell refusal at every entry point
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0365@47113ea2 whole
 
@@ -13,6 +13,8 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-27-deviation-271.md](../build/2026-10-25-build-TOOL-dWitnessedBar-27-deviation-271.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -283,7 +285,7 @@ Live at landing in every entry point. No switch: the refusal fires only on the d
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `spawn budget (forks per hot entrypoint)` · `agent-cap self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `format-guard self-test` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon naming predicates` · `lexicon selftest` · `line-length gate selftest` · `manifest-check self-test` · `measure-legs selftest` · `playbook parity selftest` · `pre-push run-log line` · `process-monitor adopter selftest` · `process-monitor census selftest` · `pytest-guardrails self-test` · `recall floor arms` · `review-join self-test` · `run-gates run-log line` · `run-selftests self-test` · `runlog selftest` · `scratch-guard self-test` · `straggler-guard arms` · `tier2-review self-test` · `transition-audit arms` · `unattended-build self-test` · `verifier fan-out self-test` · `run-gates canary` · `memory hygiene`
+`python resolver (behaviour + inline parity + idiom ban)` · `spawn budget (forks per hot entrypoint)` · `agent-cap self-test` · `branch-guard self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `format-guard self-test` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon naming predicates` · `lexicon selftest` · `line-length gate selftest` · `manifest-check self-test` · `measure-legs selftest` · `playbook parity selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `process-monitor adopter selftest` · `process-monitor census selftest` · `pytest-guardrails self-test` · `recall floor arms` · `review-join self-test` · `routed-commits selftest` · `run-gates run-log line` · `run-selftests self-test` · `runlog selftest` · `scratch-guard self-test` · `straggler-guard arms` · `tier2-review self-test` · `transition-audit arms` · `unattended-build self-test` · `verifier fan-out self-test` · `run-gates canary` · `memory hygiene`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC5 AC7 · the `refuse_wrong_shell` parity row, the both-ways coverage arm and section `2k`, staged by one member's call cut and by the drive-letter test cut from the Python twin · that suite's assertion count, raised by the arms
 
@@ -311,6 +313,11 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 AC7 · the `refuse_wrong
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `branch-guard self-test`, `playbook render selftest`,
+  `policy fixtures` and `routed-commits selftest`, whose manifest guards hold the §4 paths
+  `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/corpus_ids.py`, `tools/govkit/govkit.py`
+  and `tools/policy/check_policy.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
+  nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-67 — the round-1 audit of units 64 and 65, its 19 minors batched: fixtures git cannot reshape, seed routes and probes that are bounded and stated, sweeps and readers that keep every case, and arms graded on the tree they build on
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-66-round6-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-66-round6-fix-return.md) | research | TOOL-dWitnessedBar-66 |
 | [2026-10-25-build-TOOL-dWitnessedBar-67-deviation-671.md](../build/2026-10-25-build-TOOL-dWitnessedBar-67-deviation-671.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md) | research | TOOL-dWitnessedBar-66 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-66 |
 
 <!-- /gen:spec-records -->
@@ -344,7 +345,7 @@ S5 is this spec's gate set, and S14 is observed by the main loop at the close.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `routed-commits selftest` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates gov canary` · `run-gates evidence` · `run-gates run-log line` · `pre-push run-log line` · `pre-push self-test` · `memory-hygiene self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` · `drift-audit selftest` · `memory hygiene`
+`govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `routed-commits selftest` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates gov canary` · `run-gates evidence` · `run-gates run-log line` · `pre-push run-log line` · `pre-push self-test` · `memory-hygiene self-test` · `codebase-map adopter e2e` · `codebase-map kit selftest` · `drift-audit selftest` · `policy fixtures` · `memory hygiene`
 
 `run-gates run-log line` and `pre-push run-log line` are S5's: their suites observe the two readers
 unit 65 changes. The unattended kit's own suites are waived for this build's landing (README rule), so
@@ -391,6 +392,9 @@ New arm: tools/govkit/selftest.py · covers AC17 · the `é:x` row, staged red b
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-71, TOOL-dWitnessedBar-72 and TOOL-dWitnessedBar-73, promoted by the
   round-1 spec audit of units 66 and 67; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/govkit/govkit.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing
+  else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-78-round8-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-78-round8-fix-return.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-78-round8-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-78-round8-fix-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-74-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-74-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 |
 
 <!-- /gen:spec-records -->
@@ -401,7 +402,7 @@ S9, S12 and S14 to S18 are answered in other units' ledgers at the close.
 
 ## 7. Gates
 
-`run-gates gov canary` · `run-gates canary` · `measure-legs selftest` · `pre-push self-test` · `pre-push bar self-test` · `push-main self-test` · `pre-push run-log line` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `memory hygiene`
+`run-gates gov canary` · `run-gates canary` · `measure-legs selftest` · `pre-push self-test` · `pre-push bar self-test` · `push-main self-test` · `pre-push run-log line` · `encoding posture (text IO names its encoding)` · `python resolver (behaviour + inline parity + idiom ban)` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `policy fixtures` · `memory hygiene`
 
 `measure-legs selftest` is owed for `.githooks/pre-push`, and it, `run-gates canary` and
 `run-gates gov canary` for `tools/gate-legs.json`. `recall floor` and `recall floor arms` are owed for
@@ -449,6 +450,9 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC8 AC14 · the com
   units 74 to 78; nothing else moved.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edge of TOOL-dWitnessedBar-88, promoted by the round-1 spec audit of units 79 to 84; nothing else
+  moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
   moved.
 
 ## 10. Reuse audit

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-44 — the inherited-red upgrade step reads both policy files and maps every value today's readers accept
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 |
 | [2026-10-25-build-TOOL-dWitnessedBar-44-deviation-441.md](../build/2026-10-25-build-TOOL-dWitnessedBar-44-deviation-441.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-51 |
 
 <!-- /gen:spec-records -->
@@ -150,7 +151,7 @@ Live at landing, in the same kit version as `TOOL-dWitnessedBar-3`'s step.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `memory hygiene` · `recall floor arms`
+`govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `memory hygiene` · `recall floor arms` · `policy fixtures`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the step's table over a custom `GATE_POLICY_FILE`, four off-table values and a two-file disagreement, staged red by restoring the `.githooks/gate-env.sh`-only read · none
 
@@ -172,6 +173,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the step's table over
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-55, TOOL-dWitnessedBar-56, TOOL-dWitnessedBar-57, promoted by the
   round-1 spec audit of units 40 to 51; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/govkit/selftest.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing
+  else moved.
 
 ## 10. Reuse audit
 

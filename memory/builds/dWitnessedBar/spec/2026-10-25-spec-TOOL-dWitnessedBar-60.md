@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-60 — every bar caller that records a trusted green scrubs every knob the hook clears, held by one parity arm over the three lists
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 33 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 33 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md) | research | TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-62 |
 | [2026-10-25-build-TOOL-dWitnessedBar-60-deviation-601.md](../build/2026-10-25-build-TOOL-dWitnessedBar-60-deviation-601.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md) | research | TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-62 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-62 |
 
 <!-- /gen:spec-records -->
@@ -167,7 +168,7 @@ Live at landing, one step after `TOOL-dWitnessedBar-56`, in the parallel group o
 
 ## 7. Gates
 
-`pre-push self-test` · `pre-push bar self-test` · `measure-legs selftest` · `run-gates evidence` · `run-gates gov canary` · `memory hygiene`
+`pre-push self-test` · `pre-push bar self-test` · `measure-legs selftest` · `run-gates evidence` · `run-gates gov canary` · `scratch-guard self-test` · `tier2-review self-test` · `memory hygiene`
 
 The unattended kit's own suites are waived for this build's landing (README rule), so S3 is observed by
 AC4 and S4's arm, not by that kit's suites.
@@ -197,6 +198,9 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC3 · a post-merg
   (HIGH, item H3).
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-63's
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains `scratch-guard self-test` and `tier2-review self-test`, whose
+  manifest guards hold the §4 path `tools/unattended/unattended.sh`, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

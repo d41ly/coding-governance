@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-57-deviation-571.md](../build/2026-10-25-build-TOOL-dWitnessedBar-57-deviation-571.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-57-deviation-572.md](../build/2026-10-25-build-TOOL-dWitnessedBar-57-deviation-572.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 |
 
 <!-- /gen:spec-records -->
@@ -297,8 +298,9 @@ S21 to S24 are observed by the main loop at the close, on the tree they grade.
   dropped with its reason, and `grep -c 'refuse_wrong_shell || exit 2' tools/lib/resolve-python.sh`
   prints 0.
   Red when: the sourced canonical carries an exit its sourcer would run.
-- **AC4** — When `python measure_legs.py --selftest` runs in `tools/run-gates/` with a fixture holding
-  `x = (B if a == "bash" else "") or shutil.which(a)`, the bare-bash arm names that line; and
+- **AC4** — When `scan_bare_bash` is called from `measure_legs.py` (imported with `tools/run-gates`
+  on `sys.path`) with the root of a fixture repo under `%TEMP%` whose one `.py` holds
+  `x = (B if a == "bash" else "") or shutil.which(a)`, it names that line; and
   `regen.run_command` over a `bash` argv with the resolver stubbed to refuse raises `Refusal`.
   Red when: a variable PATH lookup of `bash` passes, or regen launches a PATH bash.
 - **AC5** — When `python tools/memory-tree/row_grammar.py --selftest` runs on a node with Git bash, the
@@ -366,7 +368,7 @@ S21 to S24 are observed by the main loop at the close, on the tree they grade.
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `run-gates canary` · `row-grammar selftest` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `shell-hygiene selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `drift-audit selftest` · `build-index selftest` · `spec-tokens self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`python resolver (behaviour + inline parity + idiom ban)` · `measure-legs selftest` · `run-gates canary` · `row-grammar selftest` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `shell-hygiene selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `drift-audit selftest` · `build-index selftest` · `spec-tokens self-test` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `policy fixtures` · `memory hygiene`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 AC6 · the indented caller, the stub definition, the dropped canonical and the moved block row, staged red by matching column 0 only · none
 New arm: tools/run-gates/measure_legs.py · covers AC4 · the variable `shutil.which` fixture, staged red by matching constant arguments only · none
@@ -396,6 +398,11 @@ New arm: tools/drift-audit/drift_report.py · covers AC16 · the `held` fixture 
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-63's
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
+- rev-4 · 2026-11-19 · §6 §7 · AC4 observes `scan_bare_bash` on a fixture repo instead of spelling the
+  `measure-legs selftest` suite, which stays on the New arm line; the leg line gains
+  `playbook render selftest` and `policy fixtures`, whose manifest guards hold the §4 paths
+  `tools/memory-tree/corpus_ids.py` and `tools/memory-tree/row_grammar.py`, per
+  brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

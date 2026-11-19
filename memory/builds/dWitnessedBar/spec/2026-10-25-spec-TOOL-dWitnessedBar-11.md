@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0349@79373aa7 whole
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -342,7 +343,8 @@ S6) for its two new legs.
   PLAY-dOrderedCharter-7 AC10 states; and when `python core.py meta-check` runs in a scratch clone of
   the built tree that commits a `.governance/policy.toml` setting `core.bypass = "never"`, it exits 1
   naming exactly the legs of the generated `tools/gate-legs.json` that carry a non-empty `enforces` and
-  a `guard`, as many as `python -c "import json;L=json.load(open('tools/gate-legs.json',encoding='utf-8'));print(sum(1 for l in L if l.get('enforces') and l.get('guard')))"`
+  a `guard`, as many as
+  `python -c "import json,sys; L = json.load(open(sys.argv[1], encoding='utf-8')); print(sum(1 for l in L if l.get('enforces') and l.get('guard')))" tools/gate-legs.json`
   prints there; under `with-hooks-report` it names none of them.
   Red when: the meta-check under `never` names fewer legs than the probe counts, so a guard skips a leg
   the parent reads as core, or names one under the default.
@@ -355,7 +357,7 @@ S6) for its two new legs.
 The pass adds the legs `gate-leg conformance` and `leg-factory selftest`; they are named here and
 not on the leg line below, which the leg join reads against today's manifest.
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `agent-instructions self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `lexicon selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `review-join self-test` · `run-gates run-log line` · `runlog selftest` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` builds a scratch tree of two descriptors and a registry and plants each arm of §4 "The gate", plus a hand-edited manifest row · none
 
@@ -413,6 +415,12 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
 - rev-4 · 2026-11-05 · §5 risks · §8 F5 · F5 RESOLVED (owner) to (b), by the brief
   `2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer`: the narrowing ask is filed in
   dOrderedCharter's `BACKLOG.md`, the parent's predicate standing until it lands; nothing else moved.
+- rev-5 · 2026-11-19 · §6 AC10 · §7 · AC10's count probe takes the manifest as its argument, so the
+  quoted `open(...)` no longer reads as a path; the leg line drops `agent-instructions self-test`, which
+  PLAY-dOrderedCharter-31 retired from `tools/gate-legs.json` with its kit, whose registry `[[retired]]`
+  successor `playbook-render` is tested by `playbook render selftest`, already on the line; it gains
+  `policy fixtures`, whose manifest guard holds the §4 path `tools/gate-legs.json`; per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing else moved.
 
 ## 10. Reuse audit
 

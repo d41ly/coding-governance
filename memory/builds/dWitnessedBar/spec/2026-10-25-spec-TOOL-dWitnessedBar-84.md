@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-84 — the round-1 audit of units 74 to 78, 16 minors batched: single-copy checks reading what exists, a sed admitting the quoted arm, honest return codes, counted loops, one key derivation, the guide guarded, records on one line
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-83-round9-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-83-round9-fix-brief.md) | research | TOOL-dWitnessedBar-83 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md) | research | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 |
 
 <!-- /gen:spec-records -->
@@ -397,7 +398,7 @@ and S16 are answered in other units' ledgers at the close.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `govkit selfcheck` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `memory hygiene`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `govkit selfcheck` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `policy fixtures` · `memory hygiene`
 
 `run-gates canary`, `run-gates gov canary` and `measure-legs selftest` are owed for `tools/gate-legs.json`; `recall floor`
 and `recall floor arms` for the paths under `memory/`. `codebase-map coverage + freshness` is S7's and
@@ -449,6 +450,9 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC11 AC13 AC14 AC17 · 
   edge of TOOL-dWitnessedBar-89, the minors batch of the round-1 spec audit of units 85 to 88;
   nothing else moved.
   The H1 is shortened to fit the build index's row cap; nothing else moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
+  moved.
 
 ## 10. Reuse audit
 

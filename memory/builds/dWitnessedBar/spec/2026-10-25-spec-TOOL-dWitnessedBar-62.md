@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md) | research | TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 |
 | [2026-10-25-build-TOOL-dWitnessedBar-62-deviation-621.md](../build/2026-10-25-build-TOOL-dWitnessedBar-62-deviation-621.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md) | research | TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 |
 
 <!-- /gen:spec-records -->
@@ -438,7 +439,7 @@ at the close, on the tree they grade.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `routed-commits selftest` · `memory-hygiene self-test` · `memory hygiene` · `kit/dogfood doc parity` · `run-gates canary` · `run-gates evidence` · `run-gates gov canary` · `run-gates adopter e2e` · `pre-push self-test` · `pre-push bar self-test` · `measure-legs selftest` · `drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest`
+`govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `routed-commits selftest` · `memory-hygiene self-test` · `memory hygiene` · `kit/dogfood doc parity` · `run-gates canary` · `run-gates evidence` · `run-gates gov canary` · `run-gates adopter e2e` · `pre-push self-test` · `pre-push bar self-test` · `measure-legs selftest` · `drift-audit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `shell-hygiene selftest` · `policy fixtures`
 
 The unattended kit's own suites are waived for this build's landing (README rule), so S1 to S3, S21 and
 S22 are observed by the govkit selftest arm, not by that kit's suites.
@@ -477,6 +478,9 @@ New arm: tools/lib/legacy_ledger.py · covers AC18 · the `.git` homes and the r
   and 14 LOW findings, batched.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-63's
   consumes-from edge, promoted by the round-1 spec audit of units 58 to 62; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/govkit/selftest.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing
+  else moved.
 
 ## 10. Reuse audit
 

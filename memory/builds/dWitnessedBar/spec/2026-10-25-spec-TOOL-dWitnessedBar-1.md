@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-1 — gate health measured and the reliability bar
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0339@8e7bc7ae whole
 
@@ -51,6 +51,8 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-21 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -259,7 +261,7 @@ Live at landing; it arms itself on the thirtieth Test-step verdict of the slowes
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `run-gates canary` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `run-gates canary` · `policy fixtures` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · `test_gate_health` over the three planted record sets, the short set staged by deleting one row of one leg · `CHECK_FLOOR` raised by the arm's counted checks
 
@@ -294,6 +296,10 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · `test_gate_healt
   `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 2: the record serves as
   `gate-health`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; the binding is observed;
   the factory is run as a subprocess and no `new gate-health` door is claimed.
+- rev-5 · 2026-11-19 · §7 · the leg line gains the leg `policy fixtures`, whose guard §4's
+  `tools/memory-tree/build_records.py` trips, as the spec-token checker's guards join named it at
+  `c6df3e901`, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is
+  unchanged, as the unit writes that path; nothing else moved.
 
 ## 10. Reuse audit
 
