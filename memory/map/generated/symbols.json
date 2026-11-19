@@ -5968,6 +5968,11 @@
       "file": "tools/gate-lint/encoding_posture.py"
     },
     {
+      "id": "check_enforces",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "check_engine_rows",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -19073,6 +19078,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "read_adopter_declarations",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "read_advertised_head",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -24450,6 +24460,11 @@
     {
       "id": "refuse_wrong_shell",
       "kind": "function",
+      "file": "tools/run-gates/adopt-run-gates.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -28610,6 +28625,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/run-gates/adopt-run-gates.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
@@ -30094,6 +30114,11 @@
     },
     {
       "id": "run_conform",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "run_conform_adopter",
       "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
     },
@@ -39431,6 +39456,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/adopt-run-gates.test.sh"
     },
     {
       "id": "wrong_shell_at",

@@ -191,6 +191,18 @@ The argv tokens are the four the descriptors already spell: `{kit}`, `{prefix}`,
 and `{map_root}`. An argv beginning `python` or `python3` runs under the reader's own interpreter.
 Rows sharing one write and one check are one item.
 
+A `[[generated]]` row may carry a `when`, and is no item where it does not hold. It has two forms,
+and neither runs a command; any other spelling is refused (TOOL-dWitnessedBar-45):
+
+| `when` | holds when |
+|---|---|
+| `"<conf file>:<KEY>=<value>"` | the conf at the repo root reads that value for the key |
+| `"exists:<path>"` | the path, its tokens resolved as an argv's are, exists in the tree |
+
+The leg factory's row carries `when = "exists:{prefix}/govkit/govkit.py"`: its render reads govkit,
+which never reaches an adopter, so an adopter's `--regen-list` names the row skipped and its bar
+does not refuse at stage 1 on a check that cannot run there.
+
 **Stages run in order, the items of one stage concurrently**, because one stage's outputs are
 disjoint and a later stage reads an earlier one's:
 
@@ -220,7 +232,8 @@ untracked file first, because the build-index generator enumerates tracked files
 record until it is added. A write that exits non-zero is followed by its own check: a fresh check
 makes it `declined`, which a kit's adopter is when it renders nothing in a state its kit declares
 legal, and the stage goes on. A write whose check is not fresh FAILS, and a failed write stops
-before the next stage. `--list` names every `[[regenerate]]` row it skips for carrying no stage.
+before the next stage. `--list` names every row it skips, each with its reason: a `[[regenerate]]`
+row for carrying no stage, a `[[generated]]` row for a `when` that does not hold.
 
 | exit | `--regen` | `--regen-check` |
 |---|---|---|
@@ -974,6 +987,14 @@ every declaration. Never hand-edit the manifest. Declare a new leg with
 --purpose <text> --enforces <tag>`, or `--exempt <why>` in place of `--kit` for a registry row; the
 kinds register reaches the same verb as `python <prefix>/playbook/core.py new gate-leg <name> ...`
 (TOOL-dWitnessedBar-11).
+
+In a tree with no govkit, which is every adopter's, `leg_factory.py` still loads: `--write`, `--check`,
+`--list` and `new` exit 2 naming the places they looked for govkit, and `--conform` grades every field
+arm over the `[[gate_leg]]` rows of the tree's `*/kit.toml` descriptors, read through `regen.py`'s
+reader. It prints `fresh: not graded here — no govkit` and `enforces: not graded here — no govkit`,
+since the render and the registries those arms read are gov's; it does not read the registry's
+`[[exempt_leg]]` rows or the flat entries' descriptors the playbook kit lands beside its engine
+(TOOL-dWitnessedBar-45).
 
 `<prefix>/gate-legs.json`, DERIVED from this kit's own location rather than spelled, so a one-segment
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
