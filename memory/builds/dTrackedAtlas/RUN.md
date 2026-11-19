@@ -9,8 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: TOOL-dTrackedAtlas-5=OPEN TOOL-dTrackedAtlas-6=OPEN TOOL-dTrackedAtlas-7=DEFERRED TOOL-dTrackedAtlas-13=OPEN TOOL-dTrackedAtlas-14=OPEN TOOL-dTrackedAtlas-15=OPEN TOOL-dTrackedAtlas-16=OPEN TOOL-dTrackedAtlas-17=OPEN
-units-at-landing: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12
+asks-at-landing: TOOL-dTrackedAtlas-5=OPEN TOOL-dTrackedAtlas-6=CLOSED TOOL-dTrackedAtlas-7=CLOSED TOOL-dTrackedAtlas-13=OPEN TOOL-dTrackedAtlas-14=OPEN TOOL-dTrackedAtlas-15=OPEN TOOL-dTrackedAtlas-16=OPEN TOOL-dTrackedAtlas-17=OPEN TOOL-dTrackedAtlas-19=OPEN
+units-at-landing: TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 TOOL-dTrackedAtlas-12 TOOL-dTrackedAtlas-18
 hold-run: 
 hold-streak: 1 · at 934f4d59
 resume-owed: none · owner
@@ -19,13 +19,13 @@ hold-reason: four Red-fix commits carry spec edits the inline lane refuses at th
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-gates-run: unattended-179507623879485724666-5596 23c8a147
+gates-run: unattended-179509664060931522435-985560 0de76a16
 parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: bb214a89ded336688af6098d1913cdd197b947ff
-phase: VERIFYING
+phase: LANDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
