@@ -115,7 +115,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`](spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-50 — the wrong-shell population is a stated predicate, the commit hook among its members](spec/2026-10-25-spec-TOOL-dWitnessedBar-50.md) | 3 | 2 | CLOSED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-15 — `test.seed` at every check's registration](spec/2026-10-25-spec-TOOL-dWitnessedBar-15.md) | 4 | 2 | CLOSED | rev-8 | 2026-11-19 |
-| [TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg](spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md) | 5 | 2 | CLOSED | rev-7 | 2026-11-19 |
+| [TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg](spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md) | 5 | 2 | CLOSED | rev-8 | 2026-11-19 |
 | [TOOL-dWitnessedBar-61 — the seed stamps the null SHA when HEAD is unborn, so a before-first-commit seed writes rows the ledger reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-61.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dWitnessedBar-22 — the `tests=` and `enforces=` edge fields on legs](spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-19 |
 | [TOOL-dWitnessedBar-47 — a seed home is admitted when its directory exists, so a fresh install seeds before its first commit](spec/2026-10-25-spec-TOOL-dWitnessedBar-47.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-19 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 307 bound to this build, across 4 record folder(s).
+Records: 308 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
