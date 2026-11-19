@@ -8,8 +8,9 @@
 #   bash card-store.fixture.sh --list            # the cases, one per line
 #
 # Each case builds, in the system temp directory, a bare remote and a repository pushed to it, holding
-# the build `tFix` (one spec, one brief), the memory-tree and loop kits copied from the tree this file
-# sits in at the paths the engine's own resolver finds them, a stub policy kit answering the case's
+# the build `tFix` (one spec, one brief), the memory-tree, loop and unattended kits copied from the tree
+# this file sits in at the paths the engine's own resolver finds them, a `.unattended.conf` with
+# RUN_CLAIMS on, so the driver writes the card's ref (TOOL-dPlacedRequest-33), a stub policy kit answering the case's
 # planted values from a file outside the repository, and a stub playbook kit whose `pockets` verb
 # prints one fact. The engine writes the session card `t1`, appends a READY body with a `## route`
 # naming `tFix`, and the case runs its verbs and prints one `card-store: <case> · <what> · held|MISSED`
@@ -21,7 +22,7 @@ set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
 CHECK="$HERE/manifest-check.sh"
-PLANTS="render publish store-remote store-local store-folder store-empty follow-rerender follow-per-step
+PLANTS="render publish publish-off publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice"
@@ -83,7 +84,7 @@ write_card_fixture() {
   git -C "$R" config user.email fixture@test && git -C "$R" config user.name fixture \
     && git -C "$R" config commit.gpgsign false && git -C "$R" config core.autocrlf false \
     && mkdir -p "$S/hooks" && git -C "$R" config core.hooksPath "$S/hooks" || return 1
-  for f in "memory-tree corpus_ids.py" "loop loop_transition.py"; do
+  for f in "memory-tree corpus_ids.py" "loop loop_transition.py" "unattended unattended.sh"; do
     f=$(ROOT="$GOVROOT" MC_DIR="$HERE" resolve_kit_file $f); [ -n "$f" ] || return 1
     rel=${f#"$GOVROOT"/}; rel=${rel%/*}
     mkdir -p "$R/$rel" && cp -R "$GOVROOT/$rel/." "$R/$rel/" || return 1
@@ -101,6 +102,7 @@ write_card_fixture() {
   rel=${f#"$GOVROOT"/}; mkdir -p "$R/${rel%/*}"
   printf '%s\n' 'import sys' 'if sys.argv[1:2] == ["pockets"]:' '    print("## pockets\n- the fixture fact")' > "$R/$rel"
   printf '%s\n' 'MEMORY_ROOT=memory' 'FAMILIES="tooling:TOOL"' 'DISCIPLINES="tooling"' > "$R/.memory-tree.conf"
+  printf 'RUN_CLAIMS="on"\n' > "$R/.unattended.conf"
   printf '__pycache__/\n' > "$R/.gitignore"
   mkdir -p "$R/memory/builds/tFix/spec" "$R/memory/builds/tFix/prompts" "$R/memory/builds/tFix/build"
   printf '# TOOL-tFix-1 — the fixture unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-1\n' > "$R/$SPEC"
@@ -144,6 +146,31 @@ case "$PLANT" in
     print_card_held "AC2 the cache's first line names that commit" "$(head -n 1 "$R/.git/orientation/tFix.md" | grep -qx "# card-ref $c1"; echo $?)"
     run_card_engine "$R" --card --publish --build tFix --session t1; c2=$(git -C "$O" rev-parse --verify -q "$REF")
     print_card_held "AC2 a second publish's commit has the first as its parent" "$([ -n "$c2" ] && [ "$c2" != "$c1" ] && [ "$(git -C "$O" rev-parse "$c2^")" = "$c1" ]; echo $?)" ;;
+  publish-off)
+    # TOOL-dPlacedRequest-33 AC1, AC2: the switch is the driver's, so the conf alone moves it.
+    set_card_policy card.snapshot every-transition
+    printf 'RUN_CLAIMS="off"\n' > "$R/.unattended.conf"
+    run_card_append
+    print_card_held "AC1 RUN_CLAIMS off: the append names the remote-ref store unwritten" "$(grep -qx 'card — remote-ref not written: RUN_CLAIMS is off' "$OUT"; echo $?)"
+    print_card_held "AC1 the clone cache and the build-folder snapshot are written" "$(grep -qx '# card-ref local' "$R/.git/orientation/tFix.md" && [ "$(measure_card_records "$R")" = 1 ]; echo $?)"
+    print_card_held "AC1 the bare remote holds no refs/gov/builds ref" "$([ -z "$(git -C "$O" for-each-ref refs/gov/builds)" ]; echo $?)"
+    printf 'RUN_CLAIMS="on"\n' > "$R/.unattended.conf"
+    run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
+    print_card_held "AC2 RUN_CLAIMS on: the bare remote holds $REF" "$([ -n "$c1" ]; echo $?)"
+    print_card_held "AC2 gov-feed.log holds its line" "$(tr -d '\r' < "$R/.git/gov-feed.log" 2>/dev/null | awk -F'\t' -v r="$REF" -v c="$c1" '$2 == r && $5 == c { f = 1 } END { exit !f }'; echo $?)"
+    print_card_held "AC2 the cache ref names the same commit" "$([ "$(git -C "$R" rev-parse --verify -q "refs/gov/remote/${REF#refs/gov/}")" = "$c1" ]; echo $?)" ;;
+  publish-hung)
+    # TOOL-dPlacedRequest-33 AC3: a driver that never answers `--card-ref`, its `--claims` answering off.
+    # The clock is the append's excess over a control append whose stub driver answers at once, so the
+    # engine's own render time, seconds on a slow node, is not charged to the bound.
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file unattended unattended.sh); [ -n "$f" ] || { echo "card-store: no driver resolves in $R"; exit 2; }
+    printf '%s\n' 'case "${1:-}" in --card-ref) echo "card-ref — off"; exit 0 ;; esac' 'echo "claims: off"' > "$f"
+    t0=$EPOCHSECONDS; CARD_FETCH_BOUND=4 run_card_append; t1=$EPOCHSECONDS
+    printf '%s\n' 'case "${1:-}" in --card-ref) exec sleep 60 ;; esac' 'echo "claims: off"' > "$f"
+    t2=$EPOCHSECONDS; CARD_FETCH_BOUND=4 run_card_append; t3=$EPOCHSECONDS
+    print_card_held "AC3 the append names no answer within the bound" "$(grep -qx 'card — remote-ref not written: no answer within 4s' "$OUT"; echo $?)"
+    print_card_held "AC3 the append took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 3s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)"
+    print_card_held "AC3 the session card is written" "$(grep -q '^READY — tFix' "$R/.git/orientation/t1.md"; echo $?)" ;;
   store-remote|store-local|store-folder|store-empty)
     case "$PLANT" in
       store-remote) set_card_policy card.store remote-ref ;; store-local) set_card_policy card.store local-clone ;;

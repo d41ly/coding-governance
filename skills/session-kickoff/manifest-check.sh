@@ -1053,93 +1053,11 @@ render_envelope_sh() {
 }
 # <<< envelope_sh
 
-# The governance ref's one compare-and-swap writer and the change feed every write joins, INLINED
-# byte-identically from the canonical copies named on their marker lines and gated by the
-# resolve-python self-test's parity table (TOOL-dPlacedRequest-2 S2): the build card's ref is
-# written through `write_gov_ref` alone, never by a hand copy.
-# >>> gov_ref_sh — canonical copy: gov-ref.sh in gov's lib dir (byte-identical; gated)
-# I1 AND I2, ONE WRITER FOR EVERY GOVERNANCE REF (TOOL-dPlacedRequest-11): a run claim, the bar-red
-# ref and every later register, request and card ref are written here, never by a hand copy.
-# `build_gov_commit` builds the commit over the empty tree under the fixed `gov-claim` identity,
-# parented on the tip its caller read, so `git log <ref>` on the remote lists every write in order; a
-# create, whose tip read is empty, is the one parentless commit. It prints nothing and returns 1 when
-# git cannot build it. `write_gov_ref` pushes `--porcelain --force-with-lease=<ref>:<expected>`, the
-# expected sha EMPTY for a create, and the porcelain line whose second field ends in `:<ref>` decides,
-# never the exit alone: `!` with `(stale info)` or `(fetch first)` is 1, LOST; any other `!`, no status
-# line, or the bound firing (124) is 2, NOT COMPLETED; any other flag is 0. The cause is in
-# GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
-# `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
-# expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
-# which admits an empty source only when `remove_gov_ref` is its caller.
-# THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
-# bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
-# pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
-# writes, empty to read no token.
-# NO REFUSAL TOKEN IS THIS PUSH'S CAUSE. The refusal file is one per git dir and nothing here removes
-# it, so another push from the same git dir can write it while this call runs: a token newer than the
-# stamp this call created just before its push is appended on rc 2 as an ADVISORY only. The
-# `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
-# The stamp is a scratch file of its own, never the push's output file, which git writes after the
-# hook ran and so would read every token as stale.
-# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it sets this node's cache ref
-# `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, then calls `add_feed_event`
-# from the `gov_feed_sh` block every carrier of this one carries beside it. A lost or uncompleted
-# write appends nothing.
-# WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
-# omitted; a token another push wrote during this call reads as fresh and is printed beside this
-# push's own cause, never as it.
-build_gov_commit() { # tip read or empty · message -> prints the commit; rc 1 when git cannot build it
-  local t c
-  local -a p=()
-  [ -z "$1" ] || p=(-p "$1")
-  t=$(git mktree </dev/null 2>/dev/null) && [ -n "$t" ] || return 1
-  c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
-    git commit-tree "$t" "${p[@]}" -m "$2" 2>/dev/null) && [ -n "$c" ] || return 1
-  printf '%s\n' "$c"
-}
-write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
-  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd=""
-  GOVREF_WHY=""
-  if [ -z "$src" ] && [ "${FUNCNAME[1]:-}" != remove_gov_ref ]; then GOVREF_WHY="no source"; return 2; fi
-  s=$(mktemp) || { GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
-  f=$(mktemp) || { rm -f "$s"; GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
-  "$GOVREF_RUNNER" "$f" push --porcelain "--force-with-lease=$ref:$exp" "$GOVREF_REMOTE" "$src:$ref" && rc=0 || rc=$?
-  line=""
-  while IFS= read -r l; do
-    case "$l" in ?$'\t'*":$ref"$'\t'*) line=${l%$'\r'} ;; esac
-  done <"$f"
-  if [ "$rc" = 124 ]; then GOVREF_WHY="the push was killed by this kit's own bound"; rc=2
-  elif [ -z "$line" ]; then GOVREF_WHY="git push exited $rc and printed no status line for $ref"; rc=2
-  elif [ "${line:0:1}" != '!' ]; then rc=0
-  else
-    case "$line" in
-      *"(stale info)"*|*"(fetch first)"*) GOVREF_WHY="lost the race on the lease: ${line##*$'\t'}"; rc=1 ;;
-      *) GOVREF_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
-    esac
-  fi
-  if [ "$rc" = 2 ]; then
-    [ -z "${GOVREF_GITDIR:-}" ] || rf="$GOVREF_GITDIR/pre-push-refusal"
-    if [ -n "$rf" ] && [ "$rf" -nt "$s" ]; then
-      { IFS=$'\t' read -r tok _ <"$rf"; } 2>/dev/null || :
-      GOVREF_WHY="$GOVREF_WHY · a pre-push refusal was recorded during this push: ${tok:-an empty refusal file}"
-    fi
-    hd=$(git symbolic-ref -q "refs/remotes/$GOVREF_REMOTE/HEAD" 2>/dev/null) || hd=""
-    [ -n "$hd" ] || GOVREF_WHY="$GOVREF_WHY · default-branch · fix once: git remote set-head $GOVREF_REMOTE -a"
-  fi
-  rm -f "$s" "$f"
-  [ "$rc" = 0 ] || return "$rc"
-  if [ -n "$src" ]; then git update-ref "refs/gov/remote/${ref#refs/gov/}" "$src" 2>/dev/null
-  else git update-ref -d "refs/gov/remote/${ref#refs/gov/}" 2>/dev/null; fi \
-    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${ref#refs/gov/}" >&2
-  add_feed_event "$ref" "$src"
-  return 0
-}
-remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
-  GOVREF_WHY=""
-  [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
-  write_gov_ref "$1" "$2" ""
-}
-# <<< gov_ref_sh
+# The change feed the card read sights into, INLINED byte-identically from the canonical copy named
+# on its marker line and gated by the resolve-python self-test's parity table (TOOL-dPlacedRequest-2
+# S2). This engine holds no writer of a governance ref (TOOL-dPlacedRequest-33 S3): the build card's
+# ref is written by the unattended driver's `--card-ref write`, and this copy stays for
+# `read_card_ref`'s sightings alone until TOOL-dPlacedRequest-34 routes that read through the driver.
 # >>> gov_feed_sh — canonical copy: gov-feed.sh in gov's lib dir (byte-identical; gated)
 # THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
 # feed's log and the offline queue's, is read and written only under a lock directory beside it in
@@ -2179,9 +2097,16 @@ check_card() {
 # ---- the build card (TOOL-dPlacedRequest-2) ------------------------------------------------------
 # A build's card, kept per build so a new session, another node or a resumed one finds it. THREE
 # STORES, `card.store` selecting any non-empty subset and every write going to each selected store and
-# no other: `remote-ref`, the ref refs/gov/builds/<slug>/card on `origin`, the truth, one commit per
-# write built by `build_gov_commit` on the tip read and written by `write_gov_ref` with that tip as its
-# expected value, so it joins the change feed; its message is `gov-card <slug>`, a blank line, `step:
+# no other: `remote-ref`, the ref refs/gov/builds/<slug>/card on the remote, the truth, one commit per
+# write, written by the unattended driver's `--card-ref write` (TOOL-dPlacedRequest-33), which builds
+# it on the tip it reads and writes it by compare-and-swap, so it joins the change feed. The driver is
+# resolved by `resolve_kit_file` and run as `derive_claims_line` runs `--claims`: stdin closed,
+# GOV_RUNLOG=0, its output to a scratch file, under `timeout -k 2 $CARD_FETCH_BOUND`. DARK BEHIND
+# RUN_CLAIMS, the switch the driver alone reads: `card-ref — off` prints `card — remote-ref not
+# written: RUN_CLAIMS is off`, and so does every other unwritten answer, with its reason; on a written
+# one the cache ref the driver's write set gives the full sha, the local ref is moved to it, and a
+# cache ref that does not read back as the driver's sha leaves the cache's `# card-ref` at `local`.
+# The message is `gov-card <slug>`, a blank line, `step:
 # <state>` (` · terminal` after it at a terminal follow, which R7 reads), `session: <sid>`, a blank line
 # and the card, every line after the fifth. `local-clone`, the cache <common dir>/orientation/<slug>.md,
 # its first line `# card-ref <the ref's commit, or local>`, trusted only while that equals the ref. And
@@ -2194,7 +2119,7 @@ check_card() {
 # policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide; a remote other than `origin`.
-CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each read or push of the card ref may take; the env override is the fixture's
+CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each read of the card ref, or the driver's write of it, may take; the env override is the fixture's
 # A session idle longer than this is recommended a fresh start: the prompt cache's five-minute lifetime,
 # PINNED 2026-10-25 and unverified against the platform's documentation in this tree.
 RESUME_IDLE_S=300
@@ -2243,12 +2168,6 @@ read_card_policy() { # card.follows|card.store|card.snapshot|resume.context|resu
     *) printf '%s answered %s values, and takes one\n' "$1" "$n"; return 1 ;;
   esac
   printf '%s\n' $out
-}
-
-# GOVREF_RUNNER for the card ref: the push, bounded as the fetch below is.
-run_card_git() { # outfile · git args… -> git's exit, 124 when the bound fired; its stdout in the file
-  local o=$1; shift
-  timeout -k 2 "$CARD_FETCH_BOUND" git "$@" </dev/null >"$o" 2>/dev/null
 }
 
 # The one read of the remote: one bounded fetch of the card ref into the local ref and the feed's cache
@@ -2338,13 +2257,23 @@ render_build_card() { # slug · step · tail file · writer verb -> the card on 
 # the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
 write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
   local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/builds/$1/card" card="$CARD_TMP/bc.card"
-  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark=""
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" drv="" a
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
   stores=" ${stores//$'\n'/ } "
   case "$stores" in *" remote-ref "*) remote=1 ;; esac
   if [ "$remote" = 1 ] && ! read_card_ref "$slug"; then
     printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2
+  fi
+  # The driver writes the ref (TOOL-dPlacedRequest-33 S2); read_card_ref above has already proved a
+  # working `timeout -k`, so what is left to ask is the conf and the driver.
+  if [ "$remote" = 1 ]; then
+    if [ ! -f "$ROOT/.unattended.conf" ]; then
+      printf 'card — remote-ref not written: no .unattended.conf in this tree\n'; remote=2
+    else
+      drv=$(resolve_kit_file unattended unattended.sh)
+      [ -n "$drv" ] || { printf 'card — remote-ref not written: no unattended driver resolves in this tree\n'; remote=2; }
+    fi
   fi
   tip=$CARD_REF_TIP
   for try in 1 2; do
@@ -2361,21 +2290,37 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
     render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
     [ "$remote" = 1 ] || break
     printf -v msg 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(<"$card")"
-    c=$(build_gov_commit "$tip" "$msg") || { printf 'card — remote-ref not written: git could not build the commit\n'; remote=2; break; }
-    GOVREF_RUNNER=run_card_git GOVREF_REMOTE=origin GOVREF_GITDIR=$(git rev-parse --absolute-git-dir 2>/dev/null | tr -d '\r') \
-      write_gov_ref "$ref" "$tip" "$c"; rc=$?
-    if [ "$rc" = 0 ]; then
-      git update-ref "$ref" "$c" 2>/dev/null
-      oid=$c
-      printf 'card — %s · step %s · remote-ref %s\n' "$slug" "$step" "${c:0:8}"
-      break
-    elif [ "$rc" = 1 ] && [ "$try" = 1 ] && read_card_ref "$slug" && [ "$CARD_REF_TIP" != "$tip" ]; then
-      tip=$CARD_REF_TIP
-      continue
-    elif [ "$rc" = 1 ]; then
-      printf 'card — remote-ref not written: lost to %s\n' "${CARD_REF_TIP:0:8}"; remote=2; break
-    fi
-    printf 'card — remote-ref not written: %s\n' "$GOVREF_WHY"; remote=2; break
+    printf '%s' "$msg" > "$CARD_TMP/bc.msg" || { printf 'card — remote-ref not written: cannot write the message to %s\n' "$CARD_TMP/bc.msg"; remote=2; break; }
+    GOV_RUNLOG=0 timeout -k 2 "$CARD_FETCH_BOUND" bash "$drv" --card-ref write "$slug" --message "$CARD_TMP/bc.msg" </dev/null >"$CARD_TMP/bc.ref" 2>"$CARD_TMP/bc.err"; rc=$?
+    a=$(tr -d '\r' < "$CARD_TMP/bc.ref" 2>/dev/null | grep -m1 '^card-ref ')
+    case "$rc:$a" in
+      124:*|137:*) printf 'card — remote-ref not written: no answer within %ss\n' "$CARD_FETCH_BOUND"; remote=2; break ;;
+      "0:card-ref — off") printf 'card — remote-ref not written: RUN_CLAIMS is off\n'; remote=2; break ;;
+      "0:card-ref — "*)
+        c=$(git rev-parse --verify -q "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null | tr -d '\r')
+        if [ -n "$c" ] && [ "${c:0:8}" = "${a##* · }" ]; then
+          git update-ref "$ref" "$c" 2>/dev/null
+          oid=$c
+        fi
+        printf 'card — %s · step %s · remote-ref %s\n' "$slug" "$step" "${a##* · }"
+        break ;;
+      "1:card-ref lost — "*)
+        if [ "$try" = 1 ] && read_card_ref "$slug" && [ "$CARD_REF_TIP" != "$tip" ]; then
+          tip=$CARD_REF_TIP
+          continue
+        fi
+        printf 'card — remote-ref not written: lost to %s\n' "${a##*— }"; remote=2; break ;;
+      *:"card-ref not written — "*) printf 'card — remote-ref not written: %s\n' "${a#card-ref not written — }"; remote=2; break ;;
+    esac
+    # No `card-ref` line: the driver's first refusal line — `fail` prints to stdout — else its first
+    # line of any kind, cut at 160 bytes, as `derive_claims_line` words a `--claims` that did not answer.
+    LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+      NF && f == "" { f = $0 }
+      /FAILED/ { f = $0; exit }
+      END { if (f == "") f = "--card-ref exited " rc " and printed nothing"
+            if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+            print "card — remote-ref not written: " f }' "$CARD_TMP/bc.ref" "$CARD_TMP/bc.err"
+    remote=2; break
   done
   case "$stores" in
     *" local-clone "*)

@@ -562,6 +562,17 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
+- `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
+  written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
+  message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the
+  switch is not `on` it prints `card-ref — off` and exits 0, reading and writing nothing, so an
+  adopter that leaves it off publishes its card to the clone and the build folder only. With it on,
+  the slug is held to the build-folder grammar, the clone's one remote is resolved (check 24),
+  `refs/gov/builds/<slug>/card` is read by one bounded fetch into this node's cache, and one commit
+  on the tip read is written by compare-and-swap, joining the change feed. It prints ONE line:
+  `card-ref — builds/<slug>/card · <sha8>` (exit 0); `card-ref lost — <sha8 of the remote tip,
+  re-read once>` (exit 1), on which the engine re-renders once and calls again; or `card-ref not
+  written — <why>` (exit 2). Neither refusal is a numbered one.
 - `--request` — `--request <file>`, an owner's request that is not yet a build, recorded by its
   content key: the first 12 hex digits (PINNED) of the SHA-256 over the loop kit's `request.py key`
   normalisation of the text, case, whitespace, ISO dates, emphasis and links folded, the file

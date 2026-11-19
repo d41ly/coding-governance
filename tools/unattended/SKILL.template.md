@@ -121,6 +121,7 @@ unattended.sh --status <slug>
 unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --lease acquire build <slug>
 unattended.sh --register problem <subject> <item> <file>
+unattended.sh --card-ref write <slug> --message <file>
 unattended.sh --request <file>
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>

@@ -47,6 +47,7 @@
 #   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
+#   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
@@ -133,7 +134,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --request --feed --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --feed --overlaps --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -4360,6 +4361,54 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
        fi
        rm -f "$d"; return 1 ;;
     *) echo "register — not written $ref · $GOVREF_WHY"; return 2 ;;
+  esac
+}
+
+# --card-ref write, THE BUILD CARD'S REMOTE REF (TOOL-dPlacedRequest-33). The kickoff engine's
+# `remote-ref` card store calls it, bounded, with the commit message it rendered in a file, so the
+# switch, the remote and the writer each live once: here. DARK BY DEFAULT: while RUN_CLAIMS is not
+# `on` it prints `card-ref — off` and exits 0, reading and writing nothing. With it on, the slug is
+# held to the build-folder grammar `check_slug` applies, the clone's one remote is resolved as every
+# claim resolves it (check 24), `refs/gov/builds/<slug>/*` is read by ONE bounded, pruned fetch into
+# this node's cache `refs/gov/remote/builds/<slug>/*` and sighted into the feed as `read_claims`
+# sights, and the commit is built by `build_gov_commit` on the card ref's tip read and written by
+# `write_gov_ref` with that tip expected, so the write joins the feed and sets the cache ref.
+# ONE LINE PER OUTCOME: `card-ref — builds/<slug>/card · <sha8>` exit 0; `card-ref lost — <sha8 of the
+# remote tip, re-read once, or `unread`>` exit 1; `card-ref not written — <why>` exit 2. Neither refusal is a
+# numbered one: the line and the return carry it, as `write_register`'s do.
+# WHAT THIS DOES NOT CHECK: that the message is a card, which the engine renders; who may publish a
+# build's card, which the lease and the claim decide.
+write_card_ref() { # slug · message file -> 0 written, 1 lost, 2 not written
+  local slug="$1" f="$2" ref tail d msg tip="" c rc
+  [ "$RUN_CLAIMS" = on ] || { echo "card-ref — off"; return 0; }
+  check_slug_shape "$slug" || { echo "card-ref not written — the build is no build-folder name: $slug"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "card-ref not written — the message file is not readable: $f"; return 2; }
+  msg=$(<"$f")
+  [ -n "$msg" ] || { echo "card-ref not written — the message file is empty: $f"; return 2; }
+  ref="refs/gov/builds/$slug/card"; tail=${ref#refs/gov/}
+  resolve_claim_remote || { echo "card-ref not written — the clone does not declare exactly one remote, check 24"; return 2; }
+  d=$(mktemp -d) || { echo "card-ref not written — no scratch directory to bound the read in"; return 2; }
+  observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*" && rc=0 || rc=$?
+  case "$rc" in
+    0) ;;
+    124) rm -rf "$d"; echo "card-ref not written — the read was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; return 2 ;;
+    *) rm -rf "$d"; echo "card-ref not written — the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
+  esac
+  add_feed_sightings refs/gov/remote/
+  tip=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
+  c=$(build_gov_commit "$tip" "$msg") || { rm -rf "$d"; echo "card-ref not written — the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) rm -rf "$d"; echo "card-ref — $tail · ${c:0:8}"; return 0 ;;
+    1) tip=""
+       if observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*"; then
+         add_feed_sightings refs/gov/remote/
+         tip=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
+       fi
+       tip=${tip:0:8}; rm -rf "$d"; echo "card-ref lost — ${tip:-unread}"; return 1 ;;
+    *) rm -rf "$d"; echo "card-ref not written — $GOVREF_WHY"; return 2 ;;
   esac
 }
 
@@ -18542,6 +18591,12 @@ while [ $# -gt 0 ]; do
     # problem names a subject and a decision names its build among its own positional words.
     --register)     refuse_waive_unless_preflight --register
                     shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-33 - the build card's remote ref, written for the kickoff engine; no slug
+    # verb, because `write` comes first and the slug second.
+    --card-ref)     refuse_waive_unless_preflight --card-ref
+                    if [ $# = 5 ] && [ "${2:-}" = write ] && [ "${4:-}" = --message ]; then write_card_ref "$3" "$5"; _rl_rc=$?
+                    else echo "card-ref not written — the form is --card-ref write <slug> --message <file>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-19 - an owner's request recorded by its content key; no slug, because a
     # request is not yet a build.
     --request)      refuse_waive_unless_preflight --request

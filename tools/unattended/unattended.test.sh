@@ -20456,6 +20456,60 @@ same "DPR12 AC7 with the switch off it prints register — off, exits 2 and the 
 rm -rf "$LF"
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-33 — `--card-ref write`, THE BUILD CARD'S REMOTE REF. Over the lease fixture's
+# origin and its clone c1 under RUN_CLAIMS on: a write creates `refs/gov/builds/tFix/card`, the cache
+# ref and the feed naming its commit, and a second write is parented on the first; each refusal exits 2
+# writing nothing, the form, the slug, the message file, two remotes and an absent origin among them;
+# with the switch off it prints `card-ref — off`, exits 0, and a logging `git` stub first on PATH logs
+# no fetch and no push (AC5). RED for AC5, observed at the close, is a verb that reads the remote before
+# it tests the switch. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT
+# DRIVE: a lost compare-and-swap, which needs a second writer between the verb's read and its push.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+printf 'gov-card tFix\n\nstep: unrecorded\nsession: s1\n\ncard — tFix\n' > "$LF/m.txt"; : > "$LF/empty.txt"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" 2>/dev/null ); cr_rc=$?
+cr_c1=$(git --git-dir="$LF/origin.git" rev-parse -q --verify refs/gov/builds/tFix/card)
+same "DPR33 S1 a write exits 0 naming the ref's tail and the commit's sha8" "$cr_rc|$cr_out" "0|card-ref — builds/tFix/card · ${cr_c1:0:8}"
+same "DPR33 S1 the cache ref names the commit the origin holds" "$(git -C "$LF/c1" rev-parse -q --verify refs/gov/remote/builds/tFix/card)" "$cr_c1"
+same "DPR33 S1 the feed holds the write's line" \
+  "$(tr -d '\r' < "$LF/c1/.git/gov-feed.log" | awk -F'\t' -v c="$cr_c1" '$2 == "refs/gov/builds/tFix/card" && $5 == c { f = 1 } END { print f + 0 }')" "1"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" 2>/dev/null ); cr_rc=$?
+same "DPR33 S1 a second write exits 0, parented on the first" \
+  "$cr_rc $(git --git-dir="$LF/origin.git" rev-parse -q --verify 'refs/gov/builds/tFix/card^')" "0 $cr_c1"
+cr_before=$(git --git-dir="$LF/origin.git" for-each-ref)
+for cr_args in "write tFix" "read tFix --message $LF/m.txt" "write bad/slug --message $LF/m.txt" "write tFix --message $LF/none.txt" "write tFix --message $LF/empty.txt"; do
+  cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref $cr_args 2>/dev/null ); cr_rc=$?
+  same "DPR33 S1 '--card-ref $cr_args' exits 2 naming why" "$cr_rc ${cr_out%% — *}" "2 card-ref not written"
+done
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix 2>/dev/null )
+hit  "$cr_out" "card-ref not written — the form is --card-ref write <slug> --message <file>"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write bad/slug --message "$LF/m.txt" 2>/dev/null )
+hit  "$cr_out" "card-ref not written — the build is no build-folder name: bad/slug"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/none.txt" 2>/dev/null )
+hit  "$cr_out" "card-ref not written — the message file is not readable:"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/empty.txt" 2>/dev/null )
+hit  "$cr_out" "card-ref not written — the message file is empty:"
+git -C "$LF/c1" remote add second "$LF/origin.git"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" 2>/dev/null ); cr_rc=$?
+git -C "$LF/c1" remote remove second
+same "DPR33 S1 a clone with two remotes exits 2 under check 24" "$cr_rc" "2"
+hit  "$cr_out" "card-ref not written — the clone does not declare exactly one remote, check 24"
+mv "$LF/origin.git" "$LF/away.git"
+cr_out=$( cd "$LF/c1" && GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" 2>/dev/null ); cr_rc=$?
+mv "$LF/away.git" "$LF/origin.git"
+same "DPR33 S1 an origin that does not answer the read exits 2" "$cr_rc" "2"
+hit  "$cr_out" "card-ref not written — the remote did not answer, git fetch exited"
+same "DPR33 S1 no refusal moved a ref on the origin" "$(git --git-dir="$LF/origin.git" for-each-ref)" "$cr_before"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
+mkdir -p "$LF/stub"; cr_sd=$(cd "$LF/stub" && pwd)
+printf '%s\n' '#!/bin/sh' "echo \"\$*\" >> \"$cr_sd/git.log\"" "exec \"$LF_GIT\" \"\$@\"" > "$LF/stub/git"; chmod +x "$LF/stub/git"
+cr_out=$( cd "$LF/c1" && PATH="$cr_sd:$PATH" GOV_RUNLOG=0 bash "$SCRIPT" --card-ref write tFix --message "$LF/m.txt" 2>/dev/null ); cr_rc=$?
+same "DPR33 AC5 with the switch off it prints card-ref — off and exits 0" "$cr_rc|$cr_out" "0|card-ref — off"
+same "DPR33 AC5 ...the stubbed git logged a call, so the stub was on PATH" "$([ -s "$LF/stub/git.log" ] && echo logged || echo empty)" "logged"
+same "DPR33 AC5 ...and no fetch and no push" "$(grep -cE '(^| )(fetch|push)( |$)' "$LF/stub/git.log")" "0"
+rm -rf "$LF"
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-19 — THE PROJECT-LEVEL REQUEST RECORD. Over the lease fixture's origin, its clone
 # c1 as node a under session qA and a second clone c2 as node b under qB: a user no fleet row names is
 # refused before any commit (AC3); A's request lands `refs/gov/requests/<key>`, one parentless commit
@@ -22838,7 +22892,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `same`, its AC4 loop's five acts folded into one and its checklist pass's unnamed-act arm among
 # them, and 1 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3915
+# RAISED 3915 -> 3936 by TOOL-dPlacedRequest-33: the card-ref block's 21 region-eight assertions (15
+# `same`, its refusal loop's five among them, one per pass, and 6 `hit`), off the diff's own lines; no
+# skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3936
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23107,7 +23164,8 @@ FLOOR_SHARD_7=311
 # RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
 # RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
 # RAISED 1138 -> 1146 by TOOL-dPlacedRequest-40: the same 8 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1146
+# RAISED 1146 -> 1167 by TOOL-dPlacedRequest-33: the same 21 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1167
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

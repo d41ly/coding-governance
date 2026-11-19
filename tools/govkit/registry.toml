@@ -378,7 +378,7 @@ why = "gov's own red/green arms for the two files above, which are themselves re
 
 [[exempt]]
 path = "skills/session-kickoff/card-store.fixture.sh"
-why = "gov's own fixture for the build card, deliberately not shipped. Each case copies the memory-tree and loop kits out of the tree it sits in into a scratch repository and drives the engine beside it against a bare remote; the kickoff self-test's arm runs it where it sits beside the checker and says so where it does not. TOOL-dPlacedRequest-2 S12."
+why = "gov's own fixture for the build card, deliberately not shipped. Each case copies the memory-tree, loop and unattended kits out of the tree it sits in into a scratch repository and drives the engine beside it against a bare remote; the kickoff self-test's arm runs it where it sits beside the checker and says so where it does not. TOOL-dPlacedRequest-2 S12."
 
 [[exempt]]
 path = "skills/session-kickoff/card-compaction.fixture.sh"
