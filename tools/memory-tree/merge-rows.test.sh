@@ -229,6 +229,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm below is unrunnable"; exit 2; }
 # This kit's own directory NAME, and each sibling kit through the resolver, which reads the install
 # receipt first. `KIT_REL` in this suite is the tool root; the heredocs below read `KIT` from the
@@ -847,7 +865,7 @@ E=$(mktemp -d); SCRATCH="$SCRATCH $E"
 mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${LIB}" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
 seed_driver_kit "$E/${PFX}${KIT}"
-cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh "$E/${PFX}lib/"
+cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh $LIB_DIR/refuse-wrong-shell.sh "$E/${PFX}lib/"
 (
   cd "$E" || exit 2
   git init -q -b main
@@ -1900,7 +1918,7 @@ LIB=${PFX}lib
 mkdir -p "$W/$MT" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"
 seed_driver_kit "$W/$MT"
-cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
+cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$ROOT/$LIB/refuse-wrong-shell.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 (
   cd "$W" || exit 2
@@ -1958,7 +1976,7 @@ mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as
   mkdir -p "$d/$mt" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
   seed_driver_kit "$d/$mt"
-  cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$d/$lb/"
+  cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$ROOT/$LIB_DIR/refuse-wrong-shell.sh" "$d/$lb/"
   git -C "$d" init -q -b main
   git -C "$d" config user.email t@e
   git -C "$d" config user.name t

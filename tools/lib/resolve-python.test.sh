@@ -41,6 +41,8 @@ bad() { echo "FAIL $1"; st=1; n=$((n+1)); }
 # rather than a skip that reports success.
 # shellcheck source=/dev/null
 . "$CANON"
+. "$HERE/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 REALPY=$(resolve_python) || { echo "FAIL no python on this host at all — the arms below cannot run"; exit 2; }
 REALPY_ABS=$(command -v "$REALPY")
 
@@ -317,7 +319,7 @@ out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r
 # dWitnessedBar's, and any grammar change outside the static mode's eight shapes.
 FD="$TMP/fd"; mkdir -p "$FD/$KIT_REL"
 printf '%s\n' "$FLOOR" > "$FD/$KIT_REL/python-floor.txt"; sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FD/copy.sh"
-cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$FD/$KIT_REL/"
+cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$HERE/refuse-wrong-shell.sh" "$FD/$KIT_REL/"
 PF701='c = 1\nv = f"{"X" if c else "y"}"\n'
 printf "$PF701" > "$FD/planted.py"
 run_down_git() { git -C "$FD" -c user.email=t@e -c user.name=t "$@"; }
@@ -406,6 +408,7 @@ needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
+refuse_wrong_shell|$ROOT/$KIT_REL/refuse-wrong-shell.sh|$KIT_REL/refuse-wrong-shell
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -468,6 +471,9 @@ read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 # policy command each carry it inline.
 # read_open_py (TOOL-aLightenedLoop-3 S3) is the `open` audit event's read filter: the policy kit's
 # guard trace and the spec-token checker's input record each carry it inline, both copy-installed.
+# refuse_wrong_shell (TOOL-dWitnessedBar-27 S1) is the wrong-shell refusal every entry point that
+# carries the resolve_python block carries directly after it; a sourcer of resolve-python.sh sources the
+# canonical instead, and the coverage arm below the loop holds the population to one shape or the other.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -494,6 +500,55 @@ while IFS='|' read -r stem canon excl; do
     done
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
+
+# THE WRONG-SHELL REFUSAL'S COVERAGE, BOTH WAYS (TOOL-dWitnessedBar-27 S5). The parity row above holds
+# every inline `refuse_wrong_shell` block to its canonical; this holds the population to the refusal,
+# over sets re-derived at every run from the tracked shell files outside the memory tree, each break
+# naming its file: (1) every inline member, a `# >>> resolve_python` carrier less the library, carries
+# the block and a `refuse_wrong_shell || exit 2` line outside it; (2) every carrier of the block, less
+# its canonical, is an inline member; (3) every file sourcing `refuse-wrong-shell.sh` carries the line;
+# (4) every file carrying the line carries the block or that source, and the library carries neither.
+# Each of the four sets must be non-empty, so an empty population reds. WHAT THIS DOES NOT CHECK: that a
+# file sourcing `resolve-python.sh` through a path it derives sources `refuse-wrong-shell.sh` at all,
+# TOOL-dWitnessedBar-50's predicate; the call's text order against `resolve_python`,
+# TOOL-dWitnessedBar-51's; and a fixture's copy set.
+scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line per break, then the counts
+  local root=$1 lib=$2 rws=$3 f
+  local -A inl=() blk=() src=() call=()
+  local ps=('*.sh' '.githooks/*' ':!memory/')
+  while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$lib" ] && inl[$f]=1; done \
+    < <(cd "$root" && git grep -l '^# >>> resolve_python' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && [ "$f" != "$rws" ] && blk[$f]=1; done \
+    < <(cd "$root" && git grep -l '^# >>> refuse_wrong_shell' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && src[$f]=1; done \
+    < <(cd "$root" && git grep -l -E '^[[:space:]]*(\.|source)[[:space:]]+[^[:space:]]*refuse-wrong-shell\.sh' -- "${ps[@]}")
+  while IFS= read -r f; do [ -n "$f" ] && call[$f]=1; done \
+    < <(cd "$root" && git grep -l -E '^[[:space:]]*refuse_wrong_shell \|\| exit 2[[:space:]]*$' -- "${ps[@]}")
+  for f in "${!inl[@]}"; do
+    [ -n "${blk[$f]:-}" ] || echo "(1) $f resolves python and carries no refuse_wrong_shell block"
+    [ -n "${call[$f]:-}" ] || echo "(1) $f resolves python and never calls refuse_wrong_shell || exit 2"
+  done
+  for f in "${!blk[@]}"; do
+    [ -n "${inl[$f]:-}" ] || echo "(2) $f carries a refuse_wrong_shell block and no resolve_python block"
+  done
+  for f in "${!src[@]}"; do
+    [ -n "${call[$f]:-}" ] || echo "(3) $f sources refuse-wrong-shell.sh and never calls refuse_wrong_shell || exit 2"
+  done
+  for f in "${!call[@]}"; do
+    [ -n "${blk[$f]:-}${src[$f]:-}" ] || [ "$f" = "$rws" ] \
+      || echo "(4) $f calls refuse_wrong_shell and neither carries the block nor sources refuse-wrong-shell.sh"
+  done
+  [ -z "$(cd "$root" && git grep -l -e '^# >>> refuse_wrong_shell' -e 'refuse_wrong_shell || exit 2' -- "$lib")" ] \
+    || echo "(4) $lib, only ever sourced, carries the refuse_wrong_shell block or its call"
+  echo "counts ${#inl[@]} ${#blk[@]} ${#src[@]} ${#call[@]}"
+}
+rws_out=$(scan_rws_coverage "$ROOT" "$KIT_REL/resolve-python.sh" "$KIT_REL/refuse-wrong-shell.sh")
+read -r _ rws_ni rws_nb rws_ns rws_nc <<<"$(tail -n 1 <<<"$rws_out")"
+echo "resolve-python.test: refuse_wrong_shell coverage over $rws_ni inline members"
+{ [ "${rws_ni:-0}" -gt 0 ] && [ "${rws_nb:-0}" -gt 0 ] && [ "${rws_ns:-0}" -gt 0 ] && [ "${rws_nc:-0}" -gt 0 ]; } \
+  || bad "the refuse_wrong_shell coverage judged an empty set (inline, block, source, call): ${rws_ni:-} ${rws_nb:-} ${rws_ns:-} ${rws_nc:-}"; ok
+rws_breaks=$(sed '$d' <<<"$rws_out" | sort)
+[ -z "$rws_breaks" ] || bad "the refuse_wrong_shell coverage broke:${rws_breaks//$'\n'/; }"; ok
 
 # ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
 # Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over
@@ -955,6 +1010,40 @@ except ValueError as e:
 [ "$rk_got" = "live new stray
 raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
   || bad "the canonical resolve_retired_kits breaks its contract: ${rk_got//$'\n'/ | }"; ok
+
+# ---- 2n. THE WRONG-SHELL REFUSAL, ITS THREE TWINS OVER ONE TRUTH TABLE (TOOL-dWitnessedBar-27) -------
+# Parity holds every copy to its canonical; this holds the three canonicals to one verdict per row of
+# the spec's §4 table: the shell's `bash refuse-wrong-shell.sh --probe <path>`, its marker staged by
+# WSL_DISTRO_NAME, set or unset, and resolve_bash.py's `wrong_shell_at` and resolve_bash.js's
+# `wrongShellAt` called with the row's path and marker. `1` is a refusal. WSL's interop entry cannot be
+# unstaged, so on a host carrying it (the held WSL mirror) a marker-0 row asks the sourced shell
+# predicate instead of the probe. A host with no node prints nothing and reds, never skips. WHAT THIS
+# DOES NOT CHECK: a real WSL bash over a `/mnt/` checkout, which the spec's AC1, AC4 and AC6 staged on
+# node d, or a resolver copy refusing for its own location, which the parity rows hold to the canonical.
+RWS_ROWS="1|/mnt/c/r/tools/x.sh|1
+1|/home/u/mirror.held/s/tools/x.sh|0
+0|/mnt/c/r/tools/x.sh|0
+0|C:/r/tools/x.sh|0
+0|/c/r/tools/x.sh|0
+1|/mnt/data/x.sh|0"
+rws_want=$(printf '%s\n' "$RWS_ROWS" | cut -d'|' -f3)
+rws_sh=$(while IFS='|' read -r w p _; do
+  if [ "$w" = 1 ]; then WSL_DISTRO_NAME=staged bash "$HERE/refuse-wrong-shell.sh" --probe "$p" 2>/dev/null
+  elif [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; then bash -c '. "$1"; wrong_shell_at "$2" 0 && exit 2; exit 0' _ "$HERE/refuse-wrong-shell.sh" "$p"
+  else env -u WSL_DISTRO_NAME bash "$HERE/refuse-wrong-shell.sh" --probe "$p" 2>/dev/null; fi
+  case $? in 0) echo 0 ;; 2) echo 1 ;; *) echo "exit $?" ;; esac
+done <<<"$RWS_ROWS")
+rws_py=$(printf '%s\n' "$RWS_ROWS" | "$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); from resolve_bash import wrong_shell_at
+for line in sys.stdin.read().split():
+    w, p, _ = line.split("|"); print(int(wrong_shell_at(p, w == "1")))' "$HERE" | tr -d '\r')
+rws_js=$(printf '%s\n' "$RWS_ROWS" | "${NODE:-node}" -e 'const { wrongShellAt } = require(process.argv[1]);
+for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Boolean)) {
+  const [w, p] = line.split("|"); console.log(wrongShellAt(p, w === "1") ? 1 : 0);
+}' "$HERE/resolve_bash.js" 2>&1 | tr -d '\r')
+[ "$(printf '%s\n' "$rws_want" | grep -c .)" = 6 ] || bad "2n: the wrong-shell truth table did not read as six rows"; ok
+[ "$rws_sh" = "$rws_want" ] || bad "2n: refuse-wrong-shell.sh --probe left the truth table: $(printf '%s' "$rws_sh" | tr '\n' ' ')"; ok
+[ "$rws_py" = "$rws_want" ] || bad "2n: resolve_bash.py's wrong_shell_at left the truth table: $(printf '%s' "$rws_py" | tr '\n' ' ')"; ok
+[ "$rws_js" = "$rws_want" ] || bad "2n: resolve_bash.js's wrongShellAt left the truth table: $(printf '%s' "$rws_js" | tr '\n' ' ')"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

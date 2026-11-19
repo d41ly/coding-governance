@@ -84,6 +84,8 @@ WIRING="$TOOL_ROOT/check-wiring.sh"
 [ -f "$WIRING" ] || { echo "FAIL the wiring checker is not at $WIRING, so the session step cannot be exercised"; exit 2; }
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
+. "$KIT_LIB/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
 
 # 57, then 83: the F6 fold of the closing diff review round 1 added exactly 26 executed assertions —

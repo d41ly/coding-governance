@@ -27,5 +27,7 @@ set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=/dev/null
 . "$HERE/resolve-python.sh"
+. "$HERE/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 PY=$(resolve_python) || exit 2
 exec "$PY" "$@"
