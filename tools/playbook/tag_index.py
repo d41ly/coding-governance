@@ -59,6 +59,7 @@ import fnmatch
 import functools
 import hashlib
 import importlib.util
+import json
 import os
 import pathlib
 import re
@@ -305,7 +306,7 @@ UNIT_EXTRACTORS = ("instruction_units:extract_unit", "instruction_units:extract_
 
 #: the one table-to-key map both TOML row readers read: a table absent here keys its rows on `tag`
 #: (PLAY-dOrderedCharter-40 S4, its section 8 F4)
-ROW_TAG_KEYS = {"reference": "registry", "key": "name", "command": "verb"}
+ROW_TAG_KEYS = {"reference": "registry", "key": "name", "command": "verb", "numbered_check": "id"}
 
 
 def read_toml_tags(text, table):
@@ -474,19 +475,80 @@ def extract_policy(ctx, path, text=None):
     return rows
 
 
-def extract_command(ctx, path, text=None):
-    """The `command` namespace: `command.<id>.<verb>` for each `[[command]]` row of a kit descriptor
-    `extract_kit` reads, `<id>` the descriptor's top-level `id`; a descriptor with no string `id` yields
-    nothing (TOOL-dDeclaredLoop-18 S4)."""
-    if text is None:
-        return extract_kit(ctx, path)
+def derive_kit_rows(text, ns, table):
+    """`<ns>.<id>.<key>` for each `[[table]]` row of a kit descriptor's `text`, `<id>` the descriptor's
+    top-level `id` and `<key>` the row's ROW_TAG_KEYS key; a descriptor with no string `id` yields
+    nothing. The one body of every extractor minting a member from a descriptor table (TOOL-dWitnessedBar-12)."""
     try:
         kid = tomllib.loads(text).get("id")
     except tomllib.TOMLDecodeError:
         return []
     if not isinstance(kid, str) or not kid:
         return []
-    return [(f"command.{kid}.{verb}", *rest) for verb, *rest in derive_tag_rows(text, "command")]
+    return [(f"{ns}.{kid}.{key}", *rest) for key, *rest in derive_tag_rows(text, table)]
+
+
+def extract_command(ctx, path, text=None):
+    """The `command` namespace: `command.<id>.<verb>` for each `[[command]]` row of a kit descriptor
+    `extract_kit` reads (TOOL-dDeclaredLoop-18 S4)."""
+    if text is None:
+        return extract_kit(ctx, path)
+    return derive_kit_rows(text, "command", "command")
+
+
+def extract_check(ctx, path, text=None):
+    """The `check` namespace: `check.<id>.<check id>` for each `[[numbered_check]]` row of a kit descriptor
+    `extract_kit` reads, beside its `[check]` table, which is govkit's verifier (TOOL-dWitnessedBar-12 S3)."""
+    if text is None:
+        return extract_kit(ctx, path)
+    return derive_kit_rows(text, "check", "numbered_check")
+
+
+def _read_leg_rows(text):
+    """(row, line, end_line, span) for each object of a leg manifest's JSON list, at its own lines;
+    a manifest that does not parse, or is no list, yields nothing."""
+    dec = json.JSONDecoder()
+    try:
+        if not isinstance(json.loads(text), list):
+            return []
+    except ValueError:
+        return []
+    lines = text.splitlines()
+    out, i = [], text.index("[") + 1
+    while True:
+        while i < len(text) and text[i] in " \t\r\n,":
+            i += 1
+        if i >= len(text) or text[i] == "]":
+            return out
+        row, end = dec.raw_decode(text, i)
+        n, last = text.count("\n", 0, i) + 1, text.count("\n", 0, end) + 1
+        if isinstance(row, dict):
+            out.append((row, n, last, "\n".join(lines[n - 1:last])))
+        i = end
+
+
+def extract_leg(ctx, path, text=None):
+    """The `leg` namespace: each row's `tag` in the leg manifest, `{prefix}/gate-legs.json` under the tool
+    root, at the row's lines; a row with no string `tag` yields nothing (TOOL-dWitnessedBar-12 S3)."""
+    if text is None:
+        troot = pathlib.PurePosixPath(ctx["kit"]).parent.as_posix()
+        return "" if path == resolve_prefix_token("{prefix}/gate-legs.json", troot) else None
+    return [(row["tag"], "tag", n, end, span) for row, n, end, span in _read_leg_rows(text)
+            if isinstance(row.get("tag"), str) and row["tag"]]
+
+
+def extract_pack(ctx, path, text=None):
+    """The `pack` namespace: `pack.<word>` for each distinct `pack` value of the leg manifest's rows, at the
+    first row carrying it (TOOL-dWitnessedBar-12 S3)."""
+    if text is None:
+        return extract_leg(ctx, path)
+    rows, seen = [], set()
+    for row, n, end, span in _read_leg_rows(text):
+        word = row.get("pack")
+        if isinstance(word, str) and word and word not in seen:
+            seen.add(word)
+            rows.append((f"pack.{word}", "tag", n, end, span))
+    return rows
 
 
 CODE_SPAN_RE = re.compile(r"(`+)(.+?)(?<!`)\1(?!`)")

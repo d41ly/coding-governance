@@ -162,6 +162,7 @@ ok = true
 # could name the conf, and the pre-push force being bounded (GATE_FULL_MAX_LAG) is why a scoped push
 # must never be the only thing between a raised pin and a verdict.
 [[gate_leg]]
+tag = "leg.lexicon.lexicon-naming-predicates"
 name = "lexicon naming predicates"
 subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
@@ -170,6 +171,7 @@ doc_reads = ["{memory_root}/builds/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.lexicon.lexicon-wiring"
 name = "lexicon wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]

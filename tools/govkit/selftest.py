@@ -1754,6 +1754,17 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
                                                 f"says {_st!r}"), out_st[-1500:])
         for f, b in keep.items():
             f.write_bytes(b)
+    # Run f (TOOL-dWitnessedBar-12 AC7): 7h compares `tag`, so a descriptor tag the manifest does not
+    # hold reds, naming the leg and both tags.
+    _tg = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["tag"]
+    write_staged(desc, f"tag = {json.dumps(_tg)}\n", 'tag = "leg.push-main.drifted"\n', "f tag")
+    rt = run_selfcheck(gcopy)
+    out_tg = rt.stdout + rt.stderr
+    check("[dWB-12] f: 7h reds a descriptor tag the manifest does not hold, naming the leg and both tags",
+          rt.returncode != 0 and check_line(out_tg, "entry 'push-main'", f"gate leg '{leg}' with tag "
+                                            "'leg.push-main.drifted'", f"says {_tg!r}"), out_tg[-1500:])
+    for f, b in keep.items():
+        f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()
@@ -2744,6 +2755,17 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
                                             floor=gk.STAGE_FLOOR_RUN_GATES) is want, ver)
     check("ST1: the manifest writer routes the stage through its own floor",
           "floor=STAGE_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-12 AC6: the tag's row of LEG_KEY_FLOORS, one minor below it and at it, derived
+    # from the table so a later raise moves both sides; and the writer reads that row.
+    _fl = gk.LEG_KEY_FLOORS["tag"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"TG1: a target at run-gates {ver} {'gets' if want else 'does not get'} a tag",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["tag"]) is want, ver)
+    check("TG1: the manifest writer routes the tag through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["tag"])' in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"

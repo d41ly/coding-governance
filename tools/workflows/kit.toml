@@ -126,6 +126,7 @@ check = ["bash", "{kit}/check-protocol-parity.test.sh"]
 stage = 1
 
 [[gate_leg]]
+tag = "leg.review-harness.verifier-fan-out"
 name = "verifier fan-out"
 subject = "repo"
 argv = ["bash", "{kit}/check-verifier-fanout.sh"]
@@ -133,6 +134,7 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.review-harness.review-protocol-parity-kit-vs-dogfood"
 name = "review-protocol parity (kit vs dogfood)"
 subject = "repo"
 argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
@@ -152,6 +154,7 @@ the parity gate is this entry's leg and it performs its own render comparison; t
 """
 
 [[gate_leg]]
+tag = "leg.review-harness.review-join-ban-no-ref-keyed-join"
 name = "review-join ban (no ref-keyed join)"
 subject = "repo"
 argv = ["bash", "{kit}/check-review-join.sh"]
@@ -159,6 +162,7 @@ guard = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.review-harness.workflow-script-syntax"
 name = "workflow script syntax"
 subject = "repo"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
@@ -172,6 +176,7 @@ stage = ["step.test"]
 # self-test bar: a guard naming this kit made the spec-tokens guards join demand that every live spec
 # touching this kit name the leg, and the self-test costs about a second (TOOL-aSightedSkeptic-9 rev-3).
 [[gate_leg]]
+tag = "leg.review-harness.review-replay-selftest"
 name = "review-replay selftest"
 subject = "kit"
 argv = ["python3", "{kit}/review_replay.py", "--selftest"]

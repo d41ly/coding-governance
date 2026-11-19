@@ -187,6 +187,7 @@ ok = true
 probe = { must_exist = ".memory-tree.conf" }
 
 [[gate_leg]]
+tag = "leg.memory-tree.memory-hygiene"
 name = "memory hygiene"
 subject = "repo"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
@@ -248,6 +249,7 @@ the adopter's two modes are `--scaffold` and `--render`, measured, and neither i
 """
 
 [[gate_leg]]
+tag = "leg.memory-tree.verdict-epoch-kit-version-dates-the-engine"
 name = "verdict epoch (kit version dates the engine)"
 subject = "repo"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
@@ -255,6 +257,7 @@ guard = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.kit-dogfood-doc-parity"
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
@@ -274,6 +277,7 @@ stage = ["step.test"]
 # than fixed.
 
 [[gate_leg]]
+tag = "leg.memory-tree.method-carriers-every-pointer-declared"
 name = "method carriers (every pointer declared)"
 subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
@@ -281,6 +285,7 @@ guard = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.build-readme-slot-contract"
 name = "build README slot contract"
 subject = "repo"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
@@ -288,6 +293,7 @@ guard = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.build-index-selftest"
 name = "build-index selftest"
 subject = "kit"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
@@ -295,6 +301,7 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.corpus-ids-selftest"
 name = "corpus-ids selftest"
 subject = "kit"
 argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
@@ -302,6 +309,7 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.gotchas-selftest"
 name = "gotchas selftest"
 subject = "kit"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
@@ -309,6 +317,7 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.row-grammar-selftest"
 name = "row-grammar selftest"
 subject = "kit"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
@@ -320,6 +329,7 @@ stage = ["step.test"]
 # their own deployer build, so withholding the leg would ship the suite and not the check that runs
 # it. Held like its four siblings, by `subject = kit`.
 [[gate_leg]]
+tag = "leg.memory-tree.backlog-migration-selftest"
 name = "backlog migration selftest"
 subject = "kit"
 argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
@@ -327,6 +337,7 @@ guard = ["{kit}/"]
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.marker-contracts"
 name = "marker contracts"
 subject = "repo"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
@@ -335,6 +346,7 @@ doc_reads = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.harness-arms-fail-branches-armed-or-pinned"
 name = "harness arms (fail branches armed or pinned)"
 subject = "repo"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
@@ -342,6 +354,7 @@ guard = []
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.check-arms-selftest"
 name = "check-arms selftest"
 subject = "kit"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
@@ -353,6 +366,7 @@ stage = ["step.test"]
 # kit, and a doc-only push can still carry a product file the target's doc class names. Full history,
 # because a shallow clone refuses rather than grading the commits it lost.
 [[gate_leg]]
+tag = "leg.memory-tree.routed-commits-name-a-specced-unit"
 name = "routed commits name a specced unit"
 subject = "repo"
 argv = ["python3", "{kit}/routed_commits.py"]
@@ -362,6 +376,7 @@ history_depth = "full"
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.memory-tree.routed-commits-selftest"
 name = "routed-commits selftest"
 subject = "kit"
 argv = ["python3", "{kit}/routed_commits.py", "--selftest"]

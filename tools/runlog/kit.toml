@@ -92,6 +92,7 @@ means = "adopted"
 # that ADDED each run-state path, and a shallow clone's boundary commit adds every one of them at
 # once, which would give every run of a build one start and red the leg on a history it cannot see.
 [[gate_leg]]
+tag = "leg.runlog.runlog-record-schema"
 name = "runlog record schema"
 subject = "repo"
 argv = ["python", "{kit}/runlog.py", "check-records"]
@@ -103,6 +104,7 @@ stage = ["step.test"]
 # its subject is the target's own rendered Skill, which goes stale when the target's memory root moves
 # or its template is edited, with nobody touching the adopter.
 [[gate_leg]]
+tag = "leg.runlog.runlog-skill-wiring"
 name = "runlog skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]

@@ -94,6 +94,7 @@ probe = { must_exist = "{kit}/drift_signals.py" }
 means = "adopted"
 
 [[gate_leg]]
+tag = "leg.drift-audit.drift-audit-records"
 name = "drift-audit records"
 subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]
@@ -141,6 +142,7 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 # the only shape that is self-consistent. The pointer is therefore still wrong in a deployed tree,
 # and the script now SAYS SO instead of being silent; the real fix is `TOOL-aScouredKit-26`.
 [[gate_leg]]
+tag = "leg.drift-audit.drift-audit-wiring"
 name = "drift-audit wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]

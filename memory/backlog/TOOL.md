@@ -702,10 +702,9 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-62](../builds/dWellOiledMachine/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
-| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | INPROGRESS | MED | TOOL-dWitnessedBar-12 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
 | [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |
-| [TOOL-dWitnessedBar-34](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-12 | 2026-10-25 | PLAY-dOrderedCharter-50 S2 READS EACH KNOWN COPY. Its owed_rows.py… |
 | [TOOL-dWitnessedBar-35](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-10-25 | TOOL-dGroundRules-25 S28 KEEPS THE BARE-BASH FALL-BACK. Its… |
 | [TOOL-dWitnessedBar-36](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-3 | 2026-10-25 | TOOL-dUnstuckLanding-11 ACCEPTS ON A KEY THIS BUILD RETIRES. Its… |
 | [TOOL-dWitnessedBar-37](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-28 | 2026-10-25 | PLAY-dOrderedCharter-36's KIND SCHEMA CANNOT SAY HOW A LEG WIDENS. It… |

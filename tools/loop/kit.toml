@@ -173,6 +173,7 @@ means = "adopted"
 # THE DEFINITION LEG SHIPS. Its subject is the definition every reader in the target reads, so a
 # failure means the target's loop does not read, whoever changed it.
 [[gate_leg]]
+tag = "leg.loop.loop-definition"
 name = "loop definition"
 subject = "repo"
 argv = ["python", "{kit}/loop_lib.py", "--check"]
@@ -184,6 +185,7 @@ stage = ["step.test"]
 # THE TRANSITION TABLES' LEG SHIPS, for the reason the definition's does: its subject is the tables every
 # mover in the target reads, so a failure means the target's moves do not hold (TOOL-dDeclaredLoop-13).
 [[gate_leg]]
+tag = "leg.loop.loop-transition-tables"
 name = "loop transition tables"
 subject = "repo"
 argv = ["python", "{kit}/loop_table.py", "check", "--selftest"]

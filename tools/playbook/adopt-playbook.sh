@@ -356,6 +356,10 @@ loop-rows $_tk|0|tags: plant loop-rows · where: rc=0 0, check: rc=0
 loop-bad-seg $_tk|1|· shape · step.Plan · segment 'Plan' is outside
 command-rows $_tk|1|\`command.corekit.old\` is cited and undeclared in command|\`command.corekit.new\`
 ns-word-leaf $_tk|0|tags: green · 0 red|namespace word
+leg-rows $_tk|0|tags: plant leg-rows · where: rc=0, check: rc=0
+pack-rows $_tk|0|tags: plant pack-rows · members pack.ratchet pack.tags, check: rc=0
+check-rows $_tk|0|members check.memory-tree.23 check.unattended.23, check: rc=0
+check-rows $_tk|0|tags: unarmed check (0 not graded)
 escaped-word $_tk|1|namespace row 'a.b' is outside seg, so no tag is graded against it
 escaped-word $_tk|1|· shape · a.b.c · namespace 'a' is not registered
 unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer

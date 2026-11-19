@@ -308,7 +308,8 @@ fail=0
 # and arm 14j's three on a refused key read, counted where no policy kit resolves too. Counted by reading.
 # 450 -> 456, TOOL-aMeasuredDrag-12: arm 1m's four, arm 1m2's one and arm 1m3's one, none gated.
 # Counted off the arms; this pass runs no suite.
-FLOOR_ASSERTIONS=456
+# 456 -> 457, TOOL-dWitnessedBar-12: arm 1a's `tag` control. Not gated. Counted by reading.
+FLOOR_ASSERTIONS=457
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -345,6 +346,10 @@ FLOOR_ASSERTIONS=456
 # attribution (exit 143 before any summary with the worktree gone; no orphan line), both counted on
 # either branch of their liveness check, and the one source scan of this kit's signal traps.
 n=0
+# THE MANIFEST'S ONE KEY SET (TOOL-dWitnessedBar-12 S4). Arm 1a and `keyset_probe` both take it as an
+# argument, so a key cannot be admitted by one and refused by the other, and owed_rows.py reads this
+# line. A row key a later unit adds is added here once, with its control pair in arm 1a.
+LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag"
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
 # Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
@@ -406,7 +411,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
+keys = set(sys.argv[2].split())   # LEG_KEYS, the one key set
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -416,15 +421,15 @@ for l in legs:
     if not isinstance(l, dict):
         print("canary: a leg row is not an object"); sys.exit(1)
     for k in l:
-        if k not in KNOWN:
+        if k not in keys:
             stray.append("%s -> %s" % (l.get("name", "?"), k))
 if stray:
-    print("canary: leg row(s) carry a key outside the pinned set %s: %s"
-          % (sorted(KNOWN), ", ".join(stray)))
+    print("canary: leg row(s) carry a key outside the pinned set LEG_KEYS %s: %s"
+          % (sorted(keys), ", ".join(stray)))
     print("canary: a near-miss spelling of `impure` is exactly what this pin exists to catch —")
     print("canary: the reuse path would find no declaration and reuse a leg that reads a remote.")
     sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_FILE" "$LEG_KEYS" || fail=1
 
 # ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
 #     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
@@ -827,10 +832,10 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "reads", "chunk", "subject", "ceiling", "signature", "doc_reads", "pack", "enforces", "pass_leg", "scope_of", "stage"}
+keys = set(sys.argv[2].split())   # LEG_KEYS, the one key set
 legs = json.load(open(sys.argv[1]))
-sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
-' "$1"; }
+sys.exit(1 if any(k not in keys for l in legs for k in l) else 0)
+' "$1" "$LEG_KEYS"; }
 if keyset_probe "$ctl/clean.json" && ! keyset_probe "$ctl/typo.json"; then :
 else
   echo "canary: the manifest key-set predicate is unarmed — it must PASS a manifest with no impure key and FAIL a near-miss spelling; one of the two did not hold"
@@ -865,7 +870,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`reads\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `enforces` (PLAY-dOrderedCharter-50 S1), by the same two halves, in both KNOWN copies before
+# ...and `enforces` (PLAY-dOrderedCharter-50 S1), by the same two halves, in `LEG_KEYS` before
 # the first leg row carries it.
 n=$((n+1))
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"enforces":["r"]}]' > "$ctl/enf.json"
@@ -875,7 +880,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`enforces\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `pass_leg` (TOOL-aNimbleMend-2 S6), by the same two halves, in both KNOWN copies: the field
+# ...and `pass_leg` (TOOL-aNimbleMend-2 S6), by the same two halves, in `LEG_KEYS`: the field
 # `pass_legs.py --apply` derives onto a row, and the near-miss is the plural a hand would type.
 n=$((n+1))
 printf '%s' '[{"name":"a","pass_leg":true,"argv":["bash","x.sh"]}]' > "$ctl/pl.json"
@@ -885,7 +890,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`pass_leg\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `scope_of` (TOOL-aNimbleMend-4 S1), by the same two halves, in both KNOWN copies: the leg a
+# ...and `scope_of` (TOOL-aNimbleMend-4 S1), by the same two halves, in `LEG_KEYS`: the leg a
 # scoped row is a cheap form of, whose reds `pass_legs.py --write` credits it. The near-miss is the
 # kebab spelling.
 n=$((n+1))
@@ -896,7 +901,7 @@ else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`scope_of\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
-# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in both KNOWN copies: the step tags
+# ...and `stage` (TOOL-dDeclaredLoop-56 S24), by the same two halves, in `LEG_KEYS`: the step tags
 # every leg row carries, and the near-miss is the plural a hand would type.
 n=$((n+1))
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stage":["step.test"]}]' > "$ctl/st.json"
@@ -904,6 +909,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"stages":["step.test"]}]' > "$c
 if keyset_probe "$ctl/st.json" && ! keyset_probe "$ctl/sttypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`stage\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `tag` (TOOL-dWitnessedBar-12 S4), by the same two halves, in `LEG_KEYS`: the leg's tag in the
+# `leg` namespace beside its `name`, and the near-miss is the plural a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tag":"leg.gov.a"}]' > "$ctl/tg.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"tags":"leg.gov.a"}]' > "$ctl/tgtypo.json"
+if keyset_probe "$ctl/tg.json" && ! keyset_probe "$ctl/tgtypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`tag\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

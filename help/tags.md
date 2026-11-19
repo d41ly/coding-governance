@@ -2,7 +2,7 @@
 
 **What it is.** A tag names one thing in the repository: `doc.build-method` is the build method
 guide, `doc.build-method#m5-recall-and-reuse` its `## M5` section. A tag is `<ns>.<seg>(.<seg>)*`,
-lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Fourteen
+lower-case, at most 64 bytes, and its namespace is a row of `tools/playbook/namespaces.toml`. Eighteen
 namespaces are registered today, each read from the file that declares its members:
 
 | Namespace | Its members come from |
@@ -21,9 +21,13 @@ namespaces are registered today, each read from the file that declares its membe
 | `item` | each `[[item]]` row's `tag` in the same file |
 | `policy` | each `[[key]]` row of `tools/policy/catalogue.toml` whose name is all literal segments, as `policy.<name>` |
 | `command` | each `[[command]]` row, `verb` and `run`, of a kit descriptor, as `command.<kit id>.<verb>` |
+| `leg` | each row's `tag` in `tools/gate-legs.json`, as `leg.<owner>.<name>`, beside the leg's free-text `name`, which stays the key every file keyed by leg joins on |
+| `pack` | each distinct `pack` value of the rows of `tools/gate-legs.json`, as `pack.<word>` |
+| `check` | each `[[numbered_check]]` row of a kit descriptor, `id` and `leg`, beside its `[check]` table, as `check.<kit id>.<check id>` |
 
 A namespace whose file declares nothing yet prints as `unarmed`, and nothing in it is graded: `step`
-and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row.
+and `item` until the loop definition lands, `command` until a descriptor holds a `[[command]]` row,
+`check` until one holds a `[[numbered_check]]` row.
 `policy` is graded today. A tag in a namespace no row registers is red: `role` joins when dBoundRoles
 registers it and `record` with dTotalRecall.
 

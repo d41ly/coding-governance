@@ -104,6 +104,7 @@ probe = { must_exist = ".claude/skills/memory-recall/SKILL.md" }
 means = "adopted"
 
 [[gate_leg]]
+tag = "leg.memory-recall.memory-recall-skill-wiring"
 name = "memory-recall skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]

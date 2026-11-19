@@ -275,6 +275,7 @@ means = "render-failed-half-stamped"
 # `doc_reads` names, so a change that moves only those records leaves it held: run it with the
 # variable at 1, or through `--checks`, after such a change.
 [[gate_leg]]
+tag = "leg.unattended.unattended-kit-gate"
 name = "unattended kit gate"
 subject = "kit"
 argv = ["bash", "{kit}/check-unattended.sh"]
@@ -288,6 +289,7 @@ stage = ["step.test"]
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
 # change a playbook.
 [[gate_leg]]
+tag = "leg.unattended.playbook-validity-gate"
 name = "playbook validity gate"
 subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
@@ -296,6 +298,7 @@ red_after_land = true
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.unattended.pass-order-history"
 name = "pass-order history"
 subject = "repo"
 argv = ["bash", "{kit}/check-pass-order.sh"]
@@ -313,6 +316,7 @@ stage = ["step.test"]
 # measured cost already sits at 73% of it: when the graded population catches up, that ceiling is the
 # next thing to red, and re-declaring it with a reason is the right answer then rather than now.
 [[gate_leg]]
+tag = "leg.unattended.brief-recorded"
 name = "brief-recorded"
 subject = "repo"
 argv = ["bash", "{kit}/check-brief-recorded.sh"]
@@ -323,6 +327,7 @@ red_after_land = true
 stage = ["step.test"]
 
 [[gate_leg]]
+tag = "leg.unattended.unattended-skill-wiring"
 name = "unattended skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]

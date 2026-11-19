@@ -397,7 +397,7 @@ PLANTS = ("none", "rebuild", "two-paths", "dirty", "one-commit", "slice", "retir
           "worktree-recreate", "helper-edit", "held-open", "extractor-removed", "worktree-spelling",
           "positional-spec-revbump", "positional-bulk-move", "queued-writers",
           "policy-ns-word", "policy-catalogue", "policy-family", "loop-rows", "loop-bad-seg", "command-rows",
-          "ns-word-leaf")
+          "ns-word-leaf", "leg-rows", "pack-rows", "check-rows")
 #: PLAY-dOrderedCharter-78 S4's two plants: a `family-id` native class over the fixture's own id grammar,
 #: owned by a build the chain registry lacks, and by the one it holds
 NATIVE_OWNERS = {"foreign-native": "dGhost", "held-native": "fixture"}
@@ -429,6 +429,10 @@ def derive_fixture_row(ns, extractor, role="describes", layer="layer.instruction
 #: TOOL-dDeclaredLoop-18 S6: the policy catalogue and the loop definition as a fixture tree holds them
 FIXTURE_CATALOGUE = instruction_units.derive_tool_rel("policy", "catalogue.toml")
 FIXTURE_LOOP = instruction_units.derive_tool_rel("loop", "loop.toml")
+#: TOOL-dWitnessedBar-12 S8: the leg manifest and two descriptors as a fixture tree holds them
+FIXTURE_LEGS = instruction_units.derive_tool_rel("gate-legs.json")
+FIXTURE_CHECK_KITS = {k: instruction_units.derive_tool_rel(k, "kit.toml") for k in ("memory-tree", "unattended")}
+NUMBERED_CHECK = '\n[[numbered_check]]\nid = "23"\nleg = "{leg}"\n'
 #: PLAY-dOrderedCharter-10 S8: each plant's registry rows and the files it adds to the base fixture
 SHAPE_PLANTS = {
     "bad-ns": (FIXTURE_UNIT_ROW, {"tools/corekit/instructions.toml": '[[unit]]\ntag = "step.build"\n'}),
@@ -483,6 +487,16 @@ SHAPE_PLANTS = {
     # S10: the `ns-word` plant's name cut to one segment, legal in both twins
     "ns-word-leaf": (derive_fixture_row("repo", "fixture_tags:extract_declared"),
                      {"tools/corekit/core.tags": "+practice.repo\n"}),
+    # TOOL-dWitnessedBar-12 S8: the leg manifest's tags, its pack values, and two kits' numbered checks
+    "leg-rows": (derive_fixture_row("leg", "tag_index:extract_leg", "selects"), {FIXTURE_LEGS: json.dumps([
+        {"name": "shell hygiene", "argv": ["bash", "a.sh"], "tag": "leg.gate-lint.shell-hygiene"},
+        {"name": "memory hygiene", "argv": ["bash", "b.sh"], "tag": "leg.gov.memory-hygiene"}], indent=2)}),
+    "pack-rows": (derive_fixture_row("pack", "tag_index:extract_pack", "selects"), {FIXTURE_LEGS: json.dumps([
+        {"name": "a", "argv": ["bash", "a.sh"], "pack": "tags"}, {"name": "b", "argv": ["bash", "b.sh"], "pack": "tags"},
+        {"name": "c", "argv": ["bash", "c.sh"], "pack": "ratchet"}], indent=2)}),
+    "check-rows": (derive_fixture_row("check", "tag_index:extract_check"), {
+        rel: f'id = "{kid}"\n\n[check]\nargv = ["bash", "check.sh"]\n' + NUMBERED_CHECK.format(leg=f"{kid} leg")
+        for kid, rel in FIXTURE_CHECK_KITS.items()}),
 }
 #: PLAY-dOrderedCharter-22's registry plants: each edits the base registry's first row, `doc`'s
 PURPOSE_PLANTS = {
@@ -1153,6 +1167,32 @@ def run_plant(root, top, plant, sets) -> int:
         checked = run_verb(root, "check", None, sets=sets)
         say(f"where: rc={rcs[0]} {rcs[1]}, check: rc={checked}")
         return 1 if any(rcs) or checked else 0
+    if plant == "leg-rows":  # TOOL-dWitnessedBar-12 AC3: a leg tag resolves to its manifest row, the check green
+        rc = run_verb(root, "where", "leg.gate-lint.shell-hygiene", sets=sets)
+        checked = run_verb(root, "check", None, sets=sets)
+        say(f"where: rc={rc}, check: rc={checked}")
+        return 1 if rc or checked else 0
+    if plant in ("pack-rows", "check-rows"):  # TOOL-dWitnessedBar-12 AC4: the members, then an empty `check`
+        ns = plant.split("-")[0]
+
+        def read_members():  # the namespace's distinct defined tags in the fixture's view
+            con = ti.load_index(root)
+            try:
+                ti.load_view(con, root, ti.derive_context(root, root / FIXTURE_KIT / "namespaces.toml"))
+                return sorted({r[0] for r in ti.read_rows(con, ("tag",), like=f"{ns}.%")})
+            finally:
+                con.close()
+        checked = run_verb(root, "check", None, sets=sets)
+        members = read_members()
+        say(f"members {' '.join(members)}, check: rc={checked}")
+        if plant == "pack-rows":
+            return 1 if checked or members != ["pack.ratchet", "pack.tags"] else 0
+        write_commit(root, {rel: (root / rel).read_text(encoding="utf-8").split("\n[[numbered_check]]")[0]
+                            for rel in FIXTURE_CHECK_KITS.values()}, "no numbered check")
+        empty = run_verb(root, "check", None, sets=sets)
+        left = read_members()
+        say(f"without [[numbered_check]]: {len(left)} members, check: rc={empty}")
+        return 1 if checked or empty or left or members != ["check.memory-tree.23", "check.unattended.23"] else 0
     if plant == "policy-catalogue":  # the index's members and families against this plant's own parse of the bytes
         import tomllib
         checked = run_verb(root, "check", None, sets=sets)
