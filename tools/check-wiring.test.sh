@@ -227,6 +227,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
 # as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
 # which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
@@ -332,7 +350,7 @@ install_driver() {
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
   # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
   # not the newline — so the list is two assignments, each of which can be marked.
-  _rels="${ROOTPFX}${MT_KIT}/merge-rows.py ${ROOTPFX}${MT_KIT}/merge-rows.sh ${ROOTPFX}${LIB}/pyrun.sh ${ROOTPFX}${LIB}/resolve-python.sh"
+  _rels="${ROOTPFX}${MT_KIT}/merge-rows.py ${ROOTPFX}${MT_KIT}/merge-rows.sh ${ROOTPFX}${LIB}/pyrun.sh ${ROOTPFX}${LIB}/resolve-python.sh ${ROOTPFX}${LIB}/refuse-wrong-shell.sh"
   for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency

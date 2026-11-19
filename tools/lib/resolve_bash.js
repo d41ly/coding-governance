@@ -20,10 +20,23 @@
 // its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
 // the answer must start MINGW or MSYS, so WSL's launcher is refused under any name. Past GOV_BASH every
 // candidate is run and reported once; `found` is the first that passed, or "" with `refusal` naming
-// every `tried` line. The bare name `bash` is never returned, and nothing is memoised here.
+// every `tried` line. The bare name `bash` is never returned, and nothing is memoised here. On a
+// `posix` host the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/`
+// returns no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried.
+// `wrongShellAt` is resolve_bash.py's `wrong_shell_at` and the shell block `refuse_wrong_shell`'s:
+// true when `wsl` is set and the path sits under a single-letter `/mnt/<drive>/` (TOOL-dWitnessedBar-27).
+function wrongShellAt(path, wsl) {
+  return Boolean(wsl) && /^\/mnt\/[a-z]\//.test(String(path));
+}
 function scanBash({ script = "", host = "" } = {}) {
   const cp = require("child_process"), fs = require("fs"), path = require("path");
   const hostRule = host || (process.platform === "win32" ? "windows" : "posix");
+  if (hostRule === "posix") {
+    const here = path.resolve(__filename);
+    const wsl = Boolean(process.env.WSL_DISTRO_NAME) || fs.existsSync("/proc/sys/fs/binfmt_misc/WSLInterop");
+    if (wrongShellAt(here, wsl)) return { found: "", tried: [], refusal: "WSL is running " + here +
+      " from a Windows checkout under /mnt/; run it with Git's bash (C:/Program Files/Git/bin/bash.exe)" };
+  }
   const tried = [], seen = new Set();
   const runProbe = (cand) => {
     const r = cp.spawnSync(cand, ["-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", String(script)],
@@ -95,6 +108,6 @@ function main(argv) {
   return found ? 0 : 2;
 }
 
-module.exports = { scanBash };
+module.exports = { scanBash, wrongShellAt };
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

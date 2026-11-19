@@ -95,6 +95,8 @@ if [ -z "$resolver" ]; then
 fi
 # shellcheck source=/dev/null
 . "$resolver"
+. "${resolver%/*}/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 if ! py=$(resolve_python); then
   echo "commit-msg: no usable python launcher, so the transition audit did NOT run over this merge."
   echo "commit-msg: Check 26 still binds at the push boundary."

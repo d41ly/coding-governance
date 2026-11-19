@@ -23748,6 +23748,411 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-agent-cap-restatement.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-hook-destinations.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-hook-destinations.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-install-prefix.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-kit-versions.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-line-length.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-line-length.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-microformats.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-playbook-parity.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-playbook-parity.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-template-size.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-testsuite-counts.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/codebase-map/adopt-codebase-map.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/codebase-map/adopt-codebase-map.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/drift-audit/adopt-drift-audit.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/govkit/census.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/lexicon/adopt-lexicon.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/lib/refuse-wrong-shell.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/loop/adopt-loop.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-recall/adopt-memory-recall.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/policy/policy-shim.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/process-monitor/adopt-process-monitor.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/pass-legs.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/runlog/adopt-runlog.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/adopt-unattended.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/adopt-unattended.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/run-unattended-gates.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/check-protocol-parity.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.test.sh"
+    },
+    {
+      "id": "refuse_wrong_shell",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "regen_cmd",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -32238,6 +32643,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "scan_rws_coverage",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "scan_secrets",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -37811,6 +38221,496 @@
       "id": "write_workflow_roles",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "wrongShellAt",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "wrongShellAt",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "wrongShellAt",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/chain-packet.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-agent-cap-restatement.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-hook-destinations.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-hook-destinations.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-install-prefix.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-kit-versions.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-line-length.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-line-length.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-microformats.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-playbook-parity.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-playbook-parity.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-template-size.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-testsuite-counts.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/codebase-map/adopt-codebase-map.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/codebase-map/adopt-codebase-map.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/drift-audit/adopt-drift-audit.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/govkit/census.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/lexicon/adopt-lexicon.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/lib/refuse-wrong-shell.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/loop/adopt-loop.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-recall/adopt-memory-recall.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/policy/policy-shim.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/process-monitor/adopt-process-monitor.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/foreign-prefix.gov.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/pass-legs.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-held-wsl.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/runlog/adopt-runlog.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/adopt-unattended.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/adopt-unattended.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/run-unattended-gates.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/runlog-writer.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/check-protocol-parity.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/check-verifier-fanout.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/spec-audit-optin.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "wrow",

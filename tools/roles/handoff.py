@@ -312,6 +312,15 @@ def extract_brief_section(text, sub_head):
 BASH_NAMES = ("bash.exe", "bash")
 
 
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
 def scan_bash(script="", host=""):
     r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
 
@@ -324,8 +333,16 @@ def scan_bash(script="", host=""):
     candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
     `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
     `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
-    adapter keeps its own, so this stays a function a truth table can call twice."""
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
     host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
     tried, seen = [], set()
 
     def run_probe(cand):
