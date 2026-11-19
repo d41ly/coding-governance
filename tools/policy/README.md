@@ -21,8 +21,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` (TOOL-dGroundRules-17) |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes`, `check_legacy_homes` and `write_legacy_homes`, the ledger factory's loader `load_ledger` and the list's registration reader `read_legacy_registration`, the census tree's `derive_census_tree` over the registry search `derive_registry_tree`, and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`, and `cmd_derive_list` for `--derive` and `--marks`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI, and `readLandedRevision(top)`, the landed revision's full sha as the shim's `landed` prints it |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -134,16 +133,24 @@ owner-silence rule that declines a raise is a later build's reader.
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where
   that is a proper ancestor of HEAD, else the remote tip; no fetched ref is no base, and a list
-  absent at the base is no comparison, never an empty one. It grades `legacy-homes.txt` too, below,
-  against the SAME base: `cmd_lists` reads `resolve_compare_base` once for both lists, the block the
-  codebase map's baseline inlines too (TOOL-dGroundRules-21 S7, S23). It grades that list only where
-  `check_legacy_graded` answers true, and otherwise prints
-  `policy lists: legacy-homes.txt · not graded · <why>` (TOOL-dGroundRules-76).
+  absent at the base is no comparison, never an empty one. `cmd_lists` reads `resolve_compare_base`
+  once for the summary list, the block the codebase map's baseline inlines too (TOOL-dGroundRules-21
+  S7, S23). It grades the legacy list too, below, the ledger row at `memory/project/legacy-homes.txt`,
+  through the baseline ledger factory, whose `compare_to_base` reads the same merge-bar base
+  (TOOL-dWitnessedBar-20). It grades that list only where `check_legacy_graded` answers true, and
+  otherwise prints `policy lists: legacy-homes.txt · not graded · <why>` (TOOL-dGroundRules-76).
   Exit 0 green, 1 red, 2 usage or a refused read.
 - `python <prefix>/policy/policy.py lists --write` — drain the list: it keeps the rows the catalogue
-  still owes and never adds one. An absent list is seeded with every owed row. It writes
-  `legacy-homes.txt`'s derived rows too, under the same `check_legacy_graded` rule, and writes
-  nothing, exit 1, while a derived row is new to the list at the compare base.
+  still owes and never adds one. An absent list is seeded with every owed row. It drains the legacy
+  list too, under the same `check_legacy_graded` rule, through the factory's row writer `write_rows`:
+  a row no home yields leaves and every other row keeps its count, sha and disposition. It writes
+  neither list, exit 1, while the legacy list holds a derived key it lacks, a row the list at the base
+  lacks with no `widened` disposition, or a malformed row.
+- `python <prefix>/policy/policy.py lists --derive legacy-homes` — print one `<conf> TAB <key> TAB 1`
+  line per row `derive_legacy_homes` yields, sorted, its notes on stderr: the seed argv of the list's
+  `[[ledger]]` registration. `lists --marks legacy-homes` prints `<conf> TAB <key> TAB <mark>`
+  instead, the mark read from `GATE_ENV_MARKS` and the home's kind, never stored in the list. Any
+  other list name exits 2.
 
 ## The legacy policy homes
 
@@ -152,36 +159,55 @@ named `.*.conf`, the gate file `.githooks/gate-env.sh`, and the roles kit's hous
 `<tool-root>/roles/house/policy.toml` and found through the inlined `resolve_kit_dir`, home `roles`
 and anchor `house/policy.toml`, never by joining a name to the tool root (TOOL-dGroundRules-21 S25).
 `derive_legacy_homes`
-parses each, never sources one, into rows `<home> <key> <mark>`: every key a kit conf assigns but a
+parses each, never sources one, into rows of a home, a key and a mark: every key a kit conf assigns but a
 `_CUTOFF` or `_PIN` (the retrofit converts those), `owner-policy`; every key the gate file assigns,
 documents in its header, or is read from it by a `read_policy_key "<expr>" KEY` call in a tracked
 shell file outside `memory/` and `help/`, less a key a kit conf holds, marked from `GATE_ENV_MARKS`
 in `policy.py`, else `unmarked`; and one `[<table>]` row per top-level table of the house file,
 `owner-policy`. An absent home yields no rows and one `legacy homes: no <home> ...` line.
 
-`lists --check` compares the derived rows, the working tree's `legacy-homes.txt` and the list at the
-compare base, the one `lists --check` reads for the summary list, identity the pair (home, key), and
-reports a committed row no home yields (`stale list at <row>` when the base's list holds its pair,
-else `typed row <row>`), a committed row under a mark the derivation does not give (`typed row`), a
-derived row the list lacks (`stale list`), a derived row the base's list lacks (`is a new legacy home
-and the list is shrink-only`), and an `unmarked` row. With no list at the base it says the list seeds
-the baseline, and with no base it compares the derivation alone and says why. A branch opened before
-the default branch dropped a key is graded at its merge-base, so the key it still carries is no new
-home (TOOL-dGroundRules-21 S23).
+THE LIST IS A LEDGER POPULATION (TOOL-dWitnessedBar-20). `memory/project/legacy-homes.txt` holds
+the population `legacy-homes`, which one `[[ledger]]` table in gov's govkit registry registers: key
+kind `key`, fields `conf` and `key`, drain `key`, direction `shrink-only`, its seed argv `lists
+--derive legacy-homes` and its leg `policy check`. Each row is the baseline ledger grammar,
+TAB-separated: the home, the key, the count `1`, the sha it was seeded at and its disposition, under
+the one header line the factory renders from the registration. That header is the file's only `#`
+line, since the factory's `write_rows` writes the header and the rows alone, so the file says nothing
+more about itself: it is written by `lists --write` and the factory's `seed`, never by hand. The mark
+is not stored: `lists --marks legacy-homes` prints it, read from the derivation. `policy.py` never
+spells the list's path: `read_legacy_registration` reads the registration through the factory's
+`read_registrations`, and the factory itself is the memory-tree kit's copy, `legacy_ledger.py`,
+loaded by `load_ledger` through `resolve_kit_dir` under this kit's `requires`. `.gitattributes` routes
+the file to the row-keyed merge driver, `merge=rows`, whose ledger class keys a row by its fields.
 
-The list is gov's own: its rows are gov's homes, so `kit.toml` withholds it from every install with
-a `project-owned` rule, the runlog descriptor's mechanism (TOOL-dGroundRules-17). Where this kit
-holds no list, `arm_legacy_homes` prints `policy-check: arm_legacy_homes · not graded · the list is
-gov's own and is withheld from installs; …` and finds nothing; it says the same wherever the tree
-holds an install receipt other than gov's source-mode one (TOOL-dSafePassage-103), which reads as no
-receipt does, a list an adopter wrote at the installed kit's directory included, since no
-adopter's list holds gov's rows (TOOL-dGroundRules-25 S11). Both verbs and the arm ask one
-predicate, `check_legacy_graded`: the list is present and `derive_census_tree` answers neither
-`adopter` nor `invalid` (TOOL-dGroundRules-76). Where it answers false, `lists --check` prints
-`policy lists: legacy-homes.txt · not graded · …` and grades the summary list alone, and `lists --write`
-writes the summary list alone, printing `legacy-homes.txt · not written`: it updates the legacy list
-where the predicate holds and never creates it. On gov's tree the case `legacy-homes-present` reds a
-deleted list.
+`lists --check` grades the population by the factory's calls for its registration, each report under
+the `legacy homes:` prefix: a first line that is not the registration's header; a malformed row;
+both ways through `compare_counts`, the derived keys measured at count 1, a row no home yields
+(`unmeasured row <conf> <key>: no scan of the legacy homes finds it`) and a derived key the list
+lacks (`undeclared site`); through `compare_to_base` under `shrink-only`, a row the list at the base
+lacks with no `widened:<record>` disposition, which reads `<conf> <key> is a new legacy home and the
+list is shrink-only; carry it as a key in <the catalogue> instead` where a home yields the key, and
+`gained <conf> <key>` where none does; and an `unmarked` row. With no base, no list at the base, or a
+row that does not parse there, `compare_to_base` answers no findings, and the check prints its reason
+as one `legacy homes: no base compare: …` note and still grades both ways. A branch opened before the
+default branch dropped a key is graded at its merge-base, so the key it still carries is no new home
+(TOOL-dGroundRules-21 S23). A key enters the list only by the factory's `seed` at an absent home or
+its widen route, which writes the row `widened:<record>`, as `retrofit.widen` allows; `lists --write`
+adds none.
+
+The list is gov's own: its rows are gov's homes, so it sits outside every kit, at a home under the
+memory tree that no descriptor ships, and its registration is in gov's govkit registry, which no
+install tracks. Both verbs and the arm ask one predicate, `check_legacy_graded`: `derive_census_tree`
+answers `source`, a `legacy-homes` registration is read at the tree, and its home is a file. The
+census is asked first, so an install, whose census answers `adopter`, never loads the factory.
+Wherever it answers false `arm_legacy_homes` prints `policy-check: arm_legacy_homes · not graded ·
+the list is gov's own and is withheld from installs; …` and finds nothing, a list an adopter wrote at
+the installed kit's directory included, since no adopter's list holds gov's rows (TOOL-dGroundRules-25
+S11); gov's source-mode receipt reads as no receipt does (TOOL-dSafePassage-103). There `lists
+--check` prints `policy lists: legacy-homes.txt · not graded · …` and grades the summary list alone,
+and `lists --write` writes the summary list alone, printing `legacy-homes.txt · not written`: it
+updates the legacy list where the predicate holds and never creates it. On gov's tree the case
+`legacy-homes-present` reds a list deleted or unregistered.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
   build owns that has a literal default, one table per first segment, written as UTF-8 bytes with LF
   line ends on every platform, so it equals the blob git stores (TOOL-dGroundRules-21 S1).
@@ -448,7 +474,7 @@ branch with a live phase all pass it, and the push-time bar does not re-judge au
 | `arm_mirror_parity` | the working-tree `.governance/policy.json` against `render_mirror` at HEAD | a mirror that differs, named by its first difference, or one that is absent where HEAD carries the policy file or a mirror; otherwise, a HEAD naming no commit included, it is announced (TOOL-dGroundRules-21 S15) |
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root, `help/` and the self-tests | a file READING `policy.json`: a line, not a comment or a Python docstring, spelling `readFileSync`, `open(`, `cat` or `git show` followed on the line by the name, `arm_single_reader`'s row for the mirror (TOOL-dGroundRules-21 S18, S20) |
-| `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the compare base | each `lists --check` report on the legacy homes; a refused read. With no list in this kit it is not graded and says so |
+| `arm_legacy_homes` | the kit confs, the gate file and the house file, the `legacy-homes` ledger row at `memory/project/legacy-homes.txt` its govkit registration names, the list at the compare base | each `lists --check` report on the legacy homes, graded by the ledger factory; a refused read or registration. Where `check_legacy_graded` answers false, the census not `source`, no registration or no file at its home, it is not graded and says so |
 | `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, read with the memory-tree kit's `tree_lib`, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26) |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file READING the template-size limits file by the same read shape, or naming `LIMITS_NAME`, `arm_single_reader`'s row for that file: `budgets.py` is its one reader (TOOL-dGroundRules-21 S20, S29) |
 | `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, which holds the deployer's registry, its `installed` path in an adopter whose receipt names its `kit`, and nowhere in a tree holding neither, which announces it), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
@@ -584,21 +610,29 @@ and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 
 render recording one input more than today's and stages that input beside its mirror: each must exit
 1 naming the input (TOOL-dGroundRules-25 S19, S21). The hook block's arms are in gov's pre-commit suite.
 
-`legacy-homes` is one outcome case over one repository per name in `LEGACY_CASES`, each a copy of `policy.py` with a
-`.unattended.conf`, a gate file and a house file, pushed to a bare remote with the list seeded; it
-prints `case <name>: red|green` and judges the copy's `lists` verbs by exit code and exact reports:
-`today` green; `planted-row` a typed row; `growth` a conf key and its row typed in, the new-home
-report, and `lists --write` exiting 1 with the list unchanged; `shrink` a conf key removed, the
-stale-list report, then green after `lists --write`; `retrofit` a `_CUTOFF` and a `_PIN` key, green
-and unlisted; `unmarked` a gate key `GATE_ENV_MARKS` lacks; `absent-homes` no gate or house file,
-green with one announce line for each; `withheld` the list deleted, the install shape, green with
-the not-graded line and no report (TOOL-dGroundRules-76). Each copy's list is seeded by
-`lists --write` over a header-only list, since that verb never creates one.
+`legacy-homes` is one outcome case over one repository per name in `LEGACY_CASES`, each a copy of `policy.py` with
+gov's govkit registry under the copy's tool root, the memory-tree kit's `legacy_ledger.py`,
+`coverage_join.py` and `backlog.py` beside it, a `.unattended.conf`, a gate file and a house file,
+pushed to a bare remote with the list seeded; it prints `case <name>: red|green` and judges the
+copy's `lists` verbs by exit code and exact reports: `today` green; `planted-row` a row typed for a
+key no home holds, the unmeasured-row report naming it as one no scan finds; `growth` a conf key and
+its row typed in `seeded`, the new-home report, and `lists --write` exiting 1 with the list
+unchanged; `widened` the same row typed `widened:<record>`, green; `shrink` a conf key removed, the
+unmeasured-row report, then green after `lists --write` with that row gone and every other line
+byte-equal; `retrofit` a `_CUTOFF` and a `_PIN` key, green and unlisted; `unmarked` a gate key
+`GATE_ENV_MARKS` lacks, red, and `lists --marks legacy-homes` printing it `unmarked`; `absent-homes`
+no gate or house file, green with one announce line for each; `withheld` the list deleted at its
+home, the shape of every tree but gov's, green with the not-graded line and no report
+(TOOL-dGroundRules-76); `drain-merge` two branches each draining one of two adjacent rows, merged with
+`merge.rows.driver` configured and the list's `merge=rows` attribute, both rows gone and no conflict
+marker. Each copy's list is seeded by the copy's `legacy_ledger.py seed --population legacy-homes`,
+which runs the registration's seed argv against the copy, since `lists --write` never creates one.
 
 `legacy-homes-present` and `budgets-ships-join` (TOOL-dGroundRules-17) read only this kit and its
-source repository, so they hold on gov's tree. The first reds this kit's directory without
-`legacy-homes.txt`, or a `kit.toml` with no `project-owned` rule naming it: an absent list is an
-announcement in the arm, so this case is what reds a list deleted on gov's tree. The second reads
+source repository, so they hold on gov's tree. The first reads gov's govkit registry and reds one
+that does not register `legacy-homes` once with its home a file, or a `legacy-homes.txt` in this
+kit's directory (TOOL-dWitnessedBar-20): an absent list is an announcement in the arm, so this case
+is what reds a list deleted or unregistered on gov's tree. The second reads
 `<tool-root>/govkit/registry.toml` and reds, naming the row, a census row whose
 `ships = false` disagrees either way with the registry's `[[exempt]]` paths, an exempt directory
 covering every enforcer under it, and a registry that exempts no census enforcer.
@@ -618,9 +652,11 @@ tool root it must print no announce line and a finding for every row, each enfor
 
 `census-source-receipt` (TOOL-dSafePassage-103) is an outcome case over one scratch repository
 holding this kit's registry under its tool root and a source-mode receipt, the keys govkit's
-source-mode update writes. `derive_census_tree` must answer `source` at that tool root and
-`check_legacy_graded` true; with the receipt's `mode` removed the tree must read as an adopter and
-the list not graded; with the registry deleted the derivation must refuse naming the receipt; and
+source-mode update writes. The case's tree tracks that registry and holds the list's home, an empty
+file at the `home` of its `legacy-homes` registration, read from the scratch tree, so
+`check_legacy_graded` can answer true (TOOL-dWitnessedBar-20). `derive_census_tree` must answer
+`source` at that tool root and `check_legacy_graded` true; with the receipt's `mode` removed the
+tree must read as an adopter and the list not graded; with the registry deleted the derivation must refuse naming the receipt; and
 with two registries in the window it must raise the search's own Refusal naming both.
 
 `reader-coverage` is one outcome case over eleven repositories, each a kit copy whose catalogue holds
@@ -668,8 +704,9 @@ admit after `git remote set-head <remote> -a`. Neither denial may name `settings
 
 The second minors batch's cases (TOOL-dGroundRules-25), each an outcome case:
 `legacy-homes-withheld-install` runs `govkit.py plan` over a target the deployer is about to install,
-which must hold `legacy-homes.txt` as one `ORDER [project-owned]` row and as no write or `SIDE` row,
-then `apply`, after which the receipt holds this kit and the target no such file (S9);
+which must exit 0 holding rows, none of them naming `legacy-homes.txt`, since the list lives outside
+every kit (TOOL-dWitnessedBar-20), then `apply`, after which the receipt holds this kit and the
+target no such file (S9);
 `census-default-adopter` installs this kit, its `requires` closure and `kickoff-manifest` with the
 answers that entry asks for and no `check-line-length`, and `arm_cap_census` must announce
 `kit check-line-length not installed`, grade `manifest-bytes` at the receipt's destination and find
@@ -743,7 +780,7 @@ and the case reds a row whose opening word differs from it (TOOL-dGroundRules-25
 | `arm_mirror_parity` | the target's `.governance/policy.json` against its render at HEAD | finding: an absent mirror reds where HEAD carries a policy file or a mirror; where HEAD carries neither, before the first landing renders one, or names no commit, it is announced `not graded` (TOOL-dGroundRules-21 S15) |
 | `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | announce: a landed revision that does not resolve, as before a first landing or on a target whose first branch is not `main`, or one whose policy file sets no key, is a legal state, so it prints `not graded` (TOOL-dGroundRules-25 S26) |
 | `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a read of the mirror | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-21 S5) |
-| `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, which `kit.toml` withholds from every install (TOOL-dGroundRules-17) | finding: a list that derives no row is a zero population; with no list, or wherever the tree holds an adopter's install receipt, any but gov's source-mode one (TOOL-dSafePassage-103), a receipt `derive_census_tree` answers `invalid` included (TOOL-dGroundRules-32 S11), it is announced: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`, and `lists --write` never creates it. `govkit plan` shows the list as an `ORDER [project-owned]` row: that row is informational, and the list is not the adopter's to author (TOOL-dGroundRules-25 S10, S11) |
+| `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, a ledger row under gov's memory tree that gov's govkit registry registers and no descriptor ships (TOOL-dWitnessedBar-20) | finding: a list that derives no row is a zero population; with no list at its home, no registration, or wherever the tree holds an adopter's install receipt, any but gov's source-mode one (TOOL-dSafePassage-103), a receipt `derive_census_tree` answers `invalid` included (TOOL-dGroundRules-32 S11), it is announced: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`, and `lists --write` never creates it. `govkit plan` shows no row for the list, and the list is not the adopter's to author (TOOL-dGroundRules-25 S11) |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | announce: before any owner build lands it grades 0 keys and prints `not graded` (TOOL-dGroundRules-21 S5), and a landed revision that does not resolve is announced too (TOOL-dGroundRules-25 S26); a memory-tree kit that does not resolve is a finding naming why |
 | `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-25 S26) |
 | `arm_cap_census` | the installed cap census against the target, by one of four answers (TOOL-dGroundRules-29, TOOL-dGroundRules-32 S11): the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; a source-mode receipt, gov's own, its top-level `mode` being `source`, reads as no receipt does, and with no registry beside it is the one finding, naming the receipt (TOOL-dSafePassage-103); with no receipt, exactly one `<tool-root>/govkit/registry.toml` with the tool root 0 to 2 deep makes it gov's source tree, each row graded at its `enforcer`, `{prefix}` read as that tool root, since no install carries the deployer's registry; neither receipt nor registry makes it unadopted, every row announced and none graded; a receipt whose `kits` is not a list of strings, or whose `prefix` opens with `/` or `\`, names a drive or holds a `..` segment, makes it `invalid`, no row graded; the requests its tracked code makes, and the limits file's rows | finding: a census that reads no row is a zero population; two or more `<tool-root>/govkit/registry.toml` with no receipt is a finding naming each, never a guessed root; the rows are graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks, or any shipped row of an unadopted tree, is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it; under `invalid` the one finding is `.governance/install.json: its <field> is not of the shape the deployer writes` |

@@ -135,7 +135,7 @@ def build_retired_gov(tmp: pathlib.Path) -> pathlib.Path:
         encoding="utf-8", newline="\n")
     shutil.copytree(govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR),
                     g / resolve_kit_path("policy"),
-                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt"))
+                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh"))
     sm = g / resolve_kit_path("sm")
     sm.mkdir(parents=True)
     shutil.copy2(govkit.GOVKIT_DIR.parent / "settings-merge.py", sm / "settings-merge.py")

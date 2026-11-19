@@ -4,12 +4,15 @@ check over the loop bound and deadline rows (TOOL-dGroundRules-11), and the read
 (TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3), its invalid-file
 branch (TOOL-dGroundRules-4), the JSON mirror the hooks read (TOOL-dGroundRules-5), and the
 shrink-only list of the legacy policy homes, derived from the files they guard (TOOL-dGroundRules-7),
-gov's own and withheld from installs, so `lists --write` never creates it (TOOL-dGroundRules-17).
-The size caps' half, the census, the switch and the `[budgets]` table's schema rule `validate`
-calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
+gov's own and never installed, a ledger population keyed by conf and key that gov's govkit registry
+registers and the baseline ledger factory grades and writes (TOOL-dWitnessedBar-20), so `lists
+--write` never creates it. The size caps' half, the census, the switch and the `[budgets]` table's
+schema rule `validate` calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
 
     python <this kit>/policy.py lists --check   # both lists against their derivations and baselines
     python <this kit>/policy.py lists --write   # drain both lists; neither ever gains a row
+    python <this kit>/policy.py lists --derive legacy-homes   # the legacy list's seed: <conf> TAB <key> TAB 1
+    python <this kit>/policy.py lists --marks legacy-homes    # each derived key's mark: <conf> TAB <key> TAB <mark>
     python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
@@ -1076,11 +1079,12 @@ def write_list(kit):
 
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
 
-LEGACY_LIST = "legacy-homes.txt"
-# Why an absent list, or any list in an adopter's tree, grades nothing; the plan's row for it is
-# `ORDER [project-owned]`, which asks the adopter for nothing (TOOL-dGroundRules-25 S10).
-LEGACY_WITHHELD = ("the list is gov's own and is withheld from installs; the plan's ORDER [project-owned] row "
-                   "for it is informational, and an adopter does not author the file")
+LEGACY_LIST = "legacy-homes.txt"  # the list's file name, for the lines that name it; its home is its registration's
+LEGACY_POPULATION = "legacy-homes"  # its population in gov's govkit registry (TOOL-dWitnessedBar-20 S1)
+# Why an absent list, or any tree but gov's source tree, grades nothing: the list is a ledger gov's
+# govkit registry alone registers, at a home outside every kit, so no install holds it (TOOL-dWitnessedBar-20 §8 F7).
+LEGACY_WITHHELD = ("the list is gov's own and is withheld from installs; it is graded only in gov's source tree, "
+                   "whose govkit registry registers its ledger, and an adopter does not author the file")
 RECEIPT_REL = f"{posixpath.dirname(POLICY_REL)}/install.json"
 DEPLOYER_HOME = "govkit"
 REGISTRY_REL = f"{DEPLOYER_HOME}/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
@@ -1144,21 +1148,50 @@ def check_receipt_prefix(value):
             and ".." not in re.split(r"[/\\]", value))
 
 
+def load_ledger(kit=KIT):
+    """The memory-tree kit's copy of the baseline ledger factory, `legacy_ledger.py`, its directory
+    found by `resolve_kit_dir` from `kit` under this kit's declared `requires` and put on `sys.path`,
+    so the copy's own imports of `backlog` and `coverage_join` resolve, the way the checker's
+    `load_tree_lib` reaches `tree_lib` (TOOL-dWitnessedBar-20 §8 F5) -> the module; LookupError where
+    no memory-tree kit is installed, ImportError where it does not import."""
+    lib = str(resolve_kit_dir("memory-tree", "legacy_ledger.py", kit))
+    if lib not in sys.path:
+        sys.path.insert(0, lib)
+    import legacy_ledger
+    return legacy_ledger
+
+
+def read_legacy_registration(repo, kit=KIT):
+    """-> (the factory, the `[[ledger]]` registration whose `population` is LEGACY_POPULATION at
+    `repo`), read by the factory's `read_registrations` over the tracked descriptors and govkit
+    registry, or None where none names it. This module never spells the list's path: its home is the
+    registration's. A refused registration, or a factory that does not load, is a Refusal."""
+    try:
+        ll = load_ledger(kit)
+    except (LookupError, ImportError) as exc:
+        raise Refusal(LEGACY_LIST, 0, f"the baseline ledger factory does not load, so the list cannot be read: {exc}") from None
+    try:
+        regs = ll.read_registrations(repo)
+    except ValueError as exc:
+        raise Refusal(LEGACY_POPULATION, 0, f"a [[ledger]] registration is refused: {exc}") from None
+    reg = next((r for r in regs if r.population == LEGACY_POPULATION), None)
+    return None if reg is None else (ll, reg)
+
+
 def check_legacy_graded(repo, kit):
-    """True where `kit`'s legacy list is graded over the tree at `repo`: the list is present and
-    `derive_census_tree` answers neither `adopter` nor `invalid` (TOOL-dGroundRules-76). The one rule
-    `cmd_lists` and the gate's `arm_legacy_homes` both ask. A Refusal from the derivation is the
-    caller's to report."""
+    """True where the legacy list is graded over the tree at `repo`: `derive_census_tree` answers
+    `source`, a `legacy-homes` registration is read there through `read_legacy_registration`, from
+    `kit`'s memory-tree kit, and its home is a file (TOOL-dWitnessedBar-20 §4 "Reaching the factory").
+    The census is asked first, so an install, whose census answers `adopter`, never loads the factory.
+    The one rule `cmd_lists`, the gate's `arm_legacy_homes` and the `census-source-receipt` case ask.
+    A Refusal from the derivation or the registration is the caller's to report."""
     tree, _held = derive_census_tree(repo)
-    return tree not in ("adopter", "invalid") and (Path(kit) / LEGACY_LIST).is_file()
+    if tree != "source":
+        return False
+    found = read_legacy_registration(repo, kit)
+    return found is not None and Path(repo, found[1].home).is_file()
 
 
-LEGACY_HEADER = (
-    "# legacy-homes.txt - GENERATED by `python <this kit>/policy.py lists --write`, never edited.\n"
-    "# One row per key a legacy policy home holds, `<home> <key> <mark>`, the mark owner-policy or\n"
-    "# mechanic. SHRINK-ONLY: `lists --check` reds a row no home yields, a derived row this list lacks,\n"
-    "# and a derived row the list at the compare base lacks. A new key goes in the catalogue instead.\n"
-)
 Row = namedtuple("Row", "home key mark")
 GATE_FILE = ".githooks/gate-env.sh"
 TOOL_ROOT = "<tool-root>/"
@@ -1296,66 +1329,99 @@ def derive_legacy_homes(repo, notes):
     return sorted(set(rows))
 
 
-def read_base_pairs(repo, kit, base):
-    """-> the (home, key) pairs of this kit's legacy list in the commit `base` names, or None where
-    that commit holds no list. `base` is the compare base `cmd_lists` resolved, the one comparison
-    the summary list reads too, never the working tree, HEAD or the landed tip (TOOL-dGroundRules-21
-    S23)."""
-    prefix = run_git(kit, "rev-parse", "--show-prefix")
-    if prefix is None:
-        raise Refusal((Path(kit) / LEGACY_LIST).as_posix(), 0, "the policy kit is in no git repository, so its list has no compare base")
-    text = run_git(repo, "show", f"{base}:{prefix.strip()}{LEGACY_LIST}")
-    return None if text is None else {tuple(ln.split(" ")[:2]) for ln in parse_list(text)}
-
-
-def check_legacy_homes(repo, kit, compare):
-    """-> (reports, notes, rows, new): the derived rows of the tree at `repo` against the committed
-    list, `kit`'s working-tree file, and the list at the compare base `compare` names, the
-    (sha or None, why) `resolve_compare_base` answered. A row's identity is its pair (home, key).
-    Reported: (1) a committed row the derivation does not yield, full row compared, as a stale list
-    where no home yields its pair and the base's list holds it, else as a typed row; (2) a derived row
-    whose pair the committed list lacks; (3) a derived row whose pair the base's list lacks, `new`
-    holding those, nothing where there is no base or no list at it, which seeds the baseline; (4) a
-    row `unmarked`. The catalogue's path in (3) is derived at runtime."""
+def check_legacy_homes(repo, kit):
+    """-> (reports, notes, rows, refused): the derived rows of the tree at `repo` graded against the
+    `legacy-homes` population by the baseline ledger factory's calls for its registration
+    (TOOL-dWitnessedBar-20 S5). A row's key is its pair (conf, key), measured at count 1.
+    Reported: the home's first line where it is not the header `render_header` renders; each row
+    `read_ledger` refuses; both ways through `compare_counts`, a row no home yields (`unmeasured row`)
+    and a derived key the list lacks (`undeclared site`); under the registration's direction through
+    `compare_to_base`, a row the list at the base lacks with no `widened` disposition (`gained`), its
+    remedy naming the catalogue derived at runtime where a home yields the key; and a gate key
+    `unmarked`, read from the derivation. Where `compare_to_base` answers no findings, its reason is
+    one note and the both-ways half still grades (§8 F6). `refused` holds the reports that stop
+    `write_legacy_homes`: a malformed row, a derived key the list lacks and a gained row, since the
+    list gains a key by no write, only by the factory's seed at an absent home or its widen route."""
+    found = read_legacy_registration(repo, kit)
+    if found is None:
+        raise Refusal(LEGACY_LIST, 0, f"no [[ledger]] registration names {LEGACY_POPULATION}, so the list has no home")
+    ll, reg = found
     notes = []
     rows = derive_legacy_homes(repo, notes)
-    derived = {(r.home, r.key): r.mark for r in rows}
-    path = Path(kit) / LEGACY_LIST
-    committed = parse_list(path.read_text(encoding="utf-8")) if path.is_file() else []
-    sha, why = compare
-    at_base = None if sha is None else read_base_pairs(repo, kit, sha)
-    reports = []
-    for ln in committed:
-        f = ln.split(" ")
-        pair = tuple(f[:2])
-        if len(f) == 3 and derived.get(pair) == f[2]:
-            continue
-        gone = len(f) == 3 and pair not in derived and at_base is not None and pair in at_base
-        reports.append(f"stale list at {ln}, re-run lists --write" if gone else f"typed row {ln}")
-    held = {tuple(ln.split(" ")[:2]) for ln in committed}
-    reports += [f"stale list at {' '.join(r)}, re-run lists --write" for r in rows if (r.home, r.key) not in held]
-    new = []
-    if sha is None:
-        notes.append(f"no base: {why}; only the derivation is compared")
-    elif at_base is None:
-        notes.append(f"no list at the base {sha[:8]} ({why}), so this one seeds the baseline")
+    measured = {(r.home, r.key): 1 for r in rows}
+    try:
+        first = Path(repo, reg.home).read_bytes().decode("utf-8").split("\n", 1)[0].rstrip("\r")
+        declared, malformed = ll.read_ledger(repo, reg)
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Refusal(reg.home, 0, f"does not read: {exc}") from None
+    header = ll.render_header(reg)
+    reports = [] if first == header else [f"{reg.home} opens {first!r}, not its registration's header {header!r}"]
+    refused = [f"{reg.home} {ll.render_malformed(m)}" for m in malformed]
+    for finding, key, have, want in ll.compare_counts(measured, {k: v[0] for k, v in declared.items()}, reg.direction):
+        if finding == "unmeasured row":
+            reports.append(f"unmeasured row {' '.join(key)}: no scan of the legacy homes finds it, re-run lists --write")
+        elif finding == "undeclared site":
+            refused.append(f"undeclared site {' '.join(key)}: a home holds it and the list lacks it, which no write adds")
+        else:
+            reports.append(f"{finding} {' '.join(key)}: measured {have}, the list holds {want}")
+    try:
+        findings, why = ll.compare_to_base(repo, reg)
+    except ValueError as exc:  # its rename read, a git that did not answer
+        raise Refusal(reg.home, 0, f"the base compare did not run: {exc}") from None
+    if findings is None:
+        notes.append(f"no base compare: {why}; only the derivation is compared")
     else:
-        grown = [r for r in rows if (r.home, r.key) not in at_base]
-        cat = derive_catalogue_rel() if grown else ""
-        new = [f"{r.home} {r.key} is a new legacy home and the list is shrink-only; carry it as a key in {cat} instead"
-               for r in grown]
-    reports += new + [f"{r.key} in {GATE_FILE} has no mark in GATE_ENV_MARKS" for r in rows if r.mark == "unmarked"]
-    return reports, notes, rows, new
+        cat = derive_catalogue_rel() if findings else ""
+        for name, key in findings:
+            if name != "gained":
+                reports.append(f"{name} {' '.join(key)} against the list at the base")
+            elif key in measured:
+                refused.append(f"{' '.join(key)} is a new legacy home and the list is shrink-only; carry it as a key in {cat} instead")
+            else:
+                refused.append(f"gained {' '.join(key)}: a row the list at the base lacks")
+    reports += refused + [f"{r.key} in {GATE_FILE} has no mark in GATE_ENV_MARKS" for r in rows if r.mark == "unmarked"]
+    return reports, notes, rows, refused
 
 
-def write_legacy_homes(repo, kit, compare):
-    """Write the derived rows under the header, sorted, unless a derived row is new to the list at the
-    compare base: then write nothing. The list shrinks by this verb and grows by none. -> (new, notes, rows)."""
-    _reports, notes, rows, new = check_legacy_homes(repo, kit, compare)
-    if not new:
-        with open(Path(kit) / LEGACY_LIST, "w", encoding="utf-8", newline="\n") as f:
-            f.write(LEGACY_HEADER + "".join(" ".join(r) + "\n" for r in rows))
-    return new, notes, rows
+def write_legacy_homes(repo, kit):
+    """Write the population through the factory's `write_rows` to its registration's home: each row a
+    home still yields keeps its count, sha and disposition, a row no home yields leaves, sorted by conf
+    then key. Where `check_legacy_homes` refuses anything, write nothing: the list shrinks by this verb
+    and grows by none (TOOL-dWitnessedBar-20 S4). -> (refused, notes, rows)."""
+    _reports, notes, rows, refused = check_legacy_homes(repo, kit)
+    if not refused:
+        ll, reg = read_legacy_registration(repo, kit)
+        declared, _malformed = ll.read_ledger(repo, reg)
+        held = {(r.home, r.key) for r in rows}
+        ll.write_rows(repo, reg, {k: declared[k] for k in sorted(declared) if k in held})
+    return refused, notes, rows
+
+
+def cmd_derive_list(flag, name):
+    """`lists --derive legacy-homes` prints `<conf> TAB <key> TAB 1` per row `derive_legacy_homes`
+    yields over the tree this kit sits in, sorted, the seed the ledger factory reads; `lists --marks
+    legacy-homes` prints `<conf> TAB <key> TAB <mark>` instead, the mark read from GATE_ENV_MARKS and
+    the home's kind, never from the list (S3, S6). Notes go to stderr, so stdout holds rows alone.
+    Any other list name exits 2."""
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")  # a seed reading the rows gets no CR
+    if name != LEGACY_POPULATION:
+        print(f"policy: lists {flag} names {name!r}; the one list it derives is {LEGACY_POPULATION}", file=sys.stderr)
+        return 2
+    top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
+    notes = []
+    try:
+        if not top:
+            raise Refusal(LEGACY_LIST, 0, "the policy kit is in no git repository, so no legacy home can be read")
+        rows = derive_legacy_homes(top, notes)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    for ln in notes:
+        print(f"legacy homes: {ln}", file=sys.stderr)
+    for r in rows:
+        print(f"{r.home}\t{r.key}\t{1 if flag == '--derive' else r.mark}")
+    return 0
 
 
 def render_toml_value(v):
@@ -1384,7 +1450,8 @@ def render_scaffold(rows):
     return out
 
 
-USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
+USAGE = ("usage: python policy.py lists --check | lists --write | lists --derive legacy-homes | lists --marks legacy-homes"
+         " | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
          " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
          " | settings [--write|--check] [<settings-file>]")
 
@@ -1487,25 +1554,32 @@ def cmd_mirror(argv):
 
 
 def cmd_lists(argv):
-    """`lists --check | --write`: both shrink-only lists, the summary list and the legacy-home list,
-    against ONE compare base, `resolve_compare_base` read once here for both (TOOL-dGroundRules-21
-    S23), so a branch opened before the default branch dropped a key is never read as adding it."""
+    """`lists --check | --write`: both shrink-only lists, the summary list and the legacy-home list.
+    The summary list is read against ONE compare base, `resolve_compare_base` read once here
+    (TOOL-dGroundRules-21 S23), so a branch opened before the default branch dropped a key is never
+    read as adding it; the legacy list's base is the factory's `compare_to_base`, the same merge-bar
+    rule (TOOL-dWitnessedBar-20 S5). `--write` writes neither list where the legacy list refuses."""
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")
     top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
     with run_without_git_env():  # the block is canonical and inherits this process's environment
         compare = resolve_compare_base(KIT)
-    # The legacy list is gov's own and withheld from installs (TOOL-dGroundRules-17): both verbs ask
-    # the gate arm's rule, so an absent list or an adopter's tree grades and writes nothing.
-    reports, notes, rows, new = [], [], [], []
+    # The legacy list is gov's own and never installed (TOOL-dWitnessedBar-20 §8 F7): both verbs ask
+    # the gate arm's rule, so an absent list or any tree but gov's source tree grades and writes nothing.
+    reports, notes, rows, refused = [], [], [], []
     try:
         if not top:
             raise Refusal(LEGACY_LIST, 0, "the policy kit is in no git repository, so no legacy home can be read")
         held = check_legacy_graded(top, KIT)  # the arm's rule (TOOL-dGroundRules-76)
-        if held:
-            reports, notes, rows, new = check_legacy_homes(top, KIT, compare)
+        if held and argv == ["--check"]:
+            reports, notes, rows, refused = check_legacy_homes(top, KIT)
+        elif held:
+            refused, notes, rows = write_legacy_homes(top, KIT)
     except Refusal as exc:
         print(exc, file=sys.stderr)
+        return 2
+    except ValueError as exc:  # the factory's row writer refusing its home
+        print(f"policy: refused · {LEGACY_LIST} · {exc}", file=sys.stderr)
         return 2
     if argv == ["--check"]:
         findings, note = check_list(KIT, compare)
@@ -1523,15 +1597,14 @@ def cmd_lists(argv):
         return 1 if n else 0
     for ln in notes:
         print(f"legacy homes: {ln}")
-    if new:
-        for r in new:
+    if refused:
+        for r in refused:
             print(f"  legacy homes: {r}")
-        print(f"policy lists: wrote nothing · {len(new)} new legacy home(s), and {LEGACY_LIST} is shrink-only")
+        print(f"policy lists: wrote nothing · {len(refused)} refused legacy row(s), and {LEGACY_LIST} is shrink-only")
         return 1
     removed = write_list(KIT)
     print(f"policy lists: wrote {LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
     if held:
-        write_legacy_homes(top, KIT, compare)
         print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
     else:
         print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
@@ -1554,6 +1627,8 @@ def main(argv):
         return 0
     if argv[:1] == ["lists"] and argv[1:] in (["--check"], ["--write"]):
         return cmd_lists(argv[1:])
+    if argv[:1] == ["lists"] and len(argv) == 3 and argv[1] in ("--derive", "--marks"):
+        return cmd_derive_list(argv[1], argv[2])
     print(USAGE, file=sys.stderr)
     return 2
 

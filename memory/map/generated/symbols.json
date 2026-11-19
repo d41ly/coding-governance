@@ -6793,6 +6793,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_legacy_drain_merge",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_legacy_graded",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -9286,6 +9291,11 @@
       "id": "cmd_convert",
       "kind": "function",
       "file": "tools/memory-tree/convert_registry.py"
+    },
+    {
+      "id": "cmd_derive_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "cmd_doctor",
@@ -11791,6 +11801,11 @@
       "id": "derive_leg_unarmed",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
+    },
+    {
+      "id": "derive_legacy_home",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_legacy_homes",
@@ -15491,6 +15506,11 @@
       "id": "load_ledger",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "load_ledger",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "load_leg_names",
@@ -19548,11 +19568,6 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
-      "id": "read_base_pairs",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
-    },
-    {
       "id": "read_base_population",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -21654,6 +21669,11 @@
     },
     {
       "id": "read_legacy_fanout",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_legacy_registration",
       "kind": "function",
       "file": "tools/policy/policy.py"
     },
@@ -26431,6 +26451,11 @@
       "id": "render_leg_row",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "render_legacy_row",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "render_legs_row",

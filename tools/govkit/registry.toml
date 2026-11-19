@@ -1697,6 +1697,9 @@ guard = [
   "{prefix}/hooks/kit.toml",
   "{prefix}/gate-legs.json",
   "{prefix}/memory-tree/backlog.py",
+  "{prefix}/memory-tree/legacy_ledger.py",
+  "{prefix}/memory-tree/coverage_join.py",
+  "memory/project/legacy-homes.txt",
   "{prefix}/memory-tree/design_lib.py",
   "{prefix}/memory-tree/asbuilt_view.py",
   "{prefix}/memory-tree/deviation_join.py",
@@ -2606,3 +2609,16 @@ fields = ["id"]
 drain = "none"
 direction = "append-only"
 home = "memory/project/landed-steps.txt"
+
+# The legacy policy homes' list (TOOL-dWitnessedBar-20 S1, §8 F4, F7): gov's own, which no target is
+# written, so it owes no step. Its seed is the policy kit's derivation, one `<conf> <key> 1` row per
+# key a legacy home holds, and its mark is read from that derivation, never stored here.
+[[ledger]]
+population = "legacy-homes"
+leg = "policy check"
+seed = ["python", "{prefix}/policy/policy.py", "lists", "--derive", "legacy-homes"]
+key = "key"
+fields = ["conf", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/legacy-homes.txt"
