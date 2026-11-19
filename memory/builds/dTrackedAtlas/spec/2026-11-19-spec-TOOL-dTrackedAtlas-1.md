@@ -1,12 +1,13 @@
 # TOOL-dTrackedAtlas-1 — one chain build-state derivation, read by the schedule and the Atlas
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-1 · base 9e21ac76 · streams tooling · ratified 2026-11-19 · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-brief.md) | research | TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTrackedAtlas-4 |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-spec-brief.md) | research | — |
@@ -51,7 +52,8 @@ at `9e21ac760` where the schedule prints four today.
 - `tools/policy/check_policy.py#derive_landed_owners`, which carries the same DEFERRED miscount: it
   is under `tools/`, and the build files it as an ask.
 - Re-pinning the schedule instrument in `tools/chain-packet.py#INSTRUMENT_BLOBS` or in the chain
-  packets: §7 F2 states why this unit moves that pin and who re-pins it.
+  packets: this unit moves that pin, as §7 F2 resolved, and the re-pins are an ask the main loop
+  files at the close.
 - Any other dClosedLoop instrument, v2's text, any chain build's specs, and the design map.
 - Refreshing the claim cache: `unattended.sh --claims` fills it, and this unit only reads it.
 - A gate, a suite arm or a self-test: the instrument is a build-folder record, checked by its
@@ -62,8 +64,8 @@ at `9e21ac760` where the schedule prints four today.
 - **hands-off** `TOOL-dTrackedAtlas-2` — renders the state document; this unit renders nothing.
 - **hands-off** `TOOL-dTrackedAtlas-3` — the page's commit and input digest; this unit supplies the
   resolved `commit` only.
-- **hands-off** external — the asks for `derive_landed_owners` and for the two re-pins of §7 F2,
-  filed by the main loop at the close, outside this unit's write set.
+- **hands-off** external — the ask for `derive_landed_owners` and the one ask for both re-pins §7
+  F2's resolution leaves owing, filed by the main loop at the close, outside this unit's write set.
 
 ## 4. Design
 
@@ -295,8 +297,10 @@ SCHED=memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedu
 ## 6. Gates
 
 The close runs the plain bar once, which holds the guarded legs of the `selftests` chunk below as
-on-demand legs, so they do not run there. `chain-packet self-test` will red its CP3, CP4 and CP5 arms on the next
-bar run with `GATE_SELFTESTS=1` until the schedule pin is re-pinned, as §7 F2 states.
+on-demand legs, so they do not run there. Because §7 F2 resolved to editing the schedule in place,
+`chain-packet self-test` will red its CP3, CP4 and CP5 arms on the next bar run with
+`GATE_SELFTESTS=1` until the door's constant and the owner's `packet.py --repin` re-pin the schedule,
+the one ask the main loop files at the close.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `chain-packet self-test` · `policy fixtures`
 
@@ -341,12 +345,17 @@ bar run with `GATE_SELFTESTS=1` until the schedule pin is re-pinned, as §7 F2 s
   (c) Edit the schedule and re-pin both in this build. Refused: the door is under `tools/`, which
   owes a `GATE_SELFTESTS=1` bar the owner ruled out for this run, and the packet re-pin is the
   owner's.
-  Recommendation: (a). It is the only option that meets the owner's acceptance inside the build's
-  rules. Its cost is one owner re-pin and one ask, and it trips none of M3's vetoes.
+  (a) is the only option that meets the owner's acceptance inside the build's rules; it trips none
+  of M3's vetoes, since the schedule is an instrument, not a governance carrier, and nothing under
+  `tools/` moves; its cost is one owner re-pin and one ask.
+  RESOLVED (agent, 2026-11-19, delegated): (a), the only option meeting the owner's acceptance; the
+  re-pins are filed as one ask at the close.
 
 ## 8. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §3 · §6 · §7 · F2 resolved to (a), the schedule edited in place, under the
+  mandate's delegated authority; folded from 2026-11-19-prompt-TOOL-dTrackedAtlas-1-f2-fold.
 
 ## 9. Reuse audit
 
