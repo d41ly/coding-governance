@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-18 — the cadence segment of the lease grammar takes any tag-grammar name
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0136@c9686488 whole
 

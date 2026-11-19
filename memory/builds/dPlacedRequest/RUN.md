@@ -127,3 +127,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T14:11:12Z draw · re-dispatch · TOOL-dPlacedRequest-20 · 10/130 · 20261119T141112Z-d0d1b8
 
 2026-11-19T14:11:13Z dispatch · item cfc89088 TOOL-dPlacedRequest-20 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-20-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md
+
+2026-11-19T14:26:42Z dispatch · item dcc88977 TOOL-dPlacedRequest-18 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-18-1-acceptance-ledger.md
