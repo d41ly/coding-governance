@@ -2316,23 +2316,38 @@ printf 'a lone CR (0x0D) here:%bX
 commit_all "$R" "embed a CR"
 run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --"
 
-# ---- TOOL-dPlacedRequest-2: the build card, through card-store.fixture.sh beside this checker ------
-# Each plant builds its own scratch repository and bare remote and removes them, so these arms share
-# nothing with the card clone above: the publish and its parented second write (AC2), the follow at a
-# move and at a terminal one (AC4), the lookup on a second clone whose stale cache is not trusted —
-# the failing case — (AC6), R7's refusal of a route to an ended build (AC9) and a terminal follow run
-# twice leaving one record (AC13). A plant counts only when it exits 0 and printed a held line. The
-# fixture is gov's and ships to no adopter (the deployer registry exempts it), so a copy of this suite
-# with no fixture beside its checker says so and runs none of these arms.
-cs_fx="$(dirname "$CHECK")/card-store.fixture.sh"
+# ---- TOOL-dPlacedRequest-2: the build card ----------------------------------------------------------
+# First its flag refusals, each exit 2 naming its cause, and the cache path read with no session, in
+# the card clone's worktree. Then card-store.fixture.sh beside this checker, whose plants each build
+# their own scratch repository and bare remote and remove them, so they share nothing with the card
+# clone: the publish and its parented second write (AC2), the follow at a move and at a terminal one
+# (AC4), the lookup on a second clone whose stale cache is not trusted — the failing case — (AC6),
+# R7's refusal of a route to an ended build (AC9) and a terminal follow run twice leaving one record
+# (AC13). A plant counts only when it exits 0 and printed a held line. The fixture is gov's and ships
+# to no adopter (the deployer registry exempts it), so a copy of this suite with no fixture beside
+# its checker says so and runs no fixture arm.
+run_card "TOOL-dPlacedRequest-2 --card --publish with no --build is refused" "$CWT" 2 "--card --publish needs --build <slug>" --card --publish --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --card --follow with no --to is refused" "$CWT" 2 "--card --follow needs --to <state>" --card --follow --build tFix
+run_card "TOOL-dPlacedRequest-2 a --build that is no slug is never joined into a ref" "$CWT" 2 "is not a build slug" --card --lookup --build 'a/b' --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --build on a session verb is refused" "$CWT" 2 "--build is the build card's flag" --card --write --build tFix --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --to off the follow is refused" "$CWT" 2 "--to and --terminal are --card --follow's flags" --card --write --to designing --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 a publish with no session card is refused" "$CWT" 2 "so there is no card to publish" --card --publish --build tFix --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --card --path --build prints the build card's cache path" "$CWT" 0 "/orientation/tFix.md" --card --path --build tFix
+cs_fx="${CHECK%/*}/card-store.fixture.sh"
+if [ -f "$cs_fx" ]; then
+  bash "$cs_fx" --plant nosuch > "$TMP/cs.out" 2>&1; cs_rc=$?
+  [ "$cs_rc" = 2 ] && grep -q "^card-store: no case 'nosuch'" "$TMP/cs.out" \
+    && { echo "ok   TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit 2)"; pass=$((pass+1)); } \
+    || { echo "FAIL TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1)); }
+fi
 [ -f "$cs_fx" ] || echo "skip TOOL-dPlacedRequest-2 the card-store plants: no card-store.fixture.sh beside $CHECK, gov's fixture, which ships to no adopter"
 for cs_plant in publish follow-rerender lookup terminal-route close-follow-twice; do
   [ -f "$cs_fx" ] || break
-  cs_out=$(TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" 2>&1); cs_rc=$?
-  if [ "$cs_rc" = 0 ] && printf '%s\n' "$cs_out" | grep -q ' · held$' && ! printf '%s\n' "$cs_out" | grep -q ' · MISSED$'; then
+  TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" > "$TMP/cs.out" 2>&1; cs_rc=$?
+  if [ "$cs_rc" = 0 ] && grep -q ' · held$' "$TMP/cs.out" && ! grep -q ' · MISSED$' "$TMP/cs.out"; then
     echo "ok   TOOL-dPlacedRequest-2 the card-store plant $cs_plant holds"; pass=$((pass+1))
   else
-    echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; printf '%s\n' "$cs_out" | sed 's/^/    /'; fail=$((fail+1))
+    echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1))
   fi
 done
 
@@ -2388,9 +2403,11 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # block; no suite ran in the pass, the card's awk was probed alone over nine rows.
 # +6: TOOL-dPlacedRequest-9 AC5's `## pockets` block, three run_card and three check_eq calls, counted off
 # the block; no suite ran in the pass, each card write was probed alone over a scratch fixture.
-# +5: TOOL-dPlacedRequest-2's build card block, one check per card-store plant, counted off the block;
-# no suite ran in the pass, each plant was run alone over its own scratch remote.
-FLOOR_ASSERTIONS=363
+# +12: TOOL-dPlacedRequest-2's build card block, its seven run_card calls (six flag refusals and the
+# cache path) and one check per card-store plant (five), counted off the block; the fixture's
+# unknown-case refusal is left uncounted. No suite ran in the pass: each command was run alone, each
+# plant over its own scratch remote.
+FLOOR_ASSERTIONS=370
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

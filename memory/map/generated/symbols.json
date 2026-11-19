@@ -36838,6 +36838,11 @@
       "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
+      "id": "write_card_cache",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "write_card_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -36861,6 +36866,11 @@
       "id": "write_card_plant",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "write_card_publish",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_card_snapshot",

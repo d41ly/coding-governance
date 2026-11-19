@@ -2318,9 +2318,10 @@ read_card_record() { # slug -> 0 found, 1 none
 # `## pockets` section fitted to the cap, and the tail file — the `## task`, `## route` and other body
 # sections and the READY line. Refused past CARD_CAP_BYTES, as `write_card` refuses.
 render_build_card() { # slug · step · tail file · writer verb -> the card on stdout; 1 and the refusal on stdout
-  local out="$CARD_TMP/bc.render" bytes
+  local out="$CARD_TMP/bc.render" bytes at
+  printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
   {
-    printf 'card — %s · step %s · published %s · by %s\n' "$1" "$2" "$(date +%Y-%m-%dT%H:%M:%S%z)" "$CARD_SID"
+    printf 'card — %s · step %s · published %s · by %s\n' "$1" "$2" "$at" "$CARD_SID"
     render_card "$4" | awk -v want=startup "$CARD_PARTS_AWK" | tail -n +2
     cat "$3"
   } | derive_pockets_block > "$out"
@@ -2340,7 +2341,7 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
   local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark=""
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
-  stores=" $(printf '%s ' $stores)"
+  stores=" ${stores//$'\n'/ } "
   case "$stores" in *" remote-ref "*) remote=1 ;; esac
   if [ "$remote" = 1 ] && ! read_card_ref "$slug"; then
     printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2
@@ -2359,7 +2360,7 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
     fi
     render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
     [ "$remote" = 1 ] || break
-    msg=$(printf 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(cat "$card")")
+    printf -v msg 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(<"$card")"
     c=$(build_gov_commit "$tip" "$msg") || { printf 'card — remote-ref not written: git could not build the commit\n'; remote=2; break; }
     GOVREF_RUNNER=run_card_git GOVREF_REMOTE=origin GOVREF_GITDIR=$(git rev-parse --absolute-git-dir 2>/dev/null | tr -d '\r') \
       write_gov_ref "$ref" "$tip" "$c"; rc=$?
@@ -2378,17 +2379,28 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
   done
   case "$stores" in
     *" local-clone "*)
-      if mkdir -p "$CARD_DIR" 2>/dev/null && { printf '# card-ref %s\n' "$oid"; cat "$card"; } > "$CARD_DIR/$slug.md.$$" \
-          && mv -f "$CARD_DIR/$slug.md.$$" "$CARD_DIR/$slug.md"; then
+      if write_card_cache "$slug" "$oid" "$card"; then
         printf 'card — %s · step %s · local-clone %s\n' "$slug" "$step" "$CARD_DIR/$slug.md"
       else
-        rm -f "$CARD_DIR/$slug.md.$$" 2>/dev/null; printf 'card — local-clone not written: cannot write %s\n' "$CARD_DIR/$slug.md"
+        printf 'card — local-clone not written: cannot write %s\n' "$CARD_DIR/$slug.md"
       fi ;;
   esac
   case "$stores:$snap" in
     *" build-folder "*:1) write_card_snapshot "$slug" "$step" "${oid/#local/none}" "$card" ;;
   esac
   return 0
+}
+
+# The cache, written through a temp `mktemp` names beside it and renamed into place, so a reader never
+# sees half a card and no other writer can know the temp's name before it exists.
+write_card_cache() { # slug · the ref's commit or local · card file -> 0 written, 1 not
+  local t
+  mkdir -p "$CARD_DIR" 2>/dev/null && t=$(mktemp "$CARD_DIR/.card.XXXXXX" 2>/dev/null) || return 1
+  if { printf '# card-ref %s\n' "$2"; cat -- "$3"; } > "$t" 2>/dev/null && mv -f "$t" "$CARD_DIR/$1.md" 2>/dev/null; then
+    return 0
+  fi
+  rm -f "$t" 2>/dev/null
+  return 1
 }
 
 # The `card` record, through the record factory's `write_record` (no door), its anchor the loop kit's
@@ -2418,7 +2430,7 @@ write_card_snapshot() { # slug · step · ref commit or none · card file -> one
   git -C "$CARD_TREE" diff --cached --quiet 2>/dev/null \
     || { printf 'card — build-folder not written: the index of %s holds staged changes, and a snapshot is committed alone\n' "$CARD_TREE"; return 0; }
   rel=$("$py" -c "$CARD_SNAPSHOT_PY" "${br%/*}" "${lt%/*}" "$CARD_TREE" "$1" "$2" "$3" "$4" 2>&1) \
-    || { why=$(printf '%s\n' "$rel" | tr -d '\r' | grep -m1 . | head -c 200); printf 'card — build-folder not written: %s\n' "$why"; return 0; }
+    || { why=${rel//$'\r'/}; why=${why#$'\n'}; why=${why%%$'\n'*}; printf 'card — build-folder not written: %s\n' "${why:0:200}"; return 0; }
   rel=${rel//$'\r'/}; rel=${rel##*$'\n'}
   if git -C "$CARD_TREE" add -- "$rel" 2>/dev/null && git -C "$CARD_TREE" commit -q -m "card snapshot($1): $2" >/dev/null 2>&1; then
     printf 'card — %s · step %s · build-folder %s · commit %s\n' "$1" "$2" "$rel" "$(git -C "$CARD_TREE" rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r')"
@@ -2427,6 +2439,15 @@ write_card_snapshot() { # slug · step · ref commit or none · card file -> one
     printf 'card — build-folder not written: git could not commit %s\n' "$rel"
   fi
   return 0
+}
+
+# The publish from the session's card (S3), at READY and by hand: no step of its own, and a snapshot
+# only where `card.snapshot` is `every-transition`.
+write_card_publish() { # slug · writer verb -> its card — lines; 0 always
+  local snapshot snap=0
+  snapshot=$(read_card_policy card.snapshot) || { printf 'card — skipped: card.snapshot refused: %s\n' "${snapshot%%$'\n'*}"; return 0; }
+  [ "$snapshot" != every-transition ] || snap=1
+  write_build_card "$1" "" session "$2" "$snap" 0
 }
 
 # The follow at a stage move (S4): `card.follows` decides what is re-published, `card.snapshot` whether
@@ -2447,9 +2468,10 @@ write_card_follow() { # slug · state · terminal 0|1 -> its card — lines; 0 a
   write_build_card "$1" "$2" "$mode" follow "$snap" "$3"
 }
 
-# The verdict on a cached card against the ref (TOOL-dDeclaredLoop-8 S3's words): the loop kit's
-# `claims.py verdict` where it resolves, its rule otherwise — `evidence` with no ref read, `fresh` when
-# the cache's `# card-ref` equals the ref's commit, `re-derived` when it does not.
+# The verdict on a cached card against the ref (TOOL-dDeclaredLoop-8 S3's words), the loop kit's
+# `claims.py verdict`: `evidence` with no ref read, `fresh` when the cache's `# card-ref` equals the
+# ref's commit, `re-derived` when it does not. Where that reader does not resolve the cache is never
+# trusted, `re-derived` with a ref read and `evidence` without, so no second copy of its rule is here.
 derive_card_verdict() { # cached card-ref or empty · the ref's commit or empty -> fresh, re-derived or evidence
   local ck py v
   ck=$(resolve_kit_file loop claims.py)
@@ -2457,7 +2479,7 @@ derive_card_verdict() { # cached card-ref or empty · the ref's commit or empty 
       && v=$("$py" "$ck" verdict --stored "${1:-?}" --class history ${2:+--recomputed "$2"} 2>/dev/null); then
     printf '%s\n' "${v%$'\r'}"; return 0
   fi
-  if [ -z "$2" ]; then echo evidence; elif [ "$1" = "$2" ]; then echo fresh; else echo re-derived; fi
+  if [ -n "$2" ]; then echo re-derived; else echo evidence; fi
 }
 
 # The lookup (S6): the build card from the first selected store that answers — the ref, the cache
@@ -2466,13 +2488,14 @@ derive_card_verdict() { # cached card-ref or empty · the ref's commit or empty 
 resolve_build_card() { # slug -> one card — line; 0 always
   local slug=$1 stores cache="$CARD_DIR/$1.md" cref="" verdict="" what="" from="$CARD_TMP/bc.found" tip="" bytes
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
-  stores=" $(printf '%s ' $stores)"
-  [ ! -f "$cache" ] || cref=$(sed -n '1s/^# card-ref //p' "$cache" | tr -d '\r')
+  stores=" ${stores//$'\n'/ } "
+  case "$stores" in *" local-clone "*) ;; *) cache="" ;; esac
+  [ -z "$cache" ] || [ ! -f "$cache" ] || cref=$(sed -n '1s/^# card-ref //p' "$cache" | tr -d '\r')
   case "$stores" in
     *" remote-ref "*)
       if read_card_ref "$slug" && [ -n "$CARD_REF_TIP" ]; then
         tip=$CARD_REF_TIP
-        verdict=$(derive_card_verdict "$([ -z "${stores##*" local-clone "*}" ] && printf '%s' "$cref")" "$tip")
+        verdict=$(derive_card_verdict "$cref" "$tip")
         if [ "$verdict" = fresh ]; then
           tail -n +2 "$cache" | tr -d '\r' > "$from"; what="cache trusted"
         else
@@ -2481,13 +2504,13 @@ resolve_build_card() { # slug -> one card — line; 0 always
             | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }' > "$from"
           what="read the ref"
           case "$stores" in
-            *" local-clone "*) { printf '# card-ref %s\n' "$tip"; cat "$from"; } > "$cache.$$" && mv -f "$cache.$$" "$cache" && what="cache rewritten" ;;
+            *" local-clone "*) write_card_cache "$slug" "$tip" "$from" && what="cache rewritten" ;;
           esac
         fi
       fi ;;
   esac
   if [ -z "$verdict" ]; then
-    case "$stores" in *" local-clone "*) [ -f "$cache" ] && { tail -n +2 "$cache" | tr -d '\r' > "$from"; what="read the cache"; verdict=evidence; } ;; esac
+    case "$stores" in *" local-clone "*) [ -n "$cache" ] && [ -f "$cache" ] && { tail -n +2 "$cache" | tr -d '\r' > "$from"; what="read the cache"; verdict=evidence; } ;; esac
   fi
   if [ -z "$verdict" ]; then
     case "$stores" in *" build-folder "*) read_card_record "$slug" && { awk '/^~~~~$/ { if (f++) exit; next } f' "$CARD_REC" | tr -d '\r' > "$from"; what="read the snapshot ${CARD_REC##*/}"; verdict=evidence; } ;; esac
@@ -2497,8 +2520,10 @@ resolve_build_card() { # slug -> one card — line; 0 always
   fi
   # A session that holds a card keeps its header line, as the replay's re-key does, since the scratch
   # guard reads the writer verb on it; the replay's own render reads no remote.
+  local verb=lookup
+  [ "$CARD_VERB" != replay ] || verb=replay
   {
-    render_card "$([ "$CARD_VERB" = replay ] && echo replay || echo lookup)" | awk -v want=startup "$CARD_PARTS_AWK" \
+    render_card "$verb" | awk -v want=startup "$CARD_PARTS_AWK" \
       | { IFS= read -r hd; if [ -f "$CARD_FILE" ]; then head -n 1 "$CARD_FILE" | tr -d '\r'; else printf '%s\n' "$hd"; fi; cat; }
     awk -v want=tail "$CARD_PARTS_AWK" "$from"
   } | derive_pockets_block > "$CARD_TMP/bc.rekeyed"
@@ -2531,7 +2556,10 @@ derive_resume_lines() { # slug -> the route —, resume — and partial — line
   out=$( CARD_TMP="$CARD_TMP/rc" && mkdir -p "$CARD_TMP" && check_card_citations "$CARD_FILE" >/dev/null 2>&1 \
          && extract_card_parts "$CARD_FILE" && check_card_route "$CARD_FILE" 1 2>&1 ); rc=$?
   rule=ok
-  [ "$rc" = 0 ] || rule=$(printf '%s\n' "$out" | sed -n 's/.*route \(R[0-9]\)[ :].*/\1/p' | head -n 1)
+  if [ "$rc" != 0 ]; then
+    rule=""
+    [[ $out =~ route\ (R[0-9])[\ :] ]] && rule=${BASH_REMATCH[1]}
+  fi
   printf 'route — re-checked · %s\n' "${rule:-unchecked: the check exited $rc}"
   if ctx=$(read_card_policy resume.context); then
     rec="fresh recommended: transcript absent"
@@ -2584,16 +2612,12 @@ if [ -n "$CARD" ]; then
         add_card_body; write_card_file
         # The publish at READY (S3): a body landing a real READY line and a route publishes its build's card.
         if [ "$CARD_APPEND_READY" = 1 ] && [ "$CARD_ROUTE" = 1 ] && _b=$(read_card_build "$CARD_TMP/body") && [ -n "$_b" ]; then
-          if _s=$(read_card_policy card.snapshot); then
-            write_build_card "$_b" "" session append "$([ "$_s" = every-transition ] && echo 1 || echo 0)" 0
-          else printf 'card — skipped: card.snapshot refused: %s\n' "${_s%%$'\n'*}"; fi
+          write_card_publish "$_b" append
         fi
       else check_card; fi ;;
     publish)
       [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE, so there is no card to publish"; exit 2; }
-      if _s=$(read_card_policy card.snapshot); then
-        write_build_card "$CARD_BUILD" "" session publish "$([ "$_s" = every-transition ] && echo 1 || echo 0)" 0
-      else printf 'card — skipped: card.snapshot refused: %s\n' "${_s%%$'\n'*}"; fi ;;
+      write_card_publish "$CARD_BUILD" publish ;;
     follow) write_card_follow "$CARD_BUILD" "$CARD_STEP" "$CARD_TERMINAL" ;;
     lookup) resolve_build_card "$CARD_BUILD"; write_card_file ;;
   esac

@@ -64,8 +64,8 @@ below.
   this session's card, a stub checker exiting 1 read as no card naming why, and a fixture under the
   `/tmp` mount read through `cygpath`.
 - AC11 — the catalogue probe printed the five `card.*` and `resume.*` keys; `scan_reader_keys` over
-  this worktree printed `['card.follows', 'card.snapshot', 'card.store']`; `git grep -n
-  "read_card_policy card.store"` found the read.
+  this worktree printed `['card.follows', 'card.snapshot', 'card.store']`; the `git grep -n` for
+  `read_card_policy card.store` over the engine found the read.
 - AC12 — `--print-bindings` — the plant `snapshot-terminal` printed `held` for an `S` row of the
   `-card-1.md` record, kind `card`, anchor `TOOL-tFix-1`, and no `A` row; the record factory's own
   plant, `build_records.py --fixture --plant typed-kinds`, printed the `card` kind `bound` and its PASS
@@ -81,6 +81,17 @@ The loop kit's follow was probed by `python -c` over `tools/loop/loop_transition
 with a stub engine: `--terminal` passed for `landed`, a member of the `terminal` set, and not for
 `designing`; no engine printed `card — skipped: no kickoff engine`. Its fixture's plant `default`
 recorded its move with that skip line printed.
+
+The bug-class checklist over the pass commit was acted on in the commit after it. Each new refusal
+gained a kickoff suite arm, each command observed alone over a scratch repository: `--card --publish`
+with no `--build`, `--card --follow` with no `--to`, a `--build` that is no slug, `--build` on
+`--card --write`, `--to` off the follow and a publish with no session card each exited 2 naming its
+cause, `--card --path --build tFix` printed the cache path, and the fixture refused an unknown case
+and a bare call with exit 2. The fixture's git runs with no global or system config. The engine,
+the fixture and the suites spell no fork the shell-hygiene leg counts: dates through
+`printf '%(…)T'`, sets and messages through `printf -v` and expansions, files read with `$(<…)`, the cache
+renamed from a `mktemp` temp. The cache verdict, where the loop kit's `claims.py` does not resolve,
+never trusts the cache. Every case was run again over the final code.
 
 Owed at the close, by the main loop: the `manifest-check self-test` leg's five card-store arms and
 the `scratch-guard self-test` leg's three readCard arms, each with the RED-first observation its

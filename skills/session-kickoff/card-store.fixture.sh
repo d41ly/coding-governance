@@ -18,7 +18,8 @@
 # WHAT THIS DOES NOT CHECK: a remote other than a local bare one; a lost compare-and-swap, which needs
 # two writers between one read and its push; the engine's other cells, which their own arms cover.
 set -u
-HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 2
+case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
+HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
 CHECK="$HERE/manifest-check.sh"
 PLANTS="render publish store-remote store-local store-folder store-empty follow-rerender follow-per-step
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline context-idle context-always-resume
@@ -33,17 +34,20 @@ case "${1:-}" in
   --plant) PLANT=${2:-} ;;
   *) echo "usage: card-store.fixture.sh --plant <case> | --list"; exit 2 ;;
 esac
-case " $(printf '%s ' $PLANTS)" in *" $PLANT "*) ;; *) echo "card-store: no case '$PLANT'; --list names them"; exit 2 ;; esac
+case " ${PLANTS//$'\n'/ } " in *" $PLANT "*) ;; *) echo "card-store: no case '$PLANT'; --list names them"; exit 2 ;; esac
 
 # The engine's own resolvers, read out of it, so no kit's path is spelled here.
 eval "$(sed -n '/^# >>> resolve_python /,/^# <<< resolve_python$/p' "$CHECK")"
 eval "$(awk '/^resolve_kit_dir\(\) \{$/,/^}$/' "$CHECK")"
 eval "$(awk '/^resolve_kit_file\(\) \{$/,/^}$/' "$CHECK")"
-GOVROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "card-store: $HERE is in no repository"; exit 2; }
+GOVROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "card-store: $HERE is in no repository"; exit 2; }
 PY=$(resolve_python 2>/dev/null) || { echo "card-store: no Python resolves on this node"; exit 2; }
 
 S=$(mktemp -d "${TMPDIR:-/tmp}/cardstore.XXXXXX") || { echo "card-store: no scratch directory under ${TMPDIR:-/tmp}"; exit 2; }
 trap 'rm -rf "$S"' EXIT
+# Hermetic: no global or system git config reaches a case, so a node's hooks path, line-ending
+# conversion or signing cannot move what it observes; the repository's own config is set below.
+: > "$S/gitconfig"; export GIT_CONFIG_GLOBAL="$S/gitconfig" GIT_CONFIG_NOSYSTEM=1
 R="$S/repo"; O="$S/origin.git"; OUT="$S/out"
 export CARD_STUB_POLICY="$S/policy.txt"
 MISSED=0
@@ -63,8 +67,12 @@ run_card_engine() {
   local t=$1; shift
   (cd "$t" && bash "$CHECK" "$@" </dev/null) > "$OUT" 2>&1
 }
-# read_ref_card <git dir or tree> — the card a card ref's tip carries, every message line after the fifth.
-read_ref_card() { git -C "$1" log -1 --format=%B "$REF" -- 2>/dev/null | tr -d '\r' | tail -n +6; }
+# read_ref_card <git dir or tree> — the card a card ref's tip carries, every message line after the
+# fifth, less the blank line `%B` closes with.
+read_ref_card() {
+  git -C "$1" log -1 --format=%B "$REF" -- 2>/dev/null | tr -d '\r' \
+    | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }'
+}
 # measure_card_records <tree> — the build's card records.
 measure_card_records() { ls "$1/memory/builds/tFix/build/" 2>/dev/null | grep -c -- '-card-[0-9]*\.md$'; }
 
@@ -126,10 +134,10 @@ write_card_fixture || { echo "card-store: the fixture could not be built under $
 
 case "$PLANT" in
   render)
-    run_card_append; card=$(read_ref_card "$O")
-    print_card_held "AC1 the first line names the build at step unrecorded" "$(case "$card" in "card — tFix · step unrecorded · "*) echo 0 ;; *) echo 1 ;; esac)"
-    print_card_held "AC1 the card carries ## pockets and ## route" "$(printf '%s\n' "$card" | grep -qx '## pockets' && printf '%s\n' "$card" | grep -qx '## route'; echo $?)"
-    print_card_held "AC1 its READY line is last" "$(printf '%s\n' "$card" | tail -n 1 | grep -q '^READY — tFix'; echo $?)" ;;
+    run_card_append; read_ref_card "$O" > "$S/card"
+    print_card_held "AC1 the first line names the build at step unrecorded" "$(head -n 1 "$S/card" | grep -q '^card — tFix · step unrecorded · '; echo $?)"
+    print_card_held "AC1 the card carries ## pockets and ## route" "$(grep -qx '## pockets' "$S/card" && grep -qx '## route' "$S/card"; echo $?)"
+    print_card_held "AC1 its READY line is last" "$(tail -n 1 "$S/card" | grep -q '^READY — tFix'; echo $?)" ;;
   publish)
     run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
     print_card_held "AC2 the bare remote holds $REF" "$([ -n "$c1" ]; echo $?)"
@@ -158,10 +166,10 @@ case "$PLANT" in
       follow-per-step) set_card_policy card.follows card-per-step ;; follow-fixed) set_card_policy card.follows fixed-at-start ;;
     esac
     run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
-    run_card_engine "$R" --card --follow --build tFix --to designing; card=$(read_ref_card "$O")
+    run_card_engine "$R" --card --follow --build tFix --to designing; read_ref_card "$O" > "$S/card"
     case "$PLANT" in
-      follow-rerender) print_card_held "AC4 re-render-at-transition: step designing, the tail kept" "$(printf '%s\n' "$card" | head -n 1 | grep -q '^card — tFix · step designing ·' && printf '%s\n' "$card" | grep -qx '## route'; echo $?)" ;;
-      follow-per-step) print_card_held "AC4 card-per-step: step designing, READY — none yet, no route" "$(printf '%s\n' "$card" | head -n 1 | grep -q '^card — tFix · step designing ·' && printf '%s\n' "$card" | grep -qx 'READY — none yet' && ! printf '%s\n' "$card" | grep -qx '## route'; echo $?)" ;;
+      follow-rerender) print_card_held "AC4 re-render-at-transition: step designing, the tail kept" "$(head -n 1 "$S/card" | grep -q '^card — tFix · step designing ·' && grep -qx '## route' "$S/card"; echo $?)" ;;
+      follow-per-step) print_card_held "AC4 card-per-step: step designing, READY — none yet, no route" "$(head -n 1 "$S/card" | grep -q '^card — tFix · step designing ·' && grep -qx 'READY — none yet' "$S/card" && ! grep -qx '## route' "$S/card"; echo $?)" ;;
       follow-fixed) print_card_held "AC4 fixed-at-start: the ref is unchanged" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$c1" ] && grep -q 'fixed-at-start: nothing written' "$OUT"; echo $?)" ;;
     esac
     run_card_engine "$R" --card --follow --build tFix --to landed --terminal
@@ -207,8 +215,8 @@ case "$PLANT" in
       context-always-fresh) set_card_policy resume.context always-fresh ;;
       partial-restart) set_card_policy resume.partial restart-item ;; partial-ask) set_card_policy resume.partial ask-owner ;;
     esac
-    tx="$S/transcript.jsonl"; : > "$tx"; touch -d "@$(( $(date +%s) - 1800 ))" "$tx"
-    payload=$(printf '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$tx" "$R")
+    tx="$S/transcript.jsonl"; : > "$tx"; touch -d "@$(( EPOCHSECONDS - 1800 ))" "$tx"
+    printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$tx" "$R"
     read_card_fixture_verdict() { printf 'pass\n'; }
     export -f read_card_fixture_verdict
     case "$PLANT" in
@@ -216,7 +224,7 @@ case "$PLANT" in
         printf '@.claude/orientation-card.md\n' > "$R/CLAUDE.md"
         read_card_fixture_verdict() { printf 'red: no recorded run\n'; }
         export -f read_card_fixture_verdict ;;
-      context-transcript-absent) payload=$(printf '{"session_id":"t1","cwd":"%s"}' "$R") ;;
+      context-transcript-absent) printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R" ;;
       partial-*) : > "$R/one.txt"; : > "$R/two.txt" ;;
     esac
     if [ "$PLANT" = terminal-route ]; then
@@ -240,7 +248,7 @@ case "$PLANT" in
         print_card_held "AC7 ...and with no reader exported, the same" "$(grep -qF "$want" "$OUT" && grep -q '^resume — fresh recommended' "$OUT"; echo $?)" ;;
       context-transcript-absent)
         print_card_held "AC7 no transcript_path: fresh, transcript absent" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)"
-        payload=$(printf '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$S/deleted.jsonl" "$R")
+        printf -v payload '{"session_id":"t1","transcript_path":"%s","cwd":"%s"}' "$S/deleted.jsonl" "$R"
         (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
         print_card_held "AC7 a transcript_path naming a deleted file: the same" "$(grep -qx 'resume — fresh recommended: transcript absent (resume.context: fresh-when-idle)' "$OUT"; echo $?)" ;;
       partial-*)

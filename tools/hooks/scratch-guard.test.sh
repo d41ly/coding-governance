@@ -1733,7 +1733,7 @@ SG_PROJECT="$SG_CWD_FIX"
 sg_cc="$TMP/cardcheck"; mkdir -p "$sg_cc"
 printf 'card — the stub card\n' > "$sg_cc/stub-card.md"
 # The stub prints its own directory as its bash spells it, a /tmp/… mount on Windows among them.
-printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$(cd "$(dirname "$0")" && pwd)/stub-card.md"' > "$sg_cc/answers.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'cd "${0%/*}" && printf "%s\n" "$PWD/stub-card.md"' > "$sg_cc/answers.sh"
 printf '#!/usr/bin/env bash\nexit 1\n' > "$sg_cc/silent.sh"
 sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null" : c.text.trim())' "$HOOK" "$SGFIX/.git" "$sg_cc/answers.sh" 2>&1)
 [ "$sg_got" = "card — the stub card" ] && { echo "ok   AC10 readCard reads the path the checker answers"; pass=$((pass+1)); } \
