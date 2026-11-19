@@ -223,3 +223,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T21:49:07Z brief · item TOOL-dPlacedRequest-40 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-19T21:59:24Z dispatch · item cae9cb2d TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md
+2026-11-19T22:15:11Z draw · re-dispatch · TOOL-dPlacedRequest-33 · 25/130 · 20261119T221511Z-f73f8f
+
+2026-11-19T22:15:11Z dispatch · item f4012d32 TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md
