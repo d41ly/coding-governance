@@ -20455,6 +20455,65 @@ same "DPR12 AC7 with the switch off it prints register — off, exits 2 and the 
 rm -rf "$LF"
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-19 — THE PROJECT-LEVEL REQUEST RECORD. Over the lease fixture's origin, its clone
+# c1 as node a under session qA and a second clone c2 as node b under qB: a user no fleet row names is
+# refused before any commit (AC3); A's request lands `refs/gov/requests/<key>`, one parentless commit
+# holding the three key lines, no remote object carrying the marker, the text byte for byte in c1's
+# common dir (AC2); a repeat exits 0 `already recorded`, the ref unmoved (AC3); B claims A's request by
+# lease, `kind: request`, `slug: -`, A is refused `live-holder`, a key with no record `no-record` exit 1,
+# a build lease of the slug `request` refused, A's `--claims` reads the row `live`, and B holds no
+# request ref and no feed line of one (AC4); consent holds in A's typing session alone (AC5). RED,
+# observed at the close, is the base driver, which has no request verb. Waived by README rule 8 with
+# the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a push the remote refuses, the exit 2.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
+run_request_arm() { ( cd "$LF/${RQ_CLONE:-c1}" && USERNAME=${RQ_USER:-daily-agent} CLAUDE_CODE_SESSION_ID=${RQ_SID:-qA} GOV_RUNLOG=0 bash "$SCRIPT" "$@" 2>&1 ); }
+printf 'Fix the lander push, zq-request-marker-7, on 2026-11-19\n' > "$LF/req.md"
+rq_out=$(RQ_USER=nobody run_request_arm --request "$LF/req.md"); rq_rc=$?
+same "DPR19 AC3 a user no fleet row names exits 2 and the origin holds no request" \
+  "$rq_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests | grep -c .)" "2 0"
+hit  "$rq_out" "not written · this node has no row in fleet.toml"
+rq_out=$(run_request_arm --request "$LF/req.md"); rq_rc=$?
+rq_key=$(printf '%s\n' "$rq_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+same "DPR19 AC2 clone A's request exits 0 printing its twelve-hex key" "$rq_rc ${#rq_key}" "0 12"
+same "DPR19 AC2 the record holds exactly the three key lines and no parent" \
+  "$(git --git-dir="$LF/origin.git" log -1 --format=%B "refs/gov/requests/$rq_key" -- | grep -c .) $(git --git-dir="$LF/origin.git" log -1 --format=%B "refs/gov/requests/$rq_key" -- | grep -cE '^(content-key|fleet-tag|session): ') [$(git --git-dir="$LF/origin.git" log -1 --format=%P "refs/gov/requests/$rq_key" --)]" "4 3 []"
+same "DPR19 AC2 no object on the origin carries the marker" \
+  "$(git -C "$LF/origin.git" cat-file --batch-all-objects --batch | grep -c zq-request-marker-7)" "0"
+same "DPR19 AC2 the words sit byte for byte in clone A's common dir" \
+  "$(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs) $(cat "$LF/c1/.git/requests/$rq_key.typed")" "identical qA"
+rq_tip=$(git --git-dir="$LF/origin.git" rev-parse "refs/gov/requests/$rq_key")
+rq_out=$(run_request_arm --request "$LF/req.md"); rq_rc=$?
+same "DPR19 AC3 a repeated request exits 0 and the ref is unmoved" \
+  "$rq_rc $(git --git-dir="$LF/origin.git" rev-parse "refs/gov/requests/$rq_key")" "0 $rq_tip"
+hit  "$rq_out" "request — $rq_key · already recorded"
+rq_out=$(RQ_CLONE=c2 RQ_USER=agent5 RQ_SID=qB run_request_arm --lease acquire request "$rq_key"); rq_rc=$?
+same "DPR19 AC4 clone B acquires A's request lease, kind request, slug -, fleet tag b" \
+  "$rq_rc $(read_lease_field "request/$rq_key" kind) $(read_lease_field "request/$rq_key" slug) $(read_lease_field "request/$rq_key" fleet-tag)" "0 request - b"
+rq_out=$(run_request_arm --lease acquire request "$rq_key"); rq_rc=$?
+same "DPR19 AC4 clone A's acquisition is refused" "$rq_rc" "1"
+hit  "$rq_out" "lease refused — live-holder · request/$rq_key"
+rq_out=$(run_request_arm --lease acquire request 0123456789ab); rq_rc=$?
+same "DPR19 AC4 a key with no record exits 1 and writes no lease" \
+  "$rq_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/leases/request/0123456789ab | grep -c .)" "1 0"
+hit  "$rq_out" "lease refused — no-record · request/0123456789ab"
+rq_out=$(run_request_arm --lease acquire build request); rq_rc=$?
+same "DPR19 AC4 a build lease of the slug request exits 2" "$rq_rc" "2"
+hit  "$rq_out" "the slug request is reserved"
+same "DPR19 AC4 clone A's claim read lists the request lease live" \
+  "$(run_request_arm --claims | awk -F'\t' -v t="request/$rq_key" '$1 == t { print $5 }')" "live"
+same "DPR19 AC4 clone B holds no request ref and its feed names none" \
+  "$(git -C "$LF/c2" for-each-ref refs/gov/ | grep -c 'requests/') $(cat "$LF/c2/.git/gov-feed.log" 2>/dev/null | grep -c 'refs/gov/requests/')" "0 0"
+rq_got=$( for rq_c in "c1 qA" "c1 qA2" "c2 qB"; do
+  ( cd "$LF/${rq_c% *}" && export CLAUDE_CODE_SESSION_ID=${rq_c#* } && set +u && . "$SCRIPT" >/dev/null 2>&1
+    check_request_consent "$rq_key" >/dev/null; printf '%s ' "$?" ); done )
+same "DPR19 AC5 consent holds in A's typing session and nowhere else" "$rq_got" "0 1 1 "
+rq_out=$( cd "$LF/c2" && export CLAUDE_CODE_SESSION_ID=qB && set +u && . "$SCRIPT" >/dev/null 2>&1; check_request_consent "$rq_key" )
+hit  "$rq_out" "relayed"
+rm -rf "$LF"
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-15 — THE FENCE READ, `--lease fence build <slug>`, over the lease fixture: no
 # lease on the remote and the switch off each print one `fence — none` line, exit 0; a lease this
 # session holds prints `fence — <ref> <tip> <beat>`, the beat a commit on the tip whose record
@@ -22514,7 +22573,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3829 -> 3837 by TOOL-dPlacedRequest-15: the fence read block's 8 region-eight assertions
 # (8 `same`, its checklist pass's illegal-slug and offline arms among them), off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3837
+# RAISED 3837 -> 3856 by TOOL-dPlacedRequest-19: the request record block's 19 region-eight assertions
+# (13 `same` and 6 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3856
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22777,7 +22839,8 @@ FLOOR_SHARD_7=311
 # RAISED 1035 -> 1051 by TOOL-dPlacedRequest-12's checklist pass: the same 16 region-eight refusal arms, see FLOOR_ASSERTIONS.
 # RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1060 -> 1068 by TOOL-dPlacedRequest-15: the same 8 region-eight fence read assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1068
+# RAISED 1068 -> 1087 by TOOL-dPlacedRequest-19: the same 19 region-eight request record assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1087
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

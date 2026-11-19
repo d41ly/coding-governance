@@ -188,17 +188,21 @@ announced, and declines the take-over.
 **The claim on the remote** is where two NODES learn of each other, which the lease cannot do
 because it lives on the run's own branch. Where `RUN_CLAIMS` is `on` (absent or blank is `off`), a
 run's claim is its BUILD LEASE, `refs/gov/leases/<slug>/build`, on the remote the landing push goes
-to. One grammar serves every holder: `refs/gov/leases/<slug>/build`, `refs/gov/leases/<slug>/unit/<id>`
-and `refs/gov/leases/run/<cadence>/<period>`, each segment a legal one-segment ref name. `<cadence>` is
+to. One grammar serves every holder: `refs/gov/leases/<slug>/build`, `refs/gov/leases/<slug>/unit/<id>`,
+`refs/gov/leases/run/<cadence>/<period>` and `refs/gov/leases/request/<content key>`, each segment a
+legal one-segment ref name. A request's `<content key>` is the twelve lower-case hex digits (PINNED)
+`--request` derived, and its lease is acquired only over its record `refs/gov/requests/<content key>`,
+read alone and bounded before the claim read, a remote holding none refusing `no-record`. `<cadence>` is
 any segment the tag grammar admits, `[a-z0-9][a-z0-9-]*` within 64 bytes (PINNED, the grammar's cap),
 and never a list of cadence kinds, so a cadence an expansion registers holds a lease as `maintain`
 does; a name outside it is refused `outside seg` or `over 64 bytes`. The slug `run` is reserved: a
 build or unit lease of it is refused, because `refs/gov/leases/run/build` and a cadence named `build`
-cannot both be refs. The ref names
+cannot both be refs. The slug `request` is reserved the same way, so a build or unit lease of it is
+refused and the namespace `refs/gov/leases/request/` holds request leases alone. The ref names
 a commit over the empty tree whose message is `gov-claim <tail>` (the ref after `refs/gov/leases/`), a
 blank line, and sixteen `key: value` lines: `slug`, `node`, `host`, `session`, `keepalive`, `status`
 (`live`, `held`, `released`, `landed`, `aborted` or `withdrawn`), `lease-utc`, `beat-utc`, `epoch`, `kind`
-(`build`, `unit` or `run`), `fleet-tag` (this node's row of `fleet.toml`), `renews`, `witness`,
+(`build`, `unit`, `run` or `request`, whose `slug` is `-` as a run's), `fleet-tag` (this node's row of `fleet.toml`), `renews`, `witness`,
 `offer`, `offer-deadline` and `last-fetch`, the first two an offer's target and window (below), `-`
 on every other write, and `last-fetch` this node's last fetch on a queued write, `-` on every other. A lease outside a run writes
 `keepalive: absent`. **The epoch** is 1 on a create, the read epoch plus one on a take of a foreign
@@ -224,14 +228,15 @@ changes. It stops an accidental second driver, as the lease does; a run holding 
 can force or delete the ref.
 
 **The lease verbs**, `--lease acquire|renew|release|take-over` over `build <slug>`, `unit <slug>
-<id>` or `run <cadence> <period>`, and `--lease flush`, read the remote's leases and decide by the
+<id>`, `run <cadence> <period>` or `request <content key>`, and `--lease flush`, read the remote's leases and decide by the
 `lease` column below. A lease is `mine` when its `fleet-tag` and `session` are this node's and this
 harness's, `same session` when its `session` alone is. A refusal names one cause: `live-holder`, a
 foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or unit tombstone or a
 foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how
-one of two nodes creating one build lease learns the slug is taken; `overlap`; `offline`; and an
-offer's two, `offered` and `terminal` (below). A node no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
+one of two nodes creating one build lease learns the slug is taken; `overlap`; `offline`;
+`no-record`, a request lease whose record the remote does not hold; and an offer's two, `offered`
+and `terminal` (below). A node no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
 process through the policy kit, a refused read writing nothing:
 
 | key | values (default first) | what it decides |

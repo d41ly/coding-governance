@@ -99,6 +99,7 @@ loop guard fixtures	kit	selftests
 loop item kind	repo	selftests
 loop parent routes	kit	selftests
 loop position fixtures	kit	selftests
+loop request fixtures	kit	selftests
 loop review bounds fixtures	kit	selftests
 loop scenario fixtures	repo	selftests
 loop splice check	repo	selftests

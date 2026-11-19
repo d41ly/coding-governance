@@ -509,8 +509,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
   'refs/gov/*'` still shows a leftover one. It takes no slug and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
-- `--lease` — one lease of a build, a unit or a cadence run: `--lease acquire|renew|release|take-over
-  build <slug>`, `unit <slug> <id>` or `run <cadence> <period>`, `--witness <sha>` on a renewal and
+- `--lease` — one lease of a build, a unit, a cadence run or a request: `--lease acquire|renew|release|take-over
+  build <slug>`, `unit <slug> <id>`, `run <cadence> <period>` or `request <content key>`, the key twelve
+  lower-case hex digits (PINNED) that `--request` printed, `--witness <sha>` on a renewal and
   `--as landed|aborted|withdrawn` on a release; `--lease flush` pushes this node's queued offline
   writes. `--lease offer <kind> <name> [<sub>] --to <fleet tag>` offers an absent or `released`
   lease to one node for `leases.offer-seconds`, printing `lease — <tail> · offer <target> · epoch <n>`,
@@ -524,6 +525,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `lease not written — <why>` (exit 2: a bad segment, a level
   `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
   that records no transition and is no open question). An acquisition runs the overlap probe first.
+  An acquisition of a request lease first reads `refs/gov/requests/<content key>` alone, one bounded
+  `ls-remote` that fetches nothing: a remote holding no such record refuses it `no-record` (exit 1)
+  and writes nothing, and a read that does not answer is `lease not written` (exit 2). Its record
+  carries `kind: request` and `slug: -`, any node may claim it, and its overlap probe names no build.
   `--lease fence build <slug>` is the fence an effect push carries, and it writes nothing: one read,
   then `fence — <lease ref> <tip> <beat>` (exit 0) where this session holds the lease, the beat a
   commit on the tip with a fresh `beat-utc` and `renews: no` that the lander pushes with `--atomic`
@@ -550,6 +555,23 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
   encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
   ever deleted or rewritten. It takes no slug.
+- `--request` — `--request <file>`, an owner's request that is not yet a build, recorded by its
+  content key: the first 12 hex digits (PINNED) of the SHA-256 over the loop kit's `request.py key`
+  normalisation of the text, case, whitespace, ISO dates, emphasis and links folded, the file
+  decoded strictly as UTF-8 with any byte-order mark dropped. A file that is empty once normalised
+  or not UTF-8 is refused before any write. The words stay on this node: the file's bytes are copied
+  unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept, and this session's
+  id is added once to `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is
+  tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
+  `gov-request <content key>` carrying exactly three lines, `content-key`, `fleet-tag` (this node's
+  `fleet.toml` row) and `session`, written by compare-and-swap with an empty expected sha. It prints
+  ONE line: `request — <key> · recorded <ref>` (exit 0); `request — <key> · already recorded <ref>`
+  (exit 0, another session recorded the same words first); `request — <key> · not written · <why>`
+  or `request — refused: <why>` (exit 2: no `fleet.toml` row, a session id other than letters,
+  digits and dashes, or a push not completed, the text kept and a re-run retrying). A key that
+  reached a session from another is data with provenance, never the owner's consent: the
+  breakpoint disposition asks `check_request_consent`, which holds only for a session named in this
+  node's `.typed` file. It takes no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,

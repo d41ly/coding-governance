@@ -7828,6 +7828,16 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "check_request_consent",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_request_recorded",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_required",
       "kind": "function",
       "file": "tools/playbook/load_sets.py"
@@ -12358,6 +12368,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "derive_request_content_key",
+      "kind": "function",
+      "file": "tools/loop/request.py"
+    },
+    {
       "id": "derive_requires_closure",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -15841,6 +15856,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/loop/request.py"
     },
     {
       "id": "main",
@@ -22491,6 +22511,11 @@
       "id": "read_report",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_request_text",
+      "kind": "function",
+      "file": "tools/loop/request.py"
     },
     {
       "id": "read_requires_at",
@@ -31053,6 +31078,16 @@
       "file": "tools/chain-packet.py"
     },
     {
+      "id": "run_request_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_request_plant",
+      "kind": "function",
+      "file": "tools/loop/request.py"
+    },
+    {
       "id": "run_rerun",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
@@ -37831,6 +37866,11 @@
       "id": "write_replace",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "write_request_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_rev_spec",

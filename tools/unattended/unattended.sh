@@ -41,12 +41,13 @@
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
 #   unattended.sh --claims [--with-key]                            # every run claim and lease on the remote: name, node or fleet tag, status, beat-age-s, verdict[, key]
-#   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
+#   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit, cadence run or request, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
 #   unattended.sh --lease fence build <slug>                       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
+#   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
 #   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
@@ -132,7 +133,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --feed --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --request --feed --overlaps --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -2453,6 +2454,8 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # TOOL-dPlacedRequest-41 S1: a `cached` read handed CL_QUEUED, `<ref> TAB <commit>`, the newest
 # queued commit of the one ref an offline write is about to build on, reads that commit's record in
 # place of the ref's cached tip, one `git cat-file`, and moves no ref: the commit stays a local object.
+# TOOL-dPlacedRequest-19 S4: a lease tail `request/<content key>` is kind `request`, slug `-`, named by
+# its tail as a cadence lease is; the fetch's refspecs are unchanged, so no request record is read here.
 read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   local pol="$1" d rc lf qr alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
@@ -2524,6 +2527,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
         if (tail ~ /^[^\/]+\/build$/) { kd = "build"; sl = tail; sub(/\/build$/, "", sl); nm = sl }
         else if (tail ~ /^run\/[^\/]+\/[^\/]+$/) { kd = "run"; sl = "-" }
         else if (tail ~ /^[^\/]+\/unit\/[^\/]+$/) { kd = "unit"; sl = tail; sub(/\/.*$/, "", sl) }
+        else if (tail ~ /^request\/[0123456789abcdef]+$/ && length(tail) == 20) { kd = "request"; sl = "-" }
         if (kd == "" || hdr != "gov-claim " tail || v["kind"] != kd || v["slug"] != sl || v["epoch"] !~ /^[1-9][0-9]*$/) ok = 0
         f2 = v["fleet-tag"]; ep = v["epoch"]; ko = (kd == "" ? "?" : kd)
         if (kd == "build") lb[nm] = 1
@@ -2627,6 +2631,8 @@ print_claims() { # [--with-key] -> the rows on stdout; rc 2 when the remote does
 # TOOL-dPlacedRequest-1 S11: a legacy row is keyed over `refs/gov/runs/<slug>@<sha>`, a lease row over
 # the ref `derive_lease_ref` builds from its kind and name, and `runstate=` is read from the row's slug,
 # the build a unit lease belongs to, and `?` for a cadence lease, which has no run record.
+# TOOL-dPlacedRequest-19 S4: a request lease row is keyed over `derive_lease_ref request <key>`'s ref,
+# `runstate=?` as a cadence row, since a request names no build.
 derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
   local py d br blobs="" refs
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || return 1
@@ -2637,6 +2643,7 @@ derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
         build) derive_lease_ref build "$nm" >/dev/null; sl=$nm ;;
         unit) derive_lease_ref unit "${nm%%/*}" "${nm##*/}" >/dev/null; sl=${nm%%/*} ;;
         run) sl=${nm#run/}; derive_lease_ref run "${sl%%/*}" "${nm##*/}" >/dev/null; sl=- ;;
+        request) derive_lease_ref request "${nm#request/}" >/dev/null; sl=- ;;
         *) LEASE_REF="$CLAIM_NS/$nm"; sl=$nm ;;
       esac
       printf '%s\t%s\n' "${LEASE_REF:-$LEASE_NS/$nm}@$sha" "$sl"
@@ -3539,22 +3546,29 @@ check_cadence_segment() { # name -> 0 inside seg and 64 bytes; 1 with the rule b
 # `check_cadence_segment` (TOOL-dPlacedRequest-18). The slug `run` is reserved: a build or unit lease of
 # it is refused, because `refs/gov/leases/run/build` and a cadence named `build` cannot both be refs.
 # Sets LEASE_REF and prints it, so a caller in a loop spawns nothing.
-derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> -> LEASE_REF on stdout; rc 2 with LEASE_WHY
+# TOOL-dPlacedRequest-19 S4: the kind `request` builds `refs/gov/leases/request/<content key>`, the key
+# twelve lower-case hex digits and no third segment, and the slug `request` is reserved as `run` is.
+derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> | request <content key> -> LEASE_REF on stdout; rc 2 with LEASE_WHY
   local k="${1:-}" n="${2:-}" s="${3:-}"
   LEASE_REF=""; LEASE_WHY=""
   case "$k" in
-    build) [ -z "$s" ] || { LEASE_WHY="a build lease takes no third segment: $s"; return 2; } ;;
+    build|request) [ -z "$s" ] || { LEASE_WHY="a $k lease takes no third segment: $s"; return 2; } ;;
     unit|run) [ -n "$s" ] || { LEASE_WHY="a $k lease takes a third segment"; return 2; } ;;
-    *) LEASE_WHY="the lease kind is build, unit or run, not '$k'"; return 2 ;;
+    *) LEASE_WHY="the lease kind is build, unit, run or request, not '$k'"; return 2 ;;
   esac
   check_lease_segment "$n" || { LEASE_WHY="'$n' is not a legal one-segment ref name"; return 2; }
   [ -z "$s" ] || check_lease_segment "$s" || { LEASE_WHY="'$s' is not a legal one-segment ref name"; return 2; }
   [ "$k" != run ] || check_cadence_segment "$n" >/dev/null || { LEASE_WHY="the cadence '$n' is $LEASE_WHY"; return 2; }
-  case "$k:$n" in build:run|unit:run) LEASE_WHY="the slug run is reserved: a $k lease of it would read as the cadence namespace $LEASE_NS/run/"; return 2 ;; esac
+  [ "$k" != request ] || [[ $n =~ ^[0123456789abcdef]{12}$ ]] || { LEASE_WHY="'$n' is no content key, twelve lower-case hex digits"; return 2; }
+  case "$k:$n" in
+    build:run|unit:run) LEASE_WHY="the slug run is reserved: a $k lease of it would read as the cadence namespace $LEASE_NS/run/"; return 2 ;;
+    build:request|unit:request) LEASE_WHY="the slug request is reserved: a $k lease of it would read as the request namespace $LEASE_NS/request/"; return 2 ;;
+  esac
   case "$k" in
     build) LEASE_REF="$LEASE_NS/$n/build" ;;
     unit) LEASE_REF="$LEASE_NS/$n/unit/$s" ;;
     run) LEASE_REF="$LEASE_NS/run/$n/$s" ;;
+    request) LEASE_REF="$LEASE_NS/request/$n" ;;
   esac
   printf '%s\n' "$LEASE_REF"
 }
@@ -3947,6 +3961,9 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # nor `absent`, since either value names no session. It writes through `write_lease_offer`, on an
 # absent lease a create through the same feed read, and runs no overlap probe, because an offer
 # acquires nothing.
+# TOOL-dPlacedRequest-19 S4: the kind `request <content key>` writes `kind: request` and `slug: -`
+# through the default arm below; an acquire of it first reads its record's existence, refused
+# `no-record` (exit 1) where the remote holds none, and its overlap probe names no build, as a run's.
 run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
   local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la ot os odl=""
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
@@ -4005,6 +4022,16 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   esac
   tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it writes no lease: $tag"; return 2; }
   FLEET_TAG=$tag; sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  # A REQUEST IS CLAIMED ONLY OVER ITS RECORD (TOOL-dPlacedRequest-19 S4, F5): one bounded read of
+  # that one ref, before the claim read and apart from it, so the claim read fetches no request record.
+  if [ "$act:$kind" = acquire:request ]; then
+    check_request_recorded "$name"; rc=$?
+    case "$rc" in
+      0) ;;
+      1) echo "lease refused — no-record · $tail · $RQ_WHY"; return 1 ;;
+      *) echo "lease not written — $RQ_WHY"; return 2 ;;
+    esac
+  fi
   WL_QUEUE=""
   if read_claims quiet; then
     write_gov_queue >&2 || :
@@ -4033,7 +4060,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   if [ "$act" = acquire ]; then
     hd=$(GIT symbolic-ref -q "refs/remotes/$CR_NAME/HEAD" 2>/dev/null) || hd=""
     ASHA=""; [ -z "$hd" ] || ASHA=$(GIT rev-parse --verify --quiet "$hd^{commit}" 2>/dev/null) || ASHA=""
-    case "$kind" in run) check_cross_run_overlap "" acquire ;; *) check_cross_run_overlap "$name" acquire ;; esac \
+    case "$kind" in run|request) check_cross_run_overlap "" acquire ;; *) check_cross_run_overlap "$name" acquire ;; esac \
       || { echo "lease refused — overlap · $tail · $OV_WHY"; remove_gov_queue_hold; return 1; }
   fi
   check_claim_writable "$lname" lease "$tag" "$sid" "$la"; rc=$?
@@ -4290,6 +4317,105 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
        rm -f "$d"; return 1 ;;
     *) echo "register — not written $ref · $GOVREF_WHY"; return 2 ;;
   esac
+}
+
+# --request, THE PROJECT-LEVEL REQUEST RECORD (TOOL-dPlacedRequest-19). An owner's request that is not
+# yet a build is keyed by its text alone: `request_content_key`, the loop kit's `request.py key`, found
+# by `resolve_kit_dir` as `derive_claim_keys` finds `claims.py`, refusing a file that is empty once
+# normalised or not UTF-8. THE WORDS STAY ON THIS NODE: the file's bytes are copied unchanged to
+# `<git-common-dir>/requests/<key>.md`, the first copy kept, and this session's id is appended once to
+# `<git-common-dir>/requests/<key>.typed`; nothing under `requests/` is tracked or pushed. THE REMOTE
+# HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
+# whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
+# `fleet-tag` (this node's, as `resolve_fleet_tag` reads it from `fleet.toml`) and `session` (letters,
+# digits and dashes), each held at the write, written by `write_gov_ref` with an EMPTY expected sha, so
+# every write is a create. ONE LINE PER OUTCOME: `request — <key> · recorded <ref>` exit 0; `request —
+# <key> · already recorded <ref>` exit 0, a lost create; `request — <key> · not written · <why>` exit 2,
+# the text kept, and re-running the verb retries; or the key's own `request — refused:` line, exit 2,
+# before any write. Every refusal precedes the local copy, and the copy precedes the push.
+# WHAT THIS DOES NOT CHECK: that the file holds the owner's words, which the verb trusts its caller
+# for until the intake hook lands, a non-goal of this unit; the text is never scanned, because it never
+# leaves this node.
+RQ_WHY=""
+write_request_record() { # file -> 0 recorded or already recorded, 2 not written
+  local f="${1:-}" py d out key tag sid cdir msg c rc
+  [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "request — not written · the request file is not readable: $f"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request — not written · no python resolves, so the content key cannot be derived"; return 2; }
+  d=$(resolve_kit_dir "$py" loop request.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "request — not written · no loop kit holding request.py resolves beside this kit, so the content key cannot be derived"; return 2; }
+  [ -f "$d/request.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" "$d/request.py" key "$f" 2>&1) && rc=0 || rc=$?
+  out=${out//$'\r'/}
+  if [ "$rc" != 0 ] || ! [[ $out =~ ^[0123456789abcdef]{12}$ ]]; then
+    printf '%s\n' "${out:-request — refused: $f did not key, request.py exited $rc}"; return 2
+  fi
+  key=$out
+  tag=$(resolve_fleet_tag) || { echo "request — $key · not written · this node has no row in fleet.toml: $tag"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "request — $key · not written · the session id is not letters, digits and dashes"; return 2; }
+  cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} && [ -n "$cdir" ] \
+    || { echo "request — $key · not written · no git common dir resolves for the local store"; return 2; }
+  mkdir -p "$cdir/requests" 2>/dev/null || { echo "request — $key · not written · the local store cannot be made: $cdir/requests"; return 2; }
+  if [ ! -e "$cdir/requests/$key.md" ]; then
+    cp -- "$f" "$cdir/requests/$key.md.$$" 2>/dev/null && mv -n -- "$cdir/requests/$key.md.$$" "$cdir/requests/$key.md" 2>/dev/null
+    rm -f -- "$cdir/requests/$key.md.$$"
+    [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; return 2; }
+  fi
+  grep -qxF -- "$sid" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\n' "$sid" >>"$cdir/requests/$key.typed" \
+    || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; return 2; }
+  msg=$(printf 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid")
+  resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
+  c=$(build_gov_commit "" "$msg") || { echo "request — $key · not written, the text kept · the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "refs/gov/requests/$key" "" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) echo "request — $key · recorded refs/gov/requests/$key"; return 0 ;;
+    1) echo "request — $key · already recorded refs/gov/requests/$key"; return 0 ;;
+    *) echo "request — $key · not written, the text kept and a re-run retries · $GOVREF_WHY"; return 2 ;;
+  esac
+}
+
+# THE RECORD'S EXISTENCE, before a request lease is acquired (TOOL-dPlacedRequest-19 S4, F5): ONE
+# bounded `ls-remote --exit-code` of `refs/gov/requests/<key>` alone against the claim remote, as
+# `branch_tip_quiet` asks for one branch. It fetches nothing and sights nothing into the feed, so the
+# claim read stays the size it is. Check 24's refusal of other than one remote is swallowed, as the
+# quiet claim read swallows it, and reaches RQ_WHY. -> 0 recorded; 1 the remote answered and holds no
+# such ref; 2 the read did not answer or the bound fired; the cause in RQ_WHY.
+check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read; RQ_WHY
+  local key="$1" f l rc hit="" _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  RQ_WHY=""
+  resolve_claim_remote >/dev/null; rc=$?
+  status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
+  [ "$rc" = 0 ] || { RQ_WHY="the clone does not declare exactly one remote, check 24"; return 2; }
+  f=$(mktemp) || { RQ_WHY="cannot create a scratch file to bound the record read"; return 2; }
+  observe_remote "$f" ls-remote --exit-code "$CR_URL" "refs/gov/requests/$key" && rc=0 || rc=$?
+  while IFS= read -r l; do case "${l%$'\r'}" in *$'\t'"refs/gov/requests/$key") hit=1 ;; esac; done <"$f"
+  rm -f "$f"
+  case "$rc:$hit" in
+    0:1) return 0 ;;
+    0:|2:*) RQ_WHY="the remote holds no refs/gov/requests/$key, so no request of that key is recorded"; return 1 ;;
+    124:*) RQ_WHY="the record read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL"; return 2 ;;
+    *) RQ_WHY="the remote did not answer the record read, git ls-remote exited $rc: $CR_URL"; return 2 ;;
+  esac
+}
+
+# THE CONSENT PREDICATE (TOOL-dPlacedRequest-19 S5): a request is the owner's consent only in a session
+# that recorded its words on THIS node, a line of `<git-common-dir>/requests/<key>.typed`. A key that
+# arrived from another node or session has no such line, so the predicate refuses it by default; the
+# breakpoint disposition calls it before it fires (TOOL-dPlacedRequest-5). -> 0 consent; 1 printing one
+# `request — <key> · relayed` line otherwise, a malformed key or no common dir included.
+# WHAT THIS DOES NOT CHECK: that the session typed the words rather than relayed them into `--request`.
+check_request_consent() { # content key -> 0 this session typed it here, 1 relayed
+  local key="${1:-}" cdir sid="${CLAUDE_CODE_SESSION_ID:-absent}"
+  cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || cdir=""
+  cdir=${cdir%$'\r'}
+  if [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && grep -qxF -- "$sid" "$cdir/requests/$key.typed" 2>/dev/null; then
+    return 0
+  fi
+  echo "request — ${key:--} · relayed: data with provenance, never consent"
+  return 1
 }
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
@@ -18325,7 +18451,7 @@ while [ $# -gt 0 ]; do
                         echo "lease not written — --lease fence takes build <slug> and nothing else"; _rl_rc=2
                       else write_fence_beat "${LV_POS[1]}"; _rl_rc=$?; fi
                     elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
-                      echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id> or run <cadence> <period>"; _rl_rc=2
+                      echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id>, run <cadence> <period> or request <content key>"; _rl_rc=2
                     else
                       run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR" "$LV_TO"; _rl_rc=$?
                     fi
@@ -18334,6 +18460,10 @@ while [ $# -gt 0 ]; do
     # problem names a subject and a decision names its build among its own positional words.
     --register)     refuse_waive_unless_preflight --register
                     shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-19 - an owner's request recorded by its content key; no slug, because a
+    # request is not yet a build.
+    --request)      refuse_waive_unless_preflight --request
+                    shift; write_request_record "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
     # of governance refs this clone holds; no slug, because the feed is the node's.
     --feed)         refuse_waive_unless_preflight --feed

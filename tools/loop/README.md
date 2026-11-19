@@ -508,6 +508,23 @@ python <prefix>/loop/claims.py card-keys
 python <prefix>/loop/claims.py --selftest
 ```
 
+## The request key
+
+`request.py` (TOOL-dPlacedRequest-19) keys an owner's request by its text alone, the key I11 names
+`request_content_key`. `derive_request_content_key` is the first twelve hex digits of the SHA-256 over
+the UTF-8 bytes of the memory-tree kit's `derive_content_key` of the text, so case, whitespace, ISO
+dates, emphasis and links fold away and two typings of one request key alike; a text that normalises
+to nothing is refused. `key <file>` reads the file as bytes and decodes them strictly as `utf-8-sig`,
+so a byte-order mark never reaches the key, and refuses an undecodable byte by its offset with exit 2.
+The unattended driver's `--request` finds the module by `resolve_kit_dir` and records the request under
+that key. `--fixture --plant <case>` runs one of `PLANTS`, and `--selftest` runs every case through
+`run_selftest_cases`; it is gov's `loop request fixtures` leg.
+
+```bash
+python <prefix>/loop/request.py key <file>
+python <prefix>/loop/request.py --selftest
+```
+
 ## The position engine
 
 `position.py` (TOOL-dDeclaredLoop-7) answers where a build is and what runs next from witnesses alone.

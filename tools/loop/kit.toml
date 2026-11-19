@@ -71,6 +71,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # copy, and imports only loop_lib.py beside it, so its reach takes no edge; the session-kickoff checker
 # and the unattended driver each find it by `resolve_kit_dir` and print a skipped or `-` form where it
 # does not resolve. Its leg is gov's own [[exempt_leg]].
+# The request key (TOOL-dPlacedRequest-19): request.py keys an owner's request by its text through the
+# memory-tree kit's `derive_content_key` in row_grammar.py, under the edge above, and imports loop_lib.py
+# beside it; the unattended driver finds it by `resolve_kit_dir` for `--request` and refuses the verb
+# naming it where it does not resolve. Its leg, `loop request fixtures`, is gov's own [[exempt_leg]], no
+# row here.
 # The position engine (TOOL-dDeclaredLoop-7): position.py reads commits, acceptance records and the
 # front matter through the memory-tree kit under the edge above, the run facts through the policy kit
 # by `read_policy_kit`, and each unit's M2 state from the unattended driver's `--plan`, found by
