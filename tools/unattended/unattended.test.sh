@@ -20600,6 +20600,8 @@ fa_off=$(git --git-dir="$LF/origin.git" log -1 --format=%B "$fb_beat" | git --gi
 git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tFix/build "$fa_off"
 fa_out=$(run_lease_arm fence build tFix --after "$fa_old"); fa_rc=$?
 same "DPR29 AC3 a same-epoch tip the read one does not precede is refused epoch-fence, exit 1" "$fa_rc|${fa_out%% · node*}" "1|lease refused — epoch-fence · tFix/build"
+fa_out=$(run_lease_arm fence build tFix --after "$fa_off"); fa_rc=$?
+same "DPR29 AC3 ...and that tip, handed as its own --after, re-fences, so the refusal above was the ancestry's" "$fa_rc|${fa_out% *}" "0|fence — refs/gov/leases/tFix/build $fa_off"
 fa_out=$(run_lease_arm fence build tNone --after "$fa_old"); fa_rc=$?
 same "DPR29 S1 a re-fence over no lease on the remote is refused epoch-fence, exit 1" "$fa_rc|$fa_out" "1|lease refused — epoch-fence · tNone/build · no lease on the remote"
 fa_out=$(run_lease_arm fence build tFix --after "${fa_old:0:12}"); fa_rc=$?
@@ -22642,10 +22644,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # (22 `same` and 15 `hit`, its checklist pass's refusal and offline arms among them), off the diff's own
 # lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-# RAISED 3874 -> 3881 by TOOL-dPlacedRequest-29: the re-fence block's 7 region-eight assertions (7
+# RAISED 3874 -> 3882 by TOOL-dPlacedRequest-29: the re-fence block's 8 region-eight assertions (8
 # `same`, its refusal arms among them), off the diff's own lines; no skip branch. No suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3881
+FLOOR_ASSERTIONS=3882
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22909,8 +22911,8 @@ FLOOR_SHARD_7=311
 # RAISED 1051 -> 1060 by TOOL-dPlacedRequest-42: the same 9 region-eight offline create assertions, see FLOOR_ASSERTIONS.
 # RAISED 1060 -> 1068 by TOOL-dPlacedRequest-15: the same 8 region-eight fence read assertions, see FLOOR_ASSERTIONS.
 # RAISED 1068 -> 1105 by TOOL-dPlacedRequest-19: the same 37 region-eight request record assertions, see FLOOR_ASSERTIONS.
-# RAISED 1105 -> 1112 by TOOL-dPlacedRequest-29: the same 7 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1112
+# RAISED 1105 -> 1113 by TOOL-dPlacedRequest-29: the same 8 region-eight re-fence assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1113
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
