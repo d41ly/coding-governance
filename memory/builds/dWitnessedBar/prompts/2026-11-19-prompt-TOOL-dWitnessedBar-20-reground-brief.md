@@ -1,6 +1,6 @@
-**Serves:** journal TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24
+**Serves:** journal TOOL-dWitnessedBar-20
 
-# Brief — dWitnessedBar: TOOL-dWitnessedBar-20, TOOL-dWitnessedBar-24 re-grounded on the tree as built, before dispatch
+# Brief — dWitnessedBar: TOOL-dWitnessedBar-20 re-grounded on the tree as built, before dispatch
 
 ## The prompt
 
@@ -22,29 +22,23 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    symbol, line citation, section name, count, population and edge. Re-derive each PINNED count with the command the
    spec states and re-pin it with today's date. A population the spec enumerates is re-derived, every new member listed
    in Files touched with the legs its guard names on the gates section's leg line, and a prose-only mention named as
-   outside the population. Cite moved lines as `path#symbol` or blob-pinned, never a bare `path:line`.
+   outside the population. Cite moved code-file lines as `path#symbol` or blob-pinned, never a bare `path:line`; leave a carried clause token byte-identical.
    What is built so far:
-   - Built: unit 26 (`7526c98fa`, the `resolve_bash_py` block, `scan_bare_bash`); unit 27 (`cc35bb62c`,
-     `tools/lib/refuse-wrong-shell.sh`, section `2n`); unit 48 (`75a15d9ce`); unit 49 (`ef33493d7`); unit 13
-     (`34f8bb7db`, red-fixes `010323e92` and `2bd7e6e36`: `tools/lib/legacy_ledger.py` with `read_rows`,
-     `read_registrations` over every tracked `kit.toml` and the `DEPLOYER_HOME` registry, `read_renames`,
-     `compare_to_base`, `write_rows`, the CLI `read|compare|carry` with `compare --measured <path>`, inline copies in
-     memory-tree and gate-lint, the ledger class in `tools/memory-tree/merge-rows.py`, section `2o`). Unit 50 (`2b4d10063`, red-fix `cb93e79f0`: `--coverage` in `tools/lib/refuse-wrong-shell.sh`).
-     Unit 15 (rev-8: `test.seed` at every check's registration) is building now.
-   - Queued from re-grounded specs, each the contract for what will exist: unit 12
-     (rev-6: `leg`, `check`, `pack` tag namespaces, `tag` on every leg, `[[numbered_check]]` tables), unit 61 (rev-3),
-     unit 22 (rev-4: `tests` edge field), unit 47 (rev-6), unit 19 (rev-4: the leg's `purpose`), unit 11 (rev-6: the
-     gate-leg factory), unit 14 (rev-7: the `ratchet` leg pack), unit 45 (rev-3) and unit 54 (rev-4), which land in one
-     merge, unit 16 (rev-6: gov's registries converted onto the ledger; §8 F7 leaves `positional-refs.txt`,
-     `unpinned-facts.txt` and `positional-producers.txt` to unit 18), unit 46 (rev-5: `--seed-pins`).
-   - Also queued: unit 17 (rev-4: the seven record and row pins as keyed populations), unit 18 (rev-5: §8 F4 —
-     `positional-refs` registers in `tools/playbook/kit.toml`, the other lists and `landed-steps` in
-     `tools/govkit/registry.toml`; §8 F6 — `landed-steps` graded by `leg = "ratchet (both ways)"`), unit 52 (rev-3),
-     unit 53 (rev-3).
+   - Built and landed through order 12: units 26, 27, 48, 49, 13, 50, 15, 12, 61, 22, 47, 19, 11, 14, 45, 54, 16
+     (`87bc9f615`, `3ce285ad7`: gov's registries on the ledger, homes once under `tools/` moved to `memory/project/`,
+     the step program `tools/govkit/steps/registry_to_ledger.py`), 46, 17 (`dbbd8caba`: `{prefix}` resolved in seed
+     argvs by the factory), 52 (`fd73e0bbb`), 53 (`b4d0b0f50`) and 18 (`0519457ea`: the playbook lists registered,
+     `memory/project/instructions-legacy.txt` moved off the tool root).
+   - A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`, which takes no waiver:
+     `tools/lib/legacy_ledger.py#read_registrations` reads `home` literally, so a home under the tool root names
+     nothing at an adopter installed elsewhere. Unit 16 moved four such homes to `memory/project/`; unit 18 moved
+     `instructions-legacy.txt` the same way.
 2. A choice the re-ground forces that the spec cannot derive is a fork: decide it by the build method's M3, mark it
    RESOLVED in §8 with the delegated mark, and name it in your return.
-
-Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24` and
+3. Settle where `legacy-homes.txt`'s ledger home lives so `install-prefix (shipped surface)` stays green: a home
+   outside the tool root (as units 16 and 18 moved theirs), or another route the landed factory reads literally.
+   Restate S1, S2, S7, S10, Files touched and every reader that names the path. The choice is a fork for item 2.
+Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-20` and
 `python tools/check-spec-tokens.py --spec <path>` over each spec, and fix every finding either names. Write no
 numeric fact without an id, a path:line, PINNED or DERIVED on its line.
 
@@ -58,11 +52,11 @@ memory hygiene · spec tokens (a spec's own names resolve)
 
 ### Non-goals
 
-No spec outside TOOL-dWitnessedBar-20, TOOL-dWitnessedBar-24. No product code. No change to Goal or Scope intent beyond what the tree forces.
+No spec outside TOOL-dWitnessedBar-20. No product code. No change to Goal or Scope intent beyond what the tree forces.
 
 ### Limitations
 
-Each status header keeps its status. The write grant is `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md`, `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md` alone.
+Each status header keeps its status. The write grant is `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md` alone.
 
 ### Reuse
 
