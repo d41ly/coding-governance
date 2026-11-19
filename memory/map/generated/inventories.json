@@ -330,6 +330,7 @@
       "doc-names-an-argument-the-code-never-reads.md",
       "empty-field-collapses-unless-it-is-last.md",
       "fail-count-reads-a-pattern-the-row-never-prints.md",
+      "failed-stage-reads-as-nothing-staged.md",
       "fallback-drain-strands-its-witnesses.md",
       "fallback-fabricates-the-passing-value.md",
       "fixed-base-assumes-one-commit-per-pass.md",

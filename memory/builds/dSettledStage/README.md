@@ -57,11 +57,11 @@ ids TOOL-dSettledStage-1 TOOL-dSettledStage-2 TOOL-dSettledStage-3 TOOL-dSettled
 |---|---|---|---|---|---|
 | [TOOL-dSettledStage-1 — the lander commits a dirty-then-staged change only when the stage holds a diff](spec/2026-11-19-spec-TOOL-dSettledStage-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-11-19 |
 | [TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode](spec/2026-11-19-spec-TOOL-dSettledStage-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-19 |
-| [TOOL-dSettledStage-3 — a failed stage refuses: the lander's stage helper answers 2 and every caller aborts on it](spec/2026-11-19-spec-TOOL-dSettledStage-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-19 |
+| [TOOL-dSettledStage-3 — a failed stage refuses: the lander's stage helper answers 2 and every caller aborts on it](spec/2026-11-19-spec-TOOL-dSettledStage-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-19 |
 | [TOOL-dSettledStage-4 — the stage scan reads past a quoted substitution, every git global option and a stager's wrappers, and arm 43 proves its shape](spec/2026-11-19-spec-TOOL-dSettledStage-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

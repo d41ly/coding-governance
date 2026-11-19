@@ -236,7 +236,7 @@ the lander that reconciles, gates and pushes the default branch, and the pre-pus
 - decisions 4: `TOOL-aLeasedGauntlet-1`, `TOOL-dLoggedFlight-4`, `TOOL-dDerivedDocket-26`, `TOOL-aSignalledHook-1`
 - gate-legs 2: `pre-push self-test`, `push-main self-test`
 - git-hooks 1: `pre-push`
-- gotcha-classes 1: `signal-killed-hook-reads-as-success.md`
+- gotcha-classes 2: `signal-killed-hook-reads-as-success.md`, `failed-stage-reads-as-nothing-staged.md`
 - globs 4: `tools/push-main.sh`, `tools/push-main.test.sh`, `.githooks/pre-push`, `.githooks/pre-push.test.sh`
 
 ## review-harnesses
