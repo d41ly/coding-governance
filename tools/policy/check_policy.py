@@ -20,7 +20,14 @@ and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRu
 `arm_reader_coverage` reds a catalogue key whose owner build has landed, every spec in its build
 folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads,
 by a literal or by the name of a module constant (TOOL-dGroundRules-8, TOOL-dLandedOwners-2); it
-grades nothing until an owner lands, and announces so. The mirror's
+grades nothing until an owner lands, and announces so. A key whose consumer sits outside the scanned
+code is declared in this kit's authored `unscanned-readers.txt`, one row `<key> <path> <reason>`
+(TOOL-dLandedOwners-3): a graded, unread, declared key whose path is a tracked file the scan does not
+open prints `reader coverage: <key> (owner <o>) declared outside the scan at <path>: <reason>` and
+is never counted as read. Findings keep the list true: a line that is not a row, a key no
+catalogue row names, a key on a second row, and, for a graded key, a row the scan now reads, a path
+not tracked, or a path the scan reads. The list is withheld from installs, where it is absent and
+reads as no rows. The mirror's
 three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governance/policy.json` that
 differs from its render at HEAD, or is absent where HEAD carries the policy file or a mirror, and
 announces otherwise (TOOL-dGroundRules-21 S15); `arm_mirror_landed` reds a key the policy file at
@@ -113,6 +120,9 @@ reports, printing `case <name>: red|green`.
 a kit copy whose catalogue carries the planted key, a planted spec under `bPlanted`'s build folder and
 the planted consumers, pushed to one bare remote, then the spec's working-tree token; it judges
 `check_reader_coverage` by the key it reds and the count it grades, printing `case <name>: red|green`.
+`reader-coverage-declared` (TOOL-dLandedOwners-3) builds that repository per case of RD_CASES with the
+case's list written to `unscanned-readers.txt` in the kit copy, and judges its findings' texts, its
+graded count and the disposition or announce line its stdout must hold.
 
 The `limit-` cases are outcome cases of the agent limit (TOOL-dGroundRules-10), one repository each
 with no remote, so local main is its landed revision. `limit-conf-lowers`, `limit-conf-no-raise` and
@@ -471,6 +481,9 @@ PATTERN_SEGMENT = r"(?:\"[^\"\n]*\"|[^'\"`\s.()]+)"
 # `design_lib` because `gen_build_index` imports it at module scope (TOOL-dLandedOwners-1).
 RUN_READER_MODULES = ("gen_build_index", "backlog", "row_grammar", "design_lib")
 RUN_RECORD = re.compile(r"^RUN(?:\.LANDED\.[0-9a-f]{8})?\.md$")  # a build's run record, live or rotated
+# The authored list of keys read only outside the scanned code, in this kit's directory and withheld
+# from installs by its kit.toml (TOOL-dLandedOwners-3 S1).
+UNSCANNED_LIST = "unscanned-readers.txt"
 
 
 def load_tree_lib_or_refuse(kit=KIT):
@@ -638,23 +651,31 @@ def derive_landed_owners(repo, kit=KIT):
     return derive_landed_builds(repo, {str(r["owner"]) for r in rows if r.get("owner")}, kit)
 
 
-def scan_reader_keys(repo, kit=KIT):
-    """-> every key text a call of READER_SHAPES passes in the tracked code of `repo`, read from disk:
-    `git ls-files` with a row's suffix or under its directory, outside the memory root and `help/`,
-    never a `*.test.sh`, `*.test.js`, `selftest*.py` or `test_*.py`, nor this module at `kit`'s path,
-    whose fixtures name keys without consuming them. A line opening `#` or `//` is a comment. A row
-    naming an `args` group reads each argument that is a name, or `<keyword>=<name>`, as every text
-    MODULE_CONSTANT binds that name to in the same file, never its own match (TOOL-dLandedOwners-2)."""
+def derive_scanned_files(repo, kit=KIT):
+    """-> the tracked paths of `repo` the reader scan opens: `git ls-files` over CODE_PATHSPECS with a
+    READER_SHAPES row's suffix or under its directory, outside the memory root and `help/`, never a
+    `*.test.sh`, `*.test.js`, `selftest*.py` or `test_*.py`, nor this module at `kit`'s path, whose
+    fixtures name keys without consuming them. The one file selection `scan_reader_keys` reads and a
+    declared row's path is judged against (TOOL-dLandedOwners-3 S4)."""
     own = (policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip() + Path(__file__).name
     skip = (read_memory_root(repo) + "/", "help/")
+    return [f for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0")
+            if f and not f.startswith(skip) and f != own and not READER_SKIPPED.search(f)
+            and any(any(f.startswith(p) if p.endswith("/") else f.endswith(p) for p in files)
+                    for files, _rx in READER_SHAPES)]
+
+
+def scan_reader_keys(repo, kit=KIT):
+    """-> every key text a call of READER_SHAPES passes in the tracked code of `repo`, read from disk,
+    in each file `derive_scanned_files` selects. A line opening `#` or `//` is a comment. A row
+    naming an `args` group reads each argument that is a name, or `<keyword>=<name>`, as every text
+    MODULE_CONSTANT binds that name to in the same file, never its own match (TOOL-dLandedOwners-2)."""
     spelled = set()
-    for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0"):
-        if not f or f.startswith(skip) or f == own or READER_SKIPPED.search(f):
-            continue
+    for f in derive_scanned_files(repo, kit):
         shapes = [rx for files, rx in READER_SHAPES
                   if any(f.startswith(p) if p.endswith("/") else f.endswith(p) for p in files)]
         try:
-            text = Path(repo, f).read_text(encoding="utf-8", errors="replace") if shapes else ""
+            text = Path(repo, f).read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         consts = {}  # name -> every text a module constant binds it to in this file
@@ -690,21 +711,76 @@ def check_key_read(key, spelled, names):
     return any(s not in names and rx.fullmatch(s) for s in spelled)
 
 
+def read_unscanned_readers(kit, names):
+    """-> ({key: (line, path, reason)}, [finding]) from UNSCANNED_LIST in `kit`'s directory, the
+    authored rows `<key> <path> <reason>` of a key whose consumer sits outside the code the reader
+    scan reads (TOOL-dLandedOwners-3 S2). A line opening `#` and a blank line are skipped; a row is
+    split on its first two runs of whitespace, the reason the rest of the line. An absent list is no
+    rows and no finding. A line that is not a row, a key no catalogue row of `names` names, and a key
+    on a second row are each one finding naming the line; the first row of a key is the one kept."""
+    path = Path(kit, UNSCANNED_LIST)
+    if not path.is_file():
+        return {}, []
+    rows, findings = {}, []
+    for n, line in enumerate(path.read_text(encoding="utf-8-sig", errors="replace").splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        cells = line.split(None, 2)
+        at = f"reader coverage: {UNSCANNED_LIST}:{n}"
+        if len(cells) < 3 or not cells[2].strip():
+            findings.append(f"{at} is not a row: a row is <key> <path> <reason>")
+        elif cells[0] not in names:
+            findings.append(f"{at} names {cells[0]}, which no catalogue row names")
+        elif cells[0] in rows:
+            findings.append(f"{at} declares {cells[0]} a second time, first at line {rows[cells[0]][0]}")
+        else:
+            rows[cells[0]] = (n, cells[1], cells[2].strip())
+    return rows, findings
+
+
 def check_reader_coverage(repo, landed=None, kit=KIT):
     """-> (the count of keys graded, one finding per graded key with no reader): a key is graded when
     its catalogue owner has landed, `derive_landed_owners` unless `landed` names the set, and read
-    when `scan_reader_keys` finds a call passing it. Prints the summary line on every run, and the
-    announce line when it graded nothing. A Refusal reading the landed revision passes through."""
+    when `scan_reader_keys` finds a call passing it. A graded key with no reader that a row of
+    `read_unscanned_readers` declares is disposed instead: one line naming its path and reason, printed
+    after the summary, and no finding, where the path is a tracked file `derive_scanned_files` does
+    not select; a declared key the scan reads, at an untracked path or at a scanned file is a finding
+    (TOOL-dLandedOwners-3 S3), and so is each finding of the list's shape, graded or not. Prints the
+    summary line on every run, and the announce line when it graded nothing. A Refusal reading the
+    landed revision passes through."""
     rows = policy.load_catalogue(kit)
     sha, _how = policy.derive_landed_revision(repo)
     owners = derive_landed_owners(repo, kit) if landed is None else set(landed)
     graded = [r for r in rows if r.get("owner") in owners]
     spelled = scan_reader_keys(repo, kit) if graded else set()
     names = {str(r.get("name")) for r in rows}
-    findings = [f"reader coverage: {r['name']} (owner {r['owner']}, landed at {sha[:8]}) has no reader"
-                for r in graded if not check_key_read(str(r["name"]), spelled, names)]
+    declared, findings = read_unscanned_readers(kit, names)
+    paths = sorted({declared[str(r["name"])][1] for r in graded if str(r["name"]) in declared})
+    scanned = set(derive_scanned_files(repo, kit)) if paths else set()
+    tracked = set((policy.run_git(repo, "--literal-pathspecs", "ls-files", "-z", "--", *paths) or "").split("\0")
+                  if paths else ())
+    disposed = []
+    for r in graded:
+        key, owner = str(r["name"]), r["owner"]
+        said = f"reader coverage: {key} (owner {owner}, landed at {sha[:8]})"
+        read = check_key_read(key, spelled, names)
+        if key not in declared:
+            if not read:
+                findings.append(f"{said} has no reader")
+            continue
+        _n, path, reason = declared[key]
+        if read:
+            findings.append(f"{said} is declared outside the scan, and the scan reads it: drop its row")
+        elif path not in tracked:
+            findings.append(f"{said} is declared read at {path}, which is not a tracked file")
+        elif path in scanned:
+            findings.append(f"{said} is declared read at {path}, which the scan reads: give the scan its shape instead")
+        else:
+            disposed.append(f"reader coverage: {key} (owner {owner}) declared outside the scan at {path}: {reason}")
     print(f"reader coverage: graded {len(graded)} of {len(rows)} catalogue key(s); "
           f"landed owners: {', '.join(sorted(owners)) or 'none'}")
+    for line in disposed:
+        print(line)
     if not graded:
         print(f"reader coverage: graded 0, so this arm checked nothing at {sha[:8]}")
     return len(graded), findings
@@ -3094,6 +3170,62 @@ def run_reader_carried(name):
     return print_checks(name, checks)
 
 
+# `reader-coverage-declared` (TOOL-dLandedOwners-3): a key read only outside the scanned code, declared
+# in UNSCANNED_LIST. The planted instrument sits under the memory root, which the scan never reads.
+RD_INSTRUMENT = "memory/builds/bPlanted/build/instrument.py"
+# case -> (the planted spec's token, landed and in the tree, the tracked files planted {path: text},
+# the list's text, the texts each one finding holds, the count of keys graded, the text stdout holds)
+RD_CASES = {
+    "declared-outside": ("CLOSED", {RD_INSTRUMENT: 'APPROVAL = "author-recorded"\n'},
+                         f"# a planted list\n\n{RC_KEY} {RD_INSTRUMENT} the instrument applies the value\n", (), 1,
+                         f"declared outside the scan at {RD_INSTRUMENT}: the instrument applies the value"),
+    "declared-unlanded": ("OPEN", {}, f"{RC_KEY} {RD_INSTRUMENT} the instrument applies the value\n", (), 0,
+                          "so this arm checked nothing at"),
+    "declared-and-read": ("CLOSED", {RD_INSTRUMENT: 'APPROVAL = "author-recorded"\n', "consumer.py": RC_CALL},
+                          f"{RC_KEY} {RD_INSTRUMENT} the instrument applies the value\n", ("and the scan reads it",), 1, ""),
+    "declared-untracked": ("CLOSED", {}, f"{RC_KEY} {RD_INSTRUMENT} the instrument applies the value\n",
+                           ("which is not a tracked file",), 1, ""),
+    "declared-scanned": ("CLOSED", {"consumer.py": "value = 1\n"}, f"{RC_KEY} consumer.py the consumer applies the value\n",
+                         ("which the scan reads",), 1, ""),
+    "declared-malformed": ("CLOSED", {RD_INSTRUMENT: 'APPROVAL = "author-recorded"\n'}, f"{RC_KEY} {RD_INSTRUMENT}\n",
+                           ("is not a row", "has no reader"), 1, ""),
+    "declared-unknown": ("CLOSED", {RD_INSTRUMENT: 'APPROVAL = "author-recorded"\n', "consumer.py": RC_CALL},
+                         f"fixture.absent {RD_INSTRUMENT} the instrument applies the value\n",
+                         ("which no catalogue row names",), 1, ""),
+    "declared-twice": ("CLOSED", {RD_INSTRUMENT: 'APPROVAL = "author-recorded"\n'},
+                       f"{RC_KEY} {RD_INSTRUMENT} the instrument applies the value\n" * 2,
+                       ("a second time, first at line",), 1, ""),
+}
+
+
+def run_reader_declared(name):
+    """`check_reader_coverage` over one repository per RD_CASES case, `build_reader_coverage_repo`'s with
+    the case's list written to UNSCANNED_LIST in the kit copy, printing `case <name>: red|green`: a case
+    passes when its findings are as many as its texts, each text is held by one finding, it grades its
+    count of keys, and its stdout holds its text, the disposition line or the announce line."""
+    checks = []
+    for case, (token, plants, listed, texts, want_n, told) in RD_CASES.items():
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            kit = build_reader_coverage_repo(t, name, spec=([(RC_KEY, RC_OWNER)], token, token, plants, None, want_n))
+            (kit / UNSCANNED_LIST).write_text(listed, encoding="utf-8", newline="\n")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                n, findings = check_reader_coverage(t / "r", kit=kit)
+            ok = (n == want_n and len(findings) == len(texts) and told in out.getvalue()
+                  and all(any(x in f for f in findings) for x in texts))
+            checks.append((f"case {case}: {'red' if findings else 'green'}", "check_reader_coverage", ok,
+                           f"graded {n} · " + ("; ".join(findings) or out.getvalue().strip().replace("\n", " · "))))
+        except subprocess.CalledProcessError as exc:
+            checks.append((f"case {case}: not built", "the fixture's git", False,
+                           f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
+        except policy.Refusal as exc:
+            checks.append((f"case {case}: refused", "check_reader_coverage", False, str(exc)))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
 # ---- the agent limit (TOOL-dGroundRules-10) ------------------------------------------------------
 
 LIMIT_POLICY = "[runtime]\nagents-in-flight = {n}\n"
@@ -5217,6 +5349,7 @@ CASES = [
     ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
     ("reader-coverage-relocated", None, run_reader_relocated),  # the kits at a tool root unlike gov's
+    ("reader-coverage-declared", None, run_reader_declared),  # a key read only outside the scan, declared in the list
     ("reader-quoted-pattern", None, run_reader_quoted),  # a pattern key read through a quoted segment
     ("reader-coverage-carried", None, run_reader_carried),  # a build run landed with a unit carried forward
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each

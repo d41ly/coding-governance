@@ -12338,6 +12338,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "derive_scanned_files",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_schema",
       "kind": "function",
       "file": "tools/playbook/fixtures/row_kind.py"
@@ -23433,6 +23438,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_unscanned_readers",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_usage_classes",
       "kind": "function",
       "file": "tools/govkit/docs_leg.py"
@@ -30544,6 +30554,11 @@
     },
     {
       "id": "run_reader_coverage",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_declared",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },

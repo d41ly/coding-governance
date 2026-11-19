@@ -1,11 +1,12 @@
 # TOOL-dLandedOwners-3 — a key read only outside the scanned code takes a declared, reasoned disposition in reader coverage
 
-**Status:** INPROGRESS · rev-1 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dLandedOwners-3-ledger.md](../build/2026-11-19-build-TOOL-dLandedOwners-3-ledger.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-1 TOOL-dLandedOwners-2 |
 | [2026-11-19-prompt-TOOL-dLandedOwners-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-3-build-brief.md) | research | — |
 

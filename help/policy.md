@@ -162,9 +162,25 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   and the catalogue never count. For a key with a `*` or `<name>` part, such as `budgets.*`, a
   variable in that part counts too: `policy.py get "budgets.$cap"`, or a quoted part holding the
   variable, `resolve(f'budgets."{cap}"')`.
-- **To clear it,** do one of two things: add the reader, a call of that shape where the code uses the
-  value; or, if the key's build has not really landed, make the row's `owner` a build that has not
-  landed yet.
+- **To clear it,** do one of three things: add the reader, a call of that shape where the code uses
+  the value; or, if the key's build has not really landed, make the row's `owner` a build that has
+  not landed yet; or, if the only code that uses the key sits where the check does not look, under
+  the memory tree say, declare it in `tools/policy/unscanned-readers.txt`.
+- **A declared key** is one row of `unscanned-readers.txt`: `<key> <path> <reason>`, split on the
+  first two runs of spaces, so the path holds no space and the reason is the rest of the line. Lines
+  opening `#` and blank lines are skipped. A declared key is never counted as read. Instead every run
+  prints its row after the summary line:
+
+  ```
+  reader coverage: <key> (owner <owner>) declared outside the scan at <path>: <reason>
+  ```
+
+  The row must stay true. Each of these reds the check: a line that is not a row
+  (`unscanned-readers.txt:<n> is not a row`), a key no catalogue row names, a key on a second row,
+  a declared key the scan now reads (`drop its row`), a path that is not a tracked file, and a path
+  the check already reads (`give the scan its shape instead`). The last three apply once the key's
+  owner has landed. The check does not confirm the file really uses the key: the printed reason is
+  your claim, there for anyone to read. The list is gov's own, and no install receives it.
 - **Every run says what it graded:** `reader coverage: graded <n> of <m> catalogue key(s); landed
   owners: <builds>`, and while no owner build has landed,
   `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes.
