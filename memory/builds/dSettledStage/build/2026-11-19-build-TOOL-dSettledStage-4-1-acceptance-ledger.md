@@ -10,15 +10,15 @@ base scanner is `tools/gate-lint/sh_hygiene.py` at blob `19e87517`, the blob at 
 ea1efc18f, read before the first edit; the base suite is `git show 41e57fca5:tools/push-main.test.sh`.
 
 **Evidences:** TOOL-dSettledStage-4
-- AC1 — `"$(date)"` — `scan_stage_file` of the built scanner read the `--allow-empty` fixture as
+- AC1 — `(0, 0, 0, 1)` — `scan_stage_file` of the built scanner read the `--allow-empty` fixture as
   (0, 0, 0, 1) and the `--cached` fixture as (0, 1, 0, 0); the base scanner read both as
   (1, 0, 0, 0), PINNED at blob `19e87517`. An unquoted `$(date)` and a `$((1+2))` before
   `--allow-empty` read (0, 0, 0, 1) on the built scanner, and
   `n=$(git diff --cached --name-only | wc -l)` still reads admitted.
-- AC2 — `--no-pager` — the built scanner read each of the eight option fixtures as (1, 0, 0, 0), and
+- AC2 — `(1, 0, 0, 0)` — the built scanner read each of the eight option fixtures as (1, 0, 0, 0), and
   `--exec-path=/x` too; the base read each as (0, 0, 0, 0), PINNED at blob `19e87517`.
   `git $GIT_OPTS commit` and `git "--no-pager" commit` read (0, 0, 0, 0) on the built scanner.
-- AC3 — `read_stage_helpers` — the built scanner read the two-hop unchecked fixture as
+- AC3 — `(0, 0, 1, 0)` — the built scanner read the two-hop unchecked fixture as
   (1, 0, 0, 0), the two-hop checked one as (0, 1, 0, 0) and the call cycle as (0, 0, 1, 0), each
   under a millisecond; the base read the two-hop unchecked one as (0, 0, 1, 0), PINNED at blob
   `19e87517`.
@@ -38,7 +38,7 @@ ea1efc18f, read before the first edit; the base suite is `git show 41e57fca5:too
   sites, DERIVED at observation, and `build_stage_measured` equalled the registry's rows, 3 sites in
   3 rows, DERIVED at observation, so no row moved and the registry is unedited. The leg-argv run and
   its empty-registry and lowered-row cases are the close's.
-- AC7 — `out43` — the criterion's `<a43>` over this worktree's lander printed `l43=0` with
+- AC7 — `l43=0` — the criterion's `<a43>` over this worktree's lander printed `l43=0` with
   `eol-empty=1` and `eol-dirty=1` in `$out43`; with `GIT_CONFIG_VALUE_0=false` it printed `l43=1`,
   no `eol-dirty=1`. The extract from 41e57fca5 with the same rewrite printed `l43=0`, the vacuous
   pass. The arm's stage carries `2>/dev/null`, arm 42's spelling, so git's line-ending warning does
@@ -52,6 +52,14 @@ ea1efc18f, read before the first edit; the base suite is `git show 41e57fca5:too
 
 **Also probed:** `bash -n` passed over `tools/push-main.test.sh`. The naming lexicon answered OK for
 `read_stage_calls` as `py.function`.
+
+**The bug-class checklist over the product commit** selected `failed-stage-reads-as-nothing-staged`
+on arm 43's new liveness stage. Its line,
+`git add -A 2>/dev/null; git diff --cached --quiet && echo eol-empty=1`,
+the spec's spelling and arm 42's, prints the marker over a stage that failed. Joining the two with
+`&&` closes it in both arms; the scratch-guard refused the edit once the spec was CLOSED, so it is
+left to the close or a follow-up. A cause that persists to the fold still reds the arm, through the
+fold's own stage refusal and `eol-rc`.
 
 **Owed to the close (the main loop, after every unit is terminal):**
 - New arm `tools/gate-lint/sh_hygiene.py --selftest`, covering AC1 to AC4: RED over a copy with the
