@@ -1084,8 +1084,8 @@ mkdir -p "$LLR/tools/fx" "$LLR/tools/govkit" "$LLR/scripts/recall" "$LLR/memory/
 build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/govkit/registry.toml"
 build_ll_table fx-recall key '"name"' append-only memory/project/fx-recall.txt > "$LLR/scripts/recall/kit.toml"
 { build_ll_ledger fx-sites site path,delimiter shrink-only; printf 'a.sh\tEOF\t2\tabcdef12\tseeded\nc.sh\tEOF\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-sites.txt"
-{ build_ll_ledger fx-refs record ref,note append-only; printf 'y.py:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
-{ build_ll_ledger fx-keys key ref declared-set; printf 'x.py:120\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-keys.txt"
+{ build_ll_ledger fx-refs record ref,note append-only; printf 'y:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
+{ build_ll_ledger fx-keys key ref declared-set; printf 'x:120\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-keys.txt"
 { build_ll_ledger fx-recall key name append-only; printf 'alpha\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-recall.txt"
 printf 'echo the a script\n' > "$LLR/a.sh"; printf 'echo the c script\n' > "$LLR/c.sh"
 git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m fixture \
@@ -1122,7 +1122,7 @@ grep -q "gained e.sh${T}EOF" <<<"$out" || bad "2o AC3: a key the shrink-only led
 run_ll_reset; printf 'e.sh\tEOF\t1\tabcdef12\twidened:REC-1\n' >> "$LLR/memory/project/fx-sites.txt"
 out=$(run_ll compare fx-sites); run_ll_reset
 { ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a widened gain was refused: ${out//$'\n'/ | }"; ok
-printf 'z.py:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-keys.txt"
+printf 'z:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-keys.txt"
 out=$(run_ll compare fx-keys); run_ll_reset
 { ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a declared-set ledger's gain was refused: ${out//$'\n'/ | }"; ok
 git -C "$LLR" update-ref -d refs/remotes/origin/main
@@ -1148,7 +1148,7 @@ ll_after=$(cksum < "$LLR/memory/project/fx-sites.txt"); run_ll_reset
 # AC9 — a population registered only in the govkit registry, one whose kit sits outside the others'
 # parent, and a kit table declaring the first one's home.
 out=$(run_ll read fx-keys)
-{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "x.py:120${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "x:120${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
   || bad "2o AC9 AC10: read fx-keys, registered in the govkit registry with ref verbatim, did not print its row and exit 0: ${out//$'\n'/ | }"; ok
 out=$(run_ll read fx-recall)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "alpha${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
@@ -1166,7 +1166,7 @@ out=$(run_ll read fx-sites); run_ll_reset
   || bad "2o AC10: a site key field 120 with no verbatim read clean: ${out//$'\n'/ | }"; ok
 out=$(run_ll read fx-refs)
 [ "${out##*$'\n'}" = rc=0 ] || bad "2o AC10: read fx-refs over its verbatim ref did not exit 0: ${out//$'\n'/ | }"; ok
-printf 'y.py:8\tz:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-refs.txt"
+printf 'y:8\tz:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-refs.txt"
 out=$(run_ll read fx-refs); run_ll_reset
 { [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 3: a key field reads as a line number' <<<"$out"; } \
   || bad "2o AC10: verbatim ref waived the line-number refusal on the note field too: ${out//$'\n'/ | }"; ok

@@ -47,10 +47,10 @@ gate legs, refused to this role, so the main loop owes them too.
   registries, and 2000 measured and declared pairs with and without `explained` and `listing`), and
   none differed.
 - AC9 — `read_registrations` — `read fx-keys`, registered only in the fixture's
-  `tools/govkit/registry.toml`, printed `x.py:120 1 abcdef12 seeded` and exited 0; `read fx-recall`,
+  `tools/govkit/registry.toml`, printed `x:120 1 abcdef12 seeded` and exited 0; `read fx-recall`,
   registered in `scripts/recall/kit.toml`, exited 0 with its row; a table in `tools/fx/kit.toml`
   declaring `fx-keys`' home made `read fx-keys` exit 2 naming both tables.
 - AC10 — `verbatim` — `fx-keys`, `key = "key"`, `fields = ["ref"]`, `verbatim = ["ref"]`, read
-  `x.py:120` and exited 0; `fx-sites`, with no `verbatim`, holding a key field `120` exited 1 naming
+  `x:120` and exited 0; `fx-sites`, with no `verbatim`, holding a key field `120` exited 1 naming
   line 4; `fx-refs`, `verbatim = ["ref"]` over `fields = ["ref", "note"]`, exited 1 naming line 3 for a
   note `z:9`; `verbatim = ["nope"]` made `read fx-keys` exit 2 naming the `fx-keys` table.
