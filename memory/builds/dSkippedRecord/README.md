@@ -48,22 +48,23 @@ prompt is recorded verbatim under `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dSkippedRecord-1 — the close's run-record commit is made only when staging left a diff](spec/2026-11-20-spec-TOOL-dSkippedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-20 |
+| [TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built](spec/2026-11-20-spec-TOOL-dSkippedRecord-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dSkippedRecord-1.
+Ids no `spec-audit` record has ever named: TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -71,6 +72,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dSkippedRecord-1` | no |
+| 2 | `TOOL-dSkippedRecord-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
