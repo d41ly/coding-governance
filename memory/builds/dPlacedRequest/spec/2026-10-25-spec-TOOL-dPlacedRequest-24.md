@@ -297,7 +297,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 · the qu
   `2026-11-19-prompt-TOOL-dPlacedRequest-24-divergence-brief`, the builder's DIVERGENCE of run
   `wf_495a7364-a80`: git 2.54.0 tests up to date before the lease, so a loser of two concurrent
   flushes keeps its line (rc 2) and its next flush prints `flushed`; the goal says so, S5 and AC2 are
-  deleted with their `ls-remote` branch and perf line, AC2's id is left as a gap, §4 records the
+  deleted with their `ls-remote` branch and perf line, AC2's id is left as a gap, the Evidence section now records the
   measurement PINNED, and §5 risks name `post-merge.sh`'s unset `ROOT` and `add_health_event` until
   TOOL-dPlacedRequest-36.
 
