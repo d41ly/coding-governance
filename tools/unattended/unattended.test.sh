@@ -278,6 +278,16 @@ n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+# A SIGHTING PLANTED IN A CLONE'S CHANGE FEED (TOOL-dPlacedRequest-17): one six-field line, as though
+# that clone's node first saw the commit at the ref at `seen-utc`. The observer clock ages a claim by
+# this line, never by its `beat-utc`, so a seed that stages an age plants the sighting at that age.
+add_claim_sighting() { # clone dir · ref · tree · commit · seen-utc
+  local f s k
+  f="$(git -C "$1" rev-parse --path-format=absolute --git-common-dir)/gov-feed.log"
+  s=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$f" 2>/dev/null) || s=0
+  k=${2#refs/gov/}; k=${k%%/*}
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$((${s:-0} + 1))" "$2" "$k" "$3" "$4" "$5" >>"$f"
+}
 # TOOL-aWokenSentinel-17 — the `--status` line is read by FIELD, never as "everything after
 # `next `". The driver's printf takes `$parked` LAST, so every suffix — parked, noted, STALE briefs,
 # briefs gone, resume-tick — prints AFTER `next`, and a whole-line reader survives only on a fixture
@@ -13136,6 +13146,7 @@ seed_su_claim() { # slug · session · keepalive · status · beat-utc
   t=$(git --git-dir="$su_origin" mktree </dev/null)
   c=$(git --git-dir="$su_origin" commit-tree "$t" -m "$(printf 'gov-claim %s\n\nslug: %s\nnode: other\nhost: otherhost\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' "$1" "$1" "$2" "$3" "$4" "$5" "$5")")
   git --git-dir="$su_origin" update-ref "refs/gov/runs/$1" "$c"
+  add_claim_sighting "$su_dir" "refs/gov/runs/$1" "$t" "$c" "$5"
 }
 read_su_ref() { git --git-dir="$su_origin" rev-parse -q --verify "refs/gov/leases/$1/build" 2>/dev/null || git --git-dir="$su_origin" rev-parse -q --verify "refs/gov/runs/$1" 2>/dev/null; }
 read_su_claim() { local r="refs/gov/leases/$1/build"; git --git-dir="$su_origin" rev-parse -q --verify "$r" >/dev/null 2>&1 || r="refs/gov/runs/$1"; git --git-dir="$su_origin" log -1 --format=%B "$r" -- 2>/dev/null | sed -n "s/^$2: //p"; }
@@ -17458,7 +17469,11 @@ if in_shard 8; then
 # the bare origin and the git dir outlive reset_tree.
 # ==================================================================================================
 GH_BIN=$(mktemp -d); GH_GIT=$(command -v git)
-GH_BOUND=5400   # mkconf's RESUME_STALE_BOUND, read back below so the stale split is DERIVED from the conf
+GH_BOUND=5400   # mkconf's RESUME_STALE_BOUND, read back below; the holder's quarter-bound due rule reads it
+# THE STALE SPLIT (TOOL-dPlacedRequest-17 S3): `leases.expiry-hours`' catalogue default, 24 h, in
+# seconds, against the first sighting of the claim's renewing beat; each seed plants that sighting at
+# the `beat-utc` it is handed, so an arm stages an age exactly as it did before the observer clock.
+GH_EXPIRY=86400
 derive_claim_now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 derive_claim_ago() { date -u -d "@$(( $(date -u +%s) - $1 ))" +%Y-%m-%dT%H:%M:%SZ; }
 remove_claim_refs() { git --git-dir="$ORIGIN" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$ORIGIN" update-ref --stdin; }
@@ -17469,6 +17484,7 @@ seed_claim() { # slug · session · keepalive · status · beat-utc (empty omits
   [ -z "$5" ] || m=$(printf '%s\nbeat-utc: %s' "$m" "$5")
   t=$(git --git-dir="$ORIGIN" mktree </dev/null); c=$(git --git-dir="$ORIGIN" commit-tree "$t" -m "$m")
   git --git-dir="$ORIGIN" update-ref "refs/gov/runs/$1" "$c"
+  [ -z "$5" ] || add_claim_sighting . "refs/gov/runs/$1" "$t" "$c" "$5"
 }
 # THE SLUG'S CLAIM IS ITS BUILD LEASE (TOOL-dPlacedRequest-1 S4): a seeded legacy claim is read until the
 # driver's first write creates the lease on its tip, so a claim's position is the lease's where one exists.
@@ -17482,6 +17498,7 @@ seed_lease() { # slug · session · fleet tag · status · beat-utc (empty omits
   m=$(printf '%s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -' "$m" "$3")
   t=$(git --git-dir="$ORIGIN" mktree </dev/null); c=$(git --git-dir="$ORIGIN" commit-tree "$t" -m "$m")
   git --git-dir="$ORIGIN" update-ref "refs/gov/leases/$1/build" "$c"
+  [ -z "$5" ] || add_claim_sighting . "refs/gov/leases/$1/build" "$t" "$c" "$5"
 }
 read_claim_ref() { git --git-dir="$ORIGIN" rev-parse -q --verify "refs/gov/leases/$1/build" 2>/dev/null || git --git-dir="$ORIGIN" rev-parse -q --verify "refs/gov/runs/$1" 2>/dev/null; }
 read_claim_field() { local r="refs/gov/leases/$1/build"; git --git-dir="$ORIGIN" rev-parse -q --verify "$r" >/dev/null 2>&1 || r="refs/gov/runs/$1"; git --git-dir="$ORIGIN" log -1 --format=%B "$r" -- 2>/dev/null | sed -n "s/^$2: //p"; }
@@ -17500,12 +17517,12 @@ out=$(bash "$SCRIPT" --claims 2>/dev/null); rc=$?
 same "AC1 --claims over an empty namespace prints exactly claims: none" "$out" "claims: none"
 same "AC1 ...and exits 0" "$rc" "0"
 # ---- AC2: five claims, one per verdict, six TAB-separated fields each, sorted by slug, the stale
-# ---- split on the conf's own bound and the unparsed claim's age `-`; the sixth field is the claim's
+# ---- split on `leases.expiry-hours` (GH_EXPIRY) and the unparsed claim's age `-`; the sixth field is the claim's
 # ---- key (TOOL-dDeclaredLoop-8 S7), RED against the driver's five. The sixth field is printed under
 # ---- `--claims --with-key` alone, and plain `--claims` prints the same rows in five fields
 # ---- (TOOL-dDeclaredLoop-56 S9), RED against a driver printing six by default.
 seed_claim gA s-a k-a live "$(derive_claim_now)"
-seed_claim gB s-b k-b live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim gB s-b k-b live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 seed_claim gC s-c k-c held "$(derive_claim_ago $((GH_BOUND * 3)))"
 seed_claim gD s-d k-d landed "$(derive_claim_now)"
 seed_claim gE s-e k-e live ""
@@ -17556,7 +17573,7 @@ rm -rf "$GH_C2"
 # ---- AC5: a STALE claim and a LANDED one are both taken over by a new session's --preflight, and only
 # ---- the stale take-over is announced.
 arm_claim_fixture
-seed_claim tFresh s-old k-old live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim tFresh s-old k-old live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 out=$(run --preflight tFresh --keepalive-id k1)
 hit  "$out" "preflight OK"
 hit  "$out" "unattended: claim taken over — tFresh · node other · session s-old · beat "
@@ -17572,7 +17589,7 @@ same "AC5 the landed claim now names this session" "$(read_claim_field tFresh se
 # ---- and nothing is printed when there are none.
 arm_claim_fixture
 seed_claim gL s-l k-l live "$(derive_claim_now)"
-seed_claim gS s-s k-s live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim gS s-s k-s live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 seed_claim gH s-h k-h held "$(derive_claim_now)"
 seed_claim gU s-u k-u live ""
 seed_claim gT s-t k-t aborted "$(derive_claim_now)"
@@ -17666,7 +17683,7 @@ before=$(sum)
 out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
 hit  "$out" "UNATTENDED check 107 FAILED"
 same "AC8 the refused take-over left the record byte-unchanged" "$(sum)" "$before"
-seed_claim tRun s-third k-third live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim tRun s-third k-third live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
 hit  "$out" "taken over — phase RUNNING · keepalive kB"
 hit  "$out" "unattended: claim taken over — tRun · node other · session s-third"
@@ -17718,7 +17735,7 @@ out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit  "$out" "UNATTENDED check 108 FAILED"
 miss "$out" "dispatch declared"
 same "AC19 the refused dispatch left the record byte-unchanged" "$(sum)" "$before"
-seed_claim tRun s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim tRun s-other k-other live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 gh_sha=$(read_claim_ref tRun)
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 hit  "$out" "--code claim-lost"
@@ -17738,7 +17755,7 @@ out=$(env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --resume tRun --keepalive-id 
 same "AC18 the replaced holder's next resume exits 0" "$rc" "0"
 same "AC18 ...and pushes nothing while the beat is not due" "$(read_claim_ref tRun)" "$gh_sha"
 build_claim_landing
-seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND + 600)))"
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_EXPIRY + 600)))"
 out=$(CLAUDE_CODE_SESSION_ID=T run --resume tRun --keepalive-id k2)
 hit  "$out" "landing re-bound · keepalive k1 -> k2"
 same "AC18 the re-bind writes its keepalive over the prior session's stale claim" "$(read_claim_field tRun keepalive)" "k2"
@@ -18179,7 +18196,7 @@ seed_lease_row() { # row · slug · the reacher's session
     same) seed_lease "$2" "$3" b live "$(derive_claim_now)" ;;
     foreign-live) seed_lease "$2" s-other b live "$(derive_claim_now)" ;;
     foreign-held) seed_lease "$2" s-other b held "$(derive_claim_now)" ;;
-    foreign-stale) seed_lease "$2" s-other b live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
+    foreign-stale) seed_lease "$2" s-other b live "$(derive_claim_ago $((GH_EXPIRY + 600)))" ;;
     foreign-terminal) seed_lease "$2" s-other b landed "$(derive_claim_now)" ;;
     foreign-unknown) seed_lease "$2" s-other b live "" ;;
     *) echo "FAIL DPR1 the cell table names a lease row no seed builds: $1"; st=1; return 1 ;;
@@ -18192,7 +18209,7 @@ seed_claim_row() { # row · slug · the reacher's session · its keepalive
     same) seed_claim "$2" "$3" k-other live "$(derive_claim_now)" ;;
     foreign-live) seed_claim "$2" s-other k-other live "$(derive_claim_now)" ;;
     foreign-held) seed_claim "$2" s-other k-other held "$(derive_claim_now)" ;;
-    foreign-stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))" ;;
+    foreign-stale) seed_claim "$2" s-other k-other live "$(derive_claim_ago $((GH_EXPIRY + 600)))" ;;
     foreign-terminal) seed_claim "$2" s-other k-other landed "$(derive_claim_now)" ;;
     foreign-unknown) seed_claim "$2" s-other k-other live "" ;;
     *) echo "FAIL GH12 the cell table names a row no seed builds: $1"; st=1; return 1 ;;
@@ -18430,7 +18447,7 @@ miss "$out" "UNATTENDED check 107 FAILED"
 same "GH20 AC6 ...and leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
 same "GH20 AC6 ...and session s2" "$(read_claim_field tRun session)" "s2"
 git reset -q --hard "$gp_aged"; git clean -qfd
-seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_BOUND + 600)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+seed_claim tRun s1 k1 live "$(derive_claim_ago $((GH_EXPIRY + 600)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
 out=$(CLAUDE_CODE_SESSION_ID=s3 run --resume tRun --keepalive-id k3); rc=$?
 same "GH20 AC6 the s3 take-over exits 0" "$rc" "0"
 hit  "$out" "unattended: presumed-stopped — "
@@ -18785,7 +18802,8 @@ seed_lease_at() { # tail · slug · kind · fleet tag · session · status · be
   local t c
   t=$(git --git-dir="$LF/origin.git" mktree </dev/null)
   c=$(git --git-dir="$LF/origin.git" commit-tree "$t" -m "$(printf 'gov-claim %s\n\nslug: %s\nnode: other\nhost: h\nsession: %s\nkeepalive: absent\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -' "$1" "$2" "$5" "$6" "$7" "$7" "$8" "$3" "$4")")
-  git --git-dir="$LF/origin.git" update-ref "refs/gov/leases/$1" "$c"; printf '%s\n' "$c"
+  git --git-dir="$LF/origin.git" update-ref "refs/gov/leases/$1" "$c"; add_claim_sighting "$LF/c1" "refs/gov/leases/$1" "$t" "$c" "$7"
+  printf '%s\n' "$c"
 }
 # ---- AC17 first, over a policy file whose FIRST revision does not parse: no valid revision precedes
 # ---- it, so `get` refuses, and the verb exits 2 naming the key and writes nothing. RED against a
@@ -19014,6 +19032,154 @@ same "DPR1 AC14 ...and is admitted under warn, printing the UNAVAILABLE line" "$
 # ---- AC19: CLAIM_MODES names `lease`; the GH19 arm above holds its eight cells typed.
 hit  "$gc_modes" "lease"
 rm -rf "$LF"
+fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-17 — THE OBSERVER CLOCK. `--claims` over the lease fixture's clone, each lease
+# planted on its origin by `commit-tree` with explicit parents and each sighting a line planted in the
+# clone's change feed, so a record's age is what this node measured and never its `beat-utc`. AC1's
+# red is a scratch copy of the driver whose age pass reads `beat-utc` for every sighting; AC6's is a
+# copy that deletes the feed between the fetch and the age pass; AC5 sources the `gov_feed_sh` block
+# and `check_deadline_passed` from the driver. Waived by README rule 8 with the rest of this suite, so
+# each criterion's own probe is its observation at landing. WHAT THIS BLOCK DOES NOT DRIVE: a clock
+# stepped between a sighting and its judgment, and the offer and tombstone later units write.
+# ==================================================================================================
+LF=$(mktemp -d); write_lease_fixture
+OC_REF=refs/gov/leases/tOc/build
+OC_TREE=$(git --git-dir="$LF/origin.git" mktree </dev/null)
+add_lease_commit() { # epoch · renews · beat-utc · [parent] · [offer-deadline] -> the tOc build lease commit, on the fixture's origin
+  local m
+  m=$(printf 'gov-claim tOc/build\n\nslug: tOc\nnode: other\nhost: h\nsession: s-o\nkeepalive: absent\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: build\nfleet-tag: b\nrenews: %s\nwitness: -\noffer: -\noffer-deadline: %s\nlast-fetch: -' \
+    "$3" "$3" "$1" "$2" "${5:--}")
+  if [ -n "${4:-}" ]; then git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -p "$4" -m "$m"
+  else git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -m "$m"; fi
+}
+remove_clock_refs() { # -> no governance ref on the origin or in the clone's cache, and no feed in the clone
+  git --git-dir="$LF/origin.git" for-each-ref --format='delete %(refname)' refs/gov | git --git-dir="$LF/origin.git" update-ref --stdin
+  git -C "$LF/c1" for-each-ref --format='delete %(refname)' refs/gov | git -C "$LF/c1" update-ref --stdin
+  rm -f "$LF/c1/.git/gov-feed.log" "$LF/c1/.git/gov-feed.seq"
+}
+read_clock_row() { # [driver] -> `verdict age` of the tOc row `--claims` prints
+  ( cd "$LF/c1" && bash "${1:-$SCRIPT}" --claims 2>/dev/null ) | awk -F'\t' '$1 == "tOc" { print $5, $4 }'
+}
+oc_copy=$(mktemp -d); cp "$HERE/lib-unattended.sh" "$oc_copy/"
+oc_src=$(<"$SCRIPT")
+oc_cut='| read_first_seen >"$d/seen"'
+oc_beat='| cat >/dev/null; cut -f9 "$d/rows" | sed p >"$d/seen"'
+printf '%s\n' "${oc_src/"$oc_cut"/"$oc_beat"}" >"$oc_copy/beat-utc.sh"
+oc_cut='  add_feed_sightings refs/gov/remote/'
+oc_beat="$oc_cut"$'\n''  rm -f "$GOVFEED_DIR/gov-feed.log"'
+printf '%s\n' "${oc_src/"$oc_cut"/"$oc_beat"}" >"$oc_copy/no-feed.sh"
+same "DPR17 each scratch copy carries its one staged line" \
+  "$(grep -c 'sed p >"$d/seen"' "$oc_copy/beat-utc.sh") $(grep -c '^  rm -f "$GOVFEED_DIR/gov-feed.log"$' "$oc_copy/no-feed.sh")" "1 1"
+# ---- AC1: a lease stamped by a holder a day behind, `beat-utc` 25 h before now, that this node sights
+# ---- now reads live, aged under a minute; the copy whose age pass reads `beat-utc` reads it stale.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_a"
+oc_row=$(read_clock_row)
+same "DPR17 AC1 a lease stamped 25 h behind and sighted now reads live" "${oc_row%% *}" "live"
+same "DPR17 AC1 ...aged under 60 s on this node's clock" "$(awk -v a="${oc_row#* }" 'BEGIN { print (a ~ /^[0-9]+$/ && a < 60) }')" "1"
+oc_row=$(read_clock_row "$oc_copy/beat-utc.sh")
+same "DPR17 AC1 RED: the copy whose age pass reads beat-utc reads it stale" "${oc_row%% *}" "stale"
+# ---- AC2: the same lease first seen 25 h ago reads stale; under `leases.expiry-hours = 48` live.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_a"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+oc_row=$(read_clock_row)
+same "DPR17 AC2 a lease first seen 25 h ago reads stale" "${oc_row%% *}" "stale"
+write_lease_policy '[leases]
+expiry-hours = 48'
+oc_row=$(read_clock_row)
+same "DPR17 AC2 ...and live under leases.expiry-hours 48" "${oc_row%% *}" "live"
+write_lease_policy '[budgets]
+enforce = "warn"'
+# ---- AC3: a `renews: yes` commit first seen 25 h ago under a `renews: no` beat seen a minute ago
+# ---- reads stale, aged by the beat; with that beat `renews: yes` it reads live.
+for oc_v in no:stale yes:live; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); oc_b=$(add_lease_commit 1 "${oc_v%%:*}" "$(derive_claim_ago 60)" "$oc_a")
+  git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR17 AC3 a renews: ${oc_v%%:*} beat over a renewal first seen 25 h ago reads ${oc_v#*:}" "${oc_row%% *}" "${oc_v#*:}"
+  [ "${oc_v%%:*}" != no ] || oc_age=${oc_row#* }
+done
+same "DPR17 AC3 ...the stale one aged by its tip's sighting, under 120 s" "$(awk -v a="$oc_age" 'BEGIN { print (a ~ /^[0-9]+$/ && a < 120) }')" "1"
+# ---- AC4: a lease whose renewing commit carries `renews: -`, first seen 1,000 h ago, reads live.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 - "$(derive_claim_ago 3600000)"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_a"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600000)"
+oc_row=$(read_clock_row)
+same "DPR17 AC4 renews: - first seen 1000 h ago reads live" "${oc_row%% *}" "live"
+# ---- AC5: the deadline is the first sighting's: an offer seen 60 s ago whose `offer-deadline` passed a
+# ---- day ago has not passed 300 s, one seen 400 s ago has; a tombstone seen 6 days ago whose
+# ---- `beat-utc` reads 8 days has not passed 604800 s, one seen 8 days ago has; an unsighted one is 2.
+remove_clock_refs
+oc_out=$( (
+  awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" >"$oc_copy/deadline.sh"
+  awk '/^check_deadline_passed\(\) \{/{f=1} f{print} f && /^\}/{exit}' "$SCRIPT" >>"$oc_copy/deadline.sh"
+  . "$oc_copy/deadline.sh"; GOVFEED_DIR="$LF/c1/.git"
+  o1=$(add_lease_commit 1 yes "$(derive_claim_ago 60)" "" "$(derive_claim_ago 86400)")
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$o1" "$(derive_claim_ago 60)"
+  check_deadline_passed "$OC_REF" "$o1" 300; echo "offer60=$?"
+  o2=$(add_lease_commit 1 yes "$(derive_claim_ago 400)" "" "$(derive_claim_ago 86400)")
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$o2" "$(derive_claim_ago 400)"
+  check_deadline_passed "$OC_REF" "$o2" 300; echo "offer400=$?"
+  t1=$(add_lease_commit 1 yes "$(derive_claim_ago 691200)")
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$t1" "$(derive_claim_ago 518400)"
+  check_deadline_passed "$OC_REF" "$t1" 604800; echo "tomb6=$?"
+  t2=$(add_lease_commit 1 yes "$(derive_claim_ago 691200)" "$t1")
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$t2" "$(derive_claim_ago 691200)"
+  check_deadline_passed "$OC_REF" "$t2" 604800; echo "tomb8=$?"
+  u=$(add_lease_commit 1 yes "$(derive_claim_ago 5)" "$t2")
+  check_deadline_passed "$OC_REF" "$u" 300; echo "unsighted=$?"
+) 2>&1 )
+same "DPR17 AC5 an offer first seen 60 s ago, its offer-deadline a day past, has not passed 300 s" "$(printf '%s\n' "$oc_out" | sed -n 's/^offer60=//p')" "1"
+same "DPR17 AC5 ...one first seen 400 s ago has" "$(printf '%s\n' "$oc_out" | sed -n 's/^offer400=//p')" "0"
+same "DPR17 AC5 a tombstone first seen 6 days ago, its beat-utc 8 days, has not passed 604800 s" "$(printf '%s\n' "$oc_out" | sed -n 's/^tomb6=//p')" "1"
+same "DPR17 AC5 ...one first seen 8 days ago has" "$(printf '%s\n' "$oc_out" | sed -n 's/^tomb8=//p')" "0"
+same "DPR17 AC5 an unsighted commit returns 2" "$(printf '%s\n' "$oc_out" | sed -n 's/^unsighted=//p')" "2"
+# ---- AC6: the feed deleted after the fetch and before the age pass reads every row unknown, aged -,
+# ---- the lease and a legacy claim alike, where the driver itself reads both live.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_now)"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_a"
+oc_l=$(git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -m "$(printf 'gov-claim tLg\n\nslug: tLg\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$(derive_claim_now)" "$(derive_claim_now)")")
+git --git-dir="$LF/origin.git" update-ref refs/gov/runs/tLg "$oc_l"
+same "DPR17 AC6 with its feed both rows read live" \
+  "$( (cd "$LF/c1" && bash "$SCRIPT" --claims 2>/dev/null) | awk -F'\t' '{ print $1 ":" $5 }' | tr '\n' ' ')" "tLg:live tOc:live "
+same "DPR17 AC6 the feed deleted before the age pass reads every row unknown, aged -" \
+  "$( (cd "$LF/c1" && bash "$oc_copy/no-feed.sh" --claims 2>/dev/null) | awk -F'\t' '{ print $1 ":" $4 ":" $5 }' | tr '\n' ' ')" "tLg:-:unknown tOc:-:unknown "
+# ---- AC8: a tenure of three commits all `renews: no` is aged from its opener: first seen 23 h ago it
+# ---- reads live, 25 h ago stale; parented on a legacy chain sighted a minute ago, the same.
+for oc_v in 82800:live 90000:stale; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 no "$(derive_claim_now)"); oc_b=$(add_lease_commit 1 no "$(derive_claim_now)" "$oc_a")
+  oc_c=$(add_lease_commit 1 no "$(derive_claim_now)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago "${oc_v%%:*}")"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR17 AC8 a tenure all renews: no, its opener first seen ${oc_v%%:*} s ago, reads ${oc_v#*:}" "${oc_row%% *}" "${oc_v#*:}"
+  remove_clock_refs
+  oc_g=$(git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -m "$(printf 'gov-claim tOc\n\nslug: tOc\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$(derive_claim_now)" "$(derive_claim_now)")")
+  oc_h=$(git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -p "$oc_g" -m "$(printf 'gov-claim tOc\n\nslug: tOc\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s' "$(derive_claim_now)" "$(derive_claim_now)")")
+  git --git-dir="$LF/origin.git" update-ref refs/gov/runs/tOc "$oc_h"
+  oc_a=$(add_lease_commit 1 no "$(derive_claim_now)" "$oc_h"); oc_b=$(add_lease_commit 1 no "$(derive_claim_now)" "$oc_a")
+  oc_c=$(add_lease_commit 1 no "$(derive_claim_now)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  for oc_r in refs/gov/runs/tOc "$OC_REF"; do
+    add_claim_sighting "$LF/c1" "$oc_r" "$OC_TREE" "$oc_g" "$(derive_claim_ago 60)"
+    add_claim_sighting "$LF/c1" "$oc_r" "$OC_TREE" "$oc_h" "$(derive_claim_ago 60)"
+  done
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago "${oc_v%%:*}")"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR17 AC8 ...over a legacy chain sighted a minute ago, its opener first seen ${oc_v%%:*} s ago, still ${oc_v#*:}" "${oc_row%% *}" "${oc_v#*:}"
+done
+rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 8; then
@@ -20989,7 +21155,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3510 -> 3531 by TOOL-dPlacedRequest-1, at its bug-class checklist: the verb's ten argument and
 # table refusals, one `same` and one `hit` per row of a ten-row loop, and one `same` that none wrote,
 # all in region eight; counted off the diff's own lines, no suite ran.
-FLOOR_ASSERTIONS=3531
+# RAISED 3531 -> 3552 by TOOL-dPlacedRequest-17: the observer clock block's 21 `same` lines in region
+# eight (AC3's and AC8's loops run twice each), every one unconditional, counted off the diff's own
+# lines; the re-staged claim arms keep their count. No suite ran, and its RED-first observation is
+# the close's.
+FLOOR_ASSERTIONS=3552
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -21234,7 +21404,8 @@ FLOOR_SHARD_7=311
 # RAISED 668 -> 673 by TOOL-dPlacedRequest-13: the same 5 region-eight `--feed` refusal assertions, see FLOOR_ASSERTIONS.
 # RAISED 673 -> 744 by TOOL-dPlacedRequest-1: the same 71 region-eight lease assertions, see FLOOR_ASSERTIONS.
 # RAISED 744 -> 765 by TOOL-dPlacedRequest-1: the same 21 region-eight `--lease` refusal assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=765
+# RAISED 765 -> 786 by TOOL-dPlacedRequest-17: the same 21 region-eight observer clock assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=786
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

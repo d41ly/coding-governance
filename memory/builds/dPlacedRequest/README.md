@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -101,7 +101,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git](spec/2026-10-25-spec-TOOL-dPlacedRequest-13.md) | 2 | 2 | CLOSED | rev-8 | 2026-11-19 |
 | [TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys](spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md) | 3 | 2 | CLOSED | rev-9 | 2026-11-19 |
 | [TOOL-dPlacedRequest-27 — the change feed skips only an immediate retry: the append-once test reads the ref's newest event](spec/2026-10-25-spec-TOOL-dPlacedRequest-27.md) | 3 | 2 | CLOSED | rev-2 | 2026-11-19 |
-| [TOOL-dPlacedRequest-17 — every lease deadline judged by the observer clock: expiry, an offer's deadline and a tombstone's prune age](spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md) | 4 | 2 | INPROGRESS | rev-5 | 2026-11-19 |
+| [TOOL-dPlacedRequest-17 — every lease deadline judged by the observer clock: expiry, an offer's deadline and a tombstone's prune age](spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md) | 4 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-23 — a strict claim read stays strict: `leases.offline` never reaches the preflight, a take-over or the close](spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly](spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md) | 4 | 2 | DEFERRED | rev-7 | 2026-11-19 |
 | [TOOL-dPlacedRequest-25 — a write that opens a holder's tenure renews the lease](spec/2026-10-25-spec-TOOL-dPlacedRequest-25.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 171 bound to this build, across 4 record folder(s).
+Records: 172 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

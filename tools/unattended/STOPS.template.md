@@ -216,7 +216,7 @@ harness's, `same session` when its `session` alone is. A refusal names one cause
 foreign holder (naming `--lease take-over` when stale); `tombstone`, a foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how
 one of two nodes creating one build lease learns the slug is taken; `overlap`; and `offline`. A node
-no `fleet.toml` row names writes nothing. Four policy keys and `leases` shape it, each read once per
+no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
 process through the policy kit, a refused read writing nothing:
 
 | key | values (default first) | what it decides |
@@ -226,6 +226,9 @@ process through the policy kit, a refused read writing nothing:
 | `leases.overlap` | `kit-dirs`, `files`, `builds` | the overlap probe's join at an acquisition and at preflight: `kit-dirs` joins a kit or skill directory, `files` a path, `builds` reports one finding per branch |
 | `leases` | `warn`, `refuse` | under `refuse` an acquisition with an overlap finding, or a probe that cannot run, is refused `overlap` |
 | `leases.offline` | `warn`, `refuse`, `follow-leases` | an unanswered read: `warn` queues the write in `<git-common-dir>/gov-queue.log` and prints `queued`, flushed by `--lease flush` or the next read that answers, a lost one printing `yield`; `refuse` refuses `offline`; `follow-leases` lets a renewal of a held lease print `follow-leases` and refuses the rest. No value creates a ref while offline |
+| `leases.expiry-hours` | `24`, any number of hours from 0 | a `live` lease reads `stale` once this node first saw its renewing beat longer ago |
+| `leases.offer-seconds` | `300`, any number of seconds from 0 | an offer is open while this node first saw the commit that set it at most this long ago |
+| `leases.queued-claim-days` | `7`, any number of days from 0 | a terminal tombstone is prunable once this node first saw it longer ago |
 
 **The change feed** is this node's record of every governance ref write it made or saw:
 `<git-common-dir>/gov-feed.log`, never pushed, one line each of `seq`, ref, kind, the commit's tree,
@@ -238,13 +241,29 @@ that line's commit or at a commit not authored `gov-claim`. `--feed check` holds
 what those cached refs derive, `--feed rebuild` writes it where none is present, and `--feed print`
 replays it from a `seq`. A pruned ref's events stay in the feed and out of the check.
 
+**The observer clock** judges every lease deadline: a record's age is now minus the time this node
+first saw it, the `seen-utc` of its oldest line in this node's own feed, both on this node's clock,
+so a constant skew between two nodes cancels. No deadline reads the holder's `beat-utc` or a stamp the
+record carries, such as its `offer-deadline`. `--claims` prints the age of the claim's tip, the time since this node
+first saw it. A claim's RENEWING BEAT is the newest commit of the tip's first-parent
+walk through its current tenure, the commits whose `epoch` is the tip's (an absent `epoch` reads 0),
+whose `renews` reads `yes` or is absent, else the tenure's opening commit whatever its `renews` says;
+a migrated lease's legacy commits beneath its opener never renew it, and a fence beat writing
+`renews: no` moves the tip and leaves the beat where it was. A `live` claim is `stale` once this node
+first saw its renewing beat more than `leases.expiry-hours` ago, and never where that beat carries
+`renews: -`. An offer's deadline (`leases.offer-seconds`) and a tombstone's prune age
+(`leases.queued-claim-days`) are the same judgment. A clock stepped between a sighting and its
+judgment moves this node's ages by the step, and never another node's.
+
 | claim | verdict |
 |---|---|
-| `live`, beat at most `RESUME_STALE_BOUND` old | `live` |
-| `live`, beat older | `stale` |
+| `live`, its renewing beat first seen by this node at most `leases.expiry-hours` ago | `live` |
+| `live`, its renewing beat first seen longer ago | `stale` |
+| `live`, its renewing beat carrying `renews: -` | `live` |
 | `held`, any age | `held` |
 | `landed`, `aborted` or `withdrawn` | `terminal` |
-| a key missing, a slug other than the ref's, a status outside the set, a beat that does not parse | `unknown`, age `-` |
+| a key missing, a slug other than the ref's, a status outside the set | `unknown`, age `-` |
+| its tip or renewing beat not yet in this node's feed, or a sighting that does not parse | `unknown`, age `-` |
 
 A claim is `mine` when its `keepalive` AND `session` equal the run's lease (`absent` compares
 literally); `same session` when its `session` is this harness's session; `foreign` otherwise, read
@@ -277,7 +296,7 @@ Every take of the run columns bumps the epoch. The `lease` column, by act:
 | `unknown` | refused `live-holder` | refused `live-holder` | refused `live-holder` | refused `live-holder` |
 
 The holder is `--resume`'s holder row and its `--replaces` block, `--dispatch` and `--close`; it
-renews when the beat is a quarter of the bound old or a field it writes differs, and otherwise only
+renews when its tip, by this node's first sighting, is a quarter of `RESUME_STALE_BOUND` old or a field it writes differs, and otherwise only
 reads, so a lost claim is found on every call. A race lost between the read and the push is check
 108; a push refused for any other reason, or not answered, is check 109 at `--preflight`, at a
 take-over and at `--close`, and one announced line at the holder's `--resume` and `--dispatch`, which

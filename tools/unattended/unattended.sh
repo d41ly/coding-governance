@@ -2454,6 +2454,17 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # A lease is `unknown` unless its first line is `gov-claim <tail>`, its `slug` and `kind` agree with
 # the ref and its `epoch` is positive. `cached` reads the caches with no fetch, for `leases.offline`;
 # a fetch that fails sets CL_OFFLINE.
+# THE OBSERVER CLOCK (TOOL-dPlacedRequest-17 S2, S3): no age reads the holder's `beat-utc`. ONE
+# `git log` over every cached tip maps each first-parent commit to its parent, `epoch` (absent 0) and
+# `renews`; per row a walk from its own tip, while the `epoch` is the tip's, finds the RENEWING BEAT,
+# the newest commit whose `renews` is `yes` or absent, else the tenure's opening commit (§8 F5), so a
+# migrated lease's legacy commits beneath its opener never renew it. `read_first_seen` gives the
+# first sighting of the tip and of that beat, and the one `date` ages both on this node's clock:
+# field 4 is now minus the tip's sighting, and a `live` row is `stale` once its beat's sighting is
+# older than `leases.expiry-hours` (`read_lease_bound expiry`), never where that beat carries
+# `renews: -`. A tip or beat the feed has not sighted reads `unknown`, age `-`; a refused bound reads
+# every row the bound would decide `unknown`. WHAT THIS DOES NOT CHECK: a clock stepped between a
+# sighting and its judgment, which moves this node's ages by the step.
 read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   local pol="$1" d rc alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
@@ -2492,10 +2503,9 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
   # commit costs one awk pass (TOOL-dPlacedRequest-27).
   add_feed_sightings refs/gov/remote/
   GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" "$LEASE_CACHE/" >"$d/refs" 2>/dev/null
-  printf 'now\n' >"$d/stamps"
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
-  CL_STF="$d/stamps" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" '
+  CL_TIPS="$d/tips" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" -v rfe="$CLAIM_NS/" -v lfe="$LEASE_NS/" '
     function dash(x) { return x == "" ? "-" : x }
     function flush(  k, ok, st, i, nm, kd, sl, f2, ep, ko) {
       if (ref == "") return
@@ -2516,10 +2526,8 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
         if (v["slug"] != nm) ok = 0
         f2 = v["node"]; ep = ("epoch" in v ? v["epoch"] : "0"); ko = "-"
       }
-      i = 0
-      if (v["beat-utc"] ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) { print v["beat-utc"] >> ENVIRON["CL_STF"]; i = ++n }
-      row[++nr] = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", nm, dash(f2), dash(st), sha, dash(v["session"]), dash(v["keepalive"]), dash(v["host"]), dash(v["lease-utc"]), dash(v["beat-utc"]), ok, i, dash(ep), ko, dash(v["renews"]), dash(v["witness"]), dash(v["offer"]), dash(v["offer-deadline"]), dash(v["last-fetch"]))
-      old[nr] = !lease; who[nr] = nm
+      row[++nr] = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", nm, dash(f2), dash(st), sha, dash(v["session"]), dash(v["keepalive"]), dash(v["host"]), dash(v["lease-utc"]), dash(v["beat-utc"]), ok, (lease ? lfe : rfe) tail, dash(ep), ko, dash(v["renews"]), dash(v["witness"]), dash(v["offer"]), dash(v["offer-deadline"]), dash(v["last-fetch"]))
+      old[nr] = !lease; who[nr] = nm; tip[nr] = sha
     }
     BEGIN { split("slug node host session keepalive status lease-utc beat-utc", K, " "); for (j in K) want[K[j]] = 1
             split("epoch kind fleet-tag renews witness offer offer-deadline last-fetch", E, " "); for (j in E) more[E[j]] = 1 }
@@ -2530,19 +2538,44 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
       if (head) { hdr = $0; head = 0; next }
       p = index($0, ": ")
       if (p > 1) { k = substr($0, 1, p - 1); if (((k in want) || (k in more)) && !(k in v)) { x = substr($0, p + 2); gsub(/\t/, " ", x); v[k] = x } } }
-    END { flush(); for (j = 1; j <= nr; j++) if (!(old[j] && (who[j] in lb))) print row[j] }' "$d/refs" >"$d/rows"
+    END { flush(); for (j = 1; j <= nr; j++) if (!(old[j] && (who[j] in lb))) { print row[j]; print tip[j] > ENVIRON["CL_TIPS"] } }' "$d/refs" >"$d/rows"
   if [ -s "$d/rows" ]; then
+    read_lease_bound expiry >/dev/null || LB_VALUE=""
+    GIT log --first-parent --format='%x01%H %P%n%B' --stdin <"$d/tips" >"$d/log" 2>/dev/null || alive=0
+    # THE WALK (S2): two `ref TAB commit` pairs per row, its tip then its renewing beat, and one line
+    # per row saying whether that beat carries `renews: -`, the row's own tip standing for both where
+    # the log does not hold it.
+    CL_LOG="$d/log" CL_NEVER="$d/never" awk -F'\t' -v OFS='\t' '
+      BEGIN { while ((getline l < ENVIRON["CL_LOG"]) > 0) {
+                sub(/\r$/, "", l)
+                if (substr(l, 1, 1) == "\001") { split(substr(l, 2), h, " "); c = h[1]; par[c] = h[2]; ep[c] = 0; continue }
+                if (c == "") continue
+                if (l ~ /^epoch: / && !((c, "e") in got)) { got[c, "e"] = 1; ep[c] = substr(l, 8) + 0 }
+                else if (l ~ /^renews: / && !(c in rn)) rn[c] = substr(l, 9) } }
+      { b = ""; o = $4; c = $4
+        if ($10 == 1 && (c in ep)) {
+          e = ep[c]
+          while (c != "" && (c in ep) && ep[c] == e) { o = c; if (!(c in rn) || rn[c] == "yes") { b = c; break }; c = par[c] }
+        }
+        if (b == "") b = o
+        print $11, $4; print $11, b
+        print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"] }' "$d/rows" | read_first_seen >"$d/seen"
+    awk 'BEGIN { print "now" } $0 != "-"' "$d/seen" >"$d/stamps"
     date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
     nask=$(grep -c '' "$d/stamps"); ngot=$(grep -c '' "$d/ages")
     [ "$nask" = "$ngot" ] || alive=0
-    CL_AGES="$d/ages" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$RESUME_STALE_BOUND" '
-      BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l }
-      { a = "-"
-        if (alive && $10 == 1 && $11 > 0) { a = age[1] - age[$11 + 1]; if (a < 0) a = 0 }
+    CL_AGES="$d/ages" CL_SEEN="$d/seen" CL_NEVER="$d/never" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$LB_VALUE" '
+      BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l
+              m = 1; while ((getline l < ENVIRON["CL_SEEN"]) > 0) { sub(/\r$/, "", l); at[++ns] = (l == "-" ? 0 : ++m) }
+              while ((getline l < ENVIRON["CL_NEVER"]) > 0) nv[++nn] = l + 0 }
+      { a = "-"; t = at[2 * NR - 1]; r = at[2 * NR]
+        if (alive && $10 == 1 && t > 0 && r > 0) { a = age[1] - age[t]; if (a < 0) a = 0; ra = age[1] - age[r]; if (ra < 0) ra = 0 }
         if ($10 != 1 || a == "-") { vd = "unknown"; a = "-" }
         else if ($3 == "held") vd = "held"
         else if ($3 == "landed" || $3 == "aborted" || $3 == "withdrawn") vd = "terminal"
-        else if (a + 0 <= bound + 0) vd = "live"
+        else if (nv[NR]) vd = "live"
+        else if (bound == "") vd = "unknown"
+        else if (ra + 0 <= bound + 0) vd = "live"
         else vd = "stale"
         print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9, $12, $13, $14, $15, $16, $17, $18 }' "$d/rows" | LC_ALL=C sort -t $'\t' -k1,1 >"$d/claims"
     IFS= read -r -d '' CLAIM_ROWS <"$d/claims" || :
@@ -3066,6 +3099,22 @@ print_feed() {       # [seq] -> every event whose seq is at or after it, in file
   [ -f "$d/gov-feed.log" ] || return 0
   awk -F'\t' -v from="$from" 'NF == 6 && $1 ~ /^[0-9]+$/ && $1 + 0 >= from + 0' "$d/gov-feed.log"
 }
+# THE OBSERVER CLOCK, I8 (TOOL-dPlacedRequest-17): the one reader of a first sighting. Per
+# `ref TAB commit` pair on stdin, in order, the `seen-utc` of the oldest feed line of that ref and
+# commit, or `-` where the feed holds none, has none of that shape, or cannot be read. Every lease
+# deadline is now minus that stamp, both read on this node's clock, never the holder's `beat-utc`.
+read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` per pair
+  local f=""
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -z "${GOVFEED_DIR%$'\r'}" ] || f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  FEED_FILE="$f" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+              if (!((x[2] SUBSEP x[5]) in seen)) seen[x[2], x[5]] = x[6] } }
+    { sub(/\r$/, ""); print (($1 SUBSEP $2) in seen ? seen[$1, $2] : "-") }'
+}
 # <<< gov_feed_sh
 
 # ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read, through the one writer
@@ -3207,11 +3256,11 @@ write_claim_beat() { # slug -> exactly one `beat —` line
 # `check_claim_writable` (S6). Each verb prints ONE line: `lease — <tail> · <act> · epoch <n>` exit 0,
 # `lease refused — <cause> · <tail> · <holder>` exit 1 (`live-holder`, `tombstone`, `epoch-fence`,
 # `overlap`, `offline`), or `lease not written — <why>` exit 2. Dark behind RUN_CLAIMS, as every claim.
-# WHAT THIS DOES NOT CHECK: expiry by a declared clock (TOOL-dPlacedRequest-17), hand-over, tombstone
-# and prune (TOOL-dPlacedRequest-16), offers (TOOL-dPlacedRequest-20); the queue is unlocked until
+# Expiry is judged by the observer clock in `read_claims` (TOOL-dPlacedRequest-17).
+# WHAT THIS DOES NOT CHECK: hand-over, tombstone and prune (TOOL-dPlacedRequest-16), offers (TOOL-dPlacedRequest-20); the queue is unlocked until
 # TOOL-dPlacedRequest-24, so two writers flushing one queue at once can push one line twice, the
 # second losing its compare-and-swap.
-FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""
+FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""; LB_VALUE=""
 LR_RENEWS=""; LR_WITNESS=""; LT_RECORD=""; LT_WHY=""; LT_SHA=""; LW_SHA=""; LW_VERDICT=""; GQ_PUSHED=""
 
 # A LEGAL ONE-SEGMENT REF NAME, as `git check-ref-format` reads one, held in bash so no segment costs a
@@ -3251,7 +3300,10 @@ derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> 
 # ONE NOTE per process naming the keys; a refused `get`, an invalid file included, returns 1 and the
 # refusal in LP_VALUE, and the caller writes nothing. A value outside the closed set refuses too.
 # Sets LP_VALUE and prints it; called directly, never in a substitution, so the read is kept.
-read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
+# TOOL-dPlacedRequest-17 S5 adds the three bounds a lease deadline is judged by, `leases.expiry-hours`,
+# `leases.queued-claim-days` and `leases.offer-seconds`, each a non-negative number and read through
+# `read_lease_bound` in seconds.
+read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
   local key="${1:-}" def py d out v
   case "$key" in
     leases) def=warn ;;
@@ -3259,7 +3311,10 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     leases.renewal) def=progress ;;
     leases.overlap) def=kit-dirs ;;
     leases.offline) def=warn ;;
-    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap or leases.offline, and was asked for '$key'"
+    leases.expiry-hours) def=24 ;;
+    leases.queued-claim-days) def=7 ;;
+    leases.offer-seconds) def=300 ;;
+    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days or leases.offer-seconds, and was asked for '$key'"
        printf '%s\n' "$LP_VALUE"; return 1 ;;
   esac
   case $'\n'"$LP_SEEN" in
@@ -3267,7 +3322,7 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
   esac
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap and leases.offline take their catalogue defaults; $key reads '$def'." >&2
+    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days and leases.offer-seconds take their catalogue defaults; $key reads '$def'." >&2
     LP_NOTED=1; out=$def
   else
     # THE KIT'S PATH IS REPO-RELATIVE TO ITS OWN CHECKOUT: a driver run over another tree, a fixture's,
@@ -3279,6 +3334,9 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
       leases.renewal) out=$("$py" "$d/policy.py" get leases.renewal 2>&1) ;;
       leases.overlap) out=$("$py" "$d/policy.py" get leases.overlap 2>&1) ;;
       leases.offline) out=$("$py" "$d/policy.py" get leases.offline 2>&1) ;;
+      leases.expiry-hours) out=$("$py" "$d/policy.py" get leases.expiry-hours 2>&1) ;;
+      leases.queued-claim-days) out=$("$py" "$d/policy.py" get leases.queued-claim-days 2>&1) ;;
+      leases.offer-seconds) out=$("$py" "$d/policy.py" get leases.offer-seconds 2>&1) ;;
     esac || { LP_VALUE=${out//$'\r'/}; LP_VALUE=${LP_VALUE//$'\n'/ }; printf '%s\n' "$LP_VALUE"; return 1; }
     out=${out%$'\r'}
   fi
@@ -3287,11 +3345,54 @@ read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|
     leases.renewal:progress|leases.renewal:activity|leases.renewal:fixed|leases.renewal:none) ;;
     leases.overlap:kit-dirs|leases.overlap:files|leases.overlap:builds) ;;
     leases.offline:warn|leases.offline:refuse|leases.offline:follow-leases) ;;
+    leases.expiry-hours:*|leases.queued-claim-days:*|leases.offer-seconds:*)
+      [[ $out =~ ^[0-9]+(\.[0-9]+)?$ ]] || { LP_VALUE="$key answered '$out', which is not the non-negative number this driver ages a lease by"
+        printf '%s\n' "$LP_VALUE"; return 1; } ;;
     *) LP_VALUE="$key answered '$out', which is outside the closed set this driver branches on"
        printf '%s\n' "$LP_VALUE"; return 1 ;;
   esac
   LP_SEEN="$LP_SEEN$key=$out"$'\n'; LP_VALUE=$out
   printf '%s\n' "$out"
+}
+
+# THE THREE BOUNDS A LEASE DEADLINE IS JUDGED BY (TOOL-dPlacedRequest-17 S5), in whole seconds, each
+# read through `read_lease_policy`: `expiry` is `leases.expiry-hours` (24), `offer` is
+# `leases.offer-seconds` (300) and `prune` is `leases.queued-claim-days` (7), a fraction kept to the
+# second and the rest dropped. Sets LB_VALUE and prints it; a refused read returns 1, LB_VALUE empty
+# and the refusal in LP_VALUE. Called directly, never in a substitution, so the read is kept.
+read_lease_bound() { # expiry|offer|prune -> LB_VALUE, seconds, on stdout; 1 with the refusal in LP_VALUE
+  local key m ip fp=""
+  LB_VALUE=""
+  case "${1:-}" in
+    expiry) key=leases.expiry-hours; m=3600 ;;
+    offer) key=leases.offer-seconds; m=1 ;;
+    prune) key=leases.queued-claim-days; m=86400 ;;
+    *) LP_VALUE="read_lease_bound reads expiry, offer or prune, and was asked for '${1:-}'"; printf '%s\n' "$LP_VALUE"; return 1 ;;
+  esac
+  read_lease_policy "$key" >/dev/null || { printf '%s\n' "$LP_VALUE"; return 1; }
+  ip=${LP_VALUE%%.*}; [ "$ip" = "$LP_VALUE" ] || fp=${LP_VALUE#*.}
+  fp=${fp:0:6}
+  LB_VALUE=$(( 10#$ip * m ))
+  [ -z "$fp" ] || LB_VALUE=$(( LB_VALUE + 10#$fp * m / 10**${#fp} ))
+  printf '%s\n' "$LB_VALUE"
+}
+
+# THE DEADLINE (TOOL-dPlacedRequest-17 S4, I8): whether this node first saw `<commit>` at `<ref>`, the
+# ref as the change feed spells it (`refs/gov/<tail>`), more than `<seconds>` ago, both stamps on this
+# node's clock through `read_first_seen` and one `date`. A stamp the record carries, its `beat-utc` or
+# `offer-deadline`, decides nothing. The one judgment an offer's deadline (TOOL-dPlacedRequest-20) and
+# a tombstone's prune age (TOOL-dPlacedRequest-16) call. A bound that is not whole seconds, or a
+# sighting `date` cannot read, is as unknown as an unsighted commit.
+check_deadline_passed() { # ref · commit · seconds -> rc 0 passed, 1 not yet, 2 the feed has not sighted it
+  local s t now
+  case "${3:-}" in ""|*[!0-9]*) return 2 ;; esac
+  s=$(printf '%s\t%s\n' "$1" "$2" | read_first_seen); s=${s%$'\r'}
+  case "$s" in ""|-) return 2 ;; esac
+  t=$(printf 'now\n%s\n' "$s" | date -u -f - +%s 2>/dev/null) || return 2
+  t=${t//$'\r'/}; now=${t%%$'\n'*}; s=${t#*$'\n'}
+  case "$now:$s" in *[!0-9:]*|:*|*:) return 2 ;; esac
+  [ $(( now - s )) -gt $(( 10#$3 )) ] && return 0
+  return 1
 }
 
 # `transitions.record`, the channels TOOL-dDeclaredLoop-3 S4 selects, read once per process through the
@@ -8915,7 +9016,7 @@ verb_preflight() { # slug · keepalive-id
           && write_claim "$slug" aborted "$_pf_cka" soft "" "$_pf_lu"; then
           echo "unattended: claim marked aborted — $slug, created by this refused call"
         else
-          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after ${RESUME_STALE_BOUND}s"
+          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after leases.expiry-hours with no renewal"
         fi ;;
       "") ;;
       *) echo "unattended: claim left — $slug · $_pf_act · this call refused after it" ;;
