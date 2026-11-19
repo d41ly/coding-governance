@@ -37,8 +37,9 @@ and the fold returns 1 on it (TOOL-dSettledStage-3).
 
 ## Gate
 
-Arms 44 and 45 of `tools/push-main.test.sh` gate the lander's instance: the attended landing over a
-regeneration that holds the index lock, and the helper and the fold cut from the lander under the
-lock with an unlocked control. No gate reads the class elsewhere: `tools/gate-lint/sh_hygiene.py`'s
+The lander's instance is gated by arms 44 and 45 of `tools/push-main.test.sh`, on the `push-main
+self-test` leg: the attended landing over a regeneration that holds the index lock, and the helper and
+the fold cut from the lander under the lock with an unlocked control. The class has no machine gate
+elsewhere: `tools/gate-lint/sh_hygiene.py`'s
 stage-commit mode reads whether a staged test follows a stage, never whether the stage's exit status
 was read.
