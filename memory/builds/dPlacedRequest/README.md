@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -114,7 +114,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-41 — a second offline write to a queued lease chains on the queued commit](spec/2026-10-25-spec-TOOL-dPlacedRequest-41.md) | 5 | 2 | CLOSED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take](spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md) | 6 | 2 | CLOSED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-18 — the cadence segment of the lease grammar takes any tag-grammar name](spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md) | 7 | 2 | CLOSED | rev-4 | 2026-11-19 |
-| [TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included](spec/2026-10-25-spec-TOOL-dPlacedRequest-28.md) | 7 | 2 | DEFERRED | rev-3 | 2026-11-19 |
+| [TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included](spec/2026-10-25-spec-TOOL-dPlacedRequest-28.md) | 7 | 2 | INPROGRESS | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-12 — create-only decision and problem registers on the remote](spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md) | 8 | 2 | DEFERRED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-42 — an offline lease create reads the feed first, as every create on an empty parent does](spec/2026-10-25-spec-TOOL-dPlacedRequest-42.md) | 8 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically](spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md) | 9 | 2 | DEFERRED | rev-6 | 2026-11-19 |
