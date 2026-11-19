@@ -8,13 +8,16 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 3.
-- Built so far: units 26, 27, 48 and 49 — the `resolve_bash_py` block (`scan_bash`, `BASH_NAMES`,
-  `wrong_shell_at`) and its JavaScript twin with name-keeping adapters, `tools/lib/refuse-wrong-shell.sh` in every
-  `resolve_python` member, and `scan_bare_bash` in `tools/run-gates/measure_legs.py` with shapes 1 to 4. Sections `2j`
-  and `2n` of `tools/lib/resolve-python.test.sh` are theirs; this unit's section is `2o`, as the spec says.
-- The spec is rev-3, re-grounded at `d08ded6f1`: the canonical imports `compute_coverage` from
-  `tools/lib/coverage_join.py` and `resolve_compare_base` from `tools/lib/compare_base.py`; gate-lint's new
-  `coverage_join.py` copies memory-tree's shape with its three blocks; AC8 compares against the pass's parent commit.
+- Built so far: units 26, 27, 48 and 49 — the `resolve_bash_py` block (`scan_bash`, `BASH_NAMES`, `wrong_shell_at`)
+  and its JavaScript twin with name-keeping adapters, `tools/lib/refuse-wrong-shell.sh` in every `resolve_python`
+  member, and `scan_bare_bash` in `tools/run-gates/measure_legs.py` with shapes 1 to 4. Sections `2j` and `2n` of
+  `tools/lib/resolve-python.test.sh` are theirs; this unit's section is `2o`.
+- The spec is rev-4, revised over the first builder's divergence
+  (`build/2026-11-19-build-TOOL-dWitnessedBar-13-1-builder-return.md`): `compare` reads measured rows from
+  `--measured <path>` (§8 F6), `read_registrations` reads every tracked `kit.toml` and `govkit/registry.toml` at any
+  depth (§8 F7), `read_renames` re-keys base rows before `compare_to_base` judges, `carry` writes only a tracked home,
+  and the merge class passes its row plane to every postcondition. The new "The CLI" sub-section gives each verb.
+- Unit 50 is flipped INPROGRESS and waits on this pass, because both write `tools/lib/resolve-python.test.sh`.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand
   a claim that no longer holds back as a divergence rather than building around it.
