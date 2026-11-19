@@ -79,3 +79,11 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T10:33:59Z brief · item TOOL-dPlacedRequest-25 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-19T10:45:59Z dispatch · item 6e909d5f TOOL-dPlacedRequest-16 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh help/loop.md memory/map/generated tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/loop/budget.py tools/govkit/subject-pins.tsv memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md
+
+2026-11-19T11:15:25Z brief · item TOOL-dPlacedRequest-16 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T11:16:19Z draw · re-dispatch · TOOL-dPlacedRequest-16 · 5/130 · 20261119T111619Z-280c9d
+
+2026-11-19T11:16:19Z dispatch · item 5f71c060 TOOL-dPlacedRequest-16 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md
+2026-11-19T11:49:25Z draw · re-dispatch · TOOL-dPlacedRequest-16 · 6/130 · 20261119T114925Z-f7c57c
+
+2026-11-19T11:49:25Z dispatch · item 5f71c060 TOOL-dPlacedRequest-16 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/loop.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md tools/unattended/STOPS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated tools/govkit/subject-pins.tsv

@@ -714,7 +714,7 @@ render_health_cell() {
 # stale bound and the verdict table, and a second reader of them is a second implementation. That
 # read moves no branch or remote-tracking ref and writes no FETCH_HEAD; the driver's private claim
 # cache is the only ref namespace it touches. TWO CLOCKS: the driver's splits `live` from `stale`;
-# this one hides a `stale` or `terminal` claim whose beat is older than CARD_CLAIMS_HIDE_S, and never
+# this one hides a `stale`, `terminal` or `released` claim whose beat is older than CARD_CLAIMS_HIDE_S, and never
 # a `live`, `held` or `unknown` one, which want a reader whatever their age. THE BOUND IS A KILL INTO
 # A FILE: `timeout` kills its own process group, and a `$( )` capture would still wait for any
 # grandchild holding the pipe, so the bound would decide the verdict and not the clock. stdin is
@@ -727,7 +727,8 @@ render_health_cell() {
 # Each row is six TAB fields, the sixth the claim's key or `-` (TOOL-dDeclaredLoop-8 S7), printed as
 # ` · key ` and the eight characters after `k1:`. The read asks `--claims --with-key`, and a row of five,
 # from a driver released before the flag, which ignores it, prints ` · key -` (TOOL-dDeclaredLoop-56 S8),
-# so neither side of a kit skew loses the cell.
+# so neither side of a kit skew loses the cell. A `released` row, a build lease handed over at a run's
+# end (TOOL-dPlacedRequest-16 S9), ranks beside `terminal` and hides under the same bound.
 derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
   local drv sd rc
   [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
@@ -745,13 +746,13 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
       # verdict, then slug, so a busy remote cannot push a live claim off the card.
       # ponytail: insertion sort, O(n^2) over a card's handful of claims; sort(1) if a remote holds hundreds.
       LC_ALL=C awk -F'\t' -v hide="$CARD_CLAIMS_HIDE_S" -v cap="$CARD_CLAIMS_ROWS" '
-        BEGIN { n = split("live held unknown stale terminal", o, " "); for (i = 1; i <= n; i++) rk[o[i]] = i }
+        BEGIN { n = split("live held unknown stale terminal", o, " "); for (i = 1; i <= n; i++) rk[o[i]] = i; rk["released"] = rk["terminal"] }
         { sub(/\r$/, "") }
         $0 == "claims: none" { none = 1; next }
         $0 == "claims: off" { off = 1; next }
         (NF == 5 || NF == 6) && ($5 in rk) {
           all++
-          if (($5 == "stale" || $5 == "terminal") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
+          if (($5 == "stale" || $5 == "terminal" || $5 == "released") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
           k = rk[$5] "\t" $1
           r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5 " · key " (NF == 6 && $6 ~ /^k1:/ ? substr($6, 4, 8) : "-")
           for (i = ++m; i > 1 && key[i - 1] > k; i--) { key[i] = key[i - 1]; row[i] = row[i - 1] }

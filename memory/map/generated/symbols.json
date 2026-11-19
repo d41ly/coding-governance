@@ -29403,6 +29403,11 @@
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
+      "id": "run_draw_arm",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_drive",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -30306,6 +30311,11 @@
       "id": "run_loop_verb",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_loop_verb",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_main",
@@ -37006,6 +37016,11 @@
       "id": "write_lease_policy",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_lease_prune",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_lease_spec",

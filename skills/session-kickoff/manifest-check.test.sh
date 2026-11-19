@@ -2108,6 +2108,26 @@ check_eq "DPR1 AC18 the lease row is six fields keyed over refs/gov/leases/tLeas
 git -C "$CLB" update-ref -d refs/gov/leases/tLease/build
 git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/leases/ | git -C "$CCLONE" update-ref --stdin
 
+# TOOL-dPlacedRequest-16 AC15 — two `released` claims beside the seven, a build lease handed over at a
+# run's end: sRel first seen two hours ago and rRelOld three days ago, each sighting planted in the
+# clone's change feed, the driver's observer clock. The cell counts nine, ranks sRel among the
+# `terminal` rows and hides rRelOld past CARD_CLAIMS_HIDE_S, and never reads `skipped:`. RED against a
+# card whose verdict set omits `released`: the whole cell reads skipped. Both are removed after, so
+# every count below is the seven legacy claims'.
+seed_claim sRel released 7200; seed_claim rRelOld released 259200
+for cl_r in "sRel 7200" "rRelOld 259200"; do
+  cl_s=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 1 }' "$CCLONE/.git/gov-feed.log" 2>/dev/null)
+  printf '%s\trefs/gov/runs/%s\truns\t%s\t%s\t%s\n' "${cl_s:-1}" "${cl_r%% *}" "$CLET" "$(git -C "$CLB" rev-parse "refs/gov/runs/${cl_r%% *}")" \
+    "$(date -u -d "@$((CLNOW - ${cl_r#* }))" +%Y-%m-%dT%H:%M:%SZ)" >>"$CCLONE/.git/gov-feed.log"
+done
+run_card "DPR16 AC15 --card --write over nine claims, two released" "$CWT" 0 "claims — 9 on the remote · " --card --write --session "$NONCE-c16"
+cl_cell=$(read_claims_cell "$NONCE-c16")
+check_eq "DPR16 AC15 sRel's row reads released, a terminal-rank row beside it, rRelOld hidden, no skipped line" \
+  "  sRel · n1 · released · beat Ns · released · key K|terminal|0|0" \
+  "$(printf '%s\n' "$cl_cell" | grep -m1 '^  sRel · ')|$(printf '%s\n' "$cl_cell" | grep -A1 '^  sRel · ' | tail -1 | sed -E 's/.* · ([a-z]+) · key K$/\1/')|$(printf '%s\n' "$cl_cell" | grep -c 'rRelOld')|$(printf '%s\n' "$cl_cell" | grep -c 'skipped:')"
+git -C "$CLB" update-ref -d refs/gov/runs/sRel; git -C "$CLB" update-ref -d refs/gov/runs/rRelOld
+git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/runs/sRel refs/gov/remote/runs/rRelOld | git -C "$CCLONE" update-ref --stdin
+
 # AC10 and S7 — the replay reads no remote: with the remote broken, the stored head prints
 # unchanged, and a replay that finds no card writes one whose cell made no read.
 git -C "$CCLONE" remote set-url origin "$TMP/nope.git"
@@ -2311,7 +2331,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # the AC8 six-field row (one), counted off the diff; no suite ran in the pass, each probed over a scratch clone.
 # +2: TOOL-dDeclaredLoop-56 AC5's five-field stand-in driver, one run_card and one check_eq, counted off
 # the block; no suite ran in the pass, the card's awk was probed alone over the stand-in's row.
-FLOOR_ASSERTIONS=350
+# +2: TOOL-dPlacedRequest-16 AC15's two `released` seeds, one run_card and one check_eq, counted off the
+# block; no suite ran in the pass, the card's awk was probed alone over nine rows.
+FLOOR_ASSERTIONS=352
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

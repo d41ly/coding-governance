@@ -192,15 +192,19 @@ to. One grammar serves every holder: `refs/gov/leases/<slug>/build`, `refs/gov/l
 and `refs/gov/leases/run/<cadence>/<period>`, each segment a legal one-segment ref name. The ref names
 a commit over the empty tree whose message is `gov-claim <tail>` (the ref after `refs/gov/leases/`), a
 blank line, and sixteen `key: value` lines: `slug`, `node`, `host`, `session`, `keepalive`, `status`
-(`live`, `held`, `landed`, `aborted` or `withdrawn`), `lease-utc`, `beat-utc`, `epoch`, `kind`
+(`live`, `held`, `released`, `landed`, `aborted` or `withdrawn`), `lease-utc`, `beat-utc`, `epoch`, `kind`
 (`build`, `unit` or `run`), `fleet-tag` (this node's row of `fleet.toml`), `renews`, `witness`,
-`offer`, `offer-deadline` and `last-fetch`, the last three `-` for now. A lease outside a run writes
+`offer`, `offer-deadline` and `last-fetch`, the first two `-` for now and `last-fetch` this node's
+last fetch on a queued write, `-` on every other. A lease outside a run writes
 `keepalive: absent`. **The epoch** is 1 on a create, the read epoch plus one on a take of a foreign
-lease, and the read epoch on every other write. Each commit's parent is the ref's previous tip, so
+lease, and the read epoch on every other write; a create of a ref the remote no longer holds, which
+this node's feed names, is parented on the newest commit the feed holds for it at its epoch plus one,
+so a lease's epoch rises for its whole life. Each commit's parent is the ref's previous tip, so
 the lease's history is its parent chain, every holder and beat in order; a create is the one
 parentless commit. Every write is a compare-and-swap, `--force-with-lease` on the sha the same call
-read, empty for a create, and leaves the ref in place; a terminal lease is taken over by the slug's
-next run and never deleted. A lease is `unknown` unless its first line, `slug`, `kind` and a positive
+read, empty for a create, and leaves the ref in place. A terminal cadence `run` lease or legacy run
+claim is taken over by the slug's next run; a build or unit lease is never deleted, and only a run's
+tombstone is ever pruned (below). A lease is `unknown` unless its first line, `slug`, `kind` and a positive
 `epoch` agree with its ref. The legacy `refs/gov/runs/<slug>` claim is still read, in the same fetch,
 its epoch 0 and its row losing to a lease of the same slug; the first write to a slug holding only a
 legacy claim creates the build lease parented on the legacy tip at epoch 1, and the legacy ref never
@@ -213,7 +217,8 @@ can force or delete the ref.
 <id>` or `run <cadence> <period>`, and `--lease flush`, read the remote's leases and decide by the
 `lease` column below. A lease is `mine` when its `fleet-tag` and `session` are this node's and this
 harness's, `same session` when its `session` alone is. A refusal names one cause: `live-holder`, a
-foreign holder (naming `--lease take-over` when stale); `tombstone`, a foreign terminal lease;
+foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or unit tombstone or a
+foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how
 one of two nodes creating one build lease learns the slug is taken; `overlap`; and `offline`. A node
 no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
@@ -228,7 +233,32 @@ process through the policy kit, a refused read writing nothing:
 | `leases.offline` | `warn`, `refuse`, `follow-leases` | an unanswered read: `warn` queues the write in `<git-common-dir>/gov-queue.log` and prints `queued`, flushed by `--lease flush` or the next read that answers, a lost one printing `yield`. The queue is read and written only under the node lock `gov-queue.lock` beside it, waited on for 5 s (PINNED, the driver's wait): an acquire queued again for one ref and cached tip appends nothing and prints `queued — already`, a busy lock refuses the append as `gov-queue.lock busy` and skips a flush with one `queue: NOTE -` line, and a flush pushes with no lock held and then rewrites the file less exactly the lines it resolved, so a line queued during its pushes stays; `refuse` refuses `offline`; `follow-leases` lets a renewal of a held lease print `follow-leases` and refuses the rest. No value creates a ref while offline. The key governs the `--lease` verbs and the soft and quiet claim callers alone: `--preflight`, a take-over and `--close` read the claims strict and refuse with check 109 when the remote does not answer, whatever the key says, and queue nothing |
 | `leases.expiry-hours` | `24`, any number of hours from 0 | a `live` lease reads `stale` once this node first saw its renewing beat longer ago |
 | `leases.offer-seconds` | `300`, any number of seconds from 0 | an offer is open while this node first saw the commit that set it at most this long ago |
-| `leases.queued-claim-days` | `7`, any number of days from 0 | a terminal tombstone is prunable once this node first saw it longer ago |
+| `leases.queued-claim-days` | `7`, any number of days from 0 | a run's terminal tombstone is prunable once this node first saw it longer ago, and a queued write whose `last-fetch` is older, `-` or unparsable is refused `epoch-fence` and leaves the queue |
+
+**The hand-over and the tombstone.** A release with no `--as` hands the lease over: it writes
+`released`, read with the verdict `released`, and every mode takes it as free, parented on its tip at
+its epoch plus one, its releaser included; the holder column alone refuses it, as a terminal claim,
+and `--beat` declines it. A run's end hands its build over: `--landed`, `--abort`, `--settle` and a
+refused `--preflight` write `released`, the run's own outcome staying in its run-state file. Only
+`--lease release --as landed` or `--as withdrawn` writes a build or unit lease terminal, a TOMBSTONE,
+at Deploy's release or a withdrawal; a cadence `run` lease takes `--as landed` or `--as aborted`, and
+every other pair prints `lease not written — --as <status> on a <kind> lease`, exit 2. A tombstone
+refuses every mode, its writer included, but `--lease acquire build <slug> --for draw`, a patch
+build's draw on its closed root: the draw writes `held` at the epoch plus one, parented on the
+tombstone, and `--lease release build <slug> --as landed` writes the tombstone back at that epoch,
+the one release such a hold admits. A `held` lease whose first-parent chain reaches a tombstone
+through `held` records only is a DRAW'S HOLD: its holder reads it `mine` and keeps it `held`, and
+everyone else reads a tombstone, a later draw taking it only once this node first saw its renewing
+beat more than `leases.expiry-hours` ago (`live-holder` before, and while that beat carries `renews:
+-` or is unsighted). The driver wraps a patch draw in that acquire and release on the root
+`budget.py origin` names; an acquire that does not take the hold, a queued one included, refuses the
+draw, and with `RUN_CLAIMS` off it draws as before. The class order: a `released` record, then a
+build or unit tombstone, BEFORE the identity rows; a draw's hold after them. `--lease prune` deletes,
+by compare-and-swap on the tip it read, each cadence `run` lease and legacy run claim terminal past
+`leases.queued-claim-days` by the observer clock, and never a build or unit lease: naming one prints
+`prune refused — tombstone`, exit 1. Every successful read stamps `<git-common-dir>/gov-last-fetch`,
+written to a file of its own and renamed over it, which a queued write copies into `last-fetch`, so
+no queued claim outlives the tombstone it would race.
 
 **The change feed** is this node's record of every governance ref write it made or saw:
 `<git-common-dir>/gov-feed.log`, never pushed, one line each of `seq`, ref, kind, the commit's tree,
@@ -261,13 +291,15 @@ judgment moves this node's ages by the step, and never another node's.
 | `live`, its renewing beat first seen longer ago | `stale` |
 | `live`, its renewing beat carrying `renews: -` | `live` |
 | `held`, any age | `held` |
+| `released`, any age | `released` |
 | `landed`, `aborted` or `withdrawn` | `terminal` |
 | a key missing, a slug other than the ref's, a status outside the set | `unknown`, age `-` |
 | its tip or renewing beat not yet in this node's feed, or a sighting that does not parse | `unknown`, age `-` |
 
-A claim is `mine` when its `keepalive` AND `session` equal the run's lease (`absent` compares
+A `released` claim reads `foreign-released` and a build or unit tombstone `foreign-tombstone`, both
+tested FIRST. Then a claim is `mine` when its `keepalive` AND `session` equal the run's lease (`absent` compares
 literally); `same session` when its `session` is this harness's session; `foreign` otherwise, read
-by its verdict. The rows are tested in that order. A holder or status write also reads `mine` a
+by its verdict, a draw's hold reading `foreign-tombstone`. The rows are tested in that order. A holder or status write also reads `mine` a
 claim of the lease's `keepalive` whose `session` is ANY member of the record's `prior-session`, and
 the restart row's take-over reads such a claim `same session`. That fact is a SET: members separated
 by one space, `absent` a member like any other, and the empty value or a missing line the empty set.
@@ -275,6 +307,8 @@ by one space, `absent` a member like any other, and the empty value or a missing
 | claim read | `--preflight` | take-over | holder | status write |
 |---|---|---|---|---|
 | none | create | create | create | create |
+| `released` | take | take | check 108 | take |
+| build or unit tombstone | check 107, `tombstone` | check 107, `tombstone` | check 108, `tombstone` | announce `tombstone`, exit unchanged |
 | mine | renew | renew | renew when due | write |
 | same session | rewrite | take | take | write |
 | foreign `live` | check 107 | check 107 | check 108 | announce |
@@ -288,6 +322,8 @@ Every take of the run columns bumps the epoch. The `lease` column, by act:
 | claim read | `lease` acquire | `lease` take-over | `lease` renew | `lease` release |
 |---|---|---|---|---|
 | none | create, epoch 1 | create, epoch 1 | not written, exit 2 | not written, exit 2 |
+| `released` | take, epoch +1 | take, epoch +1 | not written, exit 2 | not written, exit 2 |
+| build or unit tombstone | refused `tombstone`; `--for draw` takes it, epoch +1 | refused `tombstone` | refused `tombstone` | refused `tombstone` |
 | mine | renew | renew | renew | write the status |
 | same session | rewrite | take, epoch +1 | rewrite | write the status |
 | foreign `live` or `held` | refused `live-holder` | refused `live-holder` | refused `live-holder` | refused `live-holder` |
@@ -307,8 +343,8 @@ call and the read claim's session, each once. That row is the set's one writer: 
 write of that row that lands empties it, writing the empty value only when the set is non-empty, and
 a landed `--beat`, `--dispatch` or status write leaves it as it is. A holder refused at check 108
 ends with `--abort <slug> --code claim-lost`. The status
-writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`), `--settle` (`landed`
-over a landed hand-off, `aborted` over an abandoned working record, and none over a legacy
+writes are `--hold` (`held`), `--landed` (`released`), `--abort` (`released`), `--settle` (`released`
+over a landed hand-off or an abandoned working record, and none over a legacy
 `ABORTED` one) and the landing re-bind (`live`, its new keepalive), each after its own staging
 and never failing its verb. A `--settle` re-run over a record it already settled rewrites no record
 and retries that status write, only over a claim of the record's own lease still `held` or `live`,

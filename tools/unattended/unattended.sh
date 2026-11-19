@@ -41,8 +41,9 @@
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
 #   unattended.sh --claims [--with-key]                            # every run claim and lease on the remote: name, node or fleet tag, status, beat-age-s, verdict[, key]
-#   unattended.sh --lease acquire|renew|release|take-over <kind> <name> [<sub>] [--witness <sha>] [--as <status>]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
+#   unattended.sh --lease acquire|renew|release|take-over <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
+#   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
 #   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
@@ -2396,7 +2397,7 @@ LEASE_REF=""
 CR_NAME=""; CR_URL=""
 CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
 CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
-CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""
+CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""
 WC_WHY=""; WC_BEAT=""; WC_EPOCH=""
 WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_VERDICT=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""
 
@@ -2443,8 +2444,11 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # `renews: -`. A tip or beat the feed has not sighted reads `unknown`, age `-`; a refused bound reads
 # every row the bound would decide `unknown`. WHAT THIS DOES NOT CHECK: a clock stepped between a
 # sighting and its judgment, which moves this node's ages by the step.
+# TOOL-dPlacedRequest-16: `released` joins the status set with the verdict `released`, a hand-over
+# any mode takes; and the walk's renewing beat leaves as a NINETEENTH field, `beat-sha`, after the
+# eighteen above, so the draw's hold is aged over the same beat with no second walk.
 read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
-  local pol="$1" d rc alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local pol="$1" d rc lf alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
   # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
   # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
@@ -2480,6 +2484,16 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
   # for its ref, another node's beats included, joins it oldest first; a ref whose tip is that line's
   # commit costs one awk pass (TOOL-dPlacedRequest-27).
   add_feed_sightings refs/gov/remote/
+  # THE LAST FETCH (TOOL-dPlacedRequest-16 S6): a read that answered stamps `gov-last-fetch` in the
+  # common dir with this node's time, written to a file of this process's own and renamed over it, so
+  # a reader sees the old stamp or the new one and never a torn file. The offline queue copies it into
+  # a queued record's `last-fetch`, which `write_gov_queue` ages.
+  if [ "$pol" != cached ] && [ -n "${GOVFEED_DIR%$'\r'}" ]; then
+    TZ=UTC printf -v lf '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    { printf '%s\n' "$lf" >"${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID" \
+      && mv -f "${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID" "${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null \
+      || rm -f "${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID"
+  fi
   GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" "$LEASE_CACHE/" >"$d/refs" 2>/dev/null
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
@@ -2490,7 +2504,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
       ok = 1
       for (k in want) if (!(k in v)) ok = 0
       st = v["status"]
-      if (st != "live" && st != "held" && st != "landed" && st != "aborted" && st != "withdrawn") ok = 0
+      if (st != "live" && st != "held" && st != "released" && st != "landed" && st != "aborted" && st != "withdrawn") ok = 0
       nm = tail
       if (lease) {
         kd = ""; sl = ""
@@ -2523,7 +2537,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     # THE WALK (S2): two `ref TAB commit` pairs per row, its tip then its renewing beat, and one line
     # per row saying whether that beat carries `renews: -`, the row's own tip standing for both where
     # the log does not hold it.
-    CL_LOG="$d/log" CL_NEVER="$d/never" awk -F'\t' -v OFS='\t' '
+    CL_LOG="$d/log" CL_NEVER="$d/never" CL_BEATS="$d/beats" awk -F'\t' -v OFS='\t' '
       BEGIN { while ((getline l < ENVIRON["CL_LOG"]) > 0) {
                 sub(/\r$/, "", l)
                 if (substr(l, 1, 1) == "\001") { split(substr(l, 2), h, " "); c = h[1]; par[c] = h[2]; ep[c] = 0; continue }
@@ -2537,25 +2551,27 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
         }
         if (b == "") b = o
         print $11, $4; print $11, b
-        print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"] }' "$d/rows" | read_first_seen >"$d/seen"
+        print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"]; print b > ENVIRON["CL_BEATS"] }' "$d/rows" | read_first_seen >"$d/seen"
     awk 'BEGIN { print "now" } $0 != "-"' "$d/seen" >"$d/stamps"
     date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
     nask=$(grep -c '' "$d/stamps"); ngot=$(grep -c '' "$d/ages")
     [ "$nask" = "$ngot" ] || alive=0
-    CL_AGES="$d/ages" CL_SEEN="$d/seen" CL_NEVER="$d/never" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$LB_VALUE" '
+    CL_AGES="$d/ages" CL_SEEN="$d/seen" CL_NEVER="$d/never" CL_BEATS="$d/beats" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$LB_VALUE" '
       BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l
               m = 1; while ((getline l < ENVIRON["CL_SEEN"]) > 0) { sub(/\r$/, "", l); at[++ns] = (l == "-" ? 0 : ++m) }
-              while ((getline l < ENVIRON["CL_NEVER"]) > 0) nv[++nn] = l + 0 }
+              while ((getline l < ENVIRON["CL_NEVER"]) > 0) nv[++nn] = l + 0
+              while ((getline l < ENVIRON["CL_BEATS"]) > 0) { sub(/\r$/, "", l); bs[++nb] = l } }
       { a = "-"; t = at[2 * NR - 1]; r = at[2 * NR]
         if (alive && $10 == 1 && t > 0 && r > 0) { a = age[1] - age[t]; if (a < 0) a = 0; ra = age[1] - age[r]; if (ra < 0) ra = 0 }
         if ($10 != 1 || a == "-") { vd = "unknown"; a = "-" }
         else if ($3 == "held") vd = "held"
+        else if ($3 == "released") vd = "released"
         else if ($3 == "landed" || $3 == "aborted" || $3 == "withdrawn") vd = "terminal"
         else if (nv[NR]) vd = "live"
         else if (bound == "") vd = "unknown"
         else if (ra + 0 <= bound + 0) vd = "live"
         else vd = "stale"
-        print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9, $12, $13, $14, $15, $16, $17, $18 }' "$d/rows" | LC_ALL=C sort -t $'\t' -k1,1 >"$d/claims"
+        print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9, $12, $13, $14, $15, $16, $17, $18, (bs[NR] == "" ? "-" : bs[NR]) }' "$d/rows" | LC_ALL=C sort -t $'\t' -k1,1 >"$d/claims"
     IFS= read -r -d '' CLAIM_ROWS <"$d/claims" || :
     CLAIM_ROWS=${CLAIM_ROWS%$'\n'}
   fi
@@ -2634,7 +2650,7 @@ derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
 # catch-alls, each of which refuses, announces or declines, and none of which writes a claim.
 # WHAT THIS DOES NOT CHECK: that a member here has a case branch below; the per-cell arm owns that.
 # The verdict half of a `foreign-` class is read off the remote's row, so the join cannot see it.
-CLAIM_READS="none mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
+CLAIM_READS="none foreign-released foreign-tombstone mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
 CLAIM_MODES="preflight take-over holder status beat lease"
 
 # WHO MAY WRITE THIS SLUG'S CLAIM, by the table in the stops guide's section 7. The identity rows are
@@ -2664,12 +2680,17 @@ CLAIM_MODES="preflight take-over holder status beat lease"
 # CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, CW_HINT `take-over` on a stale
 # acquire) and prints nothing, the verb printing its own line; rc 3 is `none` under renew or release.
 # Every row read also sets CW_EPOCH, CW_KIND (`-` for a legacy claim), CW_TAG, CW_WIT and CW_LEASE.
+# TOOL-dPlacedRequest-16 - `foreign-released` is free to every mode but the holder's, which refuses it
+# as a terminal claim, and `--beat`, which declines it; the lease act `draw` (`--for draw`) takes a
+# tombstone. `foreign-tombstone` refuses each run column by its own check carrying `tombstone`, and
+# the status column announces it, exit unchanged, so a run still closes over its own tombstone.
+# CW_DRAW is 1 where the row is a draw's hold, whoever reads it.
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
   local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps="" la=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
-  local c_epoch c_kind c_renews c_wit c_rest
+  local c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest c_tail dh
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
-  CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""
+  CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""
   [ "$mode" != lease ] || la="$wka"
   row=""
   case $'\n'"$CLAIM_ROWS" in
@@ -2678,7 +2699,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   if [ -z "$row" ]; then
     cls=none
   else
-    IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_kind c_renews c_wit c_rest <<<"$row"
+    IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest <<<"$row"
     CW_SHA="$c_sha"; CW_SESS="$c_sess"; CW_STATUS="$c_status"
     CW_KIND="${c_kind:--}"; CW_WIT="${c_wit:--}"; CW_LEASE="$c_lease"
     case "${c_epoch:-0}" in *[!0-9]*) CW_EPOCH=0 ;; *) CW_EPOCH=$((10#${c_epoch:-0})) ;; esac
@@ -2687,7 +2708,12 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
     CW_FROM="$slug from node $c_node session $c_sess beat-age $c_btxt"
     if [ -n "$rel" ]; then fact "$rel" prior-session >/dev/null; ps=$_fact; fi
-    if [ "$mode" = lease ]; then
+    # THE CLASS ORDER (TOOL-dPlacedRequest-16, its section 4): a `released` record, then a build or unit
+    # tombstone, BEFORE the identity rows, so its releaser takes a hand-over at the epoch plus one and
+    # nobody, its writer included, revives a tombstone; a draw's hold after them, below.
+    if [ "$c_status" = released ]; then cls=foreign-released
+    elif { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; } && { [ "$c_status" = landed ] || [ "$c_status" = withdrawn ]; }; then cls=foreign-tombstone
+    elif [ "$mode" = lease ]; then
       if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
       elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
       else cls="foreign-$c_verdict"; fi
@@ -2696,6 +2722,28 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
     elif fact "$rel" keepalive >/dev/null; [ -n "$ps" ] && [ "$mode" = take-over ] && [[ " $ps " == *" $c_sess "* ]] && [ "$c_ka" = "$_fact" ]; then cls=same
     else cls="foreign-$c_verdict"; fi
+    # A DRAW'S HOLD (S3): a `held` build or unit lease whose first-parent chain reaches a tombstone
+    # through `held` records only, read by ONE `git log` stopping at the first record not `held`. It
+    # prints the `renews` of the row's renewing beat, `beat-sha`, or `?` where the held run does not
+    # hold it. Its holder reads it `mine` or `same`; everyone else reads a tombstone.
+    if [ "$c_status" = held ] && { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; }; then
+      c_tail=$c_slug; [ "$c_kind" = unit ] || c_tail="$c_slug/build"
+      dh=$(GIT log --first-parent --format='%x01%H%n%B' "$c_sha" -- 2>/dev/null | CW_BEAT="$c_bsha" awk '
+        function check_draw_hold() { fin = 1
+          if (st == "held") { fin = 0; if (c == ENVIRON["CW_BEAT"]) rb = (rn == "" ? "absent" : rn); return 0 }
+          if (st == "landed" || st == "withdrawn") hit = 1
+          return 1 }
+        substr($0, 1, 1) == "\001" { if (c != "" && check_draw_hold()) exit; c = substr($0, 2); sub(/\r$/, "", c); st = ""; rn = ""; next }
+        { sub(/\r$/, "") }
+        /^status: / && st == "" { st = substr($0, 9) }
+        /^renews: / && rn == "" { rn = substr($0, 9) }
+        END { if (!fin && c != "") check_draw_hold(); if (hit) print (rb == "" ? "?" : rb) }')
+      dh=${dh%$'\r'}
+      if [ -n "$dh" ]; then
+        CW_DRAW=1
+        case "$cls" in mine|same) ;; *) cls=foreign-tombstone ;; esac
+      fi
+    fi
   fi
   CW_CLS="$cls"
   if [ "$cls" = mine ]; then
@@ -2716,12 +2764,34 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     fi
   fi
   case "$mode:$cls" in
-    lease:none) case "$la" in acquire|take-over) CW_ACT=create ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:none) case "$la" in acquire|take-over|draw) CW_ACT=create ;; *) CW_CAUSE=none; return 3 ;; esac ;;
     lease:mine) case "$la" in release) CW_ACT=write ;; *) CW_ACT=renew ;; esac ;;
     lease:same) case "$la" in take-over) CW_ACT=take ;; release) CW_ACT=write ;; *) CW_ACT=rewrite ;; esac ;;
-    lease:foreign-stale) case "$la" in take-over) CW_ACT=take-announced ;; acquire) CW_CAUSE=live-holder; CW_HINT=take-over; return 1 ;; *) CW_CAUSE=live-holder; return 1 ;; esac ;;
+    lease:foreign-released) case "$la" in acquire|take-over|draw) CW_ACT=take ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    # THE DRAW (S4): `--for draw` takes a tombstone, and a draw's hold once its renewing beat is stale by
+    # `check_deadline_passed` over `leases.expiry-hours` (its F6); a beat writing `renews: -`, one the
+    # feed has not sighted or a refused bound keeps the hold `live-holder`. Every other act is refused.
+    lease:foreign-tombstone)
+      case "$la:$CW_DRAW" in
+        draw:) CW_ACT=take ;;
+        draw:1)
+          if [ "$dh" != - ] && [ "$dh" != "?" ] && read_lease_bound expiry >/dev/null \
+            && check_deadline_passed "$LEASE_NS/$c_tail" "$c_bsha" "$LB_VALUE"; then CW_ACT=take
+          else CW_CAUSE=live-holder; return 1; fi ;;
+        *) CW_CAUSE=tombstone; return 1 ;;
+      esac ;;
     lease:foreign-terminal) CW_CAUSE=tombstone; return 1 ;;
     lease:*) CW_CAUSE=live-holder; return 1 ;;
+    preflight:foreign-tombstone|take-over:foreign-tombstone)
+      fail 107 "this slug's lease on the remote is a tombstone, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written, and the lease names its last writer: $CW_WHO"
+      return 1 ;;
+    holder:foreign-tombstone)
+      fail 108 "this run's lease on the remote is a tombstone, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $CW_WHO"
+      return 1 ;;
+    status:foreign-tombstone)
+      echo "unattended: claim not written — $slug is held $c_status by session $c_sess on $c_node, beat $c_btxt · tombstone"
+      return 3 ;;
+    preflight:foreign-released|take-over:foreign-released|status:foreign-released) CW_ACT=take ;;
     *:none) CW_ACT=create ;;
     preflight:mine|take-over:mine) CW_ACT=renew ;;
     holder:mine|beat:mine) [ -n "$due" ] || return 2; CW_ACT=renew ;;
@@ -3171,7 +3241,7 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
 # WC_WHY `already` where a line already queues the ref and tip, rc 2 `gov-queue.lock busy` on its lock.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   if [ -n "$rel" ]; then
@@ -3183,7 +3253,9 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
     sid="${CLAUDE_CODE_SESSION_ID:-}"; host=$(read_host_name) || host=""; lease="${lease:-$WC_BEAT}"
   fi
   sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
-  case "$CW_ACT" in create) ep=1 ;; take|take-announced) ep=$((CW_EPOCH + 1)) ;; *) ep=$CW_EPOCH ;; esac
+  # A create is epoch 1, or the epoch plus one of the record the feed last held for a ref the remote
+  # no longer holds, which `run_lease_verb` hands in as CW_EPOCH and CW_SHA (TOOL-dPlacedRequest-16 S5).
+  case "$CW_ACT" in create|take|take-announced) ep=$((CW_EPOCH + 1)) ;; *) ep=$CW_EPOCH ;; esac
   [ "$ep" -ge 1 ] 2>/dev/null || ep=1
   case "$CW_KIND" in ""|-) exp="" ;; *) exp=$CW_SHA ;; esac
   if [ -n "$WL_REF" ]; then
@@ -3199,13 +3271,22 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   fi
   rv=""; ! read_lease_policy leases.renewal >/dev/null || rv=$LP_VALUE
   er=$CW_EPOCH; [ "$CW_ACT" != create ] || er=""
+  # A QUEUED write records this node's last fetch (S6): the stamp `read_claims` keeps, or `-` where it is
+  # absent or no ISO-8601 UTC second, which `write_gov_queue` refuses as `epoch-fence`.
+  lf=-
+  if [ -n "$WL_QUEUE" ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    { IFS= read -r lf <"${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null || lf=""
+    lf=${lf%$'\r'}
+    [[ $lf =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] || lf=-
+  fi
   derive_lease_renews "$er" "$ep" "$rv" "$wv" >/dev/null; ren=$LR_RENEWS
   if [ -z "$ref" ]; then
     WC_WHY="no lease ref derives for $slug: $LEASE_WHY"; rc=2
   else
-    msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: -\noffer-deadline: -\nlast-fetch: -' \
+    msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: -\noffer-deadline: -\nlast-fetch: %s' \
       "${ref#"$LEASE_NS"/}" "$sl" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT" \
-      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}")
+      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "$lf")
     if ! c=$(build_gov_commit "$CW_SHA" "$msg"); then
       WC_WHY="the claim commit could not be built in this clone"; rc=2
     elif [ -n "$WL_QUEUE" ]; then
@@ -3286,7 +3367,8 @@ write_claim_beat() { # slug -> exactly one `beat —` line
 # `lease refused — <cause> · <tail> · <holder>` exit 1 (`live-holder`, `tombstone`, `epoch-fence`,
 # `overlap`, `offline`), or `lease not written — <why>` exit 2. Dark behind RUN_CLAIMS, as every claim.
 # Expiry is judged by the observer clock in `read_claims` (TOOL-dPlacedRequest-17).
-# WHAT THIS DOES NOT CHECK: hand-over, tombstone and prune (TOOL-dPlacedRequest-16), offers (TOOL-dPlacedRequest-20); the queue is unlocked until
+# The hand-over, the tombstone, the draw and `--lease prune` are TOOL-dPlacedRequest-16's.
+# WHAT THIS DOES NOT CHECK: offers (TOOL-dPlacedRequest-20); the queue is unlocked until
 # TOOL-dPlacedRequest-24, so two writers flushing one queue at once can push one line twice, the
 # second losing its compare-and-swap.
 FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""; LB_VALUE=""
@@ -3591,7 +3673,7 @@ add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not,
   return "$rc"
 }
 write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept or the lock busy; GQ_PUSHED
-  local d f l ref tip c utc rc kept=0 ep tok n
+  local d f l ref tip c utc rc kept=0 ep tok n m lf s bd="" now
   local -a q=()
   local -A rs=()
   GQ_PUSHED=""
@@ -3610,9 +3692,24 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
     IFS=$'\t' read -r ref tip c utc <<<"$l"
     if [ -z "$ref" ] || [ -z "$c" ]; then n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue; fi
     [ "$tip" != - ] || tip=""
+    m=$(GIT log -1 --format=%B "$c" 2>/dev/null | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^last-fetch: / && f == "" { f = substr($0, 13) } END { print e "\t" f }')
+    ep=${m%%$'\t'*}; lf=${m#*$'\t'}; lf=${lf%$'\r'}
+    # THE QUEUED CLAIM'S AGE (TOOL-dPlacedRequest-16 S6): a write whose `last-fetch` is `-`, unparsable
+    # or older than `leases.queued-claim-days` is refused `epoch-fence` and leaves the queue, so no
+    # queued claim outlives a tombstone it would race; a refused bound keeps the line.
+    if [ -z "$bd" ]; then
+      read_lease_bound prune >/dev/null || { kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: leases.queued-claim-days refused: $LP_VALUE"; continue; }
+      bd=$LB_VALUE; TZ=UTC printf -v now '%(%s)T' -1
+    fi
+    s=""; [[ $lf =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] && s=$(date -u -d "$lf" +%s 2>/dev/null)
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s="" ;; esac
+    if [ -z "$s" ] || [ $(( now - s )) -gt "$bd" ]; then
+      GQ_PUSHED=1; echo "lease refused — epoch-fence · ${ref#"$LEASE_NS"/} · queued with last fetch ${lf:--}, older than leases.queued-claim-days or none"
+      n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue
+    fi
     GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
     write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
-    ep=$(GIT log -1 --format=%B "$c" 2>/dev/null | awk '{ sub(/\r$/, "") } /^epoch: / { print substr($0, 8); exit }')
     case "$rc" in
       0) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · flushed · epoch ${ep:--}" ;;
       1) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · $GOVREF_WHY"
@@ -3640,8 +3737,15 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # (S7), the node's fleet tag (S11), the read (with the queue flushed after a read that answered, S10, or
 # `leases.offline` where it did not), the overlap at an acquisition (S9), the `lease` column, the
 # witness at a renewal (S8), the write.
-run_lease_verb() { # act · kind · name · sub · witness · release status -> 0 written, 1 refused, 2 not written
-  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow
+# TOOL-dPlacedRequest-16: a release with no `--as` hands the lease over, `released`; a build or unit
+# lease takes `--as landed|withdrawn`, its tombstone, and a cadence `run` lease `--as landed|aborted`,
+# every other pair refused, writing nothing (its "The release outcomes"). `--for draw` acquires a
+# build's tombstone, writing `held` at the epoch plus one; the hold's own holder keeps it `held`, and
+# releases it only `--as landed`, at the same epoch. A create of a ref the remote no longer holds is
+# parented on the newest commit this node's feed holds for it, at its epoch plus one, and a build or
+# unit tombstone there is refused `tombstone` (S5).
+run_lease_verb() { # act · kind · name · sub · witness · release status · purpose -> 0 written, 1 refused, 2 not written
+  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la fc fm fe
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
   if [ "$act" = flush ]; then
     read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }
@@ -3654,11 +3758,23 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
   ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
   case "$kind" in build) lname=$name; sl=$name ;; unit) lname=$tail; sl=$name ;; *) lname=$tail; sl=- ;; esac
   [ -z "$warg" ] || [ "$act" = renew ] || { echo "lease not written — --witness names a renewal's witness, and $act takes none"; return 2; }
+  la=$act
+  case "$fp" in
+    "") ;;
+    draw) [ "$act:$kind" = acquire:build ] || { echo "lease not written — --for draw names a build lease's acquisition, and $act $kind takes none"; return 2; }
+          la=draw ;;
+    *) echo "lease not written — --for names draw, not '$fp'"; return 2 ;;
+  esac
   if [ "$act" = release ]; then
-    case "$as" in landed|aborted|withdrawn) st=$as ;; *) echo "lease not written — a release names its status with --as landed, aborted or withdrawn"; return 2 ;; esac
+    case "$kind:$as" in
+      *:) st=released ;;
+      build:landed|build:withdrawn|unit:landed|unit:withdrawn|run:landed|run:aborted) st=$as ;;
+      *:landed|*:aborted|*:withdrawn) echo "lease not written — --as $as on a $kind lease"; return 2 ;;
+      *) echo "lease not written — a release names its status with --as landed, aborted or withdrawn, or none to hand the lease over"; return 2 ;;
+    esac
   else
     [ -z "$as" ] || { echo "lease not written — --as names a release's status, and $act takes none"; return 2; }
-    st=live
+    st=live; [ "$la" != draw ] || st=held
   fi
   for k in leases leases.granularity leases.renewal leases.overlap leases.offline; do
     read_lease_policy "$k" >/dev/null || { echo "lease not written — $k refused: $LP_VALUE"; return 2; }
@@ -3696,13 +3812,34 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
     case "$kind" in run) check_cross_run_overlap "" acquire ;; *) check_cross_run_overlap "$name" acquire ;; esac \
       || { echo "lease refused — overlap · $tail · $OV_WHY"; WL_QUEUE=""; return 1; }
   fi
-  check_claim_writable "$lname" lease "$tag" "$sid" "$act"; rc=$?
+  check_claim_writable "$lname" lease "$tag" "$sid" "$la"; rc=$?
   case "$rc" in
     0) ;;
     1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+ · stale, so --lease take-over takes it}"; WL_QUEUE=""; return 1 ;;
     3) echo "lease not written — $tail holds no lease to $act"; WL_QUEUE=""; return 2 ;;
     *) echo "lease not written — the claim table declined $tail"; WL_QUEUE=""; return 2 ;;
   esac
+  # A DRAW'S HOLD, WRITTEN BY ITS OWN HOLDER, stays `held`, and its one release is `--as landed`.
+  if [ -n "$CW_DRAW" ] && { [ "$CW_CLS" = mine ] || [ "$CW_CLS" = same ]; }; then
+    if [ "$act" != release ]; then st=held
+    elif [ "$st" != landed ]; then echo "lease not written — a draw's hold is released --as landed"; WL_QUEUE=""; return 2; fi
+  fi
+  # THE EPOCH FOR LIFE (S5): a create of a ref the remote does not hold reads the newest commit this
+  # node's feed holds for it, one awk and one cat-file.
+  if [ "$CW_ACT" = create ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    fc=""
+    [ ! -f "${GOVFEED_DIR%$'\r'}/gov-feed.log" ] || fc=$(LF_REF="$ref" awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $2 == ENVIRON["LF_REF"] && $5 ~ /^[0-9a-f]+$/ && $5 !~ /^0+$/ { c = $5 } END { print c }' "${GOVFEED_DIR%$'\r'}/gov-feed.log")
+    if [ -n "$fc" ] && fm=$(GIT cat-file commit "$fc" 2>/dev/null); then
+      fe=$(printf '%s\n' "$fm" | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^kind: / && k == "" { k = substr($0, 7) } /^status: / && s == "" { s = substr($0, 9) } END { print e " " k " " s }')
+      case "${fe#* }" in
+        "build landed"|"build withdrawn"|"unit landed"|"unit withdrawn")
+          echo "lease refused — tombstone · $tail · the remote no longer holds it, and this node's feed last saw its tombstone $fc"; WL_QUEUE=""; return 1 ;;
+      esac
+      CW_SHA=$fc
+      case "${fe%% *}" in ""|*[!0-9]*) CW_EPOCH=0 ;; *) CW_EPOCH=$((10#${fe%% *})) ;; esac
+    fi
+  fi
   # THE WITNESS VERDICT (TOOL-dPlacedRequest-25 S1): `question` for an open question, `new` for a
   # transition differing from the record's witness, `none` otherwise, a closed question included; a
   # witness the check answers is stored under every policy. `write_claim` derives `renews` from it.
@@ -3731,11 +3868,52 @@ run_lease_verb() { # act · kind · name · sub · witness · release status -> 
     echo "lease not written — $WC_WHY"; return 2
   fi
   case "$rc" in
-    0) case "$CW_ACT" in write) echo "lease — $tail · released $st · epoch $WC_EPOCH" ;; *) echo "lease — $tail · $CW_ACT · epoch $WC_EPOCH" ;; esac
+    0) case "$CW_ACT:$st" in
+         write:released) echo "lease — $tail · released · epoch $WC_EPOCH" ;;
+         write:*) echo "lease — $tail · released $st · epoch $WC_EPOCH" ;;
+         *) echo "lease — $tail · $CW_ACT · epoch $WC_EPOCH" ;;
+       esac
        return 0 ;;
     1) echo "lease refused — epoch-fence · $tail · $WC_WHY"; return 1 ;;
     *) echo "lease not written — $WC_WHY"; return 2 ;;
   esac
+}
+
+# --lease prune, ONLY A RUN'S TOMBSTONE (TOOL-dPlacedRequest-16 S7): each cadence `run` lease and each
+# legacy `refs/gov/runs/*` claim whose verdict is `terminal` and whose tip this node first saw longer
+# ago than `leases.queued-claim-days` (`check_deadline_passed`) is deleted by compare-and-swap on that
+# tip through `remove_gov_ref`, one line each. A build or unit lease is never pruned: naming one prints
+# `prune refused — tombstone` and exits 1, since a patch build's draw on a closed root must find it.
+# Named, a run lease is the only candidate. A queued claim older than the same bound is refused
+# `epoch-fence` (S6), so no queued claim outlives the tombstone it would race.
+# WHAT THIS DOES NOT CHECK: a legacy claim hidden behind a build lease of its slug, which `read_claims`
+# drops, and a run lease whose tip the feed has not sighted, which is left.
+write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refused, 2 not written
+  local want="" rc=0 n=0 l ref sha bd
+  local -a cand=()
+  [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or pruned"; return 2; }
+  if [ $# -gt 0 ]; then
+    derive_lease_ref "$@" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+    case "$1" in build|unit) echo "prune refused — tombstone · ${LEASE_REF#"$LEASE_NS"/} · a $1 lease is never pruned"; return 1 ;; esac
+    want=$LEASE_REF
+  fi
+  read_lease_bound prune >/dev/null || { echo "lease not written — leases.queued-claim-days refused: $LP_VALUE"; return 2; }
+  bd=$LB_VALUE   # kept apart: the claim read below sets LB_VALUE to the expiry bound
+  read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  mapfile -t cand < <(printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v lns="$LEASE_NS/" -v rns="$CLAIM_NS/" -v want="$want" '
+    { sub(/\r$/, "") }
+    $5 == "terminal" && ($13 == "run" || $13 == "-") { r = ($13 == "run" ? lns : rns) $1; if (want == "" || r == want) print r "\t" $6 }')
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  for l in "${cand[@]}"; do
+    [ -n "$l" ] || continue
+    ref=${l%%$'\t'*}; sha=${l#*$'\t'}
+    check_deadline_passed "$ref" "$sha" "$bd" || continue
+    if remove_gov_ref "$ref" "$sha"; then n=$((n + 1)); echo "lease — ${ref#refs/gov/} · pruned"
+    else rc=2; echo "lease not written — ${ref#refs/gov/} · $GOVREF_WHY"; fi
+  done
+  [ "$n" != 0 ] || [ "$rc" != 0 ] || echo "lease — prune · nothing to prune"
+  return "$rc"
 }
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
@@ -4600,7 +4778,7 @@ check_single_live() {
   read_derived_phase --prime
   [ "$RUN_CLAIMS" = on ] && [ -n "$CLAIM_ROWS" ] || return 0
   printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v me="${SLUG:-}" '
-    $1 != me && $5 != "terminal" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
+    $1 != me && $5 != "terminal" && $5 != "released" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
     END { if (n) { printf "unattended: %d claim(s) on the remote for other slugs — this run is NOT blocked by them:\n", n; for (i = 1; i <= n; i++) print r[i] } }'
   return 0
 }
@@ -7243,10 +7421,12 @@ run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's firs
 check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer or the unread claims
   local slug="$1" mine row peer node rest verdict
   local -a _cp_rows
+  _bd_root=""
   run_loop_verb budget.py origin "--build=$slug" || return 0
   [ "$_bd_rc" = 0 ] || return 0
   mine=${_bd_why##* · }
   [ -n "$mine" ] && [ "$mine" != none ] || return 0
+  _bd_root=$mine
   if ! read_claims quiet; then
     _bd_rc=2
     _bd_why="budget: patch draw refused — claims unread: $CL_WHY"
@@ -7267,9 +7447,36 @@ check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming th
   done
   return 0
 }
+# THE DRAW'S HOLD (TOOL-dPlacedRequest-16 S4 and F7): a patch build draws only while it holds its closed
+# root's lease, `--lease acquire build <root> --for draw` before the draw and `--lease release build
+# <root> --as landed` after every draw answer, both through `run_lease_verb` in a subshell, so two draws
+# on one closed root serialise. An acquire that does not exit 0, or queues offline, refuses the draw
+# with `_bd_rc=2` and its line; a release that does not exit 0 prints its line and leaves the hold,
+# which a later draw takes once stale. With RUN_CLAIMS off, or no readable origin, it draws as before.
 run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
-  check_patch_peers "$1" || return 0
-  run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  local _bd_held="" _bd_line _bd_lrc _bd_prc _bd_pwhy
+  # The peers' refusal is held while the hold is acquired: an acquire that does not take the hold names
+  # its own line first, a queued one included, and a peer refusal releases the hold it took.
+  check_patch_peers "$1"; _bd_prc=$?; _bd_pwhy=${_bd_why:-}
+  if [ -n "${_bd_root:-}" ] && [ "$RUN_CLAIMS" = on ]; then
+    _bd_line=$(run_lease_verb acquire build "$_bd_root" "" "" "" draw 2>/dev/null); _bd_lrc=$?
+    _bd_line=${_bd_line##*$'\n'}; _bd_line=${_bd_line%$'\r'}
+    case "$_bd_lrc:$_bd_line" in
+      0:*" · queued"*|0:*"queued — already"*|[!0]*)
+        _bd_rc=2; _bd_why="budget: patch draw refused — $_bd_line"; return 0 ;;
+    esac
+    _bd_held=$_bd_root
+  fi
+  if [ "$_bd_prc" = 0 ]; then
+    run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  else
+    _bd_rc=2; _bd_why=$_bd_pwhy
+  fi
+  if [ -n "$_bd_held" ]; then
+    _bd_line=$(run_lease_verb release build "$_bd_held" "" "" landed 2>/dev/null) \
+      || printf '%s\n' "${_bd_line##*$'\n'}"
+  fi
+  [ "$_bd_prc" = 0 ] || return 0
   # THE LAP REFUSAL NAMES ITS REMEDY (TOOL-dDeclaredLoop-31 S5), after the module's line, which keeps naming
   # flow.on-exhausted: end the build while no exhaustion row stands, else the ending that row recorded.
   [ "$_bd_rc" = 3 ] || return 0
@@ -7847,12 +8054,12 @@ WTS
       # may never come, so the ledger goes HERE, beside the one write this verb makes.
       remove_procs_ledger "$slug"
       # TOOL-aGraftedHelix-1 S9 (spec rev-7) - THE IN-PLACE LANDING'S STATUS WRITE. This branch stages
-      # nothing, so the claim reads `landed` once the observation above is written, announced and never
+      # nothing, so the claim reads `released` (TOOL-dPlacedRequest-16 S2) once the observation above is written, announced and never
       # failing the verb like the staged writes; left `live` it would age to `stale` and be announced at
       # every later --preflight of another slug.
       if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
         fact "$rel" keepalive >/dev/null; _sk=$_fact
-        fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+        fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
       fi
       return 0
     fi
@@ -8098,12 +8305,12 @@ WTS
   set_fact "$rel" phase LANDED || return 1
   remove_procs_ledger "$slug"
   stage_or_fail "$rel" || return 1
-  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `landed`.
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `released`, the build lease handed over (TOOL-dPlacedRequest-16 S2).
   # Announced and never failing the verb when this call may not write it or the write does not
   # complete, because the local record is the truth and the claim then ages to `stale`.
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     fact "$rel" keepalive >/dev/null; _sk=$_fact
-    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
   fi
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
@@ -8239,12 +8446,12 @@ verb_abort() { # slug · reason · code
   set_fact "$rel" halt-code "$code" || return 1
   park "$rel" abort "$slug" "$reason" || return 1
   stage_or_fail "$rel" || return 1
-  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `aborted`.
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `released`, the build lease handed over (TOOL-dPlacedRequest-16 S2).
   # Announced and never failing the verb when this call may not write it or the write does not
   # complete, because the local record is the truth and the claim then ages to `stale`.
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     fact "$rel" keepalive >/dev/null; _sk=$_fact
-    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" aborted "$_sk" soft "$rel"
+    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
   fi
   echo "unattended: phase ABORTED · witness $head · halt-code $code · reason recorded as a parked entry"
   return 0
@@ -8673,6 +8880,8 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 write_settle_claim() { # slug · run-state file · status to write · first|retry
   local slug="$1" rel="$2" st="$3" when="$4" _sk
   [ -n "$st" ] && [ "$RUN_CLAIMS" = on ] || return 0
+  # A run's end hands its build lease over (TOOL-dPlacedRequest-16 S2): `landed` and `aborted` write `released`.
+  case "$st" in landed|aborted) st=released ;; esac
   read_claims soft || return 0
   fact "$rel" keepalive >/dev/null; _sk=$_fact
   fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" || return 0
@@ -9101,7 +9310,7 @@ verb_preflight() { # slug · keepalive-id
     case "$_pf_act" in
       create)
         if read_claims soft && check_claim_writable "$slug" status "$_pf_cka" "${CLAUDE_CODE_SESSION_ID:-absent}" "$_pf_cka" \
-          && write_claim "$slug" aborted "$_pf_cka" soft "" "$_pf_lu"; then
+          && write_claim "$slug" released "$_pf_cka" soft "" "$_pf_lu"; then
           echo "unattended: claim marked aborted — $slug, created by this refused call"
         else
           echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after leases.expiry-hours with no renewal"
@@ -17713,14 +17922,14 @@ while [ $# -gt 0 ]; do
     # cadence lease is named by its kind and segments, and `flush` names none.
     --lease)        refuse_waive_unless_preflight --lease
                     shift; LV_ACT=${1:-}; [ $# -eq 0 ] || shift
-                    LV_POS=(); LV_WIT=""; LV_AS=""; _rl_rc=""
+                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; _rl_rc=""
                     while [ $# -gt 0 ]; do
                       case "$1" in
-                        --witness|--as)
+                        --witness|--as|--for)
                           if [ $# -lt 2 ] || [ -z "$2" ]; then echo "lease not written — $1 takes a value"; _rl_rc=2; break; fi
-                          if [ "$1" = --witness ]; then LV_WIT=$2; else LV_AS=$2; fi
+                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; *) LV_FOR=$2 ;; esac
                           shift 2 ;;
-                        --*) echo "lease not written — --lease takes --witness <sha> or --as <status>, not $1"; _rl_rc=2; break ;;
+                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status> or --for draw, not $1"; _rl_rc=2; break ;;
                         *) LV_POS+=("$1"); shift ;;
                       esac
                     done
@@ -17728,10 +17937,15 @@ while [ $# -gt 0 ]; do
                     elif [ "$LV_ACT" = flush ]; then
                       if [ "${#LV_POS[@]}" -gt 0 ]; then echo "lease not written — --lease flush takes no argument"; _rl_rc=2
                       else run_lease_verb flush; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = prune ]; then
+                      # TOOL-dPlacedRequest-16 S7 - every prunable run tombstone, or the one lease named.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                        echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
+                      else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
                     elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                       echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id> or run <cadence> <period>"; _rl_rc=2
                     else
-                      run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS"; _rl_rc=$?
+                      run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR"; _rl_rc=$?
                     fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
