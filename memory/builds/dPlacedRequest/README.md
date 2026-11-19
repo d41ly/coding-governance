@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -110,7 +110,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-36 — the node-lock factory writes its health events through the lock's own common dir](spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md) | 5 | 2 | CLOSED | rev-5 | 2026-11-19 |
 | [TOOL-dPlacedRequest-37 — the node lock's deadline is the block's own bound, never the driver's `REMOTE_BOUND`](spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md) | 5 | 2 | CLOSED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-38 — the parity leg runs every inline `gov_feed_sh` copy under `set -u` with nothing from its carrier](spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md) | 5 | 2 | CLOSED | rev-6 | 2026-11-19 |
-| [TOOL-dPlacedRequest-39 — a feed append that aborts never takes its carrier down](spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md) | 5 | 2 | DEFERRED | rev-4 | 2026-11-19 |
+| [TOOL-dPlacedRequest-39 — a feed append that aborts never takes its carrier down](spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-11-19 |
 | [TOOL-dPlacedRequest-41 — a second offline write to a queued lease chains on the queued commit](spec/2026-10-25-spec-TOOL-dPlacedRequest-41.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 | [TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take](spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-18 — the cadence segment of the lease grammar takes any tag-grammar name](spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md) | 7 | 2 | DEFERRED | rev-4 | 2026-11-19 |

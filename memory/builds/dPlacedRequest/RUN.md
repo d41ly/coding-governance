@@ -106,3 +106,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T12:40:14Z dispatch · item a8ef2cf1 TOOL-dPlacedRequest-38 · reason tools/lib/resolve-python.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-38-1-acceptance-ledger.md
 
 2026-11-19T12:43:06Z brief · item TOOL-dPlacedRequest-38 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-19T12:58:57Z dispatch · item fe17c278 TOOL-dPlacedRequest-39 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-39-1-acceptance-ledger.md

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-39 — a feed append that aborts never takes its carrier down
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
