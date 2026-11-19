@@ -19,6 +19,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-16-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-1-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-2-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-2-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-3-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-3-builder-return.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-41.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-41.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-42.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-red-fix-42.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-16-registry-conversion.md](../build/2026-11-19-build-TOOL-dWitnessedBar-16-registry-conversion.md) | journal | — |
@@ -39,6 +40,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-2-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-3-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-4-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-4-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-token-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-token-fix-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 |
