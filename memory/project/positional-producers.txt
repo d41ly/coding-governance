@@ -19,7 +19,3 @@ tools/runlog/SKILL.template.md	`<path>:<line>`, a run-state line by its time and
 tools/workflows/check-review-join.js	`its skeptic verdict on a \`file:line\` STRING loses findings to echo drift and COLLAPSES two ` +
 tools/workflows/check-verifier-fanout.sh	# MSYS converts an absolute path only as a whole argument, so `<path>:<line>` reached node unconverted
 tools/workflows/replay_scorer.py	"""`<path>:<line>` of each pairing comprehension in the tracked `*.py` at and below `root`, this file excepted.
-# an edge plant's expected output: the resolver prints the fixture manifest's file:line, and the plant row asserts it (TOOL-dWitnessedBar-22)
-tools/playbook/adopt-playbook.sh	leg-resolved|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
-tools/playbook/adopt-playbook.sh	leg-resolved|0|edges: resolved · gate-legs.json:4 · tests=layer.memory · layer.memory
-tools/playbook/adopt-playbook.sh	leg-rule-member|0|edges: resolved · gate-legs.json:4 · enforces=practice.land · practice.land
