@@ -20552,13 +20552,14 @@ same "DPR19 S3 the re-run records the kept request" \
 hit  "$rq_out" "request — $rq_k2 · recorded"
 # ---- TOOL-dPlacedRequest-30 — A COLLISION IS REFUSED, NEVER MERGED. A text differing from req.md only in
 # ---- its ISO date keys alike: exit 2 `collision`, the stored copy byte for byte req.md, the `.typed`
-# ---- lines and the ref unmoved (AC1). req.md again, its CRLF copy, a BOM-and-CRLF copy and a re-wrapped
+# ---- lines and the ref unmoved (AC1), sent under a session `.typed` does not yet name, so a write the
+# ---- refusal let through would add its line. req.md again, its CRLF copy, a BOM-and-CRLF copy and a re-wrapped
 # ---- copy are the same words: each exit 0 `already recorded`, the stored copy unchanged (AC2). RED,
 # ---- observed at the close: the first-copy rule takes the date pair as recorded, and a raw `cmp -s`
 # ---- refuses the CRLF, BOM and re-wrapped copies. WHAT THIS DOES NOT DRIVE: a non-ASCII whitespace copy.
 rq_typed=$(grep -c '' "$LF/c1/.git/requests/$rq_key.typed")
 printf 'Fix the lander push, zq-request-marker-7, on 2026-11-20\n' > "$LF/date.md"
-rq_out=$(run_request_arm --request "$LF/date.md"); rq_rc=$?
+rq_out=$(RQ_SID=qC run_request_arm --request "$LF/date.md"); rq_rc=$?
 same "DPR30 AC1 a request differing only in its date exits 2, the copy, .typed and ref unmoved" \
   "$rq_rc $(cmp -s "$LF/req.md" "$LF/c1/.git/requests/$rq_key.md" && echo identical || echo differs) $(grep -c '' "$LF/c1/.git/requests/$rq_key.typed") $(git --git-dir="$LF/origin.git" rev-parse "refs/gov/requests/$rq_key")" \
   "2 identical $rq_typed $rq_tip"

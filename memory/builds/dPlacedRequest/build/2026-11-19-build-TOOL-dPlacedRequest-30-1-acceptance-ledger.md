@@ -43,3 +43,15 @@ driver the AC1 `same` and its `hit` failed and the AC2 four passed; under the ra
 and the identical copy passed and the CRLF, BOM and re-wrapped copies failed. That probe is no suite reading.
 The suite is waived for this build's landing by README rule 8. The floors rose by the same 6 (DERIVED):
 `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8`.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit selected 54 classes (DERIVED: 48
+by an anchor, 6 universal). One needed a change. fixture-passes-by-finding-nothing: the AC1 assertion's
+`.typed` count could not move under a write the refusal let through, because the block's session `qA` was
+already named there and the writer appends a session once; the date-differing request now runs under
+session `qC`, so the first-copy rule reads `0 identical 2` against the wanted `2 identical 1` (PINNED), a
+probe of the arm's lines observed under the base driver. refusal-branch-with-no-arm: the one branch this
+pass adds, the collision, is the arm's AC1. guard-above-a-fold-makes-its-fallback-dead: the compare runs
+only where the stored copy exists, so the copy branch below it still runs on an absent one. topology-sweep:
+two sessions racing one key between the compare and the copy is `TOOL-dPlacedRequest-43`'s, the hand-off
+the spec's edges name. The verbs template and its render are byte-identical, and the codebase map was
+regenerated for the new `derive_request_fold`.

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

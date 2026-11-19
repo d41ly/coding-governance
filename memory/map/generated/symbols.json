@@ -12373,6 +12373,11 @@
       "file": "tools/loop/request.py"
     },
     {
+      "id": "derive_request_fold",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "derive_requires_closure",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
