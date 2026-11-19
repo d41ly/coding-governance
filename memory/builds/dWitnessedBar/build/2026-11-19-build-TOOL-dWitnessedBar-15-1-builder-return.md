@@ -15,7 +15,7 @@ DIVERGENCE: §4 "Files touched" (and S5, which puts `gen_map.py --out` in this u
    - (b) S2, read literally, says a failed seed leaves "the header and one `# unarmed` line". Under `--widen` over an armed home, that would wipe the rows that §4's widen row says are never removed. The spec should state the widen-failure case. I built it as: write nothing, print `unarmed <p> <reason>; the armed home is unchanged`, exit 1.
    - (c) The exit code of a failed seed is not stated anywhere. I used 1, the CLI's existing convention for a finding.
 
-3. Not a spec defect, but it also blocks any commit here: HYGIENE check 9 failed on `memory/builds/dWitnessedBar/README.md`. Other agents have uncommitted edits to specs 14, 16, 20 and 24, plus untracked prompt files, in this shared worktree. The hook renders from that working tree, and `--write-staged` declined for that reason. Those files were left untouched.
+3. Not a spec defect, but it also blocks any commit here: the hygiene check-catalog row for README regions (`doc.hygiene#the-check-catalog-all-in-tools-memory-tree-check-memory-hygiene-sh-this-file-is-the-prose-home`) failed on `memory/builds/dWitnessedBar/README.md`. Other agents have uncommitted edits to specs 14, 16, 20 and 24, plus untracked prompt files, in this shared worktree. The hook renders from that working tree, and `--write-staged` declined for that reason. Those files were left untouched.
 
 Every path this pass changed is restored to HEAD and nothing was committed. RUN.md stays staged with the driver's dispatch rows, as it was at base plus this pass's declarations.
 
@@ -26,7 +26,7 @@ TOOL-dWitnessedBar-15 was built and checked with scratch-fixture probes, then ro
 **Saved work.** The full staged diff is in C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/TOOL-dWitnessedBar-15-pass.patch. It holds every path except RUN.md and was confirmed reversible with `git apply --check -R --cached`. The drafted commit message, with its `Decided:` lines and `Pass:` trailer, is in C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/TOOL-dWitnessedBar-15-commit-msg.txt.
 
 **What the patch contains:**
-- `tools/lib/legacy_ledger.py`: new functions inside the `legacy_ledger_py` block, copied byte-identically into the memory-tree and gate-lint copies: `seed_population`, `seed_home`, `read_home_state`, `check_home_admitted`, `run_seed_argv`, `read_seed_policy` and `run_seed_cli`. `write_rows` now writes through a new `_write_atomic`. The 600 s bound is pinned as `SEED_TIMEOUT`.
+- `tools/lib/legacy_ledger.py`: new functions inside the `legacy_ledger_py` block, copied byte-identically into the memory-tree and gate-lint copies: `seed_population`, `seed_home`, `read_home_state`, `check_home_admitted`, `run_seed_argv`, `read_seed_policy` and `run_seed_cli`. `write_rows` now writes through a new `_write_atomic`. The seed bound is pinned as `SEED_TIMEOUT` (PINNED: its value lives in `tools/lib/legacy_ledger.py#SEED_TIMEOUT`).
 - `retrofit.unseeded` is read by calling `policy.py get "retrofit.unseeded"` as a subprocess, with the key as a literal, from the kit `resolve_kit_dir` finds.
 - The memory-tree copy gains a seed-only `__main__` and imports `resolve_kit_dir` from `backlog`. The gate-lint copy carries an inline `resolve_kit_dir` block, which I checked against its canonical with `blk`.
 - `gen_map.py` gains `--out`.
