@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: tooling
 roster: TOOL
 ids: TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-16 TOOL-dScopedBuild-17 TOOL-dScopedBuild-18 TOOL-dScopedBuild-19 TOOL-dScopedBuild-20 TOOL-dScopedBuild-21 TOOL-dScopedBuild-22 TOOL-dScopedBuild-23 TOOL-dScopedBuild-24 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43
-spec-audit: 2026-10-21
 parents: dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders
 may: PLAY-dClosedLoop-3
 ---

@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: playbook
 roster: PLAY
 ids: PLAY-dConvergedCharter-1 PLAY-dConvergedCharter-2 PLAY-dConvergedCharter-3 PLAY-dConvergedCharter-4 PLAY-dConvergedCharter-5 PLAY-dConvergedCharter-6 PLAY-dConvergedCharter-7 PLAY-dConvergedCharter-8 PLAY-dConvergedCharter-9 PLAY-dConvergedCharter-10 PLAY-dConvergedCharter-11 PLAY-dConvergedCharter-12 PLAY-dConvergedCharter-13 PLAY-dConvergedCharter-14 PLAY-dConvergedCharter-15 PLAY-dConvergedCharter-16 PLAY-dConvergedCharter-17 PLAY-dConvergedCharter-18 PLAY-dConvergedCharter-19 PLAY-dConvergedCharter-20 PLAY-dConvergedCharter-21 PLAY-dConvergedCharter-22 PLAY-dConvergedCharter-23 PLAY-dConvergedCharter-24 PLAY-dConvergedCharter-25 PLAY-dConvergedCharter-26 PLAY-dConvergedCharter-27 PLAY-dConvergedCharter-28 PLAY-dConvergedCharter-29 PLAY-dConvergedCharter-30 PLAY-dConvergedCharter-31 PLAY-dConvergedCharter-32 PLAY-dConvergedCharter-33 PLAY-dConvergedCharter-34 PLAY-dConvergedCharter-35 PLAY-dConvergedCharter-36 PLAY-dConvergedCharter-37 PLAY-dConvergedCharter-38 PLAY-dConvergedCharter-39 PLAY-dConvergedCharter-40 PLAY-dConvergedCharter-41
-spec-audit: 2026-10-21
 parents: dScopedBuild dShippedRelease dCalibratedLens dMindYourWords
 may: PLAY-dClosedLoop-3
 ---
