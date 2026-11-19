@@ -235,12 +235,17 @@ def read_budget_value(root):
     """`(base, per-unit, route-backs)` at HEAD of `root`. ValueError naming the key on a policy refusal
     or a value of neither form; LookupError where the policy kit does not resolve."""
     policy, _guard = read_policy_kit()
-    got = {}
-    for key in (BUDGET_KEY, ROUTE_KEY):
+
+    def read_one(key):
         try:
-            got[key] = policy.resolve(key, str(root), "HEAD").value
+            return policy.resolve(key, str(root), "HEAD").value
         except policy.Refusal as e:
             raise ValueError("%s does not resolve at HEAD: %s" % (key, e)) from None
+
+    # one call per key, each passing its constant by name, so reader coverage reads both
+    # (TOOL-dLandedOwners-2)
+    got = {BUDGET_KEY: read_one(BUDGET_KEY)}
+    got[ROUTE_KEY] = read_one(ROUTE_KEY)
     value = got[BUDGET_KEY]
     hit = re.fullmatch(r"([0-9]+)\+([0-9]+)", value) if isinstance(value, str) else None
     if hit:

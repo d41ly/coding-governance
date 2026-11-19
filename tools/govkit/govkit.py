@@ -381,6 +381,16 @@ def load_toml(path: pathlib.Path) -> dict:
         raise Refusal(f"{path.as_posix()} is not valid TOML: {e}") from e
 
 
+def derive_withheld_names(kit_dir: pathlib.Path) -> list[str]:
+    """The file names the kit at `kit_dir` withholds from installs: each `include` of each `[[files]]`
+    rule of its `kit.toml` whose `role` is `project-owned`, in rule order, a string include read as a
+    one-name list, read through `load_toml`. A fixture copying a kit source spreads these into its
+    ignore list, so no copy restates a withheld name (TOOL-dLandedOwners-4 S9)."""
+    rules = load_toml(pathlib.Path(kit_dir) / "kit.toml").get("files", [])
+    return [n for r in rules if r.get("role") == "project-owned"
+            for n in (r.get("include") if isinstance(r.get("include"), list) else [r.get("include")])]
+
+
 def surface_paths(root: pathlib.Path, globs: list[str]) -> set[str]:
     """Tracked paths inside the declared surface, as repo-relative posix strings.
 
