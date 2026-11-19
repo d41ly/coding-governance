@@ -968,24 +968,44 @@ def check_page(page, ref="HEAD"):
         return print_refusal(str(e))
 
 
+VALUED_OPTIONS = ("--page", "--ref", "--claims", "--plant", "--out")
+
+
+def read_options(argv):
+    """({option: value} for each option of VALUED_OPTIONS present in argv, None), or
+    (None, "<option> takes a value") for the first option of VALUED_OPTIONS, in that tuple's order,
+    that is the last argument or whose next argument starts with "-". An option present more than once
+    reads its first occurrence. This is the one place in the generator that indexes argv."""
+    values = {}
+    for option in VALUED_OPTIONS:
+        if option not in argv:
+            continue
+        at = argv.index(option) + 1
+        if at >= len(argv) or argv[at].startswith("-"):
+            return None, f"{option} takes a value"
+        values[option] = argv[at]
+    return values, None
+
+
 def main(argv):
+    values, reason = read_options(argv)
     if "--page" in argv:
-        at = argv.index("--page") + 1
-        page = argv[at] if at < len(argv) else ""
-        has_ref = "--ref" in argv and argv.index("--ref") + 1 < len(argv)
+        if reason:
+            print(f"atlas: cannot check: {reason}", file=sys.stderr)
+            return 2
         mixed = [o for o in ("--plant", "--out", "--claims") if o in argv]
-        if "--check" not in argv or mixed or not page or page.startswith("-") or ("--ref" in argv and not has_ref):
+        if "--check" not in argv or mixed:
             print(f"atlas: cannot check: --page takes a page path and runs with --check and an optional --ref alone"
                   f"{', not ' + ' '.join(mixed) if mixed else ''}", file=sys.stderr)
             return 2
-        return check_page(page, argv[argv.index("--ref") + 1] if has_ref else "HEAD")
-    ref = argv[argv.index("--ref") + 1] if "--ref" in argv else "HEAD"
-    claims = argv[argv.index("--claims") + 1] if "--claims" in argv else "cache"
+        return check_page(values["--page"], values.get("--ref", "HEAD"))
+    if reason:
+        sys.exit(f"atlas: {reason}")
+    ref = values.get("--ref", "HEAD")
+    claims = values.get("--claims", "cache")
     if claims not in ("cache", "none"):
         sys.exit(f"atlas: --claims takes cache or none, not {claims}")
-    if ref.startswith("-"):
-        sys.exit(f"atlas: --ref takes a revision, not {ref}")
-    plant = argv[argv.index("--plant") + 1] if "--plant" in argv else None
+    plant = values.get("--plant")
     data = derive_actual(derive(plant), ref, claims == "cache", plant)
     if "--check" in argv:
         n = sum(len(r["sections"]) for r in data["records"])
@@ -994,7 +1014,7 @@ def main(argv):
         return 0
     if "--out" not in argv:
         sys.exit(__doc__)
-    out = Path(argv[argv.index("--out") + 1])
+    out = Path(values["--out"])
     try:
         data["stamp"] = build_stamp(data)
     except StampError as e:

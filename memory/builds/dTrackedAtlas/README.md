@@ -78,7 +78,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 | [TOOL-dTrackedAtlas-11 — the closing review's minors: one reader for valued options, the stale ledger line cleared, the owed pane looks recorded](spec/2026-11-19-spec-TOOL-dTrackedAtlas-11.md) | 8 | 1 | SPECCED | rev-1 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 44 bound to this build, across 4 record folder(s).
+Records: 45 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
