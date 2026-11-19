@@ -41,7 +41,7 @@ PLAYBOOK_KIT = ('id = "playbook"\nhome = "playbook"\nversion_from = { none = "fi
 #: the fixture's regenerate: one composition line, in the delta report's shape, naming the unit the drift names
 COMPOSE_LINE = f"  {'stale':<18} [{'gov:alpha':<13}] {UNIT}"
 COMPOSE = f"print({COMPOSE_LINE!r})\n"
-IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt")
+IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh")
 
 
 def build_stale_gov(tmp: pathlib.Path) -> pathlib.Path:
