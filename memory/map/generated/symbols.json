@@ -37478,6 +37478,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "write_staged_change",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "write_staging_line",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
