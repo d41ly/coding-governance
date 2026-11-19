@@ -856,3 +856,10 @@ shape = "verb"
 entry = "{prefix}/playbook/overlay.py"
 verb = "check"
 flags = []
+
+[[usage]]
+id = "script:{prefix}/memory-tree/ratchet.py#widen"
+shape = "verb"
+entry = "{prefix}/memory-tree/ratchet.py"
+verb = "widen"
+flags = ["--key=", "--reason=", "--unit="]
