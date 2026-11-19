@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-45 — the leg factory runs in a tree with no govkit: its generated row stays gov's, and its adopter verbs import no govkit
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -20,7 +20,7 @@
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
 confirmed finding **id 33 at HIGH**, its item **H6**, alone in that item. `TOOL-dWitnessedBar-11` S2 puts
 the factory's `[[generated]]` row in `tools/run-gates/kit.toml`, which ships (`include = "**"`,
-`tools/run-gates/kit.toml:18`), and `regen.py --check` reads every tracked descriptor and runs before the
+`tools/run-gates/kit.toml@4d1909b97cfa:23`), and `regen.py --check` reads every tracked descriptor and runs before the
 first leg. `leg_factory.py` imports govkit's `read_descriptors` and `resolve_tokens`, and govkit never
 reaches an adopter. Once run-gates updates, every adopter's bar fails at stage 1, and
 `TOOL-dWitnessedBar-28` S8's `leg sources` leg (`leg_factory.py --sources`) hits the same import failure.
@@ -31,7 +31,11 @@ This unit takes the skeptic's corrected fix. It repairs `TOOL-dWitnessedBar-11`.
 - **S1** — A gov-only row. `regen.py`'s `when` gains a second form, `exists:<path>`, its tokens resolved
   as a row's argv tokens are, holding when that path exists in the tree. The factory's `[[generated]]`
   row carries `when = "exists:{prefix}/govkit/govkit.py"`, so in a tree with no govkit regen skips it
-  and lists it skipped. Observed by AC1.
+  and lists it skipped. Today `tools/run-gates/regen.py#build_items` passes over a `[[generated]]` row
+  whose `when` does not hold without adding it to `skipped`, and `tools/run-gates/regen.py#print_items`
+  prints every skipped entry as one that carries no stage. So a row a `when` skips joins `skipped`, and
+  each entry carries its own reason, printed `its when <when> does not hold` for such a row. Observed
+  by AC1.
 - **S2** — No import at load. `leg_factory.py` imports only the standard library and its sibling
   `regen` at module level. govkit is loaded inside the verbs that need it, through one function
   `load_govkit(root)`, which exits 2 naming the path it looked for when govkit is absent. Observed by AC2.
@@ -66,13 +70,22 @@ This unit takes the skeptic's corrected fix. It repairs `TOOL-dWitnessedBar-11`.
 
 ### Evidence
 
-- `regen.py` reads every tracked `tools/*/kit.toml` (`read_descriptors`, `tools/run-gates/regen.py:108-122`),
-  honours a row's `when = "<conf>:<KEY>=<value>"` (`check_when`, `:140-146`) and skips the row when it
-  does not hold (`build_items`, `:186-187`).
-- `regen.resolve_argv` resolves `{kit}`, `{prefix}`, `{memory_root}` and `{map_root}` (`:125-138`), the
+- `regen.py` reads every tracked `tools/*/kit.toml` (`tools/run-gates/regen.py#read_descriptors`),
+  honours a row's `when = "<conf>:<KEY>=<value>"` (`tools/run-gates/regen.py#check_when`) and skips
+  the row when it does not hold (`tools/run-gates/regen.py#build_items`), listing it nowhere.
+- `regen.resolve_argv` (`tools/run-gates/regen.py#resolve_argv`) resolves the four tokens of
+  `tools/run-gates/regen.py#TOKENS`, `{kit}`, `{prefix}`, `{memory_root}` and `{map_root}`, the
   tokens unit 11 §4 step 3 resolves.
+- `regen.py` imports only the standard library at module level and runs `main` only under
+  `__main__`, so a sibling may import it; it loads `profile_bar.py` only inside
+  `tools/run-gates/regen.py#resolve_bash`.
 - `run-gates adopter e2e` runs `tools/run-gates/adopt-run-gates.test.sh`, the kit's own adopter suite.
-- govkit is an `[[exempt]]` home and never installed at an adopter (`tools/govkit/registry.toml`).
+- govkit is an `[[exempt]]` home and never installed at an adopter (`tools/govkit/registry.toml`, its
+  `path = "{prefix}/govkit"` row).
+- govkit selfcheck's `[[generated]]` arm (`tools/govkit/govkit.py#selfcheck`, its `_gwbad` test)
+  refuses a `when` that does not fullmatch `<conf>:<KEY>=<value>`, so it refuses the `exists:` form
+  until TOOL-dWitnessedBar-54 S2 widens it. The leg `govkit selfcheck` carries no `guard` in
+  `tools/gate-legs.json`, so it runs on every bar (§8 F3).
 
 ### The `when` grammar
 
@@ -95,7 +108,9 @@ None for gov: govkit exists, so the row holds and every verb runs as unit 11 sta
 
 ### Rollout
 
-Live at landing, before any adopter updates past unit 11.
+Live at landing, before any adopter updates past unit 11. This unit and TOOL-dWitnessedBar-54 land
+on local main in one merge, this unit's commit first, and the bar runs once over both, since
+govkit selfcheck refuses the factory row's `exists:` `when` until unit 54 S2 lands (§8 F3).
 
 ### Files touched (estimate)
 
@@ -143,7 +158,7 @@ Live at landing, before any adopter updates past unit 11.
 
 ## 7. Gates
 
-`run-gates adopter e2e` · `run-gates wiring` · `run-gates canary` · `measure-legs selftest` · `memory hygiene`
+`run-gates adopter e2e` · `run-gates wiring` · `run-gates canary` · `measure-legs selftest` · `govkit selfcheck` · `memory hygiene`
 
 New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scratch target applied with the run-gates kit alone, running `regen.py --check`, the module import, `--write` and `--conform` there, staged red by removing the row's `when` · none
 
@@ -160,6 +175,15 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
   read; (c) is a check that passes over nothing in every adopter. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 3, an extension of the condition regen already honours. widens: none ·
   relaxes: none
+- **F3 — How does this unit land green while govkit selfcheck refuses the `exists:` form?** The
+  re-ground at `5e569d9c9` read `tools/govkit/govkit.py#selfcheck`: its `[[generated]]` arm refuses
+  every `when` outside `<conf>:<KEY>=<value>`, and its leg runs on every bar. TOOL-dWitnessedBar-54 S2
+  widens that arm, and its S3 parity arm needs this unit's `exists:` reading in `regen.py`, so neither
+  unit lands green alone. Options: (a) the two land on local main in one merge, this unit's commit
+  first, under one bar; (b) this unit's pass widens the selfcheck arm itself; (c) this unit lands
+  alone and the bar reds until unit 54. (b) states unit 54 S2 in two specs, and (c) fails the bar
+  every unit passes, veto 1. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3, the one option
+  that leaves each spec's scope as written and lands no red. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -167,6 +191,12 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-54, TOOL-dWitnessedBar-56, TOOL-dWitnessedBar-57, promoted by the
   round-1 spec audit of units 40 to 51; nothing else moved.
+- rev-3 · 2026-11-19 · §1 · S1 · §4 Evidence, Rollout · §7 · §8 F3 · re-grounded at `5e569d9c9` per
+  brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief: line citations become `path#symbol`
+  or blob-pinned (the descriptor's `include = "**"` moved to line 23); S1 states that a `when`-skipped
+  row joins regen's `skipped` list with its own reason, which `print_items` lacks today; govkit
+  selfcheck's `when` arm, which refuses `exists:` until unit 54, joins the evidence and the leg line,
+  and F3 lands the two units in one merge.
 
 ## 10. Reuse audit
 
