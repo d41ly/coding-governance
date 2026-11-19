@@ -50,6 +50,22 @@ driver run over this tree and over a scratch repository holding only a one-line 
   refusals, no spec after `--files-touched`, another flag, and a spec git cannot read, each exited 2
   (PINNED) with one `path-tokens not read` line. The `conf-readers-declared` plant still held.
 
+**The checklist, acted on.** The bug-class checklist over the pass commit `76d584249` selected 63
+classes (DERIVED: 57 by an anchor and 6 universal). Two needed a change. refusal-branch-with-no-arm:
+the resolver's refusals were probed by hand only, so `seed-write` now also runs a missing `--unit`, a
+missing `--build`, a `--build` of `../tFix`, a unit no spec defines and a spec written but never
+committed, which the driver cannot read at HEAD, and `seed-scope` an item no row declares and an
+unknown flag, each owed exit 2 (PINNED) and its exact line; all four plants held again.
+bounded-through-a-pipe-is-unbounded: the driver call ran through `subprocess.run` with a timeout over
+captured pipes, which a surviving grandchild holds open, so it is now a `Popen` in its own process
+group on POSIX, killed past `SEED_DRIVER_BOUND` through `tools/loop/loop_witness.py#run_tree_kill` with
+no second read of its pipes; a probe at a 0.2 s bound (PINNED) refused in 0.3 s (PINNED) and left no
+driver process behind. The rest named nothing in this diff: every git call drops the inherited git
+location variables through `read_clean_env`; the Skill and verb-carrier lines were inserted after keys
+that occur once; the arms compare exact lines, never a line count; the help text opens no inline fence.
+Not driven by any arm: the driver's `mktemp` failure, and the seed resolver with no unattended driver
+installed, which a probe observed by making `resolve_kit_dir` refuse.
+
 **Owed at the close.** The two `New arm:` lines of section 7: the four seed plants under the `loop
 definition` leg's `--selftest`, RED-first on `seed-bad`'s staged break; and the `--path-tokens` block of
 `tools/unattended/unattended.test.sh`, 8 assertions (DERIVED: 7 `same`, 1 `hit`) in region one beside a

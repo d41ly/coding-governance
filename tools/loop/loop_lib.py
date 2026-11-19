@@ -237,11 +237,12 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "seed-bad": "item.build.unit-pass's seed set to diff, and item.plan.place, a command item, given seed "
                       "write-set",
           "seed-write": "seed item.build.unit-pass run in a scratch repository whose unit spec declares one path "
-                        "twice, plain and with a leading ./",
+                        "twice, plain and with a leading ./, then with each argument the write set owes missing "
+                        "or wrong",
           "seed-question": "seed item.plan.research run with a question naming two backticked paths, then with no "
                            "question",
           "seed-scope": "seed item.design.inventory run in a scratch repository, its scope-paths source armed by "
-                        "no plan record"}
+                        "no plan record, then an undeclared item and an unknown flag"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -320,6 +321,8 @@ SEED_PLANTS = ("seed-write", "seed-question", "seed-scope")
 #: The one path the `seed-write` plant's spec declares twice, plain and with a leading `./`: the plant's own,
 #: under its scratch repository.
 PLANT_SEED_PATH = "fx/seed-plant.txt"
+#: The `seed-write` plant's second unit, whose spec is written and never committed.
+PLANT_SEED_UNCOMMITTED = "TOOL-tFix-3"
 #: The `seed-question` plant's question and the two paths it names backticked.
 PLANT_SEED_QUESTION = ("is `fx/y.sh` racing with `fx/z.sh`?", ["fx/y.sh", "fx/z.sh"])
 #: The declaration sites outside the definition whose entries `--grade-site` grades: the unattended
@@ -1588,7 +1591,9 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
     resolves, the source is `unarmed`. ValueError naming why on a missing `unit` or `build` for `write-set`,
     a `build` that is no one path segment, a missing or empty `question` for `question-paths`, an unknown
     value, a working directory in no git work tree, no spec or two specs defining `unit`, and a driver
-    call that exits non-zero or does not answer within `SEED_DRIVER_BOUND` seconds."""
+    call that does not start, exits non-zero, or does not answer within `SEED_DRIVER_BOUND` seconds, a
+    driver past it killed with its children through `loop_witness.py`'s `run_tree_kill`."""
+    import os
     import subprocess
     tag, seed = item.get("tag"), item.get("seed", SEED_NONE)
     if seed == SEED_NONE:
@@ -1607,7 +1612,7 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
             raise ValueError("the item %s seeds question-paths, which takes --question <text>" % tag)
     else:
         raise ValueError("the item %s seed %r is no seed value" % (tag, seed))
-    from loop_witness import read_clean_env, resolve_bash
+    from loop_witness import read_clean_env, resolve_bash, run_tree_kill
     env = read_clean_env()
     try:
         p = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8",
@@ -1648,18 +1653,23 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
     bash = resolve_bash(driver)
     if bash is None:
         return "unarmed — %s: no bash that can see %s" % (seed, driver.as_posix())
+    try:   # its own process group on POSIX, so a timed-out driver is killed with every child it started
+        proc = subprocess.Popen([bash, str(driver), *argv], cwd=str(top), env=env, stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
+                                errors="replace", **({} if os.name == "nt" else {"start_new_session": True}))
+    except OSError as e:
+        raise ValueError("the unattended driver did not start: %s" % e) from None
     try:
-        p = subprocess.run([bash, str(driver), *argv], cwd=str(top), input=question if seed == "question-paths" else "",
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
-                           timeout=SEED_DRIVER_BOUND)
+        out, err = proc.communicate(question if seed == "question-paths" else "", timeout=SEED_DRIVER_BOUND)
     except subprocess.TimeoutExpired:
+        run_tree_kill(proc)   # never a second communicate: a surviving grandchild would hold the pipe open
         raise ValueError("the unattended driver's --path-tokens did not answer within %d seconds" % (
             SEED_DRIVER_BOUND)) from None
-    if p.returncode != 0:
-        said = (p.stdout.strip().splitlines() or p.stderr.strip().splitlines() or ["no output"])[0]
-        raise ValueError("the unattended driver's --path-tokens exited %d: %s" % (p.returncode, said))
+    if proc.returncode != 0:
+        said = (out.strip().splitlines() or err.strip().splitlines() or ["no output"])[0]
+        raise ValueError("the unattended driver's --path-tokens exited %d: %s" % (proc.returncode, said))
     paths = []
-    for line in p.stdout.splitlines():
+    for line in out.splitlines():
         path = resolve_seed_path(line)
         if path and path not in paths:
             paths.append(path)
@@ -2077,17 +2087,20 @@ def write_seed_plant(scratch):
     """The scratch repository the resolver plants run `seed` in, `scratch` itself (TOOL-dPlacedRequest-8): a
     `.unattended.conf` the unattended driver loads, and the build `tFix`'s unit spec, `loop_witness.py`'s
     `FX_UNIT`, whose Files touched declares `PLANT_SEED_PATH` twice, plain and with a leading `./`, committed.
-    No path is spelled with backslashes, since the one token rule reads none (its spec's F3)."""
+    No path is spelled with backslashes, since the one token rule reads none (its spec's F3). A second
+    unit's spec, `PLANT_SEED_UNCOMMITTED`'s, is written after the commit and never committed, so the
+    driver cannot read it at HEAD."""
     from loop_witness import FX_UNIT, run_fixture_git, write_fixture_files
+    spec = "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · base 0123abcd\n\n" \
+           "### Files touched (estimate)\n\n- `%s`\n- `./%s`, the same path again\n"
     run_fixture_git(scratch, "init", "-q", "--template=")
     write_fixture_files(scratch, {
         ".unattended.conf": "MEMORY_ROOT=memory\n",
-        "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT:
-            "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · base 0123abcd\n\n"
-            "### Files touched (estimate)\n\n- `%s`\n- `./%s`, the same path again\n" % (
-                FX_UNIT, PLANT_SEED_PATH, PLANT_SEED_PATH)})
+        "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT: spec % (FX_UNIT, PLANT_SEED_PATH, PLANT_SEED_PATH)})
     run_fixture_git(scratch, "add", "-A")
     run_fixture_git(scratch, "commit", "-q", "-m", "the seed plant's unit")
+    write_fixture_files(scratch, {"memory/builds/tFix/spec/2026-01-02-spec-%s.md" % PLANT_SEED_UNCOMMITTED:
+                                  spec % (PLANT_SEED_UNCOMMITTED, PLANT_SEED_PATH, PLANT_SEED_PATH)})
     return FX_UNIT
 
 
@@ -2095,21 +2108,39 @@ def check_seed_plant(plant):
     """The refusals of one resolver plant (TOOL-dPlacedRequest-8 AC4, AC5, AC6), each `seed` call it makes
     printed with its exit and output lines: this file run as a process in the scratch repository
     `write_seed_plant` writes under the host temp directory, removed after. `seed-write` owes
-    `PLANT_SEED_PATH` once, without its `./`; `seed-question` owes the question's two paths, then exit 2
-    naming `--question` with none; `seed-scope` owes the one `unarmed — scope-paths:` line naming
-    dRankedPlan. Each holding plant prints `loop: fixture · <plant> held · <what it printed>`."""
+    `PLANT_SEED_PATH` once, without its `./`, then exit 2 and the one line naming why for a missing
+    `--unit`, a missing `--build`, a `--build` that walks out of the builds folder, a unit no spec
+    defines and a spec the driver cannot read at HEAD; `seed-question` owes the question's two paths,
+    then exit 2 naming `--question` with none; `seed-scope` owes the one `unarmed — scope-paths:` line
+    naming dRankedPlan, then exit 2 for an item no row declares and for a flag the command does not take.
+    Each holding plant prints `loop: fixture · <plant> held · <what it printed>`."""
     import subprocess
     from loop_witness import read_clean_env, remove_tree
     scratch = tempfile.mkdtemp(prefix="seed-")
     refusals, held = [], ""
+    pass_item, said = "item.build.unit-pass", "loop: seed · "
     try:
         unit = write_seed_plant(scratch)
         question, asked = PLANT_SEED_QUESTION
-        runs = {"seed-write": [(["item.build.unit-pass", "--build", "tFix", "--unit", unit], 0, [PLANT_SEED_PATH])],
+        runs = {"seed-write": [
+                    ([pass_item, "--build", "tFix", "--unit", unit], 0, [PLANT_SEED_PATH]),
+                    ([pass_item, "--build", "tFix"], 2, [said + "the item %s seeds write-set, which takes --unit "
+                                                         "<id>" % pass_item]),
+                    ([pass_item, "--unit", unit], 2, [said + "the item %s seeds write-set, which takes --build "
+                                                      "<slug>" % pass_item]),
+                    ([pass_item, "--build", "../tFix", "--unit", unit], 2, [
+                        said + "--build '../tFix' is no build slug, one path segment of letters, digits, _ and -"]),
+                    ([pass_item, "--build", "tFix", "--unit", "TOOL-tFix-2"], 2, [
+                        said + "0 spec(s) under memory/builds/tFix/spec/ define TOOL-tFix-2, where one owes it"]),
+                    ([pass_item, "--build", "tFix", "--unit", PLANT_SEED_UNCOMMITTED], 2, [
+                        said + "the unattended driver's --path-tokens exited 2: path-tokens not read — git cannot "
+                               "read HEAD or a spec at it: exit 128"])],
                 "seed-question": [(["item.plan.research", "--question", question], 0, asked),
-                                  (["item.plan.research"], 2, ["loop: seed · the item item.plan.research seeds "
+                                  (["item.plan.research"], 2, [said + "the item item.plan.research seeds "
                                                                "question-paths, which takes --question <text>"])],
-                "seed-scope": [(["item.design.inventory", "--build", "tFix"], 0, [SEED_SCOPE_UNARMED])]}[plant]
+                "seed-scope": [(["item.design.inventory", "--build", "tFix"], 0, [SEED_SCOPE_UNARMED]),
+                               (["item.no-such"], 2, [said + "no [[item]] row declares item.no-such"]),
+                               (["item.design.inventory", "--frob", "x"], 2, [])]}[plant]
         for args, owed, want in runs:
             p = subprocess.run([sys.executable, str(pathlib.Path(__file__).absolute()), "seed", *args], cwd=scratch,
                                capture_output=True, text=True, encoding="utf-8", errors="replace",
