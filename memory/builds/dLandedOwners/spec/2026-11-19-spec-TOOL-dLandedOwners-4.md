@@ -1,12 +1,13 @@
 # TOOL-dLandedOwners-4 — the closing review's promoted findings: the kit threaded to every resolver, a failing case for each landed-predicate arm, every withheld file checked, one git-read refusal and the docs aligned
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-2 · base 515a3e6c · streams tooling · order 4
+**Status:** INPROGRESS · rev-1 · 2026-11-19 · node d · Tier-2 · base 515a3e6c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dLandedOwners-4-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dLandedOwners-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-4-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
