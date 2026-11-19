@@ -6,11 +6,11 @@ The ONE answer the schedule script (`tree_state`, `chain`, `claims`, `graph`) an
 
 Usage (from a worktree root; `unattended.sh --claims` fills the claim cache, this file only reads it):
   . tools/lib/resolve-python.sh && PY=$(resolve_python)
-  "$PY" <this file> [--ref <rev>] [--claims cache|none]
+  "$PY" <this file> [--ref <rev>] [--default-ref <rev>] [--claims cache|none]
 prints the state document as JSON. Exit 0; 1 when v2's `[chain]` does not hold 22 builds and 509 clauses; 2 when the
-ref does not resolve, a git call fails or times out, a needed conf key is absent, a spec file name outside
-`[A-Za-z0-9._-]+\.md` is refused, or no answer comes within DERIVE_BOUND seconds, with one `build-state: <reason>`
-line on stderr.
+ref or the default-branch ref does not resolve, a git call fails or times out, a needed conf key is absent, a spec
+file name outside `[A-Za-z0-9._-]+\.md` is refused, or no answer comes within DERIVE_BOUND seconds, with one
+`build-state: <reason>` line on stderr.
 
 A library caller loads it by path (its file name is no module name) and calls `derive`, `read_chain`,
 `derive_predecessors` or `read_claims`; it arms no wall bound. Git is read in `root`, a worktree root, and never its working
@@ -19,15 +19,19 @@ tree; the code reused is loaded from the repository this file sits in.
 THE LANDED PREDICATE (spec section 7, F1 (g)). A run record is `<build>/RUN.md` or a rotated `RUN.LANDED.<blob8>.md`
 beside it, read at the ref; its `base:` and `phase:` come from its `## Run facts`. Its kind is README rule 1 at that
 base, `deviations.py#derive_run_kind`, the test `unattended.sh#check_spec_run` applies. Its landings are the merges on
-the ref's first-parent history whose diff against their first parent touches the build's RUN.md and whose RUN.md
-carries the run's base. A build run has landed when a build-kind record has a landing; a DEFERRED unit of a landed
-build run is carried, never unbuilt.
+the default branch's first-parent history that the ref contains, whose diff against their first parent touches the
+build's RUN.md and whose RUN.md carries the run's base. The default branch is `--default-ref`, else the remote-tracking
+ref `refs/remotes/<remote>/<branch>` that `tools/lib/resolve_remote.py` names, and the document records both, as
+`default_ref` and the `default_commit` it resolves to; one that resolves to no commit is a refusal, never the ref
+itself. A build run has landed when a build-kind record has a landing; a DEFERRED unit of a landed build run is
+carried, never unbuilt.
 
-WHAT IT DOES NOT CHECK: that a merge touching RUN.md with a run's base is that run's own landing rather than a merge
-of its branch for another reason; a run record rotated outside the driver; a record whose base resolves to no commit,
-whose kind reads null and which lands nothing; the open forks of a CLOSED or WONTDO spec; claims newer than the
-last `unattended.sh --claims`; and a spec whose name git's listing quotes, such as one holding a non-ASCII byte, `"`
-or `\`, which is not listed as a spec at all.
+WHAT IT DOES NOT CHECK: that the default-branch ref is current, because a landing the remote took and this repository
+has not fetched reads not-landed; that a merge touching RUN.md with a run's base is that run's own landing rather than
+a merge of its branch for another reason; a run record rotated outside the driver; a record whose base resolves to no
+commit, whose kind reads null and which lands nothing; the open forks of a CLOSED or WONTDO spec; claims newer than
+the last `unattended.sh --claims`; and a spec whose name git's listing quotes, such as one holding a non-ASCII byte,
+`"` or `\`, which is not listed as a spec at all.
 """
 import argparse
 import collections
@@ -50,6 +54,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[4]
 V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
 DEVIATIONS = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py"
+LADDER = "tools/lib/resolve_remote.py"
 ROOT = "dTrueNorth"
 WHOLE = frozenset({"dTrueNorth"})              # one run, spec and build together (`[answers-2]` item 5)
 CID = re.compile(r"`(cl-d[A-Z]\w+-\d{4})`")
@@ -74,7 +79,8 @@ class ChainError(Exception):
 
 
 class StateError(Exception):
-    """The ref does not resolve, a git call fails or times out, or a needed conf key is absent."""
+    """The ref or the default-branch ref does not resolve, a git call fails or times out, or a needed conf key is
+    absent."""
 
 
 def run_git(root, *args):
@@ -237,14 +243,38 @@ def scan_forks(root, specs, cutoff):
     return {p for i, p in enumerate(paths) if graded[str(i)] == "FORKED"}
 
 
-def derive_landings(root, commit, m, names):
-    """{slug: [(sha, subject, RUN.md base)]}, oldest first: the merges on `commit`'s first-parent line whose diff
-    against their first parent touches the build's RUN.md, each with the base its RUN.md carries."""
+def resolve_default_ref(root, default_ref):
+    """(name, commit) of the default branch landings are measured on: `default_ref` as passed, else
+    refs/remotes/<remote>/<branch> as the remote ladder names it. StateError, ending `pass --default-ref <rev>`, when
+    the ladder refuses or names no branch, or the name resolves to no commit; never a fall back to the derived ref."""
+    if default_ref is None:
+        ladder = load_module("build_state_resolve_remote", REPO / LADDER)
+        remote, branch, _, refusal = ladder.resolve_remote(root)
+        if refusal:
+            raise StateError(f"{refusal} Or pass --default-ref <rev>")
+        if not remote or not branch:
+            raise StateError("the remote ladder names no default branch here; pass --default-ref <rev>")
+        name = f"refs/remotes/{remote}/{branch}"
+    else:
+        name = default_ref
+    if name.startswith("-"):
+        raise StateError(f"--default-ref takes a revision, not {name}")
+    if not run_git_ok(root, "rev-parse", "--verify", "--quiet", f"{name}^{{commit}}"):
+        raise StateError(f"the default-branch ref {name} resolves to no commit in {root}; pass --default-ref <rev>")
+    return name, run_git(root, "rev-parse", "--verify", "--quiet", f"{name}^{{commit}}").strip()
+
+
+def derive_landings(root, commit, default_commit, m, names):
+    """{slug: [(sha, subject, RUN.md base)]}, oldest first: the merges on `default_commit`'s first-parent line that
+    `commit` contains and whose diff against their first parent touches the build's RUN.md, each with the base its
+    RUN.md carries."""
+    outside = set(run_git(root, "rev-list", f"{commit}..{default_commit}").split())
     cand = {}
     for b in names:
-        log = run_git(root, "log", "--first-parent", "--merges", "--format=%H%x09%s", commit, "--",
+        log = run_git(root, "log", "--first-parent", "--merges", "--format=%H%x09%s", default_commit, "--",
                       f"{m}/builds/{b}/RUN.md")
-        cand[b] = [tuple(ln.split("\t", 1)) for ln in reversed(log.splitlines()) if "\t" in ln]
+        cand[b] = [tuple(ln.split("\t", 1)) for ln in reversed(log.splitlines())
+                   if "\t" in ln and ln.split("\t", 1)[0] not in outside]
     blobs = read_blobs(root, [(sha, f"{m}/builds/{b}/RUN.md") for b in names for sha, _ in cand[b]])
     return {b: [(sha, subject, read_run_facts(blobs.get((sha, f"{m}/builds/{b}/RUN.md")) or "").get("base"))
                 for sha, subject in cand[b]] for b in names}
@@ -271,12 +301,14 @@ def derive_next(entry, spec_done, landed, parents, claim):
     return {"run": run, "waiting_on": waiting, "state": state}
 
 
-def derive(ref="HEAD", root=".", claims=True, detail=True):
-    """The state document of every build of v2's `[chain]` at `ref`, in row order."""
+def derive(ref="HEAD", root=".", claims=True, detail=True, default_ref=None):
+    """The state document of every build of v2's `[chain]` at `ref`, in row order, its landings measured on
+    `default_ref`, else the remote ladder's default branch."""
     if not run_git_ok(root, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"):
         raise StateError(f"{ref} resolves to no commit in {root}")
     commit = run_git(root, "rev-parse", "--verify", f"{ref}^{{commit}}").strip()
     subject = run_git(root, "log", "-1", "--format=%s", commit).rstrip("\n")
+    default_name, default_commit = resolve_default_ref(root, default_ref)
     deviations, tree_lib, _ = load_kits()
     conf, families, cutoff = read_conf(root, commit)
     m = conf["MEMORY_ROOT"]
@@ -301,7 +333,7 @@ def derive(ref="HEAD", root=".", claims=True, detail=True):
     wanted = [p for b in names for p in files[b]["specs"] + files[b]["runs"] + (files[b]["deviations"] if detail
                                                                                else [])]
     blobs = {p: text or "" for (_, p), text in read_blobs(root, [(commit, p) for p in wanted]).items()}
-    landings = derive_landings(root, commit, m, names)
+    landings = derive_landings(root, commit, default_commit, m, names)
 
     kinds = {}
     entries, spec_done, landed, terminal_not = [], {}, {}, {}
@@ -377,7 +409,8 @@ def derive(ref="HEAD", root=".", claims=True, detail=True):
         e["claim"] = cache.get(e["slug"])
         e["next"] = derive_next(e, spec_done, landed, parents, e["claim"])
     return {
-        "schema": 1, "ref": ref, "commit": commit, "subject": subject, "claims_read": bool(claims),
+        "schema": 1, "ref": ref, "commit": commit, "subject": subject, "default_ref": default_name,
+        "default_commit": default_commit, "claims_read": bool(claims),
         "builds": entries,
         "landed": [e["slug"] for e in entries if e["build_run"]["state"] != "not-landed"],
         "ready": [e["slug"] for e in entries if not e["next"]["waiting_on"] and e["next"]["state"] != "done"],
@@ -403,13 +436,14 @@ def print_bound_expiry():
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Every dClosedLoop chain build's state at a ref, as JSON.")
     ap.add_argument("--ref", default="HEAD")
+    ap.add_argument("--default-ref")
     ap.add_argument("--claims", choices=("cache", "none"), default="cache")
     a = ap.parse_args(argv)
     timer = threading.Timer(DERIVE_BOUND, print_bound_expiry)
     timer.daemon = True
     timer.start()
     try:
-        doc = derive(a.ref, claims=a.claims == "cache")
+        doc = derive(a.ref, claims=a.claims == "cache", default_ref=a.default_ref)
     except ChainError as e:
         print(f"build-state: {e}", file=sys.stderr)
         return 1

@@ -18,8 +18,9 @@ one answer this script and the Atlas read:
     `**Carries:**`, `**Moved:**`, `**Retired:**` and `**Deferred:**` lines. A build's spec phase is DONE when its specs
     carry or release every clause of its row and none is OPEN or SPECCED. Its build phase is DONE when its build run
     has landed, the derivation's build-phase rule: a run record of the build (RUN.md, or a rotated RUN.LANDED.*.md)
-    reads as a build run by README rule 1 at its own `base:`, and a first-parent merge of --ref carried it. A
-    DEFERRED unit of a landed build run is carried forward, never unbuilt.
+    reads as a build run by README rule 1 at its own `base:`, and a merge on the default branch's first-parent line,
+    which --ref contains, carried it (the derivation's THE LANDED PREDICATE). A DEFERRED unit of a landed build run
+    is carried forward, never unbuilt.
   - the run claims `unattended.sh --claims` last cached under `refs/gov/remote/runs/<slug>` (no fetch is made here),
     `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag, and `RESUME_STALE_BOUND` from
     `.unattended.conf`. A `held` claim, or a `live` one whose `beat-utc` is within the bound, pins that build's next
