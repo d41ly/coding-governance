@@ -1,13 +1,15 @@
 # TOOL-dSettledStage-1 — the lander commits a dirty-then-staged change only when the stage holds a diff
 
-**Status:** CLOSED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-build-TOOL-dSettledStage-1-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dSettledStage-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dSettledStage-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dSettledStage-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-brief.md) | research | TOOL-dSettledStage-2 |
+| [2026-11-19-prompt-TOOL-dSettledStage-1-pass-legs-fix.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-pass-legs-fix.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -53,7 +55,7 @@ nothing and the landing goes on to the bar.
 - No change to `.githooks/pre-push`, the merge bar or `tools/run-gates/`.
 - No class gate and no gotcha entry. Gating the dirty-then-stage class is TOOL-dSettledStage-2.
 - No change to the commit sites in `tools/unattended/`. If unit 2's class predicate finds one
-  there, unit 2 records it as a follow-up.
+  there, TOOL-dSettledStage-2 registers it as a follow-up.
 - No new refusal and no new message on the skip. The skip is silent, as the clean-tree path already
   is (section 4).
 - No `--allow-empty` commit, and no new `--no-verify` anywhere.
@@ -307,6 +309,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-19 · initial draft.
+- rev-2 · 2026-11-19 · §3 · the writing-practice leg's pinned-facts arm read `2 records` as an unpinned
+  count; the sentence names TOOL-dSettledStage-2 instead, with no change of meaning, by
+  `2026-11-19-prompt-TOOL-dSettledStage-1-pass-legs-fix`.
 
 ## 10. Reuse audit
 

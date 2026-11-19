@@ -8,7 +8,7 @@
 >
 > **What happened (node d, 2026-11-19, landing 12764ec21):**
 > - `run_regen` rewrote `.governance/instructions.lock`. The regen log said "moved", followed by git's "LF will be replaced by CRLF" warning.
-> - At `tools/push-main.sh:1393`, `git status --porcelain` was non-empty, so the lander ran `git add -A` and then `git commit -q --no-verify ...`.
+> - At `tools/push-main.sh@cd8cf562:1393`, `git status --porcelain` was non-empty, so the lander ran `git add -A` and then `git commit -q --no-verify ...`.
 > - Staging normalized the file back to the committed bytes, so nothing was staged and the commit failed.
 > - The lander printed "push-main: could not commit the regenerated outputs. Aborted (no push)." and exited 1, before the bar.
 > - A plain re-run landed cleanly: bar GREEN 100/100, pushed 9e21ac760..12764ec21.

@@ -1,12 +1,14 @@
 # TOOL-dSettledStage-2 — a commit after a stage nothing tested is gated: a fifth shell-hygiene mode
 
-**Status:** SPECCED · rev-1 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-2 · base 12764ec2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dSettledStage-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-1-brief.md) | research | TOOL-dSettledStage-1 |
+| [2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md](../prompts/2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -21,10 +23,11 @@ product shell source reds instead of aborting a landing.
 
 The brief chose between a scan in `tools/gate-lint/sh_hygiene.py` and a `memory/gotchas/` class.
 Its rule was a scan if its predicate is precise over the real tree, and a gotcha otherwise. The
-probe in §4 ran the predicate over the tree at `12764ec21`. It found 7 sites in 4 files. Every hit
-is a live `git add` followed by a live commit in one scope. None is in quoted text, in a comment or
-in a quoted heredoc. So this unit is the scan: a fifth mode, `--stage-commits`, with its own leg
-and a shrink-only registry.
+probe in §4 ran the predicate over the tree at `12764ec21`.
+It found 7 sites in 4 files, PINNED at `12764ec21`.
+Every hit is a live `git add` followed by a live commit in one scope. None is in quoted text, in a
+comment or in a quoted heredoc. So this unit is the scan: a fifth mode, `--stage-commits`, with its
+own leg and a shrink-only registry.
 
 ## 2. Scope (IN)
 
@@ -97,7 +100,8 @@ and a shrink-only registry.
   `tools/codebase-map/map_lib.py` and commits nowhere, so no Python instance of the class exists
   today.
 - Suites. The leg excludes `*.test.sh`, as the spawn-idiom and temp-name legs do. Every suite builds
-  fixture repositories whose commits stage new files, and the probe read 977 such sites in 54 files.
+  fixture repositories whose commits stage new files.
+  The probe read 977 such sites in 54 files, PINNED at `12764ec21`.
 - A `memory/gotchas/` class. It was the brief's fallback, and the probe in §4 decided against it.
 - A help page. No page under `help/` documents gate-lint. `entry:gate-lint` is a row of
   `memory/project/docs-undocumented.txt`, and the docs leg's members are kits, verbs, hooks and keys,
@@ -141,7 +145,7 @@ PINNED there on 2026-11-19 and DERIVED at observation.
 | Reading | Count | Sites |
 |---|---|---|
 | sources scanned | 75 | — |
-| unchecked, GATED | 7 in 4 files | `tools/push-main.sh` lines 1065, 1347, 1372 and 1396; `tools/unattended/unattended.sh` line 16592; `tools/unattended/pass-tree.sh` line 271; `skills/session-kickoff/card-compaction.fixture.sh` line 44 |
+| unchecked, GATED | 7 in 4 files, PINNED | `tools/push-main.sh` lines 1065, 1347, 1372 and 1396; `tools/unattended/unattended.sh` line 16592; `tools/unattended/pass-tree.sh` line 271; `skills/session-kickoff/card-compaction.fixture.sh` line 44 |
 | admitted | 0 | — |
 | unpaired | 2 in 1 file | `tools/unattended/unattended.sh` lines 2789 and 11434 |
 | empty-ok | 0 | — |
@@ -333,7 +337,7 @@ as an empty declaration. `<base>` is a local `git clone` of gov under `%TEMP%`, 
   `git status --porcelain` test opening an `if`, then `git add -A`, then `git commit -q -m x`. It
   also holds `b.sh` with `if ! git diff --cached --quiet; then` around the same commit. When
   `<sh> --stage-commits <t>/empty.txt <t>/r` runs, it exits 1. Its one finding names `a.sh` with 1
-  `unchecked-stage` site and lists `a.sh:3`. The class lines read 1 unchecked and 1 admitted, and
+  `unchecked-stage` site and lists line 3 of `a.sh`. The class lines read 1 unchecked and 1 admitted, and
   `b.sh` appears in no finding.
   Red when: a copy of `<sh>` whose staged-test step is taken out names `b.sh` as well.
 - **AC2** — When `<sh> --stage-commits <t>/empty.txt <base> tools/push-main.sh` runs, it exits 1. Its
@@ -349,10 +353,10 @@ as an empty declaration. `<base>` is a local `git clone` of gov under `%TEMP%`, 
   `write_staged_change`.
   figure: 4 PINNED from `TOOL-dSettledStage-1` rev-1's S2 and S3; DERIVED at observation.
 - **AC4** — When `<sh> --stage-commits <reg> . ':!*.test.sh' ':!memory/'` runs at `<p2>`, it exits 0.
-  Its OK line counts 3 registered sites in 3 rows, each row's reason prints, and the unpaired list
-  names `tools/unattended/unattended.sh`. The same run with `<t>/empty.txt` exits 1, with 3 sites
-  in 3 files. `grep -n 'stage-commit-sites.txt' .memory-tree.conf` prints the
-  `PROJECT_REGISTRY_EXTRA` line.
+  Its OK line counts 3 registered sites in 3 rows, DERIVED at observation.
+  Each row's reason prints, and the unpaired list names `tools/unattended/unattended.sh`.
+  The same run with `<t>/empty.txt` exits 1, with 3 sites in 3 files, DERIVED at observation.
+  `grep -n 'stage-commit-sites.txt' .memory-tree.conf` prints the `PROJECT_REGISTRY_EXTRA` line.
   Red when: the run with `<reg>` and root `<base>` exits 1, with `tools/push-main.sh` undeclared
   at 4 sites.
   figure: 75 sources, 3 in 3 and 7 in 4 PINNED at `12764ec21` on 2026-11-19; DERIVED at
@@ -408,9 +412,15 @@ none
 
 - rev-1 · 2026-11-19 · initial draft, from the dSettledStage brief's item 3 and the owner's "go, no
   audit". The brief's scan-or-gotcha rule was decided by a probe of the predicate over the tree at
-  `12764ec21`: 7 sites in 4 files, every one a live stage-then-commit. The gate is a fifth
-  `sh_hygiene.py` mode with its own leg, and 3 registered sites in 3 files after unit 1's fix. The
-  temp mode's quote blanker and function-span loop are extracted for the new mode to share.
+  `12764ec21`. It read 7 sites in 4 files, PINNED at `12764ec21`, every one a live stage-then-commit.
+  The gate is a fifth `sh_hygiene.py` mode with its own leg.
+  It registers 3 sites in 3 files after unit 1's fix, DERIVED at observation.
+  The temp mode's quote blanker and function-span loop are extracted for the new mode to share.
+- rev-2 · 2026-11-19 · the pass-leg fix `2026-11-19-prompt-TOOL-dSettledStage-2-pass-legs-fix`, after
+  `864d85d42`. It pins the counts the `pinned-facts` arm read unpinned, `4 files`, `54 files`,
+  `3 rows` and `3 files`, on their own lines in §1, §3, §4's probe table, AC4 and this log. It
+  rewords AC1's fixture line so `positional` reads no citation in it. No meaning, criterion, figure
+  or status moves.
 
 ## 10. Reuse audit
 
