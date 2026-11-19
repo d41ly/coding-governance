@@ -22,7 +22,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   routes this unit. Its staged pass is saved, untracked, as
   `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/TOOL-dWitnessedBar-52-pass.patch`.
   Apply it with `git apply --index`, leaving out the generated indexes (`--exclude` for `memory/LIVE.md`, the
-  build README and `memory/backlog/TOOL.md`, which records commits since have moved) and regenerating them; verify it against the spec as you would your own build, flip the spec to
+  build README, `memory/backlog/TOOL.md` and this spec, whose records region later commits moved) and regenerating them; verify it against the spec as you would your own build, flip the spec to
   `CLOSED`, re-run the index generator, and make the pass commit; its return names the `Decided:` trailer for
   deviation 522. Then run `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD`.
 - Unit 53 consumes from this unit and builds after it.
