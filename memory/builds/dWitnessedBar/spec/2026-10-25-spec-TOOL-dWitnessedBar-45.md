@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-45 — the leg factory runs in a tree with no govkit: its generated row stays gov's, and its adopter verbs import no govkit
 
-**Status:** DEFERRED · rev-3 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -37,15 +37,25 @@ This unit takes the skeptic's corrected fix. It repairs `TOOL-dWitnessedBar-11`.
   prints every skipped entry as one that carries no stage. So a row a `when` skips joins `skipped`, and
   each entry carries its own reason, printed `its when <when> does not hold` for such a row. Observed
   by AC1.
-- **S2** — No import at load. `leg_factory.py` imports only the standard library and its sibling
-  `regen` at module level. govkit is loaded inside the verbs that need it, through one function
-  `load_govkit(root)`, which exits 2 naming the path it looked for when govkit is absent. Observed by AC2.
+- **S2** — No import at load. `leg_factory.py` imports at module level only the standard library and
+  two shipped run-gates siblings: `regen`, and `pass_legs`, whose rule and render unit 11 §4 step 5
+  sets `pass_leg` through. Each of the two imports only the standard library (§4 Evidence). govkit
+  is loaded inside the verbs that need it, through one function `load_govkit(root)`. It finds govkit
+  through the inline `resolve_kit_dir` copy unit 11 §10 carries, as
+  `tools/run-gates/owed_rows.py#load_readers` does. Where govkit is absent it exits 2 with that
+  lookup's `LookupError` line, which names the places looked. Observed by AC2.
 - **S3** — The adopter verbs. Every verb a tree with no govkit runs reads descriptors through
   `regen.read_descriptors` and resolves tokens through `regen.resolve_argv`, and never calls
   `load_govkit`: `--sources` and `--legacy-rows` (`TOOL-dWitnessedBar-28`), and `--conform`, which
-  unit 28 S3 makes a fixed row of an adopter's composition. Under no govkit, `--conform` runs its field
-  arms over the target's descriptors and prints `fresh: not graded here — no govkit`, since the render
-  the `fresh` arm compares is gov's. Observed by AC2 and AC3.
+  unit 28 S3 makes a fixed row of an adopter's composition. Under no govkit, `--conform` runs its other
+  field arms over the `[[gate_leg]]` rows of the target's descriptors. It prints
+  `fresh: not graded here — no govkit`, since the render the `fresh` arm compares is gov's, and
+  `enforces: not graded here — no govkit` (§8 F4). What it does not read there: the registry's
+  `[[exempt_leg]]` rows, which live in `tools/govkit/registry.toml` and never reach an adopter; and
+  the flat entries' descriptors, which the playbook kit lands as `{prefix}/playbook/<entry>.kit.toml`
+  (`tools/playbook/kit.toml`, its flat-entry `[[files]]` rules). `regen.read_descriptors` reads only
+  `*/kit.toml` one directory below the tool root, so it reads none of those descriptors. Observed by
+  AC2 and AC3.
 - **S4** — The gov verbs refuse plainly. `--write`, `--check`, `--list` and `new` call `load_govkit` and,
   in a tree with no govkit, exit 2 with its message, never an import traceback. Observed by AC2.
 
@@ -79,7 +89,20 @@ This unit takes the skeptic's corrected fix. It repairs `TOOL-dWitnessedBar-11`.
   tokens unit 11 §4 step 3 resolves.
 - `regen.py` imports only the standard library at module level and runs `main` only under
   `__main__`, so a sibling may import it; it loads `profile_bar.py` only inside
-  `tools/run-gates/regen.py#resolve_bash`.
+  `tools/run-gates/regen.py#resolve_bash`. `pass_legs.py` imports only the standard library too, and
+  ships: the run-gates descriptor withholds only its evidence file, `pass-leg-evidence.txt`.
+- The inline `resolve_kit_dir` (`tools/run-gates/owed_rows.py#resolve_kit_dir`, the canonical copy
+  in `tools/lib/resolve_kit_dir.py`) raises `LookupError` naming the receipt and the two probe paths
+  it looked in, never a guessed prefix.
+- An adopter holding the playbook kit receives each flat entry's descriptor beside the engine, as
+  `{prefix}/playbook/<entry>.kit.toml` (`tools/playbook/kit.toml`, the rules under its "EVERY FLAT
+  ENTRY'S DESCRIPTOR TRAVELS TOO" comment). It does not receive `core-pending.txt`, which the kit
+  marks `project-owned` and writes empty at the target. At this spec's rev-1 (`dc75b671c`) the
+  playbook kit shipped its own descriptor alone and no flat entry's.
+- Unit 11's `enforces` arm reads gov's principle registry, practice catalogue and pending list
+  (TOOL-dWitnessedBar-11 §4 "The gate"). The registry's `core meta-check` `[[exempt_leg]]` row keeps
+  the leg that grades the same pair at gov, "the principles, legs and pending rows it grades are
+  authored here" (`tools/govkit/registry.toml`, that row's `why`).
 - `run-gates adopter e2e` runs `tools/run-gates/adopt-run-gates.test.sh`, the kit's own adopter suite.
 - govkit is an `[[exempt]]` home and never installed at an adopter (`tools/govkit/registry.toml`, its
   `path = "{prefix}/govkit"` row).
@@ -99,7 +122,8 @@ A `when` naming neither form is a refusal, as a malformed one is today. Neither 
 
 ### Inventory
 
-Minted: the `exists:` form of `when`; `load_govkit`; the `fresh: not graded here — no govkit` line.
+Minted: the `exists:` form of `when`; `load_govkit`; the `fresh: not graded here — no govkit` and
+`enforces: not graded here — no govkit` lines.
 Naming cells: `load_govkit` is asked of `python tools/lexicon/lexicon.py --suggest load_govkit --as
 py.function` at the pass.
 
@@ -132,10 +156,12 @@ govkit selfcheck refuses the factory row's `exists:` `when` until unit 54 S2 lan
 
 - security — no new surface; `exists:` reads a path and runs nothing.
 - perf / scale — one stat per row carrying the form.
-- error / empty / loading states — a gov verb without govkit exits 2 naming the path; `--conform` names
-  the arm it did not grade.
+- error / empty / loading states — a gov verb without govkit exits 2 naming the places it looked;
+  `--conform` names each arm it did not grade.
 - observability — `regen.py --list` names the skipped row.
-- risks — `--conform` at an adopter grades fields only; the line says so.
+- risks — `--conform` at an adopter grades the `[[gate_leg]]` rows of its `*/kit.toml` descriptors
+  only, never the flat entries' copies under the playbook kit or the `fresh` and `enforces` arms; the
+  lines say which arms.
 - testing — AC1 to AC3 by fixture and the adopter suite; the arm of §7 at the close.
 - migration — none.
 - user docs — `tools/run-gates/README.md`'s regen section names the `exists:` form at the pass.
@@ -149,13 +175,14 @@ govkit selfcheck refuses the factory row's `exists:` `when` until unit 54 S2 lan
   stage 1.
   fixture: a scratch target under `%TEMP%/<short-name>`; the tree holds none.
 - **AC2** — When `python -c "import leg_factory"` runs in that scratch tree's run-gates kit directory it
-  exits 0, and `python leg_factory.py --write` there exits 2 naming the govkit path it looked for; once
+  exits 0, and `python leg_factory.py --write` there exits 2 naming the govkit paths it looked in; once
   `TOOL-dWitnessedBar-28` has added `--sources`, the same suite runs it there with no traceback.
   Red when: the module imports govkit at load, so every verb fails with `ModuleNotFoundError`.
 - **AC3** — When `python leg_factory.py --conform` runs in the same scratch tree, it prints
-  `fresh: not graded here — no govkit` and exits 0 over the target's untouched descriptors; in gov's
-  tree it grades `fresh` as unit 11 states.
-  Red when: `--conform` refuses or crashes where govkit is absent, so the fixed row reds every adopter.
+  `fresh: not graded here — no govkit` and `enforces: not graded here — no govkit` and exits 0 over
+  the target's untouched descriptors; in gov's tree it grades `fresh` and `enforces` as unit 11 states.
+  Red when: `--conform` refuses or crashes where govkit is absent, or grades `enforces` against
+  registries the target does not hold, so the fixed row reds every adopter.
 
 ## 7. Gates
 
@@ -185,6 +212,19 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
   alone and the bar reds until unit 54. (b) states unit 54 S2 in two specs, and (c) fails the bar
   every unit passes, veto 1. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3, the one option
   that leaves each spec's scope as written and lands no red. widens: none · relaxes: none
+- **F4 — What does `--conform`'s `enforces` arm do in a tree with no govkit?** Unit 11's gate table
+  grades an empty `enforces` against gov's `core-pending.txt`, and each tag against gov's principle
+  registry and practice catalogue (§4 Evidence). AC1's scratch holds the run-gates kit alone, so none
+  of the three is there. An adopter holding the playbook kit has the two registries but an empty
+  `core-pending.txt` of its own. Options: (a) the arm is gov's, as `fresh` is: under no govkit
+  `--conform` prints `enforces: not graded here — no govkit` and skips it; (b) the arm runs wherever
+  the playbook registries resolve and prints a not-graded line where they do not; (c) the arm runs
+  unconditionally. (c) fails AC3 in AC1's scratch, which holds no registry, so veto 1 discards it.
+  (b) reds an adopter holding the playbook kit on every gov leg unit 11 S6 leaves pending, since that
+  adopter's own `core-pending.txt` is empty. That is the failure AC3's Red-when names, so veto 1
+  discards (b) too. RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor. Its reason
+  matches the one the registry's `core meta-check` row gives for keeping that leg at gov: the pair it
+  grades is authored there. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -198,11 +238,21 @@ New arm: tools/run-gates/adopt-run-gates.test.sh · covers AC1 AC2 AC3 · a scra
   row joins regen's `skipped` list with its own reason, which `print_items` lacks today; govkit
   selfcheck's `when` arm, which refuses `exists:` until unit 54, joins the evidence and the leg line,
   and F3 lands the two units in one merge.
+- rev-4 · 2026-11-19 · S2 · S3 · §4 Evidence, Inventory · §5 · AC2 · AC3 · §8 F4 · §10 · re-grounded at
+  `4e5497fb7` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief, against
+  TOOL-dWitnessedBar-11 rev-6 as the contract. S2's module-level imports now name `pass_legs`, which
+  unit 11 §4 step 5 renders `pass_leg` through. `load_govkit` wraps unit 11's inline
+  `resolve_kit_dir` and exits with its `LookupError` line. S3 states what an adopter's `--conform`
+  does not read: the registry's exempt rows, and the flat-entry descriptors the playbook kit now
+  ships under `{prefix}/playbook/`. Unit 11's `enforces` arm is gov's, as `fresh` is (F4), and AC3
+  observes its line. Every other claim was re-read at HEAD and holds.
 
 ## 10. Reuse audit
 
 The seams extended are `regen.py`'s row condition `check_when` and its shipped reader
 `read_descriptors` with `resolve_argv`, which the factory reuses instead of importing govkit's.
+`load_govkit` reuses the inline `resolve_kit_dir` lookup unit 11 already carries
+(`tools/run-gates/owed_rows.py#load_readers` is the precedent), rather than a second path probe.
 `python tools/codebase-map/reuse_lookup.py "skip a generated row when a gov-only tool is absent"`
 ranked `rows`, `row`, `absent`, `skip`, `extract_row` and `resolve_generated_indexes`; the last is the
 unattended kit's reader of `GENERATED_INDEXES`, rejected in §4, and none of the others conditions a row.
