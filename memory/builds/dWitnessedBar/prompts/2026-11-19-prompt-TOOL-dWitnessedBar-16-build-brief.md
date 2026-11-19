@@ -12,7 +12,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `3fb69a6e7`: the `ratchet` pack in `tools/memory-tree/ratchet.py`, the `conf-scalar-pins` population, the `new at`
   rule for a population the base holds nowhere, `populated` red on an empty armed population), 45 and 54 (the
   `exists:` form of a generated row's `when`, read by regen, lib-unattended and selfcheck alike).
-- The spec is rev-9, re-grounded with unit 14's rev-10 as the contract; read `ratchet.py` as it landed, including its
+- The spec was re-grounded with unit 14's rev-10 as the contract; read `ratchet.py` as it landed, including its
   helper names after the red-fix, and hand back any claim its landed shape breaks as a divergence.
 - Unit 14's F8 reds `populated` on an armed population with no rows until unit 7 lands; a converted file that ends up
   with no rows is red there, not unarmed.
@@ -23,8 +23,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   refuses a pass that declares it. Do not write it in the worktree. Write its converted bytes, exactly as the spec's
   S7 would leave the tracked file, to
   `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/readme-contract.converted.txt`
-  and name that path in your return; the main loop commits it in the commit right after your pass. Every reader you
-  change must accept both the old and the converted file until then.
+  and name that path in your return; the main loop commits it in the commit right after your pass. Only
+  `readme-contract.txt`'s reader keeps the transitional read the spec's F15 names.
+- The spec is rev-11 and builds in TWO passes. THIS pass is pass 1: everything but S12. Leave the spec's status
+  `INPROGRESS` (do not flip it to CLOSED) and say so in your return; after the main loop's conversion commit, a second
+  pass builds S12, deletes the transitional read and closes the spec.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand
   a claim that no longer holds back as a divergence rather than building around it.
@@ -34,7 +37,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - One pass commit, its subject naming `TOOL-dWitnessedBar-16`, its trailer block carrying `Pass: TOOL-dWitnessedBar-16`
   beside the attribution trailer. Stage explicit paths only, never `git add -A`.
 - Commit `memory/builds/dWitnessedBar/RUN.md` with the pass, since `--dispatch` stages rows in it.
-- The spec's status is already `INPROGRESS`; move it to `CLOSED` only in the pass commit, after every edit has landed.
+- The spec's status is already `INPROGRESS`; this pass leaves it there (see the two-pass note above), and the second pass moves it to `CLOSED`.
   Run `python tools/memory-tree/gen_build_index.py --write` after staging and commit every file it rewrites.
 - Write the acceptance ledger
   `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-16-1-acceptance-ledger.md` in the pass commit:

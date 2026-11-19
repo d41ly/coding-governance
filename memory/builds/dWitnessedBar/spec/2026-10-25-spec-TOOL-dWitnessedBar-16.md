@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** INPROGRESS · rev-10 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-11 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -24,6 +24,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md) | journal | TOOL-dWitnessedBar-14 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md) | journal | TOOL-dWitnessedBar-46 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md) | journal | — |
@@ -66,15 +67,23 @@ retrofit.md below, each of its lines cited at that blob).
   populations", never a line number; the count is its count column, else `1`, and a `ceiling` row's
   ceiling. Each header names the fields §4's table spells, and each registration lists in `verbatim`
   the fields that table marks, so every row at the base reads through
-  `tools/lib/legacy_ledger.py#_parse_rows` (§4 "Field names"). Observed by AC2.
+  `tools/lib/legacy_ledger.py#_parse_rows` (§4 "Field names"). A home with no row is written as its
+  header and `# unarmed · dead probe · <base sha>`, the bytes `seed_population` writes for a dead
+  probe (§8 F14). Observed by AC2 and AC13.
 - **S3** — Each registered. One `[[ledger]]` table per population, in the descriptor of the kit whose
   check reads it, carrying every one of `LEDGER_FIELDS` (`tools/lib/legacy_ledger.py#_check_table`):
   the direction its header declares, its `leg` and a `seed` argv among them; the three read
   by kit-less gov tools, the `docs` leg's list (§8 F3) and the lists of two entry descriptors (§8 F9)
   register in `tools/govkit/registry.toml`.
-  `test.seed` (I5), TOOL-dWitnessedBar-15 S1's `python legacy_ledger.py seed --population <name>`, runs
-  at each registration, finds the converted home armed, prints `present <population>` and writes
-  nothing (`tools/lib/legacy_ledger.py#seed_population`). Observed by AC1.
+  Every `seed` this unit writes, S8's two included, is `["python",
+  "{prefix}/memory-tree/convert_registry.py", "read-back", "<population>"]` (§8 F13). `read-back`
+  prints each row of the population's working home as its key fields and count, TAB-joined, the
+  measured rows `tools/memory-tree/ratchet.py#read_seed_rows` parses; where `read_home_state` reads
+  the home absent or unarmed it prints one `dead probe: <home> holds no row` line.
+  `test.seed` (I5), TOOL-dWitnessedBar-15 S1's `python legacy_ledger.py seed --population <name>`,
+  prints `present <population>` at each armed home and writes nothing
+  (`tools/lib/legacy_ledger.py#seed_population`); at F14's unarmed homes it re-runs the seed and
+  rewrites only the state line. Observed by AC1 and AC13.
 - **S4** — Each reader re-pointed. Every reader §4's table names reads rows through the factory's
   `read_rows` and grades through `compare_counts` and `compare_to_base`, keeping its messages and its
   exit codes; no reader keeps a parser of the old grammar. That promise is narrowed where the row
@@ -92,7 +101,8 @@ retrofit.md below, each of its lines cited at that blob).
   of that reader holds, the survivor join and the `lacks its <field> field` refusals included, each
   firing on an empty key field (§8 F12). `check-arms.py#parse_pin` keeps its legacy read of a tracked
   sidecar `unarmed-branches.txt`, which S1's rule does not find and TOOL-dWitnessedBar-51 S17
-  converts (§3 Edges). Observed by AC3 and AC4.
+  converts (§3 Edges). Fourth, `gen_build_index.py#read_contract_rows` keeps S7's transitional read
+  until S12 deletes it. Observed by AC3 and AC4.
   **Readers:** by name: a git grep over `tools/` at 2b0490b8d finds `REASON-OWED` in
   `tools/memory-tree/check-arms.py` (its module docstring, `REASON_OWED`, `check_refusal_sites`,
   `cmd_emit_pin` and the `cmd_selftest` arm staging it), in `tools/memory-tree/README.md` and in
@@ -110,7 +120,10 @@ retrofit.md below, each of its lines cited at that blob).
   no reason is lost (§8 F1). Observed by AC2.
 - **S6** — The two map files take the ledger grammar at `memory/map/baseline.txt` and
   `memory/map/affordance-exempt.txt`, in their own directory, because a TAB row is not TOML; every
-  reader of the old names is re-pointed, check 3's admitted names included (§8 F2). Observed by AC5
+  reader of the old names is re-pointed, check 3's admitted names included (§8 F2). The gap:
+  `tools/codebase-map/test_codebase_map.py@15ab8d82849f:169` passes `baseline.toml` until
+  TOOL-dWitnessedBar-51 S5 re-points it, and F8's adapter answers a name no registration homes with
+  `None` and its reason, so that never-gains test prints `UNGRADED` in the span. Observed by AC5
   and AC11.
   **Readers:** by name: a git grep for the two names over `tools/` at b3b523896 finds
   `tools/codebase-map/map_lib.py` (`load_map_tree`, `load_affordance_exempt`,
@@ -135,8 +148,12 @@ retrofit.md below, each of its lines cited at that blob).
   with its memory-tree and gate-lint copies, which parses TOML, re-pointed per §8 F8.
 - **S7** — `readme-contract.txt` keyed by `path` and `binding` (`bound` or `exempt`), a `declared-set`;
   its `exempt-pin:` line retires and `gen_build_index.py --check-format` refuses an `exempt` row whose
-  path the base's rows did not hold as `exempt`, read through `compare_to_base` (§8 F4). Observed by
-  AC6.
+  path the base's rows did not hold as `exempt`, read through `compare_to_base` (§8 F4); where that
+  answers `None`, a legacy base home included, the exempt compare prints `UNGRADED` with its reason.
+  The main loop commits the converted file after the pass (§3 Edges), so until then
+  `read_contract_rows` reads a home whose first line is not its header through
+  `read_legacy_rows`, the legacy table S10's `convert` reads, in memory (§8 F15).
+  Observed by AC6.
   **Readers:** by name: `tools/memory-tree/gen_build_index.py` (`read_contract_rows`,
   `check_contract_registry`, and its fixtures in `cmd_selftest` and `_build_sc_tree`),
   `tools/memory-tree/adopt-memory-tree.sh` (its `readme-contract.txt` seed),
@@ -190,6 +207,13 @@ retrofit.md below, each of its lines cited at that blob).
   <sha12>` with its row count and graded no further by `never gains`, `seed laundering` and `rename`.
   The two renamed map homes are S14's `new at` as written. What it does not check: a legacy home's
   rows against the converted ones, which AC2 observes. Observed by AC12.
+- **S12** — The transitional read retires. The first pass leaves this spec INPROGRESS. After the main
+  loop's commit of the converted `readme-contract.txt`, a second build pass of this unit deletes
+  S7's transitional read from `gen_build_index.py`, with any fixture staging it, and closes the spec
+  (§8 F15). Observed by AC14.
+  **Readers:** by name: `read_contract_rows` in `tools/memory-tree/gen_build_index.py` and any
+  `cmd_selftest` fixture of S7 staging the legacy file; `read_legacy_rows` itself stays, S10's ·
+  by value: NO VALUE READERS, the read yielding the rows the converted file then holds.
 
 ## 3. Non-goals (OUT)
 
@@ -210,7 +234,7 @@ retrofit.md below, each of its lines cited at that blob).
 - **consumes-from** `TOOL-dWitnessedBar-14` — `retrofit.widen` and its widen route, the only way a converted population grows, its ceiling arm, which takes over the retired `RATCHETS` rows' raise-needs-a-reason rule, and `ratchet.py`'s S14 probe, which S11 extends
 - **hands-off** `TOOL-dWitnessedBar-17` — `RATCHETS` with its `drift_signals.py` rows retired and drift reading pins from the `drift-pins` population, on which the conf pins' rows move
 - **consumes-from** external — TOOL-dSafePassage-1's `[[upgrade]]` row grammar and before-image helpers, landed in `tools/govkit/upgrade_steps.py`, for S10's steps; TOOL-dSafePassage-13's `docs` leg and its list
-- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 21, 22, 36 and 37: the `unarmed-branches.txt` sidecar's conversion, the rename's other carriers and scoped grep, and the `readme-contract.txt` conversion, which this unit's dispatched pass leaves to that unit's main-loop commit, each a scope item of that unit
+- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 21, 22, 36 and 37: the `unarmed-branches.txt` sidecar's conversion, the rename's other carriers and scoped grep, and the `readme-contract.txt` conversion, which this unit's dispatched pass leaves to that unit's main-loop commit, each a scope item of that unit; S32's `{prefix}` resolution, which makes S3's seeds runnable (§8 F13)
 - **hands-off** `TOOL-dWitnessedBar-57` — the exempt file's rename, which unit 47's adopter arm follows under the resolver and ledger minors batch (ids 7, 21)
 
 ## 4. Design
@@ -294,8 +318,9 @@ sites and `supersedes` clause go to the conversion record beside their keys, as 
 .githooks/pre-commit	path-subst	1	<base sha>	seeded
 ```
 
-One commit converts every file, registers every population, re-points every reader and adds every
-`.gitattributes` line, so no tree holds the old grammar beside a new reader. The conversion record
+One commit converts every file but `readme-contract.txt`, registers every population, re-points every
+reader and adds every `.gitattributes` line, so no tree holds the old grammar beside a new reader but
+in S7's transitional read, which S12 deletes. The conversion record
 holds, per population, a table of key and former reason, and the count of rows before and after.
 
 ### Drift
@@ -315,13 +340,17 @@ replays each list's history by counting its rows; the header is a `#` line, so a
 one row per key keeps the low water, and the two ordinal registries' low water falls once, at the
 conversion, to the keyed count. The `docs` leg reads its list's low water through the same function
 (`tools/govkit/docs_leg.py#check_legacy_low_water`), so it holds there too.
+A pin of 0 writes no `drift-pins` row, since a row's count is at least 1
+(`tools/lib/legacy_ledger.py#_parse_rows`). Each zero pin at `c52a74c4d` (DERIVED by importing
+`drift_signals.py`) names a signal whose record already carries tolerance 0, which
+`ctx.pins.get(<signal>, <tolerance>)` in `tools/drift-audit/drift_report.py#main` keeps.
 
 ### Inventory
 
 Minted: the 29 `[[ledger]]` tables (DERIVED from §4's table); `memory/map/baseline.txt` and `memory/map/affordance-exempt.txt`
 in place of the TOML names; `tools/drift-audit/drift-pins.txt` and `drift-baselines.txt` with their
-two registrations; `tools/memory-tree/convert_registry.py` with its verbs `convert`, `up`, `down` and
-`witness` and its legacy-grammar table; the `[[upgrade]]` rows of S10; the conversion record; the
+two registrations; `tools/memory-tree/convert_registry.py` with its verbs `convert`, `up`, `down`,
+`witness` and `read-back`, and its legacy-grammar table read by `read_legacy_rows`; the `[[upgrade]]` rows of S10; the conversion record; the
 `regrammared at` answer and its `regrammared` fixture plant in `ratchet.py` (S11). Naming cells: each function and flag is asked of
 `python tools/lexicon/lexicon.py --suggest <name>` with `--as py.function` or `--as cli.flag` at the
 pass.
@@ -452,9 +481,10 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   through `write_rows`, and under `up` the before-image `upgrade_steps.py` owns.
 - perf / scale — every reader reads one file as before; drift's shrink signal reads 21 lists where it
   read six (DERIVED, §4 "Rollout").
-- error / empty / loading states — an empty population keeps its header and reads `unarmed` until a
-  planted row is seen red (unit 14's `populated`); a header disagreeing with its registration is the
-  factory's refusal.
+- error / empty / loading states — an empty home holds its header and its `# unarmed` state line
+  (§8 F14), which `ratchet (populated)` skips and `ratchet (unarmed)` prints unarmed; a commit giving
+  one a first row deletes that line, and a drain to no row writes it; a header disagreeing with its
+  registration is the factory's refusal.
 - observability — the conversion record's before and after counts per population.
 - risks — a reader whose message quoted a reason now has none to quote; the record keeps it, said in
   S5. The reason refusals S4 names retire, so a new row's reason is held by its widen record and no
@@ -462,7 +492,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   §4 "Drift". A `refusal-retirements.txt` row's survivor is a key field of an append-only
   population, so recording a new survivor rewrites a base row, which `never gains` reds as
   `removed` at that pass; the header's `APPEND-ONLY` already forbade that edit, which no reader graded.
-- testing — AC1 to AC12 by probes, fixtures and scratch clones; the arms in §7 are observed RED then
+  `seed laundering` cannot see a converted row removed while its debt remains (§8 F13).
+- testing — AC1 to AC14 by probes, fixtures and scratch clones; the arms in §7 are observed RED then
   GREEN by the main loop at the close.
 - migration — §4 and S10.
 - user docs — `tools/drift-audit/README.md` replaces its `SHRINK_ONLY`, `PINS` and `BASELINES` rows;
@@ -473,8 +504,9 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 
 - **AC1** — When the rule of S1 is run over `git ls-files memory/project memory/map tools` on the landed
   tree, the two map names read as their `.txt` successors, every path it yields but the three §3 leaves to
-  unit 18, unit 14's `conf-scalar-pins.txt` among them, is the `home` of exactly one registration, `python legacy_ledger.py read <population>` reads each, and each
-  population §4's table names has its row's direction.
+  unit 18, unit 14's `conf-scalar-pins.txt` among them, is the `home` of exactly one registration, `python legacy_ledger.py read <population>` reads each, each
+  registration this unit writes carries S3's `seed`, and each population §4's table names has its
+  row's direction.
   Red when: a registry the rule finds has no registration, so it is graded by no engine.
   figure: the set is DERIVED at observation; 28 is PINNED at `19d6aae6`, 32 PINNED at `05245bf0e` and at `b3b523896`.
 - **AC2** — When the conversion record's before and after tables are compared with
@@ -497,8 +529,10 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - **AC5** — When `git ls-files memory/map/` runs, it lists `baseline.txt` and `affordance-exempt.txt`
   and no `.toml` of either name, and `python tools/codebase-map/gen_map.py --check` exits 0.
   Red when: a reader still opens the TOML name, so the map's baseline reads empty.
-- **AC6** — When retrofit.md's probe runs in a scratch clone: the converted `readme-contract.txt`, a new
-  build README with its `bound` row, then `python tools/memory-tree/gen_build_index.py --check-format`
+- **AC6** — When `python tools/memory-tree/gen_build_index.py --check-format` runs at the first pass
+  over today's legacy `readme-contract.txt`, it exits 0 through S7's transitional read. When
+  retrofit.md's probe runs in a scratch clone whose `origin/main` holds the converted
+  `readme-contract.txt`: a new build README with its `bound` row, then `python tools/memory-tree/gen_build_index.py --check-format`
   and `python ratchet.py never-gains`, both exit 0; with the new row written `exempt`, `--check-format`
   exits 1 naming the path as a new exemption.
   Red when: the exemption shrink rule left with `exempt-pin:` and nothing replaced it.
@@ -534,14 +568,24 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   `--plant home-moved` `never-gains` still exits 1 printing `unresolved`.
   Red when: the conversion's own pass reds until its push lands, or a base home opening with a
   ledger header reads as a legacy one.
+- **AC13** — When `python convert_registry.py read-back spawn-idiom-sites` runs on the landed tree, it prints one line per row of `memory/project/spawn-idiom-sites.txt`, its `path`,
+  `class` and count TAB-joined, and no other line; for `transition-audit` it prints one
+  `dead probe:` line. `python tools/memory-tree/ratchet.py populated` and `ratchet.py unarmed` each
+  exit 0, printing each of §8 F14's homes `unarmed`.
+  Red when: a seed prints what the factory cannot parse, or an empty home reads armed, so
+  `populated` reds the bar.
+  figure: F14's seven homes are PINNED at `c52a74c4d` (2026-11-19).
+- **AC14** — When `git grep -n read_legacy_rows -- tools/memory-tree/gen_build_index.py` runs after
+  S12's second pass, it prints nothing, and `python tools/memory-tree/gen_build_index.py
+  --check-format` exits 0 over the converted file.
+  Red when: the transitional read outlives the conversion, so the reader keeps two grammars.
 
 ## 7. Gates
 
-The `ratchet` pack's legs (unit 14) grade every converted population, the base legs once the push
-lands it (§4 "Rollout"); they are not on the leg line below, which the leg join reads against today's
-manifest.
+The `ratchet` pack's legs (unit 14) grade every converted population: §8 F14's homes read
+`unarmed`, and each in-place home reads `regrammared at` on a base leg until the push lands (S11).
 
-`memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `playbook render selftest` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `routed-commits selftest` · `docs`
+`ratchet (never gains)` · `ratchet (unarmed)` · `ratchet (populated)` · `ratchet (seed laundering)` · `ratchet (rename)` · `ratchet (key shape)` · `ratchet selftest` · `install-prefix (shipped surface)` · `memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `playbook render selftest` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `routed-commits selftest` · `docs`
 
 New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PINS and BASELINES fixtures re-pointed to registrations and the two populations, the failing case staged by a raised `drift-pins` row and a gained `drift-baselines` id · none
 
@@ -615,46 +659,71 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
 - **F10 — How does the codebase-map adopter seed the affordance list once it is a registered
   population?** Since TOOL-dWitnessedBar-15 the adopter runs the factory's unregistered
   `seed --home <map root>/affordance-exempt.toml -- gen_map.py --seed-affordance-baseline --out {out}`
-  (`tools/codebase-map/adopt-codebase-map.sh`), a form `tools/lib/legacy_ledger.py#seed_home`
-  describes for a population not yet in the ledger grammar; its suite's arm 8 seeds a target with
-  nothing staged or committed (`tools/codebase-map/adopt-codebase-map.test.sh`).
-  Options: (a) `seed --population affordance-exempt`, the registration's seed printing the rows;
-  (b) keep `seed --home`, over the `.txt` name and the adopter's own map root, with `--out` writing
-  the ledger grammar that `render_affordance_exempt`, re-pointed by S6, renders. (a) needs a
-  registration `read_registrations` finds only in a tracked descriptor, so on arm 8's target it
-  finds none and `codebase-map adopter e2e`, a leg §7 names, reds: veto 1.
-  RESOLVED (agent, 2026-11-19, delegated): (b), the one survivor; the factory's header check
-  (§5) holds the rendered header to the registration. widens: none · relaxes: none
+  (`tools/codebase-map/adopt-codebase-map.sh`, `tools/lib/legacy_ledger.py#seed_home`), and its
+  suite's arm 8 seeds a target with nothing staged or committed
+  (`tools/codebase-map/adopt-codebase-map.test.sh`). Options: (a) `seed --population
+  affordance-exempt`; (b) keep `seed --home` over the `.txt` name and the adopter's map root, `--out`
+  writing the ledger grammar `render_affordance_exempt` renders (S6). (a) needs a registration that
+  `read_registrations` finds only in a tracked descriptor, none on arm 8's target, so
+  `codebase-map adopter e2e`, a leg §7 names, reds: veto 1. RESOLVED (agent, 2026-11-19, delegated):
+  (b), the one survivor; the factory's header check (§5) holds the rendered header to the
+  registration. widens: none · relaxes: none
 - **F11 — How does the conversion's own pass go green, when unit 14's legs read a legacy base home
-  `unresolved`?** TOOL-dWitnessedBar-14 S14 and AC12, as that spec stands at this re-ground (rev-10),
-  grade `new at` only a population the base holds nowhere, and a base home that does not parse
-  `unresolved`, exit 1. Options: (a) S11, a legacy home at the base read `regrammared at` by one case
-  added to `ratchet.py`'s S14 probe; (b) the same case written into unit 14's S14, an amendment to an
-  INPROGRESS sibling's spec, which this writer does not hold; (c) register the populations one pass
-  after the conversion lands; (d) land red. (c) leaves the converted homes unregistered at the pass,
-  so AC1 fails; (d) fails the bar §7 reads; veto 1 each. Of (a) and (b), (a) leaves no question open
-  here. RESOLVED (agent, 2026-11-19, delegated): (a); should the main loop fold (b) into unit 14 while
-  it is open, S11 and AC12 leave this spec. widens: none · relaxes: unit 14 S14's `unresolved` for a
-  base home holding no ledger header
+  `unresolved`?** TOOL-dWitnessedBar-14 S14 and AC12 grade `new at` only a population the base holds
+  nowhere, and a base home that does not parse `unresolved`, exit 1. Options: (a) S11, a legacy base
+  home read `regrammared at` by one case added to `ratchet.py`'s S14 probe; (b) the same case written
+  into unit 14's spec, which this writer does not hold; (c) register the populations one pass after
+  the conversion, so AC1 fails; (d) land red, failing the bar §7 reads. (c) and (d) fail veto 1.
+  RESOLVED (agent, 2026-11-19, delegated): (a), which leaves no question open here. widens: none ·
+  relaxes: unit 14 S14's `unresolved` for a base home holding no ledger header
 - **F12 — What does a reader keep of a field it grades that is neither a key column nor a count?**
-  The first builder's return (`2026-11-19-build-TOOL-dWitnessedBar-16-1-builder-return`) found
-  `tools/memory-tree/check-arms.py#check_retirements` grading each row's R1 to R4, its survivor
-  file, the survivor's signature join and its replay. Rev-9's key `unit, path, check` dropped all of
-  them, and the `check-arms selftest` arms in `check-arms.py#cmd_selftest` plant a row whose survivor
-  lacks its signature, or which lacks its survivor or replay. The same reader, and others S4 names,
-  also grade or print a row's reason. Options: (a) every such field into the record by F1, the
-  survivor join and its arms retiring with a §5 risk line; (b) survivor, signature and replay as
-  verbatim key fields, R1 to R4 into the record, retiring the four `lacks its R<k> field` refusals;
-  (c) every field `check_retirements` grades as a key field, R1 to R4 included, verbatim where
-  §4 "Field names" marks it, with reasons still in the record by F1; (d) reasons as key fields too.
-  (d) fails AC3 and AC4, veto 1: a counted reader's scan measures keys that carry no reason, so
-  `compare_counts` would read every row `unmeasured` and every site `undeclared`. (a) retires the
-  survivor join, which is the only check that a retired refusal still refuses somewhere, and it
-  narrows a §7 leg's arms. (c) keeps every message of that reader but the one about grammar (S4).
-  It needs no scan, because `refusal-retirements.txt` is a record population that `check_retirements`
-  joins and never counts. It edits nothing, because the population is append-only. RESOLVED (agent,
-  2026-11-19, delegated): (c), the most feature-rich survivor; reasons stay F1's. widens: none ·
-  relaxes: the reason refusals S4 names, retired with F1's reason column
+  `tools/memory-tree/check-arms.py#check_retirements` grades each row's R1 to R4, its survivor file,
+  the survivor's signature join and its replay, and `check-arms.py#cmd_selftest` plants a row whose
+  survivor lacks its signature, or which lacks its survivor or replay; rev-9's key `unit, path,
+  check` dropped them all (`2026-11-19-build-TOOL-dWitnessedBar-16-1-builder-return`). That reader,
+  and others S4 names, also grade or print a row's reason. Options: (a) every such field into the
+  record by F1, the survivor join retiring; (b) survivor, signature and replay as verbatim key
+  fields, R1 to R4 into the record; (c) every field `check_retirements` grades as a key field,
+  verbatim where §4 "Field names" marks it, reasons still F1's; (d) reasons as key fields too.
+  (d) fails AC3 and AC4, veto 1: a counted reader's scan measures keys carrying no reason, so
+  `compare_counts` would read every row `unmeasured`. (a) retires the only check that a retired
+  refusal still refuses somewhere. (c) needs no scan and edits nothing, since `check_retirements`
+  joins and never counts this append-only population. RESOLVED (agent, 2026-11-19, delegated): (c),
+  the most feature-rich survivor; reasons stay F1's. widens: none · relaxes: the reason refusals S4
+  names, retired with F1's reason column
+- **F13 — What does each registration's `seed` run?** `seed_population` writes nothing for
+  `seed = []`, `ratchet.py#run_unarmed` reds such a registration whose home holds rows, and
+  `ratchet.py#run_seed_laundering` runs the seed when a base row leaves; no reader §4 names prints
+  keyed rows (`2026-11-19-build-TOOL-dWitnessedBar-16-2-builder-return`). Options: (a) a measure
+  mode in each reader, a new public surface per shipped tool (veto 2); (b) one `read-back` verb on
+  the `convert_registry.py` this unit mints, printing the home's own rows; (c) `seed = []` (veto 1).
+  A literal kit path in the argv adds an `install-prefix (shipped surface)` offender per registration
+  (veto 1), so it spells `{prefix}`, which the landed `run_seed_argv` leaves literal until
+  TOOL-dWitnessedBar-51 S32; a seed run exits non-zero until then, and until this build's push the
+  base holds each legacy home, which S11 grades no further. RESOLVED (agent, 2026-11-19, delegated):
+  (b), the one survivor. What it does not check: the seed shares its home's state, so
+  `seed laundering` never sees a removed row; each reader's leg grades that where it measures (AC4),
+  and `never gains` for an append-only population. widens: none · relaxes: `seed laundering`'s
+  removal arm over these populations
+- **F14 — What is a converted home holding no row?** Seven are empty at `c52a74c4d` (PINNED,
+  2026-11-19): `corpus-path-unresolved.txt`, `id-orphan-waiver.txt`, `location-probe-waivers.txt`,
+  `stale-header-waiver.txt`, `transition-audit.txt`, `lexicon-suffix-waivers.txt` and
+  `lexicon-verb-waivers.txt`. Options: (a) the header alone, which `ratchet.py#run_populated` reds
+  as `empty` until unit 7 lands; (b) the header and `# unarmed · dead probe · <base sha>`, which
+  `run_populated` skips and `run_unarmed` prints `unarmed`; (c) no registration, failing AC1. (a)
+  fails the bar §7 reads and (c) AC1, veto 1 each. RESOLVED (agent, 2026-11-19, delegated): (b), the
+  one survivor. widens: none · relaxes: none
+- **F15 — How is `readme-contract.txt` read across the main loop's conversion commit?** `--dispatch`
+  refuses the file to the pass (TOOL-dWitnessedBar-51 S22), yet the pass legs run before the main
+  loop's commit (M6) and the builder's `gen_build_index.py --write` reads it. Options: (a) S7's
+  transitional read, deleted by S12's second pass, the spec INPROGRESS between, since the scratch
+  guard refuses a CLOSED unit's writes (`tools/unattended/unattended.sh@6386416b1626:9133-9137`);
+  (b) the same read, its deletion handed to TOOL-dWitnessedBar-51, whose spec this writer does not
+  hold; (c) no transitional read, which reds the pass; (d) an old-grammar parser in
+  `gen_build_index.py`, which S4 and AC3 refuse. (c) and (d) fail veto 1. RESOLVED (agent,
+  2026-11-19, delegated): (a), the most feature-rich survivor, holding S4 and AC3 at this unit's
+  close with no follow-up on another spec. widens: none · relaxes: S4's one grammar per reader,
+  until S12's pass
 
 ## 9. Revision log
 
@@ -705,6 +774,13 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   registers under `_check_table`, with `verbatim` fields declared. `refusal-retirements.txt` keys every
   field `check_retirements` grades (F12). S4 is narrowed in words for reason, ordinal and grammar
   messages, and for the sidecar left to unit 51. No Goal or Scope intent moved.
+- rev-11 · 2026-11-19 · S2 · S3 · S4 · S6 · S7 · S12 (new) · §3 Edges · §4 The conversion, Drift,
+  Inventory · §5 · AC1 · AC6 · AC13 AC14 (new) · §7 · §8 F10 F11 F12 · F13 F14 F15 (new) · §10 · per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer, over the second builder's divergence at
+  `6f80e4e8e`: every seed is the `read-back` argv (F13); the seven empty homes are written unarmed
+  (F14); `readme-contract.txt` is read transitionally until a second pass deletes that read (F15);
+  the map test's `UNGRADED` gap and drift's zero pins are stated; F11 drops its stale conditional on
+  an open unit 14; F10 to F12 tightened in wording, no claim moved. No Goal moved.
 
 ## 10. Reuse audit
 
@@ -714,7 +790,9 @@ and `compare_counts` the adapters `tools/gate-lint/sh_hygiene.py#read_registry` 
 other registry parser §4 names; drift's
 `signal_shrink_only` and `tools/drift-audit/drift_report.py#derive_low_waters` are kept and
 re-fed from the registrations. S10's step programs follow `tools/govkit/steps/review_rounds.py`'s
-shape over `upgrade_steps.py`'s before-image helpers, minting no second step runner. The adopters'
+shape over `upgrade_steps.py`'s before-image helpers, minting no second step runner. `read-back`
+reads through the factory's `read_ledger`, and `read_legacy_rows` is the one legacy parser that
+`convert` and S7's transitional read share. The adopters'
 seeds stay on unit 15's `tools/lib/legacy_ledger.py#seed_home` (§8 F10). `python tools/codebase-map/reuse_lookup.py "convert waiver and exemption registry files to one keyed row grammar and re-point their readers"`
 ranked generic stems (`rows`, `read`, `key`, `grammar`) and no conversion seam, which agrees with
 source: nothing converts a registry today. Scout C's reader list agrees with `git grep` over each file
