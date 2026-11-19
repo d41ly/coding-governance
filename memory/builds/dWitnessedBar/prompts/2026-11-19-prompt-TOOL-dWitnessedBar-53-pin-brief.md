@@ -18,8 +18,8 @@ Revise the spec named here in place, as a rev bump with one revision-log line na
 
 ### Items
 
-1. The checker printed, on 2026-11-19 at `da9345429`: `unpinned fact `6 rows`: pin it on its line (an id, a
-   path:line, PINNED or DERIVED)`. The fact sits in §2's probe paragraph, on the line that begins "After the commit,
+1. The checker printed, on 2026-11-19 at `da9345429`: an unpinned-fact red on
+   the re-seed's row count, pin missing from its line. The fact sits in §2's probe paragraph, on the line that begins "After the commit,
    with those homes removed"; its PINNED mark wrapped onto the next line. Put a pin on the fact's own line, or rewrap
    the sentence so the existing mark lands on it.
 2. Change nothing else. The status header keeps its status; bump only the rev.

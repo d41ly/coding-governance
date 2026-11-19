@@ -18,6 +18,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-2-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-3-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-3-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 |
