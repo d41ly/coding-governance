@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg
 
-**Status:** INPROGRESS · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 5 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0350@37beff65 whole
 **Carries:** node:tag-namespace.leg
@@ -22,6 +22,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-brief.md) | journal | TOOL-dWitnessedBar-61 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-12-reground-spec-writer.md) | journal | — |
@@ -76,9 +77,11 @@ record measured them, and no leg carries a tag today: `grep -c '"tag"' tools/gat
 - **S6** — govkit selfcheck 7h's both-ways join (`tools/govkit/govkit.py#selfcheck`, its `7h` block)
   gains `tag`: a descriptor row and its manifest row carry the same tag. Observed by AC7.
 - **S7** — The gov canary `tools/run-gates/run-gates.gov.test.sh` asserts every row of gov's own
-  manifest carries a `tag` in the `leg` namespace and no two rows share one. Observed by AC1.
+  manifest carries a `tag` in the `leg` namespace and no two rows share one. It is the one check
+  that reds a duplicated leg tag (§8 F10). Observed by AC1.
 - **S8** — The fixture plants, on PLAY-dOrderedCharter-19 S13's
-  `gov_tag.py --fixture --plant <case>`: `leg-rows`, `leg-dup`, `pack-rows` and `check-rows`.
+  `gov_tag.py --fixture --plant <case>`: `leg-rows`, `pack-rows` and `check-rows`, each a row of the
+  playbook-render selftest's `run_plant_rows` heredoc in `tools/playbook/adopt-playbook.sh`.
   Observed by AC3 and AC4.
 - **S9** — `help/tags.md`'s namespace table gains the `leg`, `pack` and `check` rows, and its
   sentence counting the registered namespaces reads the registry's count after the pass. Observed by
@@ -229,7 +232,7 @@ The run-gates kit's version moves at this pass, and `LEG_KEY_FLOORS["tag"]` is t
 
 Minted: the leg tags, one per manifest row, the `[[namespace]]` rows `leg`, `check` and `pack`, `extract_leg`,
 `extract_pack`, `extract_check`, `derive_kit_rows`, the `[[numbered_check]]` descriptor table and its
-`ROW_TAG_KEYS` entry, `LEG_KEYS`, `LEG_KEY_FLOORS`, the gov canary's tag arm, the four plants. Naming
+`ROW_TAG_KEYS` entry, `LEG_KEYS`, `LEG_KEY_FLOORS`, the gov canary's tag arm, S8's plants. Naming
 cells: `extract_leg`, `extract_pack`, `extract_check` and `derive_kit_rows` each read `OK` from the
 lexicon's `--suggest` under `--as py.function` (asked 2026-11-19). `LEG_KEY_FLOORS` has no cell: the
 lexicon declares `js.function`, `js.type`, `py.function`, `py.type` and `sh.function`, and refuses
@@ -251,25 +254,41 @@ through `apply` or `update` above the floor.
 - `tools/playbook/namespaces.toml`
 - `tools/playbook/tag_index.py`
 - `tools/playbook/gov_tag.py`
+- `tools/playbook/adopt-playbook.sh` (S8's plant rows)
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
 - `help/tags.md`
-- the 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a30a26466`):
-  `tools/branch-reconcile/kit.toml`, `tools/codebase-map/kit.toml`, `tools/drift-audit/kit.toml`,
-  `tools/gate-lint/kit.toml`, `tools/lexicon/kit.toml`, `tools/loop/kit.toml`,
-  `tools/memory-recall/kit.toml`, `tools/memory-tree/kit.toml`, `tools/playbook/kit.toml`,
-  `tools/policy/kit.toml`, `tools/process-monitor/kit.toml`, `tools/roles/kit.toml`,
-  `tools/run-gates/kit.toml`, `tools/runlog/kit.toml`, `tools/unattended/kit.toml`,
-  `tools/workflows/kit.toml`,
-  `tools/govkit/entries/check-agent-cap-restatement.kit.toml`,
-  `tools/govkit/entries/check-install-prefix.kit.toml`,
-  `tools/govkit/entries/check-kit-versions.kit.toml`,
-  `tools/govkit/entries/check-line-length.kit.toml`,
-  `tools/govkit/entries/check-microformats.kit.toml`,
-  `tools/govkit/entries/check-placeholders.kit.toml`,
-  `tools/govkit/entries/check-testsuite-counts.kit.toml`,
-  `tools/govkit/entries/check-wiring.kit.toml`, `tools/govkit/entries/kickoff-manifest.kit.toml`,
-  `tools/govkit/entries/push-main.kit.toml`, `tools/govkit/entries/settings-merge.kit.toml`
+
+The 27 descriptors carrying `[[gate_leg]]` rows (PINNED 2026-11-19 at `a30a26466`; DERIVED again
+2026-11-19 at `d832ccb37`, 70 rows, the same set):
+
+- `tools/branch-reconcile/kit.toml`
+- `tools/codebase-map/kit.toml`
+- `tools/drift-audit/kit.toml`
+- `tools/gate-lint/kit.toml`
+- `tools/lexicon/kit.toml`
+- `tools/loop/kit.toml`
+- `tools/memory-recall/kit.toml`
+- `tools/memory-tree/kit.toml`
+- `tools/playbook/kit.toml`
+- `tools/policy/kit.toml`
+- `tools/process-monitor/kit.toml`
+- `tools/roles/kit.toml`
+- `tools/run-gates/kit.toml`
+- `tools/runlog/kit.toml`
+- `tools/unattended/kit.toml`
+- `tools/workflows/kit.toml`
+- `tools/govkit/entries/check-agent-cap-restatement.kit.toml`
+- `tools/govkit/entries/check-install-prefix.kit.toml`
+- `tools/govkit/entries/check-kit-versions.kit.toml`
+- `tools/govkit/entries/check-line-length.kit.toml`
+- `tools/govkit/entries/check-microformats.kit.toml`
+- `tools/govkit/entries/check-placeholders.kit.toml`
+- `tools/govkit/entries/check-testsuite-counts.kit.toml`
+- `tools/govkit/entries/check-wiring.kit.toml`
+- `tools/govkit/entries/kickoff-manifest.kit.toml`
+- `tools/govkit/entries/push-main.kit.toml`
+- `tools/govkit/entries/settings-merge.kit.toml`
 
 ### Alternatives rejected
 
@@ -286,8 +305,13 @@ through `apply` or `update` above the floor.
 - perf / scale — three extractors over one JSON and the descriptors; the index re-parses only
   changed blobs.
 - error / empty / loading states — `check` prints `unarmed` while no `[[numbered_check]]` row exists,
-  never green; a duplicate or malformed tag reds the gov canary naming both rows.
-- observability — `gov_tag.py check` prints each namespace's member count.
+  never green; a duplicate or malformed tag reds the gov canary naming both rows. What `check` does not
+  check: two rows sharing one `leg` tag, since no red site it reaches compares one defining row's tag
+  against another's (§8 F10), so a duplicate in a manifest other than gov's own is red nowhere.
+- observability — `gov_tag.py check` counts S2's namespaces and their members in its totals line,
+  `tags: <n> namespaces, <n> tags, …`, and prints `tags: join check · unarmed …` and
+  `tags: unarmed check (…)` while `check` declares nothing (`tools/playbook/gov_tag.py#run_check`). It
+  prints no per-namespace member count; `where` and `refs` address one member.
 - risks — the `check` namespace is empty at landing; an adopter below the floor carries no tags,
   so a selection by `leg.*` there selects nothing until it updates. `extract_check` takes the
   descriptor's `id` as `extract_command` does, so a policy kit `[[numbered_check]]` row would mint
@@ -315,10 +339,10 @@ through `apply` or `update` above the floor.
   Red when: a row is missing, so a `leg.*` tag reads `namespace not registered`, or the help page
   omits one.
   figure: 3 is DERIVED from S2's three rows.
-- **AC3** — When `python gov_tag.py --fixture --plant leg-rows` runs, the index holds the fixture's
-  `leg.gate-lint.shell-hygiene` member; under `--plant leg-dup`, two rows with one tag, `check`
-  exits 1 naming the tag.
-  Red when: `extract_leg` reads the `name` instead of the `tag`, or a duplicate passes.
+- **AC3** — When `python gov_tag.py --fixture --plant leg-rows` runs, `where` resolves the fixture's
+  `leg.gate-lint.shell-hygiene` member to its manifest row and `check` exits 0, the plant printing
+  both exits on one line, as `loop-rows` does. A duplicated tag is AC1's, on the gov canary (§8 F10).
+  Red when: `extract_leg` reads the `name` instead of the `tag`, so `where` resolves no row.
 - **AC4** — When `python gov_tag.py --fixture --plant pack-rows` runs, a fixture manifest whose rows
   carry `"pack": "tags"` twice and `"pack": "ratchet"` once yields exactly `pack.tags` and
   `pack.ratchet`; under `--plant check-rows`, two kits each declaring `[[numbered_check]]` with
@@ -348,7 +372,7 @@ through `apply` or `update` above the floor.
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC5 · both key-set arms reading `LEG_KEYS`, and `owed_rows.py --selftest` reading it, staged by `tag` cut from it · that suite's arm count
 New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 · the tag presence and uniqueness arm, staged by one duplicated tag · that suite's arm count
-New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the playbook-render selftest runs `gov_tag.py --fixture` under the four plants, staged by `leg-dup` · none
+New arm: tools/playbook/adopt-playbook.sh · covers AC3 AC4 · the playbook-render selftest runs `gov_tag.py --fixture` under S8's plants, its `run_plant_rows` rows, staged by `extract_leg` reading each row's `name`, which reds the `leg-rows` row · none
 New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 7h's tag join, staged by the floor table entry removed · none
 
 ## 8. Open questions
@@ -436,6 +460,19 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   `tools/playbook/tag_index.py#derive_extractor_versions` hashes as the index's cache key, so a policy
   kit check row is refused on arrival rather than respelled (§5). RESOLVED (agent, 2026-11-19, delegated): (a), rung 3, the only
   option that keeps the form and both rules. widens: none · relaxes: none
+- **F10 — Which check reds two manifest rows sharing one `leg` tag?** rev-6's AC3 asked `check` to,
+  but the first builder's return (`2026-11-19-build-TOOL-dWitnessedBar-12-1-builder-return`) found no
+  red site `run_check` reaches that compares one defining row's tag against another's:
+  `tools/playbook/tag_index.py#check_namespace_joins` keeps a tag's first declaration
+  (`declared.setdefault`), `tools/playbook/gov_tag.py#run_name_check` grades `sorted(set(tags))`, and
+  the `two-paths` plant holds one tag defined at two paths legal. Options: (a) a duplicate-definition
+  arm in `check` for the `leg` namespace alone; (b) the same arm over every namespace; (c) the gov
+  canary's tag arm alone (S7), observed by AC1, with AC3 keeping its extractor half and the `leg-dup`
+  plant dropped. (a) and (b) each change the shape or join check, which §3 rules out as
+  PLAY-dOrderedCharter-19's and -10's, so veto 1 discards both; (b) would also red what `two-paths`
+  holds legal. (c) leaves a duplicate in a manifest other than gov's own red nowhere (§5).
+  Recommendation (c). RESOLVED (agent, 2026-11-19, delegated): (c), rung 3, the one option §3 leaves
+  standing. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -471,13 +508,20 @@ New arm: tools/govkit/selftest.py · covers AC6 AC7 · the `tag` floor pair and 
   run-gates README and `help/tags.md` (S9), and the leg line gains the legs they trip or that grade
   the rows; `LEG_KEY_FLOORS`' naming cell is undeclared; citations re-pinned as `path#symbol` or
   blob-pinned.
+- rev-7 · 2026-11-19 · §2 §4 §5 §6 §7 §8 §10 · S7 S8 · AC3 · F10 · per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-12-2-spec-writer, over the first builder's divergence: AC3's
+  duplicate half moves to the gov canary arm AC1 observes (F10) and the `leg-dup` plant is dropped;
+  Files touched gains `tools/playbook/adopt-playbook.sh`, whose `run_plant_rows` heredoc takes the
+  plant rows, and lists each descriptor (27, DERIVED at `d832ccb37`) as its own bullet; §5's
+  observability line states what `run_check` prints; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended are PLAY-dOrderedCharter-19's registry, index and fixture and
 PLAY-dOrderedCharter-10's extractor module and shape check, landed since `cdfbd1cf` as
 `tools/playbook/namespaces.toml`, `tools/playbook/tag_index.py` and `tools/playbook/gov_tag.py`
-(`tools/playbook/gov_tag.py#build_tags_fixture` holds the plants); the descriptor-row extractor
+(`tools/playbook/gov_tag.py#build_tags_fixture` holds the plants, and the playbook-render selftest's
+`run_plant_rows` heredoc in `tools/playbook/adopt-playbook.sh` runs them); the descriptor-row extractor
 `tools/playbook/tag_index.py#extract_command`, whose body becomes the factory `extract_check` shares
 ([reuse], second instance), with `tools/playbook/tag_index.py#derive_tag_rows` and its
 `ROW_TAG_KEYS` map; the canary's two key-set literals and their landed reader
