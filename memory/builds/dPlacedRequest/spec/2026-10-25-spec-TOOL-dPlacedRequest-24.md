@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly
 
-**Status:** INPROGRESS · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-8 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,8 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-24-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-24-1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-24-divergence-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-24-divergence-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
@@ -27,12 +29,12 @@ The spec audit of this build, round 1
 confirmed **finding 56 at HIGH**, its item **H9**. `TOOL-dPlacedRequest-1` §4 "The offline queue"
 has every successful read in every session on the node read, push and rewrite
 `<git-common-dir>/gov-queue.log` line by line, with no lock and no idempotence key. Two concurrent
-flushes push one commit, and the loser prints a false `yield` with a `lease-yielded` health event;
-each rewrites the file from its own read and can drop a line appended between, losing a queued
-acquisition; and re-running an offline acquire queues a second line for one ref and tip, which yields
-spuriously. This unit repairs `TOOL-dPlacedRequest-1`: the queue is read and rewritten only under a
-node lock, a line is appended once per ref and cached tip, and a lost push whose remote tip is the
-queued commit is a landing, not a yield.
+flushes push one commit; the loser's update fails as `[remote rejected]`, so its line is kept (rc 2)
+and its next flush reads `[up to date]` and resolves it as `flushed` (§4 Evidence, PINNED
+2026-11-19). But each rewrites the file from its own read and can drop a line appended between,
+losing a queued acquisition; and re-running an offline acquire queues a second line for one ref and
+tip, which yields spuriously. This unit repairs `TOOL-dPlacedRequest-1`: the queue is read and
+rewritten only under a node lock, and a line is appended once per ref and cached tip.
 
 The lock is the second node-local lock this build mints, after `TOOL-dPlacedRequest-13`'s
 `gov-feed.lock`, so it is built as one factory both take, carrying the guarded stale break the
@@ -79,10 +81,6 @@ deleted claim-push lock had (charter rule `[reuse]`).
   then takes the lock again, re-reads the file, and rewrites it without exactly the lines it resolved,
   so a line appended during the pushes is kept. A lock it cannot take skips this flush with one
   `queue: NOTE -` line, and the next successful read flushes. Observed by AC4.
-- **S5** — A lost push that landed is landed. When `write_gov_ref` returns 1 for a queued line, one
-  bounded `ls-remote` of the ref through `observe_remote` reads the remote tip: equal to the queued
-  commit, the line is resolved as landed, with no `yield` line and no `lease-yielded` event; any other
-  tip is today's `yield`. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -124,6 +122,14 @@ deleted claim-push lock had (charter rule `[reuse]`).
 - `TOOL-dPlacedRequest-11` S6 deletes `write_claim`'s take of `claim-push.lock` and the lander's wait,
   and keeps the factory; `TOOL-dPlacedRequest-13` §4 step 1 re-specifies an unguarded break for the
   feed, which S2 replaces with the factory.
+- The fact the flush rests on, PINNED 2026-11-19 by a probe of git 2.54.0 against a scratch bare
+  origin (builder run `wf_495a7364-a80`): `git push --porcelain --force-with-lease=<ref>: origin
+  <c>:<ref>` with the remote ref already at `<c>` exits 0 and prints `=` and `[up to date]`, because
+  git tests up to date before the lease, and prints `[rejected] (stale info)` only when the remote
+  tip is a different commit; `write_gov_ref` (`tools/lib/gov-ref.sh#write_gov_ref`) reads a line not
+  opening with `!` as rc 0, `(stale info)` as rc 1 and any other refusal, `[remote rejected]`
+  included, as rc 2. So a loser of two concurrent flushes keeps its line and its next flush prints
+  `flushed`, and no path prints a false `yield`.
 
 ### The queue under the lock
 
@@ -138,7 +144,7 @@ write_gov_queue
   lock; snapshot = every line; unlock
   for each line, oldest first:  write_gov_ref ref tip commit   (no lock held)
     rc 0 -> resolved
-    rc 1 -> ls-remote ref == commit ? resolved (landed) : resolved (yield, health event)
+    rc 1 -> resolved (yield, health event)
     rc 2 -> kept
   lock; rewrite = file now, less the resolved lines; unlock
 ```
@@ -189,14 +195,17 @@ Moved, not minted: the `write_dir_lock` family, `read_proc_token` and `check_pro
 ## 5. Production-readiness checklist
 
 - security — no new surface: both files stay in the common dir and are never pushed.
-- perf / scale — two lock takes per flush and one per append, each a `mkdir`; one `ls-remote` per lost
-  push only.
+- perf / scale — two lock takes per flush and one per append, each a `mkdir`.
 - error / empty / loading states — a busy lock refuses an append with exit 2 and skips a flush with a
   NOTE; an empty queue flushes nothing.
 - observability — `queued — already`, the NOTE lines and the two renamed health events.
 - risks — the factory keeps its stated blind spots (the comment above
   `tools/unattended/unattended.sh#check_dir_lock_stale`): four writers in one window around a stalled
-  breaker, and a wall-clock step.
+  breaker, and a wall-clock step. And `tools/run-gates/post-merge.sh` runs under `set -u` with no
+  `ROOT` and no `add_health_event`, so the moved factory's stale-break path, which calls
+  `add_health_event "$(resolve_health_log "$ROOT")"` (`tools/unattended/unattended.sh#write_dir_lock`),
+  reaches those unset names there until `TOOL-dPlacedRequest-36` lands; S1 already defers that
+  carrier's event log path to that unit.
 - testing — the probes of §6 and the arm in §7.
 - migration — none: the queue and the lock are new in this build.
 - user docs — `memory/guides/UNATTENDED-STOPS.md` section 7; `help/loop.md` anchors the driver's verbs beside its `--claims` paragraph, and this unit adds no verb.
@@ -208,11 +217,7 @@ The fixture is `TOOL-dPlacedRequest-1` AC7's scratch clone and bare origin, `RUN
 - **AC1** — When the origin is renamed away and `--lease acquire build tOff` runs twice, the second
   prints `queued — already` and `grep -c '' gov-queue.log` prints 1.
   Red when: a re-run offline acquire queues a second line for one ref and tip.
-- **AC2** — When the origin is restored with its `refs/gov/leases/tOff/build` planted at the queued
-  commit and `--lease flush` runs, it exits 0, prints no `yield`, the health log gains no
-  `lease-yielded` line and `gov-queue.log` is empty; with the ref planted at another commit, it prints
-  `yield`.
-  Red when: a push another flush already landed is reported as lost.
+- Removed at rev-8, the criterion once labelled AC2: its S5 trigger, a lost push whose remote tip is the queued commit, cannot occur (§4 Evidence).
 - **AC3** — When a probe holds `gov-queue.lock` with a live `until` and calls `add_gov_queue`, the call
   exits 2 within 6 s printing `gov-queue.lock` and the file is unchanged. When the probe instead wraps
   `write_dir_lock`, the original kept under another name by `eval` of `declare -f`, so each call
@@ -247,7 +252,7 @@ The fixture is `TOOL-dPlacedRequest-1` AC7's scratch clone and bare origin, `RUN
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the queue arms over a planted lock, a planted landed tip and a stub writer, staged against `TOOL-dPlacedRequest-1`'s unlocked queue · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 · the queue arms over a planted lock and a stub writer, staged against `TOOL-dPlacedRequest-1`'s unlocked queue · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -287,6 +292,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   `write_dir_lock_wait`, the one retrying take its two locks and unit 49 S25 call; finding 16 (M7),
   the user-docs line names `help/loop.md`, which anchors the driver's verbs; finding 17 (M8), this
   unit's own pass regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- rev-8 · 2026-11-19 · §1 · §2 S5 · §4 Evidence, The queue under the lock · §5 · §6 AC2 · §7 · folds
+  `2026-11-19-prompt-TOOL-dPlacedRequest-24-divergence-brief`, the builder's DIVERGENCE of run
+  `wf_495a7364-a80`: git 2.54.0 tests up to date before the lease, so a loser of two concurrent
+  flushes keeps its line (rc 2) and its next flush prints `flushed`; the goal says so, S5 and AC2 are
+  deleted with their `ls-remote` branch and perf line, AC2's id is left as a gap, §4 records the
+  measurement PINNED, and §5 risks name `post-merge.sh`'s unset `ROOT` and `add_health_event` until
+  TOOL-dPlacedRequest-36.
 
 ## 10. Reuse audit
 
