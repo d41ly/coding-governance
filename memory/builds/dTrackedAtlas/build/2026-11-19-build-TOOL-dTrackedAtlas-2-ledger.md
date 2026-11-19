@@ -12,9 +12,9 @@ tracked file was never edited to stage a red.
 Recorded before the first edit, at `d9bbd1d4c`:
 
 - AC9's probe printed `8bbf287e2f1ac362607683b2165ec614f40a2bb37de5c7e336f918b81226bc8c` and the keys
-  `areas build chain consult contract contracts cycle decisions digest events gaps kitFates kits latest
-  layers libraryItems libraryPaths libraryRound loops memory oneLine owed policies presets principles
-  programs progress records reviews roster sources steps terminal timeline tools transitions v2map v2open`.
+  `areas build chain consult contract contracts cycle decisions digest events gaps kitFates kits latest`
+  `layers libraryItems libraryPaths libraryRound loops memory oneLine owed policies presets principles`
+  `programs progress records reviews roster sources steps terminal timeline tools transitions v2map v2open`.
 - AC7's cases under `--check --plant <case>`, each exiting `1`:
   - `kind-unplaced`: `atlas: layer-memory [contract] kind 'ghost kind' names no writer item and carries no marker`
   - `kind-ghost-tag`: `atlas: layer-memory [contract] kind 'ghost kind' names ['plan.ghost-writer'], resolving to no item, key or file`
@@ -46,19 +46,21 @@ Recorded before the first edit, at `d9bbd1d4c`:
 - AC5 — `head -n 4 "$OUT"` printed `<!doctype html>`, `<meta charset="utf-8">`, the viewport line and
   `<title>Closed Loop Atlas</title>`; the `body {` rule reads `margin: 0`. Red: the template at
   `d9bbd1d4c` opens with `<title>Closed Loop Atlas</title>`.
-- AC6 — `--check --ref 9e21ac760 --claims none --plant state-dropped` exited `1` with `atlas: the chain
-  state lacks dDeclaredLoop and holds none the chain does not`; `--plant asbuilt-dropped` exited `1`
-  with `atlas: the as-built view lacks dDeclaredLoop and holds none the chain does not`; without
+- AC6 — `--check --ref 9e21ac760 --claims none --plant state-dropped` exited `1` with
+  `atlas: the chain state lacks dDeclaredLoop and holds none the chain does not`;
+  `--plant asbuilt-dropped` exited `1` with
+  `atlas: the as-built view lacks dDeclaredLoop and holds none the chain does not`; without
   `--plant` it exited `0`. Red: each join staged away, the planted run exited `0`; before this unit
   each case exited `1` with `atlas: no plant`, which the line check tells apart.
 - AC7 — the same command with each of the seven cases exited `1` and printed the line recorded above,
-  byte-equal under `diff`. Red: a staged admission without `CORPUS_PLANTS` printed `atlas: no plant
-  instruments-decision`.
-- AC8 — `--check --ref 0000000000 --claims none` exited `1`; the last stderr line is `atlas: chain
-  state: 0000000000 resolves to no commit in <worktree>`, with no `Traceback`. Red: a staged handler
+  byte-equal under `diff`. Red: a staged admission without `CORPUS_PLANTS` printed
+  `atlas: no plant instruments-decision`.
+- AC8 — `--check --ref 0000000000 --claims none` exited `1`; the last stderr line is
+  `atlas: chain state: 0000000000 resolves to no commit in <worktree>`, with no `Traceback`. Red: a staged handler
   catching `ChainError` alone let `StateError` escape as a traceback.
 - AC9 — the probe printed the hash and the keys recorded above, equal under `diff`; no `state`,
-  `baseline` or `asBuilt`. Red: a staged `derive` returning a `state` key printed
+  `baseline` or `asBuilt`. Red: a staged `derive` returning a `state` key, an empty one rather than a
+  document read through git, which the key check reads alike and the hash tells apart either way, printed
   `cb94e61ff4ca74cac4f77a61becc205450e641ed90ebf6c2551a2c1ce321ac9e` with `state` among its keys.
 - AC10 — AC1's command to two scratch paths: `cmp` exited `0`. Red: a staged clock value in the data
   made `cmp` exit `1`.
@@ -67,9 +69,9 @@ Recorded before the first edit, at `d9bbd1d4c`:
 - AC12 — not observed in the browser pane, which this pass cannot open: owed to the close. A headless
   Edge `--dump-dom` of `$OUT` served by `python -m http.server` from the scratch directory stood in for
   the render: the Chain view's table held `22` rows (DERIVED, one per `[chain]` row), six reading
-  `landed` or `landed, carrying 1` with AC1's merges, dPlacedRequest and dWitnessedBar reading `can
-  start`; the Comparison view's side labels read `The baseline: an implicit loop` and `Baseline,
-  measured 2026-10-15`, none `Today`; and the default area, Instruction, showed its "Since the
+  `landed` or `landed, carrying 1` with AC1's merges, dPlacedRequest and dWitnessedBar reading
+  `can start`; the Comparison view's side labels read `The baseline: an implicit loop` and
+  `Baseline, measured 2026-10-15`, none `Today`; and the default area, Instruction, showed its "Since the
   baseline" panel naming dSafePassage `3ada42ab1` and dOrderedCharter `9760fb746`. The Build area's
   panel, which needs a click, was not observed.
 
