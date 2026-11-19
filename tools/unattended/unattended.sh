@@ -44,6 +44,8 @@
 #   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit or cadence run, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
+#   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
+#   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
 #   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
@@ -129,7 +131,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --feed --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --feed --overlaps --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -4139,6 +4141,114 @@ write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refu
   done
   [ "$n" != 0 ] || [ "$rc" != 0 ] || echo "lease — prune · nothing to prune"
   return "$rc"
+}
+
+# --register, TWO CREATE-ONLY REGISTERS ON THE REMOTE (TOOL-dPlacedRequest-12). A decision is
+# `refs/gov/decisions/<build>/<key>`, the key `derive_decision_key` over the item that raised the
+# question and its declared fork, never the decision's wording; a problem is
+# `refs/gov/problems/<encoded subject>/<id>`, the subject one encoded component and the id
+# `derive_problem_id` over the filer's session, the item it filed from (`none` outside one), the raw
+# subject and the body's bytes. Each entry is ONE parentless commit over the empty tree from
+# `build_gov_commit ""`, written by `write_gov_ref` with an EMPTY expected sha, so every write is a
+# create: a second decision on one slot, or a retried filing, loses the lease and is never written
+# beside the first, while new problem content on one subject derives a new id and lands beside it.
+# THE ENCODER writes every byte outside `[A-Za-z0-9_-]` as `%` and two upper-case hex digits under
+# LC_ALL=C, so `/`, every dot, `+`, a space, `:`, `~` and every other byte `git check-ref-format`
+# refuses are escaped and the result is always one legal component; an empty text is refused. `+`
+# being escaped inside either part, a decision key splits back into exactly one item and fork.
+# THE ORDER: the switch (`register — off`, exit 2, nothing read or written), the arity, each field
+# non-empty and free of control bytes, `<build>` through `check_slug`, the component bound, the body,
+# and only then the remote. REF_COMPONENT_CEILING bounds the whole component the ref carries, the
+# encoded subject or the JOINED key, never a segment alone, since an escaped byte costs three and a
+# loose ref's name is 255 bytes. The body is refused over 4096 bytes, or carrying a NUL or a control
+# byte other than tab and newline (a CR included), before any commit is built.
+# THE RECORD: `gov-decision <build>/<key>` or `gov-problem <encoded subject>/<id>`, a blank line, the
+# `key: value` lines (`build`, `item`, `fork`, `session`; or `subject`, the raw one, `item`,
+# `session`), a blank line and the body's text.
+# ONE LINE PER OUTCOME: `register — written <ref>` exit 0; `register — exists <ref>` exit 1, followed
+# by the first entry's record, read by ONE bounded fetch into this node's cache ref and sighted into
+# the feed as `read_claims` sights; `register — not written <ref> · <why>` exit 2.
+# WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44), and who files how many problems; an
+# entry is never pruned, so both namespaces only grow.
+REF_COMPONENT_CEILING=200
+derive_ref_segment() { # text -> the text with every byte outside [A-Za-z0-9_-] as %HH; rc 1 on an empty text
+  local LC_ALL=C s="$1" o="" c i
+  [ -n "$s" ] || return 1
+  for ((i = 0; i < ${#s}; i++)); do
+    c=${s:i:1}
+    case "$c" in
+      [A-Za-z0-9_-]) o+=$c ;;
+      *) printf -v c '%%%02X' "'$c"; o+=$c ;;
+    esac
+  done
+  printf '%s\n' "$o"
+}
+derive_decision_key() { # item · fork -> `<item segment>+<fork segment>`; rc 1 when either is empty
+  local a b
+  a=$(derive_ref_segment "$1") && b=$(derive_ref_segment "$2") || return 1
+  printf '%s+%s\n' "$a" "$b"
+}
+derive_problem_id() { # session · item · subject · body file -> the first 12 hex digits; rc 1 when git cannot hash
+  local h
+  h=$({ printf '%s\0%s\0%s\0' "$1" "$2" "$3"; cat -- "$4" && printf '\0'; } | GIT hash-object --stdin 2>/dev/null) || return 1
+  [[ $h =~ ^[0-9a-f]{12} ]] || return 1
+  printf '%s\n' "${h:0:12}"
+}
+write_register() { # decision <build> <item> <fork> <file> | problem <subject> <item> <file> -> 0 written, 1 exists, 2 not written
+  local kind="${1:-}" b="" it="" fk="" sub="" f="" comp ref sid n bad msg c rc d LC_ALL=C
+  [ "$RUN_CLAIMS" = on ] || { echo "register — off"; return 2; }
+  case "$kind:$#" in
+    decision:5) b=$2; it=$3; fk=$4; f=$5 ;;
+    problem:4) sub=$2; it=$3; f=$4 ;;
+    *) echo "register — not written · the forms are --register decision <build> <item> <fork> <file> and --register problem <subject> <item> <file>"; return 2 ;;
+  esac
+  for n in build item fork subject; do
+    case "$kind:$n" in decision:subject|problem:build|problem:fork) continue ;; esac
+    case "$n" in build) bad=$b ;; item) bad=$it ;; fork) bad=$fk ;; *) bad=$sub ;; esac
+    [ -n "$bad" ] || { echo "register — not written · an empty $n"; return 2; }
+    case "$bad" in *[[:cntrl:]]*) echo "register — not written · the $n carries a control byte"; return 2 ;; esac
+  done
+  if [ "$kind" = decision ]; then
+    check_slug "$b" || { echo "register — not written · the build is no build-folder name: $b"; return 2; }
+    comp=$(derive_decision_key "$it" "$fk") || { echo "register — not written · the decision key did not derive"; return 2; }
+    n="decision key"
+  else
+    comp=$(derive_ref_segment "$sub") || { echo "register — not written · the subject did not encode"; return 2; }
+    n=subject
+  fi
+  [ "${#comp}" -le "$REF_COMPONENT_CEILING" ] || { echo "register — refused $n over ${#comp} bytes encoded"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "register — not written · the body file is not readable: $f"; return 2; }
+  n=$(wc -c <"$f") && n=${n//[!0-9]/} || n=""
+  [ -n "$n" ] && [ "$n" -le 4096 ] || { echo "register — not written · the body is over 4096 bytes: ${n:-unread} · $f"; return 2; }
+  bad=$(LC_ALL=C tr -d '\011\012\040-\176\200-\377' <"$f" | wc -c) && bad=${bad//[!0-9]/} || bad=""
+  [ "$bad" = 0 ] || { echo "register — not written · the body carries a NUL or a control byte other than tab and newline: $f"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}; sid=${sid//[[:cntrl:]]/ }
+  if [ "$kind" = decision ]; then
+    ref="refs/gov/decisions/$b/$comp"
+    msg=$(printf 'gov-decision %s/%s\n\nbuild: %s\nitem: %s\nfork: %s\nsession: %s\n\n' "$b" "$comp" "$b" "$it" "$fk" "$sid"; cat -- "$f")
+  else
+    c=$(derive_problem_id "$sid" "$it" "$sub" "$f") || { echo "register — not written · the problem id did not derive"; return 2; }
+    ref="refs/gov/problems/$comp/$c"
+    msg=$(printf 'gov-problem %s/%s\n\nsubject: %s\nitem: %s\nsession: %s\n\n' "$comp" "$c" "$sub" "$it" "$sid"; cat -- "$f")
+  fi
+  resolve_claim_remote || { echo "register — not written $ref · the clone does not declare exactly one remote, check 24"; return 2; }
+  c=$(build_gov_commit "" "$msg") || { echo "register — not written $ref · the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "$ref" "" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) echo "register — written $ref"; return 0 ;;
+    1) echo "register — exists $ref"
+       d=$(mktemp) || { echo "register — exists $ref · its record was not read: no scratch file"; return 1; }
+       if observe_remote "$d" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+$ref:refs/gov/remote/${ref#refs/gov/}"; then
+         add_feed_sightings refs/gov/remote/
+         GIT log -1 --format=%B "refs/gov/remote/${ref#refs/gov/}" -- 2>/dev/null
+       else
+         echo "register — exists $ref · its record was not read: the bounded fetch failed"
+       fi
+       rm -f "$d"; return 1 ;;
+    *) echo "register — not written $ref · $GOVREF_WHY"; return 2 ;;
+  esac
 }
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
@@ -18174,6 +18284,10 @@ while [ $# -gt 0 ]; do
                       run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR" "$LV_TO"; _rl_rc=$?
                     fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-12 - one create-only decision or problem on the remote; no slug, because a
+    # problem names a subject and a decision names its build among its own positional words.
+    --register)     refuse_waive_unless_preflight --register
+                    shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
     # of governance refs this clone holds; no slug, because the feed is the node's.
     --feed)         refuse_waive_unless_preflight --feed

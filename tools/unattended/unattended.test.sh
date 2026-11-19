@@ -20300,6 +20300,76 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-12 — THE CREATE-ONLY DECISION AND PROBLEM REGISTERS. Over the lease fixture's
+# origin, its clone c1 under session rA and a second clone c2 under rB, both under RUN_CLAIMS on: the
+# sourced encoder prints each subject of the spec's table, every ref legal (AC1), and two texts never
+# encode alike while an empty one is refused (AC2); A decides one slot and B's second decision of it
+# exits 1 printing A's record, the origin holding A's text only (AC3); two problems on one path land
+# beside each other (AC4) and a retried filing exits 1, one ref (AC5); a 4097-byte body and one with a
+# NUL are refused, the origin unchanged (AC6); with the switch off nothing is written (AC7); an
+# 80-slash subject and a 241-byte joined key are refused over the ceiling (AC9, AC10). RED, observed
+# at the close, is the base driver, which has no register verb. Waived by README rule 8 with the rest
+# of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a push the remote refuses, the `not written` exit 2.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+git clone -q "$LF/origin.git" "$LF/c2" 2>/dev/null; cp "$LF/c1/.unattended.conf" "$LF/c2/"
+run_register_arm() { ( cd "$LF/${RG_CLONE:-c1}" && CLAUDE_CODE_SESSION_ID=${RG_SID:-rA} GOV_RUNLOG=0 bash "$SCRIPT" --register "$@" 2>&1 ); }
+printf 'decided by A\n' > "$LF/a.txt"; printf 'decided by B\n' > "$LF/b.txt"
+printf 'problem one\n' > "$LF/p1.txt"; printf 'problem two\n' > "$LF/p2.txt"
+head -c 4097 /dev/zero | tr '\0' x > "$LF/big.txt"; printf 'a\0b\n' > "$LF/nul.txt"
+rg_got=$( cd "$LF/c1" && set +u && . "$SCRIPT" >/dev/null 2>&1
+  for rg_s in .githooks/pre-push x.lock "a b" ns:tag HEAD~1; do
+    rg_o=$(derive_ref_segment "$rg_s"); git check-ref-format "refs/gov/problems/$rg_o/x" && printf '%s ' "$rg_o" || printf 'ILLEGAL:%s ' "$rg_o"
+  done )
+same "DPR12 AC1 the encoder prints each subject of the table, every ref legal" "$rg_got" \
+  "%2Egithooks%2Fpre-push x%2Elock a%20b ns%3Atag HEAD%7E1 "
+rg_got=$( cd "$LF/c1" && set +u && . "$SCRIPT" >/dev/null 2>&1
+  printf '%s %s %s ' "$(derive_ref_segment a+b)" "$(derive_ref_segment a/b)" "$(derive_ref_segment a%2Bb)"
+  derive_ref_segment "" >/dev/null && printf 'empty-encoded' || printf 'empty-refused' )
+same "DPR12 AC2 three texts encode apart and an empty text is refused" "$rg_got" "a%2Bb a%2Fb a%252Bb empty-refused"
+rg_ref='refs/gov/decisions/tFix/entry%2Eclaim+F1'
+rg_out=$(run_register_arm decision tFix entry.claim F1 "$LF/a.txt"); rg_rc=$?
+same "DPR12 AC3 clone A's decision exits 0" "$rg_rc" "0"
+hit  "$rg_out" "register — written $rg_ref"
+rg_out=$(RG_CLONE=c2 RG_SID=rB run_register_arm decision tFix entry.claim F1 "$LF/b.txt"); rg_rc=$?
+same "DPR12 AC3 clone B's decision of the same slot exits 1" "$rg_rc" "1"
+hit  "$rg_out" "register — exists $rg_ref"
+hit  "$rg_out" "decided by A"
+same "DPR12 AC3 the origin holds A's text only, one parentless commit" \
+  "$(git --git-dir="$LF/origin.git" log --format=%B "$rg_ref" -- | grep -c 'decided by') $(git --git-dir="$LF/origin.git" log -1 --format=%B "$rg_ref" -- | grep -c 'decided by A') [$(git --git-dir="$LF/origin.git" log -1 --format=%P "$rg_ref" --)]" "1 1 []"
+run_register_arm problem src/push-main.sh none "$LF/p1.txt" >/dev/null; rg_rc=$?
+run_register_arm problem src/push-main.sh none "$LF/p2.txt" >/dev/null; rg_rc2=$?
+same "DPR12 AC4 two problems on one path land as two refs under one encoded subject" \
+  "$rg_rc $rg_rc2:$(git --git-dir="$LF/origin.git" for-each-ref 'refs/gov/problems/src%2Fpush-main%2Esh/' | grep -c .)" "0 0:2"
+rg_out=$(run_register_arm problem src/push-main.sh none "$LF/p1.txt"); rg_rc=$?
+same "DPR12 AC5 a retried filing exits 1 and the origin keeps two refs" \
+  "$rg_rc $(git --git-dir="$LF/origin.git" for-each-ref 'refs/gov/problems/' | grep -c .)" "1 2"
+hit  "$rg_out" "register — exists refs/gov/problems/src%2Fpush-main%2Esh/"
+rg_before=$(git --git-dir="$LF/origin.git" for-each-ref)
+rg_out=$(run_register_arm problem src/x.sh none "$LF/big.txt"); rg_rc=$?
+same "DPR12 AC6 a 4097-byte body exits 2" "$rg_rc" "2"
+hit  "$rg_out" "register — not written · the body is over 4096 bytes: 4097"
+rg_out=$(run_register_arm problem src/x.sh none "$LF/nul.txt"); rg_rc=$?
+same "DPR12 AC6 a body carrying a NUL exits 2, the origin unchanged" \
+  "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
+hit  "$rg_out" "register — not written · the body carries a NUL or a control byte other than tab and newline"
+rg_out=$(run_register_arm problem "$(printf '/%.0s' $(seq 80))" none "$LF/p1.txt"); rg_rc=$?
+same "DPR12 AC9 an 80-slash subject exits 2, the origin's problems unchanged" \
+  "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
+hit  "$rg_out" "register — refused subject over 240 bytes encoded"
+rg_out=$(run_register_arm decision tFix "$(printf 'i%.0s' $(seq 120))" "$(printf 'f%.0s' $(seq 120))" "$LF/a.txt"); rg_rc=$?
+same "DPR12 AC10 a 241-byte joined key exits 2, the origin's decisions unchanged" \
+  "$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "2 unchanged"
+hit  "$rg_out" "register — refused decision key over 241 bytes encoded"
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"
+rg_out=$(run_register_arm decision tFix entry.claim F2 "$LF/a.txt"); rg_rc=$?
+same "DPR12 AC7 with the switch off it prints register — off, exits 2 and the origin gains no ref" \
+  "$rg_out|$rg_rc $([ "$rg_before" = "$(git --git-dir="$LF/origin.git" for-each-ref)" ] && echo unchanged || echo changed)" "register — off|2 unchanged"
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
 # no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
 # fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
@@ -22311,7 +22381,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3763 -> 3784 by TOOL-dPlacedRequest-28: the feed-first create block's 21 region-eight
 # assertions (15 `same`, the AC5 loop's two among them, one per pass, and 6 `hit`), off the diff's own lines;
 # no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3784
+# RAISED 3784 -> 3804 by TOOL-dPlacedRequest-12: the register block's 20 region-eight assertions
+# (12 `same` and 8 `hit`), off the diff's own lines; no skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3804
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22570,7 +22643,8 @@ FLOOR_SHARD_7=311
 # RAISED 968 -> 986 by TOOL-dPlacedRequest-20: the same 18 region-eight offer and cell assertions, see FLOOR_ASSERTIONS.
 # RAISED 986 -> 994 by TOOL-dPlacedRequest-20's checklist pass: the same 8 region-eight refusal and window arms, see FLOOR_ASSERTIONS.
 # RAISED 994 -> 1015 by TOOL-dPlacedRequest-28: the same 21 region-eight feed-first create assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1015
+# RAISED 1015 -> 1035 by TOOL-dPlacedRequest-12: the same 20 region-eight register assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1035
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

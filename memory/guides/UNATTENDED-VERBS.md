@@ -526,6 +526,25 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   that records no transition and is no open question). An acquisition runs the overlap probe first.
   Dark behind `RUN_CLAIMS` like every claim; `UNATTENDED-STOPS.md` §7 is the grammar, the record,
   the epoch and the four `leases.*` keys.
+- `--register` — two create-only registers on the remote, each entry ONE parentless commit written
+  by compare-and-swap with an empty expected sha, so a second write of one ref is refused, never
+  written beside the first. `--register decision <build> <item> <fork> <file>` writes
+  `refs/gov/decisions/<build>/<key>`, the key the item and the fork each encoded and joined by `+`,
+  never the decision's wording; `--register problem <subject> <item> <file>` writes
+  `refs/gov/problems/<encoded subject>/<id>`, the id the first 12 hex digits (PINNED) of `git hash-object`
+  over the filer's session, the item it filed from (`none` outside one), the raw subject and the
+  body's bytes, each followed by a NUL, so new text on one subject lands beside and a retried filing
+  is refused. The encoding writes every byte outside `[A-Za-z0-9_-]` as `%` and two upper-case hex
+  digits, so a subject is one legal ref component and an empty text is refused; the encoded subject,
+  or the joined key, is refused over `REF_COMPONENT_CEILING` (200 bytes, PINNED) before any commit. The
+  record is `gov-decision <build>/<key>` or `gov-problem <encoded subject>/<id>`, a blank line, the
+  `key: value` lines (`build`, `item`, `fork`, `session`; or `subject`, `item`, `session`), a blank
+  line and the body, which is refused over 4096 bytes (PINNED) or carrying a NUL or a control byte other than
+  tab and newline. It prints ONE line: `register — written <ref>` (exit 0); `register — exists
+  <ref>` and then the first entry's record, read by one bounded fetch (exit 1); or
+  `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
+  encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
+  ever deleted or rewritten. It takes no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,

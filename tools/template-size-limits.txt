@@ -247,7 +247,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	68288
 # fenced verb list gains, which the kit gate's check 26 requires of the declared `--lease` verb, so it is a
 # block the gate reads and no prose coming back. The render measures 11094 CR-stripped, and the row is
 # that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-1).
-.claude/skills/unattended/SKILL.md	11094
+# RAISED 11094 -> 11151, 2026-11-19, by TOOL-dPlacedRequest-12: the `--register problem <subject> <item>
+# <file>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--register` verb, so it is a block the gate reads and no prose coming back. The render measures 11151
+# CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms above
+# (memory/DECISIONS.md, TOOL-dPlacedRequest-12).
+.claude/skills/unattended/SKILL.md	11151
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
