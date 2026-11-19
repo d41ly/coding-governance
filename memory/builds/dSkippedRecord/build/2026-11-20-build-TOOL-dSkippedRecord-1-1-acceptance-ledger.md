@@ -60,7 +60,7 @@ the session scratchpad, never an edit in the tree.
 - AC5 — the stage-commit leg's own argv, `sh_hygiene.py --stage-commits` over the drained registry,
   run directly at e56a3e698: exit 0, "2 registered site(s) in 2 row(s) match the scan", and
   `tools/unattended/unattended.sh` reads only its two `unpaired` commits, neither the run record's.
-  At the base, with the row standing, it read 3 sites in 3 rows.
+  At the base, with the row standing, it read 3 sites in 3 rows, DERIVED at observation.
 
 The probe, as run (`probe.sh <driver> <suite> <lib> <fixture dir>`):
 
