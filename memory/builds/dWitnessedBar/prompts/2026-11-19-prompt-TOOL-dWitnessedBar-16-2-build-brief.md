@@ -9,26 +9,14 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - This is dWitnessedBar's build run. Its spec run landed every spec DEFERRED, and this run builds them in the build-order
   table's order. This unit is build order 10.
 - THIS IS PASS 2 of the two-pass unit. Pass 1 landed as `87bc9f615` and `6c989def1`, and the main loop committed the
-  converted `memory/project/readme-contract.txt` in `1f4ce2c30`. Build S12: delete the transitional old-grammar read
-  F15 names, observe AC14, and move the spec's status to `CLOSED` in this pass's commit.
-- Pass 1's pass legs ran red, and their full output is the untracked log
-  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit16-pass1-pass-legs.log`.
-  Fix every red there that pass 1 caused, in this pass, each the way its leg's own message directs:
-  - install-prefix: the kit-path spellings in `tools/memory-tree/convert_registry.py`, the `[[ledger]]` and
-    `[[upgrade]]` rows in `tools/memory-tree/kit.toml`, `tools/codebase-map/kit.toml`, `tools/drift-audit/kit.toml`
-    and `tools/govkit/registry.toml`, `tools/drift-audit/selftest.py`, and `tools/check-dead-paths.sh`. Spell each
-    through a token the reader resolves or route it through `resolve_kit_dir`; the leg takes no waiver. If a seed argv
-    or a home cannot be spelled so the landed factory still runs it, say so in your return rather than route around
-    the gate. The one carried red, the `conf-scalar-pins` seed argv at its unit 14 spelling, stays until unit 51.
-  - dead-path carriers: the old names `memory/map/baseline.toml` and `memory/map/affordance-exempt.toml` still
-    spelled in `.gitattributes`, `.governance/instructions.toml`, `AGENTS.md`, `WIRE-INTO-PROJECT.md`, a gotcha
-    record and the codebase-map dossier. Repoint each where this unit owns the text; where unit 51 S5 owns the
-    respelling, add a waiver row naming that unit.
-  - shell hygiene: two new substitution-fed loops and two registry counts that fell; feed the loops from a scratch
-    file and lower the counts in `memory/project/substitution-fed-loops.txt`.
-  - verdict epoch: add `convert_registry.py` to the `DELEGATES` list `tools/memory-tree/check-verdict-epoch.sh` reads.
-  - lexicon: verb offenders rose by eight; rename the new definitions to declared verbs (`lexicon.py --suggest`),
-    and re-measure `.lexicon.conf`'s pin only for parity copies that cannot be renamed.
+  converted `memory/project/readme-contract.txt` in `1f4ce2c30`. The spec is now rev-13: build S12 (delete the
+  transitional read, observe AC14), S14 (move the four lists under the tool root to `memory/project/` with every
+  name of them) and S15 (pass 1's remaining pass-leg reds), and move the spec's status to `CLOSED` in this pass's
+  commit.
+- Pass 1's pass-leg output is the untracked log
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit16-pass1-pass-legs.log`;
+  S15 lists what of it this pass owns. The one install-prefix line that stays is unit 14's `conf-scalar-pins` seed
+  argv, carried until unit 51.
 - Run `python tools/playbook/writing_practice.py check pinned-facts` and `python tools/playbook/positional.py` over
   your own records before committing; they read only tracked files.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still

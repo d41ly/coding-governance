@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** INPROGRESS · rev-12 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-13 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -33,6 +33,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-4-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-5-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-6-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-6-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-16-7-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-7-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md) | journal | TOOL-dWitnessedBar-46 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md) | journal | — |
@@ -202,17 +203,36 @@ retrofit.md below, each of its lines cited at that blob).
 - **S10** — The adopter step. `tools/memory-tree/convert_registry.py convert --home <home>` converts one
   file of a legacy grammar its table names into the ledger grammar, stamping the sha
   `tools/lib/legacy_ledger.py#read_head_sha` names, as `seed` does with no `--sha` (§8 F17), and
-  printing each reason the record keeps (S5); gov's own conversion runs it. Its step verbs `up|down|witness <target> --home
-  <home>` are the thin adapter the landed `[[upgrade]]` grammar requires: `id`, `up`, `down`,
+  printing each reason the record keeps (S5); gov's own conversion runs it. Its table is keyed by the
+  ledger home's file name, so every `--home` names a registration's home. The two map homes read
+  their `.toml` sibling, drift's two the file `--from` names, and every other home itself. The
+  table names no descriptor path. A population's table is read through
+  `tools/lib/legacy_ledger.py#read_registrations` over the checkout holding the program, and
+  `<entry>` is the `id` of the descriptor its `source` names. The program keeps `convert` and
+  `read-back` and loses its step verbs and `load_steps`.
+  The step is gov's own program off every kit path, `tools/govkit/steps/registry_to_ledger.py`, as
+  `tools/govkit/steps/review_rounds.py` sits (§8 F20). Its verbs `up|down|witness <target> --home
+  <home> [--from <path>]` are the thin adapter the landed `[[upgrade]]` grammar requires: `id`, `up`, `down`,
   `witness`, `surfaces` and `needs-target`, with `resume` and `reverted` optional
-  (`tools/govkit/upgrade_steps.py#read_steps`, over `STEP_KEYS`):
-  `up` writes the before-image through `upgrade_steps.write_before_image` and then runs `convert`;
-  `down` restores through `write_from_before_image`; `witness` exits 0 when the home is absent or its
-  first line is a ledger header. Each kit whose reader changes gains one `[[upgrade]]` row per registry
+  (`tools/govkit/upgrade_steps.py#read_steps`, over `STEP_KEYS`). It loads `upgrade_steps.py`
+  beside it, as `tools/govkit/steps/conf_to_policy.py#load_steps` does. It loads
+  `convert_registry.py` through govkit's `resolve_kit_dir`, as
+  `tools/govkit/docs_leg.py#read_legacy_rows` loads the factory.
+  `up` writes the before-image through `upgrade_steps.write_before_image` and then the converted file;
+  `down` restores through `write_from_before_image`; `witness` exits 0 when the legacy file is absent or the home's
+  first line is a ledger header. `--from` names the legacy file, read inside the target through
+  `upgrade_steps.check_contained`, and only drift's two rows pass it (§8 F19). Each kit whose reader changes gains one `[[upgrade]]` row per registry
   it seeds, `id = "<entry>/<population>-to-ledger"` with `<entry>` its descriptor's own id, as
-  `read_steps` requires, argv `["python", "{gov}/memory-tree/convert_registry.py", "<verb>", "{target}", "--home",
-  "<home>"]`, `surfaces = ["file:<home>"]`, `needs-target = false`, as
-  `tools/govkit/steps/review_rounds.py` is shaped. Observed by AC10.
+  `read_steps` requires, `surfaces = ["file:<home>"]`, `needs-target = false`, and the argv below,
+  drift's two rows appending `"--from", "{prefix}/drift-audit/drift_signals.py"`:
+
+  ```
+  ["python", "{gov}/govkit/steps/registry_to_ledger.py", "<verb>", "{target}", "--home", "<home>"]
+  ```
+
+  No argv spells a kit segment followed by a file, which rule 3 of `tools/check-install-prefix.sh`
+  counts (`tools/check-install-prefix.sh@8f5e3580d5a3:497-503`); there `govkit/steps/` is a kit
+  segment followed by a directory. Observed by AC10 and AC15.
 - **S11** — The conversion's own pass graded. TOOL-dWitnessedBar-14 S14 prints a population
   `new at <sha12>` only where the base holds no file at its home and none opening with its header;
   an in-place home's base holds the legacy grammar, which `compare_to_base` does not parse, so its
@@ -234,6 +254,75 @@ retrofit.md below, each of its lines cited at that blob).
   IN THEIR GRAMMAR`; body naming F16's five homes and each one's blocker; accept `each is converted
   onto the ledger grammar and registered, its reader reading it through the factory, or an owner
   ruling keeps it in its grammar`. Observed by AC1.
+- **S14** — The four homes under gov's tool root move to `memory/project/` under their own names (§8
+  F19): `dead-path-waivers.txt`, `playbook-kit-waivers.txt`, `drift-pins.txt` and
+  `drift-baselines.txt`, each by `git mv` with every row kept. The factory reads `home` literally
+  (`tools/lib/legacy_ledger.py#read_registrations`), so a home under the tool root names nothing at
+  an adopter installed elsewhere, and rule 2 of `tools/check-install-prefix.sh` counts it. Each
+  `[[ledger]]` `home` follows the move, with drift's `[[upgrade]]` rows' `--home` and `surfaces` and
+  each `.gitattributes` line. Gov's two lists are read at the new home, which their readers spell as
+  `tools/check-spec-tokens.py@6035ac5e2a9a:566` spells its own: `tools/check-dead-paths.sh`'s
+  `WAIVERS` and the default of `tools/check-playbook-parity.sh`'s `PLAYBOOK_KIT_WAIVERS`, with their
+  suites' fixtures. The registry's two `[[exempt]]` rows for them are deleted, and the `playbook
+  parity selftest` leg's guard names the new home in `tools/govkit/registry.toml` and in
+  `tools/gate-legs.json`. drift-audit's `[[files]]` row withholding its two from installs
+  (`tools/drift-audit/kit.toml@be87c48c6160:49-52`) is deleted, since neither sits in the kit. Check 3
+  admits each name by its own rule (`tools/memory-tree/check-memory-hygiene.sh@3794d1a0dc3b:1030-1035`).
+  drift's two, which drift-audit's steps write at every adopter, join its admitted list. Gov's two
+  join gov's `PROJECT_REGISTRY_EXTRA` (`.memory-tree.conf@a63207924120:960`). Observed by AC15.
+  **Readers:** by name: a git grep for the four names over the tree at c084b29f0 finds
+  `tools/check-dead-paths.sh` (`WAIVERS`) with `tools/check-dead-paths.test.sh`;
+  `tools/check-playbook-parity.sh` (`WAIVERS`) with `tools/check-playbook-parity.test.sh`;
+  `tools/govkit/registry.toml` (two `[[exempt]]`, two `[[ledger]]` and a leg guard) and
+  `tools/gate-legs.json` (that guard); `tools/drift-audit/kit.toml` (`[[files]]`, `[[ledger]]`,
+  `[[upgrade]]`); `tools/drift-audit/drift_signals.py` and `tools/drift-audit/drift_signals.template.py`
+  (comments); `tools/drift-audit/README.md`; `tools/drift-audit/SKILL.template.md` with its render
+  `.claude/skills/drift-audit/SKILL.md`; `tools/drift-audit/selftest.py` (`PINS_HOME`,
+  `BASELINES_HOME`); `tools/memory-tree/convert_registry.py` (`LEGACY`); `.gitattributes`; and the
+  live map and gotcha pages `memory/map/features/install-prefix.md`, `memory/map/features/playbook.md`,
+  `memory/map/features/testsuite-counts.md` and
+  `memory/gotchas/line-keyed-registry-reds-on-a-file-that-grew.md`, with the generated
+  `memory/map/generated/CARDS.md` · by value: NO VALUE READERS, a move keeping every row.
+- **S15** — Pass 1's other reds, cleared by the second pass beside S12
+  (`2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return`).
+  - `verdict epoch (kit version dates the engine)`: S12's deletion removes the one import of
+    `convert_registry` by a delegate (`tools/memory-tree/gen_build_index.py@365dfdc8b812:2641`), so
+    `DELEGATES` (`tools/memory-tree/check-verdict-epoch.sh@ded1ce42501f:285`) gains no row.
+  - `dead-path carriers (deleted files still named)`: each carrier of the two map `.toml` names that
+    TOOL-dWitnessedBar-51 S5 respells takes one `dead-path-waivers` row whose disposition is
+    `carried:TOOL-dWitnessedBar-51`, and the conversion record lists each beside its key with `S5`.
+    Those are the two `text eol=lf` lines of `.gitattributes` (`.gitattributes@d48ebce6a8e0:260-261`),
+    and the lines the leg names in `AGENTS.md`, `.governance/instructions.toml`,
+    `WIRE-INTO-PROJECT.md`, `memory/gotchas/assertion-between-two-derived-values.md`,
+    `memory/map/features/codebase-map.md`, `tools/codebase-map/test_codebase_map.py`,
+    `tools/codebase-map/test_codebase_map.template.py` and a `tools/check-spec-tokens.test.sh`
+    fixture string. This unit's own carrier, `tools/codebase-map/selftest.py@dc72eb300f1a:1607`, is
+    repointed to `memory/map/baseline.txt`, and S10's `.txt` homes leave no step row naming a `.toml`.
+  - `shell hygiene (a loop fed by a command substitution)`: the two loops pass 1 fed by a here-string
+    (`tools/check-dead-paths.sh@2453c7fcb1d8:268`, `tools/gate-lint/fork-count.sh@ed96c3f9badd:337`)
+    read a scratch file instead, the remedy the module docstring of `tools/gate-lint/sh_hygiene.py`
+    names. The `substitution-fed-loops` rows of `check-memory-hygiene.sh` and
+    `check-method-carriers.sh` drop to the counts the leg measures (DERIVED at the pass).
+  - `install-prefix (shipped surface)`, beyond S10 and S14: `tools/check-dead-paths.sh` carries the
+    `resolve_python` and `refuse_wrong_shell` blocks inline between their markers, as
+    `tools/check-playbook-parity.sh` does, where it sources them from the lib directory
+    (`tools/check-dead-paths.sh@2453c7fcb1d8:223-226`). `tools/drift-audit/selftest.py@241f25777e90:395-398`
+    names the memory-tree kit through a variable, as it names its own through `KIT_NAME`. The leg's
+    one remaining offender is unit 14's `conf-scalar-pins` seed argv
+    (`tools/memory-tree/kit.toml@c7e2c84cfc70:719`), carried to TOOL-dWitnessedBar-51.
+  - `lexicon naming predicates`: each verb offender a pass-1 definition adds, as
+    `python tools/lexicon/lexicon.py --offenders` lists it against `VERB_OFFENDER_PIN`
+    (`.lexicon.conf@f2bb3e765e3b:398`), takes the declared verb `--suggest` names. An inline copy of
+    a canonical block keeps its name, and the pin is re-measured with a `RE-MEASURED` comment naming
+    this unit, as that conf records each earlier copy.
+
+  Observed by AC14 and AC16. The lexicon item is NOT OBSERVED by a criterion: its one observation is
+  the lexicon's own measure, which the `lexicon naming predicates` leg runs.
+  **Readers:** by name: the `convert_registry` import S12 removes is read by
+  `tools/memory-tree/check-verdict-epoch.sh`'s import-closure walk; the two here-string loops by
+  `tools/gate-lint/sh_hygiene.py`'s scan; the lib-dir sourcing and each renamed definition by their
+  own files alone, each rename's callers changing with it · by value: NO VALUE READERS, each spelling
+  removed carrying no value another reader consumes.
 
 ## 3. Non-goals (OUT)
 
@@ -253,7 +342,8 @@ retrofit.md below, each of its lines cited at that blob).
 - A registry only an adopter holds, such as the roles kit's `role-stand-in-waiver.txt`: gov's tree has
   none for the rule to find, so its kit converts it when it next re-points that reader.
 - Draining any row: a conversion is a regrammar at one SHA and adds or drops no key.
-- Moving any population out of its directory (retrofit.md:258-272, "No population moves").
+- Moving any population out of its directory (retrofit.md:258-272, "No population moves"), but
+  the four homes under gov's tool root, which S14 moves to `memory/project/` (§8 F19).
 
 ### Edges
 
@@ -283,6 +373,7 @@ The pass re-derives the set at its base and re-reads each header; a disagreement
 | `memory/map/baseline.toml` | shrink-only | key · kind, key | 1 | `map_lib.parse_baseline`, `gen_map.py`, `owed_rows.derive_owed_rows` | codebase-map |
 | `memory/project/brief-recorded-waiver.txt` | shrink-only | record · unit | 1 | `tools/unattended/check-brief-recorded.sh` | unattended |
 | `memory/project/curation-debt.txt` | shrink-only | site · path | 1 | `check-memory-hygiene.sh` | memory-tree |
+| `memory/project/dead-path-waivers.txt`, from `tools/` (S14) | declared-set | site · path, text (verbatim) | lines of that text | `tools/check-dead-paths.sh` | registry |
 | `memory/project/docs-undocumented.txt` | shrink-only | key · id | 1 | `tools/govkit/docs_leg.py#read_legacy_rows` | registry |
 | `memory/project/encoding-posture-sites.txt` | shrink-only | site · path, arm | its count | `encoding_posture.py` `read_registry`, `check_registry` | gate-lint |
 | `memory/project/fork-ceilings.txt` | ceiling | key · id, bash, base (verbatim), setup, command | the ceiling | `tools/gate-lint/fork-count.sh` | gate-lint |
@@ -291,6 +382,7 @@ The pass re-derives the set at its base and re-reads each header; a disagreement
 | `memory/project/location-probe-waivers.txt` | shrink-only | site · path, probe | its count | `sh_hygiene.py` `read_registry`, `check_registry` | gate-lint |
 | `memory/project/method-carriers.txt` | declared-set | site · path | 1 | `check-method-carriers.sh` | memory-tree |
 | `memory/project/pass-order-waiver.txt` | shrink-only | record · unit | 1 | `tools/unattended/check-pass-order.sh` | unattended |
+| `memory/project/playbook-kit-waivers.txt`, from `tools/` (S14) | declared-set | key · kit | 1 | `tools/check-playbook-parity.sh` | registry |
 | `memory/project/readme-contract.txt` | declared-set | site · path, binding | 1 | `gen_build_index.py` | memory-tree |
 | `memory/project/refusal-retirements.txt` | append-only | record · unit, path, check, r1, r2, r3, r4, survivor, signature, replay; verbatim all but unit, path and survivor (§8 F12) | 1 | `check-arms.py` | memory-tree |
 | `memory/project/spawn-idiom-sites.txt` | shrink-only | site · path, class | its count | `sh_hygiene.py` | gate-lint |
@@ -300,8 +392,6 @@ The pass re-derives the set at its base and re-reads each header; a disagreement
 | `memory/project/temp-name-sites.txt` | shrink-only | site · path, class | its count | `sh_hygiene.py` | gate-lint |
 | `memory/project/trace-waiver.txt` | shrink-only | site · path, subject | 1 | `drift_report.py`, `check-memory-hygiene.sh` | memory-tree |
 | `memory/project/unarmed-branches.txt` | shrink-only | site · path, check (verbatim), signature (verbatim) | branches of that signature | `check-arms.py` | memory-tree |
-| `tools/dead-path-waivers.txt` | declared-set | site · path, text (verbatim) | lines of that text | `tools/check-dead-paths.sh` | registry |
-| `tools/playbook-kit-waivers.txt` | declared-set | key · kit | 1 | `tools/check-playbook-parity.sh` | registry |
 
 Totals: 16 shrink-only, 1 append-only, 5 declared-set, 1 ceiling (DERIVED from the table). Two registries key a row by an
 ordinal (`unarmed-branches.txt`'s and `dead-path-waivers.txt`'s), a position among equal rows; the
@@ -349,14 +439,14 @@ holds, per population, a table of key and former reason, and the count of rows b
 | Retired | Replaced by | Home |
 |---|---|---|
 | `SHRINK_ONLY` | `read_registrations(root)` filtered to `shrink-only`, each with its registration's population name as its gloss | derived |
-| `PINS` | the `ceiling` population `drift-pins`, key `key` · signal, count the pin | `tools/drift-audit/drift-pins.txt` |
-| `BASELINES` | the `shrink-only` population `drift-baselines`, key `record` · signal, id | `tools/drift-audit/drift-baselines.txt` |
+| `PINS` | the `ceiling` population `drift-pins`, key `key` · signal, count the pin | `memory/project/drift-pins.txt` |
+| `BASELINES` | the `shrink-only` population `drift-baselines`, key `record` · signal, id | `memory/project/drift-baselines.txt` |
 | template `DECLARED_EMPTY`'s shrink entry | an empty `shrink-only` registration list | derived |
 | six `RATCHETS` rows naming `drift_signals.py` keys | the `ratchet` pack's ceiling arm over `drift-pins` (unit 14) | — |
 
-The two new files are drift's project layer, as `drift_signals.py` is: withheld from installs by a
-`project-owned` `[[files]]` row in `tools/drift-audit/kit.toml`, and an adopter's own `PINS` and
-`BASELINES` dicts become its files through S10's step. `tools/drift-audit/drift_report.py#derive_low_waters`
+The two new files sit in `memory/project/` beside every other population, outside the kit, so no
+`[[files]]` row withholds them (S14, §8 F19). An adopter's own `PINS` and `BASELINES` dicts become
+its files through S10's step, which reads its layer from `--from`. `tools/drift-audit/drift_report.py#derive_low_waters`
 replays each list's history by counting its rows; the header is a `#` line, so a regrammar that keeps
 one row per key keeps the low water, and the two ordinal registries' low water falls once, at the
 conversion, to the keyed count. The `docs` leg reads its list's low water through the same function
@@ -369,9 +459,11 @@ A pin of 0 writes no `drift-pins` row, since a row's count is at least 1
 ### Inventory
 
 Minted: the 23 `[[ledger]]` tables (DERIVED from §4's table); `memory/map/baseline.txt` and `memory/map/affordance-exempt.txt`
-in place of the TOML names; `tools/drift-audit/drift-pins.txt` and `drift-baselines.txt` with their
-two registrations; `tools/memory-tree/convert_registry.py` with its verbs `convert`, `up`, `down`,
-`witness` and `read-back`, and its legacy-grammar table read by `read_legacy_rows`; the `[[upgrade]]` rows of S10; the conversion record; the
+in place of the TOML names; `memory/project/drift-pins.txt` and `memory/project/drift-baselines.txt`
+with their two registrations; `tools/memory-tree/convert_registry.py` with its verbs `convert` and
+`read-back`, and its legacy-grammar table read by `read_legacy_rows`;
+`tools/govkit/steps/registry_to_ledger.py` with its verbs `up`, `down` and `witness` and its
+`--from` flag; the `[[upgrade]]` rows of S10; the conversion record; the
 `regrammared at` answer and its `regrammared` fixture plant in `ratchet.py` (S11). Naming cells: each function and flag is asked of
 `python tools/lexicon/lexicon.py --suggest <name>` with `--as py.function` or `--as cli.flag` at the
 pass.
@@ -388,8 +480,11 @@ Live at landing: every converted population joins the `ratchet` pack's legs as d
 shrink signal watches every `shrink-only` registration where it watched six (§1): §4's 16 (DERIVED,
 §4's table), `drift-baselines` and unit 14's `conf-scalar-pins`, 18 (DERIVED from those). At the
 pass's close and its push, each in-place home reads `regrammared at <sha12>` (S11), and the two
-renamed map homes and the two drift homes `new at <sha12>` (TOOL-dWitnessedBar-14 S14); every base
-leg grades them once the push lands the conversion. The pass starts from
+renamed map homes and S14's four `new at <sha12>` (TOOL-dWitnessedBar-14 S14); every base
+leg grades them once the push lands the conversion. S14's moves read `new at` only where the
+compare base holds no file opening with their headers, as the merge-base `9e21ac760` of this branch
+and `origin/main` holds none (PINNED, 2026-11-19, by `git grep` of each header at it); a base
+holding pass 1's homes would read them `unresolved`, unit 14's `home-moved` case. The pass starts from
 retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 `python tools/run-gates/owed_rows.py --base HEAD` before its commit (PLAY-dOrderedCharter-50 S6).
 
@@ -416,8 +511,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `memory/project/temp-name-sites.txt`
 - `memory/project/trace-waiver.txt`
 - `memory/project/unarmed-branches.txt`
-- `tools/dead-path-waivers.txt`
-- `tools/playbook-kit-waivers.txt`
+- `memory/project/dead-path-waivers.txt` (moved from the tool root, S14)
+- `memory/project/playbook-kit-waivers.txt` (moved from the tool root, S14)
 - `tools/codebase-map/map_lib.py`
 - `tools/codebase-map/gen_map.py`
 - `tools/codebase-map/map_diff.py`
@@ -439,6 +534,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/memory-tree/check-method-carriers.sh`
 - `tools/memory-tree/adopt-memory-tree.sh`
 - `tools/memory-tree/convert_registry.py`
+- `tools/govkit/steps/registry_to_ledger.py` (S10, §8 F20)
 - `tools/memory-tree/ratchet.py` (S11, landed by TOOL-dWitnessedBar-14)
 - `tools/memory-tree/kit.toml`
 - `tools/gate-lint/sh_hygiene.py`
@@ -454,6 +550,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/check-playbook-parity.sh`
 - `tools/run-gates/owed_rows.py`
 - `tools/govkit/registry.toml`
+- `tools/gate-legs.json` (the `playbook parity selftest` guard, S14)
 - `tools/govkit/refusal_join.py`
 - `tools/govkit/check_runbook_parity.py`
 - `tools/govkit/docs_leg.py`
@@ -462,14 +559,17 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/drift_signals.py`
 - `tools/drift-audit/drift_signals.template.py`
-- `tools/drift-audit/drift-pins.txt`
-- `tools/drift-audit/drift-baselines.txt`
+- `memory/project/drift-pins.txt` (moved from the drift-audit kit, S14)
+- `memory/project/drift-baselines.txt` (moved from the drift-audit kit, S14)
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
 - `tools/drift-audit/SKILL.template.md` (rendered to `.claude/skills/drift-audit/SKILL.md`)
 - `tools/drift-audit/adopt-drift-audit.sh`
 - `tools/drift-audit/kit.toml`
 - `.gitattributes`
+- `.memory-tree.conf` (its `PROJECT_REGISTRY_EXTRA`, S14)
+- `.lexicon.conf` (its `VERB_OFFENDER_PIN`, where S15 re-measures it)
+- `memory/map/features/install-prefix.md`, `memory/map/features/playbook.md`, `memory/map/features/testsuite-counts.md` and `memory/gotchas/line-keyed-registry-reds-on-a-file-that-grew.md` (S14), with `memory/map/generated/CARDS.md` regenerated
 - each reader's suite where it plants a legacy row: `tools/unattended/check-brief-recorded.test.sh`, `tools/unattended/check-pass-order.test.sh`, `tools/unattended/unattended.test.sh`, `tools/memory-tree/check-memory-hygiene.test.sh`, `tools/memory-tree/check-method-carriers.test.sh`, `tools/check-dead-paths.test.sh`, `tools/check-playbook-parity.test.sh`, `tools/check-spec-tokens.test.sh`
 - `memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-16-registry-conversion.md`
 - `memory/builds/dWitnessedBar/BACKLOG.md` (S13's ask)
@@ -486,7 +586,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 ## 5. Production-readiness checklist
 
 - security — no new write path; `convert_registry.py` writes only the one home it is given, atomically
-  through `write_rows`, and under `up` the before-image `upgrade_steps.py` owns.
+  through `write_rows`, and under `up` the before-image `upgrade_steps.py` owns. The step program
+  reads `--from` only inside the target, through `upgrade_steps.check_contained` (S10).
 - perf / scale — every reader reads one file as before; drift's shrink signal reads 18 lists where it
   read six (DERIVED, §4 "Rollout").
 - error / empty / loading states — an empty home holds its header and its `# unarmed` state line
@@ -502,8 +603,10 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   `removed` at that pass; the header's `APPEND-ONLY` already forbade that edit, which no reader graded.
   `seed laundering` cannot see a converted row removed while its debt remains (§8 F13). Six
   registries stay in their grammar, ungraded by the `ratchet` legs and, for
-  `corpus-path-unresolved.txt`, unwatched by drift until unit 17 converts it (§3, §8 F16).
-- testing — AC1 to AC14 by probes, fixtures and scratch clones; the arms in §7 are observed RED then
+  `corpus-path-unresolved.txt`, unwatched by drift until unit 17 converts it (§3, §8 F16). An adopter
+  whose drift-audit kit is not at `<prefix>/drift-audit/` keeps its `PINS` where `--from` does not
+  look, so its step writes nothing there (§8 F19).
+- testing — AC1 to AC16 by probes, fixtures and scratch clones; the arms in §7 are observed RED then
   GREEN by the main loop at the close.
 - migration — §4 and S10.
 - user docs — `tools/drift-audit/README.md` replaces its `SHRINK_ONLY`, `PINS` and `BASELINES` rows;
@@ -513,7 +616,8 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 ## 6. Acceptance criteria
 
 - **AC1** — When the rule of S1 is run over `git ls-files memory/project memory/map tools` on the landed
-  tree, the two map names read as their `.txt` successors, every path it yields but the three §3 leaves to
+  tree, the two map names read as their `.txt` successors, S14's two tool-root lists read at their
+  `memory/project/` homes, every path it yields but the three §3 leaves to
   unit 18 and the six of F16, unit 14's `conf-scalar-pins.txt` among them, is the `home` of exactly one registration, `python legacy_ledger.py read <population>` reads each, each
   registration this unit writes carries S3's `seed`, and each population §4's table names has its
   row's direction; and `memory/builds/dWitnessedBar/BACKLOG.md` holds S13's ask, its title
@@ -564,13 +668,18 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - **AC9** — When `git check-attr merge -- memory/project/spawn-idiom-sites.txt` runs, it prints
   `merge: rows`, and the same holds for every converted home.
   Red when: a home lacks the line, so two concurrent drains conflict on the whole file.
-- **AC10** — When `python convert_registry.py up <adopter> --home memory/project/unarmed-branches.txt`
-  runs on a scratch adopter holding today's legacy file, the file takes the ledger grammar under the
+- **AC10** — When S10's step program runs `up <adopter> --home memory/project/unarmed-branches.txt`
+  on a scratch adopter holding today's legacy file, the file takes the ledger grammar under the
   header `# ledger · <population> · key site path,check,signature · direction shrink-only · drain
   <drain>`, with one row per `path, check, signature` and the count of its ordinals, and the dropped reasons are printed; `witness`
-  then exits 0; `convert` run again exits 0 and writes nothing; `down` restores the legacy bytes.
-  Red when: a second run re-dates the rows, the `seed laundering` case, or `down` leaves the ledger.
-  fixture: a scratch adopter under `%TEMP%/<short-name>` holding a copy of today's file.
+  then exits 0; `convert_registry.py convert` run again exits 0 and writes nothing; `down` restores the legacy bytes.
+  When `up` runs with `--home` naming the `drift-pins` home and `--from tools/drift-audit/drift_signals.py`
+  over an adopter whose layer's `PINS` holds a non-zero pin, the home holds one row per non-zero pin;
+  with a `--from` path holding a `..` segment it exits 1 writing nothing.
+  Red when: a second run re-dates the rows, the `seed laundering` case, `down` leaves the ledger, or
+  `--from` reads outside the target.
+  fixture: a scratch adopter under `%TEMP%/<short-name>` holding a copy of today's file and a
+  `tools/drift-audit/drift_signals.py` layer.
 - **AC11** — When `python tools/run-gates/owed_rows.py --selftest` runs on the landed tree after the
   rename, it exits 0; and when a scratch clone removes from `tools/gate-legs.json` a leg whose name
   the renamed map baseline (S6's `baseline.txt` in `memory/map/`) still lists and runs
@@ -592,16 +701,39 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   `populated` reds the bar.
   figure: F14's four homes are PINNED at `a966a5779` (2026-11-19).
 - **AC14** — When `git grep -n read_legacy_rows -- tools/memory-tree/gen_build_index.py` runs after
-  S12's second pass, it prints nothing, and `python tools/memory-tree/gen_build_index.py
-  --check-format` exits 0 over the converted file.
-  Red when: the transitional read outlives the conversion, so the reader keeps two grammars.
+  S12's second pass, it prints nothing, nor does `git grep -n "import convert_registry" -- tools`,
+  and `python tools/memory-tree/gen_build_index.py --check-format` exits 0 over the converted file.
+  Red when: the transitional read outlives the conversion, so the reader keeps two grammars and a
+  delegate imports a module the verdict epoch does not list.
+- **AC15** — When `git ls-files -- memory/project tools` is filtered for the four names S14 moves, it
+  lists each under `memory/project/` and none under `tools/`, and `python tools/lib/legacy_ledger.py
+  read <population>` exits 0 for each. `git grep -nE '[{]gov[}]/memory-tree/|^home = "tools/' --
+  'tools/*/kit.toml' tools/govkit/registry.toml` prints nothing. `git grep -cF
+  '"{gov}/govkit/steps/registry_to_ledger.py"' -- 'tools/*/kit.toml'` totals three for each `[[upgrade]]` row whose id ends
+  `-to-ledger`. `git grep -nE 'TOOLS / |"[a-z-]+/(kit|registry)[.]toml"' --
+  tools/memory-tree/convert_registry.py` prints nothing.
+  Red when: a home or an argv keeps a kit segment followed by a file, which an adopter installed at
+  another prefix reads as nothing.
+  figure: the row count is DERIVED by `git grep -c 'to-ledger"$' -- 'tools/*/kit.toml'`.
+- **AC16** — When `git grep -n 'done <<<' -- tools/check-dead-paths.sh tools/gate-lint/fork-count.sh`
+  runs on the landed tree, it prints nothing, nor does `git grep -n '_self_dir/lib/' --
+  tools/check-dead-paths.sh`, nor `git grep -n 'baseline.toml' -- tools/codebase-map/selftest.py
+  tools/codebase-map/kit.toml`. Each `memory/project/dead-path-waivers.txt` row whose disposition is
+  `carried:TOOL-dWitnessedBar-51` names a line that `git grep -nF` finds at its path, `{prefix}`
+  read as `tools`.
+  Red when: a pass-1 loop stays fed by a here-string, a lib path stays spelled, or a row waives a
+  carrier that is not there.
 
 ## 7. Gates
 
 The `ratchet` pack's legs (unit 14) grade every converted population: §8 F14's homes read
 `unarmed`, and each in-place home reads `regrammared at` on a base leg until the push lands (S11).
 
-`ratchet (never gains)` · `ratchet (unarmed)` · `ratchet (populated)` · `ratchet (seed laundering)` · `ratchet (rename)` · `ratchet (key shape)` · `ratchet selftest` · `install-prefix (shipped surface)` · `memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `playbook render selftest` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `routed-commits selftest` · `docs`
+The `install-prefix (shipped surface)` leg keeps one offender at this unit's close, unit 14's
+`conf-scalar-pins` seed argv, which TOOL-dWitnessedBar-51 carries (S15); every other offender pass 1
+left is cleared by S10, S14 and S15.
+
+`ratchet (never gains)` · `ratchet (unarmed)` · `ratchet (populated)` · `ratchet (seed laundering)` · `ratchet (rename)` · `ratchet (key shape)` · `ratchet selftest` · `install-prefix (shipped surface)` · `dead-path carriers (deleted files still named)` · `straggler-guard arms` · `run-gates gov canary` · `measure-legs selftest` · `shell hygiene (a loop fed by a command substitution)` · `verdict epoch (kit version dates the engine)` · `step-rows-frozen` · `memory hygiene` · `memory-hygiene self-test` · `branch-guard self-test` · `playbook render selftest` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `routed-commits selftest` · `docs`
 
 New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PINS and BASELINES fixtures re-pointed to registrations and the two populations, the failing case staged by a raised `drift-pins` row and a gained `drift-baselines` id · none
 
@@ -772,6 +904,38 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   `gen_map.py` writes the unarmed line itself, a second copy of the factory's `UNARMED_LEAD` bytes.
   RESOLVED (agent, 2026-11-19, delegated): (a), the factory's own dead-probe seam. widens: none ·
   relaxes: none
+- **F19 — Where do the four populations homed under gov's tool root go?** The factory reads `home`
+  literally (`tools/lib/legacy_ledger.py#read_registrations`), so a home under `tools/` names
+  nothing at an adopter installed at another prefix, and rule 2 of `tools/check-install-prefix.sh`
+  counts each, a leg that takes no waiver (`2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return`).
+  Options: (a) each to `memory/project/` under its own name, where every other population sits; gov's
+  two lists read there as `tools/check-spec-tokens.py@6035ac5e2a9a:566` reads its own, and drift's two
+  steps read the adopter's layer through `--from {prefix}/drift-audit/drift_signals.py`; (b) homes
+  spelled `{prefix}/…` with the factory resolving the token; (c) drift's two moved and gov's two
+  left, as gov's own lists that no install receives; (d) drift's two steps dropped, so an adopter's
+  measured `PINS` and `BASELINES` are lost. (b) changes unit 13's factory, a §3 Non-goal, and (c)
+  leaves the leg red, veto 1 each; (d) drops data an adopter holds, veto 3. RESOLVED (agent,
+  2026-11-19, delegated): (a), the one survivor. retrofit.md:258-272's reasons against a move do
+  not reach it: check 3 admits each name by its own rule (S14), no adopter holds a reader of gov's two
+  lists, and every reader is re-pointed in this unit. What it does not check: an adopter whose
+  drift-audit kit is not at `<prefix>/drift-audit/` holds its layer where `--from` does not look,
+  so its step reads no legacy file there and writes nothing. widens: none · relaxes: §3's "No
+  population moves", for these four
+- **F20 — Which program does each `[[upgrade]]` argv run?** `{gov}/memory-tree/convert_registry.py`
+  is a kit segment followed by a file, which rule 3 of `tools/check-install-prefix.sh` counts;
+  `tools/govkit/upgrade_steps.py#check_argv` admits only `{gov}`, `{target}` and `{prefix}`; and
+  `tools/govkit/upgrade_steps.py#derive_step_context` answers `{prefix}` with the target's relative
+  install prefix while `tools/govkit/upgrade_steps.py#run_step_isolated` spawns from gov's checkout, so
+  a `{prefix}` program names nothing there. Options: (a) a step program at
+  `tools/govkit/steps/registry_to_ledger.py` holding `up`, `down` and `witness` and loading
+  `convert_registry.py` through `resolve_kit_dir`, the shipped program keeping `convert` and
+  `read-back`; (b) the same path as a forward to `convert_registry.py`'s own step verbs, which keeps
+  that shipped program's `load_steps` reaching the deployer by a kit path; (c)
+  `{target}/{prefix}/memory-tree/convert_registry.py`, the target's own copy. (c) runs no program
+  gov tracks, which the respelling must keep, and `check_frozen` reads `{gov}/` programs alone, so
+  nothing would freeze it. RESOLVED (agent, 2026-11-19, delegated): (a), of the two survivors the one
+  that removes text: the step verbs and the deployer reach leave a program every adopter receives
+  and none can run without a deployer. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -838,6 +1002,14 @@ New arm: tools/memory-tree/ratchet.py · covers AC12 · `ratchet selftest` gains
   stated in S4; the empty homes re-pinned at four, the map list among them (F14); an empty adopter
   affordance list seeded unarmed (F18); F9 moot. §1 narrowed as the brief directs; no other Goal
   intent moved.
+- rev-13 · 2026-11-19 · S10 · S14 S15 (new) · §3 · §4 The populations, Drift, Inventory, Rollout,
+  Files touched · §5 · AC1 AC10 AC14 · AC15 AC16 (new) · §7 · §8 F19 F20 (new) · §10 · per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-16-spec-fix-4-brief, handed off as
+  2026-11-19-prompt-TOOL-dWitnessedBar-16-7-spec-writer, over pass 2's divergence in
+  `2026-11-19-build-TOOL-dWitnessedBar-16-4-builder-return`, from the tree pass 1 landed. Every
+  `[[upgrade]]` argv runs gov's step program `tools/govkit/steps/registry_to_ledger.py` (F20). The
+  four homes under gov's tool root move to `memory/project/` (S14, F19), and §3's "No population
+  moves" is restated for them. The return's other pass-1 reds are folded in as S15. No Goal moved.
 
 ## 10. Reuse audit
 
@@ -846,8 +1018,12 @@ and `compare_counts` the adapters `tools/gate-lint/sh_hygiene.py#read_registry` 
 `tools/gate-lint/encoding_posture.py#read_registry` already call (unit 13 S9), and which replace every
 other registry parser §4 names; drift's
 `signal_shrink_only` and `tools/drift-audit/drift_report.py#derive_low_waters` are kept and
-re-fed from the registrations. S10's step programs follow `tools/govkit/steps/review_rounds.py`'s
-shape over `upgrade_steps.py`'s before-image helpers, minting no second step runner. `read-back`
+re-fed from the registrations. S10's step program `tools/govkit/steps/registry_to_ledger.py` sits as
+`tools/govkit/steps/review_rounds.py` does, over `upgrade_steps.py`'s before-image helpers and
+`check_contained`, minting no second step runner. It loads the conversion through govkit's
+`resolve_kit_dir`, as `tools/govkit/docs_leg.py#read_legacy_rows` loads the factory, and
+`convert_registry.py` finds a population's table through the factory's own `read_registrations`.
+S14's homes follow `tools/check-spec-tokens.py`'s own `memory/project/` home. `read-back`
 reads through the factory's `read_ledger`, and `read_legacy_rows` is the one legacy parser that
 `convert` and S7's transitional read share. The adopters'
 seeds stay on unit 15's `tools/lib/legacy_ledger.py#seed_home` and its dead-probe line (§8 F10,
