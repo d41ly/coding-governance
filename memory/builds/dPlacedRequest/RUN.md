@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 15d20d36330b4f414ec50df6817e962037c85177
-phase: REVIEWING
+witness: 88f3b4132f3cd79b01fbe745acd962b9edc18895
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -39,3 +39,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-19T06:46:56Z draw · review-round · dPlacedRequest-spec-set-r3 · 2/130 · 20261119T064656Z-50cda6
 
 2026-11-19T06:46:56Z review · item dPlacedRequest-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 18 · folded 20 · promoted 0 · disposition fold
+
+2026-11-19T06:50:21Z dispatch · item 88f3b413 TOOL-dPlacedRequest-11 · reason tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/README.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh tools/loop/README.md help/loop.md .githooks/pre-push .githooks/pre-push.test.sh tools/govkit/subject-pins.tsv memory/map/generated
