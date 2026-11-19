@@ -34,3 +34,10 @@ repositories were made by the case's own `tempfile.mkdtemp(prefix="pol-")` under
   each stating the module-constant shape, and
   `grep -c "a key passed through a variable reads as unread" tools/policy/README.md` printed `0`.
   Red: at the base the first grep found no line in either file and the count printed `1`.
+
+## New-arm observations (main loop, M8)
+
+Observed at `f3a64d91b` in an LF clone under `%TEMP%/armlo`, through `python tools/policy/check_policy.py --fixture <case>`, one staged break at a time, the file restored byte for byte after each run. Before the breaks and after the restore every fixture below read `0 wrong` at `f3a64d91b`.
+
+- `--fixture reader-coverage` · break: the fourth `READER_SHAPES` row deleted · RED: `case reader-constant` printed WRONG, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage` · break: `MODULE_CONSTANT` unanchored from column 0 (`^` removed) · RED: `case constant-unread` printed `WRONG: graded 1`, rc 1 at `f3a64d91b` · GREEN once restored.

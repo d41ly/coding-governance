@@ -51,3 +51,9 @@ repositories were made by the case's own `tempfile.mkdtemp(prefix="pol-")` under
   over `tools/policy/README.md` found the arms-table row, the arm paragraph and the fixture paragraph.
   Red: at the base, `grep -n "A build whose specs are still" help/policy.md` found line 149; it finds
   nothing now.
+
+## New-arm observations (main loop, M8)
+
+Observed at `f3a64d91b` in an LF clone under `%TEMP%/armlo`, through `python tools/policy/check_policy.py --fixture <case>`, one staged break at a time, the file restored byte for byte after each run. Before the breaks and after the restore every fixture below read `0 wrong` at `f3a64d91b`.
+
+- `--fixture reader-coverage-carried` · break: the `if not runs: return landed` guard of `derive_landed_builds` replaced by an unconditional `return landed`, so half 2 never runs · RED: `case carried-landed` printed `WRONG: graded 0`, rc 1 at `f3a64d91b` · GREEN once restored.

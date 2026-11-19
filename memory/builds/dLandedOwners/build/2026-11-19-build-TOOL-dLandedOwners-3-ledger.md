@@ -47,3 +47,10 @@ removed by `remove_repo`; the real repository's refs were never written.
 Owed to the close (M8): the arm `tools/policy/check_policy.py --fixture reader-coverage-declared`
 observed RED on its staged break and GREEN restored, recorded here under a `Pass: none` commit, and
 the legs of the spec's section 7.
+
+## New-arm observations (main loop, M8)
+
+Observed at `f3a64d91b` in an LF clone under `%TEMP%/armlo`, through `python tools/policy/check_policy.py --fixture <case>`, one staged break at a time, the file restored byte for byte after each run. Before the breaks and after the restore every fixture below read `0 wrong` at `f3a64d91b`.
+
+- `--fixture reader-coverage-declared` · break: `read_unscanned_readers` answers no rows (its `is_file` test replaced by `True`) · RED: `case declared-outside` printed WRONG, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage-declared` · break: the scanned-path test of `check_reader_coverage` (`elif path in scanned`) replaced by `elif False` · RED: `case declared-scanned` printed `WRONG: graded 1`, rc 1 at `f3a64d91b` · GREEN once restored.

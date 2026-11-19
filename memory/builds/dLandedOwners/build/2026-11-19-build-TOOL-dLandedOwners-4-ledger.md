@@ -75,3 +75,15 @@ GREEN restored through `check_policy.py --fixture <case>`, recorded here under a
 the case `adopter-fresh-target`, whose stray check now reads `derive_withheld_names` and which this
 pass did not run; the govkit fixtures `stale_edges.py` and `retired_edits.py` and the shims case, whose
 ignore lists now derive the names; and the legs of the spec's section 7.
+
+## New-arm observations (main loop, M8)
+
+Observed at `f3a64d91b` in an LF clone under `%TEMP%/armlo`, through `python tools/policy/check_policy.py --fixture <case>`, one staged break at a time, the file restored byte for byte after each run. Before the breaks and after the restore every fixture below read `0 wrong` at `f3a64d91b`.
+
+- `--fixture reader-coverage-carried` · break: `derive_run_kind` loads its own modules from the default kit · RED: `case kit-root-threaded` printed WRONG with the refusal, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage-carried` · break: the `bases[b] &` intersection dropped · RED: `case landing-other-base` printed `WRONG: graded 1`, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage-carried` · break: `RUN_RECORD` narrowed to `^RUN\.md$` · RED: `case rotated-landed` printed `WRONG: graded 0`, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage-carried` · break: `disposed.add(row.target)` replaced by `pass` · RED: `case disposed-ask-landed` printed `WRONG: graded 0`, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture reader-coverage-carried` · break: `derive_run_kind`'s last line answers `"spec"` always · RED: `case roster-specced-landed` printed `WRONG: graded 0`, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture legacy-homes-withheld-install` · break: an `engine` rule for `unscanned-readers.txt` appended after the `project-owned` rule in `tools/policy/kit.toml` · RED: the plan and apply checks for `unscanned-readers.txt` printed WRONG, rc 1 at `f3a64d91b` · GREEN once restored.
+- `--fixture legacy-homes-present` · break: `unscanned-readers.txt` taken out of the `project-owned` include · RED: the descriptor check printed `WRONG: no such rule`, rc 1 at `f3a64d91b` · GREEN once restored.
