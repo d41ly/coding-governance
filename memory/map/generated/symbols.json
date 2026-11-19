@@ -95,6 +95,11 @@
     {
       "id": "Coverage",
       "kind": "class",
+      "file": "tools/gate-lint/coverage_join.py"
+    },
+    {
+      "id": "Coverage",
+      "kind": "class",
       "file": "tools/lib/coverage_join.py"
     },
     {
@@ -461,6 +466,21 @@
       "id": "Refused",
       "kind": "class",
       "file": "tools/workflows/review_pin.py"
+    },
+    {
+      "id": "Registration",
+      "kind": "class",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "Registration",
+      "kind": "class",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "Registration",
+      "kind": "class",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "Report",
@@ -3278,6 +3298,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_ledger_plane",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "build_leg_yield",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -3326,6 +3351,16 @@
       "id": "build_live_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_ll_ledger",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "build_ll_table",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "build_ln_fixture",
@@ -4411,6 +4446,21 @@
       "id": "carry_matches",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "carry_renames",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "carry_renames",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "carry_renames",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "carve_out_sites",
@@ -6418,6 +6468,21 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_home",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "check_home",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "check_home",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "check_honest_rotation",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -6666,6 +6731,11 @@
       "id": "check_lease_only_diff",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "check_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "check_leg_claimable",
@@ -9035,6 +9105,11 @@
     {
       "id": "cmd_carry",
       "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "cmd_carry",
+      "kind": "function",
       "file": "tools/push-main.sh"
     },
     {
@@ -9121,6 +9196,11 @@
       "id": "cmd_check_with_ids",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_compare",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
     },
     {
       "id": "cmd_contribute",
@@ -9306,6 +9386,11 @@
       "id": "cmd_prose",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_read",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
     },
     {
       "id": "cmd_ready",
@@ -9563,9 +9648,44 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "compare_counts",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "compare_counts",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "compare_counts",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
+      "id": "compare_to_base",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "compare_to_base",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "compare_to_base",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "compliant",
       "kind": "function",
       "file": "tools/check-testsuite-counts.sh"
+    },
+    {
+      "id": "compute_coverage",
+      "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
     },
     {
       "id": "compute_coverage",
@@ -10236,6 +10356,11 @@
       "id": "derive_baseline_additions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "derive_baseline_additions",
+      "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
     },
     {
       "id": "derive_baseline_additions",
@@ -13340,6 +13465,11 @@
     {
       "id": "drop_touched_exemptions",
       "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
+    },
+    {
+      "id": "drop_touched_exemptions",
+      "kind": "function",
       "file": "tools/lib/coverage_join.py"
     },
     {
@@ -15570,6 +15700,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/lib/python_floor.py"
     },
     {
@@ -16361,6 +16496,11 @@
       "id": "measure_known_set",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "measure_ledger_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
     },
     {
       "id": "measure_legs_retried_after_timeout",
@@ -17421,6 +17561,21 @@
       "id": "parse_grants",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "parse_header",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "parse_header",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "parse_header",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "parse_iso",
@@ -20918,6 +21073,21 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_ledger",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_ledger",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "read_ledger_lines",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -22093,6 +22263,21 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "read_registrations",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_registrations",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_registrations",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "read_registry",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
@@ -22166,6 +22351,21 @@
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_renames",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_renames",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_renames",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "read_render_state",
@@ -22381,6 +22581,21 @@
       "id": "read_rows",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_rows",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "read_rows",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "read_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "read_rows",
@@ -25453,6 +25668,21 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "render_header",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "render_header",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "render_header",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "render_heads",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -25543,6 +25773,16 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "render_ledger_head",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "render_ledger_row",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
       "id": "render_leg_row",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -25591,6 +25831,21 @@
       "id": "render_loop_order",
       "kind": "function",
       "file": "tools/loop/composition.py"
+    },
+    {
+      "id": "render_malformed",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "render_malformed",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "render_malformed",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "render_map_line",
@@ -26770,6 +27025,11 @@
     {
       "id": "resolve_compare_base",
       "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
+    },
+    {
+      "id": "resolve_compare_base",
+      "kind": "function",
       "file": "tools/lib/compare_base.py"
     },
     {
@@ -27568,6 +27828,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "resolve_ledger_factory",
+      "kind": "function",
+      "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
       "id": "resolve_leg_manifest",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
@@ -28251,6 +28516,11 @@
       "id": "resolve_remote",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
+      "file": "tools/gate-lint/coverage_join.py"
     },
     {
       "id": "resolve_remote",
@@ -30466,6 +30736,16 @@
       "id": "run_live_session",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_ll",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "run_ll_reset",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "run_ln",
@@ -37836,6 +38116,21 @@
       "id": "write_row_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_rows",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "write_rows",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "write_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "write_rows_spec",

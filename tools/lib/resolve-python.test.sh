@@ -409,6 +409,7 @@ run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 refuse_wrong_shell|$ROOT/$KIT_REL/refuse-wrong-shell.sh|$KIT_REL/refuse-wrong-shell
+legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -474,6 +475,11 @@ refuse_wrong_shell|$ROOT/$KIT_REL/refuse-wrong-shell.sh|$KIT_REL/refuse-wrong-sh
 # refuse_wrong_shell (TOOL-dWitnessedBar-27 S1) is the wrong-shell refusal every entry point that
 # carries the resolve_python block carries directly after it; a sourcer of resolve-python.sh sources the
 # canonical instead, and the coverage arm below the loop holds the population to one shape or the other.
+# legacy_ledger_py (TOOL-dWitnessedBar-13 S8) is the baseline ledger factory: the memory-tree kit's
+# copy, which the row-keyed merge driver reads a ledger's header through, and the gate-lint kit's copy,
+# which its two count-ratchet adapters read through. gate-lint requires no kit, so it also carries a
+# coverage_join.py shaped as memory-tree's, whose coverage_join, remote_ladder_py and compare_base_py
+# blocks the existing rows above find by their markers; part 2o below holds the canonical's CLI.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -1044,6 +1050,135 @@ for (const line of require("fs").readFileSync(0, "utf8").split("\n").filter(Bool
 [ "$rws_sh" = "$rws_want" ] || bad "2n: refuse-wrong-shell.sh --probe left the truth table: $(printf '%s' "$rws_sh" | tr '\n' ' ')"; ok
 [ "$rws_py" = "$rws_want" ] || bad "2n: resolve_bash.py's wrong_shell_at left the truth table: $(printf '%s' "$rws_py" | tr '\n' ' ')"; ok
 [ "$rws_js" = "$rws_want" ] || bad "2n: resolve_bash.js's wrongShellAt left the truth table: $(printf '%s' "$rws_js" | tr '\n' ' ')"; ok
+
+# ---- 2o. THE BASELINE LEDGER FACTORY, BEHAVIOUR (TOOL-dWitnessedBar-13) ------------------------------
+# Parity holds the two kit copies to the canonical; this holds the canonical's CLI to the spec's AC1 to
+# AC4, AC9 and AC10 over one fixture repo whose `main` sits on a bare remote it has fetched, so
+# `resolve_compare_base` resolves, with every edit made on a branch off it and reset after its arm. Four
+# registrations: `fx-sites` (site, shrink-only) and `fx-refs` (record, append-only, `ref` verbatim) in
+# tools/fx/kit.toml, `fx-keys` (key, declared-set, `ref` verbatim) in the fixture's govkit registry, and
+# `fx-recall` (key, append-only) in scripts/recall/kit.toml, outside the directory holding the other
+# kit. Then AC7: one byte changed in a scratch copy of the gate-lint copy reads as drift through `blk`.
+# WHAT THIS DOES NOT CHECK: a registration's `seed` argv, which the factory never runs; a ledger merge,
+# merge-rows.test.sh's group 1l; and AC8, the two scanners' own legs at the pass tip.
+T=$'\t'
+LL="$TMP/ll"; LLR="$LL/repo"; mkdir -p "$LL"
+build_ll_table() { # population key fields direction home [verbatim] -> one [[ledger]] table
+  printf '[[ledger]]\npopulation = "%s"\nleg = "fx leg"\nseed = []\nkey = "%s"\nfields = [%s]\ndrain = "none"\ndirection = "%s"\nhome = "%s"\n' "$1" "$2" "$3" "$4" "$5"
+  [ -z "${6:-}" ] || printf 'verbatim = [%s]\n' "$6"
+  printf '\n'
+}
+build_ll_ledger() { # population key fields-csv direction -> the header the factory renders
+  printf '# ledger · %s · key %s %s · direction %s · drain none\n' "$1" "$2" "$3" "$4"
+}
+run_ll() { # verb population [--measured path] -> the CLI's stdout and stderr, then rc=<exit>
+  (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$HERE/legacy_ledger.py" "$@") 2>&1 | tr -d '\r'
+  echo "rc=${PIPESTATUS[0]}"
+}
+run_ll_reset() { git -C "$LLR" reset -q --hard && git -C "$LLR" clean -qfd; }
+git init -q --bare "$LL/remote.git"
+git init -q -b main "$LLR" && git -C "$LLR" config core.autocrlf false
+mkdir -p "$LLR/tools/fx" "$LLR/tools/govkit" "$LLR/scripts/recall" "$LLR/memory/project"
+{ printf 'id = "fx"\n\n'; build_ll_table fx-sites site '"path", "delimiter"' shrink-only memory/project/fx-sites.txt
+  build_ll_table fx-refs record '"ref", "note"' append-only memory/project/fx-refs.txt '"ref"'; } > "$LLR/tools/fx/kit.toml"
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"ref"' > "$LLR/tools/govkit/registry.toml"
+build_ll_table fx-recall key '"name"' append-only memory/project/fx-recall.txt > "$LLR/scripts/recall/kit.toml"
+{ build_ll_ledger fx-sites site path,delimiter shrink-only; printf 'a.sh\tEOF\t2\tabcdef12\tseeded\nc.sh\tEOF\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-sites.txt"
+{ build_ll_ledger fx-refs record ref,note append-only; printf 'y.py:7\tnote\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-refs.txt"
+{ build_ll_ledger fx-keys key ref declared-set; printf 'x.py:120\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-keys.txt"
+{ build_ll_ledger fx-recall key name append-only; printf 'alpha\t1\tabcdef12\tseeded\n'; } > "$LLR/memory/project/fx-recall.txt"
+printf 'echo the a script\n' > "$LLR/a.sh"; printf 'echo the c script\n' > "$LLR/c.sh"
+git -C "$LLR" add -A && git -C "$LLR" -c user.email=t@e -c user.name=t commit -q --no-verify -m fixture \
+  && git -C "$LLR" remote add origin ../remote.git && git -C "$LLR" push -q origin main 2>/dev/null \
+  && git -C "$LLR" fetch -q origin && git -C "$LLR" remote set-head origin main >/dev/null \
+  && git -C "$LLR" checkout -q -b feature || bad "2o: the ledger fixture repo could not be built"; ok
+# AC1 — rows read, then a disagreeing header, a line-number key and a disposition outside the set.
+out=$(run_ll read fx-sites)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "a.sh${T}EOF${T}2${T}abcdef12${T}seeded" <<<"$out" && grep -qxF "c.sh${T}EOF${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC1: read fx-sites did not print both rows and exit 0: ${out//$'\n'/ | }"; ok
+{ build_ll_ledger fx-sites site path,delimiter append-only; git -C "$LLR" show HEAD:memory/project/fx-sites.txt | tail -n +2; } > "$LL/fx-sites.txt"
+cp "$LL/fx-sites.txt" "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 1: the header' <<<"$out"; } || bad "2o AC1: a header disagreeing with its registration read clean: ${out//$'\n'/ | }"; ok
+printf 'a.sh\t42\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: a key field reads as a line number' <<<"$out"; } || bad "2o AC1: a line-number key read clean: ${out//$'\n'/ | }"; ok
+printf 'd.sh\tEOF\t1\tabcdef12\tdone\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: the disposition' <<<"$out"; } || bad "2o AC1: the disposition done read clean: ${out//$'\n'/ | }"; ok
+# AC2 — both ways against a measurement, and a compare given none says so.
+printf 'a.sh\tEOF\t2\nb2.sh\tEOF\t1\n' > "$LL/measured.txt"
+out=$(run_ll compare fx-sites --measured "$LL/measured.txt")
+{ [ "$(grep -c 'undeclared site b2.sh' <<<"$out")" = 1 ] && [ "$(grep -c 'unmeasured row c.sh' <<<"$out")" = 1 ] \
+  && [ "$(grep -cE 'undeclared site|unmeasured row' <<<"$out")" = 2 ] && [ "${out##*$'\n'}" = rc=1 ]; } \
+  || bad "2o AC2: compare --measured did not name one undeclared site and one unmeasured row: ${out//$'\n'/ | }"; ok
+out=$(run_ll compare fx-sites)
+{ ! grep -qE 'undeclared site|unmeasured row' <<<"$out" && grep -q 'both-ways half was not run' <<<"$out"; } \
+  || bad "2o AC2: a compare given no measurement passed as if both ways had been read: ${out//$'\n'/ | }"; ok
+# AC3 — a gain against the base under shrink-only, widened, under declared-set, and with no base.
+printf 'e.sh\tEOF\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll compare fx-sites)
+grep -q "gained e.sh${T}EOF" <<<"$out" || bad "2o AC3: a key the shrink-only ledger gained was not printed gained: ${out//$'\n'/ | }"; ok
+run_ll_reset; printf 'e.sh\tEOF\t1\tabcdef12\twidened:REC-1\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll compare fx-sites); run_ll_reset
+{ ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a widened gain was refused: ${out//$'\n'/ | }"; ok
+printf 'z.py:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-keys.txt"
+out=$(run_ll compare fx-keys); run_ll_reset
+{ ! grep -q 'gained' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } || bad "2o AC3: a declared-set ledger's gain was refused: ${out//$'\n'/ | }"; ok
+git -C "$LLR" update-ref -d refs/remotes/origin/main
+out=$(run_ll compare fx-sites); git -C "$LLR" fetch -q origin
+{ grep -q 'unresolved — no origin/main ref to compare against' <<<"$out" && [ "${out##*$'\n'}" = rc=1 ]; } \
+  || bad "2o AC3: a compare with no base did not print unresolved and its reason: ${out//$'\n'/ | }"; ok
+# AC4 — a staged rename carried, then compared clean; an untracked home is never written.
+git -C "$LLR" mv a.sh b.sh
+out=$(run_ll carry fx-sites)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "b.sh${T}EOF${T}2${T}abcdef12${T}seeded" "$LLR/memory/project/fx-sites.txt" \
+  && ! grep -q '^a\.sh' "$LLR/memory/project/fx-sites.txt"; } || bad "2o AC4: carry did not move a.sh's row to b.sh with its count, sha and disposition: ${out//$'\n'/ | }"; ok
+printf 'b.sh\tEOF\t2\nc.sh\tEOF\t1\n' > "$LL/measured.txt"
+out=$(run_ll compare fx-sites --measured "$LL/measured.txt")
+{ ! grep -qE 'gained|unmeasured row|undeclared site' <<<"$out" && [ "${out##*$'\n'}" = rc=0 ]; } \
+  || bad "2o AC4: a carried rename read as a drain and a gain: ${out//$'\n'/ | }"; ok
+run_ll_reset; git -C "$LLR" mv a.sh b.sh && git -C "$LLR" rm -q --cached memory/project/fx-sites.txt
+ll_before=$(cksum < "$LLR/memory/project/fx-sites.txt")
+out=$(run_ll carry fx-sites)
+ll_after=$(cksum < "$LLR/memory/project/fx-sites.txt"); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q 'memory/project/fx-sites.txt is not a tracked home' <<<"$out" \
+  && [ "$ll_before" = "$ll_after" ]; } \
+  || bad "2o AC4: carry over an untracked home did not exit 2 naming it with the file's bytes unchanged: ${out//$'\n'/ | }"; ok
+# AC9 — a population registered only in the govkit registry, one whose kit sits outside the others'
+# parent, and a kit table declaring the first one's home.
+out=$(run_ll read fx-keys)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "x.py:120${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC9 AC10: read fx-keys, registered in the govkit registry with ref verbatim, did not print its row and exit 0: ${out//$'\n'/ | }"; ok
+out=$(run_ll read fx-recall)
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "alpha${T}1${T}abcdef12${T}seeded" <<<"$out"; } \
+  || bad "2o AC9: read fx-recall, registered in scripts/recall/kit.toml, did not print its row and exit 0: ${out//$'\n'/ | }"; ok
+build_ll_table fx-dup key '"ref"' declared-set memory/project/fx-keys.txt >> "$LLR/tools/fx/kit.toml"
+out=$(run_ll read fx-keys); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "declare one home memory/project/fx-keys.txt" <<<"$out" \
+  && grep -q "tools/govkit/registry.toml: \[\[ledger\]\] 'fx-keys'" <<<"$out" && grep -q "tools/fx/kit.toml: \[\[ledger\]\] 'fx-dup'" <<<"$out"; } \
+  || bad "2o AC9: two tables declaring one home did not exit 2 naming both: ${out//$'\n'/ | }"; ok
+# AC10 — verbatim is per field and per registration: a second population's line-number key, a
+# verbatim registration's other field, and a verbatim entry outside the fields.
+printf 'a.sh\t120\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-sites.txt"
+out=$(run_ll read fx-sites); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 4: a key field reads as a line number' <<<"$out"; } \
+  || bad "2o AC10: a site key field 120 with no verbatim read clean: ${out//$'\n'/ | }"; ok
+out=$(run_ll read fx-refs)
+[ "${out##*$'\n'}" = rc=0 ] || bad "2o AC10: read fx-refs over its verbatim ref did not exit 0: ${out//$'\n'/ | }"; ok
+printf 'y.py:8\tz:9\t1\tabcdef12\tseeded\n' >> "$LLR/memory/project/fx-refs.txt"
+out=$(run_ll read fx-refs); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=1 ] && grep -q 'line 3: a key field reads as a line number' <<<"$out"; } \
+  || bad "2o AC10: verbatim ref waived the line-number refusal on the note field too: ${out//$'\n'/ | }"; ok
+build_ll_table fx-keys key '"ref"' declared-set memory/project/fx-keys.txt '"nope"' > "$LLR/tools/govkit/registry.toml"
+out=$(run_ll read fx-keys); run_ll_reset
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q "tools/govkit/registry.toml: \[\[ledger\]\] 'fx-keys': verbatim names nope, not in its fields" <<<"$out"; } \
+  || bad "2o AC10: a verbatim entry outside the fields was accepted: ${out//$'\n'/ | }"; ok
+# AC7 — the parity cut sees one byte changed in the gate-lint copy.
+sed 's/^KEY_KINDS = /KEY_KINDZ = /' "$ROOT/${PFX}gate-lint/legacy_ledger.py" > "$TMP/ll-drift.py"
+{ [ "$(blk legacy_ledger_py "$ROOT/${PFX}gate-lint/legacy_ledger.py")" = "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ] \
+  && [ "$(blk legacy_ledger_py "$TMP/ll-drift.py")" != "$(blk legacy_ledger_py "$HERE/legacy_ledger.py")" ]; } \
+  || bad "2o AC7: the legacy_ledger_py cut did not hold the gate-lint copy identical, or missed one changed byte"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

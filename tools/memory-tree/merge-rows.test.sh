@@ -636,6 +636,43 @@ keys "$NOID" && bad "oracle: the driver keyed a row with no id at all"
 { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-3 theirs; } > "$TMP/b"
 run "disjoint appends" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 
+# --- 1l. the LEDGER class: disjoint appends and a concurrent drain on a planted ledger --------------
+# TOOL-dWitnessedBar-13 S7. A baseline ledger opens with the header its factory renders from the
+# registration, and its rows are TAB fields keyed by the header's key fields, so neither the bullet
+# plane nor the anchor grammar sees one; `check_ledger` reads the header on all three sides and `merge`
+# hands the ledger plane to every reader of rows. AC5: `%A` and `%B` each append a row, and the result
+# holds both, the header once, census `ledger-keyed` and verdict `clean` — red when the TSV rows fall to
+# the structure plane and the append conflicts, or a postcondition reads the bullet plane. AC6: a key
+# both sides lowered keeps the lower count, and a key `%A` drained while `%B` left it as at `%O` is
+# absent. WHAT THIS DOES NOT CHECK: a ledger's `merge=rows` attribute, which each converting unit adds,
+# and the ledger rule's other cases, which are TOOL-dWitnessedBar-51's.
+render_ledger_head() { printf '# ledger · fx-refs · key key ref · direction shrink-only · drain key\n'; }
+render_ledger_row() { printf '%s\t%s\t%s\tseeded\n' "$1" "$2" "${3:-abcdef12}"; }
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-2 1; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-3 2; } > "$TMP/b"
+cp "$TMP/a" "$TMP/la"
+run "disjoint appends on a ledger" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^# ledger · ' "$TMP/a")" = 1 ] || bad "ledger appends: the header is not written exactly once"
+for k in TOOL-zFixture-2 TOOL-zFixture-3; do
+  grep -q "^$k"$'\t' "$TMP/a" || bad "ledger appends: the appended row $k is not in the result"
+done
+cp "$TMP/la" "$TMP/a"
+lline=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null | grep '^merge-rows: rows ' | tail -1)
+grep -q 'census ledger-keyed, clean$' <<<"$lline" \
+  || bad "ledger appends: the audit line does not read census ledger-keyed and verdict clean: [$lline]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 2; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3 1234abcd; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/b"
+run "concurrent drain on a ledger" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
+[ "$(grep "^TOOL-zFixture-1"$'\t' "$TMP/a" | cut -f2,3 | tr '\t' ' ')" = "2 abcdef12" ] \
+  || bad "ledger drain: the key both sides lowered did not keep %A's count 2 with its sha: [$(grep "^TOOL-zFixture-1" "$TMP/a" | tr '\t' ' ')]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+cp "$TMP/o" "$TMP/b"
+run "a drained ledger key beats a carried one" 0 "TOOL-zFixture-2 " TOOL-zFixture-1
+grep -q "^TOOL-zFixture-1"$'\t' "$TMP/a" && bad "ledger drain: the key %A drained and %B carried survived the merge"
+
 # --- 2. the shape that broke union: same id, different text, both sides ---------------------------
 { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
 { pre; row TOOL-zFixture-1 ours; } > "$TMP/a"
@@ -2345,8 +2382,8 @@ check_table_case "only theirs adds a tag" "$MANIFEST" 0 "" red
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 57 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 57 — a group was deleted"
-[ "$nruns" -ge 42 ] || bad "only $nruns 'run' case(s) remain, expected at least 42 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 58 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 58 — a group was deleted"
+[ "$nruns" -ge 45 ] || bad "only $nruns 'run' case(s) remain, expected at least 45 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

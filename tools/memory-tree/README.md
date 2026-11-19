@@ -151,6 +151,19 @@ pre-switch branch's shard edits from line-merging into a view, and git asks the 
 path whose attribute names it, so without that line git's own text merge completes the merge with
 nothing refusing it.
 
+**A baseline ledger merges through the same driver** (TOOL-dWitnessedBar-13). A ledger is the file
+the baseline ledger factory, this kit's `legacy_ledger.py`, keeps for one population a check
+tolerates: a header rendered from the population's `[[ledger]]` registration, then one TAB-separated
+row per key, `<key fields> TAB <count> TAB <sha> TAB <disposition>`. Its home is declared rather
+than path-shaped, so the driver's ledger class recognises it by that header on all three sides and
+never by `%P`; headers that disagree are a whole-file conflict. Over a ledger every line that is
+neither blank nor `#` is a row, keyed by the header's key fields, every postcondition reads that row
+plane, and the audit line's census field reads `ledger-keyed`. Two rows meet by one rule: a key one
+side drained and the other left alone is removed, and a key both sides changed keeps the lower count
+with that side's sha and disposition; equal counts that differ otherwise conflict. A ledger's
+attribute is one line beside the ones above, `<home> merge=rows`, which the unit that converts a
+population into a ledger adds; no second driver and no second `git config` line exist.
+
 The driver COMMAND is git config, so it is per node — and both of its path arguments carry the
 install prefix, so there is no single literal that starts in both layouts. Do not hand-type it; this
 one spelling is correct in both, because the runbook installs `check-wiring.sh` at `<root>/<prefix>/`

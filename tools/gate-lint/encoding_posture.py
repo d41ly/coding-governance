@@ -53,6 +53,11 @@ import subprocess
 import sys
 import tempfile
 
+# The baseline ledger factory, this kit's own inline copy (TOOL-dWitnessedBar-13 S9): the registry's
+# rows are read by `read_rows` and graded by `compare_counts`, and the two adapters below keep this
+# scanner's signatures, messages and four-field grammar.
+from legacy_ledger import compare_counts, read_rows
+
 ARMS = ("file-io", "subprocess")
 # method -> the positional slot its `encoding` argument occupies:
 #   Path.read_text(encoding, errors) · Path.write_text(data, encoding, errors)
@@ -163,30 +168,33 @@ def build_measured(hits: list[tuple[str, int, int, str, str]]) -> dict[tuple[str
 
 
 def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[str]]:
-    """The declared sites, plus every malformed row. A row is `path TAB arm TAB count TAB reason`."""
+    """The declared sites, plus every malformed row. A row is `path TAB arm TAB count TAB reason`.
+
+    A thin adapter over the factory's `read_rows` with the `("reason",)` tail (TOOL-dWitnessedBar-13
+    S9). The factory's line-number refusal is skipped on both key fields, because the closed arm set
+    is the stricter test here and the one whose words this registry has always printed; each line the
+    factory read or refused is then graded in line order, the arm first, as before.
+    """
+    rows, refused = read_rows(path, 2, tail=("reason",), verbatim=(0, 1))
+    graded = sorted([(number, None, row) for _count, _tail, number, row in rows.values()] + refused)
     declared: dict[tuple[str, str], int] = {}
     malformed: list[str] = []
-    for number, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
-        row = raw.rstrip("\r")
-        if not row.strip() or row.lstrip().startswith("#"):
-            continue
-        fields = row.split("\t")
-        if len(fields) < 4 or not fields[3].strip():
+    for number, kind, row in graded:
+        if kind == "fields":
             malformed.append(f"line {number}: not <path> TAB <arm> TAB <count> TAB <reason>: {row}")
             continue
+        fields = row.split("\t")
         rel, arm, count = fields[0].strip(), fields[1].strip(), fields[2].strip()
         if arm not in ARMS:
             malformed.append(f"line {number}: {arm!r} is not an arm ({', '.join(ARMS)}) — the key is "
                              f"the ARM, never a line number, because a line number moves on an "
                              f"unrelated edit: {row}")
-            continue
-        if not count.isdigit() or int(count) < 1:
+        elif kind == "count":
             malformed.append(f"line {number}: count {count!r} is not a positive integer: {row}")
-            continue
-        if (rel, arm) in declared:
+        elif kind == "duplicate":
             malformed.append(f"line {number}: ({rel}, {arm}) is declared twice: {row}")
-            continue
-        declared[(rel, arm)] = int(count)
+        else:
+            declared[(rel, arm)] = int(count)
     return declared, malformed
 
 
@@ -204,18 +212,21 @@ def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], li
 
 def check_registry(measured: dict[tuple[str, str], int],
                    declared: dict[tuple[str, str], int]) -> list[str]:
-    """Set equality in both directions, with the counts. Returns one line per violation."""
+    """Set equality in both directions, with the counts. Returns one line per violation.
+
+    A thin adapter over the factory's `compare_counts` (TOOL-dWitnessedBar-13 S9); `shrink-only`
+    reports a count that fell as well as one that rose, so the equality is unchanged.
+    """
     problems = []
-    for key in sorted(set(measured) | set(declared)):
+    for finding, key, have, want in compare_counts(measured, declared, "shrink-only"):
         rel, arm = key
-        have, want = measured.get(key), declared.get(key)
-        if want is None:
+        if finding == "undeclared site":
             problems.append(f"{rel}: {have} unencoded [{arm}] call(s) and no registry row declares "
                             f"them — pass encoding=\"utf-8\"")
-        elif have is None:
+        elif finding == "unmeasured row":
             problems.append(f"{rel}: the registry declares [{arm}] and the scan no longer finds it — "
                             f"delete the row, or a drained site leaves a widened exemption behind")
-        elif have != want:
+        else:
             problems.append(f"{rel}: the registry declares {want} [{arm}] site(s) and the scan "
                             f"measures {have} — the count may fall with the sites and may not rise")
     return problems
