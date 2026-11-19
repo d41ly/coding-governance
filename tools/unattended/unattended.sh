@@ -3969,15 +3969,24 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # TOOL-dPlacedRequest-19 S4: the kind `request <content key>` writes `kind: request` and `slug: -`
 # through the default arm below; an acquire of it first reads its record's existence, refused
 # `no-record` (exit 1) where the remote holds none, and its overlap probe names no build, as a run's.
-# TOOL-dPlacedRequest-32 S4: with no session, CLAUDE_CODE_SESSION_ID unset, empty or `absent`, the verb
-# prints `lease not written — no session: ...` and exits 2 before any read, because a `--lease` write
-# records `keepalive: absent` and so no keepalive identifies its holder either. The driver's run
+# TOOL-dPlacedRequest-32 S4: with no session, CLAUDE_CODE_SESSION_ID unset, empty or `absent`, a holder
+# act prints `lease not written — no session: ...` and exits 2 before any read, because a `--lease`
+# write records `keepalive: absent` and so no keepalive identifies its holder either. The driver's run
 # claim, which carries the run's keepalive, is written by the run columns and keeps their rules.
+# TOOL-dPlacedRequest-40: the refusal gates the HOLDER ACTS by name, `acquire`, `take-over`, `renew`,
+# `release` and `offer`, each writing a record naming its holder, and an act on no list, so a new act
+# is gated until it is named exempt. `prune`, `flush`, `fence` and `status` name no holder and run with
+# no session as their own units state; `prune` and `fence` are dispatched to their own writers before
+# this verb, and no read here asks for an identity they do not need.
 run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
   local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la ot os odl=""
   [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
-  case "${CLAUDE_CODE_SESSION_ID:-absent}" in
-    absent) echo "lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder"; return 2 ;;
+  case "$act" in
+    prune|flush|fence|status) ;;
+    acquire|take-over|renew|release|offer|*)
+      case "${CLAUDE_CODE_SESSION_ID:-absent}" in
+        absent) echo "lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder"; return 2 ;;
+      esac ;;
   esac
   if [ "$act" = flush ]; then
     read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }

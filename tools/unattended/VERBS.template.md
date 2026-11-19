@@ -523,7 +523,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `lease refused — <cause> · <tail> · <holder>` (exit 1; `live-holder`, `tombstone`, `epoch-fence`,
   `overlap`, `offline`, or an offer's `offered`, naming its target, and `terminal`), or
   `lease not written — <why>` (exit 2: no session, `CLAUDE_CODE_SESSION_ID` unset, empty or
-  `absent`, before any read; a bad segment, a level `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
+  `absent`, at a holder act, `acquire`, `take-over`, `renew`, `release` or `offer`, before any read,
+  while `flush`, `prune` and `fence` run with no session; a bad segment, a level `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
   that records no transition and is no open question). An acquisition runs the overlap probe first.
   An acquisition of a request lease first reads `refs/gov/requests/<content key>` alone, one bounded
   `ls-remote` that fetches nothing: a remote holding no such record refuses it `no-record` (exit 1)

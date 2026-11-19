@@ -236,9 +236,12 @@ when its `fleet-tag` is this node's and its `session` and this harness's are bot
 with either absent it is `mine` only through a keepalive present on both and equal, which a run claim
 carries and a `--lease` write, recording `keepalive: absent`, does not, so two id-less sessions of one
 node never share a lease. It is `same session` when its `session` alone is this harness's present
-session. With no session the lease verbs print
+session. With no session the holder acts, `acquire`, `take-over`, `renew`, `release` and `offer`,
+each writing a record that names its holder, print
 `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder`
-and exit 2, reading and writing nothing; the driver's run claim, which carries the run's keepalive,
+and exit 2, reading and writing nothing, and so does an act on no list until it is named exempt; the
+exempt acts, `prune`, `flush`, `fence` and `status`, name no holder and run with no session as they
+run with one, a fence on a held lease answering its own refusal; the driver's run claim, which carries the run's keepalive,
 keeps the run columns' rules below. A refusal names one cause: `live-holder`, a
 foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or unit tombstone or a
 foreign terminal lease;

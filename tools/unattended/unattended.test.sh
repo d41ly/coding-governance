@@ -20621,8 +20621,8 @@ rm -rf "$LF"
 # close: the `lease` mode's `mine` row with its two session guards cut reads AC4's plant `mine`, and
 # the base driver's `.typed` append and predicate consent on the planted line. Waived by README rule 8
 # with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: an empty CLAUDE_CODE_SESSION_ID, which
-# the driver's `:-absent` folds as it folds an unset one, and `--lease flush` with no session, which
-# shares the acquire's refusal site.
+# the driver's `:-absent` folds as it folds an unset one, and the acts that name no holder, which
+# TOOL-dPlacedRequest-40's block below runs with no session.
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 ns_rc=""
@@ -20681,6 +20681,49 @@ for ns_k in k2 k3; do
   esac
 done
 remove_claim_refs; reset_tree
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-40 — THE ID-LESS REFUSAL GATES THE HOLDER ACTS BY NAME. Over a fresh lease
+# fixture, every act below run with CLAUDE_CODE_SESSION_ID unset: `--lease fence build tFix` with no
+# lease ref prints `fence — none` and exits 0 (AC3); a cadence `run` tombstone first sighted eight days
+# ago is pruned, exit 0, its ref gone (AC1); one line s1 queued with the origin renamed away is flushed,
+# exit 0, the queue empty and the lease on the origin (AC2); and over s1's held build lease `acquire`,
+# `take-over`, `renew`, `release --as withdrawn` and `offer --to b` each exit 2 printing `no session`,
+# the origin's refs unmoved, where s1's own renewal still writes (AC4). RED, observed at the close: a
+# scratch copy whose exempt list names `release` reads AC4's release refused `live-holder`, not `no
+# session`; a copy refusing every `--lease` act with no session at the verb's dispatch reds AC1, AC2
+# and AC3, the base driver AC2 alone, since its prune and fence run outside `run_lease_verb`. Waived by
+# README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: `status`, which no act
+# dispatch reaches until TOOL-dPlacedRequest-34 mints it, and an act on neither list, which the verb's
+# own act check refuses after the gate.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+il_out=$(run_offer_arm "$LF/c1" daily-agent - fence build tFix); il_rc=$?
+same "DPR40 AC3 with no session and no lease ref, the fence prints fence — none, exit 0" "$il_rc|$il_out" "0|fence — none · no lease on the remote"
+seed_lease_at run/weekly/2026-10 - run b s-o landed "$(derive_claim_ago $((8 * 86400)))" 1 >/dev/null
+il_out=$(run_offer_arm "$LF/c1" daily-agent - prune); il_rc=$?
+same "DPR40 AC1 with no session the prune exits 0 and the run tombstone is gone" \
+  "$il_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/leases/run | grep -c .)" "0 0"
+hit  "$il_out" "lease — leases/run/weekly/2026-10 · pruned"
+derive_claim_now >"$LF/c1/.git/gov-last-fetch"
+mv "$LF/origin.git" "$LF/away.git"; run_lease_arm acquire build tQueue >/dev/null; mv "$LF/away.git" "$LF/origin.git"
+same "DPR40 AC2 control: s1's offline acquire queued one line" "$(grep -c . "$LF/c1/.git/gov-queue.log")" "1"
+il_out=$(run_offer_arm "$LF/c1" daily-agent - flush); il_rc=$?
+same "DPR40 AC2 with no session the flush exits 0, the queue empty and the lease on the origin" \
+  "$il_rc $(grep -c . "$LF/c1/.git/gov-queue.log") $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/leases/tQueue | grep -c .)" "0 0 1"
+run_lease_arm acquire build tFix >/dev/null
+il_refs=$(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname) %(objectname)' refs/gov); il_rc=""
+for il_a in "acquire build tFix" "take-over build tFix" "renew build tFix" "release build tFix --as withdrawn" "offer build tFix --to b"; do
+  il_out=$(run_offer_arm "$LF/c1" daily-agent - $il_a)
+  il_rc="$il_rc$? $(printf '%s\n' "$il_out" | grep -cxF 'lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder') "
+done
+same "DPR40 AC4 acquire, take-over, renew, release and offer each exit 2 printing no session, the origin unmoved" \
+  "$il_rc$([ "$(git --git-dir="$LF/origin.git" for-each-ref --format='%(refname) %(objectname)' refs/gov)" = "$il_refs" ] && echo unmoved || echo moved)" "2 1 2 1 2 1 2 1 2 1 unmoved"
+il_out=$(run_lease_arm renew build tFix); il_rc=$?
+same "DPR40 AC4 control: s1's own renewal of the lease still writes" "$il_rc $(read_lease_field tFix/build session)" "0 s1"
+rm -rf "$LF"
 
 # ==================================================================================================
 # TOOL-dPlacedRequest-15 — THE FENCE READ, `--lease fence build <slug>`, over the lease fixture: no
@@ -22786,7 +22829,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3896 -> 3907 by TOOL-dPlacedRequest-32: the id-less session block's 11 region-eight assertions
 # (10 `same`, its two loops' six among them, one per pass, and 1 `hit`), off the diff's own lines; no
 # skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3907
+# RAISED 3907 -> 3914 by TOOL-dPlacedRequest-40: the id-less act block's 7 region-eight assertions (6
+# `same`, its AC4 loop's five acts folded into one, and 1 `hit`), off the diff's own lines; no skip
+# branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3914
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23054,7 +23100,8 @@ FLOOR_SHARD_7=311
 # RAISED 1113 -> 1119 by TOOL-dPlacedRequest-30: the same 6 region-eight collision assertions, see FLOOR_ASSERTIONS.
 # RAISED 1119 -> 1127 by TOOL-dPlacedRequest-31: the same 8 region-eight consent assertions, see FLOOR_ASSERTIONS.
 # RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1138
+# RAISED 1138 -> 1145 by TOOL-dPlacedRequest-40: the same 7 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1145
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
