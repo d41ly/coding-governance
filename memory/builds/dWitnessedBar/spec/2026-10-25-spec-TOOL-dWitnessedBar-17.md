@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-17 — the seven record and row pins as keyed populations, and the date cutoffs registered as cutoffs
 
-**Status:** INPROGRESS · rev-8 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-9 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 11 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0355@0f895fff whole
 
@@ -20,12 +20,14 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-3-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-3-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-4-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-brief.md) | journal | TOOL-dWitnessedBar-18 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-2-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-3-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-fix-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
@@ -172,7 +174,9 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
   and where the conf assigns the key blank also removes its population's home, so its checks stay off
   as the blank pin left them (S4). The memory-tree descriptor gains the conversion row of §4 "The
   dead-path registry". Observed by AC10.
-  Each seed program is an engine file every adopter holds at the spelled path (§4 "The pins").
+  Each seed program is an engine file every adopter holds at the spelled path, and none is the
+  generator of a generated index: the codebase-map step seeds through `map_diff.py`, never
+  `gen_map.py` (§4 "The pins", §8 F12).
   **Readers:** by name: at an adopter, the kit copies of the readers S3 lists, `corpus_ids.py`,
   `row_grammar.py` and `check-memory-hygiene.sh` among them, which S1 and S4 re-point before any
   step runs; the gate at the adopter's `GATE_FILE` is project-owned and never re-copied, so its
@@ -221,7 +225,7 @@ count, registers the two unset ones unseeded, and registers every date cutoff in
 | `DEAD_PATH_PIN` | 0 | `corpus-path-unresolved` | site · path, cited | `convert_registry.py read-back corpus-path-unresolved` | `memory hygiene` | memory-tree |
 | `ROW_DUPLICATE_PIN` | 3 | `row-duplicates` | record · shard, row key | `row_grammar.py --list-duplicates` | `memory hygiene` | memory-tree |
 | `RECORD_UNBOUND_PIN` | 16 | `unbound-records` | record · record path | `corpus_ids.py --list-unbound` (§8 F6) | `memory hygiene` | memory-tree |
-| `DOSSIER_DECISIONS_EMPTY_PIN` | 16 | `dossier-decisions-empty` | key · feature | `gen_map.py --list-empty-decisions` | `ratchet (both ways)` (§8 F10) | codebase-map |
+| `DOSSIER_DECISIONS_EMPTY_PIN` | 16 | `dossier-decisions-empty` | key · feature | `map_diff.py --list-empty-decisions` (§8 F12) | `ratchet (both ways)` (§8 F10) | codebase-map |
 | `SEVERITY_UNLABELLED_PIN` | unset | `severity-unlabelled`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 | `LIVE_ROW_PIN` | unset | `live-rows`, unseeded | record · shard, row key | `[]` | `memory hygiene` | memory-tree |
 
@@ -242,13 +246,23 @@ carry it; check 21's graded `U` rows, the ones its `extract_graded_rows` keeps, 
 by a hygiene print mode `--list-unbound` that exits before check 1 and asked for by `corpus_ids.py
 --list-unbound` through `tools/memory-tree/corpus_ids.py#ask_shell`; the `empty` list
 `test_dossier_decisions_are_declining` builds, each count `1`, printed by a `--list-empty-decisions`
-mode joining the mode group of `tools/codebase-map/gen_map.py#main`, which already reads the same
-`load_map_tree(IDS, decision_id_re=ID_RE)` (`tools/codebase-map/gen_map.py@874cdcafb861:140`), the
-test then deleted from the gate and its template (§8 F10). Each seed program is an engine file every
+flag of `tools/codebase-map/map_diff.py#main` (§8 F12). The flag takes no range and is refused beside
+`--stale-dossiers`, `--tree` or `--drop-affordance-exempt`, as `--tree` is
+(`tools/codebase-map/map_diff.py@aacff5d2425c:264-267`). It reads the map tree as that file's two
+modes already do,
+`load_map_tree(ext.inventory_ids(), decision_id_re=getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))`
+(`tools/codebase-map/map_diff.py@aacff5d2425c:298-299`, `tools/codebase-map/map_diff.py@aacff5d2425c:331`),
+prints nothing over a tree holding no dossier, as the test's own empty branch grades nothing, and
+writes no file. The flag gets a usage line in the module docstring, which `--help` prints. The test is
+then deleted from the gate and its template (§8 F10). Each seed program is an engine file every
 adopter holds at its `{prefix}` path: memory-tree's under its `**` engine rule
-(`tools/memory-tree/kit.toml@aca25b09b5ce:30-31`), and `gen_map.py` under codebase-map's
+(`tools/memory-tree/kit.toml@aca25b09b5ce:30-31`), and `map_diff.py` under codebase-map's
 (`tools/codebase-map/kit.toml@8dfb2a659a2e:10-12`), whose `project-owned` rule withholds
-`test_codebase_map.py` (`tools/codebase-map/kit.toml@8dfb2a659a2e:32-34`). The unseeded homes are `memory/project/severity-unlabelled.txt` and
+`test_codebase_map.py` (`tools/codebase-map/kit.toml@8dfb2a659a2e:32-34`). No seed program renders a
+generated index: the codebase-map descriptor's one `[[generated]]` row names `gen_map.py` as the
+generator of `{map_root}/generated` (`tools/codebase-map/kit.toml@8dfb2a659a2e:172-179`), and
+`map_diff.py` writes only `affordance-exempt.txt`, and only under `--drop-affordance-exempt`
+(`tools/codebase-map/map_diff.py@aacff5d2425c:108-127`). The unseeded homes are `memory/project/severity-unlabelled.txt` and
 `memory/project/live-rows.txt`, declared and never written while `seed = []`. Check 3 reads no
 registration (`git grep -n legacy_ledger tools/memory-tree/check-memory-hygiene.sh` prints nothing at
 `2b0490b8d`), so the unit that gives either a seed adds its name to check 3's list as S7 does.
@@ -323,7 +337,7 @@ Minted: the populations `row-duplicates`, `unbound-records`, `dossier-decisions-
 `severity-unlabelled`, `live-rows` and `date-cutoffs`, their registrations and the four written homes
 `memory/project/row-duplicates.txt`, `unbound-records.txt`, `dossier-decisions-empty.txt` and
 `date-cutoffs.txt`; the verbs `measure-cutoffs`, `--list-duplicates`, `--list-unbound` (the hygiene
-print mode and the `corpus_ids.py` mode that asks it) and `gen_map.py`'s `--list-empty-decisions`; the conf walk
+print mode and the `corpus_ids.py` mode that asks it) and `map_diff.py`'s `--list-empty-decisions`; the conf walk
 `measure-cutoffs` and `measure_scalar_pins` share; the step program `tools/govkit/steps/conf_pins_to_ledger.py` and the
 `[[upgrade]]` rows of S8; the `corpus-path-unresolved` registration, its `LEGACY` row and its
 conversion row. Naming cells: each file name, verb and flag is asked of
@@ -366,7 +380,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
 - `tools/memory-tree/README.md`
 - `tools/memory-tree/HYGIENE.template.md` (rendered to `memory/HYGIENE.md`)
 - `tools/memory-tree/ratchet.py`
-- `tools/codebase-map/gen_map.py`
+- `tools/codebase-map/map_diff.py`
 - `tools/codebase-map/test_codebase_map.py`
 - `tools/codebase-map/test_codebase_map.template.py`
 - `tools/codebase-map/reuse_lookup.py`
@@ -432,7 +446,9 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   Red when: the new record passes because the unbound count is still at or under 16.
 - **AC4** — When a scratch clone empties one feature dossier's `decisions` and runs
   `python tools/memory-tree/ratchet.py both-ways`, it exits 1 naming `dossier-decisions-empty`,
-  `undeclared site` and that feature. When a scratch
+  `undeclared site` and that feature, and `python tools/codebase-map/map_diff.py --list-empty-decisions`
+  run there prints that feature's line and leaves `git status --porcelain -- memory/map/generated`
+  printing nothing. When a scratch
   clone of the landed tree, its conf holding no pin and each of `id-orphan-waiver.txt` and
   `corpus-path-unresolved.txt` its header and `# unarmed` line, commits to `memory/README.md` a
   backticked citation of a path no file holds and runs `python tools/memory-tree/corpus_ids.py`, it
@@ -444,7 +460,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   run there exits 0.
   Red when: the checks still read the conf keys, so removing the keys disarms them silently, or an
   empty zero-bound home disarms them, or a fresh scaffold writes a home, arming checks its own
-  rendered documents' citations red.
+  rendered documents' citations red, or the empty-decisions seed rewrites the map's generated index.
 - **AC5** — When `python tools/lib/legacy_ledger.py seed --population severity-unlabelled` and the same
   for `live-rows` run on the landed tree, each prints `unarmed <population> no seed` and exits 0 under
   `retrofit.unseeded`'s default, writing no home, and `python ratchet.py unarmed` exits 0 naming both
@@ -487,7 +503,7 @@ data. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its
   The `DOSSIER_DECISIONS_EMPTY_PIN` step's `up`, in a scratch clone of the landed tree with
   `tools/codebase-map/test_codebase_map.py` removed, as an adopter's kit directory holds no such file,
   `dossier-decisions-empty.txt` removed and the key assigned `"16"` in `.codebase-map.conf`, seeds
-  that population with as many rows as `python tools/codebase-map/gen_map.py --list-empty-decisions`
+  that population with as many rows as `python tools/codebase-map/map_diff.py --list-empty-decisions`
   prints lines and removes the key.
   Red when: the step removes the key before the seed writes, so a failed seed loses the bound, or
   leaves the key's `conf-scalar-pins` row, which `keys-not-scalar` then reds as an `unmeasured row`,
@@ -608,8 +624,8 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
 - **F10 — Which program seeds `dossier-decisions-empty`, and which leg grades it at an adopter?** The
   gate is `project-owned`, kept at the adopter's `GATE_FILE` and never re-copied
   (`tools/codebase-map/kit.toml@8dfb2a659a2e:32-34`; `tools/codebase-map/check_gate_coverage.py`, its
-  docstring), so no seed can name it at `{prefix}`. Options: (a) `gen_map.py --list-empty-decisions`
-  under the leg `codebase-map coverage + freshness`, the gate's test re-pointed to the population;
+  docstring), so no seed can name it at `{prefix}`. Options: (a) an engine program's
+  `--list-empty-decisions`, `map_diff.py`'s since rev-9 (F12), under the leg `codebase-map coverage + freshness`, the gate's test re-pointed to the population;
   (b) the same seed under `ratchet (both ways)`, the test deleted from the gate and its template.
   Under (a) an adopter's frozen test reads the removed key as unset and prints `UNGRADED`, while
   `run_both_ways` prints the registration `graded by` that leg (`tools/memory-tree/ratchet.py#run_both_ways`),
@@ -629,6 +645,26 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   follow-up left open at every adopter, and adds a seed run to a scaffolder that calls no ledger code.
   RESOLVED (agent, 2026-11-19, delegated): (a), fewest follow-ups open, removing the two blocks and
   two fixture names. widens: none · relaxes: none
+- **F12 — Which engine file carries the `--list-empty-decisions` seed verb?** `gen_map.py` is the
+  generator of `{map_root}/generated` (`tools/codebase-map/kit.toml@8dfb2a659a2e:172-179`), and this
+  unit's dispatch rows reserve `memory/map/generated/symbols.json`, so a Files touched naming both pairs
+  a generated index with its generator, which `--dispatch` refuses (the brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-17-4-spec-writer). Every other file the `**` engine rule ships
+  renders no generated index (`tools/codebase-map/kit.toml@8dfb2a659a2e:10-12`). Options: (a)
+  `map_diff.py`, a flag beside `--tree` and `--stale-dossiers`, whose two modes already load the map
+  tree with the inventory ids and the decision-id pattern
+  (`tools/codebase-map/map_diff.py@aacff5d2425c:298-299`, `tools/codebase-map/map_diff.py@aacff5d2425c:331`);
+  (b) `reuse_lookup.py`, which takes a required query and appends a row to the lookups log in the git
+  common dir on every run (`tools/codebase-map/reuse_lookup.py#write_lookup`), so each
+  `ratchet (both ways)` run would log a lookup nobody made; (c) `check_gate_coverage.py`, a gate leg's
+  own argv, which reads no dossier; (d) a new engine file, or a `__main__` on `map_lib.py`. (b) widens
+  a write surface beyond the unit's priced one, the lookups log fed by a seed (veto 3); (d) adds a new
+  public surface where an existing program has a mode group to join (veto 2). (a) and (c) pass every
+  criterion; (a) loads the tree through the read the measurement needs and leaves no gate program
+  changed, (c) would add a dossier reader to a gate leg the `codebase-map gate coverage` guard re-runs
+  on every kit edit. RESOLVED (agent, 2026-11-19, delegated): (a), the tie broken by the seam:
+  `map_diff.py`'s existing tree read. `gen_map.py` leaves Files touched, and no other clause edits it.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -671,6 +707,11 @@ New arm: tools/memory-tree/ratchet.py · covers AC7 · a `cutoff-later` and a `c
   fresh scaffold writes neither home of checks 13 to 15, each fixture writing either named in S4
   (F11); `dossier-decisions-empty` seeds through `gen_map.py`, which every adopter holds, graded by
   `ratchet (both ways)` (F10).
+- rev-9 · 2026-11-19 · S8 · §4 The pins, Inventory, Files touched · AC4 · AC10 · §8 F10 F12 · §10 ·
+  revised by brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-4-spec-writer over the third dispatch's
+  check-49 refusal: the `--list-empty-decisions` seed verb moves from `gen_map.py`, the generator of
+  `memory/map/generated/`, to `map_diff.py`, an engine file rendering no generated index (F12), and
+  `gen_map.py` leaves Files touched.
 
 ## 10. Reuse audit
 
@@ -684,8 +725,8 @@ existing Python-to-shell seam (§8 F6). The pin readers re-pointed are
 `tools/memory-tree/corpus_ids.py#checks` and `#armed`, check 21
 (`tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:1772-1792`),
 `tools/memory-tree/row_grammar.py#cmd_check` with `#pin_of` and `#_parse_shard_pins`; the
-empty-decisions measurement joins the mode group of `tools/codebase-map/gen_map.py#main`, the engine
-program already reading the map tree, and
+empty-decisions measurement joins the flags of `tools/codebase-map/map_diff.py#main`, the engine
+program already reading the map tree that renders no generated index (§8 F12), and
 `tools/codebase-map/test_codebase_map.py#test_dossier_decisions_are_declining` is deleted (§8 F10). S8's step program
 follows `tools/govkit/steps/review_rounds.py`, the landed step that takes a conf key out, over
 `upgrade_steps.py`'s before-image helpers, minting no second step runner. The dead-path registry
