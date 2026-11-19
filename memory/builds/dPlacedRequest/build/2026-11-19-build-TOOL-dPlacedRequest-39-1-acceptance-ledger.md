@@ -44,14 +44,28 @@ scratch repository with one commit under the node's short temp path. (PINNED)
   the planted copy, `no-after 0 lock` for the brace-group copy, `after 1 lock` for the trap-cut (DERIVED)
   copy, `after 1 1 / after 1` for the clean append and its retry, and `after 1 1 / after 2` for the (DERIVED)
   copy whose key check falls through.
+- The bug-class checklist over the pass commit selected 54 classes. One needed a change: (DERIVED)
+  `refusal-branch-with-no-arm`, since the busy exit's NOTE, a decline line the restructured body
+  dispatches on rc 3, had no arm. The block now drives it: a live lock another writer holds, 60 s (DERIVED)
+  ahead, through a copy taking with no wait, read `after 1 0 other`, the busy NOTE alone and the (DERIVED)
+  holder's `owner` untouched; its red, the same copy with the busy take exiting 4, read (DERIVED)
+  `after 0 1 other`, an abort's NOTE in its place, both observed by a probe of the two copies. The (DERIVED)
+  `heredoc-escape-reaches-the-regex` class bit once in this pass, a backslash lost from a plant line
+  written through a heredoc before the commit, and the line was rewritten with the edit tool. The
+  rest needed none: the plant's arm asserts bash's unbound-name line, so its fixture reaches the
+  abort; each staged red is a `mutate` of the shipped cut that reds a no-op; counts are `grep -c`
+  over files; every git call unsets `GIT_DIR` or runs under `env -i`, and the scratch commit passes
+  `--no-verify` and `commit.gpgsign=false`.
 
 ## Owed at the close
 
 - The spec's `New arm:` line: `tools/unattended/unattended.test.sh`, the region-8 (PINNED)
-  TOOL-dPlacedRequest-39 block in a compound block of its own, 11 executed assertions (5 `same`, 1 (DERIVED)
-  `hit`, 5 `mutate`), no skip branch; `FLOOR_ASSERTIONS` 3709 to 3720 and `FLOOR_SHARD_8` 940 to (DERIVED)
-  951. Its RED-first observation inside the suite is the close's; waived for this build's landing (DERIVED)
+  TOOL-dPlacedRequest-39 block in a compound block of its own, 15 executed assertions (7 `same`, 1 (DERIVED)
+  `hit`, 7 `mutate`), no skip branch; `FLOOR_ASSERTIONS` 3709 to 3724 and `FLOOR_SHARD_8` 940 to (DERIVED)
+  955. Its RED-first observation inside the suite is the close's; waived for this build's landing (DERIVED)
   by README rule 8. (PINNED)
+- The positional citations of `tools/unattended/unattended.sh` and `tools/run-gates/post-merge.sh`
+  past the `gov_feed_sh` block, which the block's net 13 added lines move, read by the pass legs. (DERIVED)
 - `tools/lib/resolve-python.test.sh` section 2a over the retargeted release plants, and the (PINNED)
   TOOL-dPlacedRequest-37 region-8 block's changed AC3 red reading, both read by their suites at the (PINNED)
   close.

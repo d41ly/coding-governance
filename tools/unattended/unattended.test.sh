@@ -19576,12 +19576,13 @@ if in_shard 8; then
 # `: "$GOVFEED_PLANT_UNSET"` planted on the line after the trap's arming prints bash's unbound-name
 # line, one `feed: NOTE - refs/gov/bar-red: the append exited 1` line and the marker, and leaves no
 # `gov-feed.lock`. AC2: the unplanted cut appends one line with `seq` 1, and a retry appends none.
+# The busy exit, 3, prints the lock-busy NOTE alone and leaves the holder's lock.
 # RED for AC1 is the planted copy with its subshell turned into a brace group, the uncontained body:
 # the abort ends the carrier and the marker never prints; and the planted copy with its trap cut: the
 # carrier runs on but the lock stays held. RED for AC2 is a copy whose key check falls through: the
 # retry appends a second line. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK
 # DOES NOT DRIVE: an abort between the take and the trap's arming, which leaves the lock to its
-# deadline; the lock-busy NOTE, which the TOOL-dPlacedRequest-13 arms leave undriven too.
+# deadline; the 5 s wait before the lock-busy NOTE, since the busy copies take with no wait.
 # ==================================================================================================
 ca_d=$(mktemp -d)
 awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" >"$ca_d/cut.sh"
@@ -19619,6 +19620,22 @@ for ca_v in cut keyless; do
 done
 same "DPR39 AC2 a clean append writes one line with seq 1, and its retry appends none" "$ca_k" "after 1 1 / after 1"
 same "DPR39 AC2 RED: a copy whose key check falls through appends the retry" "${ca_x##* }" "2"
+# ---- The busy exit: a live lock another writer holds, 60 s ahead. The copies take with no wait, so
+# ---- the 5 s wait itself is not driven; RED is a copy whose busy take exits 4, read as an abort.
+cp "$ca_d/cut.sh" "$ca_d/busy.sh"
+mutate "$ca_d/busy.sh" 's/ node 5 || exit 3$/ node 0 || exit 3/'
+cp "$ca_d/busy.sh" "$ca_d/busy4.sh"
+mutate "$ca_d/busy4.sh" 's/ node 0 || exit 3$/ node 0 || exit 4/'
+for ca_v in busy busy4; do
+  rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+  mkdir "$ca_c/gov-feed.lock"; echo "$((EPOCHSECONDS + 60))" >"$ca_c/gov-feed.lock/until"; echo other >"$ca_c/gov-feed.lock/owner"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>"$ca_d/$ca_v.err")
+  ca_r="${ca_o:-no-after} $(grep -c '^feed: NOTE - the feed lock in .* was held for 5s, so this write of refs/gov/bar-red ' "$ca_d/$ca_v.err")"
+  ca_r="$ca_r $(grep -c '^feed: NOTE - refs/gov/bar-red: the append exited' "$ca_d/$ca_v.err") $(cat "$ca_c/gov-feed.lock/owner" 2>/dev/null)"
+  case "$ca_v" in busy) ca_b=$ca_r ;; *) ca_b4=$ca_r ;; esac
+done
+same "DPR39 a busy lock prints the lock-busy NOTE alone, runs on, and leaves the holder's lock" "$ca_b" "after 1 0 other"
+same "DPR39 RED: a busy take exiting 4 reads as an abort, not as busy" "$ca_b4" "after 0 1 other"
 rm -rf "$ca_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21895,10 +21912,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3702 -> 3709 by TOOL-dPlacedRequest-37: the deadline block's 7 region-eight assertions
 # (4 `same`, 1 `hit`, 2 `mutate`), or the same 7 counted on its skip branch, off the diff's own
 # lines; no suite ran, and its RED-first observation is the close's.
-# RAISED 3709 -> 3720 by TOOL-dPlacedRequest-39: the contained append block's 11 region-eight
-# assertions (5 `same`, 1 `hit`, 5 `mutate`), off the diff's own lines; it has no skip branch, it
+# RAISED 3709 -> 3724 by TOOL-dPlacedRequest-39: the contained append block's 15 region-eight
+# assertions (7 `same`, 1 `hit`, 7 `mutate`), off the diff's own lines; it has no skip branch, it
 # cuts the driver's own block. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3720
+FLOOR_ASSERTIONS=3724
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -22152,8 +22169,8 @@ FLOOR_SHARD_7=311
 # RAISED 914 -> 926 by TOOL-dPlacedRequest-26: the same 12 region-eight tenure walk assertions, see FLOOR_ASSERTIONS.
 # RAISED 926 -> 933 by TOOL-dPlacedRequest-36: the same 7 region-eight carrier event assertions, see FLOOR_ASSERTIONS.
 # RAISED 933 -> 940 by TOOL-dPlacedRequest-37: the same 7 region-eight node lock deadline assertions, see FLOOR_ASSERTIONS.
-# RAISED 940 -> 951 by TOOL-dPlacedRequest-39: the same 11 region-eight contained append assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=951
+# RAISED 940 -> 955 by TOOL-dPlacedRequest-39: the same 15 region-eight contained append assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=955
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
