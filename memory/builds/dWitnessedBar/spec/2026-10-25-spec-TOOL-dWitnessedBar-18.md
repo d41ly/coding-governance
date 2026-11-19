@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-18 — the positional references, the producer hits, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population
 
-**Status:** INPROGRESS · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-8 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0356@4d098894 whole
 
@@ -21,6 +21,7 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-18-2-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-2-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-18-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-2-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-18-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-3-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-18-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-2-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-brief.md) | journal | — |
@@ -86,12 +87,19 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
   each keeps its messages, its policy key and its exit, so no writer leaves a list in the old grammar
   for `read_rows` to refuse. Where no registration names the list, as at a repository carrying no
   govkit registry, an absent or empty list reads as no rows, as today, and a list holding rows is
-  refused with exit 2 naming the population. Observed by AC2, AC3, AC4 and AC7.
+  refused with exit 2 naming the population; a writer of a list no registration names refuses with
+  exit 2 naming the population and writes nothing, having no header to render.
+  `render_playbook.py#write_empty_lists`, where it wrote `positional-refs.txt` as empty bytes, writes
+  the bytes `tools/memory-tree/convert_registry.py#derive_converted_text` returns for that
+  registration with no row, its header and `# unarmed · dead probe · <sha>`, the registration found as
+  `convert_registry.py#derive_registration` finds it and the sha the target's
+  `tools/memory-tree/legacy_ledger.py#read_head_sha`, refusing as the converter does where no sha is
+  read, so a fresh target's list reads `unarmed` as a converted one does (§8 F9); `core-pending.txt`,
+  no population, stays empty bytes. Observed by AC2, AC3, AC4, AC7 and AC8.
   **Readers:** by name: in `positional.py`, `read_list` and `write_list`, which `check_positional`,
   `run_seed`, `run_shrink` and `run_pin` call and which `check_pinned_facts` in `writing_practice.py`
   calls for its seed and shrink, and `read_producer_rows`, `check_producers` and `run_producers`; in
-  `instruction_units.py`, `read_legacy`; in `render_playbook.py`, `write_empty_lists`, which writes the
-  header where it wrote empty bytes; and the fixtures that write a list: the positional plants of
+  `instruction_units.py`, `read_legacy`; in `render_playbook.py`, `write_empty_lists`, as above; and the fixtures that write a list: the positional plants of
   `gov_tag.py`'s `run_plant`, the facts plants of `writing_practice.py`'s `PLANTS` with its fixture
   tree, and `instruction_units.py`'s `arm_legacy`, each writing the `[[ledger]]` table its list's
   registration holds into the scratch tree, read from gov's descriptor and never retyped · by value:
@@ -212,7 +220,10 @@ site`. The three registry-registered lists and
 row). That step program reads `tools/memory-tree/convert_registry.py#LEGACY`, which gains the row
 `positional-refs.txt` read by the existing `parse_keyed_reason(2)`, as `trace-waiver.txt`'s is; the
 step id's head is the descriptor's `id`, `playbook-render` (`convert_registry.py#derive_registration`).
-An empty list, which `write_empty_lists` wrote at every target, converts to the header alone.
+An empty list, which `write_empty_lists` wrote at every target, converts to its header and the
+factory's unarmed line, `# unarmed · dead probe · <sha>` (`convert_registry.py#derive_converted_text`),
+which `tools/memory-tree/legacy_ledger.py#read_home_state` reads `unarmed`, as §5 states; a target
+rendered after this unit already holds that file, which `convert_registry.py#derive_after` leaves alone.
 
 ### Rollout
 
@@ -265,14 +276,14 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
   ways)`; `positional-refs` is the largest population at 38364 rows (PINNED 2026-11-19, §4).
 - error / empty / loading states — an empty list after conversion reads `unarmed` until its check is
   seen red (unit 14 `populated`); a list holding rows with no registration naming it is refused, never
-  read as empty.
+  read as empty. A fresh target's list, written by `write_empty_lists`, holds the same state (S5).
 - observability — each check prints its population count, as today.
 - risks — a producer reason now lives in the conversion record and a widen record, not above its row
   (§8 F5); the playbook descriptor's registration travels to every adopter, whose memory root may not
   be `memory`, and the home it names is literal, as unit 16's memory-tree registrations are. Gov's
   receipt keeps an `engine` row for the legacy list's old path until gov's own install rewrites it
   (S5); a reader that requires a receipt row's path to exist meets it at the close.
-- testing — AC1 to AC7; the arm in §7 is observed RED then GREEN by the main loop at the close.
+- testing — AC1 to AC8; the arm in §7 is observed RED then GREEN by the main loop at the close.
 - migration — §4.
 - user docs — `help/tags.md` and `tools/playbook/README.md` name the lists' rows as ledger rows (S7).
 
@@ -320,6 +331,13 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
   `# ledger · positional-refs`, `# ledger · positional-producers`, `# ledger · unpinned-facts` and
   `# ledger · instructions-legacy`; and the `tags positional selftest` leg's argv exits 0.
   Red when: a writer of a list keeps the old grammar, so `read_rows` refuses the list it wrote.
+- **AC8** — When a `python -c` probe in `tools/playbook/` calls `render_playbook.write_empty_lists`
+  over a scratch git target holding `memory/project/` and no `positional-refs.txt`, the file it writes
+  reads `unarmed` through `legacy_ledger.read_home_state`, `legacy_ledger.read_ledger` reads it with no
+  row and no malformed line, and its bytes equal `derive_converted_text`'s for the `positional-refs`
+  registration with no row at that target's `read_head_sha`.
+  Red when: the list is written as the header alone, which reads armed and reds `ratchet (populated)`
+  at every fresh target, or left as empty bytes, which `read_home_state` reads armed too.
 
 ## 7. Gates
 
@@ -414,6 +432,19 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   Neither trips a veto and each satisfies every criterion. RESOLVED (agent, 2026-11-20, delegated):
   (a), tie-broken on fewer open questions, and the option that moves no text. widens: none · relaxes:
   none
+- **F9 — What does `write_empty_lists` write as a fresh target's `positional-refs.txt`, given a
+  converted empty list reads `unarmed`?** `convert_registry.py#derive_converted_text` writes a home
+  with no row as its header and `# unarmed · dead probe · <sha>`, which `read_home_state` reads
+  `unarmed` (`2026-11-19-build-TOOL-dWitnessedBar-18-2-builder-return`). Options: (a) the same bytes,
+  through `derive_converted_text`, so a fresh list reads `unarmed` and `seed_population` seeds it as it
+  seeds a converted one; (b) the header alone, which reads armed with no row; (c) no file, the list
+  dropped from `write_empty_lists`. (b) reds `ratchet (populated)` at every fresh target
+  (`tools/memory-tree/ratchet.py#run_populated`), a leg on §7's line, and `seed_population` reads the
+  home `present` and never seeds it (veto 1); (c) reds the positional arm's absent-list finding at
+  every fresh target (`tools/playbook/positional.py#check_positional`), re-speccing
+  PLAY-dOrderedCharter-70 S10's write against §3 (veto 1). RESOLVED (agent, 2026-11-20, delegated):
+  (a), the one survivor; the converter's own function writes it, so no new reader or writer of the
+  state is minted. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -451,6 +482,11 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   prints every step id the graded tree declares and reads no ref (F6 re-resolved to option (a)), so a
   step's row lands with its step; the step count re-pinned at `192908a02`; `ratchet.py` joins Files
   touched for the `append-removed` plant. No Goal or Scope intent moved.
+- rev-8 · 2026-11-20 · S5 · §4 Migration · §5 · AC8 (new) · §8 F9 (new) · per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-18-spec-fix-2-brief: an empty list converts to its header and
+  the factory's unarmed line, as the landed converter writes it, and `write_empty_lists` writes the same
+  at a fresh target (F9), so both read `unarmed`; a list writer no registration names refuses with
+  exit 2. No Goal or Scope intent moved.
 
 ## 10. Reuse audit
 
