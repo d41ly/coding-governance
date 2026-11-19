@@ -1,6 +1,6 @@
 # TOOL-dLandedOwners-1 — the policy kit's landed predicate counts a build run that carried a unit forward
 
-**Status:** SPECCED · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
+**Status:** INPROGRESS · rev-2 · 2026-11-19 · node d · Tier-2 · base 51971579 · streams tooling · order 1 · closes TOOL-dTrackedAtlas-5 · ratified 2026-11-19
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-brief.md) | research | TOOL-dLandedOwners-2 TOOL-dLandedOwners-3 |
+| [2026-11-19-prompt-TOOL-dLandedOwners-1-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-f1-fold.md) | research | — |
 | [2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md](../prompts/2026-11-19-prompt-TOOL-dLandedOwners-1-pinned-facts-fold.md) | research | TOOL-dLandedOwners-2 |
 

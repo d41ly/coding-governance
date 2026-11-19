@@ -675,7 +675,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-108](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE RECORD-KIND CHECK READS NO SERVES LINE OUTSIDE THE BUILD FOLDERS.… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
-| [TOOL-dTrackedAtlas-5](../builds/dTrackedAtlas/BACKLOG.md) | SPECCED | MED | TOOL-dLandedOwners-1 | 2026-11-19 | THE POLICY KIT'S LANDED-OWNER SET MISCOUNTS A BUILD RUN THAT CARRIED A… |
+| [TOOL-dTrackedAtlas-5](../builds/dTrackedAtlas/BACKLOG.md) | INPROGRESS | MED | TOOL-dLandedOwners-1 | 2026-11-19 | THE POLICY KIT'S LANDED-OWNER SET MISCOUNTS A BUILD RUN THAT CARRIED A… |
 | [TOOL-dTrackedAtlas-13](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite pre-push run-log line red at 9e21ac76 on the daily held… |
 | [TOOL-dTrackedAtlas-14](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite loop guard fixtures red at 9e21ac76 on the daily held… |
 | [TOOL-dTrackedAtlas-15](../builds/dTrackedAtlas/BACKLOG.md) | OPEN | HIGH | — | 2026-11-19 | held red: suite unattended brief-recorded selftest red at 9e21ac76 on… |
