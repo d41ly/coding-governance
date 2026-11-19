@@ -8853,6 +8853,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "check_when_forms_agree",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_whole_conflict",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
