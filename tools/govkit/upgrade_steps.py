@@ -363,6 +363,83 @@ OPT_IN_ALL = "opt_in_all"
 TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 _BASH: str | None = None
 
 
@@ -382,7 +459,9 @@ def resolve_bash() -> str:
     because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
 
     A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
-    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
+    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub. The rule is the
+    one `resolve_bash_py` block above (TOOL-dWitnessedBar-26): GOV_BASH, Git's own `bin/bash.exe`,
+    then PATH, each RUN and a WSL launcher refused under any name; this adapter keeps the memo.
 
     WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
     check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
@@ -392,34 +471,11 @@ def resolve_bash() -> str:
     global _BASH
     if _BASH:
         return _BASH
-
-    def check_runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if check_runs(override):
-            _BASH = override
-            return _BASH
-        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
-                      f"that is set and unusable is this failure, not a fall-through.")
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                continue          # a launcher for a DIFFERENT filesystem
-            if not check_runs(cand):
-                continue          # on disk, cannot execute
-            _BASH = cand
-            return _BASH
-    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
-                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
+    found, _tried, refusal = scan_bash()
+    if not found:
+        raise Refusal(f"govkit: {refusal}")
+    _BASH = found
+    return _BASH
 
 
 def resolve_shell_argv(argv: list[str]) -> list[str]:
@@ -429,15 +485,12 @@ def resolve_shell_argv(argv: list[str]) -> list[str]:
     target chose and is none of govkit's business, and `sh` is left alone because substituting
     bash for it would change the language a target asked for.
 
-    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
-    exactly as it does today instead of newly refusing on a path that never needed this.
+    Raises `resolve_bash`'s Refusal when no bash resolves (TOOL-dWitnessedBar-26 S7): the argv
+    unchanged would hand the bare name to the loader, which on Windows answers with WSL's launcher.
     """
-    if not argv or argv[0] not in ("bash", "bash.exe"):
+    if not argv or argv[0] not in BASH_NAMES:
         return list(argv)
-    try:
-        return [resolve_bash()] + list(argv[1:])
-    except Refusal:
-        return list(argv)
+    return [resolve_bash()] + list(argv[1:])
 
 
 def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:

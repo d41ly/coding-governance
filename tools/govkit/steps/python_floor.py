@@ -5,12 +5,14 @@
 
 Its row is the floor row of `steps.toml`. It finds gov's `<prefix>/lib/python-floor.sh` through the
 step module's `resolve_kit_dir`, runs it under the bash that module's `resolve_shell_argv` resolves,
-`GOV_BASH` first, with this program's own arguments, falling back to bare `bash` where none resolves as
-the parent's argv did before TOOL-dSafePassage-82 (TOOL-dSafePassage-87 S4), and exits as it exits: the script owns every verb, every line it prints and every refusal.
+`GOV_BASH` first, with this program's own arguments, and exits as it exits: the script owns every
+verb, every line it prints and every refusal. Where no bash resolves, that module's Refusal is
+written as one `python_floor.py:` line and the exit is 2, never the bare name `bash`, which the
+Windows loader answers with WSL's launcher (TOOL-dWitnessedBar-26 S7).
 The step module is loaded by its path, because the runner's `-I` drops this file's own directory from
 `sys.path`; nothing is imported from govkit, so a step running isolated runs this.
 
-Exit: the script's own, or 2 when no floor script resolves.
+Exit: the script's own, or 2 when no floor script or no bash resolves.
 """
 
 import importlib.util
@@ -33,7 +35,12 @@ def main(argv: list[str]) -> int:
     except LookupError as e:
         sys.stderr.write(f"python_floor.py: {e}\n")
         return 2
-    return subprocess.run(steps.resolve_shell_argv(["bash", (kit / FLOOR_SCRIPT).as_posix(), *argv])).returncode
+    try:
+        run = steps.resolve_shell_argv(["bash", (kit / FLOOR_SCRIPT).as_posix(), *argv])
+    except steps.Refusal as e:
+        sys.stderr.write(f"python_floor.py: {e}\n")
+        return 2
+    return subprocess.run(run).returncode
 
 
 if __name__ == "__main__":

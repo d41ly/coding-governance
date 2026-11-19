@@ -2679,27 +2679,82 @@ def test_redact_parity(_tmp):
               got == port and got.count(b"://***:***@") >= 5, repr((got, port))[:600])
 
 
-def test_no_bare_bash_argv(tmp):
-    """AC34. An `ast` scan of this file finds no subprocess call whose argv opens with the literal
-    'bash', so every bash this tool starts is the one `resolve_bash` found; and an empty resolve
-    refuses with exit 2 before any leg, naming each candidate. Red when one call spells `["bash", …]`."""
-    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
-        tree = ast.parse(fh.read())
-    calls, bare = 0, []
-    for n in ast.walk(tree):
-        f = n.func if isinstance(n, ast.Call) else None
-        if not (isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == "subprocess"
-                and n.args):
+def scan_bare_bash(root):
+    """`<path>:<line>: <shape>` for every tracked `*.py` and `*.js` line at `root`, outside a
+    `resolve_bash_py` or `resolve_bash_js` block, that launches the bare name `bash` or falls back to it
+    (TOOL-dWitnessedBar-26 §4 "The query"). Python is read by `ast`: shape 1, a call whose first
+    argument is a list or tuple literal opening with `bash` or `bash.exe` (`resolve_shell_argv`, which
+    refuses, aside), or an `or` whose last operand is that name; shape 2, a list or tuple literal holding
+    both names, the PATH loop the block alone may spell. JavaScript is read by a regex: shape 3, `spawn`,
+    `spawnSync`, `execFile` or `execFileSync` with that name first, or an `||` or `??` falling back to it.
+    A language with no tracked file read is a line too, and so is a `*.py` `ast` cannot parse, so an
+    empty or unread population is never a pass.
+    WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable, a conditional whose `else` is
+    `"bash"`, and a name bound to `"bash"` and launched later."""
+    names = profile_bar.BASH_NAMES
+    js_rx = re.compile(r"""\b(?:spawn|spawnSync|execFile|execFileSync)\(\s*(['"`])bash(?:\.exe)?\1"""
+                       r"""|(?:\|\||\?\?)\s*(['"`])bash(?:\.exe)?\2""")
+    listed = subprocess.run(["git", "ls-files", "-z", "--", "*.py", "*.js"], cwd=root, capture_output=True,
+                            timeout=60).stdout.decode("utf-8", "replace")
+    hits, read = [], {".py": 0, ".js": 0}
+    for rel in sorted(p for p in listed.split("\0") if p):
+        try:
+            with open(os.path.join(root, rel), encoding="utf-8-sig", errors="replace") as fh:
+                lines = fh.read().split("\n")
+        except OSError:
             continue
-        calls += 1
-        a0 = n.args[0]
-        while isinstance(a0, ast.BinOp):
-            a0 = a0.left
-        if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
-                and a0.elts[0].value == "bash":
-            bare.append(n.lineno)
-    check_arm("AC34 no subprocess argv opens with a bare 'bash'", calls >= 3 and not bare,
-              "%d subprocess call(s) read, bare at %s" % (calls, bare))
+        ext = os.path.splitext(rel)[1]
+        read[ext] += 1
+        marker = "# " if ext == ".py" else "// "
+        stem = "resolve_bash_py" if ext == ".py" else "resolve_bash_js"
+        outside, inside = set(), False
+        for i, ln in enumerate(lines, 1):
+            if ln.startswith(marker + ">>> " + stem):
+                inside = True
+            if not inside:
+                outside.add(i)
+            if ln.startswith(marker + "<<< " + stem):
+                inside = False
+        if ext == ".js":
+            hits += ["%s:%d: shape 3" % (rel, i) for i, ln in enumerate(lines, 1) if i in outside and js_rx.search(ln)]
+            continue
+        try:
+            tree = ast.parse("\n".join(lines))
+        except (SyntaxError, ValueError) as exc:
+            hits.append("%s: not read, %s" % (rel, exc))
+            continue
+        for n in ast.walk(tree):
+            shape = ""
+            if isinstance(n, ast.Call) and n.args:
+                a0, f = n.args[0], n.func
+                while isinstance(a0, ast.BinOp):
+                    a0 = a0.left
+                fname = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else ""
+                if isinstance(a0, (ast.List, ast.Tuple)) and a0.elts and isinstance(a0.elts[0], ast.Constant) \
+                        and a0.elts[0].value in names and fname != "resolve_shell_argv":
+                    shape = "shape 1"
+            elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant) \
+                    and n.values[-1].value in names:
+                shape = "shape 1"
+            elif isinstance(n, (ast.List, ast.Tuple)) \
+                    and set(names) <= {e.value for e in n.elts if isinstance(e, ast.Constant)}:
+                shape = "shape 2"
+            if shape and n.lineno in outside:
+                hits.append("%s:%d: %s" % (rel, n.lineno, shape))
+    hits += ["no tracked *%s file was read at %s" % (ext, root) for ext, k in read.items() if not k]
+    return hits
+
+
+def test_no_bare_bash_argv(tmp):
+    """AC34, widened by TOOL-dWitnessedBar-26 S6. `scan_bare_bash` over every tracked `*.py` and `*.js`
+    of this repository finds no launch of, and no fall-back to, the bare name `bash`, and read both
+    languages, so every bash a gov file starts is one a resolver found; and an empty resolve refuses
+    with exit 2 before any leg, naming each candidate. Red when one tracked file spells `["bash", …]`,
+    `… or "bash"`, the PATH loop outside the block, or `spawnSync('bash', …)`."""
+    top = profile_bar.run_git(["rev-parse", "--show-toplevel"], cwd=KITDIR)
+    hits = scan_bare_bash(top) if top else ["no repository at %s" % KITDIR]
+    check_arm("AC34 no tracked *.py or *.js launches or falls back to a bare 'bash'", not hits,
+              "; ".join(hits[:20]))
     out = tempfile.mkdtemp(prefix="out.", dir=tmp)
     real = profile_bar.resolve_bash
     profile_bar.resolve_bash = lambda *_a, **_k: ("", ["cand-a", "cand-b"])

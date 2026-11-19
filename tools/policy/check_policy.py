@@ -908,30 +908,89 @@ def load_tree_lib(kit=KIT):
     return tree_lib
 
 
-# The run-gates kit's rule, profile_bar.py's `resolve_bash` (TOOL-dGroundRules-21 S14), inlined from
-# its canonical block (TOOL-dGroundRules-25 S28).
+# The one bash rule, the `resolve_bash_py` block inlined from its canonical (TOOL-dGroundRules-25 S28,
+# rewritten by TOOL-dWitnessedBar-26), and `resolve_bash`, this kit's `path or None` adapter over it.
 # >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
-def resolve_bash(script):
-    r"""The bash that can SEE `script`, by RUNNING each candidate, or None. GOV_BASH first, then the
-    bash PATH names, then Git for Windows' two paths, each kept only when `test -f` on the script
-    exits 0 under it. On Windows PATH order commonly puts the System32 WSL launcher first, which
-    cannot open a `C:/` path, and a stub that exits 127 can sit there too (gotcha
-    subprocess-resolves-a-different-shell); being on PATH is not evidence."""
-    cands = [os.environ.get("GOV_BASH", ""), shutil.which("bash") or "",
-             "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"]
-    tried = []
-    for c in cands:
-        if not c or c in tried:
-            continue
-        tried.append(c)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    tried, seen = [], set()
+
+    def run_probe(cand):
         try:
-            r = subprocess.run([c, "-c", 'test -f "$1"', "_", str(script)], capture_output=True, timeout=20)
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
         except (OSError, subprocess.SubprocessError):
-            continue
-        if r.returncode == 0:
-            return c
-    return None
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
 # <<< resolve_bash_py
+
+
+def resolve_bash(script):
+    """The bash that can SEE `script`, or None: the one `resolve_bash_py` block above, run with it,
+    its refusal read as None (TOOL-dWitnessedBar-26)."""
+    return scan_bash(script)[0] or None
 
 
 def run_adopter_suite(name):
@@ -2258,8 +2317,8 @@ def run_mirror_landed_parity(name):
     try:
         bash = resolve_bash((kit / "policy-shim.sh").as_posix())
         if bash is None:
-            print(f"policy-fixture: {name} · WRONG: no bash can see the shim: GOV_BASH, PATH's bash and Git for "
-                  "Windows' two were each tried; set GOV_BASH")
+            print(f"policy-fixture: {name} · WRONG: no bash can see the shim: GOV_BASH, Git's own "
+                  "bin/bash.exe and each bash on PATH were each tried; set GOV_BASH")
             return 1, 1
         print(f"policy-fixture: {name} · the shim runs under {bash}")
         run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
@@ -3337,11 +3396,15 @@ def render_said(out, mark):
 
 
 def run_case_argv(cwd, argv, env=None, stdin=None):
-    """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s, an
-    `env` value of None drops that variable, and `stdin` is the text piped in."""
+    """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `scan_bash`'s, and none
+    resolving is `(None, <its refusal>)`, the shape a spawn that did not run returns; an `env` value of
+    None drops that variable, and `stdin` is the text piped in."""
     add_argv_reads(argv, cwd)
     if argv[0] == "bash":
-        argv = [resolve_bash(Path(cwd, str(argv[1])).as_posix()) or "bash", *argv[1:]]
+        found, _tried, refusal = scan_bash(Path(cwd, str(argv[1])).as_posix())
+        if not found:
+            return None, f"bash did not run: {refusal}"
+        argv = [found, *argv[1:]]
     merged = {**os.environ, **(env or {})}
     try:
         p = subprocess.run([str(a) for a in argv], cwd=cwd, capture_output=True, text=True, encoding="utf-8",

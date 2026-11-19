@@ -4874,17 +4874,21 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 def check_floor_bash(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
     every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
-    floor stub reaches its fallback to bare `bash`, its tail graded by `test_floor_fallback`, which
-    TOOL-dSafePassage-92 grades over every host shape the bar runs on. Called from `check_step_isolation`."""
+    floor stub either spawns the bash the block finds through Git's own `bin/bash.exe`, its tail graded
+    by `test_floor_fallback`, which TOOL-dSafePassage-92 grades over every host shape the bar runs on,
+    or refuses with exit 2 naming GOV_BASH. On `path94`, which drops git too, `resolve_shell_argv`
+    raises its Refusal (TOOL-dWitnessedBar-26 §4 "The govkit floor arms"). Called from
+    `check_step_isolation`."""
     us = govkit_module().upgrade_steps
     floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
     # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
     # holding a bash dropped but a System32 or WindowsApps launcher, which resolve_bash skips, and
     # GOV_BASH the parent's own bash: the floor stub resolves bash as the parent does, so it holds.
+    # The names planted and dropped are the block's own BASH_NAMES, the names its PATH step tries.
     bash87 = us.resolve_bash()
     fake87 = tmp / "dsp87-nobash"
     fake87.mkdir(exist_ok=True)
-    for nm in ("bash", "bash.exe"):
+    for nm in us.BASH_NAMES:
         (fake87 / nm).write_bytes(b"not a program\n")
         (fake87 / nm).chmod(0o755)
 
@@ -4892,8 +4896,13 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         return any(s in d.replace("\\", "/").lower() for s in ("/system32", "/windowsapps"))
 
     keep87 = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and (test_launcher87(d) or not any(
-        os.path.isfile(os.path.join(d, n)) for n in ("bash", "bash.exe")))]
+        os.path.isfile(os.path.join(d, n)) for n in us.BASH_NAMES))]
     path87 = os.pathsep.join([str(fake87)] + keep87)
+    # TOOL-dWitnessedBar-26: Git's `cmd` directory holds git and no bash, so it stays on path87 and
+    # the block's step 2 finds Git's own `bin/bash.exe` through it. path94 drops every directory
+    # holding git as well, so step 2 does not run and no bash resolves on any host.
+    path94 = os.pathsep.join([str(fake87)] + [d for d in keep87 if not any(
+        os.path.isfile(os.path.join(d, n)) for n in ("git", "git.exe"))])
     with set_environ({"PATH": path87, "GOV_BASH": bash87, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
     check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
@@ -4914,7 +4923,8 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     def read_fallback_argv(steps: types.ModuleType) -> object:
         # TOOL-dSafePassage-94: what `steps` hands the stub for a bare bash, read in this process with
         # its cached bash cleared, or the exception the call raised. A spawn crash's tail cannot show
-        # which spawn crashed, so this read is what proves the call reaches its fallback.
+        # which spawn crashed, so this read is what proves where the call ends: on path94, since
+        # TOOL-dWitnessedBar-26, in its Refusal.
         try:
             held = steps._BASH
         except AttributeError as e:  # TOOL-dSafePassage-95: a copy that did not load has no memo
@@ -4927,39 +4937,48 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         finally:
             steps._BASH = held
 
-    # TOOL-dSafePassage-94: the regression that read must see, check_runs no longer catching a spawn's
-    # OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
+    # TOOL-dSafePassage-94: the regression that read must see, the block's probe no longer catching a
+    # spawn's OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
     # TOOL-dSafePassage-95: staged by build_staged_copy, its anchor replaced once, and a copy that
-    # does not load is a labelled FAIL rather than a crash of the suite.
+    # does not load is a labelled FAIL rather than a crash of the suite. TOOL-dWitnessedBar-26: the
+    # anchor is the `resolve_bash_py` block's probe catch, once in the file, since step 2's own catch
+    # is followed by a different line.
     src94 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
-    anchor94 = "returncode == 0\n        except OSError:"
+    anchor94 = 'except (OSError, subprocess.SubprocessError):\n            return "did not run"'
     sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
     shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
     try:
         spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
-            tmp / "dsp94-narrowed", src94.replace(anchor94, "returncode == 0\n        except ValueError:", 1)))
+            tmp / "dsp94-narrowed", src94.replace(anchor94, 'except ValueError:\n            return "did not run"', 1)))
         steps94 = importlib.util.module_from_spec(spec94)
         spec94.loader.exec_module(steps94)
         steps94._BASH = sentinel94  # TOOL-dSafePassage-95: a memo only the raise path's restore gives back
     except Exception as e:  # noqa: BLE001 - a copy that does not load is what this records
         check("[dSP-95] the staged copy of upgrade_steps.py loads", False, repr(e))
 
-    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
-    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
-    # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
-    # so the rc, is the node's, so only the tail is graded, by `test_floor_fallback`.
+    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset. TOOL-dWitnessedBar-26: path87 keeps
+    # git, so where the block finds a bash through Git's own `bin/bash.exe` the stub spawns it and the
+    # tail is graded by `test_floor_fallback`; where it finds none the stub refuses with exit 2 and a
+    # tail naming GOV_BASH, never a traceback. The block is read in this process under that staging.
     with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+        found91 = us.scan_bash()[0]
+    check("[dSP-91 L2] the floor row's witness, PATH's bash unusable and GOV_BASH unset, spawns the bash "
+          "the block finds, else refuses naming GOV_BASH",
+          test_floor_fallback(got["tail"]) if found91 else
+          (got["rc"] == 2 and "GOV_BASH" in got["tail"] and "Traceback" not in got["tail"]),
+          f"block found {found91!r}; {got}")
+    # TOOL-dWitnessedBar-26: path94 drops git too, so no bash resolves on any host and the reads see
+    # resolve_shell_argv raise. They run in this process and need no git.
+    with set_environ({"PATH": path94, "GOV_BASH": None}):
         argv94, cut94 = read_fallback_argv(us), read_fallback_argv(steps94)
-    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
-          test_floor_fallback(got["tail"]), str(got))
-    check("[dSP-94] resolve_shell_argv on that PATH, GOV_BASH unset and no bash cached, hands back bare bash",
-          argv94 == ["bash", "x"], repr(argv94))
-    check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
+    check("[dSP-94] resolve_shell_argv on path94, GOV_BASH unset and no bash cached, raises its Refusal",
+          isinstance(argv94, us.Refusal), repr(argv94))
+    check("[dSP-94] the same read, the block's probe catch narrowed to ValueError, reads the spawn's OSError",
           src94.count(anchor94) == 1 and isinstance(cut94, OSError), f"anchor count {src94.count(anchor94)}; {cut94!r}")
     check("[dSP-95] the read gives the parent's bash cache back",
-          argv94 == ["bash", "x"] and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
+          isinstance(argv94, us.Refusal) and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
     check("[dSP-95] the read that raises gives the copy's bash cache back",
           isinstance(cut94, OSError) and getattr(steps94, "_BASH", None) == sentinel94,
           f"cut94 {cut94!r}; {getattr(steps94, '_BASH', None)!r}")
@@ -5907,7 +5926,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     seen = []
     for _ in ("with", "without"):
         seen.append([(r.returncode, r.stdout, r.stderr) for r in (
-            subprocess.run(["bash", str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
+            subprocess.run([govkit_module().resolve_bash(), str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
                            errors="replace", cwd=str(clone), timeout=900)
             for leg in ("check-wiring.sh", "check-install-prefix.sh"))])
         if rp.is_file():

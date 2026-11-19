@@ -4563,6 +4563,21 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkCandidate",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "checkCandidate",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "checkCandidate",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "checkCarries",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -4621,6 +4636,21 @@
       "id": "checkFile",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "checkFile",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
     },
     {
       "id": "checkFile",
@@ -7436,6 +7466,11 @@
       "id": "check_rationale_apart",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "check_rb_row",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "check_reachable",
@@ -15536,6 +15571,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.py"
     },
     {
       "id": "main",
@@ -26170,11 +26215,6 @@
     {
       "id": "resolve_bash",
       "kind": "function",
-      "file": "tools/lib/resolve_bash.py"
-    },
-    {
-      "id": "resolve_bash",
-      "kind": "function",
       "file": "tools/loop/loop_witness.py"
     },
     {
@@ -28519,6 +28559,21 @@
     },
     {
       "id": "runLiveness",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "runProbe",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "runProbe",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "runProbe",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
     },
@@ -31523,6 +31578,21 @@
       "file": "tools/workflows/check-verifier-fanout.js"
     },
     {
+      "id": "scanBash",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.js"
+    },
+    {
+      "id": "scanBash",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "scanBash",
+      "kind": "function",
+      "file": "tools/unattended/stop-guard.js"
+    },
+    {
       "id": "scanCommandHeads",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -31633,9 +31703,84 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "scan_bare_bash",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "scan_bare_sources",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/lib/resolve_bash.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "scan_candidates",

@@ -4329,25 +4329,103 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
           _measure_git_calls(dr, small, dr.read_aborted_verdicts) == seen[6], f"{seen}")
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_bash_shell(probe_dir: pathlib.Path) -> str | None:
-    """A shell that runs the kit library as bash runs it: `[[ ]]` and process substitution, both of
-    which the library uses. `sh` on MSYS is bash in POSIX mode, so the probe leaves that mode first."""
+    """The bash the one `resolve_bash_py` block above finds, kept only when it runs the kit library as
+    bash runs it: `[[ ]]` and process substitution, both of which the library uses. None when the
+    block refuses, so a WSL launcher or a bare `bash` never runs the library; the probe leaves POSIX
+    mode first, as a bash started under the name `sh` would be in it."""
+    cand = scan_bash()[0]
+    if not cand:
+        return None
     marker = probe_dir / ".bashprobe"
     marker.write_text("PROBE=works\n", encoding="utf-8", newline="\n")
     probe = ('set +o posix 2>/dev/null; . ./.bashprobe; y=$(cat < <(printf %s "$PROBE")); '
              '[[ "$y" == works ]] && printf %s "$y"')
     try:
-        for cand in ("bash", "sh", "/usr/bin/bash", "/bin/bash"):
-            try:
-                out = subprocess.run([cand, "-c", probe], cwd=str(probe_dir), capture_output=True,
-                                     text=True, encoding="utf-8", errors="replace")
-            except (OSError, FileNotFoundError):
-                continue
-            if out.returncode == 0 and out.stdout.strip() == "works":
-                return cand
+        out = subprocess.run([cand, "-c", probe], cwd=str(probe_dir), capture_output=True,
+                             text=True, encoding="utf-8", errors="replace")
+    except OSError:
         return None
     finally:
         marker.unlink(missing_ok=True)
+    return cand if out.returncode == 0 and out.stdout.strip() == "works" else None
 
 
 def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:

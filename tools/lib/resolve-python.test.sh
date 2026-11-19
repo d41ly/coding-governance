@@ -394,6 +394,7 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
 git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
+resolve_bash_js|$ROOT/$KIT_REL/resolve_bash.js|$KIT_REL/resolve_bash
 coverage_join|$ROOT/$KIT_REL/coverage_join.py|$KIT_REL/coverage_join
 common_git_dir|$ROOT/$KIT_REL/common_dir.py|$KIT_REL/common_dir
 render_envelope|$ROOT/$KIT_REL/envelope.py|$KIT_REL/envelope
@@ -433,8 +434,11 @@ read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 # compare_base_py (TOOL-dGroundRules-21 S7) is the shrink-only compare base the codebase map and the
 # policy kit both read, and git_env_leaks_py (S9) the git variables the policy reader drops, the
 # memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
-# resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
-# carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
+# resolve_bash_py (TOOL-dGroundRules-25 S28, rewritten by TOOL-dWitnessedBar-26) is the one bash rule
+# every gov Python file that starts a bash carries, each behind its own adapter, and resolve_bash_js
+# its JavaScript twin, the copy the stop guard and the policy mirror carry between `// >>> ` markers,
+# which is why the extractor and the population grep read that marker and `*.js` too; §2j below holds
+# the two canonicals to one truth table.
 # coverage_join (PLAY-dOrderedCharter-19 S9) is the join factory, compute_coverage and its siblings,
 # moved out of the codebase-map kit so no core build imports it; its one copy is memory-tree's
 # coverage_join.py, which every codebase-map consumer imports. common_git_dir (S10) is the main
@@ -468,18 +472,19 @@ read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
 # file — `run-selftests.sh` carries two, one per embedded program — was never compared at all.
-blk() { awk -v s="$1" -v k="${3:-1}" '$0 ~ ("^# >>> " s){i++; if(i==k)f=1} f{print} f && $0 ~ ("^# <<< " s){exit}' "$2" | tr -d '\r'; }
+# A JavaScript copy opens `// >>> ` (TOOL-dWitnessedBar-26 S4), so both read that marker beside `# >>> `.
+blk() { awk -v s="$1" -v k="${3:-1}" '$0 ~ ("^(# |// )>>> " s){i++; if(i==k)f=1} f{print} f && $0 ~ ("^(# |// )<<< " s){exit}' "$2" | tr -d '\r'; }
 while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue
   want=$(blk "$stem" "$canon")
   [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
-  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md | grep -v "^$excl" || true)
+  copies=$(cd "$ROOT" && git grep -l -E "^(# |// )>>> $stem" -- '*.sh' '*.py' '*.js' '.githooks/*' WIRE-INTO-PROJECT.md | grep -v "^$excl" || true)
   # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
   # pass by judging nothing, which is the vacuity this whole file refuses.
   [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok
   while IFS= read -r rel; do
     [ -n "$rel" ] || continue
-    nblk=$(grep -c "^# >>> $stem" "$ROOT/$rel")
+    nblk=$(grep -cE "^(# |// )>>> $stem" "$ROOT/$rel")
     k=1
     while [ "$k" -le "$nblk" ]; do
       if [ "$(blk "$stem" "$ROOT/$rel" "$k")" != "$want" ]; then
@@ -721,41 +726,90 @@ for ck_k in 1 2 3; do
   fi; ok
 done
 
-# ---- 2j. THE TWO BASH RESOLVERS' CANDIDATE ORDER, BEHAVIOUR (TOOL-dGroundRules-82) -----------------
-# Parity holds check_policy.py's copy of resolve_bash to its canonical; this holds the policy kit's JS
-# resolveBash to the canonical's candidate ORDER, which no byte compare can, as TOOL-dGroundRules-81 §4
-# "The order" states it. Each runs with its spawn stubbed, so every candidate fails and each prints all
-# it tried, over a PATH of two fixture directories, each holding the bash name `shutil.which` finds on
-# this host. GOV_BASH first and RB_TAIL last are one order on both sides; in the PATH slot the JS tries
-# every PATH bash and Python the one `which` names. D1 stands for a first PATH bash that cannot see the
-# shim, so D2 in the JS list is the case TOOL-dGroundRules-81 restored. A host with no node prints no
-# list and reds, never skips. WHAT THIS DOES NOT CHECK: which candidate a real host keeps, a repeat
-# tried once, a `bash.exe` before a `bash` in one directory (git-bash opens `bash.exe` when asked to
-# write `bash` beside it), or any resolve_bash copy but the canonical.
+# ---- 2j. THE ONE BASH RESOLVER, ITS TWO CANONICALS OVER ONE TRUTH TABLE (TOOL-dWitnessedBar-26) ----
+# Rewritten from TOOL-dGroundRules-82's order arm. Parity holds every copy of resolve_bash_py and
+# resolve_bash_js to its canonical; this holds the two canonicals, resolve_bash.py's `scan_bash` and
+# resolve_bash.js's `scanBash`, to one truth table, which no byte compare can. Each row runs both with
+# their spawn stubbed, so no bash of this host decides a row: the stub answers `git --exec-path` with
+# the row's Git, or fails to start where it is `none`, and each candidate, keyed by its path under the
+# fixture root F, with the row's `uname -s` line and exit, or fails to start where the row names none.
+# The rows are TOOL-dWitnessedBar-26's AC1 to AC4 in fixture form, a candidate that cannot see the
+# script, a repeat, an empty `uname` line and an absent Git bash; both outputs must equal the row's.
+# A host with no node prints nothing and reds, never skips. WHAT THIS DOES NOT CHECK: a real bash or a
+# real WSL launcher (the spec's AC1 to AC4 staged those on node d), the 20 s bound, or a copy against
+# its canonical, which the parity rows above do.
 POLICY_DIR=$(resolve_kit_dir "$REALPY" policy policy-mirror.js "$HERE") || exit 2
 NODE=$(command -v node)
-case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) RB_B=bash.exe ;; *) RB_B=bash ;; esac
-RB="$TMP/rb"; mkdir -p "$RB/D1" "$RB/D2"
-: > "$RB/D1/$RB_B"; : > "$RB/D2/$RB_B"; chmod +x "$RB/D1/$RB_B" "$RB/D2/$RB_B"
-RB_TAIL="C:/Program Files/Git/bin/bash.exe;C:/Program Files/Git/usr/bin/bash.exe;bash"
-rb_js=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
-const cp = require("child_process"), path = require("path");
-const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = [];
-cp.spawnSync = (c) => c === "git" ? { status: 0, stdout: process.cwd() + "\n" } : (tried.push(c), { status: 1 });
-try { require(process.argv[1]).readPolicy("runtime.agents-in-flight"); } catch (_e) { /* the refusal is expected */ }
-console.log(tried.map((c) => c.split(root).join("F").split(path.sep).join("/")).join(";"));' "$ROOT/$POLICY_DIR/policy-mirror.js" 2>&1)
-rb_py=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$REALPY_ABS" -B -c '
+RB="$TMP/rb"; mkdir -p "$RB/G/bin" "$RB/D1" "$RB/D2" "$RB/sys/system32"
+for rb_f in G/bin/bash.exe D1/bash.exe D2/bash sys/system32/bash.exe; do : > "$RB/$rb_f"; chmod +x "$RB/$rb_f"; done
+RB_GIT_OK=G/mingw64/libexec/git-core
+check_rb_row() {  # <label> <host> <GOV_BASH> <git exec-path under F, or none> <PATH dirs under F> <answers> <want>
+  local rb_path="" rb_d rb_py rb_js
+  for rb_d in $5; do rb_path="${rb_path:+$rb_path:}$RB/$rb_d"; done
+  rb_py=$(cd "$RB" && PATH="$rb_path" GOV_BASH="$3" RB_GIT="$4" RB_ANSWERS="$6" "$REALPY_ABS" -B -c '
 import os, subprocess, sys
 sys.path.insert(0, sys.argv[1])
 import resolve_bash
-root, tried = os.path.dirname(os.environ["PATH"].split(os.pathsep)[0]), []
-subprocess.run = lambda argv, **kw: tried.append(argv[0]) or subprocess.CompletedProcess(argv, 1)
-resolve_bash.resolve_bash("x")
-print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe") for c in tried))' "$HERE" 2>&1 | tr -d '\r')
-[ "$rb_js" = "GB;F/D1/$RB_B;F/D2/$RB_B;$RB_TAIL" ] \
-  || bad "the JS resolveBash order left the one TOOL-dGroundRules-81 states: $rb_js"; ok
-[ "$rb_py" = "GB;F/D1/$RB_B;$RB_TAIL" ] \
-  || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
+root = os.getcwd().replace("\\", "/")
+ans = dict(a.split("=", 1) for a in os.environ["RB_ANSWERS"].split(";") if a)
+def run(argv, **kw):
+    c = argv[0].replace("\\", "/")
+    if c == "git":
+        if os.environ["RB_GIT"] == "none":
+            raise OSError("no git")
+        return subprocess.CompletedProcess(argv, 0, (root + "/" + os.environ["RB_GIT"] + "\n").encode(), b"")
+    k = "F/" + c[len(root) + 1:] if c.startswith(root + "/") else c
+    if k not in ans:
+        raise OSError("not a program")
+    u, rc = ans[k].rsplit(":", 1)
+    return subprocess.CompletedProcess(argv, int(rc), (u + "\n").encode() if u else b"", b"")
+subprocess.run = run
+found, tried, refusal = resolve_bash.scan_bash(sys.argv[2], sys.argv[3])
+out = ["tried: " + t for t in tried] + (["bash: " + found] if found else ["refused: " + refusal])
+print(" | ".join(out).replace(root, "F") + " rc=" + ("0" if found else "2"))' "$HERE" x "$2" 2>&1 | tr -d '\r')
+  rb_js=$(cd "$RB" && PATH="$rb_path" GOV_BASH="$3" RB_GIT="$4" RB_ANSWERS="$6" "$NODE" -e '
+const cp = require("child_process"), path = require("path");
+const root = process.cwd().split(path.sep).join("/"), ans = {};
+for (const a of process.env.RB_ANSWERS.split(";").filter(Boolean)) ans[a.slice(0, a.indexOf("="))] = a.slice(a.indexOf("=") + 1);
+cp.spawnSync = (c) => {
+  c = c.split("\\").join("/");
+  if (c === "git") return process.env.RB_GIT === "none" ? { error: new Error("no git"), status: null }
+    : { status: 0, stdout: Buffer.from(root + "/" + process.env.RB_GIT + "\n") };
+  const k = c.startsWith(root + "/") ? "F/" + c.slice(root.length + 1) : c;
+  if (!(k in ans)) return { error: new Error("not a program"), status: null };
+  const i = ans[k].lastIndexOf(":"), u = ans[k].slice(0, i);
+  return { status: Number(ans[k].slice(i + 1)), stdout: Buffer.from(u ? u + "\n" : "") };
+};
+const { found, tried, refusal } = require(process.argv[1]).scanBash({ script: process.argv[2], host: process.argv[3] });
+const out = tried.map((t) => "tried: " + t).concat(found ? ["bash: " + found] : ["refused: " + refusal]);
+console.log(out.join(" | ").split(root).join("F") + " rc=" + (found ? 0 : 2));' "$HERE/resolve_bash.js" x "$2" 2>&1 | tr -d '\r')
+  [ "$rb_py" = "$7" ] || bad "2j $1: resolve_bash.py's scan_bash left the truth table: '$rb_py'"; ok
+  [ "$rb_js" = "$7" ] || bad "2j $1: resolve_bash.js's scanBash left the truth table: '$rb_js'"; ok
+}
+check_rb_row "AC1, Git's bash before PATH, every candidate reported" windows "" "$RB_GIT_OK" "D1 sys/system32" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0;F/D1/bash.exe=Linux:0" \
+  "tried: F/G/bin/bash.exe: runs | tried: F/D1/bash.exe: answered Linux | tried: F/sys/system32/bash.exe: a launcher | bash: F/G/bin/bash.exe rc=0"
+check_rb_row "AC2, no Git and only WSL: a refusal naming every line" windows "" none "D1 sys/system32" \
+  "F/D1/bash.exe=Linux:0" \
+  "tried: git --exec-path: did not run | tried: F/D1/bash.exe: answered Linux | tried: F/sys/system32/bash.exe: a launcher | refused: no bash runs that can see x: git --exec-path: did not run; F/D1/bash.exe: answered Linux; F/sys/system32/bash.exe: a launcher; set GOV_BASH to Git's bash rc=2"
+check_rb_row "AC3, a posix host takes a bash that runs whatever uname answers" posix "" none "D1" \
+  "F/D1/bash.exe=Linux:0" \
+  "tried: git --exec-path: did not run | tried: F/D1/bash.exe: runs | bash: F/D1/bash.exe rc=0"
+check_rb_row "AC4, an unusable GOV_BASH is refused alone" windows GB "$RB_GIT_OK" "D1" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0" \
+  "tried: GB: did not run | refused: GOV_BASH is set to 'GB' and did not run, so nothing after it is tried: an override that is set and unusable is refused, never a fall-through rc=2"
+check_rb_row "AC4, a usable GOV_BASH is taken alone" windows GB "$RB_GIT_OK" "D1" \
+  "GB=MSYS_NT-10.0:0" \
+  "tried: GB: runs | bash: GB rc=0"
+check_rb_row "a bash that cannot see the script, then a later one that can" windows "" "$RB_GIT_OK" "D2" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:1;F/D2/bash=MSYS_NT-10.0:0" \
+  "tried: F/G/bin/bash.exe: cannot see x | tried: F/D2/bash: runs | bash: F/D2/bash rc=0"
+check_rb_row "a repeat is tried once" windows "" "$RB_GIT_OK" "G/bin D2" \
+  "F/G/bin/bash.exe=MINGW64_NT-10.0:0;F/D2/bash=MSYS_NT-10.0:0" \
+  "tried: F/G/bin/bash.exe: runs | tried: F/D2/bash: runs | bash: F/G/bin/bash.exe rc=0"
+check_rb_row "an empty uname line did not run, and an absent Git bash is named" posix "" H/x/y/z "D1" \
+  "F/D1/bash.exe=:0" \
+  "tried: F/H/bin/bash.exe: absent | tried: F/D1/bash.exe: did not run | refused: no bash runs that can see x: F/H/bin/bash.exe: absent; F/D1/bash.exe: did not run; set GOV_BASH to Git's bash rc=2"
 
 # ---- 2k. THE JS KIT RESOLVER PORT, BEHAVIOUR (TOOL-dFairHearing-32 S26) -----------------------------
 # The hooks kit's agent-cap.js and the review kit's spec-audit-optin.js each carry `resolveKitDir`, a JS

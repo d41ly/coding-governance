@@ -241,7 +241,7 @@ def resolve_bash(probe):
     try:
         spec.loader.exec_module(mod)
         found, _tried = mod.resolve_bash(str(probe))
-    except Exception:  # noqa: BLE001 - any failure to load or run the resolver falls back to PATH
+    except Exception:  # noqa: BLE001 - any failure to load or run the resolver is main's refusal
         return ""
     return found
 
@@ -274,11 +274,15 @@ def run_command(argv, root, bound):
     run = list(argv)
     if run[0] in ("python", "python3"):
         run[0] = sys.executable
+    elif run[0] == "bash":
+        # THE RESOLVED BASH ALONE, never a PATH lookup of the name (TOOL-dWitnessedBar-26): `main`
+        # refuses before any row runs where none resolved, so an empty `BASH` never reaches here.
+        run[0] = BASH
     else:
         # ON PATH, FIRST. Windows' process creation searches its system directory BEFORE `PATH`, and on
         # a node with WSL installed `bash` there is WSL's, which cannot read a linked worktree's `.git`
         # file and reported every Git-Bash check "not a git repo" (measured 2026-10-11, node `a`).
-        run[0] = (BASH if run[0] == "bash" else "") or shutil.which(run[0]) or run[0]
+        run[0] = shutil.which(run[0]) or run[0]
     env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
     # NO INHERITED PWD. bash keeps an inherited PWD that names its working directory by another
     # spelling, and node `a`'s TEMP is an 8.3 short name git spells long: an adopter comparing the two
@@ -459,6 +463,10 @@ def main(argv):
         return 0
     if any(a == "bash" for i in items for a in (i["write"][0], i["check"][0])):
         BASH = resolve_bash(root / f"{descriptors[0][0]}/kit.toml")
+        if not BASH:
+            print("regen: REFUSED — a staged row runs bash and no bash resolved that can see this tree; "
+                  "set GOV_BASH to Git's bash")
+            return 2
     if argv[1] == "--check":
         return run_checks(items, root, jobs, bound)
     return run_writes(items, root, jobs, bound)

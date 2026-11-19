@@ -348,6 +348,83 @@ def read_backlog_conf(conf: dict):
         raise Problem(f"corpus_ids: {exc}") from None
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_bash() -> str:
     """The bash that shares THIS filesystem — not whatever the name `bash` resolves to.
 
@@ -362,37 +439,13 @@ def resolve_bash() -> str:
     mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
     which answers `command -v` and exits 9009 without executing anything (see
     <prefix>/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
-    never a silent fall-through to something else.
+    never a silent fall-through to something else. The rule is the one `resolve_bash_py` block above
+    (TOOL-dWitnessedBar-26); its refusal is this module's Problem.
     """
-    def runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if runs(override):
-            return override
-        raise Problem("corpus_ids: GOV_BASH is set to '%s' and does not run. An override that is set "
-                      "and unusable is this failure, not a fall-through — you would believe you had "
-                      "chosen." % override)
-    skipped = []
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                skipped.append(cand)          # a launcher for a different filesystem
-                continue
-            if not runs(cand):
-                skipped.append(cand)          # on disk, cannot execute
-                continue
-            return cand
-    raise Problem("corpus_ids: no usable bash on PATH — set GOV_BASH to one that shares this "
-                  "filesystem" + (" (skipped %s)" % ", ".join(skipped) if skipped else ""))
+    found, _tried, refusal = scan_bash()
+    if not found:
+        raise Problem("corpus_ids: " + refusal)
+    return found
 
 
 def ask_shell(flag: str, root: str) -> str:
