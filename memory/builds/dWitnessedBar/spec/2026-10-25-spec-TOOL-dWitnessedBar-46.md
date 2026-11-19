@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-46 — what an adopter receives of the ratchet pack: the scalar-pin leg over its own seeded pins, and the rest kept gov's
 
-**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -38,15 +38,17 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
 - **S1** — The adopter-receives table. §4 "What an adopter receives" states, per leg of unit 14's pack,
   whether it ships, by one rule: a leg ships when every input it reads at an adopter either ships with
   the kit or is seeded at the adopter by `test.seed`. Observed by AC1.
-- **S2** — The scalar-pin leg ships over the adopter's own pins. `conf-scalar-pins`' registration gets
-  the seed `["python3", "{kit}/ratchet.py", "keys-not-scalar", "--measure"]`, printing one row per
-  `*_PIN=` assignment of a scalar count in the tree's tracked root confs, keyed by conf and key. The
-  memory-tree adopter runs `legacy_ledger.py seed --population conf-scalar-pins` from its kit's copy,
+- **S2** — The scalar-pin leg ships over the adopter's own pins. The `conf-scalar-pins` registration
+  and its seed `keys-not-scalar --measure` are TOOL-dWitnessedBar-14's (its §4 "Migration", §8 F6):
+  one row per conf and key, its count the number of `<KEY>=` assignments, a blank value included
+  (its S11). An adopter receives that registration as unit 14 spells it, run as written at its root
+  (§8 F4). The memory-tree adopter runs `legacy_ledger.py seed --population conf-scalar-pins` from its kit's copy,
   absent-only, in one shell function of `tools/memory-tree/adopt-memory-tree.sh` with two callers: the
   end of `--scaffold`, and a new narrow mode `--seed-pins` that a `[[regenerate]]` row of
   `tools/memory-tree/kit.toml` carrying no `stage` runs at each `govkit update`, as the `--arm-routing`
-  row does (§8 F3). So a conf made from the example seeds its `ROW_DUPLICATE_PIN` row at a fresh
-  install and at an existing adopter's next update, and the leg is green. Observed by AC2 and AC4.
+  row does (§8 F3). So a conf made from the example seeds its five `*_PIN` rows (PINNED, §4 Evidence),
+  `ROW_DUPLICATE_PIN`'s among them, at a fresh install and at an existing adopter's next update, and the leg is green.
+  Observed by AC2 and AC4.
 - **S3** — An unarmed population is never green. `keys-not-scalar` over an absent or unarmed
   `conf-scalar-pins` exits 1 printing `unarmed conf-scalar-pins` and the seed command, so a failed seed
   is visible rather than silent. Observed by AC3.
@@ -57,12 +59,18 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
   `ratchet (unarmed)`, `ratchet (populated)`, `ratchet (seed laundering)`, `ratchet (rename)` and
   `ratchet (key shape)` move from `[[gate_leg]]` rows of `tools/memory-tree/kit.toml` to `[[exempt_leg]]`
   rows of `tools/govkit/registry.toml`, each carrying its whole row and a `why` naming the gov-only input
-  it reads. `ratchet selftest` ships, since its fixtures build their own repositories. gov's manifest is
-  unchanged as a set. Observed by AC1.
+  it reads. An exempt row has no `[gate_leg.gov]` sub-table and its `{kit}` renders `{prefix}`
+  (`tools/run-gates/leg_factory.py#read_declarations`), so each moved row writes its `chunk` and
+  `ceiling` flat, respells its argv's `{kit}/` as `{prefix}/memory-tree/`, and carries the tag
+  `leg.gov.<slug>` (§8 F5); `tools/gate-legs.json` is re-rendered by `leg_factory.py --write`.
+  `ratchet selftest` ships, since its fixtures build their own repositories. gov's manifest keeps the
+  same nine names (DERIVED, §4's adopter-receives table). Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
-- The pack's verbs, the widen route and the population itself: `TOOL-dWitnessedBar-14`'s.
+- The pack's verbs, `keys-not-scalar --measure` among them, the widen route, the population and its
+  registration: `TOOL-dWitnessedBar-14`'s.
+- A seed argv's head and `{kit}` resolved at an adopter: `TOOL-dWitnessedBar-51` S32 (id 55), order 31.
 - `test.seed` and its home rule: `TOOL-dWitnessedBar-15`'s and `TOOL-dWitnessedBar-47`'s.
 - Shipping the seven gov-only legs to adopters: a later build, once each has an adopter seed and a base
   every adopter holds. The exit code of a live leg with no base is the minors batch's id 58 item
@@ -87,9 +95,11 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
 
 - The example conf: `ROW_DUPLICATE_PIN="0"`
   (`tools/memory-tree/.memory-tree.conf.example@7159dd975131:325`); the other four `*_PIN=` lines
-  there are blank (`:200`, `:203`, `:335`, `:336`), which assign no count. Five assignments and one
-  count, PINNED 2026-11-19 at `98e33d71c` by
-  `grep -nE '^[A-Z_]+_PIN=' tools/memory-tree/.memory-tree.conf.example`.
+  there are blank (`:200`, `:203`, `:335`, `:336`). Five assignments, one of them a count, PINNED
+  2026-11-19 at `b3b523896`, the blob unchanged since `98e33d71c`, by
+  `grep -nE '^[A-Z_]+_PIN=' tools/memory-tree/.memory-tree.conf.example`. Unit 14's leg reads every
+  `*_PIN=` assignment, a blank one included (TOOL-dWitnessedBar-14 §4 "The scalar pins"), so each
+  assignment the grep finds is a key the adopter's population holds.
 - `adopt-memory-tree.sh` copies the example when no conf exists and exits 1 asking for an edit
   (`tools/memory-tree/adopt-memory-tree.sh@d56ac45b165c:97-101`), creates `$M/project` (`:671`) and
   stages `$M` alone (`:844`, `:846`).
@@ -98,8 +108,17 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
   `[[regenerate]]` rows and never its `[adopt]` (`tools/govkit/govkit.py#_cmd_update`), and
   memory-tree's rows run `--render`, whose block states it writes no waiver registry, and
   `--arm-routing`, which appends conf keys only when neither is assigned
-  (`tools/memory-tree/kit.toml@19c9d3690e0a:115-148`, `:233-241`). So a seed in `--scaffold` alone
+  (`tools/memory-tree/kit.toml@2dd59ca54ee6:115-148`, `:245-251`). So a seed in `--scaffold` alone
   never reaches the update the Goal names (§8 F3).
+- Unit 14's registration seeds through `["python", "tools/memory-tree/ratchet.py", "keys-not-scalar",
+  "--measure"]` (TOOL-dWitnessedBar-14 §4 "Migration"), and the landed seed run executes an argv as
+  written at the repository root (`tools/lib/legacy_ledger.py#run_seed_argv`). An adopter keeps its
+  kits under a prefix of its own choosing (`WIRE-INTO-PROJECT.md`, its `<prefix>` paragraph), so that
+  path holds only at the prefix `tools` (§8 F4).
+- A leg an adopter does not receive is an `[[exempt_leg]]` row of the deployer's registry carrying its
+  whole row (`tools/run-gates/leg_factory.py`, its module docstring, landed by TOOL-dWitnessedBar-11 at
+  `b80649e60`); its owner segment is `gov` (`tools/run-gates/leg_factory.py#derive_leg_tag`,
+  TOOL-dWitnessedBar-12 §8 F1).
 - `govkit apply` stages every file it lands before it runs any adopter
   (`tools/govkit/govkit.py#_cmd_apply`, its STAGE block), so at a governed install the kit's
   descriptor is in the index when `--scaffold` runs, and `read_registrations`, which reads tracked
@@ -132,17 +151,19 @@ fix. It repairs `TOOL-dWitnessedBar-14`.
 
 ### Inventory
 
-Minted: the verb flag `keys-not-scalar --measure`; the adopter mode `--seed-pins`, its shell function
-and its `[[regenerate]]` row; the check-3 name `conf-scalar-pins.txt`; seven `[[exempt_leg]]` rows.
+Minted: the adopter mode `--seed-pins`, its shell function and its `[[regenerate]]` row; the check-3
+name `conf-scalar-pins.txt`; seven `[[exempt_leg]]` rows (DERIVED, S5), each tagged `leg.gov.<slug>`.
+`keys-not-scalar --measure` is TOOL-dWitnessedBar-14's (its §8 F6), and this unit mints no seed.
 Naming cells: the shell function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
-sh.function` at the pass. The two flags have no cell: the lexicon's surfaces are function, type, file
-and constant, and `--suggest measure --as cli.flag` is refused as MALFORMED (run 2026-11-19 at
-`98e33d71c`).
+sh.function` at the pass. The flag has no cell: the lexicon's surfaces are function, type, file and
+constant, and `--suggest seed-pins --as cli.flag` is refused as MALFORMED (run 2026-11-19 at
+`b3b523896`).
 
 ### Migration
 
-gov's manifest rows are unchanged as a set: the seven legs render from `[[exempt_leg]]` rows with the
-same keys. An adopter's next `govkit update` receives two ratchet legs and seeds its pins through the
+gov's manifest keeps the same nine legs (DERIVED, §4's table): the seven render from `[[exempt_leg]]` rows with the same
+keys, after every descriptor's rows (the render order `tools/run-gates/leg_factory.py`'s module
+docstring states), each `tag` respelled for its owner (§8 F5). An adopter's next `govkit update` receives two ratchet legs and seeds its pins through the
 `--seed-pins` row. The row carries no `stage`, so `tools/run-gates/regen.py` lists it skipped and it
 never runs at a bar.
 
@@ -160,7 +181,7 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 - `tools/memory-tree/check-memory-hygiene.test.sh`
 - `tools/memory-tree/README.md`
 - `tools/govkit/registry.toml`
-- `tools/gate-legs.json`
+- `tools/gate-legs.json`, rendered by `leg_factory.py --write`
 
 ### Alternatives rejected
 
@@ -178,7 +199,10 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 - observability — the leg prints the population's rows and each unheld pin by conf and key.
 - risks — a failed adopter seed reds the leg until re-run; S3 makes that red say what to run. A kit
   copied by hand and left unstaged at `--scaffold` holds no registration `read_registrations` sees, so
-  that seed writes nothing and S3's red names the command to run once the kit is committed.
+  that seed writes nothing and S3's red names the command to run once the kit is committed. An
+  adopter whose prefix is not `tools`, or where `python` does not resolve, runs unit 14's seed argv to
+  a non-zero exit, so its home holds the unarmed line and S3's red names the seed command until
+  TOOL-dWitnessedBar-51 S32 resolves the head and the path (§8 F4).
 - testing — AC1 to AC3 by probe and fixture; the arm of §7 at the close.
 - migration — §4.
 - user docs — `tools/memory-tree/README.md`'s pack section gains the adopter-receives table at the pass;
@@ -186,16 +210,19 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python -c "import json,sys; print(sorted(l['name'] for l in json.load(open(sys.argv[1], encoding='utf-8')) if l.get('pack') == 'ratchet'))" tools/gate-legs.json`
-  runs, it prints the nine legs as before, and `grep -c '^\[\[gate_leg\]\]' tools/memory-tree/kit.toml`
+- **AC1** — When `python -c "import json,sys; print(sorted((l['name'], l['tag']) for l in json.load(open(sys.argv[1], encoding='utf-8')) if l.get('pack') == 'ratchet'))" tools/gate-legs.json`
+  runs, it prints the nine legs as before, the seven of S5 each tagged `leg.gov.<slug>` and the other
+  two `leg.memory-tree.<slug>`, and `grep -c '^\[\[gate_leg\]\]' tools/memory-tree/kit.toml`
   falls by seven against the pass's parent while `tools/govkit/registry.toml` gains seven
   `[[exempt_leg]]` rows naming them.
-  Red when: a leg reading a gov-only input stays a shipped `[[gate_leg]]`.
+  Red when: a leg reading a gov-only input stays a shipped `[[gate_leg]]`, or a moved leg keeps a
+  tag naming a descriptor that no longer declares it.
 - **AC2** — When `adopt-memory-tree.sh --scaffold` builds a scratch tree from the example conf and the
   tree is committed, `python ratchet.py keys-not-scalar` there exits 0
-  naming one row, `.memory-tree.conf` and `ROW_DUPLICATE_PIN`, and check 3 passes with
-  `conf-scalar-pins.txt` present.
+  naming five rows, each `.memory-tree.conf` and one `*_PIN` key of the example, `ROW_DUPLICATE_PIN`
+  among them, and check 3 passes with `conf-scalar-pins.txt` present.
   Red when: the adopter's pin is not seeded, or check 3 refuses its home.
+  figure: five is PINNED 2026-11-19 at `b3b523896` by §4 Evidence's grep; the rows are DERIVED at observation.
   fixture: a scratch `git init` target under `%TEMP%/<short-name>` holding the kit copied to
   `tools/memory-tree/` and the example copied to `.memory-tree.conf`, both staged before `--scaffold`,
   the kit as `govkit apply` leaves it (§4 Evidence); the tree holds none.
@@ -240,6 +267,26 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   RESOLVED (agent, 2026-11-19, delegated): (b), rung 3, the most of S2 and AC2 to AC4 met, by the
   narrow-mode seam the descriptor already uses; it writes only the registered home S2 already prices.
   widens: none · relaxes: none
+- **F4 — How is the seed an adopter receives spelled, now that TOOL-dWitnessedBar-14 registers it?**
+  Unit 14 §8 F6 registers `python tools/memory-tree/ratchet.py keys-not-scalar --measure`, as the
+  landed seed run executes an argv, and leaves the head an adopter needs to this unit. Options: (a) ship
+  it as unit 14 spells it: an adopter at the prefix `tools` seeds, and any other reads S3's `unarmed`
+  naming the seed command until TOOL-dWitnessedBar-51 S32 resolves the head and `{kit}`; (b) respell
+  it `{kit}/ratchet.py`, which the landed run executes as a literal path, so gov's seed and AC2's
+  fixture fail; (c) resolve the head and `{kit}` in the seed run here. (b) fails AC2, veto 1; (c) is
+  unit 15's seed run and unit 51 S32's scope, §3, veto 1. RESOLVED (agent, 2026-11-19, delegated):
+  (a), the one survivor; §5 names the adopter it leaves unarmed. widens: none · relaxes: none
+- **F5 — What tag does a leg S5 moves carry?** Unit 14 tags each leg `leg.memory-tree.<slug>`.
+  TOOL-dWitnessedBar-12 gives an `[[exempt_leg]]` the owner `gov` (its §8 F1, which discarded naming
+  a kit as owner of a leg its descriptor does not declare) and holds a tag as the leg's declared
+  identity, not re-derived when its `name` changes (its §4 "The tag rule"). No code outside
+  `tools/gate-legs.json` and `tools/memory-tree/kit.toml` spells a `leg.memory-tree.` tag (DERIVED at
+  `b3b523896` by `git grep -l 'leg\.memory-tree\.'`, its other hits record and spec prose). Options:
+  (a) each moved row carries `leg.gov.<slug>`, as `tools/run-gates/leg_factory.py#derive_leg_tag`
+  gives a registry row; (b) each keeps `leg.memory-tree.<slug>`. No veto discards either; (b) leaves
+  seven tags (S5) naming an owner that does not declare them, the shape unit 12 F1 discarded.
+  RESOLVED (agent, 2026-11-19, delegated): (a), the option meeting unit 12's rule, with no reference
+  broken. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -262,13 +309,23 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC2 AC3 AC4 ·
   tracked descriptors only; `never gains` reads policy through `read_policy_value` and the policy kit
   ships by default, so the policy clause leaves Alternatives rejected; the lexicon has no flag cell, so
   Inventory names none; Files touched gains the memory-tree README §5 already names.
+- rev-6 · 2026-11-19 · S2 · S5 · §3 · §4 Evidence, Inventory, Migration, Files touched · §5 · AC1 · AC2 ·
+  §8 F4 F5 · §10 · re-grounded at `b3b523896` per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief, over units 15, 12, 61, 22, 47, 19 and 11 as
+  landed and TOOL-dWitnessedBar-14's spec as the contract, rev-10 as it stands, these points unmoved
+  since rev-9: `keys-not-scalar --measure` and the
+  registration's seed are unit 14's, so S2 and Inventory drop them and F4 ships unit 14's spelling;
+  unit 14's leg reads blank pins too, so the example seeds five rows and AC2 names five; the seven
+  moved legs take unit 11's exempt row shape and a `leg.gov.` tag (F5), observed by AC1; the
+  memory-tree descriptor's citations re-pinned at its moved blob. No Goal or Scope intent moved.
 
 ## 10. Reuse audit
 
 The seams are unit 15's `seed` verb, check 3's named list of kit-shipped registries
 (`tools/memory-tree/check-memory-hygiene.sh@2c0cb6f24513:993-1046`), the adopter's narrow-mode
-`[[regenerate]]` row that `--arm-routing` already is (`tools/memory-tree/kit.toml@19c9d3690e0a:233-241`),
-and the `[[exempt_leg]]` row unit 11 gives a whole leg row.
+`[[regenerate]]` row that `--arm-routing` already is (`tools/memory-tree/kit.toml@2dd59ca54ee6:245-251`),
+and the `[[exempt_leg]]` row unit 11 landed at `b80649e60`, read whole by
+`tools/run-gates/leg_factory.py#read_declarations`, tagged by its `derive_leg_tag`.
 `python tools/codebase-map/reuse_lookup.py "seed an adopter's scalar pin population at update"`, re-run
 at `98e33d71c`, ranked `seed` (test helpers), `adopt`, `population` (`tools/govkit/refusal_join.py`),
 `derive_unit_pin`, `derive_pin_hash`, `require_adopted_root` and `declared_scalar`; none seeds a ledger

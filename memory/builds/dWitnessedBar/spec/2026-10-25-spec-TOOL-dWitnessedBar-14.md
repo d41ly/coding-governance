@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says
 
-**Status:** INPROGRESS · rev-9 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-10 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0352@2cbf95b4 whole
 **Carries:** node:policy-key.retrofit.widen
@@ -20,6 +20,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-14-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md) | journal | TOOL-dWitnessedBar-16 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-spec-writer.md) | journal | — |
@@ -47,79 +48,72 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
   registration through `read_registrations` and every population through the factory's `read_rows`,
   `compare_counts`, `compare_to_base` and `carry_renames` (unit 13's `legacy_ledger.py`, landed at
   `34f8bb7db`, its memory-tree copy `tools/memory-tree/legacy_ledger.py`). It mints no compare of its
-  own. Observed by AC1 to AC9.
-- **S2** — The pack's legs, each a declaration through `leg_factory.py` in `tools/memory-tree/kit.toml`
-  carrying `pack = "ratchet"`, the `leg.memory-tree.<name>` tag TOOL-dWitnessedBar-12 §4's rule gives
-  its name (`memory-tree` is the descriptor's `id` and no namespace word, so `ratchet (never gains)`
-  reads `leg.memory-tree.ratchet-never-gains`), the `purpose` TOOL-dWitnessedBar-19 S1 adds to the
-  key set, and `enforces`, per §4 "The pack". Each also carries `tests = ["feature.memory-tree-hygiene"]`.
-  That dossier's `[claims] gate-legs` gains the nine names (§8 F7), since TOOL-dWitnessedBar-22 S5
-  holds a leg's `tests` and the dossiers' claims to agree both ways. Each row takes the shape unit 11
-  §4 "The declaration" settles. The base row holds `name`, `subject`, `argv`, `stage` and the keys
-  above. `chunk` and the measured `ceiling` sit under `[gate_leg.gov]`, as unit 11's example row
-  holds them. `tools/gate-legs.json` gains the nine rows only through `leg_factory.py --write`.
-  `pack` is already a manifest key, carried by 6 legs (PINNED, next line) as
-  `"pack": "tags"` (PINNED 2026-11-19 at `4e5497fb7`, unchanged since `05245bf0e`). Observed by AC10.
+  own. Observed by AC1 to AC9 and AC12.
+- **S2** — The pack's legs, each declared through `leg_factory.py` in `tools/memory-tree/kit.toml` in
+  the shape unit 11 §4 "The declaration" settles. The base row holds `name`, `subject`, `argv`,
+  `stage`, `pack = "ratchet"`, the `leg.memory-tree.<name>` tag TOOL-dWitnessedBar-12 §4's rule gives
+  (`ratchet (never gains)` reads `leg.memory-tree.ratchet-never-gains`, `memory-tree` being the
+  descriptor's `id`), the `purpose` of TOOL-dWitnessedBar-19 S1, `enforces` per §4 "The pack" and
+  `tests = ["feature.memory-tree-hygiene"]`, whose dossier's `[claims] gate-legs` gains the nine names
+  (§8 F7, TOOL-dWitnessedBar-22 S5). `chunk` and the measured `ceiling` sit under `[gate_leg.gov]`.
+  `tools/gate-legs.json` gains the nine rows only through `leg_factory.py --write`. `pack` is already
+  a manifest key, carried by 6 legs as `"pack": "tags"` (PINNED 2026-11-19 at `4e5497fb7`, unchanged
+  since `05245bf0e`). Observed by AC10.
 - **S3** — `never gains`: every refusal `compare_to_base` names for a population's direction, a
   `shrink-only` key `gained` or `raised`, a `ceiling` row `above ceiling`, an `append-only` base row
-  the tree rewrote or no longer holds, so a population no check of its own grades is still held to its direction.
-  A raise is admitted only through a widen record: the landed `compare_to_base` names nothing for a
-  `shrink-only` row whose disposition opens `widened:`, and names `above ceiling` whatever the
-  disposition (`tools/lib/legacy_ledger.py#compare_to_base`), so this leg reds every `widened:<record>`
-  row of a `shrink-only` or `ceiling` population that `retrofit.widen` does not admit (S4), and reads
-  an `above ceiling` finding on a row it admits as green (§8 F5). A row the landed
-  `seed --widen <record>` appends is held the same way (`tools/lib/legacy_ledger.py#seed_population`,
-  TOOL-dWitnessedBar-15 S1): the leg reads the disposition, never which writer wrote it. What it does
-  not check: a widened row's count against the record, which names keys and no count. Observed by
-  AC1 and AC2.
+  the tree rewrote or no longer holds. A raise is admitted only through a widen record: the landed
+  `compare_to_base` names nothing for a `shrink-only` row whose disposition opens `widened:`, and
+  names `above ceiling` whatever the disposition (`tools/lib/legacy_ledger.py#compare_to_base`), so
+  this leg reds every `widened:<record>` row of a `shrink-only` or `ceiling` population that
+  `retrofit.widen` does not admit (S4), and reads an admitted row's `above ceiling` as green (§8 F5).
+  A row the landed `seed --widen <record>` appends (`tools/lib/legacy_ledger.py#seed_population`) is
+  held the same way: the leg reads the disposition, never its writer. What it does not check: a
+  widened row's count, which the record does not name. Observed by AC1 and AC2.
 - **S4** — `retrofit.widen`, whose row `tools/policy/catalogue.toml` holds (allowed `record-reason`
-  and `refuse`, default `record-reason`), landed by TOOL-dGroundRules-1. It is read through the kit's
-  one policy read, `tools/memory-tree/tree_lib.py#read_policy_value`, called with the key a literal,
-  which runs `policy.py get` at the repository's landed revision. Where no policy kit resolves
-  (`LookupError`), the value is the catalogue default `record-reason` and the leg prints one stderr
-  line naming the key and the lookup, as TOOL-dWitnessedBar-15 S3 reads `retrofit.unseeded`
-  (`tools/lib/legacy_ledger.py#read_seed_policy`); where the
-  reader refuses (`ValueError`), the leg exits 2 with the reader's line. `record-reason` admits a
+  and `refuse`, default `record-reason`), landed by TOOL-dGroundRules-1, read through
+  `tools/memory-tree/tree_lib.py#read_policy_value` with the key a literal, which runs `policy.py get`
+  at the landed revision. Where no policy kit resolves (`LookupError`), the value is `record-reason`
+  and the leg prints one stderr line naming the key and the lookup, as
+  `tools/lib/legacy_ledger.py#read_seed_policy` reads `retrofit.unseeded`; where the reader refuses
+  (`ValueError`), the leg exits 2 with its line. `record-reason` admits a
   widened row whose `<record>` names a tracked widen record holding that population, that key and a
   non-empty `**Reason:**`; `refuse` admits only such a row whose record the base already tracks, a
   widening landed before the policy turned (§8 F5). Observed by AC2.
 - **S5** — The widen record and its door. The record kind `widen` joins PLAY-dOrderedCharter-7 S7's
   factory `tools/memory-tree/build_records.py`: name `<date>-build-<unit id>-widen-<n>.md`, served as
   `**Serves:** widen <unit id>`, fields `Population`, `Keys`, `Reason` and `Caused-by`: an entry of
-  `tools/memory-tree/build_records.py#KINDS` with those four required and no closed set. The kind joins
-  the reader in the same pass: `widen` is added to `TYPED_RECORD_KINDS` in
-  `tools/memory-tree/tree_lib.py`, which the factory's kind table must equal at import
-  (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
-  `tools/memory-tree/HYGIENE.template.md` (its S5), whose closing count, "The nine after `research`
-  are the typed kinds", becomes ten; under its S3 a `-widen-<n>.md` file served as any other kind is
-  malformed. The factory's `new` verb is per kind: `tools/memory-tree/build_records.py#DOORS` names the
-  kinds it writes, and every other kind is written by
-  `tools/memory-tree/build_records.py#write_record` alone. `widen` joins `KINDS` and not `DOORS`, so
-  this unit claims no `new widen` door. `python tools/memory-tree/ratchet.py widen <population> --key
-  <k> --reason <text> --unit <id>` is the population's door: it writes the record through
-  `write_record`, passing it the build and unit `--unit` names and the four fields, and the row
-  `widened:<record stem>` through the ledger's `write_rows`, and refuses under `refuse`. Observed by
-  AC2 and AC11.
+  `tools/memory-tree/build_records.py#KINDS` with those four required and no closed set. In the same
+  pass `widen` joins `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, which the factory's kind
+  table must equal at import (PLAY-dOrderedCharter-42 S1, S2), and the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (its S5), whose count, "The nine after `research` are the
+  typed kinds", becomes ten; under its S3 a `-widen-<n>.md` file served as any other kind is malformed.
+  `widen` joins `KINDS` and not `tools/memory-tree/build_records.py#DOORS`, the kinds the `new` verb
+  writes, so no `new widen` door is claimed. `python tools/memory-tree/ratchet.py widen <population>
+  --key <k> --reason <text> --unit <id>` is the door: it writes the record through
+  `tools/memory-tree/build_records.py#write_record`, passing the build and unit `--unit` names and the
+  four fields, and the row `widened:<record stem>` through `write_rows`, and refuses under `refuse`.
+  Observed by AC2 and AC11.
 - **S6** — `both ways`: every registration whose `leg` is `ratchet (both ways)`, this leg's own
   population, has its `seed` run at HEAD against its rows through `compare_counts`; a registration
   naming any other leg is graded by that leg through the same call, and this leg prints it `graded by
   <leg>` so no population is measured twice. `leg` is a required non-empty field
   (`tools/lib/legacy_ledger.py#_check_table`), so a population with no check of its own names this leg,
   as units 17 (`date-cutoffs`, its §8 F5) and 18 (`landed-steps`, its §8 F6) register; one with
-  `seed = []` is S7's `unarmed`, never graded green here. What it does not check: that a leg another
+  `seed = []` is S7's `unarmed`, never graded green here. Where no registration names this leg, as at
+  landing, it prints `unarmed · ratchet (both ways) · no registration names this leg` beside its
+  `graded by` lines, no pass line, and exits 0 (§8 F9). What it does not check: that a leg another
   registration names exists in `tools/gate-legs.json`. The seed runs through the factory's one seed
-  run, `tools/lib/legacy_ledger.py#run_seed_argv`, the one TOOL-dWitnessedBar-15 S1's
-  `seed_population` calls under its §4 "The rule": rows on stdout, the `SEED_TIMEOUT` bound and
-  `dead probe:` liveness. It runs the argv as written at the repository root until
-  TOOL-dWitnessedBar-51 S32's argv head resolution lands. This leg writes no argv runner of its own.
-  Observed by AC3.
+  run, `tools/lib/legacy_ledger.py#run_seed_argv`, which `seed_population` calls (TOOL-dWitnessedBar-15
+  S1): rows on stdout, the `SEED_TIMEOUT` bound and `dead probe:` liveness, the argv as written at the
+  repository root until TOOL-dWitnessedBar-51 S32 lands. Observed by AC3.
 - **S7** — `unarmed`: a registration with `seed = []`, or whose home holds the `# unarmed · <reason> ·
   <sha>` line `test.seed` leaves for a failed or dead-probe seed (I5, unit 15 S2), reading anything but
   `unarmed`. The home's state is read through `tools/lib/legacy_ledger.py#read_home_state`, never a
   second parse of the line. Observed by AC4.
-- **S8** — `populated`: an empty population after a live seed reading armed. It reads `unarmed` until the
-  leg its registration names has a seen-red record (I16), which unit 7 defines and this leg reads as data
-  once any exists. Observed by AC4.
+- **S8** — `populated`: an empty population after a live seed, a home `read_home_state` reads `armed`
+  holding no row. No seen-red reader is landed, so none is admitted: each prints `<population> · empty
+  · reads unarmed, no seen-red reader` and the leg exits 1 (§8 F8). Admitting one a seen-red record
+  (I16) vouches for lands with unit 7's reader; no seen-red line is parsed here. Observed by AC4.
 - **S9** — `seed laundering`: against the base, a surviving key whose SHA or disposition was rewritten
   (re-dated, or turned back to `seeded`) or a row removed while its seed still measures the key.
   A base row stamped with the null SHA of TOOL-dWitnessedBar-61, seeded before any commit, is held
@@ -136,14 +130,20 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
   as the factory's line-number refusal over every population. Observed by AC8.
 - **S13** — The fixture arms. `python tools/memory-tree/ratchet.py --fixture --plant <case>` builds a
   scratch repository with a registration, a population and a base commit, and runs the case's leg; the
-  `untouched quiet` and `merge` rows live here, the second replaying two branches that drain one
-  population and merge through `merge-rows.sh`. The base commit is the one a configured remote's
-  tracking ref names (`git remote add`, then `git update-ref refs/remotes/<remote>/main`), because
-  `tools/lib/compare_base.py#resolve_compare_base` fetches nothing and answers no base without one;
-  `tools/codebase-map/selftest.py#test_baseline_additions_from_git` sets its base up the same way. The
-  policy reader reads that same landed revision, so a plant run under `refuse` commits
-  `.governance/policy.toml` with `widen = "refuse"` under `[retrofit]` into the base commit.
-  Observed by AC9.
+  `untouched quiet` and `merge` rows live here, the second merging two drains through `merge-rows.sh`.
+  The base commit is the one a remote's tracking ref names (`git remote add`, then `git update-ref
+  refs/remotes/<remote>/main`), since `tools/lib/compare_base.py#resolve_compare_base` fetches nothing,
+  as `tools/codebase-map/selftest.py#test_baseline_additions_from_git` sets its base. A plant run under
+  `refuse` commits `.governance/policy.toml` with `widen = "refuse"` under `[retrofit]` into that base,
+  the revision the policy reader reads. Observed by AC9.
+- **S14** — `new at <base>`: a population the base holds nowhere, as one whose registration and home
+  are both new on the branch. Where `resolve_compare_base`'s sha holds no file at its `home`
+  (`git cat-file -e`) and no file whose first line is its header (one `git grep -n` there, each line-1
+  hit read by `tools/lib/legacy_ledger.py#parse_header`), `never gains`, `seed laundering` and `rename`
+  print it `new at <sha12>` with its row count and grade it no further (§8 F10). Its own leg holds it
+  at HEAD, and the base once the push lands it. A base holding its header at another path is no new
+  population: `compare_to_base`'s no-home answer prints `unresolved`, red. What it does not check: the
+  rows a first seed writes, which are `test.seed`'s (unit 15). Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -153,7 +153,7 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
   --list` prints it `unarmed · build.scope (dScopedBuild)`.
 - Converting gov's registries, the pins and the cutoffs: units 16, 17 and 18; each joins this pack as
   data once registered.
-- The seen-red record: unit 7's (I16).
+- The seen-red record, its reader and the admission of an empty population it names: unit 7's (I16).
 - The `retrofit.widen` catalogue row: TOOL-dGroundRules-1's, landed in `tools/policy/catalogue.toml`;
   this unit reads it and never re-declares it.
 - The `purpose` and `tests` keys and the `tests`-to-claims compare: units 19 and 22's, both CLOSED
@@ -167,9 +167,9 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
 - **consumes-from** `TOOL-dWitnessedBar-12` — the `tag` field and the `pack` namespace's `pack.ratchet`, which S2's legs carry
 - **consumes-from** `TOOL-dWitnessedBar-11` — `leg_factory.py`, through which S2 declares the pack's legs
 - **hands-off** `TOOL-dWitnessedBar-16` — `retrofit.widen` and the widen route of S5, the only way a converted registry's population grows
-- **hands-off** `TOOL-dWitnessedBar-17` — the `conf-scalar-pins` population of S11, whose seven rows the pins' conversion drains, `ratchet.py`, to which it adds its `measure-cutoffs` verb, and S6's `both ways`, which grades `date-cutoffs` as its own leg's population
-- **hands-off** `TOOL-dWitnessedBar-18` — `ratchet.py`, whose `never gains` and `both ways` legs grade the five populations that unit registers, `landed-steps` as `both ways`' own (S6), and whose selftest takes its `append-removed` plant
-- **consumes-from** external — TOOL-dGroundRules-2's `policy.py get` and TOOL-dGroundRules-1's catalogue row `retrofit.widen`, both landed and read through memory-tree's `read_policy_value`; PLAY-dOrderedCharter-7 S7's `build_records.py` with its `write_record`, and PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS`, file-name join and closed kind list, all landed, which the `widen` kind joins; dScopedBuild's `build.scope` for the touch join
+- **hands-off** `TOOL-dWitnessedBar-17` — S11's `conf-scalar-pins`, whose rows the pins' conversion drains (S11), `ratchet.py`, which gains its `measure-cutoffs` verb, and S6's `both ways`, which grades `date-cutoffs` as its own
+- **hands-off** `TOOL-dWitnessedBar-18` — `ratchet.py`, whose `never gains` and `both ways` grade that unit's populations, `landed-steps` as `both ways`' own (S6), and whose selftest takes its `append-removed` plant
+- **consumes-from** external — TOOL-dGroundRules-2's `policy.py get` and TOOL-dGroundRules-1's `retrofit.widen` row, read through `read_policy_value`; PLAY-dOrderedCharter-7 S7's `write_record` and PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS` and closed kind list, which `widen` joins; dScopedBuild's `build.scope` for the touch join
 - **hands-off** `TOOL-dWitnessedBar-46` — the pack's legs, the `conf-scalar-pins` registration and its seed `keys-not-scalar --measure` (§8 F6), whose shipping to adopters unit 46 decides (id 34)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 7 and 58: `ratchet selftest`'s `enforces`, and a live leg's exit 1 with no base, each a scope item of that unit
 - **hands-off** `TOOL-dWitnessedBar-52` — `ratchet.py keys-not-scalar`, whose conf read unit 52 binds to the seed's `root_confs` (id 1)
@@ -201,6 +201,10 @@ carries `stage = ["step.test"]` and `tests = ["feature.memory-tree-hygiene"]` (�
 Each prints its population count and, with no base, `unresolved` naming `compare_to_base`'s reason,
 never green (the base bullet under the table, from
 `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md@5b0cb48caa25:440`).
+A population the base holds nowhere is `new at <sha12>` (S14). A live leg with nothing to grade prints
+one `unarmed · <leg> · <why>` line and no pass line, and exits 0 (§8 F9), as `--list` prints it. What
+that does not check: the runner prints the exit 0 as passed, so `unarmed` is read in the leg's
+output and `--list`, never in the bar.
 The table's rows are that file's `[ratchet]` table, from
 `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md@5b0cb48caa25:428`.
 
@@ -238,10 +242,11 @@ gain against this population. `UNIVERSAL_BUDGET` is a budget and no pin, and sta
 
 Minted: `tools/memory-tree/ratchet.py` with verbs `never-gains`, `both-ways`, `unarmed`, `populated`,
 `seed-laundering`, `rename`, `keys-not-scalar` and its `--measure` mode, `key-shape`, `widen`,
-`--list` and `--fixture`; the nine
-legs of the table; the record kind `widen`, a member of `TYPED_RECORD_KINDS`; the population `conf-scalar-pins` and its file; the fixture
-cases of §6. Naming cells: each verb is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
-cli.flag`, each function of the same with `--as py.function`, at the pass.
+`--list` and `--fixture`; the nine legs of the table; the record kind `widen`; the population
+`conf-scalar-pins` and its file; the fixture cases of §6. Naming cells: each function is asked of
+`python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass. No cell grades a verb:
+`.lexicon.conf`'s `CELLS` declares `js.function`, `js.type`, `py.function`, `py.type` and
+`sh.function` (PINNED 2026-11-19 at `b3b523896`).
 
 ### Migration
 
@@ -262,19 +267,22 @@ direction = "shrink-only"
 home = "memory/project/conf-scalar-pins.txt"
 ```
 
-S6 prints it `graded by` its leg. The seed's head and path are spelled as the landed
-`run_seed_argv` runs them, as written at the repository root (§8 F6). `python` is the head gov's
-own manifest rows spell, as `govkit selfcheck`'s does. It is seeded at the pass's base with its nine
-rows through `test.seed`, the `seed --population conf-scalar-pins` verb of TOOL-dWitnessedBar-15 S1. Its home's `merge=rows` line
-joins `.gitattributes`, the line TOOL-dWitnessedBar-13 §3 leaves to each unit that adds a ledger. No
+S6 prints it `graded by` its leg. The seed is spelled as the landed `run_seed_argv` runs it, at the
+repository root (§8 F6), `python` being the head gov's manifest rows spell, as `govkit selfcheck`'s
+does. It is seeded at the pass's base with its nine rows through `test.seed`, the
+`seed --population conf-scalar-pins` verb of TOOL-dWitnessedBar-15 S1. Its home's `merge=rows` line
+joins `.gitattributes`, as TOOL-dWitnessedBar-13 §3 leaves to each unit adding a ledger. No
 `[[ledger]]` table is registered at `4e5497fb7` (DERIVED by `git grep -n '^\[\[ledger\]\]' -- '*.toml'`,
 which prints nothing), so this is the first. No existing population changes; each registered later
 joins the pack as data.
 
 ### Rollout
 
-Live at landing. With no registry converted yet, `never gains` grades `conf-scalar-pins` alone and
-prints the population count, so it is not green over nothing. The pass runs
+Live at landing. At the pass's close and its push, `conf-scalar-pins` is new at the base, so
+`never gains` and `seed laundering` print it `new at <sha12>` and read `unarmed` (S14). `rename` reads
+`unarmed`, no `site` population being registered, and `both ways` until unit 17 registers
+`date-cutoffs` (S6). `keys, not a scalar`, `unarmed`, `populated` and `key shape` grade it at HEAD,
+and every base leg once the push lands it. The pass runs
 `python tools/run-gates/owed_rows.py --base HEAD` before its commit (PLAY-dOrderedCharter-50 S6).
 
 ### Files touched (estimate)
@@ -289,8 +297,10 @@ prints the population count, so it is not green over nothing. The pass runs
 - `memory/map/features/memory-tree-hygiene.md`: the nine names in `[claims] gate-legs` (§8 F7)
 - `memory/map/generated/`, its leg inventory re-rendered by the map's own generator
 - `memory/project/conf-scalar-pins.txt`
-- `.memory-tree.conf`
-- `.gitattributes`
+- `.memory-tree.conf`: `PROJECT_REGISTRY_EXTRA` names `conf-scalar-pins.txt`
+- `.gitattributes`: the home's `merge=rows` line
+- `memory/guides/SESSION-KICKOFF.md`: `last-audit` re-stamped, its `watch:` naming two paths above
+- `.lexicon.conf`: only where the lexicon's `--measure` moves a pin, none expected
 - `tools/govkit/subject-pins.tsv`
 
 ### Alternatives rejected
@@ -305,14 +315,14 @@ prints the population count, so it is not green over nothing. The pass runs
 
 - security — `widen` writes one record and one row in the working tree; it runs no seed argv itself.
 - perf / scale — `both ways` runs only seeds no other leg runs; the others read files and `git diff`.
-- error / empty / loading states — no base reads `unresolved`; an empty population reads `unarmed`; a
-  registration that fails to parse is unit 13's refusal, printed.
+- error / empty / loading states — S14, F9 and S8 for a base lacking a population, a leg with nothing
+  to grade and an empty armed population; no base reads `unresolved`; a bad registration is unit 13's.
 - observability — every leg prints its population count and each finding's population and key.
 - risks — the touch join stays unarmed until dScopedBuild; said on every `--list`.
-- testing — the plants of S13; the arm in §7 is observed RED then GREEN by the main loop at the close.
+- testing — the plants of S13; the main loop observes §7's arm RED then GREEN at the close.
 - migration — §4.
-- user docs — `tools/memory-tree/README.md` gains the pack's legs and the widen route; no page under
-  `help/` documents the ledger.
+- user docs — `tools/memory-tree/README.md` gains the legs and the widen route; no `help/` page
+  documents the ledger.
 
 ## 6. Acceptance criteria
 
@@ -331,12 +341,14 @@ prints the population count, so it is not green over nothing. The pass runs
 - **AC3** — When `python ratchet.py --fixture --plant both-ways` runs over a registration naming
   `ratchet (both ways)`, a measured key with no row and a row no seed finds each make `both-ways` exit 1
   naming it; a registration naming another leg, its seed planted to exit 1, prints `graded by <leg>`
-  and its seed never runs.
-  Red when: a registration naming this leg is printed `graded by` and measured by nothing, or a
-  population another leg grades is measured a second time here.
+  and its seed never runs; with no registration naming the leg, it exits 0 printing `unarmed` and
+  no pass line.
+  Red when: a registration naming this leg is printed `graded by` and measured by nothing, a
+  population another leg grades is measured a second time here, or an empty own population passes.
 - **AC4** — When `python ratchet.py --fixture --plant unarmed-green` runs, a registration whose seed
   `test.seed` recorded failed reading armed makes `unarmed` exit 1; under `--plant
-  populated-empty-armed`, an empty population after a live seed reading armed makes `populated` exit 1.
+  populated-empty-armed`, an empty population after a live seed reading armed makes `populated` exit 1
+  naming it, with no seen-red record in the fixture.
   Red when: an empty population reads green.
 - **AC5** — When `python ratchet.py --fixture --plant laundering` runs, a re-seed at a later SHA
   re-dating one row and rewriting another's disposition to `seeded` makes `seed-laundering` exit 1
@@ -371,122 +383,119 @@ prints the population count, so it is not green over nothing. The pass runs
   prints an `S` row for its `<date>-build-<id>-widen-1.md` with kind `widen`, and no `A` row for it.
   Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
   refuses at import or the record reads malformed.
+- **AC12** — When `python ratchet.py --fixture --plant new-population` runs, a registration and home
+  the base commit lacks, `never-gains` and `seed-laundering` each exit 0 printing `new at` with the
+  population's row count; under `--plant home-moved`, the base holding that population's header at
+  another path, `never-gains` exits 1 printing `unresolved`.
+  Red when: a population new on the branch reds until the push lands it, or a moved home reads new.
 
 ## 7. Gates
 
-The pass adds the nine legs of §4's table; they are named there and not on the leg line below, which
-the leg join reads against today's manifest.
+The nine legs of §4's table are named there, not on the leg line, which reads today's manifest.
 
-`memory hygiene` · `memory-hygiene self-test` · `policy fixtures` · `build-index selftest` · `corpus-ids selftest` · `gotchas selftest` · `row-keyed merge driver replay` · `kit/dogfood doc parity` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `policy fixtures` · `build-index selftest` · `corpus-ids selftest` · `gotchas selftest` · `row-keyed merge driver replay` · `kit/dogfood doc parity` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-tree/ratchet.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · `ratchet selftest` runs every `--fixture --plant` case, its failing cases staged by `gain`, `gain-refused`, `laundering` and `rename` · none
+New arm: tools/memory-tree/ratchet.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC12 · `ratchet selftest` runs every `--fixture --plant` case, its failing cases staged by `gain`, `gain-refused`, `laundering`, `rename` and `home-moved` · none
 
 ## 8. Open questions
 
 - **F1 — Where does the pack's checker live?** Options: (a) `tools/memory-tree/ratchet.py`, beside the
-  factory's memory-tree copy and `merge-rows.py`; (b) `tools/lib/`, which ships nothing and has no
-  descriptor to declare legs in; (c) `tools/run-gates/`, which carries no ledger copy. RESOLVED (agent,
-  2026-10-25, delegated): (a), rung 3, the kit that already carries the factory copy unit 13 S8 installs
-  and the merge driver the `merge` row replays. widens: none · relaxes: none
-- **F2 — Does `never gains` grade a raised `ceiling`?** Options: (a) yes, a raise is a weakening and
-  needs a widen record; (b) no, only `shrink-only`. The `never gains` row of retrofit's `[ratchet]`
-  table (`memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md@5b0cb48caa25:428`)
-  states the row for shrink-only debt,
-  and unit 13's `ceiling` direction refuses only a value above its row, so under (b) a ceiling could be
-  raised to admit anything, the waiver drift's `RATCHETS` "weakens up" rows exist to refuse.
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the option keeping the protection
-  TOOL-dWitnessedBar-16 removes from drift when its pins become a `ceiling` population. A bound this
-  spec adds, the weakest tier. widens: none · relaxes: none
+  factory's memory-tree copy and `merge-rows.py`; (b) `tools/lib/`, which ships nothing and declares no
+  legs; (c) `tools/run-gates/`, which carries no ledger copy. RESOLVED (agent, 2026-10-25, delegated):
+  (a), rung 3, the kit carrying the factory copy and the merge driver. widens: none · relaxes: none
+- **F2 — Does `never gains` grade a raised `ceiling`?** Options: (a) yes, a raise needs a widen
+  record; (b) no, only `shrink-only`, as retrofit's `[ratchet]` row (§4 "The pack") states it. Under
+  (b) a ceiling could be raised to admit anything, the waiver drift's `RATCHETS` "weakens up" rows
+  refuse. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, keeping the protection
+  TOOL-dWitnessedBar-16 removes from drift. widens: none · relaxes: none
 - **F3 — What does the `keys, not a scalar` leg grade on its first day, when nine scalar pins exist?**
   Options: (a) a `shrink-only` population of the nine, drained by their converters; (b) red until
-  unit 17 and dMindYourWords land; (c) grade only after they land. (b) reds the bar at landing; (c) is a
-  check that grades nothing. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the ledger's own
-  answer to tolerated debt. widens: none · relaxes: none
-- **F4 — How does a `widened:` disposition name its record?** Options: (a) the record's file stem;
-  (b) its repo-relative path; (c) an id inside it. (b) puts `/` into a TAB row unit 13's key grammar
-  reads; (c) needs a second id grammar. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, a stem the
-  build-records grammar already makes unique. widens: none · relaxes: none
+  unit 17 and dMindYourWords land; (c) grade only after they land. (b) reds the bar at landing; (c)
+  grades nothing. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none
+- **F4 — How does a `widened:` disposition name its record?** Options: (a) its file stem; (b) its
+  path, putting `/` into a TAB row; (c) an id inside it, a second id grammar. RESOLVED (agent,
+  2026-10-25, delegated): (a), rung 3, a stem already unique. widens: none · relaxes: none
 - **F5 — How does `never gains` hold a widened row to its record, when the landed `compare_to_base`
   passes a widened `shrink-only` row unseen?** Options: (a) grade every `widened:` row of a
   `shrink-only` or `ceiling` population against its record, `refuse` admitting only a record the base
-  commit tracks, read at `resolve_compare_base`'s sha; (b) grade only the rows `compare_to_base` names,
-  so a widened `shrink-only` gain is never read; (c) a base-row read of this leg's own; (d) a record
-  check inside `compare_to_base`. (b) fails AC2's empty-reason case; (c) and (d) take the factory's base
-  and compare, §3's unit 13 (veto 1). RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor.
-  widens: none · relaxes: none
+  tracks; (b) only the rows `compare_to_base` names; (c) a base-row read of this leg's own; (d) a record
+  check inside `compare_to_base`. (b) fails AC2's empty-reason case; (c) and (d) are §3's unit 13;
+  veto 1 each. RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor. widens: none · relaxes: none
 - **F6 — What seed does `conf-scalar-pins` register, now that the landed seed writes no row for
   `seed = []`?** `seed_population` reports a `seed = []` registration unarmed and writes nothing
-  (`tools/lib/legacy_ledger.py#seed_population`). §4 "Migration" seeds nine rows through it.
-  TOOL-dWitnessedBar-46 S2, a later unit, gives the registration the seed `keys-not-scalar --measure`
-  with a `{kit}` head, a token `run_seed_argv` does not resolve until TOOL-dWitnessedBar-51 S32 lands.
-  Options: (a) this unit mints `keys-not-scalar --measure` and registers it as the seed, spelled as the
-  landed runner runs it, `python tools/memory-tree/ratchet.py`; unit 46 S2 is left to respell the
-  head for an adopter. (b) Register `seed = []` and leave the seed to unit 46. (c) Write the nine rows
-  by hand beside a `seed = []` registration. (b) leaves the population unarmed at landing, so
-  `keys-not-scalar` reds the bar, F3's discarded (b); that fails AC7, veto 1. (c) writes seeded rows
-  outside `test.seed`, unit 15's by §3, and S7 reads a `seed = []` registration unarmed whatever its
-  home holds; that fails AC7 and §3, veto 1. RESOLVED (agent, 2026-11-19, delegated): (a), the one
-  survivor. The `Minted:` line of unit 46 naming `--measure` goes to that unit's own re-ground.
-  widens: none · relaxes: none
+  (`tools/lib/legacy_ledger.py#seed_population`). TOOL-dWitnessedBar-46 S2, a later unit, spells the
+  seed with a `{kit}` head `run_seed_argv` does not resolve until TOOL-dWitnessedBar-51 S32 lands.
+  Options: (a) this unit mints `keys-not-scalar --measure` as the seed, spelled as the landed runner
+  runs it, and unit 46 respells the head for an adopter; (b) `seed = []`, the seed left to unit 46;
+  (c) the rows written by hand beside `seed = []`. (b) leaves the population unarmed at landing, F3's
+  discarded (b), failing AC7; (c) writes seeded rows outside `test.seed`, §3's unit 15, and S7 reads
+  it unarmed, failing AC7; veto 1 each. RESOLVED (agent, 2026-11-19, delegated): (a), the one
+  survivor. widens: none · relaxes: none
 - **F7 — Which dossier claims the pack's nine legs?** The map's coverage gate reds a manifest leg no
   dossier claims and no baseline row holds (`tools/codebase-map/map_lib.py`, its module docstring's
-  "both directions"). At `4e5497fb7` every leg is claimed or baselined, DERIVED by joining each
-  dossier's `[claims] gate-legs` and `memory/map/baseline.toml` to the manifest. Since
-  TOOL-dWitnessedBar-22 S5, a leg a dossier claims carries `feature.<f>` in `tests`, and a leg
-  carrying it is claimed by that dossier (`tools/run-gates/run-gates.gov.test.sh`, its G11 block).
-  Options: (a) `memory/map/features/memory-tree-hygiene.md`, whose `kits` claims `memory-tree` and
-  whose `gate-legs` already holds the kit's other legs, each new leg carrying
-  `tests = ["feature.memory-tree-hygiene"]`. (b) A new dossier for the ledger and its pack. (c)
-  Baseline rows. (c) adds keys to a shrink-only baseline, which the map's own never-gains test reds
-  (`tools/codebase-map/test_codebase_map.py#test_baseline_never_gains_a_key`), veto 1. (a) and (b)
-  meet every criterion; the tie-break takes the seam that exists. RESOLVED (agent, 2026-11-19,
-  delegated): (a), the kit's own dossier reused. widens: none · relaxes: none
+  "both directions"). Since TOOL-dWitnessedBar-22 S5 a leg a dossier claims carries `feature.<f>` in
+  `tests`, and the reverse (`tools/run-gates/run-gates.gov.test.sh`, its G11 block). Options: (a)
+  `memory/map/features/memory-tree-hygiene.md`, whose `gate-legs` holds the kit's other legs, each new
+  leg carrying `tests = ["feature.memory-tree-hygiene"]`; (b) a new dossier; (c) baseline rows. (c)
+  adds keys to a shrink-only baseline
+  (`tools/codebase-map/test_codebase_map.py#test_baseline_never_gains_a_key`), veto 1; the tie-break
+  takes the seam that exists. RESOLVED (agent, 2026-11-19, delegated): (a). widens: none · relaxes: none
+- **F8 — What arms `populated` before unit 7's seen-red reader lands?** Options: (a) no empty armed
+  population is admitted; (b) it prints `unarmed` and exits 0; (c) AC4's populated half moves to unit 7;
+  (d) this unit parses the I16 line. (b) and (c) fail AC4, (c) also editing a spec this revision may
+  not; (d) is §3's unit 7; veto 1 each. RESOLVED (agent, 2026-11-19, delegated): (a), the one survivor.
+  A unit draining a population to no row reds `populated` until unit 7 lands. widens: none · relaxes: none
+- **F9 — What does a leg with nothing to grade print and exit with?** Options: (a) one `unarmed` line,
+  exit 0; (b) exit 1 until a population joins it; (c) `both ways` declared with the first registration
+  naming it; (d) `both ways` also checking each `graded by` leg exists. (b) reds this pass's push while
+  unit 17, which arms it, consumes this unit, F3's discarded (b); (c) fails AC10; veto 1 each. (d)
+  widens S6 past the divergence, the brief's non-goal. RESOLVED (agent, 2026-11-19, delegated): (a),
+  its limit stated in §4 "The pack". widens: none · relaxes: none
+- **F10 — How is a population graded against a base holding neither its registration nor its home?**
+  Options: (a) S14's `new at`, the base probed for the home and the header; (b) `unresolved`, red until
+  the push lands it; (c) the home's absence alone decides; (d) a `new` answer inside `compare_to_base`.
+  (b) reds every pass registering a population, though its push needs a green bar; (d) is §3's unit
+  13; veto 1 each. (a) also keeps a moved home graded (AC12). RESOLVED (agent, 2026-11-19, delegated):
+  (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 14, the brief's shared interfaces I2, I4
   and I5, scout C's row for cl-0352, retrofit.md's `[ratchet]`, `[ledger]` and `[seed]`, and unit 13's
   spec as written at base `cdfbd1cf`, measured at `19d6aae6`.
-- rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
-  edges of TOOL-dWitnessedBar-46, TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
-- rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
-  edges of TOOL-dWitnessedBar-52, TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units
-  40 to 51; nothing else moved.
-- rev-4 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
-  consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-2 · 2026-10-25 · §3 · Edges gain hands-off bullets mirroring TOOL-dWitnessedBar-46 and
+  TOOL-dWitnessedBar-51, by the round-1 spec audit's disposal.
+- rev-3 · 2026-10-25 · §3 · Edges gain hands-off bullets mirroring TOOL-dWitnessedBar-52 and
+  TOOL-dWitnessedBar-57, by the round-1 spec audit of units 40 to 51.
+- rev-4 · 2026-10-25 · §3 · Edges gain the hands-off bullet mirroring TOOL-dWitnessedBar-62, by the
+  round-1 spec audit of units 52 to 57.
 - rev-5 · 2026-10-26 · §2 S5 · §3 Edges · §4 The widen route, Inventory, Files touched · §6 AC11 ·
-  re-grounded on dOrderedCharter at `462d20f35` and dDeclaredLoop at `783f1ad3a` by the cross-check
-  record `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 41: the record serves
-  as `widen`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; the binding is observed; no
-  `new widen` door is claimed.
-- rev-6 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
-  `tools/memory-tree/kit.toml`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief;
-  nothing else moved.
+  re-grounded by `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 41: the
+  record serves as `widen`, joined to `TYPED_RECORD_KINDS`; no `new widen` door is claimed.
+- rev-6 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.
 - rev-7 · 2026-11-19 · S1 · S2 · S4 · S5 · S6 · S13 · §3 · §4 The pack, The scalar pins, Migration ·
   AC7 · §8 F2 · §10 · re-grounded at `5e569d9c9` per brief
-  2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief: `retrofit.widen` has landed, so S4 reads it
-  through `tree_lib.read_policy_value` with the catalogue default where no policy kit resolves; the
-  factory's `new` verb is per kind (`DOORS`), so S5 writes through `write_record` and names the
-  HYGIENE count that becomes ten; S2 states unit 12's tag rule and unit 19's `purpose`; S6 runs seeds
-  through unit 15's seed run; S13's base is a remote-tracking ref, the policy reader's landed revision
-  too; the nine pins re-pinned, unchanged; every line citation `path#symbol` or blob-pinned.
+  2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-brief: S4 reads the landed `retrofit.widen`; S5
+  writes through `write_record`, no `DOORS` entry; S2 states unit 12's tag and unit 19's `purpose`; S6
+  runs unit 15's seed run; S13's base is a remote-tracking ref; citations `path#symbol` or blob-pinned.
 - rev-8 · 2026-11-19 · S1 · S2 · S3 · S4 · S6 · §3 Edges · §4 The pack, The scalar pins, Migration · AC2 ·
   AC3 · AC7 · §8 F5 · §10 · re-grounded at `05245bf0e` per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief: S6 grades every registration naming
-  `ratchet (both ways)`, the leg units 17 and 18 register `date-cutoffs` and `landed-steps` with, since
-  the landed `_check_table` requires a `leg`; S3 and S4 hold a widened row to its record over the
-  landed `compare_to_base` (F5); `conf-scalar-pins` names its leg; the counts re-pinned, unchanged.
+  `ratchet (both ways)`, since `_check_table` requires a `leg`; S3 and S4 hold a widened row to its
+  record (F5); `conf-scalar-pins` names its leg.
 - rev-9 · 2026-11-19 · S2 · S3 · S4 · S6 · S7 · S9 · S11 · §3 Edges · §4 The pack, The scalar pins,
   Inventory, Migration, Files touched · AC7 · AC10 · §7 · §8 F6, F7 · §10 · re-grounded at `4e5497fb7`
   per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief, over units 15, 12, 61, 22, 47
-  and 19 as landed and TOOL-dWitnessedBar-11 rev-6 as the contract. §3 names the `purpose` and
-  `tests` keys as units 19 and 22's, CLOSED, rather than as edges. S2's rows take unit 11's
-  declaration shape, `chunk` and `ceiling` under `[gate_leg.gov]`. Since unit 22 they carry `tests`,
-  with the dossier claim F7 resolves, so `codebase-map coverage + freshness` joins the leg line. S3
-  holds a row from the landed `seed --widen` like any widened row. S6 names `run_seed_argv`, S7
-  `read_home_state`, and S9 the null SHA. The Migration writes the registration's eight fields, with
-  its seed `keys-not-scalar --measure` (F6), since the landed seed writes nothing for `seed = []`.
-  The two counts were re-pinned, unchanged.
+  and 19 as landed and TOOL-dWitnessedBar-11 rev-6: S2's rows take unit 11's shape and carry `tests`
+  (F7); S3 holds a `seed --widen` row; S6, S7 and S9 name `run_seed_argv`, `read_home_state` and the
+  null SHA; the Migration writes eight fields with the seed `keys-not-scalar --measure` (F6).
+- rev-10 · 2026-11-19 · S1 · S6 · S8 · S14 · §3 · §4 The pack, Inventory, Rollout, Files touched · §5 ·
+  AC3 · AC4 · AC12 · §7 · §8 F8, F9, F10 · per brief 2026-11-19-prompt-TOOL-dWitnessedBar-14-spec-fix-brief,
+  over builder return 1's divergence: a population the base holds nowhere reads `new at` (F10);
+  `populated` admits no empty armed population before unit 7 (F8); a leg with nothing to grade prints
+  `unarmed`, exit 0 (F9); the absent `cli.flag` cell dropped; Files touched gains the kickoff manifest
+  and `.lexicon.conf`, the leg line `lexicon naming predicates`.
 
 ## 10. Reuse audit
 
@@ -496,16 +505,13 @@ imports; the never-gains precedent is the map's `test_baseline_never_gains_a_key
 (`tools/codebase-map/test_codebase_map.py#test_baseline_never_gains_a_key`) over
 `derive_baseline_additions` (`tools/codebase-map/map_lib.py#derive_baseline_additions`), and the
 reason-on-raise idiom is drift's `RATCHETS` (`tools/drift-audit/drift_signals.py#RATCHETS`) checked by
-`build_baseline_findings` (`tools/drift-audit/drift_report.py#build_baseline_findings`). The
-re-ground adds three landed seams this unit extends rather than re-writes: the record writer
-`tools/memory-tree/build_records.py#write_record` for the widen record, the kit's one policy read
-`tools/memory-tree/tree_lib.py#read_policy_value` for `retrofit.widen`, and unit 15's seed run for
-`both ways`. At `4e5497fb7` that seed run is landed as
-`tools/lib/legacy_ledger.py#run_seed_argv`, and the home state as
-`tools/lib/legacy_ledger.py#read_home_state`, both reused by S6 and S7. The landed `seed --widen`
-writes the same `widened:` disposition S3 grades. It appends only keys a home lacks and never
-raises a row, so S5's door stays the route for a raise. The map dossier
-`memory/map/features/memory-tree-hygiene.md` is the seam F7 extends. `python tools/codebase-map/reuse_lookup.py "a population that may never gain a key against the merge base unless widened with a reason"`
+`build_baseline_findings` (`tools/drift-audit/drift_report.py#build_baseline_findings`). Landed seams
+reused rather than re-written: `tools/memory-tree/build_records.py#write_record` (S5),
+`tools/memory-tree/tree_lib.py#read_policy_value` (S4), `tools/lib/legacy_ledger.py#run_seed_argv`
+(S6), `tools/lib/legacy_ledger.py#read_home_state` (S7, S8), and `resolve_compare_base` with
+`tools/lib/legacy_ledger.py#parse_header` (S14). The landed `seed --widen` writes the `widened:`
+disposition S3 grades and never raises a row, so S5's door stays the route for a raise. F7 extends
+the dossier `memory/map/features/memory-tree-hygiene.md`. `python tools/codebase-map/reuse_lookup.py "a population that may never gain a key against the merge base unless widened with a reason"`
 ranked `resolve_compare_base`, `derive_baseline_additions` and `test_baseline_never_gains_a_key` as the
 nearest seams, which agree with source; nothing at base checks a rename, a merge, an empty population or
 seed laundering (scout C, confirmed by the same probe's empty shortlist for those words).
