@@ -16,4 +16,3 @@
 # row's reason on every run, green included. No total is written here: the scanner derives them.
 skills/session-kickoff/card-compaction.fixture.sh	unchecked-stage	1	a fixture's first commit in the repository it just created, after staging the two files it wrote, so the stage is never empty; predates the lint; drained by deleting this row in the commit that fixes it
 tools/unattended/pass-tree.sh	unchecked-stage	1	concludes a merge in progress, which commits on an empty stage; predates the lint; drained by deleting this row in the commit that fixes it
-tools/unattended/unattended.sh	unchecked-stage	1	`write_run_record`'s close commit, a true instance: an unchanged record stages nothing and the commit fails with a printed line; the follow-up the dSettledStage brief records; predates the lint; drained by deleting this row in the commit that fixes it
