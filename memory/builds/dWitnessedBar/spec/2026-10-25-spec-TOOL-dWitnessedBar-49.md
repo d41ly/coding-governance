@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-49 — the bash query sees a PATH lookup of `bash`, and the recall selftest resolves its bash through the block
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
