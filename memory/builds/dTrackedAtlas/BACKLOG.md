@@ -31,4 +31,4 @@
 - KEEP · TOOL-dTrackedAtlas-6 · the packet re-pin is the owner's at a console, and the door constant sits under `tools/`
 - KEEP · TOOL-dTrackedAtlas-7 · held by TOOL-dTrackedAtlas-4, DEFERRED against it until the owner picks its spec's fork F3
 - SEV · TOOL-dTrackedAtlas-19 · MED · two kit edits land with their kits' held self-tests unrun
-- KEEP · TOOL-dTrackedAtlas-19 · the run may not run the suites; the bar is the owner's to run or waive
+- WONTDO · TOOL-dTrackedAtlas-19 · the owner, 2026-11-19: "remove the ask TOOL-dTrackedAtlas-19" — the flagged bar is waived for this build, and no run owes it
