@@ -89,10 +89,10 @@ INSTRUMENT_BLOBS = {
     # `real_specs`'s sorted `*.md` glob of each build's `spec/` folder, read as UTF-8; and `main`'s
     # `--report` branch, which prints `report` and returns 0.
     "carries": "0b5fab9cc06d7b03c50ab94522092e2b9e266ce3",
-    # `git(*args, check=True)` returning stdout decoded `text=True, encoding="utf-8"`; and the two
-    # calls `tree_state` makes, `git("ls-tree", "-r", "--name-only", ref, <folder>)` once per
-    # build and `git("show", f"{ref}:{p}")` once per listed path.
-    "schedule": "5aa5421e265b02ba4478f8860ad9a4f5fea94500",
+    # `git(*args, check=True)` returning stdout decoded `text=True, encoding="utf-8"`, which
+    # `set_reads` rebinds. `tree_state` reads the chain build-state derivation and calls no `git`
+    # (TOOL-dTrackedAtlas-18), so the rebound read answers no parent spec at this blob.
+    "schedule": "6184e5717b5909ebff84695a6d317548b6ab2ff5",
 }
 FAST_MODES = ("--write", "--check", "--fixture")
 
