@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 9e21ac760dc0a43d6ed007396922722ccee98d57 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 18af33dafb409fbcd19a32db4fb56454bed5f594
-phase: SPECCING
+witness: 5c2d5b5af190eb8d337430eb6a82bcc0c4d6b561
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-atlas-actual-state-a632fb
@@ -71,3 +71,7 @@ base: 6547d032070ac45966116e412d91e84ceef963b1
 2026-11-19T06:21:55Z rescope · item add TOOL-dTrackedAtlas-10 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) H3 HIGH (findings 3 and 5): the page digest omits the merge history the landed predicate reads; promoted
 
 2026-11-19T06:21:56Z rescope · item add TOOL-dTrackedAtlas-11 · reason closing review round 1 (reviews/2026-11-19-review-TOOL-dTrackedAtlas-1-2-3-4-diff-review-round1.md) M1, L1, L2: owed pane observations under CLOSED specs, valued options with no value, a stale ledger owed line; batched into one unit
+
+2026-11-19T06:43:34Z brief · item TOOL-dTrackedAtlas-8 · reason 1c16a39dee34 memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-8-build-brief.md
+
+2026-11-19T06:43:58Z dispatch · item 5c2d5b5a TOOL-dTrackedAtlas-8 · reason memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-1-build-state.py memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-8-ledger.md memory/builds/dTrackedAtlas/spec/2026-11-19-spec-TOOL-dTrackedAtlas-8.md

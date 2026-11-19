@@ -6,6 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-8.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-8.md) | red-fix | — |
+| [2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-9.md](../build/2026-11-19-build-TOOL-dTrackedAtlas-8-red-fix-9.md) | red-fix | — |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-8-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-8-build-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-8-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-8-spec-brief.md) | research | TOOL-dTrackedAtlas-9 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 |
 
 <!-- /gen:spec-records -->

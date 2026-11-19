@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-19-prompt-TOOL-dTrackedAtlas-8-spec-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-8-spec-brief.md) | research | TOOL-dTrackedAtlas-8 TOOL-dTrackedAtlas-10 TOOL-dTrackedAtlas-11 |
+| [2026-11-19-prompt-TOOL-dTrackedAtlas-9-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-9-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
