@@ -17233,8 +17233,14 @@ hit  "$(run_render_helper "" write_run_record | grep '^STAGED:')" "memory/LIVE.m
 # ---- TOOL-dSkippedRecord-1 AC1: an `in-place` close whose record re-renders byte-identical stages
 # ---- nothing, so the commit is skipped with one line and HEAD stays put. Staged red by restoring
 # ---- `write_run_record` from 81657e77, which commits the empty stage and prints its commit-failed line.
+# ---- TOOL-dSkippedRecord-2: the skip line is read whole, its hash the one `fixture` committed the
+# ---- record at, read after the helper returns from the repository it left. An empty read stands as
+# ---- `unread`, so a blank hash in the line cannot meet a blank read. Staged red by deleting the
+# ---- driver's `GIT log` substitution from the skip line, or by pointing it at another path.
 out=$(run_render_helper "" write_run_record same)
-hit  "$out" "unattended: run record unchanged"
+lu_hash=$(git log -1 --format=%h -- memory/builds/tRun/build/lu-record.md)
+same "the skip line" "$(printf '%s\n' "$out" | grep '^unattended: run record unchanged')" \
+  "unattended: run record unchanged — re-rendering it staged no change, so no commit was made; the record was last committed at ${lu_hash:-unread}"
 hit  "$out" "HEAD: same"
 miss "$out" "its commit failed"
 # ---- AC2, the control: a real diff reaches the commit branch and commits, so `same` cannot pass on a

@@ -48,17 +48,17 @@ prompt is recorded verbatim under `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dSkippedRecord-1 — the close's run-record commit is made only when staging left a diff](spec/2026-11-20-spec-TOOL-dSkippedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-20 |
-| [TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built](spec/2026-11-20-spec-TOOL-dSkippedRecord-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
+| [TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built](spec/2026-11-20-spec-TOOL-dSkippedRecord-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

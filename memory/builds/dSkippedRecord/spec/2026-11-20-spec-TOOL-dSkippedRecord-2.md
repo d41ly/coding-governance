@@ -1,11 +1,12 @@
 # TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 81657e77 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-20 · node d · Tier-2 · base 81657e77 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
