@@ -64,7 +64,7 @@ ids TOOL-dTrackedAtlas-1 TOOL-dTrackedAtlas-2 TOOL-dTrackedAtlas-3 TOOL-dTracked
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 5 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
