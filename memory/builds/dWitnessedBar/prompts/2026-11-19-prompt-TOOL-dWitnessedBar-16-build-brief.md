@@ -19,6 +19,12 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The pass legs carry one known red: install-prefix on the `conf-scalar-pins` seed argv in
   `tools/memory-tree/kit.toml`, held until unit 51. Any other red is this unit's to fix.
 - Unit 46 builds after this unit at the same order.
+- `memory/project/readme-contract.txt` is a shared record (`SHARED_RECORDS` in `.unattended.conf`), so `--dispatch`
+  refuses a pass that declares it. Do not write it in the worktree. Write its converted bytes, exactly as the spec's
+  S7 would leave the tracked file, to
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/readme-contract.converted.txt`
+  and name that path in your return; the main loop commits it in the commit right after your pass. Every reader you
+  change must accept both the old and the converted file until then.
 - Every roster spec was re-grounded at `e4ac7c40c` so `check-spec-tokens.py --spec` admits it; the spec's base is still
   older than the run's `9e21ac76`. Verify each claim about current code against source before building on it, and hand
   a claim that no longer holds back as a divergence rather than building around it.
