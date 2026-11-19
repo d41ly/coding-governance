@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-54 — the `exists:` spelling of a generated row's `when` reaches its other two readers, and the three readers are held to agree
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -46,7 +46,7 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
   admits, beside `<conf>:<KEY>=<value>`, `exists:<path>` whose path is non-empty and carries no token
   outside `regen.TOKENS` (`tools/run-gates/regen.py#TOKENS`); its refusal message names both forms,
   and the `when with no conf part` case of the `[aWP r2]` arm
-  (`tools/govkit/selftest.py@b19bf481bc8a:7500-7501`), which expects the substring
+  (`tools/govkit/selftest.py@45513099a87c:7587-7588`), which expects the substring
   `a when shaped <conf>:<KEY>=<value>`, expects the new message. Observed by AC2.
 - **S3** — The three readers agree. `tools/govkit/selftest.py` gains an arm over a scratch tree holding
   one `[[generated]]` row per `when` form, a conf form that holds, one that does not, an `exists:` path
@@ -75,7 +75,7 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
 
 ### Evidence
 
-- The readers, DERIVED 2026-11-19 at `98e33d71c` by
+- The readers, DERIVED 2026-11-19 at `4e5497fb7`, the same three as at `98e33d71c`, by
   `git grep -nE 'get\("when"\)|\["when"\]|\^when\[|"when", "w"' -- 'tools/*.py' 'tools/*.sh' 'tools/*.js'`:
   `regen.check_when` (`tools/run-gates/regen.py#check_when`, called in
   `tools/run-gates/regen.py#build_items`), govkit selfcheck 6c (`tools/govkit/govkit.py#selfcheck`,
@@ -92,6 +92,10 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
   `write`, `check` and `stage`, and `tools/run-gates/regen.py#check_operand` refuses one whose script
   is not in the tree, so each row of S3's scratch tree carries the three and names a script the tree
   holds; `resolve_generated_indexes` keeps a row carrying a `path` and a `generator`.
+- Selfcheck 6c requires every `[[generated]]` row to carry a `generator` file beside its descriptor
+  and a `why` (`tools/govkit/govkit.py#selfcheck`, the refusal beside `_gwbad`). So the factory row
+  TOOL-dWitnessedBar-11 S2 adds to `tools/run-gates/kit.toml` carries a `generator`, the pair AC1
+  reads.
 - The driver and three of its checkers resolve `GENERATED_INDEXES` through this reader, each at its
   `GENERATED_INDEXES=$(resolve_generated_indexes …)` line: `tools/unattended/unattended.sh@6386416b1626:928`,
   `tools/unattended/check-unattended.sh@287ccb81fe28:520`,
@@ -200,6 +204,12 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 · five `when` forms read by
   moved lines; S3's scratch rows carry `write`, `check` and `stage`, the rows `build_items` admits;
   AC1's scratch is a clone; and the Rollout lands this unit with TOOL-dWitnessedBar-45 in one merge,
   unit 45 first, under one bar, per unit 45 §8 F3.
+- rev-5 · 2026-11-19 · S2 · §4 Evidence · §10 · re-grounded at `4e5497fb7` per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief. The `[aWP r2]` case S2 rewrites moved,
+  re-pinned to its new blob. The reader population was re-derived by its stated command and holds the
+  same three. The four `GENERATED_INDEXES` callers and the lib-unattended blob are unchanged. The
+  evidence names selfcheck 6c's `generator` requirement, which makes the factory row of
+  TOOL-dWitnessedBar-11 S2 carry the pair AC1 reads. Every other claim was re-read at HEAD and holds.
 
 ## 10. Reuse audit
 
@@ -208,5 +218,6 @@ The seams extended are the two readers themselves, `resolve_generated_indexes` a
 `python tools/codebase-map/reuse_lookup.py "evaluate a generated row when condition in the shell reader"`
 ranked `rows`, `row`, `read_text`, `read`, `read_bytes`, `read_git` and `read_memory_tree`, re-run at
 `98e33d71c`, generic stems of no condition reader, so no existing seam fits beyond the readers named.
+At `4e5497fb7` the three readers and `regen.TOKENS` are unchanged.
 
 Recall terms used: `python tools/memory-recall/query.py "how do the readers of a generated row condition agree" --terms "generated when regen check_when govkit selfcheck _gwbad resolve_generated_indexes GENERATED_INDEXES shell reader parity"`
