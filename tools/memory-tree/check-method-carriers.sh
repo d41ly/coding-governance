@@ -279,7 +279,7 @@ rows, bad = LL.read_rows(sys.argv[2], 1)
 for entry in bad:
     print(LL.render_malformed(entry).replace("\t", " "))
 for key in rows:
-    print(key[0])' "$HERE" "$REG" | tr -d '\r') || { echo "method-carriers: the ledger factory beside this leg did not read $REG"; exit 2; }
+    print(key[0])' "$HERE" "$REG" | tr -d '\r'; exit "${PIPESTATUS[0]}") || { echo "method-carriers: the ledger factory beside this leg did not read $REG"; exit 2; }
 declared=$_rows
 
 # ONE pass, collecting into variables the MAIN shell owns. Every `while` below would otherwise run in
