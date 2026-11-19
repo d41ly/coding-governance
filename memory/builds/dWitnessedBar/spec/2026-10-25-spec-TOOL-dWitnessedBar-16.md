@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** DEFERRED · rev-9 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-9 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -21,6 +21,7 @@
 | [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-2-brief.md) | journal | TOOL-dWitnessedBar-14 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-3-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-brief.md) | journal | TOOL-dWitnessedBar-46 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-2-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-16-reground-brief.md) | journal | — |
