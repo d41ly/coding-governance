@@ -3331,7 +3331,7 @@ read_feed_lease_tip() { # lease ref -> nothing, `tombstone <commit>` or `<commit
 # `offer` and `offer-deadline` for `write_lease_offer` (TOOL-dPlacedRequest-20) and are `-` on every
 # other write, so an acquisition of an offered lease carries no stale offer.
 write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed, 3 a feed tombstone; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf pt pe ft=""
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf pt pe ft="" wt
   WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
   if [ -n "$rel" ]; then
@@ -3411,8 +3411,10 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   fi
   case "$rc:$CW_MODE:$pol" in
     3:preflight:*|3:take-over:*) fail 107 "this slug's lease is a tombstone in this node's feed, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written: $slug · tombstone · $WC_WHY" ;;
-    3:holder:*) fail 108 "this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $slug · tombstone · $WC_WHY" ;;
-    1:*:strict|1:*:holder) fail 108 "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug · $WC_WHY" ;;
+    3:holder:*|1:*:strict|1:*:holder)
+      msg="the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it" wt=""
+      [ "$rc" != 3 ] || { msg="this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug"; wt=" · tombstone"; }
+      fail 108 "$msg; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug$wt · $WC_WHY" ;;
     2:*:strict) fail 109 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
     *:quiet) ;;
     *) echo "unattended: claim not written — $slug · $WC_WHY" ;;

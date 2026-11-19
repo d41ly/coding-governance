@@ -20289,7 +20289,7 @@ bash "$SCRIPT" --claims >/dev/null 2>&1; git --git-dir="$ORIGIN" update-ref -d r
 out=$(run --resume tRun --keepalive-id k1); rc=$?
 same "DPR28 AC6 the holder's --resume over a deleted tombstone exits 1, the origin holding no tRun lease" \
   "$rc $(git --git-dir="$ORIGIN" for-each-ref refs/gov/leases/tRun | grep -c .)" "1 0"
-hit  "$out" "UNATTENDED check 108 FAILED — this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: tRun · tombstone · the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
+hit  "$out" "UNATTENDED check 108 FAILED — this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: tRun · tombstone · the remote no longer holds it, and this node's feed last saw its tombstone $fr_t"
 # ---- ...and under another session, whose lease is not current, the holder's other write: check 108.
 out=$(CLAUDE_CODE_SESSION_ID=s-other run --resume tRun --keepalive-id k1); rc=$?
 same "DPR28 AC6 the holder's --resume under another session exits 1, the origin holding no tRun lease" \
