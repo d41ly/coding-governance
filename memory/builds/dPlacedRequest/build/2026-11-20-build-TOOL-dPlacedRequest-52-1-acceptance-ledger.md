@@ -13,6 +13,8 @@ of the changed code: a cut of a function or a loop sourced over a stub, or an `a
 file, each run under the session scratch or the node's short temp path.
 
 **Evidences:** TOOL-dPlacedRequest-52
+- AC1 — the placed-race block — owed to the close: the driver suite's run judges the `DPR48 AC1` and `DPR48 AC2` rows on the first kept attempt, and its red runs the block with `SCRIPT` at `3fc16744c`; this pass probed the attempt loop alone, below under AC3 and AC4.
+- AC9 — `size join` — owed to the close: the line is the spec-tokens leg's output, which a role agent may not run; see Items diverged.
 - AC5 — `awk '/^write_request_record\(\)/{f=1} f; f&&/^}/{exit}'` over the driver, then `grep -n 'cp -- '`, printed one line naming `$key.md.$$`, after the `write_dir_lock_wait` line and before the `remove_dir_lock` line of the cut. (DERIVED)
 - AC10 — `sed '/^## 9\./,$d'` over spec 43 piped to `grep -o 47104 | wc -l` printed 0, and the same cut holds `read_size_ceilings`. (PINNED)
 - AC19 — the four callers and `resolve_card_driver`, cut from the engine and sourced over a stub driver that prints `FAILED: boom` and exits 125, with CARD_REF_WHY holding a stale reason: the claims cell printed `claims — skipped: FAILED: boom`, the overlaps cell `overlaps — skipped: FAILED: boom`, and the lookup set `--card-ref lookup exited 125 and printed no card-ref line`. (DERIVED)
