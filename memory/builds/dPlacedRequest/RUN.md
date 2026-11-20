@@ -392,3 +392,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T10:48:24Z draw · fix-pass · TOOL-dPlacedRequest-51 · 53/130 · 20261120T104824Z-5d66e8
 
 2026-11-20T10:48:24Z dispatch · item a49d6946 TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
+
+2026-11-20T11:19:10Z dispatch · item 15f92838 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
