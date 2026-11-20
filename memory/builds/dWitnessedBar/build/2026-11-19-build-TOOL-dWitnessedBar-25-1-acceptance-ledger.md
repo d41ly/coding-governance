@@ -21,7 +21,7 @@ observation of both `New arm:` lines: the evidence suite's AC1-AC5 arms and `kee
   showing no `GATE_CAUSE` (the probe read the wrong output index, and the re-run was refused by the
   scratch-guard as a runner call), owed to the evidence arm at the close.
 - AC3 — `tail.1` — the leg printing 100 numbered lines and exiting 1 left `tail.1 ad79964f… red` in both
-  verdicts, and `<common-dir>/gate-tails/ad79964f…` held 60 lines from `line 42`, its name equal to
+  verdicts, and `<common-dir>/gate-tails/ad79964f…` held 60 lines from `line 42`, its name equal to (DERIVED from the builder's probe)
   `git hash-object --stdin` of its bytes.
 - AC4 — `***:***@` — the same tail held the URL masked `***:***@` and no `secret`.
 - AC5 — `GATE_RUN_KEEP` — six further red runs with a tail each left five run directories and exactly
