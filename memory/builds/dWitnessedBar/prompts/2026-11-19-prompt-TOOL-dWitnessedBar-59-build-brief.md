@@ -43,3 +43,18 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no suite, no bar. Verify with a fixture or a probe of the code you changed.
 - A change the spec did not state is a deviation record in `build/`, as the build README's rules say; its values are
   `report` and `author-recorded`.
+
+## A resumed pass
+
+- The first builder of this unit (`wf_d197bf6c-a6a`) built and probed the whole unit but could not commit: closing the
+  spec rewrites the build README, and check 49 refused it while sibling unit 1 held that path. Its return is
+  `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-builder-return.md`.
+- Unit 1 is now committed (`8bd06547b`), and this unit is re-dispatched there with the build README, `memory/LIVE.md`,
+  `memory/backlog/TOOL.md`, `memory/map/generated/symbols.json` and the dClosedLoop as-built view declared. Nothing else
+  is in flight in this tree, so commit directly here; no clean clone is needed.
+- Apply that builder's patch
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit59-selftest.patch`
+  and its ledger draft
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit59-acceptance-ledger.md`,
+  verify them against the spec by re-running its probe, flip the spec to CLOSED, regenerate the index and the map, and
+  commit the pass through the hooks with the trailer `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.

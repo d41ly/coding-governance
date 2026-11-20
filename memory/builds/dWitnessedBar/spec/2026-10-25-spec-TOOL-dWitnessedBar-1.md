@@ -23,6 +23,7 @@
 | [2026-11-05-build-TOOL-dWitnessedBar-1-crosscheck-returns.md](../build/2026-11-05-build-TOOL-dWitnessedBar-1-crosscheck-returns.md) | research | TOOL-dWitnessedBar-21 |
 | [2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md](../build/2026-11-05-build-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-21 |
 | [2026-11-19-build-TOOL-dWitnessedBar-1-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-1-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-1-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
