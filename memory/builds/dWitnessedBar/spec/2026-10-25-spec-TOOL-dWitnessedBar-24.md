@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-24 — the portability leg pack: every P37 rule on a leg, each arm seen red on a planted case
 
-**Status:** INPROGRESS · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 14 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 14 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0362@46f28632 whole
 
@@ -18,6 +18,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-24-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-24-build-brief.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-24-2-build-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-24-2-build-brief.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-24-spec-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-24-spec-fix-brief.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-24-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-24-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
@@ -87,12 +88,14 @@ arm seen red on a planted case, its debt held on ledger populations.
   TAB-separated, and its home under `memory/project/`. Each home is added to `PROJECT_REGISTRY_EXTRA`
   (`.memory-tree.conf@17effb7cf8fa:956`), and `test.seed` (I5) seeds it at registration. Observed by
   AC13.
-- **S14** — The pending rows. The three `practice.portable.*` rows PLAY-dOrderedCharter-30 S3 left in
-  `tools/playbook/core-pending.txt` (line-endings, quoting, language-roles) leave it, each now enforced
-  by a pack leg. Observed by AC12.
-  **Readers:** by name: `tools/playbook/core.py`, whose `read_pending` reads the list for its
-  `meta-check` verb · by value: `tools/playbook/core.py`'s `meta-check`, which reds a pending row
-  whose item is enforced now, so the rows leave in the commit that lands their legs.
+- **S14** — The pending rows, §4 "The pending list". The three `practice.portable.*` rows
+  PLAY-dOrderedCharter-30 S3 left in `tools/playbook/core-pending.txt` (line-endings, quoting,
+  language-roles) and the `leg` rows of the loop-fed and fork-spent legs leave it, each now enforced by
+  a pack leg, and `powershell hygiene selftest` gains a `leg` row. Observed by AC12.
+  **Readers:** by name: `tools/playbook/core.py` (`meta-check`) and `tools/run-gates/leg_factory.py`
+  (its enforces arm) · by value: both, which red a leg with neither `enforces` nor a row
+  (`tools/run-gates/leg_factory.py@039976a7939e:435`), and `meta-check` a row whose item is enforced
+  now (`tools/playbook/core.py@854477bd34cb:342`), so every edit lands with its legs.
 - **S15** — The kit README. `tools/gate-lint/README.md` names every leg the kit declares, the pack, and
   the PowerShell scan leg an adopter tracking `.ps1` adds. NOT OBSERVED — prose, read by the closing
   review.
@@ -154,10 +157,17 @@ of the pack: it tests the resolver, and the pack's legs grade the tree.
 
 Each new leg's tag follows TOOL-dWitnessedBar-12 §4 "The tag rule": `leg.gate-lint.<folded name>` for a
 row of `tools/gate-lint/kit.toml`, and `leg.gov.<folded name>` for the floor and bare-shell legs, cut
-at `TAG_MAX_BYTES` (§8 F10). Each adopter leg is a `[[gate_leg]]` of `tools/gate-lint/kit.toml` whose
+at `TAG_MAX_BYTES`; the moved encoding leg keeps its `leg.gov.` tag (§8 F10). Each adopter leg is a
+`[[gate_leg]]` of `tools/gate-lint/kit.toml` whose
 argv passes no registry and grades against an empty declaration, the posture the four `shell hygiene`
 rows set (the first at `tools/gate-lint/kit.toml@61946391f2f6:62`). Gov's own argv, passing its
-population's home, sits under the row's `[gate_leg.gov]` sub-table (TOOL-dWitnessedBar-11 S1). The
+population's home, sits under the row's `[gate_leg.gov]` sub-table (TOOL-dWitnessedBar-11 S1). It
+grades, and its population's seed measures, the encoding leg's pathspecs `. {prefix} skills` for
+`--stdout` and `--js` (`tools/govkit/registry.toml@6d70f1996799:1632`), and the location-probe row's
+`. :!memory/` for `--path-literals`, `--quoting` and `--shell-role`
+(`tools/gate-lint/kit.toml@633bb16a908a:95`). No new leg has a guard but `powershell hygiene
+selftest`, `subject = "kit"`, `chunk = "selftests"`, guarded on `{kit}/ps-hygiene.py`, which imports
+no kit sibling (`tools/gate-lint/ps-hygiene.py@f935291ce677:43`) (§8 F12). The
 floor and bare-shell legs are `[[exempt_leg]]` rows of `tools/govkit/registry.toml`, which carry the
 whole leg row after unit 11: the floor module lives in gov's `tools/lib/`, which ships nothing, and
 the bare-shell query grades launches against the resolver blocks gov's kits carry (§8 F9).
@@ -211,7 +221,9 @@ target ends `.sh`, `.py` or `.js` (`heredoc-source`, "no source written through 
 research-compatibility.md's P-quote row. `--shell-role`: one row per tracked shell file, the class of
 §4 "Line endings" less the `py`, `js`, `json` and `toml` members, its count the file's non-blank,
 non-comment lines; the population is `shrink-only`, so a grown or new shell file reds unless the
-factory's widen route records it (§8 F3). Each mode joins `tools/gate-lint/sh_hygiene.py#main`'s flag
+factory's widen route records it (§8 F3), and a shrunk one reds `count fell` until its row is lowered
+in the same commit, the factory's `compare_counts` under `shrink-only` as the existing adapter calls
+it (`tools/gate-lint/sh_hygiene.py@5242b444b6ba:476`) (§8 F11). Each mode joins `tools/gate-lint/sh_hygiene.py#main`'s flag
 dispatch beside `--location-probes`, `--spawn-idioms` and `--temp-names`.
 
 ### The floor
@@ -226,6 +238,16 @@ attributes (the census `night-pass-instruments.md:35761` carries). It is red on 
 the floor or removed at or before it, printing each feature's count. No interpreter at the floor is
 red, naming the floor and the install command TOOL-dSafePassage-11 S4 names, where the module's `down`
 falls back to a static mode: a floor arm that skips is the gap-tool-21 it closes (§8 F5).
+
+### The pending list
+
+`tools/playbook/core-pending.txt` loses the rows `practice.portable.line-endings`,
+`practice.portable.quoting` and `practice.portable.language-roles`, and the `leg` rows `shell hygiene
+(a loop fed by a command substitution)` and `shell hygiene (a fork spent on builtin work)`, whose legs
+now carry `practice.portable.launch`. It gains `leg`, `powershell hygiene selftest`, `dWitnessedBar`,
+TAB-joined, directly after the `shell-hygiene selftest` row: a self-test leg carries no `enforces`
+(AC12), as that row's leg does. The header calls the list shrink-only once seeded, and a new leg's row
+has been added before: PLAY-dOrderedCharter-86 S4, on PLAY-dOrderedCharter-39's precedent.
 
 ### Inventory
 
@@ -269,6 +291,15 @@ grow `tools/run-gates/run-gates.sh` and `.githooks/pre-push`) carry a widen row 
 - `memory/project/path-literal-sites.txt`
 - `memory/project/quoting-sites.txt`
 - `memory/project/shell-role.txt`
+- `tools/govkit/subject-pins.tsv` (a row per new leg, generated by `python tools/govkit/govkit.py
+  selfcheck --write`; a pass whose role refuses that command returns the rows to the main loop, which
+  writes them, `tools/run-gates/owed_rows.py@8eab2971cf48:424`)
+- `memory/map/features/gate-lint.md` (each new leg's gate-legs claim, then `python
+  tools/codebase-map/gen_map.py --write`, `tools/run-gates/owed_rows.py@8eab2971cf48:429`)
+
+Neither run-gates evidence list owes a row: a new leg's `ceiling-evidence.txt` row is written only by
+`derive-ceilings.py --write` after a measured bar (`tools/run-gates/owed_rows.py@8eab2971cf48:11`),
+and `pass-leg-evidence.txt` is rewritten whole from a node's bar log by `pass_legs.py --write`.
 
 ### Alternatives rejected
 
@@ -285,10 +316,15 @@ grow `tools/run-gates/run-gates.sh` and `.githooks/pre-push`) carry a widen row 
 - security — no new write path; the scanners read tracked blobs and write only through the factory.
 - perf / scale — each arm is one `git ls-files` and one parse per file; the floor arm compiles 245
   files (PINNED 2026-11-19, `git ls-files -- '*.py' | wc -l`) in one interpreter process.
-- error / empty / loading states — an empty population prints its zero and exits 1, as both scanners
-  already do; no interpreter at the floor is red with the install command.
+- error / empty / loading states — an empty population is never a pass: `encoding_posture.py`'s modes
+  exit 1 (`tools/gate-lint/encoding_posture.py@73b681ecf94c:317`), as `eol_class.py` and the census
+  do; `sh_hygiene.py`'s modes refuse with 2 (`tools/gate-lint/sh_hygiene.py@5242b444b6ba:586`);
+  `--bare-bash` exits 1, a language with no file read being a printed line
+  (`tools/run-gates/measure_legs.py@d888b331c80f:2697`). No interpreter at the floor is red with the
+  install command.
 - observability — each leg prints its graded count; the census prints one line per feature.
-- risks — the shell-role population reds every shell growth until a widen row is written; §4 Rollout
+- risks — the shell-role population reds every shell growth until a widen row is written, and every
+  trim until its row is lowered (§8 F11); §4 Rollout
   names this build's own later units.
 - testing — each arm's planted case, observed through the scanner on a scratch repository; the suite
   arms in §7 are observed RED then GREEN by the main loop at the close.
@@ -333,7 +369,8 @@ named file committed; `<empty>` is an empty registry file.
   Red when: a heredoc writing a non-source file is graded, or either planted site passes.
 - **AC9** — When `python measure_legs.py --bare-bash <repo>` runs over a scratch repository holding
   `subprocess.run(["bash", "x.sh"])` in `a.py`, it exits 1 naming `a.py`, and over one holding only
-  `resolve_bash_py`-guarded launches it exits 0.
+  `resolve_bash_py`-guarded launches in `a.py` beside a tracked `b.js` that launches nothing it
+  exits 0.
   Red when: the flag reads `measure_legs.py` alone, as `test_no_bare_bash_argv` did before unit 26
   widened it.
 - **AC10** — When `python <lib>/python_floor.py census` runs in a scratch repository whose lib
@@ -345,12 +382,15 @@ named file committed; `<empty>` is an empty registry file.
   cost: needs an interpreter at the declared floor on the node (AP-31: every node runs 3.15).
 - **AC11** — When `python sh_hygiene.py --shell-role <ledger> <repo>` runs over a scratch repository
   whose ledger holds `a.sh` at 10 code lines, it exits 1 once `a.sh` has 11, exits 1 for a new `b.sh`,
-  and exits 0 once `a.sh` has 9.
-  Red when: a comment line counts, or a new shell file passes with no row.
+  exits 1 naming `count fell` once `a.sh` has 9, and exits 0 once the ledger row reads 9 too.
+  Red when: a comment line counts, a new shell file passes with no row, or a fall passes unrecorded.
 - **AC12** — When `python -c "import json,sys; [print(r['name'], r.get('enforces')) for r in json.load(open(sys.argv[1], encoding='utf-8')) if r.get('pack') == 'portability']" gate-legs.json`
   runs under `tools/`, it prints each leg of §4 "The arms", every rule tag but none on a self-test leg,
-  and `grep -c 'practice.portable.' core-pending.txt` under `tools/playbook/` prints 0.
-  Red when: a rule stays pending, so the meta-check counts `practice.portable` unenforced.
+  and under `tools/playbook/` `grep -c 'practice.portable.' core-pending.txt` prints 0,
+  `grep -c 'powershell hygiene selftest' core-pending.txt` prints 1, and `grep -c 'shell hygiene ('
+  core-pending.txt` prints 0.
+  Red when: a rule stays pending, so the meta-check counts `practice.portable` unenforced, or a §4
+  "The pending list" row is missing or stale.
 - **AC13** — When `python legacy_ledger.py read <population>` runs from `tools/lib/` on the built tree
   for each of the five populations of §4, it prints that population's rows and exits 0, and
   `grep -c 'shell-role.txt' .memory-tree.conf` prints 1.
@@ -362,7 +402,8 @@ named file committed; `<empty>` is an empty registry file.
 `encoding posture (text IO names its encoding)` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a location probe asked from a moved directory)` · `shell hygiene (a fork spent on builtin work)` · `shell hygiene (a fixed-name temp renamed into place)` · `shell-hygiene selftest` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `policy fixtures`
 
 The nine new legs of §4 are not in the manifest at HEAD on 2026-11-19, so they are named in prose; the
-guards join's broad `tools/` and `tools/lib/` guards are excluded by the checker's floor.
+guards join's broad `tools/` and `tools/lib/` guards are excluded by the checker's floor. The one
+guarded new leg names `ps-hygiene.py`, which no §4 path trips (§8 F12).
 
 New arm: tools/gate-lint/sh_hygiene.py --selftest · covers AC6 AC8 AC11 · the `--path-literals`, `--quoting` and `--shell-role` predicates each staged to accept their planted site · none
 New arm: tools/gate-lint/encoding_posture.py --selftest · covers AC4 AC5 · the `--stdout` and `--js` predicates staged to accept their planted site · none
@@ -435,6 +476,21 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · the census verb's in
   `id` or `gov` for an exempt row. Options: (a) unit 12's rule; (b) the mode words. (b) is the drift
   TOOL-dWitnessedBar-51 S42 and its AC35 red. RESOLVED (agent, 2026-11-19, delegated): (a), rung 1,
   unit 12's "a new leg is given its tag by the same rule". widens: none · relaxes: none
+  The moved encoding leg is not new: it keeps `leg.gov.encoding-posture-text-io-names-its-encoding`,
+  since after the pass "a tag is the leg's declared identity" with no owned rename path (unit 12 §4).
+- **F11 — Does the shell-role scan red a count that fell?** Options: (a) yes, `count fell` until the
+  row is lowered, the factory's `shrink-only` as every adapter grades it; (b) no, the scan grades with
+  `ceiling` while its table declares `shrink-only`. (b) grades a direction its table does not declare
+  and lets a trimmed file regrow to its old count with no widen row, failing S11's "only shrinks".
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 1, S11; AC11 is rewritten to match.
+  widens: none · relaxes: none
+- **F12 — What guards `powershell hygiene selftest`?** Options: (a) `{kit}/`, as the shell-hygiene
+  self-test, which trips on §4's gate-lint paths, so §7 must name a leg the checker reds as "not a
+  name in tools/gate-legs.json" until the pass lands it; (b) `{kit}/ps-hygiene.py`, the one file its
+  self-test grades, as `micro-format gate selftest` guards its scanner
+  (`tools/govkit/entries/check-microformats.kit.toml@8863a649129f:67`); (c) none, an unguarded held
+  leg of gap-test-09's class. RESOLVED (agent, 2026-11-20, delegated): (b), rung 1, the only option
+  the checker admits before and after the pass with no unguarded held leg. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -454,6 +510,10 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · the census verb's in
   the registry, gate-lint, attribute, conf and README lines blob-pinned; `enforces` named as landed by
   PLAY-dOrderedCharter-7; S14's readers landed; the floor arm becomes `python_floor.py census` (§8 F8);
   the bare-shell exemption's reason corrected (§8 F9); the tags follow unit 12's rule (§8 F10).
+- rev-6 · 2026-11-20 · S14 · §4 · §5 · AC9 · AC11 · AC12 · §7 · §8 · over the first builder's eight
+  points, per brief 2026-11-20-prompt-TOOL-dWitnessedBar-24-spec-fix-brief: every pending-list edit;
+  gov's pathspecs; pins, dossier and evidence lists in Files touched; the empty-population exits;
+  AC9's `.js`; a fall reds (§8 F11); the moved leg's tag (§8 F10); the self-test's guard (§8 F12).
 
 ## 10. Reuse audit
 
@@ -470,9 +530,7 @@ sources found. For the line-ending class leg, `tools/govkit/govkit.py#eol_popula
 every tracked path with `check-attr --stdin -z`, and the deployer's renormalize step reads the index
 through `ls-files --eol -z`; both are the deployer's, which `tools/gate-lint/kit.toml`'s `requires =
 []` cannot reach, so "no existing seam fits" the shipped leg, and `eol_class.py` takes both reads'
-recorded lessons, `-z` and git's own pattern resolution. The floor arm's "no seam" claim of rev-4,
-`grep -n floor tools/lib/resolve-python.sh` empty at `cdfbd1cf`, no longer holds: `python_floor.py`
-landed with TOOL-dSafePassage-11 (§8 F8). The recall probe returned the brief's row, scout B's row,
+recorded lessons, `-z` and git's own pattern resolution. The recall probe returned the brief's row, scout B's row,
 v2:1760 and PLAY-dOrderedCharter-30 §3; scout B's "80 of 150 at `w/crlf`" agreed with source at
 `cdfbd1cf`, and §1 re-pins it.
 
