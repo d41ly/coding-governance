@@ -143,8 +143,8 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-47 — an arm pins the age walk's sighted guard: an unsighted commit is never compared with the threshold](spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md) | 24 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge](spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md) | 25 | 2 | CLOSED | rev-9 | 2026-11-20 |
 | [TOOL-dPlacedRequest-45 — the default-branch merge class names the walk from a prepared merge, and selects the file that builds one](spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md) | 25 | 2 | INPROGRESS | rev-5 | 2026-11-20 |
-| [TOOL-dPlacedRequest-48 — the request-lock race is placed by an announcing stub, not left to the scheduler](spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md) | 25 | 2 | DEFERRED | rev-9 | 2026-11-20 |
-| [TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it](spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md) | 25 | 2 | DEFERRED | rev-5 | 2026-11-20 |
+| [TOOL-dPlacedRequest-48 — the request-lock race is placed by an announcing stub, not left to the scheduler](spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md) | 25 | 2 | DEFERRED | rev-10 | 2026-11-20 |
+| [TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it](spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md) | 25 | 2 | DEFERRED | rev-6 | 2026-11-20 |
 | [TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail](spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md) | 26 | 2 | DEFERRED | rev-6 | 2026-11-19 |
 | [TOOL-dPlacedRequest-51 — the prepared-merge shape table splits the first-parent walk by `--no-merges`](spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md) | 27 | 2 | DEFERRED | rev-9 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 277 bound to this build, across 4 record folder(s).
+Records: 279 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
