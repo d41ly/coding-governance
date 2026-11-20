@@ -297,11 +297,26 @@ def test_generated_artifacts_are_fresh() -> None:
         for tier, artifact in orphaned)
 
 
+def derive_unstaged_artifacts() -> list[str]:
+    """The generated artifacts the worktree holds differently from the index, repo-relative: fresh in
+    the worktree and not staged, so a commit would carry the stale copies. `--precommit` reds on them,
+    the check the pre-commit hook made before its leg was derived (TOOL-dWitnessedBar-10 S5). It
+    reads the INDEX against the worktree; it does not grade the index's own copies."""
+    import subprocess
+    gen_dir = m.map_root() / "generated"
+    out = subprocess.run(["git", "diff", "--name-only", "--", gen_dir.as_posix()],
+                         capture_output=True, text=True, encoding="utf-8", cwd=str(m.repo_root()))
+    return [p for p in out.stdout.splitlines() if p.strip()]
+
+
 # ======================================================================================
 # Standalone runner (projects without a test framework)
 # ======================================================================================
 
 if __name__ == "__main__":
+    # `--precommit`: the commit-time form. Every assertion below, then the regenerated artifacts left
+    # unstaged are a failure naming each, since the commit would carry the stale copies.
+    precommit = "--precommit" in sys.argv[1:]
     failures = 0
     for fn in (
         test_every_inventory_key_is_claimed_or_baselined,
@@ -317,5 +332,12 @@ if __name__ == "__main__":
             print(f"ok   {fn.__name__}")
         except AssertionError as exc:
             print(f"FAIL {fn.__name__}\n{exc}")
+            failures += 1
+    if precommit and not failures:
+        unstaged = derive_unstaged_artifacts()
+        if unstaged:
+            print("FAIL the codebase-map artifacts are fresh in the worktree but NOT staged, so this commit "
+                  "carries the stale copies. Stage them:")
+            print("\n".join(f"    {p}" for p in unstaged))
             failures += 1
     sys.exit(1 if failures else 0)

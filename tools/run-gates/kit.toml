@@ -68,9 +68,11 @@ role = "project-owned"
 # receiving them gets a pin measured on a corpus they do not have. `derive-ceilings.py`
 # itself DOES ship -- it is the tool, and it refuses rather than defaulting when no headroom
 # is declared, which is the announced-unarmed state rather than a silent one.
-# TOOL-aQuenchedHarness-2.
+# TOOL-aQuenchedHarness-2. `bar-wall-evidence.txt` rides the same rule: it carries THIS repo's
+# whole-bar wall seconds per node, and `profile_bar.py --record` writes an adopter its own
+# (TOOL-dWitnessedBar-10 S9).
 [[files]]
-include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
+include = ["ceiling-evidence.txt", "ceiling-margin.txt", "bar-wall-evidence.txt"]
 role = "project-owned"
 
 # AND SO IS THE PASS-LEG EVIDENCE. `pass-leg-evidence.txt` carries THIS repo's recorded reds per

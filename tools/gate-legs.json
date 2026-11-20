@@ -46,6 +46,11 @@
     "stage": [
       "step.build",
       "step.test"
+    ],
+    "precommit": [
+      "python3",
+      "{prefix}/codebase-map/test_codebase_map.py",
+      "--precommit"
     ]
   },
   {
@@ -752,6 +757,11 @@
     "stage": [
       "step.build",
       "step.test"
+    ],
+    "precommit": [
+      "bash",
+      "skills/session-kickoff/manifest-check.sh",
+      "--staged"
     ]
   },
   {
@@ -1773,6 +1783,11 @@
     "stage": [
       "step.build",
       "step.test"
+    ],
+    "precommit": [
+      "bash",
+      "{prefix}/unattended/adopt-unattended.sh",
+      "--check"
     ]
   },
   {
@@ -2544,6 +2559,10 @@
     "stage": [
       "step.build",
       "step.test"
+    ],
+    "precommit": [
+      "bash",
+      "{prefix}/check-template-size.sh"
     ]
   },
   {

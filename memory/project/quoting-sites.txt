@@ -1,6 +1,6 @@
 # ledger · quoting-sites · key site path,class · direction shrink-only · drain hunk
 .githooks/pre-commit	tab-ifs-read	1	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-.githooks/pre-commit.test.sh	heredoc-source	2	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
+.githooks/pre-commit.test.sh	heredoc-source	1	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 .githooks/pre-push	tab-ifs-read	3	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 .githooks/pre-push.runlog.test.sh	heredoc-source	2	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 .githooks/pre-push.runlog.test.sh	tab-ifs-read	3	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded

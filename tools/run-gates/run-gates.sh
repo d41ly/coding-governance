@@ -9,6 +9,7 @@
 # descriptor stages is proved fresh by `regen.py --check` and none is regenerated here. GATE_REGEN_CHECK=0
 # skips it; a guard-scoped leg may then let a stale output through, so the push bar scrubs that knob.
 #   bash <prefix>/run-gates/run-gates.sh --regen | --regen-check | --regen-list   # the verb, no bar
+#   bash <prefix>/run-gates/run-gates.sh --precommit [--list]   # every row's `precommit` argv, no bar
 #   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
 #                                                    # <prefix>/run-gates/gate-profiles.txt declares
 #                                                    # for the detected cores and RAM
@@ -33,7 +34,8 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.52   # gov:kit run-gates@1.52
+KIT_RUN_GATES_VERSION=1.53   # gov:kit run-gates@1.53
+# 1.52 -> 1.53: the canary's one key set, `LEG_KEYS`, admits `precommit`, govkit's `LEG_KEY_FLOORS["precommit"]`, and `--precommit` runs it (TOOL-dWitnessedBar-10).
 # 1.51 -> 1.52: the canary's one key set, `LEG_KEYS`, admits `purpose`, govkit's `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
 # 1.50 -> 1.51: the canary's one key set, `LEG_KEYS`, admits `tag`, govkit's `LEG_KEY_FLOORS["tag"]` (TOOL-dWitnessedBar-12).
 # 1.47 -> 1.49: the canary admits `stage` (TOOL-dDeclaredLoop-4), stepping over origin/main's 1.48, which ships without it (TOOL-dDeclaredLoop-46).
@@ -382,6 +384,9 @@ case "${1:-}" in
   --regen)       exec "$PYBIN" "$KITDIR/regen.py" --write ;;
   --regen-check) exec "$PYBIN" "$KITDIR/regen.py" --check ;;
   --regen-list)  exec "$PYBIN" "$KITDIR/regen.py" --list ;;
+  # THE COMMIT-TIME LIST, derived (TOOL-dWitnessedBar-10 S3): `precommit.py` runs each manifest row's
+  # `precommit` argv its `guard` trips, under the interpreter just resolved; the pre-commit hook's call.
+  --precommit)   shift; exec "$PYBIN" "$KITDIR/precommit.py" "$@" ;;
 esac
 fails=0; n=0; skips=0; ondemands=0
 

@@ -4341,6 +4341,22 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 if leg.get("purpose") is not None and check_target_reads_subject(
                         target, deploy, descs, floor=LEG_KEY_FLOORS["purpose"]):
                     row["purpose"] = leg["purpose"]
+                # THE COMMIT-TIME ARGV TRAVELS, each element resolved as `argv`'s is, and only into a
+                # runner whose `LEG_KEYS` admits it, at LEG_KEY_FLOORS' row (TOOL-dWitnessedBar-10 S1).
+                # An element left unresolved is a named problem and the key is not written, so the hook
+                # never runs a literal token at every commit; the row's bar half still lands.
+                if leg.get("precommit") is not None and check_target_reads_subject(
+                        target, deploy, descs, floor=LEG_KEY_FLOORS["precommit"]):
+                    _pc, _pc_miss = [], []
+                    for a in leg["precommit"]:
+                        s, m = resolve_tokens(a, ctx)
+                        _pc.append(s)
+                        _pc_miss += m
+                    if _pc_miss:
+                        r.fail(f"leg '{nm}' precommit still carries {_pc_miss[0]} after rendering — a "
+                               f"commit-time argv wired to an unresolved token fails every commit")
+                    else:
+                        row["precommit"] = _pc
                 # THE CEILING TRAVELS where the descriptor declares one and the target's runner is
                 # at CEILING_FLOOR_RUN_GATES or later, carried verbatim: the descriptor is
                 # gov-authored and the leg factory's gate (`--conform`, its `ceiling` arm) grades its
@@ -5940,7 +5956,8 @@ STAGE_FLOOR_RUN_GATES = (1, 49)
 # the four constants above are, through `check_target_reads_subject`'s `floor`. A later key is a row
 # here, never a fifth constant. `tag`: 1.51, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-12 S5).
 # `purpose`: 1.52, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-19 S1).
-LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52)}
+# `precommit`: 1.53, where `LEG_KEYS` gained it and `--precommit` reads it (TOOL-dWitnessedBar-10 S1).
+LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52), "precommit": (1, 53)}
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

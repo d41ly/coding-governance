@@ -106,6 +106,7 @@ name = "codebase-map coverage + freshness"
 subject = "repo"
 purpose = "grades the codebase map's coverage and freshness"
 argv = ["python", "{gate_file}"]
+precommit = ["python", "{gate_file}", "--precommit"]
 guard = []
 history_depth = "full"
 stage = ["step.build", "step.test"]
@@ -113,6 +114,7 @@ enforces = ["practice.derive"]
 
 [gate_leg.gov]
 argv = ["python3", "{prefix}/codebase-map/test_codebase_map.py"]
+precommit = ["python3", "{prefix}/codebase-map/test_codebase_map.py", "--precommit"]
 reads = { base = "its baseline is the one carried at the merge-base with the remote default branch (TOOL-aSparedSpawn-13 S3).", history = "it reads that baseline out of history (TOOL-aSparedSpawn-13 S3)." }
 guard = []
 chunk = "declarations"

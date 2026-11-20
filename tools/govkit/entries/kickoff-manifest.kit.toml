@@ -71,6 +71,7 @@ name = "kickoff-manifest ratchet"
 subject = "repo"
 purpose = "verifies the kickoff manifest against mechanical signals"
 argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
+precommit = ["bash", "{prefix}/manifest-check.sh", "--staged", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true
@@ -78,6 +79,7 @@ stage = ["step.build", "step.test"]
 
 [gate_leg.gov]
 argv = ["bash", "skills/session-kickoff/manifest-check.sh"]
+precommit = ["bash", "skills/session-kickoff/manifest-check.sh", "--staged"]
 reads = { history = "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)." }
 guard = []
 chunk = "records"

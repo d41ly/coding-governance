@@ -847,6 +847,7 @@ gates gov's OWN product template at the repo root. An adopter's instantiated pla
 tag = "leg.gov.template-size-48kib"
 purpose = "caps the charter template's bytes at its declared ceiling"
 argv = ["bash", "{prefix}/check-template-size.sh"]
+precommit = ["bash", "{prefix}/check-template-size.sh"]
 chunk = "product"
 subject = "repo"
 ceiling = 300

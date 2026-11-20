@@ -360,6 +360,7 @@ name = "unattended skill wiring"
 subject = "repo"
 purpose = "verifies the unattended Skill still matches kit and conf"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
+precommit = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
 stage = ["step.build", "step.test"]

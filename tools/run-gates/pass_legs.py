@@ -97,7 +97,8 @@ def read_manifest() -> tuple:
 
 
 def read_ceilings() -> dict:
-    """{leg: evidenced maximum seconds} from the tracked ceiling evidence."""
+    """{leg: evidenced maximum seconds} from the tracked ceiling evidence, the largest across its rows:
+    one leg carries a row per node that measured it (TOOL-dWitnessedBar-10 S6)."""
     out = {}
     if not CEILINGS.is_file():
         return out
@@ -106,7 +107,7 @@ def read_ceilings() -> dict:
             continue
         f = line.split("\t")
         try:
-            out[f[0]] = float(f[1])
+            out[f[0]] = max(out.get(f[0], 0.0), float(f[1]))
         except (IndexError, ValueError):
             continue
     return out

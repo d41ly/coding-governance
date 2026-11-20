@@ -2833,6 +2833,16 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
                                             floor=gk.LEG_KEY_FLOORS["purpose"]) is want, ver)
     check("PU1: the manifest writer routes the purpose through its row of LEG_KEY_FLOORS",
           'floor=LEG_KEY_FLOORS["purpose"])' in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-10 AC6: the precommit's row of LEG_KEY_FLOORS, the same pair, and the writer reads it.
+    _fl = gk.LEG_KEY_FLOORS["precommit"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"PC1: a target at run-gates {ver} {'gets' if want else 'does not get'} a precommit",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["precommit"]) is want, ver)
+    check("PC1: the manifest writer routes the precommit through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["precommit"])' in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"
