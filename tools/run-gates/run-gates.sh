@@ -6364,13 +6364,17 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
         | awk -F'\t' '$1 == "tree" { printf "%s ", $2 }')"
       # shellcheck disable=SC2086  # one word per worktree head, each a sha with no space
       _vkeep+="$(git rev-parse $_vheads 2>/dev/null | tr '\n' ' ') "
-      _vrm=0
-      while IFS= read -r _vf; do
-        _vt=${_vf##*/}; _vt=${_vt%.scoped}
-        case "$_vt" in ''|*[!0-9a-f]*) continue ;; esac
-        case "$_vkeep" in *" $_vt "*) continue ;; esac
-        rm -f "$_vf" 2>/dev/null && _vrm=$((_vrm + 1))
-      done <<<"$_vold"
+      # A pipe, not a here-string from a substitution: the loop runs in the pipeline and hands its count back.
+      _vrm=$(printf '%s\n' "$_vold" | {
+        _vn=0
+        while IFS= read -r _vf; do
+          _vt=${_vf##*/}; _vt=${_vt%.scoped}
+          case "$_vt" in ''|*[!0-9a-f]*) continue ;; esac
+          case "$_vkeep" in *" $_vt "*) continue ;; esac
+          rm -f "$_vf" 2>/dev/null && _vn=$((_vn + 1))
+        done
+        printf '%s\n' "$_vn"
+      })
       [ "$_vrm" -gt 0 ] && echo "run-gates: per-tree verdicts pruned — $_vrm older than ${VERDICT_GRACE_DAYS} days and named by no retained run or worktree head" >&2
     fi
   fi
