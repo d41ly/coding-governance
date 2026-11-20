@@ -2778,9 +2778,13 @@ CLAIM_MODES="preflight take-over holder status beat lease"
 # this harness's, `same session` when only the session is, and `foreign` otherwise.
 # TOOL-dPlacedRequest-32 S3 - AN ABSENT SESSION IS NO IDENTITY: the session handed in is `mine` only
 # where it and the record's are both present, neither empty nor `absent`, and equal. With either absent
-# a lease is `mine` only through a keepalive present on both and equal, and this column is handed
+# a lease is `mine` only through a keepalive present on both and equal, and the `--lease` verbs hand
 # none, a `--lease` write recording `keepalive: absent`, so two id-less sessions of one node read each
-# other's lease `foreign`. A run claim's keepalive identity is the run columns' rows below, unchanged. rc 0 writes with
+# other's lease `foreign`. A run claim's keepalive identity is the run columns' rows below, unchanged.
+# TOOL-dPlacedRequest-97 - THE FENCE IS THE ONE `lease` CALLER HANDING A KEEPALIVE: `write_fence_beat`
+# hands the slug's run-state file as the sixth argument, and with either session absent a lease of this
+# node's fleet tag is `mine` where its `keepalive` is present, not `absent`, and equals that file's
+# `keepalive` fact, so an id-less run's `--preflight` lease fences; a missing file answers nothing. rc 0 writes with
 # CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, and `offered` or `terminal` for
 # TOOL-dPlacedRequest-20 below, CW_HINT `take-over` on a stale
 # acquire) and prints nothing, the verb printing its own line; rc 3 is `none` under renew or release.
@@ -2843,6 +2847,8 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     elif { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; } && { [ "$c_status" = landed ] || [ "$c_status" = withdrawn ]; }; then cls=foreign-tombstone
     elif [ "$mode" = lease ]; then
       if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ] && [ -n "$sid" ] && [ "$sid" != absent ]; then cls=mine
+      elif [ -n "$rel" ] && { [ "$sid" = absent ] || [ "$c_sess" = absent ]; } && [ "$c_node" = "$ka" ] \
+        && [ -n "$c_ka" ] && [ "$c_ka" != absent ] && fact "$rel" keepalive >/dev/null && [ "$c_ka" = "$_fact" ]; then cls=mine
       elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
       else cls="foreign-$c_verdict"; fi
     elif [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
@@ -4386,7 +4392,7 @@ write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refu
 # — epoch-fence`, exit 1; a foreign holder keeps its own cause word. The lander reads a fence line
 # as `refenced` and retries, anything else as `fenced`.
 write_fence_beat() { # slug · [--after tip] -> one line; 0 a fence or none, 1 refused, 2 not written
-  local slug="$1" after="${2:-}" ref tail tag sid rc cause body beat ae
+  local slug="$1" after="${2:-}" ref tail tag sid rel rc cause body beat ae
   if [ -n "$after" ] && ! [[ $after =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
     echo "lease not written — --after takes the full sha of the lease tip a fence read: $after"; return 2
   fi
@@ -4396,8 +4402,9 @@ write_fence_beat() { # slug · [--after tip] -> one line; 0 a fence or none, 1 r
   [ "$RUN_CLAIMS" = on ] || { echo "lease refused — epoch-fence · $tail · leases are off, so no lease re-fences"; return 1; }
   tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it holds no lease: $tag"; return 2; }
   sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  runmd_of "$slug" >/dev/null; rel=$_runmd
   read_claims quiet || { echo "lease refused — offline · $tail · $CL_WHY"; return 1; }
-  check_claim_writable "$slug" lease "$tag" "$sid" fence; rc=$?
+  check_claim_writable "$slug" lease "$tag" "$sid" fence "$rel"; rc=$?
   case "$CW_CLS:$CW_KIND" in
     none:*|*:-|*:)
       [ -z "$after" ] || { echo "lease refused — epoch-fence · $tail · no lease on the remote"; return 1; }

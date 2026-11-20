@@ -21423,6 +21423,43 @@ fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-97 — THE FENCE KNOWS AN ID-LESS RUN'S OWN CLAIM BY ITS KEEPALIVE. Over a fresh
+# lease fixture: a build lease of this node's fleet tag `a` with `session: absent` and `keepalive: K`,
+# as an id-less `--preflight` writes one, and the slug's run-state file holding `keepalive: K` under
+# its run facts. With CLAUDE_CODE_SESSION_ID unset, `--lease fence build tKa` prints its fence line on
+# the planted tip and a beat parented on it, exit 0 (AC1); a present session s2 that is not the
+# record's, its acquire past `run_lease_verb`'s session gate, is refused `live-holder`, exit 1, the
+# origin unmoved, because the `--lease` verbs hand the column no run-state file (S1's non-goal); with
+# the fact changed to `keepalive: K2` the same fence is refused `live-holder`, exit 1 (AC1's twin).
+# RED, observed at the close, is the lease column at 95c3103ad, which compares no keepalive, so the
+# first fence is refused `live-holder`. Waived by README rule 8 with the rest of this suite, its clean
+# reading owed with PLAY-dClosedLoop-14. WHAT THIS BLOCK DOES NOT DRIVE: a lease of another fleet tag
+# under the same keepalive, and a `--lease fence --after` re-fence of the id-less run's own beat.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+ki_t=$(seed_lease_at tKa/build tKa build a absent live "$(derive_claim_now)" 1)
+ki_m=$(git --git-dir="$LF/origin.git" log -1 --format=%B "$ki_t" -- | sed 's/^keepalive: absent$/keepalive: K/')
+ki_tip=$(git --git-dir="$LF/origin.git" commit-tree "$(git --git-dir="$LF/origin.git" mktree </dev/null)" -p "$ki_t" -m "$ki_m")
+git --git-dir="$LF/origin.git" update-ref refs/gov/leases/tKa/build "$ki_tip"
+mkdir -p "$LF/c1/memory/builds/tKa"; printf '# tKa\n\n## Run facts\n\nkeepalive: K\n' > "$LF/c1/memory/builds/tKa/RUN.md"
+same "DPR97 AC1 control: the planted lease is tag a, session absent, keepalive K" \
+  "$(read_lease_field tKa/build fleet-tag) $(read_lease_field tKa/build session) $(read_lease_field tKa/build keepalive)" "a absent K"
+ki_out=$(run_offer_arm "$LF/c1" daily-agent - fence build tKa); ki_rc=$?
+same "DPR97 AC1 with no session the run's own lease fences on its keepalive, exit 0" "$ki_rc|${ki_out% *}" "0|fence — refs/gov/leases/tKa/build $ki_tip"
+same "DPR97 AC1 ...the beat is a commit on the tip, the origin unmoved" \
+  "$(git -C "$LF/c1" rev-parse "${ki_out##* }^" 2>/dev/null) $(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tKa/build)" "$ki_tip $ki_tip"
+ki_out=$(LA_SID=s2 run_lease_arm acquire build tKa); ki_rc=$?
+same "DPR97 S1 an acquire by a present session not the record's is refused, exit 1, the origin unmoved" \
+  "$ki_rc $(git --git-dir="$LF/origin.git" rev-parse refs/gov/leases/tKa/build)" "1 $ki_tip"
+hit  "$ki_out" "lease refused — live-holder · tKa/build"
+sed -i 's/^keepalive: K$/keepalive: K2/' "$LF/c1/memory/builds/tKa/RUN.md"
+ki_out=$(run_offer_arm "$LF/c1" daily-agent - fence build tKa); ki_rc=$?
+same "DPR97 AC1 a run-state keepalive K2 is no identity: the fence is refused live-holder, exit 1" "$ki_rc|${ki_out%% · node*}" "1|lease refused — live-holder · tKa/build"
+rm -rf "$LF"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
 # no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
 # fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
@@ -23726,7 +23763,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the diff's own lines, 4 `same`, 5 `hit` and 1 `miss` for the probe arm and 2 `same` for the static
 # CW_* join, no loop over an assertion and no skip branch. No suite ran, and its RED-first observation
 # is the close's.
-FLOOR_ASSERTIONS=4056
+# RAISED 4056 -> 4062 by TOOL-dPlacedRequest-97: the id-less fence's 6 region-eight assertions off the
+# diff's own lines, 5 `same` and 1 `hit`, no loop over an assertion and no skip branch. No suite ran,
+# and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4062
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24008,7 +24048,8 @@ FLOOR_SHARD_7=311
 # RAISED 1256 -> 1257 by TOOL-dPlacedRequest-58: the same 1 region-eight placed-race reset assertion, see FLOOR_ASSERTIONS.
 # RAISED 1257 -> 1263 by TOOL-dPlacedRequest-59: the same 6 region-eight claim-line reader assertions, see FLOOR_ASSERTIONS.
 # RAISED 1263 -> 1275 by TOOL-dPlacedRequest-96: the same 12 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1275
+# RAISED 1275 -> 1281 by TOOL-dPlacedRequest-97: the same 6 region-eight id-less fence assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1281
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
