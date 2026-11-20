@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-43-deviation-432.md](../build/2026-10-25-build-TOOL-dWitnessedBar-43-deviation-432.md) | deviation | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-43-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-43-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-43-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-43-1-builder-return.md) | journal | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-43-red-fix-129.md](../build/2026-11-20-build-TOOL-dWitnessedBar-43-red-fix-129.md) | red-fix | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-43-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-43-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-brief.md) | journal | — |
