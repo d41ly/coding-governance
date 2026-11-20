@@ -23,8 +23,9 @@ pre-push suite's AC4 cases.
 - AC3 — `reused_cache` — a full run over the fixture manifest wrote a per-tree record whose
   `reused`/`reused_cache` lines read `reused:0 reused_cache:0`. Owed: the evidence arm's RED-first
   observation.
-- AC4 — `reused 1` — `check_tree_reuse` forced on a record with neither key (`carries neither reused
-  nor reused_cache`), on `reused 1` with no `reused_cache`, and on `reused 1`/`reused_cache 1`; it
+- AC4 — `reused 1` — `check_tree_reuse` forced on a record with neither key, naming the pair
+  (`carries neither reused nor reused_cache`), on `reused 1` with no `reused_cache`, and on
+  `reused 1`/`reused_cache 1`; it
   adopted `0`/`0`, `2`/`0` and an empty `reused` beside `reused_cache 0`. Not observed here: the hook
   run end to end over a scratch clone printing its `not covered` line, owed to the pre-push suite's
   `keyless` and `reused` cases and their RED-first observation at the close.
