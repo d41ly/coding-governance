@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.169 -->
+<!-- gov:kit memory-tree@2.170 -->
 [memory/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # memory/ retention & hygiene
 
