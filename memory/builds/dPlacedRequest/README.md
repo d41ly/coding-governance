@@ -134,7 +134,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-10 — a build's scenarios chosen at `entry.place`, every admission predicate re-evaluated by `placement.check`](spec/2026-10-25-spec-TOOL-dPlacedRequest-10.md) | 17 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dPlacedRequest-14 — the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key](spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md) | 18 | 2 | CLOSED | rev-6 | 2026-11-20 |
 | [TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`](spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md) | 19 | 2 | CLOSED | rev-7 | 2026-11-20 |
-| [TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause](spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md) | 20 | 2 | INPROGRESS | rev-8 | 2026-11-19 |
+| [TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause](spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md) | 20 | 2 | INPROGRESS | rev-9 | 2026-11-20 |
 | [TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim](spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks](spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md) | 22 | 2 | DEFERRED | rev-13 | 2026-11-19 |
 | [TOOL-dPlacedRequest-35 — the bounded age walk ends a tail at its tenure before it reads an age](spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md) | 23 | 2 | DEFERRED | rev-4 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 247 bound to this build, across 4 record folder(s).
+Records: 249 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

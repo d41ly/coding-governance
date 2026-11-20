@@ -25677,10 +25677,8 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219-2220
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:3940
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:4069-4071
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:2396
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:4183-4192
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2118
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2145-2147
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md	tools/unattended/unattended.sh:2118
