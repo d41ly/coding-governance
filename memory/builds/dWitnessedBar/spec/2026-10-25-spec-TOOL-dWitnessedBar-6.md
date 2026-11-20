@@ -25,6 +25,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-6-reground3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-6-reground3-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-6-reground3-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-6-reground3-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
