@@ -19413,6 +19413,60 @@ add_claim_sighting "$LF/c1" refs/gov/runs/tFix "$OC_TREE" "$oc_g" "$(derive_clai
 add_claim_sighting "$LF/c1" refs/gov/runs/tFix "$OC_TREE" "$oc_h" "$(derive_claim_ago 60)"
 same "DPR26 AC4 a legacy chain with no epoch, its tip first seen a minute ago, reads live" \
   "$( (cd "$LF/c1" && bash "$SCRIPT" --claims 2>/dev/null) | awk -F'\t' '$1 == "tFix" { print $5 }')" "live"
+# ==================================================================================================
+# TOOL-dPlacedRequest-35 — THE TENURE STOP COMES BEFORE ANY AGE. Over the same fixture, the walk tests
+# each commit's epoch before its `renews` and before its sighting, the tip included, so an age is only
+# ever read inside the tip's tenure. RED is a scratch copy whose `awk` tests the threshold first (AC1,
+# AC3), and one whose walk skips the tip (AC2). Waived by README rule 8 with the rest of this suite.
+# WHAT THIS BLOCK DOES NOT DRIVE: an unsighted commit at the threshold test, TOOL-dPlacedRequest-47's.
+# ==================================================================================================
+so_cut='if (ep[c] != te[i]) { stop(i, od[i]); return }'
+so_age='if (thr != "" && ((rf[i], c) in seen) && seen[rf[i], c] < thr) { stop(i, c); return }'
+so_red="$so_age"$'\n'"$so_cut"
+printf '%s\n' "${oc_src/"$so_cut"/"$so_red"}" >"$oc_copy/age-first.sh"
+so_cut='if (!(i in te)) te[i] = ep[c]'
+so_red='if (!(i in sk)) { sk[i] = 1; c = par[c]; if (c == "") { stop(i, od[i]); return }; continue }'$'\n'"$so_cut"
+printf '%s\n' "${oc_src/"$so_cut"/"$so_red"}" >"$oc_copy/skip-tip.sh"
+same "DPR35 each scratch copy carries its one staged test" \
+  "$(grep -cF "$so_age" "$oc_copy/age-first.sh") $(grep -cF 'if (!(i in sk))' "$oc_copy/skip-tip.sh")" "2 1"
+# ---- AC1: TOOL-dPlacedRequest-26 AC1's chain, an epoch-1 `renews: yes` commit first seen 25 h ago
+# ---- under an epoch-2 take-over `renews: no` first seen a minute ago, reads live; threshold first, stale.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); oc_b=$(add_lease_commit 2 no "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR35 AC1 a take-over sighted a minute ago over a renewal sighted 25 h ago reads live" "${oc_row%% *}" "live"
+oc_row=$(read_clock_row "$oc_copy/age-first.sh")
+same "DPR35 AC1 RED: the copy whose awk tests the threshold first reads it stale" "${oc_row%% *}" "stale"
+# ---- AC2: an epoch-2 tip `renews: yes` first seen a minute ago over two epoch-1 commits first seen
+# ---- 25 h ago reads live; the copy whose walk skips the tip reads the older tenure's age, stale.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 93600)"); oc_b=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)" "$oc_a")
+oc_c=$(add_lease_commit 2 yes "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 93600)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR35 AC2 a renewing tip sighted a minute ago over an older tenure sighted 25 h ago reads live" "${oc_row%% *}" "live"
+oc_row=$(read_clock_row "$oc_copy/skip-tip.sh")
+same "DPR35 AC2 RED: the copy whose walk skips the tip reads it stale" "${oc_row%% *}" "stale"
+# ---- AC3: an epoch-2 tenure of two `renews: no` commits over an epoch-1 renewal first seen 25 h ago:
+# ---- its older commit first seen 25 h ago reads stale, a minute ago live; threshold first, both stale.
+so_red=""
+for so_v in 90000:stale 60:live; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 93600)"); oc_b=$(add_lease_commit 2 no "$(derive_claim_ago "${so_v%%:*}")" "$oc_a")
+  oc_c=$(add_lease_commit 2 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 93600)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago "${so_v%%:*}")"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row)
+  same "DPR35 AC3 a tenure with no renewing commit, its older commit first seen ${so_v%%:*} s ago, reads ${so_v#*:}" "${oc_row%% *}" "${so_v#*:}"
+  oc_row=$(read_clock_row "$oc_copy/age-first.sh"); so_red="$so_red${oc_row%% *} "
+done
+same "DPR35 AC3 RED: the copy whose awk tests the threshold first reads both stale" "$so_red" "stale stale "
 rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -23056,7 +23110,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `same`, its refusal arms among them, and 1 `hit`) and the verb's 4 region-one parity assertions (the
 # row's 3 and its declared-verb line's 1), off the diff's own lines; no skip branch. No suite ran, and
 # its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3949
+# RAISED 3949 -> 3957 by TOOL-dPlacedRequest-35: the stop-order block's 8 region-eight assertions (8
+# `same`, its AC3 loop's two among them, one per pass), off the diff's own lines; no skip branch. No
+# suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3957
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23327,7 +23384,8 @@ FLOOR_SHARD_7=311
 # RAISED 1127 -> 1138 by TOOL-dPlacedRequest-32: the same 11 region-eight id-less session assertions, see FLOOR_ASSERTIONS.
 # RAISED 1138 -> 1146 by TOOL-dPlacedRequest-40: the same 8 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
 # RAISED 1146 -> 1168 by TOOL-dPlacedRequest-33: the same 22 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1168
+# RAISED 1168 -> 1176 by TOOL-dPlacedRequest-35: the same 8 region-eight stop-order assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1176
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

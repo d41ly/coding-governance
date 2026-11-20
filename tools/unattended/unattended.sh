@@ -2562,13 +2562,15 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     thr=""
     if [ -n "$LB_VALUE" ]; then printf -v now '%(%s)T' -1; TZ=UTC printf -v thr '%(%Y-%m-%dT%H:%M:%SZ)T' "$((now - LB_VALUE))"; fi
     # THE WALK (S2), BOUNDED (TOOL-dPlacedRequest-34 S43): ONE streaming `git log --first-parent` over
-    # every row's tip, piped to an `awk` that walks each row from its tip and stops it, in this order, at
-    # its RENEWING BEAT (a commit of the tip's epoch whose `renews` is `yes` or absent), at its TENURE'S
-    # START (the first commit of another epoch ends it, the oldest commit read inside it standing for the
-    # beat), or at a commit the feed first sighted before `thr`, now less `leases.expiry-hours`, which
-    # makes the row `stale` whatever lies further back and stands for the beat. A row whose chain ends
-    # first takes its oldest commit read. The `awk` exits once every row is resolved, and `git log` stops
-    # on the closed pipe, so a read costs each lease's commits sighted inside the bound, not its history.
+    # every row's tip, piped to an `awk` that walks each row from its tip, the tip included, and tests
+    # each commit in this order (TOOL-dPlacedRequest-35 S1): its TENURE'S END first (a commit whose epoch
+    # differs from the tip's is another holder's, read no further and never aged, the oldest commit read
+    # inside the tenure standing for the beat); then its RENEWING BEAT (`renews` is `yes` or absent);
+    # then a commit the feed first sighted before `thr`, now less `leases.expiry-hours`, which makes the
+    # row `stale` whatever lies further back inside the tenure and stands for the beat. A row whose chain
+    # ends first takes its oldest commit read (S2). The `awk` exits once every row is resolved, and
+    # `git log` stops on the closed pipe, so a read costs each lease's commits sighted inside the bound,
+    # not its history.
     # In one first-parent chain `git log` names a child before its parent whatever the dates; a commit
     # reached out of that order is held and read when its child is. The sighting is `read_first_seen`'s
     # rule, the oldest well-formed feed line of the ref and commit, applied in place because its answer
@@ -2588,8 +2590,8 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
         while (1) {
           if (!(c in kn)) { wt[c] = wt[c] " " i; return }
           if (!(i in te)) te[i] = ep[c]
-          if (ep[c] == te[i] && (!(c in rn) || rn[c] == "yes")) { stop(i, c); return }
           if (ep[c] != te[i]) { stop(i, od[i]); return }
+          if (!(c in rn) || rn[c] == "yes") { stop(i, c); return }
           if (thr != "" && ((rf[i], c) in seen) && seen[rf[i], c] < thr) { stop(i, c); return }
           od[i] = c; c = par[c]
           if (c == "") { stop(i, od[i]); return }
