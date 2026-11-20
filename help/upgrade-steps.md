@@ -427,6 +427,41 @@ python tools/govkit/steps/review_rounds.py down <repo>     # exit 1 if a file ch
 
 Then commit the result, `.governance/steps/unattended/` included.
 
+## Where `INHERITED_RED`'s value lives
+
+Which red blocks a landing is the policy key `verdict.blocks` in `.governance/policy.toml` now, and
+neither the pre-push hook nor the driver reads an `INHERITED_RED` line. Before, each read it from
+its own file: the hook from `.githooks/gate-env.sh`, and the driver from the file `GATE_POLICY_FILE`
+names in `.unattended.conf`, or from `.githooks/gate-env.sh` too where that key is blank or absent
+or there is no conf. The step `govkit/inherited-red-to-verdict-blocks` reads both files, each only
+where present, and writes the value they meant:
+
+| What the files hold | What `[verdict] blocks` gets |
+|---|---|
+| `land` | `own-mixed-contended` |
+| `park` | `every-red` |
+| any other value, `Park` and `LAND` included | `every-red`, as both readers read it |
+| a `GATE_POLICY_FILE` that is absolute or climbs out of the tree, beside a key in `.githooks/gate-env.sh` | `every-red`, as the driver read it; that file is neither read nor edited |
+| a blank value, or no `INHERITED_RED` in either file | nothing: the catalogue default `own-only` applies |
+
+Where the two files say different things, the step writes the one that blocks more, `every-red`.
+Where your policy file already sets `verdict.blocks` to another value, the up prints `conflict ·
+verdict.blocks · policy <value> · gate <value>`, exits 1 and writes nothing, so you settle which
+one decides and run it again. It also exits 1, writing nothing, on a file that is not UTF-8. The up
+then takes every `INHERITED_RED` line out of each file that held one and keeps the file. Its witness
+prints one line per file it reads, naming the file, the value found and the value written, and
+holds once neither file assigns the key. Its down puts every file back byte-for-byte.
+`update --write` runs it as one of its steps; to run it by hand, from this checkout: <!-- usage: script:tools/govkit/steps/inherited_red.py#up 7d308cd4 --> <!-- usage: script:tools/govkit/steps/inherited_red.py#witness 79b2b797 --> <!-- usage: script:tools/govkit/steps/inherited_red.py#down 14a9242d -->
+
+<!-- run: no — runs a kit by its path in gov's checkout, absent from a scratch adopter, and a <repo> placeholder -->
+```sh
+python tools/govkit/steps/inherited_red.py up <repo>       # exit 1, writing nothing, on a conflict
+python tools/govkit/steps/inherited_red.py witness <repo>  # exit 0 once no INHERITED_RED is left
+python tools/govkit/steps/inherited_red.py down <repo>     # exit 1 if a file changed since the up
+```
+
+Then commit the result, `.governance/steps/govkit/` included.
+
 ## What this release's steps do to your repository
 
 Five moves reach an installed repository through `update`, each named here with what it leaves
