@@ -46,6 +46,13 @@ carry no criterion and were not read.
 - The tree's 59 AC21 already wraps once, after its first line; unit 60's form finds the phrase twice over the tree, from the two lines that do not wrap, so the scratch copy rewraps those two. (DERIVED)
 - Over the whole folder, `grep -lE '^t=\$\(git rev-list'` listed the specs of units 55, 56 and 59, each CLOSED; 59's §4 names the blocks of 55 and 56 superseded by its own. (DERIVED)
 - The unit's commits change no file outside the build folder and the spec's status cell, so no function is minted, renamed or deleted. (DERIVED)
+- The bug-class checklist over the pass commit selected `fixture-passes-by-finding-nothing`: every zero above is paired with a read of the same population that printed its token, AC4's empty sweep with a scratch folder over which it printed a bullet, and every hold with a label, heading or scratch copy that reads otherwise. (DERIVED)
+- It selected `heredoc-escape-reaches-the-regex`: a first `sed` respelling of AC12's class wrote a tab byte where `\t` was meant, and its section read held no `[ \t]`; the scratch copy was rebuilt by Python with the backslash spelled as a code point, and the probes ran from files written by the edit tools. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: AC11's move, AC12's respelling, AC18's removed entry, AC19's rewrap and AC4's respelled base each change the shipped text of the spec they read, never a stand-in. (DERIVED)
+- It selected `criterion-asserts-what-its-own-command-cannot-show` and `amendment-leaves-its-other-half-standing`: AC14's population clause names a spec its own selector excludes once 59 closed, the clause the re-grounding left beside its rev-5 order; it is recorded under Items diverged, not read as held. (DERIVED)
+- It selected `one-value-field-records-a-mixed-outcome`: the close commit names AC14's diverged clause beside the criteria observed. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line, and a probe found each answer's first token in its criterion's joined text. (DERIVED)
+- It selected `inline-fence-swallows-the-rest-of-the-file` and `pipe-in-a-code-span-splits-a-table-cell`: this record holds no fence and no table, so its pipes sit in list items. (DERIVED)
 
 ## Items diverged
 
