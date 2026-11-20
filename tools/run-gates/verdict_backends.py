@@ -61,6 +61,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 
 sys.dont_write_bytecode = True
@@ -83,6 +84,7 @@ READER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*:[A-Za-z_][A-Za-z0-9_]*")
 SHA = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 SIGNERS_KEY = "verdict.peer.signers"
 GOOD_SIGNATURE = re.compile(r'Good "git" signature for (\S+) with ')
+PEER_SIGNERS_GRACE_S = 86400  # seconds a signer temp may stand before a peer read sweeps it as a killed read's
 
 Verdict = collections.namedtuple("Verdict", "state witness why")
 
@@ -433,16 +435,40 @@ def read_node_tag():
     return node if re.fullmatch(r"[A-Za-z0-9._-]+", node) else ""
 
 
+def remove_stale_signer_temps(common, now=None):
+    """Unlink every `gov-signers-` file directly under the common git dir `common` whose mtime is older
+    than `PEER_SIGNERS_GRACE_S`, the file a killed peer read left (TOOL-dWitnessedBar-63 S20, §8 F5). A
+    younger one may be a concurrent read's live file and is kept; one that cannot be read or unlinked is
+    left for the next read. -> the names removed."""
+    now = time.time() if now is None else now
+    gone = []
+    try:
+        found = sorted(pathlib.Path(common).glob("gov-signers-*"))
+    except OSError:
+        return gone
+    for p in found:
+        try:
+            if p.is_file() and now - p.stat().st_mtime > PEER_SIGNERS_GRACE_S:
+                p.unlink()
+                gone.append(p.name)
+        except OSError:
+            continue
+    return gone
+
+
 def read_signer_principal(repo, ref, members):
     """`ref` verified by `git verify-tag --raw` against the allowed-signers lines `members`, written to a temp
     file under the common git dir and removed after -> (the principal its `Good "git" signature` line names,
     None), or ('', the NONE or DEAD PROBE Verdict saying why none stands). Git writes that line to standard
     error, so both streams are read. The file is created, written, read and unlinked inside ONE
-    `try`/`finally`, so no outcome after `mkstemp`, a failed write, a timeout or a signal included,
-    leaves it behind (TOOL-dWitnessedBar-62 S39)."""
+    `try`/`finally`, so a normal exit, an exception, a subprocess timeout or a `KeyboardInterrupt` after
+    `mkstemp` leaves nothing behind (TOOL-dWitnessedBar-62 S39). A process kill runs no `finally` and can
+    leave the file, so each read first runs `remove_stale_signer_temps`, which sweeps any such file older
+    than `PEER_SIGNERS_GRACE_S` (TOOL-dWitnessedBar-63 S20)."""
     common = read_common_dir(repo)
     if common is None:
         return "", Verdict("DEAD PROBE", "", "no git common dir resolves here, so no signer file can be written")
+    remove_stale_signer_temps(common)
     name = None
     try:
         fd, name = tempfile.mkstemp(prefix="gov-signers-", dir=str(common))
@@ -629,8 +655,10 @@ PLANTS = {
     "edited-selection": "a full GREEN whose selection.1 was edited after its hash was taken",
     "underived-selection": "a full GREEN holding a quarantine row the landed revision does not derive",
     "clean": "a full GREEN with the reuse pair at 0 under selection none, then holding the row R derives",
+    "key-no-tab": "a full GREEN whose reuse key is a bare reused line with no TAB, read as an absent key",
     "peer-tip-missing": "a peer ref the remote advertises whose tag names a commit the remote lacks, so the fetch fails",
-    "peer-no-ssh-keygen": "node b's signed GREEN read on node a with gpg.ssh.program at an absent path",
+    "peer-no-ssh-keygen": "node b's signed GREEN read on node a with gpg.ssh.program at an absent path, beside an aged "
+                          "and a young signer temp",
     "peer-bad-signature": "a tag node b signed whose message was edited after signing, read on node a",
     "peer": "over the signed, pinned setup: a tag node b signed read on node a, one node a signed of its own, and one "
             "naming another tree",
@@ -838,7 +866,7 @@ def run_plant(case, top):
 
 
 LOCAL_PLANTS = ("reused-cache", "reused-alone", "no-pair", "no-selection", "edited-selection", "underived-selection",
-                "clean")
+                "clean", "key-no-tab")
 LOCAL_POLICY = '[tests]\nlanding-levels = ["unit", "integration"]\nwithout-cadence = "report-unrun"\n'
 
 
@@ -890,6 +918,11 @@ def run_local_plant(case, top, run_scenario):
     elif case == "no-pair":
         write_record(pair=())
         read_local("neither reuse key", "NONE", ["neither reused nor reused_cache"])
+    elif case == "key-no-tab":
+        # TOOL-dWitnessedBar-63 AC11 (S19): `read_tag_lines` skips a line with no TAB, so a bare `reused`
+        # reads as no key at all; a reader taking the key as its value reads `reused reused leg(s)`.
+        write_record(pair=("reused\n",))
+        read_local("a bare reused line, no TAB", "NONE", ["neither reused nor reused_cache"])
     elif case == "no-selection":
         write_record(selection=(None, []))
         read_local("no selection key", "NONE", ["carries no selection"])
@@ -1006,14 +1039,24 @@ def run_peer_plant(case, top, run_scenario):
     elif case == "peer-no-ssh-keygen":
         write_tag(sha, "b", "b", tree)
         run_fixture_git(work, "config", "gpg.ssh.program", pathlib.Path(top, "absent", "ssh-keygen").as_posix())
+        # TOOL-dWitnessedBar-63 AC12 (S20): a killed read's signer temp, aged past the grace, and a younger
+        # one a concurrent read may still hold, both planted before the read.
+        common = read_common_dir(work)
+        aged, young = common / "gov-signers-aged", common / "gov-signers-young"
+        for p in (aged, young):
+            p.write_bytes(b"")
+        old = time.time() - 2 * PEER_SIGNERS_GRACE_S
+        os.utime(aged, (old, old))
         run_node_read("gpg.ssh.program at an absent path", sha, 1, [said % "DEAD PROBE", "verify-tag --raw"])
-        # TOOL-dWitnessedBar-62 AC26: the failed read leaves no allowed-signers temp in the common git dir,
-        # listed by a process of its own as `ls <git-dir>` would, exiting 1 on any.
-        run_scenario("no signer temp left after the failed read", work,
+        # TOOL-dWitnessedBar-62 AC26: the failed read leaves no allowed-signers temp of its own in the common
+        # git dir, listed by a process of its own as `ls <git-dir>` would; the aged temp is swept and the
+        # young one kept, so the young one alone is left, else exit 1.
+        run_scenario("no signer temp of the read left, the aged one swept, the young one kept", work,
                      [sys.executable, "-c", "import pathlib, sys; left = sorted(p.name for p in "
                       "pathlib.Path(sys.argv[1]).glob('gov-signers-*')); "
-                      "print('signer temps left:', len(left), *left); sys.exit(1 if left else 0)",
-                      str(read_common_dir(work))], 0, ["signer temps left: 0"])
+                      "print('signer temps left:', len(left), *left); sys.exit(0 if left == ['gov-signers-young'] else 1)",
+                      str(common)], 0, ["signer temps left: 1 gov-signers-young"])
+        young.unlink(missing_ok=True)
     elif case == "peer-bad-signature":
         write_tag(sha, "b", "b", tree)
         ref = VERDICT_REF + sha

@@ -612,3 +612,11 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T21:54:16Z dispatch · item b82c0f53 TOOL-dWitnessedBar-62 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-20T22:17:58Z brief · item TOOL-dWitnessedBar-63 · reason 20c547d2b8f1 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-63-build-brief.md
+
+2026-11-20T22:20:04Z dispatch · item e1c032c1 TOOL-dWitnessedBar-63 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/gate-lint/legacy_ledger.py tools/govkit/govkit.py tools/govkit/selftest.py tools/lib/legacy_ledger.py tools/lib/resolve-python.test.sh tools/memory-tree/README.md tools/memory-tree/legacy_ledger.py tools/memory-tree/ratchet.py tools/run-gates/README.md tools/run-gates/regen.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.sh tools/run-gates/verdict_backends.py tools/unattended/lib-unattended.sh tools/unattended/unattended.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-63-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-63.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T22:38:23Z draw · re-dispatch · TOOL-dWitnessedBar-63 · 106/180 · 20261120T223823Z-567c64
+
+2026-11-20T22:38:23Z dispatch · item e1c032c1 TOOL-dWitnessedBar-63 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-63-widen-6.md memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-63-deviation-632.md memory/guides/SESSION-KICKOFF.md
+2026-11-20T22:42:07Z draw · re-dispatch · TOOL-dWitnessedBar-63 · 107/180 · 20261120T224207Z-4edd3e
+
+2026-11-20T22:42:07Z dispatch · item e1c032c1 TOOL-dWitnessedBar-63 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

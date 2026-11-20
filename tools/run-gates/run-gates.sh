@@ -2565,13 +2565,19 @@ RUNLOG_RC=""; RUNLOG_DONE=""
 # the caller names and for nothing else, so a line the runner did not expect cannot set a variable.
 # The caller declares the variables it names, as locals, before calling. Rc 1 when the file is absent.
 read_record_keys() { # file · variable prefix · key... -> sets <prefix><key> for each named key present
-  local _rk_f=$1 _rk_p=$2 _rk_k="" _rk_v="" _rk_want
+  # Each line is read WHOLE and its value is everything after the first TAB, so an empty last field
+  # keeps its TAB; a line with no TAB is no key at all (TOOL-dWitnessedBar-63 S17, S19), as
+  # verdict_backends.py's `read_tag_lines` reads it. A TAB IFS would strip the one and set the other.
+  local _rk_f=$1 _rk_p=$2 _rk_l="" _rk_k="" _rk_v="" _rk_want
   shift 2
   _rk_want=" $* "
   [ -f "$_rk_f" ] || return 1
-  while IFS=$'\t' read -r _rk_k _rk_v || [ -n "$_rk_k" ]; do
-    case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac
-    _rk_k=""; _rk_v=""
+  while IFS= read -r _rk_l || [ -n "$_rk_l" ]; do
+    case "$_rk_l" in
+      *$'\t'*) _rk_k=${_rk_l%%$'\t'*}; _rk_v=${_rk_l#*$'\t'}
+        case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac ;;
+    esac
+    _rk_l=""
   done 2>/dev/null < "$_rk_f"
   return 0
 }

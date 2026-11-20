@@ -1765,7 +1765,8 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     and `exists:` absent, each carrying `write`, `check` and `stage`, and no refused form: regen reads
     them TOGETHER, and its kept paths must equal the shell reader's kept pairs, with selfcheck refusing
     none. Each REFUSED form, an unknown token, an empty `exists:` path, a `when` of neither form, an
-    absolute `exists:` path and one holding a `..` segment, sits ALONE in its own tree beside one
+    absolute `exists:` path, one holding a `..` segment, and the backslash, UNC and colon paths of
+    TOOL-dWitnessedBar-63 AC5, sits ALONE in its own tree beside one
     conf-true row, because one refused row refuses its whole descriptor in regen: regen raises naming
     the row, the shell reader names the descriptor and the `when` on stderr and keeps the conf-true
     row, and selfcheck refuses the row. A row lacking `write`, `check` and `stage` is skipped by regen
@@ -1784,8 +1785,14 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     admissible = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
                   "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt"}
     # The `..` form names a file that exists, so a reader without the containment test KEEPS it.
+    # TOOL-dWitnessedBar-63 AC5 (S9 to S11): five Windows path forms, spelled as the TOML source text,
+    # which the shell reader reads raw and tomllib unescapes, so the shell sees `\\` where regen and
+    # selfcheck see `\`. RED against a shell reader without its backslash fold, which tests `..\\x` as a
+    # path that does not exist and skips it silently, naming nothing.
     refused = {"unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:", "no-colon": "W54=on",
-               "absolute": f"exists:/{rk}/regen.py", "dotdot": f"exists:{{kit}}/../{rk}/regen.py"}
+               "absolute": f"exists:/{rk}/regen.py", "dotdot": f"exists:{{kit}}/../{rk}/regen.py",
+               "bs-dotdot": r"exists:..\\x", "bs-inner": r"exists:a\\..\\..\\x", "bs-rooted": r"exists:\\x",
+               "unc": r"exists:\\\\server\\share", "colon": "exists:a:b"}
     conf.write_text("W54=on\n", encoding="utf-8", newline="\n")
 
     def render_w62_rows(forms: dict, bare: bool) -> str:
@@ -1799,9 +1806,10 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
                      'why = "the when-form parity fixture, a row regen never reads"\nwhen = "w54.conf:W54=on"\n')
         return text
 
-    def read_w62_tree(forms: dict, bare: bool = False):
-        """-> (regen's kept labels or its Refusal text, the shell run, the selfcheck run, not compared)."""
-        desc.write_bytes(keep + render_w62_rows(forms, bare).encode("utf-8"))
+    def read_w62_tree(forms: dict, bare: bool = False, extra: str = ""):
+        """-> (regen's kept labels or its Refusal text, the shell run, the selfcheck run, not compared);
+        `extra` is descriptor text appended after the rows."""
+        desc.write_bytes(keep + (render_w62_rows(forms, bare) + extra).encode("utf-8"))
         spec = importlib.util.spec_from_file_location("w54_regen", gcopy / kit_rel / "regen.py")
         rg = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(rg)
@@ -1861,8 +1869,20 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
                           and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
                           for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
             graded += 1
-        check("[dWB-62 AC2] every refused form was read in its own tree", graded == len(refused) == 5,
-              f"{graded} of {len(refused)}")
+        check("[dWB-62 AC2] [dWB-63 AC5] every refused form was read in its own tree",
+              graded == len(refused) == 10, f"{graded} of {len(refused)}")
+        # TOOL-dWitnessedBar-63 AC14 (S22): a row carrying a path and `when = "exists:"` and no generator,
+        # beside one conf-true row. The shell reader reads each row whole and grades the `when` before the
+        # generator, so it names the descriptor and the `when` and keeps the conf-true row only. RED
+        # against a TAB-IFS read, which folds the empty generator so the `when` lands in its place and
+        # the row is kept.
+        nogen = '\n[[generated]]\npath = "{kit}/w54-nogen.out"\nwhy = "a generator-less row"\nwhen = "exists:"\n'
+        forms = {"conf-true": admissible["conf-true"]}
+        _r, sh, _sc, _u = read_w62_tree(forms, extra=nogen)
+        check("[dWB-63 AC14] a generator-less row whose when is exists: alone: the shell reader names the "
+              "descriptor and the when on stderr and keeps the conf-true row only",
+              any(f"{here} declares" in ln and ln.endswith("skipped: exists:") for ln in sh.stderr.splitlines())
+              and extract_labels(sh, {**forms, "nogen": ""}) == {"conf-true"}, f"{sh.stdout[-600:]}\n{sh.stderr[-800:]}")
     finally:
         desc.write_bytes(keep)
         conf.unlink(missing_ok=True)
@@ -4358,6 +4378,37 @@ read_policy_key "$(cat ./f)" "$1"
         graded += 1
     check("[dWB-55 AC4] every row of the reader parity set was graded, lone-cr included",
           graded == len(rows) == 12, f"{graded} of {len(rows)}")
+
+    # TOOL-dWitnessedBar-63 AC13 (S21): the step reads `.unattended.conf` as bytes, LF alone separating
+    # lines, so a conf holding `GATE_POLICY_FILE=pol-a<CR>GATE_POLICY_FILE=pol-b<LF>` resolves, byte for
+    # byte, the one path the hook's `read_policy_key` reads from it, and `pol-b`, holding land, is never
+    # read. The path is observed through `derive_reads` with the containment walk stubbed for the call,
+    # since a CR names no file on Windows and the walk refuses it there; the up then runs whole and
+    # writes no verdict.blocks. A conf naming a policy file whose INHERITED_RED holds a lone CR maps as
+    # unit 59's AC1 maps it. RED against a text-mode conf read, which splits at the CR and takes pol-b.
+    conf_cr = b"GATE_POLICY_FILE=pol-a\rGATE_POLICY_FILE=pol-b\n"
+    t = build_target(tmp, None, "ir63-ac13", {".unattended.conf": conf_cr, "pol-b": "INHERITED_RED=land\n"})
+    want, err = read_hook_value(conf_cr, "GATE_POLICY_FILE")
+    walk = step.C2P.STEPS.check_contained
+    step.C2P.STEPS.check_contained = lambda target, rel: None
+    try:
+        reads, _off = step.derive_reads(t)
+    except step.Refusal as e:
+        reads = [f"refused: {e}"]
+    finally:
+        step.C2P.STEPS.check_contained = walk
+    up = run_step("up", t)
+    check("[dWB-63 AC13] pol-a<CR>GATE_POLICY_FILE=pol-b: the step resolves the path the hook's "
+          "read_policy_key reads, byte for byte, and its up never reads pol-b",
+          want is not None and reads == [gate, want] and "pol-b" not in reads and read_blocks(t) is None
+          and (t / "pol-b").read_bytes() == b"INHERITED_RED=land\n",
+          f"hook {want!r} step {reads!r} {err} {up.stdout}{up.stderr}".strip())
+    t = build_target(tmp, None, "ir63-ac13-lone-cr", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                                      "ops/p.sh": b"INHERITED_RED=park\rINHERITED_RED=land\n"})
+    up = run_step("up", t)
+    check("[dWB-63 AC13] a GATE_POLICY_FILE holding park<CR>INHERITED_RED=land: the up writes every-red, as "
+          "unit 59's AC1 maps the gate file",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
 
 
 def check_steps_recordable() -> None:

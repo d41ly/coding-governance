@@ -35,7 +35,9 @@ A write that exits non-zero is followed by its own check, and a fresh check make
 kit's adopter may decline to render in a state it declares legal (TOOL-aPrimedIndex-7).
 """
 import importlib.util
+import ntpath
 import os
+import posixpath
 import shutil
 import signal
 import subprocess
@@ -142,16 +144,20 @@ def check_when(root, when, ctx, where):
     """True when a row's `when` holds at the repo root: `<conf>:<KEY>=<value>` when the conf's key reads
     that value, `exists:<path>` when the path, its tokens resolved as an argv's are, exists in the tree
     (TOOL-dWitnessedBar-45 S1). Neither form runs a command; any other spelling is a Refusal, and so is
-    an `exists:` path that, resolved, is absolute (`/…`, `X:…`) or holds a `..` segment, by the pattern
-    the unattended kit's `read_gate_policy` refuses (TOOL-dWitnessedBar-62 S22)."""
+    an `exists:` path that, resolved, leaves the tree by govkit's `derive_contained_rel` rule, applied
+    inline since this copy-installed kit cannot import govkit (TOOL-dWitnessedBar-63 S11): with every
+    `\\` folded to `/` it normalises to `.`, `..` or a `../` climb or is absolute, `ntpath` reads it as
+    absolute, it holds a colon, or the folded path holds a `..` segment (TOOL-dWitnessedBar-62 S22)."""
     shape = f"{where}: a when must read <conf file>:<KEY>=<value> or exists:<path>, got {when!r}"
     w = str(when)
     if w.startswith("exists:"):
         if not w[len("exists:"):]:
             raise Refusal(shape)
         rel = resolve_argv([w[len("exists:"):]], ctx, where)[0]
-        if rel.startswith("/") or (rel[1:2] == ":" and rel[:1].isascii() and rel[:1].isalpha()) \
-                or ".." in rel.split("/"):
+        folded = rel.replace("\\", "/")
+        norm = posixpath.normpath(folded)
+        if norm in (".", "..") or norm.startswith("../") or posixpath.isabs(norm) or ntpath.isabs(rel) \
+                or ":" in rel or ".." in folded.split("/"):
             raise Refusal(f"{where}: an exists: path must be repo-relative inside the tree, with no '..' "
                           f"segment, got {when!r}")
         return (root / rel).exists()

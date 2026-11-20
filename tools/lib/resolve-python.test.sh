@@ -1477,6 +1477,23 @@ out=$(LLR="$LLU" run_ll seed --population p)
 out=$(LLR="$LLU" run_ll read p)
 { [ "${out##*$'\n'}" = rc=0 ] && [ "$(grep -c "${T}${LL_NULL}${T}seeded" <<<"$out")" = 2 ]; } \
   || bad "2o unborn AC1: read_rows did not return the two null-SHA rows: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-63 AC23 (S32, S33) — the streams read apart, through `run_seed_cli` itself: a symbolic
+# `--sha HEAD` exits 2 naming --sha and writes no home; then on the unborn HEAD every stdout line is a
+# population's and `HEAD is unborn` is on stderr. RED where the unborn line lands on the status stream.
+run_ll_py() { # python source · arg... -> rc=<exit>; at $LLU with legacy_ledger imported as L, stdout and stderr CR-cut into $LL/py.out and $LL/py.err
+  local rc
+  (cd "$LLU" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B -c 'import os, sys; sys.path.insert(0, sys.argv[1]); import legacy_ledger as L
+'"$1" "$HERE" "${@:2}") >"$LL/py.raw" 2>"$LL/py.rawerr"; rc=$?
+  tr -d '\r' < "$LL/py.raw" > "$LL/py.out"; tr -d '\r' < "$LL/py.rawerr" > "$LL/py.err"; echo "rc=$rc"
+}
+rm -f "$LL_UHOME"
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", "HEAD"], "."))')
+{ [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LL_UHOME" ]; } \
+  || bad "63 AC23: seed --sha HEAD did not exit 2 naming --sha with no home written: $out / $(tr '\n' ' ' < "$LL/py.err")"; ok
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && ! grep -qvE '^(armed|present|widened|unarmed) ' "$LL/py.out" \
+  && grep -q 'HEAD is unborn' "$LL/py.err"; } \
+  || bad "63 AC23: on an unborn HEAD a stdout line is no population's or stderr lacks HEAD is unborn: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
 rm -f "$LL_UHOME"; printf 'fail\n' > "$LLU/seed-mode.txt"
 out=$(LLR="$LLU" run_ll seed --population p)
 ll_state=$("$REALPY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import legacy_ledger as L; print(L.read_home_state(sys.argv[2]))' "$HERE" "$LL_UHOME" | tr -d '\r')
@@ -1498,6 +1515,51 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "c${T}1${T}${ll_uhead}${T}widened:R1" "$LL_UHOME" \
   && head -3 "$LL_UHOME" | cmp -s - "$LL/p.before"; } \
   || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
+
+# ---- 2o, the no-HEAD and cross-drive routes (TOOL-dWitnessedBar-63 AC4 AC6) -------------------------
+# Over the unborn fixture, now committed, through stand-ins: `read_head_sha` answering no sha and
+# `no HEAD: fatal: boom` takes unit 15's refused-home branch whole, the unarmed line on stdout, the reason
+# and `nothing written` on stderr, no home; `_run_git` answering exit 128 with nothing printed reads no
+# sha; `check_home_admitted` under an `os.path.relpath` raising ValueError, as it does across drives on
+# Windows, reads `outside the tree`, and `seed --all` over p, so refused, and x1 still seeds x1; on a
+# Windows host `seed --home` on another drive letter reads outside the tree for real. RED against a seed
+# stamping the null SHA on exit 128, and against a silent no-HEAD path. WHAT THIS DOES NOT CHECK: a real
+# corrupt HEAD, and the other-drive home off Windows, where no path has a drive.
+rm -f "$LL_UHOME"
+out=$(run_ll_py 'L.read_head_sha = lambda root: (None, "no HEAD: fatal: boom")
+sys.exit(L.run_seed_cli(["--population", "p"], "."))')
+{ [ "$out" = rc=1 ] && grep -qxF "unarmed p no HEAD: fatal: boom" "$LL/py.out" \
+  && grep -qxF "legacy_ledger: p: no HEAD: fatal: boom; nothing written" "$LL/py.err" && [ ! -e "$LL_UHOME" ]; } \
+  || bad "63 AC4: the no-HEAD seed did not print the unarmed line, name its reason and nothing written on stderr, and write no home: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(run_ll_py 'L._run_git = lambda root, *a, with_stderr=False: (128, "", "")
+print(repr(L.read_head_sha(".")))')
+{ [ "$out" = rc=0 ] && grep -qxF "(None, 'no HEAD: git rev-parse exited 128')" "$LL/py.out"; } \
+  || bad "63 AC4: a rev-parse exiting 128 with nothing printed did not read as no sha: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(run_ll_py 'def relpath(path, start=os.curdir):
+    raise ValueError("path is on mount C:, start on mount Z:")
+os.path.relpath = relpath
+print(L.check_home_admitted(".", "memory/project/p.txt"))')
+{ [ "$out" = rc=0 ] && grep -q '^outside the tree .*p\.txt$' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "63 AC6: check_home_admitted under a relpath raising ValueError did not read outside the tree: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+build_ll_seeded x1 memory/project/x1.txt "$LL_SEEDARGV" >> "$LLU/tools/fx/kit.toml"
+out=$(run_ll_py '_rel = os.path.relpath
+def relpath(path, start=os.curdir):
+    if os.path.basename(str(path)) == "p.txt":
+        raise ValueError("path is on mount C:, start on mount Z:")
+    return _rel(path, start)
+os.path.relpath = relpath
+sys.exit(L.run_seed_cli(["--all"], "."))')
+{ [ "$out" = rc=1 ] && grep -q '^unarmed p outside the tree ' "$LL/py.out" && grep -q '^armed x1 ' "$LL/py.out" \
+  && [ ! -e "$LL_UHOME" ] && [ -f "$LLU/memory/project/x1.txt" ] && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "63 AC6: seed --all over a cross-drive first home did not refuse p and seed x1: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+if [ "$("$REALPY" -c 'import os; print(os.name)' | tr -d '\r')" = nt ]; then
+  ll_drive=$(cd "$LLU" && "$REALPY" -c 'import os; print(os.path.splitdrive(os.getcwd())[0][:1].upper())' | tr -d '\r')
+  ll_other=Z; [ "$ll_drive" != Z ] || ll_other=Y
+  printf 'tmpl\n' > "$LL/tmpl63.txt"
+  out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--home", sys.argv[2], "--copy", sys.argv[3]], "."))' "$ll_other:/x" "$LL/tmpl63.txt")
+  { [ "$out" = rc=1 ] && grep -q '^unarmed .* outside the tree ' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "63 AC6: seed --home $ll_other:/x from a fixture on $ll_drive: did not read outside the tree: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
+fi
 
 # ---- 2o, the fresh adopt (TOOL-dWitnessedBar-47 AC1) ---------------------------------------------
 # A third fixture, a `git init` with nothing committed holding this repo's drift-audit kit, its seeded

@@ -26273,6 +26273,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "remove_stale_signer_temps",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "remove_stubs",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -32929,6 +32934,11 @@
     },
     {
       "id": "run_ll",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "run_ll_py",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
     },

@@ -234,7 +234,7 @@ adopter ships with the kit or is seeded there:
 
 | Leg | Reads at an adopter | Ships |
 |---|---|---|
-| `ratchet (keys, not a scalar)` | the adopter's root confs and its seeded `conf-scalar-pins` | yes |
+| `ratchet (keys, not a scalar)` | the adopter's root confs in the working tree, ignored ones excluded, and its seeded `conf-scalar-pins` | yes |
 | `ratchet selftest` | its own scratch repositories | yes, held as a kit self-test |
 | `ratchet (never gains)` | every registered population and the base remote; `retrofit.widen` | no, `[[exempt_leg]]` |
 | `ratchet (both ways)` | every registration's seed run at HEAD | no |

@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=312
+FLOOR_ASSERTIONS=314
+# RAISED 312 -> 314 by TOOL-dWitnessedBar-63 on 2026-11-21: the runner's record reader cut alone, an empty
+# last field kept and a no-TAB line unset. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 311 -> 312 by TOOL-dWitnessedBar-62 on 2026-11-20: the runner's record of an empty-note selection
 # row. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 310 -> 311 by TOOL-dWitnessedBar-60 on 2026-11-20: the post-merge run under an inherited
@@ -3312,6 +3314,22 @@ kt_out=$("$DC_PY" "$ROOT/${PFX}${KIT}/keep_tails.py" --selftest 2>&1); kt_rc=$?
 [ "$kt_rc" = 0 ] && grep -q 'case fenced: ok' <<<"$kt_out" \
   && ok "51-AC30 keep_tails.py --selftest holds the fence, the fields and the cut" \
   || { nope "51-AC30 keep_tails.py --selftest exited $kt_rc"; printf '%s\n' "$kt_out" | sed 's/^/      /'; }
+
+# --- TOOL-dWitnessedBar-63 AC16 (S17, S19, S24): the runner's record reader, cut from the runner ---------
+# `read_record_keys`, cut by its awk range and sourced alone, reads `note<TAB>a<TAB>` with the empty last
+# field kept, and leaves a bare `reused` line unset, as `read_tag_lines` reads one. RED against the
+# `IFS=$'\t'` split, which strips the trailing TAB and sets `reused` empty. WHAT THIS DOES NOT CHECK: the
+# awk readers of run records, whose keys the runner writes as one scalar after the key.
+rk_fn=$(awk '/^read_record_keys\(\)/,/^}/' "$RUNNER")
+printf 'note\ta\t\nreused\n' > "$tmp/rk-record"
+rk_out=$( eval "$rk_fn"; unset rk_note rk_reused; read_record_keys "$tmp/rk-record" rk_ note reused
+  printf 'note=[%s] reused=%s' "${rk_note-unset}" "${rk_reused+set}" )
+[ -n "$rk_fn" ] && [ "${rk_out% reused=*}" = "note=[a"$'\t'"]" ] \
+  && ok "63-AC16 read_record_keys keeps an empty last field's TAB in note" \
+  || nope "63-AC16 read_record_keys read note<TAB>a<TAB> as '${rk_out% reused=*}', or did not cut from the runner"
+[ -n "$rk_fn" ] && [ "${rk_out##* reused=}" = "" ] \
+  && ok "63-AC16 read_record_keys leaves a no-TAB reused line unset" \
+  || nope "63-AC16 read_record_keys set reused from a line with no TAB: $rk_out"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

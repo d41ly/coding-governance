@@ -243,7 +243,10 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=38
+FLOOR_ASSERTIONS=41
+# RAISED 38 -> 41 by TOOL-dWitnessedBar-63 on 2026-11-21: the scrub parity arm's first-and-last-name read
+# and its copy with the PM_SCRUB assignment taken out, and the key-no-tab plant in the verdict backends'
+# plant loop, one assertion each. Counted by reading; no suite ran.
 # RAISED 35 -> 38 by TOOL-dWitnessedBar-60 on 2026-11-20: the bar-scrub parity arm over the shipped files
 # and its two staged copies, one assertion each. Counted by reading; no suite ran.
 # RAISED 25 -> 35 by TOOL-dWitnessedBar-56 on 2026-11-20: its seven local-hook plants and three peer
@@ -789,11 +792,13 @@ a=$((a+1))
 # reuse pair (`reused-cache`, `reused-alone`, `no-pair`) and the selection (`no-selection`,
 # `edited-selection`, `underived-selection` at the landed revision), and GREEN over `clean`; a peer ref
 # the fetch cannot bring in and a verify with no ssh-keygen read DEAD PROBE, and a tag edited after it
-# was signed NONE naming the bad signature. WHAT THIS DOES NOT CHECK: a
+# was signed NONE naming the bad signature. TOOL-dWitnessedBar-63 (AC11, AC12): `key-no-tab`, a bare
+# `reused` line read as an absent key, and the no-ssh-keygen read sweeping an aged signer temp while it
+# keeps a young one. WHAT THIS DOES NOT CHECK: a
 # real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
 for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache:1 reused-alone:1 no-pair:1 \
-               no-selection:1 edited-selection:1 underived-selection:1 clean:0 peer:1 peer-signed:0 peer-unsigned:2 \
-               peer-self-tag:1 peer-swapped-manifest:0 peer-tip-missing:1 peer-no-ssh-keygen:1 \
+               no-selection:1 edited-selection:1 underived-selection:1 clean:0 key-no-tab:1 peer:1 peer-signed:0 peer-unsigned:2 \
+               peer-self-tag:1 peer-swapped-manifest:0 peer-tip-missing:1 peer-no-ssh-keygen:0 \
                peer-bad-signature:1 remote-green:0 \
                swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
   a=$((a+1))
@@ -810,17 +815,26 @@ done
 # The pre-push hook scrubs `BAR_SCRUBBED_KNOBS` and clears `BAR_CLEARED_KNOBS` before its bar; post-merge's
 # `PM_SCRUB` and the unattended driver's `_gknobs` run bars whose green is trusted for the whole tree, so
 # each must carry every one of those names. The hook's two lists and `_gknobs` are read by the one-line
-# cuts the driver suite's parity arm uses; `PM_SCRUB` spans lines and is read as a range, quotes stripped
-# and newlines folded to spaces, the fold post-merge itself applies. A list that reads empty is named
-# too, so a moved or reworded line cannot pass this over nothing. Two staged copies prove it can fail.
-# WHAT THIS DOES NOT CHECK: that either caller honours its list at run time (the evidence suite's
+# cuts the driver suite's parity arm uses, each list there being one line; `PM_SCRUB` spans lines and is
+# read as a range, from the line opening `PM_SCRUB="` to the line closing the quote, quotes stripped and
+# newlines folded to spaces: the reading post-merge itself applies, `${PM_SCRUB//$'\n'/ }`. The arm
+# prints the count of names it read from each of the four lists, and the first and last name of
+# `PM_SCRUB`, so a short read shows (TOOL-dWitnessedBar-63 S3); the range read must hold the names on the
+# assignment's first and last physical lines. A list that reads empty is named too, so a moved or
+# reworded line cannot pass this over nothing. Three staged copies prove it can fail: `GATE_SELECTION`
+# cut from `PM_SCRUB`, the `PM_SCRUB` assignment taken out, and the hook's `BAR_CLEARED_KNOBS` line taken
+# out. WHAT THIS DOES NOT CHECK: that either caller honours its list at run time (the evidence suite's
 # post-merge arm observes one), the hook's `ENV_DROPPED_KNOBS`, or the policy keys set from R's file.
-check_bar_scrub_parity() {   # hook · post-merge · driver -> one line per missing name or empty list
+check_bar_scrub_parity() {   # hook · post-merge · driver -> one `read` line of the four counts, then one line per missing name or empty list
   local sk ck pm dr k out=""
+  local -a ws wc wp wd
   sk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
   ck=$(sed -n 's/^BAR_CLEARED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
   pm=$(sed -n '/^PM_SCRUB="/,/"$/p' "$2" 2>/dev/null | sed -e 's/^PM_SCRUB=//' -e 's/"//g' | tr '\n' ' ')
   dr=$(sed -n 's/^ *local _gk _gknobs="\([^"]*\)".*/\1/p' "$3" 2>/dev/null)
+  ws=($sk); wc=($ck); wp=($pm); wd=($dr)
+  printf 'read BAR_SCRUBBED_KNOBS %d · BAR_CLEARED_KNOBS %d · PM_SCRUB %d (%s … %s) · _gknobs %d\n' \
+    "${#ws[@]}" "${#wc[@]}" "${#wp[@]}" "${wp[0]:-none}" "${wp[*]: -1}" "${#wd[@]}"
   [ -n "${sk// /}" ] || out+="BAR_SCRUBBED_KNOBS reads empty in $1"$'\n'
   [ -n "${ck// /}" ] || out+="BAR_CLEARED_KNOBS reads empty in $1"$'\n'
   [ -n "${pm// /}" ] || out+="PM_SCRUB reads empty in $2"$'\n'
@@ -835,15 +849,32 @@ check_bar_scrub_parity() {   # hook · post-merge · driver -> one line per miss
 bsp_hook="$ROOT/.githooks/pre-push"; bsp_pm="$KITDIR/post-merge.sh"; bsp_uk=unattended; bsp_drv="$ROOT/${PFX}$bsp_uk/$bsp_uk.sh"  # the driver kit, named once
 a=$((a+1))
 bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_pm" "$bsp_drv") \
+  && echo "gov-canary: bar-scrub parity ${bsp_out%%$'\n'*}" \
   || { echo "gov-canary: a bar caller does not scrub every knob the pre-push hook scrubs or clears:"; printf '%s\n' "$bsp_out" | sed 's/^/  /'; fail=1; }
+# The names on the assignment's first and last physical lines, read apart from the range cut.
+bsp_first=$(sed -n 's/^PM_SCRUB="\([^ "]*\).*/\1/p' "$bsp_pm")
+bsp_last=$(sed -n '/^PM_SCRUB="/,/"$/{/"$/s/.*[ "]\([^ "]*\)"$/\1/p}' "$bsp_pm")
+a=$((a+1))
+case "${bsp_out%%$'\n'*}" in
+  *"PM_SCRUB "*" ($bsp_first … $bsp_last) "*)
+    [ -n "$bsp_first" ] && [ -n "$bsp_last" ] \
+      || { echo "gov-canary: the first or last name of PM_SCRUB's assignment did not read: '$bsp_first' '$bsp_last'"; fail=1; } ;;
+  *) echo "gov-canary: the scrub parity arm's PM_SCRUB read does not run from $bsp_first to $bsp_last: ${bsp_out%%$'\n'*}"; fail=1 ;;
+esac
 bsp_t=$(mktemp -d)
-sed '/^PM_SCRUB="/,/"$/s/ GATE_SELECTION\([ "]\)/\1/'"$bsp_pm" > "$bsp_t/post-merge.sh"
+sed '/^PM_SCRUB="/,/"$/s/ GATE_SELECTION\([ "]\)/\1/' "$bsp_pm" > "$bsp_t/post-merge.sh"
+sed '/^PM_SCRUB="/,/"$/d' "$bsp_pm" > "$bsp_t/post-merge-none.sh"
 sed '/^BAR_CLEARED_KNOBS=/d' "$bsp_hook" > "$bsp_t/pre-push"
 a=$((a+1))
 bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/post-merge.sh" "$bsp_drv") \
   && { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut passed the scrub parity arm"; fail=1; }
 printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* lacks GATE_SELECTION$' \
   || { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut was not named for it: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/post-merge-none.sh" "$bsp_drv") \
+  && { echo "gov-canary: a post-merge copy with no PM_SCRUB assignment passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB reads empty' \
+  || { echo "gov-canary: a post-merge copy with no PM_SCRUB assignment was not named as an empty list: $bsp_out"; fail=1; }
 a=$((a+1))
 bsp_out=$(check_bar_scrub_parity "$bsp_t/pre-push" "$bsp_pm" "$bsp_drv") \
   && { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line passed the scrub parity arm"; fail=1; }

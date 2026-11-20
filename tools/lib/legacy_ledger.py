@@ -34,7 +34,7 @@ It prints one row or finding per line and exits 0 on no finding, 1 on any findin
 exits 1 when a seed left one unarmed by a failure, or `refused` and exit 2 for a home that exists but
 does not read or whose header disagrees, writing nothing (TOOL-dWitnessedBar-51 S50); the memory-tree kit's copy carries it too, so an
 adopter seeds through that copy. With no `--sha` it stamps HEAD's sha, or, where HEAD is unborn in a
-repository with no commit yet, the null SHA of forty `0`s, saying so on one line; a later seed never
+repository with no commit yet, the null SHA of forty `0`s, saying so on one stderr line; a later seed never
 re-dates those rows (TOOL-dWitnessedBar-61). A home is admitted when, resolved with symlinks followed,
 it lies inside the work tree and outside its git dir, `git check-ignore` does not match it, and its
 parent directory exists in the working tree, tracked files or none, so a fresh install seeds before its
@@ -451,17 +451,18 @@ UNBORN_LINE = "seed: HEAD is unborn, rows carry the null SHA"
 
 def read_head_sha(root):
     """-> (sha, reason) of the commit `seed` stamps where no `--sha` is given (TOOL-dWitnessedBar-61):
-    HEAD's sha from `git rev-parse --verify --quiet HEAD`; `NULL_SHA` where that exits non-zero with
-    nothing printed, as it does on an unborn HEAD, in a repository with no commit yet; on any other
-    failure no sha and the reason `no HEAD: <its stderr line>`. The recall kit's `read_worktree_head`
-    and the overlay's `check_born` read an unborn HEAD the same way and neither is importable from this
-    block. WHAT IT DOES NOT CHECK: that a silent non-zero exit is an unborn HEAD rather than another
-    failure git reports without a line."""
+    HEAD's sha from `git rev-parse --verify --quiet HEAD`; `NULL_SHA` where that exits 1 with nothing on
+    stdout or stderr, as it does on an unborn HEAD, in a repository with no commit yet; on any other
+    failure, exit 128 or any stderr text among them, no sha and the reason `no HEAD: <its stderr line>`,
+    so a tree git refused to read is never stamped as seeded before any commit (TOOL-dWitnessedBar-63
+    S8). The recall kit's `read_worktree_head` and the overlay's `check_born` read an unborn HEAD the
+    same way and neither is importable from this block. WHAT IT DOES NOT CHECK: that a silent exit 1 is
+    an unborn HEAD rather than a HEAD naming a branch that does not exist, which git reports the same."""
     rc, out, err = _run_git(root, "rev-parse", "--verify", "--quiet", "HEAD", with_stderr=True)
     out, err = out.strip(), err.strip()
     if rc == 0 and out:
         return out, ""
-    if rc != 0 and not out and not err:
+    if rc == 1 and not out and not err:
         return NULL_SHA, ""
     return None, "no HEAD: %s" % (err.splitlines() or ["git rev-parse exited %d" % rc])[0].strip()
 
@@ -689,8 +690,10 @@ def run_seed_cli(args, cwd):
     `seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)`: one line per population, exit
     0, or 1 when a seed left one unarmed by a failure, or 2 on a refusal. `seed = []` exits 0 under
     `retrofit.unseeded: unarmed` and 2 under `refuse`, naming every such registration. With no `--sha`,
-    `read_head_sha` names the sha: on an unborn HEAD the null SHA, `UNBORN_LINE` printed once; on any
-    other failure each population is `unarmed` with that reason and nothing is written."""
+    `read_head_sha` names the sha: on an unborn HEAD the null SHA, `UNBORN_LINE` printed once on stderr,
+    so stdout keeps one line per population (TOOL-dWitnessedBar-63 S32); on any other failure each
+    population is `unarmed` with that reason and nothing is written, the refused-home branch whole: stderr
+    carries `legacy_ledger: <population>: <reason>; nothing written` (TOOL-dWitnessedBar-63 S6)."""
     usage = ("usage: legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]\n"
              "       legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)")
     argv = None
@@ -736,10 +739,11 @@ def run_seed_cli(args, cwd):
             except ValueError:  # another drive on Windows: `check_home_admitted` reads it outside the tree
                 home = pathlib.Path(cwd, opts["--home"]).as_posix()
             if no_head:
+                print("legacy_ledger: %s: %s; nothing written" % (home, no_head), file=sys.stderr)
                 print("unarmed %s %s" % (home, no_head))
                 return 1
             if unborn:
-                print(UNBORN_LINE)
+                print(UNBORN_LINE, file=sys.stderr)
             copy = str(pathlib.Path(cwd, opts["--copy"])) if "--copy" in opts else None
             line, ok = seed_home(root, home, sha, argv=argv, template=copy)
             print(line)
@@ -770,10 +774,12 @@ def run_seed_cli(args, cwd):
             return 2
     if no_head:
         for reg in picked:
+            if reg.seed:
+                print("legacy_ledger: %s: %s; nothing written" % (reg.population, no_head), file=sys.stderr)
             print("unarmed %s %s" % (reg.population, no_head if reg.seed else "no seed"))
         return 1 if any(reg.seed for reg in picked) else 0
     if unborn:
-        print(UNBORN_LINE)
+        print(UNBORN_LINE, file=sys.stderr)
     worst = 0
     for reg in picked:
         try:
