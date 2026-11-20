@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-1 — gate health measured and the reliability bar
 
-**Status:** CLOSED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0339@8e7bc7ae whole
 
@@ -446,13 +446,16 @@ AC6's plant, a record of every `TYPED_RECORD_KINDS` member.
 - rev-6 · 2026-11-20 · §1 · S1 S2 S4 S5 · S6 S7 S8 · §3 · §4 · §5 · AC1 to AC8 · §7 · §8 ·
   §10 · re-grounded on the tree at `a4fd535ed`, after `TOOL-dWitnessedBar-8` landed at `5944dcc3c`, by
   the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief`: line citations become `path#symbol`;
-  the manifest re-pinned at 219 legs, 118 on the bar; the factory loaded in-process, not run as a
+  the manifest re-pinned at 219 legs, 118 on the bar (PINNED 2026-11-20); the factory loaded in-process, not run as a
   subprocess, since its `new` is closed over `DOORS` (F4); `--with` counts the record `flakes` just
   wrote (F5); the flake body's reader moves to the factory (F6, S7); unit 8's `flakes-window` fixture,
   which reds once the kind is registered, re-staged (S8, AC8); unarmed reads `value` -1, since the
   report's table compares `value` as a number; AC4's grep becomes a stub-kit observation; AC6 is
   observed by the factory's `typed-kinds` plant; `tools/run-gates/README.md` and the symbol map join
   Files touched.
+- rev-7 · 2026-11-20 · §9 · the rev-6 line's manifest figure gains the PINNED mark §4 gives the
+  same count, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-1-pin1-brief`; nothing else
+  moved, and the status stays CLOSED.
 
 ## 10. Reuse audit
 
