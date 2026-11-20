@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it
 
-**Status:** DEFERRED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
