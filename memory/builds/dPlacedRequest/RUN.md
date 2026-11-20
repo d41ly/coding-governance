@@ -389,3 +389,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T10:38:57Z dispatch · item eb0bd1be TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
 
 2026-11-20T10:41:21Z brief · item TOOL-dPlacedRequest-51 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T10:48:24Z draw · fix-pass · TOOL-dPlacedRequest-51 · 53/130 · 20261120T104824Z-5d66e8
+
+2026-11-20T10:48:24Z dispatch · item a49d6946 TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
