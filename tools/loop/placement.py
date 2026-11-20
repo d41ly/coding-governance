@@ -196,7 +196,7 @@ def write_placement_blocks(path, blocks):
     os.replace(tmp, path)
 
 
-def place_request(store, key, fields, placer, reenters=None):
+def add_placement(store, key, fields, placer, reenters=None):
     """Append one block for request `key` to `<store>/<key>.placement`. `fields` holds the return's keys; its
     disposition is resolved to a member, its reason and evidence redacted and capped. `reenters`, when passed,
     is held by `check_reenters_item` before any write. -> the block written. PlacementRefused naming the value
@@ -355,7 +355,7 @@ def write_placement(args, root, store):
         more = run_observation_probes(root, store, args.request, subjects)
         if more:
             fields["evidence"] = "; ".join(x for x in [fields.get("evidence", "")] + more if x and x != NO_VALUE)
-    block = place_request(store, args.request, fields, placer, args.reenters)
+    block = add_placement(store, args.request, fields, placer, args.reenters)
     print("%s: placed — %s %s · %s · placer %s · check pending" % (
         SAY, block["disposition"], block["build"], args.request, placer))
     return 0
@@ -597,7 +597,7 @@ def write_foreign_lease(root, build):
         ("slug", build), ("node", "z"), ("host", "elsewhere"), ("session", "s-other"), ("keepalive", "k-other"),
         ("status", "live"), ("lease-utc", now), ("beat-utc", now), ("epoch", "1"), ("kind", "build"),
         ("fleet-tag", "z"), ("renews", "yes")))
-    tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, check=True,
+    tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
     sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
     run_fixture_git(root, "push", "-q", "origin", "%s:refs/gov/leases/%s/build" % (sha, build))
@@ -842,14 +842,14 @@ def check_placement_plant(case, top, seen, bad):
                    1, "disposes adopt, no member")
     elif case == "late-answer":   # AC12
         try:
-            place_request(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "r"}, "owner",
+            add_placement(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "r"}, "owner",
                           FX_ITEM.split("#")[0])
             bad.append("reenters TOOL-tFix-1 was not refused")
         except PlacementRefused as e:
             seen.append("TOOL-tFix-1 refused: %s" % str(e)[:60])
         if (store / ("%s.placement" % FX_KEY)).exists():
             bad.append("a malformed item wrote a block")
-        place_request(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "the owner's late answer"},
+        add_placement(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "the owner's late answer"},
                       "owner", FX_ITEM)
         if read_newest_block().get("reenters") != FX_ITEM:
             bad.append("read_placement returned reenters %s" % read_newest_block().get("reenters"))
@@ -860,7 +860,7 @@ def check_placement_plant(case, top, seen, bad):
         lines = got[1].splitlines()
         if lines[:2] != ["disposition: amend", "reenters: %s" % FX_ITEM]:
             bad.append("record printed %r, the item not right after disposition" % lines)
-        place_request(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "a plain amend"}, "agent")
+        add_placement(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "a plain amend"}, "agent")
         if read_newest_block().get("reenters") != NO_VALUE:
             bad.append("a block without the line read %s" % read_newest_block().get("reenters"))
         run_placement_command(root, "check", "--request", FX_KEY)

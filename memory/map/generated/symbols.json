@@ -928,6 +928,11 @@
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
     },
     {
+      "id": "add_placement",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "add_plant",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -18256,11 +18261,6 @@
       "id": "pinned_units",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
-    },
-    {
-      "id": "place_request",
-      "kind": "function",
-      "file": "tools/loop/placement.py"
     },
     {
       "id": "plan",
