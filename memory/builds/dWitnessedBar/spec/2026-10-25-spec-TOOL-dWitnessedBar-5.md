@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-5 — held legs by policy
 
-**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0343@3d7be760 whole
 **Carries:** node:item.test.select
@@ -19,6 +19,8 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief.md) | journal | TOOL-dWitnessedBar-23 |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md) | journal | TOOL-dWitnessedBar-3 |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -127,6 +129,7 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
 
 ### Edges
 
+- **consumes-from** `TOOL-dWitnessedBar-3` — `tools/run-gates/verdict_flow.py`, the file unit 3 mints with its `route` and `judge` verbs and its `--fixture` cases, to which S5 to S7 add `select`, `select --check` and their fixture cases
 - **consumes-from** `TOOL-dWitnessedBar-9` — `tests.landing-levels`, with the leg row's `level` and `tests.without-cadence`, which `select` turns into `level` rows
 - **hands-off** `TOOL-dWitnessedBar-8` — `verdict.held`, the hold predicate's `quarantine` source and the `SELECT_SOURCES` table its quarantine reader joins
 - **hands-off** `TOOL-dWitnessedBar-30` — `verdict.held`, the `held.<n>` results a streak is read from, and the held mode that executes a leg without counting it
@@ -230,9 +233,9 @@ TAB or a newline, and `select` refuses to write a row whose leg name holds ` · 
 ### Held legs guarded (S8)
 
 The held legs with no guard at HEAD `8a98c9cf`, measured as the manifest rows whose `subject` is
-`kit` or whose `chunk` is `selftests` and whose `guard` is absent or empty, PINNED 2026-11-20: 36
-of 101 held rows, of 219 rows, by reading `tools/gate-legs.json` at HEAD, each declaration found by
-`python tools/run-gates/leg_factory.py --list`. The eight the base draft counted at `19d6aae6` are
+`kit` or whose `chunk` is `selftests` and whose `guard` is absent or empty,
+PINNED 2026-11-20: 36 of 101 held rows, of 219 rows, by reading `tools/gate-legs.json` at HEAD, each
+declaration found by `python tools/run-gates/leg_factory.py --list`. The eight the base draft counted at `19d6aae6` are
 all still here; the other 28 joined the population since (both PINNED 2026-11-20).
 
 | Declared in | Held legs with no guard |
@@ -388,13 +391,13 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
 - **F4 — `verdict_flow.py`, which S5 to S7 extend, is not in the tree: how does this spec take it?**
   Options: (a) a §3 `consumes-from` edge naming `TOOL-dWitnessedBar-3`, which mints the file at
   order 20; (b) this unit creates the file where it is absent; (c) name the dependency in S5's prose
-  and in §10, and leave the reciprocal edge pair to the dispatcher. (a) is the declared form, but the
-  edge join reds a one-way edge and unit 3's spec declares no `hands-off` back, which is outside this
-  re-ground's write grant; (b) makes two units mint one file, whichever lands second meeting a
-  conflict. RESOLVED (agent, 2026-11-20, delegated): (c), M3 veto 1 strikes (a) here, since the
-  hygiene gate this spec must pass reds it, and (b) strikes on the order the headers already declare;
-  the pair is named in the return of brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief so
-  the next spec edit can add both lines in one commit. widens: none · relaxes: none
+  and in §10, and leave the reciprocal edge pair to the dispatcher. (a) is the declared form, and the
+  edge join reds it only while unit 3's spec declares no `hands-off` back; (b) makes two units mint
+  one file, whichever lands second meeting a conflict. RESOLVED (agent, 2026-11-20, delegated): (a), the §3 `consumes-from`
+  `TOOL-dWitnessedBar-3` edge, with unit 3's spec declaring the mirroring `hands-off` back, both lines
+  added in one commit by brief 2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief; (b) strikes on the
+  order the headers already declare, and (c) leaves a declared dependency in prose. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -420,6 +423,10 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
   `check_declarations` and its count joins `run_conform`'s line; S3's by-name readers corrected to
   the one pattern the suite spells; S4 names the three verdict writers; S5 reads `every-declared`
   and names `verdict_flow.py` as unit 3's, by the new §8 F4; AC1 and AC3 state their HEAD counts.
+- rev-7 · 2026-11-20 · §3 Edges · §4 · §8 F4 · per brief 2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief:
+  the Edges block gains `consumes-from` `TOOL-dWitnessedBar-3` for `verdict_flow.py`, mirrored by unit
+  3's `hands-off`; F4 re-resolved to (a), the edge; S8's count sentence rewrapped so its PINNED mark
+  shares the `219 rows` line; nothing else moved.
 
 ## 10. Reuse audit
 
