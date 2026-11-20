@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason
 
-**Status:** DEFERRED · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-68
+**Status:** INPROGRESS · rev-7 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-68
 
 **Carries:** cl-dClosedLoop-0123@626c316e whole
 **Carries:** node:policy-key.placement
