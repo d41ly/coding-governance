@@ -1678,7 +1678,8 @@ no unit for `none`. `unit` is refused until units can be held apart from their b
 `record` writes the failure into the block and exits 0. A passed `new`, `amend`, `patch` or `repeat` is
 then held for you, `placement: held-owner`, while the Plan or Design item it enters is unbuilt, and once
 its claim exists the owner item names `refs/gov/claims/<slug>`; your disposition record of that build
-naming `item.entry.place` releases it.
+naming `item.entry.place` with the placement's own word releases it, and any other word refuses it,
+back to placing.
 
 **The record**, `placement.py record --request <key>`, prints the passed block's `disposition`,
 `build`, `playbook` and `reason` lines, with `reenters` after `disposition` for an owner's late answer,

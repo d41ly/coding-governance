@@ -5697,6 +5697,13 @@ read_brief_items() {
 }
 # Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
 BI_NOTE=""
+# A BUILD README'S `opened:` date at a commit, its front matter alone read, a trailing CR dropped; empty
+# where the commit holds no README or the README no date. One reader for the three prompt-mode grades
+# that grandfather a README opened before PROMPT_BRIEF_CUTOFF (TOOL-dPlacedRequest-4 extracted it).
+read_readme_opened() { # commit · README path -> the date on stdout
+  GIT show "$1:$2" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }'
+}
+
 # TOOL-aQuotedBrief-3 S3 - `build-complete` TERM 7, read at close: every brief item of a prompt-mode
 # run past PROMPT_BRIEF_CUTOFF is built by CLOSED units or parked as `brief item <n>: ...`. The mode is
 # the run-state fact, the record and the README `opened:` are read at the pinned BASE - the same gate
@@ -5723,7 +5730,7 @@ check_brief_items() { # slug
     *) BI_NOTE="note — the project conf at the default-branch side of the pinned BASE declares no dated PROMPT_BRIEF_CUTOFF, so the brief-item term is OFF and a brief item is not graded here: ${cut:-blank}"
        return 0 ;;
   esac
-  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  opened=$(read_readme_opened "$base" "$rel")
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac
@@ -5852,7 +5859,7 @@ check_prompt_brief() { # slug · base
        return 0 ;;
   esac
   readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
-  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  opened=$(read_readme_opened "$base" "$rel")
   # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
@@ -5959,7 +5966,7 @@ check_prompt_placement() { # slug · base
   cut=$(read_brief_cutoff "$AUTH_CONF_AT") || return 1
   case "$cut" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
   readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
-  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  opened=$(read_readme_opened "$base" "$rel")
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac

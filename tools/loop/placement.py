@@ -45,7 +45,7 @@ verdict. A failed fact under `placement.check` = `refuse` prints `placement: ref
 <fact>` and exits 1, the route back to `item.entry.place`; under `record` it writes `recorded <fact>` and
 exits 0. A passed placement whose route enters Plan or Design is held by its `STAND_INS` row: `check` prints
 `placement: held-owner`, and the owner item naming the claim ref once `refs/gov/claims/<slug>` exists, until
-an owner's disposition record of that build names `item.entry.place`.
+an owner's disposition record of that build names `item.entry.place` with its word; another word refuses it.
 
 RECORD. `record` prints the newest block's `disposition`, its `reenters` where it is not `none`, `build`,
 `playbook` and `reason` lines, the lines the claim commit carries, when its `check:` reads `pass` or
@@ -119,8 +119,10 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
           "observation": "a claimed observation refused unverified until its probe record carries a verdict",
           "claim-lines": "record prints a passed new block's four lines, and nothing for a refused block",
           "routes-to-plan": "a passed new placement held for the owner, the owner item naming the claim ref",
-          "owner-released": "the same placement passes once the owner's disposition record names item.entry.place",
+          "owner-released": "the owner disposing another word refuses the placement; disposing its own word releases it",
           "prompt-continue": "the driver's prompt-mode check refuses a continue placement and admits a new one",
+          "refusals": "each refusal branch the other plants do not reach: a bad key, an unreadable return, a bad "
+                      "slug or path, a mismatched mode, each disposition's failing fact and a bad owner record",
           "late-answer": "a re-entering amend kept by check and printed after disposition; a malformed item refused"}
 
 
@@ -494,12 +496,11 @@ def check_disposition_fact(root, common, store, key, block):
 
 
 def read_owner_release(root, build):
-    """The stem of the owner's newest disposition record of `build` naming `PLACE_ITEM`, or None."""
+    """`(stem, word)` of the owner's newest disposition record of `build` naming `PLACE_ITEM`, or None."""
     if build == NO_VALUE:
         return None
     from adapt import read_disposition_release
-    hit = read_disposition_release(root, build, PLACE_ITEM, ())
-    return hit[0] if hit else None
+    return read_disposition_release(root, build, PLACE_ITEM, ())
 
 
 def check_placement(root, common, store, key):
@@ -525,9 +526,13 @@ def check_placement(root, common, store, key):
     block["check"] = "pass"
     write_placement_blocks(path, blocks)
     row = next((r for r in STAND_INS if word in r["dispositions"]), None)
-    released = read_owner_release(root, build) if row else None
-    if row is None or released:
-        return 0, ["%s: pass — %s %s%s" % (SAY, word, build, " · released by %s" % released if released else "")]
+    answer = read_owner_release(root, build) if row else None
+    if answer and answer[1] != word:   # the owner disposed otherwise: a rejection, back to placing
+        block["check"] = "refused the owner disposed %s by %s" % (answer[1], answer[0])
+        write_placement_blocks(path, blocks)
+        return 1, ["%s: refused — %s · the owner disposed %s by %s" % (SAY, word, answer[1], answer[0])]
+    if row is None or answer:
+        return 0, ["%s: pass — %s %s%s" % (SAY, word, build, " · released by %s" % answer[0] if answer else "")]
     lines = []
     claim = "refs/gov/claims/%s" % build
     held = build != NO_VALUE and subprocess.run(["git", "show-ref", "--verify", "--quiet", claim], cwd=str(root),
@@ -561,7 +566,10 @@ def write_placement_fixture(top, policy="", driver=False, remote=False):
     run_fixture_git(root, "symbolic-ref", "HEAD", "refs/heads/main")
     fm = "---\nslug: %s\nnode: a\nopened: 2026-11-01\nstreams: tooling\nroster: TOOL\nids: TOOL-%s-1\n---\n\n# %s\n"
     spec = "# TOOL-%s-1 — a unit\n\n**Status:** %s · rev-1 · 2026-11-01 · node a · Tier-2 · base 0123abcd\n"
-    files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\n', ".governance/policy.toml": policy}
+    files = {".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\nBACKLOG_MODE=builds\n',
+             ".governance/policy.toml": policy, "memory/project/stale-header-waiver.txt": "",
+             "memory/builds/%s/BACKLOG.md" % FX_LIVE: "# %s — asks\n\n## Asks\n\n- TOOL-%s-9 · filed 2026-11-01 · an "
+                                                      "ask filed against the live build\n" % (FX_LIVE, FX_LIVE)}
     for build, status in ((FX_LIVE, "INPROGRESS"), (FX_DONE, "CLOSED")):
         files["memory/builds/%s/README.md" % build] = fm % (build, build, build)
         files["memory/builds/%s/spec/2026-11-01-spec-TOOL-%s-1.md" % (build, build)] = spec % (build, status)
@@ -595,11 +603,11 @@ def write_foreign_lease(root, build):
     run_fixture_git(root, "push", "-q", "origin", "%s:refs/gov/leases/%s/build" % (sha, build))
 
 
-def run_placement_command(root, *argv):
-    """This script as a process in `root`: `(exit, stdout and stderr)`."""
+def run_placement_command(root, *argv, session="absent"):
+    """This script as a process in `root` under the session id `session`: `(exit, stdout and stderr)`."""
     p = subprocess.run([sys.executable, str(pathlib.Path(__file__).absolute()), *argv], cwd=str(root),
                        capture_output=True, text=True, encoding="utf-8", errors="replace",
-                       env=read_clean_env(PYTHONIOENCODING="utf-8", CLAUDE_CODE_SESSION_ID="absent"))
+                       env=read_clean_env(PYTHONIOENCODING="utf-8", CLAUDE_CODE_SESSION_ID=session))
     return p.returncode, (p.stdout + p.stderr).strip()
 
 
@@ -721,6 +729,10 @@ def check_placement_plant(case, top, seen, bad):
         check_case("record", run_placement_command(root, "check", "--request", FX_KEY), 0, "placement: recorded — %s" % word)
         if not read_newest_block().get("check", "").startswith("recorded "):
             bad.append("the block's check reads %s, not recorded" % read_newest_block().get("check"))
+        if case == "amend-leased":   # a lease the reader cannot read is a fact, never a pass
+            run_fixture_git(root, "remote", "remove", "origin")
+            check_case("unreadable", run_placement_command(root, "check", "--request", FX_KEY), 0,
+                       "placement: recorded — amend", "could not be read")
     elif case == "observation":   # AC7
         write_request_text()
         check_case("place", run_placed_return(disposition="new", build=FX_NEW, reason="r", observations="the card drops its route"),
@@ -753,6 +765,11 @@ def check_placement_plant(case, top, seen, bad):
             check_case("held", run_placement_command(root, "check", "--request", FX_KEY), 0,
                    "held-owner — new %s" % FX_LIVE, "owner item — new %s · claim refs/gov/claims/%s" % (FX_LIVE, FX_LIVE))
         else:
+            read_build_records().write_disposition(str(root), FX_LIVE, FX_UNIT, PLACE_ITEM, "ask", "terminal")
+            run_fixture_git(root, "add", "-A")
+            run_fixture_git(root, "commit", "-q", "-m", "the owner's rejection")
+            check_case("rejected", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                       "placement: refused — new · the owner disposed ask by ")
             read_build_records().write_disposition(str(root), FX_LIVE, FX_UNIT, PLACE_ITEM, "new", "terminal")
             run_fixture_git(root, "add", "-A")
             run_fixture_git(root, "commit", "-q", "-m", "the owner's release")
@@ -783,6 +800,46 @@ def check_placement_plant(case, top, seen, bad):
                 check_case(word, got, 0)
                 if "check 119" in got[1]:
                     bad.append("a passed new placement was refused: %s" % got[1][-300:])
+    elif case == "refusals":   # every refusal branch the plants above do not reach
+        check_case("bad key", run_placement_command(root, "check", "--request", "XYZ"), 2, "no content key")
+        check_case("no placement", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                   "refused — no placement")
+        ret = rets / "odd.txt"
+        for what, text, owed in (("odd line", "a sentence with no key\n", "is no key: value"),
+                                 ("twice", "reason: a\nreason: b\n", "gives reason twice")):
+            ret.write_text(text, encoding="utf-8")
+            check_case(what, run_placement_command(root, "place", "--request", FX_KEY, "--return", str(ret)), 1, owed)
+        check_case("slug", run_placed_return(disposition="new", build="../x", reason="r"), 1, "is no build slug")
+        check_case("playbook", run_placed_return(disposition="repeat", playbook="../etc/pb.md", reason="r"), 1,
+                   "no repo-relative path")
+        check_case("declared", run_placement_command(root, "place", "--request", FX_KEY, "--declared", "new"), 2,
+                   "placement is agent-places")
+        if (store / ("%s.placement" % FX_KEY)).exists():
+            bad.append("a refused place wrote a block")
+        card = pathlib.Path(store.parent, "orientation", "s-fx.md")
+        write_fixture_files(card.parent, {card.name: "# card\n\n## route\n- build: %s\n- unit: %s\n" % (FX_LIVE, FX_UNIT)})
+        for n, (fields, fact) in enumerate((
+                ({"disposition": "unit", "build": FX_LIVE}, "build.unit-holders is not landed"),
+                ({"disposition": "breakpoint", "build": FX_LIVE}, "TOOL-dPlacedRequest-5"),
+                ({"disposition": "repeat", "playbook": "playbooks/none.md"}, "not in the tree at HEAD"),
+                ({"disposition": "ask", "build": FX_LIVE, "evidence": "TOOL-%s-8" % FX_LIVE}, "no ask of %s" % FX_LIVE),
+                ({"disposition": "none"}, "routes %s" % FX_UNIT),
+                ({"disposition": "new", "build": FX_NEW}, "held neither"),
+                ({"disposition": "patch", "build": FX_NEW}, "%s does not exist" % FX_NEW),
+                ({"disposition": "continue"}, "names no build"))):
+            key = "%012x" % (0xc00 + n)
+            run_placed_return(key, reason="the scout's word", **fields)
+            check_case(fields["disposition"], run_placement_command(root, "check", "--request", key, session="s-fx"), 1,
+                       "placement: refused — %s" % fields["disposition"], fact)
+        run_placed_return("%012x" % 0xcff, disposition="ask", build=FX_LIVE, reason="r",
+                          evidence="TOOL-%s-9; TOOL-%s-90" % (FX_LIVE, FX_LIVE))
+        check_case("ask filed", run_placement_command(root, "check", "--request", "%012x" % 0xcff), 0, "pass — ask")
+        write_policy_commit('placement = "owner-places"\n')
+        check_case("owner not a record", run_placement_command(root, "place", "--request", FX_KEY, "--owner",
+                                                               str(rets / "odd.txt")), 1, "no well-formed disposition record")
+        rel = read_build_records().write_disposition(str(root), FX_LIVE, FX_UNIT, OWNER_ITEM, "adopt", "terminal")
+        check_case("owner word", run_placement_command(root, "place", "--request", FX_KEY, "--owner", str(root / rel)),
+                   1, "disposes adopt, no member")
     elif case == "late-answer":   # AC12
         try:
             place_request(store, FX_KEY, {"disposition": "amend", "build": FX_LIVE, "reason": "r"}, "owner",

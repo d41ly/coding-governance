@@ -22778,6 +22778,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "read_readme_opened",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_receipt",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"

@@ -6,7 +6,8 @@ The unit was built from its spec at rev-7 (PINNED) on base `7936d33ed`. `tools/l
 the verbs `place`, `check` and `record`, the functions `tools/loop/placement.py#place_request`,
 `tools/loop/placement.py#check_placement`, `tools/loop/placement.py#read_placement`,
 `tools/loop/placement.py#print_claim_lines` and `tools/loop/placement.py#check_reenters_item`, the table
-`tools/loop/placement.py#STAND_INS`, and fourteen (DERIVED) fixture plants. The unattended driver gains
+`tools/loop/placement.py#STAND_INS`, and fifteen (DERIVED) fixture plants, the fifteenth, `refusals`, added
+by the checklist pass. The unattended driver gains
 `tools/unattended/unattended.sh#check_prompt_placement`, called at the first preflight beside
 `check_prompt_brief`, refusing by check 119 (DERIVED, the next code free after 118); the two (DERIVED) `fail 31`
 sites of the `--landed` verb's LANDING test were merged into one, byte for byte, to pay for it under the
@@ -45,19 +46,33 @@ run by direct CLI, or `--fixture` over every plant, which printed `placement: fi
   and exited 1.
 - AC9 — `--plant routes-to-plan` answered `held-owner` and printed the owner item naming
   `refs/gov/claims/dLive`; `--plant owner-released` answered `pass` once the owner's disposition record
-  naming `item.entry.place` was committed.
+  naming `item.entry.place` with the placement's own word was committed, after a record disposing `ask`
+  refused it.
 - AC10 — `--plant prompt-continue` sourced the driver and called `check_prompt_placement` over a
   prompt-mode README opened past the conf's cutoff: `disposition: continue` exited 1 printing `UNATTENDED
   check 119 FAILED` naming `the disposition continue` and `dLive`, and `disposition: new` with a placed,
   passing block exited 0. The suite arm in `tools/unattended/unattended.test.sh` is OWED at the close,
   waived for this build's landing by the README's last build-level rule.
-- AC11 — the row named `loop placement fixtures` in `tools/gate-legs.json` carries `enforces`
-  `principle.p22` and the argv `{prefix}/loop/placement.py --fixture`, read by eye over the diff; the
-  `python -m json.tool` reading is OWED at the close.
+- AC11 — `python -m json.tool gate-legs.json`, run in the tools folder, printed the row named
+  `loop placement fixtures` with `enforces` holding `principle.p22` and the argv
+  `{prefix}/loop/placement.py --fixture`.
 - AC12 — `--plant late-answer`: `TOOL-tFix-1` was refused by `check_reenters_item` with no block written;
   the `reenters: TOOL-tFix-1#F2` block was returned by `read_placement`, kept by a passing `check`, and
   printed by `record` right after `disposition`; a block without the line read `none` and `record` printed
   no `reenters:` line.
+
+**The checklist pass.** `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over the build commit
+selected 65 (DERIVED) classes. Acted on: refusal-branch-with-no-arm, by the `refusals` plant, which reaches
+a bad key, no placement, an unreadable return line, a key given twice, a bad slug, an escaping playbook
+path, a mode mismatch, each disposition's failing fact and a filed ask's pass, and two bad owner records,
+and by an unreadable-lease case in `amend-leased`, the remote removed and the fact recorded;
+owner-item-without-its-reject-outcome, by `check` refusing a held placement whose owner record disposes
+another word, observed by `owner-released`; two-answers-to-one-question, by
+`tools/unattended/unattended.sh#read_readme_opened`, the one reader of a README's `opened:` the three
+prompt-mode grades share; criterion-asserts-what-its-own-command-cannot-show, by AC11's own command above;
+budget-row-not-remeasured-after-added-arms, by re-pricing the leg's row from 42 s (PINNED) over every
+plant by direct CLI. The leg itself is no longer run whole in this pass: once registered, the role hook
+refuses `--fixture` without a plant.
 
 **Owed at the close:** the `loop placement fixtures` leg and its RED-first observation, staged by
 `continue-closed` with the check reading the return's text; the `unattended.test.sh` arm of AC10 and its
