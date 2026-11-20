@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-47 — an arm pins the age walk's sighted guard: an unsighted commit is never compared with the threshold
 
-**Status:** INPROGRESS · rev-7 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-7 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
