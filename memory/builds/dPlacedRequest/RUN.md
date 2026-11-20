@@ -9,10 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 781244bae321d9a64abd41740d264eb5aae2b032 · park · 82 touching
+asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO
+units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100
+hold-run: 
+hold-streak: 1 · at e267d213
+resume-owed: none · owner
+held-at: 2026-11-20T18:37:38Z
+hold-reason: the spec audit chain holds at its 4-round ceiling: unit TOOL-dPlacedRequest-100 (finding 29 of the round-4 audit, a new mechanism on spec 96) is specced but unaudited; the owner decides between auditing it past the ceiling, building units 95 to 100 with specs-audited overridden for unit 100, or stopping
+hold-until: owner
+hold-code: owner-decision
+held-from: BUILDING
+refreshed-at: 781244bae321d9a64abd41740d264eb5aae2b032 · handoff · 82 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 88f3b4132f3cd79b01fbe745acd962b9edc18895
-phase: BUILDING
+witness: e267d213c519be813ae092b62742e16961c70136
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -514,3 +524,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T18:35:01Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 27 · folded 31 · promoted 1 · to units · disposition promote
 
 2026-11-20T18:37:02Z decision · item spec-audit-chain-ceiling · reason the spec audit chain stopped at its 4-round ceiling: round 4 audited the closing review's promoted units TOOL-dPlacedRequest-95 to -99 (CONVERGED, 0 blockers, 5 highs, 31 findings folded at rev-2) and promoted finding 29, a new mechanism on spec 96, to TOOL-dPlacedRequest-100, specced at rev-1 and unaudited; options: (a) audit unit 100 as a fifth round past the ceiling, (b) build units 95 to 100 now and close with specs-audited overridden for unit 100 alone, (c) stop the run here
+
+2026-11-20T18:37:42Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-20T18:37:42Z hold · item owner-decision · reason until owner · reaped 447082a8 · resume none(owner)
