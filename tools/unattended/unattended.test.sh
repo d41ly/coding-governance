@@ -21506,14 +21506,15 @@ same "DPR43 AC7 the offline create's queue line splits with a 40-hex commit fiel
 git -C "$dm_c1" config core.autocrlf true
 printf 'Keep the submitted bytes, zq-crlf-marker-43\r\n' > "$LF/a.md"
 dm_out=$(run_request_arm --request "$LF/a.md")
-dm_key=$(printf '%s\n' "$dm_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+dm_re='request — ([0-9a-f]{12}) · recorded refs/gov/requests/'
+dm_key=""; [[ $dm_out =~ $dm_re ]] && dm_key=${BASH_REMATCH[1]}
 same "DPR43 AC14 the .typed blob of a CRLF request is its --no-filters hash, not the filtered one" \
   "$(cut -f2 "$dm_c1/.git/requests/$dm_key.typed" 2>/dev/null) $([ "$(git -C "$dm_c1" hash-object -- "$LF/a.md")" != "$(git -C "$dm_c1" hash-object --no-filters -- "$LF/a.md")" ] && echo apart)" \
   "$(git -C "$dm_c1" hash-object --no-filters -- "$LF/a.md") apart"
 # ---- AC33: an LF request's stored copy rewritten to CRLF keeps no consent, where the LF copy did.
 printf 'Rewrite the line endings, zq-eol-marker-43\n' > "$LF/b.md"
 dm_out=$(run_request_arm --request "$LF/b.md")
-dm_kb=$(printf '%s\n' "$dm_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+dm_kb=""; [[ $dm_out =~ $dm_re ]] && dm_kb=${BASH_REMATCH[1]}
 # The predicate runs in process from the driver this suite sourced at its top: a second `. "$SCRIPT"`
 # assigns its readonly start stamp again and ends the subshell before the call.
 read_dm_consent() { ( cd "$dm_c1" && export CLAUDE_CODE_SESSION_ID=qA || exit 1
@@ -21535,7 +21536,7 @@ hit  "$dm_out" "not written · requests.lock busy"
 rm -rf "$dm_lk"
 dm_out=$(run_request_arm --request "$LF/c.md"); dm_rc=$?
 same "DPR43 AC30 freed, the same request records and releases the lock" \
-  "$dm_rc $(printf '%s\n' "$dm_out" | grep -c ' · recorded refs/gov/requests/') $([ -e "$dm_lk" ] && echo held || echo released)" "0 1 released"
+  "$dm_rc $([[ $dm_out =~ $dm_re ]] && echo recorded || echo unrecorded) $([ -e "$dm_lk" ] && echo held || echo released)" "0 recorded released"
 # ---- AC32: with RUN_CLAIMS off an id-less acquire answers off before its identity refusal.
 sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$dm_c1/.unattended.conf"
 dm_out=$( cd "$dm_c1" && env -u CLAUDE_CODE_SESSION_ID USERNAME=daily-agent GOV_RUNLOG=0 bash "$SCRIPT" --lease acquire build tFix 2>&1 ); dm_rc=$?
