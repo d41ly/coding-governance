@@ -10886,93 +10886,19 @@ write_inherited_asks() { # slug · R · run dir
 # is. Blank or absent is DARK and makes no request; a value outside `[A-Za-z0-9._-]+` ending `.yml`
 # or `.yaml` is refused by name before any URL is built from it.
 #
-# THE READ: one anonymous HTTPS GET of the runs listing and one per page of that run's jobs, at the
-# literal host `api.github.com`, for the owner and repository parsed out of the anchor URL only when
-# its host is `github.com`. No redirect is followed, no credential is sent or read, every request is
-# bounded at 30 seconds and every response at 4 MiB. Every way the read can fail to see the job is a
-# DEAD PROBE line that files nothing: a non-GitHub anchor, a non-200 answer, no completed scheduled
-# run, no job named `held <suite>`, or fewer jobs read than the API declares. A green day prints a
-# zero red count beside a non-zero job count, so a broken probe cannot read as a clean one.
+# THE READ is the run-gates kit's `remote_verdict.py held <anchor URL> <workflow file>`
+# (TOOL-dWitnessedBar-6 S7), moved there whole beside the `remote-ci` slot's reader and sharing its one
+# bounded GET: anonymous HTTPS to the literal host `api.github.com`, no redirect, no credential, 30
+# seconds and 4 MiB. It prints one TAB row per `held <suite>` job and ONE liveness line, or ONE DEAD
+# PROBE line that files nothing; a green day prints a zero red count beside a non-zero job count, so a
+# broken probe cannot read as a clean one. The kit is found as `write_flake_releases` finds its own,
+# and a python or a kit that does not resolve prints one `held reader: DEAD PROBE` line.
 #
 # REUSED BEFORE IT IS FILED, over EVERY build's `BACKLOG.md`, not only this one's: a red the daily
 # job carries for a week would otherwise collect one HIGH ask per closing build. A job name is
 # untrusted text bound for a tracked file, so one carrying a backtick, a control character, the
 # ` · ` separator or the ` → ` arrow is refused and named, and so is a head sha R does not descend
 # from. Nothing here changes the caller's verdict.
-read_held_reds() { # anchor URL · workflow file name -> one TAB row per held job and ONE liveness line, or ONE DEAD PROBE line
-  local py
-  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
-    echo "held reader: DEAD PROBE — no python launcher resolves, so nothing was read"; return 0
-  fi
-  RHR_URL="$1" RHR_WF="$2" "$py" -c '
-import json, os, re, sys, urllib.error, urllib.request
-try:
-    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
-except Exception:
-    pass
-def dead(why):
-    print("held reader: DEAD PROBE — " + why)
-    sys.exit(0)
-url, wf = os.environ["RHR_URL"].strip(), os.environ["RHR_WF"]
-if not re.fullmatch(r"[A-Za-z0-9._-]+\.ya?ml", wf):
-    dead("the workflow file name is outside [A-Za-z0-9._-]+ ending .yml or .yaml: " + repr(wf))
-m = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?", url)
-if not m:
-    dead("the anchor URL is not a github.com repository, so there is no public job listing to read: " + (url or "(none)"))
-class Refuse(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, *args, **kwargs):
-        return None
-opener, cap = urllib.request.build_opener(Refuse), 4 << 20
-def get(path):
-    req = urllib.request.Request("https://api.github.com" + path, headers={
-        "Accept": "application/vnd.github+json", "User-Agent": "unattended-held-reader"})
-    try:
-        with opener.open(req, timeout=30) as r:
-            status, body = r.status, r.read(cap + 1)
-    except urllib.error.HTTPError as e:
-        dead("GET " + path + " answered HTTP " + str(e.code))
-    except Exception as e:
-        dead("GET " + path + " did not answer: " + type(e).__name__)
-    if status != 200:
-        dead("GET " + path + " answered HTTP " + str(status))
-    if len(body) > cap:
-        dead("GET " + path + " answered more than the 4 MiB cap")
-    try:
-        return json.loads(body)
-    except ValueError:
-        dead("GET " + path + " answered something that is not JSON")
-base = "/repos/%s/%s/actions" % (m.group(1), m.group(2))
-runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&per_page=1").get("workflow_runs") or []
-if not runs:
-    dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
-rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
-# EVERY FIELD BEFORE THE LAST IS NON-EMPTY: the writer splits on TAB, which bash collapses, so an
-# empty sha would shift the conclusion out of its field and a red would read as no verdict at all.
-if not re.fullmatch(r"[0-9a-f]{40}", sha) or not isinstance(rid, int):
-    dead("the latest completed scheduled run carries no 40-hex head sha or integer id: %r %r" % (sha, rid))
-jobs, total, page = [], None, 1
-while True:
-    got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
-    total, batch = got.get("total_count"), got.get("jobs") or []
-    jobs += batch
-    if not batch or not isinstance(total, int) or len(jobs) >= total or page >= 50:
-        break
-    page += 1
-if not isinstance(total, int) or len(jobs) != total:
-    dead("run %s declares %s job(s) and %d were read" % (rid, total, len(jobs)))
-held = [j for j in jobs if str(j.get("name") or "").startswith("held ") and str(j.get("name"))[5:].strip()]
-if not held:
-    dead("run %s at %s carries %d job(s) and none is named held <suite>" % (rid, sha[:8], len(jobs)))
-red = 0
-for j in held:
-    c = str(j.get("conclusion") or "")
-    red += c in ("failure", "timed_out")
-    # A TAB, a newline, a CR or a NUL in a name would split the row; each becomes U+001F, a control
-    # character the writer refuses by name, so the row grammar holds and the refusal stays visible.
-    print("held\t%s\t%s\t%s\t%s" % (str(j["name"])[5:].translate({0: 31, 9: 31, 10: 31, 13: 31}), sha, rid, c))
-print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:8], len(held), red))
-' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
-}
 
 # TOOL-dWitnessedBar-8 S8 - THE LEG ASK, extracted from `write_held_asks` at its second instance, the
 # held flaky leg `gates-green` files on a red bar's `hold` line. The summary is `<form> <leg> <ask text>`.
@@ -11090,7 +11016,7 @@ write_flake_releases() { # R -> one line per release: closed or refused
 
 write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
   local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8
-  local argv file tok seen
+  local argv file tok seen py k
   local -a rows=()
   if [ -z "$r" ]; then
     echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
@@ -11106,12 +11032,19 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
     return 0
   fi
+  # TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's, found as write_flake_releases finds it.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates remote_verdict.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: held reader: DEAD PROBE — no python launcher, or no run-gates kit holding remote_verdict.py beside this kit, so nothing was read"
+    return 0
+  fi
   while IFS= read -r line; do
+    line=${line%$'\r'}
     case "$line" in
       held$'\t'*) rows+=("$line") ;;
       ?*) echo "gates-green: $line" ;;
     esac
-  done < <(read_held_reds "${AURL:-}" "$wf")
+  done < <("$py" "$k/remote_verdict.py" held "${AURL:-}" "$wf" 2>&1 || echo "held reader: DEAD PROBE — the reader exited $? without a verdict")
   for line in "${rows[@]}"; do
     IFS=$'\t' read -r _ suite sha run concl <<< "$line"
     case "$concl" in failure|timed_out) ;; *) continue ;; esac
@@ -11145,6 +11078,36 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
       HIGH "a held self-test is red on the default branch's daily job" \
       "filed by an unattended run for the owning build; outside this build's goal" || :
   done
+  return 0
+}
+
+# TOOL-dWitnessedBar-6 S8 - THE PIN'S OWNER ITEM, after the held reader and the releases on the same
+# every-return-code site: under `verdict = remote-ci` the run-gates kit's `verdict_backends.py read` at R,
+# and a HELD slot, an unset pin or a workflow differing from it, filed through `write_leg_ask` as one
+# `pin held: backend remote-ci` ask, reused while open. Any other value reads and prints nothing; a kit
+# or a python that does not resolve, or a read that refuses, is announced and files nothing. Never a
+# verdict: the lander is what refuses a landing on the slot.
+write_pin_ask() { # slug · R -> at most one line: the slot's state, or the ask filed, reused or refused
+  local slug=$1 r=$2 py k out rc=0 why
+  [ -n "$r" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_backends.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: verdict slot — no run-gates kit holding verdict_backends.py resolves beside this kit, so no pin is read"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_backends.py" read --sha "$r" 2>&1) || rc=$?
+  out=${out//$'\r'/}
+  case "$out" in
+    *"verdict: remote-ci · HELD · "*) ;;
+    *"verdict: remote-ci · "*) printf '%s\n' "$out" | sed -n 's/^verdict: /gates-green: verdict slot: /p'; return 0 ;;
+    *"verdict: "*) return 0 ;;
+    *) echo "gates-green: verdict slot — verdict_backends.py read at ${r:0:8} exited $rc, so no pin is read: ${out//$'\n'/ · }"; return 0 ;;
+  esac
+  why=$(printf '%s\n' "$out" | sed -n 's/^verdict: remote-ci · HELD · [0-9a-f]* · //p' | head -1)
+  write_leg_ask "$slug" remote-ci "pin held: backend" \
+    "held at ${r:0:8}: $why · accept the owner re-pins verdict.remote.pin or refuses the workflow change" \
+    HIGH "the remote-ci verdict slot reads HELD, so no remote verdict stands" \
+    "filed by an unattended run for the owner; a pin is the owner's to move" || :
   return 0
 }
 
@@ -12252,6 +12215,8 @@ dod_met() { # slug · run-state file · item · checker
       # TOOL-dWitnessedBar-30 S3 - AND THE RELEASES, on the same every-return-code site: each quarantined
       # leg `select` at R releases has its held-flaky-leg ask closed.
       write_flake_releases "$_gr"
+      # TOOL-dWitnessedBar-6 S8 - AND THE PIN'S OWNER ITEM, under verdict = remote-ci, on the same site.
+      write_pin_ask "$slug" "$_gr"
       RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry

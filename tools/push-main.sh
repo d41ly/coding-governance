@@ -1112,6 +1112,53 @@ read_verdict_tree() {
   esac
 }
 
+# `check_landing_verdict <sha>` reads `verdict` before each landing push (TOOL-dWitnessedBar-6 S10),
+# as `read_verdict_tree` reads its key: the policy kit found by `resolve_lander_kit`, then `policy.py
+# get`. Under `local-hook` it lands as today. Under any other backend the run-gates kit's
+# `verdict_backends.py read` judges the SHA about to be pushed, `check_backend` first, and only GREEN
+# lands; under `peer-node` a SHA not yet GREEN is published as `refs/gov/candidate/<sha>` for a peer's
+# `verify-peer`, and the lander exits rather than polling. A reader that refuses, or a value no row
+# declares, refuses before any push. Only a lander with no policy kit beside it reads the catalogue
+# default, said on one line. What it does NOT check: that a peer will ever run.
+check_landing_verdict() {  # sha -> 0 lands; 1 refused, the state or the refusal named on stderr
+  local sha=$1 got rc py dir v out state
+  got=$(resolve_lander_kit policy policy.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict reads its catalogue default, local-hook: $got" >&2
+    return 0
+  fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
+  if ! v=$(cd "$top" && "$py" "$top/$dir/policy.py" get verdict 2>&1); then
+    echo "push-main: verdict does not read, so nothing is pushed: ${v//$'\n'/ · }" >&2
+    return 1
+  fi
+  v=${v%$'\r'}
+  [ "$v" = local-hook ] && return 0
+  got=$(resolve_lander_kit run-gates verdict_backends.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict is $v and no backend reader answers ($got), so nothing is pushed" >&2
+    return 1
+  fi
+  dir=${got#*$'\t'}
+  out=$(cd "$top" && GOV_REMOTE=$remote "$py" "$top/$dir/verdict_backends.py" read --backend "$v" --sha "$sha" 2>&1); rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" >&2
+  [ "$rc" = 0 ] && return 0
+  if [ "$rc" != 1 ]; then
+    echo "push-main: verdict $v is refused (named above), so nothing is pushed" >&2
+    return 1
+  fi
+  if [ "$v" = peer-node ]; then
+    if git push --porcelain "$remote" "$sha:refs/gov/candidate/$sha" >/dev/null 2>&1; then
+      echo "push-main: published refs/gov/candidate/$sha on $remote, for a peer node's verify-peer" >&2
+    else
+      echo "push-main: refs/gov/candidate/$sha could not be published on $remote" >&2
+    fi
+  fi
+  state=$(printf '%s\n' "$out" | sed -n 's/^verdict: [^ ]* · \(.*\) · [0-9a-f]\{8\} · .*/\1/p' | head -1)
+  echo "push-main: verdict $v reads ${state:-no state} for ${sha:0:8}, not GREEN, so nothing is pushed to $def" >&2
+  return 1
+}
+
 # `print_merge_witness` — the one line naming which tree Test verifies: the value, HEAD and its tree.
 print_merge_witness() {
   local h tr
@@ -1301,6 +1348,7 @@ cmd_land() {
       exit 1
     fi
     check_carry_set "$R" || exit 1
+    check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1
     # IN THIS WORKTREE'S OWN GIT DIR, which is the one the pre-push hook reads when the push is
     # issued from here. The lander marker below is the one resolved against the COMMON dir; the two
     # files answer different questions and live in different places on purpose. Touched BEFORE the
@@ -1485,6 +1533,7 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1
   # The marker first, then the wait for a claim push in flight, then the clear (TOOL-aGraftedHelix-36
   # S10); the marker stays until the verdict files have been read.
   touch "$marker"

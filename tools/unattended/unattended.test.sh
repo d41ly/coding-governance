@@ -16797,7 +16797,15 @@ slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
 readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
-read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
+# TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's `remote_verdict.py held`, so the stub is a
+# kit holding that file, found through the resolver the writer calls; it records its argv and prints rows.
+h9_kit="$h9_dir/.git/h9-kit"; mkdir -p "$h9_kit"
+printf '%s\n' 'import os, sys' 'sys.stdout.reconfigure(encoding="utf-8", newline="\n")' \
+  'open(os.environ["H9_CALLS"], "a", encoding="utf-8").write(" ".join(sys.argv[1:]) + "\n")' \
+  'rows = os.environ.get("H9_ROWS", "")' 'print(rows) if rows else None' \
+  'print("held reader: run 9 at stub · 4 held job(s) read · 3 red")' > "$h9_kit/remote_verdict.py"
+resolve_kit_dir() { [ "$2 $3" = "run-gates remote_verdict.py" ] && [ -z "${H9_NO_KIT:-}" ] && printf '%s\n' "$h9_kit"; }
+export H9_CALLS="$h9_dir/.git/h9-calls"
 run_h9() { # R -> the sliced writer's output over the arm's repository, with ASKS_CMD blank
   local M=memory ASKS_CMD="" CONF=.unattended.conf AURL=https://github.com/o/r.git
   ( cd "$h9_dir" || exit 2; write_held_asks tRun "$1" ""; echo "h9-rc=$?" ) 2>&1
@@ -16817,8 +16825,12 @@ n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a refused HEL
 printf 'HELD_CI_WORKFLOW="remote-ci.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam armed --no-verify
 h9_r=$(git -C "$h9_dir" rev-parse HEAD)
 h9_off=$(git -C "$h9_dir" commit-tree -p HEAD -m off "$(git -C "$h9_dir" rev-parse 'HEAD^{tree}')")
-H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
+out=$(H9_NO_KIT=1 run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader: DEAD PROBE — no python launcher, or no run-gates kit holding remote_verdict.py beside this kit, so nothing was read"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a kit that does not resolve still reached a reader"; st=1; }
+export H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
 out=$(run_h9 "$h9_r")
+same "held: the moved reader is called as remote_verdict.py held <anchor> <workflow>" "$(cat "$h9_dir/.git/h9-calls")" "held https://github.com/o/r.git remote-ci.yml"
 hit  "$out" "gates-green: held reader: run 9 at stub · 4 held job(s) read · 3 red"
 hit  "$out" "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
 hit  "$out" " · held red: suite ok suite red at ${h9_r:0:8} on the daily held job, run 9 · seen \`.github/workflows/remote-ci.yml\`@${h9_r:0:8} · accept the suite is green on the daily held job at the default branch's tip"
@@ -16829,8 +16841,8 @@ hit  "$out" "h9-rc=0"
 miss "$out" "suite green suite"
 miss "$out" "suite bad"
 n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
-unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
-unset H9_ROWS
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir run_h9
+unset H9_ROWS H9_CALLS H9_NO_KIT h9_kit
 rm -rf "$h9_dir"
 # TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
 # them. Re-sourcing the driver restores every definition before an in-process call can meet one.

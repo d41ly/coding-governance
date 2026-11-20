@@ -769,6 +769,25 @@ if bad:
 a=$((a+1))
 "$PYBIN" "$KITDIR/py_reads.py" --selftest || { echo "gov-canary: py_reads.py --selftest failed"; fail=1; }
 
+# ---- THE VERDICT BACKENDS' PLANTS (TOOL-dWitnessedBar-6 AC1 to AC6, AC7's held reader) ------------
+# Each plant of the unit's design runs in its own scratch directory through `verdict_backends.py
+# --fixture`, which drives `read`, the fixture lander and `remote_verdict.py --responses`, and owes
+# its last scenario's exit and its all-held line. Arms: a duplicate descriptor row, an unregistered and
+# an undeclared value, the full slot against the scoped one, a node's own or another tree's peer tag,
+# and the witness rule's writer, liveness, failed-read and source fields. WHAT THIS DOES NOT CHECK: a
+# real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
+for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 peer:1 remote-green:0 \
+               swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
+  a=$((a+1))
+  vb_plant=${vb_case%%:*}
+  vb_out=$("$PYBIN" "$KITDIR/verdict_backends.py" --fixture --plant "$vb_plant" 2>&1); vb_rc=$?
+  case "$vb_rc:$vb_out" in
+    "${vb_case#*:}:"*"plant $vb_plant · "*"all held"*) ;;
+    *) echo "gov-canary: verdict_backends.py --fixture --plant $vb_plant exited $vb_rc, owed ${vb_case#*:} with every scenario held:"
+       printf '%s\n' "$vb_out" | grep -E 'MISSED|not run|Traceback' | sed 's/^/  /'; fail=1 ;;
+  esac
+done
+
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then
   echo "PASS ($a assertions)"

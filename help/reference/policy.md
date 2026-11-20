@@ -101,6 +101,14 @@ What a landing does with the product-test levels outside tests.landing-levels wh
 tests.without-cadence = "report-unrun"
 ```
 
+## `verdict`
+<!-- usage: policy:verdict 0427cc96 -->
+Which backend's verdict a landing stands on, a name a [[verdict_backend]] row in a kit descriptor declares: local-hook, this node's own hook's full per-tree verdict; peer-node, a second node's verify-peer tag for the commit's own tree; or remote-ci, a push run of the remote CI workflow under verdict.remote.trust. Read at the landed revision by the lander before each landing push, which under any backend but local-hook lands only on GREEN; a value no row declares refuses before any push.
+
+```text
+verdict = "peer-node"
+```
+
 ## `verdict.blocks`
 <!-- usage: policy:verdict.blocks 2f0b7c25 -->
 Which red of a red bar blocks its landing, by the class the runner's attribution reads each red at: under own-only an OWN or DEAD PROBE red blocks, under own-mixed-contended a MIXED or CONTENDED red blocks too, and under every-red an INHERITED red blocks as well. Read at the default branch's tip by the pre-push hook and the unattended driver; a red bar lands only when every red passes.
@@ -173,6 +181,30 @@ Where the tester's judgment of a blocking OWN or MIXED red sends it: under fix-p
 verdict.red-route = "always-new-unit"
 ```
 
+## `verdict.remote.trust`
+<!-- usage: policy:verdict.remote.trust 562844dc -->
+What the remote-ci backend does with the source check of its witness rule: under pinned-workflow pinned files that differ from verdict.remote.pin read HELD and an owner item asks to re-pin or to refuse; under owner-reviews-workflow-change the owner item opens at the first differing read and the slot stays HELD until the owner re-pins; under app-only the source check is skipped and a passing run reads GREEN with witness claimed, never witnessed.
+
+```text
+verdict.remote.trust = "owner-reviews-workflow-change"
+```
+
+## `verdict.remote.pin-scope`
+<!-- usage: policy:verdict.remote.pin-scope 48608634 -->
+Which files verdict.remote.pin pins for the remote-ci backend: workflow, the declared workflow .github/workflows/remote-ci.yml; or dispatch-closure, that workflow, the run-gates kit's run-gates.sh, the leg manifest and .githooks/gate-env.sh, the files that decide the bar's dispatch, never every script the bar job runs.
+
+```text
+verdict.remote.pin-scope = "dispatch-closure"
+```
+
+## `verdict.remote.pin`
+<!-- usage: policy:verdict.remote.pin fc4016ee -->
+The pin the remote-ci backend's source check compares against: one object id, git hash-object --stdin over one &lt;path&gt; &lt;blob id&gt; line per file verdict.remote.pin-scope names, sorted by path, each ending LF, which the run-gates kit's remote_verdict.py pin prints at HEAD. The owner's: set from a terminal or by policy_edit.py set on a live run's branch, and the loop guard refuses an agent's change to it anywhere else. Unset, remote-ci reads HELD, no pin.
+
+```text
+verdict.remote.pin = "1fe706824a048fd582f17ef18b4ec6b2d9898d46"
+```
+
 ## `help.enforce`
 Documented on [help/docs-leg.md](../docs-leg.md).
 
@@ -243,7 +275,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (231)
+## Not yet summarised (227)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -361,10 +393,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.adapt`
 - `flow.promote`
 - `policy-file.on-missing-expansion`
-- `verdict`
-- `verdict.remote.trust`
-- `verdict.remote.pin-scope`
-- `verdict.remote.pin`
 - `plan.authority`
 - `plan.unplaced`
 - `plan.triage`
