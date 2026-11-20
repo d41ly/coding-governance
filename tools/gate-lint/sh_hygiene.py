@@ -2138,7 +2138,7 @@ def run_selftest() -> int:
             for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
                 subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
             oid = subprocess.run(["git", "hash-object", "kit.sh"], cwd=str(tree), capture_output=True,
-                                 text=True, check=True).stdout.strip()
+                                 text=True, encoding="utf-8", check=True).stdout.strip()
             (tree / ".governance").mkdir()
             (tree / ".governance" / "install.json").write_text(json.dumps({"files": [
                 {"path": "kit.sh", "role": "engine", "oid": oid, "gov_oid": oid}]}), encoding="utf-8")
