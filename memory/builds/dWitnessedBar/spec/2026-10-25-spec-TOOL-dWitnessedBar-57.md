@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,8 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-57-deviation-572.md](../build/2026-10-25-build-TOOL-dWitnessedBar-57-deviation-572.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-57-pin1-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-57-pin1-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-57-pin1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-57-pin1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-57-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-57-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-57-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-57-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 |
@@ -477,11 +479,11 @@ New arm: tools/drift-audit/drift_report.py · covers AC16 · the `held` fixture 
 - **F4 — Where is unit 51's AC36 answered, now that its carrier edits landed with no grant trailer
   (id 10)?** Unit 7's pass `28edeaa0b` edits `memory/HYGIENE.md` and `memory/guides/BUILD-METHOD.md` and
   carries `Pass` alone, and `cdfbd1cf..HEAD` holds other builds' edits of both files. (a) the grant where
-  §8 records one, unit 51's F3 `grants:` line naming both carriers, beside that pass commit's paths; (b)
-  the trailer rule as written, which reds over landed commits no pass may rewrite; (c) S21 left NOT
-  OBSERVED. RESOLVED (agent, 2026-11-20, delegated): (a), rung 3, the one option an observation can pass:
-  (b) fails AC19 as written at HEAD (veto 1) and (c) leaves the finding open. widens: none · relaxes: the
-  grant is read from unit 51's §8 rather than from a commit trailer
+  the Open questions section records one, unit 51's F3 `grants:` line naming both carriers, beside that
+  pass commit's paths; (b) the trailer rule as written, which reds over landed commits no pass may
+  rewrite; (c) S21 left NOT OBSERVED. RESOLVED (agent, 2026-11-20, delegated): (a), rung 3, the one option
+  an observation can pass: (b) fails AC19 as written at HEAD (veto 1) and (c) leaves the finding open.
+  widens: none · relaxes: the grant is read from unit 51's §8 rather than from a commit trailer
 - **F5 — What does `flakes` pass as `--selection` for a run whose record holds no selection (id 26)?**
   (a) an empty temporary file, removed after the call, as `TOOL-dWitnessedBar-62` S18 passes for its
   observers; (b) `--selection` optional for that caller, against S18's exit 2; (c) the absent path, read by
@@ -508,6 +510,9 @@ New arm: tools/drift-audit/drift_report.py · covers AC16 · the `held` fixture 
   taken from the landed commits; S18 cites `read_gate_health` and gains `verdict_flow.py` and the drift
   selftest; S24 gains §4's pack probe; id 31 re-pointed to unit 21; criteria a role can run without a gate
   leg; Files touched names the paths left as built.
+- rev-6 · 2026-11-20 · §8 F4 · the fork names unit 51's section by its title, Open questions, so no
+  number sits before `records`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-57-pin1-brief; nothing
+  else moved.
 
 ## 10. Reuse audit
 
