@@ -140,8 +140,8 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit](spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md) | 19 | 2 | CLOSED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-42 — the tail sweep keeps every tail any worktree's retained run names, and never a fresh one](spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md) | 19 | 2 | CLOSED | rev-3 | 2026-11-20 |
 | [TOOL-dWitnessedBar-3 — attribution deciding what blocks](spec/2026-10-25-spec-TOOL-dWitnessedBar-3.md) | 20 | 2 | CLOSED | rev-8 | 2026-11-20 |
-| [TOOL-dWitnessedBar-44 — the inherited-red upgrade step reads both policy files and maps every value today's readers accept](spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | DEFERRED | rev-7 | 2026-11-20 |
+| [TOOL-dWitnessedBar-44 — the inherited-red upgrade step reads both policy files and maps every value today's readers accept](spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-20 |
+| [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | DEFERRED | rev-8 | 2026-11-20 |
 | [TOOL-dWitnessedBar-41 — the selection a bar ran under travels on the per-tree verdict, and the hook re-derives it before adopting](spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it](spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md) | 22 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | DEFERRED | rev-4 | 2026-10-26 |
