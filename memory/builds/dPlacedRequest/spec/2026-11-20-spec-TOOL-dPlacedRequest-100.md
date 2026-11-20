@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md](../build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md](../build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md) | research | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md) | research | — |

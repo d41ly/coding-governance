@@ -647,7 +647,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   claimant key, session, content key, disposition, reason, scenarios and facts, and on a patch the origin
   slug and its newest default-branch commit. A read or create that does not answer takes
   `leases.offline`: `refuse` exit 1, any other value exit 4, no claim queued and no folder written. A
-  patch or a repeat then takes its build lease (`--lease acquire build <slug>`): `tombstone`, `terminal`
+  patch or a repeat then takes its build lease (`--lease acquire build <slug>`),
+  and a stale build lease is taken over (TOOL-dPlacedRequest-100): an acquire refusal ending with the stale hint runs `--lease
+  take-over build <slug>` once, a take-over written printing `take-announced` and proceeding as an acquire
+  does, one refused routed by its own cause as below, one not written exit 2. Otherwise: `tombstone`, `terminal`
   and `epoch-fence` print one `ask:` line and exit 1 whatever `leases` says, never retried;
   `live-holder`, `offered` and an `overlap` under `leases: refuse` add `wait-since:` to the claim by a
   parented commit and exit 4 until `flow.wait-ceiling` has passed by this node's clock, then print an

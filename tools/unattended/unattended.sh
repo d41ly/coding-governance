@@ -4087,6 +4087,11 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
   return 0
 }
 
+# THE STALE HINT, SPELLED ONCE (TOOL-dPlacedRequest-100 S1): `run_lease_verb` appends it to an acquire's
+# `live-holder` refusal where the lease reads stale, and `run_entry_claim` reads the refusal line's
+# suffix against it to take the lease over, so a reworded hint cannot silently disable that branch.
+LEASE_STALE_HINT=' · stale, so --lease take-over takes it'
+
 # --lease, THE VERB'S BODY (S5). Order: the switch, the act and the ref, the five keys, the granularity
 # (S7), the node's fleet tag (S11), the read (with the queue flushed after a read that answered, S10, or
 # `leases.offline` where it did not), the overlap at an acquisition (S9), the `lease` column, the
@@ -4239,7 +4244,7 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   check_claim_writable "$lname" lease "$tag" "$sid" "$la"; rc=$?
   case "$rc" in
     0) ;;
-    1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+ · stale, so --lease take-over takes it}"; remove_gov_queue_hold; return 1 ;;
+    1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+$LEASE_STALE_HINT}"; remove_gov_queue_hold; return 1 ;;
     3) echo "lease not written — $tail holds no lease to $act"; remove_gov_queue_hold; return 2 ;;
     *) echo "lease not written — the claim table declined $tail"; remove_gov_queue_hold; return 2 ;;
   esac
@@ -4822,7 +4827,10 @@ run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 n
 # kit's `check_slug_claimed` and the claim is created by `write_gov_ref` with an EMPTY expected sha, a
 # lost create read as above. An unanswered read or create takes `leases.offline`: `refuse` exit 1, any
 # other value exit 4, no claim queued and no folder written. A patch or a repeat then takes its build
-# lease through `run_lease_verb acquire build`, a refusal routed by `claim.py route`: a terminal cause
+# lease through `run_lease_verb acquire build`. A STALE LEASE IS TAKEN OVER (TOOL-dPlacedRequest-100): an
+# acquire refusal whose line ends with `LEASE_STALE_HINT` runs `run_lease_verb take-over build` once; a
+# take-over written is the claim's lease and the claim goes on, one refused has its own cause routed as
+# an acquire refusal is, and one not written exits 2. A refusal is routed by `claim.py route`: a terminal cause
 # prints one `ask:` line and exits 1, never retried; a wait adds `wait-since:` by a parented commit
 # (`add_claim_key`) and exits 4 until `flow.wait-ceiling` has passed, then prints an owner item and exits
 # 1; an overlap the probe notes under `leases: warn` adds `overlap:` and proceeds. Then `claim.py
@@ -4917,6 +4925,16 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
     out=${out//$'\r'/}
     printf '%s\n' "$out"
     line=$(printf '%s\n' "$out" | grep -m1 '^lease ')
+    if [ "$rc" = 1 ] && [[ $line == *"$LEASE_STALE_HINT" ]]; then
+      out=$(run_lease_verb take-over build "$slug" "" "" "" "" "" 2>&1) && rc=0 || rc=$?
+      out=${out//$'\r'/}
+      printf '%s\n' "$out"
+      case "$rc" in
+        0) echo "entry-claim — $slug · the stale build lease taken over" ;;
+        1) line=$(printf '%s\n' "$out" | grep -m1 '^lease ') ;;
+        *) echo "claim not written — $slug · the stale build lease was not taken over"; return 2 ;;
+      esac
+    fi
     if [ "$rc" = 0 ]; then
       case "$out" in
         *"sharing a path; this run is NOT blocked"*)

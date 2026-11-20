@@ -382,6 +382,8 @@ PLANTS = {"patch-owner-unratified": "a patch under patch.ratify = owner: the own
           "repeat-no-pieces": "a repeat with no --pieces: one line naming --pieces, exit 2, no claim ref, no folder",
           "live-holder": "a live holder: exit 4 adding wait-since; past flow.wait-ceiling the resumed claim exits 1 "
                          "with the owner item",
+          "stale-holder": "a holder first sighted past leases.expiry-hours: the claim takes the lease over, exits 0 "
+                          "claimed with take-announced, the lease's epoch one above the planted one and no wait-since",
           "overlap-warn": "an overlapping branch under leases warn: the claim proceeds with an overlap: key",
           "first-record": "a repeat's scaffold commit, then its transition into designing under scenario.playbook-run",
           "first-record-patch": "a patch under patch.ratify = auto recorded as item.plan.dedupe under stand-in "
@@ -609,6 +611,26 @@ def check_claim_plant(case, top, seen, bad):
               "claimed by this claimant")
         if "the local pre-check" in got[1]:
             bad.append("the resumed claim ran the local pre-check")
+    elif case == "stale-holder":   # TOOL-dPlacedRequest-100 AC1
+        write_foreign_lease(root, slug)
+        lease = "refs/gov/leases/%s/build" % slug
+        tip, planted = read_remote_log(lease)[0]
+        # its first sighting 25 hours back, the row `add_claim_sighting` in the unattended suite writes
+        feed = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "gov-feed.log"
+        rows = feed.read_text(encoding="utf-8").splitlines() if feed.exists() else []
+        seq = max([int(r.split("\t", 1)[0]) for r in rows if r.split("\t", 1)[0].isdigit()] or [0]) + 1
+        ago = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=25)).strftime(UTC)
+        with feed.open("a", encoding="utf-8", newline="\n") as fh:
+            fh.write("%d\t%s\tleases\t%s\t%s\t%s\n" % (seq, lease, run_fixture_git(root, "rev-parse", tip + "^{tree}"),
+                                                       tip, ago))
+        got = run_entry()
+        check("stale", got, 0, "take-announced", "the stale build lease taken over", "entry-claim — %s · claimed" % slug)
+        epochs = [re.search(r"^epoch: (\d+)$", m, re.M) for m in (planted, (read_remote_log(lease) or [("", "")])[0][1])]
+        seen.append("lease epoch %s -> %s" % tuple(e.group(1) if e else "-" for e in epochs))
+        if not all(epochs) or int(epochs[1].group(1)) != int(epochs[0].group(1)) + 1:
+            bad.append("the lease's epoch is not one above the planted one")
+        if any("wait-since: " in m for _s, m in read_remote_log(claim_ref)):
+            bad.append("the claim waited on the stale lease, adding wait-since")
     elif case == "overlap-warn":   # AC6
         run_fixture_git(root, "checkout", "-q", "-b", "other")
         write_fixture_files(root, {"tools/zq-shared/x.txt": "theirs\n"})
