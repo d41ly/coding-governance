@@ -10,6 +10,7 @@
 | [2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-1.md](../build/2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-1.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-2.md](../build/2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-2.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-3.md](../build/2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-3.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-5.md](../build/2026-11-20-build-TOOL-dSkippedRecord-1-red-fix-5.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-1-brief.md) | research | — |
 | [2026-11-20-review-TOOL-dSkippedRecord-1-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dSkippedRecord-1-closing-diff-round1.md) | diff-review | — |
 
