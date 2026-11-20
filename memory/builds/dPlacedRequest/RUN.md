@@ -362,3 +362,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T08:40:52Z brief · item TOOL-dPlacedRequest-44 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-20T08:47:15Z dispatch · item 8933233e TOOL-dPlacedRequest-45 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-45-1-acceptance-ledger.md
+
+2026-11-20T08:55:55Z brief · item TOOL-dPlacedRequest-45 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
