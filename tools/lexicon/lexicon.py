@@ -410,11 +410,66 @@ def render_pin_rows(rows: dict) -> list[str]:
     return out
 
 
+# >>> home_graded_py — canonical copy: home_graded.py in gov's lib dir (byte-identical; gated)
+def derive_home_graded(root):
+    """The set of tracked paths under `root` that a `.governance/install.json` `engine` row installed
+    at gov's own bytes (`oid` == `gov_oid`) and that still hash to them. Empty when there is no
+    receipt, it does not read, or the hash fails: the caller then grades every path, as before."""
+    import json
+    import pathlib
+    import subprocess
+    root = pathlib.Path(root)
+    try:
+        rows = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    want = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("role") != "engine":
+            continue
+        path, oid = row.get("path"), row.get("oid")
+        if isinstance(path, str) and isinstance(oid, str) and oid and oid == row.get("gov_oid") \
+                and ".." not in path.split("/") and (root / path).is_file():
+            want[path] = oid
+    if not want:
+        return set()
+    paths = sorted(want)
+    try:
+        out = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(root),
+                             input="".join(p + "\n" for p in paths), capture_output=True,
+                             text=True, encoding="utf-8")
+    except OSError:
+        return set()
+    got = out.stdout.split()
+    if out.returncode != 0 or len(got) != len(paths):
+        return set()
+    return {p for p, oid in zip(paths, got) if oid == want[p]}
+# <<< home_graded_py
+
+
+#: the deployer's own state dir: written by govkit and the renderer, never authored in this tree
+DEPLOYER_STATE = ".governance/"
+
+
 def tracked_files(root: Path) -> list[str]:
+    """The corpus: every tracked path, less what this tree did not write (TOOL-dHomeGraded-1 S2).
+
+    A kit file gov installed at its own bytes is gov's code, graded by gov's lexicon against gov's
+    canon and pins; counting it here charges this tree's pin with gov's names and moves it at every
+    re-adoption. The deployer's state dir holds govkit's receipt and the renderer's lock, data no one
+    names. An edited kit file hashes to new bytes and stays in. Said once, on standard error, so no
+    output a caller pastes changes."""
     out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True, encoding="utf-8")
     if out.returncode != 0:
         raise SystemExit("lexicon: not a git repo, or `git ls-files` failed")
-    return [ln for ln in out.stdout.splitlines() if ln.strip()]
+    home = derive_home_graded(root)
+    rels = [ln for ln in out.stdout.splitlines() if ln.strip()]
+    kept = [ln for ln in rels if ln not in home and not ln.startswith(DEPLOYER_STATE)]
+    if len(kept) != len(rels):
+        print(f"lexicon: {len(rels) - len(kept)} file(s) not graded here — kit files "
+              f".governance/install.json installed at gov's own bytes, which gov grades, and "
+              f"{DEPLOYER_STATE}, the deployer's state", file=sys.stderr)
+    return kept
 
 
 def ext_of(path: str) -> str:

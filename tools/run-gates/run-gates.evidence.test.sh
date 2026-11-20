@@ -2569,6 +2569,15 @@ PW_OUT=$( cd "$PW_T" && unset GATE_LEGS; "$DC_PY" "$PW_K/pass_legs.py" --check 2
 [ "$PW_RC" = 0 ] && [ ! -e "$PW_K/../gate-legs.json" ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: not derived, no leg manifest at ' \
   && ok "--check with no manifest beside the kit and GATE_LEGS unset exits 0 on a not-derived line" \
   || { nope "--check refused a fresh install that holds no manifest beside the kit (rc=$PW_RC)"; print_pw_out; }
+# A MANIFEST THE DEPLOY FILE NAMES (TOOL-dHomeGraded-1 S6): an adopter whose bar is its own keeps gov's
+# legs in the file `[gate_runner].file` names, and with GATE_LEGS unset that file is read, not the sibling.
+mkdir -p "$PW_T/.governance"
+printf '[gate_runner]\nkind = "manifest"\nfile = "legs.json"\n' > "$PW_T/.governance/deploy.toml"
+PW_OUT=$( cd "$PW_T" && unset GATE_LEGS; GOV_NODE=f "$DC_PY" "$PW_K/pass_legs.py" --check 2>&1 | tr -d '\r'; exit "${PIPESTATUS[0]}" ); PW_RC=$?
+[ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 6 declared, 600.0s of 600s" ] \
+  && ok "--check with GATE_LEGS unset reads the manifest [gate_runner].file names" \
+  || { nope "--check did not read the manifest the deploy file names (rc=$PW_RC)"; print_pw_out; }
+rm -rf "$PW_T/.governance"
 rm -f "$PW_M"
 run_pw f --check
 [ "$PW_RC" = 2 ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: REFUSED — the leg manifest .* does not read as JSON' \

@@ -59,6 +59,10 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 # repository's shell tree and not about the kit that ships the scanner, and NO guard, because it
 # grades every tracked `*.sh`: no subset of paths bounds it, and a guard could only make it skip the
 # file that just broke.
+# NO REGISTRY ARGUMENT IS NOT AN EMPTY ONE when the target holds the default (TOOL-dHomeGraded-1 S7): each
+# mode then reads `<MEMORY_ROOT>/project/<its registry>.txt`, the path the home rows below name, so an
+# adopter declares its own sites there without editing gov's emitted row, which govkit reports as drift.
+# A kit file installed at gov's own bytes is not graded in an adopter at all: gov grades it here.
 [[gate_leg]]
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"

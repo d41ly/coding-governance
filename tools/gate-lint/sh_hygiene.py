@@ -154,6 +154,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -384,6 +385,59 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
     return found
 
 
+# >>> home_graded_py — canonical copy: home_graded.py in gov's lib dir (byte-identical; gated)
+def derive_home_graded(root):
+    """The set of tracked paths under `root` that a `.governance/install.json` `engine` row installed
+    at gov's own bytes (`oid` == `gov_oid`) and that still hash to them. Empty when there is no
+    receipt, it does not read, or the hash fails: the caller then grades every path, as before."""
+    import json
+    import pathlib
+    import subprocess
+    root = pathlib.Path(root)
+    try:
+        rows = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    want = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("role") != "engine":
+            continue
+        path, oid = row.get("path"), row.get("oid")
+        if isinstance(path, str) and isinstance(oid, str) and oid and oid == row.get("gov_oid") \
+                and ".." not in path.split("/") and (root / path).is_file():
+            want[path] = oid
+    if not want:
+        return set()
+    paths = sorted(want)
+    try:
+        out = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(root),
+                             input="".join(p + "\n" for p in paths), capture_output=True,
+                             text=True, encoding="utf-8")
+    except OSError:
+        return set()
+    got = out.stdout.split()
+    if out.returncode != 0 or len(got) != len(paths):
+        return set()
+    return {p for p, oid in zip(paths, got) if oid == want[p]}
+# <<< home_graded_py
+
+
+_HOME_TOLD: set = set()
+
+
+def remove_home_graded(root: pathlib.Path, rels: list[str]) -> list[str]:
+    """`rels` less the files gov installed here at its own bytes (TOOL-dHomeGraded-1 S2). Those are
+    gov's code, graded on gov's bar against gov's registries; grading them here against this tree's
+    declaration lists sites nobody in this tree wrote. Said once per root, with the count."""
+    home = derive_home_graded(root)
+    kept = [rel for rel in rels if rel not in home]
+    if len(kept) != len(rels) and str(root) not in _HOME_TOLD:
+        _HOME_TOLD.add(str(root))
+        print(f"sh-hygiene: {len(home)} file(s) .governance/install.json installed at gov's own bytes "
+              f"are gov's to grade and are not graded here; an edited one is")
+    return kept
+
+
 def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]], int]:
     """Every tracked `*.sh` under `root`, classified. Returns (findings, files scanned).
 
@@ -399,7 +453,7 @@ def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]]
         # zero files; only one of them means "there is nothing here to grade".
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
-    paths = [p for p in listing.stdout.split("\0") if p]
+    paths = remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])
     total: dict[str, list[tuple[str, int, str]]] = {key: [] for key, _l, _g in CLASSES}
     scanned = 0
     for rel in sorted(paths):
@@ -479,6 +533,34 @@ def resolve_declaration(arg: str | None, shape: tuple = DELIMITER_SHAPE,
                       f"a file, which is a typo and not a posture; OMIT it to grade against an "
                       f"empty declaration")
     return read_registry(path, shape, reasons)
+
+
+def derive_default_registry(root: pathlib.Path, name: str) -> str | None:
+    """The registry a mode reads when no argument names one: `<MEMORY_ROOT>/project/<name>` under
+    `root`, when that file exists (TOOL-dHomeGraded-1 S7). gov's own rows pass the same path. An
+    adopter's leg row is gov's emission and carries no registry argument, and editing the row is
+    drift govkit reports, so the default path is where an adopter declares its own sites. Absent, the
+    run grades against an empty declaration as before. MEMORY_ROOT is read from `.memory-tree.conf`,
+    one `KEY=value` line, `memory` when the conf or the key is absent."""
+    memory_root = "memory"
+    try:
+        for line in (root / ".memory-tree.conf").read_text(encoding="utf-8").splitlines():
+            if line.startswith("MEMORY_ROOT="):
+                memory_root = line.split("=", 1)[1].strip().strip("\"'").strip("/") or "memory"
+    except OSError:
+        pass
+    path = root / memory_root / "project" / name
+    return str(path) if path.is_file() else None
+
+
+def print_registry_posture(args: list[str], default: str | None) -> None:
+    """One line saying which declaration this run grades against, when no argument named one."""
+    if args:
+        return
+    if default:
+        print(f"sh-hygiene: no registry argument, so this run reads the default registry {default}")
+    else:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
 
 
 def check_registry(measured: dict[tuple[str, str], int],
@@ -596,7 +678,9 @@ def run_probe_scan(args: list[str]) -> int:
         return 2
     reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, PROBE_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "location-probe-waivers.txt"),
+            PROBE_KEY_SHAPE, reasons)
         found, scanned = scan_probe_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -605,8 +689,7 @@ def run_probe_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "location-probe-waivers.txt"))
     print_probe_populations(found, scanned)
     measured = build_probe_measured(found)
     # A WAIVED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
@@ -923,7 +1006,7 @@ def read_shell_sources(root: pathlib.Path, pathspecs: list[str]) -> list[tuple[s
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
     sources = []
-    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+    for rel in sorted(remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])):
         full = root / rel
         name = rel.rsplit("/", 1)[-1]
         if not full.is_file() or not (name.endswith(".sh") or "." not in name):
@@ -1001,7 +1084,9 @@ def run_spawn_scan(args: list[str]) -> int:
         return 2
     reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, SPAWN_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "spawn-idiom-sites.txt"),
+            SPAWN_KEY_SHAPE, reasons)
         found, product, suites = scan_spawn_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1010,8 +1095,7 @@ def run_spawn_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "spawn-idiom-sites.txt"))
     print_spawn_populations(found, product, suites)
     for key in [k for k in declared if k[1] in SPAWN_BANNED]:
         malformed.append(f"{key[0]}: the registry declares `{key[1]}`, a BANNED class no row can waive "
@@ -1236,7 +1320,9 @@ def run_temp_scan(args: list[str]) -> int:
         return 2
     reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, TEMP_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "temp-name-sites.txt"),
+            TEMP_KEY_SHAPE, reasons)
         found, scanned = scan_temp_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1245,8 +1331,7 @@ def run_temp_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "temp-name-sites.txt"))
     print_temp_populations(found, scanned)
     # A REGISTERED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
     for key in sorted(declared):
@@ -1507,7 +1592,9 @@ def run_stage_scan(args: list[str]) -> int:
         return 2
     reasons: dict[tuple[str, str], str] = {}
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None, STAGE_KEY_SHAPE, reasons)
+        declared, malformed = resolve_declaration(
+            args[0] if args else derive_default_registry(root, "stage-commit-sites.txt"),
+            STAGE_KEY_SHAPE, reasons)
         found, scanned = scan_stage_tree(root, args[2:])
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
@@ -1516,8 +1603,7 @@ def run_stage_scan(args: list[str]) -> int:
         print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
               "NOTHING — that is a refusal and not a pass", file=sys.stderr)
         return 2
-    if not args:
-        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print_registry_posture(args, derive_default_registry(root, "stage-commit-sites.txt"))
     print_stage_populations(found, scanned)
     # A REGISTERED SITE SAYS WHY ON EVERY RUN, green included: a reason nobody reads is no reason.
     for key in sorted(declared):
@@ -2037,6 +2123,60 @@ def run_selftest() -> int:
          (len(stage_problems), stage_problems[0] == STAGE_UNDECLARED.format(rel="a.sh", count=1),
           "no longer finds" in stage_problems[1]), (2, True, True), say=True)
 
+    # HOME-GRADED (TOOL-dHomeGraded-1 S2). Two files carrying the same fixed-name temp, one claimed by a
+    # receipt `engine` row at gov's bytes: only the other is named. Then the claimed one is edited, and
+    # both are: a receipt row excuses gov's bytes, never a file this tree changed.
+    held = {name: os.environ.pop(name) for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+            if name in os.environ}
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            tree = pathlib.Path(scratch)
+            site = b'printf x >"$dst.tmp"\nmv "$dst.tmp" "$dst"\n'
+            (tree / "kit.sh").write_bytes(site)
+            (tree / "own.sh").write_bytes(site)
+            (tree / "reg.txt").write_text("", encoding="utf-8")
+            for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+                subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+            oid = subprocess.run(["git", "hash-object", "kit.sh"], cwd=str(tree), capture_output=True,
+                                 text=True, check=True).stdout.strip()
+            (tree / ".governance").mkdir()
+            (tree / ".governance" / "install.json").write_text(json.dumps({"files": [
+                {"path": "kit.sh", "role": "engine", "oid": oid, "gov_oid": oid}]}), encoding="utf-8")
+            homed = []
+            for body in (site, site + b"# edited here\n"):
+                (tree / "kit.sh").write_bytes(body)
+                _HOME_TOLD.clear()
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_temp_scan([str(tree / "reg.txt"), str(tree)])
+                homed.append((code, "kit.sh:" in said.getvalue(), "own.sh:" in said.getvalue(),
+                              "gov's own bytes" in said.getvalue()))
+            test("home-graded: a receipt engine row at gov's bytes leaves its file out, the other named",
+                 homed[0], (1, False, True, True), say=True)
+            test("home-graded: the same file edited here is graded again",
+                 homed[1], (1, True, True, False), say=True)
+            # DEFAULT REGISTRY (TOOL-dHomeGraded-1 S7): with no argument, a run from the root reads
+            # `<MEMORY_ROOT>/project/temp-name-sites.txt` when it exists, and its row declares the site.
+            (tree / ".governance" / "install.json").unlink()
+            (tree / "kit.sh").unlink()
+            (tree / ".memory-tree.conf").write_text("MEMORY_ROOT=records\n", encoding="utf-8")
+            (tree / "records" / "project").mkdir(parents=True)
+            (tree / "records" / "project" / "temp-name-sites.txt").write_text(
+                "own.sh\tfixed-temp\t1\ta fixture's fixed temp\n", encoding="utf-8")
+            subprocess.run(["git", "add", "-A"], cwd=str(tree), capture_output=True, check=True)
+            here = os.getcwd()
+            os.chdir(tree)
+            try:
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_temp_scan([])
+            finally:
+                os.chdir(here)
+            test("default registry: no argument reads <MEMORY_ROOT>/project/temp-name-sites.txt and is green",
+                 (code, "reads the default registry" in said.getvalue()), (0, True), say=True)
+    finally:
+        os.environ.update(held)
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -2061,7 +2201,8 @@ def main(argv: list[str]) -> int:
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
     try:
-        declared, malformed = resolve_declaration(args[0] if args else None)
+        declared, malformed = resolve_declaration(args[0] if args else derive_default_registry(
+            root, "substitution-fed-loops.txt"))
     except OSError as exc:
         print(f"sh-hygiene: {exc}", file=sys.stderr)
         return 2
