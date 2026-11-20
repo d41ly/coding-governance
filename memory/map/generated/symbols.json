@@ -10608,6 +10608,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_default_registry",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "derive_definition_rel",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
@@ -18171,6 +18176,11 @@
       "id": "print_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "print_registry_posture",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "print_rekeyed_card",

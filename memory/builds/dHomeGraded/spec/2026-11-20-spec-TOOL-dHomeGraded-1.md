@@ -39,6 +39,9 @@ byte-identical to gov's sources, and the rest on four deployer defects the re-ad
   `write_gate_legs`' own claim test on the next run, which reads `emitted` as ownership.
 - **S6** — `pass_legs.py` reads `[gate_runner].file` from `.governance/deploy.toml` when `GATE_LEGS`
   is unset and the deploy file names one, before falling back to the sibling manifest. Observed by AC6.
+- **S7** — With no registry argument, each `sh_hygiene.py` mode reads `<MEMORY_ROOT>/project/<its
+  registry>` when that file exists, the path gov's own rows pass, so an adopter declares its sites
+  without editing gov's emitted leg row. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -99,6 +102,10 @@ successor declares the same leg name, which the existing claim path keeps.
 - **AC6** — When `python tools/run-gates/pass_legs.py --check` runs in inCMS' re-adoption worktree
   with `GATE_LEGS` unset, it reads the manifest `[gate_runner].file` names. Red when: the unchanged
   reader runs there, which refused inCMS' own object-shaped sibling manifest.
+- **AC7** — When `python tools/gate-lint/sh_hygiene.py --spawn-idioms` runs with nicocares'
+  re-adoption worktree as its working directory and nicocares' `spawn-idiom-sites.txt` declaring its
+  14 rows, it exits 0 and names the registry it read. Red when: the unchanged scanner runs there,
+  which graded those sites against an empty declaration.
 
 ## 6. Gates
 
@@ -112,4 +119,5 @@ none
 
 - rev-1 · 2026-11-20 · initial draft.
 - rev-2 · 2026-11-20 · AC1 to AC4 run gov's own checkers, AC4 over the census fixture's plant, and §6
-  names every leg whose guard the touched files trip, and §3 leaves the method-carriers leg out.
+  names every leg whose guard the touched files trip, §3 leaves the method-carriers leg out, and S7 adds
+  the default registry path the re-adoption needed.
