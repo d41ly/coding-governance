@@ -44,6 +44,13 @@ home and temp, never the suite, against the fixed hook.
 - The hooks kit's version carrier was not moved by hand: `tools/govkit/govkit.py#cmd_epoch` states the lander mints the bump at the push boundary and a branch owes none, and this build's earlier hook moves, units 2, 34 and 43, carry no hand bump either. (DERIVED)
 - MSYS rewrites a quoted `"/"` inside a native program's argument to Git's install root, so the arm spells its forward slash through `path.posix.sep`; the first draft's marker path was mangled that way and the first probe read was discarded. (DERIVED)
 
+- The bug-class checklist over the pass commit selected `portability-sweep`: fixture three's payload spelled the target unquoted, so a scratch path holding a space would split it; the arm now single-quotes it, and the block probe read all four rows `ok` again under a scratch directory whose name holds a space, while the probe's quoted form still wrote the marker at `95c3103ad` and not at this pass. (DERIVED)
+- It selected `fixture-passes-by-finding-nothing`: each row holds only when the target tracks its checker and the card's text names no kickoff checker, so a fixture that built nothing or a hook that never reached `readCard` reads `FAIL`, and the marker the same fixtures wrote at the base is the liveness of the marker check. (DERIVED)
+- It selected `budget-row-not-remeasured-after-added-arms` and `an-attested-count-must-count-what-the-grader-counts`: the row is re-priced as a proxy above and its leg reading is owed below; each of the arm's rows moves the executed count by exactly one, on `ok` or on `FAIL`. (DERIVED)
+- It selected `held-suite-guard-misses-a-sibling-kit`: the arm copies only the hooks kit's own scripts, the kit resolver among them, and reads no sibling kit's file. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: the RED reading ran the hook's scripts as committed at `95c3103ad`, not a hand-made break. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line. (DERIVED)
+
 ## Items diverged
 
 None.

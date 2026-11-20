@@ -1828,7 +1828,7 @@ for sg95_f in "1 a copy outside any repository:$sg95/hk" "2 a copy in a reposito
   esac
 done
 rm -f "$sg95/marker"; sg_hook=$HOOK; HOOK="$sg95/hk/scratch-guard.js"
-run_card "TOOL-dPlacedRequest-95 AC1 fixture 3 a git -C <target> commit -> allow, the card absent naming no kickoff checker" 0 "one;;orientation card absent;;no kickoff checker" "git -C $sg95_tc commit -m x" session_id=sgtest-c1 "cwd=$SG_CWD_WT"
+run_card "TOOL-dPlacedRequest-95 AC1 fixture 3 a git -C <target> commit -> allow, the card absent naming no kickoff checker" 0 "one;;orientation card absent;;no kickoff checker" "git -C '$sg95_tc' commit -m x" session_id=sgtest-c1 "cwd=$SG_CWD_WT"
 HOOK=$sg_hook
 [ "$sg95_tracked" = manifest-check.sh ] && [ ! -e "$sg95/marker" ] \
   && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
