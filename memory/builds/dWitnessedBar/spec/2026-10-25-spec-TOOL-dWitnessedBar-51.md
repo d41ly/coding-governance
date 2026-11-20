@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** INPROGRESS · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -53,14 +53,14 @@ leave this unit's scope. The items §4 "What HEAD already holds" lists landed wi
 ## 2. Scope (IN)
 
 - **S1** — id 1. Every `shell-role` row the leg `portability (shell lines only shrink)` reds at the pass
-  is settled in the pass commit. The owing set is derived, never typed: each tracked shell file whose
-  code-line count, as `sh_hygiene.py --shell-role --measure` prints it, differs from its row in
-  `memory/project/shell-role.txt`. A grown or new file is widened through
-  `python tools/memory-tree/ratchet.py widen shell-role --key <path> --reason <text> --unit <id>`, one
-  record per growing unit, its `Caused-by` that unit, found as the pass commits after unit 24's
-  (`fe49c7d2a`) that touched the file, this unit's own growth under `TOOL-dWitnessedBar-51`; each
-  widened row's count is then set to the measured count (§8 F5). A file that shrank has its row lowered
-  to its count. Observed by AC1.
+  is settled in the pass commit. The owing set is derived, never typed: each shell file whose code-line
+  count, as the `shell-role` seed of `tools/gate-lint/kit.toml` prints it after the pass's own edits,
+  differs from its row in `memory/project/shell-role.txt`. Every grown or new key goes through one
+  `python tools/memory-tree/ratchet.py widen shell-role --key <path> [--key <path>] --reason <text> --unit TOOL-dWitnessedBar-51`,
+  so its one record is this unit's and its `Caused-by` names `TOOL-dWitnessedBar-51`; `<text>` states
+  the derivation, the pass commits after unit 24's (`fe49c7d2a`) that touched each key (§8 F10). Each
+  widened row's count is then set to the measured count (§8 F5); a shrunk file's row is lowered to its
+  count. Observed by AC1.
 - **S2** — id 40. Units 4 and 25, which `TOOL-dWitnessedBar-24` §4 Rollout names as owing a widen row,
   are covered by S1's derivation like every other, and the `--shell-role` paragraph of
   `tools/gate-lint/README.md` states the derivation in place of a unit list. Observed by AC1.
@@ -129,7 +129,9 @@ leave this unit's scope. The items §4 "What HEAD already holds" lists landed wi
   continuation lines joined. Observed by AC2.
 - **S21** — id 31. `tools/drift-audit/drift_report.py#read_gate_health` takes the bar's legs through
   `tools/run-gates/held_halves.py#test_held`, carried inline under a `PARITY_ROWS` row since drift-audit
-  cannot import run-gates. The copies at `tools/run-gates/run-selftests.sh@f6685fa0:985` and
+  cannot import run-gates: the kit hold, the one a manifest row carries. A `quarantine` or `level` hold
+  is a `GATE_SELECTION` row `tools/run-gates/run-gates.sh#derive_hold_source` reads, so its reader is
+  `TOOL-dWitnessedBar-62` S17's (§8 F11). The copies at `tools/run-gates/run-selftests.sh@f6685fa0:985` and
   `tools/govkit/govkit.py@7999040a:2603` read `derive_hold_source`'s word or state why each stays.
   Observed by AC17.
 - **S22** — id 36. Present at HEAD: `memory/project/readme-contract.txt` was converted by the main
@@ -268,7 +270,7 @@ leave this unit's scope. The items §4 "What HEAD already holds" lists landed wi
 - **consumes-from** `TOOL-dWitnessedBar-50` — the derived wrong-shell population and `refuse-wrong-shell.sh --coverage` (id 51)
 - **hands-off** `TOOL-dWitnessedBar-56` — the AC24 arm, the tail cut of S34 and the verdict prune of S28, which the verdict-boundary minors batch ages, escapes and annotates (ids 23, 48, 49)
 - **hands-off** `TOOL-dWitnessedBar-57` — S1, S13, S21, S23, AC8, AC15, AC35, AC36 and its two parity rows, which the resolver and ledger minors batch grades on the prepared merge, observes and gives canonical markers (ids 9, 10, 22, 26, 31, 34, 38, 39, 46)
-- **hands-off** `TOOL-dWitnessedBar-62` — S1, AC8, AC17 and S21's `PARITY_ROWS` precedent, on which the minors batch anchors the pass commit in `build_commit`, passes `--selection` and carries drift-audit's selection reader (ids 5, 23, 24, 29)
+- **hands-off** `TOOL-dWitnessedBar-62` — S1, AC8, AC17 and S21's `PARITY_ROWS` precedent, on which the minors batch anchors the pass commit in `build_commit`, passes `--selection`, carries drift-audit's selection reader and adds the `held` fixture's quarantine-held leg (ids 5, 23, 24, 29)
 
 ## 4. Design
 
@@ -289,9 +291,11 @@ them and observes each through its criterion.
 
 - The shell-role leg grades each row exactly (`tools/gate-lint/sh_hygiene.py#run_shell_role_scan`), and
   `tools/memory-tree/ratchet.py#run_widen` raises a widened row by one. At HEAD 24 rows differ from the
-  measure, 20 grown, 3 shrunk and 1 new file, `tools/run-gates/lib-verdict.sh` (PINNED 2026-11-20, a
-  probe of `sh_hygiene.measure_code_lines` over `read_shell_sources` against the rows); unit 10's three
-  `widened:` rows name a deviation record.
+  measure, 20 grown, 3 shrunk and 1 new file, `tools/run-gates/lib-verdict.sh` (PINNED 2026-11-20, the
+  seed's `--measure . ':!memory/'` against the rows); unit 10's three `widened:` rows name a deviation
+  record, each file among the grown. The build holds no widen record (DERIVED, `git ls-files
+  'memory/builds/dWitnessedBar/build/*-widen-*'`), and `write_record` numbers a kind build-wide, so
+  S1's is `widen-1`.
 - `seen_red.py` resolves a whole first field (`tools/memory-tree/seen_red.py#derive_owed_gates`); of this
   build's flagged `New arm:` lines, 5 at HEAD (PINNED 2026-11-20), two resolve under S4's rule.
 - The map files carry `.txt` names; the dead-path waiver holds 20 `carried:TOOL-dWitnessedBar-51` rows
@@ -333,10 +337,10 @@ print(n)"
 
 ```
 c24   = fe49c7d2a, unit 24's pass commit
-owed  = each shell file whose `--measure` count differs from its row, or has no row
-for each owed file grown or new, for each unit u whose pass commit in c24..HEAD touched it:
-    ratchet.py widen shell-role --key <path> --reason "grown by u's pass" --unit u
-then:   each owed row's count := its `--measure` count (§8 F5)
+owed  = each shell file whose seed count, after the pass's edits, differs from its row or has none
+ratchet.py widen shell-role --key k for every owed k grown or new
+    --reason "grown by the pass commits in c24..HEAD touching each key" --unit TOOL-dWitnessedBar-51
+then:   each owed row's count := its seed count (§8 F5)
 ```
 
 ### The declarative keys (S36, S48)
@@ -380,8 +384,11 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 `tools/memory-tree/merge-rows.py`, `tools/memory-tree/merge-rows.test.sh`, `tools/lib/legacy_ledger.py`,
 `tools/memory-tree/legacy_ledger.py`, `tools/gate-lint/legacy_ledger.py`, `tools/run-gates/README.md`,
 `tools/gate-lint/eol_class.py`, `tools/run-gates/precommit.py`, `tools/memory-tree/kit.toml`,
-`memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-51-widen-<n>.md`,
-`memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-51-deviation-<n>.md`.
+`memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-51-widen-1.md`, S1's one record,
+`memory/builds/dWitnessedBar/build/<date>-build-TOOL-dWitnessedBar-51-deviation-<n>.md`, and
+`memory/guides/SESSION-KICKOFF.md`, its `last-audit` re-stamped, since `.memory-tree.conf`,
+`tools/run-gates/run-gates.sh`, `tools/run-gates/run-selftests.sh` and
+`tools/memory-tree/check-memory-hygiene.sh` sit on its `watch:` line.
 
 ### Alternatives rejected
 
@@ -401,11 +408,13 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python ratchet.py never-gains` and `python sh_hygiene.py --shell-role <ledger> .` run on
-  the built tree, neither names a `shell-role` key, and every `widened:` row of `shell-role.txt` names a
-  tracked widen record whose `**Caused-by:**` is a unit whose pass commit after `fe49c7d2a` touched that
-  file; `tools/gate-lint/README.md` names the derivation and lists no unit.
-  Red when: a shell file grown by a later unit has no widen row, so the leg reds at the close.
+- **AC1** — When `python ratchet.py never-gains` and `python sh_hygiene.py --shell-role <ledger> . ':!memory/'`
+  run on the built tree, neither names a `shell-role` key; every `widened:` row of `shell-role.txt` names
+  `<date>-build-TOOL-dWitnessedBar-51-widen-1`, whose `**Caused-by:**` is `TOOL-dWitnessedBar-51` and
+  whose Keys hold the row's key; `git show --name-only --format= HEAD -- memory/builds/dWitnessedBar/spec/`
+  at the pass commit names this spec alone; `tools/gate-lint/README.md` names the derivation and lists
+  no unit.
+  Red when: a grown shell file has no widen row, or a record filed under a CLOSED unit re-renders its spec.
 - **AC2** — When `python seen_red.py --fixture --plant unseen-arm-with-args` runs in `tools/memory-tree/`,
   it exits 1 naming the leg; `--plant arm-outside-gates`, a spec quoting a `New arm:` line in its §4, exits
   0 owing nothing for it; and `python seen_red.py --build dWitnessedBar` lists `shell-hygiene selftest`
@@ -465,9 +474,9 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
   `grep -c '^# >>> acceptance_reader' fix_keeps.py` prints 1.
   Red when: the reader grades a section by position, or drifts from the spec-token checker's.
 - **AC17** — When `python drift_report.py --gate-health --fixture held` runs in `tools/drift-audit/` over a
-  fixture manifest with one leg held by `quarantine` and one by `kit`, neither is a bar leg, and
-  `grep -c '^# >>> hold_predicate' drift_report.py` prints 1.
-  Red when: the measurement's population differs from what the runner holds.
+  fixture manifest with one leg whose `subject` is `kit`, one whose `chunk` is `selftests` and one
+  unheld, only the unheld leg is a bar leg, and `grep -c '^# >>> hold_predicate' drift_report.py` prints 1.
+  Red when: the measurement's population differs from what the runner's kit hold holds.
 - **AC18** — When `git log -1 --format=%B -- memory/project/readme-contract.txt` runs, it prints the main
   loop's commit carrying `Pass: none`, and `python gen_build_index.py --check` in `tools/memory-tree/`
   exits 0 over the converted file.
@@ -614,6 +623,21 @@ New arm: tools/unattended/unattended.test.sh · covers AC16 AC31 · the plants `
 - **F9 — Where does S34's `keep_tails.py --selftest` arm live, when no leg runs that selftest?** (a) the
   evidence suite calls it, a suite a leg runs, so `test.seen-red` owes it; (b) a new leg. RESOLVED (agent,
   2026-11-20, delegated): (a), rung 3, no new leg for one arm. widens: none · relaxes: none
+- **F10 — Under which unit is S1's widen record filed?** `run_widen` files it under `--unit` and writes
+  that id as its `Caused-by`, and the units that grew the files are CLOSED, so a record serving one
+  re-renders that spec's `gen:spec-records` region. (a) one call under `TOOL-dWitnessedBar-51`, its
+  `Reason` stating the derivation; (b) a `--caused-by` option on the door; (c) one record per growing
+  unit, re-rendering CLOSED specs. RESOLVED (agent, 2026-11-20, delegated): (a): (c) moves frozen
+  specs, and (b) is a door option this batch alone would use. What it does not check: which unit grew
+  a key, which `git log` over the key derives. widens: none · relaxes: none
+- **F11 — Where does S21 read a quarantine hold, when no manifest row carries one?** Only
+  `derive_hold_source` reads one, from the `GATE_SELECTION` file `verdict_flow.py select` writes. (a)
+  S21 carries the kit hold and AC17 grades it, the selection's holds waiting with
+  `TOOL-dWitnessedBar-62` S17 and S18; (b) S21 also carries `verdict_flow.py#read_selection` and a
+  `--selection` flag; (c) AC17 states a quarantine-held leg stays a bar leg. RESOLVED (agent,
+  2026-11-20, delegated): (a): (b) is a new surface (veto 2) unit 62 owns, and (c) leaves a criterion
+  for 62 to reverse. What it does not check: a leg a selection holds, still in drift's bar until unit
+  62 lands. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -639,6 +663,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC16 AC31 · the plants `
   only; S17, S30 and S46 keep the landed shape (F6 to F8); S25's callers re-counted; S51 and AC41 carry
   the install-prefix fix; the arm homes are the suites a leg runs (F9); §7 gains the legs its new paths'
   guards name. Goal and Scope intent unchanged.
+- rev-7 · 2026-11-20 · S1 · S21 · §3 · §4 · AC1 · AC17 · §8 F10 F11 · the builder's three divergences
+  folded by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-spec-writer`: S1's one widen
+  record is filed under this unit (F10); S21 and AC17 grade the kit hold, the quarantine half going to
+  unit 62 (F11); Files touched names `widen-1` and SESSION-KICKOFF's re-stamp. No code moved since rev-6.
 
 ## 10. Reuse audit
 
