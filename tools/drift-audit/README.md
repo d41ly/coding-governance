@@ -106,7 +106,7 @@ Then, in order:
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio`, `--gate-health` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
 | `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `HANDKEPT`, `RATCHETS`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR`, `DEAD_READINGS_LIMIT`, `DEAD_FILED` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
@@ -158,6 +158,7 @@ empty by declaration wherever there is none.
 | `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |
 | `dossiers_older_than_their_paths` | how many codebase-map feature dossiers are older than their paths — a commit touching a path the dossier claims is not an ancestor of the dossier's own last commit? Read from the map kit's own `map_diff.py --stale-dossiers --json`, so the attribution is spelled once; map-root paths are never a claim, and a merge commit carries no paths, so a change made only in a conflict resolution is not seen. The detail is the refresh worklist, most-behind first. Not asked where the map kit is absent or unadopted; DEAD PROBE on a shallow clone or when nothing touched a claimed path. | no |
 | `live_builds_without_activity` | how many live builds are dormant? Counts the `dormant` cells of the `Activity` column the memory-tree generator renders into `LIVE.md` against its `LIVE_DORMANT_DAYS`, found by header name, and defines no dormancy rule of its own; `of` counts the `active` and `dormant` rows, any other cell is unjudgeable, and the detail names each dormant build with its `Last record`. Not asked where `LIVE.md` or its `Activity` column is absent. | no |
+| `gate_health` | what reliability bar do the flake records measure? Once every leg of the bar (each leg of the gate-leg manifest beside this kit's tool root that the kit hold, `subject` `kit` or `chunk` `selftests`, does not hold) has thirty verdicts in the flake records, one more than the nearest-rank 90th percentile, across those legs, of each leg's flakes in its newest ten by `Ended`, as `value`; `n/a` while unarmed, its first detail row naming each leg short of thirty with its count. Read through the memory-tree record factory; DEAD PROBE only where no factory resolves or no manifest reads. | no |
 
 ### Armed cutoff keys are a budget
 
@@ -273,6 +274,22 @@ signal, refuses `--check`, `--offenders` and `--delta`, and is on no bar and no 
 known: a fix not called `fix` is missed, and blame credits moved code to its mover. The caveat line it
 always prints is the rule: a difference between two months of one repository is not evidence of an
 effect, so it prints no comparison.
+
+## Gate health — `--gate-health`, the reliability bar
+
+`drift_report.py --gate-health` prints the `gate_health` measurement in one line: `drift-report:
+gate-health measured <count>/10 · legs <armed>/<bar legs> · verdicts <run id> …`, or `drift-report:
+gate-health unarmed · <leg> <rows>/30 …`. It is a mode of its own, as `--escape-ratio` is: it reads
+`.memory-tree.conf`, the gate-leg manifest and the flake records through the memory-tree factory alone,
+no project layer and no base ref, and refuses `--check`, `--offenders`, `--delta` and `--escape-ratio`.
+`--with <path>` counts one flake record not yet staged beside the tracked ones, and is refused unless the
+path is a flake record inside this repository. `--write --build <slug> --unit <id>` writes the armed
+measurement as a `gate-health` record of that build, `Measured`, `Verdicts` (the `Run` of every flake
+record it read) and `Legs`, through the factory's `write_record`, and prints `drift-report: wrote <path>`;
+an unarmed one writes nothing. Exit 0 measured or unarmed, 2 refused with nothing written. The run-gates
+kit's `verdict_flow.py flakes` runs it with `--write` and `--with` after each flake record it writes, and
+reads the newest gate-health record's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
+`--gate-health --fixture differs|lower|short|write` runs one planted case over a scratch repository.
 
 ## What "landed" is measured against — the base ladder
 

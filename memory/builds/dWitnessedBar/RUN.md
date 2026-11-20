@@ -495,3 +495,10 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T09:48:09Z brief · item TOOL-dWitnessedBar-1 · reason 2ae724760d05 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-build-brief.md
 
 2026-11-20T09:48:09Z brief · item TOOL-dWitnessedBar-59 · reason cbc2208a1e3d memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-59-build-brief.md
+
+2026-11-20T09:50:12Z dispatch · item 609cd40b TOOL-dWitnessedBar-1 · reason memory/HYGIENE.md tools/drift-audit/README.md tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/run-gates/README.md tools/run-gates/verdict_flow.py memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-11.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-12.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-1-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-20T09:51:19Z dispatch · item 609cd40b TOOL-dWitnessedBar-59 · reason tools/govkit/selftest.py memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-59-deviation-591.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md
+2026-11-20T10:06:16Z draw · re-dispatch · TOOL-dWitnessedBar-1 · 89/180 · 20261120T100616Z-7b4dcf
+
+2026-11-20T10:06:16Z dispatch · item 609cd40b TOOL-dWitnessedBar-1 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md

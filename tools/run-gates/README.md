@@ -1514,7 +1514,13 @@ runs it on every red bar it reads. `verdict_flow.py judge --run <run dir> --leg 
 (TOOL-dWitnessedBar-8), and acts as `verdict.flakes` reads: under `retry-only` it writes nothing; under
 `record` and `quarantine` it writes one `flake` record through the memory-tree factory's
 `write_record`, `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one TAB row per executed leg, `<leg> ·
-<first rc> · <re-run rc or ->`. A flake is a row whose first rc is not 0 and whose re-run rc is. Under
+<first rc> · <re-run rc or ->`. A flake is a row whose first rc is not 0 and whose re-run rc is, as the
+factory's `derive_flaked` says, and the rows are read through its `read_flake_body`. It then runs the
+drift kit's gate-health measurement in the repository's top, bounded at 60 seconds, `drift_report.py
+--gate-health --write --build <slug> --unit <id> --with <the record it wrote>`, and prints every line it
+prints, so a `drift-report: wrote <path>` line's gate-health record is staged beside the flake record;
+no drift kit, a non-zero exit or the bound firing prints one `flakes  gate-health · <why>` line, and
+`flakes` still exits 0. The holds it prints read the threshold in force before that record. Under
 `quarantine` it prints `hold  <leg>  <flakes>/<window>  <record ids>` for each leg whose flakes in its
 last `<window>` rows, newest `Ended` first across every tracked flake record and after its last
 release, reach `verdict.flakes.entry`, and that no OPEN held-flaky-leg ask names: a declared

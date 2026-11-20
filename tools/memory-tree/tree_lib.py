@@ -510,9 +510,11 @@ BIND_HEAD_LINES = 12
 # `write_record` by the ratchet pack's `ratchet.py widen` alone. `leg-tail` (TOOL-dWitnessedBar-25 S6) is a
 # failing leg's output tail kept by its hash, written through `write_record` by the run-gates kit's
 # `keep_tails.py` alone. `flake` (TOOL-dWitnessedBar-8 S3) is one `test.flakes` run's per-leg verdicts,
-# written through `write_record` by the run-gates kit's `verdict_flow.py flakes` alone.
+# written through `write_record` by the run-gates kit's `verdict_flow.py flakes` alone. `gate-health`
+# (TOOL-dWitnessedBar-1 S4) is one gate-health measurement, the reliability bar derived from the flake records,
+# written through `write_record` by the drift kit's `drift_report.py --gate-health --write` alone.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
-                      "transition", "recommendation", "widen", "leg-tail", "flake")
+                      "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

@@ -65,7 +65,13 @@ the `quarantine` row TOOL-dWitnessedBar-8. `<run dir>` is one run record of the 
          tree), `Sha` (the header's head) and `Legs`, then one fenced TAB row per executed leg,
          `<leg> · <first rc> · <re-run rc or ->`, the first rc the retry's where one ran; a held,
          skipped or reused leg wrote no `<i>.leg` and has no row. It prints `verdict-flow: wrote
-         <path>`. Under `quarantine` it then prints `hold  <leg>  <flakes>/<window>  <record ids>`
+         <path>`, then runs the drift kit's gate-health measurement in the repository's top within
+         HEALTH_BOUND, `drift_report.py --gate-health --write --build <slug> --unit <id> --with <that
+         record>`, and prints every line it prints unchanged, so a `drift-report: wrote <path>` line is
+         staged beside the flake record (TOOL-dWitnessedBar-1 S5); no drift kit, a non-zero exit or the
+         bound firing prints one `flakes  gate-health · <why>` line instead. The flake body is read, and a
+         row judged flaked, through the factory's `read_flake_body` and `derive_flaked`. Under
+         `quarantine` it then prints `hold  <leg>  <flakes>/<window>  <record ids>`
          for each leg whose flakes in its last `<window>` rows reach the entry threshold and that no
          OPEN held-flaky-leg ask names. The threshold is `verdict.flakes.entry`: a declared
          `<count>/<window>`, or under `measured` the `Measured` of the newest `gate-health` record
@@ -101,12 +107,15 @@ plants a repository whose manifest holds an `e2e` leg and whose policy lands `un
 selects at R, moves the leg's level in the working tree alone, and checks a run that adds a row.
 `--fixture held-policy` selects under each `verdict.held` value. `--fixture route-flaky` routes an OWN
 red whose re-run reads `ok` and one whose re-run reads `fail`. `--fixture flakes-record` writes a record
-under `record`, reads it with the factory's `read`, and writes none under `retry-only`. `--fixture
-flakes-window` holds a leg at 2 flakes in 10 and not one at 1, reads a planted gate-health `Measured`
-only while the kind is registered, and holds no leg released after its flakes. `--fixture
+under `record`, reads it with the factory's `read`, and runs a stub drift kit's measurement with the
+record named by `--with`; under `retry-only` it writes none and runs no stub. `--fixture
+flakes-window` holds a leg at 2 flakes in 10 and not one at 1 with no gate-health record, none at a
+planted `Measured` of 3/10, both legs at one of 1/10, 2/10 again with the kind taken out of the loaded
+table for that case alone, and holds no leg released after its flakes. `--fixture
 quarantine-source` reads a quarantine row from an ask at R and none from the working tree. `--fixture
-quarantine-check` reds a hold below 2/10 and passes one at it. Each exits 0 when every case reads as
-planted, 1 naming each that does not.
+quarantine-check` reds a hold below 2/10 and passes one at it. `--fixture measured-check` reds a hold at
+2 flakes filed after a gate-health record held 3/10, and passes it with that record dated after the
+filing. Each exits 0 when every case reads as planted, 1 naming each that does not.
 
 WHAT IT DOES NOT CHECK. That the attribution was made against the landing base, or that its `blocks`
 words were derived by `lib-verdict.sh`: the runner writes both, and the readers that land a red read
@@ -174,6 +183,7 @@ ENTRY_DEFAULT = (2, 10)  # v2:1274's literal default, held until a gate-health r
 ENTRY_FORM = re.compile(r"([0-9]+)/([0-9]+)")
 FLAKE_KIND = "flake"
 HEALTH_KIND = "gate-health"  # registered by TOOL-dWitnessedBar-1; read only while the factory holds it
+HEALTH_BOUND = 60  # seconds, the gate-health measurement `flakes` runs, inside the driver's 120 (TOOL-dWitnessedBar-1 S5)
 FLAKY_FORM = "held flaky leg: leg"
 FLAKY_ASK = re.compile(r"held flaky leg: leg (.+?) flaked ([0-9]+) in its last ([0-9]+) verdicts")
 LEG_ROW = re.compile(r"([0-9]+)\.leg")
@@ -342,15 +352,16 @@ def cmd_route(run):
     return 0, [f"route  {leg}  {cls} · {blocks} · {route}" for leg, cls, blocks, route, _, _ in out_rows]
 
 
-def run_kit(here, home, anchor, args, what, cwd=None):
-    """The kit `home` found from `here`, its `anchor` run with `args` in `cwd` -> the completed process."""
+def run_kit(here, home, anchor, args, what, cwd=None, bound=BOUND):
+    """The kit `home` found from `here`, its `anchor` run with `args` in `cwd` within `bound` seconds -> the
+    completed process."""
     try:
         kit = resolve_kit_dir(home, anchor, here)
     except LookupError as e:
         raise Refusal(f"{what}: {e}") from None
     try:
         return subprocess.run([sys.executable, str(pathlib.Path(kit, anchor)), *args], capture_output=True,
-                              encoding="utf-8", errors="replace", timeout=BOUND, cwd=cwd)
+                              encoding="utf-8", errors="replace", timeout=bound, cwd=cwd)
     except (OSError, subprocess.TimeoutExpired) as e:
         raise Refusal(f"{what}: {anchor} did not answer: {e}") from None
 
@@ -676,7 +687,7 @@ def read_flake_rows(run):
 def read_flake_record(build_records, path, text):
     """One flake record: its fields, `id` (the stem), `ended` (UTC) and `rows`, the TAB rows of its body."""
     fields, bad, name = build_records.read_record(path, text, FLAKE_KIND)
-    rows = [tuple(ln.split("\t")) for ln in text.replace("\r\n", "\n").split("\n") if ln.count("\t") == 2]
+    rows = build_records.read_flake_body(text)
     return {**fields, "path": path, "id": pathlib.PurePosixPath(path).stem, "ended": read_instant(fields.get("Ended")),
             "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
             "malformed": bad, "rows": rows}
@@ -755,9 +766,11 @@ def read_flake_releases(top, factory, asks, records):
     return out
 
 
-def derive_flake_holds(records, threshold, releases):
+def derive_flake_holds(factory, records, threshold, releases):
     """[(leg, flakes, window, [record ids])] for each leg whose flakes in its last `window` rows, newest
-    `Ended` first across `records` and only those after its release, reach `count`, in leg order."""
+    `Ended` first across `records` and only those after its release, reach `count`, in leg order. A row
+    flaked where the factory's `derive_flaked` says so."""
+    build_records = factory[0]
     count, window = threshold
     seen = {}
     for r in sorted(records, key=lambda r: (r["ended"], r["id"]), reverse=True):
@@ -768,7 +781,7 @@ def derive_flake_holds(records, threshold, releases):
                 continue
             got = seen.setdefault(leg, [])
             if len(got) < window:
-                got.append((first not in ("0", "-") and first.lstrip("-").isdigit() and rerun == "0", r["id"]))
+                got.append((build_records.derive_flaked(first, rerun), r["id"]))
     holds = []
     for leg in sorted(seen):
         ids = [rid for flake, rid in seen[leg] if flake]
@@ -783,8 +796,8 @@ def derive_hold_lines(top, factory, entry, asks, extra=()):
     threshold, said = read_flake_threshold(top, factory, entry)
     held = {leg for leg, *_ in read_flaky_asks(asks, "OPEN")}
     lines = [f"flakes  threshold {threshold[0]}/{threshold[1]} · {said}"]
-    for leg, flakes, window, ids in derive_flake_holds(records, threshold, read_flake_releases(top, factory, asks,
-                                                                                               records)):
+    for leg, flakes, window, ids in derive_flake_holds(factory, records, threshold,
+                                                       read_flake_releases(top, factory, asks, records)):
         if leg in held:
             lines.append(f"flakes  {leg} flaked {flakes} in {window}, and an OPEN held-flaky-leg ask names it")
         else:
@@ -818,6 +831,23 @@ def read_flake_policy(top, here):
     return value, entry
 
 
+def write_gate_health(top, build, unit, rel, here=HERE):
+    """-> the lines the drift kit's gate-health measurement prints, run in `top` within HEALTH_BOUND over the
+    tracked flake records and `rel`, the one just written (TOOL-dWitnessedBar-1 S5), each unchanged, so the
+    driver stages the record a `drift-report: wrote <path>` line names. No drift kit, a non-zero exit or the
+    bound firing is one `flakes  gate-health · <why>` line instead, and never a refusal of `flakes`."""
+    try:
+        p = run_kit(here, "drift-audit", "drift_report.py",
+                    ["--gate-health", "--write", "--build", build, "--unit", unit, "--with", rel],
+                    "no drift kit measures gate health", cwd=top, bound=HEALTH_BOUND)
+    except Refusal as e:
+        return [f"flakes  gate-health · {e}"]
+    if p.returncode != 0:
+        why = next((ln.strip() for ln in p.stderr.splitlines() if ln.strip()), "it printed nothing on stderr")
+        return [f"flakes  gate-health · drift_report.py --gate-health exited {p.returncode}: {why}"]
+    return [ln for ln in p.stdout.splitlines() if ln.strip()]
+
+
 def cmd_flakes(run, build, unit, here=HERE, repo=None):
     """-> (rc, out lines). `test.flakes` over one run record, under `verdict.flakes`."""
     top = read_top(repo or pathlib.Path("."))
@@ -846,9 +876,10 @@ def cmd_flakes(run, build, unit, here=HERE, repo=None):
                                           lines=body)
         except (ValueError, OSError) as e:
             raise Refusal(f"the record factory refused the flake record: {e}") from None
-        flaked = sum(1 for _, first, rerun in rows if first != "0" and rerun == "0")
+        flaked = sum(1 for _, first, rerun in rows if factory[0].derive_flaked(first, rerun))
         lines.append(f"{SAY}: wrote {rel} · {len(rows)} leg(s), {flaked} flake(s)")
         extra.append(rel)
+        lines += write_gate_health(top, build, unit, rel, here)
     if value == "record":
         return 0, lines + ["flakes  re-entry test.verdict"]
     asks, said = read_repo_asks(top)
@@ -871,7 +902,7 @@ def cmd_flakes_check(here=HERE, repo=None):
         day = str(a.get("filed", ""))
         (count, window), why = read_flake_threshold(top, factory, entry, day)
         then = [r for r in records if r["ended"].date().isoformat() <= day]
-        flakes = {h[0]: h[1] for h in derive_flake_holds(then, (1, window), releases)}.get(leg, 0)
+        flakes = {h[0]: h[1] for h in derive_flake_holds(factory, then, (1, window), releases)}.get(leg, 0)
         line = (f"flakes --check  ask {a.get('id')} holds leg {leg}, which flaked {flakes} in its last {window} at "
                 f"its filing on {day}, against the entry threshold {count}/{window} ({why})")
         (bad if flakes < count else out).append(line + (", below it" if flakes < count else ""))
@@ -1237,11 +1268,19 @@ def write_flake_ask(leg, n, filed, flakes=2, window=10):
             f"seen planted · accept the leg is released after its streak, or its flake is fixed\n")
 
 
+STUB_DRIFT = """import sys
+print("stub-drift: argv " + " ".join(sys.argv[1:]))
+"""
+
+
 def run_fixture_flakes_record():
     out, bad = [], []
     for value in ("record", "retry-only"):
         with tempfile.TemporaryDirectory(prefix="vflow-") as root:
             repo, here, sha = write_flake_repo(root, f'[verdict]\nflakes = "{value}"\n')
+            # a stub drift kit beside the kits, printing the argv the gate-health measurement is run with
+            (here / "drift-audit").mkdir()
+            (here / "drift-audit" / "drift_report.py").write_text(STUB_DRIFT, encoding="utf-8")
             run = pathlib.Path(root, "run")
             run.mkdir()
             (run / "verdict").write_text("ended\t2026-01-02T03:04:05Z\nverdict\tRED\nfailed\t2\ntree\t" + "a" * 40
@@ -1258,13 +1297,20 @@ def run_fixture_flakes_record():
                 rc, lines = 2, [f"refused · {e}"]
             out += [f"{value}: {ln}" for ln in lines]
             written = sorted(repo.joinpath("memory/builds", FLAKE_BUILD, "build").glob(f"*-{FLAKE_KIND}-*.md"))
+            stub = [ln for ln in lines if ln.startswith("stub-drift: argv ")]
             if value == "retry-only":
                 if rc != 0 or written:
                     bad.append(f"under retry-only flakes exited {rc} writing {len(written)} record(s), planted to write none")
+                if stub:
+                    bad.append(f"under retry-only the gate-health measurement ran: {stub}")
                 continue
             if rc != 0 or len(written) != 1:
                 bad.append(f"under record flakes exited {rc} writing {len(written)} record(s), planted to write one: {lines}")
                 continue
+            rel = written[0].relative_to(repo).as_posix()
+            want = f"--gate-health --write --build {FLAKE_BUILD} --unit {FLAKE_UNIT} --with {rel}"
+            if stub != [f"stub-drift: argv {want}"]:
+                bad.append(f"under record the gate-health measurement printed {stub}, planted one run with {want}")
             factory = load_flake_factory()
             rec = read_flake_record(factory[0], written[0].relative_to(repo).as_posix(),
                                     written[0].read_text(encoding="utf-8"))
@@ -1304,21 +1350,36 @@ def run_fixture_flakes_window():
         got = read_holds("no gate-health record")
         if got != [want]:
             bad.append(f"with no gate-health record the holds read {got}, planted [{want}]")
+        # TOOL-dWitnessedBar-1 S8: the factory registers the kind, so the records are planted as the drift kit
+        # writes them; the unregistered case takes the kind out of the loaded table for itself alone.
         if kinds.get(HEALTH_KIND) is None:
-            try:
-                kinds[HEALTH_KIND] = {"required": ("Measured",), "closed": ()}
-                factory[0].write_record(repo, FLAKE_BUILD, FLAKE_UNIT, HEALTH_KIND, "planted", [("Measured", "3/10")])
-                write_fixture_commit(repo, "a gate-health record")
-                got = read_holds("Measured 3/10, the kind registered")
-                if got:
-                    bad.append(f"with Measured 3/10 the holds read {got}, planted none")
-            finally:
-                kinds.pop(HEALTH_KIND, None)
-            got = read_holds("the record planted, no kind registered")
-            if got != [want]:
-                bad.append(f"with no gate-health kind registered the holds read {got}, planted [{want}]")
-        else:
-            bad.append(f"the factory registers {HEALTH_KIND} already, so the fixture's registration is no case")
+            bad.append(f"the factory registers no {HEALTH_KIND} kind, so no Measured case is a case")
+            return out, bad
+        health = [("Verdicts", "planted"), ("Legs", "2/2")]
+        factory[0].write_record(repo, FLAKE_BUILD, FLAKE_UNIT, HEALTH_KIND, "planted", [("Measured", "3/10"), *health])
+        write_fixture_commit(repo, "a gate-health record above A's flakes")
+        got = read_holds("Measured 3/10")
+        if got:
+            bad.append(f"with Measured 3/10 the holds read {got}, planted none")
+        factory[0].write_record(repo, FLAKE_BUILD, FLAKE_UNIT, HEALTH_KIND, "planted", [("Measured", "1/10"), *health])
+        write_fixture_commit(repo, "a newer gate-health record at one in ten")
+        want_one = [f"hold  A  2/10  {ids[7]} {ids[3]}", f"hold  B  1/10  {ids[5]}"]
+        got = read_holds("Measured 1/10")
+        if got != want_one:
+            bad.append(f"with Measured 1/10 the holds read {got}, planted {want_one}")
+        entry = kinds.pop(HEALTH_KIND)
+        try:
+            got = read_holds("the records planted, the kind out of the table")
+        finally:
+            kinds[HEALTH_KIND] = entry
+        if got != [want]:
+            bad.append(f"with no gate-health kind registered the holds read {got}, planted [{want}]")
+        if kinds.get(HEALTH_KIND) is not entry:
+            bad.append(f"the {HEALTH_KIND} kind is not back in the table after the unregistered case")
+        # the release case reads at 2/10, so its gate-health records leave the tree first
+        for p in sorted(repo.joinpath("memory/builds", FLAKE_BUILD, "build").glob(f"*-{HEALTH_KIND}-*.md")):
+            p.unlink()
+        write_fixture_commit(repo, "the gate-health records removed")
         bl = repo.joinpath("memory/builds", FLAKE_BUILD, "BACKLOG.md")
         with bl.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(write_flake_ask("A", 9, "2026-01-12"))
@@ -1385,12 +1446,38 @@ def run_fixture_quarantine_check():
     return out, bad
 
 
+def run_fixture_measured_check():
+    """TOOL-dWitnessedBar-1 S6: a hold at two in ten, its ask filed after a gate-health record held 3/10, reds
+    `flakes --check`; the same record dated after the ask leaves 2/10 in force at the filing, and passes."""
+    out, bad = [], []
+    for what, dated, want in (("Measured 3/10 dated before the ask", "2026-01-20", 1),
+                              ("Measured 3/10 dated after the ask", "2026-02-10", 0)):
+        with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+            repo, here, _ = write_flake_repo(root, "", write_flake_ask("D", 5, "2026-02-01"))
+            factory = load_flake_factory()
+            for k in range(10):
+                write_flake_rows(factory, repo, f"2026-01-{k + 1:02d}T00:00:00Z",
+                                 [("D", "1", "0") if k in (2, 6) else ("D", "0", "-")])
+            factory[0].write_record(repo, FLAKE_BUILD, FLAKE_UNIT, HEALTH_KIND, "planted",
+                                    [("Measured", "3/10"), ("Verdicts", "planted"), ("Legs", "1/1")], today=dated)
+            write_fixture_commit(repo, "D's records and a gate-health record")
+            try:
+                rc, lines = cmd_flakes_check(here, repo)
+            except Refusal as e:
+                rc, lines = 2, [f"refused · {e}"]
+            out += [f"{what}: rc {rc} · {ln}" for ln in lines]
+            text = " ".join(lines)
+            if rc != want or (want and not all(s in text for s in ("leg D", "flaked 2 ", "3/10"))):
+                bad.append(f"{what}: flakes --check exited {rc}, planted {want}: {lines}")
+    return out, bad
+
+
 FIXTURES = {"route": run_fixture_route, "red-route": run_fixture_red_route,
             "selection-rows": run_fixture_selection_rows, "held-keys": run_fixture_held_keys,
             "select": run_fixture_select, "held-policy": run_fixture_held_policy,
             "route-flaky": run_fixture_route_flaky, "flakes-record": run_fixture_flakes_record,
             "flakes-window": run_fixture_flakes_window, "quarantine-source": run_fixture_quarantine_source,
-            "quarantine-check": run_fixture_quarantine_check}
+            "quarantine-check": run_fixture_quarantine_check, "measured-check": run_fixture_measured_check}
 
 
 def main(argv=None):

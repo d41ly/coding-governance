@@ -97,7 +97,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 486
+CHECK_FLOOR = 494
+# 486 -> 494, TOOL-dWitnessedBar-1: the eight checks of `test_gate_health`, two per `--fixture` case,
+# COUNTED off the arm rather than measured, because the unit pass runs no suite.
 # 482 + 482 -> 486, TOOL-aSparedSpawn-34, the merge of local main into aSparedSpawn: base 478, plus 4
 # from this branch (TOOL-aSparedSpawn-11) and 4 from local main (TOOL-aPairedSlots-7 and -11).
 # 478 -> 482, TOOL-aSparedSpawn-11: the four checks of `test_one_signal_matches_report`, COUNTED off
@@ -3152,6 +3154,31 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
           [d["leg"] for d in got["detail"]] == ["leg a", "leg b"], f"got {got['detail']}")
 
 
+def test_gate_health(tmp: pathlib.Path) -> None:
+    """TOOL-dWitnessedBar-1: the reliability bar measured from the flake records, over drift's four
+    `--gate-health --fixture` cases. Each plants its own scratch repository holding this kit, the
+    memory-tree factory and a manifest, so the arm reads the mode as an install runs it; `short` and
+    `write` stage the unarmed set by deleting one row of one leg. Red when the percentile is taken over
+    every row rather than per leg, the one is not added, an unarmed measurement prints a value or writes a
+    record, or a `--with` naming no flake record is not refused."""
+    print("gate health, the reliability bar measured from the flake records")
+    try:
+        resolve_kit_dir(LEDGER_KIT_HOME, "build_records.py", KIT)
+    except LookupError as exc:
+        skip("gate health", f"no memory-tree record factory in this install: {exc}")
+        return
+    wants = {"differs": "gate-health measured 4/10 · legs 10/10 · verdicts fx-00 ",
+             "lower": "gate-health measured 1/10 · legs 10/10 · verdicts fx-00 ",
+             "short": "gate-health unarmed · leg 03 29/30\n",
+             "write": "drift-report: wrote memory/builds/tHealth/build/"}
+    for case, want in wants.items():
+        p = run([sys.executable, str(KIT / "drift_report.py"), "--gate-health", "--fixture", case], KIT)
+        check(f"gate health: --fixture {case} reads every case as planted",
+              p.returncode == 0 and f"gate-health fixture {case} ok" in p.stdout,
+              f"rc {p.returncode}: {(p.stdout + p.stderr)[-400:]}")
+        check(f"gate health: --fixture {case} prints {want.strip()!r}", want in p.stdout, p.stdout[-400:])
+
+
 def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-21: armed `_CUTOFF` keys in TRACKED root confs, pinned only where declared.
 
@@ -4641,6 +4668,7 @@ def main() -> int:
         test_backlog_ask_signals(tmp)
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
+        test_gate_health(tmp)
         test_fleet_over_budget(tmp)
         test_remote_ci_red_streak(tmp)
         test_auto_memory_pointers(tmp)

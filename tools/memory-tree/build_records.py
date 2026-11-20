@@ -101,12 +101,21 @@ the same way, and so is a line that reads as a field.
 THE FLAKE KIND (TOOL-dWitnessedBar-8 S3): `<date>-build-<unit id>-flake-<n>.md`, one `test.flakes` run's
 verdicts: `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one fenced block of TAB rows, `<leg> · <first rc> ·
 <re-run rc or ->`, one per leg the run executed. It has no `new` door: the run-gates kit's `verdict_flow.py
-flakes` loads this factory as `keep_tails.py` does and calls `write_record`.
+flakes` loads this factory as `keep_tails.py` does and calls `write_record`. The body's one reader is
+`read_flake_body`, its rows, and a row flaked where `derive_flaked` says so: its first rc a non-zero integer and
+its re-run rc 0. Both kits that read flake records, run-gates and drift, read them through these two
+(TOOL-dWitnessedBar-1 S7), so the grammar has this one home.
+
+THE GATE-HEALTH KIND (TOOL-dWitnessedBar-1 S4): `<date>-build-<unit id>-gate-health-<n>.md`, one gate-health
+measurement: `Measured` (the reliability bar, `<count>/10`), `Verdicts` (the `Run` of every flake record it
+read) and `Legs` (`<armed>/<bar legs>`). It has no `new` door: the drift kit's `drift_report.py --gate-health
+--write` loads this factory in-process and calls `write_record`, and the run-gates kit's `verdict_flow.py` reads
+the newest one's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
 
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
 2 an unreadable path or a pending kind. A kind with a reader of its own is read by it; `exception` by
-`read_exception`; every other kind, `widen`, `leg-tail` and `flake` among them, by `read_record` and its
-`KINDS` entry alone.
+`read_exception`; every other kind, `widen`, `leg-tail`, `flake` and `gate-health` among them, by
+`read_record` and its `KINDS` entry alone.
 
 ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
 bindings reader admits and joins to their file names, and an import whose table differs from that tuple
@@ -212,6 +221,11 @@ KINDS = {
         "required": ("Run", "Ended", "Sha", "Tree", "Legs"),
         "closed": (),
     },
+    "gate-health": {   # TOOL-dWitnessedBar-1 S4: written by the drift kit's `drift_report.py --gate-health --write`,
+        # no `new` door
+        "required": ("Measured", "Verdicts", "Legs"),
+        "closed": (),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "
@@ -292,6 +306,17 @@ def read_records(root, conf, kind, reader):
             others = ", ".join(o["path"] for o in group if o is not r)
             r["malformed"].append(("file name", f"shares {kind}-{n} with {others}"))
     return records
+
+
+# -------------------------------------------------------------------------------- the flake kind's body
+def read_flake_body(text):
+    """[(leg, first rc, re-run rc or -)], the TAB rows of a flake record's body (TOOL-dWitnessedBar-1 S7)."""
+    return [tuple(ln.split("\t")) for ln in text.replace("\r\n", "\n").split("\n") if ln.count("\t") == 2]
+
+
+def derive_flaked(first, rerun):
+    """True where a flake row flaked: its first rc a non-zero integer and its re-run rc 0."""
+    return first not in ("0", "-") and first.lstrip("-").isdigit() and rerun == "0"
 
 
 # -------------------------------------------------------------------------------- the exception kind

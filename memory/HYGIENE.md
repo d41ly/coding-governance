@@ -678,7 +678,9 @@ carry it too:
   records") · `widen` (a population's growth admitted with its reason, written by the ratchet pack's
   `ratchet.py widen` door) · `leg-tail` (a failing leg's output tail kept by its hash, written by the
   run-gates kit's `keep_tails.py`) · `flake` (one `test.flakes` run's per-leg verdicts, written by the run-gates kit's
-  `verdict_flow.py flakes`). The twelve after `research` are the typed kinds: each record is named
+  `verdict_flow.py flakes`) · `gate-health` (one gate-health measurement, the reliability bar derived from
+  the flake records, written by the drift kit's `drift_report.py --gate-health --write`). The thirteen
+  after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
