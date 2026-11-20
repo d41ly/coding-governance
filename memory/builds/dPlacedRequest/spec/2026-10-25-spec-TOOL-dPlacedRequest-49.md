@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail
 
-**Status:** DEFERRED · rev-7 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-7 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

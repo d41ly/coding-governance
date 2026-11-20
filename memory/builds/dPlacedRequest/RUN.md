@@ -375,3 +375,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T09:24:07Z draw · fix-pass · TOOL-dPlacedRequest-50 · 50/130 · 20261120T092407Z-febeb5
 
 2026-11-20T09:24:07Z dispatch · item b35e530d TOOL-dPlacedRequest-50 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-50-1-acceptance-ledger.md
+
+2026-11-20T09:58:15Z dispatch · item caa6d188 TOOL-dPlacedRequest-49 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/orientation-card.md tools/unattended/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-49-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
