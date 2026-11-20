@@ -585,3 +585,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T20:08:05Z dispatch · item 3e20f8e4 TOOL-dWitnessedBar-57 · reason memory/map/generated/symbols.json
 
 2026-11-20T20:32:22Z brief · item TOOL-dWitnessedBar-58 · reason 808e6bbfc1a3 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-58-build-brief.md
+
+2026-11-20T20:34:23Z dispatch · item d463c624 TOOL-dWitnessedBar-58 · reason .githooks/pre-push.test.sh tools/run-gates/run-gates.evidence.test.sh memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-58-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-58.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T20:39:43Z draw · re-dispatch · TOOL-dWitnessedBar-58 · 101/180 · 20261120T203943Z-514e20
+
+2026-11-20T20:39:43Z dispatch · item d463c624 TOOL-dWitnessedBar-58 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-58-widen-3.md

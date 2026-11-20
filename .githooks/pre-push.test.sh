@@ -1589,10 +1589,20 @@ esac
 build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
 git commit -q --allow-empty -m c1 >/dev/null 2>&1
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
-_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
+# TOOL-dWitnessedBar-58 AC1 (S1): this push's bar is a capturing stub in place of $green, exiting 0 as it
+# does, and writing the GATE_BASE_FROM its own environment holds to a file under the fixture's git dir:
+# the bar command is where the hook's export is still visible, since the runner unsets it before any leg.
+# An absent file fails the arm. Red against a hook that drops the export on the inherited-green branch.
+ir_bf="$(git rev-parse --absolute-git-dir)/ir-base-from"; rm -f "$ir_bf"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_BASE_FROM-unset}" > "%s"\nexit 0\n' "$ir_bf" > "$tmp/ir-ac4/stub-bf.sh"
+_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $tmp/ir-ac4/stub-bf.sh" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"at base ${IR_R:0:8}"*) ok "IR AC4 an inherited green at the remote sha scopes the gate" ;;
   *) bad "IR AC4 expected a scoped gate naming the inherited green, got: $_o" ;;
+esac
+case "$(cat "$ir_bf" 2>/dev/null || echo 'no file')" in
+  inherited) ok "IR TOOL-dWitnessedBar-58 AC1 the inherited-green push hands its bar GATE_BASE_FROM=inherited" ;;
+  *) bad "IR TOOL-dWitnessedBar-58 AC1 the inherited-green push's bar read GATE_BASE_FROM '$(cat "$ir_bf" 2>/dev/null || echo 'no file')': $_o" ;;
 esac
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c3 && git push origin main' 2>&1 )
 case "$_o" in
