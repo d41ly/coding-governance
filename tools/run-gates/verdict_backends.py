@@ -750,7 +750,7 @@ def run_peer_plant(case, top, run_scenario):
         key = pathlib.Path(top, f"key-{n}")
         try:
             p = subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", n, "-f", str(key)],
-                               capture_output=True, text=True, timeout=BOUND, stdin=subprocess.DEVNULL)
+                               capture_output=True, text=True, encoding="utf-8", timeout=BOUND, stdin=subprocess.DEVNULL)
         except (OSError, subprocess.SubprocessError) as e:
             raise OSError(f"no ssh-keygen runs, so no throwaway node key is made: {e}") from None
         if p.returncode != 0:
