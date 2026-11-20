@@ -25712,13 +25712,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3579
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3763
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md	tools/unattended/unattended.sh:2260
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:880
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:896-902
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	tools/push-main.sh:921
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	push-main.sh:921
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	tools/memory-tree/gotchas.py:65
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md	tools/unattended/unattended.test.sh:6098
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	check-spec-tokens.py:530
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:220
@@ -25741,7 +25734,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:11866-11869
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:12762
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:3975-4041
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md	tools/unattended/unattended.sh:2181
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	skills/session-kickoff/manifest-check.sh:648
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-python.test.sh:218

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-44-order-25-reground-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-44-order-25-reground-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 |
 | [2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
@@ -23,117 +24,131 @@
 
 The spec audit of the round-3 promotions
 (`memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md`)
-confirmed **finding 1 at HIGH**, its item **H1**, which holds no other finding.
-`TOOL-dPlacedRequest-47` S1 guards the threshold compare so an unsighted commit is never compared,
-and says AC1 and AC2 observe it. Neither does. AC1 empties the feed and AC2's tip is unsighted, so
-both stop at the unsighted-tip stop before any compare. AC3's commit is a renewing beat, which
-resolves before the threshold test, so its `Red when:` cannot happen. A build that adds only the
-unsighted-tip stop and leaves the compare unguarded passes all three, and a sighted fresh tip over an
-unsighted `renews: no` middle commit then reads `stale` (`"" < threshold`) and can be taken over. This
-unit repairs `TOOL-dPlacedRequest-47`, at order 24, so it sits at order 25: S1's own case gets a
-criterion whose fixture reaches the guard past every earlier stop, and 47's other criteria become
-reachable.
+confirmed **finding 1 at HIGH**, its item **H1**, which holds no other finding. The finding: spec 47,
+as then written, named criteria for its sighted guard on the threshold compare that all stopped
+before the compare, so a build that left the compare unguarded passed every one of them, and a
+sighted tip over an unsighted `renews: no` middle commit could read `stale` and be taken over.
+
+`TOOL-dPlacedRequest-47` has since been rescoped and built, and is CLOSED. Its rev-7 AC1 is the mixed
+tenure this unit asked for: a tip sighted 60 s ago, a middle commit with no feed line, and an opener
+sighted 90000 s ago, which reads `stale` on the driver and `unknown -` on a scratch copy whose
+threshold test compares unguarded. Its AC2 and AC3 each say the unguarded copy reads them alike, so
+neither is a red case. Both are built as the `DPR47` rows of `tools/unattended/unattended.test.sh`.
+This unit rules (F2), on a measured probe, that the AC1 tenure reaches the guard past every earlier
+stop, so it builds nothing: its items are observations of spec 47's arm and text, and spec 47 stays
+as built under the charter's P19.
 
 ## 2. Scope (IN)
 
-- **S1** — The guard's criterion. `TOOL-dPlacedRequest-47` gains AC4, in place: over three commits of
-  one epoch, tip first, a `renews: no` tip sighted a minute ago, a `renews: no` middle commit, and a
-  `renews: no` tenure start sighted a minute ago, `--claims` prints `live`. AC4 runs twice, once with
-  no feed line for the middle commit and once with a line carrying `-` in its `seen-utc` field. Its
-  `Red when:` is the scratch copy of the driver whose `awk` holds the unguarded compare, which prints
-  `stale`. 47 S1's "Observed by" names AC4. The case joins 47's arm in
-  `tools/unattended/unattended.test.sh`. Observed by AC1.
-- **S2** — 47's other criteria reach what they name. 47 AC1's cached refs are pinned to tips whose
-  `renews` reads `no`, so the `unknown` comes from the unsighted-tip stop and not from the renewing
-  mapping at `tools/unattended/unattended.sh:2181`. 47 AC3's `Red when:` is restated as the beat's
-  age arithmetic on `-`: the row prints a numeric age or `stale` where `unknown` with age `-` is
-  owed. Both edits are one rev bump of 47 with its §9 line. Observed by AC2.
+- **S1** — The guard reached, an observation. Over spec 47's AC1 tenure the walk in
+  `tools/unattended/unattended.sh#read_claims` reads the tip (sighted, same epoch, `renews: no`, not
+  below the threshold) and reads on; the middle commit is absent from `seen`, so the guard alone
+  lets it read on; the opener is below the threshold and stops the row. The driver reads `stale` and
+  the unguarded copy, which compares the middle's empty stamp, reads `unknown -`. The block's two
+  `DPR47 AC1` rows assert both readings. Observed by AC1.
+- **S2** — Spec 47's criteria reach what they name, an observation. Its AC1 is the red case and
+  plants `renews: no` commits; its AC2 and AC3 each state that the unguarded copy reads them alike, an
+  observation the arm makes and never its red case; its S1 names AC1. This unit writes nothing into
+  spec 47. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
-- No change to the walk or its guard: they are `TOOL-dPlacedRequest-47`'s, built at order 24. This
-  unit observes them.
-- No shape test on a malformed `seen-utc`: finding 34's item of `TOOL-dPlacedRequest-52`.
+- No edit to spec 47, which is CLOSED, and no change to the walk or its guard, which it built.
+- No arm row and no driver change (F2): the unit's items are observations.
+- No row for a middle commit whose only feed line carries `-`. Measured, it separates the guard as
+  spec 47's AC1 row does and, beyond that, the walk's ISO-shape filter of `seen-utc`, which is
+  finding 34's shape test, `TOOL-dPlacedRequest-52` S21.
 - No new bug-class record: `memory/gotchas/fixture-passes-by-finding-nothing.md` already names the
   class the review filed this under, and one more instance adds no class.
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-47` — the guarded threshold compare, its arm and AC1 to AC3, which this unit reaches with a new criterion and restates in place; without the guard there is nothing for AC4 to observe
+- **consumes-from** `TOOL-dPlacedRequest-47` — the guarded threshold compare, its arm and AC1 to AC3, which this unit observes; without the arm there is nothing for AC1 to read
 - **hands-off** `TOOL-dPlacedRequest-56` — §4 Files touched, Evidence and Edges, which that unit's items for findings 3, 6 and 15 amend
 - **hands-off** `TOOL-dPlacedRequest-61` — §4 Files touched, whose sequence sentence that unit's item for finding 10 fixes word for word
 
 ## 4. Design
 
-### The fixture rows
+### The walk the arm reaches
+
+`tools/unattended/unattended.sh#read_claims` runs the walk's `step` per row, tip first. It waits for
+a commit not yet read, then stops at the first of: an epoch other than the tip's, `renews: -`,
+`renews: yes` or no `renews` key, and the threshold test, which compares a commit's stamp only when the pair of its ref
+and the commit is in `seen`. The feed read that fills `seen` skips a line whose `seen-utc` is not
+ISO-shaped, so a commit with no line and a commit whose line carries `-` are both absent from it. The
+verdict pass prints `unknown` with age `-` for a beat with no sighting, and otherwise ages a `stale`
+row from its tip.
+
+### The measured readings
+
+Planted 2026-11-20 by the probe of Evidence, each verdict PINNED that day.
 
 ```
-row         tip (renews, seen)      middle (renews, seen)     start (renews, seen)    expect
-AC4 unset   no, a minute ago        no, no feed line          no, a minute ago         live
-AC4 dash    no, a minute ago        no, feed line seen-utc -  no, a minute ago         live
-red copy    the same rows, the awk's compare unguarded                                 stale
+input                               driver       unguarded copy   copy without the walk's ISO filter
+47 AC1: middle with no feed line    stale        unknown -        stale
+middle whose only line carries -    stale        unknown -        unknown -
 ```
 
-The walk of `TOOL-dPlacedRequest-47` §4 reads the tip: sighted, not a renewing beat, not below the
-threshold, so it reads on. The middle commit is unsighted and is never compared, so it reads on. The
-start is sighted a minute ago and is the oldest of the tenure, and the chain ends there, so 35 S2's
-fallback ages it `live`. The unguarded copy compares the middle's empty or `-` stamp, which sorts below
-every ISO stamp, and resolves `stale`. That difference is the guard, observed alone.
+The first row is spec 47's AC1, built: it separates the driver from the unguarded copy and nothing
+else. The second separates the same pair and also the copy without the ISO filter, which is the
+shape test unit 52 owns (§3).
 
 ### Evidence
 
-- `TOOL-dPlacedRequest-47` S1 (`:33-35`) names AC1 and AC2; its AC1 (`:111-114`), AC2 (`:115-117`)
-  and AC3 (`:118-120`) are as the review reads them.
-- The verdict `awk` maps an unaged row to `unknown` at `tools/unattended/unattended.sh:2181`,
-  `if ($10 != 1 || a == "-") { vd = "unknown"; a = "-" }`, read 2026-10-25.
+- The probe, 2026-11-20: a scratch script that sources `write_lease_fixture`, `mkconf` and
+  `add_claim_sighting` from `tools/unattended/unattended.test.sh`, then the observer clock's
+  `add_lease_commit`, `remove_clock_refs` and `read_clock_row`, plants each tenure as the `DPR47 AC1`
+  rows plant it, and reads the `tOc` row over the driver, over the arm's own unguarded substitution,
+  and over a copy that cuts the first ISO-shape test of the driver, the one in `read_claims`' feed
+  read; `read_first_seen`'s own test stays.
+- `grep -c 'DPR47 AC1' tools/unattended/unattended.test.sh` prints 2 (PINNED, 2026-11-20), the
+  driver row and the red row.
+- Spec 47 before its revision log carries `never its red case` twice (PINNED, 2026-11-20), at AC2 and
+  AC3.
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.test.sh`: the AC4 rows in 47's arm
-- `memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md`: S1, AC1, AC3, AC4
-  and its §9 line
-- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
-  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
-  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
-  only
+None: the unit builds nothing, and its pass records AC1 and AC2 in its acceptance ledger.
 
 ### Alternatives rejected
 
-- **Make AC1's tips sighted.** AC1 is the empty-feed criterion that `TOOL-dPlacedRequest-17` AC6
-  asks for, and sighting its tips removes that case.
-- **A criterion in this unit only.** The guard is 47's, so its criterion belongs in 47's §6, which
-  is where a reader of 47 looks for what observes S1.
+- **The row spec 47 does not plant, beside its block.** Measured, it adds no reading of the guard
+  that AC1's row lacks, and what it adds is unit 52's shape test (F2).
+- **A criterion added to spec 47.** Spec 47 is CLOSED and the charter's P19 keeps it as built.
 
 ## 5. Production-readiness checklist
 
-- security — the criterion that observes a take-over guard.
-- perf / scale — two more planted rows in one arm.
+- security — the observation that a take-over guard is pinned; no code moves.
+- perf / scale — none: no arm is added.
 - error / empty / loading states — N/A — no runtime path changes.
-- observability — the arm prints each row's verdict.
-- risks — none: a test row and spec text.
-- testing — the probes of §6 and the arm in §7.
+- observability — the `DPR47` rows name each reading.
+- risks — none: spec text only.
+- testing — the probes of §6.
 - migration — none.
-- user docs — none: a criterion.
+- user docs — none: no user-facing change.
 
 ## 6. Acceptance criteria
 
-The fixture is `TOOL-dPlacedRequest-26`'s: a scratch clone with a bare origin, `RUN_CLAIMS=on`, a
-planted feed and `leases.expiry-hours` 24.
+The fixture is spec 47's: the observer clock fixture of `tools/unattended/unattended.test.sh`, a
+scratch clone with a bare origin from `write_lease_fixture`, `RUN_CLAIMS=on`, `leases.expiry-hours`
+at its default.
 
-- **AC1** — When 47's AC4 rows are planted and `--claims` runs over the built walk, both rows print
-  `live`; over the scratch copy whose `awk` reads `seen-utc < threshold` with no sighted test, both
-  print `stale`.
-  Red when: the two runs print the same verdict, so the rows do not reach the guard.
-- **AC2** — When `grep -n -A3 'AC1\*\*' 2026-10-25-spec-TOOL-dPlacedRequest-47.md` and the same for
-  `AC3` run, AC1's text names `renews: no` tips and AC3's `Red when:` names the beat's age on `-`,
-  and 47 S1 names AC4.
-  Red when: a criterion of 47 still names a break its fixture cannot stage.
+- **AC1** — When a probe sourcing the suite's fixture helpers plants spec 47's AC1 tenure and runs
+  `read_clock_row` over `$SCRIPT` and over the unguarded copy, they print `stale` and `unknown -`,
+  and `grep -c 'DPR47 AC1' tools/unattended/unattended.test.sh` prints 2.
+  Red when: the two read alike, so the tenure does not reach the guard.
+  figure: the sighting ages 60 s and 90000 s PINNED literals of spec 47 rev-7; the count 2 PINNED,
+  2026-11-20.
+- **AC2** — When `sed '/^## 9\./,$d' 2026-10-25-spec-TOOL-dPlacedRequest-47.md | tr -s '[:space:]' ' '`
+  runs, it carries `never its red case` twice, and its AC1 names `renews: no` and the unguarded copy.
+  Red when: a criterion of spec 47 names a break its fixture cannot stage.
+  figure: the count 2 PINNED, 2026-11-20.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · a sighted tip over an unsighted middle commit, with no line and with a `-` line, staged by a scratch copy whose `awk` compares unguarded · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+No new arm: the unit builds nothing, and the arm it observes is spec 47's.
 
 ## 8. Open questions
 
@@ -142,6 +157,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · a sighted tip over
   tips; (c) a criterion held in this unit only. (b) loses the empty-feed case; (c) puts 47's
   observation outside 47. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's fix
   judged sound. widens: none · relaxes: none
+- **F2 — Does spec 47 rev-7's AC1 already reach the guard past every earlier stop?** (a) Yes:
+  S1 and S2 become observations of spec 47's arm and text, and the unit builds nothing; (b) no, or
+  not wholly: the unit adds the one row spec 47 does not plant, a middle commit whose only feed line
+  carries `-`, beside spec 47's block. Measured in §4, the AC1 tenure reads `stale` on the driver
+  and `unknown -` on the unguarded copy, and the `-` row adds only the walk's ISO-shape filter.
+  Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; the AC1 rows read the tip past its sighting,
+  the middle past the guard alone and the opener to its stop, so the guard is reached past every
+  earlier stop, and the `-` row's one extra separation is finding 34's shape test, owned by
+  `TOOL-dPlacedRequest-52`. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -152,16 +177,24 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · a sighted tip over
 - rev-4 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
   regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- rev-5 · 2026-11-20 · §1 · §2 S1 S2 · §3 · §4 · §5 · §6 AC1 AC2 · §7 · §8 F2 · §10 · re-grounded
+  by `2026-11-20-prompt-TOOL-dPlacedRequest-44-order-25-reground-brief`: spec 47 rev-7's arm and
+  `tools/unattended/unattended.sh#read_claims` probed, the readings measured and pinned; F2 rules
+  that spec 47's AC1 reaches the guard, so S1 and S2 are observations, the unit builds nothing, and
+  the `-` row is left to `TOOL-dPlacedRequest-52`; spec 47 untouched; Files touched, the arm line and
+  the suite's legs taken out; the line citation swapped for a symbol citation.
 
 ## 10. Reuse audit
 
-The seam extended is `TOOL-dPlacedRequest-47`'s arm in `tools/unattended/unattended.test.sh` and its
-planted-chain fixture from `TOOL-dPlacedRequest-26`; no product seam is added.
+The seam is spec 47's arm in `tools/unattended/unattended.test.sh` and the observer clock fixture it
+plants on, with its helpers `add_lease_commit`, `add_claim_sighting`, `read_clock_row` and
+`remove_clock_refs`; the guard it reaches is the walk's `step` in
+`tools/unattended/unattended.sh#read_claims`. No product seam is added and none is extended.
 `python tools/codebase-map/reuse_lookup.py "a fixture that reaches a guard past every earlier stop in
-the age walk"` ranked `walk`, `fixture` (`tools/unattended/unattended.test.sh` among its files) and
-`build_fixture`, name stems only; `fixture` is the suite this unit's rows join. `python
-tools/memory-recall/query.py "which criterion observes the sighted guard on the age walk threshold
-compare"` returned this audit's H1, `TOOL-dPlacedRequest-47` and `TOOL-dPlacedRequest-46`; none
-disagrees with source.
+the age walk"`, re-run 2026-11-20, ranked `fixture`, `walk`, `run_fixture_git`, `write_fixture_files`
+and `build_fixture`, name stems only; `fixture` names the suite spec 47's rows sit in.
+`python tools/memory-recall/query.py "which criterion observes the sighted guard on the age walk
+threshold compare"` with the terms below, re-run 2026-11-20, returned `TOOL-dPlacedRequest-47`, this
+spec, the round-3 audit's H1 and `TOOL-dPlacedRequest-46`; none disagrees with source.
 
 Recall terms used: unsighted seen-utc threshold guard criterion fixture reaches stop renews no tenure start live stale
