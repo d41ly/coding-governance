@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: a0ae4dcac415bfab8de7cce5da6423311a25a39e · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: c95ef6216483338ec4c2b9b18817188b74d95d8d
 phase: RUNNING
@@ -31,3 +32,5 @@ base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 ## Parked
 
 2026-11-20T11:11:30Z rescope · item add TOOL-dQuietDisk-26 · reason TOOL-dQuietDisk-10 F1 resolved (b): check-wiring.sh re-lists the tree per check (1,679 ls-files and 421 check-attr of the suite's 3,786 git processes); one listing per invocation is its own mechanism (M2)
+
+2026-11-20T11:33:40Z decision · item every unit waits for dWitnessedBar's landing (37 of 88 units closed at 2026-11-20 12:00, order 23 of 50 building) · reason options: (a) --hold, refused by its vocabulary: HOLD_CODES_CORE holds host, platform, owner and inherited-red codes and none names a wait on another build; (b) build the non-overlapping units first, refused: only TOOL-dQuietDisk-4's write set avoids dWitnessedBar's diff and it reads unit 1's store, whose files overlap; (c) wait RUNNING on the 10-minute idle-wake, re-ground every spec on the landed tip (unit 19 to the last order), take the B0 readings there, then dispatch by order — taken
