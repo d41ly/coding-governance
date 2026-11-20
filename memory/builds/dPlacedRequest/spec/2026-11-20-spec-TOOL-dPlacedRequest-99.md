@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-99 — the closing review's minors: every plant on a gate, a resolver arm, honest re-fence and card outcomes, a re-priced row and three loose ends
 
-**Status:** DEFERRED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** INPROGRESS · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
