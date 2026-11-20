@@ -12421,7 +12421,7 @@ memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parent
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	6 specs
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	334 s
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	6 calls
-memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	63 specs
+memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	69 specs
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	21 specs
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md	3 units
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md	20 units
