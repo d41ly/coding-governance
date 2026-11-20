@@ -11936,7 +11936,7 @@ dod_met() { # slug · run-state file · item · checker
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
       local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
-      local -a _genv _grb
+      local -a _genv _grb _gfrom
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
       # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
@@ -12071,8 +12071,11 @@ dod_met() { # slug · run-state file · item · checker
           fi
           RB_BOUND=$_gbound
           # shellcheck disable=SC2086
+          # TOOL-dWitnessedBar-40 S2 - a `-` full base is an inherited green, which the runner cannot
+          # tell from GATE_BASE: it is told on the argv, so it writes no per-tree verdict of this bar.
+          _gfrom=(); [ "$_gfull" = - ] && _gfrom=(GATE_BASE_FROM=inherited)
           case "$_gdec" in
-            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" ${_gfrom[@]+"${_gfrom[@]}"} "${_genv[@]}" $GATE_CMD; _grc=$? ;;
             covered) _grc=0 ;;
             *)       run_bounded env "${_gscrub[@]}" GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
           esac

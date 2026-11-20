@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-40 — the per-tree verdict keeps the retired writers' two declines and carries the reuse pair the hook judges
 
-**Status:** INPROGRESS · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 18 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 18 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-40-deviation-401.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-deviation-401.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-deviation-402.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-deviation-402.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-11-19-build-TOOL-dWitnessedBar-40-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-40-1-acceptance-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |

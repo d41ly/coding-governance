@@ -25343,6 +25343,11 @@
       "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
     },
     {
+      "id": "remove_bg_key",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "remove_census_watcher",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"

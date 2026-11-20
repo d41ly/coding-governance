@@ -1742,8 +1742,20 @@ check_tree_verdict() {
   if [ "$bg_verdict" != GREEN ]; then force="it reads verdict '${bg_verdict:-none}', not GREEN"; return 0; fi
   if [ -z "$bg_sha" ]; then force="it names no sha"; return 0; fi
   check_green_record "$bg_sha" "$bg_fp" "$bg_blob" "$bg_man" "$bg_st" "$1"
-  [ -z "$force" ] && check_green_reuse "$1" "$bg_reused" "$bg_reused_cache"
+  [ -z "$force" ] && check_tree_reuse "$1"
   return 0
+}
+
+# check_tree_reuse <label> — predicate 9 over the per-tree verdict read_bar_file last read, for both of
+# its readers, `check_tree_verdict` and the cover pass (TOOL-dWitnessedBar-40 S4). A runner stamp with
+# neither reuse key forces nothing, which older stamps rely on; a per-tree verdict carrying neither
+# cannot say whether its run reused a leg, so it forces. Sets `force` to the failure or empty.
+check_tree_reuse() {
+  force=""
+  if [ -z "$bg_reused" ] && [ -z "$bg_reused_cache" ]; then
+    force="the recorded $1 carries neither reused nor reused_cache, so it cannot say whether its run reused a leg"; return 0
+  fi
+  check_green_reuse "$1" "$bg_reused" "$bg_reused_cache"
 }
 
 # check_bar_record <path> — whether the pushed tree's per-tree verdict is adoptable as this push's
@@ -2190,7 +2202,7 @@ check_cover_record() {
     if [ "$bg_tree" != "$_tip_tree" ]; then
       cover_why="it graded tree ${bg_tree:0:8} and the pushed tip holds ${_tip_tree:0:8}"; return 0
     fi
-    check_green_reuse "$bg_kind tree verdict" "$bg_reused" "$bg_reused_cache"
+    check_tree_reuse "$bg_kind tree verdict"
     if [ -n "$force" ]; then cover_why=$force; return 0; fi
   else
     [ -n "$_tip_fp" ] || { [ -x "$kitfp" ] && _tip_fp=$(bash "$kitfp" "$main_local" 2>/dev/null); }
@@ -2312,6 +2324,9 @@ if [ -n "$inh_sha" ]; then
   [ -n "$DOCS_ONLY" ] && export GATE_DOCS_BASE="$main_remote"
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) —$_docs_clause inherited green ${inh_sha:0:8} at base ${main_remote:0:8} is ${lag:-0} first-parent landing(s) back, within $GATE_FULL_MAX_LAG; the full green was not usable: $full_force$_reuse_clause — bar: $bar_label"
   export GATE_BASE="$scoped_base"
+  # The runner cannot tell an inherited base from GATE_BASE, and writes no per-tree verdict on one
+  # (TOOL-dWitnessedBar-40 S2).
+  export GATE_BASE_FROM=inherited
   [ -n "$REUSE_OFFER" ] && export GATE_REUSE_PUSH="$REUSE_OFFER"
   RUNLOG_DECISION=scoped
 elif [ -n "$force" ]; then

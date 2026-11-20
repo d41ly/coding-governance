@@ -2310,11 +2310,12 @@ write_bg_verdict() { # sha · kind · base -> the runner's per-tree verdict of s
   # common dir with a reproducible fingerprint and the manifest blob; BG_VF its path, BG_VN its name
   local t d; t=$(git rev-parse "$1^{tree}"); d="$(git rev-parse --git-common-dir)/gate-verdict"; mkdir -p "$d"
   BG_VN="gate-verdict/$t"; [ "$2" = scoped ] && BG_VN="$BG_VN.scoped"; BG_VF="${d%/gate-verdict}/$BG_VN"
-  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\t%s\nbase\t%s\nmanifest\t%s\nmanifest_blob\t%s\nfingerprint\t%s\nselftests\t\nrun_id\tplanted\nstamped\tx\nby\trunner\n' \
+  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\t%s\nbase\t%s\nmanifest\t%s\nmanifest_blob\t%s\nfingerprint\t%s\nselftests\t\nreused\t0\nreused_cache\t0\nrun_id\tplanted\nstamped\tx\nby\trunner\n' \
     "$t" "$1" "$2" "$3" "$KIT_REL/gate-legs.json" "$(git rev-parse "$1:$KIT_REL/gate-legs.json")" \
     "$(bash "$KIT_REL/$RUN_GATES/gate-fingerprint.sh" "$1")" > "$BG_VF"
 }
 read_bg_key() { awk -F'\t' -v k="$2" '$1==k{print $2}' "$1" 2>/dev/null; }
+remove_bg_key() { awk -F'\t' -v k="$2" '$1!=k' "$1" > "$1.x" && mv "$1.x" "$1"; }
 set_bg_key() { awk -F'\t' -v k="$2" -v v="$3" 'BEGIN{OFS="\t"} $1==k{$2=v} {print}' "$1" > "$1.x" && mv "$1.x" "$1"; }
 write_bg_stamp() { # sha -> a runner gate-full-green with a reproducible fingerprint and the manifest blob
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nmanifest\t%s\nselftests\t\nrun_id\ttest\n' "$1" \
@@ -2367,15 +2368,21 @@ cd "$pfx_home" || exit 2
 # covers nothing: the bar runs and the `not covered` line names why. The unaltered GREEN is the
 # control, adopted with no bar run and its path printed. Red against a hook that ignores the record
 # (the control) or adopts any of the five.
+# TOOL-dWitnessedBar-40 AC4 — a GREEN per-tree verdict carrying neither `reused` nor `reused_cache`
+# cannot say whether its run reused a leg, and one with `reused 1` and no `reused_cache` cannot say
+# which kind: both run the bar, the first naming the missing pair. The control plants both at 0 and is
+# adopted. Red against a hook whose per-tree readers lack the keyless check.
 build_bg_fixture ac6 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
-for _c in verdict manifest reused_cache selftests tree control; do
+for _c in verdict manifest reused_cache keyless reused selftests tree control; do
   write_bg_verdict "$_x" full ""; _e=()
   case $_c in
     verdict) set_bg_key "$BG_VF" verdict RED; _want="it reads verdict 'RED', not GREEN" ;;
     manifest) set_bg_key "$BG_VF" manifest elsewhere/other-legs.json; _want="earned on the leg manifest elsewhere/other-legs.json" ;;
     reused_cache) printf 'reused\t1\nreused_cache\t1\n' >> "$BG_VF"; _want="reused 1 leg(s) from the cache" ;;
+    keyless) remove_bg_key "$BG_VF" reused; remove_bg_key "$BG_VF" reused_cache; _want="carries neither reused nor reused_cache" ;;
+    reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
     tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
     control) _want="pre-push: covered on main push" ;;
