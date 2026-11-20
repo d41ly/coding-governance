@@ -952,5 +952,71 @@ same  "range push line agrees: RANGE mode, exit code" "$rc" "0"
 has   "range push line agrees: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
 rm -rf "$T"
 
+# ---- TOOL-dWitnessedBar-2 AC6: THE UNWITNESSED PASS COMMIT, under each value of `hooks.bypass`. The
+# ---- fixture's base commit adds the driver, so it carries `Commit-Checked` and is the anchor F8
+# ---- derives; the run's pinned BASE is that commit. Past it, one pass commit carries no
+# ---- `Commit-Checked:` trailer and one, the control, carries it. `refused` at HEAD exits 1 naming the
+# ---- first and never the second; `allowed` lists it as a note and exits 0; `--preview` lists it under
+# ---- either and exits 0. Staged red by deleting the policy read, so `refused` reads as `allowed`.
+PK_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
+seed_witness_fixture() { # hooks.bypass value · [noanchor] -> prints the fixture root; sets nothing else
+  local T
+  T=$(mktemp -d) || exit 2
+  ( cd "$T" || exit 2
+    git init -q . && git checkout -q -b main
+    git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    mkdir -p ${PFX}${KIT_NAME} "${PFX}${PK_DIR##*/}" .governance memory/builds/tWit/spec
+    cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-pass-order.sh" "$KIT/commit_trailers.py" ${PFX}${KIT_NAME}/
+    # A driver that never carried the trailer: no commit of this history adds it, so no anchor.
+    [ "${2:-}" != noanchor ] || sed -i 's/Commit-Checked/Commit-Unchecked/g' "${PFX}${KIT_NAME}/unattended.sh"
+    cp "$SRC_ROOT/$PK_DIR/policy.py" "$SRC_ROOT/$PK_DIR/budgets.py" "$SRC_ROOT/$PK_DIR/caps.toml" \
+       "$SRC_ROOT/$PK_DIR/catalogue.toml" "${PFX}${PK_DIR##*/}/"
+    printf '[hooks]\nbypass = "%s"\n' "$1" > .governance/policy.toml
+    printf 'MEMORY_ROOT=memory\nPASS_ORDER_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+    { printf -- '---\nslug: tWit\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tWit-1\n---\n# tWit\n'
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      printf '| [ARCH-tWit-1 — unit](spec/s1.md) | 1 | 2 | OPEN | rev-1 | 2026-06-01 |\n'
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tWit/README.md
+    git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+    printf '# tWit\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' \
+      "$(git rev-parse HEAD)" > memory/builds/tWit/RUN.md
+    git add -A >/dev/null; git commit -q -m "run state" --no-verify
+    printf 'one\n' > ${PFX}w1.sh; git add -A >/dev/null
+    git commit -q -m "ARCH-tWit-1: past the hooks" -m "Pass: ARCH-tWit-1" --no-verify
+    printf 'two\n' > ${PFX}w2.sh; git add -A >/dev/null
+    git commit -q -m "ARCH-tWit-1: through the check" -m "Pass: ARCH-tWit-1
+Commit-Checked: unattended@1.0" --no-verify
+  ) >/dev/null 2>&1
+  printf '%s' "$T"
+}
+SRC_ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
+for wv in refused allowed; do
+  T=$(seed_witness_fixture "$wv")
+  W_UN=$(git -C "$T" rev-parse --short=12 HEAD~1); W_OK=$(git -C "$T" rev-parse --short=12 HEAD)
+  o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+  if [ "$wv" = refused ]; then
+    same  "unwitnessed under refused: the leg reds" "$rc" "1"
+    has   "unwitnessed under refused: it names the commit made past the hooks" "$o" "$W_UN — a pass commit naming ARCH-tWit-1"
+    has   "unwitnessed under refused: the FAILED line says why" "$o" "hooks.bypass is refused at HEAD"
+  else
+    same  "unwitnessed under allowed: the leg stays green" "$rc" "0"
+    has   "unwitnessed under allowed: it lists the commit as a note" "$o" "pass-order: note — hooks.bypass is allowed at HEAD"
+    has   "unwitnessed under allowed: the note names the commit" "$o" "$W_UN — a pass commit naming ARCH-tWit-1"
+  fi
+  hasnt "unwitnessed under $wv: the witnessed control is never listed" "$o" "$W_OK"
+  has   "unwitnessed under $wv: the summary counts the range past the anchor" "$o" "1 unwitnessed pass commit(s) in 1 build range(s) past the Commit-Checked anchor"
+  o=$(cd "$T" && bash "$LEG" --preview 2>&1); rc=$?
+  same  "unwitnessed under $wv, --preview: exit status is not set" "$rc" "0"
+  has   "unwitnessed under $wv, --preview: the commit is listed" "$o" "pass-order --preview: unwitnessed pass commits, under hooks.bypass $wv:"
+  rm -rf "$T"
+done
+# ...and a history whose driver never carried the trailer has no anchor: no range is graded, and the
+# summary says so rather than reporting a clean count.
+T=$(seed_witness_fixture refused noanchor)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+has   "no anchor: the summary says no range is graded" "$o" "no Commit-Checked anchor in HEAD's history"
+same  "no anchor: nothing is refused, exit code" "$rc" "0"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

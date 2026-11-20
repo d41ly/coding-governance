@@ -32,6 +32,14 @@ core.exceptions = "owner-only-expiring"
 ## `policy-file.on-invalid`
 Documented on [help/policy.md](../policy.md).
 
+## `hooks.bypass`
+<!-- usage: policy:hooks.bypass c687519d -->
+Whether a hook bypass is only recorded or also refused. Under both values each one is recorded as a decision=bypass line in the git common dir's runlog/pushes.log: a landing the pre-push hook never allowed, which the lander reports landed UNGATED, and a pushed pass commit with no Commit-Checked: trailer, which the unattended commit check never saw. Under allowed the push proceeds and the pass-order leg lists such commits as a note. Under refused the pre-push hook refuses them, the pass-order leg reds on them, and the lander and the hook refuse every landing until verdict names an off-node backend, since a hook on the bypassing node cannot refuse its own bypass. Read at the default branch's tip by the hook, at the landed revision by the lander, and at the graded commit by the leg.
+
+```text
+hooks.bypass = "refused"
+```
+
 ## `runtime.agents-in-flight`
 Documented on [help/agent-limit.md](../agent-limit.md).
 
@@ -275,7 +283,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (227)
+## Not yet summarised (226)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -285,7 +293,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `policy-file.guard`
 - `policy-file.proof`
 - `floor`
-- `hooks.bypass`
 - `transitions.record`
 - `leases`
 - `leases.granularity`

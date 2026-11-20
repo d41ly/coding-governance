@@ -2,6 +2,7 @@
 """verdict_backends.py — the verdict backends registered under the policy key `verdict` (TOOL-dWitnessedBar-6).
 
     python verdict_backends.py read [--backend <name>] --sha <sha>   # one line: verdict: <backend> · <state> · <sha8> · <why>
+    python verdict_backends.py off-node [--backend <name>]           # is the row off-node? exit 0 yes, 1 no, 2 refused
     python verdict_backends.py verify-peer [--remote <name>]          # run on a second fleet node
     python verdict_backends.py --fixture --plant <case>
 
@@ -20,6 +21,12 @@ any read.
 ONE READ for every backend, `read_verdict(backend, sha, tree)` -> `Verdict(state, witness, why)`, the
 state one of GREEN, RED, NONE, HELD and DEAD PROBE. Only GREEN stands: NONE, HELD and DEAD PROBE are no
 verdict and never green. `read` exits 0 on GREEN, 1 on any other state, 2 on a refusal.
+
+`off-node` (TOOL-dWitnessedBar-2 F5) reads the value as `read` does, finds its row by `check_backend`, and
+prints one line, `verdict-backends: off-node · <name> · <true|false> · off-node backends: <names>`, the
+names every declared row with `off_node = true`. It exits 0 when the row is off-node, 1 when it is not, 2
+on a refusal. The lander and the pre-push hook ask it under `hooks.bypass = refused`, which stands only on
+an off-node witness, because a hook on the bypassing node cannot refuse its own bypass.
 
 `local-hook` reads the runner-written per-tree verdict `<common-dir>/gate-verdict/<tree hash>`, the full
 slot only, never the `.scoped` one beside it. `peer-node` fetches `refs/gov/verdict/<sha>`, an annotated
@@ -431,6 +438,8 @@ PLANTS = {
     "local-green": "a full per-tree verdict GREEN, then RED, then none, then a scoped-only GREEN",
     "peer": "a tag from node b read on node a, the same tag from node a, and one naming another tree",
     "lander-peer": "the lander under verdict = peer-node with no peer verdict: a candidate published, nothing landed",
+    "lander-refused": "off-node asked of local-hook, then the lander under hooks.bypass = refused and verdict = local-hook: "
+                      "both name the off-node backends, no push",
     "remote-green": "a push run of the declared workflow, its bar step success, the pinned file deriving the pin",
     "swapped-workflow": "the same run over a workflow differing from the pin, under pinned-workflow then app-only",
     "other-path": "a run whose path is another workflow file",
@@ -536,10 +545,12 @@ def run_plant(case, top):
             said, rc = f"{SAY}: refused · {e}\n", 2
         sys.stdout.write(said)
         out.append(("local-hook declared twice", rc, 2, [f"{FIX_TOOLS}/other/kit.toml", f"{FIX_KIT}/kit.toml"], said))
-    elif case in ("unregistered", "undeclared", "lander-peer"):
-        value = {"unregistered": "ci-cloud", "undeclared": "remote-ci", "lander-peer": "peer-node"}[case]
+    elif case in ("unregistered", "undeclared", "lander-peer", "lander-refused"):
+        value = {"unregistered": "ci-cloud", "undeclared": "remote-ci", "lander-peer": "peer-node",
+                 "lander-refused": "local-hook"}[case]
         names = ["local-hook", "peer-node"] if case == "undeclared" else [n for n, _r, _o in FIX_ROWS]
-        work = write_fixture_tree(top, {".governance/policy.toml": f'verdict = "{value}"\n',
+        bypass = '\n[hooks]\nbypass = "refused"\n' if case == "lander-refused" else ""
+        work = write_fixture_tree(top, {".governance/policy.toml": f'verdict = "{value}"\n{bypass}',
                                         f"{FIX_KIT}/kit.toml": render_rows(names)})
         (work / "unit.txt").write_text("a unit to land\n", encoding="utf-8")
         run_fixture_git(work, "add", "-A")
@@ -560,6 +571,13 @@ def run_plant(case, top):
             needles = ["verdict = remote-ci names no declared verdict backend", "local-hook, peer-node"]
             run_scenario("read", work, [sys.executable, *reader], 2, needles)
             run_scenario("the lander", work, lander, 1, needles, GOV_NODE="a")
+        elif case == "lander-refused":
+            run_scenario("off-node", work, [sys.executable, f"{FIX_KIT}/verdict_backends.py", "off-node", "--backend",
+                                            "local-hook"], 1,
+                         ["off-node · local-hook · false · off-node backends: peer-node, remote-ci"])
+            run_scenario("the lander", work, lander, 1,
+                         ["hooks.bypass is refused and verdict local-hook is no off-node backend", "peer-node, remote-ci"],
+                         GOV_NODE="a")
         else:
             run_scenario("the lander", work, lander, 1,
                          ["verdict: peer-node · NONE · " + sha[:8], "reads NONE"], GOV_NODE="a")
@@ -736,12 +754,26 @@ def run_read(backend_name, sha, repo="."):
     return 0 if v.state == "GREEN" else 1
 
 
+def run_off_node(backend_name, repo="."):
+    """The `off-node` verb -> its exit: 0 when the row `verdict` names is off-node, 1 when it is not, 2 refused."""
+    try:
+        backends = read_backends(TOOL_ROOT)
+        name = backend_name or read_backend_name(repo)
+        backend = check_backend(name, backends)
+    except Refusal as e:
+        print(f"{SAY}: refused · {e}")
+        return 2
+    names = ", ".join(r["name"] for r in backends if r["off_node"]) or "none"
+    print(f"{SAY}: off-node · {backend['name']} · {str(backend['off_node']).lower()} · off-node backends: {names}")
+    return 0 if backend["off_node"] else 1
+
+
 def main(argv):
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace", newline="\n")
     ap = argparse.ArgumentParser(prog="verdict_backends.py", description=__doc__.split("\n\n")[0])
-    ap.add_argument("verb", nargs="?", choices=["read", "verify-peer"])
+    ap.add_argument("verb", nargs="?", choices=["read", "off-node", "verify-peer"])
     ap.add_argument("--backend", help="read this backend rather than the value `verdict` holds")
     ap.add_argument("--sha", help="the commit read")
     ap.add_argument("--remote", default=None, help="verify-peer's remote, origin by default")
@@ -749,9 +781,11 @@ def main(argv):
     ap.add_argument("--plant", choices=list(PLANTS))
     args = ap.parse_args(argv)
     if args.fixture != bool(args.plant) or (args.fixture == bool(args.verb)):
-        ap.error("one of read --sha <sha>, verify-peer or --fixture --plant <case>")
+        ap.error("one of read --sha <sha>, off-node, verify-peer or --fixture --plant <case>")
     if args.fixture:
         return run_fixture(args.plant)
+    if args.verb == "off-node":
+        return run_off_node(args.backend)
     if args.verb == "read":
         if not args.sha:
             ap.error("read takes --sha <sha>")

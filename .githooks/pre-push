@@ -506,10 +506,32 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
     bar-refused)    dec=refuse-bar ;;
     merge-loss)     dec=refuse-merge-loss ;;
     signalled)      dec=refuse-signal ;;
+    bypass-refused) dec=refuse-bypass ;;
   esac
   { printf '%s\t%s\n' "$1" "${2-}" > "$PUSH_REFUSAL"; } 2>/dev/null
   [ -n "$dec" ] || return 0
   if [ -n "$RUNLOG_N" ]; then RUNLOG_DECISION=$dec; else write_push_once "$dec"; fi
+}
+
+# `write_bypass_line <kind> <sha> <policy> [<tree verdict>]` records one hook bypass (TOOL-dWitnessedBar-2
+# S2): one `ev=once` line, `decision=bypass`, in the pushes journal, `runlog/pushes.log` under the git
+# common dir, in the runlog kit's grammar, and one `bypass:` line on stderr. BYTE-IDENTICAL in the
+# lander and the pre-push hook, which ships verbatim and sources no kit; the lander suite holds the
+# pair. EVIDENCE, NEVER AN INPUT: nothing branches on the line, a failed append prints one line and
+# moves no exit, and `GOV_RUNLOG=0` writes no journal line. Every value is a fixed token or hex, so
+# none needs the grammar's escaping, and the line is far under its cap.
+write_bypass_line() { # kind · sha · policy · [tree verdict] -> one journal line and one stderr line
+  local t gcd tab=$'\t'
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  echo "bypass: $1 · ${2:0:8} · hooks.bypass $3${4:+ · tree verdict $4} · recorded in runlog/pushes.log" >&2
+  [ "${GOV_RUNLOG:-}" != 0 ] || return 0
+  gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
+  if [ -n "$gcd" ] && { [ -d "$gcd/runlog" ] || mkdir "$gcd/runlog" 2>/dev/null; } \
+     && { printf '%s\n' "v=1${tab}t=$t${tab}p=pushes${tab}ev=once${tab}decision=bypass${tab}bypass=$1${tab}sha=$2${tab}policy=$3${4:+${tab}tree_verdict=$4}" >> "$gcd/runlog/pushes.log"; } 2>/dev/null; then
+    return 0
+  fi
+  echo "${0##*/}: run log — cannot append to ${gcd:-(no git dir resolved)}/runlog/pushes.log, so this bypass is not recorded there; the exit is unaffected" >&2
+  return 0
 }
 
 # ---- WHERE THIS TREE KEEPS ITS KITS — TOOL-dRetiredFork-11 ---------------------------------------
@@ -1520,12 +1542,12 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-PP_READ_AT=""; PP_HELD=on-demand
-read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), PP_MAX_AGE (the positive bound declared, or empty), PP_WHY and PP_HELD (verdict.held)
+PP_READ_AT=""; PP_HELD=on-demand; PP_BYPASS=allowed; PP_BYPASS_WHY=""
+read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), PP_MAX_AGE (the positive bound declared, or empty), PP_WHY, PP_HELD (verdict.held), PP_BYPASS and PP_BYPASS_WHY (hooks.bypass)
   local sha=$1 blob age="" bnd py dir="" rel tree val rc
   # READ ONCE PER SHA: the doc class and the policy line ask for the same R.
   [ -n "$sha" ] && [ "$sha" = "$PP_READ_AT" ] && return 0
-  PP_POLICY=every-red; PP_MAX_AGE=""; PP_WHY=""; PP_HELD=on-demand
+  PP_POLICY=every-red; PP_MAX_AGE=""; PP_WHY=""; PP_HELD=on-demand; PP_BYPASS=allowed; PP_BYPASS_WHY=""
   if [ -z "$sha" ] || [ -z "${sha//0/}" ]; then
     PP_WHY="the remote holds no tip for $def yet, so there is no R to read a policy at"; return 0
   fi
@@ -1548,6 +1570,15 @@ read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), 
       PP_HELD=$(cd "$top" && "$py" "$tree/$rel" get verdict.held --rev "$sha" 2>/dev/null) || PP_HELD=""
       PP_HELD=${PP_HELD%$'\r'}
       case "$PP_HELD" in peer-or-cadence|push-selected|on-demand) ;; *) PP_HELD=on-demand ;; esac
+      # `hooks.bypass` at the same R (TOOL-dWitnessedBar-2 S1): an answer outside its two values, or
+      # none, reads as the catalogue default `allowed`, and PP_BYPASS_WHY says so.
+      PP_BYPASS=$(cd "$top" && "$py" "$tree/${dir%$'\r'}/policy.py" get hooks.bypass --rev "$sha" 2>/dev/null) || PP_BYPASS=""
+      PP_BYPASS=${PP_BYPASS%$'\r'}
+      case "$PP_BYPASS" in
+        allowed|refused) ;;
+        *) PP_BYPASS_WHY="the reader, policy.py get, answered '${PP_BYPASS:-nothing}' at ${sha:0:8}, so hooks.bypass reads its catalogue default, allowed"
+           PP_BYPASS=allowed ;;
+      esac
       break
     done
   fi
@@ -1949,6 +1980,77 @@ read_policy_at "$main_remote"
 if [ "$PP_HELD" = push-selected ] && [ -z "${GATE_SELFTESTS:-}" ]; then
   # One statement, so govkit 7h3 never reads this policy-derived export as a policy the hook ships.
   GATE_SELFTESTS=changed && export GATE_SELFTESTS \n    && echo "pre-push: verdict.held at ${main_remote:0:8} reads push-selected, so this bar runs the held legs the push moved (GATE_SELFTESTS=changed)"
+fi
+
+# ---- EACH HOOK BYPASS RECORDED, AND REFUSED UNDER `hooks.bypass = refused` — TOOL-dWitnessedBar-2 ----
+# `hooks.bypass` is read at R by `read_policy_at` above, beside `verdict.held`, never from the pushed
+# tree. S5: the pushed range R..tip is walked through the memory-tree kit's copy of the one trailer
+# reader, its `unchecked` verb, which lists each non-merge commit whose `Pass:` trailer names a unit and
+# that carries no `Commit-Checked:` value, the trailer the unattended commit check writes onto a pass
+# commit it admitted: so each one listed was made past the commit hooks. Each is recorded through
+# `write_bypass_line`, and under `allowed` the push proceeds. S6: under `refused` the run-gates kit's
+# registry is asked, by its `off-node` verb, whether the `verdict` row is off-node, and every landing is
+# refused while it is not, because a hook on this node cannot refuse its own bypass; then any
+# unwitnessed commit refuses the push, naming each SHA. Both refusals are `bypass-refused`. A kit or a
+# launcher that does not resolve prints one line, and under `refused` refuses: deny by default. The
+# kits are found as the policy push arm finds its own, a copy under the pushing tree vetted first.
+# WHAT THIS DOES NOT CATCH: a `--no-verify` push, which runs no hook, and which the off-node bar's
+# pass-order arm reads from history instead; a typed `Commit-Checked:` line, which is text; a push to a
+# remote with no tip yet, which has no R to read the policy at.
+if [ -z "$DECIDE" ] && [ -n "${main_local//0/}" ] && [ -n "${main_remote//0/}" ]; then
+  _bp_py=$(resolve_python 2>/dev/null || true)
+  _bp_ct=""; _bp_vb=""; _bp_out=""; _bp_rc=0; _bp_shas=""; _bp_miss=""
+  [ -z "$PP_BYPASS_WHY" ] || echo "pre-push: $PP_BYPASS_WHY"
+  if [ -n "$_bp_py" ]; then
+    for _bp_tree in "$top" "$(cd "${0%/*}/.." && pwd)"; do
+      if [ -z "$_bp_ct" ] && _bp_dir=$(resolve_kit_dir "$_bp_py" memory-tree commit_trailers.py "$_bp_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+        [ "$_bp_tree" != "$top" ] || check_reviewed_file "${_bp_dir%$'\r'}/commit_trailers.py" "$main_local" "runs as the hook-bypass walk"
+        _bp_ct="$_bp_tree/${_bp_dir%$'\r'}/commit_trailers.py"
+      fi
+      if [ -z "$_bp_vb" ] && _bp_dir=$(resolve_kit_dir "$_bp_py" run-gates verdict_backends.py "$_bp_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+        [ "$_bp_tree" != "$top" ] || check_reviewed_file "${_bp_dir%$'\r'}/verdict_backends.py" "$main_local" "is asked whether verdict is off-node"
+        _bp_vb="$_bp_tree/${_bp_dir%$'\r'}/verdict_backends.py"
+      fi
+    done
+  fi
+  if [ -z "$_bp_py" ]; then
+    _bp_miss="no usable python launcher resolved"
+  elif [ -z "$_bp_ct" ]; then
+    _bp_miss="the memory-tree kit's commit_trailers.py is installed neither under '$top' nor beside this hook"
+  elif ! _bp_out=$(cd "$top" && "$_bp_py" "$_bp_ct" unchecked "$main_remote..$main_local" 2>&1); then
+    _bp_miss="the trailer reader's unchecked verb refused: ${_bp_out//$'\n'/ · }"
+  fi
+  if [ -n "$_bp_miss" ]; then
+    echo "pre-push: the hook-bypass walk did NOT run over refs/heads/$def — $_bp_miss, so no unwitnessed pass commit in this push was recorded."
+  else
+    while read -r _bp_sha _; do
+      # A SHA LINE ONLY: the reader's own stderr note, merged into this capture, is no commit.
+      case "${#_bp_sha}:$_bp_sha" in 40:*[!0-9a-f]*|64:*[!0-9a-f]*) continue ;; 40:*|64:*) ;; *) continue ;; esac
+      write_bypass_line unwitnessed-commit "$_bp_sha" "$PP_BYPASS"
+      _bp_shas="$_bp_shas ${_bp_sha:0:8}"
+    done <<< "${_bp_out//$'\r'/}"
+    [ -z "$_bp_shas" ] || [ "$PP_BYPASS" = refused ] \
+      || echo "pre-push: hooks.bypass at ${main_remote:0:8} reads allowed, so the pass commit(s)$_bp_shas, made past the commit check, are recorded and the push proceeds"
+  fi
+  if [ "$PP_BYPASS" = refused ]; then
+    if [ -z "$_bp_py" ] || [ -z "$_bp_vb" ]; then
+      _bp_rc=2; _bp_out="no run-gates kit's verdict_backends.py resolves under '$top' or beside this hook${_bp_py:-, and no usable python launcher}"
+    else
+      _bp_out=$(cd "$top" && "$_bp_py" "$_bp_vb" off-node 2>&1); _bp_rc=$?
+    fi
+    if [ "$_bp_rc" != 0 ]; then
+      why="pre-push: REFUSING — hooks.bypass at ${main_remote:0:8} is refused, and verdict names no off-node backend, so nothing lands: a hook on this node cannot refuse its own bypass, and only an off-node witness can (${_bp_out//$'\n'/ · })."
+      echo "$why" >&2
+      echo "  Set verdict to an off-node backend the registry names, or hooks.bypass to allowed." >&2
+      write_refusal bypass-refused "$why"; RUNLOG_CLEAN=1; exit 1
+    fi
+    if [ -n "$_bp_miss" ] || [ -n "$_bp_shas" ]; then
+      why="pre-push: REFUSING — hooks.bypass at ${main_remote:0:8} is refused, and ${_bp_shas:+the pass commit(s)$_bp_shas carry no Commit-Checked: trailer, so the commit check never saw them}${_bp_miss:+the hook-bypass walk did not run: $_bp_miss}."
+      echo "$why" >&2
+      echo "  Remake each named commit through the unattended commit check, which writes its trailer." >&2
+      write_refusal bypass-refused "$why"; RUNLOG_CLEAN=1; exit 1
+    fi
+  fi
 fi
 
 # 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 9, per candidate

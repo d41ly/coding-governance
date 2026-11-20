@@ -482,6 +482,37 @@ read_history_range "$DRIVER"
 PS_DIR=$(mktemp -d) || { echo "pass-order: cannot make a scratch directory for the historical spec blobs, so no unit could be classified"; exit 2; }
 trap 'rm -rf "$PS_DIR"' EXIT
 
+# ------------------------------------------------------------------- THE UNWITNESSED PASS COMMITS
+# TOOL-dWitnessedBar-2 S7. The driver's commit check writes `Commit-Checked: unattended@<version>` onto
+# every pass commit it admits, so a commit whose `Pass:` trailer names a unit and that lacks one was
+# made past the hooks. Each build range below is walked through the `unchecked` verb of this kit's copy
+# of the one trailer reader, and every such commit is listed once. `hooks.bypass`, read through the
+# policy kit's reader AT THE GRADED COMMIT (`--rev HEAD`), decides what a listing does: under `refused`
+# the leg exits 1, under `allowed`, or where the reader does not answer, it is a note and exit 0, and
+# `--preview` lists it under either. Run inside the bar an off-node backend runs, this is the refusal no
+# local bypass reaches.
+# THE ANCHOR (F8): pass commits landed before the trailer existed carry none, so a range is graded only
+# when its BASE descends from the earliest commit of HEAD's history that adds `Commit-Checked` to the
+# driver beside this leg, found by one `git log -S`. A history with no such commit grades no range and
+# says so on the summary line. WHAT THIS DOES NOT CHECK: that a trailer was written by the hook rather
+# than typed, since it is text; a range the cutoff above skips.
+BYPASS_POLICY=allowed; BYPASS_ANCHOR=""; BYPASS_PY=""
+bypass_graded=0; unw_n=0; unwitnessed=""; unwitnessed_seen=" "
+_drv_rel=$(derive_self_rel "$HERE") || _drv_rel=""
+IFS= read -r BYPASS_ANCHOR < <(GIT log --reverse --format=%H -S Commit-Checked HEAD -- "${_drv_rel:+$_drv_rel/}unattended.sh" 2>/dev/null) || :
+if [ -n "$BYPASS_ANCHOR" ]; then
+  BYPASS_PY=$(resolve_python 2>/dev/null) || BYPASS_PY=""
+  _bp_val=""
+  if [ -n "$BYPASS_PY" ] && _bp_kit=$(resolve_kit_dir "$BYPASS_PY" policy policy.py "$HERE" 2>/dev/null) && [ -n "$_bp_kit" ]; then
+    _bp_val=$("$BYPASS_PY" "${_bp_kit%$'\r'}/policy.py" get hooks.bypass --rev HEAD 2>/dev/null) || _bp_val=""
+    _bp_val=${_bp_val%$'\r'}
+  fi
+  case "$_bp_val" in
+    allowed|refused) BYPASS_POLICY=$_bp_val ;;
+    *) echo "pass-order: hooks.bypass reads its catalogue default, allowed: the policy kit's reader answered '${_bp_val:-nothing}' at HEAD" ;;
+  esac
+fi
+
 # THE POPULATION COMES FROM THE GRADED COMMIT TOO, and this line was the last one left behind.
 # The fold moved four record READS to `HEAD:` and left the SELECTOR that decides which builds are
 # read at all on `git ls-files`, which enumerates the INDEX. So one `git rm --cached` of a build
@@ -542,6 +573,23 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     [ -n "$first" ] || { skipped_cutoff=$((skipped_cutoff+1)); continue; }
     base=$(GIT rev-parse "$first^" 2>/dev/null) || base=""
     norun_graded=$((norun_graded+1))
+  fi
+
+  # S7 - THE UNWITNESSED PASS COMMITS of this build's range, graded only past the anchor (above).
+  if [ -n "$BYPASS_ANCHOR" ] && [ -n "$base" ] && GIT merge-base --is-ancestor "$BYPASS_ANCHOR" "$base" 2>/dev/null; then
+    bypass_graded=$((bypass_graded+1))
+    if [ -z "$BYPASS_PY" ] || ! _uc_out=$("$BYPASS_PY" "$HERE/commit_trailers.py" unchecked "$base..HEAD" 2>&1); then
+      echo "pass-order: the unwitnessed pass commits of $slug cannot be read, so this leg would grade the hook bypass by nothing: ${_uc_out:-no python launcher resolved}"
+      exit 2
+    fi
+    while read -r _uc _uids; do
+      # A SHA LINE ONLY: the reader's own stderr note, merged into this capture, is no commit.
+      case "${#_uc}:$_uc" in 40:*[!0-9a-f]*|64:*[!0-9a-f]*) continue ;; 40:*|64:*) ;; *) continue ;; esac
+      case "$unwitnessed_seen" in *" $_uc "*) continue ;; esac
+      unwitnessed_seen="$unwitnessed_seen$_uc "; unw_n=$((unw_n+1))
+      unwitnessed="$unwitnessed
+  ${_uc:0:12} — a pass commit naming $_uids, in $slug's range, with no Commit-Checked: trailer, so the commit check never saw it"
+    done <<< "${_uc_out//$'\r'/}"
   fi
 
   # The CLOSED units, from the generated region. A row's id is spelled twice, so `match` takes the
@@ -710,15 +758,25 @@ for _w in $waived_ids; do
   fi
   stale="$stale $_w"
 done
-echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap · $HR_FIELD · $not_judged waivers not judged"
+if [ -n "$BYPASS_ANCHOR" ]; then
+  _unw_field="$unw_n unwitnessed pass commit(s) in $bypass_graded build range(s) past the Commit-Checked anchor ${BYPASS_ANCHOR:0:8}, hooks.bypass $BYPASS_POLICY at HEAD"
+else
+  _unw_field="no Commit-Checked anchor in HEAD's history, so no build range is graded for unwitnessed pass commits"
+fi
+echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap · $HR_FIELD · $not_judged waivers not judged · $_unw_field"
 echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 
 if [ "$PREVIEW" = 1 ]; then
   echo "pass-order --preview: every violation the predicate finds, waived or not:${previews:-
   (none)}"
   [ -n "$stale" ] && echo "pass-order --preview: waiver rows matching nothing:$stale"
+  [ -n "$unwitnessed" ] && echo "pass-order --preview: unwitnessed pass commits, under hooks.bypass $BYPASS_POLICY:$unwitnessed"
   echo "pass-order --preview: exit status is NOT set in this mode"
   exit 0
+fi
+
+if [ -n "$unwitnessed" ] && [ "$BYPASS_POLICY" != refused ]; then
+  echo "pass-order: note — hooks.bypass is $BYPASS_POLICY at HEAD, so these pass commits made past the commit check are listed and not refused:$unwitnessed"
 fi
 
 if [ -n "$stale" ]; then
@@ -728,6 +786,11 @@ fi
 
 if [ -n "$violations" ]; then
   echo "pass-order FAILED — a unit was BUILT before a conforming spec for it existed:$violations"
+  exit 1
+fi
+
+if [ -n "$unwitnessed" ] && [ "$BYPASS_POLICY" = refused ]; then
+  echo "pass-order FAILED — hooks.bypass is refused at HEAD, and these pass commits carry no Commit-Checked: trailer, so each was made past the commit check:$unwitnessed"
   exit 1
 fi
 exit 0

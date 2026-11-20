@@ -15656,6 +15656,13 @@ check_commit_message() { # commit message file
       return 1
     fi
   done
+  # THE COMMIT CHECK'S WITNESS (TOOL-dWitnessedBar-2 S4), on its one admitting path for a commit whose
+  # Pass: trailer names an open dispatched pass: the message gains `Commit-Checked:
+  # unattended@<kit version>`, so a pass commit this hook never saw is told by the trailer's absence,
+  # which the pre-push hook and the pass-order leg read under `hooks.bypass`. A failed append prints one
+  # line and still admits: the trailer is evidence, and this check gains no refusal.
+  git interpret-trailers --in-place --if-exists replace --trailer "Commit-Checked: unattended@$KIT_UNATTENDED_VERSION" "$msg" 2>/dev/null \
+    || echo "unattended: --check-commit admitted this pass commit and could not append its Commit-Checked: trailer to $msg, so the pre-push hook will read it as made past the commit check"
   return 0
 }
 
