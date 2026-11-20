@@ -50,14 +50,14 @@ once restored. The index generator's `--check` printed the same lines before and
   while `check_slug_claimed` over the slug refuses it; the claim ref stayed at one commit (PINNED) and HEAD
   where the first run left it. `--plant slug-minted-locally`: a slug whose build folder a local commit
   touched was refused naming `the local pre-check of a fresh claim`, exit 1, and no claim ref was created.
-- AC4 — `--plant slug-taken`: a claim ref under the key `z:s-other`; the verb exited 5 printing `claimed
-  under another key` and `a fresh slug owed`, and the request ref gained one `route-back ·
-  item.entry.claim` row, the record created from the kept copy. With the scratch remote renamed away, a
+- AC4 — `--plant slug-taken`: a claim ref under the key `z:s-other`; the verb exited 5 printing
+  `claimed under another key` and `a fresh slug owed`, and the request ref gained one
+  `route-back · item.entry.claim` row, the record created from the kept copy. With the scratch remote renamed away, a
   second slug exited 4 printing `claim not written — offline`, and no build folder was written.
 - AC5 — the index generator's `--placed-build`, probed in a scratch repository through
   `tools/memory-tree/gen_build_index.py#cmd_placed_build`: `--origin aFoo` wrote and staged a README whose
-  front matter carries the six required keys, `status: OPEN` and `parents: aFoo`; `--playbook
-  playbooks/zq-run.md --pieces 3` wrote `authorized-by: recipe`, the `playbook:` key and `pieces: 3` (PINNED); no
+  front matter carries the six required keys, `status: OPEN` and `parents: aFoo`;
+  `--playbook playbooks/zq-run.md --pieces 3` wrote `authorized-by: recipe`, the `playbook:` key and `pieces: 3` (PINNED); no
   request text appears in either, and a repeat with no `--pieces` was refused before any write.
   `--plant repeat-no-pieces`: the verb printed one line naming `--pieces` and exited 2, the scratch remote
   holding no `refs/gov/claims/dRunAgain` and the fixture no build folder.
@@ -68,8 +68,8 @@ once restored. The index generator's `--check` printed the same lines before and
   `--plant overlap-warn`: a remote branch and this run's own commit sharing one path under `leases: warn`;
   the verb exited 0 printing `overlap noted`, the claim ref's newest commit holding `overlap:`, and the
   first record written.
-- AC7 — `--plant first-record`: a repeat exited 0; `HEAD~1` is `records(dRunAgain): entry.claim's derived
-  plan record`, carrying the README and `memory/project/readme-contract.txt` alone, and HEAD the
+- AC7 — `--plant first-record`: a repeat exited 0; `HEAD~1` is
+  `records(dRunAgain): entry.claim's derived plan record`, carrying the README and `memory/project/readme-contract.txt` alone, and HEAD the
   transition commit carrying no file, its trailer `none -> designing` with `item=item.entry.claim` and
   `scenario=scenario.playbook-run`, the index left clean. `--plant first-record-patch`: a patch under
   `patch.ratify` = `auto` recorded `item=item.plan.dedupe`, `stand-in=dRankedPlan` and
