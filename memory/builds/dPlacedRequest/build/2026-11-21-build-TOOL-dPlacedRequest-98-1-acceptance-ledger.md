@@ -66,6 +66,13 @@ reads the pin from the `FLOOR_ASSERTIONS=` line, and evaluates the cut with `n` 
 - The kit-epoch leg reads the push-main entry as `skip · no declared version`, its descriptor's `version_from` being `none`, so no version carrier moved. (DERIVED)
 - `bash -n tools/push-main.test.sh` exited 0, and the `testsuite counts` leg's `compliant` patterns, run by `grep` over the suite, each matched once. (DERIVED)
 
+- The bug-class checklist over the pass commit selected `two-answers-to-one-question`: the block's header still said the fixture's launcher launched the kit beside the lander, and arm 54's comment that its stub passed other calls to the real driver; both now name the copy and the fixture's launcher. (DERIVED)
+- It selected `fixture-inherits-ambient-machine-state`: `tools/push-main.sh` reads no `GOV_NODE`, the fixture plants `USERNAME` for every driver call, and the copied kit tree holds no `.governance` receipt, so the probe rung alone resolves the copy. (DERIVED)
+- It selected `portability-sweep`: `env -u` is in GNU and BSD `env`, and the copy's deepest path under the suite's temp root stays far under the Windows path limit. (DERIVED)
+- It selected `budget-row-not-remeasured-after-added-arms`: the row is re-priced here as a proxy and its measured reading is owed below. (DERIVED)
+- It selected `an-attested-count-must-count-what-the-grader-counts` and `insert-after-a-key-that-occurs-twice`: no `ok` sits in a subshell, a pipe or a helper called more than once, and `FLOOR_ASSERTIONS` is assigned on one line only. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing` and `empty-field-collapses-unless-it-is-last`: every answer keeps its tokens on one line, and the budget row keeps its empty third field between two tabs, as before. (DERIVED)
+
 ## Items diverged
 
 None.

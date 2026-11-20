@@ -1633,7 +1633,8 @@ fi
 
 # 42-51 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
 #      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside
-#      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of it,
+#      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of a
+#      copy of it in the fixture's own kit tree (below),
 #      leases on, and clone A's session `sA` holding the build lease `fx` under fleet tag `a`. Clone B
 #      takes the lease over as fleet tag `b`, same session, which the `lease` column reads `same`.
 #      A planted fence read stands in a stub driver committed at the same place. Staged against the
@@ -1857,7 +1858,7 @@ else
   if write_fence_fixture; then
     # 54 — TOOL-dPlacedRequest-43 AC28: the lease moves inside the first push's hook as 52's does, and
     #      a stub driver answers the `--after` re-fence read `lease refused — offline`, the driver's
-    #      line for a read that did not answer, passing every other call to the real driver. The
+    #      line for a read that did not answer, passing every other call to the fixture's launcher. The
     #      landing exits 1 `unreachable`, no abort remedy and never `fenced`, the branch unmoved.
     #      Staged against TOOL-dPlacedRequest-29's lander, which reads every refusal there `fenced`.
     git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
