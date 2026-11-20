@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md) | research | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md) | research | — |
 
@@ -147,7 +148,7 @@ prints `take-announced`, leaves the remote lease's `epoch:` one above the plante
   `claim.py` beside the driver of 95c3103ad, the claim exits 4 printing `claim waiting`, its RED-first
   reading.
   fixture: the throwaway repository and bare remote the plant builds; the tree holds none.
-  cost: one plant, under a minute on node d (UNVERIFIED, an estimate from the row's 120 s over 13 plants).
+  cost: one plant, under a minute on node d (UNVERIFIED, an estimate from the row's PINNED 120 s proxy over 13 plants).
 - **AC2** — When `grep -c 'stale, so --lease take-over takes it' tools/unattended/unattended.sh` runs,
   it prints 1, and `grep -c 'LEASE_STALE_HINT' tools/unattended/unattended.sh` prints at least 3.
   Red when: the hint is typed in two places; at 95c3103ad the second grep prints 0, its RED-first
@@ -171,6 +172,8 @@ none
 - rev-1 · 2026-11-20 · initial draft, promoted by the disposal of
   2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit, item H4 (HIGH, finding id 29), as the repair
   of `TOOL-dPlacedRequest-96`, whose Goal this unit's disposal corrected.
+- rev-1 · 2026-11-20 · editorial, no criterion moved: AC1's cost line marks the budget row's figure
+  it cites, per 2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.
 
 ## 10. Reuse audit
 
