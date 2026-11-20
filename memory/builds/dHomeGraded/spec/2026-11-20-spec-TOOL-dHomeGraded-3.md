@@ -1,6 +1,6 @@
 # TOOL-dHomeGraded-3 — `gen_map.py` runs under the interpreter `.codebase-map.conf` names
 
-**Status:** OPEN · rev-1 · 2026-11-20 · node d · Tier-1 · base 8cdee285 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-20 · node d · Tier-1 · base 8cdee285 · streams tooling
 
 <!-- gen:spec-records -->
 

@@ -50,7 +50,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dHomeGraded-1 TOOL-dHomeGraded-2 TOOL-dHomeGraded-3
 
 <!-- gen:build-units -->
@@ -58,7 +58,7 @@ ids TOOL-dHomeGraded-1 TOOL-dHomeGraded-2 TOOL-dHomeGraded-3
 |---|---|---|---|---|---|
 | [TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close](spec/2026-11-20-spec-TOOL-dHomeGraded-1.md) | — | 1 | CLOSED | rev-2 | 2026-11-20 |
 | [TOOL-dHomeGraded-2 — `govkit update` reaps a retired row that a live row at the same path supersedes](spec/2026-11-20-spec-TOOL-dHomeGraded-2.md) | — | 1 | CLOSED | rev-1 | 2026-11-20 |
-| [TOOL-dHomeGraded-3 — `gen_map.py` runs under the interpreter `.codebase-map.conf` names](spec/2026-11-20-spec-TOOL-dHomeGraded-3.md) | — | 1 | OPEN | rev-1 | 2026-11-20 |
+| [TOOL-dHomeGraded-3 — `gen_map.py` runs under the interpreter `.codebase-map.conf` names](spec/2026-11-20-spec-TOOL-dHomeGraded-3.md) | — | 1 | CLOSED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
