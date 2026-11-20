@@ -10,7 +10,7 @@ by the new memory-hygiene self-test block extracted into a scratch script with `
 stubbed, by check 23's ledger awk extracted from the engine and run over a scratch ledger, and by
 `grep` and `wc -c` over the edited files. The suites themselves were not run: the `New arm:` lines of
 spec section 7, in `check-memory-hygiene.test.sh` and `ratchet.py --fixture`, their RED-first
-observations and the section 7 legs are owed to the main loop at the close.
+observations and the legs of §7 are owed to the main loop at the close.
 
 **Evidences:** TOOL-dWitnessedBar-7
 - AC1 — `python seen_red.py --fixture --plant seen` in `tools/memory-tree/` exited 0 printing
