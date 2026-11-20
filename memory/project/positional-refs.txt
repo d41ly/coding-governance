@@ -25717,35 +25717,8 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:11866-11869
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:12762
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:3975-4041
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:2170
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:8536
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/roles/handoff.py:97
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-brief-recorded.sh:381
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-pass-order.sh:356
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/unattended.sh:1350-1353
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/workflows/unattended-build.js:608-613
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	unattended.sh:1350
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M3
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1359-1375
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1364
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:13746-13758
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:6399-6411
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:708
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/workflows/unattended-build.js:608-613
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	HYGIENE check 25
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/unattended/unattended.sh:852
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/memory-tree/tree_lib.py:27
