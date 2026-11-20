@@ -342,3 +342,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T06:28:08Z draw · re-dispatch · TOOL-dPlacedRequest-46 · 47/130 · 20261120T062808Z-011deb
 
 2026-11-20T06:28:08Z dispatch · item 143880b7 TOOL-dPlacedRequest-46 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-46-1-acceptance-ledger.md
+
+2026-11-20T06:43:01Z dispatch · item 669f99f7 TOOL-dPlacedRequest-47 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-47-1-acceptance-ledger.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md
