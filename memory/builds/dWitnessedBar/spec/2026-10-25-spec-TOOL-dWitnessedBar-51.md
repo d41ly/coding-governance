@@ -17,6 +17,7 @@
 | [2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md](../build/2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md) | deviation | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-51-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-51-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-1-builder-return.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-51-2-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-2-builder-return.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md) | deviation | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md) | deviation | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md) | widen | — |
