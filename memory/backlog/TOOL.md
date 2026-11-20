@@ -581,6 +581,12 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
+| [TOOL-dQuietDisk-20](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | THE R1 TO R8 DESIGN RULES FOR SPEC AUTHORS ARE NOT WRITTEN DOWN. The… |
+| [TOOL-dQuietDisk-21](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | NO SELF-TEST ROW DECLARES A TEMP-ENTRY OR RESIDUE CEILING (G-A).… |
+| [TOOL-dQuietDisk-22](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | NO LEG DECLARES A GIT-PROCESS CEILING (G-B). The bar measures seconds… |
+| [TOOL-dQuietDisk-23](../builds/dQuietDisk/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE REST OF THE G-C STATIC LINT IS UNBUILT. TOOL-dQuietDisk-9 lands… |
+| [TOOL-dQuietDisk-24](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | unattended.test.sh REBUILDS ITS PROLOGUE IN EVERY SHARD (K2). Each of… |
+| [TOOL-dQuietDisk-25](../builds/dQuietDisk/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | check-unattended.test.sh BUILDS A REPOSITORY PER CASE. It has 13 git… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
