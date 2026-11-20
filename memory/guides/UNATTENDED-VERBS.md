@@ -540,7 +540,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   the new tip only where this session holds the lease, `<tip>` is on the new tip's first-parent
   chain and the new tip's `epoch` is `<tip>`'s; a later epoch, a tip off that chain, leases off and
   no lease on the remote are each `lease refused — epoch-fence` (exit 1), a foreign holder keeping
-  its own cause word. `--after` on any other act, or no full sha, exits 2.
+  its own cause word, and a read that does not answer `lease refused — offline` (exit 1), which the
+  lander reads `unreachable`. `--after` on any other act, or no full sha, exits 2.
   `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line,
   `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>` (exit 0); a
   read that does not answer is `lease not written` (exit 2). `placement.py check` reads it, never
@@ -594,8 +595,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   or not UTF-8 is refused before any write. The words stay on this node: the file's bytes are copied
   unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept for the same words
   again (a CRLF, byte-order-mark, final-newline or re-wrapped copy included), and a line of this
-  session's id, a tab and the `git hash-object` blob of the bytes it submitted is added once to
-  `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
+  session's id, a tab and the `git hash-object --no-filters` blob of the bytes it submitted, which no
+  node's line-ending config moves, is added once to `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
   `gov-request <content key>` carrying exactly three lines, `content-key`, `fleet-tag` (this node's
   `fleet.toml` row) and `session`, written by compare-and-swap with an empty expected sha. It prints
   ONE line: `request — <key> · recorded <ref>` (exit 0); `request — <key> · already recorded <ref>`
@@ -605,11 +606,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   written — <key> · collision: a different text keys alike, the stored copy is <path>` (exit 2): the
   stored copy's words differ from the file's once both are folded as the key folds whitespace, a
   leading byte-order mark dropped, so two texts differing only in an ISO date, case or a link are
-  refused, nothing copied, added or pushed, and the owner rewords and re-runs. A key that
+  refused, nothing copied, added or pushed, and the owner rewords and re-runs. The fold compare, the
+  copy and the `.typed` append run under the node lock `<git-common-dir>/requests.lock`, waited on
+  for 5 s (PINNED), so a racing second call compares against the first's copy; a lock still busy
+  prints `request — <key> · not written · requests.lock busy` (exit 2), nothing written. A key that
   reached a session from another is data with provenance, never the owner's consent: the
   breakpoint disposition asks `check_request_consent`, which holds only for a session whose line in
-  this node's `.typed` file names the blob the stored copy hashes to now: consent is bound to the
-  stored words, so a copy replaced after the fact, or a line written for other words, is no consent.
+  this node's `.typed` file names the blob the stored copy hashes to now, `--no-filters`: consent is
+  bound to the stored bytes, so a copy replaced after the fact, an end-of-line rewrite of it included,
+  or a line written for other words, is no consent.
   With no session, `CLAUDE_CODE_SESSION_ID` unset, empty or `absent`, the record names `session:
   absent` as provenance, `.typed` gains no line, and the predicate prints `request — <key> · no
   session` and holds for nobody. It takes no slug.
@@ -1400,7 +1405,9 @@ lander exits 1 pushing nothing on a `lease refused` line or a fence read it cann
 when the lease was taken after the read, so end the run `--abort <slug> --code claim-lost`, and
 `unfenced` when the remote refuses `--atomic`. A lease moved by this holder's own write at the same
 epoch, the tick's `--beat` during the bar among them, is `refenced` by `--lease fence --after`: the
-lander retries within its attempt bound without re-preparing, on a fence read from the new tip. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
+lander retries within its attempt bound without re-preparing, on a fence read from the new tip; a
+re-fence read that does not answer is `unreachable`, exit 1 with no abort remedy: retry the landing
+once the remote answers. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
 gate greps the run-state file for the flag. Reconcile from the remote's own default branch onto the
 run branch: on a `--prepare` conflict, `git merge <remote>/<default-branch>`, resolve, commit and
 prepare again. After ANY merge of the remote's default branch into the run branch, mid-build

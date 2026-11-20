@@ -82,8 +82,12 @@ default:
 The `remote-ref` store is written by the unattended driver, `--card-ref write`, and only while your
 `.unattended.conf` sets `RUN_CLAIMS="on"`. With the switch off, or no `.unattended.conf`, the append
 prints `card — remote-ref not written:` and the reason, writes nothing to the remote, and still writes
-the other two stores; the cache's first line then reads `# card-ref local`. A driver that does not
-answer within the card's fetch bound is named the same way, and the append goes on.
+the other two stores; the cache's first line then reads `# card-ref local`. A read of the card ref
+that does not answer within the card's fetch bound wrote nothing and is named the same way, and the
+append goes on. The write has its own, longer publish bound, `CARD_PUBLISH_BOUND`, so it is not
+stopped while the remote is still answering; a write stopped at that bound prints `card —
+remote-ref unknown:` instead, because it may have landed first, and a landed one is picked up at
+the next read of the remote. The append goes on either way.
 
 `card.snapshot` is `terminal-only` by default, so the build folder gets one record when the build
 ends. With `every-transition` it gets a record at every stage move and at the `READY` publish too.

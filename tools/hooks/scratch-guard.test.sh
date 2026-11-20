@@ -1774,6 +1774,25 @@ else
   echo "  skip — AC28 (ii) the MSYS /c/ fold: this host is not Windows, so no drive spelling exists to fold and nothing was read"
 fi
 
+# ---- TOOL-dPlacedRequest-43 AC18 (S18): readCard's two spawns pass runLiveness' whole option set ----
+# A stub checker that never answers, and one that backgrounds a sleeping child holding its stdout and
+# exits, each read as no card, named, within the bound plus 1 s; the bound is read from the hook's own
+# CARD_PATH_BOUND_MS, never typed here. readCard's body, cut from `function readCard(` to the next line
+# opening `function `, spells the kill signal twice. Staged against the spawn with no kill signal, the
+# count reds; on Windows node's own timeout already bounds both stubs, so the count is the red there.
+# WHAT THIS DOES NOT CHECK: a checker that ignores SIGKILL, which no process can.
+sg_bound=$(sed -n 's/^const CARD_PATH_BOUND_MS = \([0-9][0-9]*\)$/\1/p' "$HOOK")
+printf '#!/usr/bin/env bash\nexec sleep 60\n' > "$sg_cc/hung.sh"
+printf '#!/usr/bin/env bash\nsleep 60 &\nexit 0\n' > "$sg_cc/orphan.sh"
+for sg_c in hung orphan; do
+  sg_got=$(node -e 'const t = Date.now(); const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log((c.text === null && c.shown.startsWith("(no card: ") ? "none" : "read") + " " + (Date.now() - t <= Number(process.argv[4]) + 1000 ? "bounded" : "late"))' "$HOOK" "$SGFIX/.git" "$sg_cc/$sg_c.sh" "${sg_bound:-0}" 2>&1)
+  [ "$sg_got" = "none bounded" ] && { echo "ok   AC18 a $sg_c checker reads as no card within ${sg_bound}ms plus 1 s"; pass=$((pass+1)); } \
+    || { echo "FAIL AC18 a $sg_c checker reads as no card within ${sg_bound:-?}ms plus 1 s: $sg_got"; fail=$((fail+1)); }
+done
+sg_got=$(awk '/^function readCard\(/ { f = 1; print; next } f && /^function / { f = 0 } f' "$HOOK" | grep -c "killSignal: 'SIGKILL'")
+[ "$sg_got" = 2 ] && { echo "ok   AC18 readCard's body passes the kill signal on both spawns"; pass=$((pass+1)); } \
+  || { echo "FAIL AC18 readCard's body passes the kill signal on both spawns: $sg_got"; fail=$((fail+1)); }
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1817,8 +1836,10 @@ n=$((pass+fail))
 # 4e6ac5f7c, counted by hand under the same rule.
 # 393 = 390 + the 3 readCard rows TOOL-dPlacedRequest-2 added for its AC10 (the stub's path read, the
 # silent checker read as no card, the source's one call), counted by hand under the same rule.
+# 396 = 393 + the 3 readCard rows TOOL-dPlacedRequest-43 added for its AC18 (the hung checker, the
+# orphaned grandchild, the body's two kill signals), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=393
+FLOOR_ASSERTIONS=396
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

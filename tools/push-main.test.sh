@@ -1822,6 +1822,30 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
   else
     bad "52-53 the fenced-push fixture, made once above, could not be made again"
   fi
+  if write_fence_fixture; then
+    # 54 — TOOL-dPlacedRequest-43 AC28: the lease moves inside the first push's hook as 52's does, and
+    #      a stub driver answers the `--after` re-fence read `lease refused — offline`, the driver's
+    #      line for a read that did not answer, passing every other call to the real driver. The
+    #      landing exits 1 `unreachable`, no abort remedy and never `fenced`, the branch unmoved.
+    #      Staged against TOOL-dPlacedRequest-29's lander, which reads every refusal there `fenced`.
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease refused — offline · fx/build · the remote did not answer the claim read'; exit 1 ;; esac
+exec bash \"$HERE/$_fn_k/unattended.sh\" \"\$@\""
+    m54=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out54=$(run_fence_land --land --slug fx); rc54=$?
+    g54="$rc54 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m54" ] && echo unchanged)"
+    case "$g54|$out54" in
+      *"push-main: fenced —"*|*"claim-lost"*) bad "54 a re-fence read that did not answer told the holder to abort: [$g54] $out54" ;;
+      "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+        ok "54 a killed --after read refuses the landing unreachable, no abort remedy, the branch unmoved" ;;
+      *) bad "54 a killed --after read did not refuse as unreachable with the branch unmoved: [$g54] $out54" ;;
+    esac
+  else
+    bad "54 the fenced-push fixture could not be made a third time"
+  fi
 else
   echo "  skip — 42-53 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
 fi

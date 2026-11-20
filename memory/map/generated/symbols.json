@@ -808,6 +808,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "add_gov_queue",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "add_health_event",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -20178,6 +20183,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_claims",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_claims_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -20604,6 +20614,11 @@
     },
     {
       "id": "read_dl_sum",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_dm_consent",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },
@@ -30368,6 +30383,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_dm_strict",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_docs_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -30426,6 +30446,11 @@
       "id": "run_driver",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_driver_bounded",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "run_edge_arm",

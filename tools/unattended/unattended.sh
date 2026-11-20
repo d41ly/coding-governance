@@ -4573,8 +4573,8 @@ print_card_ref() { # slug -> 0 read or off, 2 not read
 # `<git-common-dir>/requests/<key>.md`, the first copy kept for the same words again (TOOL-dPlacedRequest-30:
 # a stored copy whose `derive_request_fold` differs from the file's is a COLLISION, `request not
 # written — <key> · collision: ...` exit 2, before any write), and `<session><TAB><blob>` is appended once
-# to `<git-common-dir>/requests/<key>.typed`, the blob `git hash-object` of the bytes THIS session
-# submitted (TOOL-dPlacedRequest-31), a hash that does not answer refused as the append is, and no
+# to `<git-common-dir>/requests/<key>.typed`, the blob `git hash-object --no-filters` of the bytes THIS
+# session submitted (TOOL-dPlacedRequest-31, -43), a hash that does not answer refused as the append is, and no
 # line at all with no session (TOOL-dPlacedRequest-32); nothing under `requests/` is tracked or pushed. THE REMOTE
 # HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
 # whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
@@ -4582,7 +4582,8 @@ print_card_ref() { # slug -> 0 read or off, 2 not read
 # digits and dashes), each held at the write, written by `write_gov_ref` with an EMPTY expected sha, so
 # every write is a create. ONE LINE PER OUTCOME: `request — <key> · recorded <ref>` exit 0; `request —
 # <key> · already recorded <ref>` exit 0, a lost create; `request — <key> · not written · <why>` exit 2,
-# the text kept, and re-running the verb retries; or the key's own `request — refused:` line, exit 2,
+# the text kept, and re-running the verb retries; `request — <key> · not written · requests.lock busy`
+# exit 2, nothing written, the node lock busy past its wait (TOOL-dPlacedRequest-43 S30); or the key's own `request — refused:` line, exit 2,
 # before any write. Every refusal precedes the local copy, and the copy precedes the push.
 # WHAT THIS DOES NOT CHECK: that the file holds the owner's words, which the verb trusts its caller
 # for until the intake hook lands, a non-goal of this unit; the text is never scanned, because it never
@@ -4600,7 +4601,7 @@ derive_request_fold() { # file -> its folded text on stdout
   LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
 }
 write_request_record() { # file -> 0 recorded or already recorded, 2 not written
-  local f="${1:-}" py d out key tag sid cdir blob msg c rc
+  local f="${1:-}" py d out key tag sid cdir blob msg c rc tok
   [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
   [ -f "$f" ] && [ -r "$f" ] || { echo "request — not written · the request file is not readable: $f"; return 2; }
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request — not written · no python resolves, so the content key cannot be derived"; return 2; }
@@ -4618,22 +4619,34 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
   [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "request — $key · not written · the session id is not letters, digits and dashes"; return 2; }
   cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} && [ -n "$cdir" ] \
     || { echo "request — $key · not written · no git common dir resolves for the local store"; return 2; }
+  # THE REQUESTS LOCK (TOOL-dPlacedRequest-43 S30): the fold compare, the copy and the `.typed` append
+  # run under the node lock `<git-common-dir>/requests.lock`, stem `node`, waited on as the queue's is,
+  # so a racing second call re-runs the compare after the first's copy, and every way out of the
+  # block releases it before the push, which holds no lock. A lock still busy after the wait refuses.
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$cdir/requests.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "request — $key · not written · requests.lock busy"; return 2; }
+  rc=0
   if [ -e "$cdir/requests/$key.md" ] && ! cmp -s <(derive_request_fold "$cdir/requests/$key.md") <(derive_request_fold "$f"); then
-    echo "request not written — $key · collision: a different text keys alike, the stored copy is $cdir/requests/$key.md"; return 2
-  fi
-  mkdir -p "$cdir/requests" 2>/dev/null || { echo "request — $key · not written · the local store cannot be made: $cdir/requests"; return 2; }
-  if [ ! -e "$cdir/requests/$key.md" ]; then
+    echo "request not written — $key · collision: a different text keys alike, the stored copy is $cdir/requests/$key.md"; rc=2
+  elif ! mkdir -p "$cdir/requests" 2>/dev/null; then
+    echo "request — $key · not written · the local store cannot be made: $cdir/requests"; rc=2
+  elif [ ! -e "$cdir/requests/$key.md" ]; then
     cp -- "$f" "$cdir/requests/$key.md.$$" 2>/dev/null && mv -n -- "$cdir/requests/$key.md.$$" "$cdir/requests/$key.md" 2>/dev/null
     rm -f -- "$cdir/requests/$key.md.$$"
-    [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; return 2; }
+    [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; rc=2; }
   fi
   # NO SESSION, NO CONSENT (TOOL-dPlacedRequest-32 S2): an id-less session's record keeps `session:
   # absent` as provenance, and `.typed` gains no line, since `absent` would name every id-less session.
-  if [ "$sid" != absent ]; then
-    blob=$(GIT hash-object -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
+  # THE BLOB IS OF THE SUBMITTED BYTES (TOOL-dPlacedRequest-43 S14): `--no-filters`, so no node's
+  # `core.autocrlf` or clean filter moves it, and `check_request_consent` hashes the stored copy alike.
+  if [ "$rc" = 0 ] && [ "$sid" != absent ]; then
+    blob=$(GIT hash-object --no-filters -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
       && { grep -qxF -- "$sid"$'\t'"$blob" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\t%s\n' "$sid" "$blob" >>"$cdir/requests/$key.typed"; } \
-      || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; return 2; }
+      || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; rc=2; }
   fi
+  remove_dir_lock "$cdir/requests.lock" "$tok"
+  [ "$rc" = 0 ] || return 2
   msg=$(printf 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid")
   resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
   c=$(build_gov_commit "" "$msg") || { echo "request — $key · not written, the text kept · the commit could not be built in this clone"; return 2; }
@@ -4892,7 +4905,7 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
 # arrived from another node or session has no such line, so the predicate refuses it by default; the
 # breakpoint disposition calls it before it fires (TOOL-dPlacedRequest-5). CONSENT IS BOUND TO THE BYTES
 # (TOOL-dPlacedRequest-31): the line must be `<this session><TAB><blob>`, the blob the one `git
-# hash-object` reads from `<git-common-dir>/requests/<key>.md` NOW, so a stored copy replaced after the
+# hash-object --no-filters` reads from `<git-common-dir>/requests/<key>.md` NOW, a CRLF rewrite included, so a stored copy replaced after the
 # fact, or a line written for other words, is no consent; a line of any other shape never matches.
 # -> 0 consent; 1 printing one `request — <key> · relayed` line otherwise, a malformed key, no common
 # dir and a missing stored copy included. NO SESSION IS NO CONSENT (TOOL-dPlacedRequest-32 S2):
@@ -4907,7 +4920,7 @@ check_request_consent() { # content key -> 0 this session typed it here, 1 relay
   fi
   cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || cdir=""
   cdir=${cdir%$'\r'}
-  [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && now=$(GIT hash-object -- "$cdir/requests/$key.md" 2>/dev/null) || now=""
+  [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && now=$(GIT hash-object --no-filters -- "$cdir/requests/$key.md" 2>/dev/null) || now=""
   now=${now%$'\r'}
   if [ -n "$now" ] && grep -qxF -- "$sid"$'\t'"$now" "$cdir/requests/$key.typed" 2>/dev/null; then
     return 0

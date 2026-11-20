@@ -411,9 +411,12 @@ SWEEP_NOBASELINE_RX='expected set not yet observed'
 # THE NODE IS THE CHARTER'S NODE-REGISTRY TAG, never a hostname, which the registry does not know:
 # GOV_NODE when set, else USERNAME/USER matched against the registry table of the charter at the
 # repo root — `AGENTS.md`, then `CLAUDE.md`, the precedent `run-gates.gov.test.sh` spells — with the
-# row regex the drift audit's `_resolve_node_tag` uses (the registry's machine/user token is a
-# SUBSTRING of the lowercased user). Prints the tag; returns 1 when no row
-# matches, and the caller refuses BY NAME rather than falling back to a hostname.
+# row regex the drift audit's `_resolve_node_tag` uses. ONE REGISTRY, ONE RULE (TOOL-dPlacedRequest-43
+# S20): that table is the one the playbook kit's `derive_node_table` renders from `fleet.toml`, and the
+# row's user token, case-folded, must EQUAL the case-folded user, `read_fleet_tag`'s rule, which the
+# unattended driver's `resolve_fleet_tag` asks; a substring match named `a` for a user `daily-agent2`.
+# It stays a read of the rendered table because this kit carries no playbook kit. Prints the tag;
+# returns 1 when no row matches, and the caller refuses BY NAME rather than falling back to a hostname.
 _rs_reg_rx='^\|[[:space:]]*`([a-z])`[[:space:]]*\|[[:space:]]*`?([A-Za-z0-9_@.-]+)`?'
 read_registry_tags() {  # every tag the registry table carries, one per line
   local f line
@@ -444,7 +447,7 @@ resolve_node_tag() {
     while IFS= read -r line; do
       if [[ "$line" =~ $_rs_reg_rx ]]; then
         tok=${BASH_REMATCH[2],,}
-        case "$user" in *"$tok"*) printf '%s' "${BASH_REMATCH[1]}"; return 0 ;; esac
+        [ "$user" != "$tok" ] || { printf '%s' "${BASH_REMATCH[1]}"; return 0; }
       fi
     done < "$f"
   done

@@ -65,7 +65,8 @@
 # re-read with `--lease fence build <slug> --after <the tip read>`, and a fence line there, this
 # session's lease at the same epoch on a tip descending from the one read, retries the push within
 # the same attempt bound and without re-preparing, the next attempt's fence read fencing on the new
-# tip; only a refusal, a later epoch or another holder, is `fenced`.
+# tip; only a refusal, a later epoch or another holder, is `fenced`. A re-fence read that does not
+# answer, `lease refused — offline`, is `unreachable`, exit 1 with no abort remedy (TOOL-dPlacedRequest-43).
 #
 # WHY THE FLAGS EXIST — TOOL-dDerivedDocket-2. The attended path lands only from the primary tree
 # with the default branch checked out, and it pushes that branch, which every build on the node
@@ -280,7 +281,7 @@ export GIT_SSH_COMMAND
 # input here (the attended push says why, S2). Every class but `race` has already said why on
 # stderr; a caller retries on `race` and `refenced` and exits 1 otherwise.
 derive_push_failure() {  # -> refused | unreachable | unchanged | refenced | fenced | unfenced | race on stdout
-  local tok msg lt fr ft
+  local tok msg lt fr ft rc
   tok=""; msg=""
   [ -f "$refusal" ] && IFS=$'\t' read -r tok msg < "$refusal"
   case "$tok" in
@@ -319,9 +320,16 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | refenced | fen
       # The re-fence runs in this function's own subshell, so the FENCE_ names it sets die with it;
       # the next attempt's fence read is the one its push carries (S3).
       fr=$FENCE_REF; ft=$FENCE_TIP
-      if read_fence_line "$ft" && [ -n "$FENCE_REF" ]; then
+      read_fence_line "$ft" && rc=0 || rc=$?
+      if [ "$rc" = 0 ] && [ -n "$FENCE_REF" ]; then
         echo "push-main: the lease moved under this holder's own write; re-fencing on ${FENCE_TIP:0:8} (attempt $((attempt + 1))/$max)" >&2
         echo refenced; return 0
+      fi
+      # THE RE-FENCE READ DID NOT ANSWER (TOOL-dPlacedRequest-43 S28): whether the lease was taken is
+      # unknown, so the holder is told to retry, never to abort; `fenced` is kept for a read that answered.
+      if [ "$rc" = 3 ]; then
+        echo "push-main: unreachable — the lease $fr moved from ${ft:0:8} and the re-fence read did not answer, so whether it was taken is unknown; nothing landed, retry when the remote answers." >&2
+        echo unreachable; return 0
       fi
       echo "push-main: fenced — the lease $fr was taken after the fence read it at ${ft:0:8} and is now ${lt:-deleted}, so the atomic push landed nothing; end the run with --abort $SLUG --code claim-lost." >&2
       echo fenced; return 0
@@ -509,7 +517,7 @@ check_fence_beat() {  # tip · beat -> 0 when the beat is parented on the tip an
 # refuses as unparsed: only a missing driver means no fence. A driver beside this lander that no
 # python finds refuses too, as `run_gov_first` does. Handed the tip a failed push fenced on, it asks
 # `--after <tip>`, the re-fence `derive_push_failure` reads (TOOL-dPlacedRequest-29 S2).
-read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, its line printed
+read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, 3 the read did not answer (`lease refused — offline`), its line printed
   local got rc dir out rest fr ft fb kit=unattended anchor=unattended.sh
   FENCE_REF=""; FENCE_TIP=""; FENCE_BEAT=""
   [ -n "$SLUG" ] || return 0
@@ -541,6 +549,11 @@ read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_
         FENCE_REF=$fr; FENCE_TIP=$ft; FENCE_BEAT=$fb
         return 0
       fi ;;
+    "1:lease refused — offline · "*)
+      # AN UNANSWERED READ IS NO REFUSAL BY THE LEASE (TOOL-dPlacedRequest-43 S28): returned apart, 3,
+      # so the re-fence reads it `unreachable` and never tells a holder to abort.
+      echo "push-main: the fence read of '$SLUG' did not answer, so nothing was pushed — $out" >&2
+      return 3 ;;
     "1:lease refused — "?*)
       echo "push-main: the fence refused the landing of '$SLUG', so nothing was pushed — $out" >&2
       return 1 ;;

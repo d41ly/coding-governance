@@ -781,7 +781,10 @@ function readCard(commonDir, sessionId, checker) {
   let why = ''
   let r
   try {
-    r = spawnSync(bash, [engine, '--card', '--path', '--session', sid], { cwd, encoding: 'utf8', input: '', timeout: CARD_PATH_BOUND_MS, windowsHide: true })
+    // RUN AS runLiveness RUNS THE DRIVER (TOOL-dPlacedRequest-43 S18): the bound kills with SIGKILL, and
+    // stdin is closed rather than piped, so a checker that never answers, or a grandchild holding its
+    // stdout, reads as no card within the bound.
+    r = spawnSync(bash, [engine, '--card', '--path', '--session', sid], { cwd, encoding: 'utf8', timeout: CARD_PATH_BOUND_MS, killSignal: 'SIGKILL', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
   } catch (e) { why = String((e && e.message) || e) }
   const out = r && !r.error && r.status === 0 ? String(r.stdout || '').trim().split(/\r?\n/)[0] : ''
   if (out) {
@@ -790,7 +793,7 @@ function readCard(commonDir, sessionId, checker) {
     let native = buildNativePath(out)
     if (native === out && process.platform === 'win32' && out.startsWith('/')) {
       try {
-        const c = spawnSync(bash, ['-c', 'cygpath -m -- "$1"', '_', out], { encoding: 'utf8', input: '', timeout: CARD_PATH_BOUND_MS, windowsHide: true })
+        const c = spawnSync(bash, ['-c', 'cygpath -m -- "$1"', '_', out], { encoding: 'utf8', timeout: CARD_PATH_BOUND_MS, killSignal: 'SIGKILL', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
         const w = c && c.status === 0 ? String(c.stdout || '').trim() : ''
         if (/^[A-Za-z]:\//.test(w)) native = w
       } catch { /* kept as printed */ }

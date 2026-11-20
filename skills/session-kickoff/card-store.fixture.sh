@@ -22,7 +22,7 @@ set -u
 case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
 CHECK="$HERE/manifest-check.sh"
-PLANTS="render publish publish-off publish-unwritten publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
+PLANTS="render publish publish-off publish-unwritten publish-late publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice"
@@ -174,6 +174,19 @@ case "$PLANT" in
     run_card_append
     print_card_held "S2 the driver's refusal is relayed: two remotes, check 24" "$(grep -qx 'card — remote-ref not written: the clone does not declare exactly one remote, check 24' "$OUT"; echo $?)"
     print_card_held "S2 none of the three wrote a ref, and the cache reads local" "$([ -z "$(git -C "$O" for-each-ref refs/gov/builds)" ] && grep -qx '# card-ref local' "$R/.git/orientation/tFix.md"; echo $?)" ;;
+  publish-late)
+    # TOOL-dPlacedRequest-43 AC17: a stub driver whose lookup answers `none` and whose write lands the
+    # card ref on the bare remote, then sleeps past CARD_PUBLISH_BOUND=2; the append names the store
+    # `unknown`, since the write landed, never `not written`. Staged against the `not written` kill line.
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file unattended unattended.sh); [ -n "$f" ] || { echo "card-store: no driver resolves in $R"; exit 2; }
+    printf '%s\n' 'case "${1:-} ${2:-}" in' \
+      '  "--card-ref lookup") echo "card-ref — none"; exit 0 ;;' \
+      '  "--card-ref write") c=$(git commit-tree "$(git mktree </dev/null)" -m "gov-card tFix") && git push -q origin "$c:'"$REF"'" 2>/dev/null; exec sleep 60 ;;' \
+      'esac' 'echo "claims: off"' > "$f"
+    CARD_PUBLISH_BOUND=2 run_card_append
+    print_card_held "AC17 a killed publish whose write landed names the store unknown" "$(grep -qx 'card — remote-ref unknown: no answer within 2s' "$OUT"; echo $?)"
+    print_card_held "AC17 ...never not written" "$(! grep -q '^card — remote-ref not written' "$OUT"; echo $?)"
+    print_card_held "AC17 the bare remote holds the ref the write landed" "$(git -C "$O" rev-parse --verify -q "$REF" >/dev/null; echo $?)" ;;
   publish-hung)
     # TOOL-dPlacedRequest-33 AC3: a driver that never answers `--card-ref`, its `--claims` answering off.
     # The clock is the append's excess over a control append whose stub driver answers at once, so the

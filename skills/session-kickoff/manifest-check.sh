@@ -436,9 +436,13 @@ getval() {
 
 # The `node —` cell: the FIRST table under a `## Node registry` heading of the file the manifest's
 # `registry:` key names, backticks stripped, `$USERNAME` (else `$USER`) matched against the
-# Machine/user cell by equality or by the prefix `<user> @` — never row-wide, because the Remote
-# column repeats one github user on every row and a row-wide match hits all of them. No unique
-# match is UNKNOWN with the reason, printed, never guessed; the card still writes.
+# Machine/user cell's user, the text before ` @` — never row-wide, because the Remote column repeats
+# one github user on every row and a row-wide match hits all of them. No unique match is UNKNOWN with
+# the reason, printed, never guessed; the card still writes. ONE REGISTRY, ONE RULE
+# (TOOL-dPlacedRequest-43 S20): the table is the one the playbook kit's `derive_node_table` renders
+# from `fleet.toml`, and the user is case-folded and equal to the row's, `read_fleet_tag`'s rule, which
+# the unattended driver's `resolve_fleet_tag` asks. It stays a read of the rendered table because this
+# kit is copy-installed and carries no playbook kit.
 derive_node_tag() {
   local reg="$1" user="${USERNAME:-${USER:-}}" hits tag mu
   [ -n "$reg" ] || { printf 'node — UNKNOWN: no registry\n'; return 0; }
@@ -454,7 +458,8 @@ derive_node_tag() {
     { gsub(/`/,"",ln); split(ln, c, "|"); tag=c[2]; mu=c[3]
       gsub(/^[ \t]+|[ \t]+$/,"",tag); gsub(/^[ \t]+|[ \t]+$/,"",mu)
       if (tag=="Tag" || tag ~ /^:?-+:?$/) next
-      if (mu==user || index(mu, user " @")==1) { hits++; found=tag; foundmu=mu } }
+      mt=mu; i=index(mt, " @"); if (i) mt=substr(mt, 1, i-1)
+      if (tolower(mt)==tolower(user)) { hits++; found=tag; foundmu=mu } }
     END { printf "%d\t%s\t%s\n", hits+0, found, foundmu }' "$reg")
   case "$hits" in
     1) printf 'node — %s · %s\n' "$tag" "$mu" ;;
@@ -640,16 +645,13 @@ render_keys_cell() {
 # journal. Every failure is its own `skipped:` form, never a clean answer, and the card still writes.
 # WHAT THIS DOES NOT CHECK: that the refs are fresh — they are as of this clone's last fetch.
 derive_overlaps_line() {
-  local drv sf rc
-  [ -f "$ROOT/.unattended.conf" ] || { printf 'overlaps — skipped: no .unattended.conf in this tree\n'; return 0; }
-  drv=$(resolve_kit_file unattended unattended.sh)
-  [ -n "$drv" ] || { printf 'overlaps — skipped: no unattended driver resolves in this tree\n'; return 0; }
-  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
-    || { printf 'overlaps — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  local sf rc
   sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.overlaps.XXXXXX") \
     || { printf 'overlaps — skipped: no scratch file under %s to capture the read in\n' "$CARD_DIR"; return 0; }
-  GOV_RUNLOG=0 timeout -k 2 "$CARD_OVERLAP_BOUND" bash "$drv" --overlaps </dev/null >"$sf" 2>/dev/null; rc=$?
+  run_driver_bounded "$CARD_OVERLAP_BOUND" "$sf" /dev/null --overlaps; rc=$?
   case "$rc" in
+    125)
+      printf 'overlaps — skipped: %s\n' "$CARD_REF_WHY" ;;
     0)
       # ponytail: a cut that splits a UTF-8 character drops the high bytes it left.
       LC_ALL=C awk -v cap="$CARD_OVERLAP_ROWS" '
@@ -767,17 +769,14 @@ render_health_cell() {
 # so neither side of a kit skew loses the cell. A `released` row, a build lease handed over at a run's
 # end (TOOL-dPlacedRequest-16 S9), ranks beside `terminal` and hides under the same bound.
 derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
-  local drv sd rc
+  local sd rc
   [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
-  [ -f "$ROOT/.unattended.conf" ] || { printf 'claims — skipped: no .unattended.conf in this tree\n'; return 0; }
-  drv=$(resolve_kit_file unattended unattended.sh)
-  [ -n "$drv" ] || { printf 'claims — skipped: no unattended driver resolves in this tree\n'; return 0; }
-  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
-    || { printf 'claims — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
   sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.claims.XXXXXX") \
     || { printf 'claims — skipped: no scratch directory under %s to capture the read in\n' "$CARD_DIR"; return 0; }
-  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims --with-key </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
+  run_driver_bounded "$CARD_CLAIMS_BOUND" "$sd/out" "$sd/err" --claims --with-key; rc=$?
   case "$rc" in
+    125)
+      printf 'claims — skipped: %s\n' "$CARD_REF_WHY" ;;
     0)
       # Split on the TAB in awk, never `read`: an empty field collapses under `read`. Ordered by
       # verdict, then slug, so a busy remote cannot push a live claim off the card.
@@ -1775,8 +1774,9 @@ check_card() {
 # no other: `remote-ref`, the ref refs/gov/builds/<slug>/card on the remote, the truth, one commit per
 # write, written by the unattended driver's `--card-ref write` (TOOL-dPlacedRequest-33), which builds
 # it on the tip it reads and writes it by compare-and-swap, so it joins the change feed. The driver is
-# resolved by `resolve_kit_file` and run as `derive_claims_line` runs `--claims`: stdin closed,
-# GOV_RUNLOG=0, its output to a scratch file, under `timeout -k 2 $CARD_FETCH_BOUND`. DARK BEHIND
+# resolved by `resolve_kit_file` and run through `run_driver_bounded`, as `derive_claims_line` runs
+# `--claims`: stdin closed, GOV_RUNLOG=0, its output to a scratch file, the lookup under
+# CARD_FETCH_BOUND and the write under CARD_PUBLISH_BOUND, a killed write `remote-ref unknown`. DARK BEHIND
 # RUN_CLAIMS, the switch the driver alone reads: `card-ref — off` prints `card — remote-ref not
 # written: RUN_CLAIMS is off`, and so does every other unwritten answer, with its reason; on a written
 # one the cache ref the driver's write set gives the full sha, and a cache ref that does not read back
@@ -1796,7 +1796,11 @@ check_card() {
 # policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide.
-CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each read of the card ref, or the driver's write of it, may take; the env override is the fixture's
+CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each lookup of the card ref may take; the env override is the fixture's
+# THE PUBLISH BOUND (TOOL-dPlacedRequest-43 S16): the driver's `--card-ref write` alone, a writer, so it
+# sits above that verb's worst case, two REMOTE_BOUND calls and the feed lock's wait, and never kills a
+# write the remote is still answering; the lookup, a reader the session waits on, keeps the fetch bound.
+CARD_PUBLISH_BOUND=${CARD_PUBLISH_BOUND:-140}   # seconds the driver's write of the card ref may take; the env override is the fixture's
 # A session idle longer than this is recommended a fresh start: the prompt cache's five-minute lifetime,
 # PINNED 2026-10-25 and unverified against the platform's documentation in this tree.
 RESUME_IDLE_S=300
@@ -1858,9 +1862,22 @@ resolve_card_driver() { # -> 0 with CARD_DRV, 1 with CARD_REF_WHY
   return 0
 }
 
+# THE BOUNDED DRIVER CALL (TOOL-dPlacedRequest-43 S19), spelled once for the engine's four calls of the
+# unattended driver, the `overlaps —` and `claims —` cells and the card ref's lookup and write:
+# `resolve_card_driver`'s three checks, then the driver under the caller's bound with stdin closed,
+# GOV_RUNLOG=0 and its output into the caller's files, a kill into a file and never a `$( )` capture a
+# grandchild could hold open. -> the verb's exit, 124 or 137 the kill; 125 where no driver resolves,
+# CARD_REF_WHY saying why and the caller printing its own skip line.
+run_driver_bounded() { # bound · out file · err file · verb args -> the verb's exit, 125 not run
+  local b=$1 o=$2 e=$3
+  shift 3
+  resolve_card_driver || return 125
+  GOV_RUNLOG=0 timeout -k 2 "$b" bash "$CARD_DRV" "$@" </dev/null >"$o" 2>"$e"
+}
+
 # The one read of the remote (TOOL-dPlacedRequest-34 S10 to S12): the driver's read-only
-# `--card-ref lookup <slug>`, run as `derive_claims_line` runs `--claims`, stdin closed, GOV_RUNLOG=0,
-# its output to a scratch file, under `timeout -k 2 $CARD_FETCH_BOUND`. The driver fetches into the
+# `--card-ref lookup <slug>`, run through `run_driver_bounded` as `derive_claims_line` runs `--claims`,
+# under CARD_FETCH_BOUND; a killed lookup wrote nothing, so it stays `not written`. The driver fetches into the
 # cache ref refs/gov/remote/builds/<slug>/card and sights the feed, so nothing here fetches or writes a
 # ref. Sets CARD_REF_TIP, empty where the remote holds no card, or CARD_REF_WHY: `RUN_CLAIMS is off`, a
 # driver that did not answer within the bound or printed no `card-ref` line, each naming itself; 1 then,
@@ -1868,8 +1885,8 @@ resolve_card_driver() { # -> 0 with CARD_DRV, 1 with CARD_REF_WHY
 read_card_ref() { # slug -> 0 the remote answered, 1 not
   local o="$CARD_TMP/lookup" rc a
   CARD_REF_TIP=""; CARD_REF_WHY=""
-  resolve_card_driver || return 1
-  GOV_RUNLOG=0 timeout -k 2 "$CARD_FETCH_BOUND" bash "$CARD_DRV" --card-ref lookup "$1" </dev/null >"$o" 2>/dev/null; rc=$?
+  run_driver_bounded "$CARD_FETCH_BOUND" "$o" /dev/null --card-ref lookup "$1"; rc=$?
+  [ "$rc" != 125 ] || return 1
   a=$(tr -d '\r' < "$o" 2>/dev/null | grep -m1 '^card-ref ')
   case "$rc:$a" in
     124:*|137:*) CARD_REF_WHY="no answer within ${CARD_FETCH_BOUND}s" ;;
@@ -1946,7 +1963,7 @@ render_build_card() { # slug · step · tail file · writer verb -> the card on 
 # the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
 write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
   local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/remote/builds/$1/card" card="$CARD_TMP/bc.card"
-  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" drv="" a
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
   stores=" ${stores//$'\n'/ } "
@@ -1954,9 +1971,8 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
   if [ "$remote" = 1 ] && ! read_card_ref "$slug"; then
     printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2
   fi
-  # The driver writes the ref (TOOL-dPlacedRequest-33 S2); read_card_ref above resolved it, the conf
-  # and a working `timeout -k` (TOOL-dPlacedRequest-34 S10).
-  [ "$remote" != 1 ] || drv=$CARD_DRV
+  # The driver writes the ref (TOOL-dPlacedRequest-33 S2), through `run_driver_bounded` under its own
+  # publish bound (TOOL-dPlacedRequest-43 S16, S19).
   tip=$CARD_REF_TIP
   for try in 1 2; do
     case "$mode" in
@@ -1973,10 +1989,13 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
     [ "$remote" = 1 ] || break
     printf -v msg 'gov-card %s\n\nstep: %s%s\nsession: %s\n\n%s' "$slug" "$step" "$mark" "$CARD_SID" "$(<"$card")"
     printf '%s' "$msg" > "$CARD_TMP/bc.msg" || { printf 'card — remote-ref not written: cannot write the message to %s\n' "$CARD_TMP/bc.msg"; remote=2; break; }
-    GOV_RUNLOG=0 timeout -k 2 "$CARD_FETCH_BOUND" bash "$drv" --card-ref write "$slug" --message "$CARD_TMP/bc.msg" </dev/null >"$CARD_TMP/bc.ref" 2>"$CARD_TMP/bc.err"; rc=$?
+    run_driver_bounded "$CARD_PUBLISH_BOUND" "$CARD_TMP/bc.ref" "$CARD_TMP/bc.err" --card-ref write "$slug" --message "$CARD_TMP/bc.msg"; rc=$?
     a=$(tr -d '\r' < "$CARD_TMP/bc.ref" 2>/dev/null | grep -m1 '^card-ref ')
+    # A KILLED PUBLISH MAY HAVE LANDED (TOOL-dPlacedRequest-43 S17): the write can reach the remote before
+    # the bound fires, and a landed one reaches the feed at the next sighting, so its outcome is unknown.
     case "$rc:$a" in
-      124:*|137:*) printf 'card — remote-ref not written: no answer within %ss\n' "$CARD_FETCH_BOUND"; remote=2; break ;;
+      125:*) printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2; break ;;
+      124:*|137:*) printf 'card — remote-ref unknown: no answer within %ss\n' "$CARD_PUBLISH_BOUND"; remote=2; break ;;
       "0:card-ref — off") printf 'card — remote-ref not written: RUN_CLAIMS is off\n'; remote=2; break ;;
       "0:card-ref — "*)
         c=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null | tr -d '\r')

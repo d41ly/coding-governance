@@ -21453,6 +21453,143 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 8; then
 
+# ==================================================================================================
+# TOOL-dPlacedRequest-43 — THE ROUND-1 PROMOTIONS' MINORS, observed by behaviour. Over a fresh lease
+# fixture: `--lease acquire` and `--lease take-over`, each a create over a `released` build lease the
+# feed sighted and the origin no longer holds, are parented on the feed's commit at its epoch plus one
+# (AC3), and a take-over over a sighted, deleted build tombstone exits 1 `tombstone`, no ref made
+# (AC4); an offline create's queue line splits under `IFS=$'\t' read` with a 40-hex commit (AC7); under
+# `core.autocrlf=true` a CRLF request's `.typed` blob is the `--no-filters` one (AC14), and a CRLF copy
+# replacing an LF request's stored copy is no consent (AC33); a live `requests.lock` refuses
+# `--request` with exit 2 inside 6 s, store and origin unchanged, and the request lands once it is
+# freed (AC30); with RUN_CLAIMS off an id-less `--lease acquire` prints `lease — off` (AC32). In the
+# claim fixture's tree, the claims fetch answered by a git shim that fails it, `leases.offline` planted
+# `warn`: a take-over `--resume` and `--close` each exit non-zero at check 109, the queue untouched
+# (AC1); in process, a logging `add_gov_queue` stub sees no call from `--claims`, `--preflight`, the
+# take-over or `--close`, and sees the one call a staged `read_claims` makes on its failure, the stub's
+# liveness (AC2); and a take-over column read from another session under the record's own keepalive is
+# a `foreign-` class (AC15). RED, observed at the close: for AC14 and AC33 the filtered hash; for AC30
+# a `--request` with the lock cut; for AC3 a `write_claim` with its feed read cut; for AC15 a run
+# column reading the keepalive alone `mine`; for AC1 and AC2 a strict caller queueing its write.
+# Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: two `--request`
+# calls racing, TOOL-dPlacedRequest-48's placed-race arm; and a renamed-away origin for AC1, under
+# which the take-over `--resume` refuses at check 27, its anchor read, before the claim read, so the
+# claims fetch alone is failed, as AC19 fails it.
+# ==================================================================================================
+cd "$TMP" || exit 2
+LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
+dm_c1="$LF/c1"; dm_q="$dm_c1/.git/gov-queue.log"
+# ---- AC3: two released leases at epoch 4, sighted by a `--claims` read, deleted on the origin.
+dm_ra=$(seed_lease_at tRa/build tRa build b s-o released "$(derive_claim_now)" 4)
+dm_rt=$(seed_lease_at tRt/build tRt build b s-o released "$(derive_claim_now)" 4)
+dm_tt=$(seed_lease_at tTb/build tTb build b s-o landed "$(derive_claim_now)" 3)
+( cd "$dm_c1" && GOV_RUNLOG=0 bash "$SCRIPT" --claims >/dev/null 2>&1 )
+for dm_t in tRa tRt tTb; do git --git-dir="$LF/origin.git" update-ref -d "refs/gov/leases/$dm_t/build"; done
+run_lease_arm acquire build tRa >/dev/null; dm_rc=$?
+same "DPR43 AC3 --lease acquire over a deleted released lease writes epoch 5 on the feed's commit" \
+  "$dm_rc $(read_lease_field tRa/build epoch) $(git --git-dir="$LF/origin.git" rev-list --parents -n1 refs/gov/leases/tRa/build -- | cut -d' ' -f2)" "0 5 $dm_ra"
+run_lease_arm take-over build tRt >/dev/null; dm_rc=$?
+same "DPR43 AC3 --lease take-over over a deleted released lease writes epoch 5 on the feed's commit" \
+  "$dm_rc $(read_lease_field tRt/build epoch) $(git --git-dir="$LF/origin.git" rev-list --parents -n1 refs/gov/leases/tRt/build -- | cut -d' ' -f2)" "0 5 $dm_rt"
+# ---- AC4: a take-over over a deleted build tombstone the feed sighted is refused, no ref made.
+dm_out=$(run_lease_arm take-over build tTb); dm_rc=$?
+same "DPR43 AC4 --lease take-over over a deleted tombstone exits 1, the origin holding no tTb lease" \
+  "$dm_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/leases/tTb | grep -c .)" "1 0"
+hit  "$dm_out" "lease refused — tombstone · tTb/build"
+# ---- AC7: an offline create's queue line reads under a TAB split with a 40-hex commit field.
+mv "$LF/origin.git" "$LF/away.git"
+run_lease_arm acquire build tOff >/dev/null
+mv "$LF/away.git" "$LF/origin.git"
+dm_got=$(IFS=$'\t' read -r dm_ref dm_tip dm_commit dm_utc <"$dm_q"; printf '%s %s' "$dm_ref" "$([[ $dm_commit =~ ^[0-9a-f]{40}$ ]] && echo commit || echo "shifted:$dm_commit")")
+same "DPR43 AC7 the offline create's queue line splits with a 40-hex commit field" "$dm_got" "refs/gov/leases/tOff/build commit"
+# ---- AC14: a CRLF request under core.autocrlf=true keeps the blob of the bytes submitted.
+git -C "$dm_c1" config core.autocrlf true
+printf 'Keep the submitted bytes, zq-crlf-marker-43\r\n' > "$LF/a.md"
+dm_out=$(run_request_arm --request "$LF/a.md")
+dm_key=$(printf '%s\n' "$dm_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+same "DPR43 AC14 the .typed blob of a CRLF request is its --no-filters hash, not the filtered one" \
+  "$(cut -f2 "$dm_c1/.git/requests/$dm_key.typed" 2>/dev/null) $([ "$(git -C "$dm_c1" hash-object -- "$LF/a.md")" != "$(git -C "$dm_c1" hash-object --no-filters -- "$LF/a.md")" ] && echo apart)" \
+  "$(git -C "$dm_c1" hash-object --no-filters -- "$LF/a.md") apart"
+# ---- AC33: an LF request's stored copy rewritten to CRLF keeps no consent, where the LF copy did.
+printf 'Rewrite the line endings, zq-eol-marker-43\n' > "$LF/b.md"
+dm_out=$(run_request_arm --request "$LF/b.md")
+dm_kb=$(printf '%s\n' "$dm_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+# The predicate runs in process from the driver this suite sourced at its top: a second `. "$SCRIPT"`
+# assigns its readonly start stamp again and ends the subshell before the call.
+read_dm_consent() { ( cd "$dm_c1" && export CLAUDE_CODE_SESSION_ID=qA || exit 1
+  dm_o=$(check_request_consent "$1"); printf '%s|%s' "$dm_o" "$?" ); }
+same "DPR43 AC33 control: qA's own LF request consents" "${#dm_kb} $(read_dm_consent "$dm_kb")" "12 |0"
+printf 'Rewrite the line endings, zq-eol-marker-43\r\n' > "$dm_c1/.git/requests/$dm_kb.md"
+same "DPR43 AC33 its stored copy rewritten to CRLF is no consent, relayed" \
+  "$(read_dm_consent "$dm_kb")" "request — $dm_kb · relayed: data with provenance, never consent|1"
+git -C "$dm_c1" config core.autocrlf false
+# ---- AC30: a live requests.lock refuses --request inside 6 s, writing nothing; freed, it records.
+printf 'Wait for the requests lock, zq-lock-marker-43\n' > "$LF/c.md"
+dm_lk="$dm_c1/.git/requests.lock"; mkdir "$dm_lk"; echo "$((EPOCHSECONDS + 60))" >"$dm_lk/until"; echo w-other >"$dm_lk/owner"
+dm_st=$(ls -R "$dm_c1/.git/requests" | cksum); dm_or=$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | cksum)
+dm_t0=$EPOCHSECONDS; dm_out=$(run_request_arm --request "$LF/c.md"); dm_rc=$?; dm_t1=$EPOCHSECONDS
+same "DPR43 AC30 a held requests.lock refuses --request with exit 2 within 6 s, the store and the origin unchanged" \
+  "$dm_rc $([ $((dm_t1 - dm_t0)) -le 6 ] && echo within || echo "late $((dm_t1 - dm_t0))s") $([ "$(ls -R "$dm_c1/.git/requests" | cksum)" = "$dm_st" ] && echo store) $([ "$(git --git-dir="$LF/origin.git" for-each-ref refs/gov | cksum)" = "$dm_or" ] && echo origin)" \
+  "2 within store origin"
+hit  "$dm_out" "not written · requests.lock busy"
+rm -rf "$dm_lk"
+dm_out=$(run_request_arm --request "$LF/c.md"); dm_rc=$?
+same "DPR43 AC30 freed, the same request records and releases the lock" \
+  "$dm_rc $(printf '%s\n' "$dm_out" | grep -c ' · recorded refs/gov/requests/') $([ -e "$dm_lk" ] && echo held || echo released)" "0 1 released"
+# ---- AC32: with RUN_CLAIMS off an id-less acquire answers off before its identity refusal.
+sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$dm_c1/.unattended.conf"
+dm_out=$( cd "$dm_c1" && env -u CLAUDE_CODE_SESSION_ID USERNAME=daily-agent GOV_RUNLOG=0 bash "$SCRIPT" --lease acquire build tFix 2>&1 ); dm_rc=$?
+sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' "$dm_c1/.unattended.conf"
+same "DPR43 AC32 an id-less acquire with RUN_CLAIMS off exits 0" "$dm_rc" "0"
+hit  "$dm_out" "lease — off · tFix/build"
+rm -rf "$LF"
+# ---- AC1: a take-over --resume and --close, the claims fetch failing and `warn` planted, refuse at
+# ---- check 109 and queue nothing. The run is aged so the second keepalive takes it over (AC8's way).
+build_claim_held
+mkdir -p .governance && printf '[leases]\noffline = "warn"\n' > .governance/policy.toml
+git add .governance/policy.toml && git commit -q -m dm-warn --no-verify && git push -q -f origin HEAD:main 2>/dev/null && git fetch -q origin
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m dm-aged --no-verify
+dm_q="$TMP/.git/gov-queue.log"; rm -f "$dm_q"
+cat > "$GH_BIN/git" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" fetch "*"refs/gov/"*) exit 128 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GH_BIN/git"
+dm_out=$(CLAUDE_CODE_SESSION_ID=s-new PATH="$GH_BIN:$PATH" run_proc --resume tRun --keepalive-id kB); dm_rc=$?
+same "DPR43 AC1 a take-over --resume whose claim read fails exits non-zero, nothing queued" "$([ "$dm_rc" != 0 ] && echo refused) $([ -e "$dm_q" ] && echo queue || echo none)" "refused none"
+hit  "$dm_out" "UNATTENDED check 109 FAILED"
+dm_out=$(PATH="$GH_BIN:$PATH" run_proc --close tRun); dm_rc=$?
+same "DPR43 AC1 --close whose claim read fails exits non-zero, nothing queued" "$([ "$dm_rc" != 0 ] && echo refused) $([ -e "$dm_q" ] && echo queue || echo none)" "refused none"
+hit  "$dm_out" "UNATTENDED check 109 FAILED"
+# ---- AC2: the four strict callers in process, `add_gov_queue` a logging stub; then its liveness, a
+# ---- staged `read_claims` that queues on its failure, logged once.
+dm_log=$(mktemp)
+run_dm_strict() { ( export PATH="$GH_BIN:$PATH"; hash -r
+  add_gov_queue() { printf '%s\n' "$*" >>"$dm_log"; return 0; }
+  [ "${1:-}" != staged ] || { shift
+    eval "$(declare -f read_claims | sed '1s/^read_claims /read_claims_once /')"
+    read_claims() { read_claims_once "$@" || { add_gov_queue refs/gov/leases/tRun/build "" 0000000000000000000000000000000000000000; return 1; }; }; }
+  run_main_at_head run_inproc "$@" 2>&1 ); }
+dm_out=$(run_dm_strict --claims); hit "$dm_out" "the claims on the remote could not be read"
+dm_out=$(run_dm_strict --preflight tFresh --keepalive-id k1); hit "$dm_out" "UNATTENDED check 109 FAILED"
+dm_out=$(CLAUDE_CODE_SESSION_ID=s-new run_dm_strict --resume tRun --keepalive-id kB); hit "$dm_out" "UNATTENDED check 109 FAILED"
+dm_out=$(run_dm_strict --close tRun); hit "$dm_out" "UNATTENDED check 109 FAILED"
+same "DPR43 AC2 no strict caller reached the queue writer" "$(grep -c '' "$dm_log")" "0"
+run_dm_strict staged --close tRun >/dev/null
+same "DPR43 AC2 the stub's liveness: a staged read that queues on its failure is logged once" "$(grep -c '' "$dm_log")" "1"
+rm -f "$GH_BIN/git" "$dm_log" "$dm_q"
+git push -q -f origin "$BASE":main 2>/dev/null
+# ---- AC15: a run column read from another session under the record's own keepalive is foreign.
+remove_claim_refs
+seed_lease tTk s1 a live "$(derive_claim_now)" k1
+dm_got=$( export CLAUDE_CODE_SESSION_ID=s2; GOVFEED_DIR=""; load_driver_conf >/dev/null 2>&1
+  read_claims strict >/dev/null 2>&1; check_claim_writable tTk take-over k1 s2 k1 >/dev/null 2>&1; printf '%s' "$CW_CLS" )
+same "DPR43 AC15 session s2 under the record's keepalive k1 reads a foreign- class in the take-over column" "${dm_got%%-*}" "foreign"
+remove_claim_refs; reset_tree
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -23221,7 +23358,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3965 -> 3970 by TOOL-dPlacedRequest-47: the sighted-guard block's 5 region-eight assertions
 # (5 `same`, no loop), off the diff's own lines; no skip branch. No suite ran, and its RED-first
 # observation is the close's.
-FLOOR_ASSERTIONS=3970
+# RAISED 3970 -> 3995 by TOOL-dPlacedRequest-43: the minors block's 25 region-eight executions (24
+# `same` and `hit` lines, no loop, and the one `mutate` its `build_claim_held` pays), counted by a
+# probe of the block alone; no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3995
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23495,7 +23635,8 @@ FLOOR_SHARD_7=311
 # RAISED 1168 -> 1176 by TOOL-dPlacedRequest-35: the same 8 region-eight stop-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1176 -> 1184 by TOOL-dPlacedRequest-46: the same 8 region-eight dash-stop assertions, see FLOOR_ASSERTIONS.
 # RAISED 1184 -> 1189 by TOOL-dPlacedRequest-47: the same 5 region-eight sighted-guard assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1189
+# RAISED 1189 -> 1214 by TOOL-dPlacedRequest-43: the same 25 region-eight minors executions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1214
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

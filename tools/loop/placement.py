@@ -1006,11 +1006,13 @@ def read_fleet_user():
 def write_typed_request(root, store, text, typed=True):
     """The request `text` kept as the driver's `--request` keeps it, `<key>.md` in `store`, and, where
     `typed`, its `<key>.typed` line for `FX_SESSION` beside it, the session tab the kept copy's blob, so the
-    fixture's session reads as having typed it here. -> its content key."""
+    fixture's session reads as having typed it here. The blob is hashed `--no-filters`, as the driver's
+    writer and its consent read hash it (TOOL-dPlacedRequest-43 S23), so no node's config moves it.
+    -> its content key."""
     key = derive_request_content_key(text)
     write_fixture_files(store, {"%s.md" % key: text})
     if typed:
-        blob = run_fixture_git(root, "hash-object", "--", str(store / ("%s.md" % key)))
+        blob = run_fixture_git(root, "hash-object", "--no-filters", "--", str(store / ("%s.md" % key)))
         write_fixture_files(store, {"%s.typed" % key: "%s\t%s\n" % (FX_SESSION, blob)})
     return key
 
