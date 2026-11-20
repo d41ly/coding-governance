@@ -528,3 +528,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T13:00:59Z draw · re-dispatch · TOOL-dWitnessedBar-7 · 93/180 · 20261120T130059Z-0b3323
 
 2026-11-20T13:00:59Z dispatch · item 0b01f7cc TOOL-dWitnessedBar-7 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-11-20T13:13:31Z brief · item TOOL-dWitnessedBar-21 · reason 2f827a8f9591 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-21-build-brief.md
