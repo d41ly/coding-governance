@@ -2,7 +2,7 @@
 
 # Closing diff review, round 1: the dPlacedRequest Entry build
 
-Node `d` · 2026-11-20 · Tier-2 · on `branch/unattended-dplacedrequest-42a7be`. This was an adversarial fan through `tier2-review.js`: 5 finder lenses, then 5 skeptic batches, then this synthesis. The range is the whole of dPlacedRequest, the Entry build of the dClosedLoop chain. It holds 63 Tier-2 units (TOOL-dPlacedRequest-1 to -64; there is no -22) that close 18 owned gaps across concurrency, orientation and flow. It is 313 commits over 318 files, +40179/−6221.
+Node `d` · 2026-11-20 · Tier-2 · on `branch/unattended-dplacedrequest-42a7be`. This was an adversarial fan through `tier2-review.js`: 5 finder lenses, then 5 skeptic batches, then this synthesis. The range is the whole of dPlacedRequest, the Entry build of the dClosedLoop chain. It holds 63 Tier-2 units (TOOL-dPlacedRequest-1 to -64; there is no -22) that close 18 owned gaps across concurrency, orientation and flow. It is 313 commits over 318 files, +40179/−6221. (PINNED)
 
 **Reviewed range:** `9e21ac760dc0a43d6ed007396922722ccee98d57...95c3103ad4d50a921228af623d34be493f807ff7`. **ROUND 1.**
 

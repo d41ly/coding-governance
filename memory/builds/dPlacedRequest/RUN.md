@@ -491,3 +491,16 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T16:15:13Z dispatch · item 8398e96c TOOL-dPlacedRequest-64 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-64-1-acceptance-ledger.md
 
 2026-11-20T16:29:18Z review · item dPlacedRequest · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 2
+2026-11-20T16:44:59Z draw · review-round · dPlacedRequest · 69/130 · 20261120T164459Z-4c66dc
+
+2026-11-20T16:45:00Z review · item dPlacedRequest · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 6 · NON-CONVERGENT · highs 4 · minors 8 · to units · disposition promote
+
+2026-11-20T16:47:25Z rescope · item add TOOL-dPlacedRequest-95 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-closing-review-spec-brief.md)
+
+2026-11-20T16:47:26Z rescope · item add TOOL-dPlacedRequest-96 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md)
+
+2026-11-20T16:47:27Z rescope · item add TOOL-dPlacedRequest-97 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-97-closing-review-spec-brief.md)
+
+2026-11-20T16:47:28Z rescope · item add TOOL-dPlacedRequest-98 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-98-closing-review-spec-brief.md)
+
+2026-11-20T16:47:29Z rescope · item add TOOL-dPlacedRequest-99 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-99-closing-review-spec-brief.md)
