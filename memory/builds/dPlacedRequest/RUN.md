@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 781244bae321d9a64abd41740d264eb5aae2b032 · park · 82 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 88f3b4132f3cd79b01fbe745acd962b9edc18895
 phase: BUILDING
@@ -511,3 +512,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T18:35:01Z draw · review-round · dPlacedRequest-spec-set-r4 · 70/130 · 20261120T183501Z-d748b4
 
 2026-11-20T18:35:01Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 27 · folded 31 · promoted 1 · to units · disposition promote
+
+2026-11-20T18:37:02Z decision · item spec-audit-chain-ceiling · reason the spec audit chain stopped at its 4-round ceiling: round 4 audited the closing review's promoted units TOOL-dPlacedRequest-95 to -99 (CONVERGED, 0 blockers, 5 highs, 31 findings folded at rev-2) and promoted finding 29, a new mechanism on spec 96, to TOOL-dPlacedRequest-100, specced at rev-1 and unaudited; options: (a) audit unit 100 as a fifth round past the ceiling, (b) build units 95 to 100 now and close with specs-audited overridden for unit 100 alone, (c) stop the run here
