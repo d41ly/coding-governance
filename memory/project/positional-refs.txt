@@ -25729,8 +25729,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	BUILD-METHOD M8
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	push-main.sh:921
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	tools/memory-tree/gotchas.py:65
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2118
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2181
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md	tools/unattended/unattended.test.sh:6098
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	check-spec-tokens.py:530

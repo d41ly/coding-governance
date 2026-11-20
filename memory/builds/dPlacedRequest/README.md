@@ -140,7 +140,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-35 — the bounded age walk ends a tail at its tenure before it reads an age](spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md) | 23 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept](spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md) | 24 | 2 | DEFERRED | rev-10 | 2026-11-19 |
 | [TOOL-dPlacedRequest-46 — the bounded age walk stops on a `renews: -` commit before any threshold test](spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md) | 24 | 2 | CLOSED | rev-6 | 2026-11-20 |
-| [TOOL-dPlacedRequest-47 — the bounded age walk never compares an unsighted commit with the threshold](spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md) | 24 | 2 | INPROGRESS | rev-6 | 2026-11-19 |
+| [TOOL-dPlacedRequest-47 — an arm pins the age walk's sighted guard: an unsighted commit is never compared with the threshold](spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md) | 24 | 2 | INPROGRESS | rev-7 | 2026-11-20 |
 | [TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge](spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md) | 25 | 2 | DEFERRED | rev-8 | 2026-10-25 |
 | [TOOL-dPlacedRequest-45 — the default-branch merge class names the walk from a prepared merge, and selects the file that builds one](spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md) | 25 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dPlacedRequest-48 — the request-lock race is placed by an announcing stub, not left to the scheduler](spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md) | 25 | 2 | DEFERRED | rev-8 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 268 bound to this build, across 4 record folder(s).
+Records: 270 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
