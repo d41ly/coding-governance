@@ -20,6 +20,11 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-51-2-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-2-builder-return.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md) | deviation | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-130.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-130.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-131.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-131.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-132.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-132.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-133.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-133.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-134.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-red-fix-134.md) | red-fix | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
@@ -31,6 +36,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-spec-writer.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-pin1-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-pin1-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-51-pin1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-pin1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
