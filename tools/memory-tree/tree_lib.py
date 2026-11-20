@@ -523,6 +523,24 @@ BIND_RE = re.compile(
     r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
 )
 UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
+EVIDENCES_RE = re.compile(r"^\*\*Evidences:\*\* `?([^`\s]+)`?")
+
+
+def read_evidence_lines(text: str) -> list:
+    """`(line number, unit, line)` for every line of `text` under an `**Evidences:** <unit>` block: a
+    block opens at its `**Evidences:**` line and ends at the next one or at a line opening `#`, a
+    heading. The walk `deviation_join.read_population`'s ledger arm did inline, extracted at its second
+    Python instance, `seen_red.read_seen_red_records` (TOOL-dWitnessedBar-7 S2). It reads no binding:
+    whether the text is a `journal` record is each caller's test, through `read_bindings`."""
+    out, unit = [], None
+    for n, line in enumerate(text.split("\n"), 1):
+        ev = EVIDENCES_RE.match(line)
+        if ev or line.startswith("#"):
+            unit = ev.group(1) if ev else None
+            continue
+        if unit:
+            out.append((n, unit, line))
+    return out
 
 
 def _id_alternation(conf: dict) -> str:

@@ -2940,6 +2940,11 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/playbook/overlay.py"
     },
     {
@@ -12333,6 +12338,11 @@
       "file": "tools/playbook/overlay.py"
     },
     {
+      "id": "derive_owed_gates",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
       "id": "derive_owed_rows",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
@@ -16635,6 +16645,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
@@ -20560,6 +20575,11 @@
     {
       "id": "read_conf",
       "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "read_conf",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -21026,6 +21046,11 @@
       "id": "read_evidence",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
+      "id": "read_evidence_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_exception",
@@ -22448,6 +22473,11 @@
       "file": "tools/run-gates/precommit.py"
     },
     {
+      "id": "read_manifest_legs",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
       "id": "read_manifest_rows",
       "kind": "function",
       "file": "tools/run-gates/product_tests.py"
@@ -23823,6 +23853,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_run_base",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
       "id": "read_run_commits",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -23956,6 +23991,11 @@
       "id": "read_seed_rows",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "read_seen_red_records",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "read_selection",
@@ -24691,6 +24731,11 @@
       "id": "read_tracked",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_tracked",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "read_tracked_asks",
@@ -27131,6 +27176,11 @@
       "id": "render_layer_refusal",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "render_ledger",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "render_ledger_head",
@@ -31018,6 +31068,11 @@
       "file": "tools/playbook/load_sets.py"
     },
     {
+      "id": "run_build",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
       "id": "run_bundle",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
@@ -31610,6 +31665,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -32041,6 +32101,11 @@
       "id": "run_git_in",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_git_in",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "run_git_staged",
@@ -32914,6 +32979,11 @@
     },
     {
       "id": "run_plant_populated_empty_armed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_populated_seen_red",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -39225,6 +39295,11 @@
     {
       "id": "write_fixture_commit",
       "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
+      "id": "write_fixture_commit",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -39236,6 +39311,11 @@
       "id": "write_fixture_files",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "write_fixture_files",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "write_fixture_pass",

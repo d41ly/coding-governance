@@ -45,7 +45,9 @@ count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S
 WHAT IT DOES NOT CHECK. A widened row's count, which the record does not name. That a leg another
 registration names exists in the manifest. The rows a first seed writes, which are `test.seed`'s
 (unit 15). The touch join, which is `build.scope`'s (dScopedBuild) and printed unarmed by `--list`.
-An empty armed population is never admitted: no seen-red reader is landed (unit 7).
+An empty armed population is admitted on any seen-red line naming its registration's leg, read through
+`seen_red.read_seen_red_records` (unit 7): that the leg has been seen red, never that this population's
+emptiness is right.
 """
 from __future__ import annotations
 
@@ -67,6 +69,7 @@ if str(KIT) not in sys.path:
 import legacy_ledger as LL  # noqa: E402  the ledger factory, this kit's copy
 from build_records import derive_record_name, read_record, write_record  # noqa: E402  the record factory
 from tree_lib import parse_conf_line, read_policy_value  # noqa: E402  the kit's one conf line and policy read
+from seen_red import read_seen_red_records  # noqa: E402  the one seen-red record reader (unit 7)
 
 SAY = "ratchet"
 LEGS = {  # verb -> the leg it is
@@ -99,7 +102,7 @@ PIN_RE = re.compile(r"([A-Z_]+_PIN)=")
 CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
 BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
 UNIT_RE = re.compile(r"[A-Za-z]+-([A-Za-z0-9]+)-\d+")
-EMPTY_TEXT = "reads unarmed, no seen-red reader"
+EMPTY_TEXT = "reads unarmed, no seen-red line names its leg"
 
 
 def print_line(*parts):
@@ -376,19 +379,27 @@ def run_unarmed(root):
 
 
 def run_populated(root):
-    """`ratchet (populated)`: an armed home holding no row after a live seed. No seen-red reader is
-    landed, so none is admitted."""
+    """`ratchet (populated)`: an armed home holding no row after a live seed, unless a seen-red line
+    names the registration's leg (unit 7 S10): the seen-red records are read once, at the first such
+    home, and the first record listed for the leg is printed as the admission. A refused seen-red line
+    is `ValueError`, which `main` exits 2 on."""
     leg = LEGS["populated"]
     regs = LL.read_registrations(root)
     if not regs:
         print_line("unarmed", leg, derive_leg_population(regs, "populated")[1])
         return 0
-    red = 0
+    red, records = 0, None
     for reg in regs:
         if not reg.seed or LL.read_home_state(pathlib.Path(root, reg.home)) != "armed":
             continue
         rows, bad = LL.read_ledger(root, reg)
         if not rows and not bad:
+            if records is None:
+                records = read_seen_red_records(root)
+            if records.get(reg.leg):
+                red_sha, _green, rel, _n = records[reg.leg][0]
+                print_line(leg, reg.population, "admitted", "seen red at %s in %s" % (red_sha[:8], rel))
+                continue
             print_line(leg, reg.population, "empty", EMPTY_TEXT)
             red = 1
         else:
@@ -947,6 +958,28 @@ def run_plant_populated_empty_armed(top, results):
                      ["fix-pop · empty · " + EMPTY_TEXT])
 
 
+def run_plant_populated_seen_red(top, results):
+    """Unit 7 S10, one fixture three ways: a journal record's seen-red line naming the registration's leg
+    admits its empty armed population, exit 0; the line removed, it reads `empty`, exit 1; the line's red
+    SHA dropped, the reader refuses it naming the record, exit 2."""
+    ledger = "memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md"
+
+    def render_ledger(line):
+        return ("# %s — acceptance ledger\n\n**Serves:** journal %s\n\n**Evidences:** %s\n"
+                "- AC1 — `ratchet.py populated` — observed\n%s\n" % (FIX_UNIT, FIX_UNIT, FIX_UNIT, line))
+    seen = "- seen-red — `%s` — red `%s` — green `%s` — the population drained" % (LEGS["never-gains"], SHA_A, SHA_A)
+    write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows([]), ledger: render_ledger(seen),
+                                               ".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n'})
+    check_plant_case(results, "populated-seen-red", "a seen-red line names the leg", top, ["populated"], 0,
+                     ["fix-pop · admitted · seen red at %s in %s" % (SHA_A[:8], ledger)], ["empty"])
+    write_files(top, {ledger: render_ledger("")})
+    check_plant_case(results, "populated-seen-red", "the seen-red line removed", top, ["populated"], 1,
+                     ["fix-pop · empty · " + EMPTY_TEXT], ["admitted"])
+    write_files(top, {ledger: render_ledger(seen.replace("red `%s` — green" % SHA_A, "green"))})
+    check_plant_case(results, "populated-seen-red", "the seen-red line's red SHA dropped", top, ["populated"], 2,
+                     [ledger], ["admitted"])
+
+
 def run_plant_laundering(top, results):
     def build_row(name, sha=SHA_A, disposition="seeded"):
         return ((name,), 1, sha, disposition)
@@ -1097,6 +1130,7 @@ PLANTS = {
     "ceiling-widened": run_plant_ceiling_widened, "both-ways": run_plant_both_ways,
     "cutoff-later": run_plant_cutoff_later, "cutoff-blank": run_plant_cutoff_blank,
     "unarmed-green": run_plant_unarmed_green, "populated-empty-armed": run_plant_populated_empty_armed,
+    "populated-seen-red": run_plant_populated_seen_red,
     "laundering": run_plant_laundering, "rename": run_plant_rename, "key-number": run_plant_key_number,
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
     "new-population": run_plant_new_population, "home-moved": run_plant_home_moved,
