@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-55 — the version oracle's verdict reads its walk's own exit status
 
-**Status:** INPROGRESS · rev-3 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-3 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

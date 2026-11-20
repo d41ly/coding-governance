@@ -420,3 +420,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T12:19:45Z dispatch · item fe7af0b8 TOOL-dPlacedRequest-55 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-55-1-acceptance-ledger.md
 
 2026-11-20T12:21:43Z brief · item TOOL-dPlacedRequest-55 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T12:28:17Z draw · fix-pass · TOOL-dPlacedRequest-55 · 58/130 · 20261120T122817Z-05c9a0
+
+2026-11-20T12:28:17Z dispatch · item e2d4054a TOOL-dPlacedRequest-55 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-55-1-acceptance-ledger.md
