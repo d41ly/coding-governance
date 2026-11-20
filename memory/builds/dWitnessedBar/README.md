@@ -156,8 +156,8 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-43 — a peer-node verdict stands only under the source pin and from a tag its node signed](spec/2026-10-25-spec-TOOL-dWitnessedBar-43.md) | 29 | 2 | CLOSED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing](spec/2026-10-25-spec-TOOL-dWitnessedBar-28.md) | 30 | 2 | DEFERRED | rev-7 | 2026-11-20 |
 | [TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb](spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md) | 31 | 2 | CLOSED | rev-8 | 2026-11-20 |
-| [TOOL-dWitnessedBar-56 — the round-1 audit of units 40 to 51, verdict-boundary minors batched: a lossless selection, one adoption rule on both readers, honest peer reads, and floors under the new arms](spec/2026-10-25-spec-TOOL-dWitnessedBar-56.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-26 |
-| [TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red](spec/2026-10-25-spec-TOOL-dWitnessedBar-57.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-25 |
+| [TOOL-dWitnessedBar-56 — the round-1 audit of units 40 to 51, verdict-boundary minors batched: a lossless selection, one adoption rule on both readers, honest peer reads, and floors under the new arms](spec/2026-10-25-spec-TOOL-dWitnessedBar-56.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-20 |
+| [TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red](spec/2026-10-25-spec-TOOL-dWitnessedBar-57.md) | 32 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-58 — the hook's inherited-base export observed where the knob is still visible: the stub bar's environment and the runner's decline, with every leg proven blind to it](spec/2026-10-25-spec-TOOL-dWitnessedBar-58.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-60 — every bar caller that records a trusted green scrubs every knob the hook clears, held by one parity arm over the three lists](spec/2026-10-25-spec-TOOL-dWitnessedBar-60.md) | 33 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-62.md) | 34 | 2 | DEFERRED | rev-4 | 2026-10-25 |
@@ -279,7 +279,7 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 88 spec(s) a
 | 29 | `TOOL-dWitnessedBar-2`, `TOOL-dWitnessedBar-43` | no |
 | 30 | `TOOL-dWitnessedBar-28` | no |
 | 31 | `TOOL-dWitnessedBar-51` | no |
-| 32 | `TOOL-dWitnessedBar-56`, `TOOL-dWitnessedBar-57` | yes |
+| 32 | `TOOL-dWitnessedBar-56`, `TOOL-dWitnessedBar-57` | no |
 | 33 | `TOOL-dWitnessedBar-58`, `TOOL-dWitnessedBar-60` | no |
 | 34 | `TOOL-dWitnessedBar-62` | no |
 | 35 | `TOOL-dWitnessedBar-63` | no |
