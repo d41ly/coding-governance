@@ -11,7 +11,7 @@
 ## 1. Goal
 
 An adopter's bar grades what the adopter wrote. Re-adopting gov 608aa364 into nicocares and inCMS
-redded 19 and 17 legs before either tree changed a line, most of them on kit files installed
+redded 19 and 17 legs (PINNED, measured 2026-11-20) before either tree changed a line, most of them on kit files installed
 byte-identical to gov's sources, and the rest on four deployer defects the re-adoption exposed.
 
 ## 2. Scope (IN)
@@ -87,7 +87,7 @@ successor declares the same leg name, which the existing claim path keeps.
 
 - **AC1** — When `python tools/gate-lint/sh_hygiene.py --temp-names` runs with nicocares' re-adoption
   worktree as its working directory, it names no site in a receipt-claimed engine file and prints the
-  count it dropped. Red when: the unchanged scanner runs there, which listed 59 sites in 19 files.
+  count it dropped. Red when: the unchanged scanner runs there, which listed 59 sites in 19 files (PINNED).
 - **AC2** — When `python tools/lexicon/lexicon.py` runs with the same working directory, no offender
   line names a receipt-claimed engine file and `lock` is no undeclared extension. Red when: the
   unchanged lexicon runs there, which counted 2073 verb offenders over a pin of 1898.
@@ -104,7 +104,7 @@ successor declares the same leg name, which the existing claim path keeps.
   reader runs there, which refused inCMS' own object-shaped sibling manifest.
 - **AC7** — When `python tools/gate-lint/sh_hygiene.py --spawn-idioms` runs with nicocares'
   re-adoption worktree as its working directory and nicocares' `spawn-idiom-sites.txt` declaring its
-  14 rows, it exits 0 and names the registry it read. Red when: the unchanged scanner runs there,
+  14 rows (PINNED), it exits 0 and names the registry it read. Red when: the unchanged scanner runs there,
   which graded those sites against an empty declaration.
 
 ## 6. Gates
