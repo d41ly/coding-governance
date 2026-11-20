@@ -114,11 +114,11 @@ def read_product_value(repo):
 
 def check_runner(r, where):
     """`r`, a `[[test_runner]]` row, refused where a key the adapter needs is malformed."""
-    def is_argv(v):
+    def check_argv(v):
         return isinstance(v, list) and len(v) >= 2 and all(isinstance(x, str) and x for x in v)
     if not isinstance(r.get("runner"), str) or not r["runner"]:
         raise Refusal(f"{where}: a [[test_runner]] row carries no runner name")
-    if not is_argv(r.get("detect")) or not is_argv(r.get("argv")) or "{level}" not in "".join(r["argv"]):
+    if not check_argv(r.get("detect")) or not check_argv(r.get("argv")) or "{level}" not in "".join(r["argv"]):
         raise Refusal(f"{where}: runner {r['runner']!r} needs a detect argv and an argv spelling {{level}}")
     if not isinstance(r.get("levels"), list) or not all(isinstance(x, str) for x in r["levels"]):
         raise Refusal(f"{where}: runner {r['runner']!r} carries no levels list")
@@ -311,10 +311,10 @@ def write_fixture_repo(top, value, level, pytest_table):
 
 def remove_tree(path):
     """`path` removed, git's read-only object files included."""
-    def again(fn, p, _exc):
+    def remove_readonly(fn, p, _exc):
         os.chmod(p, stat.S_IWRITE)
         fn(p)
-    shutil.rmtree(path, onexc=again)
+    shutil.rmtree(path, onexc=remove_readonly)
 
 
 def run_fixture(only):

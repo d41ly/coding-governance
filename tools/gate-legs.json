@@ -1636,7 +1636,7 @@
       "--fixture"
     ],
     "guard": [],
-    "chunk": "selftests",
+    "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300,
     "enforces": [
