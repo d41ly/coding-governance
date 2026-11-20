@@ -1809,6 +1809,8 @@ set +f; IFS=$_mb_ifs
 check_budget_breach() {
   if [ "$(read_budget_field "$1" 3)" = warn ]; then
     printf 'BUDGET WARN — %s · %s · %s %s over %s · %s\n' "$1" "$5" "$2" "$3" "$4" "$(read_budget_rule "$1")"
+    # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+    printf 'gate-warn\tsize\t%s\t%s · %s %s over %s\n' "${5//[$'\t\r\n']/ }" "$1" "$2" "$3" "$4"
     return 0
   fi
   [ -z "$MB_NOTE" ] || { echo "$MB_NOTE"; MB_NOTE=""; }

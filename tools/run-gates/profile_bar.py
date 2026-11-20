@@ -71,8 +71,10 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # It did: `retry` (TOOL-dDerivedDocket-26) and `attr` (TOOL-dDerivedDocket-23) landed in the runner
 # and not here, and this reader refused every bar until they were carried. Neither is a leg's final
 # verdict, which is why each has its own set below rather than a place in NOT_RUN.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held|retry|attr)\s+(.*)$")
-PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held", "retry", "attr")
+# `warn` (TOOL-dWitnessedBar-29) is the second annotation: a size warning a leg that already printed
+# `GATE ok` carried, named after the leg lines, so it names no new leg and moves no verdict.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held|retry|attr|warn)\s+(.*)$")
+PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held", "retry", "attr", "warn")
 # Verbs whose leg did NOT execute. `skip` is a guard decision and `held` is a subject decision; the
 # two have different remedies and are counted separately, but neither contributes work.
 NOT_RUN = ("skip", "held")
@@ -82,8 +84,9 @@ NOT_RUN = ("skip", "held")
 # `retry` nothing supersedes is a retry the wall cut: the leg ran and did not pass.
 INTERIM = ("retry",)
 # An ANNOTATION of a verdict already printed. `attr` classifies a red leg against a base commit
-# after the bar has reported it `FAIL`, so it names no new leg and changes no verdict.
-ANNOTATION = ("attr",)
+# after the bar has reported it `FAIL`, so it names no new leg and changes no verdict; `warn` shows a
+# size warning a passing leg printed, after that leg's `GATE ok`.
+ANNOTATION = ("attr", "warn")
 
 
 def derive_runner_verbs(runner_path):

@@ -2572,7 +2572,9 @@ def read_slot_mode(root: str) -> tuple:
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does. A slot over
     its declared ceiling is hard under the `readme-slot` cap's `refuse` and a `BUDGET WARN` advisory
-    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding."""
+    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding. Each advisory is `(line, marker)`,
+    the marker the runner's `gate-warn` line its printer prints after it (TOOL-dWitnessedBar-29 S2),
+    built by the policy kit's `render_warn_marker`, and empty where no policy kit loads."""
     here = resolve_slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
@@ -2587,12 +2589,17 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
         if cap is not None and size > cap:
             mode, rule = read_slot_mode(root)
             if mode == "warn":
-                adv.append(f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}")
+                adv.append((f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}",
+                            f"readme-slot · `{head}` {size} bytes over {cap}"))
             else:
                 hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B · {rule}")
         elif hw is not None and size > hw:
-            adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
-                       f"{hw} B and under its {cap} B ceiling")
+            read_slot_mode(root)  # loads the policy kit's module once, the marker's factory
+            adv.append((f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
+                        f"{hw} B and under its {cap} B ceiling",
+                        f"slot `{head}` {size} B over high-water {hw} B"))
+    budgets = sys.modules.get("budgets")
+    adv = [(line, budgets.render_warn_marker(rel, detail) if budgets else "") for line, detail in adv]
     return hard, adv
 
 
@@ -3363,10 +3370,12 @@ def cmd_check_format(root: str, conf: dict) -> int:
             adv += a
     # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
     # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
-    for line in adv:
+    for line, marker in adv:
         if not line.startswith("BUDGET WARN"):  # a warned breach prints alone (TOOL-dGroundRules-9)
             print("build-index ADVISORY — a slot passed its recorded high-water:")
         print(line)
+        if marker:
+            print(marker)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
         for line in bad:

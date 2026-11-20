@@ -960,6 +960,35 @@ worktree wrote before its verdict names it survives; the sweep prints one `run-g
 with the counts it removed and kept. **What the sweep does not check:** a sweep that reads a tail's
 time just before another worktree's bar freshens it can still remove it.
 
+**A size warning a passing leg prints is shown, not buried** (TOOL-dWitnessedBar-29). A green leg's
+output stays in the work dir, so a `TEMPLATE-SIZE WARN` or `BUDGET WARN` line inside one reached
+nobody. Every size-warning emitter prints a MARKER on the line after its human warning, on the same
+stream: `gate-warn<TAB><class><TAB><subject><TAB><detail>`, the class `size`, the subject the path the
+warning measured (repo-relative inside the repository, else the warning's own subject, such as a
+roster slot or a rule's line), the detail free text; the policy kit's `budgets.render_warn_marker`
+builds it for the Python emitters. After the pool drains, the serial retry, the reuse sample and the
+red legs' re-run, `scan_leg_warnings` runs ONE `grep -F` over the copies of the legs that passed —
+`<i>.out` where `<i>.rc` reads `0`, `<i>.retry.out` where `<i>.retry.rc` does, a held leg a selection's
+`run` row executed from its first attempt alone — and never over a failed, skipped, unrun held or
+reused leg, a sample's second look or a red leg's re-run. Each marker line is one summary line before
+the `----` line, in manifest order, on stdout and in `gate-last-summary.txt`:
+
+```text
+GATE warn  build-method size  (memory/guides/BUILD-METHOD.md: 28351 -> 29326 (+975) over high-water; grown by TOOL-dX-4)
+gates GREEN — 141/141 legs passed (1 warned)
+```
+
+`grown by` is `routed_commits.py --newest-unit HEAD <subject>` from the memory-tree kit, reached
+through `resolve_kit_dir`: the newest non-merge commit touching the subject whose unit a spec defines,
+one python spawn per distinct subject and none on a run with no warning. It names the newest unit that
+CHANGED the file, which may have shrunk it, not a proven grower. It reads `-` and names why — no
+memory-tree kit, an attribution that failed, or no commit naming a specced unit (every subject that is
+not a path). The verdict gains `warned<TAB><n>` and one `warn.<k><TAB><leg name><TAB><class><TAB><subject><TAB><unit>`
+per warning, `<k>` from 1, after `tail.<n>`; the value keeps its inner TABs, so a reader splits it
+itself. A warning never moves the verdict or the exit code, and `profile_bar.py` reads `GATE warn` as
+an annotation. **What it does not check:** a warning printed with no marker, or a marker a leg prints
+for any other reason.
+
 **The keep verb commits them.** `python keep_tails.py --run <run id> --build <slug> --unit <unit id>`,
 run in the repository, reads `trace.leg-output` through the policy kit's `policy.py get`, the catalogue
 default where that reader cannot run. Under `tail-by-hash`, the default, it writes one `leg-tail`
@@ -1019,7 +1048,7 @@ and changes no reader:
 
 | File | Written | Keys this runner writes |
 |---|---|---|
-| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; and `tail.<n>` per failing leg (see "The run record") |
+| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; `tail.<n>` per failing leg; and `warned` with one `warn.<k>` per size warning a passing leg printed (see "The run record") |
 | `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `selection` and `selection.<n>` (below), `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
 
 The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are

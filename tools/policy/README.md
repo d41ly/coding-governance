@@ -28,7 +28,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
-| `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
+| `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, `render_warn_marker`, the runner's `gate-warn<TAB>size<TAB><subject><TAB><detail>` line every size warning prints after its own (TOOL-dWitnessedBar-29), the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs, `check` printing the marker after a warned verdict |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 | `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 

@@ -813,6 +813,8 @@ check_cap_findings() {
     _r=${CAP_RULE[$_cap]-}
     if [ "$_mode" = warn ]; then
       printf 'BUDGET WARN — %s · %s · %s %s over %s · %s · check %s\n' "$_cap" "${_t%%[ :]*}" "$_n" "$_u" "$_v" "$_r" "$1"
+      # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+      _t=${_t%%[ :]*}; printf 'gate-warn\tsize\t%s\t%s · %s %s over %s\n' "${_t//[$'\t\r\n']/ }" "$_cap" "$_n" "$_u" "$_v"
     else
       _CAP_REFUSED="$_CAP_REFUSED$_t${_r:+ · $_r}"$'\n'
     fi

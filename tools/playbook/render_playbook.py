@@ -1003,8 +1003,14 @@ def check_one_line_regions(text: str, cap: tuple | None = None) -> list:
                           f'so a rule spans two lines or is not a rule: {quoted!r}')
         if limit and len(line.rstrip()) > limit:
             if mode == 'warn':
+                # The runner's `gate-warn` marker on the warning's next line, inside its own item, so it prints
+                # wherever the notes print (TOOL-dWitnessedBar-29 S2); the policy kit's module is the
+                # one `read_one_line_cap` loaded to answer `warn`.
+                budgets = sys.modules.get('budgets')
+                said = f'one-line-rule · {len(line.rstrip())} chars over {limit}'
                 warned.append(f'BUDGET WARN — one-line-rule · line {n} {quoted!r} · '
-                              f'{len(line.rstrip())} chars over {limit} · {rule}')
+                              f'{len(line.rstrip())} chars over {limit} · {rule}'
+                              + ('\n' + budgets.render_warn_marker(f'line {n} {quoted!r}', said) if budgets else ''))
                 continue
             raise Refusal(f'line {n}: a rule in a one-line region is {len(line.rstrip())} '
                           f'characters, past the {limit} a one-line rule may take: {quoted!r}'
@@ -1922,8 +1928,10 @@ def check_charter_budget(target: Path, charter_path: Path, body: str, parts: dic
     rel = Path(os.path.relpath(charter_path, target)).as_posix()
     refused, lines = load_sets.run_budget_check(target, [(rel, size)])
     largest = ' · '.join(f'{o} {n}' for o, n in measure_contributors(size, parts or {}))
-    lines = [ln + (f' · key budgets."{rel}"' if f' over {rel} ' in ln else '') + f' · largest: {largest}'
-             if ' BUDGET ' in ln else ln for ln in lines]
+    # A warned line carries its runner marker after a newline (TOOL-dWitnessedBar-29 S2): the tail goes
+    # on the warning, before it.
+    lines = [h + (f' · key budgets."{rel}"' if f' over {rel} ' in h else '') + f' · largest: {largest}' + s + m
+             if ' BUDGET ' in h else h + s + m for h, s, m in (ln.partition('\n') for ln in lines)]
     if refused:
         raise Refusal('\n'.join(sorted(lines, key=lambda ln: 'BUDGET REFUSE' not in ln)))
     return [f'budget    {ln}' for ln in lines]

@@ -1776,6 +1776,9 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
     and it reads no line count: the template gate prices bytes only, and so does this."""
     ceiling = answer.value
     hits, stale, held, largest, size, warned = [], [], 0, None, {}, 0
+    # The policy kit's module, on the path since `read_size_ceilings` found it: a warned verdict carries
+    # its `gate-warn` marker line after it (TOOL-dWitnessedBar-29 S2), built by the kit's one factory.
+    import budgets
     for f in specs:
         n = len((root / f).read_bytes().replace(b"\r", b""))
         size[f] = n
@@ -1792,6 +1795,7 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
             else:
                 warned += 1
                 print(f"{verdict.line} · held at its recorded high-water {rec} in {hw_rel}, grown +{n - rec}")
+                print(budgets.render_warn_marker(f, f"{answer.cap} · {n} {answer.unit} over {answer.value}"))
             continue
         if largest is None or n > largest[0]:
             largest = (n, f)
@@ -1804,6 +1808,7 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
             else:
                 warned += 1
                 print(verdict.line)
+                print(budgets.render_warn_marker(f, f"{answer.cap} · {n} {answer.unit} over {answer.value}"))
     for key in sorted(highwater):
         if not key.startswith("memory/builds/"):
             continue

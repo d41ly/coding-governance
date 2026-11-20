@@ -867,7 +867,12 @@ def print_roster(memory_root):
         line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
             lib.MEMORY_ROOT_TOKEN, memory_root)
         if cap and len(line) > cap and mode == "warn":
-            warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule))
+            # The runner's `gate-warn` marker on the warning's next line, on its stream (TOOL-dWitnessedBar-29 S2, §8
+            # F4); `read_cap_answer` loaded its factory to answer `warn`.
+            budgets = sys.modules.get("budgets")
+            warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule)
+                          + ("\n" + budgets.render_warn_marker(slot, "roster-line · %d chars over %d" % (len(line), cap))
+                             if budgets else ""))
         elif cap and len(line) > cap:
             bad.append("roster line for %s is %d characters, past the %d a one-line charter rule may "
                        "take; shorten its description, mandatory or output (%s)" % (slot, len(line), cap, rule))

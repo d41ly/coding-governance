@@ -317,7 +317,9 @@ fail=0
 # without one as well (41 -> 45). Counted by reading; this pass runs no suite.
 # 465 -> 468, TOOL-dWitnessedBar-30: arm 3h3r's three, a quarantined leg run outside the verdict. Not
 # gated. Counted by reading; this pass runs no suite.
-FLOOR_ASSERTIONS=468
+# 468 -> 480, TOOL-dWitnessedBar-29: arm 9e3's twelve, a passing leg's size warning shown, seven through
+# the bar and five through the sliced `scan_leg_warnings`. Not gated. Counted by reading; no suite ran.
+FLOOR_ASSERTIONS=480
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3632,6 +3634,49 @@ check_hv_value "S9 the secret the links share still holds its bytes" "$(cmp -s "
 check_hv_value "S9 the bar over the planted links exits 0" "$HV_RC" 0
 check_hv_value "S9 the ledger carries the leg's row" \
   "$(awk -F'\t' '$1 == "plant" { c++ } END { print c + 0 }' "$H9e2/.git/gate-ledger.tsv" 2>/dev/null)" 1
+
+# 9e3. TOOL-dWitnessedBar-29 AC3 AC4 AC6 — A SIZE WARNING A PASSING LEG PRINTS IS SHOWN. The leg prints a
+#      human warning and the `gate-warn` marker after it and exits 0; the bar prints one `GATE warn` line
+#      naming the leg, the subject and the detail, counts it on the closing line and in the summary file,
+#      and writes `warned 1` and a `warn.1` row whose fourth TAB field is the subject, its verdict still
+#      GREEN. The scratch repository carries no memory-tree kit, so the unit reads `-` and names why.
+#      Then the runner's own `scan_leg_warnings`, sliced out, over planted work dirs: a red leg's marker,
+#      a red leg's re-run and a held leg's retry copy are never read; a held leg's passing first attempt is.
+#      Red when the `scan_leg_warnings` call is dropped: no line, no key.
+H9e3="$HV/r9e3"; build_hv_repo "$H9e3"
+printf '%s\n' '#!/usr/bin/env bash' 'echo "TEMPLATE-SIZE WARN — big.md grew past its recorded high-water"' \
+  "printf 'gate-warn\\tsize\\tfx/big.md\\t1 -> 2 (+1) over high-water\\n'" 'exit 0' > "$H9e3/fx/warn.sh"
+printf '[{"name": "sizer", "argv": ["bash", "fx/warn.sh"]}]\n' > "$HV/warn.json"
+( cd "$H9e3" && git add -A && git commit -qm warn ) >/dev/null 2>&1
+run_hv_bar "$H9e3" "$HV/warn.json"
+check_hv_line "dWB29 AC3 AC6 the passing leg's warning is shown, its unit '-' naming the absent kit" \
+  '^GATE warn  sizer  \(fx/big\.md: 1 -> 2 \(\+1\) over high-water; no memory-tree kit to attribute it: .*; grown by -\)$'
+check_hv_line "dWB29 S6 the closing line counts it" '^gates GREEN — 1/1 legs passed \(1 warned\)$'
+check_hv_value "dWB29 S6 the summary file carries it" \
+  "$(grep -c '^GATE warn  sizer  (fx/big.md: ' "$H9e3/.git/gate-last-summary.txt" 2>/dev/null)" 1
+check_hv_value "dWB29 AC4 the bar still exits 0" "$HV_RC" 0
+check_hv_value "dWB29 AC4 its verdict still reads GREEN" "$(read_hv_record "$H9e3" verdict)" GREEN
+check_hv_value "dWB29 AC4 the verdict counts one warning" "$(read_hv_record "$H9e3" warned)" 1
+_hvrec=$(ls -1td "$H9e3"/.git/gate-run/*/ 2>/dev/null | head -1)
+check_hv_value "dWB29 AC4 its warn.1 row names the subject fourth" \
+  "$(awk -F'\t' '$1 == "warn.1" { print $4 }' "${_hvrec}verdict" 2>/dev/null)" fx/big.md
+awk '/^scan_leg_warnings\(\) \{/,/^}/' "$KITDIR/run-gates.sh" > "$HV/scan9e3.sh"
+sed -n '/^RKD_PROGRAM=""/,/^RKD$/p' "$KITDIR/run-gates.sh" > "$HV/rkd9e3.sh"
+mkdir -p "$HV/w9e3" "$HV/nokit9e3"
+run_warn_slice() { # plant, eval'd with W the work dir -> how many `GATE warn` lines the slice prints
+  rm -f "$HV/w9e3"/* 2>/dev/null
+  ( W=$HV/w9e3; eval "$1"
+    WORK=$W; names=(sizer); total=1; KITDIR=$HV/nokit9e3
+    . "$HV/rkd9e3.sh"; . "$HV/scan9e3.sh"; scan_leg_warnings ) 2>/dev/null | grep -c '^GATE warn  sizer  '
+}
+_mk9e3='printf "gate-warn\tsize\tfx/big.md\td\n"'
+check_hv_value "dWB29 AC3 the slice shows a passing leg's marker" "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 0 > \$W/0.rc")" 1
+check_hv_value "dWB29 AC3 a failed leg's marker is not shown" "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 1 > \$W/0.rc")" 0
+check_hv_value "dWB29 AC3 a red leg's re-run is not read" "$(run_warn_slice "$_mk9e3 > \$W/0.rerun.out; printf 1 > \$W/0.rc; printf 0 > \$W/0.rerun.rc")" 0
+check_hv_value "dWB29 AC3 a held leg run outside the verdict is read from its passing first attempt" \
+  "$(run_warn_slice "$_mk9e3 > \$W/0.out; printf 0 > \$W/0.rc; : > \$W/0.heldrun")" 1
+check_hv_value "dWB29 AC3 a held leg's retry copy is never read" \
+  "$(run_warn_slice "$_mk9e3 > \$W/0.retry.out; printf 1 > \$W/0.rc; printf 0 > \$W/0.retry.rc; : > \$W/0.heldrun")" 0
 
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   # 9f. AC1 and AC2 — A LEG THAT TIMES OUT ONLY BESIDE A SPINNER. The contended leg waits for the
