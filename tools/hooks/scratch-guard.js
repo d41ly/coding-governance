@@ -697,27 +697,27 @@ const CARD_PATH_BOUND_MS = 10000
 
 /**
  * The kickoff checker `manifest-check.sh`, the one reader of where a card lives (TOOL-dPlacedRequest-2
- * S10): the kit resolver from this hook's own directory, else the ONE file of that name the hook's
- * own repository tracks, then the one `cwd`'s repository tracks — gov homes that kit under `skills/`,
- * where no probe walks, as the roles kit's `resolve_card_path` finds it. null when none answers.
+ * S10), resolved from this hook's OWN install and nowhere else: the kit resolver from this hook's own
+ * directory, else the ONE file of that name the hook's own repository tracks — gov homes that kit
+ * under `skills/`, where no probe walks, as the roles kit's `resolve_card_path` finds it. The commit
+ * or edit target's tree is never a rung (TOOL-dPlacedRequest-95): its tracked checker is code that
+ * repository authored, and it would run inside PreToolUse on this node. null when neither answers.
  */
-function resolveKickoffChecker(cwd) {
+function resolveKickoffChecker() {
   const fs = require('fs')
   const path = require('path')
   const { spawnSync } = require('child_process')
   try {
     return path.join(require('./agent-cap.js').resolveKitDir('session-kickoff', 'manifest-check.sh', __dirname), 'manifest-check.sh')
   } catch { /* the next rung */ }
-  for (const dir of [__dirname, cwd]) {
-    const hit = dir ? resolveToplevel(dir) : null
-    if (!hit) continue
-    let r
-    try {
-      r = spawnSync('git', ['ls-files', '--', 'manifest-check.sh', '*/manifest-check.sh'], { cwd: hit.toplevel, encoding: 'utf8', timeout: 20000, windowsHide: true })
-    } catch { continue }
-    const hits = r && r.status === 0 ? String(r.stdout || '').split(/\r?\n/).filter(Boolean) : []
-    if (hits.length === 1 && fs.existsSync(path.join(hit.toplevel, hits[0]))) return path.join(hit.toplevel, hits[0])
-  }
+  const hit = resolveToplevel(__dirname)
+  if (!hit) return null
+  let r
+  try {
+    r = spawnSync('git', ['ls-files', '--', 'manifest-check.sh', '*/manifest-check.sh'], { cwd: hit.toplevel, encoding: 'utf8', timeout: 20000, windowsHide: true })
+  } catch { return null }
+  const hits = r && r.status === 0 ? String(r.stdout || '').split(/\r?\n/).filter(Boolean) : []
+  if (hits.length === 1 && fs.existsSync(path.join(hit.toplevel, hits[0]))) return path.join(hit.toplevel, hits[0])
   return null
 }
 
@@ -767,7 +767,7 @@ function readCard(commonDir, sessionId, checker) {
     return card
   }
   const cwd = path.basename(commonDir) === '.git' ? path.dirname(commonDir) : commonDir
-  const engine = checker === undefined ? resolveKickoffChecker(cwd) : checker
+  const engine = checker === undefined ? resolveKickoffChecker() : checker
   if (!engine) {
     card.shown = '(no card: no kickoff checker manifest-check.sh resolves to answer --card --path)'
     return card

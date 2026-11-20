@@ -1793,6 +1793,47 @@ sg_got=$(awk '/^function readCard\(/ { f = 1; print; next } f && /^function / { 
 [ "$sg_got" = 2 ] && { echo "ok   AC18 readCard's body passes the kill signal on both spawns"; pass=$((pass+1)); } \
   || { echo "FAIL AC18 readCard's body passes the kill signal on both spawns: $sg_got"; fail=$((fail+1)); }
 
+# ---- TOOL-dPlacedRequest-95 AC1 (S1): the hook never runs a checker its target's tree tracks ------
+# The target is a scratch repository tracking one manifest-check.sh that writes a marker and prints
+# nothing. Three fixtures reach it, each through a copy of this kit's scripts: (1) readCard over the
+# target's common dir with no checker argument, the copy in a directory outside any repository, so no
+# install-side rung answers; (2) the same through a copy inside a scratch repository tracking two
+# checkers, so the hook's own toplevel rung misses; (3) the copy of (1) fed a main-loop PreToolUse
+# payload of `git -C <target> commit`. Each holds when the target tracks its checker, no marker
+# exists, and the card reads absent naming no kickoff checker. Staged against the hook at 95c3103ad,
+# whose third rung walked the target's toplevel, every fixture writes the marker.
+# WHAT THIS DOES NOT CHECK: the write gate's route reader, which reaches the same readCard through
+# renderRouteText and is not driven here; a hook whose own install the kit resolver answers for.
+sg95="$TMP/sg95"; sg95_t="$sg95/target"; sg95_own="$sg95/own"
+mkdir -p "$sg95/hk" "$sg95_own/hk" "$sg95_own/a" "$sg95_own/b" "$sg95_t"
+cp "$HERE"/*.js "$sg95/hk/"; cp "$HERE"/*.js "$sg95_own/hk/"
+# The marker is spelled as node spells the scratch dir, forward slashes, so any bash writes the one file.
+# The slash is `posix.sep`, never a quoted "/" literal: MSYS rewrites one inside a native program's
+# argument to Git's install root.
+sg95_m="$(cd "$sg95" && node -p 'const p = require("path"); process.cwd().split(p.sep).join(p.posix.sep)')/marker"
+sg95_tc=$(cd "$sg95_t" && node -p 'const p = require("path"); process.cwd().split(p.sep).join(p.posix.sep)')
+printf '#!/usr/bin/env bash\n: > "%s"\n' "$sg95_m" > "$sg95_t/manifest-check.sh"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$sg95_own/a/manifest-check.sh"; cp "$sg95_own/a/manifest-check.sh" "$sg95_own/b/"
+git init -q "$sg95_t" && $SGGIT -C "$sg95_t" add manifest-check.sh && $SGGIT -C "$sg95_t" commit -q -m target
+git init -q "$sg95_own" && $SGGIT -C "$sg95_own" add a b && $SGGIT -C "$sg95_own" commit -q -m own
+sg95_tracked=$(git -C "$sg95_t" ls-files -- manifest-check.sh)
+for sg95_f in "1 a copy outside any repository:$sg95/hk" "2 a copy in a repository tracking two checkers:$sg95_own/hk"; do
+  rm -f "$sg95/marker"
+  sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1"); console.log(c.text === null ? "null · " + c.shown : "read")' "${sg95_f#*:}/scratch-guard.js" "$sg95_t/.git" 2>&1)
+  case "$sg95_tracked;$sg_got" in
+    "manifest-check.sh;null · (no card: no kickoff checker"*) [ ! -e "$sg95/marker" ] \
+      && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: the target's tracked checker is not run, the card reads absent naming no kickoff checker"; pass=$((pass+1)); } \
+      || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: the target's tracked checker ran and wrote its marker"; fail=$((fail+1)); } ;;
+    *) echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: tracked '$sg95_tracked', read: $sg_got"; fail=$((fail+1)) ;;
+  esac
+done
+rm -f "$sg95/marker"; sg_hook=$HOOK; HOOK="$sg95/hk/scratch-guard.js"
+run_card "TOOL-dPlacedRequest-95 AC1 fixture 3 a git -C <target> commit -> allow, the card absent naming no kickoff checker" 0 "one;;orientation card absent;;no kickoff checker" "git -C $sg95_tc commit -m x" session_id=sgtest-c1 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook
+[ "$sg95_tracked" = manifest-check.sh ] && [ ! -e "$sg95/marker" ] \
+  && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
+  || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture 3: tracked '$sg95_tracked', or the target's checker ran and wrote its marker"; fail=$((fail+1)); }
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1838,8 +1879,10 @@ n=$((pass+fail))
 # silent checker read as no card, the source's one call), counted by hand under the same rule.
 # 396 = 393 + the 3 readCard rows TOOL-dPlacedRequest-43 added for its AC18 (the hung checker, the
 # orphaned grandchild, the body's two kill signals), counted by hand under the same rule.
+# 400 = 396 + the 4 rows TOOL-dPlacedRequest-95 added for its AC1 (fixtures 1 and 2 one each, fixture 3
+# its run_card row and its marker row), counted by hand under the same rule.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=396
+FLOOR_ASSERTIONS=400
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

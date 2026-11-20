@@ -132,7 +132,7 @@ run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
 branch-reconcile selftest	78		measured 52s on node d 2026-10-13, the whole suite run once at VERIFYING over 92 assertions, x1.5
 runlog selftest	93		measured 62s on node d 2026-09-16, the worst of the direct runs (58 to 62 s) after the closing review's round-1 fold and the second origin/main reconcile raised the suite to 1291 assertions, x1.5
-scratch-guard self-test	290		measured 187s on node a 2026-11-13 at 2ba17e9d6, one direct run of the suite alone on a clone, 378 passed and 7 failed, the 7 filed as TOOL-aNimbleMend-17, x1.5. TOOL-aNimbleMend-15
+scratch-guard self-test	282		PINNED proxy r 188s on the run's node 2026-11-20, not a suite reading: the row's 187s from node a 2026-11-13 at 2ba17e9d6 (one direct run of the suite alone on a clone, 378 passed and 7 failed, the 7 filed as TOOL-aNimbleMend-17; TOOL-aNimbleMend-15) plus 0.8s, the TOOL-dPlacedRequest-95 arm's three fixtures run by direct CLI over base cd30d3d2c, each in a throwaway repository as the suite does; x1.5. Re-price from the main loop's first reading of the leg alone. TOOL-dPlacedRequest-95
 format-guard self-test	30		worst of 2 readings 16s on node a 2026-10-13 (73 assertions, post-reboot), x1.5 rounded up; re-declared at aHeardState's VERIFYING from the ESTIMATE of 120
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
