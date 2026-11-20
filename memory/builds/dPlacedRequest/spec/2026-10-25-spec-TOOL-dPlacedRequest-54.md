@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge
 
-**Status:** INPROGRESS · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
