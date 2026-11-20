@@ -399,3 +399,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T11:25:44Z draw · re-dispatch · TOOL-dPlacedRequest-52 · 54/130 · 20261120T112544Z-3c7062
 
 2026-11-20T11:25:44Z dispatch · item ce4a81a9 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
+2026-11-20T11:42:31Z draw · fix-pass · TOOL-dPlacedRequest-52 · 55/130 · 20261120T114231Z-efeb66
+
+2026-11-20T11:42:31Z dispatch · item 4834fe05 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
