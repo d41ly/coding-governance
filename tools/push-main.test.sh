@@ -1659,9 +1659,9 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 wit
   fx_line="no playbook kit holding render_playbook.py beside this lander, so the fixture's registry has no reader to copy"
   [ -n "$_fn_pb" ] || return 1
   fx_line="the fixture's kit tree could not be made under $FX/kit"
-  git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/playbook" \
+  git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/$_fn_pb" \
     && printf '[[node]]\ntag = "%s"\nuser = "%s"\nhost = ""\nprojects_root = "%s"\nvariances = ""\n\n' a daily-agent "$FX" b agent5 "$FX" \
-      > "$FX/kit/playbook/fleet.toml" || return 1
+      > "$FX/kit/$_fn_pb/fleet.toml" || return 1
   for _fn_s in policy loop; do # the driver's optional siblings its lease verbs resolve, where this install has them
     [ ! -d "$HERE/$_fn_s" ] || cp -R "$HERE/$_fn_s" "$FX/kit/$_fn_s" || return 1
   done
