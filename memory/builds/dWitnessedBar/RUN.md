@@ -407,3 +407,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T04:25:34Z brief · item TOOL-dWitnessedBar-40 · reason dada112a6d45 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-40-build-brief.md
 
 2026-11-20T04:27:32Z dispatch · item 1ffa6f67 TOOL-dWitnessedBar-40 · reason .githooks/pre-push .githooks/pre-push.test.sh memory/guides/SESSION-KICKOFF.md tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.sh tools/unattended/unattended.sh memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-40-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-40.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T04:36:23Z draw · fix-pass · TOOL-dWitnessedBar-40 · 73/180 · 20261120T043623Z-f0cad3
+
+2026-11-20T04:36:23Z dispatch · item ebe139e1 TOOL-dWitnessedBar-40 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-40-deviation-403.md
