@@ -1,0 +1,10 @@
+# TOOL-dWitnessedBar-6 red-fix 125 — install-prefix (shipped surface) fixed in ff89a2ff
+
+**Serves:** red-fix TOOL-dWitnessedBar-6
+
+- **Leg:** install-prefix (shipped surface)
+- **Red line:** install-prefix: RED — 580 tracked file(s) graded, 7 render(s) left out as matching their template, 9 kit-path spelling(s)
+- **Files:** .lexicon.conf, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-acceptance-ledger.md, memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-6-1-builder-return.md, memory/project/docs-undocumented.txt, memory/project/unarmed-branches.txt, tools/run-gates/README.md, tools/run-gates/remote_verdict.py, tools/run-gates/verdict_backends.py
+- **Commit:** ff89a2ff561b053d4254bdc550e5d0117432b913
+- **Rerun:** bash tools/run-gates/pass-legs.sh --base 0ee16214987c5f39b2236d0388f25df0c67b7320
+- **Caused-by:** TOOL-dWitnessedBar-6
