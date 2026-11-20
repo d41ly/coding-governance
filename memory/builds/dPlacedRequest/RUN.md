@@ -551,3 +551,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T21:58:49Z draw · fix-pass · TOOL-dPlacedRequest-97 · 73/130 · 20261120T215849Z-383d50
 
 2026-11-20T21:58:49Z dispatch · item e4de3f59 TOOL-dPlacedRequest-97 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-97-1-acceptance-ledger.md
+
+2026-11-20T22:02:39Z dispatch · item 9251abe3 TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md

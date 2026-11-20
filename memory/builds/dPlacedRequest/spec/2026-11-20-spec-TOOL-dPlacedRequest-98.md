@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-98 — the fenced-landing arms fail, never skip, when their fixture fails
 
-**Status:** DEFERRED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** INPROGRESS · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
