@@ -9,7 +9,7 @@ computed witness serving `item.probe.run`, and the outcome `probe` routed to the
 19 (DERIVED) role items outside the probe program. `tools/loop/loop_lib.py#check_program` admits `step =
 "none"` for the segments of `tools/loop/loop_lib.py#PROGRAM_SEGMENTS` and returns each program under its
 segment; `tools/loop/loop_lib.py#check_probe_outcomes` and `tools/loop/loop_lib.py#read_trigger_causes` are
-new, with three plants. `tools/loop/probe.py` is the program's tool. The record factory gains the two kinds
+new, with four (DERIVED) plants by the end of the checklist pass. `tools/loop/probe.py` is the program's tool. The record factory gains the two kinds
 and their readers, `tools/memory-tree/build_records.py#read_probe_trigger` and
 `tools/memory-tree/build_records.py#read_probe`, and `tools/memory-tree/tree_lib.py#TYPED_RECORD_KINDS` and
 the HYGIENE template and its render name them. The leg `loop probe fixtures` is registered as
@@ -68,8 +68,11 @@ parsed definition, or one `--fixture --plant` case of `tools/loop/probe.py` run 
   `check_transition_tables` refused no cross-step route, and `tools/loop/termination.py#check_termination`
   over gov's composition returned no finding, so no counted cycle passes a probe item.
 - AC10 — the catalogue read printed the four `probe.*` keys, and the `probe.points` row read `set` and
-  `[]`. The reader-coverage half and the `git grep` half read tracked files, so they are observed after
-  the pass commit, below.
+  `[]`. After the pass commit `0c406e7e1`, `check_policy.scan_reader_keys` at the repository root printed
+  a list holding `probe.experiment.authority`, `probe.observations`, `probe.points` and `probe.raise`,
+  and `git grep -n "probe.raise" -- probe.py` in the loop kit's directory found the literal-key read
+  `policy.resolve("probe.raise", str(root))`. The same list held one message text opening `probe.points`,
+  which the checklist pass reworded to open `the key`.
 - AC11 — `grep -n "probe.observations" loop.md` in `help/` finds the section `Testing outside Test: the
   probe program`, which names the two ways in and the four keys.
 - AC12 — `tools/gate-legs.json` holds the row `loop probe fixtures`, its argv `python
@@ -83,10 +86,34 @@ parsed definition, or one `--fixture --plant` case of `tools/loop/probe.py` run 
   command holding the separator each exited 2 (PINNED) with the record's bytes unchanged; over a second
   pinned record, once `run` wrote a run line, a further `design` exited 2 (PINNED) naming the record,
   whose bytes stayed unchanged.
-- The sixteen (DERIVED) plants, run one at a time by direct CLI, all held, in 36 s (PINNED) on the run's
-  node: the proxy the budget row records.
+- The sixteen (DERIVED) plants of the pass commit, run one at a time by direct CLI, all held, in 36 s
+  (PINNED) on the run's node; after the checklist pass the eighteen (DERIVED) plants held in 111 s
+  (PINNED) under load and 49 s (PINNED) again, and the budget row prices the worst reading.
+
+**The checklist, acted on.** The bug-class checklist over the pass commit `0c406e7e1` selected 40
+classes (DERIVED: 34 by an anchor and 6 universal). Four needed a change.
+rule-stated-with-no-check-that-fails: refusal branches had no arm, so the plant `refusals` stages a bad
+`--asker`, `--request` and `--build`, a retried trigger, pin, design, run, judge and return, a pin of a
+path that is no trigger record, run, judge and return out of order, an experiment's run and a returned
+request probe, and held, exit 0 (PINNED); `record-malformed` stages a bad `Sha`, a verdict beside a
+claimed judgment, a verdict with no `Judged`, a bad method line, a bad run line and a trigger's bad
+`Asker`, each read exit 1 (PINNED) naming its field; `loop_lib.py`'s plant `probe-route` routes a role
+item's `probe` into the probe program and drew `routes probe to 'item.probe.trigger', not
+stand-in:{prefix}/loop/probe.py`, exit 1 (PINNED). append-without-an-idempotence-key: a retried
+`trigger` over a build and a retried `design` each appended a second copy, so a build trigger whose
+cause, asker, subject and position a record holds, and a method entry the record holds, now exit 1
+(PINNED) writing nothing. naming-leg-grades-what-python-named: the plants' inner helpers were named
+after the verbs they call, `trigger` among them, and are renamed through the naming lexicon.
+budget-row-not-remeasured-after-added-arms: the budget row and the leg's ceiling are re-priced from the
+eighteen plants. The rest named nothing in this diff: each plant asserts the line its arm prints, never
+an empty population; every write is one line through the factory's forged-field rule; the probe
+verbs strip the inherited git variables through `tools/loop/loop_witness.py#read_clean_env`; no fence
+opens inline. Not driven by any arm: the `LoopError` branches of
+`tools/loop/loop_lib.py#read_trigger_causes`, which reads the shipped definition alone; the cause with no
+rule in `tools/loop/probe.py#check_trigger_cause`, which needs a definition row the tree does not hold;
+and a pin whose commit git refuses.
 
 **Owed to the main loop at the close:** the `loop probe fixtures` leg itself, `loop definition fixtures`
-over the three new plants, `loop definition`, `loop transition tables`, `loop item kind`, `loop
+over the four (DERIVED) new plants, `loop definition`, `loop transition tables`, `loop item kind`, `loop
 termination`, the `testsuite counts` leg reading the new count line, the core meta-check over the deleted
 pending row, the docs leg, and both New arm lines' RED-first observations.

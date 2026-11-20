@@ -13,8 +13,8 @@
 
 Every verb runs in the repository at the current directory and prints one `probe — ` line naming the record
 and the route taken, `· to <target>`: a declared probe item, the asker named in the line, or an owner item,
-`OWNER_ITEM`, the unattended driver's stand-in. A route to the probe tool's stand-in, `PROBE_STAND_IN`, is
-that line: the asker is re-entered with it as its input.
+`OWNER_ITEM`, the unattended driver's stand-in. A route to the probe tool's stand-in, loop_lib.py's
+`PROBE_STAND_IN`, is that line: the asker is re-entered with it as its input.
 
 THE TWO WAYS IN. `trigger` opens a probe for one of the causes the loop definition's `[[trigger-cause]]`
 rows hold for the program `probe`, read by `loop_lib.read_trigger_causes`; any other cause exits 2 naming
@@ -25,8 +25,9 @@ landed revision: `point` opens where `--at` is a member of `probe.points`, read 
 `probe.observations=verify-before-place`, at `item.plan.input` under `verify-at-plan` and nowhere under
 `on-request`, where the owner opens a probe with `--cause owner`; `reproduction` always. A refused cause
 writes nothing and prints `probe — not opened · <key>: <why> · to <asker>`, exit 1. With `--build` and
-`--unit` it writes the `probe-trigger` record through the memory-tree kit's `write_record`; `--build`
-without `--unit` exits 2. With `--request <content key>` it writes `<key>.probe-trigger.md` beside the
+`--unit` it writes the `probe-trigger` record through the memory-tree kit's `write_record`, and a trigger
+whose cause, asker, subject and position a record of the build holds already exits 1, so a retry opens
+nothing twice; `--build` without `--unit` exits 2. With `--request <content key>` it writes `<key>.probe-trigger.md` beside the
 request's local text in `<git-common-dir>/requests/`, minting no id: a request holds one entry-time probe,
 so a trigger for a key whose probe is open with a new subject joins it, adding its `Subject` line and
 printing `probe — joined`, and the same subject again, or a probe already returned, exits 1.
@@ -42,7 +43,9 @@ shape being unbuilt.
 THE METHOD. `design` appends one `- method · <exit>:<hash> · <command>` entry, its marks trailing, to the
 record's `## Method` section, the method's one writer. It refuses, exit 2 and the record's bytes unchanged,
 an `--expect` outside `loop_witness.EXPECT`, a `--mark` outside the two, a command holding the field
-separator ` · `, and a frozen record, one already holding a run line.
+separator ` · `, and a frozen record, one already holding a run line; an entry the method holds already
+exits 1, so a retry appends nothing twice. `run`, `judge` and `return` each exit 1 on a record they have
+done already and 2 on one whose earlier verb has not run.
 
 RUN, JUDGE, RETURN. `run` reads the method. An entry marked `visual` makes it run nothing and write
 `Verdict: unrunnable` and `Judged: computed`, routing to `item.probe.return`. Otherwise it calls
@@ -81,7 +84,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import (PROBE_STAND_IN, LoopError, read_memory_tree, read_trigger_causes,  # noqa: E402
+from loop_lib import (LoopError, read_memory_tree, read_trigger_causes, resolve_memory_root,  # noqa: E402
                       run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_witness import (EXPECT, TIMEOUT, read_clean_env, remove_tree, resolve_commit,  # noqa: E402
@@ -120,7 +123,11 @@ PLANTS = {"trigger-causes": "a cause outside the rows, a build trigger with its 
           "judge-claimed": "a method entry marked judge claimed: claimed, no verdict, item.probe.judge-claimed",
           "experiment": "an experiment pinned: item.probe.experiment and the owner item naming dBoundRoles",
           "verdict-cross": "a reproduction's record carrying measured: read refuses its Verdict",
-          "design": "two entries appended, each refusal writing nothing, and a frozen record refused"}
+          "design": "two entries appended, each refusal writing nothing, and a frozen record refused",
+          "refusals": "each verb's other refusals: a bad flag, a retried verb, a verb out of order, an experiment "
+                      "run, and a returned request probe",
+          "record-malformed": "a bad Sha, a verdict beside a claimed judgment, a verdict with no Judged, a bad "
+                              "method line, a bad run line and a trigger's bad Asker, each read malformed"}
 
 
 class ProbeRefused(ValueError):
@@ -178,7 +185,7 @@ def read_probe_points(root, build=None):
     try:
         return list(policy.resolve("probe.points", str(root)).value)
     except policy.Refusal as e:
-        raise ProbeRefused("probe.points does not resolve: %s" % e) from None
+        raise ProbeRefused("the key probe.points does not resolve: %s" % e) from None
 
 
 def check_trigger_cause(cause, at, root, build):
@@ -314,6 +321,16 @@ def write_probe_trigger(args, root, store):
     fields = [("Cause", args.cause), ("Asker", args.asker), ("Subject", args.subject), ("At", args.at or "none"),
               ("Key", args.request or "none")]
     if args.build is not None:
+        br = read_build_records()
+        if not br.SLUG.fullmatch(args.build):
+            raise ProbeRefused("--build %r is not a build slug" % args.build)
+        folder = root / resolve_memory_root(root) / "builds" / args.build / "build"
+        for other in sorted(folder.glob("*-probe-trigger-*.md")):   # a retried trigger opens nothing twice
+            if br.derive_record_name("probe-trigger").search(other.as_posix()) and \
+                    all(kv in read_record_fields(other)[1] for kv in fields[:4]):
+                print("%s — already opened · %s · the build holds this trigger" % (
+                    SAY, derive_record_shown(other, root)))
+                return 1
         try:
             rel = read_build_records().write_record(root, args.build, args.unit, "probe-trigger",
                                                     "%s from %s" % (args.cause, args.asker), fields)
@@ -422,6 +439,8 @@ def write_method_entry(args, root, store):
         raise ProbeRefused("the entry %r is not the method grammar" % entry)
     text, _fields = read_record_fields(path)
     rows = text.rstrip("\n").split("\n")
+    if entry in rows:   # a retried design appends nothing twice
+        raise ProbeRefused("%s holds the entry already: %s" % (shown, entry), 1)
     if "## Method" not in rows:
         rows += ["", "## Method", ""]
     rows.append(entry)
@@ -605,10 +624,10 @@ def check_probe_plant(case, root, seen, bad):
     folder = root / "memory" / "builds" / FX_BUILD / "build"
     store = pathlib.Path(run_probe_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
 
-    def trigger(cause, *more, subject="the owner reports the card drops its route"):
+    def run_trigger_case(cause, *more, subject="the owner reports the card drops its route"):
         return run_probe_command(root, "trigger", "--cause", cause, "--asker", FX_ASKER, "--subject", subject, *more)
 
-    def expect(what, got, rc, *needles):
+    def check_case_line(what, got, rc, *needles):
         """One observation: `got`, `(exit, output)`, owed `rc` and a line holding every needle."""
         line = next((ln for ln in got[1].splitlines() if all(n in ln for n in needles)), None)
         seen.append("%s exit %d" % (what, got[0]))
@@ -617,33 +636,40 @@ def check_probe_plant(case, root, seen, bad):
                 what, got[0], rc, " and ".join(needles), got[1][-300:]))
         return line or ""
 
-    def opened(line):
+    def read_opened_path(line):
         """The record an opened or pinned line names, as a path."""
         m = re.search(r"probe — (?:opened|pinned) · (\S+) · ", line)
         return pathlib.Path(m.group(1)) if m else None
 
-    def pinned(kind, *more):
-        """A trigger by the owner and its probe pinned at HEAD: the probe record's path."""
-        rel = opened(expect("trigger", trigger("owner", *build), 0, "probe — opened"))
+    pins = []
+
+    def write_pinned_probe(kind, *more):
+        """A trigger by the owner, its subject new to the build, and its probe pinned at HEAD: the probe
+        record's path."""
+        pins.append(kind)
+        subject = "the card drops its route, probe %d" % len(pins)
+        rel = read_opened_path(check_case_line("trigger", run_trigger_case("owner", *build, subject=subject), 0,
+                                               "probe — opened"))
         got = run_probe_command(root, "pin", "--trigger", str(rel), "--sha", "HEAD", "--kind", kind,
                                 "--question", "does a compaction drop the card's route?",
                                 "--losing", "the replayed card keeps its route section", *more)
-        out = opened(expect("pin", got, 0, "probe — pinned"))
+        out = read_opened_path(check_case_line("pin", got, 0, "probe — pinned"))
         return root / out if out else root
 
-    def clean(what):
+    def check_tree_clean(what):
         status = run_probe_git(root, "status", "--porcelain")
         seen.append("%s status %s" % (what, "clean" if not status else "dirty"))
         if status:
             bad.append("%s left the tree dirty: %s" % (what, status))
 
     if case == "trigger-causes":   # AC2
-        expect("hunch", trigger("hunch", *build), 2, "point owner observation raised reproduction")
-        rel = opened(expect("owner", trigger("owner", *build), 0, "probe — opened", "to item.probe.pin"))
+        check_case_line("hunch", run_trigger_case("hunch", *build), 2, "point owner observation raised reproduction")
+        rel = read_opened_path(check_case_line("owner", run_trigger_case("owner", *build), 0, "probe — opened",
+                                               "to item.probe.pin"))
         if not rel or not re.fullmatch(r"memory/builds/%s/build/\d{4}-\d{2}-\d{2}-build-%s-probe-trigger-1\.md" % (
                 FX_BUILD, FX_UNIT), rel.as_posix()):
             bad.append("the trigger record is %s, not <date>-build-%s-probe-trigger-1.md" % (rel, FX_UNIT))
-        expect("no unit", trigger("owner", "--build", FX_BUILD), 2, "--unit")
+        check_case_line("no unit", run_trigger_case("owner", "--build", FX_BUILD), 2, "--unit")
         if len(list(folder.glob("*.md"))) != 1:
             bad.append("the build folder holds %d records, not 1" % len(list(folder.glob("*.md"))))
     elif case in ("raise-owner-only", "raise-off", "points-unlisted", "observation-at-plan",
@@ -658,34 +684,34 @@ def check_probe_plant(case, root, seen, bad):
                                         ("observation", "--at", "item.plan.input")], ("owner",))}[case]
         key = {"raise": "probe.raise", "point": "probe.points", "obser": "probe.observations"}[case[:5]]
         for cause in refused:
-            line = expect(cause[0], trigger(*cause, *build), 1, "probe — not opened", key + ":")
+            line = check_case_line(cause[0], run_trigger_case(*cause, *build), 1, "probe — not opened", key + ":")
             if not line.endswith("· to %s" % FX_ASKER):
                 bad.append("the refusal %r does not end · to %s" % (line, FX_ASKER))
-            clean(cause[0])
-        expect(admitted[0], trigger(*admitted, *build), 0, "probe — opened")
+            check_tree_clean(cause[0])
+        check_case_line(admitted[0], run_trigger_case(*admitted, *build), 0, "probe — opened")
     elif case == "points-undeclared":
-        expect("points", run_probe_command(root, "points", "--build", FX_BUILD), 1, "probe — refused · probe.points:",
+        check_case_line("points", run_probe_command(root, "points", "--build", FX_BUILD), 1, "probe — refused · probe.points:",
                "item.plan.nope")
     elif case == "pin":   # AC4
-        rel = opened(expect("trigger", trigger("owner", *build), 0, "probe — opened"))
+        rel = read_opened_path(check_case_line("trigger", run_trigger_case("owner", *build), 0, "probe — opened"))
         before = sorted(p.name for p in folder.glob("*.md"))
-        expect("bad sha", run_probe_command(root, "pin", "--trigger", str(rel), "--sha", "0badc0de", "--kind",
+        check_case_line("bad sha", run_probe_command(root, "pin", "--trigger", str(rel), "--sha", "0badc0de", "--kind",
                                             "verification", "--question", "q", "--losing", "l"), 2, "names no commit")
         if sorted(p.name for p in folder.glob("*.md")) != before:
             bad.append("a refused pin wrote a record")
         got = run_probe_command(root, "pin", "--trigger", str(rel), "--sha", "HEAD", "--kind", "verification",
                                 "--question", "does a compaction drop the card's route?",
                                 "--losing", "the replayed card keeps its route section")
-        out = opened(expect("pin", got, 0, "probe — pinned", "to item.probe.design"))
+        out = read_opened_path(check_case_line("pin", got, 0, "probe — pinned", "to item.probe.design"))
         subject = run_probe_git(root, "log", "-1", "--format=%s")
         held = run_probe_git(root, "show", "HEAD:%s" % out.as_posix()) if out else ""
         seen.append("subject %s" % subject)
         if subject != "probe pin(%s): verification" % FX_ASKER or "- **Losing:** " not in held or "run ·" in held:
             bad.append("the pin commit reads %r and holds %r" % (subject, held[-300:]))
         head = run_probe_git(root, "rev-parse", "HEAD")
-        entry = opened(expect("entry trigger", trigger("observation", "--request", FX_KEY, "--at", FX_ASKER), 0,
+        entry = read_opened_path(check_case_line("entry trigger", run_trigger_case("observation", "--request", FX_KEY, "--at", FX_ASKER), 0,
                               "probe — opened"))
-        expect("entry pin", run_probe_command(root, "pin", "--trigger", str(entry), "--sha", "HEAD", "--kind",
+        check_case_line("entry pin", run_probe_command(root, "pin", "--trigger", str(entry), "--sha", "HEAD", "--kind",
                                               "verification", "--question", "q", "--losing", "the route stays"), 0,
                "probe — pinned", "%s.probe.md" % FX_KEY)
         stored = store / ("%s.probe.md" % FX_KEY)
@@ -694,31 +720,31 @@ def check_probe_plant(case, root, seen, bad):
         if run_probe_git(root, "rev-parse", "HEAD") != head:
             bad.append("the entry-time pin moved HEAD")
     elif case == "entry-time":   # AC8
-        rel = opened(expect("first", trigger("observation", "--request", FX_KEY, "--at", FX_ASKER), 0,
+        rel = read_opened_path(check_case_line("first", run_trigger_case("observation", "--request", FX_KEY, "--at", FX_ASKER), 0,
                             "probe — opened"))
         if rel != store / ("%s.probe-trigger.md" % FX_KEY):
             bad.append("the record is %s, not requests/%s.probe-trigger.md" % (rel, FX_KEY))
         if folder.exists() and any(folder.iterdir()):
             bad.append("an entry-time trigger wrote into the build folder")
-        expect("second", trigger("observation", "--request", FX_KEY, "--at", FX_ASKER, subject="a second observation"),
+        check_case_line("second", run_trigger_case("observation", "--request", FX_KEY, "--at", FX_ASKER, subject="a second observation"),
                0, "probe — joined")
         text = rel.read_text(encoding="utf-8") if rel and rel.is_file() else ""
         if text.count("- **Subject:** ") != 2:
             bad.append("the record holds %d Subject lines, not 2" % text.count("- **Subject:** "))
-        expect("first again", trigger("observation", "--request", FX_KEY, "--at", FX_ASKER), 1, "already opened")
+        check_case_line("first again", run_trigger_case("observation", "--request", FX_KEY, "--at", FX_ASKER), 1, "already opened")
     elif case in ("run-judge", "run-refuted"):   # AC5, AC7
         head = run_probe_git(root, "rev-parse", "HEAD")
         prediction = "1:000000000000"
         if case == "run-judge":
             [(_c, code, digest)] = run_witness_commands(root, head, [FX_CMD])
             prediction = "%s:%s" % (code, digest)
-        probe = pinned("reproduction")
-        expect("design", run_probe_command(root, "design", "--probe", str(probe), "--cmd", FX_CMD, "--expect",
+        probe = write_pinned_probe("reproduction")
+        check_case_line("design", run_probe_command(root, "design", "--probe", str(probe), "--cmd", FX_CMD, "--expect",
                                            prediction), 0, "probe — designed")
-        expect("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — ran")
+        check_case_line("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — ran")
         verdict = "confirmed" if case == "run-judge" else "refuted"
-        expect("judge", run_probe_command(root, "judge", "--probe", str(probe)), 0, "probe — judged · " + verdict)
-        expect("return", run_probe_command(root, "return", "--probe", str(probe)), 0,
+        check_case_line("judge", run_probe_command(root, "judge", "--probe", str(probe)), 0, "probe — judged · " + verdict)
+        check_case_line("return", run_probe_command(root, "return", "--probe", str(probe)), 0,
                "probe — %s · " % verdict, "· to %s" % FX_ASKER)
         text = probe.read_text(encoding="utf-8")
         if "- **Verdict:** %s" % verdict not in text or "- **Judged:** computed" not in text:
@@ -744,67 +770,130 @@ def check_probe_plant(case, root, seen, bad):
             if any(r.startswith("A\t") for r in rows):
                 bad.append("--print-bindings printed an A row: %s" % [r for r in rows if r.startswith("A\t")])
     elif case in ("visual", "judge-claimed"):   # AC6
-        probe = pinned("verification")
+        probe = write_pinned_probe("verification")
         mark = "visual" if case == "visual" else "judge claimed"
-        expect("design", run_probe_command(root, "design", "--probe", str(probe), "--cmd", FX_CMD, "--expect",
+        check_case_line("design", run_probe_command(root, "design", "--probe", str(probe), "--cmd", FX_CMD, "--expect",
                                            "1:9c0e5a1b2f33", "--mark", mark), 0, "probe — designed")
         if case == "visual":
-            expect("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — unrunnable",
+            check_case_line("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — unrunnable",
                    "to item.probe.return")
             text = probe.read_text(encoding="utf-8")
             if "run ·" in text or "- **Verdict:** unrunnable" not in text or "- **Judged:** computed" not in text:
                 bad.append("the record is not unrunnable, computed and unrun: %s" % text[-400:])
-            expect("return", run_probe_command(root, "return", "--probe", str(probe)), 0, "probe — unrunnable",
+            check_case_line("return", run_probe_command(root, "return", "--probe", str(probe)), 0, "probe — unrunnable",
                    "to %s" % OWNER_ITEM)
         else:
-            expect("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — ran")
-            expect("judge", run_probe_command(root, "judge", "--probe", str(probe)), 0, "probe — claimed",
+            check_case_line("run", run_probe_command(root, "run", "--probe", str(probe)), 0, "probe — ran")
+            check_case_line("judge", run_probe_command(root, "judge", "--probe", str(probe)), 0, "probe — claimed",
                    "to item.probe.judge-claimed")
             text = probe.read_text(encoding="utf-8")
             if "- **Judged:** claimed" not in text or "- **Verdict:** " in text:
                 bad.append("the record is not claimed with no verdict: %s" % text[-400:])
-            expect("return", run_probe_command(root, "return", "--probe", str(probe)), 0, "probe — claimed",
+            check_case_line("return", run_probe_command(root, "return", "--probe", str(probe)), 0, "probe — claimed",
                    "to %s" % OWNER_ITEM)
     elif case == "experiment":   # AC6
-        rel = opened(expect("trigger", trigger("owner", *build), 0, "probe — opened"))
+        rel = read_opened_path(check_case_line("trigger", run_trigger_case("owner", *build), 0, "probe — opened"))
         got = run_probe_command(root, "pin", "--trigger", str(rel), "--sha", "HEAD", "--kind", "experiment",
                                 "--question", "how long does a replay take?", "--losing", "it takes no longer")
-        expect("pin", got, 0, "probe — pinned", "to item.probe.experiment")
-        expect("stand-in", got, 0, "probe — beyond-authority", "dBoundRoles", "probe.experiment.authority=within-cap",
+        check_case_line("pin", got, 0, "probe — pinned", "to item.probe.experiment")
+        check_case_line("stand-in", got, 0, "probe — beyond-authority", "dBoundRoles", "probe.experiment.authority=within-cap",
                "to %s" % OWNER_ITEM)
     elif case == "verdict-cross":   # AC7
-        probe = pinned("reproduction")
+        probe = write_pinned_probe("reproduction")
         write_probe_fields(probe, [("Verdict", "measured"), ("Judged", "computed")])
         mt = read_memory_tree("build_records.py")
         p = subprocess.run([sys.executable, str(mt / "build_records.py"), "read", str(probe)], capture_output=True,
                            text=True, encoding="utf-8", errors="replace")
-        expect("read", (p.returncode, p.stdout + p.stderr), 1, "malformed · Verdict", "measured")
+        check_case_line("read", (p.returncode, p.stdout + p.stderr), 1, "malformed · Verdict", "measured")
     elif case == "design":   # AC14
-        probe = pinned("verification")
+        probe = write_pinned_probe("verification")
         design = ["design", "--probe", str(probe), "--cmd", FX_CMD, "--expect", "1:9c0e5a1b2f33"]
         before = probe.read_bytes()
         for what, argv, needle in (("bad expect", design[:-1] + ["one"], "--expect"),
                                    ("bad mark", design + ["--mark", "audible"], "--mark"),
                                    ("separator", design[:4] + ["bash a.sh · b", "--expect", "1:9c0e5a1b2f33"],
                                     "field separator")):
-            expect(what, run_probe_command(root, *argv), 2, needle)
+            check_case_line(what, run_probe_command(root, *argv), 2, needle)
         if probe.read_bytes() != before:
             bad.append("a refused design changed the record")
-        expect("first", run_probe_command(root, *design), 0, "probe — designed", "method 1")
-        expect("second", run_probe_command(root, *design, "--mark", "visual"), 0, "probe — designed", "method 2")
+        check_case_line("first", run_probe_command(root, *design), 0, "probe — designed", "method 1")
+        check_case_line("second", run_probe_command(root, *design, "--mark", "visual"), 0, "probe — designed", "method 2")
         entries = [ln for ln in probe.read_text(encoding="utf-8").splitlines() if ln.startswith("- method · ")]
         if len(entries) != 2 or entries[0] != "- method · 1:9c0e5a1b2f33 · %s" % FX_CMD \
                 or not entries[1].endswith(" · visual"):
             bad.append("the method holds %r, not the entry and a second ending · visual" % entries)
-        frozen = pinned("verification")
-        expect("third design", run_probe_command(root, "design", "--probe", str(frozen), "--cmd", FX_CMD, "--expect",
+        frozen = write_pinned_probe("verification")
+        check_case_line("third design", run_probe_command(root, "design", "--probe", str(frozen), "--cmd", FX_CMD, "--expect",
                                                  "1:9c0e5a1b2f33"), 0, "probe — designed")
-        expect("run", run_probe_command(root, "run", "--probe", str(frozen)), 0, "probe — ran")
+        check_case_line("run", run_probe_command(root, "run", "--probe", str(frozen)), 0, "probe — ran")
         held = frozen.read_bytes()
-        expect("frozen", run_probe_command(root, "design", "--probe", str(frozen), "--cmd", FX_CMD, "--expect",
+        check_case_line("frozen", run_probe_command(root, "design", "--probe", str(frozen), "--cmd", FX_CMD, "--expect",
                                            "1:9c0e5a1b2f33"), 2, "is frozen", frozen.name)
         if frozen.read_bytes() != held:
             bad.append("design wrote to a frozen record")
+    elif case == "refusals":
+        cmd = ["--cmd", FX_CMD, "--expect", "1:9c0e5a1b2f33"]
+        check_case_line("asker", run_probe_command(root, "trigger", "--cause", "owner", "--asker", "nobody", "--subject",
+                                                   "s", *build), 2, "is not an item tag")
+        check_case_line("key", run_trigger_case("owner", "--request", "XYZ"), 2, "is not a content key")
+        check_case_line("slug", run_trigger_case("owner", "--build", "../x", "--unit", FX_UNIT), 2, "is not a build slug")
+        rel = read_opened_path(check_case_line("trigger", run_trigger_case("owner", *build), 0, "probe — opened"))
+        check_case_line("trigger again", run_trigger_case("owner", *build), 1, "already opened")
+        pin = ["pin", "--sha", "HEAD", "--kind", "verification", "--question", "q", "--losing", "l"]
+        check_case_line("pin a non-trigger", run_probe_command(root, *pin, "--trigger", "replay-case.sh"), 2,
+                        "is neither")
+        got = read_opened_path(check_case_line("pin", run_probe_command(root, *pin, "--trigger", str(rel)), 0,
+                                               "probe — pinned"))
+        probe = root / got if got else root
+        check_case_line("pin again", run_probe_command(root, *pin, "--trigger", str(rel)), 1, "pinned already")
+
+        def run_probe_verb(name):
+            """One verb over the plant's probe record: `(exit, output)`."""
+            return run_probe_command(root, name, "--probe", str(probe))
+
+        check_case_line("run, no method", run_probe_verb("run"), 2, "holds no method")
+        check_case_line("judge, no run", run_probe_verb("judge"), 2, "no run line")
+        check_case_line("return, unjudged", run_probe_verb("return"), 2, "is not judged")
+        check_case_line("design", run_probe_command(root, "design", "--probe", str(probe), *cmd), 0, "method 1")
+        check_case_line("design again", run_probe_command(root, "design", "--probe", str(probe), *cmd), 1,
+                        "holds the entry already")
+        for name, done in (("run", "run already"), ("judge", "judged already"), ("return", "returned already")):
+            check_case_line(name, run_probe_verb(name), 0, "probe — ")
+            check_case_line(name + " again", run_probe_verb(name), 1, done)
+        experiment = write_pinned_probe("experiment")
+        check_case_line("design experiment", run_probe_command(root, "design", "--probe", str(experiment), *cmd), 0,
+                        "method 1")
+        check_case_line("run experiment", run_probe_command(root, "run", "--probe", str(experiment)), 1,
+                        "beyond-authority", "dBoundRoles")
+        if "run ·" in experiment.read_text(encoding="utf-8"):
+            bad.append("an experiment's run wrote a run line")
+        entry = read_opened_path(check_case_line("entry", run_trigger_case("reproduction", "--request", FX_KEY), 0,
+                                                 "probe — opened"))
+        stored = read_opened_path(check_case_line("entry pin", run_probe_command(root, *pin, "--trigger", str(entry)),
+                                                  0, "probe — pinned"))
+        for argv in (["design", "--probe", str(stored), *cmd, "--mark", "visual"], ["run", "--probe", str(stored)],
+                     ["return", "--probe", str(stored)]):
+            check_case_line(argv[0], run_probe_command(root, *argv), 0, "probe — ")
+        check_case_line("entry returned", run_trigger_case("reproduction", "--request", FX_KEY, subject="another"), 1,
+                        "already returned")
+    elif case == "record-malformed":
+        probe = write_pinned_probe("reproduction")
+        text = probe.read_text(encoding="utf-8")
+        trigger = next(folder.glob("*-probe-trigger-1.md"))
+        mt = read_memory_tree("build_records.py")
+        sha = re.search(r"- \*\*Sha:\*\* (\S+)", text).group(1)
+        for n, (field, path, body) in enumerate((
+                ("Sha", probe, text.replace(sha, "xyz")),
+                ("Verdict", probe, text + "- **Verdict:** confirmed\n- **Judged:** claimed\n"),
+                ("Judged", probe, text + "- **Verdict:** confirmed\n"),
+                ("method", probe, text + "\n## Method\n\n- method · nope · bash x.sh\n"),
+                ("run line", probe, text + "\nrun · x · y · bash x.sh\n"),
+                ("Asker", trigger, trigger.read_text(encoding="utf-8").replace("item.entry.place", "nobody"))), 10):
+            planted = path.with_name(re.sub(r"-(\d+)\.md$", "-%d.md" % n, path.name))
+            planted.write_text(body, encoding="utf-8", newline="\n")
+            p = subprocess.run([sys.executable, str(mt / "build_records.py"), "read", str(planted)],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            check_case_line("read " + field, (p.returncode, p.stdout + p.stderr), 1, "malformed · " + field)
 
 
 def main(argv):

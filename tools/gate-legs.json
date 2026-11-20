@@ -2250,7 +2250,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120,
+    "ceiling": 300,
     "enforces": ["principle.p31"],
     "stage": ["step.test"]
   },

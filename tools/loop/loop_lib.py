@@ -156,8 +156,8 @@ plants, `SEED_PLANTS` and `seed-bad`, run `seed` as a process in a scratch repos
 definition's seeds. The map's plants, `map-bad`, `unfold-unregistered`, `unfold-no-map` and
 `unfold-not-list`, break the declarations, `no-registry` resolves the registry from an empty scratch
 directory and `registry-bad` from one whose registry is no TOML. `probe-step` adds a row of a gov
-step's tag at step `none`, `role-no-probe` takes the `probe` outcome off a role item and `probe-self`
-gives one to the probe program's design item. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
+step's tag at step `none`, `role-no-probe` takes the `probe` outcome off a role item, `probe-route`
+routes it into the probe program, and `probe-self` gives one to the probe program's design item. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
@@ -281,7 +281,8 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
                           "TOML",
           "probe-step": "a copy of item.probe.trigger tagged item.plan.x, at step none",
           "role-no-probe": "item.plan.research's probe outcome and its route taken out",
-          "probe-self": "item.probe.design given the probe outcome, routed to the probe tool"}
+          "probe-self": "item.probe.design given the probe outcome, routed to the probe tool",
+          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -345,7 +346,9 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "probe-step": (1, "loop: ", "the item item.plan.x step 'none' is not step.plan"),
               "role-no-probe": (1, "loop: refused · ", "the item item.plan.research, a role item, carries no probe "
                                                        "outcome"),
-              "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome")}
+              "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome"),
+              "probe-route": (1, "loop: refused · ", "the item item.plan.research routes probe to "
+                                                     "'item.probe.trigger', not ")}
 #: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
 NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
@@ -2032,6 +2035,8 @@ def write_loop_plant(data, case, rows, base_rows):
         elif case == "probe-self":
             items["item.probe.design"]["outcomes"].append("probe")
             items["item.probe.design"]["routes"]["probe"] = PROBE_STAND_IN
+        elif case == "probe-route":
+            items["item.plan.research"]["routes"]["probe"] = "item.probe.trigger"
         else:
             plan["exit"] = "item.design.exit"
 
