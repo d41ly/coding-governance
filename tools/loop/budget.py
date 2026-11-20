@@ -260,7 +260,8 @@ REQUEST_PLANTS = {"placement-loop": "one recorded request placed, its check refu
                                  "it, and no line of the request's text on the remote",
                   "two-nodes": "two clones drawing on one key at once, the second's push held until the first wrote",
                   "unreachable": "a draw and a re-placement with the remote unreachable, then a kept text keying to "
-                                 "another request",
+                                 "another request, a key with neither record nor kept text, and a deleted record "
+                                 "created again from its kept text",
                   "slug-retry": "the claiming item's slug retry drawn as entry.claim draws it, the cause retry, then "
                                 "budget.py's own request refusals and a malformed row",
                   "owner-after-exhausted": "a spent request placed again, then placed by the owner's record"}
@@ -826,6 +827,19 @@ def run_request_draw_plant(case):
             rc, out = run_driver_verb("--request-draw", "abcdefabcdef", "--cause", "route-back", "--item", PLACE_ITEM)
             check(rc == 2 and ", not abcdefabcdef, so no record is created" in out and len(read_git(origin, "for-each-ref", "refs/gov/requests")[1].splitlines()) == 1,
                   "a kept text keying to another request answered %d %r" % (rc, out[-200:]))
+            # TOOL-dPlacedRequest-34 AC41: neither a record nor a kept text draws nothing and creates no ref;
+            # a record deleted from the origin is created again from the kept text, parentless, under the row.
+            rc, out = run_driver_verb("--request-draw", "0123456789ab", "--cause", "route-back", "--item", PLACE_ITEM)
+            check(rc == 2 and "--request <file>" in out
+                  and read_git(origin, "rev-parse", "-q", "--verify", "refs/gov/requests/0123456789ab")[0] != 0,
+                  "a key with no record and no kept text answered %d %r, or a ref was created" % (rc, out[-200:]))
+            gone = read_git(origin, "update-ref", "-d", ref)[0] == 0 and read_git(origin, "rev-parse", "-q", "--verify", ref)[0] != 0
+            rc, out = run_draw()
+            got = read_ref_rows()
+            check(gone and rc == 0 and out.endswith("draw · route-back · %s · 1/4" % PLACE_ITEM) and len(got) == 2
+                  and got[0][1] == got[1][0] and not got[1][1],
+                  "a deleted record with its kept text answered %d %r over %d commit(s), not a row on a re-created "
+                  "parentless record" % (rc, out[-200:], len(got)))
         elif case == "slug-retry":   # AC5: the draw entry.claim makes before a fresh slug, TOOL-dPlacedRequest-21's site
             rc, out = run_draw(item=CLAIM_ITEM)
             check(rc == 0 and out.endswith("draw · route-back · %s · 1/4" % CLAIM_ITEM), "the slug retry drew %r" % out)

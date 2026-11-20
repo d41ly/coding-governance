@@ -7698,6 +7698,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "check_probe_head",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "check_probe_landed",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -12746,6 +12751,11 @@
       "id": "derive_request_fold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_request_probe_paths",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "derive_requires_closure",
@@ -21301,6 +21311,11 @@
       "id": "read_handpicked_copies",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "read_head_blob",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "read_header_edges",
@@ -29981,6 +29996,11 @@
       "id": "run_bundle_verb",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "run_c9c",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
     },
     {
       "id": "run_callers_probe",

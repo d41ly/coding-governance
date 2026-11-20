@@ -2446,7 +2446,8 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # the ref and its `epoch` is positive. `cached` reads the caches with no fetch, for `leases.offline`;
 # a fetch that fails sets CL_OFFLINE.
 # THE OBSERVER CLOCK (TOOL-dPlacedRequest-17 S2, S3): no age reads the holder's `beat-utc`. ONE
-# `git log` over every cached tip maps each first-parent commit to its parent, `epoch` (absent 0) and
+# `git log` over every cached tip, streamed and bounded (TOOL-dPlacedRequest-34 S43, at THE WALK below),
+# reads each first-parent commit's parent, `epoch` (absent 0) and
 # `renews`; per row a walk from its own tip, while the `epoch` is the tip's, finds the RENEWING BEAT,
 # the newest commit whose `renews` is `yes` or absent, else the tenure's opening commit (§8 F5), so a
 # migrated lease's legacy commits beneath its opener never renew it. `read_first_seen` gives the
@@ -2465,7 +2466,7 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # TOOL-dPlacedRequest-19 S4: a lease tail `request/<content key>` is kind `request`, slug `-`, named by
 # its tail as a cadence lease is; the fetch's refspecs are unchanged, so no request record is read here.
 read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
-  local pol="$1" d rc lf qr alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local pol="$1" d rc lf qr alive=1 nask ngot thr now fd="" _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
   # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
   # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
@@ -2558,25 +2559,71 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     END { flush(); for (j = 1; j <= nr; j++) if (!(old[j] && (who[j] in lb))) { print row[j]; print tip[j] > ENVIRON["CL_TIPS"] } }' "$d/refs" >"$d/rows"
   if [ -s "$d/rows" ]; then
     read_lease_bound expiry >/dev/null || LB_VALUE=""
-    GIT log --first-parent --format='%x01%H %P%n%B' --stdin <"$d/tips" >"$d/log" 2>/dev/null || alive=0
-    # THE WALK (S2): two `ref TAB commit` pairs per row, its tip then its renewing beat, and one line
-    # per row saying whether that beat carries `renews: -`, the row's own tip standing for both where
-    # the log does not hold it.
-    CL_LOG="$d/log" CL_NEVER="$d/never" CL_BEATS="$d/beats" awk -F'\t' -v OFS='\t' '
-      BEGIN { while ((getline l < ENVIRON["CL_LOG"]) > 0) {
-                sub(/\r$/, "", l)
-                if (substr(l, 1, 1) == "\001") { split(substr(l, 2), h, " "); c = h[1]; par[c] = h[2]; ep[c] = 0; continue }
-                if (c == "") continue
-                if (l ~ /^epoch: / && !((c, "e") in got)) { got[c, "e"] = 1; ep[c] = substr(l, 8) + 0 }
-                else if (l ~ /^renews: / && !(c in rn)) rn[c] = substr(l, 9) } }
-      { b = ""; o = $4; c = $4
-        if ($10 == 1 && (c in ep)) {
-          e = ep[c]
-          while (c != "" && (c in ep) && ep[c] == e) { o = c; if (!(c in rn) || rn[c] == "yes") { b = c; break }; c = par[c] }
+    thr=""
+    if [ -n "$LB_VALUE" ]; then printf -v now '%(%s)T' -1; TZ=UTC printf -v thr '%(%Y-%m-%dT%H:%M:%SZ)T' "$((now - LB_VALUE))"; fi
+    # THE WALK (S2), BOUNDED (TOOL-dPlacedRequest-34 S43): ONE streaming `git log --first-parent` over
+    # every row's tip, piped to an `awk` that walks each row from its tip and stops it, in this order, at
+    # its RENEWING BEAT (a commit of the tip's epoch whose `renews` is `yes` or absent), at its TENURE'S
+    # START (the first commit of another epoch ends it, the oldest commit read inside it standing for the
+    # beat), or at a commit the feed first sighted before `thr`, now less `leases.expiry-hours`, which
+    # makes the row `stale` whatever lies further back and stands for the beat. A row whose chain ends
+    # first takes its oldest commit read. The `awk` exits once every row is resolved, and `git log` stops
+    # on the closed pipe, so a read costs each lease's commits sighted inside the bound, not its history.
+    # In one first-parent chain `git log` names a child before its parent whatever the dates; a commit
+    # reached out of that order is held and read when its child is. The sighting is `read_first_seen`'s
+    # rule, the oldest well-formed feed line of the ref and commit, applied in place because its answer
+    # has to come back inside the stream; an unsighted commit never stops a row. A `\002` line carries
+    # git's exit, so a log that failed before every row resolved reads every age `-`, as before. It
+    # prints two `ref TAB commit` pairs per row, its tip then its beat, and one line per row saying
+    # whether that beat carries `renews: -`, the row's own tip standing for both where the log does not
+    # hold it. WHAT THIS DOES NOT CHECK: a sighting older than its parent's, which only a feed edited
+    # by hand holds, and which stops the row early at that commit.
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    [ -z "${GOVFEED_DIR%$'\r'}" ] || fd="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+    { GIT log --first-parent --format='%x01%H %P%n%B' --stdin <"$d/tips" 2>/dev/null; printf '\002%s\n' "$?"; } 2>/dev/null \
+      | CL_ROWS="$d/rows" CL_FEED="$fd" CL_NEVER="$d/never" CL_BEATS="$d/beats" CL_PAIRS="$d/pairs" CL_WALK="$d/walk" \
+        awk -v thr="$thr" '
+      function stop(i, b) { if (i in bt) return; bt[i] = b; nd++ }
+      function step(i, c) {
+        while (1) {
+          if (!(c in kn)) { wt[c] = wt[c] " " i; return }
+          if (!(i in te)) te[i] = ep[c]
+          if (ep[c] == te[i] && (!(c in rn) || rn[c] == "yes")) { stop(i, c); return }
+          if (ep[c] != te[i]) { stop(i, od[i]); return }
+          if (thr != "" && ((rf[i], c) in seen) && seen[rf[i], c] < thr) { stop(i, c); return }
+          od[i] = c; c = par[c]
+          if (c == "") { stop(i, od[i]); return }
         }
-        if (b == "") b = o
-        print $11, $4; print $11, b
-        print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"]; print b > ENVIRON["CL_BEATS"] }' "$d/rows" | read_first_seen >"$d/seen"
+      }
+      function read_commit(  n, w, j) {
+        if (cc == "") return
+        kn[cc] = 1; par[cc] = cp; ep[cc] = ce + 0; if (cr != "\001") rn[cc] = cr
+        w = wt[cc]; delete wt[cc]; n = split(w, ws, " ")
+        for (j = 1; j <= n; j++) step(ws[j] + 0, cc)
+        cc = ""
+      }
+      BEGIN { while ((getline l < ENVIRON["CL_ROWS"]) > 0) {
+                sub(/\r$/, "", l); split(l, f, "\t"); nr++; tp[nr] = f[4]; rf[nr] = f[11]; od[nr] = f[4]; want[f[11]] = 1
+                if (f[10] != 1) stop(nr, f[4]); else wt[f[4]] = wt[f[4]] " " nr }
+              if (ENVIRON["CL_FEED"] != "") while ((getline l < ENVIRON["CL_FEED"]) > 0) {
+                sub(/\r$/, "", l)
+                if (split(l, x, "\t") != 6 || !(x[2] in want) || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+                if (!((x[2], x[5]) in seen)) seen[x[2], x[5]] = x[6] }
+              if (nd == nr) exit }
+      { sub(/\r$/, "") }
+      substr($0, 1, 1) == "\001" { read_commit(); if (nd == nr) exit
+                                   split(substr($0, 2), h, " "); cc = h[1]; cp = h[2]; ce = 0; ge = 0; cr = "\001"; next }
+      substr($0, 1, 1) == "\002" { read_commit(); rc = substr($0, 2); next }
+      cc == "" { next }
+      /^epoch: / && !ge { ge = 1; ce = substr($0, 8) + 0; next }
+      /^renews: / && cr == "\001" { cr = substr($0, 9) }
+      END { read_commit()
+            print ((nd == nr || rc == "0") ? "ok" : "dead") > ENVIRON["CL_WALK"]
+            for (i = 1; i <= nr; i++) { b = (i in bt) ? bt[i] : od[i]
+              print rf[i] "\t" tp[i] > ENVIRON["CL_PAIRS"]; print rf[i] "\t" b > ENVIRON["CL_PAIRS"]
+              print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"]; print b > ENVIRON["CL_BEATS"] } }'
+    [ "$(cat "$d/walk" 2>/dev/null)" = ok ] || alive=0
+    read_first_seen <"$d/pairs" >"$d/seen"
     awk 'BEGIN { print "now" } $0 != "-"' "$d/seen" >"$d/stamps"
     date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
     nask=$(grep -c '' "$d/stamps"); ngot=$(grep -c '' "$d/ages")

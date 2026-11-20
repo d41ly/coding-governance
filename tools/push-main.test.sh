@@ -1676,6 +1676,13 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
   g42="$rc42 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && echo main) $([ "$b42" != "$tip42" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$b42^")" = "$tip42" ] && echo beat) $(git --git-dir="$FX/o.git" log -1 --format=%B "$b42" | sed -n 's/^renews: //p') $(grep -c "refs/gov/leases/fx/build.*$b42" "$FX/a/.git/gov-feed.log" 2>/dev/null)"
   [ "$g42" = "0 main beat no 1" ] && ok "42 a fenced landing pushes the branch and a beat parented on the tip read, renews: no, one feed event" \
     || bad "42 the fenced landing did not move the branch and the lease together, or the feed missed the beat: [$g42] $out42"
+  # 42b — TOOL-dPlacedRequest-34 AC6 (S6): the landing's beat is clone A's cache ref, so its feed checks
+  #       clean. Staged against `add_feed_event` alone in the lander's fenced push: the cache stays on
+  #       the tip the fence read, and `--feed check` exits 1 printing `extra` for the beat.
+  c42=$(git -C "$FX/a" rev-parse -q --verify refs/gov/remote/leases/fx/build)
+  f42=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --feed check 2>&1); fr42=$?
+  [ -n "$b42" ] && [ "$c42 $fr42" = "$b42 0" ] && ok "42b the fenced landing sets the cache ref to its beat and the feed checks clean" \
+    || bad "42b the cache ref does not name the landed beat, or the feed check refused: [$c42 $fr42, beat $b42] $f42"
   # 43 — AC2: clone B takes the lease over inside A's hook, after the fence read; A's atomic push lands
   #      nothing and the lander exits 1 naming `fenced`, the branch unchanged and the lease B's.
   git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"

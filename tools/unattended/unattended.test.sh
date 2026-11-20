@@ -19232,8 +19232,8 @@ read_clock_row() { # [driver] -> `verdict age` of the tOc row `--claims` prints
 }
 oc_copy=$(mktemp -d); cp "$HERE/lib-unattended.sh" "$oc_copy/"
 oc_src=$(<"$SCRIPT")
-oc_cut='| read_first_seen >"$d/seen"'
-oc_beat='| cat >/dev/null; cut -f9 "$d/rows" | sed p >"$d/seen"'
+oc_cut='read_first_seen <"$d/pairs" >"$d/seen"'
+oc_beat='cut -f9 "$d/rows" | sed p >"$d/seen"'
 printf '%s\n' "${oc_src/"$oc_cut"/"$oc_beat"}" >"$oc_copy/beat-utc.sh"
 oc_cut='  add_feed_sightings refs/gov/remote/'
 oc_beat="$oc_cut"$'\n''  rm -f "$GOVFEED_DIR/gov-feed.log"'
@@ -19358,10 +19358,10 @@ if in_shard 8; then
 # holder's. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a
 # holder re-taking its own lease at a higher epoch, which opens a tenure like any take.
 # ==================================================================================================
-tn_cut='while (c != "" && (c in ep) && ep[c] == e)'
-tn_red='while (c != "" && (c in ep))'
+tn_cut='if (ep[c] != te[i]) { stop(i, od[i]); return }'
+tn_red='if (0) { stop(i, od[i]); return }'
 printf '%s\n' "${oc_src/"$tn_cut"/"$tn_red"}" >"$oc_copy/cross.sh"
-same "DPR26 the scratch copy carries its one staged walk" "$(grep -c 'while (c != "" && (c in ep)) {' "$oc_copy/cross.sh")" "1"
+same "DPR26 the scratch copy carries its one staged walk" "$(grep -cF 'if (0) { stop(i, od[i]); return }' "$oc_copy/cross.sh")" "1"
 # ---- AC1: an epoch-1 renewal first seen 25 h ago under an epoch-2 take-over `renews: no` first seen a
 # ---- minute ago reads live, and a third session's take-over is refused live-holder.
 remove_clock_refs

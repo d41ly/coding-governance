@@ -1808,12 +1808,15 @@ The tool is `probe.py` in the loop kit, run in your repository, one verb per ite
   the probe and writes a `probe-trigger` record in the build's `build/` folder, or,
   given a request's content key before any build folder exists, `<key>.probe-trigger.md` beside the
   request's text in your git directory's `requests/` store, which is never pushed. A second
-  observation of the same request joins its probe and prints `probe — joined`. A refused cause writes
+  observation of the same request joins its open probe and prints `probe — joined`; once that probe
+  has returned, a later trigger opens the next one, `<key>.probe-trigger-2.md` with its probe
+  `<key>.probe-2.md`, and the returned verdict is never written over. A refused cause writes
   nothing and prints `probe — not opened · <key>: <why> · to <asker>`.
 - **`pin`**, `probe.py pin --trigger <record> --sha <commit> --kind verification|reproduction|experiment
   --question <text> --losing <text>`, writes the `probe` record's head, the commit, the kind, the question and the losing
   outcome, before anything runs, and commits it alone as `probe pin(<asker>): <kind>`; a request's
-  head stays in the store. A commit that does not resolve exits 2. An experiment routes to the owner
+  head stays in the store, uncommitted, so its git blob is written to the trigger record as `Head`,
+  and `run` refuses, exit 2, a head edited since. A commit that does not resolve exits 2. An experiment routes to the owner
   item naming dBoundRoles, which builds its shape.
 - **`design`**, `probe.py design --probe <record> --cmd <command> --expect <exit>:<hash>`, with `--mark
   visual` or `--mark "judge claimed"`, appends one `- method · <exit>:<hash> · <command>` entry to the record's `## Method`

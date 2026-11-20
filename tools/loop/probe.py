@@ -28,14 +28,17 @@ writes nothing and prints `probe — not opened · <key>: <why> · to <asker>`, 
 `--unit` it writes the `probe-trigger` record through the memory-tree kit's `write_record`, and a trigger
 whose cause, asker, subject and position a record of the build holds already exits 1, so a retry opens
 nothing twice; `--build` without `--unit` exits 2. With `--request <content key>` it writes `<key>.probe-trigger.md` beside the
-request's local text in `<git-common-dir>/requests/`, minting no id: a request holds one entry-time probe,
-so a trigger for a key whose probe is open with a new subject joins it, adding its `Subject` line and
-printing `probe — joined`, and the same subject again, or a probe already returned, exits 1.
+request's local text in `<git-common-dir>/requests/`, minting no id: a request holds one OPEN entry-time
+probe, so a trigger for a key whose probe is open with a new subject joins it, adding its `Subject` line and
+printing `probe — joined`, and the same subject again exits 1. A trigger after the newest probe returned
+opens the next, `<key>.probe-trigger-2.md` and so on, its probe `<key>.probe-2.md`, so no verdict is ever
+written over (TOOL-dPlacedRequest-34 S47).
 
 THE HEAD. `pin` reads the trigger record, resolves `--sha` to its commit (exit 2 where it names none) and
 writes the `probe` record's head, `Sha`, `Kind`, `Question`, `Losing`, `Asker` and `Trigger`, before any
 command runs: a build-folder record is committed alone, subject `probe pin(<asker>): <kind>`, and an
-entry-time head is written as `<key>.probe.md` in the requests store, committed nowhere. A verification or
+entry-time head is written as `<key>.probe.md` in the requests store, committed nowhere, its git blob
+recorded as the trigger record's `Head` before `run`, which refuses, exit 2, a head whose blob moved. A verification or
 a reproduction routes to `item.probe.design`, an experiment to `item.probe.experiment`, whose stand-in
 prints the owner item naming dBoundRoles and `probe.experiment.authority` with its value, the experiment
 shape being unbuilt.
@@ -71,7 +74,8 @@ case through `loop_lib.run_selftest_cases`, the `loop probe fixtures` leg.
 WHAT THIS DOES NOT CHECK: that a method's command tests what the question asks, or that its prediction was
 made before the output was seen beyond the freeze at the first run line; that the asker names an item a
 loop declares; that a request key names a stored request; a claimed judgment's truth, which is held as
-claimed and goes to the owner, never to a gate. No probe verdict feeds a landing.
+claimed and goes to the owner, never to a gate; an entry-time head edited together with its trigger's
+`Head`, which no file in a store nothing commits can hold against. No probe verdict feeds a landing.
 """
 import argparse
 import pathlib
@@ -115,8 +119,10 @@ PLANTS = {"trigger-causes": "a cause outside the rows, a build trigger with its 
                                  "opened",
           "observation-on-request": "probe.observations=on-request: an observation refused at both positions, the "
                                     "owner's probe opened",
-          "pin": "a verification pinned and committed alone, an unresolvable sha refused, an entry-time head stored",
-          "entry-time": "a request's trigger beside its text, a second subject joined, the first again refused",
+          "pin": "a verification pinned and committed alone, an unresolvable sha refused, an entry-time head stored "
+                 "with its blob in the trigger",
+          "entry-time": "a request's trigger beside its text, a second subject joined, the first again refused, "
+                        "then its head pinned and edited before run: run refused naming it",
           "run-judge": "a reproduction predicting the planted failure: run, judge and return confirm it",
           "run-refuted": "a reproduction whose prediction differs: refuted",
           "visual": "a method entry marked visual: nothing run, unrunnable, the owner item",
@@ -125,7 +131,7 @@ PLANTS = {"trigger-causes": "a cause outside the rows, a build trigger with its 
           "verdict-cross": "a reproduction's record carrying measured: read refuses its Verdict",
           "design": "two entries appended, each refusal writing nothing, and a frozen record refused",
           "refusals": "each verb's other refusals: a bad flag, a retried verb, a verb out of order, an experiment "
-                      "run, and a returned request probe",
+                      "run, and a returned request probe triggered again, opening <key>.probe-2.md beside its verdict",
           "record-malformed": "a bad Sha, a verdict beside a claimed judgment, a verdict with no Judged, a bad "
                               "method line, a bad run line and a trigger's bad Asker, each read malformed"}
 
@@ -258,16 +264,55 @@ def write_request_record(path, head, fields):
         fh.write("\n".join([head, ""] + ["- **%s:** %s" % kv for kv in fields]) + "\n")
 
 
+def derive_request_probe_paths(store, key, n):
+    """`(trigger, probe)`, the paths of request `key`'s `n`-th entry-time probe in the requests `store`:
+    `<key>.probe-trigger.md` and `<key>.probe.md` for the first, `<key>.probe-trigger-<n>.md` and
+    `<key>.probe-<n>.md` for each later one (TOOL-dPlacedRequest-34 S47)."""
+    tail = "" if n == 1 else "-%d" % n
+    return store / ("%s.probe-trigger%s.md" % (key, tail)), store / ("%s.probe%s.md" % (key, tail))
+
+
+def read_head_blob(root, text):
+    """The git blob id of an entry-time probe record's HEAD, the bytes `pin` wrote: `text` up to its
+    `## Method` section, LF line ends, read by `git hash-object` in `root`. ProbeRefused where git does not
+    answer."""
+    head = text.replace("\r\n", "\n").split("\n\n## Method\n", 1)[0].rstrip("\n") + "\n"
+    p = subprocess.run(["git", "-C", str(root), "hash-object", "--stdin"], input=head.encode("utf-8"),
+                       capture_output=True, env=read_clean_env())
+    blob = p.stdout.decode("utf-8", "replace").strip()
+    if p.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40,64}", blob):
+        raise ProbeRefused("git hash-object did not answer for the probe's head: %s" % (
+            p.stderr.decode("utf-8", "replace").strip() or "exit %d" % p.returncode))
+    return blob
+
+
+def check_probe_head(path, record, root, store):
+    """None where `path` is no entry-time record or its head is the one `pin` recorded; ProbeRefused naming
+    the record where the trigger holds no `Head` or the head's blob moved since (TOOL-dPlacedRequest-34 S47)."""
+    if path.parent != store.resolve():
+        return
+    trigger = store / ("%s.md" % record.get("Trigger", ""))
+    pinned = dict(read_record_fields(trigger)[1]).get("Head") if trigger.is_file() else None
+    if not pinned:
+        raise ProbeRefused("%s has no head blob recorded in its trigger %s, so its pin cannot be checked" % (
+            path.as_posix(), trigger.name))
+    now = read_head_blob(root, read_record_fields(path)[0])
+    if now != pinned:
+        raise ProbeRefused("%s: the head moved since pin, blob %s pinned and %s now, so nothing ran" % (
+            path.as_posix(), pinned[:12], now[:12]))
+
+
 def resolve_probe_path(arg, root, store, kind):
     """`(path, (build, unit) or None)` of a `kind` record named `arg`: a build-folder record by the factory's
-    name grammar, its build and unit, or an entry-time `<key>.<kind>.md` in the requests `store`, None.
-    ProbeRefused for any other path or one that does not exist."""
+    name grammar, its build and unit, or an entry-time `<key>.<kind>.md` or `<key>.<kind>-<n>.md` in the
+    requests `store`, None. ProbeRefused for any other path or one that does not exist."""
     br = read_build_records()
     path = pathlib.Path(arg)
     path = (path if path.is_absolute() else pathlib.Path.cwd() / path).resolve()
     if not path.is_file():
         raise ProbeRefused("%s names no %s record" % (arg, kind))
-    if path.parent == store.resolve() and re.fullmatch(r"[0-9a-f]{12}\.%s\.md" % re.escape(kind), path.name):
+    if path.parent == store.resolve() and re.fullmatch(r"[0-9a-f]{12}\.%s(?:-(?:[2-9]|[1-9][0-9]+))?\.md" % re.escape(kind),
+                                                       path.name):
         return path, None
     try:
         rel = path.relative_to(root.resolve()).as_posix()
@@ -338,13 +383,14 @@ def write_probe_trigger(args, root, store):
             raise ProbeRefused(str(e)) from None
         print("%s — opened · %s · to item.probe.pin" % (SAY, rel))
         return 0
-    path = store / ("%s.probe-trigger.md" % args.request)
+    n = 1
+    while derive_request_probe_paths(store, args.request, n + 1)[0].is_file():   # the request's newest probe
+        n += 1
+    path, probe = derive_request_probe_paths(store, args.request, n)
+    if path.is_file() and probe.is_file() and any(k == "Writer" for k, _v in read_record_fields(probe)[1]):
+        path, probe = derive_request_probe_paths(store, args.request, n + 1)   # a returned verdict stays as it is
     if path.is_file():
         _text, held = read_record_fields(path)
-        probe = store / ("%s.probe.md" % args.request)
-        if probe.is_file() and any(k == "Writer" for k, _v in read_record_fields(probe)[1]):
-            print("%s — already returned · %s · a request holds one entry-time probe" % (SAY, probe.as_posix()))
-            return 1
         if args.subject in [v for k, v in held if k == "Subject"]:
             print("%s — already opened · %s · the subject is the probe's already" % (SAY, path.as_posix()))
             return 1
@@ -379,10 +425,15 @@ def write_probe_pin(args, root, store):
               ("Asker", asker), ("Trigger", trigger)]
     title = "%s for %s" % (args.kind, asker)
     if owner is None:
-        out = store / ("%s.probe.md" % trigger[:-len(".probe-trigger")])
+        out = store / ("%s.md" % trigger.replace(".probe-trigger", ".probe", 1))
         if out.exists():
-            raise ProbeRefused("%s is pinned already: a request holds one entry-time probe" % out.as_posix(), 1)
-        write_request_record(out, "# request %s probe — %s" % (trigger[:-len(".probe-trigger")], title), fields)
+            raise ProbeRefused("%s is pinned already: a trigger holds one entry-time probe" % out.as_posix(), 1)
+        write_request_record(out, "# request %s probe — %s" % (trigger.split(".", 1)[0], title), fields)
+        try:   # the head's blob, recorded before any command runs, is what `run` holds the head to
+            write_probe_fields(path, [("Head", read_head_blob(root, read_record_fields(out)[0]))])
+        except ProbeRefused:
+            out.unlink()
+            raise
         shown = out.as_posix()
     else:
         br = read_build_records()
@@ -457,6 +508,7 @@ def run_probe_rerun(args, root, store):
         raise ProbeRefused("%s is run already" % shown, 1)
     if not record["method"]:
         raise ProbeRefused("%s holds no method entry to run" % shown)
+    check_probe_head(path, record, root, store)
     if record["Kind"] == "experiment":
         print(read_experiment_line(shown, root))
         return 1
@@ -717,6 +769,10 @@ def check_probe_plant(case, root, seen, bad):
         stored = store / ("%s.probe.md" % FX_KEY)
         if not stored.is_file() or "- **Losing:** the route stays" not in stored.read_text(encoding="utf-8"):
             bad.append("the entry-time head is not %s holding Losing" % stored.as_posix())
+        pinned = dict(read_record_fields(entry)[1]).get("Head") if entry else None
+        seen.append("head blob %s" % (pinned or "none")[:12])
+        if stored.is_file() and pinned != read_head_blob(root, stored.read_text(encoding="utf-8")):
+            bad.append("the trigger's Head %s is not the blob of the stored head" % pinned)
         if run_probe_git(root, "rev-parse", "HEAD") != head:
             bad.append("the entry-time pin moved HEAD")
     elif case == "entry-time":   # AC8
@@ -732,6 +788,20 @@ def check_probe_plant(case, root, seen, bad):
         if text.count("- **Subject:** ") != 2:
             bad.append("the record holds %d Subject lines, not 2" % text.count("- **Subject:** "))
         check_case_line("first again", run_trigger_case("observation", "--request", FX_KEY, "--at", FX_ASKER), 1, "already opened")
+        # TOOL-dPlacedRequest-34 AC47: the head edited between pin and run is refused, the record unrun.
+        stored = read_opened_path(check_case_line("pin", run_probe_command(
+            root, "pin", "--trigger", str(rel), "--sha", "HEAD", "--kind", "verification", "--question", "q",
+            "--losing", "the route stays"), 0, "probe — pinned", "%s.probe.md" % FX_KEY))
+        if stored:
+            check_case_line("design", run_probe_command(root, "design", "--probe", str(stored), "--cmd", FX_CMD,
+                                                        "--expect", "1:9c0e5a1b2f33"), 0, "probe — designed")
+            text = stored.read_text(encoding="utf-8")
+            stored.write_text(text.replace("- **Losing:** the route stays", "- **Losing:** the route goes"),
+                              encoding="utf-8", newline="\n")
+            check_case_line("edited head", run_probe_command(root, "run", "--probe", str(stored)), 2,
+                            "the head moved since pin", stored.name)
+            if "run ·" in stored.read_text(encoding="utf-8"):
+                bad.append("a run over an edited head wrote a run line")
     elif case in ("run-judge", "run-refuted"):   # AC5, AC7
         head = run_probe_git(root, "rev-parse", "HEAD")
         prediction = "1:000000000000"
@@ -874,8 +944,15 @@ def check_probe_plant(case, root, seen, bad):
         for argv in (["design", "--probe", str(stored), *cmd, "--mark", "visual"], ["run", "--probe", str(stored)],
                      ["return", "--probe", str(stored)]):
             check_case_line(argv[0], run_probe_command(root, *argv), 0, "probe — ")
-        check_case_line("entry returned", run_trigger_case("reproduction", "--request", FX_KEY, subject="another"), 1,
-                        "already returned")
+        # TOOL-dPlacedRequest-34 AC47: a trigger after the probe returned opens the next, never over the verdict.
+        held = stored.read_bytes() if stored else b""
+        again = read_opened_path(check_case_line("entry returned", run_trigger_case(
+            "reproduction", "--request", FX_KEY, subject="another"), 0, "probe — opened",
+            "%s.probe-trigger-2.md" % FX_KEY))
+        check_case_line("second pin", run_probe_command(root, *pin, "--trigger", str(again)), 0, "probe — pinned",
+                        "%s.probe-2.md" % FX_KEY)
+        if not (store / ("%s.probe-2.md" % FX_KEY)).is_file() or not stored or stored.read_bytes() != held:
+            bad.append("the second probe is not %s.probe-2.md beside the first's unchanged verdict" % FX_KEY)
     elif case == "record-malformed":
         probe = write_pinned_probe("reproduction")
         text = probe.read_text(encoding="utf-8")

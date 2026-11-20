@@ -404,6 +404,41 @@ case "$msg" in
   *) bad "9b the runner did not run, so the control grades nothing: ${msg:-<no output>}" ;;
 esac
 
+# case 9c — THE CLAIM FAST PATH ADMITS A PARENTED BEAT (TOOL-dPlacedRequest-34 AC24, AC25). A commit over
+#           the empty tree parented on another such commit, an unattended run's claim beat, is pushed
+#           alone to a non-default ref, the hook driven directly as in case 9 with a stub
+#           `straggler-guard.sh` beside it that prints a marker when sourced. The live hook prints no
+#           marker; a commit carrying a file prints it, the control that the stub is reachable at all;
+#           and a copy staged back to the base predicate, a parent `missing` and nothing else, prints it
+#           for the beat, so the two predicates are seen to differ. RED is the parented shape taking the
+#           slow path. WHAT THIS DOES NOT CHECK: the library's own setup, which the stub stands in for.
+c9c_z=0000000000000000000000000000000000000000
+c9c_t=$(git hash-object -w -t tree --stdin </dev/null)
+c9c_0=$(git commit-tree "$c9c_t" -m "gov-claim fx/build")
+c9c_1=$(git commit-tree "$c9c_t" -p "$c9c_0" -m "gov-claim fx/build")
+c9c_b=$(printf 'x\n' | git hash-object -w --stdin)
+c9c_f=$(git commit-tree "$(printf '100644 blob %s\tc9c.txt\n' "$c9c_b" | git mktree)" -m c9c-file)
+for c9c_d in live base; do
+  mkdir -p "$tmp/c9c-$c9c_d"
+  cp "$tmp/hooks/pre-push" "$tmp/c9c-$c9c_d/pre-push"
+  printf '%s\n' 'echo "STRAGGLER-GUARD-SOURCED"' > "$tmp/c9c-$c9c_d/straggler-guard.sh"
+done
+sed 's/ || \[ "\${_sg_rows\[_sg_i + 2\]}" = "tree 0" \]//' "$tmp/hooks/pre-push" > "$tmp/c9c-base/pre-push"
+run_c9c() { # hook dir · sha -> the hook's output for one push of that sha to refs/gov/leases/fx/build
+  GOV_GATE_CMD="bash $green" bash "$tmp/c9c-$1/pre-push" origin "$tmp/remote.git" \
+    <<<"refs/gov/leases/fx/build $2 refs/gov/leases/fx/build $c9c_z" 2>&1
+}
+if cmp -s "$tmp/hooks/pre-push" "$tmp/c9c-base/pre-push"; then
+  bad "9c the staged base predicate changed nothing, so the hook no longer spells the parented test this arm stages away"
+else
+  case "$(run_c9c live "$c9c_1")" in *STRAGGLER-GUARD-SOURCED*) bad "9c AC24 a parented claim beat pushed alone took the slow path, the straggler layer sourced" ;;
+    *) ok "9c AC24 a parented claim beat pushed alone sources no straggler-guard.sh" ;; esac
+  case "$(run_c9c live "$c9c_f")" in *STRAGGLER-GUARD-SOURCED*) ok "9c control — a commit carrying a file sources the stub" ;;
+    *) bad "9c control — a commit carrying a file did not source the stub, so the marker grades nothing" ;; esac
+  case "$(run_c9c base "$c9c_1")" in *STRAGGLER-GUARD-SOURCED*) ok "9c AC25 the base predicate sends the same beat down the slow path" ;;
+    *) bad "9c AC25 the base predicate also skipped the parented beat, so the two predicates read alike" ;; esac
+fi
+
 # ============================================================================================
 # THE BOUNDARY DECIDES. One arm per forcing predicate, plus the one that matters most: the arm
 # proving a scoped run is EVER chosen. Without it every predicate below is satisfied by a hook

@@ -834,6 +834,20 @@ print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe")
   || bad "the JS resolveBash order left the one TOOL-dGroundRules-81 states: $rb_js"; ok
 [ "$rb_py" = "GB;F/D1/$RB_B;$RB_TAIL" ] \
   || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
+# TOOL-dPlacedRequest-34 S28 (AC28): the hooks kit's readCard finds its bash through resolveCardBash, a
+# third port of the same order; with its spawn stubbed over the same two directories it lists what it
+# tried for the checker it is handed, and that list is the JS port's. Staged by a reorder of
+# resolveCardBash's candidates, it differs. WHAT THIS DOES NOT CHECK: the `test -f` each candidate runs,
+# which the hooks kit's own suite drives with a stub bash first on PATH.
+SG_HOOKS_DIR=$(resolve_kit_dir "$REALPY" hooks scratch-guard.js "$HERE") || exit 2
+rb_sg=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
+const cp = require("child_process"), path = require("path");
+const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = [];
+cp.spawnSync = (c) => (tried.push(c), { status: 1 });
+require(process.argv[1]).readCard(path.join(process.cwd(), ".git"), "s1", "x");
+console.log(tried.map((c) => c.split(root).join("F").split(path.sep).join("/")).join(";"));' "$ROOT/$SG_HOOKS_DIR/scratch-guard.js" 2>&1)
+[ "$rb_sg" = "GB;F/D1/$RB_B;F/D2/$RB_B;$RB_TAIL" ] \
+  || bad "readCard's resolveCardBash order left the canonical resolve_bash order the JS port holds: $rb_sg"; ok
 
 # ---- 2k. THE JS KIT RESOLVER PORT, BEHAVIOUR (TOOL-dFairHearing-32 S26) -----------------------------
 # The hooks kit's agent-cap.js and the review kit's spec-audit-optin.js each carry `resolveKitDir`, a JS

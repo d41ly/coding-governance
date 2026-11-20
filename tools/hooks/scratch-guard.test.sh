@@ -1745,6 +1745,35 @@ if grep -q "'--card', '--path'" "$HOOK" && [ "$(grep -c "'orientation', sid" "$H
   echo "ok   AC10 the hook asks --card --path and joins no card path of its own"; pass=$((pass+1))
 else echo "FAIL AC10 the hook asks --card --path and joins no card path of its own"; fail=$((fail+1)); fi
 
+# ---- TOOL-dPlacedRequest-34 AC28 (S28): readCard RUNS each bash candidate, and folds an MSYS answer ----
+# (i) A stub bash FIRST on PATH that cannot run the checker, a non-running bash.exe on Windows and a bash
+# exiting 1 elsewhere, is passed over, and the PATH bash after it reads the card the checker answers.
+# (ii) On Windows, a checker printing the card's `/c/…` spelling is read at its `C:/` path, the bash
+# given as GOV_BASH and nothing but node's directory on PATH, so no cygpath can answer and only the fold
+# turns the path native. Staged against a bare `bash` and an existence-only resolver, (i) reds, the stub
+# answering or chosen; staged against no fold, (ii) reds, `/c/…` naming no file. WHAT THIS DOES NOT
+# CHECK: (ii) off Windows, where no drive spelling exists to fold, which prints one skip line naming it;
+# the Git for Windows defaults after PATH, which a host with a working PATH bash never reaches.
+sg_sb="$TMP/stubbash"; mkdir -p "$sg_sb"
+sg_node=$(command -v node)
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) sg_win=1; printf 'not a program\n' > "$sg_sb/bash.exe" ;;
+  *) sg_win=""; printf '#!/bin/sh\nexit 1\n' > "$sg_sb/bash"; chmod +x "$sg_sb/bash" ;;
+esac
+sg_got=$(env -u GOV_BASH PATH="$sg_sb:$PATH" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim())' "$HOOK" "$SGFIX/.git" "$sg_cc/answers.sh" 2>&1)
+[ "$sg_got" = "card — the stub card" ] && { echo "ok   AC28 a bash first on PATH that cannot run the checker is passed over, and the card is read"; pass=$((pass+1)); } \
+  || { echo "FAIL AC28 a bash first on PATH that cannot run the checker is passed over, and the card is read: $sg_got"; fail=$((fail+1)); }
+if [ -n "$sg_win" ]; then
+  sg_cm=$(cygpath -m "$sg_cc/stub-card.md")
+  sg_cu="/$(printf '%s' "${sg_cm:0:1}" | tr 'A-Z' 'a-z')${sg_cm:2}"
+  printf '%s\n' '#!/usr/bin/env bash' "printf '%s\\n' '$sg_cu'" > "$sg_cc/answers-msys.sh"
+  sg_got=$(GOV_BASH="$(cygpath -m "$(command -v bash)")" PATH="$(dirname "$sg_node")" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim() + " · " + (/^[A-Za-z]:\//.test(c.path) ? "native" : "as printed " + c.path))' "$HOOK" "$SGFIX/.git" "$sg_cc/answers-msys.sh" 2>&1)
+  [ "$sg_got" = "card — the stub card · native" ] && { echo "ok   AC28 a checker printing $sg_cu is read at its native path"; pass=$((pass+1)); } \
+    || { echo "FAIL AC28 a checker printing an MSYS /c/ path is read at its native path $sg_cm: $sg_got"; fail=$((fail+1)); }
+else
+  echo "  skip — AC28 (ii) the MSYS /c/ fold: this host is not Windows, so no drive spelling exists to fold and nothing was read"
+fi
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
