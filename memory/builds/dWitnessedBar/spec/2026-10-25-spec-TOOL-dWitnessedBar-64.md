@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-64 — the seed reads HEAD as unborn only when it names a branch that does not exist, so a HEAD git cannot resolve takes the no-HEAD path
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md) | research | TOOL-dWitnessedBar-65 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-64-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-64-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md) | research | TOOL-dWitnessedBar-65 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-64-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-64-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-64-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-64-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-64-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-64-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-65 |
