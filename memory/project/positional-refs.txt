@@ -25717,19 +25717,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:11866-11869
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:12762
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:3975-4041
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	skills/session-kickoff/manifest-check.sh:648
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-python.test.sh:218
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-remote.sh:3-7
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/push-main.sh:514-516
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2165
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2335-2350
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:514-526
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:516
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:880
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md	tools/unattended/unattended.test.sh:6098
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M6
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M8

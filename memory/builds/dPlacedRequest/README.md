@@ -147,10 +147,10 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it](spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md) | 25 | 2 | CLOSED | rev-6 | 2026-11-20 |
 | [TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail](spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md) | 26 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dPlacedRequest-51 — the prepared-merge shape table splits the first-parent walk by `--no-merges`](spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md) | 26 | 2 | CLOSED | rev-3 | 2026-11-20 |
-| [TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md) | 27 | 2 | DEFERRED | rev-9 | 2026-11-19 |
-| [TOOL-dPlacedRequest-53 — unit 52's "named twice" criteria count occurrences, never lines of squeezed text](spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-25 |
-| [TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge](spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md) | 28 | 2 | DEFERRED | rev-5 | 2026-10-25 |
-| [TOOL-dPlacedRequest-55 — the version oracle's verdict reads its walk's own exit status](spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-25 |
+| [TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md) | 27 | 2 | DEFERRED | rev-10 | 2026-11-20 |
+| [TOOL-dPlacedRequest-53 — unit 52's "named twice" criteria count occurrences, never lines of squeezed text](spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md) | 28 | 2 | DEFERRED | rev-3 | 2026-11-20 |
+| [TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge](spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md) | 28 | 2 | DEFERRED | rev-6 | 2026-11-20 |
+| [TOOL-dPlacedRequest-55 — the version oracle's verdict reads its walk's own exit status](spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md) | 28 | 2 | DEFERRED | rev-3 | 2026-11-20 |
 | [TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md) | 29 | 2 | DEFERRED | rev-7 | 2026-11-19 |
 | [TOOL-dPlacedRequest-57 — the version oracle's base is the observing run's own pinned BASE, never a sha a spec pins](spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md) | 29 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dPlacedRequest-58 — every attempt of the placed race starts with no handshake file an earlier attempt left](spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md) | 30 | 2 | DEFERRED | rev-4 | 2026-11-19 |
@@ -162,7 +162,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-3 | 2026-11-19 |
 <!-- /gen:build-units -->
 
-Records: 287 bound to this build, across 4 record folder(s).
+Records: 289 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -172,8 +172,8 @@ Ids whose spec moved past its audited revision: TOOL-dPlacedRequest-10@rev-3 TOO
 TOOL-dPlacedRequest-19@rev-4 TOOL-dPlacedRequest-2@rev-7 TOOL-dPlacedRequest-21@rev-6 TOOL-dPlacedRequest-23@rev-2 TOOL-dPlacedRequest-24@rev-5 TOOL-dPlacedRequest-25@rev-2 TOOL-dPlacedRequest-26@rev-2 TOOL-dPlacedRequest-27@rev-1 TOOL-dPlacedRequest-28@rev-2 TOOL-dPlacedRequest-29@rev-2
 TOOL-dPlacedRequest-3@rev-5 TOOL-dPlacedRequest-30@rev-4 TOOL-dPlacedRequest-31@rev-3 TOOL-dPlacedRequest-32@rev-3 TOOL-dPlacedRequest-33@rev-6 TOOL-dPlacedRequest-34@rev-12 TOOL-dPlacedRequest-35@rev-2 TOOL-dPlacedRequest-36@rev-4 TOOL-dPlacedRequest-37@rev-4 TOOL-dPlacedRequest-38@rev-4
 TOOL-dPlacedRequest-39@rev-3 TOOL-dPlacedRequest-4@rev-5 TOOL-dPlacedRequest-40@rev-2 TOOL-dPlacedRequest-41@rev-2 TOOL-dPlacedRequest-42@rev-2 TOOL-dPlacedRequest-43@rev-9 TOOL-dPlacedRequest-44@rev-8 TOOL-dPlacedRequest-45@rev-4 TOOL-dPlacedRequest-46@rev-3 TOOL-dPlacedRequest-47@rev-4
-TOOL-dPlacedRequest-48@rev-7 TOOL-dPlacedRequest-49@rev-5 TOOL-dPlacedRequest-5@rev-5 TOOL-dPlacedRequest-50@rev-3 TOOL-dPlacedRequest-51@rev-2 TOOL-dPlacedRequest-56@rev-5 TOOL-dPlacedRequest-58@rev-3 TOOL-dPlacedRequest-59@rev-4 TOOL-dPlacedRequest-6@rev-3 TOOL-dPlacedRequest-64@rev-2
-TOOL-dPlacedRequest-7@rev-5 TOOL-dPlacedRequest-8@rev-4 TOOL-dPlacedRequest-9@rev-3.
+TOOL-dPlacedRequest-48@rev-7 TOOL-dPlacedRequest-49@rev-5 TOOL-dPlacedRequest-5@rev-5 TOOL-dPlacedRequest-50@rev-3 TOOL-dPlacedRequest-51@rev-2 TOOL-dPlacedRequest-52@rev-8 TOOL-dPlacedRequest-53@rev-2 TOOL-dPlacedRequest-54@rev-5 TOOL-dPlacedRequest-55@rev-2 TOOL-dPlacedRequest-56@rev-5
+TOOL-dPlacedRequest-58@rev-3 TOOL-dPlacedRequest-59@rev-4 TOOL-dPlacedRequest-6@rev-3 TOOL-dPlacedRequest-64@rev-2 TOOL-dPlacedRequest-7@rev-5 TOOL-dPlacedRequest-8@rev-4 TOOL-dPlacedRequest-9@rev-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

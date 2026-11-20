@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief.md) | research | TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 |
 | [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
@@ -23,55 +24,59 @@
 
 The spec audit of the round-4 promotions
 (`memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md`)
-confirmed **finding 16 at HIGH**, its item **H2**, which holds no other finding.
-`TOOL-dPlacedRequest-52` S17 finds the oracle's merge by fact 1 of `check_prepared_merge` alone,
-`git rev-list --first-parent --min-parents=2 --max-count=1 HEAD` (`tools/push-main.sh:516`), and
-drops fact 2, the first-parent check against the advertised tip (`:521-526`). Every landing leaves a
-merge on the default branch's first-parent line, so on this build's branch before `--prepare` that
-command returns `c63aabbb`, dOrderedCharter's landing merge. The oracle walks its two foreign
-commits, finds no `KIT_` line and exits 0. `TOOL-dPlacedRequest-34` AC59 is read "before the lander's
-mint", so it goes green without reading one dPlacedRequest commit, and 52 AC12's fixture holds no
-merge at all, so the shape the real tree always presents is never staged. This unit repairs
-`TOOL-dPlacedRequest-52`, at order 27, so it sits at order 28: the oracle proves the merge it found
-is this build's own, and refuses with exit 2 otherwise.
+confirmed **finding 16 at HIGH**, its item **H2**, which holds no other finding. The oracle found
+its merge by fact 1 of `tools/push-main.sh#check_prepared_merge` alone,
+`git rev-list --first-parent --min-parents=2 --max-count=1 HEAD`, and dropped fact 2, the check of
+the merge's first parent against the advertised tip. Every landing leaves a merge on the default
+branch's first-parent line, so before `--prepare` that command returns another build's landing, and
+the oracle walks its commits, finds no `KIT_` line and reads a clean build without reading one commit
+of this one. This unit's fix is the own-merge test: the merge found must be this build's own, or the
+oracle refuses with exit 2.
+
+Re-grounded on 2026-11-20 against the tree at `0d700d256` by
+`2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`. Specs 44 and 34 are CLOSED,
+and the charter's P19 keeps them as built; unit 52 is DEFERRED. The oracle now has one home, the §4
+block of `TOOL-dPlacedRequest-55`, which carries this unit's test whole (that unit's F3). So no item
+here edits a spec: unit 52's text took this unit's amendments at its rev-10 (F2), the closed specs'
+text is resolved in §4 (F4), and this unit narrows to observing the test on this repository's own
+history and in the text that carries it.
 
 ## 2. Scope (IN)
 
-- **S1** — The own-merge test. The oracle takes the build's base as its one argument and refuses
-  with exit 2 in three named cases. A base that does not resolve to a commit prints `version oracle:
-  base does not resolve`. A found merge `$t` is this build's own only when its subject begins `merge:
-  dPlacedRequest — land onto ` (the `msg` `tools/push-main.sh:880` writes) and `git merge-base
-  --is-ancestor "$t" "$base"` fails; no merge, or one failing either test, prints `version oracle: no
-  prepared merge on HEAD`. The test is written into the oracle where unit 52 left it: 44 §4, and
-  52's §4 sketch, S12 and S17 are restated to it, S17's "no subject match on HEAD" kept, since the
-  subject read is `$t`'s and never HEAD's. Observed by AC1 and AC2.
-- **S2** — The foreign shapes staged. 52 AC12 gains three rows, each expecting `no prepared merge on
-  HEAD` and exit 2: another build's landing merge on HEAD's first-parent line under a plain branch
-  commit; a merge of the default branch into the build branch, whose subject is git's own; and this
-  build's earlier landing merge under a base taken after it. 52's oracle fixtures (S14, AC11, AC13,
-  AC17) write the lander's subject on their merge and pass their own base commit. Observed by AC2.
-- **S3** — The close reads the oracle where it is true. `TOOL-dPlacedRequest-34` AC59 is restated in
-  place as one line pointing at 44 AC1: the oracle run with base `c63aabbb` on the prepared merge
-  after the last `--prepare`, header line, exit 0, no `KIT_` line. 44 AC1 names the base argument.
-  Observed by AC3.
-- **S4** — One live resolution. 52 §8 F1 is amended in place to name this unit's F1 as superseding
-  its "fact-1 derivation alone" pick, and 52 and 34 each take a rev bump with its §9 line naming this
-  unit. Observed by AC4.
+- **S1** — The own-merge test, folded. The oracle takes the build's base as its one argument and
+  refuses with exit 2 when the base does not resolve, when no merge sits on HEAD's first-parent line,
+  when the merge's subject does not begin `merge: dPlacedRequest — land onto `, the `msg`
+  `tools/push-main.sh#cmd_prepare` writes, and when `git merge-base --is-ancestor "$t" "$base"`
+  succeeds. `TOOL-dPlacedRequest-55`'s §4 block carries it. Left, its observation on this
+  repository's history. Observed by AC1.
+- **S2** — The foreign shapes staged, folded. Unit 52's AC12 moved with the oracle to unit 55, and
+  that unit's AC3 stages this unit's three foreign shapes: another build's landing under a branch
+  commit, a merge of the default branch into the branch, and this slug's earlier landing under a
+  later base. Observed by AC2.
+- **S3** — The close reads the oracle on the prepared merge. Resolved in §4: spec 34's AC59 and spec
+  44's AC1 are frozen, and the close runs unit 55's block on the prepared merge with the observing
+  run's base. NOT OBSERVED here: spec text only.
+- **S4** — One live resolution, folded. Unit 52's §8 F1 names this unit's F1 as superseding its
+  "fact-1 derivation alone" pick since 52's rev-10. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
 - No fact 2 in the oracle: it reads the remote's advertised tip, which a fixture lacks and the local
-  history check does not need (52 F1's reason, kept).
-- No change to how `push-main.sh` writes or names the merge.
-- No change to the walk itself, its status or its `--` guards: `TOOL-dPlacedRequest-55` and finding
-  8's item of `TOOL-dPlacedRequest-56`.
-- No new bug-class record: the closing review's left-shift decides one (BUILD-METHOD M8).
+  history check does not need.
+- No change to how `tools/push-main.sh` writes or names the merge.
+- No change to the walk, its status or its count: unit 55's S2 and finding 8's item of
+  `TOOL-dPlacedRequest-56`.
+- No base read: `TOOL-dPlacedRequest-57` S1 spells it.
+- No edit to spec 34 or 44, each CLOSED (F4).
+- No new bug-class record: the closing review's left-shift decides one
+  (`doc.build-method#m8-closing-the-build`).
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-52` — the oracle's S12, S17, §4 sketch, AC12, its fixtures and F1, which this unit restates so the merge found must be this build's own; without them there is no derivation to correct
-- **consumes-from** `TOOL-dPlacedRequest-44` — §4's oracle and AC1, as unit 52 leaves them, which this unit gives the own-merge test and the base argument
-- **consumes-from** `TOOL-dPlacedRequest-34` — AC59, which this unit restates as one line pointing at 44 AC1 on the prepared merge
+- **consumes-from** `TOOL-dPlacedRequest-52` — the oracle's S12, S17, AC12 and F1, whose own-merge amendments this unit made in 52's text at its rev-10; without them 52 keeps a fact-1-only derivation live
+- **consumes-from** `TOOL-dPlacedRequest-44` — §4's oracle and AC1, frozen, which unit 55's block supersedes
+- **consumes-from** `TOOL-dPlacedRequest-34` — AC59, frozen, whose close-time read §4 resolves to unit 55's block
+- **hands-off** `TOOL-dPlacedRequest-55` — the own-merge test and the base argument, which that unit's §4 block carries whole and its AC3 stages
 - **hands-off** `TOOL-dPlacedRequest-56` — the own-merge test, which that unit's items for findings 13 and 14 restate across 44, and 34 AC59 cut to one line, after which its item for finding 19 measures unit 34 against its ceiling
 - **hands-off** `TOOL-dPlacedRequest-57` — S1, S3, AC1 and AC3, which that unit restates to the observing run's `base:` fact; this unit's pass runs AC1 with that fact, never a sha an earlier run pinned
 - **hands-off** `TOOL-dPlacedRequest-59` — S1, §4, §5, AC2, AC3 and Files touched, which that unit's items for findings 2, 6, 8, 10, 15, 21 and 23 amend
@@ -81,58 +86,57 @@ is this build's own, and refuses with exit 2 otherwise.
 
 ## 4. Design
 
-### The oracle's head, as this unit leaves it
+### The oracle's head, where it lives
 
-```bash
-base=$1
-git rev-parse -q --verify "$base^{commit}" >/dev/null \
-  || { echo "version oracle: base does not resolve"; exit 2; }
-t=$(git rev-list --first-parent --min-parents=2 --max-count=1 HEAD --)
-case "$(git log -1 --format=%s "${t:-HEAD}" --)" in
-  "merge: dPlacedRequest — land onto "*) own=1 ;; *) own=0 ;; esac
-if [ -z "$t" ] || [ "$own" = 0 ] || git merge-base --is-ancestor "$t" "$base"; then
-  echo "version oracle: no prepared merge on HEAD"; exit 2; fi
-r="$t^1..$t^2"
-# the rest of the oracle as units 52 and 55 leave it
-```
+The test is the head of `TOOL-dPlacedRequest-55`'s §4 block, "The oracle the close runs": the base
+check, fact 1, the subject read of `$t` (never of HEAD), and the ancestor test, ahead of the range
+`$t^1..$t^2`. This spec carries no copy, so the close runs one oracle.
 
 The ancestor test rejects every merge the build started on top of, an earlier landing of this same
 slug included. The subject test rejects a merge made on the branch after the base, which the
 ancestor test cannot see.
 
+### The folds into unit 52 (F2)
+
+Made in unit 52's text at its rev-10, once: its S12 and S17 name unit 55's block and its own-merge
+test, its AC12 moved with the oracle to unit 55's AC3, and its F1 names this unit's F1 as
+superseding. Unit 52's oracle fixtures went with them.
+
+### The closed specs' text (S3, F4)
+
+The closing mechanism is P19: a CLOSED spec is a frozen record. Spec 34's AC59 keeps the form its
+acceptance ledger observed, and spec 49's S3 records that the close runs one oracle; spec 44's AC1
+runs spec 44's block. Unit 55's §4 names that block superseded, so the close runs unit 55's block,
+on the prepared merge after the last `--prepare`, with the observing run's base.
+
 ### Evidence
 
-- `tools/push-main.sh:514-526`: `check_prepared_merge` derives `t` by fact 1 and rejects a merge whose
-  first parent is not the advertised tip by fact 2. `:880` writes the subject; `:921` writes the merge
-  by `commit-tree` with the same `msg`.
-- Measured 2026-10-25 on node a in this worktree before `--prepare`: fact 1 alone returned
-  `c63aabbb4a73d44315dd5dd1219ff1dac5055cf8`, subject `merge: dOrderedCharter — land onto
-  origin/main at cdfbd1cf`; unit 52's §4 oracle as written printed `version oracle:
-  c63aabbb^1..c63aabbb^2 · 2 commits` and exited 0; the §4 head run with base `c63aabbb` printed `no
-  prepared merge on HEAD` and exited 2. PINNED at that date.
-- Measured the same day in a fixture under `%TEMP%` with a short name, five shapes: a foreign landing
-  under a branch commit, a default-branch merge into the branch, this build's prepared merge, that
-  merge under a stacked commit, and an earlier own landing under a later base. The §4 head refused
-  the first, second and fifth with exit 2 and walked `b1` and `bump` on the third and fourth. A copy
-  with the ancestor test alone walked the default branch's `m2` on the second shape; a copy with the
-  subject test alone walked the earlier landing's commits on the fifth. A base naming no commit
-  exited 2. PINNED at that date.
+- `tools/push-main.sh#check_prepared_merge` derives `t` by fact 1 and rejects a merge whose first
+  parent is not the advertised tip by fact 2; `tools/push-main.sh#cmd_prepare` sets
+  `msg="merge: $SLUG — land onto $remote/$def at ${R:0:8}"`; read 2026-11-20.
+- Measured 2026-10-25 on node a before `--prepare`: fact 1 alone returned `c63aabbb`, dOrderedCharter's
+  landing, and the oracle without the test walked it and exited 0. PINNED at that date.
+- Measured 2026-11-20 on node a in this worktree at `0d700d256`, with the base the run-state file's
+  `## Run facts` section holds, `9e21ac76`: fact 1 returned `9e21ac76`, subject
+  `merge: dDeclaredLoop — land onto origin/main at c1f80c00`; unit 55's block printed `version
+  oracle: no prepared merge on HEAD` and exited 2, and a copy without the subject and ancestor tests
+  walked `9e21ac76^1..9e21ac76^2` and exited 0. The landings `60d90cb71` and `ed2fbc1f2` of this
+  slug sit deeper on the default branch's first-parent line. PINNED at that date.
+- Measured 2026-10-25 in a fixture under `%TEMP%`: a copy with the ancestor test alone walked the
+  default branch's commits through a branch-side merge, and a copy with the subject test alone walked
+  an earlier landing of the slug under a later base. PINNED at that date.
 
 ### Files touched (estimate)
 
-- `memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md`: S12, S17, §4, AC11
-  to AC14, AC17, F1 and its §9 line. `TOOL-dPlacedRequest-53` and `TOOL-dPlacedRequest-55` write
-  this file at the same order, so the three passes run in sequence.
-- `memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md`: §4, AC1 and its §9
-  line. `TOOL-dPlacedRequest-55` writes this file at the same order, in the same sequence.
-- `memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md`: AC59 and its §9 line
+None: the test is unit 55's text, unit 52's amendments were made at its rev-10, and specs 34 and 44
+are CLOSED.
 
 ### Alternatives rejected
 
-- **The subject test alone.** It walks an earlier landing of this same slug once a later run starts
-  from it, measured on the fifth shape.
+- **The subject test alone.** It walks an earlier landing of this slug once a later run starts from
+  it.
 - **The ancestor test alone.** It walks the default branch's commits through a merge made on the
-  branch, measured on the second shape.
+  branch.
 - **Fact 2, the advertised tip.** It needs the remote, which the fixtures and a local read lack.
 
 ## 5. Production-readiness checklist
@@ -142,28 +146,24 @@ ancestor test cannot see.
 - error / empty / loading states — each refusal exits 2 with a named line (S1).
 - observability — the refusal names what was missing; the header still names the merge walked.
 - risks — a prepared merge written by hand with another subject is refused, which is loud; the
-  lander writes only `:880`'s subject.
+  lander writes only `tools/push-main.sh#cmd_prepare`'s subject.
 - testing — the probes of §6.
 - migration — none: the oracle is a criterion's command.
 - user docs — none: criterion text.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the oracle as 44 §4 states it runs in this worktree before `--prepare` with base
-  `c63aabbb`, it prints `version oracle: no prepared merge on HEAD` and exits 2; a scratch copy
-  without the own-merge test prints a header naming `c63aabbb` and exits 0.
+- **AC1** — When `TOOL-dPlacedRequest-55`'s §4 block runs in this build's worktree before
+  `--prepare`, with the base `TOOL-dPlacedRequest-57` S1 reads, it prints `version oracle: no
+  prepared merge on HEAD` and exits 2; a scratch copy without the subject and ancestor tests prints a
+  header naming the merge fact 1 finds and walks it.
   Red when: the oracle walks another build's landing merge and reads it as a clean build.
-- **AC2** — When the five-shape fixture of §4 Evidence is built and the oracle runs on each with the
-  fixture's base, the foreign landing, the branch-side merge and the earlier own landing each exit 2
-  printing `no prepared merge on HEAD`; the prepared merge and the stacked commit each walk the two
-  branch commits; and 52 AC12 names the three refusal rows.
-  Red when: a merge of the right shape that is not this build's own is walked.
-  fixture: built by the probe under `%TEMP%`, not held in the tree.
-- **AC3** — When the AC59 bullet of `2026-10-25-spec-TOOL-dPlacedRequest-34.md` is read, it names
-  `TOOL-dPlacedRequest-44`, the base `c63aabbb` and the prepared merge, and carries no `before the
-  lander's mint`.
-  Red when: the close reads the oracle before the merge it walks exists.
-- **AC4** — When 52's §8 is read, F1 names `TOOL-dPlacedRequest-54` as superseding its pick.
+  figure: the merge fact 1 finds DERIVED at observation; `9e21ac76` on 2026-11-20 PINNED.
+- **AC2** — When the AC3 bullet of `2026-10-25-spec-TOOL-dPlacedRequest-55.md` is read, it names the
+  three foreign shapes of S2, each expecting `no prepared merge on HEAD`.
+  Red when: a merge of the right shape that is not this build's own goes unstaged.
+- **AC4** — When the F1 item of `2026-10-25-spec-TOOL-dPlacedRequest-52.md`'s §8 is read, it names
+  `TOOL-dPlacedRequest-54` as superseding its pick.
   Red when: 52 keeps a live resolution for the fact-1-only derivation.
 
 ## 7. Gates
@@ -180,6 +180,21 @@ No new arm: the oracle is a criterion's command, observed once at the close.
   remote. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's two fixes judged sound,
   combined because the measurement rejected each alone. Supersedes `TOOL-dPlacedRequest-52` F1's
   "fact-1 derivation alone". widens: none · relaxes: none
+- **F2 — Is an amendment this unit orders to unit 52 made at a pass or now?** (a) Now, once, in 52's
+  text and, where the oracle moved, in unit 55's; (b) at unit 52's pass; (c) at this unit's pass.
+  (b) and (c) have a builder write a spec, which no builder does. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; unit 52 is DEFERRED, so the amendment is a
+  spec act the re-grounding makes once, as the brief's fold rule names. widens: none · relaxes: none
+- **F3 — Where does the corrected oracle, this unit's test included, live?** (a) In unit 55's §4,
+  the last of the three correcting units, with this spec naming it; (b) in this spec's §4, as the
+  head only; (c) in unit 52's §4. (b) splits one block across two specs; (c) is the earliest text.
+  Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; ruled whole at unit
+  55's F3, so the close runs one block. widens: none · relaxes: none
+- **F4 — What becomes of S3's restatement of the closed specs 34 and 44?** (a) Resolved in §4 naming
+  P19, the closed text untouched; (b) the closed specs edited with a rev bump; (c) dropped
+  unrecorded. (b) rewrites built work; (c) loses the fact. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; P19 freezes a CLOSED spec, and S3 owes no
+  product change. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -189,17 +204,26 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
+- rev-6 · 2026-11-20 · §1 · §2 S1 S2 S3 S4 · §3 · §4 · §5 · §6 AC1 AC2 AC4 · §8 F2 F3 F4 · §10 ·
+  re-grounded by `2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`: the test
+  lives in unit 55's §4 block (F3) and this spec carries no copy; unit 52's S12, S17, AC12 and F1
+  amended in 52's text at its rev-10 (F2), the refusal rows moving with the oracle to unit 55's AC3;
+  S3 resolved in §4 and its criterion taken out (F4); AC1 measured on this worktree's own history
+  with the run's base, the pinned `c63aabbb` no longer the base; hands-off `TOOL-dPlacedRequest-55`
+  added; Files touched now none; line citations swapped for symbol citations and the build method's
+  section to its alias tag.
 
 ## 10. Reuse audit
 
-The seam extended is the lander's own prepared-merge derivation, `check_prepared_merge` in
-`tools/push-main.sh:514-526`, whose fact 1 the oracle already copies, and the subject `:880` writes.
-`python tools/codebase-map/reuse_lookup.py "prove the newest merge on the first-parent line is this
-build's own prepared merge"` ranked `merge` (`tools/memory-tree/merge-rows.py`), `build` and
-`build_commit`, name stems only, none a merge-ownership test: no existing seam fits beyond the lander
-the oracle already copies. `python tools/memory-recall/query.py "which check proves the prepared merge
-it reads is this build's own and not another build's landing"` returned TOOL-dGroundRules-14 (the
-landing replay, which reads no merge ownership), this audit's H2, `TOOL-dPlacedRequest-44` and round
-4's M9; none disagrees with source.
+The seam extended is the lander's own prepared-merge derivation, fact 1 of
+`tools/push-main.sh#check_prepared_merge`, and the subject `tools/push-main.sh#cmd_prepare` writes,
+both read by unit 55's block. The brief's named seam, the governance-ref factory
+`tools/unattended/unattended.sh#write_gov_ref`, writes refs, and this test writes none.
+`python tools/codebase-map/reuse_lookup.py "one version oracle block carried whole where the close
+runs it"`, run 2026-11-20, ranked `run`, `run_git` and `run_selftest_cases`, name stems only, none a
+merge-ownership test: no existing seam fits beyond the lander the oracle already copies. `python
+tools/memory-recall/query.py "where does the corrected version oracle live once the spec that wrote it
+is closed"` with the terms below returned this spec, this run's brief and `TOOL-dPlacedRequest-44`;
+none disagrees with source.
 
-Recall terms used: prepared merge first-parent foreign landing merge oracle refusal base ancestor subject lander
+Recall terms used: prepared merge first-parent foreign landing oracle refusal base ancestor subject lander superseded
