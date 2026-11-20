@@ -5,6 +5,7 @@
     python <prefix>/run-gates/measure_legs.py --concurrent                  # admitted under a live load cap
     python <prefix>/run-gates/measure_legs.py --serial --legs <path> --out <root>
     python <prefix>/run-gates/measure_legs.py --selftest                    # its arms, over its own fixtures
+    python <prefix>/run-gates/measure_legs.py --bare-bash <root>            # each bare bash launch; exit 1 on any
 
 TOOL-dRedressedBar-18. The bar's profile had to be rebuilt from scratch files the runner erases. It
 came from a run with a knob in its environment, saw nothing inside a leg, and called the bar
@@ -1647,6 +1648,8 @@ def parse_flags(argv):
     mode.add_argument("--concurrent", action="store_true",
                       help="admit the next leg only at or under %d%% CPU and %d%% memory" % (CPU_CAP_PCT, MEM_CAP_PCT))
     mode.add_argument("--selftest", action="store_true", help="run this tool's arms over its own fixtures")
+    mode.add_argument("--bare-bash", metavar="ROOT", default=None,
+                      help="print each bare `bash` launch in ROOT's tracked *.py and *.js; exit 1 on any")
     ap.add_argument("--legs", default="", help="a leg manifest (default: the manifest beside this kit dir)")
     ap.add_argument("--out", default="", help="the record root (default: <git-dir>/gate-profile)")
     ap.add_argument("--census-every", type=float, default=CENSUS_EVERY_DEFAULT_S, help="seconds, 1 to 3600")
@@ -1663,8 +1666,23 @@ def parse_flags(argv):
         raise ProfileRefused("--stall-window %g is outside %g to 86400" % (opts.stall_window, 2 * opts.census_every))
     if not 0 < opts.stall_cpu <= 3600:
         raise ProfileRefused("--stall-cpu %g is outside (0, 3600]" % opts.stall_cpu)
-    opts.mode = "serial" if opts.serial else "concurrent" if opts.concurrent else "selftest"
+    opts.mode = ("serial" if opts.serial else "concurrent" if opts.concurrent
+                 else "bare-bash" if opts.bare_bash is not None else "selftest")
     return opts
+
+
+def run_bare_bash(root):
+    """`--bare-bash <root>` (TOOL-dWitnessedBar-24 S9): `scan_bare_bash` over the tracked *.py and *.js
+    at `root`, every hit printed, and 1 on any, an unread language included; 0 with one count line."""
+    hits = scan_bare_bash(root)
+    for hit in hits:
+        print(hit)
+    if hits:
+        print("measure-legs: %d bare bash launch(es) or unread population(s) at %s — launch through the "
+              "resolver block, `resolve_bash_py` or `resolve_bash_js`" % (len(hits), root))
+        return 1
+    print("measure-legs: no bare bash launch in the tracked *.py and *.js at %s" % root)
+    return 0
 
 
 def derive_kit_rel(top):
@@ -2019,6 +2037,8 @@ def main(argv=None):
         return 2
     if opts.mode == "selftest":
         return cmd_selftest()
+    if opts.mode == "bare-bash":
+        return run_bare_bash(opts.bare_bash)
     return run_profile(opts)
 
 

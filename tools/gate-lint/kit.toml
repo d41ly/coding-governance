@@ -62,6 +62,8 @@ the kit ships no adopter and no rendered artifact, so there is nothing for this 
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-loop-fed-by-a-command-substitution"
 tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.launch"]
 name = "shell hygiene (a loop fed by a command substitution)"
 subject = "repo"
 purpose = "catches a loop fed by a command substitution in a shell file"
@@ -84,6 +86,7 @@ ceiling = 300
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-location-probe-asked-from-a-moved"
 tests = ["feature.gate-lint"]
+pack = "portability"
 enforces = ["practice.portable.paths"]
 name = "shell hygiene (a location probe asked from a moved directory)"
 subject = "repo"
@@ -116,6 +119,8 @@ ceiling = 300
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-fork-spent-on-builtin-work"
 tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.launch"]
 name = "shell hygiene (a fork spent on builtin work)"
 subject = "repo"
 purpose = "catches a fork spent on builtin work in a shell file"
@@ -146,6 +151,7 @@ ceiling = 300
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-a-fixed-name-temp-renamed-into-place"
 tests = ["feature.gate-lint"]
+pack = "portability"
 enforces = ["practice.portable.temp-files"]
 name = "shell hygiene (a fixed-name temp renamed into place)"
 subject = "repo"
@@ -175,11 +181,169 @@ ceiling = 300
 [[gate_leg]]
 tag = "leg.gate-lint.shell-hygiene-selftest"
 tests = ["feature.gate-lint"]
+pack = "portability"
 name = "shell-hygiene selftest"
 subject = "kit"
 purpose = "stages breaks into a copy of the shell-hygiene scanner"
 argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
 guard = ["{kit}/"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 300
+
+# THE PORTABILITY PACK (TOOL-dWitnessedBar-24): one leg per rule of the portable practice, each row
+# `pack = "portability"` and `enforces` naming its rule, beside the four shell-hygiene rows above that
+# joined it. Every scan row is `subject = "repo"` with no guard, for the loop scan's reason, and its
+# adopter argv passes no registry, so an adopter's first run grades against an empty declaration and
+# lists every site it carries — the posture the shell-hygiene rows set. Gov's argv passes its ledger
+# home under `[gate_leg.gov]`, over the population the home's seed measures.
+#
+# The encoding leg MOVED IN from the deployer registry's `[[exempt_leg]]` table: it ships now, the
+# owner ruling that kept it gov-only (TOOL-aRepatriatedFork-3 §8 F2) answered by `test.seed`, which
+# seeds an adopter's population at the update (TOOL-dWitnessedBar-24 §8 F2). It keeps its tag.
+[[gate_leg]]
+tag = "leg.gov.encoding-posture-text-io-names-its-encoding"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.encoding"]
+name = "encoding posture (text IO names its encoding)"
+subject = "repo"
+purpose = "catches Python text IO that does not name its encoding"
+argv = ["python3", "{kit}/encoding_posture.py"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "memory/project/encoding-posture-sites.txt", ".", "{prefix}", "skills"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+[[gate_leg]]
+tag = "leg.gate-lint.encoding-posture-an-entry-point-writes-stdout-as"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.encoding"]
+name = "encoding posture (an entry point writes stdout as UTF-8)"
+subject = "repo"
+purpose = "catches an entry point printing to a non-UTF-8 stdout"
+argv = ["python3", "{kit}/encoding_posture.py", "--stdout"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "memory/project/encoding-stdout-sites.txt", ".", "{prefix}", "skills"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+[[gate_leg]]
+tag = "leg.gate-lint.encoding-posture-javascript-text-io-names-its"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.encoding"]
+name = "encoding posture (JavaScript text IO names its encoding)"
+subject = "repo"
+purpose = "catches JavaScript text IO that does not name its encoding"
+argv = ["python3", "{kit}/encoding_posture.py", "--js"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/encoding_posture.py", "--js", "memory/project/encoding-js-sites.txt", ".", "{prefix}", "skills"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+[[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-backslashed-path-handed-to-bash"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.paths"]
+name = "shell hygiene (a backslashed path handed to bash)"
+subject = "repo"
+purpose = "catches a backslashed Windows path handed to bash"
+argv = ["python3", "{kit}/sh_hygiene.py", "--path-literals"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/sh_hygiene.py", "--path-literals", "memory/project/path-literal-sites.txt", ".", ":!memory/"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+[[gate_leg]]
+tag = "leg.gate-lint.shell-hygiene-a-quoting-hazard"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.quoting"]
+name = "shell hygiene (a quoting hazard)"
+subject = "repo"
+purpose = "catches a heredoc writing source and a tab-IFS read"
+argv = ["python3", "{kit}/sh_hygiene.py", "--quoting"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/sh_hygiene.py", "--quoting", "memory/project/quoting-sites.txt", ".", ":!memory/"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+# The language-roles rule: each shell file's code lines on a shrink-only ledger, so shell outside a shim
+# only shrinks, and a shim earns its lines through the ledger factory's widen route (§8 F3).
+[[gate_leg]]
+tag = "leg.gate-lint.portability-shell-lines-only-shrink"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.language-roles"]
+name = "portability (shell lines only shrink)"
+subject = "repo"
+purpose = "holds each shell file's code lines on a shrink-only ledger"
+argv = ["python3", "{kit}/sh_hygiene.py", "--shell-role"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/gate-lint/sh_hygiene.py", "--shell-role", "memory/project/shell-role.txt", ".", ":!memory/"]
+guard = []
+chunk = "product"
+ceiling = 300
+
+# The line-ending class: read from the attribute and the index, so it carries no population.
+[[gate_leg]]
+tag = "leg.gate-lint.portability-execution-sensitive-files-are-lf-by"
+tests = ["feature.gate-lint"]
+pack = "portability"
+enforces = ["practice.portable.line-endings"]
+name = "portability (execution-sensitive files are LF by class)"
+subject = "repo"
+purpose = "grades every execution-sensitive file LF by its attribute"
+argv = ["python3", "{kit}/eol_class.py", "."]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "product"
+ceiling = 300
+
+# The PowerShell scanner's self-test (§8 F4): gov tracks no `.ps1`, and the scan refuses an empty
+# population, so gov's bar runs the predicates through the self-test. An adopter tracking `.ps1` adds
+# the scan leg itself, as the README says. Held like the shell-hygiene self-test above, for its reason,
+# but guarded on the one file its self-test grades, which imports no kit sibling (§8 F12): a guard on
+# the whole kit dir would trip on every gate-lint scanner the pack edits.
+[[gate_leg]]
+tag = "leg.gate-lint.powershell-hygiene-selftest"
+tests = ["feature.gate-lint"]
+pack = "portability"
+name = "powershell hygiene selftest"
+subject = "kit"
+purpose = "stages breaks into a copy of the PowerShell scanner"
+argv = ["python3", "{kit}/ps-hygiene.py", "--selftest"]
+guard = ["{kit}/ps-hygiene.py"]
 stage = ["step.test"]
 
 [gate_leg.gov]
@@ -249,3 +413,55 @@ fields = ["path", "class"]
 drain = "hunk"
 direction = "shrink-only"
 home = "memory/project/temp-name-sites.txt"
+
+# THE PORTABILITY PACK'S POPULATIONS (TOOL-dWitnessedBar-24 S13): each seed is the scanner's own mode
+# with `--measure`, over the population gov's leg argv grades, printing each key's fields then its count.
+[[ledger]]
+population = "encoding-stdout-sites"
+leg = "encoding posture (an entry point writes stdout as UTF-8)"
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--stdout", "--measure", ".", "{prefix}", "skills"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/encoding-stdout-sites.txt"
+
+[[ledger]]
+population = "encoding-js-sites"
+leg = "encoding posture (JavaScript text IO names its encoding)"
+seed = ["python", "{prefix}/gate-lint/encoding_posture.py", "--js", "--measure", ".", "{prefix}", "skills"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/encoding-js-sites.txt"
+
+[[ledger]]
+population = "path-literal-sites"
+leg = "shell hygiene (a backslashed path handed to bash)"
+seed = ["python", "{prefix}/gate-lint/sh_hygiene.py", "--path-literals", "--measure", ".", ":!memory/"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/path-literal-sites.txt"
+
+[[ledger]]
+population = "quoting-sites"
+leg = "shell hygiene (a quoting hazard)"
+seed = ["python", "{prefix}/gate-lint/sh_hygiene.py", "--quoting", "--measure", ".", ":!memory/"]
+key = "site"
+fields = ["path", "class"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/quoting-sites.txt"
+
+[[ledger]]
+population = "shell-role"
+leg = "portability (shell lines only shrink)"
+seed = ["python", "{prefix}/gate-lint/sh_hygiene.py", "--shell-role", "--measure", ".", ":!memory/"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/shell-role.txt"

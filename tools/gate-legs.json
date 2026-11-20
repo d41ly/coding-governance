@@ -131,6 +131,10 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.launch"
+    ],
     "stage": [
       "step.test"
     ]
@@ -153,6 +157,7 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "pack": "portability",
     "enforces": [
       "practice.portable.paths"
     ],
@@ -179,6 +184,10 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.launch"
+    ],
     "stage": [
       "step.test"
     ]
@@ -202,6 +211,7 @@
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "pack": "portability",
     "enforces": [
       "practice.portable.temp-files"
     ],
@@ -227,6 +237,213 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 300,
+    "pack": "portability",
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "encoding posture (text IO names its encoding)",
+    "pass_leg": true,
+    "tag": "leg.gov.encoding-posture-text-io-names-its-encoding",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches Python text IO that does not name its encoding",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "memory/project/encoding-posture-sites.txt",
+      ".",
+      "{prefix}",
+      "skills"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.encoding"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "encoding posture (an entry point writes stdout as UTF-8)",
+    "tag": "leg.gate-lint.encoding-posture-an-entry-point-writes-stdout-as",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches an entry point printing to a non-UTF-8 stdout",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "--stdout",
+      "memory/project/encoding-stdout-sites.txt",
+      ".",
+      "{prefix}",
+      "skills"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.encoding"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "encoding posture (JavaScript text IO names its encoding)",
+    "tag": "leg.gate-lint.encoding-posture-javascript-text-io-names-its",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches JavaScript text IO that does not name its encoding",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/encoding_posture.py",
+      "--js",
+      "memory/project/encoding-js-sites.txt",
+      ".",
+      "{prefix}",
+      "skills"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.encoding"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "shell hygiene (a backslashed path handed to bash)",
+    "tag": "leg.gate-lint.shell-hygiene-a-backslashed-path-handed-to-bash",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a backslashed Windows path handed to bash",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--path-literals",
+      "memory/project/path-literal-sites.txt",
+      ".",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.paths"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "shell hygiene (a quoting hazard)",
+    "tag": "leg.gate-lint.shell-hygiene-a-quoting-hazard",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "catches a heredoc writing source and a tab-IFS read",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--quoting",
+      "memory/project/quoting-sites.txt",
+      ".",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.quoting"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "portability (shell lines only shrink)",
+    "tag": "leg.gate-lint.portability-shell-lines-only-shrink",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "holds each shell file's code lines on a shrink-only ledger",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--shell-role",
+      "memory/project/shell-role.txt",
+      ".",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.language-roles"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "portability (execution-sensitive files are LF by class)",
+    "tag": "leg.gate-lint.portability-execution-sensitive-files-are-lf-by",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "grades every execution-sensitive file LF by its attribute",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/eol_class.py",
+      "."
+    ],
+    "guard": [],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.line-endings"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "powershell hygiene selftest",
+    "tag": "leg.gate-lint.powershell-hygiene-selftest",
+    "tests": [
+      "feature.gate-lint"
+    ],
+    "purpose": "stages breaks into a copy of the PowerShell scanner",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/ps-hygiene.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/gate-lint/ps-hygiene.py"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "pack": "portability",
     "stage": [
       "step.test"
     ]
@@ -3499,26 +3716,44 @@
     ]
   },
   {
-    "name": "encoding posture (text IO names its encoding)",
-    "pass_leg": true,
-    "tag": "leg.gov.encoding-posture-text-io-names-its-encoding",
-    "tests": [
-      "feature.gate-lint"
-    ],
-    "purpose": "catches Python text IO that does not name its encoding",
+    "name": "portability (the interpreter floor, run for real)",
+    "tag": "leg.gov.portability-the-interpreter-floor-run-for-real",
+    "purpose": "compiles the tree at the declared interpreter floor",
     "argv": [
       "python3",
-      "{prefix}/gate-lint/encoding_posture.py",
-      "memory/project/encoding-posture-sites.txt",
-      ".",
-      "{prefix}",
-      "skills"
+      "{prefix}/lib/python_floor.py",
+      "census"
     ],
     "chunk": "product",
     "subject": "repo",
     "ceiling": 300,
+    "pack": "portability",
     "enforces": [
-      "practice.portable.encoding"
+      "practice.portable.interpreter-floor"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
+    "name": "portability (a bare shell name launched)",
+    "tag": "leg.gov.portability-a-bare-shell-name-launched",
+    "tests": [
+      "feature.run-gates"
+    ],
+    "purpose": "catches a launch of the bare name bash in Python or JS",
+    "argv": [
+      "python3",
+      "{prefix}/run-gates/measure_legs.py",
+      "--bare-bash",
+      "."
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "pack": "portability",
+    "enforces": [
+      "practice.portable.launch"
     ],
     "stage": [
       "step.test"

@@ -43,6 +43,8 @@ drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
 edges (every declared edge parses, is registered and resolves)	repo	declarations
+encoding posture (JavaScript text IO names its encoding)	repo	product
+encoding posture (an entry point writes stdout as UTF-8)	repo	product
 encoding posture (text IO names its encoding)	repo	product
 every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
@@ -132,7 +134,12 @@ playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
 policy check	repo	declarations
 policy fixtures	kit	selftests
+portability (a bare shell name launched)	repo	product
+portability (execution-sensitive files are LF by class)	repo	product
+portability (shell lines only shrink)	repo	product
+portability (the interpreter floor, run for real)	repo	product
 positional (the citation check alone)	repo	declarations
+powershell hygiene selftest	kit	selftests
 pre-push bar self-test	kit	selftests
 pre-push run-log line	repo	selftests
 pre-push self-test	kit	selftests
@@ -185,10 +192,12 @@ runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shell hygiene (a backslashed path handed to bash)	repo	product
 shell hygiene (a fixed-name temp renamed into place)	repo	product
 shell hygiene (a fork spent on builtin work)	repo	product
 shell hygiene (a location probe asked from a moved directory)	repo	product
 shell hygiene (a loop fed by a command substitution)	repo	product
+shell hygiene (a quoting hazard)	repo	product
 shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations

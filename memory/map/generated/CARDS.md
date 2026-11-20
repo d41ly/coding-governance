@@ -78,11 +78,11 @@ Three scanners for the failure modes a reader cannot see: PowerShell's decoding 
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/gate-lint.md`
 - decisions 2: `TOOL-aLeakedHandle-1`, `TOOL-cListedCensus-1`
-- gate-legs 7: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `shell hygiene (a fixed-name temp renamed into place)`, `spawn budget (forks per hot entrypoint)`
+- gate-legs 16: `shell hygiene (a loop fed by a command substitution)`, `shell-hygiene selftest`, `encoding posture (text IO names its encoding)`, `shell hygiene (a location probe asked from a moved directory)`, `shell hygiene (a fork spent on builtin work)`, `shell hygiene (a fixed-name temp renamed into place)`, `spawn budget (forks per hot entrypoint)`, `encoding posture (an entry point writes stdout as UTF-8)`, `encoding posture (JavaScript text IO names its encoding)`, `shell hygiene (a backslashed path handed to bash)`, `shell hygiene (a quoting hazard)`
 - kits 1: `gate-lint`
-- gotcha-classes 1: `a-gate-that-walks-the-repo-root-reads-other-worktrees.md`
-- globs 6: `tools/gate-lint/*`, `memory/project/substitution-fed-loops.txt`, `memory/project/encoding-posture-sites.txt`
-- cut 3 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- gotcha-classes 1
+- globs 11
+- cut 17 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## govkit
 

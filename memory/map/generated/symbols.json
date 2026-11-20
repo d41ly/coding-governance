@@ -6018,6 +6018,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_eol",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
       "id": "check_epoch_verb",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -6126,6 +6131,11 @@
       "id": "check_fanout_step",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_feature_red",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "check_fences",
@@ -6876,6 +6886,11 @@
       "id": "check_m26_probe",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_main_guard",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
     },
     {
       "id": "check_malformed_plant",
@@ -8506,6 +8521,11 @@
       "id": "check_symbols",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "check_sys_stdout",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
     },
     {
       "id": "check_table_case",
@@ -15895,6 +15915,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
     },
     {
@@ -16711,6 +16736,11 @@
       "id": "measure_class_occurrences",
       "kind": "function",
       "file": "tools/workflows/review_dispose.py"
+    },
+    {
+      "id": "measure_code_lines",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "measure_commitment",
@@ -20018,6 +20048,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_class_population",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
       "id": "read_class_values",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -20573,6 +20608,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "read_eol_attributes",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
       "id": "read_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -20656,6 +20696,11 @@
       "id": "read_facts_list",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "read_feature_census",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "read_fenced_row",
@@ -21313,6 +21358,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "read_index_eol",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
       "id": "read_index_files",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -21391,6 +21441,11 @@
       "id": "read_journals",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_js_regions",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
     },
     {
       "id": "read_jsonl",
@@ -23381,6 +23436,11 @@
       "id": "read_sg_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_shebang_members",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
     },
     {
       "id": "read_sheet_row",
@@ -30203,6 +30263,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "run_bare_bash",
+      "kind": "function",
+      "file": "tools/run-gates/measure_legs.py"
+    },
+    {
       "id": "run_bash",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -30356,6 +30421,11 @@
       "id": "run_case_arms",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "run_census",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "run_census_adopter_receipt",
@@ -31061,6 +31131,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
     },
     {
       "id": "run_git",
@@ -32570,6 +32645,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/gate-lint/eol_class.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
     },
     {
@@ -32748,6 +32828,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_shell_role_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "run_ships_join",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -32766,6 +32851,11 @@
       "id": "run_shuffle_control",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "run_site_scan",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "run_skills",
@@ -33793,6 +33883,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "scan_js_io",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
+    },
+    {
       "id": "scan_keys",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -33898,6 +33993,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "scan_path_literal_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "scan_prefix_token",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -33926,6 +34026,21 @@
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_python_stdout",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "id": "scan_python_text_io",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "id": "scan_quoting_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_rc_reads",
@@ -34091,6 +34206,11 @@
       "id": "scan_stand_in_declarations",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "scan_stdout",
+      "kind": "function",
+      "file": "tools/gate-lint/encoding_posture.py"
     },
     {
       "id": "scan_substituted",
