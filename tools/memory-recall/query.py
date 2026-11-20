@@ -1317,6 +1317,11 @@ def export(repo: pathlib.Path, tag: str) -> int:
         # THE SWITCH (TOOL-dGroundRules-9): under `warn` the export writes, and says it is over.
         print(f"BUDGET WARN — recall-export · {dest.as_posix()} · {size} bytes over {cap} · {rule}",
               file=sys.stderr)
+        # The runner's `gate-warn` marker on the next line of the same stream (TOOL-dWitnessedBar-29 S2, §8 F4, F5),
+        # the policy kit's module already loaded by `read_export_cap`, whose `warn` only it answers.
+        import budgets
+        print(budgets.render_warn_marker(dest.as_posix(), f"recall-export · {size} bytes over {cap}"),
+              file=sys.stderr)
     elif cap and size > cap:
         # A bound nobody can trip is not a bound. Refuse BEFORE writing, so the oversized file
         # never exists.

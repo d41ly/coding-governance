@@ -5586,6 +5586,95 @@ if [ -n "$RERUN_RED" ] && [ ! -f "$WORK/wall.breach" ]; then
   done
 fi
 unset _rc _rc2
+
+# scan_leg_warnings — THE SIZE WARNINGS A PASSING LEG PRINTED (TOOL-dWitnessedBar-29 S3, S4, S6, S7). A
+# warning inside a green leg reached nobody: `report_one` prints `GATE ok` and the output stays in the
+# work dir. An emitter prints the marker `gate-warn<TAB><class><TAB><subject><TAB><detail>` on the line
+# after its human warning, and this reads it back with ONE `grep -F` over the copies of the legs that
+# passed: `<i>.out` where `<i>.rc` reads 0, and `<i>.retry.out` where `<i>.retry.rc` reads 0, the attempt
+# that passed. A held leg a selection's `run` row executed is read from its first attempt alone, the one
+# its `held.<n>` reads. A failed, skipped, unrun held or reused leg, a sample's second look and a red
+# leg's re-run are not read. One `GATE warn` line per warning, in manifest order, on stdout; `WARN_N`
+# and `WARN_KEYS`, the verdict record's `warn.<k>` rows. The unit is the newest specced one whose commits
+# touch the subject, the memory-tree kit's `routed_commits.py --newest-unit HEAD <subject>`, ONE spawn per
+# distinct subject; that kit is a sibling, reached through `resolve_kit_dir` from KITDIR, never by
+# literal. `-` names why where it is absent, the attribution fails or no commit names a specced unit.
+# WHAT IT DOES NOT CHECK: that the named unit GREW the file — the newest unit touching it may have
+# shrunk it — nor any warning printed without the marker. It moves no verdict and no exit code.
+# Self-contained, so a slice of it runs alone, as the suite slices `run_leg_reap`.
+scan_leg_warnings() {
+  local i rc line rest idx cls subj det got unit why tab=$'\t'
+  local -a files=()
+  local -A seen=()
+  WARN_N=0; WARN_KEYS=""
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    rc=""; { IFS= read -r rc < "$WORK/$i.rc"; } 2>/dev/null
+    [ "$rc" = 0 ] && files+=("$WORK/$i.out")
+    [ -f "$WORK/$i.heldrun" ] && continue
+    rc=""; { IFS= read -r rc < "$WORK/$i.retry.rc"; } 2>/dev/null
+    [ "$rc" = 0 ] && files+=("$WORK/$i.retry.out")
+  done
+  [ "${#files[@]}" -gt 0 ] || return 0
+  # Into a file the loop reads, never a substitution feeding it (TOOL-aSweptBar-4). `-H` names the
+  # file on a one-file search too, which is where the leg index is read from.
+  grep -F -H -e "gate-warn$tab" -- "${files[@]}" > "$WORK/warn.rows" 2>/dev/null
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    rest=${line#"$WORK/"}
+    idx=${rest%%.*}
+    case "$idx" in ''|*[!0-9]*) continue ;; esac
+    rest=${rest#*.out:}
+    case "$rest" in "gate-warn$tab"*) ;; *) continue ;; esac
+    rest=${rest#gate-warn$tab}
+    cls=${rest%%$tab*}; rest=${rest#*$tab}
+    subj=${rest%%$tab*}; det=""
+    [[ $rest == *$tab* ]] && det=${rest#*$tab}
+    if [ -z "$subj" ]; then got="-${tab}the marker names no subject"
+    elif [ -n "${seen[$subj]+x}" ]; then got=${seen[$subj]}
+    else
+      got=$(cd "$ROOT" 2>/dev/null && "$PYBIN" -B -c "$RKD_PROGRAM"'
+import contextlib, io, sys
+sys.dont_write_bytecode = True
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+here, subject = sys.argv[1], sys.argv[2]
+try:
+    kit = resolve_kit_dir("memory-tree", "routed_commits.py", here)
+except LookupError as exc:
+    print("-\tno memory-tree kit to attribute it: " + " ".join(str(exc).split()))
+    sys.exit(0)
+sys.path.insert(0, str(kit))
+said = io.StringIO()
+try:
+    import routed_commits
+    with contextlib.redirect_stdout(said):
+        rc = routed_commits.main(["routed_commits.py", "--newest-unit", "HEAD", subject])
+except Exception as exc:
+    print("-\tthe attribution failed: " + " ".join(str(exc).split()))
+    sys.exit(0)
+said = " ".join(said.getvalue().split())
+if rc == 0 and said:
+    print(said)
+elif rc == 0:
+    print("-\tno commit touching it names a specced unit")
+else:
+    print("-\tthe attribution failed: " + said)
+' "$KITDIR" "$subj" 2>/dev/null)
+      got=${got%$'\r'}
+      [ -n "$got" ] || got="-${tab}the attribution did not run"
+      seen[$subj]=$got
+    fi
+    unit=${got%%$tab*}; why=""
+    [[ $got == *$tab* ]] && why="; ${got#*$tab}"
+    WARN_N=$((WARN_N + 1))
+    printf 'GATE warn  %s  (%s: %s%s; grown by %s)\n' "${names[$idx]}" "$subj" "${det//$tab/ }" "$why" "$unit"
+    WARN_KEYS+="warn.$WARN_N$tab${names[$idx]}$tab$cls$tab$subj$tab$unit"$'\n'
+  done < "$WORK/warn.rows"
+  return 0
+}
+WARN_N=0; WARN_KEYS=""; WARN_LINES=""
+scan_leg_warnings > "$WORK/warn.lines"
+[ -s "$WORK/warn.lines" ] && { IFS= read -r -d '' WARN_LINES < "$WORK/warn.lines" || :; }
 # AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
@@ -5669,6 +5758,9 @@ if [ -n "$LEDGER" ]; then
   rm -f "$gd/gate-timings.tsv" ${TS_COMMON:+"$TS_COMMON/gate-timings.tsv"} 2>/dev/null || true
 fi
 
+# THE WARNINGS, after the last leg line and before the closing one (TOOL-dWitnessedBar-29 S6): the
+# `GATE warn` lines `scan_leg_warnings` wrote, which the summary file carries too.
+printf '%s' "$WARN_LINES"
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 [ "${reuses:-0}" -gt 0 ] && skipnote="$skipnote (${reuses} reused)"
@@ -5691,6 +5783,9 @@ fi
 # A RETRIED LEG IS NAMED IN THE TOTAL TOO (TOOL-dDerivedDocket-26 S2): a green that needed a second
 # attempt is green, and a reader of the one summary line should still be able to see it was one.
 [ "${RETRIED:-0}" -gt 0 ] && skipnote="$skipnote (${RETRIED} retried after timeout)"
+# A WARNED LEG IS NAMED IN THE TOTAL as a retried one is (TOOL-dWitnessedBar-29 S6): it passed, and the
+# one summary line still says a size warning rode on the run.
+[ "${WARN_N:-0}" -gt 0 ] && skipnote="$skipnote (${WARN_N} warned)"
 
 # THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
@@ -6011,6 +6106,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'run_id\t%s\n' "$RUNID"
     printf 'cause\t%s\n' "$RUN_CAUSE"
     printf '%s' "$TAIL_ROWS"
+    # The size warnings the passing legs printed, and one `warn.<k>` per warning, `<leg name> <class>
+    # <subject> <unit>` TAB-separated (TOOL-dWitnessedBar-29 S7). Additive keys, so `schema` stays.
+    printf 'warned\t%s\n' "${WARN_N:-0}"
+    printf '%s' "$WARN_KEYS"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi
@@ -6267,7 +6366,7 @@ elif [ "$fails" = 0 ]; then
   # measurement.
   # `QUEUE_SUMMARY` rides beside `PROF_LINE` on every path — green, red, and the durable RED copy —
   # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "$WARN_LINES"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
 elif [ "$gate_verdict" = HOST ]; then
   # EXIT 4, HOST (TOOL-dDerivedDocket-26 S5): every failed leg timed out on its first attempt beside
@@ -6286,7 +6385,7 @@ else
   # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
   # are read by the same person in the same terminal and a figure that changes meaning between them
   # is worse than either. TOOL-dUnstalledConvoy-31.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" "$hostnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf '%s' "$WARN_LINES" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" "$hostnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.

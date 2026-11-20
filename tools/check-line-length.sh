@@ -419,6 +419,8 @@ for f in $subjects; do
     if [ "$LL_MODE" = warn ]; then
       longest=$(printf '%s\n' "$over" | awk -F: '$2 + 0 > m { m = $2 + 0 } END { print m + 0 }')
       printf 'BUDGET WARN — line-length · %s · %s chars over %s · %s line(s) · %s\n' "$f" "$longest" "$limit" "$n" "$LL_RULE"
+      # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+      printf 'gate-warn\tsize\t%s\tline-length · %s chars over %s\n' "${f//[$'\t\r\n']/ }" "$longest" "$limit"
     else
       fail 3 "a subject carries line(s) over its limit of $limit characters, resolved from $src: $f ($LL_RULE)"
     fi

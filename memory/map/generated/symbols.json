@@ -27968,6 +27968,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "render_warn_marker",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "render_widen_record",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -34018,6 +34023,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_warn_slice",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
       "id": "run_wave",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -34751,6 +34761,11 @@
       "id": "scan_leg_trees",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "scan_leg_warnings",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
     },
     {
       "id": "scan_live_packets",

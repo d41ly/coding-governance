@@ -18,7 +18,9 @@
 # subject with no row keeps this script's hard default, handed in as `default:`. Whether a breach
 # REFUSES is the switch's: `budgets.enforce` (warn by default) and `budgets.pinned`. Under `warn` a
 # breach prints a `BUDGET WARN` line and exits 0; under `refuse`, or for a pinned subject, it is
-# check 2, naming the rule. The positional limit, the MAX_BYTES environment variable and the
+# check 2, naming the rule. A warned breach, and growth past the high-water, each print the marker
+# `gate-warn<TAB>size<TAB><subject><TAB><detail>` on the line after their own, which the runner reads
+# from a passing leg and shows as `GATE warn` (TOOL-dWitnessedBar-29). The positional limit, the MAX_BYTES environment variable and the
 # limits-path override retired with this script's own parse of the file, and a positional limit or
 # limits path is refused rather than ignored.
 #
@@ -518,6 +520,9 @@ elif ! printf '%s' "$recorded" | grep -qE '^[0-9]+$'; then
   fail 3 "the high-water record holds a non-numeric value for $key in $HIGHWATER: '$recorded'"
 elif [ "$bytes" -gt "$recorded" ]; then
   echo "TEMPLATE-SIZE WARN — $name grew past its recorded high-water: $recorded -> $bytes (+$((bytes - recorded))). Advisory only; re-record with --bump when the growth is intended."
+  # THE MARKER (TOOL-dWitnessedBar-29 S1) on the next line and the same stream, keyed as the row is, so
+  # the runner shows this advisory when the leg passes.
+  printf 'gate-warn\tsize\t%s\t%s -> %s (+%s) over high-water\n' "${key//[$'\t\r\n']/ }" "$recorded" "$bytes" "$((bytes - recorded))"
 fi
 
 # A warned breach has printed its BUDGET WARN line and exits 0 with no OK line: it is not within budget.

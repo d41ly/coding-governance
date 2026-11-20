@@ -342,6 +342,20 @@ def check_cap(answer, measured, subject=None):
                       f"{answer.unit} over {answer.value} · {answer.rule}")
 
 
+#: The machine line a size warning carries on the line after its human one (TOOL-dWitnessedBar-29 S1).
+WARN_MARKER = "gate-warn"
+
+
+def render_warn_marker(subject, detail):
+    """The marker line `gate-warn<TAB>size<TAB><subject><TAB><detail>` an emitter prints on the line
+    after its human size warning, on the same stream, so the runner shows a warning a passing leg
+    printed (TOOL-dWitnessedBar-29 S1, S9). Each TAB, CR or LF in either field is written as a space,
+    so a field never splits the row. The subject is the path the warning measured, repo-relative
+    inside the repository, else the warning's own subject; the detail is free text."""
+    subject, detail = (re.sub(r"[\t\r\n]", " ", str(text)) for text in (subject, detail))
+    return f"{WARN_MARKER}\tsize\t{subject}\t{detail}"
+
+
 def check_budgets(doc, text="", census=None):
     """[Problem] for the `[budgets]` table of a parsed policy file, each at the line of `text` that
     `policy.derive_key_line` finds: a `budgets.pinned` name of a class outside the switch or naming no
@@ -388,7 +402,7 @@ def main(argv):
     """`resolve`: one `<cap>\\t<value>\\t<mode>\\t<source>` row per request, `-` for an absent
     value; under `--explain`, one `budgets: <cap> · <rule> · <reason>` line per cap on stderr, the
     rule that set the mode, which a shell enforcer names on its breach line. `check`: the verdict
-    line, exit 1 when it refuses. `home`: one `<cap>\\t<home>\\t<value>` row, `read_cap_home`'s, `-`
+    line, then `render_warn_marker`'s line after a warned breach, exit 1 when it refuses. `home`: one `<cap>\\t<home>\\t<value>` row, `read_cap_home`'s, `-`
     for a home that is not `constant:`, exit 2 on its refusal (PLAY-dOrderedCharter-6). Run in the
     repository to read."""
     for stream in (sys.stdout, sys.stderr):
@@ -431,8 +445,13 @@ def main(argv):
                 print(f"budgets: {a.cap} · {a.rule} · {a.reason}", file=sys.stderr)
         print_refused()
         return 0
-    verdict = check_cap(next(iter(answers.values())), measured)
+    answer = next(iter(answers.values()))
+    verdict = check_cap(answer, measured)
     print(verdict.line)
+    if verdict.over and not verdict.refuse:
+        # A warned breach carries its marker (TOOL-dWitnessedBar-29 S9), which a caller printing this
+        # output whole, the size gate's warned-budget branch, carries with no line of its own.
+        print(render_warn_marker(answer.cap, f"{answer.cap} · {measured} {answer.unit} over {answer.value}"))
     print_refused()
     return 1 if verdict.refuse else 0
 

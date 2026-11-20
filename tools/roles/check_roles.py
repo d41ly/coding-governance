@@ -241,8 +241,13 @@ def check_roles(root, kit_dir, write=False):
             if body_mode is None:
                 body_mode = lib.read_cap_answer("role-body", root, kit_dir)[1:]
             if body_mode[0] == "warn":
-                notes.append("BUDGET WARN — role-body · %s · %d bytes over %d · %s"
-                             % (resolve_display_path(root, p), size, ceiling, body_mode[1]))
+                # The runner's `gate-warn` marker on the warning's next line, inside its own note, so it prints
+                # where the notes print (TOOL-dWitnessedBar-29 S2); `read_cap_answer` loaded its factory.
+                budgets = sys.modules.get("budgets")
+                shown = resolve_display_path(root, p)
+                notes.append("BUDGET WARN — role-body · %s · %d bytes over %d · %s" % (shown, size, ceiling, body_mode[1])
+                             + ("\n" + budgets.render_warn_marker(shown, "role-body · %d bytes over %d" % (size, ceiling))
+                                if budgets else ""))
             else:
                 add_defect(p, "R5", "body is %d bytes, over its %d-byte ceiling (%s)" % (size, ceiling, body_mode[1]))
         if not body.strip():
