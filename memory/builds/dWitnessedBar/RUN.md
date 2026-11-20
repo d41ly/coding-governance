@@ -622,3 +622,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T22:42:07Z dispatch · item e1c032c1 TOOL-dWitnessedBar-63 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-20T23:01:59Z brief · item TOOL-dWitnessedBar-64 · reason f125e3f47880 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-64-build-brief.md
+
+2026-11-20T23:04:02Z dispatch · item ed120ffc TOOL-dWitnessedBar-64 · reason tools/gate-lint/legacy_ledger.py tools/lib/legacy_ledger.py tools/lib/resolve-python.test.sh tools/memory-tree/legacy_ledger.py memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-64-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-64.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T23:09:33Z draw · re-dispatch · TOOL-dWitnessedBar-64 · 108/180 · 20261120T230933Z-255b66
+
+2026-11-20T23:09:33Z dispatch · item ed120ffc TOOL-dWitnessedBar-64 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-64-widen-7.md
