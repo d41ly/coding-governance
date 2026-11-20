@@ -45,6 +45,16 @@ argv = []
 mutates_index = false
 why_no_adopter = "the kit ships no adopter; adoption is merging its snippet into the target's ini and copying two test files"
 
+# THE RUNNER ADAPTER (TOOL-dWitnessedBar-9 S3), one row per runner. The run-gates kit's leg factory
+# runs `detect` in a repository and, where `tests.product` is `declared-with-runners`, renders one
+# leg per level `detect` prints, each running `argv` with `{level}` filled. A `[[gate_leg]]` would
+# reach every adopter whatever its `tests.product` says, so the adapter is declared here instead.
+[[test_runner]]
+runner = "pytest"
+detect = ["python3", "{kit}/run_level.py", "--detect"]
+levels = ["unit", "integration", "e2e", "performance"]
+argv = ["python3", "{kit}/run_level.py", "{level}"]
+
 [[hole]]
 id = "pytest-ini-knobs"
 kind = "measurement"

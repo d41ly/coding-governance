@@ -415,12 +415,22 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/pytest-parallel-guardrails/run_level.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "Refusal",
       "kind": "class",
       "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "Refusal",
@@ -7538,6 +7548,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "check_product_rows",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "check_program",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -8056,6 +8071,11 @@
       "id": "check_run_states",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_runner",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "check_rv_commit",
@@ -10398,6 +10418,11 @@
       "file": "tools/loop/scenario.py"
     },
     {
+      "id": "derive_adapter_row",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "derive_admission",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -11343,6 +11368,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_git_env",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "derive_gov_root",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -11938,6 +11968,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "derive_manifest_path",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "derive_manifest_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -12338,6 +12373,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "derive_product_rows",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "derive_project_name",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -12736,6 +12776,11 @@
       "id": "derive_runkey",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_runner_rows",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "derive_runner_verbs",
@@ -13376,6 +13421,11 @@
       "id": "derive_tool_rel",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "derive_tool_rel",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "derive_tool_root",
@@ -16495,6 +16545,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/run_level.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/roles/check_roles.py"
     },
     {
@@ -16546,6 +16601,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/precommit.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "main",
@@ -19953,6 +20013,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_catalogue_row",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "read_ceilings",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
@@ -20363,6 +20428,11 @@
       "file": "tools/playbook/policy_value.py"
     },
     {
+      "id": "read_declared_levels",
+      "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/run_level.py"
+    },
+    {
       "id": "read_declared_points",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -20461,6 +20531,11 @@
       "id": "read_design_view",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_detected",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "read_digest_classes",
@@ -21798,6 +21873,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "read_levels",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "read_lf",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
@@ -21976,6 +22056,11 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/run-gates/precommit.py"
+    },
+    {
+      "id": "read_manifest_rows",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "read_manifest_tags",
@@ -22748,6 +22833,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "read_product_value",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "read_profile_legs",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -23341,6 +23431,11 @@
       "id": "read_run_state",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_runner_levels",
+      "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/run_level.py"
     },
     {
       "id": "read_runner_text",
@@ -24016,6 +24111,11 @@
       "id": "read_termination_pending",
       "kind": "function",
       "file": "tools/loop/termination.py"
+    },
+    {
+      "id": "read_test_runners",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "read_text",
@@ -25381,6 +25481,11 @@
       "id": "remove_tree",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "remove_unheld_rows",
@@ -30593,6 +30698,11 @@
       "file": "tools/run-gates/leg_factory.py"
     },
     {
+      "id": "run_check",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "run_check_render",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -31043,6 +31153,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
+    },
+    {
       "id": "run_fixture_child",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -31291,6 +31406,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "run_git",
@@ -31671,6 +31791,11 @@
       "id": "run_legacy_withheld_install",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_level_tests",
+      "kind": "function",
+      "file": "tools/pytest-parallel-guardrails/run_level.py"
     },
     {
       "id": "run_lg_leg",
@@ -38466,6 +38591,11 @@
       "id": "write_fixture_repo",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "write_fixture_repo",
+      "kind": "function",
+      "file": "tools/run-gates/product_tests.py"
     },
     {
       "id": "write_fixture_round",

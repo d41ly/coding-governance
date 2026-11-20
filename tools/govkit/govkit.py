@@ -5957,7 +5957,9 @@ STAGE_FLOOR_RUN_GATES = (1, 49)
 # here, never a fifth constant. `tag`: 1.51, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-12 S5).
 # `purpose`: 1.52, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-19 S1).
 # `precommit`: 1.53, where `LEG_KEYS` gained it and `--precommit` reads it (TOOL-dWitnessedBar-10 S1).
-LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52), "precommit": (1, 53)}
+# `level`: 1.54, where `LEG_KEYS` gained it (TOOL-dWitnessedBar-9 S1). No descriptor row carries it, so
+# the emitter writes none: a runner adapter's rows reach a manifest through the leg factory alone.
+LEG_KEY_FLOORS = {"tag": (1, 51), "purpose": (1, 52), "precommit": (1, 53), "level": (1, 54)}
 
 
 def derive_doc_reads(leg: dict, ctx: dict[str, str], have: set[str]) -> tuple[list[str] | None, str]:

@@ -362,3 +362,15 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T01:53:53Z brief · item TOOL-dWitnessedBar-9 · reason 0e83c116fcb6 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-9-build-brief.md
 
 2026-11-20T01:55:48Z dispatch · item 8694b08d TOOL-dWitnessedBar-9 · reason tools/gate-legs.json tools/govkit/govkit.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt tools/pytest-parallel-guardrails/README.md tools/pytest-parallel-guardrails/kit.toml tools/pytest-parallel-guardrails/run_level.py tools/run-gates/README.md tools/run-gates/kit.toml tools/run-gates/leg_factory.py tools/run-gates/product_tests.py tools/run-gates/run-gates.test.sh memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-9-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T02:07:21Z draw · re-dispatch · TOOL-dWitnessedBar-9 · 62/180 · 20261120T020721Z-193d1a
+
+2026-11-20T02:07:21Z dispatch · item 666874a8 TOOL-dWitnessedBar-9 · reason tools/run-gates/run-gates.sh memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-9-deviation-103.md memory/map/features/run-gates.md memory/map/generated/CARDS.md
+2026-11-20T02:08:35Z draw · re-dispatch · TOOL-dWitnessedBar-9 · 63/180 · 20261120T020835Z-75ffac
+
+2026-11-20T02:08:35Z dispatch · item 666874a8 TOOL-dWitnessedBar-9 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-9-deviation-92.md
+2026-11-20T02:11:31Z draw · re-dispatch · TOOL-dWitnessedBar-9 · 64/180 · 20261120T021131Z-f21a1f
+
+2026-11-20T02:11:31Z dispatch · item 666874a8 TOOL-dWitnessedBar-9 · reason memory/map/generated/MAP.md memory/map/generated/inventories.json
+2026-11-20T02:15:27Z draw · re-dispatch · TOOL-dWitnessedBar-9 · 65/180 · 20261120T021527Z-2389d8
+
+2026-11-20T02:15:28Z dispatch · item 666874a8 TOOL-dWitnessedBar-9 · reason tools/run-gates/run-gates.sh memory/map/features/run-gates.md memory/map/generated/CARDS.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-9-deviation-92.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-9-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md memory/guides/SESSION-KICKOFF.md tools/gate-legs.json tools/govkit/govkit.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt tools/pytest-parallel-guardrails/README.md tools/pytest-parallel-guardrails/kit.toml tools/pytest-parallel-guardrails/run_level.py tools/run-gates/README.md tools/run-gates/kit.toml tools/run-gates/leg_factory.py tools/run-gates/product_tests.py tools/run-gates/run-gates.test.sh

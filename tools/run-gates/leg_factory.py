@@ -27,6 +27,10 @@ registry's rows last:
      `{memory_root}` to this tree's memory root; `{prefix}` stays, and any other token is a refusal;
   4. JSON, two-space indent, `name` first and the other keys in KEY_ORDER, UTF-8, one trailing LF;
   5. `pass_leg`, which `pass_legs.py` derives: its rule and its render, never re-stated here.
+After the declarations, each runner adapter's rows (TOOL-dWitnessedBar-9 S4): a descriptor's
+`[[test_runner]]` row, its `detect` run in the tree, one row per level it names, under the rule and
+the `tests.product` value `product_tests.py` beside this file owns; a name a declaration holds is a
+finding, never a second row.
 The file written is the manifest beside the tool root, never one `$GATE_LEGS` names.
 
 WHERE GOVKIT IS ABSENT, as in every adopter (TOOL-dWitnessedBar-45): the module still loads, since it
@@ -68,7 +72,7 @@ PLAYBOOK_HOME = "playbook"
 RUN_GATES_HOME = "run-gates"
 # The manifest's own key order, the one its rows were written in, `name` first.
 KEY_ORDER = ("name", "pass_leg", "tag", "tests", "purpose", "argv", "scope_of", "reads", "signature",
-             "guard", "impure", "chunk", "subject", "ceiling", "doc_reads", "pack", "enforces", "stage")
+             "guard", "impure", "chunk", "subject", "ceiling", "doc_reads", "pack", "level", "enforces", "stage")
 SUBJECTS = ("kit", "repo")
 # The read classes the runner's reader admits (run-gates.sh, its `reads` reader).
 READ_CLASSES = ("history", "base", "clock", "remote")
@@ -285,9 +289,45 @@ def render_rows(root, G, decls=None):
         for t in sorted(set(left)):
             found.append(("token", nm, f"{dc['file']} leg {nm!r}: gov's row still carries {{{t}}} after "
                                        f"rendering — spell gov's own value under [gate_leg.gov]"))
-        rank = {k: i for i, k in enumerate(KEY_ORDER)}
-        rows.append({k: row[k] for k in sorted(row, key=lambda k: (rank.get(k, len(rank)), k))})
-    return rows, found
+        rows.append(row)
+    taken = {r.get("name") for r in rows}
+    for a in derive_runner_rows(root, G, tool_rel):
+        if a["name"] in taken:
+            found.append(("one declaration", a["name"], f"leg {a['name']!r} is declared and is also a runner "
+                                                        f"adapter's row: one leg, one declaration"))
+            continue
+        rows.append(a)
+    rank = {k: i for i, k in enumerate(KEY_ORDER)}
+    return [{k: r[k] for k in sorted(r, key=lambda k: (rank.get(k, len(rank)), k))} for r in rows], found
+
+
+def derive_runner_rows(root, G, tool_rel):
+    """The runner adapters' rows of this tree's manifest (TOOL-dWitnessedBar-9 S4), from
+    `product_tests.derive_product_rows`: every `[[test_runner]]` row of the descriptors, its `detect`
+    run first, and `tests.product` read only where one names a level, so a tree no runner detects
+    spends no policy read. `{kit}` is spelled as gov's own rows spell it."""
+    import product_tests  # noqa: PLC0415 - the contract, read only by the render
+    reg = G.load_registry(root)
+    rep = G.Report()
+    descs = G.read_descriptors(root, reg, rep)
+    if rep.problems:
+        raise Refusal("; ".join(rep.problems))
+    runners, seen = [], set()
+    for _eid, (d, dpath) in sorted(descs.items(), key=lambda kv: (kv[1][1], kv[0])):
+        if dpath in seen:
+            continue
+        seen.add(dpath)
+        for r in d.get("test_runner") or []:
+            r = product_tests.check_runner(dict(r), dpath)
+            runners.append(dict(r, kit=derive_kit_spelling(d, tool_rel), kit_dir=pathlib.Path(root, dpath).parent,
+                                file=dpath))
+    if not runners:
+        return []
+    detected = product_tests.read_detected(root, runners)
+    if not any(detected.values()):
+        return []
+    value, _where = product_tests.read_product_value(root)
+    return product_tests.derive_product_rows(root, value, runners, [], detected)
 
 
 def render_manifest(rows):

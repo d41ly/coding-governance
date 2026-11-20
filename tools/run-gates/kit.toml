@@ -262,6 +262,26 @@ guard = []
 chunk = "selftests"
 ceiling = 300
 
+# THE PRODUCT-TEST CONTRACT (TOOL-dWitnessedBar-9 S5): the manifest's legs carrying `level` graded
+# against `tests.product`. Gov holds no product suite, so its own `check` would print its zero; gov's
+# row runs the planted cases instead, one scratch repository per value. UNGUARDED: the contract reads
+# the policy, the manifest and every tracked pytest table, and no subset of paths bounds that.
+[[gate_leg]]
+tag = "leg.run-gates.product-test-contract-tests-product"
+tests = ["feature.run-gates"]
+enforces = ["practice.verify"]
+name = "product-test contract (tests.product)"
+subject = "repo"
+purpose = "checks the product-test legs against tests.product"
+argv = ["python3", "{kit}/product_tests.py", "check"]
+guard = []
+stage = ["step.test"]
+
+[gate_leg.gov]
+argv = ["python3", "{kit}/product_tests.py", "check", "--fixture"]
+chunk = "selftests"
+ceiling = 300
+
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
 # entry is selected (S9), resolving the path tokens ONLY: the runner's own `{name}` placeholder in
 # `observed_ran` passes through verbatim, because it is the RUNNER's substitution and not the

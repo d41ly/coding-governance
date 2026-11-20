@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.53` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.54` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -158,6 +158,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `profile_bar.test.sh` | the profiler's own arms |
 | `bar-wall-evidence.txt` | gov's whole-bar wall time per node, written by `GOV_NODE=<tag> python profile_bar.py --record`; withheld from the payload |
 | `precommit.py` | the derived commit-time list behind `--precommit`: every manifest row's `precommit` argv its `guard` trips; see "The commit-time list is derived" below |
+| `product_tests.py` | the product-test contract: the rows carrying `level` graded against `tests.product`, and the runner adapters' rows the leg factory renders; see "The product-test contract" below |
 | `measure_legs.py` | the gate profiler: every manifest leg run clean and unbounded, serially or under a load cap, each in its own Windows Job Object and profiled to its processes; see "The gate profiler" below |
 | `fixtures/measure-legs/` | the fixture legs and manifests `measure_legs.py --selftest` runs |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
@@ -1035,6 +1036,34 @@ adopter's manifest from run-gates 1.52, `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitne
 declared beside the row's `argv` in the same tokens and overridden under `[gate_leg.gov]` wherever
 `argv` is; it travels into an adopter's manifest from run-gates 1.53, `LEG_KEY_FLOORS["precommit"]`
 (TOOL-dWitnessedBar-10).
+`level` is in `LEG_KEYS` from run-gates 1.54, `LEG_KEY_FLOORS["level"]`, and no row of gov's manifest
+carries it, so it is not on the list above: a row carrying it is a product-test leg, its level one of
+`unit`, `integration`, `e2e` or `performance`. See "The product-test contract" below
+(TOOL-dWitnessedBar-9).
+
+**The product-test contract — `tests.product`.** `product_tests.py check`, the leg `product-test
+contract (tests.product)`, reads `tests.product` through the policy kit's `policy.py get`, or its
+catalogue default with the reason where that reader refuses, and grades the manifest's rows carrying
+`level` against it. The four levels are the ones the catalogue's `tests.landing-levels` row names.
+
+| `tests.product` | the product-test rows the manifest may hold | `check` is red when |
+|---|---|---|
+| `none` | none | any row carries `level` |
+| `declared` | the repository's own rows carrying `level`; no adapter row is rendered | a level is outside the four, or no row carries one and a runner's `detect` names one |
+| `declared-with-runners` (the default) | those, plus one adapter row per level each detected runner declares | a level is outside the four, or a detected runner's row is missing from the manifest |
+
+A runner adapter is a `[[test_runner]]` row of a kit descriptor, holding `runner`, a `detect` argv,
+the `levels` it can run and an `argv` spelling `{level}`; the guardrails kit's pytest row is the
+first. `leg_factory.py` runs each `detect` in the tree and, where one names a level, reads
+`tests.product` and adds one row per detected level after the declarations: name `<runner> <level>
+tests`, tag `leg.<runner>.<level>`, `pack` `product-tests` and its `level`. A tree no runner detects
+spends no policy read. `check` prints the value and where it was read, each product-test row with its
+level, and the count; a tree with no product test and no runner prints `0 product-test legs declared`
+and exits 0, the zero printed so it is never read as coverage. Gov holds no product suite, so gov's
+row runs `check --fixture`, one planted repository per value, printing `case <name>: red|green` and
+exiting 1 where a case reads otherwise than it is planted to. WHAT IT DOES NOT CHECK: that a leg
+carrying a level runs tests of that level, or that an adopter whose legs the deployer emitted, rather
+than the factory rendered, holds its adapter rows.
 
 **The commit-time list is derived, not typed in the hook.** `run-gates.sh --precommit` hands over to
 `precommit.py` before any bar machinery exists, as `--regen` does. It reads the manifest beside this

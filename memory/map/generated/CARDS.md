@@ -279,12 +279,12 @@ The gate runner, its harnesses, and the adopter that keeps a target's verdict re
 
 - status `shipped` · streams `tooling` · dossier `memory/map/features/run-gates.md`
 - decisions 9: `TOOL-aPacedTurnstile-1`, `TOOL-aPacedTurnstile-2`, `TOOL-aPacedTurnstile-4`, `TOOL-aPacedTurnstile-5`, `TOOL-aPacedTurnstile-6`, `TOOL-aPacedTurnstile-3`, `TOOL-aPacedTurnstile-7`, `TOOL-aPacedTurnstile-16`, `TOOL-dLoggedFlight-3`
-- gate-legs 17: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
+- gate-legs 18: `run-gates gov canary`, `run-gates adopter e2e`, `run-gates wiring`, `profile-bar selftest`, `every held leg is budgeted, every budget row resolves`, `run-selftests self-test`, `selftest harness self-test`, `extract-arms self-test`, `leg ceilings clear their evidenced maximum`, `run-gates run-log line`, `receipt sync (installed files match the receipt)`, `pre-push bar self-test`, `held-halves selftest`, `measure-legs selftest`
 - kits 1
 - gotcha-classes 19
 - guides 1
-- globs 30
-- cut 54 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- globs 31
+- cut 56 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## run-gates-turnstile
 
