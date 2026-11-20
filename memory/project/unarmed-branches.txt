@@ -167,3 +167,5 @@ skills/session-kickoff/card-compaction.fixture.sh	exit	card-compaction: FAILED l
 tools/lib/refuse-wrong-shell.sh	exit	exit 1	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt, so no unbound record was graded	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
 tools/memory-tree/check-memory-hygiene.sh	21	/project/unbound-records.txt the ledger factory refuses or whose count is not 1	1	384e6761d5906ff2699b79165e275e5c610d8e7f	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-17-3-builder-return.md
+tools/push-main.sh	exit	branch=$(check_run_branch) || exit 1	1	56569347a42ff8777e3577a2b9076973c13a6ca8	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md
+tools/push-main.sh	exit	write_prepared_merge "$branch" "$R" >&2 || exit 1	1	56569347a42ff8777e3577a2b9076973c13a6ca8	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md

@@ -1683,8 +1683,9 @@ out42=$(
   git push -q --no-verify origin main && git -C "$tmp/remote42.git" symbolic-ref HEAD refs/heads/main
   R42=$(git rev-parse HEAD)
   git checkout -q -b feat
-  mkdir -p "./${KIT_REL}policy"
-  printf 'import os, sys\nif sys.argv[1:] != ["get", "verdict.tree"]:\n    sys.exit(2)\nprint(os.environ.get("FIX_VERDICT_TREE", "prepared-merge"))\n' > "./${KIT_REL}policy/policy.py"
+  pk=policy  # the planted reader's kit directory and file stem, named once
+  mkdir -p "./${KIT_REL}$pk"
+  printf 'import os, sys\nif sys.argv[1:] != ["get", "verdict.tree"]:\n    sys.exit(2)\nprint(os.environ.get("FIX_VERDICT_TREE", "prepared-merge"))\n' > "./${KIT_REL}$pk/$pk.py"
   echo "u42" > src-u42.txt
   git add -A && git commit -q -m "TOOL-tFix-42: a unit and the planted verdict.tree reader"
   T42=$(git rev-parse HEAD)
