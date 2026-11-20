@@ -7,6 +7,8 @@ gov:kit drift-audit@1.34
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
     python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
+    python <prefix>/drift-audit/drift_report.py --gate-health [--write --build <slug> --unit <id>] [--with <flake record>]
+    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -44,6 +46,7 @@ import argparse
 import ast
 import datetime
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -51,6 +54,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
@@ -196,18 +200,24 @@ PINS_POPULATION = "drift-pins"
 BASELINES_POPULATION = "drift-baselines"
 
 
-def load_ledger():
-    """The memory-tree kit's ledger factory, found through the sibling-kit resolver, never a spelled path."""
+def load_memory_tree(anchor: str, what: str, why: str):
+    """The memory-tree kit's module `anchor`, found through the sibling-kit resolver, never a spelled path,
+    and imported in-process: the one loader of every memory-tree module drift reads (TOOL-dWitnessedBar-1
+    §8 F4). A kit that does not resolve is a DriftError naming `what` is missing and `why` drift reads it."""
     here = pathlib.Path(__file__).resolve().parent
     try:
-        kit = resolve_kit_dir("memory-tree", "legacy_ledger.py", here)
+        kit = resolve_kit_dir("memory-tree", anchor, here)
     except LookupError as exc:
-        raise DriftError(f"the memory-tree kit's ledger factory is not found, and drift reads its "
-                         f"shrink-only lists, pins and baselines through it: {exc}") from None
+        raise DriftError(f"the memory-tree kit's {what} is not found, and {why}: {exc}") from None
     if str(kit) not in sys.path:
         sys.path.append(str(kit))
-    import legacy_ledger  # noqa: E402,PLC0415
-    return legacy_ledger
+    return importlib.import_module(pathlib.PurePath(anchor).stem)
+
+
+def load_ledger():
+    """The memory-tree kit's ledger factory, found through the sibling-kit resolver, never a spelled path."""
+    return load_memory_tree("legacy_ledger.py", "ledger factory",
+                            "drift reads its shrink-only lists, pins and baselines through it")
 
 
 def read_drift_populations(root: pathlib.Path):
@@ -3632,6 +3642,237 @@ def build_live_builds_without_activity(ctx) -> dict:
             "unjudgeable": unjudgeable, "detail": detail}
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - gate health, the reliability bar measured from the flake records (TOOL-dWitnessedBar-1)
+#
+# `verdict.flakes.entry`'s `measured` value stands for the threshold derived here: once every leg of the
+# bar has thirty verdicts in the flake records, one more than the 90th percentile, by nearest rank (§8 F2),
+# across the bar's legs, of each leg's flakes in its newest ten by `Ended` (cl-dClosedLoop-0339), written
+# `<count>/10`. The bar is every leg of the gate-leg manifest beside this kit's tool root that the kit hold
+# does not hold, `subject` `kit` or `chunk` `selftests` as `run-gates.sh#derive_hold_source` reads it,
+# restated here until TOOL-dWitnessedBar-51 takes it through the runner's predicate. The records are read
+# through the memory-tree factory, loaded in-process by `load_memory_tree`, and their body through its
+# `read_flake_body` and `derive_flaked`, so the row grammar has one home.
+#
+# REPORT-ONLY, and `n/a` while unarmed: `value` is -1 there and the first detail row names each short
+# leg, so no reader takes an unarmed measurement for a zero. DEAD PROBE only where no factory resolves or
+# no manifest reads. `--gate-health` prints the measurement and, with `--write`, writes it as a
+# `gate-health` record when armed, which `verdict_flow.py flakes` reads as the threshold in force.
+#
+# WHAT IT DOES NOT CHECK: that a flake record's rows are true, which the runner wrote; a leg's release,
+# which bounds a hold and not the bar's health; a window other than ten.
+
+
+def read_gate_health(root: pathlib.Path, extra: str | None = None):
+    """-> (rows, bar, runs, skipped). `rows` is {leg: [(ended, run, flaked), ...]} over every tracked flake
+    record of `root`, read through the factory's `read_records`, plus `extra`, one repo-relative flake record
+    not yet staged (§8 F5); `bar` the manifest's legs the kit hold does not hold, in manifest order; `runs`
+    the `Run` of every record read, oldest `Ended` first; `skipped` [(path, why)] for each record the
+    factory grades malformed or whose `Ended` does not read. A DriftError where no factory resolves, the
+    manifest does not read, or the tracked records do not."""
+    why = "drift measures gate health from the flake records through it"
+    br = load_memory_tree("build_records.py", "record factory", why)
+    dl = load_memory_tree("design_lib.py", "design library", why)
+    manifest = pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json"
+    try:
+        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8"))
+               if not (leg.get("subject") == "kit" or leg.get("chunk") == "selftests")]
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+        raise DriftError(f"the gate-leg manifest {manifest.as_posix()} does not read, so no bar leg is "
+                         f"known: {exc}") from None
+
+    def read_flake(path, text):
+        fields, bad, name = br.read_record(path, text, "flake")
+        return {"path": path, "fields": fields, "rows": br.read_flake_body(text), "malformed": bad,
+                "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None}
+    try:
+        recs = br.read_records(root, dl.read_design_conf(root), "flake", read_flake)
+    except dl.DesignRefusal as exc:
+        raise DriftError(f"the tracked flake records do not read: {exc}") from None
+    if extra and extra not in {r["path"] for r in recs}:
+        recs.append(read_flake(extra, (root / extra).read_bytes().decode("utf-8", "replace")))
+    dated, skipped = [], []
+    for r in recs:
+        try:
+            ended = datetime.datetime.fromisoformat(
+                str(r["fields"].get("Ended", "")).strip().strip("`").replace("Z", "+00:00"))
+        except ValueError:
+            ended = None
+        if r["malformed"]:
+            skipped.append((r["path"], "; ".join(f"{key} {said}" for key, said in r["malformed"])))
+        elif ended is None:
+            skipped.append((r["path"], "its Ended does not read as an instant"))
+        else:
+            utc = datetime.timezone.utc
+            dated.append(((ended if ended.tzinfo else ended.replace(tzinfo=utc)).astimezone(utc), r))
+    dated.sort(key=lambda d: (d[0], d[1]["path"]))
+    rows: dict = {}
+    for ended, r in dated:
+        for leg, first, rerun in r["rows"]:
+            rows.setdefault(leg, []).append((ended, r["fields"]["Run"], br.derive_flaked(first, rerun)))
+    return rows, bar, list(dict.fromkeys(r["fields"]["Run"] for _, r in dated)), skipped
+
+
+def derive_gate_health(rows: dict, bar: list) -> dict:
+    """The measurement over `rows` and the `bar` legs, a pure function: each bar leg's verdicts and its
+    flakes in its newest ten by `Ended`; armed only where every bar leg has thirty verdicts, `value` then one
+    more than the nearest-rank 90th percentile of those flake counts (S3), else -1; `said` the measurement in
+    words, `measured <count>/10 · legs <armed>/<bar legs>` or `unarmed · <leg> <rows>/30 …`."""
+    legs = []
+    for leg in bar:
+        got = sorted(rows.get(leg, ()), key=lambda r: (r[0], r[1]), reverse=True)
+        legs.append({"leg": leg, "verdicts": len(got), "flakes": sum(1 for r in got[:10] if r[2])})
+    short = [d for d in legs if d["verdicts"] < 30]
+    value = -1
+    if legs and not short:
+        counts = sorted(d["flakes"] for d in legs)
+        value = counts[-(-9 * len(counts) // 10) - 1] + 1   # nearest rank: the ceil(0.9 n)-th, in integers
+    said = (f"measured {value}/10 · legs {len(legs)}/{len(legs)}" if value >= 0 else
+            "unarmed · " + (" · ".join(f"{d['leg']} {d['verdicts']}/30" for d in short)
+                            or "the manifest holds no bar leg"))
+    return {"value": value, "armed": len(legs) - len(short), "of": len(legs), "said": said, "legs": legs}
+
+
+def measure_gate_health(ctx) -> dict:
+    """`gate_health`: the reliability bar derived from the flake records, or `unarmed` naming each bar leg
+    short of thirty verdicts; DEAD PROBE only where no factory resolves or no manifest reads."""
+    name = "gate_health"
+    rec = {"signal": name, "value": -1, "of": 0, "armed": 0, "tolerance": ctx.pins.get(name),
+           "gateable": False, "live": False, "detail": []}
+    try:
+        rows, bar, runs, skipped = read_gate_health(ctx.root)
+    except DriftError as exc:
+        rec["detail"] = [{"dead": str(exc)}]
+        return rec
+    got = derive_gate_health(rows, bar)
+    # live: the factory and the manifest both read, since the population moves as verdicts accrue
+    rec.update(value=got["value"], of=got["of"], armed=got["armed"], live=bar is not None)
+    rec["detail"] = ([{"gate_health": got["said"], "verdicts": len(runs)}]
+                     + [{"skipped": path, "why": said} for path, said in skipped] + got["legs"])
+    return rec
+
+
+def run_gate_health_fixture(case: str) -> int:
+    """`--gate-health --fixture <case>` (TOOL-dWitnessedBar-1 AC1 to AC4): a scratch repository holding this
+    kit, the memory-tree factory and a manifest of ten bar legs, one `kit` leg and one `selftests` leg, its
+    flake records planted through the factory and the mode run there as a subprocess, where it finds its
+    root, its factory and its manifest as an install does. `differs`: thirty records whose newest ten hold
+    eight legs at no flake and two at three, and two legs flaked five times in the twenty before them:
+    `measured 4/10`, naming the thirty runs. `lower`: nine legs never flaked and one once: `measured 1/10`.
+    `short`: one row of one leg deleted: `unarmed` naming it at 29/30 and no held leg, and `--write` writes
+    nothing. `write`: `--write` writes one gate-health record the factory's `read` passes; `--with` naming
+    no flake record is refused, writing nothing; with one row deleted `--write` writes nothing; and `--with`
+    naming an unstaged thirtieth verdict arms it. Exit 0 when every case reads as planted, 1 naming each
+    that does not, 2 where no factory resolves."""
+    try:
+        br = load_memory_tree("build_records.py", "record factory", "the fixture plants its flake records through it")
+    except DriftError as exc:
+        print(f"drift-report: gate-health fixture {case} refused · {exc}", file=sys.stderr)
+        return 2
+    legs = [f"leg {i:02d}" for i in range(1, 11)]
+    flaked = {"differs": {"leg 09": (20, 23, 26), "leg 10": (20, 23, 26), "leg 01": (0, 3, 6, 9, 12),
+                          "leg 02": (0, 3, 6, 9, 12)},
+              "lower": {"leg 10": (25,)}}.get(case, {})
+    if case in ("short", "write"):
+        flaked = {"leg 09": (20, 23, 26), "leg 10": (20, 23, 26)}
+    build, unit = "tHealth", "ARCH-tHealth-1"
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")}
+    out, bad = [], []
+    with tempfile.TemporaryDirectory(prefix="gatehealth-") as td:
+        repo = pathlib.Path(td, "repo")
+        for home, files, src in (("drift-audit", ("drift_report.py",), pathlib.Path(__file__).resolve().parent),
+                                 ("memory-tree", ("build_records.py", "design_lib.py", "tree_lib.py"),
+                                  pathlib.Path(br.__file__).resolve().parent)):
+            (repo / home).mkdir(parents=True)
+            for f in files:
+                (repo / home / f).write_bytes((src / f).read_bytes())
+        manifest = [{"name": leg, "subject": "repo", "chunk": "product", "argv": ["true"]} for leg in legs]
+        manifest += [{"name": "kit selftest", "subject": "kit", "chunk": "selftests", "argv": ["true"]},
+                     {"name": "repo selftests", "subject": "repo", "chunk": "selftests", "argv": ["true"]}]
+        (repo / "gate-legs.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8", newline="\n")
+        (repo / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
+        (repo / "memory" / "builds" / build).mkdir(parents=True)
+
+        def plant(k, rows):
+            return br.write_record(repo, build, unit, "flake", f"run fx-{k:02d}",
+                                   [("Run", f"fx-{k:02d}"), ("Ended", f"2026-{1 + k // 28:02d}-{1 + k % 28:02d}T00:00:00Z"),
+                                    ("Sha", "-"), ("Tree", "-"), ("Legs", str(len(rows)))],
+                                   lines=["```tsv", *rows, "```"])
+        planted = [plant(k, [f"{leg}\t1\t0" if k in flaked.get(leg, ()) else f"{leg}\t0\t-" for leg in legs])
+                   for k in range(30)]
+        for args in (("init", "-q"), ("add", "-A")):
+            subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, check=True)
+
+        def run_mode(*flags):
+            p = subprocess.run([sys.executable, str(repo / "drift-audit" / "drift_report.py"), "--gate-health", *flags],
+                               cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env=env, timeout=120)
+            said = [ln for ln in p.stdout.splitlines() if ln.strip()]
+            out.extend(f"{case}: {' '.join(flags) or 'measure'}: rc {p.returncode} · {ln}" for ln in said or ["(nothing)"])
+            out.extend(f"{case}: stderr · {ln}" for ln in p.stderr.splitlines() if ln.strip())
+            return p.returncode, said
+
+        def written():
+            return sorted(repo.joinpath("memory", "builds", build, "build").glob("*-gate-health-*.md"))
+
+        def drop_row(leg):
+            newest = repo / planted[-1]
+            newest.write_text(newest.read_text(encoding="utf-8").replace(f"{leg}\t0\t-\n", ""),
+                              encoding="utf-8", newline="\n")
+
+        head = "drift-report: gate-health "
+        runs = " ".join(f"fx-{k:02d}" for k in range(30))
+        write = ("--write", "--build", build, "--unit", unit)
+        if case == "differs":
+            rc, said = run_mode()
+            want = [f"{head}measured 4/10 · legs 10/10 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"differs read rc {rc} {said}, planted {want}")
+        elif case == "lower":
+            rc, said = run_mode()
+            want = [f"{head}measured 1/10 · legs 10/10 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"lower read rc {rc} {said}, planted {want}")
+        elif case == "short":
+            drop_row("leg 03")
+            rc, said = run_mode(*write)
+            want = [f"{head}unarmed · leg 03 29/30"]
+            if rc != 0 or said != want or written():
+                bad.append(f"short read rc {rc} {said} writing {len(written())} record(s), planted {want} and none")
+        else:
+            rc, said = run_mode(*write)
+            name = f"memory/builds/{build}/build/{datetime.date.today().isoformat()}-build-{unit}-gate-health-1.md"
+            want = [f"{head}measured 4/10 · legs 10/10 · verdicts {runs}", f"drift-report: wrote {name}"]
+            if rc != 0 or said != want or [p.relative_to(repo).as_posix() for p in written()] != [name]:
+                bad.append(f"armed --write read rc {rc} {said}, planted {want} and that one record")
+            else:
+                p = subprocess.run([sys.executable, str(repo / "memory-tree" / "build_records.py"), "read",
+                                    str(repo / name)], capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", env=env, timeout=120)
+                out.extend(f"write: build_records.py read: rc {p.returncode} · {ln}" for ln in p.stdout.splitlines())
+                fields = ("Measured: 4/10", f"Verdicts: {runs}", "Legs: 10/10")
+                if p.returncode != 0 or not all(f in p.stdout for f in fields):
+                    bad.append(f"the factory's read of {name} exited {p.returncode}, wanting {fields}: {p.stdout[:300]}")
+            rc, said = run_mode(*write, "--with", "gate-legs.json")
+            if rc != 2 or len(written()) != 1:
+                bad.append(f"--with naming no flake record exited {rc} with {len(written())} record(s), planted 2 and one")
+            drop_row("leg 03")
+            rc, said = run_mode(*write)
+            if rc != 0 or said != [f"{head}unarmed · leg 03 29/30"] or len(written()) != 1:
+                bad.append(f"one row deleted, --write read rc {rc} {said} with {len(written())} record(s), planted "
+                           f"unarmed and one")
+            extra = plant(30, ["leg 03\t0\t-"])
+            rc, said = run_mode("--with", extra)
+            if rc != 0 or said != [f"{head}measured 4/10 · legs 10/10 · verdicts {runs} fx-30"]:
+                bad.append(f"--with naming the unstaged thirtieth verdict read rc {rc} {said}, planted it armed")
+    for ln in out:
+        print(ln)
+    for ln in bad:
+        print(f"drift-report: gate-health fixture {case} FAILED · {ln}", file=sys.stderr)
+    print(f"drift-report: gate-health fixture {case} " + ("FAILED" if bad else "ok"))
+    return 1 if bad else 0
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -3649,7 +3890,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            measure_legs_retried_after_timeout, measure_fleet_over_budget,
            build_remote_ci_red_streak,
            build_stale_dossiers,
-           build_live_builds_without_activity]
+           build_live_builds_without_activity,
+           measure_gate_health]
 
 
 # --------------------------------------------------------------------------------------------
@@ -4349,7 +4591,77 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--escape-ratio", metavar="YYYY-MM", default=None,
                     help="on demand, minutes: the share of that month's product fixes that repaired "
                          "code already on the base; never part of the report or the bar")
+    ap.add_argument("--gate-health", action="store_true",
+                    help="measure the reliability bar from the flake records and print it; a mode of its "
+                         "own, reading the conf, the gate-leg manifest and the records alone")
+    ap.add_argument("--write", action="store_true",
+                    help="with --gate-health: write the measurement as a gate-health record when armed")
+    ap.add_argument("--build", help="with --gate-health --write: the build whose folder the record goes in")
+    ap.add_argument("--unit", help="with --gate-health --write: the unit id the record serves")
+    ap.add_argument("--with", dest="with_path", metavar="PATH",
+                    help="with --gate-health: one flake record not yet staged, counted beside the tracked ones")
+    ap.add_argument("--fixture", choices=("differs", "lower", "short", "write"),
+                    help="with --gate-health: run one planted case over a scratch repository")
     args = ap.parse_args(argv)
+
+    if args.gate_health or args.write or args.build or args.unit or args.with_path or args.fixture:
+        # TOOL-dWitnessedBar-1 S4: a mode of its own, as --escape-ratio is. It reads the conf through the
+        # factory, the manifest and the records alone: no project layer and no base ref.
+        if not args.gate_health:
+            print("drift-report: --write, --build, --unit, --with and --fixture are asked of --gate-health alone",
+                  file=sys.stderr)
+            return 2
+        clash = [f for f, on in (("--check", args.check), ("--offenders", args.offenders),
+                                 ("--delta", args.delta), ("--escape-ratio", args.escape_ratio is not None)) if on]
+        if clash:
+            print(f"drift-report: --gate-health is a mode of its own and does not combine with "
+                  f"{', '.join(clash)}", file=sys.stderr)
+            return 2
+        if args.fixture:
+            if args.write or args.build or args.unit or args.with_path:
+                print("drift-report: --fixture plants its own records and takes no --write, --build, --unit "
+                      "or --with", file=sys.stderr)
+                return 2
+            return run_gate_health_fixture(args.fixture)
+        if bool(args.build or args.unit or args.write) and not (args.write and args.build and args.unit):
+            print("drift-report: --write takes --build <slug> and --unit <id>, the record's build and unit, and "
+                  "they are asked of --write alone", file=sys.stderr)
+            return 2
+        try:
+            root = repo_root()
+            br = load_memory_tree("build_records.py", "record factory",
+                                  "drift measures gate health from the flake records through it")
+            extra = None
+            if args.with_path:
+                given = pathlib.Path(args.with_path)
+                path = (given if given.is_absolute() else pathlib.Path.cwd() / given).resolve()
+                try:
+                    extra = path.relative_to(root.resolve()).as_posix()
+                except ValueError:
+                    raise DriftError(f"--with {args.with_path} is outside this repository") from None
+                if not path.is_file() or not br.derive_record_name("flake").search(extra):
+                    raise DriftError(f"--with {args.with_path} is no flake record: a file named "
+                                     f"<date>-build-<unit id>-flake-<n>.md in a build's build/ folder")
+            rows, bar, runs, skipped = read_gate_health(root, extra)
+        except DriftError as exc:
+            print(f"drift-report: --gate-health refused, nothing written · {exc}", file=sys.stderr)
+            return 2
+        for path, said in skipped:
+            print(f"drift-report: gate-health skipped {path} · {said}", file=sys.stderr)
+        got = derive_gate_health(rows, bar)
+        armed = got["value"] >= 0
+        print(f"drift-report: gate-health {got['said']}" + (f" · verdicts {' '.join(runs)}" if armed else ""))
+        if args.write and armed:
+            try:
+                rel = br.write_record(root, args.build, args.unit, "gate-health", f"measured {got['value']}/10",
+                                      [("Measured", f"{got['value']}/10"), ("Verdicts", " ".join(runs)),
+                                       ("Legs", f"{got['armed']}/{got['of']}")])
+            except (ValueError, OSError) as exc:
+                print(f"drift-report: --gate-health refused, nothing written · the record factory refused the "
+                      f"record: {exc}", file=sys.stderr)
+                return 2
+            print(f"drift-report: wrote {rel}")
+        return 0
 
     if args.escape_ratio is not None:
         # TOOL-aMendedFleet-50 S1: a mode of its own. Beside `--check` it would put a blame per fix

@@ -11363,6 +11363,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "derive_flaked",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "derive_floor_breaches",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -11451,6 +11456,11 @@
       "id": "derive_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_gate_health",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "derive_gate_legacy",
@@ -15805,6 +15815,11 @@
     {
       "id": "load_memory_tree",
       "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "load_memory_tree",
+      "kind": "function",
       "file": "tools/playbook/core.py"
     },
     {
@@ -17121,6 +17136,11 @@
       "id": "measure_forks",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "measure_gate_health",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "measure_gh37_interleave",
@@ -21218,6 +21238,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_flake_body",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_flake_policy",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -21326,6 +21351,11 @@
       "id": "read_gate_blocks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_gate_health",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_gate_policy",
@@ -31618,6 +31648,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "run_fixture_measured_check",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_quarantine_check",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -31716,6 +31751,11 @@
       "id": "run_gate",
       "kind": "function",
       "file": "tools/check-remote-literals.test.sh"
+    },
+    {
+      "id": "run_gate_health_fixture",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "run_gate_in",
@@ -36723,6 +36763,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_gate_health",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_gate_template_boundary",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -39191,6 +39236,11 @@
       "id": "write_gate_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_gate_health",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_gate_key",
