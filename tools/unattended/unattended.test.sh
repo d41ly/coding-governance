@@ -21543,6 +21543,53 @@ dm_out=$( cd "$dm_c1" && env -u CLAUDE_CODE_SESSION_ID USERNAME=daily-agent GOV_
 sed -i 's/^RUN_CLAIMS="off"$/RUN_CLAIMS="on"/' "$dm_c1/.unattended.conf"
 same "DPR43 AC32 an id-less acquire with RUN_CLAIMS off exits 0" "$dm_rc" "0"
 hit  "$dm_out" "lease — off · tFix/build"
+# ==================================================================================================
+# TOOL-dPlacedRequest-48 — THE REQUEST RACE, PLACED. Over the same lease fixture: a stub `cp` first on
+# PATH holds call A inside its window, the lock taken and the compare made, and announces it by a file
+# before the hold. Its first call whose last argument is the temporary sibling `<key>.md.<pid>` takes
+# `$pr_h/once`, touches `$pr_h/held` and waits for `$pr_h/release` under a 60 s bound before the real
+# `cp`; every other call runs the real `cp` at once. B runs only after the announcement, never after a
+# fixed sleep, with a text differing from A's only in its ISO date, so the two key alike: B exits 2
+# `requests.lock busy` (AC1); A, released, exits 0 `recorded`, the stored copy byte for byte A's,
+# `.typed` holding qA's one line and the origin one ref (AC1); a third call with B's text exits 2
+# `collision` (AC2). No announcement inside 30 s reds as `request race never placed` (AC3), so a copy
+# that is not a `cp` spawn cannot pass vacuously. A is waited for on every path. The line printed
+# names each exit and B's seconds after the hold: B must reach the lock inside its 5 s wait of A's
+# take, or A's 10 s hold runs out and B breaks it as stale. RED, observed at the close: `SCRIPT` set to
+# the driver of a worktree at 3fc16744c, before the lock, where B copies and exits 0. Waived by README
+# rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a B that overruns A's hold,
+# TOOL-dPlacedRequest-52's re-run, and a race between two nodes.
+# ==================================================================================================
+pr_h="$LF/pr"; mkdir -p "$pr_h/bin"; pr_cp=$(command -v cp)
+printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
+  'case "${!#}" in */requests/*.md.*)' \
+  '  if mkdir "$h/once" 2>/dev/null; then touch "$h/held"; e=$((EPOCHSECONDS + 60))' \
+  '    until [ -e "$h/release" ] || [ "$EPOCHSECONDS" -ge "$e" ]; do sleep 0.05; done; fi ;;' \
+  'esac' "exec '$pr_cp' \"\$@\"" >"$pr_h/bin/cp"
+chmod +x "$pr_h/bin/cp"
+printf 'Place the request race, zq-race-marker-48, on 2026-11-19\n' > "$LF/a.md"
+printf 'Place the request race, zq-race-marker-48, on 2026-11-20\n' > "$LF/b.md"
+PATH="$pr_h/bin:$PATH" RQ_SID=qA run_request_arm --request "$LF/a.md" >"$pr_h/a.out" & pr_pa=$!
+pr_end=$((EPOCHSECONDS + 30))
+until [ -e "$pr_h/held" ] || [ "$EPOCHSECONDS" -ge "$pr_end" ]; do sleep 0.05; done
+pr_t0=$EPOCHSECONDS
+same "DPR48 AC3 call A announced its copy from inside its window" \
+  "$([ -e "$pr_h/held" ] && echo placed || echo 'request race never placed')" "placed"
+pr_out=$(PATH="$pr_h/bin:$PATH" RQ_SID=qB run_request_arm --request "$LF/b.md"); pr_rb=$?; pr_t1=$EPOCHSECONDS
+touch "$pr_h/release"; wait "$pr_pa"; pr_ra=$?
+pr_ao=$(<"$pr_h/a.out"); pr_key=""; [[ $pr_ao =~ $dm_re ]] && pr_key=${BASH_REMATCH[1]}
+pr_cmp=$(cmp -s "$LF/a.md" "$dm_c1/.git/requests/$pr_key.md" && echo a.md || echo differs)
+same "DPR48 AC1 B, run while A holds requests.lock, exits 2" "$pr_rb" "2"
+hit  "$pr_out" "not written · requests.lock busy"
+same "DPR48 AC1 A, released, exits 0 with a twelve-hex key" "$pr_ra ${#pr_key}" "0 12"
+hit  "$pr_ao" "request — $pr_key · recorded refs/gov/requests/$pr_key"
+same "DPR48 AC1 the stored copy is A's, .typed holds qA's one line, the origin one ref for the key" \
+  "$pr_cmp $(grep -c '' "$dm_c1/.git/requests/$pr_key.typed" 2>/dev/null) $(cut -f1 "$dm_c1/.git/requests/$pr_key.typed" 2>/dev/null) $(git --git-dir="$LF/origin.git" for-each-ref "refs/gov/requests/$pr_key" | grep -c .)" \
+  "a.md 1 qA 1"
+pr_out=$(run_request_arm --request "$LF/b.md"); pr_rc=$?
+same "DPR48 AC2 a third call with B's text, after A ends, exits 2" "$pr_rc" "2"
+hit  "$pr_out" "collision: a different text keys alike"
+echo "DPR48 placed race: A exited $pr_ra, B exited $pr_rb $((pr_t1 - pr_t0)) s after the hold, C exited $pr_rc, the stored copy $pr_cmp"
 rm -rf "$LF"
 # ---- AC1: a take-over --resume and --close, the claims fetch failing and `warn` planted, refuse at
 # ---- check 109 and queue nothing. The run is aged so the second keepalive takes it over (AC8's way).
@@ -23362,7 +23409,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3970 -> 3995 by TOOL-dPlacedRequest-43: the minors block's 25 region-eight executions (24
 # `same` and `hit` lines, no loop, and the one `mutate` its `build_claim_held` pays), counted by a
 # probe of the block alone; no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3995
+# RAISED 3995 -> 4003 by TOOL-dPlacedRequest-48: the placed-race block's 8 region-eight assertions (5
+# `same` and 3 `hit`, no loop), off the diff's own lines; no skip branch. No suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=4003
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23637,7 +23687,8 @@ FLOOR_SHARD_7=311
 # RAISED 1176 -> 1184 by TOOL-dPlacedRequest-46: the same 8 region-eight dash-stop assertions, see FLOOR_ASSERTIONS.
 # RAISED 1184 -> 1189 by TOOL-dPlacedRequest-47: the same 5 region-eight sighted-guard assertions, see FLOOR_ASSERTIONS.
 # RAISED 1189 -> 1214 by TOOL-dPlacedRequest-43: the same 25 region-eight minors executions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1214
+# RAISED 1214 -> 1222 by TOOL-dPlacedRequest-48: the same 8 region-eight placed-race assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1222
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
