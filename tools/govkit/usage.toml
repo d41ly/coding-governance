@@ -825,6 +825,27 @@ verb = "down"
 flags = []
 
 [[usage]]
+id = "script:{prefix}/govkit/steps/inherited_red.py#up"
+shape = "verb"
+entry = "{prefix}/govkit/steps/inherited_red.py"
+verb = "up"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/inherited_red.py#witness"
+shape = "verb"
+entry = "{prefix}/govkit/steps/inherited_red.py"
+verb = "witness"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/govkit/steps/inherited_red.py#down"
+shape = "verb"
+entry = "{prefix}/govkit/steps/inherited_red.py"
+verb = "down"
+flags = []
+
+[[usage]]
 id = "script:{prefix}/govkit/docs_leg.py"
 shape = "verb"
 entry = "{prefix}/govkit/docs_leg.py"

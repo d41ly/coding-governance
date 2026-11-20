@@ -1,31 +1,42 @@
 #!/usr/bin/env python3
-"""inherited_red.py — the upgrade step `govkit/inherited-red-to-verdict-blocks` (TOOL-dWitnessedBar-3, S8).
+"""inherited_red.py — the upgrade step `govkit/inherited-red-to-verdict-blocks` (TOOL-dWitnessedBar-3, S8;
+widened by TOOL-dWitnessedBar-44).
 
     python <prefix>/govkit/steps/inherited_red.py up|down|witness <target>
 
-Its row is in `steps.toml` beside this directory. The retired gate key `INHERITED_RED=park|land` in
-the target's `.githooks/gate-env.sh` becomes the policy key `verdict.blocks` in its
-`.governance/policy.toml`, so which red blocks a landing reads the same on either side of the step:
-`park` is `every-red` and `land` is `own-mixed-contended`. The DOWN restores both files
-byte-identical; the WITNESS exits 0 when no `INHERITED_RED` assignment is left in the gate file, or
-there is no gate file, which is the step applied.
+Its row is in `steps.toml` beside this directory. The retired gate key `INHERITED_RED` becomes the
+policy key `verdict.blocks` in the target's `.governance/policy.toml`, so which red blocks a landing
+reads the same on either side of the step. The kit before it read the key in TWO files: the pre-push
+hook read `.githooks/gate-env.sh`, and the driver read the file `GATE_POLICY_FILE` names in
+`.unattended.conf`, that same gate file where the key is blank or absent or there is no conf. The
+step reads both, each only where present, and the second only where it is another file.
 
-THE UP, in order. No gate file, or no `INHERITED_RED` line in it: exit 0, nothing written. Otherwise
-the gate file is read in `conf_to_policy.py`'s line grammar, the last assignment winning, a trailing
-` # comment` and one pair of quotes stripped; its value is parsed here, since that file's
-`parse_conf` reads integers only. A value outside `park land` exits 1 WRITING NOTHING. A blank value
-writes no policy key, so the catalogue default `own-only` applies. A mapped value is written into
-`[verdict] blocks` through `upgrade_steps.render_policy_text`, the one writer, unless the policy file
-already sets `verdict.blocks`: the same value writes nothing more, and another value is a conflict,
-printed as `conflict · verdict.blocks · policy <value> · gate <value>`, exit 1 writing nothing, since
-two keys deciding one landing must not be resolved by a step. Every `INHERITED_RED` line is then taken
-out of the gate file, which is kept, LAST, so the witness changes last. A re-run over a killed up
-recomputes from the first before-image and converges.
+THE MAPPING is the pre-step readers' own `case` arms: `land` is `own-mixed-contended`, and `park`
+and every other non-blank value, `Park` and `LAND` included, is `every-red`, as both readers read
+it. A `GATE_POLICY_FILE` that is not a repo-relative path inside the tree, by the driver's own case
+patterns, read `park`: it maps to `every-red`, and the step neither reads nor edits the file it
+names. Where the two files map to different values the stricter, `every-red`, is written. A blank
+value maps to nothing, so where every file read is blank the catalogue default `own-only` applies.
+
+THE UP, in order. No file read assigns `INHERITED_RED`: exit 0, nothing written. Otherwise each file
+is read in `conf_to_policy.py`'s line grammar, the last assignment winning, a trailing ` # comment`
+and one pair of quotes stripped; a file that is not UTF-8 exits 1 naming it, writing nothing. The
+value is written into `[verdict] blocks` through `upgrade_steps.render_policy_text`, the one writer,
+unless the policy file already sets `verdict.blocks`: the same value writes nothing more, and another
+value is a conflict, printed as `conflict · verdict.blocks · policy <value> · gate <value>`, exit 1
+writing nothing, since two keys deciding one landing must not be resolved by a step. Every
+`INHERITED_RED` line is then taken out of each file that held one, which is kept, LAST, so the
+witness changes last. A re-run over a killed up recomputes from the first before-image and
+converges. The DOWN restores every file byte-identical. The WITNESS prints one line per file read,
+naming it, the value found and the value written, and exits 0 when no `INHERITED_RED` assignment is
+left in either file, or neither is present, which is the step applied.
 
 Exit 0 done, 1 refused naming the file or the conflict (nothing written), 2 a usage error.
 """
 
+import base64
 import importlib.util
+import json
 import pathlib
 import re
 import sys
@@ -34,9 +45,12 @@ import tomllib
 STEP_ID = "govkit/inherited-red-to-verdict-blocks"
 GATE = ".githooks/gate-env.sh"
 KEY = "INHERITED_RED"
+CONF, CONF_KEY = ".unattended.conf", "GATE_POLICY_FILE"
 POLICY = ".governance/policy.toml"
 TABLE, POLICY_KEY = "verdict", "blocks"
 VALUES = {"park": "every-red", "land": "own-mixed-contended"}
+OTHER = "every-red"  # the readers' `*` arm read any value outside `park land` as park
+STRICTNESS = ("every-red", "own-mixed-contended")  # the stricter first
 
 
 def load_conf_to_policy():
@@ -57,24 +71,78 @@ C2P = load_conf_to_policy()
 Refusal = C2P.Refusal
 
 
-def parse_gate(data: bytes):
-    """The `verdict.blocks` value the gate file's last `INHERITED_RED` line maps to, None where it is blank."""
+def read_value(data: bytes, rel: str, key: str) -> str | None:
+    """The value the last `key` line of `rel`'s bytes assigns, a trailing comment and one pair of
+    quotes stripped; None where no line assigns it. Bytes that are not UTF-8 refuse, naming `rel`."""
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError as e:
-        raise Refusal(f"{GATE}: not UTF-8 ({e}), so its {KEY} cannot be read") from None
-    line, found = C2P.build_line_re(KEY), None
-    for n, ln in enumerate(text.removeprefix("﻿").split("\n"), 1):
+        raise Refusal(f"{rel}: not UTF-8 ({e}), so its {key} cannot be read") from None
+    line, found = C2P.build_line_re(key), None
+    for ln in text.removeprefix("﻿").split("\n"):
         m = line.match(ln.rstrip("\r"))
         if m:
-            found = (re.sub(r"\s+#.*$", "", m[1]).strip(), n)
-    raw, n = found
-    value = raw[1:-1] if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'" else raw
-    if value == "":
+            found = re.sub(r"\s+#.*$", "", m[1]).strip()
+    if found is None:
         return None
-    if value not in VALUES:
-        raise Refusal(f"{GATE}:{n}: {KEY} must be park or land, and reads '{value}'")
-    return VALUES[value]
+    return found[1:-1] if len(found) >= 2 and found[0] == found[-1] and found[0] in "\"'" else found
+
+
+def parse_gate(data: bytes, rel: str):
+    """The `verdict.blocks` value the last `INHERITED_RED` line of `rel` maps to, None where it is
+    blank or absent: `land` the milder, every other value the readers' `park`."""
+    value = read_value(data, rel, KEY)
+    return VALUES.get(value, OTHER) if value else None
+
+
+def derive_stricter(values) -> str | None:
+    """The value of `values` that blocks more, None where none is set."""
+    return next((v for v in STRICTNESS if v in values), None)
+
+
+def check_off_tree(path: str) -> bool:
+    """True where `path` is not a repo-relative path inside the tree by the driver's own `case`
+    patterns (`/*|[A-Za-z]:*|..|../*|*/..|*/../*`), which read `park` without reading the file."""
+    return (path.startswith("/") or re.match(r"[A-Za-z]:", path) is not None or path == ".."
+            or path.startswith("../") or path.endswith("/..") or "/../" in path)
+
+
+def derive_reads(target: pathlib.Path) -> tuple[list[str], str | None]:
+    """(the repo-relative files the step reads, the `GATE_POLICY_FILE` read as `park` unread or None).
+    The gate file always; the file the conf's `GATE_POLICY_FILE` names beside it where that is
+    another contained path. A blank or absent key, or no conf, names the gate file."""
+    conf = target / CONF
+    named = read_value(conf.read_bytes(), CONF, CONF_KEY) if conf.is_file() else None
+    if not named:
+        return [GATE], None
+    if check_off_tree(named):
+        return [GATE], named
+    C2P.STEPS.check_contained(target, named)  # a link or a git-directory path refuses, read nothing
+    rel = C2P.STEPS.derive_contained_rel(named)
+    if rel == POLICY:
+        raise Refusal(f"{CONF}: {CONF_KEY} names {POLICY}, the file this step writes, so it cannot "
+                      f"also be read as a gate file")
+    return ([GATE] if rel == GATE else [GATE, rel]), None
+
+
+def read_file(target: pathlib.Path, rel: str) -> bytes | None:
+    """`rel`'s bytes, None where it is absent or unreadable, as the driver read an absent file."""
+    p = target / rel
+    try:
+        return p.read_bytes() if p.is_file() else None
+    except OSError:
+        return None
+
+
+def read_image_before(target: pathlib.Path) -> dict:
+    """The before bytes this step's before-image records per path, {} where there is none or it
+    does not parse: the witness's value found once the up has taken the lines out."""
+    try:
+        image = C2P.STEPS.derive_image_path(target, STEP_ID)
+        paths = json.loads(image.read_text(encoding="utf-8"))["paths"] if image.is_file() else {}
+        return {p: None if v["before"] is None else base64.b64decode(v["before"]) for p, v in paths.items()}
+    except (Refusal, OSError, ValueError, KeyError, TypeError, AttributeError):
+        return {}
 
 
 def read_held(before: bytes | None):
@@ -86,24 +154,29 @@ def read_held(before: bytes | None):
 
 
 def cmd_up(target: pathlib.Path) -> int:
-    gate = target / GATE
-    if not gate.is_file() or not C2P.check_assigned(gate.read_bytes(), KEY):
-        print(f"inherited-red: up · no {KEY} in {GATE} at {target.as_posix()}, so there is nothing to move")
+    reads, off = derive_reads(target)
+    held = [rel for rel in reads if (b := read_file(target, rel)) is not None and C2P.check_assigned(b, KEY)]
+    if not held:
+        print(f"inherited-red: up · no {KEY} in {' or '.join(reads)} at {target.as_posix()}, "
+              f"so there is nothing to move")
         return 0
     pol = target / POLICY
 
     def derive_after(before):
-        gate_bytes = gate.read_bytes() if before is None else before[GATE]
-        pol_bytes = (pol.read_bytes() if pol.is_file() else None) if before is None else before.get(POLICY)
-        value = parse_gate(gate_bytes)
-        after = {GATE: C2P.render_conf_rest(gate_bytes, KEY)}
+        rels = held if before is None else [rel for rel in reads if rel in before]
+        after, values = {}, [OTHER] if off else []
+        for rel in rels:
+            data = read_file(target, rel) if before is None else before[rel]
+            values.append(parse_gate(data, rel))
+            after[rel] = C2P.render_conf_rest(data, KEY)
         if before is not None and POLICY not in before:
             return after  # the first up wrote no policy key, so a re-run writes none either
-        held = read_held(pol_bytes)
-        if value is not None and held is not None and held != value:
-            raise Refusal(f"conflict · {TABLE}.{POLICY_KEY} · policy {held} · gate {value}: settle which "
+        pol_bytes = (pol.read_bytes() if pol.is_file() else None) if before is None else before[POLICY]
+        value, have = derive_stricter(values), read_held(pol_bytes)
+        if value is not None and have is not None and have != value:
+            raise Refusal(f"conflict · {TABLE}.{POLICY_KEY} · policy {have} · gate {value}: settle which "
                           f"one decides, then re-run the step")
-        if value is not None and held is None:
+        if value is not None and have is None:
             after[POLICY] = C2P.render_policy_bytes(pol_bytes, [(TABLE, POLICY_KEY, value)])
         return after
 
@@ -111,10 +184,12 @@ def cmd_up(target: pathlib.Path) -> int:
     if after.get(POLICY) is not None:
         pol.parent.mkdir(parents=True, exist_ok=True)
         pol.write_bytes(after[POLICY])
-    gate.write_bytes(after[GATE])  # LAST: the witness reads the line's absence
-    print(f"inherited-red: up · {GATE} kept, its {KEY} taken out"
-          + (f" · {TABLE}.{POLICY_KEY} set in {POLICY}" if POLICY in after else
-             f" · {POLICY} unchanged"))
+    gates = [rel for rel in after if rel != POLICY]
+    for rel in gates:
+        (target / rel).write_bytes(after[rel])  # LAST: the witness reads the line's absence
+    print(f"inherited-red: up · {', '.join(gates)} kept, its {KEY} taken out"
+          + (f" · {CONF_KEY} {off} is outside the tree, read as park" if off else "")
+          + (f" · {TABLE}.{POLICY_KEY} set in {POLICY}" if POLICY in after else f" · {POLICY} unchanged"))
     return 0
 
 
@@ -125,11 +200,41 @@ def cmd_down(target: pathlib.Path) -> int:
 
 
 def cmd_witness(target: pathlib.Path) -> int:
-    gate = target / GATE
-    held = gate.is_file() and C2P.check_assigned(gate.read_bytes(), KEY)
-    print(f"inherited-red: witness · {GATE} " + (f"assigns {KEY}: not applied" if held else
-                                                f"assigns no {KEY}, or is absent: applied"))
-    return 1 if held else 0
+    reads, off = derive_reads(target)
+    image = read_image_before(target)
+    rows, values, pending = [], [], False
+    for rel in reads:
+        data = read_file(target, rel)
+        now = data is not None and C2P.check_assigned(data, KEY)
+        was = image.get(rel)
+        if not now and not (was is not None and C2P.check_assigned(was, KEY)):
+            rows.append(f"{rel} " + ("is absent or unreadable" if data is None else f"assigns no {KEY}")
+                        + ": applied")
+            continue
+        pending |= now
+        try:
+            raw = read_value(data if now else was, rel, KEY)
+            mapped = parse_gate(data if now else was, rel)
+        except Refusal as e:
+            rows.append(f"{e}: {'not applied' if now else 'applied'}")
+            continue
+        values.append(mapped)
+        rows.append((rel, raw, mapped, now))
+    if off and values:
+        values.append(OTHER)
+    written = derive_stricter(values) or f"nothing, {POLICY} unchanged"
+    for row in rows:
+        if isinstance(row, str):
+            print(f"inherited-red: witness · {row}")
+            continue
+        rel, raw, mapped, now = row
+        print(f"inherited-red: witness · {rel} " + ("assigns" if now else "assigned before the up")
+              + f" {KEY}={raw!s} · read as {mapped or 'nothing'} · "
+              + (f"the up writes {written}: not applied" if now else f"written {written}: applied"))
+    if off:
+        print(f"inherited-red: witness · {CONF_KEY} {off} is not a repo-relative path inside the tree, "
+              f"read as park ({OTHER}), the file neither read nor edited")
+    return 1 if pending else 0
 
 
 def main(argv: list[str]) -> int:

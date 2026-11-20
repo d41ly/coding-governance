@@ -4140,6 +4140,71 @@ def check_review_rounds_step(tmp: pathlib.Path) -> None:
           got == "[review]\nmax-rounds = 5\n\n[review.design]\nround-count = 5\n", repr(got))
 
 
+def check_inherited_red_step(tmp: pathlib.Path) -> None:
+    """TOOL-dWitnessedBar-44 AC1 AC2 AC3 — `inherited_red.py` reads `INHERITED_RED` from both files
+    the kit before it read, the hook's `.githooks/gate-env.sh` and the driver's `GATE_POLICY_FILE`,
+    and maps every value the pre-step readers accepted: `land` alone to `own-mixed-contended`, any
+    other value and an off-tree `GATE_POLICY_FILE` to `every-red`, two files to the stricter. Each
+    verb runs under `-I` as the runner runs it. RED against the step that read the gate file alone:
+    AC1's custom file writes nothing, and an off-table value refuses."""
+    import tomllib  # noqa: PLC0415
+    step_py = HERE / "steps" / "inherited_red.py"
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_blocks(t: pathlib.Path):
+        p = t / ".governance" / "policy.toml"
+        return tomllib.loads(p.read_text(encoding="utf-8")).get("verdict", {}).get("blocks") if p.is_file() else None
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {q.relative_to(t).as_posix(): q.read_bytes() for q in t.rglob("*")
+                if q.is_file() and ".git" not in q.relative_to(t).parts}
+
+    t = build_target(tmp, None, "ir-ac1", {".unattended.conf": 'GATE_POLICY_FILE="ops/gate-policy.sh"\n',
+                                          "ops/gate-policy.sh": "A=1\nINHERITED_RED=park  # was\n"})
+    w0, up = run_step("witness", t), run_step("up", t)
+    w1 = run_step("witness", t)
+    check("[dWB-44 AC1] a custom GATE_POLICY_FILE holding park, no gate-env.sh: the up writes "
+          "verdict.blocks every-red, takes the line out of the custom file, and its witness exits 1 "
+          "before and 0 after naming it",
+          up.returncode == 0 and read_blocks(t) == "every-red"
+          and (t / "ops" / "gate-policy.sh").read_bytes() == b"A=1\n"
+          and w0.returncode == 1 and w1.returncode == 0 and "ops/gate-policy.sh" in w1.stdout,
+          w0.stdout + up.stdout + up.stderr + w1.stdout)
+
+    for tag, value, want in (("park", "Park", "every-red"), ("land-uc", "LAND", "every-red"),
+                             ("bogus", "bogus", "every-red"), ("land", "land", "own-mixed-contended")):
+        t = build_target(tmp, None, f"ir-ac2-{tag}", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                                      "ops/p.sh": f"INHERITED_RED={value}\n"})
+        up = run_step("up", t)
+        check(f"[dWB-44 AC2] INHERITED_RED={value}: the up writes {want} and its witness holds after",
+              up.returncode == 0 and read_blocks(t) == want and run_step("witness", t).returncode == 0,
+              up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir-ac2-off", {".unattended.conf": "GATE_POLICY_FILE=/etc/x\n",
+                                               ".githooks/gate-env.sh": "INHERITED_RED=land\n"})
+    up = run_step("up", t)
+    check("[dWB-44 AC2] a GATE_POLICY_FILE of /etc/x beside gate-env.sh's land: the up writes every-red, "
+          "as the driver read the off-tree path",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
+
+    t = build_target(tmp, None, "ir-ac3", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                           ".githooks/gate-env.sh": "A=1\nINHERITED_RED=land\n",
+                                           "ops/p.sh": "INHERITED_RED=park\nB=2\n"})
+    pre = read_tree(t)
+    up, w1 = run_step("up", t), run_step("witness", t)
+    lines = [ln for ln in w1.stdout.splitlines() if ln.strip()]
+    check("[dWB-44 AC3] gate-env.sh land beside a GATE_POLICY_FILE holding park: the up writes the "
+          "stricter every-red and its witness prints two lines naming both files and values",
+          up.returncode == 0 and read_blocks(t) == "every-red" and w1.returncode == 0 and len(lines) == 2
+          and ".githooks/gate-env.sh" in lines[0] and "=land" in lines[0]
+          and "ops/p.sh" in lines[1] and "=park" in lines[1], up.stdout + up.stderr + w1.stdout)
+    down = run_step("down", t)
+    check("[dWB-44 AC3] the down restores both files byte for byte",
+          down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+
 def check_steps_recordable() -> None:
     """TOOL-dSafePassage-16 AC1 AC2 — the step record's precondition and its one writer over the
     spec's five receipt shapes: the predicate reads the table's answer and writes nothing, and the
@@ -6244,6 +6309,7 @@ def main() -> int:
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
         check_review_rounds_step(tmp / "drr")
+        check_inherited_red_step(tmp / "dir")
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")

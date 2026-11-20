@@ -438,3 +438,13 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T06:38:31Z brief · item TOOL-dWitnessedBar-44 · reason d64030ae12ef memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-44-build-brief.md
 
 2026-11-20T06:38:32Z brief · item TOOL-dWitnessedBar-5 · reason 88d85f20a579 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-5-build-brief.md
+
+2026-11-20T06:40:29Z dispatch · item c9b50206 TOOL-dWitnessedBar-44 · reason help/upgrade-steps.md tools/govkit/selftest.py tools/govkit/steps/inherited_red.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-44-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-20T06:41:38Z dispatch · item c9b50206 TOOL-dWitnessedBar-5 · reason .githooks/pre-push .githooks/pre-push.test.sh help/reference/policy.md tools/gate-legs.json tools/govkit/entries/check-agent-cap-restatement.kit.toml tools/govkit/entries/check-testsuite-counts.kit.toml tools/govkit/registry.toml tools/memory-tree/kit.toml tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt tools/roles/kit.toml tools/run-gates/README.md tools/run-gates/kit.toml tools/run-gates/leg_factory.py tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/verdict_flow.py tools/unattended/kit.toml tools/workflows/kit.toml memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-5-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md
+2026-11-20T06:49:01Z draw · re-dispatch · TOOL-dWitnessedBar-44 · 78/180 · 20261120T064901Z-cedd83
+
+2026-11-20T06:49:01Z dispatch · item c9b50206 TOOL-dWitnessedBar-44 · reason tools/govkit/usage.toml memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-44-change-1.md
+2026-11-20T06:50:23Z draw · re-dispatch · TOOL-dWitnessedBar-44 · 79/180 · 20261120T065023Z-902901
+
+2026-11-20T06:50:23Z dispatch · item c9b50206 TOOL-dWitnessedBar-44 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-44-deviation-442.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-44-deviation-443.md

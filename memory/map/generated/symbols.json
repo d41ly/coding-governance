@@ -6648,6 +6648,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_inherited_red_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_inject",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -7121,6 +7126,11 @@
       "id": "check_normaliser_missing_plant",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "check_off_tree",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "check_old_render",
@@ -12483,6 +12493,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_reads",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
       "id": "derive_ready",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -13351,6 +13366,11 @@
       "id": "derive_strict_value",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_stricter",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "derive_string_constants",
@@ -20968,6 +20988,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "read_file",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
       "id": "read_file_at",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -21566,6 +21591,11 @@
       "id": "read_ih_facts",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_image_before",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "read_image_changes",
@@ -24661,6 +24691,11 @@
       "id": "read_utc_now",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_value",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "read_value",
