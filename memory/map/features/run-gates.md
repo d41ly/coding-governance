@@ -63,6 +63,8 @@ globs = [
   "tools/run-gates/kit.toml",
   "tools/run-gates/profile_bar.py",
   "tools/run-gates/profile_bar.test.sh",
+  "tools/run-gates/bar-wall-evidence.txt",
+  "tools/run-gates/precommit.py",
   "tools/run-gates/gate-profiles.txt",
   "tools/run-gates/gate-fingerprint.sh",
   "tools/run-gates/run-gates.runlog.test.sh",

@@ -311,7 +311,8 @@ fail=0
 # 456 -> 457, TOOL-dWitnessedBar-12: arm 1a's `tag` control. Not gated. Counted by reading.
 # 457 -> 458, TOOL-dWitnessedBar-22: arm 1a's `tests` control. Not gated. Counted by reading.
 # 458 -> 459, TOOL-dWitnessedBar-19: arm 1a's `purpose` control. Not gated. Counted by reading.
-FLOOR_ASSERTIONS=459
+# 459 -> 460, TOOL-dWitnessedBar-10: arm 1a's `precommit` control. Not gated. Counted by reading.
+FLOOR_ASSERTIONS=460
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -351,7 +352,7 @@ n=0
 # THE MANIFEST'S ONE KEY SET (TOOL-dWitnessedBar-12 S4). Arm 1a and `keyset_probe` both take it as an
 # argument, so a key cannot be admitted by one and refused by the other, and owed_rows.py reads this
 # line. A row key a later unit adds is added here once, with its control pair in arm 1a.
-LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag tests purpose"
+LEG_KEYS="name argv guard impure reads chunk subject ceiling signature doc_reads pack enforces pass_leg scope_of stage tag tests purpose precommit"
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
 # Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
@@ -941,6 +942,16 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"],"purposes":"checks a"}]' > "$ct
 if keyset_probe "$ctl/pu.json" && ! keyset_probe "$ctl/putypo.json"; then :
 else
   echo "canary: the manifest key-set predicate must PASS a row carrying \`purpose\` and FAIL a near-miss of it; one of the two did not hold"
+  fail=1
+fi
+# ...and `precommit` (TOOL-dWitnessedBar-10 S1), by the same two halves, in `LEG_KEYS`: the argv the
+# pre-commit hook runs for the leg, and the near-miss is the hyphenated spelling a hand would type.
+n=$((n+1))
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"precommit":["bash","x.sh","--staged"]}]' > "$ctl/pc.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"pre-commit":["bash","x.sh","--staged"]}]' > "$ctl/pctypo.json"
+if keyset_probe "$ctl/pc.json" && ! keyset_probe "$ctl/pctypo.json"; then :
+else
+  echo "canary: the manifest key-set predicate must PASS a row carrying \`precommit\` and FAIL a near-miss of it; one of the two did not hold"
   fail=1
 fi
 rm -rf "$ctl"

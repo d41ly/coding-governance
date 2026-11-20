@@ -369,14 +369,18 @@ def remove_reset_rows(gd: pathlib.Path, reset) -> int:
 
 
 def read_evidence() -> dict:
-    """The tracked artifact: {name: (max_seconds, readings, node, date, source)}.
+    """The tracked artifact: {(name, node): (max_seconds, readings, node, date, source, line)}.
+
+    KEYED BY LEG AND NODE (TOOL-dWitnessedBar-10 S6): one leg carries one row per node that measured
+    it, so two nodes' writes touch different rows. `line` is the row's own text, which `--write`
+    carries byte-identical for every row it does not raise.
 
     A FIVE-FIELD ROW READS AS `runner`, which is a fact about the corpus rather than a default
     chosen for convenience: the source column arrives with `--observed` and every row written
     before it was derived from the run record. Refusing a short row instead would empty the
     artifact on the upgrade commit and red the gate for a reason that is not a ceiling's.
     """
-    out: dict[str, tuple[float, int, str, str, str]] = {}
+    out: dict[tuple[str, str], tuple[float, int, str, str, str, str]] = {}
     if not EVIDENCE.is_file():
         return out
     for line in EVIDENCE.read_text(encoding="utf-8").splitlines():
@@ -386,10 +390,20 @@ def read_evidence() -> dict:
         if len(f) < 5:
             continue
         try:
-            out[f[0]] = (float(f[1]), int(f[2]), f[3], f[4],
-                         f[5] if len(f) >= 6 and f[5].strip() else RUNNER_SOURCE)
+            out[(f[0], f[3])] = (float(f[1]), int(f[2]), f[3], f[4],
+                                 f[5] if len(f) >= 6 and f[5].strip() else RUNNER_SOURCE, line)
         except ValueError:
             continue
+    return out
+
+
+def derive_leg_maxima(ev: dict) -> dict:
+    """{name: the row of `ev` holding that leg's largest reading across nodes}: what `--check` grades a
+    ceiling against, so the headroom rule reads one number per leg however many nodes measured it."""
+    out: dict[str, tuple] = {}
+    for (name, _node), row in ev.items():
+        if name not in out or row[0] > out[name][0]:
+            out[name] = row
     return out
 
 
@@ -492,7 +506,22 @@ def cmd_write(root, gd, args) -> int:
     evidenced maximum and, with it, the floor the gate holds every ceiling above. Lowering takes
     `--reset <leg>`, which records that somebody chose it — and, here, MAKES it stick by removing
     the discarded readings from the retained run files rather than filtering them for one process.
+
+    ONE NODE'S ROWS (TOOL-dWitnessedBar-10 S6, S7). It raises, holds, lowers or drops only the rows
+    whose node is `GOV_NODE`, and carries every other node's rows byte-identical. The node is REFUSED
+    rather than defaulted, on every write and before a byte moves: a node-keyed row written under a
+    defaulted `a` from another machine would overwrite node `a`'s evidence.
     """
+    node = os.environ.get("GOV_NODE")
+    if not node:
+        print("derive-ceilings: --write needs GOV_NODE set to the node whose readings these are. Rows "
+              "are keyed by leg and node, so the node is not defaulted: a row written under a "
+              "defaulted tag would overwrite that node's evidence. Nothing was written.", file=sys.stderr)
+        return 1
+    if "\t" in node or "\n" in node:
+        print("derive-ceilings: GOV_NODE may not carry a tab or a newline — it is a field of the "
+              "tab-separated evidence file", file=sys.stderr)
+        return 1
     reset = set(args.reset or ())
     legs = read_legs(root)
     # THE LIVENESS QUESTION IS ASKED WITHOUT THE RESET FILTER, and the two are different questions.
@@ -523,18 +552,17 @@ def cmd_write(root, gd, args) -> int:
     # reads no run file at all.
     runs, aside = read_runs(gd, legs, reset) if reset else (live, live_aside)
     have = read_evidence()
-    node = os.environ.get("GOV_NODE") or "a"
     date = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs"],
                           capture_output=True, text=True, encoding="utf-8").stdout.strip() or "unknown"
     rows, raised, held, lowered = {}, 0, 0, 0
     for name, vals in runs.items():
         mx = max(vals)
-        prev = have.get(name)
+        prev = have.get((name, node))
         if prev and prev[0] >= mx and name not in reset:
-            rows[name] = prev
+            rows[(name, node)] = prev
             held += 1
         else:
-            rows[name] = (mx, len(vals), node, date, RUNNER_SOURCE)
+            rows[(name, node)] = (mx, len(vals), node, date, RUNNER_SOURCE)
             # TALLIED ON MOVEMENT, never on which branch got here. A reset leg whose re-derived
             # maximum EQUALS the stored one lands in this branch because `name not in reset` forced
             # it out of the hold, and the old `elif prev` then reported `1 raised` for a row that
@@ -549,31 +577,28 @@ def cmd_write(root, gd, args) -> int:
             elif prev:
                 held += 1
     dropped = 0
-    for name, prev in have.items():                     # rows this run measured nothing for
+    for key, prev in have.items():                      # rows this run measured nothing for
         # A RESET LEG IS NOT CARRIED FORWARD. Reaching here with one means every reading it had was
         # the killed one the reset was asked to discard, so restoring the old row would hand back
         # exactly the value the operator was clearing while printing that the reset ran. The row
         # goes, the leg reads UNBACKED — which `--check` reports and does not fail on — and the
-        # next ordinary `--write` re-derives it once the window holds a finished run.
-        if name in reset:
-            if name not in rows:                        # COUNTED ONLY WHEN A ROW ACTUALLY WENT:
+        # next ordinary `--write` re-derives it once the window holds a finished run. ONLY THIS
+        # NODE'S ROW: the reset discarded this node's readings, and another node's row is its own.
+        if key[0] in reset and key[1] == node:
+            if key not in rows:                         # COUNTED ONLY WHEN A ROW ACTUALLY WENT:
                 dropped += 1                            # a reset leg that kept `ok` readings was
             continue                                    # re-derived, not dropped
-        rows.setdefault(name, prev)
+        rows.setdefault(key, prev)
     observed = 0
     if args.observed:
-        # THE NODE IS REFUSED RATHER THAN DEFAULTED, and only here. A runner-derived row's node is
-        # a statement about the machine that just ran the bar, and `GOV_NODE or "a"` is wrong there
-        # at worst by a tag. An out-of-band row's node is half of what makes the number evidence —
+        # THE NODE IS REFUSED RATHER THAN DEFAULTED, here as on every write (the refusal at the top
+        # of this function): an out-of-band row's node is half of what makes the number evidence —
         # the reading was taken somewhere, under conditions that machine had — so a defaulted tag
-        # is a false claim about provenance, which is worse than having no row.
-        obs_node = os.environ.get("GOV_NODE")
-        if not obs_node:
-            print("derive-ceilings: --observed needs GOV_NODE set to the node the reading was "
-                  "taken on. The node is evidence here and is not defaulted.", file=sys.stderr)
-            return 1
+        # is a false claim about provenance, which is worse than having no row. The row is this
+        # node's, and monotone against this node's own maximum.
+        obs_node = node
         obs_name, obs_secs = parse_observed(args.observed, args.how or "", legs)
-        prev = rows.get(obs_name)
+        prev = rows.get((obs_name, obs_node))
         # MONOTONE STILL, and the refusal is the point of saying so. A reading at or under the
         # stored maximum moves nothing, so admitting it quietly would answer the operator's gesture
         # with a fresh row and an unchanged number — the silent no-op this artifact is arranged
@@ -584,7 +609,7 @@ def cmd_write(root, gd, args) -> int:
                   f"MONOTONE. Nothing was written. Lowering one is "
                   f"`--write --reset {obs_name}`.", file=sys.stderr)
             return 1
-        rows[obs_name] = (obs_secs, 1, obs_node, date, args.how.strip())
+        rows[(obs_name, obs_node)] = (obs_secs, 1, obs_node, date, args.how.strip())
         observed = 1
     # The header names THIS install's own path, derived, so an adopter's committed evidence file
     # carries a command that exists in their tree (TOOL-aRepatriatedFork-2 S5).
@@ -593,7 +618,11 @@ def cmd_write(root, gd, args) -> int:
     _me = pathlib.Path(__file__).resolve()
     own = f"<prefix>/{_me.parent.name}/{_me.name}"
     lines = [
-        "# ceiling-evidence.txt — the recorded maximum per gate leg, TRACKED so a gate can read it.",
+        "# ceiling-evidence.txt — the recorded maximum per gate leg and node, TRACKED so a gate can read it.",
+        "#",
+        "# KEYED BY LEG AND NODE. `--write` needs GOV_NODE, moves only that node's rows and carries",
+        "# every other node's byte-identical; `--check` grades each ceiling against the largest",
+        "# reading across nodes and names how many legs are evidenced on one node only.",
         "#",
         f"# GENERATED by `python {own} --write` from",
         "# `<git-dir>/gate-run/*/*.leg`, which keeps one file per leg per run. Do not hand-edit: a",
@@ -622,9 +651,13 @@ def cmd_write(root, gd, args) -> int:
         "#",
         "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>\t<source>",
     ]
-    for name in sorted(rows):
-        mx, n, nd, dt, src = rows[name]
-        lines.append(f"{name}\t{mx:.1f}\t{n}\t{nd}\t{dt}\t{src}")
+    for key in sorted(rows):
+        row = rows[key]
+        if len(row) > 5:                                # a row read from the file and not moved:
+            lines.append(row[5])                        # its own bytes, never a re-render
+            continue
+        mx, n, nd, dt, src = row
+        lines.append(f"{key[0]}\t{mx:.1f}\t{n}\t{nd}\t{dt}\t{src}")
     EVIDENCE.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     # `removed` IS THE LIVENESS HALF OF THIS LINE. `lowered` and `dropped` say the artifact moved;
     # only this says the scratch reading that would have restored it is gone, which is the property
@@ -648,7 +681,10 @@ def cmd_check(root, gd, args) -> int:
     is beside this script.
     """
     legs = read_legs(root)
-    ev = read_evidence()
+    rows = read_evidence()
+    # ONE NUMBER PER LEG, the largest across nodes (TOOL-dWitnessedBar-10 S6), so the headroom rule
+    # below is unchanged; `rows` stays per node for the out-of-band line and the one-node count.
+    ev = derive_leg_maxima(rows)
     floor, frac, _ = read_margin()
     if not ev:
         print(f"derive-ceilings: UNMEASURED — {EVIDENCE.name} is absent or empty, so no ceiling "
@@ -714,6 +750,15 @@ def cmd_check(root, gd, args) -> int:
               f"runner — a number an operator measured and typed, not one this tool watched: "
               + "; ".join(f"{n} {ev[n][0]:.1f}s on node {ev[n][2]}, {ev[n][4]}" for n in oob),
               file=sys.stderr)
+    # A REPORT, NEVER A FAILURE (TOOL-dWitnessedBar-10 S6): how many evidenced manifest legs only one
+    # node has measured, so a ceiling argued from one machine's load is visible as that. Printed
+    # whatever the verdict, and derived from the rows here, so it cannot disagree with the file.
+    nodes: dict[str, set] = {}
+    for (n, nd) in rows:
+        if n in legs:
+            nodes.setdefault(n, set()).add(nd)
+    print(f"ceiling-evidence: {sum(1 for s in nodes.values() if len(s) == 1)} of {len(nodes)} legs "
+          f"evidenced on one node only")
     for b in bad:
         print(f"CEILING-EVIDENCE FAILED — {b}", file=sys.stderr)
     if not bad:

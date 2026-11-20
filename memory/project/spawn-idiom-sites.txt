@@ -1,6 +1,6 @@
 # ledger · spawn-idiom-sites · key site path,class · direction shrink-only · drain hunk
 .githooks/pre-commit	path-subst	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-.githooks/pre-commit	var-pipe	4	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
+.githooks/pre-commit	var-pipe	3	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 .githooks/pre-commit.test.sh	path-subst	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 .githooks/pre-commit.test.sh	printf-subst	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 .githooks/pre-commit.test.sh	var-pipe	6	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

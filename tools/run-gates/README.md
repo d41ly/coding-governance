@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.52` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.53` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -156,6 +156,8 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
+| `bar-wall-evidence.txt` | gov's whole-bar wall time per node, written by `GOV_NODE=<tag> python profile_bar.py --record`; withheld from the payload |
+| `precommit.py` | the derived commit-time list behind `--precommit`: every manifest row's `precommit` argv its `guard` trips; see "The commit-time list is derived" below |
 | `measure_legs.py` | the gate profiler: every manifest leg run clean and unbounded, serially or under a load cap, each in its own Windows Job Object and profiled to its processes; see "The gate profiler" below |
 | `fixtures/measure-legs/` | the fixture legs and manifests `measure_legs.py --selftest` runs |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
@@ -954,6 +956,22 @@ node would have to be defaulted, and one that raises nothing. The row lands in t
 carrying its source, so a number somebody measured by hand never reads as one the runner watched,
 and `--check` names those legs apart from the rest.
 
+**Evidence is keyed by leg AND node** (TOOL-dWitnessedBar-10). A row keeps its six fields, `<leg>`,
+`<max seconds>`, `<readings>`, `<node>`, `<date>`, `<source>`, and one leg may carry one row per node.
+Every `--write` needs `GOV_NODE`, and refuses naming it when it is unset rather than defaulting to
+`a`, because a node-keyed row written under a defaulted tag overwrites that node's evidence. It
+raises or holds only the writing node's rows and carries every other node's byte-identical, so two
+nodes' writes touch different rows. `--check` grades each ceiling against the largest reading across
+nodes and prints `ceiling-evidence: <k> of <n> legs evidenced on one node only`, a report and never a
+failure. The runner's dispatch prior and `pass_legs.py`'s cost read take the same per-leg maximum.
+
+**The whole-bar wall time is committed too.** `GOV_NODE=<tag> python profile_bar.py --record [--out
+<log>]` distils the last record of `<git-dir>/gate-profile.jsonl` into the tracked
+`bar-wall-evidence.txt`, one TAB-separated row per node: `<node>`, `<date>`, `<sha8>`, `<wall
+seconds>`, `<legs run>`, `<width>`. It replaces that node's row with the latest reading, not a
+maximum, because a wall time measures a bar and bounds nothing. It refuses, writing nothing, a last
+record taken with `--scoped` (a guarded run is not the whole bar) and an unset `GOV_NODE`.
+
 **Only a reading the census found free of foreign gate work argues a ceiling.** `derive-ceilings.py`
 admits a run-record reading only when its `foreign` field reads `0`, and sets the rest aside under
 one reason each, first match: a positive count is `contended`, and anything else, `unknown` or a
@@ -1000,7 +1018,7 @@ since the render and the registries those arms read are gov's; it does not read 
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
-Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `purpose`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `precommit`, `purpose`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
 
 Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.<name>` tag in the
 leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
@@ -1013,6 +1031,23 @@ both directions (TOOL-dWitnessedBar-22). `purpose` says what the leg is for: one
 characters, no two legs sharing one: its shape and uniqueness are `leg_factory.py --conform`'s
 `purpose` arm, and selfcheck 7h grades its presence until TOOL-dWitnessedBar-51 moves it; it travels into an
 adopter's manifest from run-gates 1.52, `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
+`precommit` is the argv the pre-commit hook runs for the leg, in the manifest's `{prefix}` grammar,
+declared beside the row's `argv` in the same tokens and overridden under `[gate_leg.gov]` wherever
+`argv` is; it travels into an adopter's manifest from run-gates 1.53, `LEG_KEY_FLOORS["precommit"]`
+(TOOL-dWitnessedBar-10).
+
+**The commit-time list is derived, not typed in the hook.** `run-gates.sh --precommit` hands over to
+`precommit.py` before any bar machinery exists, as `--regen` does. It reads the manifest beside this
+kit (or `--legs <path>`), lists the staged set once, and for every row carrying `precommit`, in
+manifest order, prints `pre-commit: <name> not tripped` when the row's `guard` names no staged path,
+or runs the argv and prints `pre-commit: <name> ok` or `pre-commit: <name> FAILED (rc <n>)`. A row
+with no `guard` runs at every commit. A row whose argv names a script absent from the tree prints the
+hook's announced skip and is not a failure. It exits 1 when any run failed; `--list` prints each row's
+name, argv and trigger and runs nothing. The pre-commit hook calls it once, after its memory hygiene
+block, which stays hand-named because its commit-time form is a grade, a check-9 render and a regrade
+that no one argv states; the hygiene leg declares no `precommit`. WHAT IT DOES NOT CHECK: a trigger
+narrower than the bar's `guard` — the commit-time trigger IS the guard, so an unguarded leg costs its
+run at every commit.
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class

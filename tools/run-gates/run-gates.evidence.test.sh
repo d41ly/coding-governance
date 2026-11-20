@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=272
+FLOOR_ASSERTIONS=278
+# RAISED 272 -> 278 by TOOL-dWitnessedBar-10: the node-keyed evidence arms, AC8's one, AC7's two,
+# AC9's one, and AC10's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 253 -> 270 by TOOL-aNimbleMend-15: the pass-leg rule arms over fixtures F and B, S8's thirteen,
 # S2's one and S3's three. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 270 -> 272 by a further pass of the same unit: the two absent-manifest arms of --check.
@@ -1808,6 +1810,10 @@ cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.tx
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
 DC_SCRIPT="$DC_T/${PFX}${KIT}/derive-ceilings.py"
 DC_EV="$DC_T/${PFX}${KIT}/ceiling-evidence.txt"
+# EVERY WRITE HERE IS NODE z (TOOL-dWitnessedBar-10 S7): `--write` refuses an unset GOV_NODE, and the
+# out-of-band arms below write as z, so the runner rows they are graded beside must be z's own for the
+# monotone hold to compare one node's rows. Unset again when this fixture is removed.
+export GOV_NODE=z
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row
@@ -2188,7 +2194,7 @@ dc_reach=$(printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep 'REACHED')
 printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep -q 'does not clear its evidenced maximum' \
   && ok "it gets the headroom sentence instead, which states the floor such a ceiling has to clear" \
   || { nope "an out-of-band reading above its ceiling produced neither sentence — the row fails with no target to raise the ceiling to"; printf '%s\n' "$dc_chk" | sed 's/^/      /'; }
-rm -rf "$DC_T"
+rm -rf "$DC_T"; unset GOV_NODE
 
 # --- ONLY A CENSUSED-CLEAN READING ARGUES A CEILING (TOOL-aGraftedHelix-5) -------------------------
 # A fixture of its own, for the reason the one above gives: `--write` writes beside the script. One
@@ -2200,6 +2206,9 @@ cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.tx
   || { echo "evidence-test: cannot copy the ceiling kit for the census arms"; exit 2; }
 ( cd "$CN_T" && git init -q --template= -b main . ) >/dev/null 2>&1
 CN_SCRIPT="$CN_T/${PFX}${KIT}/derive-ceilings.py"; CN_EV="$CN_T/${PFX}${KIT}/ceiling-evidence.txt"
+# The planted rows below are node a's, and the runner writes here are node a's too, so the hold this
+# fixture grades compares one node's rows (TOOL-dWitnessedBar-10 S7). Unset when the fixture goes.
+export GOV_NODE=a
 printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 100},' '  {"name": "M", "argv": ["true"], "ceiling": 100}' ']' \
   > "$CN_T/${PFX}gate-legs.json"
 { printf 'L\tok\t0\t10.0\t0\t0\t-\t0\n'
@@ -2254,7 +2263,56 @@ cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 ); cn_rc=$?
 [ "$cn_rc" = 2 ] && printf '%s' "$cn_w" | grep -q 'DEAD PROBE' \
   && ok "AC8 control: a record holding no reading still exits 2 with DEAD PROBE" \
   || nope "AC8 control: an empty record no longer reports DEAD PROBE (rc=$cn_rc)"
-rm -rf "$CN_T"
+rm -rf "$CN_T"; unset GOV_NODE
+
+# --- EVIDENCE KEYED BY LEG AND NODE, AND THE WALL RECORD (TOOL-dWitnessedBar-10 AC7, AC8, AC10) -----
+# A fixture of its own: the ceiling script and the profiler beside a planted margin of floor 1 s and
+# fraction 0.5, so a ceiling of 16 s clears L's node-a 10.0 (needs 15) and does NOT clear a 12.0 (needs
+# 18). Node b's run record holds 12.0. A `--write` that overwrote node a's row, or a `--check` reading
+# one row per leg, reds an arm below; so does a write under a defaulted node. The profiler records the
+# last record of a planted log as node b's wall row, and refuses a `--scoped` last record.
+NK_T=$(mktemp -d)
+mkdir -p "$NK_T/${PFX}${KIT}" "$NK_T/.git/gate-run/r1"
+cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/profile_bar.py" "$NK_T/${PFX}${KIT}/" \
+  || { echo "evidence-test: cannot copy the ceiling kit for the node arms"; exit 2; }
+( cd "$NK_T" && git init -q --template= -b main . ) >/dev/null 2>&1
+printf '1\t0.5\n' > "$NK_T/${PFX}${KIT}/ceiling-margin.txt"
+printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 16}' ']' > "$NK_T/${PFX}gate-legs.json"
+NK_EV="$NK_T/${PFX}${KIT}/ceiling-evidence.txt"
+printf '# hdr\nL\t10.0\t1\ta\t2026-09-10\trunner\n' > "$NK_EV"
+printf 'L\tok\t0\t12.0\t0\t0\t-\t0\n' > "$NK_T/.git/gate-run/r1/1.leg"
+nk_a=$(awk -F'\t' '$1=="L" && $4=="a"' "$NK_EV")
+nk_before=$(<"$NK_EV")
+# AC8 first, so the file it must leave untouched is the planted one.
+nk_w=$( cd "$NK_T" && unset GOV_NODE && "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --write 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [[ $nk_w == *GOV_NODE* ]] && [ "$(<"$NK_EV")" = "$nk_before" ] \
+  && ok "AC8 --write with GOV_NODE unset exits 1 naming GOV_NODE, and the evidence bytes are unchanged" \
+  || { nope "AC8 --write with GOV_NODE unset wrote, or did not refuse naming GOV_NODE (rc=$nk_rc)"; printf '%s\n' "$nk_w" | sed 's/^/      /'; }
+nk_w=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --write 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 0 ] && [ "$(awk -F'\t' '$1=="L" && $4=="a"' "$NK_EV")" = "$nk_a" ] \
+  && awk -F'\t' '$1=="L" && $2=="12.0" && $4=="b" {f=1} END{exit !f}' "$NK_EV" \
+  && ok "AC7 GOV_NODE=b --write adds L's node-b row at 12.0 and carries node a's 10.0 row byte-identical" \
+  || { nope "AC7 node b's write overwrote node a's row, or wrote no node-b row (rc=$nk_rc)"; sed 's/^/      /' "$NK_EV"; }
+nk_c=$( cd "$NK_T" && "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --check 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [[ $'\n'$nk_c == *$'\n''CEILING-EVIDENCE FAILED — L: ceiling 16s does not clear its evidenced maximum 12.0s'* ]] \
+  && ok "AC7 --check grades L's ceiling against 12.0, the largest reading across nodes, and reds it" \
+  || { nope "AC7 --check did not grade L against the node-b maximum (rc=$nk_rc)"; printf '%s\n' "$nk_c" | sed 's/^/      /'; }
+[[ $'\n'$nk_c$'\n' == *$'\n''ceiling-evidence: 0 of 1 legs evidenced on one node only'$'\n'* ]] \
+  && ok "AC9 --check prints the one-node line, 0 of 1 once L carries rows for a and b" \
+  || { nope "AC9 --check printed no one-node line, or a wrong count"; printf '%s\n' "$nk_c" | sed 's/^/      /'; }
+NK_WALL="$NK_T/${PFX}${KIT}/bar-wall-evidence.txt"; NK_LOG="$NK_T/profile.jsonl"
+printf '%s\n' '{"at": "2026-11-20T10:00:00+02:00", "sha": "1234abcd", "full": true, "wall": 812.34, "width": 6, "legs": [{"verdict": "ok"}, {"verdict": "skip"}]}' > "$NK_LOG"
+nk_p=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/profile_bar.py" --record --out "$NK_LOG" 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 0 ] && [ "$(grep -v '^#' "$NK_WALL" 2>/dev/null)" = $'b\t2026-11-20\t1234abcd\t812.3\t1\t6' ] \
+  && ok "AC10 --record writes one node-b row carrying the full record's wall seconds" \
+  || { nope "AC10 --record wrote no node-b row, or not the record's wall (rc=$nk_rc)"; printf '%s\n' "$nk_p" | sed 's/^/      /'; }
+nk_before=$(<"$NK_WALL")
+printf '%s\n' '{"at": "2026-11-21T10:00:00+02:00", "sha": "99999999", "full": false, "wall": 5.0, "width": 6, "legs": []}' >> "$NK_LOG"
+nk_p=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/profile_bar.py" --record --out "$NK_LOG" 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [ "$(<"$NK_WALL")" = "$nk_before" ] \
+  && ok "AC10 a --scoped last record is refused with exit 1 and nothing written" \
+  || { nope "AC10 a guarded run was recorded as a whole-bar wall (rc=$nk_rc)"; printf '%s\n' "$nk_p" | sed 's/^/      /'; }
+rm -rf "$NK_T"
 
 # --- A READING TAKEN DURING A MEMORY PAUSE ARGUES NO CEILING (TOOL-aGraftedHelix-7 AC10) -----------
 # One run, one `pauses` episode from epoch 1000 to 1010, and three `ok` readings of L at foreign 0:

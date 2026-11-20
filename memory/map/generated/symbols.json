@@ -6353,6 +6353,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "check_guard_trips",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
+    },
+    {
       "id": "check_guard_witness",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -11798,6 +11803,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_leg_maxima",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "derive_leg_population",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -11981,6 +11991,11 @@
       "id": "derive_minute",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_missing_script",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "derive_module_closure",
@@ -13408,6 +13423,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_trigger",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
+    },
+    {
       "id": "derive_tripped_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -13471,6 +13491,11 @@
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_unstaged_artifacts",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
       "id": "derive_unsummarised",
@@ -16516,6 +16541,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/pass_legs.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "main",
@@ -21943,6 +21973,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "read_manifest",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
+    },
+    {
       "id": "read_manifest_tags",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -23726,6 +23761,11 @@
       "id": "read_stage_review",
       "kind": "function",
       "file": "tools/loop/breakpoints.py"
+    },
+    {
+      "id": "read_staged",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "read_staged_paths",
@@ -27600,6 +27640,11 @@
     {
       "id": "resolve_argv",
       "kind": "function",
+      "file": "tools/run-gates/precommit.py"
+    },
+    {
+      "id": "resolve_argv",
+      "kind": "function",
       "file": "tools/run-gates/regen.py"
     },
     {
@@ -27696,6 +27741,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_bash_launcher",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "resolve_bash_shell",
@@ -28861,6 +28911,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "resolve_procs_path",
@@ -32213,6 +32268,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "run_precommit",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
+    },
+    {
       "id": "run_prefix_commit",
       "kind": "function",
       "file": ".githooks/pre-commit.test.sh"
@@ -33611,6 +33671,11 @@
       "id": "scan_bash",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "scan_bash",
@@ -39788,6 +39853,11 @@
       "file": "tools/unattended/check-brief-recorded.test.sh"
     },
     {
+      "id": "write_wall_record",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "write_witness_row",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -40151,6 +40221,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/run-gates/pass-legs.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/precommit.py"
     },
     {
       "id": "wrong_shell_at",

@@ -5,8 +5,8 @@
 #   2) a commit parked OFF the default branch in the primary tree is refused
 #   3) --no-verify overrides the refusal
 # The throwaway repo has none of the gate-leg scripts (<prefix>/…, skills/…), so those legs
-# self-skip and only the guard is exercised — except the codebase-map leg, whose arms follow the
-# guard's and plant a stand-in gate. Run: bash .githooks/pre-commit.test.sh  (exit 0 = pass)
+# self-skip and only the guard is exercised; the arms after the guard's plant stand-ins of their own,
+# and the derived legs' arms copy this repository's runner. Run: bash .githooks/pre-commit.test.sh  (exit 0 = pass)
 set -u
 HOOK="$(cd "$(dirname "$0")" && pwd)/pre-commit"
 tmp=$(mktemp -d)
@@ -66,58 +66,15 @@ echo t3 > t3; git add t3
 git commit -q -m t3 2>/dev/null; ck "a tag named like the default branch does not refuse a commit on it" $? 0
 git tag -d main >/dev/null
 
-# ---- the codebase-map leg ------------------------------------------------------------------------
-# A stand-in gate, red while a flag file exists. The hook consumes only the gate's exit status and
-# output, so that is the whole contract the stand-in holds; the REAL gate was observed red on a staged
-# break when the leg landed. These arms keep the trigger, the remedy and the two refusals from
-# regressing. The gate, the map root and the resolver sit at paths gov does not use, because the leg
-# DERIVES all three and a fixture at gov's own paths would pass a leg that had them spelled back in.
+# ---- this repository's sources the stand-ins below copy ------------------------------------------
+# The tracked resolver, found by name and never spelled at gov's prefix. The codebase-map leg's arms
+# that once followed here retired with the hand-named leg (TOOL-dWitnessedBar-10 S4): the leg is a
+# derived row now, its unstaged-artifact check moved into the gate's `--precommit`, and the derived
+# arms at the end of this file drive the one call that runs it.
 git checkout -q main
 repo_src="${HOOK%/*}/.."
 resolver=$(cd "$repo_src" && git ls-files -- '*resolve-python.sh' | head -n 1)
-[ -n "$resolver" ] || { echo "FAIL no tracked resolve-python.sh in $repo_src — the map arms cannot run"; exit 2; }
-mkdir -p gate vendor map/generated
-cp "$repo_src/$resolver" vendor/
-cat > gate/test_map.py <<'EOF'
-import os, sys
-if os.path.exists("gate-red"):
-    print("FAIL test_generated_artifacts_are_fresh")
-    print("STALE symbols.json")
-    sys.exit(1)
-print("ok   test_generated_artifacts_are_fresh")
-EOF
-printf 'MAP_ROOT=map\nGATE_FILE=gate/test_map.py\n' > .codebase-map.conf
-echo '{"v":1}' > map/generated/x.json
-git add -A; git commit -q --no-verify -m map-fixture
-
-touch gate-red
-echo 'x = 1' > a.py; git add a.py
-out=$(git commit -q -m a 2>&1); ck "a staged .py with a red map gate is refused" $? 1
-printf '%s\n' "$out" | grep -q 'gen_map.py --write'; ck "the refusal prints the regen remedy" $? 0
-git reset -q
-
-echo 'function f() {}' > e.js; git add e.js
-out=$(git commit -q -m e 2>&1); ck "a staged .js with a red map gate is refused" $? 1
-printf '%s\n' "$out" | grep -q 'gen_map.py --write'; ck "the .js refusal is the map gate's" $? 0
-git reset -q
-
-echo t > b.txt; git add b.txt
-git commit -q -m b >/dev/null 2>&1; ck "a commit staging no .py or .js does not run the map gate" $? 0
-
-# Every arm below stages a file no earlier arm could have committed, so a refusal can never be
-# git's "nothing to commit" — measured: reusing a.py let this arm pass with the trigger disabled.
-rm gate-red
-echo '{"v":2}' > map/generated/x.json; echo 'y = 2' > c.py; git add c.py
-out=$(git commit -q -m c 2>&1); ck "fresh artifacts left unstaged are refused" $? 1
-printf '%s\n' "$out" | grep -q 'NOT staged'; ck "the refusal names the unstaged artifacts" $? 0
-
-git add map/generated/x.json
-git commit -q -m d >/dev/null 2>&1; ck "a green map gate with its artifacts staged is allowed" $? 0
-
-printf 'MAP_ROOT=map\nGATE_FILE=gate/moved.py\n' > .codebase-map.conf; git add .codebase-map.conf
-echo 'z = 3' > f.py; git add f.py
-out=$(git commit -q -m f 2>&1); ck "a GATE_FILE naming no file is refused, not skipped" $? 1
-printf '%s\n' "$out" | grep -q 'names no file'; ck "the refusal names the conf key" $? 0
+[ -n "$resolver" ] || { echo "FAIL no tracked resolve-python.sh in $repo_src — the launcher arms cannot run"; exit 2; }
 
 # ---- the kit-root ladder, TOOL-aRepatriatedFork-24 AC1/AC2 ---------------------------------------
 # The hygiene leg at three prefixes gov does not use, each reached by a DIFFERENT rung: `vendor/gov/`
@@ -167,48 +124,6 @@ if git -C "$repo_src" show 2143b6d6:.githooks/pre-commit > "$tmp/old-pre-commit"
 else
   echo "SKIP AC2 red-first control NOT RUN: 2143b6d6 is a coding-governance commit this repository does not carry"
 fi
-
-# ---- the unattended skill wiring leg, TOOL-aHomedAnchor-4 AC1/AC2 ---------------------------------
-# A stand-in adopter at the root install says how it was called. Staging the conf runs it with
-# --check; staging an unrelated file does not run it at all.
-ua=unattended; ad=adopt-unattended.sh
-d="$tmp/wiring"; rm -rf "$d"; mkdir -p "$d"
-out=$( cd "$d" || exit 2
-  git init -q --template= -b main
-  mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
-  mkdir -p "$ua"; printf '#!/usr/bin/env bash
-echo "WIRING RAN $*"
-' > "$ua/$ad"
-  git add -A; git commit -q --no-verify -m fixture
-  echo x > other.txt; git add other.txt; git commit -q -m other 2>&1
-  echo 'ANCHOR_SCOPE="local"' > .unattended.conf; git add .unattended.conf; git commit -q -m conf 2>&1 ); rc=$?
-case "$out" in *"WIRING RAN --check"*) r=$rc ;; *) r=1 ;; esac
-ck "AC1 a staged .unattended.conf runs the adopter with --check" "$r" 0
-n_runs=$(printf '%s
-' "$out" | grep -c 'WIRING RAN' || true)
-[ "$n_runs" = 1 ] && r=0 || r=1
-ck "AC2 an unrelated staged file does not run the adopter (one run, not $n_runs)" "$r" 0
-
-# ---- the template-size leg, TOOL-aMeasuredDrag-12 S11 ---------------------------------------------
-# TOOL-aMeasuredDrag-10 moved this leg's trigger into the one staged-list read, as `st_template`. A
-# stand-in gate at the root says it ran. Staging the template runs it and the commit exits 0; the
-# unrelated commit before it runs nothing, the control that the marker is the trigger's and not every
-# commit's. Staged red by misspelling the `st_template` case pattern.
-d="$tmp/template"; rm -rf "$d"; mkdir -p "$d"
-out=$( cd "$d" || exit 2
-  git init -q --template= -b main
-  mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
-  printf '%s\n' '#!/usr/bin/env bash' 'echo "TEMPLATE-SIZE RAN"' > check-template-size.sh
-  git add -A; git commit -q --no-verify -m fixture
-  echo x > other.txt; git add other.txt; git commit -q -m other 2>&1
-  echo '--- the template commit'
-  echo '# charter' > coding-governance-agents.template.md; git add coding-governance-agents.template.md
-  git commit -q -m template 2>&1 ); rc=$?
-case "$out" in *"--- the template commit"*"TEMPLATE-SIZE RAN"*) r=$rc ;; *) r=1 ;; esac
-ck "S11 a staged template runs the template-size gate and the commit exits 0" "$r" 0
-_p='TEMPLATE-SIZE RAN'; _t=${out//"$_p"/}; n_runs=$(( (${#out} - ${#_t}) / ${#_p} ))
-[ "$n_runs" = 1 ] && r=0 || r=1
-ck "S11 the template-size gate runs once across an unrelated commit and the template's (ran $n_runs)" "$r" 0
 
 # ---- the policy guard, TOOL-dGroundRules-6 AC9 ----------------------------------------------------
 # A stand-in guard at the root install says it ran and exits as written; its list, committed, names
@@ -369,6 +284,45 @@ ck "AC6 a check 12 refusal never runs the generator, and the commit is refused" 
 out=$(run_render_commit 9 1)
 case "$out" in *"COMMIT RC=0"*|*"grading the memory hygiene leg again"*) r=1 ;; *"GEN RAN --write-staged"*"HYGIENE RUNS=1"*) r=0 ;; *) r=1 ;; esac
 ck "AC6 a declined render is followed by no second grading, and the commit is refused" "$r" 0
+
+# ---- the derived legs, TOOL-dWitnessedBar-10 AC1/AC2/AC3 ------------------------------------------
+# This repository's runner and precommit.py, copied to a root install, read a fixture manifest: leg A
+# guarded on a/, whose precommit argv exits as `.a-rc` says, and leg B with no precommit. A staged a/
+# path runs A and commits; A failing refuses the commit naming it, and restored the same staged change
+# commits; an unrelated staged path prints A not tripped and runs neither; no runner is an announced
+# skip. B never runs. Red with the hook's derived call taken out, or with A's guard ignored.
+rg_src=$(cd "$repo_src" && git ls-files -- '*run-gates/run-gates.sh' | head -n 1)
+[ -n "$rg_src" ] || { echo "FAIL no tracked run-gates.sh in $repo_src — the derived arms cannot run"; exit 2; }
+d="$tmp/derived"; rm -rf "$d"; mkdir -p "$d"
+cd "$d" || exit 2
+git init -q --template= -b main
+mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+mkdir -p run-gates a b
+cp "$repo_src/$rg_src" "$repo_src/${rg_src%/*}/precommit.py" run-gates/
+printf '%s\n' 'echo "A RAN"; exit "$(<.a-rc)"' > a.sh; echo 0 > .a-rc
+printf '%s\n' 'echo "B RAN"' > b.sh
+printf '%s\n' '[' '  {"name": "A", "argv": ["bash", "a.sh"], "guard": ["a/"], "precommit": ["bash", "a.sh"]},' \
+  '  {"name": "B", "argv": ["bash", "b.sh"]}' ']' > gate-legs.json
+git add -A; git commit -q --no-verify -m fixture
+echo 1 > a/x; git add a/x
+out=$(git commit -q -m ax 2>&1); rc=$?
+case "$out" in *"B RAN"*) r=1 ;; *"A RAN"*"pre-commit: A ok"*) r=$rc ;; *) r=1 ;; esac
+ck "AC2 a staged a/ path runs leg A through the derived list, and the commit proceeds" "$r" 0
+echo 1 > .a-rc; echo 2 > a/x; git add a/x
+out=$(git commit -q -m ax2 2>&1); rc=$?
+case "$out" in *"pre-commit: A FAILED (rc 1)"*) r=$rc ;; *) r=0 ;; esac
+ck "AC3 leg A's precommit argv failing refuses the commit, naming it" "$r" 1
+echo 0 > .a-rc
+git commit -q -m ax2 >/dev/null 2>&1; ck "AC3 ...and with A restored, the same staged change commits" $? 0
+echo 1 > .a-rc; echo y > b/y; git add b/y
+out=$(git commit -q -m by 2>&1); rc=$?
+case "$out" in *"A RAN"*|*"B RAN"*) r=1 ;; *"pre-commit: A not tripped"*) r=$rc ;; *) r=1 ;; esac
+ck "AC2 an unrelated staged path prints A not tripped, runs neither leg, and commits" "$r" 0
+rm -rf run-gates; echo z > b/y; git add b/y
+out=$(git commit -q -m no-runner 2>&1); rc=$?
+case "$out" in *"A RAN"*) r=1 ;; *"derived pre-commit leg SKIPPED — no kit root"*) r=$rc ;; *) r=1 ;; esac
+ck "S4 a runner no rung resolves is an announced skip, and the commit proceeds" "$r" 0
+cd "$tmp" || exit 2
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
