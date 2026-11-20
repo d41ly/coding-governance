@@ -549,20 +549,34 @@ UNBORN_LINE = "seed: HEAD is unborn, rows carry the null SHA"
 
 def read_head_sha(root):
     """-> (sha, reason) of the commit `seed` stamps where no `--sha` is given (TOOL-dWitnessedBar-61):
-    HEAD's sha from `git rev-parse --verify --quiet HEAD`; `NULL_SHA` where that exits 1 with nothing on
-    stdout or stderr, as it does on an unborn HEAD, in a repository with no commit yet; on any other
-    failure, exit 128 or any stderr text among them, no sha and the reason `no HEAD: <its stderr line>`,
-    so a tree git refused to read is never stamped as seeded before any commit (TOOL-dWitnessedBar-63
-    S8). The recall kit's `read_worktree_head` and the overlay's `check_born` read an unborn HEAD the
-    same way and neither is importable from this block. WHAT IT DOES NOT CHECK: that a silent exit 1 is
-    an unborn HEAD rather than a HEAD naming a branch that does not exist, which git reports the same."""
-    rc, out, err = _run_git(root, "rev-parse", "--verify", "--quiet", "HEAD", with_stderr=True)
+    HEAD's commit from `git rev-parse --verify --quiet HEAD^{commit}`, so a ref naming a missing object
+    is never stamped; `NULL_SHA` only where that exits 1 printing nothing and HEAD names a branch that
+    does not exist, which is an unborn HEAD in a repository with no commit yet: `git symbolic-ref -q HEAD`
+    exits 0 printing one `refs/` line and nothing on stderr, and `git for-each-ref <that ref>` exits 0
+    printing nothing on either stream (TOOL-dWitnessedBar-64 S1 S2). Any other outcome, a broken,
+    dangling, looping or detached-missing HEAD among them, is no sha and the reason `no HEAD: <the first
+    stderr line of the probe that ended the read>`, or `git <verb> exited <rc>` where it printed none, so
+    a tree git refused to read is never stamped as seeded before any commit (TOOL-dWitnessedBar-63 S8,
+    TOOL-dWitnessedBar-64 S3). The recall kit's `read_worktree_head` and the overlay's `check_born` read
+    every failure as unborn and neither is importable from this block. WHAT IT DOES NOT CHECK: a git
+    release whose wording or exit codes differ from these on any of the three probes, or a branch ref
+    that `for-each-ref` matches by prefix, such as `refs/heads/b/x` beside an unborn `refs/heads/b`,
+    which reads as no HEAD."""
+    rc, out, err = _run_git(root, "rev-parse", "--verify", "--quiet", "HEAD^{commit}", with_stderr=True)
     out, err = out.strip(), err.strip()
     if rc == 0 and out:
         return out, ""
+    verb = "rev-parse"
     if rc == 1 and not out and not err:
-        return NULL_SHA, ""
-    return None, "no HEAD: %s" % (err.splitlines() or ["git rev-parse exited %d" % rc])[0].strip()
+        verb = "symbolic-ref"
+        rc, out, err = _run_git(root, "symbolic-ref", "-q", "HEAD", with_stderr=True)
+        lines = out.splitlines()
+        if rc == 0 and len(lines) == 1 and lines[0].startswith("refs/") and not err.strip():
+            verb = "for-each-ref"
+            rc, out, err = _run_git(root, "for-each-ref", lines[0], with_stderr=True)
+            if rc == 0 and not out.strip() and not err.strip():
+                return NULL_SHA, ""
+    return None, "no HEAD: %s" % (err.strip().splitlines() or ["git %s exited %d" % (verb, rc)])[0].strip()
 
 
 def read_home_state(path):

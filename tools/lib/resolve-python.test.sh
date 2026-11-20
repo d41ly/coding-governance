@@ -1462,8 +1462,8 @@ out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$NK/l
 # never committed, so `rev-parse --verify -q HEAD` exits 1 printing nothing: the seed stamps the null SHA
 # and says so, a failed seed's unarmed line carries it, and once committed a rerun leaves the home
 # byte-identical while --widen stamps the new HEAD. Red when the seed takes its sha from a bare HEAD
-# read again. WHAT THIS DOES NOT CHECK: a git failure other than an unborn HEAD, which no fixture here
-# can stage without a broken repository.
+# read again. WHAT THIS DOES NOT CHECK: an unborn HEAD in a reftable repository, or under a git release
+# answering the unborn probes otherwise; a broken HEAD is the corrupt-HEAD block's, below.
 LLU="$LL/unborn"; LL_NULL=0000000000000000000000000000000000000000
 mkdir -p "$LLU/tools/fx" "$LLU/memory/project"
 git init -q "$LLU" && git -C "$LLU" config core.autocrlf false
@@ -1516,6 +1516,38 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
   && head -3 "$LL_UHOME" | cmp -s - "$LL/p.before"; } \
   || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
 
+# ---- 2o, the corrupt HEAD (TOOL-dWitnessedBar-64 AC1) ------------------------------------------------
+# Four fresh `git init`s, each holding the unborn fixture's registration `p` staged and never committed,
+# each with HEAD broken one way: the branch file holding `garbage`; holding forty `1`s, an object that
+# does not exist; holding `ref: refs/heads/other` while `other` points back; `.git/HEAD` itself holding
+# forty `1`s. Through the CLI's `main`, each seed exits 1 with one stdout line `unarmed p no HEAD:
+# <reason>`, that reason and `; nothing written` on stderr, no home, and no file outside `.git` holding
+# the null SHA or the dangling one; the detached fixture's reason is `git symbolic-ref exited 1`. RED
+# against a seed reading a silent rev-parse exit 1 as unborn, or stamping the SHA a bare HEAD read
+# prints. WHAT THIS DOES NOT CHECK: a reftable repository, where no branch file exists to break, and a
+# git release answering these states with other exit codes or words.
+LL_DANGLING=1111111111111111111111111111111111111111
+for ll_fx in garbage missing loop detached; do
+  LLC="$LL/corrupt-$ll_fx"; mkdir -p "$LLC/tools/fx" "$LLC/memory/project"
+  git init -q "$LLC" && git -C "$LLC" config core.autocrlf false
+  cp "$LLR/fxseed.py" "$LLC/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLC/tools/fx/kit.toml"
+  printf 'a\nb\n' > "$LLC/seed-keys.txt"; : > "$LLC/memory/project/.keep"; git -C "$LLC" add -A
+  ll_ref=$(git -C "$LLC" symbolic-ref HEAD | tr -d '\r')
+  case $ll_fx in
+    garbage) printf 'garbage\n' > "$LLC/.git/$ll_ref" ;;
+    missing) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/$ll_ref" ;;
+    loop) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref"; printf 'ref: %s\n' "$ll_ref" > "$LLC/.git/refs/heads/other" ;;
+    detached) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/HEAD" ;;
+  esac
+  out=$(LLU="$LLC" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
+  ll_reason=$(sed -n 's/^unarmed p no HEAD: //p' "$LL/py.out")
+  { [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && [ -n "$ll_reason" ] \
+    && grep -qxF "legacy_ledger: p: no HEAD: $ll_reason; nothing written" "$LL/py.err" && [ ! -e "$LLC/memory/project/p.txt" ] \
+    && [ -z "$(grep -rl --exclude-dir=.git -e "$LL_NULL" -e "$LL_DANGLING" "$LLC")" ] \
+    && { [ "$ll_fx" != detached ] || [ "$ll_reason" = "git symbolic-ref exited 1" ]; }; } \
+    || bad "64 AC1: a seed on the $ll_fx HEAD did not exit 1 with one no-HEAD line and its reason, or wrote a home or a null or dangling SHA: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+
 # ---- 2o, the no-HEAD and cross-drive routes (TOOL-dWitnessedBar-63 AC4 AC6) -------------------------
 # Over the unborn fixture, now committed, through stand-ins: `read_head_sha` answering no sha and
 # `no HEAD: fatal: boom` takes unit 15's refused-home branch whole, the unarmed line on stdout, the reason
@@ -1523,8 +1555,9 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 # sha; `check_home_admitted` under an `os.path.relpath` raising ValueError, as it does across drives on
 # Windows, reads `outside the tree`, and `seed --all` over p, so refused, and x1 still seeds x1; on a
 # Windows host `seed --home` on another drive letter reads outside the tree for real. RED against a seed
-# stamping the null SHA on exit 128, and against a silent no-HEAD path. WHAT THIS DOES NOT CHECK: a real
-# corrupt HEAD, and the other-drive home off Windows, where no path has a drive.
+# stamping the null SHA on exit 128, and against a silent no-HEAD path. WHAT THIS DOES NOT CHECK: the
+# other-drive home off Windows, where no path has a drive; a real corrupt HEAD is the corrupt-HEAD
+# block's, above.
 rm -f "$LL_UHOME"
 out=$(run_ll_py 'L.read_head_sha = lambda root: (None, "no HEAD: fatal: boom")
 sys.exit(L.run_seed_cli(["--population", "p"], "."))')
