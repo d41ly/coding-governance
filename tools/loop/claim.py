@@ -629,8 +629,9 @@ def check_claim_plant(case, top, seen, bad):
         seen.append("lease epoch %s -> %s" % tuple(e.group(1) if e else "-" for e in epochs))
         if not all(epochs) or int(epochs[1].group(1)) != int(epochs[0].group(1)) + 1:
             bad.append("the lease's epoch is not one above the planted one")
-        if any("wait-since: " in m for _s, m in read_remote_log(claim_ref)):
-            bad.append("the claim waited on the stale lease, adding wait-since")
+        log = read_remote_log(claim_ref)
+        if not log or any("wait-since: " in m for _s, m in log):
+            bad.append("the claim ref holds no commit, or one adding wait-since: %r" % [m[-120:] for _s, m in log])
     elif case == "overlap-warn":   # AC6
         run_fixture_git(root, "checkout", "-q", "-b", "other")
         write_fixture_files(root, {"tools/zq-shared/x.txt": "theirs\n"})

@@ -28,3 +28,9 @@ row, and the `loop claim fixtures` budget row re-priced; S3, the route named in 
 - The row's `plants=` token reads the plant count `PLANTS` holds once `stale-holder` is added: (DERIVED)
   14 (DERIVED)
 - The kit-epoch rule binds at the push boundary, where the lander mints each moved kit's version (`tools/govkit/govkit.py#cmd_epoch`), so no version carrier moved in this pass, as in this build's earlier driver and loop-kit passes. (DERIVED)
+
+- The bug-class checklist over the pass commit `246f7c26e` selected `fixture-passes-by-finding-nothing`: the plant's no-`wait-since:` check passed over an empty claim log, so it now also misses where the claim ref holds no commit; re-run alone, the plant exited 0 held. Its sighting is live: unread, the acquire refuses with no hint and the claim waits, which the plant reads as a miss. (DERIVED)
+- It selected `refusal-branch-with-no-arm`: the take-over refused and the take-over not written have no plant, the spec naming the one `stale-holder` plant and its row's token raised by one, so both are named for the close rather than built here. (DERIVED)
+- It selected `usage-exit-list-lags-its-function`: the branch's one new return is the literal `return 2`, a code the usage line lists. (DERIVED)
+- It selected `a-spelling-change-strands-its-readers` and `two-answers-to-one-question`: the refusal line prints the same bytes, a bash probe comparing it with the inline hint it replaced, and the unattended suite's two greps of the hint read those bytes unchanged. (DERIVED)
+- It selected `budget-row-not-remeasured-after-added-arms` and `an-attested-count-must-count-what-the-grader-counts`: the row was re-read by the plant's own reading, and its token is the length of `PLANTS` imported from the module. (DERIVED)
