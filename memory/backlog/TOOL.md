@@ -562,7 +562,7 @@ Cite ids, never line numbers.
 | [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |
 | [TOOL-dMispairedQuote-8](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen admits a quote after an OPERATOR or punctuation, which… |
 | [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
-| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | DEFERRED | MED | TOOL-dPlacedRequest-51 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dPlacedRequest-22](../builds/dPlacedRequest/BACKLOG.md) | INPROGRESS | MED | TOOL-dPlacedRequest-51 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dPlacedRequest-74](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPlacedRequest-75](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS observed-by-claim-no-arm-discharges EARNED A GATE AT ITS… |
 | [TOOL-dPlacedRequest-76](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS rule-stated-with-no-check-that-fails EARNED A GATE AT ITS… |
