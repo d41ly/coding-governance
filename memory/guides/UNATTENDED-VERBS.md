@@ -613,6 +613,13 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   outside the closed set (exit 2). A lost race prints `lost the race, re-read <n> of 3` (PINNED) and
   draws again, at most three times (PINNED); an unreachable remote, a bound that fired and a fourth
   lost race print `not drawn, contention` and draw nothing (exit 2). It takes no slug.
+- `--request-consent` — `--request-consent <content key>`, the consent predicate `check_request_consent`
+  as a verb, read-only, which `placement.py check` runs for a `breakpoint` placement
+  (`TOOL-dPlacedRequest-5`): `request — <key> · typed here: this session's own words` (exit 0) where
+  this session's line in this node's `.typed` file names the blob the kept copy hashes to now, else
+  `request — <key> · relayed: data with provenance, never consent` or the `no session` line (exit 1),
+  and the form (exit 2) for any other argument count. It reads no remote and writes nothing. It takes
+  no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
@@ -837,6 +844,10 @@ one are two acts with two authorizations.
    by policy review.design: <value> · <date>` under `owed` or a Tier-2 spec under `owed-above-tier`,
    the date BASE's, and `unattended: spec-audit — not owed by policy review.design: <value>` under
    `off` or `owed-above-tier` with no Tier-2 spec; a policy file that does not read there is check 55.
+   Where none of those owes it and the build's folder at BASE holds the owner's placed `spec audit`, a
+   disposition record of `item.entry.place` disposed `breakpoint` that `placement.py breakpoint`
+   writes (`TOOL-dPlacedRequest-5`), the line reads `unattended: spec-audit — opted in by placement,
+   the owner's placed spec audit at BASE, so it is owed: <date>`, the date BASE's; it only adds.
    The audit is OPT-IN per build (owner ruling of
    2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the project default at
    the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is
@@ -1097,7 +1108,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   SPEC, then — only where the build or its project declares the audit — AUDIT and DISPOSAL, and hands
   back the ordered roster on a terminal `--review` verdict, or at SPEC completion when the audit is
   off. Pass `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`
-  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`;
+  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, or any other `opted in by` line, and omit
+  it on `not owed (opt-in)`;
   the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
   A caller passes `disposal`, the value of the `spec-disposal:` line `--plan <slug> --paths` prints,
   and omits the arg on `absent`. That line is the one answer `SPEC_FOLD_CUTOFF`, the run's first-commit

@@ -5754,6 +5754,34 @@ hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 same "the owner's default pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md)" "2026-09-21"
 git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
 git checkout -qf unit
+# ---- TOOL-dPlacedRequest-5 S7 — THE OWNER'S PLACED SPEC AUDIT IS A FOURTH SOURCE, `placement`. A
+# ---- disposition record of item.entry.place disposed breakpoint, its Reason `spec audit · request <key>`,
+# ---- committed only on the run's PUSHED branch opts nothing in; the same record landed on the default
+# ---- branch owes the audit at BASE's date. RED, observed at the close, is the placement source dropped
+# ---- from check_authorization. Waived by README rule 8 with the rest of this suite. WHAT THIS DOES NOT
+# ---- DRIVE: the record's writer, `placement.py breakpoint`, whose own plants do.
+_pr_rec="memory/builds/tBr/build/2026-11-20-build-TOOL-tBr-1-disposition-1.md"
+_pr_body='# TOOL-tBr-1 disposition 1 — item.entry.place disposed breakpoint\n\n**Serves:** disposition TOOL-tBr-1\n\n- **Item:** item.entry.place\n- **Disposition:** breakpoint\n- **Channel:** prompt\n- **Reason:** spec audit · request 3f9c2a7d01be\n- **Caused-by:** TOOL-tBr-1\n'
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/build && printf "$_pr_body" > "$_pr_rec"
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "opted in by placement"
+_aw_main0=$(git rev-parse main)
+reset_tree; git checkout -qf main
+mkdir -p memory/builds/tBr/build && printf "$_pr_body" > "$_pr_rec"
+git add -A >/dev/null && git commit -q -m pr-owner-placement --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "unattended: spec-audit — opted in by placement, the owner's placed spec audit at BASE, so it is owed: "
+same "DPR5 S7 the owner's placed spec audit pins BASE's date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md | grep -c '^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$')" "1"
+git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
+git checkout -qf unit
 # ---- OWNER RULING 2026-10-05 (aEvidencedLens): a PROMPT README's spec-audit: is admitted when its
 # ---- prompt record AT THE PINNED BASE quotes the owner asking for the audit. The ask wraps across two
 # ---- quote lines, so only the join matches; the non-asking record DESCRIBES the opt-in in its prompt
@@ -20760,6 +20788,15 @@ rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item
 mv "$LF/origin.gone" "$LF/origin.git"
 same "DPR14 AC4 an unanswered remote exits 2" "$rd_rc" "2"
 hit  "$rd_out" "request-draw — $rd_key · not drawn, contention · "
+# ---- TOOL-dPlacedRequest-5 S3 — THE CONSENT PREDICATE AS A READ-ONLY VERB. r3 was recorded by session qA
+# ---- in c1: --request-consent answers 0 for qA, 1 `relayed` for qB, and its form exit 2 with no key.
+# ---- RED, observed at the close, is the verb answering 0 whatever the predicate says.
+rd_out=$(run_request_arm --request-consent "$rd_key"); rd_rc=$?
+same "DPR5 S3 the session that recorded the words consents" "$rd_rc $rd_out" "0 request — $rd_key · typed here: this session's own words"
+rd_out=$(RQ_SID=qB run_request_arm --request-consent "$rd_key"); rd_rc=$?
+same "DPR5 S3 another session's request is relayed" "$rd_rc $rd_out" "1 request — $rd_key · relayed: data with provenance, never consent"
+rd_out=$(run_request_arm --request-consent); rd_rc=$?
+same "DPR5 S3 --request-consent with no key exits 2" "$rd_rc $rd_out" "2 request — not read · the form is --request-consent <content key>"
 rm -rf "$LF"
 
 # ==================================================================================================

@@ -123,7 +123,7 @@ The spec-audit opt-in is the OWNER's on the same reading (`TOOL-aWardedAudit-4`)
 line counts only from a `slug` README or a `prompt` one whose BASE prompt record asks for it, and
 preflight refuses it elsewhere (check 89);
 `SPEC_AUDIT_DEFAULT` is read at the default-branch side of BASE; the bar reds a run commit writing
-either. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
+either. The owner's placed `spec audit` at BASE, source `placement`, only adds an owed audit. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
 
 **The build method is a RUN-TIME dependency of this kit.** Every directive (§10) points into a
 section of it, so `--preflight` refuses a tree where `<MEMORY_ROOT>/guides/BUILD-METHOD.md` is absent

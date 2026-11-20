@@ -6,6 +6,7 @@
     python placement.py place --request <key> --owner <disposition record> [--return <file>]
     python placement.py check --request <key>
     python placement.py record --request <key>
+    python placement.py breakpoint --request <key>
     python placement.py --fixture [--plant <case>]
 
 Every verb runs in the repository at the current directory. `<key>` is a request's content key, the twelve
@@ -13,18 +14,19 @@ hex digits `request.py` derives, and its record is the node-local file `<git-com
 beside the request's local text `<key>.md`: one block per `place`, appended, the newest the placement and the
 earlier ones the loop's history. A block is `key: value` lines, ending at a blank line:
 
-    placed-utc · disposition · build · playbook · reason · evidence · observations · placer · scenarios ·
-    facts · check · reenters
+    placed-utc · disposition · build · breakpoint · playbook · reason · evidence · observations · placer ·
+    scenarios · facts · check · reenters
 
 `disposition` is one member of the loop definition's one closed set, read through `loop_lib.read_dispositions`
 and resolved through `resolve_disposition`, so an alias such as `attach` is written as the member it means and
 a word outside both is refused naming it. `reason` and `evidence` pass the runlog kit's `render_redacted` and
 are cut to `VALUE_CAP` bytes each. `reenters`, the item an owner's late answer re-enters, is written only when a
-caller passes it, its shape held by `check_reenters_item`, and a block without it reads `none`.
+caller passes it, its shape held by `check_reenters_item`, and a block without it reads `none`; so is
+`breakpoint`, the review breakpoint a `breakpoint` placement names, written only where the return carries it.
 
 PLACE. Who places is the policy key `placement`, read through the policy kit's `resolve` at the landed
 revision. Under `agent-places` the orientation scout's return, `--return <file>`, is the placement: a block of
-`disposition`, `build`, `playbook`, `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the
+`disposition`, `build`, `breakpoint`, `playbook`, `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the
 observations `; ` joined or `none`, the scenarios the scout found admitted `+` joined, and the request facts
 it read as `<name>=<value>` pairs `; ` joined, each name and value one tag segment (TOOL-dPlacedRequest-10). Under `declared-checked` the request's own declaration, `--declared <word> [<build>]`, is
 the placement and a return is evidence only. Under `owner-places` `place` writes nothing without `--owner`:
@@ -40,7 +42,11 @@ terminal by the memory-tree kit's `derive_status`, and whose build lease the una
 prints free, released, stale or held under this node's fleet tag; `new` the request's words held, its local
 text or a prompt record of the named build whose `## The prompt` keys alike; `patch` a terminal build;
 `repeat` a playbook path present at HEAD; `unit` refused while `build.unit-holders` is unlanded; `breakpoint`
-refused until TOOL-dPlacedRequest-5's check lands; `ask` an ask of the build the evidence names, among the
+by `check_breakpoint` (TOOL-dPlacedRequest-5): a `breakpoint:` name `breakpoints.py`'s
+`derive_placed_position` reads, `spec audit`, `gate review`, `closing review`, `landing review` or `item
+<tag>`, a live build as `continue` reads one, an `item <tag>` among the build's composed rows, and the
+request this session's own, the driver's `--request-consent` answering 0, a 1 refused `relayed`, since a
+request known by its record's id alone is data with provenance and never consent; `ask` an ask of the build the evidence names, among the
 rows the index generator's `--asks --build` prints; `none` a session card routing no unit. A claimed
 observation under `verify-before-place` is `observations-unverified` until its probe record carries a
 verdict. A failed fact under `placement.check` = `refuse` prints `placement: refused — <disposition> ·
@@ -74,12 +80,25 @@ being no repetition, so the owner still places once the budget is spent. The dri
 and where the driver drew nothing, a lost race or an unreachable remote among them, it exits 2; no block is
 written either way.
 
+BREAKPOINT (TOOL-dPlacedRequest-5). `breakpoint` declares a passed `breakpoint` block on its build: with the
+build's lease free or this node's, read as `check` reads `amend`'s and refused `live-holder` otherwise, it
+writes the owner's disposition record through the memory-tree kit's record factory, `Item`
+`item.entry.place`, `Disposition` `breakpoint`, `Channel` `prompt` and `Reason` `<name> · request <key>`,
+under the build's lowest unit id, in the build's `build/` folder of this tree for the session's commit, and
+prints `placement: declared — breakpoint <name> · <build> · <record>`. `breakpoints.py` lists the record and
+the main loop fires it at its position through the driver's `--trigger`; where the build's newest transition
+record is already in a step after the position's, `breakpoint` fires it at once, `--trigger <build> --subject
+<s> --cause placement`, the subject `<build>-specs` for `spec audit`, `<build>` for `closing review` and the
+position's item tag otherwise, printing the driver's lines, a refused trigger exit 1 with the record kept.
+A placed `spec audit` is also the driver's fourth source of an owed spec audit, `placement`, read at the run's
+BASE by `check_authorization`.
+
 RECORD. `record` prints the newest block's `disposition`, its `reenters` where it is not `none`, `build`,
 `playbook`, `reason`, `scenarios` and `facts` lines, the lines the claim commit carries, when its `check:`
 reads `pass` or `recorded`; any other block prints nothing and exits 1.
 
-Exit 0 placed, passed, recorded or held · 1 a refusal, named · 2 a usage error, a kit that does not resolve or
-a pre-claim draw that drew nothing · 3 the pre-claim budget exhausted.
+Exit 0 placed, passed, recorded, held or declared · 1 a refusal, named · 2 a usage error, a kit that does not
+resolve or a pre-claim draw that drew nothing · 3 the pre-claim budget exhausted.
 `--fixture --plant <case>` runs one case of `PLANTS` in a throwaway repository under the system temp folder,
 printing `placement: <case> · ... · held` or `MISSED`; `--fixture` alone runs every case through
 `loop_lib.run_selftest_cases`, the `loop placement fixtures` leg.
@@ -88,8 +107,9 @@ WHAT THIS DOES NOT CHECK: that the scout's reason is true, which is why `check` 
 request facts the scout read but `entry` are the request's, `check` re-running the predicates over them as
 written, so a predicate on a fact the scout never supplies never admits; that two
 sessions of one node hold one lease apart, since the claims reader prints a fleet tag and no session; that a
-stand-in's later item has landed, its row being deleted by the build that lands it; the `breakpoint`
-member's own facts, TOOL-dPlacedRequest-5's; and anything outside this node, the record being node-local.
+stand-in's later item has landed, its row being deleted by the build that lands it; that a session's own
+consent was typed rather than relayed into `--request`, the driver's predicate's own limit; and anything
+outside this node, the record being node-local.
 """
 import argparse
 import datetime
@@ -107,7 +127,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import (SEG, LoopError, read_dispositions, read_memory_tree, resolve_disposition,  # noqa: E402
+from loop_lib import (SEG, LoopError, read_dispositions, read_memory_tree, read_steps, resolve_disposition,  # noqa: E402
                       resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_witness import read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
@@ -118,10 +138,13 @@ SAY = "placement"
 #: A request's content key, as `request.py` derives it.
 REQUEST_KEY = re.compile(r"[0-9a-f]{%d}" % KEY_HEX)
 #: A block's keys, in the order they are written; `reenters` only where a caller passed an item.
-BLOCK_KEYS = ("placed-utc", "disposition", "build", "playbook", "reason", "evidence", "observations", "placer",
-              "scenarios", "facts", "check", "reenters")
+BLOCK_KEYS = ("placed-utc", "disposition", "build", "breakpoint", "playbook", "reason", "evidence", "observations",
+              "placer", "scenarios", "facts", "check", "reenters")
+#: The keys a block writes only where they are not `none`.
+SPARSE_KEYS = ("breakpoint", "reenters")
 #: The keys a scout's return may carry.
-RETURN_KEYS = ("disposition", "build", "playbook", "reason", "evidence", "observations", "scenarios", "facts")
+RETURN_KEYS = ("disposition", "build", "breakpoint", "playbook", "reason", "evidence", "observations", "scenarios",
+               "facts")
 #: Shared interface I20: the `entry` fact each disposition that selects scenarios derives; the rest select none.
 ENTRY_FACTS = {"new": "feature", "amend": "amendment", "patch": "patch", "repeat": "playbook-run"}
 #: The mark a selection carries where no scenario admits the request and the default places it.
@@ -135,6 +158,8 @@ OWNER_ITEM = "item.entry.place-owner"
 PLACE_ITEM = "item.entry.place"
 #: The bound on one pre-claim draw through the unattended driver, its fetch and at most four pushes, in seconds.
 DRAW_BOUND = 900
+#: The bound on a driver verb that pushes nothing, the consent read and a trigger, in seconds.
+VERB_BOUND = 300
 #: The dispositions that open or reopen a build, the ones a claim carries.
 NO_VALUE = "none"
 #: One row per route a passed placement enters while its step's items are unbuilt (C2-F7): the dispositions
@@ -175,7 +200,23 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
                       "(default) and passed",
           "scenario-refusals": "each scenario refusal the other plants do not reach: a malformed tag or fact, a tag or "
                                "fact twice, the shared scenarios out of order, a default the pack holds no row of and a "
-                               "hand-written block's malformed tag at check"}
+                               "hand-written block's malformed tag at check",
+          "audit-request": "the owner's prompt \"audit the specs\" placed as a breakpoint on a designing build, "
+                           "declared and pushed: the driver's preflight at that BASE owes the audit from placement",
+          "audit-request-owed-only": "the same under review.blocks owed-only: the listed spec audit fired by the "
+                                     "driver's --trigger with its listed cause, its line reading owed and blocks yes",
+          "breakpoint-unnamed": "a breakpoint block with no breakpoint key refused naming it, then an unknown name, "
+                                "an undeclared item and no build",
+          "breakpoint-closed": "a spec audit placed on a CLOSED build refused not live",
+          "relayed": "a breakpoint whose request has a record on the remote and no .typed line for this session "
+                     "refused relayed; with the line planted it passes",
+          "declare": "breakpoint over a passed block writes one disposition record, item.entry.place disposed "
+                     "breakpoint through the prompt; over an unchecked block it is refused",
+          "declare-held": "breakpoint on a build another node's lease holds refused live-holder, writing no record",
+          "past-position": "a spec audit declared in designing fires nothing; declared in building, the stub driver "
+                           "records one --trigger with cause placement"}
+#: The fixture's session, whose `.typed` line a breakpoint plant writes as the owner's own words.
+FX_SESSION = "s-fx"
 
 
 class PlacementRefused(ValueError):
@@ -276,9 +317,9 @@ def read_placement(path):
 
 
 def render_placement_block(block):
-    """`block`'s lines in `BLOCK_KEYS` order, `reenters` only where it is not `none`."""
+    """`block`'s lines in `BLOCK_KEYS` order, each of `SPARSE_KEYS` only where it is not `none`."""
     return ["%s: %s" % (k, block[k]) for k in BLOCK_KEYS
-            if k in block and not (k == "reenters" and block[k] == NO_VALUE)]
+            if k in block and not (k in SPARSE_KEYS and block[k] == NO_VALUE)]
 
 
 def write_placement_blocks(path, blocks):
@@ -329,7 +370,8 @@ def add_placement(store, key, fields, placer, reenters=None, before=None):
     except ValueError as e:
         raise PlacementRefused(str(e)) from None
     block = {"placed-utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-             "disposition": member, "build": build, "playbook": playbook,
+             "disposition": member, "build": build, "breakpoint": fields.get("breakpoint", "").strip() or NO_VALUE,
+             "playbook": playbook,
              "reason": render_capped_value(reason) or "-",
              "evidence": render_capped_value(fields.get("evidence", "").strip() or NO_VALUE) or NO_VALUE,
              "observations": str(count), "placer": placer, "scenarios": "+".join(named) or NO_VALUE,
@@ -483,27 +525,36 @@ def run_request_draw_verb(root, key, cause):
     run at `root` as a process, its lines printed. -> None on a draw. PlacementRefused, exit 3 with the
     exhausted line, on a spent budget, and exit 2 where nothing was drawn; LookupError where the driver or a
     bash to run it does not resolve."""
-    driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
-    bash = resolve_bash(driver)
-    if bash is None:
-        raise LookupError("no bash can run %s" % driver.as_posix())
     try:
-        p = subprocess.run([bash, driver.as_posix(), "--request-draw", key, "--cause", cause, "--item", PLACE_ITEM],
-                           cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace",
-                           env=read_clean_env(), timeout=DRAW_BOUND)
+        rc, lines, err = run_unattended_verb(root, DRAW_BOUND, "--request-draw", key, "--cause", cause,
+                                             "--item", PLACE_ITEM)
     except subprocess.TimeoutExpired:
         raise PlacementRefused("the pre-claim draw on %s did not return within %d s, so nothing was drawn and no "
                                "block is written" % (key, DRAW_BOUND), 2) from None
-    lines = [ln.rstrip("\r") for ln in p.stdout.splitlines() if ln.strip()]
-    if p.returncode == 3:
+    if rc == 3:
         spent = next((ln.split(" · ", 1)[1] for ln in lines if ln.startswith("exhausted · ")), "unread")
         raise PlacementRefused("pre-claim budget exhausted", 3,
                                "%s: pre-claim budget exhausted — %s · %s" % (SAY, key, spent))
     for line in lines:
         print(line)
-    if p.returncode != 0:
+    if rc != 0:
         raise PlacementRefused("the pre-claim draw on %s drew nothing, so no block is written: %s" % (
-            key, lines[-1] if lines else (p.stderr.strip()[-300:] or "exit %d" % p.returncode)), 2)
+            key, lines[-1] if lines else (err or "exit %d" % rc)), 2)
+
+
+def run_unattended_verb(root, bound, *argv, driver=None, env=None):
+    """The unattended driver run at `root` as a process for `argv` within `bound` seconds: `(exit, its
+    non-blank stdout lines, the tail of its stderr)`. `driver` is this tree's driver where None, else the
+    script a fixture stands in; `env`, where given, the variables set over this process's environment.
+    LookupError where the driver or a bash to run it does not resolve; subprocess.TimeoutExpired where the
+    bound fires."""
+    driver = driver or resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+    bash = resolve_bash(driver)
+    if bash is None:
+        raise LookupError("no bash can run %s" % pathlib.Path(driver).as_posix())
+    p = subprocess.run([bash, pathlib.Path(driver).as_posix(), *argv], cwd=str(root), capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=read_clean_env(**(env or {})), timeout=bound)
+    return p.returncode, [ln.rstrip("\r") for ln in p.stdout.splitlines() if ln.strip()], p.stderr.strip()[-300:]
 
 
 # ------------------------------------------------------------------------------------------ the facts
@@ -631,7 +682,7 @@ def check_disposition_fact(root, common, store, key, block):
     if word == "unit":
         return "build.unit-holders is not landed, so the build's driver alone drives its units"
     if word == "breakpoint":
-        return "the breakpoint's facts are TOOL-dPlacedRequest-5's check, which is not built"
+        return check_breakpoint(root, key, block)
     if word == "ask":
         return "names no build" if build == NO_VALUE else check_ask_filed(root, build, block.get("evidence", ""))
     if word == "none":
@@ -640,12 +691,56 @@ def check_disposition_fact(root, common, store, key, block):
     return "%s is no disposition this check reads" % word
 
 
+def check_breakpoint(root, key, block):
+    """None where a `breakpoint` block's facts hold, read from their sources now (TOOL-dPlacedRequest-5 S2,
+    S3), else the fact: its `breakpoint:` name one `derive_placed_position` reads, its build live as
+    `continue` reads one, an `item <tag>` among the build's composed rows, and the request this session's
+    own, the driver's `--request-consent <key>` answering 0; a 1 is `relayed`, and an unread answer a fact,
+    never a pass. LookupError where the driver or a bash to run it does not resolve."""
+    from breakpoints import PLACED_TAG, derive_placed_position, read_build_item_rows
+    name, build = block.get("breakpoint", NO_VALUE), block.get("build", NO_VALUE)
+    if name == NO_VALUE:
+        return "names no breakpoint: a breakpoint block carries breakpoint: <name>, a review or item <tag>"
+    try:
+        position = derive_placed_position(name)[1]
+    except ValueError as e:
+        return str(e)
+    if build == NO_VALUE:
+        return "names no build"
+    status = derive_build_status(root, build)
+    if status is None:
+        return "the build %s does not exist" % build
+    if status in read_terminal_statuses():
+        return "the build %s is %s, not live" % (build, status)
+    if name.startswith(PLACED_TAG):
+        try:
+            tags = [r.get("tag") for r in read_build_item_rows(build, root)]
+        except ValueError as e:
+            return "the composed rows at %s's pin do not read: %s" % (build, e)
+        if position not in tags:
+            return "the item %s is not declared by the composed rows at %s's pin" % (position, build)
+    try:
+        rc, lines, err = run_unattended_verb(root, VERB_BOUND, "--request-consent", key)
+    except subprocess.TimeoutExpired:
+        return "the consent of %s could not be read within %d s" % (key, VERB_BOUND)
+    if rc == 0:
+        return None
+    said = " / ".join(lines) or err or "exit %d" % rc
+    return ("relayed: %s" % said) if rc == 1 else "the consent of %s could not be read: %s" % (key, said)
+
+
 def read_owner_release(root, build):
-    """`(stem, word)` of the owner's newest disposition record of `build` naming `PLACE_ITEM`, or None."""
+    """`(stem, word)` of the owner's newest disposition record of `build` naming `PLACE_ITEM`, or None; a
+    placed breakpoint's declaration, which names that item too, is no release."""
     if build == NO_VALUE:
         return None
     from adapt import read_disposition_release
-    return read_disposition_release(root, build, PLACE_ITEM, ())
+    from breakpoints import read_placed_breakpoints
+    try:
+        placed = {b["id"] for b in read_placed_breakpoints(build, root)}
+    except ValueError as e:
+        raise PlacementRefused(str(e)) from None
+    return read_disposition_release(root, build, PLACE_ITEM, placed)
 
 
 def derive_entry_fact(disposition):
@@ -759,6 +854,63 @@ def print_claim_lines(block):
     return 0, ["%s: %s" % (k, block.get(k, NO_VALUE)) for k in keys]
 
 
+# ------------------------------------------------------------------------------------------ the breakpoint
+def check_position_passed(root, build, position):
+    """True where `build`'s newest transition record is in a step after the one item tag `position` sits in,
+    by the gov steps' order; False with no transition, and for a state or an item no step row names."""
+    from breakpoints import read_build_item_rows
+    from loop_transition import read_transitions
+    moves = read_transitions(build, root)
+    if not moves:
+        return False
+    steps = read_steps(KIT)
+    row = next((r for r in read_build_item_rows(build, root) if r.get("tag") == position), {})
+    at = next((s["order"] for s in steps if s["tag"] == row.get("step")), None)
+    now = next((s["order"] for s in steps if s["state"] == moves[0].get("to")), None)
+    return at is not None and now is not None and now > at
+
+
+def write_breakpoint_declaration(root, store, key, driver=None):
+    """The `breakpoint` verb over request `key`'s newest block, which must be a passed `breakpoint` block
+    (TOOL-dPlacedRequest-5 S4, S6). -> `(exit, lines)`: 1 and no record where the build's lease is held
+    elsewhere, `live-holder`; else the owner's disposition record written under the build's lowest unit id,
+    and, where the build is already past the position, `--trigger` run at once with cause `placement`
+    through `driver`, this tree's driver where None, a refused trigger exit 1 with the record kept.
+    PlacementRefused where the record factory or a read refuses."""
+    from breakpoints import PLACED_REQUEST, derive_placed_position
+    from loop_transition import read_build_specs
+    block = read_placement(store / ("%s.placement" % key))
+    if not block or block.get("disposition") != "breakpoint" or block.get("check") != "pass":
+        return 1, ["%s: refused — breakpoint · %s holds no passed breakpoint placement: check it first" % (SAY, key)]
+    build, name = block.get("build", NO_VALUE), block.get("breakpoint", NO_VALUE)
+    held = read_build_lease(root, build)
+    if held:
+        return 1, ["%s: refused — breakpoint · live-holder · %s" % (SAY, held)]
+    try:
+        _relation, position, _cause = derive_placed_position(name)
+        units = sorted((uid for uid, _status in read_build_specs(build, root)), key=lambda u: int(u.rsplit("-", 1)[1]))
+        if not units:
+            raise ValueError("the build %s has no unit spec, so no record can name its first unit" % build)
+        rel = read_build_records().write_disposition(str(root), build, units[0], PLACE_ITEM, "breakpoint", "prompt",
+                                                     "%s%s%s" % (name, PLACED_REQUEST, key))
+        past = check_position_passed(root, build, position)
+    except ValueError as e:
+        raise PlacementRefused(str(e)) from None
+    lines = ["%s: declared — breakpoint %s · %s · %s" % (SAY, name, build, rel)]
+    if not past:
+        return 0, lines
+    subject = {"spec audit": "%s-specs" % build, "closing review": build}.get(name, position)
+    try:
+        rc, said, err = run_unattended_verb(root, VERB_BOUND, "--trigger", build, "--subject", subject, "--cause",
+                                            "placement", driver=driver)
+    except subprocess.TimeoutExpired:
+        rc, said, err = 2, [], "no answer within %d s" % VERB_BOUND
+    if rc != 0:
+        return 1, lines + said + ["%s: trigger refused — %s · %s · the declaration kept for its position" % (
+            SAY, build, said[-1] if said else err or "exit %d" % rc)]
+    return 0, lines + said + ["%s: fired — --trigger %s --subject %s --cause placement" % (SAY, build, subject)]
+
+
 # ------------------------------------------------------------------------------------------ the fixture
 def write_scenario_composition(root, drop=()):
     """A scenario composition written into the fixture `root`, uncommitted: the kinds register and the
@@ -841,6 +993,113 @@ def read_fleet_user():
     return rows[0]["user"]
 
 
+def write_typed_request(root, store, text, typed=True):
+    """The request `text` kept as the driver's `--request` keeps it, `<key>.md` in `store`, and, where
+    `typed`, its `<key>.typed` line for `FX_SESSION` beside it, the session tab the kept copy's blob, so the
+    fixture's session reads as having typed it here. -> its content key."""
+    key = derive_request_content_key(text)
+    write_fixture_files(store, {"%s.md" % key: text})
+    if typed:
+        blob = run_fixture_git(root, "hash-object", "--", str(store / ("%s.md" % key)))
+        write_fixture_files(store, {"%s.typed" % key: "%s\t%s\n" % (FX_SESSION, blob)})
+    return key
+
+
+def write_audit_request_fixture(top, policy):
+    """The repository `top/r` holding build `tRun` in designing, one Tier-2 unit, its run-state file and
+    mandate, the unattended conf the loop witness kit's hold plant preflights and the policy file `policy`,
+    pushed to a bare `top/o.git`; then the owner's prompt "audit the specs" kept as this session's own words,
+    placed as a `breakpoint` `spec audit` on tRun, checked, declared, and the declaration committed and pushed,
+    so the remote's main is a BASE holding it. -> `(repo, key, [(verb, exit, output)])`."""
+    from loop_witness import HOLD_CONF
+    repo, origin, unit = top / "r", top / "o.git", "TOOL-tRun-1"
+    spec = "memory/builds/tRun/spec/2026-08-01-spec-%s.md" % unit
+    run_fixture_git(top, "init", "-q", "-b", "main", "--template=", str(repo))
+    write_fixture_files(repo, {
+        ".unattended.conf": HOLD_CONF, ".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tool:TOOL"\n',
+        ".governance/policy.toml": policy, "memory/project/stale-header-waiver.txt": "",
+        "memory/builds/tRun/README.md": "---\nslug: tRun\nnode: a\nopened: 2026-08-01\nstreams: tooling\nroster: TOOL\n"
+                                        "ids: %s\n---\n\n# tRun\n\n<!-- gen:build-index -->\n**Build status:** OPEN · "
+                                        "1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n"
+                                        "|---|---|---|---|\n| [%s — the unit](spec/2026-08-01-spec-%s.md) | INPROGRESS | "
+                                        "rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n"
+                                        % (unit, unit, unit),
+        spec: "# %s — the unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n" % unit,
+        "memory/builds/tRun/RUN.md": "# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n"
+                                     "## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRun to merge "
+                                     "to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n",
+        "memory/guides/BUILD-METHOD.md": "# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n"})
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "base")
+    run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "move\n\nGov-Transition: planning -> designing · "
+                    "build=tRun · item=item.plan.exit · sha=%s" % run_fixture_git(repo, "rev-parse", "HEAD")[:8])
+    run_fixture_git(top, "init", "-q", "--bare", "--template=", str(origin))
+    run_fixture_git(top, "--git-dir", str(origin), "symbolic-ref", "HEAD", "refs/heads/main")
+    for where in (("-C", str(repo)), ("--git-dir", str(origin))):   # the driver commits in both
+        run_fixture_git(top, *where, "config", "user.email", "fx@example.invalid")
+        run_fixture_git(top, *where, "config", "user.name", "fx")
+    run_fixture_git(repo, "remote", "add", "origin", str(origin))
+    run_fixture_git(repo, "push", "-q", "origin", "main")
+    run_fixture_git(repo, "fetch", "-q", "origin")
+    store = pathlib.Path(run_fixture_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
+    key = write_typed_request(repo, store, "audit the specs\n")
+    ret = top / "return.txt"
+    ret.write_text("disposition: breakpoint\nbuild: tRun\nbreakpoint: spec audit\nreason: the owner asked for the "
+                   "specs to be audited before building\n", encoding="utf-8", newline="\n")
+    said = []
+    for verb, argv in (("place", ("place", "--request", key, "--return", str(ret))),
+                       ("check", ("check", "--request", key)), ("breakpoint", ("breakpoint", "--request", key))):
+        said.append((verb,) + run_placement_command(repo, *argv, session=FX_SESSION))
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "the owner's placed spec audit")
+    run_fixture_git(repo, "push", "-q", "origin", "main")
+    run_fixture_git(repo, "fetch", "-q", "origin")
+    return repo, key, said
+
+
+def check_audit_request_plant(case, top, seen, bad):
+    """`audit-request` and `audit-request-owed-only` (TOOL-dPlacedRequest-5 AC1) in a fixture under `top`,
+    each observation appended to `seen` and each miss to `bad`."""
+    from breakpoints import read_breakpoints
+    policy = '[review]\nblocks = "owed-only"\n' if case == "audit-request-owed-only" else ""
+    repo, key, said = write_audit_request_fixture(top, policy)
+    for verb, rc, out in said:
+        seen.append("%s exit %d" % (verb, rc))
+        if rc != 0:
+            bad.append("%s exited %d: %s" % (verb, rc, out[-300:]))
+    if not list((repo / "memory" / "builds" / "tRun" / "build").glob("*-disposition-*.md")):
+        bad.append("no disposition record was declared for %s" % key)
+    env = {"GOV_DEFAULT_BRANCH": "main", "CLAUDE_CODE_SESSION_ID": FX_SESSION, "CLAUDE_PID": "999999999"}
+    if case == "audit-request":
+        base = run_fixture_git(repo, "rev-parse", "HEAD")
+        run_fixture_git(repo, "checkout", "-q", "-b", "unit")
+        run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "unit work")
+        run_fixture_git(repo, "update-ref", "refs/heads/main", "HEAD")   # a first preflight refuses a carried branch
+        try:
+            rc, lines, err = run_unattended_verb(repo, DRAW_BOUND, "--preflight", "tRun", "--keepalive-id", "k1", env=env)
+        finally:
+            run_fixture_git(repo, "update-ref", "refs/heads/main", base)
+        line = next((ln for ln in lines if ln.startswith("unattended: spec-audit — ")), "none")
+        seen.append("preflight exit %d · %s" % (rc, line))
+        if rc != 0 or "placement" not in line or "owed" not in line or "not owed" in line:
+            bad.append("the preflight exited %d, its spec-audit line %r: %s" % (rc, line, (lines[-3:], err)))
+        return
+    try:
+        listed = [b for b in read_breakpoints("tRun", repo) if b["name"] == "spec audit"]
+    except ValueError as e:
+        bad.append("the list refused: %s" % e)
+        listed = []
+    cause = listed[0]["cause"] if listed else "none"
+    seen.append("listed spec audit · %s %s · %s" % (listed[0]["relation"], listed[0]["position"], cause) if listed
+                else "no spec audit listed")
+    rc, lines, err = run_unattended_verb(repo, VERB_BOUND, "--trigger", "tRun", "--subject", "tRun-specs", "--cause",
+                                         cause, env=env)
+    out = " / ".join(lines) or err
+    seen.append("trigger exit %d" % rc)
+    if rc != 0 or '"trigger": "owed"' not in out or '"blocks": "yes"' not in out:
+        bad.append("the trigger with cause %s exited %d: %s" % (cause, rc, out[-300:]))
+
+
 def run_placement_command(root, *argv, session="absent"):
     """This script as a process in `root` under the session id `session`: `(exit, stdout and stderr)`."""
     p = subprocess.run([sys.executable, str(pathlib.Path(__file__).absolute()), *argv], cwd=str(root),
@@ -865,15 +1124,18 @@ def run_placement_plant(case):
 
 def check_placement_plant(case, top, seen, bad):
     """Run `case` in a fixture under `top`, appending each observation to `seen` and each miss to `bad`."""
+    if case in ("audit-request", "audit-request-owed-only"):
+        return check_audit_request_plant(case, top, seen, bad)
     policy = {"agent-places": '', "declared-checked": 'placement = "declared-checked"\n',
               "owner-places": 'placement = "owner-places"\n'}.get(case, "")
     # predicate-fails places again after a refused check, a lap its pre-claim draw takes over the remote
     driver = case in ("amend-leased", "late-answer", "prompt-continue", "continue-with-scenario", "no-admit",
-                      "predicate-fails")
+                      "predicate-fails", "relayed", "declare", "declare-held", "past-position")
     scenarios = {"predicate-fails": (), "scenario-missing": (), "entry-mismatch": (), "continue-with-scenario": (),
                  "no-admit": ("scenario.amendment",), "claim-lines": (),
                  "scenario-refusals": ("scenario.amendment",)}.get(case)
-    root = write_placement_fixture(top, policy, driver=driver, remote=case in ("amend-leased", "predicate-fails"),
+    root = write_placement_fixture(top, policy, driver=driver,
+                                   remote=case in ("amend-leased", "predicate-fails", "relayed", "declare-held"),
                                    scenarios=scenarios)
     store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     rets = top / "returns"
@@ -1076,7 +1338,7 @@ def check_placement_plant(case, top, seen, bad):
         write_fixture_files(card.parent, {card.name: "# card\n\n## route\n- build: %s\n- unit: %s\n" % (FX_LIVE, FX_UNIT)})
         for n, (fields, fact) in enumerate((
                 ({"disposition": "unit", "build": FX_LIVE}, "build.unit-holders is not landed"),
-                ({"disposition": "breakpoint", "build": FX_LIVE}, "TOOL-dPlacedRequest-5"),
+                ({"disposition": "breakpoint", "build": FX_LIVE}, "names no breakpoint"),
                 ({"disposition": "repeat", "playbook": "playbooks/none.md"}, "not in the tree at HEAD"),
                 ({"disposition": "ask", "build": FX_LIVE, "evidence": "TOOL-%s-8" % FX_LIVE}, "no ask of %s" % FX_LIVE),
                 ({"disposition": "none"}, "routes %s" % FX_UNIT),
@@ -1185,6 +1447,77 @@ def check_placement_plant(case, top, seen, bad):
                                               % FX_NEW).encode("utf-8"))
         check_case("hand-written", run_placement_command(root, "check", "--request", FX_KEY), 1,
                    "no scenario.<segment> tag")
+    elif case in ("breakpoint-unnamed", "breakpoint-closed"):   # TOOL-dPlacedRequest-5 AC2
+        rows = ((("unnamed", {"build": FX_LIVE}, "names no breakpoint"),
+                 ("unknown name", {"build": FX_LIVE, "breakpoint": "design review"}, "is none of spec audit"),
+                 ("undeclared item", {"build": FX_LIVE, "breakpoint": "item item.build.nothing"}, "is not declared"),
+                 ("no build", {"breakpoint": "spec audit"}, "names no build"))
+                if case == "breakpoint-unnamed" else
+                (("closed", {"build": FX_DONE, "breakpoint": "spec audit"}, "%s is CLOSED, not live" % FX_DONE),))
+        for n, (what, fields, fact) in enumerate(rows):
+            key = "%012x" % (0xd00 + n)
+            run_placed_return(key, disposition="breakpoint", reason="the owner asked for a review", **fields)
+            check_case(what, run_placement_command(root, "check", "--request", key), 1,
+                       "placement: refused — breakpoint · ", fact)
+    elif case == "relayed":   # TOOL-dPlacedRequest-5 AC3
+        key = write_typed_request(root, store, "audit the specs\n", typed=False)
+        write_fixture_gov_ref(root, "refs/gov/requests/%s" % key, "gov-request %s\n\ncontent-key: %s" % (key, key))
+        run_placed_return(key, disposition="breakpoint", build=FX_LIVE, breakpoint="spec audit", reason="the owner asked")
+        check_case("relayed", run_placement_command(root, "check", "--request", key, session=FX_SESSION), 1,
+                   "placement: refused — breakpoint · relayed")
+        write_typed_request(root, store, "audit the specs\n")
+        check_case("typed", run_placement_command(root, "check", "--request", key, session=FX_SESSION), 0,
+                   "placement: pass — breakpoint %s" % FX_LIVE)
+    elif case in ("declare", "declare-held"):   # TOOL-dPlacedRequest-5 AC4
+        key = write_typed_request(root, store, "audit the specs\n")
+        if case == "declare-held":
+            write_foreign_lease(root, FX_LIVE)
+        run_placed_return(key, disposition="breakpoint", build=FX_LIVE, breakpoint="spec audit", reason="the owner asked")
+        folder = root / "memory" / "builds" / FX_LIVE / "build"
+        if case == "declare":
+            check_case("unchecked", run_placement_command(root, "breakpoint", "--request", key), 1,
+                       "no passed breakpoint placement")
+        check_case("check", run_placement_command(root, "check", "--request", key, session=FX_SESSION), 0,
+                   "placement: pass — breakpoint %s" % FX_LIVE)
+        got = run_placement_command(root, "breakpoint", "--request", key, session=FX_SESSION)
+        recs = sorted(folder.glob("*-disposition-*.md")) if folder.is_dir() else []
+        if case == "declare-held":
+            check_case("held", got, 1, "placement: refused — breakpoint · live-holder")
+            if recs:
+                bad.append("a refused declaration wrote %s" % recs[0].name)
+            return
+        check_case("declare", got, 0, "placement: declared — breakpoint spec audit · %s" % FX_LIVE)
+        if len(recs) != 1:
+            bad.append("the build's folder holds %d disposition records, not one" % len(recs))
+            return
+        text = recs[0].read_text(encoding="utf-8")
+        rec = read_build_records().read_disposition(recs[0].relative_to(root).as_posix(), text)
+        got = {k: rec.get(k) for k in ("Item", "Disposition", "Channel", "Reason")}
+        seen.append("record %s · %s" % (recs[0].name, " · ".join("%s %s" % kv for kv in got.items())))
+        if rec["malformed"] or got != {"Item": PLACE_ITEM, "Disposition": "breakpoint", "Channel": "prompt",
+                                       "Reason": "spec audit · request %s" % key} \
+                or "**Serves:** disposition TOOL-%s-1" % FX_LIVE not in text:
+            bad.append("the record reads %s, malformed %s" % (got, rec["malformed"]))
+    elif case == "past-position":   # TOOL-dPlacedRequest-5 AC6
+        key = write_typed_request(root, store, "audit the specs\n")
+        run_placed_return(key, disposition="breakpoint", build=FX_LIVE, breakpoint="spec audit", reason="the owner asked")
+        check_case("check", run_placement_command(root, "check", "--request", key, session=FX_SESSION), 0,
+                   "placement: pass — breakpoint %s" % FX_LIVE)
+        log, stub = top / "trigger-calls.log", top / "stub-driver.sh"
+        stub.write_text('printf "%%s\\n" "$*" >> "%s"\n' % log.as_posix(), encoding="utf-8", newline="\n")
+        calls = []
+        for src, state, item, owed in (("planning", "designing", "item.plan.exit", 0),
+                                       ("designing", "building", "item.design.exit", 1)):
+            run_fixture_git(root, "commit", "-q", "--allow-empty", "-m", "move\n\nGov-Transition: %s -> %s · build=%s · "
+                            "item=%s · sha=%s" % (src, state, FX_LIVE, item, run_fixture_git(root, "rev-parse", "HEAD")[:8]))
+            rc, lines = write_breakpoint_declaration(root, store, key, driver=stub)
+            calls = log.read_text(encoding="utf-8").splitlines() if log.is_file() else []
+            seen.append("%s exit %d · %d call(s)" % (state, rc, len(calls)))
+            if rc != 0 or len(calls) != owed:
+                bad.append("declared in %s it exited %d with %d call(s), owed %d: %s" % (state, rc, len(calls), owed,
+                                                                                      " / ".join(lines)))
+        if calls != ["--trigger %s --subject %s-specs --cause placement" % (FX_LIVE, FX_LIVE)]:
+            bad.append("the stub driver recorded %s" % calls)
 
 
 def main(argv):
@@ -1200,7 +1533,8 @@ def main(argv):
     pl.add_argument("--declared", nargs="+")
     pl.add_argument("--owner")
     pl.add_argument("--reenters")
-    for verb, what in (("check", "re-check the newest block's facts"), ("record", "print the claim lines")):
+    for verb, what in (("check", "re-check the newest block's facts"), ("record", "print the claim lines"),
+                       ("breakpoint", "declare a passed breakpoint placement on its build")):
         sub.add_parser(verb, help=what).add_argument("--request", required=True)
     args = ap.parse_args(argv)
     if args.fixture:
@@ -1211,7 +1545,7 @@ def main(argv):
         cases = [(p, ["--fixture", "--plant", p], 0, "%s: %s · " % (SAY, p), "· held") for p in PLANTS]
         return run_selftest_cases(main, cases, "%s: fixtures" % SAY)
     if args.plant or args.verb is None:
-        ap.error("a verb, place, check or record, or --fixture [--plant <case>]")
+        ap.error("a verb, place, check, record or breakpoint, or --fixture [--plant <case>]")
     if not REQUEST_KEY.fullmatch(args.request):
         print("%s — refused · --request %r is no content key of %d hex digits" % (SAY, args.request, KEY_HEX))
         return 2
@@ -1222,6 +1556,8 @@ def main(argv):
             return write_placement(args, root, store)
         if args.verb == "check":
             rc, lines = check_placement(root, common, store, args.request)
+        elif args.verb == "breakpoint":
+            rc, lines = write_breakpoint_declaration(root, store, args.request)
         else:
             rc, lines = print_claim_lines(read_placement(store / ("%s.placement" % args.request)))
         for line in lines:

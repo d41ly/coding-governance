@@ -179,7 +179,11 @@ memory/guides/BUILD-METHOD.md	30720
 # beside PHASES_EXTRA, which TOOL-dDeclaredLoop-63 wrote for the protocol to state. The render measures
 # 68288 CR-stripped, and the row is that figure because this block's rule is no headroom. A run's
 # raise, on the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-75).
-memory/guides/UNATTENDED-PROTOCOL.md	68288
+# RAISED 68288 -> 68374, 2026-11-20, by TOOL-dPlacedRequest-5: section 1's spec-audit opt-in sentence
+# names the owner's placed spec audit, source `placement`, which that unit's spec has the protocol state.
+# The render measures 68374 CR-stripped (DERIVED), and the row is that figure because this block's rule
+# is no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-5).
+memory/guides/UNATTENDED-PROTOCOL.md	68374
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every
@@ -272,7 +276,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	68288
 # `--request-draw` verb, so it is a block the gate reads and no prose coming back. The render measures
 # 11351 CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four
 # terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-14).
-.claude/skills/unattended/SKILL.md	11351
+# RAISED 11351 -> 11389, 2026-11-20, by TOOL-dPlacedRequest-5: the `--request-consent <key>` line the
+# fenced verb list gains, which the kit gate's check 26 requires of the declared `--request-consent`
+# verb, so it is a block the gate reads and no prose coming back. The render measures 11389 CR-stripped
+# (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms above
+# (memory/DECISIONS.md, TOOL-dPlacedRequest-5).
+.claude/skills/unattended/SKILL.md	11389
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

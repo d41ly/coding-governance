@@ -50,6 +50,7 @@
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
+#   unattended.sh --request-consent <content key>                  # the consent predicate, read-only: 0 this session typed the request here, 1 relayed
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
 #   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
@@ -136,7 +137,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --feed --overlaps --path-tokens --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --request-consent --feed --overlaps --path-tokens --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -2263,7 +2264,8 @@ AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
 # TOOL-dDeclaredLoop-19 S8 - a third source, `policy`: the `review.design` value read at `_cb`, and the
-# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read.
+# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read. TOOL-dPlacedRequest-5 S7 - a
+# fourth, `placement`: the owner's placed `spec audit` record at BASE, which only adds an owed audit.
 AUTH_DESIGN_REVIEW=""
 _dr_answer=opt-in
 # TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
@@ -6130,7 +6132,7 @@ check_branch_carried() { # slug
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr _pd _pt
   AUTH_CONF_AT=""
   readme_of "$slug" >/dev/null; rel=$_readme
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
@@ -6249,6 +6251,25 @@ check_authorization() { # slug · base
     owed)     AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=policy ;;
     not-owed) AUTH_SPEC_AUDIT=""; AUTH_SPEC_AUDIT_FROM=policy ;;
   esac
+  # TOOL-dPlacedRequest-5 S7 - a FOURTH source, `placement`: the owner's placed `spec audit`, a disposition
+  # record in the build's `build/` folder whose Item is item.entry.place, Disposition breakpoint and Reason
+  # opens `spec audit · `, which `placement.py breakpoint` writes only once the request's consent held.
+  # Read at `_cb`, the default-branch side of the pinned BASE, as the project default is, so a record a
+  # run committed on its own pushed branch opts nothing in; on the first anchor `_cb` IS BASE. Read LAST
+  # and only where nothing above owes the audit, so it can ADD an owed audit and never cancel one, and
+  # check 89's rule that a run never opts itself out stands. Owed, it pins BASE's date, as `policy` does.
+  if [ -z "$AUTH_SPEC_AUDIT" ] && [ -n "$_cb" ]; then
+    for _pd in $(GIT ls-tree -r --name-only "$_cb" -- "$M/builds/$slug/build/" 2>/dev/null); do
+      case "$_pd" in *-disposition-[0-9]*.md) ;; *) continue ;; esac
+      _pt=$(GIT show "$_cb:$_pd" 2>/dev/null) || continue
+      _pt=${_pt//$'\r'/}
+      case "$_pt" in *$'\n- **Item:** item.entry.place\n'*) ;; *) continue ;; esac
+      case "$_pt" in *$'\n- **Disposition:** breakpoint\n'*) ;; *) continue ;; esac
+      case "$_pt" in *$'\n- **Reason:** spec audit · '*) ;; *) continue ;; esac
+      AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=placement
+      break
+    done
+  fi
   # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
   # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
   # absence the refusal just declined to assert.
@@ -10402,6 +10423,8 @@ print_spec_audit_line() { # slug · run-state file
       echo "unattended: spec-audit — opted in by policy review.design: ${AUTH_DESIGN_REVIEW:-owed} · $sa"
     elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
       echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
+    elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = placement ]; then
+      echo "unattended: spec-audit — opted in by placement, the owner's placed spec audit at BASE, so it is owed: $sa"
     else
       echo "unattended: spec-audit — opted in by README spec-audit: $sa"
     fi
@@ -18752,6 +18775,13 @@ while [ $# -gt 0 ]; do
     --request-draw) refuse_waive_unless_preflight --request-draw
                     if [ $# = 6 ] && [ "${3:-}" = --cause ] && [ "${5:-}" = --item ]; then run_request_draw "$2" "$4" "$6"; _rl_rc=$?
                     else echo "request-draw — not drawn · the form is --request-draw <content key> --cause <cause> --item <item>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-5 S3 - the consent predicate as a verb, read-only, for the placement check of a
+    # `breakpoint`: a relayed request is data with provenance and never consent. No slug, as for --request.
+    --request-consent) refuse_waive_unless_preflight --request-consent
+                    if [ $# = 2 ]; then
+                      check_request_consent "$2" && echo "request — $2 · typed here: this session's own words"; _rl_rc=$?
+                    else echo "request — not read · the form is --request-consent <content key>"; _rl_rc=2; fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
     # of governance refs this clone holds; no slug, because the feed is the node's.

@@ -5383,6 +5383,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "check_audit_request_plant",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_authorization",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5466,6 +5471,11 @@
       "id": "check_break_refuses",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "check_breakpoint",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "check_brief_items",
@@ -7621,6 +7631,11 @@
       "id": "check_policy_home_family",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "check_position_passed",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "check_positional",
@@ -12381,6 +12396,11 @@
       "id": "derive_pin_state",
       "kind": "function",
       "file": "tools/playbook/pins.py"
+    },
+    {
+      "id": "derive_placed_position",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "derive_placed_scenarios",
@@ -19798,6 +19818,11 @@
       "file": "tools/loop/loop_transition.py"
     },
     {
+      "id": "read_build_item_rows",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
+    },
+    {
       "id": "read_build_items",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -22486,6 +22511,11 @@
       "id": "read_pl_token",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_placed_breakpoints",
+      "kind": "function",
+      "file": "tools/loop/breakpoints.py"
     },
     {
       "id": "read_placement",
@@ -32538,6 +32568,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_unattended_verb",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "run_unchecked",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -37093,6 +37128,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "write_audit_request_fixture",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "write_b1_receipt",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -37146,6 +37186,11 @@
       "id": "write_br_build",
       "kind": "function",
       "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "write_breakpoint_declaration",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "write_brief_record",
@@ -39226,6 +39271,11 @@
       "id": "write_transition_record",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "write_typed_request",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "write_unit_plant",

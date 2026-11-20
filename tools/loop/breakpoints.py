@@ -16,8 +16,13 @@ at `item.design.exit` and one before `item.deploy.mandate` under `three-gates`; 
 `exit` item under `every-stage`. Each member of `review.breakpoints`, read at the build's composition pin by
 `composition.py`'s `read_tag_policy`, places a reviewer `breakpoint` before it with cause `placement`. Under
 `decisions.major = "author-owner-ratifies"`, given `--delegated-fork`, the owner item sits at
-`item.build.ratify` with cause `ratification`. One position from two declarations is listed once, and the
-list is sorted by the position item's place among the composed rows, then before, at, after.
+`item.build.ratify` with cause `ratification`. Each owner's request placed as a `breakpoint`
+(TOOL-dPlacedRequest-5), a tracked disposition record of the build whose `Item` is `item.entry.place` and
+`Disposition` `breakpoint`, read by `read_placed_breakpoints`, places a reviewer breakpoint: the name its
+`Reason` opens with, `spec audit`, `gate review`, `closing review` or `landing review` at that review's
+position, cause `owed` for `spec audit`, the audit the placement makes owed, and `placement` for the other
+three, and `item <tag>` before that tag, cause `placement`. One position from two declarations is listed
+once, and the list is sorted by the position item's place among the composed rows, then before, at, after.
 
 THE RELEASE. An owner line's last field is its release: `authorization` for the plan gate, which the
 unattended driver's `check_authorization` verifies at the pinned BASE; `released <stem> <word>` where the
@@ -55,8 +60,9 @@ default. `--fixture --plant <case>` builds a scratch repository under the host t
 and prints `held` or `MISSED`; `--selftest` runs every plant.
 
 WHAT THIS DOES NOT CHECK: a fork's class, since no fork record carries one, so every fork the agent
-resolved under delegation reads as major; whether the disposition record's writer is the owner; a review
-breakpoint firing, which is the main loop's `--trigger`.
+resolved under delegation reads as major; whether the disposition record's writer is the owner, and
+whether a placed breakpoint's request was the owner's own, which `placement.py check` held before it was
+written; a review breakpoint firing, which is the main loop's `--trigger`.
 """
 import argparse
 import ast
@@ -77,8 +83,9 @@ if str(KIT) not in sys.path:
 from adapt import read_disposition_release  # noqa: E402
 from composition import build_composition_base, read_step_composition, read_tag_policy  # noqa: E402
 from loop_items import read_composed_items  # noqa: E402
-from loop_lib import (LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree, read_steps,  # noqa: E402
-                      resolve_kit_dir, resolve_memory_root_source, run_selftest_cases)
+from loop_lib import (SEG, LoopError, derive_conf_reads, derive_fixture_boundary, read_memory_tree,  # noqa: E402
+                      read_steps, resolve_kit_dir, resolve_memory_root, resolve_memory_root_source,
+                      run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_transition import (FX_BUILD, FX_SPEC, FX_UNIT, read_build_headers, read_build_specs,  # noqa: E402
                              read_transitions, write_transition_plant)
@@ -102,9 +109,15 @@ PLAN_GATE = "item.plan.exit"
 RATIFY = "item.build.ratify"
 RELATIONS = ("before", "at", "after")
 PRE_PLACEMENT = "passed before placement"
+#: The review breakpoints an owner's request may place, each the stage whose review it is (TOOL-dPlacedRequest-5 S1).
+PLACED_REVIEWS = {row[0]: stage for stage, row in STAGE_REVIEWS.items() if stage != "plan"}
+#: The disposition record that declares a placed breakpoint: its item, its word, and the `Reason` separator
+#: before the request's content key; an item boundary's name opens `item `.
+PLACED_ITEM, PLACED_WORD, PLACED_REQUEST, PLACED_TAG = "item.entry.place", "breakpoint", " · request ", "item "
 SLUG = re.compile(r"[A-Za-z0-9_-]+")
 PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, then review.test owed",
-          "placed": "review.breakpoints naming item.build.unit-pass, then item.build.nothing",
+          "placed": "review.breakpoints naming item.build.unit-pass, then item.build.nothing, then the owner's "
+                    "placed spec audit and placed item item.build.unit-pass, each a disposition record",
           "ratification": "decisions.major author-owner-ratifies with and without --delegated-fork, a disposition "
                           "record of item.build.ratify, author-rubric, and the driver's plan_state delegated mode",
           "stage": "review.design owed-above-tier over a Tier-2 and a Tier-1 spec, then no policy file",
@@ -136,7 +149,8 @@ PLANTS = {"values": "no policy file, then autonomy three-gates and every-stage, 
 def derive_breakpoints(values, steps, tags, facts):
     """`[{name, relation, position, disposer, cause, release}]`: the breakpoints `values`, `{key: value}`,
     place over the gov `steps` and the composed `tags`, in composed order, given `facts`: `spec_audit` and
-    `delegated` true or false and `tiers` each unit's tier. An owner line's release is `authorization` at
+    `delegated` true or false, `tiers` each unit's tier and `placed` the breakpoints the owner's requests
+    placed, `read_placed_breakpoints`' entries. An owner line's release is `authorization` at
     the plan gate and `held` elsewhere. ValueError naming the key on a value outside its set, and on a
     position `tags` lacks."""
     for key, allowed in [("autonomy", AUTONOMY_VALUES), ("decisions.major", MAJOR_VALUES)] + [
@@ -178,6 +192,9 @@ def derive_breakpoints(values, steps, tags, facts):
             raise ValueError("review.breakpoints names %s, an item the composed rows at the build's pin do not "
                              "declare" % member)
         write_line("breakpoint", "before", member, "reviewer", "placement", "review.breakpoints")
+    for placed in facts.get("placed") or ():
+        write_line(placed["name"], placed["relation"], placed["position"], "reviewer", placed["cause"],
+                   "the placed breakpoint %s" % placed["id"])
     if values["decisions.major"] == "author-owner-ratifies" and facts.get("delegated"):
         write_line("owner item", "at", RATIFY, "owner", "ratification", "decisions.major")
     order = {t: n for n, t in enumerate(tags)}
@@ -230,8 +247,54 @@ def read_first_add(root, rel):
     return found[-1] if rc == 0 and found else None
 
 
+def derive_placed_position(name):
+    """`(relation, position, cause)` of a breakpoint an owner's request names `name` (TOOL-dPlacedRequest-5
+    S1, S5): a review of `PLACED_REVIEWS` at its `STAGE_REVIEWS` position, cause `owed` for `spec audit` and
+    `placement` for the other three; `item <tag>` before that tag, cause `placement`. ValueError naming any
+    other name, an empty one included."""
+    tag = name[len(PLACED_TAG):] if name.startswith(PLACED_TAG) else None
+    if tag is not None:
+        head, _dot, rest = tag.partition(".")
+        if head == "item" and rest and all(SEG.fullmatch(s) for s in rest.split(".")):
+            return "before", tag, "placement"
+    elif name in PLACED_REVIEWS:
+        _name, relation, position = STAGE_REVIEWS[PLACED_REVIEWS[name]]
+        return relation, position, "owed" if PLACED_REVIEWS[name] == "design" else "placement"
+    raise ValueError("breakpoint %r is none of %s, or item <tag>" % (name, ", ".join(PLACED_REVIEWS)))
+
+
+def read_placed_breakpoints(build, root):
+    """`[{id, name, relation, position, cause}]`, one per tracked disposition record of `build` whose `Item`
+    is `PLACED_ITEM` and whose `Disposition` is `PLACED_WORD`, oldest first (TOOL-dPlacedRequest-5 S5): the
+    name its `Reason` reads before ` · request `, `breakpoint` for an item boundary as `review.breakpoints`
+    names one, and its position by `derive_placed_position`. ValueError naming a record whose name that
+    refuses."""
+    read_memory_tree("build_records.py")
+    from build_records import read_disposition, read_records
+    found = [r for r in read_records(root, {"MEMORY_ROOT": resolve_memory_root(root)}, "disposition", read_disposition)
+             if r["build"] == build and not r["malformed"] and r.get("Item", "").strip("`") == PLACED_ITEM
+             and r.get("Disposition", "").strip("`") == PLACED_WORD]
+    out = []
+    for rec in sorted(found, key=lambda r: (r["id"][:10], r["n"] or 0)):
+        name = rec.get("Reason", "").strip("`").split(PLACED_REQUEST)[0].strip()
+        try:
+            relation, position, cause = derive_placed_position(name)
+        except ValueError as e:
+            raise ValueError("the placed breakpoint %s: %s" % (rec["id"], e)) from None
+        out.append({"id": rec["id"], "name": "breakpoint" if name.startswith(PLACED_TAG) else name,
+                    "relation": relation, "position": position, "cause": cause})
+    return out
+
+
+def read_build_item_rows(build, root):
+    """The composed item rows at `build`'s composition pin, the rows its breakpoints are listed over and a
+    placed item boundary is checked against."""
+    return read_composed_items(root, read_step_composition(root, read_transitions(build, root))[0])
+
+
 def read_breakpoints(build, root, spec_audit=False, delegated=False):
-    """`derive_breakpoints` over `build`'s policy, steps, composed tags and tiers, each owner line's release
+    """`derive_breakpoints` over `build`'s policy, steps, composed tags, tiers and placed breakpoints, each
+    owner line's release
     read: `passed before placement` on each owner gate of a build opened before this module was placed,
     else `released <stem> <word>` where the owner's disposition record of its tag answers. An owner gate
     still `held` where the opening read found no commit adding the README carries `unopened`, that path,
@@ -240,11 +303,11 @@ def read_breakpoints(build, root, spec_audit=False, delegated=False):
     root = pathlib.Path(root).absolute()
     values = read_policy_values(root)
     values["review.breakpoints"] = read_tag_policy("review.breakpoints", root, build)
-    rev = read_step_composition(root, read_transitions(build, root))[0]
-    tags = [r.get("tag") for r in read_composed_items(root, rev)]
+    tags = [r.get("tag") for r in read_build_item_rows(build, root)]
     tiers = [tier for _uid, _status, tier in read_build_headers(build, root)]
     out = derive_breakpoints(values, read_steps(KIT), tags,
-                             {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers})
+                             {"spec_audit": spec_audit, "delegated": delegated, "tiers": tiers,
+                              "placed": read_placed_breakpoints(build, root)})
     early, unopened, source = False, None, None
     if any(b["name"] == "owner gate" for b in out):   # TOOL-dDeclaredLoop-53: opened before the placement
         try:
@@ -418,6 +481,17 @@ def run_breakpoint_plant(case):
                 check(rc == 2 and len(lines) == 1 and lines[0].startswith("%s: refused · " % SAY)
                       and "review.breakpoints" in lines[0] and "item.build.nothing" in lines[0],
                       "the undeclared member read exit %d, %s" % (rc, lines))
+                # TOOL-dPlacedRequest-5 AC5: the owner's placed breakpoints, each a disposition record
+                read_memory_tree("build_records.py")
+                from build_records import write_disposition
+                for name in ("spec audit", "item item.build.unit-pass"):
+                    write_disposition(repo, FX_BUILD, FX_UNIT, PLACED_ITEM, PLACED_WORD, "prompt",
+                                      "%s%s3f9c2a7d01be" % (name, PLACED_REQUEST))
+                write_policy(repo, None, "the owner's placed breakpoints")
+                rc, lines = run_verb(repo, listed)
+                check(rc == 0 and lines == [plan, "breakpoint: spec audit · after item.design.reason · reviewer · owed",
+                                            "breakpoint: breakpoint · before item.build.unit-pass · reviewer · "
+                                            "placement", closing], "the placed records read %s" % lines)
             finally:
                 remove_tree(repo)
         elif case == "ratification":   # AC3, AC4, AC7

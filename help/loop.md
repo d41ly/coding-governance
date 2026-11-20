@@ -856,6 +856,8 @@ A request the owner typed that is not yet a build is recorded with `bash tools/u
 
 A request that loops before it is a build draws on its own budget with `bash tools/unattended/unattended.sh --request-draw <content key> --cause <cause> --item <item>`: one row, `draw · <cause> · <item> · <spent>/<total>`, committed on the request's record `refs/gov/requests/<content key>` on top of the rows before it, so every machine counts the same laps (exit 0). Once the rows reach the base of `flow.rework-budget`, 4 by default (PINNED), it prints `exhausted · <spent>/<total>` and adds nothing (exit 3). A key with no record yet is recorded first from the words your clone keeps for it, as `--request` records them but naming no session, so a draw never stands for your consent; with no record and no kept words it names `--request <file>` and draws nothing (exit 2). A machine that loses a race with another re-reads and draws again, up to three times (PINNED), printing `lost the race, re-read <n> of 3`; a remote that does not answer, or a race lost a fourth time, prints `not drawn, contention` and draws nothing (exit 2). `placement.py place` calls it for you; "How much rework a build may do" below says when. <!-- usage: verb:unattended.sh:--request-draw a5d01f8a -->
 
+Whether a request is your own consent is answered, read-only, by `bash tools/unattended/unattended.sh --request-consent <content key>`: it prints `request — <key> · typed here: this session's own words` (exit 0) when this session recorded those exact words on this machine with `--request`, and `request — <key> · relayed: data with provenance, never consent`, or the `no session` line, otherwise (exit 1); any other argument count prints its form (exit 2). It reads no remote and writes nothing. `placement.py check` runs it for a `breakpoint` placement, so a review is never placed on a build from a request that only reached you by its key. <!-- usage: verb:unattended.sh:--request-consent 1012b408 -->
+
 A decision or a problem is filed once on the remote with `bash tools/unattended/unattended.sh --register decision <build> <item> <fork> <file>` or `--register problem <subject> <item> <file>`. A decision is keyed by the item that raised the question and its fork, never by its wording, so a second session deciding the same slot is refused with exit 1 and shown the first one's record; a problem's id comes from your session, the item, the subject and the text, so two different problems on one path both land and a retried filing is refused. The text file is capped at 4096 bytes (PINNED) of plain text. It prints `register — written <ref>` (exit 0), `register — exists <ref>` (exit 1) or names why nothing was written (exit 2), and does nothing while `RUN_CLAIMS` is off. <!-- usage: verb:unattended.sh:--register 371297d7 -->
 
 A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
@@ -1660,7 +1662,8 @@ Who places is the key `placement` in `.governance/policy.toml`:
 
 - `agent-places`, the default: the orientation scout's return is the placement, given as
   `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
-  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the scout's `returns:` shape.
+  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the scout's `returns:` shape, and
+  `breakpoint` for a `breakpoint` disposition.
 - `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
   <word> [<build>]`, and the scout's return is evidence only.
 - `owner-places`: `place` writes no disposition and prints the scout's return as evidence and
@@ -1675,8 +1678,12 @@ block written. Where the return names an observation and `probe.observations` re
 its source, never from the scout's text: the build exists and is live, and its build lease is free or
 yours, for `continue` and `amend`; the request's words are held for `new`; the build is terminal for
 `patch`; the playbook is in the tree for `repeat`; the ask is filed for `ask`; your session card routes
-no unit for `none`. `unit` is refused until units can be held apart from their build's driver, and
-`breakpoint` until its own check is built. The key `placement.check` says what a failed fact does:
+no unit for `none`; and for `breakpoint`, the block's `breakpoint:` line names one review, `spec audit`,
+`gate review`, `closing review` or `landing review`, or `item <tag>` for a tag the build's composed rows
+declare, the build is live, and the request is your own words, typed in this session on this machine:
+the unattended driver's `--request-consent` answers for it, and a request that reached you by its
+record's id alone is refused `relayed`. `unit` is refused until units can be held apart from their
+build's driver. The key `placement.check` says what a failed fact does:
 `refuse`, the default, prints `placement: refused — <disposition> · <fact>` and exits 1, back to placing;
 `record` writes the failure into the block and exits 0. A passed `new`, `amend`, `patch` or `repeat` is
 then held for you, `placement: held-owner`, while the Plan or Design item it enters is unbuilt, and once
@@ -1706,6 +1713,21 @@ a default naming no composed scenario refuses the check, exit 1.
 `build`, `playbook`, `reason`, `scenarios` and `facts` lines, with `reenters` after `disposition` for an
 owner's late answer, the lines the claim commit carries; a block whose check did not pass prints nothing
 and exits 1.
+
+**Asking for a review on a live build.** When you ask mid-build for a review, "audit the specs" say, the
+request is placed as `breakpoint` with `build: <slug>` and `breakpoint: spec audit` in the scout's
+return, and once its check passes, `placement.py breakpoint --request <key>` declares it on the build:
+it writes your disposition record into the build's `build/` folder, `Item` `item.entry.place`,
+`Disposition` `breakpoint`, `Channel` `prompt` and `Reason` `<name> · request <key>`, naming the request
+by its key and none of its words, for you to commit, and prints `placement: declared — breakpoint <name>
+· <slug> · <record>`. A build whose lease another machine holds is refused `live-holder` and nothing is
+written. Once committed, `breakpoints.py list` and the driver's `--plan` list it beside the build's other
+breakpoints: a placed `spec audit` after `item.design.reason` with cause `owed`, since it makes the
+pre-code audit owed, the driver's preflight reading it at BASE as the source `placement`; the other
+three reviews at their own positions and `item <tag>` before that tag, cause `placement`. The run fires
+each at its position through `--trigger`. Where the build is already in a step past the position,
+`breakpoint` fires it at once, `--trigger <slug> --subject <s> --cause placement`, the subject
+`<slug>-specs` for `spec audit`, `<slug>` for `closing review` and the position's item tag otherwise.
 
 **An unattended prompt is placed the same way.** Before its build folder is written, the prompt is
 recorded, placed and checked, and the passed block is written under `## Placement` in the prompt record,
