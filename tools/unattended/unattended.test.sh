@@ -20788,6 +20788,24 @@ rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item
 mv "$LF/origin.gone" "$LF/origin.git"
 same "DPR14 AC4 an unanswered remote exits 2" "$rd_rc" "2"
 hit  "$rd_out" "request-draw — $rd_key · not drawn, contention · "
+# ---- TOOL-dPlacedRequest-21 — THE CLAIM'S REFUSALS BEFORE THE REMOTE. Over the same origin and c1: the
+# ---- form refused exit 2; a request with no passed placement refused exit 1; a placed repeat with no
+# ---- --pieces refused exit 2 in one line naming the flag, the origin holding no claim ref (AC5). RED,
+# ---- observed at the close, is a repeat claim created before its count is read. Waived by README rule 8
+# ---- with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: the lease routes, the resume and the
+# ---- first record, which the loop kit's `loop claim fixtures` plants drive over a scratch remote.
+ec_out=$(run_request_arm --entry-claim dZqClaim); ec_rc=$?
+same "DPR21 S1 --entry-claim with no --request exits 2" "$ec_rc" "2"
+hit  "$ec_out" "claim not written — the form is --entry-claim <slug> --request <content key> [--pieces <n>]"
+ec_out=$(run_request_arm --entry-claim dZqClaim --request "$rd_key"); ec_rc=$?
+same "DPR21 S1 a request with no passed placement exits 1" "$ec_rc" "1"
+hit  "$ec_out" "no passed placement"
+ec_cd=$(git -C "$LF/c1" rev-parse --path-format=absolute --git-common-dir)
+printf 'placed-utc: 2026-11-20T00:00:00Z\ndisposition: repeat\nbuild: none\nplaybook: tools/x.md\nreason: again\nevidence: none\nobservations: none\nplacer: declared\nscenarios: scenario.playbook-run\nfacts: entry=playbook-run\ncheck: pass\n\n' > "$ec_cd/requests/$rd_key.placement"
+ec_out=$(run_request_arm --entry-claim dZqClaim --request "$rd_key"); ec_rc=$?
+same "DPR21 AC5 a repeat with no --pieces exits 2 in one line, no claim ref created" \
+  "$ec_rc $(printf '%s\n' "$ec_out" | grep -c .) $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/claims | grep -c .)" "2 1 0"
+hit  "$ec_out" "--pieces"
 # ---- TOOL-dPlacedRequest-5 S3 — THE CONSENT PREDICATE AS A READ-ONLY VERB. r3 was recorded by session qA
 # ---- in c1: --request-consent answers 0 for qA, 1 `relayed` for qB, and its form exit 2 with no key.
 # ---- RED, observed at the close, is the verb answering 0 whatever the predicate says.

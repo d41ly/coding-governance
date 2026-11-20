@@ -135,10 +135,10 @@ The loop definition: the five gov steps as data, each roles workflow's build ord
 
 - status `building` · streams `tooling` · dossier `memory/map/features/loop.md`
 - decisions 1: `TOOL-dDeclaredLoop-1`
-- gate-legs 26: `loop definition`, `loop definition fixtures`, `loop computed witness`, `loop checklist tags`, `loop transition tables`, `loop item kind`, `loop splice check`, `loop parent routes`, `loop transition record`, `loop guard fixtures`, `loop claims fixtures`, `loop request fixtures`, `loop probe fixtures`, `loop placement fixtures`, `loop position fixtures`, `loop upstream fixtures`, `loop review bounds fixtures`, `loop composition fixtures`, `loop adapt fixtures`, `loop budget fixtures`, `loop breakpoint fixtures`, `loop scenario fixtures`, `loop termination`, `loop stage coverage`, `loop command conformance`
+- gate-legs 27: `loop definition`, `loop definition fixtures`, `loop computed witness`, `loop checklist tags`, `loop transition tables`, `loop item kind`, `loop splice check`, `loop parent routes`, `loop transition record`, `loop guard fixtures`, `loop claims fixtures`, `loop request fixtures`, `loop probe fixtures`, `loop placement fixtures`, `loop claim fixtures`, `loop position fixtures`, `loop upstream fixtures`, `loop review bounds fixtures`, `loop composition fixtures`, `loop adapt fixtures`, `loop budget fixtures`, `loop breakpoint fixtures`, `loop scenario fixtures`, `loop termination`, `loop stage coverage`
 - kits 1: `loop`
 - globs 2
-- cut 3 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 4 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## memory-recall
 

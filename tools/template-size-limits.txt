@@ -281,7 +281,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	68374
 # verb, so it is a block the gate reads and no prose coming back. The render measures 11389 CR-stripped
 # (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms above
 # (memory/DECISIONS.md, TOOL-dPlacedRequest-5).
-.claude/skills/unattended/SKILL.md	11389
+# RAISED 11389 -> 11455, 2026-11-20, by TOOL-dPlacedRequest-21: the `--entry-claim <slug> --request <key>
+# [--pieces <n>]` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--entry-claim` verb, so it is a block the gate reads and no prose coming back. The render measures 11455
+# CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms
+# above (memory/DECISIONS.md, TOOL-dPlacedRequest-21).
+.claude/skills/unattended/SKILL.md	11455
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

@@ -24,7 +24,10 @@ record, and the writer's next move after it back-fills one per earlier trailer, 
 table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it; resolves `--witness`
 to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row and
 `composition=<sha8>`, the commit HEAD names (`composition.py`, TOOL-dDeclaredLoop-26), which a `--field`
-may not give; adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
+may not give; refuses a move into `designing` of a build whose claim body, as `claim.py`'s `read_claim_body`
+reads this node's cache of `refs/gov/claims/<slug>`, says `disposition: patch` while `check_patch_ratified`
+holds it under `patch.ratify` = `owner`, naming that key and the owner item, exit 2 (TOOL-dPlacedRequest-21
+S6); adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
 `scenario-settled=<entries>` where a conflict settled, both derived by `scenario.py`'s
 `derive_move_scenarios` and never given, printing `loop: scenario · unread · <why>` and recording neither
 where the scenario composition at HEAD is unarmed (TOOL-dDeclaredLoop-27); refuses a staged index; where the build's previous move was pinned at another commit,
@@ -386,6 +389,15 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
     chosen = read_cached_channels(root, "HEAD", cache)
     data, where = read_definition(KIT)
     row, to = derive_move("build", state, item, outcome, facts, read_transition_rows(data, where))
+    if to == "designing":   # a placed patch waits on its owner's ratification (TOOL-dPlacedRequest-21 S6)
+        from claim import PatchHeld, check_patch_ratified, read_anchor_unit, read_claim_body
+        if read_claim_body(root, build).get("disposition") == "patch":
+            held = check_patch_ratified(root, build)
+            if held in ("held", "rejected"):
+                raise PatchHeld("patch.ratify is owner and %s's patch is %s: the owner item ratify %s, item.entry.claim "
+                                "disposed ratified under %s, releases the record into designing"
+                                % (build, "rejected for good" if held == "rejected" else "unratified", build,
+                                   read_anchor_unit(root, build)))
     sha = resolve_commit(root, witness)
     if sha is None:
         raise ValueError("--witness %s names no commit in %s" % (witness, root.as_posix()))

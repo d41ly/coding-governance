@@ -50,6 +50,7 @@
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
+#   unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]   # a placed new, patch or repeat request claimed as a build: refs/gov/claims/<slug>, its lease, plan record and first record; 0 claimed, 1 refused, 4 waiting, 5 a fresh slug owed
 #   unattended.sh --request-consent <content key>                  # the consent predicate, read-only: 0 this session typed the request here, 1 relayed
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
@@ -137,7 +138,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --request-consent --feed --overlaps --path-tokens --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --entry-claim --request-consent --feed --overlaps --path-tokens --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -4589,6 +4590,150 @@ run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 n
     esac
   done
   rm -f "$s"; echo "request-draw — $key · not drawn, contention · the race was lost four times"; return 2
+}
+
+# --entry-claim, THE CLAIM (TOOL-dPlacedRequest-21): a placed `new`, `patch` or `repeat` request becomes a
+# build by one act. The loop kit's `claim.py`, found by `resolve_kit_dir` as `budget.py` is, holds the
+# logic; this function holds every remote read and write. In order: `claim.py body` reads the placement's
+# claim lines and refuses a disposition, a slug or, on a repeat, a `--pieces` count before anything is
+# read from the remote; ONE bounded `ls-remote --exit-code` of `refs/gov/claims/<slug>` through
+# `observe_remote`, as `check_request_recorded` reads a request; where the ref exists, ONE bounded fetch
+# into its cache ref, its body read by `claim.py read`: this claimant's key (`<fleet tag>:<session>`) is a
+# RESUME, which skips the local pre-check, another key draws `route-back` on `item.entry.claim` through
+# `run_request_draw` and exits 5, a fresh slug owed; with no ref, `claim.py precheck` runs the memory-tree
+# kit's `check_slug_claimed` and the claim is created by `write_gov_ref` with an EMPTY expected sha, a
+# lost create read as above. An unanswered read or create takes `leases.offline`: `refuse` exit 1, any
+# other value exit 4, no claim queued and no folder written. A patch or a repeat then takes its build
+# lease through `run_lease_verb acquire build`, a refusal routed by `claim.py route`: a terminal cause
+# prints one `ask:` line and exits 1, never retried; a wait adds `wait-since:` by a parented commit
+# (`add_claim_key`) and exits 4 until `flow.wait-ceiling` has passed, then prints an owner item and exits
+# 1; an overlap the probe notes under `leases: warn` adds `overlap:` and proceeds. Then `claim.py
+# scaffold` commits the derived plan record alone and `claim.py record` writes the first transition
+# record. -> 0 claimed or resumed, 1 refused, 2 not written, 3 the request's pre-claim budget spent, 4
+# waiting, 5 a fresh slug owed; 4 and 5 are printed by name beside the code.
+# WHAT THIS DOES NOT CHECK: that the other key's claim is live, since a claim never expires; a lease
+# `queued` offline, read as taken, its flush deciding it later.
+CLM_KEY=""; CLM_WHY=""
+read_claim_ref() { # claim ref · claim.py dir · python -> 0 with CLM_KEY its claimant-key; 2 not read, CLM_WHY
+  local ref="$1" s rc out
+  CLM_KEY=""; CLM_WHY=""
+  s=$(mktemp) || { CLM_WHY="cannot create a scratch file to bound the claim fetch"; return 2; }
+  observe_remote "$s" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+$ref:refs/gov/remote/${ref#refs/gov/}" && rc=0 || rc=$?
+  rm -f "$s"
+  [ "$rc" = 0 ] || { CLM_WHY="the claim fetch exited $rc: $CR_URL"; return 2; }
+  add_feed_sightings refs/gov/remote/
+  out=$("$3" "$2/claim.py" read --slug "${ref##*/}" 2>&1) || { CLM_WHY="the fetched claim does not read: ${out//$'\n'/ }"; return 2; }
+  CLM_KEY=$(printf '%s\n' "${out//$'\r'/}" | sed -n 's/^claimant-key: //p' | head -1)
+  return 0
+}
+add_claim_key() { # claim ref · slug · one `key: value` line -> 0 written on the cached tip, 2 not written, its line printed
+  local ref="$1" tip c rc
+  tip=$(GIT rev-parse -q --verify "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
+  [ -n "$tip" ] || { echo "claim not written — no cached tip of $ref to add '$3' to"; return 2; }
+  c=$(build_gov_commit "$tip" "$(printf 'gov-claim claims/%s\n\n%s' "$2" "$3")") \
+    || { echo "claim not written — the commit adding '$3' could not be built in this clone"; return 2; }
+  write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
+  [ "$rc" = 0 ] || { echo "claim not written — '$3' was not added to $ref: $GOVREF_WHY"; return 2; }
+  return 0
+}
+run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 claimed, 1 refused, 2 not written, 3 spent, 4 waiting, 5 a fresh slug owed
+  local slug="$1" key="$2" pf="$3" pieces="$4" py d tag sid msg disp f rc hit="" c out line cause own="" ref
+  local _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local -a pa=()
+  [ "$pf" = 0 ] || pa=(--pieces "$pieces")
+  ref="refs/gov/claims/$slug"
+  [ "$RUN_CLAIMS" = on ] || { echo "claim not written — RUN_CLAIMS is not on in $CONF, so no claim is read or written"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  [ "$sid" != absent ] || { echo "claim not written — no session: CLAUDE_CODE_SESSION_ID is unset, so no claimant key names the claim"; return 2; }
+  [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "claim not written — the session id is not letters, digits and dashes"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "claim not written — no python resolves, so the placement cannot be read"; return 2; }
+  d=$(resolve_kit_dir "$py" loop claim.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "claim not written — no loop kit holding claim.py resolves beside this kit"; return 2; }
+  [ -f "$d/claim.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  tag=$(resolve_fleet_tag) || { echo "claim not written — this node has no row in fleet.toml: $tag"; return 2; }
+  msg=$("$py" "$d/claim.py" body --request "$key" --slug "$slug" --claimant "$tag:$sid" "${pa[@]}" 2>&1) && rc=0 || rc=$?
+  msg=${msg//$'\r'/}
+  [ "$rc" = 0 ] || { printf '%s\n' "$msg"; return "$rc"; }
+  disp=$(printf '%s\n' "$msg" | sed -n 's/^disposition: //p' | head -1)
+  resolve_claim_remote >/dev/null; rc=$?
+  status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
+  [ "$rc" = 0 ] || { echo "claim not written — the clone does not declare exactly one remote, check 24"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  f=$(mktemp) || { echo "claim not written — cannot create a scratch file to bound the claim read"; return 2; }
+  observe_remote "$f" ls-remote --exit-code "$CR_URL" "$ref" && rc=0 || rc=$?
+  while IFS= read -r line; do case "${line%$'\r'}" in *$'\t'"$ref") hit=1 ;; esac; done <"$f"
+  rm -f "$f"
+  case "$rc:$hit" in
+    0:1) read_claim_ref "$ref" "$d" "$py" && rc=1 || rc=2 ;;
+    0:|2:*)
+      out=$("$py" "$d/claim.py" precheck --slug "$slug" 2>&1) || { rc=$?; printf '%s\n' "${out//$'\r'/}"; return "$rc"; }
+      c=$(build_gov_commit "" "$msg") || { echo "claim not written — the claim commit could not be built in this clone"; return 2; }
+      write_gov_ref "$ref" "" "$c" && rc=0 || rc=$?
+      case "$rc" in
+        0) echo "entry-claim — $slug · claimed $ref · $disp" ;;
+        1) read_claim_ref "$ref" "$d" "$py" || rc=2 ;;
+        *) CLM_WHY=$GOVREF_WHY ;;
+      esac ;;
+    *) CLM_WHY="the claim read did not answer, git ls-remote exited $rc: $CR_URL"; rc=2 ;;
+  esac
+  if [ "$rc" = 1 ]; then
+    if [ "$CLM_KEY" != "$tag:$sid" ]; then
+      run_request_draw "$key" route-back item.entry.claim; rc=$?
+      [ "$rc" != 3 ] || { echo "claim refused — $slug · claimed under another key, and the request's pre-claim budget is spent"; return 3; }
+      echo "claim refused — $slug · claimed under another key, $CLM_KEY · a fresh slug owed · exit 5 (a fresh slug owed)"; return 5
+    fi
+    own=1; echo "entry-claim — $slug · claimed by this claimant · resuming at the first step not witnessed"
+  elif [ "$rc" = 2 ]; then
+    out=$("$py" "$d/claim.py" route --cause offline --slug "$slug" 2>&1); out=${out//$'\r'/}
+    case "$out" in
+      "route · refuse-offline"*) echo "lease refused — offline · claims/$slug · $CLM_WHY"; return 1 ;;
+      "route · wait-offline"*) echo "claim not written — offline · claims/$slug · $CLM_WHY · ${out#route · wait-offline · }: no claim is queued and no folder written, so a re-run claims it once the remote answers · exit 4 (waiting)"; return 4 ;;
+      *) printf '%s\n' "$out"; return 2 ;;
+    esac
+  fi
+  if [ "$disp" != new ]; then
+    out=$(run_lease_verb acquire build "$slug" "" "" "" "" "" 2>&1) && rc=0 || rc=$?
+    out=${out//$'\r'/}
+    printf '%s\n' "$out"
+    line=$(printf '%s\n' "$out" | grep -m1 '^lease ')
+    if [ "$rc" = 0 ]; then
+      case "$out" in
+        *"sharing a path; this run is NOT blocked"*)
+          line=$(printf '%s\n' "$out" | sed -n 's/^  \(..*\)$/\1/p' | head -1)
+          add_claim_key "$ref" "$slug" "overlap: ${line:-a path an unmerged branch shares}" || return 2
+          echo "entry-claim — $slug · overlap noted on the claim, the lease taken as held under leases warn" ;;
+      esac
+    elif [ "$rc" = 1 ]; then
+      cause=${line#lease refused — }; cause=${cause%% *}
+      out=$("$py" "$d/claim.py" route --cause "$cause" --slug "$slug" 2>&1); rc=$?; out=${out//$'\r'/}
+      [ "$rc" = 0 ] || { printf '%s\n' "$out"; return 2; }
+      case "$out" in
+        "route · refuse-offline"*) echo "claim refused — $slug · offline · leases.offline refuse"; return 1 ;;
+        "route · refuse "*)
+          echo "ask: $slug · $cause · request $key · the build lease refused $cause, which no retry lifts whatever leases says"
+          echo "claim refused — $slug · $cause · never retried"; return 1 ;;
+        "route · stamp"*)
+          line=$(read_utc_now)
+          add_claim_key "$ref" "$slug" "wait-since: $line" || return 2
+          echo "claim waiting — $slug · $cause · wait-since $line · ${out#route · stamp · } · exit 4 (waiting)"; return 4 ;;
+        "route · wait "*) echo "claim waiting — $slug · $cause · ${out#route · wait · } · exit 4 (waiting)"; return 4 ;;
+        "route · expired"*) echo "owner item: $slug · $cause past flow.wait-ceiling · ${out#route · expired · } · request $key"; return 1 ;;
+        "route · wait-offline"*) echo "claim waiting — $slug · offline · ${out#route · wait-offline · } · exit 4 (waiting)"; return 4 ;;
+        *) echo "claim not written — $slug · claim.py route answered: $out"; return 2 ;;
+      esac
+    else
+      echo "claim not written — $slug · the build lease was not written, so no folder is written"; return 2
+    fi
+    out=$("$py" "$d/claim.py" scaffold --slug "$slug" --request "$key" "${pa[@]}" 2>&1) && rc=0 || rc=$?
+    printf '%s\n' "${out//$'\r'/}"
+    [ "$rc" = 0 ] || return "$rc"
+  fi
+  out=$("$py" "$d/claim.py" record --slug "$slug" 2>&1) && rc=0 || rc=$?
+  printf '%s\n' "${out//$'\r'/}"
+  [ "$rc" = 0 ] || return "$rc"
+  echo "entry-claim — $slug · claimed · $disp${own:+ · resumed by this claimant}"
+  return 0
 }
 
 # THE CONSENT PREDICATE (TOOL-dPlacedRequest-19 S5): a request is the owner's consent only in a session
@@ -18776,6 +18921,12 @@ while [ $# -gt 0 ]; do
     --request-draw) refuse_waive_unless_preflight --request-draw
                     if [ $# = 6 ] && [ "${3:-}" = --cause ] && [ "${5:-}" = --item ]; then run_request_draw "$2" "$4" "$6"; _rl_rc=$?
                     else echo "request-draw — not drawn · the form is --request-draw <content key> --cause <cause> --item <item>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-21 - entry.claim: a placed request claimed as a build, no run-state file needed.
+    --entry-claim)  refuse_waive_unless_preflight --entry-claim
+                    if [ "${3:-}" = --request ] && [ $# = 4 ]; then run_entry_claim "$2" "$4" 0 ""; _rl_rc=$?
+                    elif [ "${3:-}" = --request ] && [ $# = 6 ] && [ "${5:-}" = --pieces ]; then run_entry_claim "$2" "$4" 1 "$6"; _rl_rc=$?
+                    else echo "claim not written — the form is --entry-claim <slug> --request <content key> [--pieces <n>]"; _rl_rc=2; fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-5 S3 - the consent predicate as a verb, read-only, for the placement check of a
     # `breakpoint`: a relayed request is data with provenance and never consent. No slug, as for --request.

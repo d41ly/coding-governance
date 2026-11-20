@@ -124,6 +124,7 @@ unattended.sh --register problem <subject> <item> <file>
 unattended.sh --card-ref write <slug> --message <file>
 unattended.sh --request <file>
 unattended.sh --request-draw <key> --cause <c> --item <i>
+unattended.sh --entry-claim <slug> --request <key> [--pieces <n>]
 unattended.sh --request-consent <key>
 unattended.sh --overlaps  # local
 unattended.sh --path-tokens --files-touched HEAD <spec>

@@ -88,6 +88,7 @@ loop adapt fixtures	kit	selftests
 loop breakpoint fixtures	kit	selftests
 loop budget fixtures	kit	selftests
 loop checklist tags	repo	declarations
+loop claim fixtures	kit	selftests
 loop claims fixtures	kit	selftests
 loop command conformance	repo	declarations
 loop composition fixtures	kit	selftests

@@ -87,6 +87,13 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `--claims`, each found by `resolve_kit_dir`, so it takes no edge to any of them: a kit that does not resolve
 # exits 2 `unarmed`, never a default, and an unreadable lease is a refused fact. The driver's prompt-mode
 # preflight finds it the same way. Its leg, `loop placement fixtures`, is gov's own [[exempt_leg]], no row here.
+# The claim (TOOL-dPlacedRequest-21): claim.py, the python half of the unattended driver's `--entry-claim`,
+# reads the placement's claim lines through placement.py beside it, the slug pre-check and the placed build's
+# scaffold through the memory-tree kit's index generator under the edge above, `patch.ratify`, `leases` and
+# `flow.wait-ceiling` through the policy kit by `read_policy_kit`, and writes the first transition record
+# through loop_transition.py, whose writer reads its `check_patch_ratified`; the driver finds it by
+# `resolve_kit_dir`, so it takes no edge: a kit that does not resolve exits 2 `unarmed`, never a default.
+# Its leg, `loop claim fixtures`, is gov's own [[exempt_leg]], no row here.
 # The code seed (TOOL-dPlacedRequest-8): loop_lib.py's `resolve_item_seed` runs the unattended driver's
 # `--path-tokens`, found by `resolve_kit_dir`, so it takes no edge, the driver's kit requiring this one,
 # and prints `unarmed` where the driver does not resolve; its plants ride the `loop definition` leg.

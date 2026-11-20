@@ -613,6 +613,31 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   outside the closed set (exit 2). A lost race prints `lost the race, re-read <n> of 3` (PINNED) and
   draws again, at most three times (PINNED); an unreachable remote, a bound that fired and a fourth
   lost race print `not drawn, contention` and draw nothing (exit 2). It takes no slug.
+- `--entry-claim` — `--entry-claim <slug> --request <content key> [--pieces <n>]`, the act that makes a
+  placed `new`, `patch` or `repeat` request a build (TOOL-dPlacedRequest-21). The loop kit's `claim.py`
+  reads the placement's claim lines and refuses another disposition (exit 1), a slug `--new-build` would
+  refuse and, on a repeat, a missing or non-positive `--pieces`, the count the owner asked for (exit 2,
+  one line), before any remote read. One bounded `ls-remote --exit-code` of `refs/gov/claims/<slug>`
+  follows: where it exists, one bounded fetch reads its `claimant-key`, this claimant's (`<fleet
+  tag>:<session>`) resuming at the first step not witnessed with no slug pre-check, another key drawing
+  `route-back` on `item.entry.claim` through `--request-draw` and exiting 5, a fresh slug owed (3 once
+  the request's budget is spent); with none, the memory-tree kit's `check_slug_claimed` runs as the local
+  pre-check and the claim is created by compare-and-swap with an empty expected sha, its body the
+  claimant key, session, content key, disposition, reason, scenarios and facts, and on a patch the origin
+  slug and its newest default-branch commit. A read or create that does not answer takes
+  `leases.offline`: `refuse` exit 1, any other value exit 4, no claim queued and no folder written. A
+  patch or a repeat then takes its build lease (`--lease acquire build <slug>`): `tombstone`, `terminal`
+  and `epoch-fence` print one `ask:` line and exit 1 whatever `leases` says, never retried;
+  `live-holder`, `offered` and an `overlap` under `leases: refuse` add `wait-since:` to the claim by a
+  parented commit and exit 4 until `flow.wait-ceiling` has passed by this node's clock, then print an
+  owner item and exit 1; an overlap noted under `warn` adds `overlap:` and proceeds. It commits the
+  derived plan record alone, the memory-tree kit's `--placed-build` README (`parents:` on a patch,
+  `authorized-by: recipe`, `playbook:` and `pieces:` on a repeat) and its contract row, refusing an index
+  holding any other staged path, then writes the build's first transition record from `none`: a `new`
+  into planning and a `repeat` into designing as `item.entry.claim` `claimed`, a `patch` into designing
+  as `item.plan.dedupe` `patch` under its stand-in, held under `patch.ratify` = `owner` until the owner
+  disposes `item.entry.claim` `ratified` on `<FAMILY>-<slug>-1`. It takes no run-state file; exit 2
+  names why nothing was written.
 - `--request-consent` — `--request-consent <content key>`, the consent predicate `check_request_consent`
   as a verb, read-only, which `placement.py check` runs for a `breakpoint` placement
   (`TOOL-dPlacedRequest-5`): `request — <key> · typed here: this session's own words` (exit 0) where

@@ -68,6 +68,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "ClaimRefused",
+      "kind": "class",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "Conf",
       "kind": "class",
       "file": "tools/memory-tree/id_grammar.py"
@@ -306,6 +311,11 @@
       "id": "ParsedRow",
       "kind": "class",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "PatchHeld",
+      "kind": "class",
+      "file": "tools/loop/claim.py"
     },
     {
       "id": "PlacementRefused",
@@ -701,6 +711,11 @@
       "id": "add_card_body",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "add_claim_key",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "add_claim_sighting",
@@ -5728,6 +5743,16 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_claim_plant",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "check_claim_slug",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "check_claim_writable",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7488,6 +7513,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_patch_ratified",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "check_path_inside",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -9098,6 +9128,11 @@
       "file": "tools/loop/termination.py"
     },
     {
+      "id": "check_wait_expired",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "check_waiver_scope",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -9669,6 +9704,11 @@
     },
     {
       "id": "cmd_new_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_placed_build",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
@@ -10881,6 +10921,11 @@
       "id": "derive_claim_now",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "derive_claim_route",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
     },
     {
       "id": "derive_claim_verdict",
@@ -12246,6 +12291,11 @@
       "id": "derive_opted_out",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_origin_sha",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
     },
     {
       "id": "derive_outcome_set",
@@ -16170,6 +16220,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/claims.py"
     },
     {
@@ -19463,6 +19518,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_anchor_unit",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "read_args",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -20098,9 +20158,29 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_claim_body",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "read_claim_field",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_claim_lines",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "read_claim_policy",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "read_claim_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_claim_ref",
@@ -22516,6 +22596,11 @@
       "id": "read_placed_breakpoints",
       "kind": "function",
       "file": "tools/loop/breakpoints.py"
+    },
+    {
+      "id": "read_placed_build_args",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_placement",
@@ -25843,6 +25928,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "render_claim_body",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "render_clauses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -26371,6 +26461,11 @@
       "id": "render_pin_rows",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "render_placed_build_readme",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_placement_block",
@@ -30108,6 +30203,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_claim_plant",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "run_claim_verb",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "run_claims_plant",
       "kind": "function",
       "file": "tools/loop/claims.py"
@@ -30351,6 +30456,11 @@
       "id": "run_engine",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_entry_claim",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_entry_files",
@@ -37388,6 +37498,21 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_claim_fixture",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "write_claim_placement",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
+      "id": "write_claim_scaffold",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "write_class_row_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
@@ -37778,6 +37903,11 @@
       "file": "tools/playbook/writing_practice.py"
     },
     {
+      "id": "write_first_transition",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
+    },
+    {
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/playbook/core.py"
@@ -37791,6 +37921,11 @@
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "write_fixture_claim_commit",
+      "kind": "function",
+      "file": "tools/loop/claim.py"
     },
     {
       "id": "write_fixture_commit",
