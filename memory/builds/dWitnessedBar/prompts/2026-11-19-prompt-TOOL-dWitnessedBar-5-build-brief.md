@@ -38,3 +38,17 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no suite, no bar. Verify with a fixture or a probe of the code you changed.
 - A change the spec did not state is a deviation record in `build/`, as the build README's rules say; its values are
   `report` and `author-recorded`.
+
+## A resumed pass
+
+- The first builder of this unit (`wf_f155de9c-57a`) built the whole unit but could not commit. Its pre-commit
+  refused the pass for the kickoff manifest's re-stamp, and `--dispatch` then refused to declare that file over a
+  stale packet. Its return is `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-5-1-builder-return.md`.
+- The packet is re-pinned at `bf873d18c`, and this unit is re-dispatched there with
+  `memory/guides/SESSION-KICKOFF.md`, `tools/playbook/kit.toml` and
+  `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-5-deviation-52.md` and `-53.md` declared.
+- That builder's work is still in this working tree, unstaged, with its acceptance ledger written. Verify it against
+  the spec rather than rebuilding it: re-run its probes, write the deviation record its return owes, re-stamp the
+  manifest, and commit the pass through the hooks. Its drafted commit message is
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/msg5.txt`;
+  its trailer must read `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
