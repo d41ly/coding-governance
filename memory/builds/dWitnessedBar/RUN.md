@@ -424,3 +424,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T04:56:49Z draw · re-dispatch · TOOL-dWitnessedBar-42 · 75/180 · 20261120T045649Z-523cde
 
 2026-11-20T04:56:49Z dispatch · item 66ad2ab3 TOOL-dWitnessedBar-42 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-42-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md memory/guides/SESSION-KICKOFF.md tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.sh
+
+2026-11-20T05:38:39Z brief · item TOOL-dWitnessedBar-3 · reason 5b7e3a93b250 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-build-brief.md
