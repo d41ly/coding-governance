@@ -5623,6 +5623,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "check_check_file",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "check_checklist_rows",
       "kind": "function",
       "file": "tools/loop/loop_lib.py"
@@ -6198,6 +6203,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_fix_keeps",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_fix_pass_open",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6206,6 +6216,11 @@
       "id": "check_fixed_sources",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
+    },
+    {
+      "id": "check_fixture_plant",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "check_fixture_target",
@@ -16900,6 +16915,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.js"
     },
     {
@@ -18923,6 +18943,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "print_keeps",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "print_known_set_score",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -19713,6 +19738,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_acceptance_files",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "read_activatable_kinds",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -20476,6 +20506,11 @@
       "id": "read_clean_env",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "read_clean_env",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "read_cli_help",
@@ -22223,9 +22258,24 @@
       "file": "tools/playbook/edge_grammar.py"
     },
     {
+      "id": "read_leg_files",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "read_leg_keys",
       "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "read_leg_manifest",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "read_leg_tests",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "read_leg_usage",
@@ -23888,6 +23938,11 @@
       "file": "tools/loop/adapt.py"
     },
     {
+      "id": "read_run_rows",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "read_run_state",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -24746,6 +24801,11 @@
       "id": "read_tracked_builds",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_tracked_files",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "read_tracked_paths",
@@ -26011,6 +26071,11 @@
       "id": "remove_tree",
       "kind": "function",
       "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "remove_unheld_rows",
@@ -29200,6 +29265,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
@@ -29576,6 +29646,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/run-gates/precommit.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "resolve_procs_path",
@@ -31723,6 +31798,11 @@
       "file": "tools/run-gates/product_tests.py"
     },
     {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "run_fixture_child",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -31776,6 +31856,11 @@
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "run_fixture_govkit",
@@ -32931,6 +33016,11 @@
       "id": "run_plant_cutoff_later",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_driver",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "run_plant_gain",
@@ -34541,6 +34631,11 @@
       "id": "scan_bash",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "scan_candidates",
@@ -39318,6 +39413,11 @@
       "file": "tools/memory-tree/seen_red.py"
     },
     {
+      "id": "write_fixture_files",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "write_fixture_pass",
       "kind": "function",
       "file": "tools/unattended/pass-tree.test.sh"
@@ -39351,6 +39451,11 @@
       "id": "write_fixture_repo",
       "kind": "function",
       "file": "tools/run-gates/product_tests.py"
+    },
+    {
+      "id": "write_fixture_repo",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "write_fixture_round",
@@ -41296,6 +41401,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "wrong_shell_at",

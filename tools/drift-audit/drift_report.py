@@ -2550,7 +2550,9 @@ def build_backlog_stragglers(ctx) -> dict:
 _RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
 _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
                              "dispatch", "review", "brief", "hold", "resume", "handoff", "refusal",
-                             "fix-pass"})
+                             "fix-pass", "fix-of"})
+# `fix-of` joined in TOOL-dWitnessedBar-21, `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against; not owed.
 # `fix-pass` joined in TOOL-dDeclaredLoop-32, `--fix-pass`'s history row, not owed; its hyphen is why
 # `_RUN_ROW` below reads `[a-z][a-z-]*`.
 # `refusal` joined the driver's PARK_KINDS in TOOL-dDeclaredLoop-14, a history row and not owed.
