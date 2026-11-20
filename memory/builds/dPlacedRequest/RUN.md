@@ -530,3 +530,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T18:37:42Z hold · item owner-decision · reason until owner · reaped 447082a8 · resume none(owner)
 
 2026-11-20T20:52:25Z resume · item dPlacedRequest · reason held · keepalive 65b12df9 · manual
+
+2026-11-20T21:02:47Z dispatch · item bbcea9f6 TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
