@@ -2600,6 +2600,9 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
         graded = readers = 0
         for leg in json.loads(legs_path.read_text(encoding="utf-8")):
             guard = [g for g in (leg.get("guard") or []) if g]
+            # The KIT hold, `derive_hold_source`'s `kit` word, restated and kept: govkit cannot import the
+            # run-gates kit, and a selection-held leg is still guarded in the manifest, so it is graded
+            # here as the row it is (TOOL-dWitnessedBar-51 S21).
             if not guard or leg.get("subject") == "kit" or leg.get("chunk") == "selftests":
                 continue
             graded += 1
@@ -5144,13 +5147,15 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
 def run_probe_in_empty_dir(argv: list[str]) -> int | None:
     """Run one ALREADY-RESOLVED probe argv in a fresh empty directory; its exit, or None when it
     could not launch or ran past 120 s. Selfcheck 6b's only spawn (DEPL-aHalvedInstall-2), kept apart
-    so the site that runs gov's own probes never reaches a target's tokens."""
+    so the site that runs gov's own probes never reaches a target's tokens. `resolve_shell_argv` RAISES
+    `Refusal` where a `bash` head finds no bash that runs; that is a probe that could not launch, so it
+    is caught here and read as None, never let escape selfcheck (TOOL-dWitnessedBar-51 S25)."""
     with tempfile.TemporaryDirectory(prefix="govkit-6b-") as empty:
         try:
             return subprocess.run(resolve_shell_argv(argv), cwd=empty, capture_output=True,
                                   text=True, encoding="utf-8", errors="replace",
                                   timeout=120).returncode
-        except (OSError, subprocess.TimeoutExpired):
+        except (OSError, subprocess.TimeoutExpired, Refusal):
             return None
 
 

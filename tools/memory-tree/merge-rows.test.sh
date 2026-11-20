@@ -644,8 +644,8 @@ run "disjoint appends" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
 # holds both, the header once, census `ledger-keyed` and verdict `clean` — red when the TSV rows fall to
 # the structure plane and the append conflicts, or a postcondition reads the bullet plane. AC6: a key
 # both sides lowered keeps the lower count, and a key `%A` drained while `%B` left it as at `%O` is
-# absent. WHAT THIS DOES NOT CHECK: a ledger's `merge=rows` attribute, which each converting unit adds,
-# and the ledger rule's other cases, which are TOOL-dWitnessedBar-51's.
+# absent. WHAT THIS DOES NOT CHECK: a ledger's `merge=rows` attribute, which each converting unit adds;
+# the ledger rule's other cases are the 1m arms below (TOOL-dWitnessedBar-51).
 render_ledger_head() { printf '# ledger · fx-refs · key key ref · direction shrink-only · drain key\n'; }
 render_ledger_row() { printf '%s\t%s\t%s\tseeded\n' "$1" "$2" "${3:-abcdef12}"; }
 { render_ledger_head; render_ledger_row TOOL-zFixture-1 3; } > "$TMP/o"
@@ -672,6 +672,34 @@ run "concurrent drain on a ledger" 0 "TOOL-zFixture-1 TOOL-zFixture-2 "
 cp "$TMP/o" "$TMP/b"
 run "a drained ledger key beats a carried one" 0 "TOOL-zFixture-2 " TOOL-zFixture-1
 grep -q "^TOOL-zFixture-1"$'\t' "$TMP/a" && bad "ledger drain: the key %A drained and %B carried survived the merge"
+
+# --- 1m. the ledger rule's remaining cases (TOOL-dWitnessedBar-51 S31, AC27) ------------------------------
+# A key both sides ADDED takes the lower count, so a widen is never dropped at the merge's choice; a `%O`
+# with no header, a legacy grammar, beside `%A` and `%B` carrying one is still the ledger class; and a key
+# one side took out while the other changed it is a conflict region, never a silent drain. RED where the
+# add/add rule is dropped (rc 1, both rows in markers), where `%O`'s missing header drops the class to
+# the structure plane (the census is not ledger-keyed), or where the removal wins (rc 0).
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-5 4 1234abcd; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-5 2; } > "$TMP/b"
+run "a ledger key both sides added" 0 "TOOL-zFixture-1 TOOL-zFixture-5 "
+[ "$(grep "^TOOL-zFixture-5"$'\t' "$TMP/a" | cut -f2,3 | tr '\t' ' ')" = "2 abcdef12" ] \
+  || bad "ledger add/add: the key both sides added did not keep %B's lower count 2 with its sha: [$(grep "^TOOL-zFixture-5" "$TMP/a" | tr '\t' ' ')]"
+printf 'TOOL-zFixture-1\tthe legacy grammar, a reason column\n' > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-2 1; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3; render_ledger_row TOOL-zFixture-3 2; } > "$TMP/b"
+cp "$TMP/a" "$TMP/la"
+run "a header-less base beside two ledgers" 0 "TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3 "
+[ "$(grep -c '^# ledger · ' "$TMP/a")" = 1 ] || bad "ledger header-less base: the header is not written exactly once"
+cp "$TMP/la" "$TMP/a"
+lline=$($DRV "$TMP/o" "$TMP/a" "$TMP/b" x 2>&1 >/dev/null | grep '^merge-rows: rows ' | tail -1)
+grep -q 'census ledger-keyed, clean$' <<<"$lline" \
+  || bad "ledger header-less base: the audit line does not read census ledger-keyed and verdict clean: [$lline]"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 5; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/o"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/a"
+{ render_ledger_head; render_ledger_row TOOL-zFixture-1 3 1234abcd; render_ledger_row TOOL-zFixture-2 4; } > "$TMP/b"
+run "a ledger key removed against changed" 1 "TOOL-zFixture-1 TOOL-zFixture-2 "
+grep -q '^<<<<<<< ours$' "$TMP/a" || bad "ledger removed/changed: no conflict region written for the key %A removed and %B changed"
 
 # --- 2. the shape that broke union: same id, different text, both sides ---------------------------
 { pre; row TOOL-zFixture-1 base; } > "$TMP/o"

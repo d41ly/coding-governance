@@ -255,7 +255,11 @@ redirection target ends `.sh`, `.py` or `.js` (`heredoc-source`) and a `read` un
 neither blank nor a comment, on one `shrink-only` ledger row per file: a new file, a grown file and a
 row whose file is gone are red, and so is a file that shrank, `count fell`, until its row is lowered in
 the same commit, so shell outside a shim only shrinks, a trim cannot regrow unrecorded, and a shim
-earns its lines through the ledger factory's widen route. `--measure` prints the rows a seed writes and grades
+earns its lines through the ledger factory's widen route. The rows a pass owes are DERIVED, never
+listed by unit: each shell file whose `--measure` count, after the pass's own edits, differs from its
+row or has none. Every grown or new key goes through one `ratchet.py widen shell-role --key <path> ...
+--unit <the pass's unit>` call, whose record names the derivation, and each owed row's count is then set
+to its measured count, a shrunk file's lowered to it. `--measure` prints the rows a seed writes and grades
 nothing. What they do not check: a path split across a continuation or built in a variable, a source
 written by `tee` or `printf`, and an IFS set on an earlier line.
 

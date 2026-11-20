@@ -478,10 +478,14 @@ def check_declarations(decls, rows):
             found.append(("held guard", nm, f"held leg {nm!r} in {dc['file']} carries neither a guard nor a "
                                             f"non-empty unguarded_why: declare the guard that skips it when "
                                             f"nothing it reads moved, or why it runs whole under GATE_SELFTESTS"))
+    # THE `purpose presence` ARM (TOOL-dWitnessedBar-51 S8): every leg says what it is for, so a row with
+    # no `purpose` reds by name; no pending population excuses one, since every row carries the key.
     purposes = {}
     for row in rows:
         nm = row["name"]
         if "purpose" not in row:
+            found.append(("purpose presence", nm, f"leg {nm!r} carries no purpose: every leg declares one "
+                                                  f"line saying what it is for"))
             continue
         pu = row["purpose"]
         if not isinstance(pu, str):
@@ -863,6 +867,8 @@ def run_selftest():
         ("purpose, run h2: two legs sharing one", lambda t: write_planted(
             t, be, 'purpose = "arms the beta fixture red and green"', pu_a), run_conform, 1,
          ("purpose ·", "'alpha check'", "'beta selftest'", "share the purpose"), ()),
+        ("purpose presence: a declaration with no purpose", lambda t: write_planted(t, al, pu_a + "\n", ""),
+         run_conform, 1, ("purpose presence ·", "'alpha check'", "carries no purpose"), ()),
         ("purpose, run i1: 60 characters, one multibyte, is silent", lambda t: write_planted(
             t, al, pu_a, f'purpose = "{"é" + "x" * 59}"'), run_conform, 0, ("conform · green",),
          ("purpose ·",)),

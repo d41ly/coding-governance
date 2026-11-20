@@ -36,9 +36,11 @@
 # A typed list missed .githooks/pre-commit, which sources the resolver from a path it derives at run
 # time. `--coverage` derives it, prints its count and each named exclusion with its reason, and exits 1
 # naming each member that neither carries this block nor sources this file, or never calls
-# `refuse_wrong_shell || exit 2`, and each exclusion written without a reason. WHAT IT DOES NOT CHECK:
-# that the call precedes the member's first resolve_python call (TOOL-dWitnessedBar-51), and that a
-# named exclusion is still selected by the predicate.
+# `refuse_wrong_shell || exit 2`, or whose first such line outside the block does not precede its first
+# line calling resolve_python outside a `# >>> resolve_python` block and outside a function body
+# (TOOL-dWitnessedBar-51 S29), and each exclusion written without a reason. WHAT IT DOES NOT CHECK: a
+# function whose body resolves python, called at top level above the refusal, which the text order
+# does not follow; and that a named exclusion is still selected by the predicate.
 
 # >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
 wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
@@ -74,6 +76,27 @@ derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member p
     }' canon="$2")
 }
 
+# A line inside a function body defined at column 0 calls nothing where it stands, so the order read
+# skips it: the first resolve_python CALL is the first one the file's own top level runs.
+scan_rws_order() {  # <repo root>, member paths on stdin -> `o <path>|<refusal line>|<first resolve_python call line>`
+  (cd "$1" && awk '
+    {
+      f = $0; n = 0; i = 0; fn = 0; rws = 0; rp = 0
+      while ((getline l < f) > 0) {
+        n++; sub(/\r$/, "", l)
+        if (l ~ /^# >>> resolve_python/) { i = 1; continue }
+        if (l ~ /^# <<< resolve_python/) { i = 0; continue }
+        if (i) continue
+        if (fn) { if (l ~ /^}/) fn = 0; continue }
+        if (l ~ /^(function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*(\(\))?[ \t]*\{/) { if (l !~ /}[ \t;]*$/) fn = 1; continue }
+        if (!rws && l ~ /^[ \t]*refuse_wrong_shell \|\| exit 2[ \t]*$/) rws = n
+        if (!rp && (l ~ /\$\(resolve_python/ || l ~ /^resolve_python([ \t;|&]|$)/)) rp = n
+      }
+      close(f)
+      print "o " f "|" rws "|" rp
+    }')
+}
+
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
   case "${1:-}:$#" in
     :0) refuse_wrong_shell || exit 2 ;;
@@ -94,6 +117,7 @@ $_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that
         cd "$_rws_root" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE || exit 2
         { printf '%s\n' "$_rws_excl" | sed 's/^/x /'
           printf '%s\n' "$_rws_pop" | sed 's/^/m /'
+          printf '%s\n' "$_rws_pop" | scan_rws_order "$_rws_root"
           git grep -l '^# >>> refuse_wrong_shell' -- tools skills .githooks | sed 's/^/b /'
           git grep -l -E '^[[:space:]]*(\.|source)[[:space:]]+[^[:space:]]*refuse-wrong-shell\.sh' -- tools skills .githooks | sed 's/^/s /'
           git grep -l -E '^[[:space:]]*refuse_wrong_shell \|\| exit 2[[:space:]]*$' -- tools skills .githooks | sed 's/^/c /'
@@ -104,6 +128,7 @@ $_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that
                      else { ex[p] = r; xo[++nx] = p }
                      next }
           t == "m" { m[++nm] = k; next }
+          t == "o" { split(k, o, "|"); orws[o[1]] = o[2] + 0; orp[o[1]] = o[3] + 0; next }
           { s[t, k] = 1 }
           END {
             for (j = 1; j <= nm; j++) {
@@ -112,6 +137,7 @@ $_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that
               n++
               if (!s["b", f] && !s["s", f]) bad[++nb] = f " neither carries the refuse_wrong_shell block nor sources refuse-wrong-shell.sh"
               if (!s["c", f]) bad[++nb] = f " never calls refuse_wrong_shell || exit 2"
+              else if (orp[f] && (!orws[f] || orws[f] > orp[f])) bad[++nb] = f " refuses only after it resolved python: its first refuse_wrong_shell || exit 2 is line " orws[f] ", its first resolve_python call line " orp[f]
             }
             print "refuse_wrong_shell coverage: " (n + 0) " members, derived from " (nm + 0) " files the predicate selects less " (nx + 0) " named exclusions"
             for (j = 1; j <= nx; j++) print "  excluded: " xo[j] " (" ex[xo[j]] ")"

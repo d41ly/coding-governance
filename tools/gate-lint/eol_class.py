@@ -26,7 +26,10 @@ THE POPULATION is `git ls-files` under the root, never a list: an empty one prin
 WHAT THIS DOES NOT CHECK: a member's worktree bytes (deliberately, above); a file outside the class
 that an interpreter still reads, such as a `.txt` table parsed with a TAB split, which its own pin
 carries; an index column of `mixed`, which is neither `lf` nor `crlf` and is not graded; and a
-shebang file with an extension outside the class.
+shebang file with an extension outside the class. Nor an existing worktree's checkout: a clone made
+before the pin keeps its CRLF copies until those files are checked out again
+(`git checkout -- <paths>`), which `git add --renormalize .` does not do, since it rewrites the index
+and an LF blob is already what the index holds.
 """
 from __future__ import annotations
 

@@ -231,7 +231,7 @@
 - `AGENTS.md` is canonical and `CLAUDE.md` imports it; the playbook renderer, `playbook-render`, wires every other agent's filename to it.
 - `skills/session-kickoff/` stays at the repository root, because every machine discovers it through a junction.
 - The memory tree is flat: a spec, review or research record lives in its build's folder, and `memory/project/` holds only the gates' row registries.
-- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.
+- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.txt`, which shrinks unless a recorded decision says otherwise.
 - Work state is read from the generated `memory/LIVE.md` and `memory/ledger/`; there is no authored session ledger.
 - Read `memory/guides/MERGE-BAR.md` before running, scoping or debugging a bar, and before any push.
 - `GATE_SELFTESTS=1` runs the held kit self-tests on demand only, and no boundary sets it.

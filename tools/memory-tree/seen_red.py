@@ -12,10 +12,13 @@ dScopedBuild's `build.acceptance` writes it, the main loop's acceptance-ledger l
 
 THE OWED SET, `derive_owed_gates`: (a) every leg whose manifest row at HEAD is absent at the base or
 carries another `argv`, the manifest `routed_commits.resolve_leg_manifest` locates, both revisions read
-in one `tree_lib.read_blobs_at` call; (b) every `New arm:` line of a spec under the build's `spec/`,
-its suite path the first ` · ` field, resolved to the HEAD legs whose `argv`, each `{prefix}` resolved
-against `legacy_ledger.derive_seed_prefix`, holds it, one gate any of those legs satisfies. A line
-resolving to no leg is named and owes nothing.
+in one `tree_lib.read_blobs_at` call; (b) every `New arm:` line inside the Gates section of a spec
+under the build's `spec/`, read by the `arm_walk` block, the spec-token checker's own walk carried inline
+(indented continuation lines joined, a line quoted in any other section never read): its suite path is
+the first whitespace-delimited word of its first ` · ` field and each later word of that field a further
+argv element (TOOL-dWitnessedBar-51 S4, S20), resolved to the HEAD legs whose `argv`, each `{prefix}`
+resolved against `legacy_ledger.derive_seed_prefix`, holds the path and every further word, one gate any
+of those legs satisfies. A line resolving to no leg is named and owes nothing.
 
 `--build` joins each owed gate to a seen-red line naming it in a journal record of that build and
 prints `seen-red: <leg> · <red sha8> · <record>` or `seen-red: <leg> · NO RECORD`: exit 1 on any NO
@@ -54,6 +57,49 @@ NEW_ARM_LEAD = "New arm:"
 SLUG_RE = re.compile(r"[A-Za-z0-9]+")
 BASE_RE = re.compile(r"[0-9a-f]{7,40}")
 RUN_FACTS = "## Run facts"
+
+
+# >>> arm_walk -- canonical copy: check-spec-tokens.py in the gov tools dir (byte-identical; gated)
+# The Gates section by its heading text and its `New arm:` lines: `seen_red.py` in the memory-tree kit
+# carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy that drifts.
+GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
+
+
+def extract_gates(text):
+    """Section 7 by its HEADING TEXT, never by its ordinal.
+
+    TOOL-aJoinedCanon-7. A Tier-1 spec under the light profile may legally drop
+    `## 5. Production-readiness checklist`, which slides every later section up one — so the ordinal
+    read grades whatever happens to sit seventh, and once the S7 arm below turns a silent read into a
+    VERDICT that becomes a red on a spec the format permits. The pattern is check 12's
+    acceptance-witness regex with one word changed: bracketed dot, tab class and end anchor intact.
+
+    Returns None when the spec carries NO Gates heading at all. That is a different fact from an
+    empty section and the report keeps the two apart, because they have different remedies.
+    """
+    m = GATES_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^## ", rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
+
+
+def scan_arm_lines(gates):
+    """`gates`' `New arm:` lines, `gates` a Gates section `extract_gates` returned, each joined with its
+    indented continuation lines into one string: a line opening `New arm:` starts an arm, an indented
+    non-blank line continues the open one, and any other line closes it (TOOL-dWitnessedBar-51 S20)."""
+    arms, cur = [], None
+    for line in gates.splitlines():
+        if line.startswith("New arm:"):
+            cur = [line.strip()]
+            arms.append(cur)
+        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
+            cur.append(line.strip())
+        else:
+            cur = None
+    return [" ".join(arm) for arm in arms]
+# <<< arm_walk
 
 
 def read_conf(root):
@@ -143,11 +189,11 @@ def derive_owed_gates(root, slug, base):
     spec_dir = "%s/builds/%s/spec/" % (conf["MEMORY_ROOT"], slug)
     unresolved = []
     for spec in sorted(p for p in read_tracked(root) if p.startswith(spec_dir) and p.endswith(".md")):
-        for line in read_text(os.path.join(str(root), spec)).split("\n"):
-            if not line.startswith(NEW_ARM_LEAD):
-                continue
-            suite = line[len(NEW_ARM_LEAD):].split(" · ", 1)[0].strip()
-            legs = [name for name, argv in argvs.items() if suite in argv]
+        section = extract_gates(read_text(os.path.join(str(root), spec)).replace("\r\n", "\n"))
+        for arm in scan_arm_lines(section or ""):
+            suite = arm[len(NEW_ARM_LEAD):].split(" · ", 1)[0].strip().strip("`")
+            words = suite.split()
+            legs = [name for name, argv in argvs.items() if words and all(w in argv for w in words)]
             if not legs:
                 unresolved.append((spec, suite))
             elif tuple(legs) not in seen:
@@ -196,10 +242,11 @@ def run_build(root, slug, base=None):
 
 
 # ------------------------------------------------------------------------------------------- the fixture
-PLANTS = ("seen", "unseen-gate", "unseen-arm", "bad-line", "empty")
+PLANTS = ("seen", "unseen-gate", "unseen-arm", "unseen-arm-with-args", "arm-outside-gates", "bad-line", "empty")
 FIX_SLUG = "dFix"
 FIX_BASE_LEG = {"name": "fix base leg", "argv": ["bash", "tools/fix/base.test.sh"]}
 FIX_ADDED_LEG = {"name": "fix added leg", "argv": ["bash", "tools/fix/added.test.sh"]}
+FIX_ARGS_LEG = {"name": "fix args leg", "argv": ["python", "tools/x.py", "--selftest"]}
 FIX_LEDGER = "memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md"
 FIX_SPEC = "memory/builds/dFix/spec/2026-01-01-spec-TOOL-dFix-1.md"
 
@@ -243,7 +290,8 @@ def build_fixture(top, plant):
         run_git_in(top, "config", k, v)
     base = write_fixture_commit(top, {
         ".memory-tree.conf": 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nLEG_MANIFEST="gate-legs.json"\n',
-        "gate-legs.json": json.dumps([FIX_BASE_LEG], indent=2) + "\n",
+        "gate-legs.json": json.dumps([FIX_BASE_LEG] + ([FIX_ARGS_LEG] if plant == "unseen-arm-with-args" else []),
+                                     indent=2) + "\n",
         "memory/builds/dFix/README.md": "# dFix\n"}, "base")
     files = {"memory/builds/dFix/RUN.md": "# dFix run\n\n## Run facts\n\nbase: %s\n\n## Parked\n" % base}
     if plant in ("seen", "unseen-gate", "bad-line"):
@@ -256,6 +304,13 @@ def build_fixture(top, plant):
     elif plant == "unseen-arm":
         files[FIX_SPEC] = ("# TOOL-dFix-1 — a unit\n\n## 7. Gates\n\n`fix base leg`\n\n"
                            "New arm: tools/fix/base.test.sh · covers AC1 · the plant, staged red by its inverse · none\n")
+    elif plant == "unseen-arm-with-args":
+        files[FIX_SPEC] = ("# TOOL-dFix-1 — a unit\n\n## 7. Gates\n\n`fix args leg`\n\n"
+                           "New arm: tools/x.py --selftest · covers AC1 · the plant, staged red by its inverse · none\n")
+    elif plant == "arm-outside-gates":
+        files[FIX_SPEC] = ("# TOOL-dFix-1 — a unit\n\n## 4. Design\n\nThe arm this spec quotes:\n\n"
+                           "New arm: tools/fix/base.test.sh · covers AC1 · quoted, not declared · none\n\n"
+                           "## 7. Gates\n\n`fix base leg`\n")
     write_fixture_commit(top, files, plant)
 
 

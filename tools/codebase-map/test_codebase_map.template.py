@@ -10,7 +10,7 @@ Remedies when this gate fails on your change:
 - claim the new key in the owning `<MAP_ROOT>/features/<feature>.md` (create it from any
   existing dossier — headings are pinned, prose is free), or
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
-- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not
+- `baseline.txt` never gains a key: the gate refuses one the baseline at the branch's base did not
   carry (the merge-base with the remote default branch) — claim it in a dossier instead;
 - claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
 
@@ -146,7 +146,7 @@ def test_every_inventory_key_is_claimed_or_baselined() -> None:
     assert cov.clean, (
         "codebase-map coverage violations.\n"
         f"UNCLAIMED (new key? claim it in a feature dossier, or FOUNDATION.md for shared "
-        f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"
+        f"substrate; baseline.txt is reserved for the initial backfill): {cov.unclaimed}\n"
         f"STALE CLAIMS (a dossier names a key that no longer exists): {cov.stale_claims}\n"
         f"STALE BASELINE (delete the line — the item is gone): {cov.stale_baseline}\n"
         f"LAZY BASELINE (now claimed — delete its baseline line): {cov.lazy_baseline}"
@@ -166,13 +166,13 @@ def test_baseline_never_gains_a_key() -> None:
     if base is None:
         print(f"     UNGRADED: {why}")
         return
-    added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())
+    added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.txt").relative_to(root).as_posix())
     if added is None:
         print(f"     UNGRADED: {note} ({why})")
         return
     print(f"     compared against {base[:12]} ({why}): {note}")
     assert not added, (
-        "baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "
+        "baseline.txt GAINED keys its base did not carry — claim each in a feature dossier, or "
         "FOUNDATION.md for shared substrate, and delete it from the baseline:\n"
         + "\n".join(f"  {inv}: {key}" for inv, keys in added.items() for key in keys)
     )

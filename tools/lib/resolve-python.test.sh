@@ -435,6 +435,9 @@ guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
 refuse_wrong_shell|$ROOT/$KIT_REL/refuse-wrong-shell.sh|$KIT_REL/refuse-wrong-shell
 legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
+acceptance_reader|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
+arm_walk|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
+hold_predicate|$ROOT/$RUNGATES_DIR/held_halves.py|$RUNGATES_DIR/held_halves
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -506,6 +509,14 @@ legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
 # coverage_join.py shaped as memory-tree's, whose coverage_join, remote_ladder_py and compare_base_py
 # blocks the existing rows above find by their markers, and a resolve_kit_dir block beside the factory's,
 # through which `seed` finds the policy kit (TOOL-dWitnessedBar-15); part 2o below holds the canonical's CLI.
+# Each kit copy also carries a resolve_bash_py block, through which a seed argv's `bash` head resolves
+# (TOOL-dWitnessedBar-51 S32), and the row of that name reads it.
+# acceptance_reader and arm_walk (TOOL-dWitnessedBar-51 S19, S20) are the spec-token checker's own
+# readers, a canonical in a tool file as kickoff_region's is: the acceptance section by heading text and
+# its backticked tokens, which the unattended kit's fix_keeps.py carries, and the Gates section by
+# heading text and its `New arm:` walk, which the memory-tree kit's seen_red.py carries. hold_predicate
+# (S21) is the run-gates kit's hold predicate, `held_halves.py#test_held`, which drift-audit's
+# drift_report.py carries because that kit cannot import run-gates.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -544,9 +555,9 @@ done <<<"$PARITY_ROWS"
 # carries the block or that source, and the library carries neither. Each of the five sets must be
 # non-empty, so an empty population reds. Then `refuse-wrong-shell.sh --coverage` holds that derived
 # population, a file sourcing `resolve-python.sh` through a path it derives included, to the block or
-# the source and the call, less its named exclusions, each of which must carry its reason. WHAT THIS
-# DOES NOT CHECK: the call's text order against `resolve_python`, TOOL-dWitnessedBar-51's; that a named
-# exclusion is still selected by the predicate; and a fixture's copy set.
+# the source and the call, less its named exclusions, each of which must carry its reason, and the call
+# before the first top-level `resolve_python` call (TOOL-dWitnessedBar-51, the order arm below). WHAT
+# THIS DOES NOT CHECK: that a named exclusion is still selected by the predicate; and a fixture's copy set.
 scan_rws_coverage() {  # <repo root> <library rel> <canonical rel> -> one line per break, then the counts
   local root=$1 lib=$2 rws=$3 f
   local -A inl=() blk=() src=() call=() pop=()
@@ -589,6 +600,24 @@ rws_cov=$(bash "$HERE/refuse-wrong-shell.sh" --coverage 2>&1) \
   || bad "refuse-wrong-shell.sh --coverage broke over the derived population:${rws_cov//$'\n'/; }"; ok
 grep -q '^refuse_wrong_shell coverage: [1-9][0-9]* members' <<<"$rws_cov" \
   || bad "refuse-wrong-shell.sh --coverage printed no non-zero member count: ${rws_cov%%$'\n'*}"; ok
+# THE ORDER (TOOL-dWitnessedBar-51 S29, AC25): a scratch repository whose two members source the resolver
+# and the refusal, one calling `refuse_wrong_shell || exit 2` before its first `resolve_python` call and
+# one after it; `--coverage` there exits 1 naming the late one alone, and a call inside a function body
+# defined above the refusal is no call where it stands. RED where the order is not read: exit 0.
+RWO="$TMP/rws-order"; mkdir -p "$RWO/tools/lib" "$RWO/tools/x" "$RWO/tools/unattended"
+cp "$HERE/refuse-wrong-shell.sh" "$HERE/resolve-python.sh" "$RWO/tools/lib/"
+for rwo_f in lib-unattended.sh pass-tree.sh pass-tree.test.sh; do : > "$RWO/tools/unattended/$rwo_f"; done
+rwo_head='#!/usr/bin/env bash
+HERE=$(cd "$(dirname "$0")/../lib" && pwd)
+. "$HERE/resolve-python.sh"
+. "$HERE/refuse-wrong-shell.sh"'
+printf '%s\nlate_py() {\n  py=$(resolve_python)\n}\nrefuse_wrong_shell || exit 2\npy=$(resolve_python)\n' "$rwo_head" > "$RWO/tools/x/early.sh"
+printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > "$RWO/tools/x/late.sh"
+(cd "$RWO" && git init -q && git add -A) || bad "the wrong-shell order fixture could not be staged"; ok
+rwo_out=$(cd "$RWO" && bash tools/lib/refuse-wrong-shell.sh --coverage 2>&1); rwo_rc=$?
+{ [ "$rwo_rc" = 1 ] && grep -q '^BREAK tools/x/late.sh refuses only after it resolved python' <<<"$rwo_out" \
+  && ! grep -q 'early.sh' <<<"$rwo_out"; } \
+  || bad "refuse-wrong-shell.sh --coverage did not red the member refusing after its resolve_python call alone (rc $rwo_rc):${rwo_out//$'\n'/; }"; ok
 
 # ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
 # Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over
@@ -1309,6 +1338,26 @@ out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/l
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-pfx 1" <<<"$out" \
   && grep -qxF "p${T}1${T}$(git -C "$LLR" rev-parse HEAD)${T}seeded" "$LLR/memory/project/fx-pfx.txt"; } \
   || bad "2o seed S9: a seed argv's {prefix} did not resolve to the tool root above the running copy: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-51 S32, AC28 — a seed argv's head `python3` runs as the running interpreter, never a
+# PATH lookup that can reach the MS-Store stub, with `{prefix}` resolved and the cwd at the root. RED where
+# the head is spelled as written: on a host whose `python3` is the stub the seed exits 9009 and reads
+# unarmed, and on any host the child's interpreter can differ from the parent's.
+printf '%s\n' 'import os, sys' 'print("p\t1")' 'open("argv-run.txt", "w").write(sys.executable + chr(10) + os.getcwd())' > "$LLR/tools/fx/fxrun.py"
+build_ll_seeded fx-run memory/project/fx-run.txt "['python3', '{prefix}/fx/fxrun.py']" >> "$LLR/tools/fx/kit.toml"
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-run) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+ll_parent=$(cd "$LLR" && "$REALPY" -B -c 'import os, sys; print(sys.executable); print(os.getcwd())' | tr -d '\r')
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-run 1" <<<"$out" \
+  && [ "$(tr -d '\r' < "$LLR/argv-run.txt")" = "$ll_parent" ]; } \
+  || bad "2o seed S32: a python3 head did not run as the running interpreter at the root: ${out//$'\n'/ | } / $(tr '\n' ' ' < "$LLR/argv-run.txt" 2>/dev/null)"; ok
+# TOOL-dWitnessedBar-51 S50, AC40 — a registered home that exists and whose first line is no header, a
+# legacy-grammar file, is refused: `refused <population>`, exit 2, the home byte-identical. RED where it
+# reads `present` (an armed home) or is treated as absent and rewritten.
+printf 'p\tthe legacy grammar, a reason column\n' > "$LLR/memory/project/fx-run.txt"; cp "$LLR/memory/project/fx-run.txt" "$LL/fx-run.before"
+out=$( (cd "$LLR" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$PK/legacy_ledger.py" seed --population fx-run) 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}")
+{ [ "${out##*$'\n'}" = rc=2 ] && grep -q '^refused fx-run header disagrees' <<<"$out" && ! grep -q '^present\|^armed' <<<"$out" \
+  && cmp -s "$LL/fx-run.before" "$LLR/memory/project/fx-run.txt"; } \
+  || bad "2o seed S50: a legacy-grammar home read present or absent, or was written: ${out//$'\n'/ | }"; ok
+rm -f "$LLR/argv-run.txt"
 run_ll_reset
 # AC6 — `seed = []` under the default, under a landed `refuse`, and with no policy kit resolving.
 out=$(run_ll seed --all)

@@ -975,6 +975,10 @@ if [ "$MODE" = check ]; then
   fails=0
   # FORWARD: every leg the bar holds carries a row. A suite that arrives without one would be exempt
   # from the budget rule by the act of arriving.
+  # The predicate below is the KIT hold, `held_halves.py#test_held` restated, and it stays: the budget
+  # rule is about the kit-held population a manifest row declares, which is all `derive_hold_source`'s
+  # `kit` word reads, and a `quarantine` or `level` hold is a selection row of one bar, never a budget
+  # population (TOOL-dWitnessedBar-51 S21).
   missing=$("$PYBIN" - "$BUDGETS" "$LEGS" <<'PY'
 import json, sys
 declared = set()

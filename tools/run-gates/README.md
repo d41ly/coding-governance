@@ -201,6 +201,14 @@ the run started and did not move, under any non-empty `GATE_SELFTESTS`, so a `GA
 seeds every record; a red or a retried pass removes it. The `gate-full-green` stamp of such a run
 says `selftests changed`, never `1`, and a push that runs the self-tests forces over it.
 
+Manifest order drives five readings, so moving a row is a change to each of them and never a no-op:
+the dispatch tie-break (legs dispatch largest-first by recorded seconds, and a tie keeps manifest
+order because the sort is stable); the report order, every `GATE` line and every `GATE warn` line, so
+the output is byte-stable at any width; the `fail.<n>` indices of the run-log line, numbered in that
+order up to their cap; the spec-token checker's `--legs-for`, which names each leg's first tripping
+guard in that order; and the held halves, whose `held_halves.py` partition lists each half's held legs
+in that order.
+
 ## Why it became a kit
 
 It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `<prefix>/lib/`,

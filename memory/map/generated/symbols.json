@@ -6203,6 +6203,11 @@
       "file": "tools/lib/python_floor.py"
     },
     {
+      "id": "check_fenced_case",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -6613,6 +6618,21 @@
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
+      "id": "check_home_readable",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "check_home_readable",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "check_home_readable",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "id": "check_honest_rotation",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -6926,6 +6946,11 @@
       "id": "check_lf_lines",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "check_light_profile",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
     },
     {
       "id": "check_lin_control",
@@ -14358,6 +14383,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "extract_acceptance",
+      "kind": "function",
+      "file": "tools/unattended/fix_keeps.py"
+    },
+    {
       "id": "extract_arm_rows",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -14496,6 +14526,11 @@
       "id": "extract_gates",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_gates",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
     },
     {
       "id": "extract_git_spans",
@@ -27088,6 +27123,11 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "render_cut_tail",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "render_cycle",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -27221,6 +27261,11 @@
       "id": "render_family_view",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_fenced",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "render_finding",
@@ -28221,6 +28266,11 @@
       "id": "render_units",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "render_unresolved",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
     },
     {
       "id": "render_value",
@@ -30556,6 +30606,21 @@
       "id": "resolve_runlog_dirs",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_seed_head",
+      "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "resolve_seed_head",
+      "kind": "function",
+      "file": "tools/lib/legacy_ledger.py"
+    },
+    {
+      "id": "resolve_seed_head",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "resolve_selection",
@@ -33238,6 +33303,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "run_plant_cutoff_none",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_plant_driver",
       "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
@@ -33284,6 +33354,11 @@
     },
     {
       "id": "run_plant_new_population",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_no_base_remedy",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -34768,6 +34843,16 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "scan_arm_lines",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_arm_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/seen_red.py"
+    },
+    {
       "id": "scan_artifacts",
       "kind": "function",
       "file": "tools/codebase-map/check_gate_coverage.py"
@@ -34800,6 +34885,11 @@
     {
       "id": "scan_bash",
       "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
@@ -34826,6 +34916,11 @@
       "id": "scan_bash",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "scan_bash",
@@ -35371,6 +35466,11 @@
       "id": "scan_rws_coverage",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "scan_rws_order",
+      "kind": "function",
+      "file": "tools/lib/refuse-wrong-shell.sh"
     },
     {
       "id": "scan_secrets",
@@ -37336,6 +37436,11 @@
       "id": "test_health_appender_failures_return_none_with_one_note",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_held",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "test_held",
@@ -41385,6 +41490,11 @@
     {
       "id": "wrong_shell_at",
       "kind": "function",
+      "file": "tools/gate-lint/legacy_ledger.py"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
       "file": "tools/govkit/census.test.sh"
     },
     {
@@ -41481,6 +41591,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "wrong_shell_at",

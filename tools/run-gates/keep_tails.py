@@ -11,7 +11,11 @@ at `<common-dir>/gate-tails/<hash>`. This verb reads `trace.leg-output` through 
   tail-by-hash  writes one `leg-tail` record per `tail.<n>` of run `<run id>` through the memory-tree
                 record factory's `write_record`, into build `<slug>`'s `build/` folder under `<unit id>`:
                 fields `Leg`, `Hash`, `Run`, `Sha` (the run header's `head`) and `Cause`, then the tail in
-                one fenced block, each span runlog's `scan_secrets` finds replaced by its placeholder. A
+                one fenced block, each span runlog's `scan_secrets` finds replaced by its placeholder. The
+                tail is decoded with `errors='replace'` and its `Hash` names the stored bytes; the fence
+                is a backtick run one longer than the longest inside the tail, three at least, and a tail
+                line that would read as a record field is written behind `FIELD_SHIELD`, so no tail
+                closes the fence early or forges a field (TOOL-dWitnessedBar-51 S34). A
                 hash a tracked `leg-tail` record already holds, or one written earlier in this call, is
                 skipped. Prints `keep-tails: wrote <path> · <hash> <leg>` or `keep-tails: skipped …`
                 per tail.
@@ -25,12 +29,13 @@ stderr with nothing written for it · 2 refused before any write: a malformed ar
 no verdict for the run, a value outside the catalogue row, or a sibling kit that does not resolve.
 
 `--selftest` plants a scratch repository per case under the system temp directory: a run holding one
-tail, kept and then kept again once tracked; the key planted `node-local`; and a tail holding a
-secret-shaped line. Exit 0 when every case reads as planted, 1 naming each that does not.
+tail, kept and then kept again once tracked; the key planted `node-local`; a tail holding a
+secret-shaped line; and a tail opening a three-backtick line, carrying a `**Hash:**` line and cut, as
+the runner cuts it, at the last whole UTF-8 character within 8192 bytes of a multibyte one. Exit 0 when
+every case reads as planted, 1 naming each that does not.
 
-WHAT IT DOES NOT CHECK. That a tail decodes or that its cut lands on a character boundary (an
-undecodable byte is replaced), or that a tail line is no fence: unit 51's. Secret shapes runlog's table
-does not know. That the run record belongs to this build: the caller names both.
+WHAT IT DOES NOT CHECK. A byte that is not UTF-8 inside the tail, which is replaced. Secret shapes
+runlog's table does not know. That the run record belongs to this build: the caller names both.
 """
 import argparse
 import os
@@ -55,6 +60,8 @@ RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 HASH = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 TAIL_KEY = re.compile(r"tail\.([0-9]+)")
 BOUND = 120  # seconds, each git call
+TAIL_BYTES = 8192  # the runner's cut, PINNED by TOOL-dWitnessedBar-25: its last whole UTF-8 character within these
+FIELD_SHIELD = "| "  # what a tail line that would read as a record field is written behind (S34)
 
 
 def run_git(top, *args, data=None):
@@ -161,6 +168,19 @@ def read_blob_hash(top, data):
     return p.stdout.strip() if p.returncode == 0 else ""
 
 
+def render_fenced(text, build_records):
+    """`text` as the record's fenced block, a list of lines: the fence a backtick run one longer than the
+    longest inside `text`, three at least, so no tail line closes it; each line the record factory would
+    read as a field, or refuse as forging one, written behind `FIELD_SHIELD`, so the fields read once."""
+    body = text[:-1] if text.endswith("\n") else text
+    rows = body.split("\n") if body else []
+    longest = max((len(run) for run in re.findall(r"`+", body)), default=0)
+    fence = "`" * max(3, longest + 1)
+    shielded = [FIELD_SHIELD + ln if build_records.FIELD.match(ln) or build_records.FORGED_FIELD.match(ln) else ln
+                for ln in rows]
+    return [fence, *shielded, fence]
+
+
 def run_keep(cwd, run, build, unit):
     """-> (exit, stdout lines, stderr lines) of one keep over run `run` in the repository at `cwd`."""
     if not RUN_ID.fullmatch(run or ""):
@@ -197,9 +217,7 @@ def run_keep(cwd, run, build, unit):
             err.append(f"{SAY}: {what} — {src.as_posix()} does not hash to its name, so no record is written")
             rc = 1
             continue
-        text = render_redacted(data.decode("utf-8", "replace"))
-        body = text[:-1] if text.endswith("\n") else text
-        lines = ["```", *(body.split("\n") if body else []), "```"]
+        lines = render_fenced(render_redacted(data.decode("utf-8", "replace")), build_records)
         fields = [("Leg", leg), ("Hash", h), ("Run", run), ("Sha", header.get("head") or "-"),
                   ("Cause", verdict.get("cause") or "-")]
         try:
@@ -242,6 +260,38 @@ def write_fixture_repo(top, value, tail):
     return h
 
 
+def render_cut_tail():
+    """The `fenced` case's tail: a line opening three backticks and a `**Hash:**` line, after a run of
+    text whose two-byte character straddles the 8192nd byte from the end, cut as the runner cuts it:
+    the last 8192 bytes, less the continuation bytes that open them."""
+    whole = ("x" * 9 + "\u00e9") * 900 + "\n```\n**Hash:** forged\n- **Leg:** forged\nFAIL the fixture leg.\n"
+    data = whole.encode("utf-8")
+    start = len(data) - TAIL_BYTES
+    if not 0x80 <= data[start] < 0xC0:
+        raise Refusal("the fenced case's plant does not straddle a character at its cut, so it proves no cut")
+    while 0 <= start < len(data) and 0x80 <= data[start] < 0xC0:
+        start += 1
+    return data[max(start, 0):]
+
+
+def check_fenced_case(top, h, tail, text, path):
+    """The `fenced` case's reasons, empty when it reads as planted."""
+    why = []
+    build_records, _design_lib, _tree_lib = load_factory()
+    fields, bad, _name = build_records.read_record(path.relative_to(top).as_posix(), text, KIND)
+    body = text.split("\n")
+    fence = next((ln for ln in body if ln.startswith("```")), "")
+    inner = text[text.index(fence) + len(fence):text.rindex(fence)] if fence else text
+    longest = max((len(r) for r in re.findall(r"`+", inner)), default=0)
+    if len(fence) <= longest or body.count(fence) != 2:
+        why.append(f"the fence {fence!r} is not longer than the {longest}-backtick run inside it, or not one pair")
+    if bad or fields.get("Hash") != h or fields.get("Leg") != "fixture leg":
+        why.append(f"the fields did not read once: Hash {fields.get('Hash')!r}, Leg {fields.get('Leg')!r}, {bad}")
+    if h != read_blob_hash(top, tail) or len(tail) > TAIL_BYTES or "\ufffd" in text:
+        why.append("the hash names other bytes, the cut kept more than 8192 bytes, or a character was split")
+    return why
+
+
 def run_selftest():
     """Each planted case, graded by what `run_keep` writes and prints."""
     lines, failed = [], 0
@@ -249,7 +299,8 @@ def run_selftest():
     secret = "AKIA" + "Q7" * 8
     cases = (("kept once", KEEP, b"line 1\nFAIL the fixture leg\n"),
              ("node-local", "node-local", b"FAIL the fixture leg\n"),
-             ("secret masked", KEEP, f"aws configure set aws_access_key_id {secret}\n".encode()))
+             ("secret masked", KEEP, f"aws configure set aws_access_key_id {secret}\n".encode()),
+             ("fenced", KEEP, render_cut_tail()))
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="kt25-"))
     try:
         for i, (label, value, tail) in enumerate(cases):
@@ -277,6 +328,8 @@ def run_selftest():
                     if rc2 != 0 or len(again) != 1 or not any(ln.startswith(f"{SAY}: skipped {h}") for ln in out2):
                         why.append(f"a second keep over a tracked hash wrote {len(again) - 1} record(s) "
                                    f"or did not skip it: {out2 + err2}")
+                elif label == "fenced":
+                    why += check_fenced_case(top, h, tail, text, made[0])
                 elif secret in text or "<redacted:aws-key>" not in text:
                     why.append("the record carries the secret, or not its placeholder")
             except Refusal as e:

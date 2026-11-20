@@ -725,7 +725,7 @@ when = "before any review, for the bug classes a diff can hit"
 [[ledger]]
 population = "conf-scalar-pins"
 leg = "ratchet (keys, not a scalar)"
-seed = ["python", "tools/memory-tree/ratchet.py", "keys-not-scalar", "--measure"]
+seed = ["python", "{prefix}/memory-tree/ratchet.py", "keys-not-scalar", "--measure"]
 key = "key"
 fields = ["conf", "key"]
 drain = "key"

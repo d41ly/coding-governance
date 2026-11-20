@@ -36,13 +36,14 @@ commit-time form is a grade, a check-9 render and a regrade no one argv states, 
 hand-named and the leg declares no `precommit` (spec §8 F3).
 """
 import argparse
-import json
 import os
 import pathlib
 import subprocess
 import sys
 
 HERE = pathlib.Path(os.path.abspath(__file__)).parent
+sys.path.insert(0, str(HERE))
+import held_halves  # noqa: E402  the sibling: load_manifest, the one leg-manifest reader, as measure_legs.py reads it
 SAY = "pre-commit"
 # The argv words that name an interpreter this process resolves itself, never by PATH.
 PYTHON_WORDS = ("python", "python3")
@@ -171,16 +172,12 @@ def resolve_bash_launcher():
 
 
 def read_manifest(path):
-    """The manifest's rows, or exit 2 naming the path: an unreadable manifest is never an empty list."""
-    try:
-        rows = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
-        print(f"{SAY}: cannot read the leg manifest {path}: {e}", file=sys.stderr)
+    """The manifest's rows through `held_halves.load_manifest`, the kit's one leg-manifest reader, or
+    exit 2 naming its refusal: an unreadable manifest is never an empty list (TOOL-dWitnessedBar-51 S47)."""
+    def refuse(msg):
+        print(f"{SAY}: {msg}", file=sys.stderr)
         raise SystemExit(2)
-    if not isinstance(rows, list):
-        print(f"{SAY}: the leg manifest {path} is not a JSON list", file=sys.stderr)
-        raise SystemExit(2)
-    return [r for r in rows if isinstance(r, dict)]
+    return held_halves.load_manifest(str(path), refuse=refuse)
 
 
 def read_staged(root):

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** INPROGRESS · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,7 +15,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md) | research | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md](../build/2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-51-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-51-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-51-1-builder-return.md) | journal | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md](../build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |

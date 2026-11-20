@@ -1469,7 +1469,7 @@ check_clears_only("AC2 unattended dossier",
             "  20470 bytes against a 20480-byte `DOSSIER_CAP_BYTES`; it describes the kit's gates and refusals,\n")
 check_clears_only("AC2 run-gates dossier",
             "- **S12** — author `memory/map/features/run-gates.md` claiming the `kits` key and the gate-leg keys\n"
-            "  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`.\n")
+            "  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.txt`.\n")
 # AC3 -- the forward-looking claim: a key-shaped token no tree holds yet clears, since nothing resolves.
 check_clears_only("AC3 unwritten key", "`memory/map/features/runlog.md` claims `tUnwrittenLeg-not-yet-built` once it lands.\n")
 # AC7 -- the same refused sentence fenced and unfenced: one hit, on the unfenced line.

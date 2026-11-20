@@ -557,7 +557,7 @@ or self-prune rule from your kickoff manifest (§4) and from the charter you ren
    project's inventories — this is the real work; follow `<kit>/INVENTORY-DERIVATION.md`
    (prefer registry imports; fail-closed helpers; full extension sets; POSIX keys).
 4. `<kit>/adopt-codebase-map.sh --scaffold` — scaffolds the map tree, seeds the shrink-only
-   baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing
+   baseline from live inventories AND the shrink-only `affordance-exempt.txt` from existing
    dossiers (so the graced `## Reuse affordance` check never retro-reds the fleet), installs the
    gate at GATE_FILE and runs it once (green on a fresh seed, by construction). `MAP_PY` overrides
    the launcher; unset, the kit RUNS each candidate (`python3`, `python`, `py`) and takes the first
@@ -569,7 +569,7 @@ or self-prune rule from your kickoff manifest (§4) and from the charter you ren
    wire through; list any layer with no symbol extractor in `.codebase-map.conf` `RECALL_DARK_LAYERS`
    so the lookup flags the gap instead of a falsely-confident "no seam fits".
    **DoD (at review):** run `python <kit>/map_diff.py <base>..<head> --drop-affordance-exempt`
-   — touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the
+   — touching a graced feature's files drops its `affordance-exempt.txt` grace mechanically, so the
    gate then demands its `## Reuse affordance` block (no human remembering).
    To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
@@ -1400,7 +1400,7 @@ it.
 
 - Codebase-map (only if §3b adopted): the `codebase-map` kit dir at whatever prefix you chose +
   project-owned `<kit>/map_extractors.py` · `.codebase-map.conf` at the ROOT · the gate at GATE_FILE ·
-  `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
+  `<MAP_ROOT>/` (FOUNDATION.md, baseline.txt, affordance-exempt.txt, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
   `.claude/skills/memory-recall/SKILL.md` (+ the kit's own `recall-opened.js`, `<prefix>/settings-merge.py`
   and the settings block only if the step-4 opt-in was taken). The index and query log live under the
@@ -2177,7 +2177,7 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   `<kit>/map_extractors.py` or `.codebase-map.conf`.
   When an overwrite first introduces the graced `## Reuse affordance` check, run
   `python <kit>/gen_map.py --seed-affordance-baseline` ONCE (or re-run the adopter) and
-  commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing
+  commit `<MAP_ROOT>/affordance-exempt.txt` in the same landing — that seed graces the existing
   dossiers so the new check does not retro-red them (it is a no-op once the file is present).
   Any overwrite that moves `KIT_CODEBASE_MAP_VERSION` also owes one `python <kit>/gen_map.py
   --write` in the same landing: the version rides `inventories.json`, `MAP.md` and `symbols.json`

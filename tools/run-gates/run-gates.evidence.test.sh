@@ -316,7 +316,10 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=297
+FLOOR_ASSERTIONS=302
+# RAISED 297 -> 302 by TOOL-dWitnessedBar-51: the declarative-key quarantine's precondition and two arms,
+# the two-worktree verdict prune's one and keep_tails' fence and cut's one. Counted one per `ok … || nope`
+# pair; this pass runs no suite.
 # RAISED 292 -> 297 by TOOL-dWitnessedBar-42: the every-worktree tail sweep, AC1's one, AC2's two, AC3's
 # one and the two-worktree control's one. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 287 -> 292 by TOOL-dWitnessedBar-40: the per-tree verdict's declines and reuse pair, AC1's two,
@@ -3172,6 +3175,69 @@ pm_rc=$(run_pm 0123456789abcdef0123456789abcdef01234567)
   && ok "AC10 a sha naming no commit exits 2 with a usage line and no bar" || { nope "AC10 an unknown sha did not refuse (rc=$pm_rc)"; print_pm_out; }
 rm -rf "$PM_T"
 # <<< post-merge arms
+
+# --- TOOL-dWitnessedBar-51 AC32: A DECLARATIVE KEY RELEASES NO QUARANTINE (S36, S48) ---------------------
+# The runner hashes a row less its DECLARATIVE_LEG_KEYS, read from its sibling held_halves.py, so a reuse
+# quarantine planted at `pa`'s row hash holds across a `purpose` reworded and is released by an `argv`
+# changed. The fixture's kit dir carries the sibling, as an install does. RED when the whole row is hashed:
+# the reworded purpose moves the hash and the quarantine line never prints.
+ru_repo
+cp "$ROOT/${PFX}${KIT}/held_halves.py" "$ROOT/${PFX}${KIT}/profile_bar.py" "$RU_T/${PFX}${KIT}/"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "purpose": "one"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null
+dk_q=$("$DC_PY" -c 'import hashlib, json, sys
+sys.path.insert(0, sys.argv[1])
+from held_halves import DECLARATIVE_LEG_KEYS as K
+r = next(l for l in json.load(open(sys.argv[2], encoding="utf-8")) if l["name"] == "pa")
+print(hashlib.sha1(json.dumps({k: v for k, v in r.items() if k not in K}, sort_keys=True).encode()).hexdigest(),
+      hashlib.sha1(b"pa").hexdigest()[:16])' "$RU_T/${PFX}${KIT}" "$RU_T/${PFX}gate-legs.json" | tr -d '\r')
+mkdir -p "$RU_GD/gate-cache" && printf '%s' "${dk_q% *}" > "$RU_GD/gate-cache/quarantine.${dk_q#* }"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" \
+  && ok "51-AC32 precondition: the quarantine planted at pa's row hash holds" \
+  || nope "51-AC32 the planted quarantine did not hold, so the arms below prove nothing"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "purpose": "two"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" && ! grep -q '^GATE reuse pa' "$REC_OUT" \
+  && ok "51-AC32 a reworded purpose leaves pa quarantined" || nope "51-AC32 a declarative key released the quarantine"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh", "moved"], "guard": ["ga/"], "purpose": "two"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" \
+  && nope "51-AC32 an argv changed did not release the quarantine" || ok "51-AC32 an argv changed releases it"
+ru_done
+
+# --- TOOL-dWitnessedBar-51 AC24: THE VERDICT PRUNE KEEPS ANOTHER WORKTREE'S LIVE VERDICT (S28) -----------
+# Worktree B's retained run record names tree T1; T1's verdict and an unnamed T2's are 31 days old. A run in
+# worktree A keeps T1 and removes T2. RED when the prune reads only its own worktree's runs (T1 goes) or
+# never prunes (T2 stays).
+ru_repo
+vp_b="$RU_T.wb"; git -C "$RU_T" worktree add -q "$vp_b" -b vp-b >/dev/null 2>&1
+vp_t1=1111111111111111111111111111111111111111; vp_t2=2222222222222222222222222222222222222222
+mkdir -p "$RU_GD/gate-verdict" "$RU_GD/worktrees/${vp_b##*/}/gate-run/vp-1"
+printf 'tree\t%s\n' "$vp_t1" > "$RU_GD/worktrees/${vp_b##*/}/gate-run/vp-1/verdict"
+printf 'verdict\tGREEN\n' > "$RU_GD/gate-verdict/$vp_t1"; printf 'verdict\tGREEN\n' > "$RU_GD/gate-verdict/$vp_t2"
+"$DC_PY" -c 'import os, sys, time
+t = time.time() - 31 * 86400
+for p in sys.argv[1:]:
+    os.utime(p, (t, t))' "$RU_GD/gate-verdict/$vp_t1" "$RU_GD/gate-verdict/$vp_t2"
+ru_run >/dev/null
+[ -f "$RU_GD/gate-verdict/$vp_t1" ] && [ ! -e "$RU_GD/gate-verdict/$vp_t2" ] \
+  && ok "51-AC24 a run in worktree A keeps the verdict B's run names and prunes the unnamed 31-day one" \
+  || { nope "51-AC24 the prune removed B's live verdict or kept the unnamed old one"; ls "$RU_GD/gate-verdict" | sed 's/^/      /'; }
+git -C "$RU_T" worktree remove --force "$vp_b" >/dev/null 2>&1; rm -rf "$vp_b"
+ru_done
+
+# --- TOOL-dWitnessedBar-51 AC30 (§8 F9): keep_tails.py --selftest, its fence and its character cut ------
+# The keep verb's self-test holds a tail opening three backticks, carrying a `**Hash:**` line and cut at the
+# last whole character within 8192 bytes: a longer fence, the fields read once, the hash the stored bytes'.
+# RED with a fixed three-backtick fence: the tail's own line closes it.
+kt_out=$("$DC_PY" "$ROOT/${PFX}${KIT}/keep_tails.py" --selftest 2>&1); kt_rc=$?
+[ "$kt_rc" = 0 ] && grep -q 'case fenced: ok' <<<"$kt_out" \
+  && ok "51-AC30 keep_tails.py --selftest holds the fence, the fields and the cut" \
+  || { nope "51-AC30 keep_tails.py --selftest exited $kt_rc"; printf '%s\n' "$kt_out" | sed 's/^/      /'; }
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

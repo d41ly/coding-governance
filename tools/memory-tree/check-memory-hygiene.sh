@@ -1113,6 +1113,11 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # homes, `live-rows.txt` and `severity-unlabelled.txt`, are never written while their seed is
   # empty, so the unit giving either a seed adds its name here.
   F:row-duplicates.txt|F:unbound-records.txt|F:dossier-decisions-empty.txt|F:date-cutoffs.txt) ;;
+  # The same class: the gate-lint kit's portability ledgers, which its `[[ledger]]` tables register and its
+  # seed writes at these paths at every adopter (TOOL-dWitnessedBar-24 S13), named here and not in a
+  # project's PROJECT_REGISTRY_EXTRA, the rule TOOL-dWitnessedBar-17 S7 follows (TOOL-dWitnessedBar-51 S13).
+  F:encoding-stdout-sites.txt|F:encoding-js-sites.txt|F:path-literal-sites.txt|F:quoting-sites.txt) ;;
+  F:shell-role.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what adopter nc carved this file out to do.
   #

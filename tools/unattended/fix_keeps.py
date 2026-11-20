@@ -15,14 +15,16 @@ declared or a staged path among the keeps under its check 49.
 
 `read_leg_files(rows, name, tool_root, tracked)` reads a leg's own files: each word of its `argv` in
 the leg manifest, `{prefix}` resolved to the tool root, that carries a `/`, no whitespace, and names
-a tracked file, in argv order, so the gate script is the first. It is the runner's argv-word census
+a tracked file, in argv order, so the gate script is the first, then the tracked files under a
+`fixtures/` or `fixture/` directory inside that script's own kit directory (TOOL-dWitnessedBar-51 S35). It is the runner's argv-word census
 without the census's extension filter, because the census selects shipped sources and this selects
 the files a check reads. The manifest is `gate-legs.json` in the directory holding the run-gates kit
 that `resolve_kit_dir` finds from here, the reading the memory-tree kit's `routed_commits.py` makes,
 and the tool root is that directory relative to the repository. An unknown leg is refused by name.
 
 `read_acceptance_files(spec_text, tracked)` reads the acceptance commands' own files: each word of a
-backticked token in the spec's acceptance-criteria section that names a tracked file, by its path or
+backticked token in the spec's acceptance-criteria section, found by heading text through the
+`acceptance_reader` block the spec-token checker owns, that names a tracked file, by its path or
 by a basename no other tracked file carries, and that is a check file: a `*.test.sh`, a name ending
 `selftest.py`, a `test_*.py`, or a file under a `fixtures/` directory. A product file a command
 probes is not kept, so a fix pass can still touch the code it fixes; a probe whose plants live
@@ -57,13 +59,14 @@ SAY = "fix-of"
 RUN_GATES = ("run-gates", "run-gates.sh")
 #: The check-file class of section 8 F2: these suffixes, a `test_*.py`, or a file under `fixtures/`.
 CHECK_SUFFIXES = (".test.sh", "selftest.py")
-HEADING = re.compile(r"^(#{1,6})\s")
-ACCEPTANCE_HEADING = re.compile(r"^(#{1,6})\s+(?:\d+\.\s*)?acceptance criteria\b", re.I)
-TICKED = re.compile(r"`([^`]+)`")
+#: The directory names whose tracked files inside the gate script's own kit directory a leg keeps.
+FIXTURE_DIRS = ("fixtures", "fixture")
 PLANTS = {"writes-test-file": "a fix pass of the leg fx canary declaring the leg's suite file",
           "writes-product": "a fix pass of the leg fx canary declaring the product file",
           "commit-test-file": "the product fix pass, then its suite file staged and --check-commit run",
           "acceptance-fixture": "a fix pass after a failed acceptance, its AC naming a fixture and a product file",
+          "light-profile": "the keeps of a Tier-1 spec whose acceptance section is its fifth, not its sixth",
+          "writes-fixture": "a fix pass of the leg fx canary declaring a file under its kit's fixtures/",
           "unknown-leg": "a fix pass naming a leg the manifest does not carry"}
 #: The fixture's tool root, its unit, its leg and its kit's files: `fx` is no directory of a real tool root.
 FX_ROOT = "tools"
@@ -256,6 +259,29 @@ def read_clean_env(**put):
     return env
 
 
+# >>> acceptance_reader -- canonical copy: check-spec-tokens.py in the gov tools dir (byte-identical; gated)
+# The acceptance section by its heading text and its backticked tokens: `fix_keeps.py` in the
+# unattended kit carries this block inline, and the parity table reds a copy that drifts.
+TICK = re.compile(r"`([^`\n]+)`")
+AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
+
+
+def extract_acceptance(text):
+    """The acceptance section by its HEADING TEXT — `extract_gates` with `AC_HEAD` in its place.
+
+    TOOL-aDeferredBar-2. Both bullet-loop joins read it: the ordinal read graded whatever sat sixth,
+    which under the light profile is the Gates section. None when the spec carries no such heading,
+    which the bullet loop reads as an empty population.
+    """
+    m = AC_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^## ", rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
+# <<< acceptance_reader
+
+
 def check_check_file(path):
     """True when the repo-relative `path` is a check file by section 8 F2's class."""
     parts = path.split("/")
@@ -265,18 +291,28 @@ def check_check_file(path):
 
 
 def read_leg_files(rows, name, tool_root, tracked):
-    """The leg `name`'s own files, in argv order: each word of its `argv`, `{prefix}` resolved against
-    `tool_root`, that carries a `/`, no whitespace, and is in `tracked`. LookupError naming an
-    unknown leg."""
-    tracked = set(tracked)
+    """The leg `name`'s own files: each word of its `argv`, `{prefix}` resolved against `tool_root`,
+    that carries a `/`, no whitespace, and is in `tracked`, in argv order; then every tracked file under
+    a `fixtures/` or `fixture/` directory inside the gate script's own kit directory, the first such
+    word's `<tool root>/<kit>/`, sorted (TOOL-dWitnessedBar-51 S35). A product module the script imports
+    is not kept. LookupError naming an unknown leg."""
+    tracked = sorted(set(tracked))
     row = next((r for r in rows if isinstance(r, dict) and r.get("name") == name), None)
     if row is None:
         raise LookupError("no leg named '%s' in the leg manifest, so its own files cannot be read" % name)
-    kept = []
+    kept, present = [], set(tracked)
     for word in row.get("argv") or []:
         word = resolve_prefix_token(str(word), tool_root)
-        if "/" in word and not any(c.isspace() for c in word) and word in tracked and word not in kept:
+        if "/" in word and not any(c.isspace() for c in word) and word in present and word not in kept:
             kept.append(word)
+    if kept:
+        root = (tool_root.strip("/") + "/") if tool_root not in ("", ".") else ""
+        rest = kept[0][len(root):] if kept[0].startswith(root) else kept[0]
+        kit = root + rest.split("/", 1)[0] + "/" if "/" in rest else kept[0].rsplit("/", 1)[0] + "/"
+        for path in tracked:
+            inner = path[len(kit):].split("/")[:-1] if path.startswith(kit) else ()
+            if any(d in FIXTURE_DIRS for d in inner) and path not in kept:
+                kept.append(path)
     return kept
 
 
@@ -290,25 +326,17 @@ def read_leg_tests(rows, name):
 def read_acceptance_files(spec_text, tracked):
     """The check files the backticked tokens of the spec's acceptance-criteria section name, in the
     order they are named: a word that is a tracked path, or a bare basename exactly one tracked
-    file carries, kept when `check_check_file` holds for it."""
+    file carries, kept when `check_check_file` holds for it. The section is found by heading text and
+    its tokens read by the `acceptance_reader` block, the spec-token checker's own reader carried
+    inline (TOOL-dWitnessedBar-51 S19), so a light-profile spec's section is read wherever it sits."""
     tracked = list(tracked)
     paths = set(tracked)
     names = {}
     for path in tracked:
         names.setdefault(path.rsplit("/", 1)[-1], []).append(path)
-    section, level = [], 0
-    for line in spec_text.splitlines():
-        head = HEADING.match(line)
-        if head and level and len(head.group(1)) <= level:
-            level = 0
-        ac = ACCEPTANCE_HEADING.match(line)
-        if ac:
-            level = len(ac.group(1))
-            continue
-        if level:
-            section.append(line)
+    section = extract_acceptance(spec_text.replace("\r\n", "\n")) or ""
     kept = []
-    for token in TICKED.findall("\n".join(section)):
+    for token in TICK.findall(section):
         for word in token.split():
             word = word.strip("'\"")
             path = word if word in paths else None
@@ -514,6 +542,8 @@ def check_fixture_plant(plant, root, bad):
     def run_driver(*argv):
         return run_plant_driver(bash, driver, repo, *argv)
 
+    if plant == "light-profile":
+        return check_light_profile(repo, bad)
     # a FIRST preflight refuses a carried branch, so local main stands at HEAD for that call alone
     run_fixture_git(repo, "update-ref", "refs/heads/main", "HEAD")
     rc, said = run_driver("--preflight", "tFix", "--keepalive-id", "k1")
@@ -526,11 +556,13 @@ def check_fixture_plant(plant, root, bad):
     run_md = pathlib.Path(repo, FX_RUN)
     leg = "leg:" + FX_LEG
     dispatch = ("--dispatch", "tFix", "--pass", FX_UNIT)
-    if plant in ("writes-test-file", "unknown-leg"):
+    if plant in ("writes-test-file", "writes-fixture", "unknown-leg"):
         before = run_md.read_bytes()
         red, needles = ((leg, ("UNATTENDED check 49 FAILED", FX_SUITE, "gov-tester", "spec-wrong", "feature.fx"))
-                        if plant == "writes-test-file" else ("leg:nope", ("UNATTENDED check 49 FAILED", "nope")))
-        writes = FX_SUITE if plant == "writes-test-file" else FX_PRODUCT
+                        if plant == "writes-test-file" else
+                        (leg, ("UNATTENDED check 49 FAILED", FX_FIXTURE)) if plant == "writes-fixture" else
+                        ("leg:nope", ("UNATTENDED check 49 FAILED", "nope")))
+        writes = {"writes-test-file": FX_SUITE, "writes-fixture": FX_FIXTURE}.get(plant, FX_PRODUCT)
         rc, said = run_driver(*dispatch, "--writes", writes, "--fix-of", red)
         if rc == 0 or not all(n in said for n in needles):
             bad.append("--dispatch --fix-of %s --writes %s exited %d, not non-zero printing %s" % (
@@ -577,6 +609,20 @@ def check_fixture_plant(plant, root, bad):
     rc, said = run_driver(*dispatch, "--writes", FX_PRODUCT, "--fix-of", "acceptance")
     if rc != 0 or len(read_run_rows(repo, "fix-of")) != 1:
         bad.append("--dispatch --fix-of acceptance --writes %s exited %d, not 0 with one fix-of row" % (FX_PRODUCT, rc))
+    return None
+
+
+def check_light_profile(repo, bad):
+    """`light-profile`: a Tier-1 spec with no production-readiness section, its acceptance section the
+    fifth, read for its tokens by heading text; the keeps hold the fixture its AC names."""
+    light = FX_SPEC_TEXT.replace("## 6. Acceptance criteria", "## 5. Acceptance criteria").replace(
+        "## 7. Gates", "## 6. Gates").replace("## 8. Open questions", "## 7. Open questions")
+    write_fixture_files(repo, {"memory/builds/tFix/spec/light.md": light})
+    tracked = read_tracked_files(repo)
+    got = read_acceptance_files(light, tracked)
+    print("%s: light-profile keeps · %s" % (SAY, " ".join(got) or "(nothing)"))
+    if got != [FX_FIXTURE]:
+        bad.append("the light-profile spec's acceptance section kept [%s], not %s alone" % (" ".join(got), FX_FIXTURE))
     return None
 
 

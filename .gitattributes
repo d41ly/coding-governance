@@ -285,8 +285,8 @@ tools/unattended/*.md text eol=lf
 tools/memory-tree/*.template.md text eol=lf
 
 memory/map/generated/* text eol=lf
-memory/map/baseline.toml text eol=lf
-memory/map/affordance-exempt.toml text eol=lf
+memory/map/baseline.txt text eol=lf
+memory/map/affordance-exempt.txt text eol=lf
 
 # govkit — the deployer's registry and its per-entry descriptors. Pinned for the same reason every
 # other declaration file here is: these are READ by a tool, and a CR byte in a conf or a descriptor
