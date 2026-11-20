@@ -1,6 +1,6 @@
 # TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close
 
-**Status:** OPEN · rev-1 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling
+**Status:** OPEN · rev-2 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -45,6 +45,8 @@ byte-identical to gov's sources, and the rest on four deployer defects the re-ad
 - A gov registry shipped to adopters: gov's own rows name gov's paths and stay home.
 - A kit file the adopter edited: its bytes no longer match the receipt and it is graded as before.
 - The seed-to-engine template move and `apply`'s two bar runs, also seen on the re-adoption.
+- The method-carriers leg, a shell check that resolves no Python: an adopter declares the kit files
+  that cite the method in its own registry, as `adopt-memory-tree.sh --scaffold` measures them.
 
 ### Edges
 
@@ -80,27 +82,27 @@ successor declares the same leg name, which the existing claim path keeps.
 
 ## 5. Acceptance criteria
 
-- **AC1** — When `python scripts/gate-lint/sh_hygiene.py --temp-names` runs in nicocares' re-adoption
-  worktree with this unit's scanner, it names no site in a receipt-claimed engine file and prints the
+- **AC1** — When `python tools/gate-lint/sh_hygiene.py --temp-names` runs with nicocares' re-adoption
+  worktree as its working directory, it names no site in a receipt-claimed engine file and prints the
   count it dropped. Red when: the unchanged scanner runs there, which listed 59 sites in 19 files.
-- **AC2** — When `python scripts/lexicon/lexicon.py` runs in the same worktree with this unit's
-  lexicon, no offender line names a receipt-claimed engine file and `lock` is no undeclared extension.
-  Red when: the unchanged lexicon runs there, which counted 2073 verb offenders over a pin of 1898.
-- **AC3** — When `python scripts/memory-tree/check-arms.py` runs in the same worktree with this unit's
-  check-arms, no HYGIENE line names `TOOL-aSparedSpawn-14`. Red when: the unchanged check-arms runs.
-- **AC4** — When `python scripts/policy/check_policy.py` runs in the same worktree with this unit's
-  policy kit, no cap census row says its enforcer is not a file. Red when: the unchanged census runs,
-  which named 11 rows.
+- **AC2** — When `python tools/lexicon/lexicon.py` runs with the same working directory, no offender
+  line names a receipt-claimed engine file and `lock` is no undeclared extension. Red when: the
+  unchanged lexicon runs there, which counted 2073 verb offenders over a pin of 1898.
+- **AC3** — When `python tools/memory-tree/check-arms.py --check` runs with the same working
+  directory, no HYGIENE line names `TOOL-aSparedSpawn-14`. Red when: the unchanged check-arms runs.
+- **AC4** — When `python tools/policy/check_policy.py --fixture census-default-adopter` runs, the
+  plant that moves an installed enforcer one directory above its kit home, with its receipt row, finds
+  it through that row. Red when: the unchanged census runs, which names the moved enforcer's rows.
 - **AC5** — When `govkit update --write` runs against a target whose receipt emitted the
   `agent-instructions wiring` leg, the runner and the restamped receipt no longer carry it. Red when:
   the unchanged govkit runs, which kept the row and left the leg exiting 127.
 - **AC6** — When `python tools/run-gates/pass_legs.py --check` runs in inCMS' re-adoption worktree
-  with `GATE_LEGS` unset, it reads `scripts/run-gates/gate-legs.json`. Red when: the unchanged reader
-  runs there, which refused the object-shaped `scripts/gate-legs.json`.
+  with `GATE_LEGS` unset, it reads the manifest `[gate_runner].file` names. Red when: the unchanged
+  reader runs there, which refused inCMS' own object-shaped sibling manifest.
 
 ## 6. Gates
 
-`routed commits name a specced unit` · `shell-hygiene selftest` · `lexicon selftest` · `check-arms selftest` · `policy fixtures` · `govkit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers`
+`routed commits name a specced unit` · `shell-hygiene selftest` · `lexicon selftest` · `check-arms selftest` · `policy fixtures` · `govkit selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `kit version markers` · `scratch-guard self-test` · `routed-commits selftest` · `codebase-map kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest`
 
 ## 7. Open questions
 
@@ -109,3 +111,5 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-20 · AC1 to AC4 run gov's own checkers, AC4 over the census fixture's plant, and §6
+  names every leg whose guard the touched files trip, and §3 leaves the method-carriers leg out.
