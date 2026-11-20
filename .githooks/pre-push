@@ -1669,7 +1669,10 @@ read_bar_file() {
   [ -f "$1" ] || return 0
   # A `selection.<n>` value is the row past its first TAB, byte for byte (TOOL-dWitnessedBar-56 S1): `read`
   # with a TAB IFS would drop an empty last field's TAB, and the row would no longer hash as written.
+  # A line with no TAB is no key at all (TOOL-dWitnessedBar-63 S19): a bare `selection.<n>` would
+  # otherwise read its own key as its value.
   while IFS= read -r ln; do
+    case "$ln" in *$'\t'*) ;; *) continue ;; esac
     IFS=$'\t' read -r k v <<<"$ln"
     case "$k" in selection.[1-9]*) v=${ln#*$'\t'} ;; esac
     case "$k" in

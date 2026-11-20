@@ -2422,8 +2422,10 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     if _regen is not None:
         _rg_spec.loader.exec_module(_regen)
 
-    # A resolved path that is absolute or holds a `..` segment is refused too, by the containment
-    # pattern regen's `check_when` and the shell reader apply (TOOL-dWitnessedBar-62 S22).
+    # A resolved path is graded by govkit's one containment rule, `derive_contained_rel`, which folds
+    # every `\` to `/` and refuses a `.`, `..` or `../` climb, a rooted, UNC or drive-absolute path and a
+    # colon anywhere, with unit 62 S22's `..`-segment refusal kept on the folded path
+    # (TOOL-dWitnessedBar-63 S10): regen's `check_when` and the shell reader apply the same rule.
     def _check_exists_refused(w):
         if _regen is None or not w:
             return True
@@ -2431,7 +2433,7 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
             rel = _regen.resolve_argv([w], {t: "x" for t in _regen.TOKENS}, "when")[0]
         except _regen.Refusal:
             return True
-        return rel.startswith("/") or bool(re.match(r"[A-Za-z]:", rel)) or ".." in rel.split("/")
+        return upgrade_steps.derive_contained_rel(rel) is None or ".." in rel.replace("\\", "/").split("/")
     _n_gen = 0
     for eid, (d, _dpath) in sorted(descs.items()):
         _gtoml = [(str(_r.get("path") or ""), str(_r.get("generator") or ""), str(_r.get("when") or ""))

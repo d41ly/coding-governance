@@ -1590,12 +1590,14 @@ build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad
 git commit -q --allow-empty -m c1 >/dev/null 2>&1
 write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
 # TOOL-dWitnessedBar-58 AC1 (S1): this push's bar is a capturing stub in place of $green, exiting 0 as it
-# does, and writing the GATE_BASE_FROM its own environment holds to a file under the fixture's git dir:
-# the bar command is where the hook's export is still visible, since the runner unsets it before any leg.
-# An absent file fails the arm. Red against a hook that drops the export on the inherited-green branch.
-ir_bf="$(git rev-parse --absolute-git-dir)/ir-base-from"; rm -f "$ir_bf"
-printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_BASE_FROM-unset}" > "%s"\nexit 0\n' "$ir_bf" > "$tmp/ir-ac4/stub-bf.sh"
-_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $tmp/ir-ac4/stub-bf.sh" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
+# does, and writing the GATE_BASE_FROM its own environment holds to the suite scratch file `IR_BF_ENV`
+# names, rooted at `$tmp` as `docstub`'s `$DOCS_ENV` is (TOOL-dWitnessedBar-63 S28), never under the
+# fixture's git dir: the bar command is where the hook's export is still visible, since the runner unsets
+# it before any leg. An absent file fails the arm. Red against a hook that drops the export on the
+# inherited-green branch.
+ir_bf="$tmp/ir-ac4/ir-base-from"; rm -f "$ir_bf"
+printf '#!/usr/bin/env bash\nprintf "%%s" "${GATE_BASE_FROM-unset}" > "$IR_BF_ENV"\nexit 0\n' > "$tmp/ir-ac4/stub-bf.sh"
+_o=$( GATE_SELFTESTS= IR_BF_ENV="$ir_bf" GOV_GATE_CMD="bash $tmp/ir-ac4/stub-bf.sh" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"at base ${IR_R:0:8}"*) ok "IR AC4 an inherited green at the remote sha scopes the gate" ;;
   *) bad "IR AC4 expected a scoped gate naming the inherited green, got: $_o" ;;
@@ -3031,5 +3033,20 @@ case "$BP_RC|$(read_token)|$BP_OUT" in
   *) bad "BP S6 expected a bypass-refused refusal naming the off-node backends, got rc $BP_RC token $(read_token): $BP_OUT" ;;
 esac
 cd "$pfx_home" || exit 2
+
+# ---- TOOL-dWitnessedBar-63 AC11 (S19): A LINE WITH NO TAB IS AN ABSENT KEY TO THE HOOK'S READERS -------
+# `read_bar_file` and `read_green_file`, cut from the hook by their awk ranges and sourced alone, read one
+# record holding `sha<TAB>abc`, a bare `selection.1` line and a bare `reused` line: `bg_sel_rows` stays
+# empty and `rec_reused` empty, and `sha` reads abc, the sentinel that the cut ran. RED against a
+# `read_bar_file` taking a no-TAB line's key as its value. WHAT THIS DOES NOT CHECK: the Python reader,
+# which verdict_backends.py's `key-no-tab` plant holds.
+nt_fns=$(awk '/^read_bar_file\(\)/,/^}/; /^read_green_file\(\)/,/^}/' "$SRC/.githooks/pre-push")
+printf 'sha\tabc\nselection.1\nreused\n' > "$tmp/nt-record"
+nt_out=$( eval "$nt_fns"; read_bar_file "$tmp/nt-record"; read_green_file "$tmp/nt-record"
+  printf 'rows=%s sha=%s reused=[%s]' "${#bg_sel_rows[@]}" "$bg_sha" "$rec_reused" )
+case "$nt_out" in
+  "rows=0 sha=abc reused=[]") ok "TOOL-dWitnessedBar-63 AC11 a bare selection.1 and a bare reused line read as absent keys in the hook" ;;
+  *) bad "TOOL-dWitnessedBar-63 AC11 a no-TAB line was read as a key by the hook's readers: $nt_out" ;;
+esac
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

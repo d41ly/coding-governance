@@ -918,19 +918,30 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
       t && /^when[ \t]*=/         { w = val($0) }
       END { flush() }' "${_rg_fs[@]}" >"$_rg_rf" 2>/dev/null
   [ "${#_rg_fs[@]}" -gt 0 ] || : >"$_rg_rf"
+  # Each row is read WHOLE and cut at its TABs by expansion (TOOL-dWitnessedBar-63 S22): a TAB IFS is
+  # whitespace to `read`, so it folds an empty generator and the `when` would land in its place. The
+  # `when` is graded on every row carrying a path, BEFORE the generator test, so a generator-less row
+  # with a malformed `when` is named too. An `exists:` path has every `\` folded to `/` before the
+  # containment test, and a colon anywhere refuses it (S9, §8 F6): `..\x`, `\\server\share` and `a:b`
+  # are skipped with the line, as govkit's `derive_contained_rel` and regen's `check_when` refuse them.
+  local _rg_ln
   {
-    while IFS=$'\t' read -r _rg_d _rg_p _rg_g _rg_w; do
+    while IFS= read -r _rg_ln; do
+      _rg_d=${_rg_ln%%$'\t'*}; _rg_ln=${_rg_ln#*$'\t'}
+      _rg_p=${_rg_ln%%$'\t'*}; _rg_ln=${_rg_ln#*$'\t'}
+      _rg_g=${_rg_ln%%$'\t'*}; _rg_w=${_rg_ln#*$'\t'}
       _rg_d=${_rg_d#"$_rg_root/"}; _rg_krel=${_rg_d%/kit.toml}
-      [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
+      [ -n "$_rg_p" ] || continue
       case "$_rg_w" in
         "") ;;
         exists:?*)
           _rg_kv=${_rg_w#exists:}
           _rg_kv=${_rg_kv//\{prefix\}/${_rg_tool:-.}}; _rg_kv=${_rg_kv//\{kit\}/$_rg_krel}
           _rg_kv=${_rg_kv//\{memory_root\}/$_rg_mem}; _rg_kv=${_rg_kv//\{map_root\}/$_rg_map}
+          _rg_kv=${_rg_kv//\\//}
           case "$_rg_kv" in
             *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] when with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
-            /*|[A-Za-z]:*|..|../*|*/..|*/../*) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+            /*|*:*|..|../*|*/..|*/../*) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
           esac
           [ -e "$_rg_root/$_rg_kv" ] || continue ;;
         *:*=*)
@@ -941,6 +952,7 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
           [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue ;;
         *) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
       esac
+      [ -n "$_rg_g" ] || continue
       [ -n "$_rg_map" ] || _rg_p=${_rg_p//\{map_root\}\//}
       _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
       _rg_p=${_rg_p//\{kit\}/$_rg_krel}

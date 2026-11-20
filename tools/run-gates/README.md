@@ -349,7 +349,9 @@ and a green earned over an uncommitted regeneration could never be reused. A tre
 descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
 check with a line naming the knob. A stale output then reds only where its own leg runs in that bar,
 and a guard can skip that leg, so a skip can turn a refusal into a green. The pre-push hook therefore
-scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6).
+scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6), and from the bars whose green they record
+the hook, post-merge (`PM_SCRUB`) and the unattended driver (`_gknobs`) all drop `GATE_REGEN_CHECK`
+(TOOL-dWitnessedBar-60).
 
 ### The lander regenerates over its merged tree
 
@@ -652,9 +654,11 @@ It makes a detached scratch worktree of `<sha>` at `<common-dir>/gate-pm.<pid>`,
 `bash <kit>/run-gates.sh`) and runs it with `GATE_FULL=1` through this kit's own
 `run-gates.sh --hold`, so it queues on the host turnstile like any other bar. Only three keys of that
 file apply: `GOV_GATE_CMD`, `GATE_SELFTESTS` and `GOV_PYTHON`, and a line naming `GOV_GATE_CMD` in
-any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. The caller's `GIT_DIR` family,
-interpreter knobs, arm seams, `GATE_REUSE`, `GATE_RUN_ID` and `GATE_TURNSTILE_HOLDER` are dropped
-and named on one `post-merge: not honoured from the environment:` line. The remote is the lander's
+any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. Every knob `PM_SCRUB` in
+`post-merge.sh` lists is dropped and named on one `post-merge: not honoured from the environment:`
+line: the caller's `GIT_DIR` family, interpreter knobs, arm seams, the reuse modes, `GATE_RUN_ID`,
+`GATE_TURNSTILE_HOLDER`, and every knob the pre-push hook scrubs or clears for a bar, which the gov
+suite's scrub parity arm holds it to (TOOL-dWitnessedBar-60). The remote is the lander's
 ladder (`GOV_REMOTE`, which `--remote` sets), and the sha must be an ancestor of that remote's
 default branch as this clone last fetched it.
 

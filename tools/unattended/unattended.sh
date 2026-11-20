@@ -12076,8 +12076,10 @@ dod_met() { # slug · run-state file · item · checker
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
       # TOOL-aFrugalTurnstile-12 S1 - THE BAR'S KNOBS ARE SCRUBBED FROM EVERY CALL BELOW. Its rc-0
       # result is a gates-green the close trusts, so a GATE_LEGS subset or a GATE_REUSE run inherited
-      # from the driver would certify the whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
-      # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
+      # from the driver would certify the whole bar for this tree. The list carries every name in the hook's
+      # BAR_SCRUBBED_KNOBS and BAR_CLEARED_KNOBS, plus its docs knob; unit 60's `check_bar_scrub_parity` arm in
+      # run-gates.gov.test.sh reds when the hook names one this list lacks (TOOL-dWitnessedBar-63 S29), since
+      # the parity arm in unattended.test.sh reads BAR_SCRUBBED_KNOBS alone. `GATE_REUSE_LINEAGE` too, which
       # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
       local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY" _gset=""
       local -a _gscrub=(-u GATE_WALL)

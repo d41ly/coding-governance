@@ -36,9 +36,9 @@ the next `<date>-build-<unit>-widen-<n>.md` of the build the unit id names throu
 count 1 for a new key and one above the row's for a key it holds; under `refuse` it writes nothing.
 `never gains` grades every `widened:` row of a `shrink-only` or `ceiling` population against its record:
 tracked, naming the population and the key, its Reason non-empty, and under `refuse` tracked at the base
-too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per root `.<name>.conf` and
-`*_PIN` key, its count the `<KEY>=` assignments of that key, each conf read from the working tree, tracked
-or not, so a conf copied before the first commit is seeded; an ignored one is never read (TOOL-dWitnessedBar-52).
+too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per `.<name>.conf` and
+`*_PIN` key of the root confs in the working tree, tracked or not, its count the `<KEY>=` assignments of
+that key, so a conf copied before the first commit is seeded; an ignored one is never read (TOOL-dWitnessedBar-52).
 `measure-cutoffs` is the `date-cutoffs` seed over the same conf walk: one TAB row per `*_CUTOFF` key, its
 count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S6), and so a value that is
 no real day, `none` say, with one stderr line naming it (TOOL-dWitnessedBar-51 S37). A base leg's
@@ -507,7 +507,7 @@ def run_rename(root):
 
 
 def read_root_confs(root):
-    """-> the root `.<name>.conf` files of `root`'s working tree, tracked or not: what
+    """-> the root confs in the working tree of `root`, each a `.<name>.conf`, tracked or not: what
     `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'` lists, so a conf an adopter has
     copied but not yet committed is read before its first commit (TOOL-dWitnessedBar-52 S1). The glob
     magic keeps `*` from crossing `/`, so a nested conf is not one. Each listed path is kept once, and
@@ -529,9 +529,8 @@ def read_root_confs(root):
 
 
 def read_root_conf_lines(root):
-    """-> [(conf, line)]: each line of every root `.<name>.conf` `read_root_confs` lists, read from the
-    working tree, the one conf walk `measure_scalar_pins` and `measure_cutoffs` share (TOOL-dWitnessedBar-17
-    S6)."""
+    """-> [(conf, line)]: each line of the root confs in the working tree that `read_root_confs` lists,
+    the one conf walk `measure_scalar_pins` and `measure_cutoffs` share (TOOL-dWitnessedBar-17 S6)."""
     out = []
     for conf in read_root_confs(root):
         try:
@@ -543,8 +542,8 @@ def read_root_conf_lines(root):
 
 
 def measure_scalar_pins(root):
-    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in each root
-    `.<name>.conf` `read_root_confs` lists, read from the working tree."""
+    """-> {(conf, key): count}: every `<KEY>=` assignment of a `*_PIN` key at a line's start in the
+    root confs in the working tree that `read_root_confs` lists."""
     counts = {}
     for conf, line in read_root_conf_lines(root):
         m = PIN_RE.match(line)
@@ -554,8 +553,8 @@ def measure_scalar_pins(root):
 
 
 def measure_cutoffs(root):
-    """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in each root
-    `.<name>.conf` `read_root_confs` lists, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
+    """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in the
+    root confs in the working tree that `read_root_confs` lists, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
     `BLANK_CUTOFF`, the `date-cutoffs` seed (TOOL-dWitnessedBar-17 S6). A value that is neither blank
     nor a real `%Y-%m-%d` day, `none` say, reads as `BLANK_CUTOFF` too, with one stderr line naming the
     conf and key, so a malformed cutoff reads as the latest one and its row's `count rose`, never as a
