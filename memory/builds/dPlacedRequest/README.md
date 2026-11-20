@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 69 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 69 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -163,7 +163,7 @@ ids TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100 TOOL-d
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dPlacedRequest-95 — the kickoff hook never runs a checker it resolved from its target's tree](spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-20 |
 | [TOOL-dPlacedRequest-96 — a foreign stale lease can be taken over again, and its hint prints](spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-20 |
-| [TOOL-dPlacedRequest-97 — the lease fence knows an id-less run's own claim by its keepalive](spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md) | 37 | 2 | INPROGRESS | rev-2 | 2026-11-20 |
+| [TOOL-dPlacedRequest-97 — the lease fence knows an id-less run's own claim by its keepalive](spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md) | 37 | 2 | CLOSED | rev-2 | 2026-11-20 |
 | [TOOL-dPlacedRequest-98 — the fenced-landing arms fail, never skip, when their fixture fails](spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-20 |
 | [TOOL-dPlacedRequest-99 — the closing review's minors: every plant on a gate, a resolver arm, honest re-fence and card outcomes, a re-priced row and three loose ends](spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md) | 37 | 2 | DEFERRED | rev-2 | 2026-11-20 |
 | [TOOL-dPlacedRequest-100 — the entry claim takes over a stale build lease instead of waiting on it](spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md) | 38 | 2 | DEFERRED | rev-1 | 2026-11-20 |
