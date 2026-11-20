@@ -243,7 +243,12 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=21
+FLOOR_ASSERTIONS=35
+# RAISED 25 -> 35 by TOOL-dWitnessedBar-56 on 2026-11-20: its seven local-hook plants and three peer
+# plants in the verdict backends' plant loop, one assertion each. Counted by reading; no suite ran.
+# RAISED 21 -> 25 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-43, whose pass left the
+# floor where it was: its four peer plants, peer-signed, peer-unsigned, peer-self-tag and
+# peer-swapped-manifest, one assertion each in the same loop. Counted by reading; no suite ran.
 # Raised 20 -> 21 by TOOL-dWitnessedBar-22, which adds G11, the `tests`-to-claims compare.
 # Raised 19 -> 20 by TOOL-dWitnessedBar-12, which adds G10, the leg tags' shape and uniqueness arm.
 # Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
@@ -777,10 +782,17 @@ a=$((a+1))
 # and the witness rule's writer, liveness, failed-read and source fields. The peer plants
 # (TOOL-dWitnessedBar-43 AC1, AC2, AC4) run over throwaway SSH keys: a signed GREEN standing, an unsigned
 # tag, a node line another node's key signed, and a candidate emptying the leg manifest read HELD under
-# dispatch-closure and workflow; each prints `not run` where no ssh-keygen runs. WHAT THIS DOES NOT CHECK: a
+# dispatch-closure and workflow; each prints `not run` where no ssh-keygen runs. TOOL-dWitnessedBar-56
+# (AC6, AC13): the local-hook reader reads NONE over a full GREEN its two record predicates refuse, the
+# reuse pair (`reused-cache`, `reused-alone`, `no-pair`) and the selection (`no-selection`,
+# `edited-selection`, `underived-selection` at the landed revision), and GREEN over `clean`; a peer ref
+# the fetch cannot bring in and a verify with no ssh-keygen read DEAD PROBE, and a tag edited after it
+# was signed NONE naming the bad signature. WHAT THIS DOES NOT CHECK: a
 # real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
-for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 peer:1 peer-signed:0 peer-unsigned:2 \
-               peer-self-tag:1 peer-swapped-manifest:0 remote-green:0 \
+for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache:1 reused-alone:1 no-pair:1 \
+               no-selection:1 edited-selection:1 underived-selection:1 clean:0 peer:1 peer-signed:0 peer-unsigned:2 \
+               peer-self-tag:1 peer-swapped-manifest:0 peer-tip-missing:1 peer-no-ssh-keygen:1 \
+               peer-bad-signature:1 remote-green:0 \
                swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
   a=$((a+1))
   vb_plant=${vb_case%%:*}

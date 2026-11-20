@@ -964,8 +964,10 @@ worktree of a clone writes one directory and a tail outlives the worktree that p
 run sweep, the tails directory keeps every hash a retained run of ANY worktree of the clone names, read
 from `<common-dir>/gate-run/*/verdict` and `<common-dir>/worktrees/*/gate-run/*/verdict`, and every
 tail modified less than `TAIL_GRACE_S` ago, seven days, so a tail a bar still running in another
-worktree wrote before its verdict names it survives; the sweep prints one `run-gates: tails swept` line
-with the counts it removed and kept. **What the sweep does not check:** a sweep that reads a tail's
+worktree wrote before its verdict names it survives. A staging temp the writer leaves when a bar dies,
+any name opening `tail.` (`tail.<n><n>.tmp`, `tail.XXXXXXXX`, either with `.cut`), is never kept as a
+tail: it is removed once older than `TAIL_GRACE_S`, and a fresh one is kept (TOOL-dWitnessedBar-56 S13).
+The sweep prints one `run-gates: tails swept` line with the counts it removed and kept. **What the sweep does not check:** a sweep that reads a tail's
 time just before another worktree's bar freshens it can still remove it.
 
 **A size warning a passing leg prints is shown, not buried** (TOOL-dWitnessedBar-29). A green leg's
@@ -1057,7 +1059,7 @@ and changes no reader:
 | File | Written | Keys this runner writes |
 |---|---|---|
 | `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; `tail.<n>` per failing leg; and `warned` with one `warn.<k>` per size warning a passing leg printed (see "The run record") |
-| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `selection` and `selection.<n>` (below), `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `selection`, `selection.<n>` and `selection_ignored` (below), `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
 
 The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
 written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
@@ -1065,20 +1067,28 @@ written through a temp name and a rename. A full run writes the bare tree file a
 tree, and the last run of a tree in a slot wins, GREEN or RED. A run that started dirty or whose tree
 moved writes none, and says so on one line; a written one prints its path.
 
-**The selection it ran under** (TOOL-dWitnessedBar-41). `selection` is the `git hash-object --stdin` of
-the CANONICAL TEXT of the file `GATE_SELECTION` named: every line whose first TAB field is `held`, in
-file order, one trailing CR cut, each LF-terminated, a row the runner printed and ignored kept. It reads
-`none` when the run read no `GATE_SELECTION` or the knob named no file. One `selection.<n>` per line of
-that text, `<n>` from 1, holds `<leg> · <source> · <note>`, the line's `held` field cut and each TAB
-after it turned into ` · `. The hook rebuilds the text from `selection.1` upward, hashes it the same way,
-and runs `verdict_flow.py select --check --selection` over it at R, at most once per hash per push: a
-record with no `selection` key, rows that do not hash to it, or a row R does not derive is not adopted.
+**The selection it ran under** (TOOL-dWitnessedBar-41, -56). `selection` is the `git hash-object --stdin`
+of the CANONICAL TEXT of the file `GATE_SELECTION` named: the rows the runner ACCEPTED and only those, in
+file order, one trailing CR cut, each LF-terminated. A row is accepted when it has four or five TAB
+fields, the first `held`, a source of `quarantine` or `level`, a fifth if present `hold` or `run`, and a
+leg the manifest carries, the field rule `verdict_flow.py`'s `read_selection` applies. Every other row is
+printed, left out of the text and the keys, and counted as `selection_ignored <n>`; a blank or `#` line
+is no row. It reads `none` when the run read no `GATE_SELECTION` or the knob named no file, and
+`selection_ignored` reads 0. One `selection.<n>` per accepted row, `<n>` from 1, holds
+`<leg><TAB><source><TAB><note>`, and `<TAB><mode>` where the row has a fifth field: the row with its
+`held` field cut and its TABs kept, so a ` · ` inside a note round-trips. The hook rebuilds each row as
+`held<TAB>` plus that value, hashes the text the same way, and runs `verdict_flow.py select --check
+--selection` over it at R, at most once per hash per push: a record with no `selection` key, rows that do
+not hash to it, or a row R does not derive is not adopted. A record written before the TAB form, its
+values joined with ` · `, rebuilds to another hash and is refused once, so the first push of such a tree
+runs its bar.
 
 **Two more runs write none** (TOOL-dWitnessedBar-40), each saying why on one line. A run in docs mode
 (`GATE_DOCS_BASE` resolved) ran fewer legs than a scoped bar from the same base, which the record
 cannot say: `run-gates: no gate-verdict written — docs mode`. A scoped run whose base is an inherited
 green rests on a base no full record names: `run-gates: no gate-verdict written — scoped on an
-inherited green`. The runner learns that from `GATE_BASE_FROM`, `inherited` or `full` (any other
+inherited green, as the run record header's base_from row reads`; that header row carries a third field,
+`inherited`, beside its source (TOOL-dWitnessedBar-56 S10). The runner learns that from `GATE_BASE_FROM`, `inherited` or `full` (any other
 value reads `full`), read once and removed before any leg starts, as `GATE_RUN_ID` is; the pre-push
 hook exports it beside `GATE_BASE` in its inherited-green branch, and the unattended close on its
 scoped bar where `--decide` named `-` as the full base.
@@ -1108,7 +1118,7 @@ under that kit), `off_node` (a boolean) and `owner`, read across every `<prefix>
 
 | Row | Reader | `off_node` | Stands when |
 |---|---|---|---|
-| `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN`; the `.scoped` slot never counts |
+| `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN` and passes the hook's two record predicates, the reuse pair and the selection re-derived at the landed revision (TOOL-dWitnessedBar-56 S7, S8); the `.scoped` slot never counts |
 | `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `node` is not this node's `GOV_NODE`, signed by the key `verdict.peer.signers` registers for that `node`, whose `verdict` is `GREEN`, and whose pinned files derive `verdict.remote.pin` under `dispatch-closure` (TOOL-dWitnessedBar-43) |
 | `remote-ci` | `read_remote_verdict` in `remote_verdict.py` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
 
@@ -1144,8 +1154,10 @@ members, one allowed-signers line `<node tag> <key type> <base64 key>` each with
 temp file under the common git dir, removed after, and runs `git -c gpg.ssh.allowedSignersFile=<file>
 verify-tag --raw`; the verdict stands only when that exits 0 and its `Good "git" signature for
 <principal>` line, which git writes to standard error, names the tag's `node` line and not this node.
-An unsigned tag, an unknown key or another principal reads `NONE`; the key unset reads `NONE`, `no
-signer table`; a verify that cannot run is `DEAD PROBE`. The key is owner-only: the loop guard refuses
+An unsigned tag, an unknown key, a bad signature (git's `Signature verification failed`, a tag whose
+message changed after it was signed, TOOL-dWitnessedBar-56 S15) or another principal reads `NONE`; the
+key unset reads `NONE`, `no signer table`; a verify that cannot run, `ssh-keygen` absent included, an
+`ls-remote` or `fetch` that fails and a refused policy read are `DEAD PROBE`. The key is owner-only: the loop guard refuses
 an agent's change to it off a live run's branch, as it does `verdict.remote.pin`. Each node's operator
 registers the node's public key with the owner. SOURCE: `check_pin_source` in `remote_verdict.py`, the
 one source rule `remote-ci` applies too, over the same three keys, so a candidate that rewrites the
@@ -1687,9 +1699,15 @@ than the threshold in force then.
 
 MIGRATION NOTE: `verdict.blocks` replaces the gate-file key `INHERITED_RED=park|land`, which the hook,
 the driver and this runner (as `GATE_INHERITED_RED`) no longer read. The govkit upgrade step
-`govkit/inherited-red-to-verdict-blocks` writes a declared `park` as `every-red` and `land` as
-`own-mixed-contended` into the target's `.governance/policy.toml` and takes the line out; an
-undeclared key leaves the catalogue default `own-only`. The age bound `INHERITED_RED_MAX_AGE` stays.
+`govkit/inherited-red-to-verdict-blocks` reads both files the key lived in, `.githooks/gate-env.sh`,
+the hook's, and the file `GATE_POLICY_FILE` names in `.unattended.conf`, the driver's, each where
+present. It writes a declared `park` as `every-red` and `land` as `own-mixed-contended` into the
+target's `.governance/policy.toml`, any other non-blank value as `every-red`, as both readers read it,
+and takes the assignments out; where the two files differ, the stricter value, `every-red`, wins. Where
+the policy file already sets `verdict.blocks` to another value the step refuses, printing `conflict ·
+verdict.blocks · policy <value> · gate <value>`, exits 1 and writes nothing. An undeclared key leaves
+the catalogue default `own-only`. The age bound `INHERITED_RED_MAX_AGE` stays. The whole step is in
+`help/upgrade-steps.md`, "Where `INHERITED_RED`'s value lives".
 
 ## The report tail contract
 

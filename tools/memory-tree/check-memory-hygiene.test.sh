@@ -5245,7 +5245,13 @@ done
 # RAISED 785 -> 789 by TOOL-dWitnessedBar-53 on 2026-11-19: its four seed-across-commit assertions, the
 # armed set, the leg before and after the first commit and the re-seed compare, each top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=789
+# RAISED 789 -> 792 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-46, whose pass left the
+# floor where it was: the scalar-pins arm's three `n=$((n+1))`, AC2, AC3 and AC4, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 792 -> 796 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-51, whose pass left the
+# floor where it was: its AC2 arm's two seen_red plants, `unseen-arm-with-args` and `arm-outside-gates`,
+# each one `n=$((n+1))` and one `hit` in the loop. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=796
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
