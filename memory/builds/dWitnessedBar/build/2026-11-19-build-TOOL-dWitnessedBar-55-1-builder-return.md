@@ -51,7 +51,7 @@ I built TOOL-dWitnessedBar-55 but did not commit it: the hooks cannot pass while
 - The AC5 greps: "not an assignment" prints lines 442 and 461 inside the section, and "line out of each file that held one" prints nothing.
 
 **Not run: owed at the close.**
-- The section 7 legs: `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `recall floor arms`, `memory hygiene`, `policy fixtures`, `step-rows-frozen` and `docs`.
+- The legs of §7: `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `recall floor arms`, `memory hygiene`, `policy fixtures`, `step-rows-frozen` and `docs`.
 - The new arm's RED-first observations in tools/govkit/selftest.py:
   - AC1, by staging a reader that takes the first assignment;
   - AC4, against the base `read_value`;

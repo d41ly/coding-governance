@@ -8,7 +8,7 @@ fixture repositories at `%TEMP%/w41a` and `%TEMP%/w41b` that ran this pass's run
 `verdict_flow.py select --check` run over planted files, and by one probe that extracted
 `check_tree_selection` from the hook and ran it under a counting stand-in for `check_selection_at_r`.
 The two `New arm:` lines of spec section 7 were written and not run: their runs, their RED-first
-observations and the section 7 legs are owed to the main loop at the close.
+observations and the legs of §7 are owed to the main loop at the close.
 
 **Evidences:** TOOL-dWitnessedBar-41
 - AC1 — `selection.1` and `selection` were written by a full run of this pass's `run-gates.sh` over a two-leg scratch clone, `GATE_SELECTION`
