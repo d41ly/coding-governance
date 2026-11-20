@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 34 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md) | research | TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-84 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-62-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-62-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-62-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-62-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-62-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-62-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 |

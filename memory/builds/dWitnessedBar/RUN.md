@@ -597,3 +597,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T20:55:20Z draw · re-dispatch · TOOL-dWitnessedBar-60 · 102/180 · 20261120T205520Z-e87c4b
 
 2026-11-20T20:55:20Z dispatch · item db4b2b67 TOOL-dWitnessedBar-60 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-60-widen-4.md
+
+2026-11-20T21:28:31Z brief · item TOOL-dWitnessedBar-62 · reason e9781df155ab memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-62-build-brief.md
