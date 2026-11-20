@@ -25687,10 +25687,6 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/push-main.sh:953-1008
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/resume-tick.sh:305-310
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/unattended.sh:2275
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	skills/session-kickoff/manifest-check.sh:1054
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/memory-tree/tree_lib.py:28
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:13-20
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:18-20
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475-1479
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260
