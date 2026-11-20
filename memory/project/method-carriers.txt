@@ -43,3 +43,4 @@ tools/playbook/instruction_units.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	s
 tools/loop/loop_witness.py	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 tools/govkit/registry.toml	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 .claude/agents/gov-tester.md	1	a925f63887048ca77b37ffb9c107b3a040ac7dec	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-23-1-builder-return.md
+tools/run-gates/README.md	1	b0ad989581b307fcb739a7b8f548509171a897c8	widened:memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-29-1-builder-return.md

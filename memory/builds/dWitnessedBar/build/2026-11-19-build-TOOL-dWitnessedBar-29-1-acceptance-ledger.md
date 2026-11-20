@@ -48,5 +48,5 @@ legs of section 7 are owed to the main loop at the close.
   `parse_verdicts` over `GATE ok    a` and `GATE warn  a  (...)` returned the one leg `ok`.
 - AC9 — `'gate-warn\tsize\ta b\tx y'`: the section-6 `python -c` in `tools/policy/` printed it; `budgets.py
   check fx.md=default:10 20` in a scratch repository whose committed policy file set `budgets.enforce =
-  "warn"` printed its `BUDGET WARN` line and then `gate-warn<TAB>size<TAB>fx.md<TAB>fx.md · 20 bytes
+  "warn"` printed its `BUDGET WARN` line and then `gate-warn<TAB>size<TAB>fx.md<TAB>fx.md · 20 bytes (DERIVED from the builder's probe)
   over 10`, exit 0, and under `refuse` its `BUDGET REFUSE` line alone, exit 1.
