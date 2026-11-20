@@ -132,7 +132,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-18 — the positional references, the producer hits, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population](spec/2026-10-25-spec-TOOL-dWitnessedBar-18.md) | 12 | 2 | CLOSED | rev-8 | 2026-11-20 |
 | [TOOL-dWitnessedBar-20 — the legacy-homes list converted into a ledger population keyed by conf and key](spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md) | 13 | 2 | CLOSED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-24 — the portability leg pack: every P37 rule on a leg, each arm seen red on a planted case](spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md) | 14 | 2 | CLOSED | rev-6 | 2026-11-20 |
-| [TOOL-dWitnessedBar-10 — the pre-commit list derived from the leg rows, and cost evidence from every node](spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md) | 15 | 2 | INPROGRESS | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-10 — the pre-commit list derived from the leg rows, and cost evidence from every node](spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md) | 15 | 2 | INPROGRESS | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-9 — the product-test contract: `level` on legs, the three `tests.*` keys, and runner adapters](spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-4 — the runner-written verdict per tree, the pre-push hook reading it, and the tree Test verifies](spec/2026-10-25-spec-TOOL-dWitnessedBar-4.md) | 17 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash](spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md) | 18 | 2 | DEFERRED | rev-4 | 2026-10-26 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 460 bound to this build, across 4 record folder(s).
+Records: 461 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
