@@ -2606,6 +2606,7 @@ LEGACY_REPORT = "  legacy homes: "
 LEGACY_CASES = ("today", "planted-row", "growth", "widened", "shrink", "retrofit", "unmarked", "absent-homes",
                 "withheld", "drain-merge")
 LEGACY_WIDEN = "widened:TOOL-bPlanted-1"  # the `widened` case's disposition, the widen route's row
+TREE_KIT = "memory-tree"  # the sibling kit the legacy-homes fixture copies the factory from and into
 LEGACY_FACTORY = ("legacy_ledger.py", "coverage_join.py", "backlog.py")  # the memory-tree copy and its two imports
 
 
@@ -2629,9 +2630,9 @@ def build_legacy_repo(t, gate, house):
     _tree, troot = policy.derive_registry_tree(top)
     if troot is None:
         raise RuntimeError(f"no {policy.REGISTRY_REL} in gov's tree, so the fixture has no registration to copy")
-    lib = resolve_kit_dir("memory-tree", LEGACY_FACTORY[0], KIT)
+    lib = resolve_kit_dir(TREE_KIT, LEGACY_FACTORY[0], KIT)
     copies = {kit.parent / policy.REGISTRY_REL: Path(top, troot, policy.REGISTRY_REL)}
-    copies.update({kit.parent / "memory-tree" / f: lib / f for f in LEGACY_FACTORY})
+    copies.update({kit.parent / TREE_KIT / f: lib / f for f in LEGACY_FACTORY})
     for dest, src in copies.items():
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(src.read_bytes().replace(b"\r\n", b"\n"))
@@ -2650,7 +2651,7 @@ def build_legacy_repo(t, gate, house):
     run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
     for msg in ("the legacy homes", "the legacy list, seeded"):
         if msg.endswith("seeded"):  # `lists --write` never creates the list: the factory's seed does
-            rc, out = run_case_argv(repo, [sys.executable, str(kit.parent / "memory-tree" / LEGACY_FACTORY[0]),
+            rc, out = run_case_argv(repo, [sys.executable, str(kit.parent / TREE_KIT / LEGACY_FACTORY[0]),
                                            "seed", "--population", policy.LEGACY_POPULATION])
             if rc != 0 or not out.startswith(f"armed {policy.LEGACY_POPULATION} "):
                 raise RuntimeError(f"the seed exited {rc}: {out.strip()}")
