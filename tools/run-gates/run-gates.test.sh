@@ -2650,7 +2650,7 @@ build_attr_fixture() { # dir — R committed, L in the working tree
   mkdir -p "$d/$KIT_REL" "$d/alt" "$d/chk2" "$d/data" "$d/other"
   for k in off c f; do mkdir -p "$d/sig-$k"; done
   for k in 2 3 5 6 8 9 10 11 12 13 14 15 16; do mkdir -p "$d/fx$k"; done
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   # THREE SIGNATURE LEGS, each in a directory of its own with its data OUTSIDE it: a checker's
@@ -2797,21 +2797,22 @@ else
   echo "canary: SKIP the three ceiling arms of section 7 — this host has no runnable 'timeout -k', so no ceiling can fire and a CONTENDED verdict cannot be staged here"
 fi
 # AC3's record — one TAB row per red leg, in the declared column order, the full R sha, reason LAST.
-# Nine columns since TOOL-dDerivedDocket-24 inserted age, owner sha8 and owner id before the reason.
+# Nine columns since TOOL-dDerivedDocket-24 inserted age, owner sha8 and owner id before the reason;
+# ten since TOOL-dWitnessedBar-3 inserted `blocks` ninth, which no handed value reads `block` on every row.
 n=$((n+1))
 _a1rec=$(ls -1d "$A1"/.git/gate-run/*/ 2>/dev/null | tail -1)
 _a1sha=$(git -C "$A1" rev-parse HEAD)
 _a1red=$(printf '%s\n' "$a1out" | grep -c '^GATE FAIL  ')
 if [ -f "${_a1rec}attribution" ]; then
   awk -F'\t' -v sha="$_a1sha" -v m="$_a1red" '
-    NF != 9 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ { bad = 1 }
+    NF != 10 || $5 != sha || $2 !~ /^(OWN|INHERITED|MIXED|CONTENDED|DEAD PROBE)$/ || $9 != "block" { bad = 1 }
     END { exit (bad || NR != m) }' "${_a1rec}attribution" \
-    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·age·owner·owner-id·reason row per red leg"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
+    || { echo "canary: attribution — AC3 the run record's attribution file is not one leg·verdict·inherited·own·R-sha·age·owner·owner-id·blocks·reason row per red leg, blocks reading block"; head -3 "${_a1rec}attribution" | sed 's/^/    /'; fail=1; }
 else
   echo "canary: attribution — AC3 the runner printed its GATE attr lines and wrote no attribution record"; fail=1
 fi
 n=$((n+1))
-printf '%s\n' "$a1out" | grep -qE "^attributed [0-9]+ of $_a1red red legs against ${_a1sha:0:8} · DEAD PROBE [0-9]+$" \
+printf '%s\n' "$a1out" | grep -qE "^attributed [0-9]+ of $_a1red red legs against ${_a1sha:0:8} · DEAD PROBE [0-9]+ · verdict.blocks every-red, none handed · $_a1red blocking$" \
   || { echo "canary: attribution — the summary line is missing or does not count every red leg"; fail=1; }
 # The R worktree is gone after the run: a trap that forgot it leaves a registered worktree per bar.
 n=$((n+1))
@@ -2834,14 +2835,14 @@ check_attr_line "$a1d" "same" "OWN · KF3" "AC5 the diff touches the runner"
 git -C "$A1" checkout -q -- "$KIT_REL/run-gates.sh" 2>/dev/null
 # AC3's summary over ONE red leg, driven through a second TRACKED manifest.
 A3="$AT/a3"; mkdir -p "$A3/$KIT_REL"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$A3/$KIT_REL/" 2>/dev/null
 ( cd "$A3" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '[\n  {"name": "absent", "argv": ["bash", "fx4/new.sh"]}\n]\n' > "$A3/$ATL"
 ( cd "$A3" && git add -A && git commit -qm R ) >/dev/null 2>&1
 mkdir -p "$A3/fx4"; printf '#!/usr/bin/env bash\necho "FAIL new"\nexit 1\n' > "$A3/fx4/new.sh"
 a3out=$(run_attr_bar "$A3" GATE_ATTRIBUTE=HEAD)
 n=$((n+1))
-printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
+printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1 · verdict.blocks every-red, none handed · 1 blocking$' \
   || { echo "canary: attribution — AC3 a leg that cannot run at R did not read \`attributed 0 of 1 red legs\`"; printf '%s\n' "$a3out" | grep -E '^(GATE attr|attributed)' | sed 's/^/    /'; fail=1; }
 
 # AC9 — THE TWO REDS THIS UNIT EXISTS TO CLOSE, replayed from the pairs their records MEASURED rather
@@ -2850,7 +2851,7 @@ printf '%s\n' "$a3out" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{
 build_replay_fixture() { # dir · R's line · L's line
   local d=$1
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nread c g p < data/lane.txt\necho "verb offenders $c over pin $p ($g graded)"\n[ "$c" -le "$p" ]\n' > "$d/fx/pin.sh"
   printf '[\n  {"name": "lexicon naming predicates", "argv": ["bash", "fx/pin.sh"]}\n]\n' > "$d/$ATL"
@@ -2882,7 +2883,7 @@ check_attr_line "$(run_attr_bar "$AT/rc" GATE_ATTRIBUTE=HEAD)" "lexicon naming p
 # plus 8 s, and R sleeps three walls and a minute, read from a file OUTSIDE the repository so it is
 # set after the measurement without moving R's tree.
 AW="$AT/aw"; mkdir -p "$AW/$KIT_REL" "$AW/fx" "$AW/data"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$AW/$KIT_REL/" 2>/dev/null
 ( cd "$AW" && git init -q --template= -b main . ) >/dev/null 2>&1
 printf '#!/usr/bin/env bash\ncase "$(cat data/m.txt)" in slow) sleep "$(cat '"'%s'"')";; esac\necho "FAIL w"\nexit 1\n' "$AT/aw.sleep" > "$AW/fx/w.sh"
 printf 'slow\n' > "$AW/data/m.txt"
@@ -2897,7 +2898,7 @@ awout=$(run_attr_bar "$AW" GATE_ATTRIBUTE=HEAD GATE_WALL="$_awwall"); awrc=$?
 _awel=$(( $(date +%s) - _aws ))
 check_attr_line "$awout" "walled" "DEAD PROBE · cut by the wall" "AC15 an R run the wall cuts"
 n=$((n+1))
-printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1$' \
+printf '%s\n' "$awout" | grep -qE '^attributed 0 of 1 red legs against [0-9a-f]{8} · DEAD PROBE 1 · verdict.blocks every-red, none handed · 1 blocking$' \
   || { echo "canary: attribution — AC15 the summary did not count the wall-cut leg"; fail=1; }
 n=$((n+1))
 { [ "$awrc" = 1 ] && [ "$_awel" -lt $(( _awsl - 20 )) ]; } \
@@ -2913,7 +2914,7 @@ n=$((n+1))
 build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -> sets AGE_R
   local d=$1 at=$2 own=${3:-} i
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
@@ -2937,15 +2938,15 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -
 }
 AG="$AT/ag"; build_age_fixture "$AG" 4
 _ag_own=$(git -C "$AG" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
-agout=$(run_attr_bar "$AG" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+agout=$(run_attr_bar "$AG" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$agout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · age 8 · owner $_ag_own AGE-tFix-4" \
   "AC3 a red that arrived inside the window names the landing that introduced it"
 n=$((n+1))
 _agrec=$(ls -1d "$AG"/.git/gate-run/*/ 2>/dev/null | tail -1)
 awk -F'\t' -v sha="$AGE_R" -v own="$_ag_own" '
-    NF != 9 || $2 != "INHERITED" || $5 != sha || $6 != "8" || $7 != own || $8 != "AGE-tFix-4" { bad = 1 }
+    NF != 10 || $2 != "INHERITED" || $5 != sha || $6 != "8" || $7 != own || $8 != "AGE-tFix-4" || $9 != "pass" { bad = 1 }
     END { exit (bad || NR != 1) }' "${_agrec}attribution" 2>/dev/null \
-  || { echo "canary: attribution — AC3 the row does not carry age 8, the owner and its id before the reason"; head -2 "${_agrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+  || { echo "canary: attribution — AC3 the row does not carry age 8, the owner, its id and blocks pass before the reason"; head -2 "${_agrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
 n=$((n+1))
 { [ -f "$AG/.git/gate-inherited-green" ] \
     && [ "$(awk -F'\t' '$1=="base"{print $2}' "$AG/.git/gate-inherited-green")" = "$AGE_R" ] \
@@ -2956,7 +2957,7 @@ n=$((n+1))
 [ ! -f "$AG/.git/gate-full-green" ] \
   || { echo "canary: attribution — AC4 an inherited-only red bar wrote gate-full-green, which a later push would read as green"; fail=1; }
 AH="$AT/ah"; build_age_fixture "$AH" 1
-ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~10" \
   "AC3 a red already present at R~10 reads aged"
 # FLIPPED by TOOL-dUnstuckLanding-16 from TOOL-dDerivedDocket-24's AC17, which asserted NO stamp: an
@@ -2969,7 +2970,7 @@ n=$((n+1))
 # TOOL-dUnstuckLanding-16 AC1 — red at R and at R~2 with the same offender, under a bound of 2: the
 # row reads `aged`, and the stamp is written naming that leg with `max_age` 2.
 rm -f "$AH/.git/gate-inherited-green"
-ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=2)
 check_attr_line "$ah2out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~2" \
   "TOOL-dUnstuckLanding-16 AC1 a red already present at R~2 reads aged"
 n=$((n+1))
@@ -2980,15 +2981,46 @@ n=$((n+1))
   || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC1 an aged leg under a bound of 2 wrote no gate-inherited-green naming R, max_age 2 and the leg"; fail=1; }
 # AC2's first clause — no bound handed: the stamp is still written, with an EMPTY `max_age`.
 rm -f "$AH/.git/gate-inherited-green"
-ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land)
+ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended)
 n=$((n+1))
 { [ -f "$AH/.git/gate-inherited-green" ] \
     && [ "$(awk -F'\t' '$1=="max_age"{print "<" $2 ">"}' "$AH/.git/gate-inherited-green")" = "<>" ] \
     && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
   || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 an INHERITED red with no age bound wrote no gate-inherited-green with an empty max_age"; printf '%s\n' "$ah3out" | grep -E '^(GATE attr|run-gates: inherited)' | sed 's/^/    /'; fail=1; }
+# TOOL-dWitnessedBar-3 AC2 — WHICH RED BLOCKS. The same one-INHERITED-leg bar under `every-red`: its
+# row reads `block`, the attr line ends `· blocks`, and no stamp is written. Under `own-only` the row
+# reads `pass` and the stamp records `blocks own-only`. Then a staged edit of `lib-verdict.sh` against
+# R reads the red OWN by KF3, so a branch editing the table cannot grade itself.
+rm -f "$AH/.git/gate-inherited-green"
+ah4out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=every-red)
+check_attr_line "$ah4out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · blocks" \
+  "TOOL-dWitnessedBar-3 AC2 an INHERITED red under every-red blocks"
+n=$((n+1))
+_ah4rec=$(ls -1td "$AH"/.git/gate-run/*/ 2>/dev/null | head -1)
+{ [ "$(awk -F'\t' 'NF == 10 { print $9 }' "${_ah4rec}attribution" 2>/dev/null)" = block ] \
+    && [ ! -f "$AH/.git/gate-inherited-green" ] \
+    && printf '%s\n' "$ah4out" | grep -qE '· verdict.blocks every-red · 1 blocking$'; } \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 an INHERITED red under every-red did not read block, wrote a stamp, or the summary did not count it"; head -2 "${_ah4rec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+ah5out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-only)
+check_attr_line "$ah5out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · passes" \
+  "TOOL-dWitnessedBar-3 AC2 an INHERITED red under own-only passes"
+n=$((n+1))
+[ "$(awk -F'\t' '$1=="blocks"{print $2}' "$AH/.git/gate-inherited-green" 2>/dev/null)" = own-only ] \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 a bar every red of which passes under own-only wrote no stamp whose blocks reads own-only"; fail=1; }
+rm -f "$AH/.git/gate-inherited-green"
+printf '# an edit of the block table\n' >> "$AH/$KIT_REL/lib-verdict.sh"
+ah6out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-only)
+check_attr_line "$ah6out" "aged leg" "OWN · KF3" \
+  "TOOL-dWitnessedBar-3 AC2 an edit of lib-verdict.sh against R reads the red OWN"
+check_attr_line "$ah6out" "aged leg" "lib-verdict.sh, so this run edited its own grader" \
+  "TOOL-dWitnessedBar-3 AC2 the KF3 reason names lib-verdict.sh"
+n=$((n+1))
+[ ! -f "$AH/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — TOOL-dWitnessedBar-3 AC2 a bar that edited lib-verdict.sh wrote the inherited-green stamp"; fail=1; }
+git -C "$AH" checkout -q -- "$KIT_REL/lib-verdict.sh"
 # AC2's last clause — a second leg reads OWN: nothing is stamped, at any age.
 AO="$AT/ao"; build_age_fixture "$AO" 1 own
-aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=2)
 check_attr_line "$aoout" "own leg" "OWN" "TOOL-dUnstuckLanding-16 AC2 a leg green at R and red at L reads OWN"
 n=$((n+1))
 [ ! -f "$AO/.git/gate-inherited-green" ] \
@@ -3005,7 +3037,7 @@ n=$((n+1))
 build_moved_age_fixture() { # dir -> sets AGE_R
   local d=$1 i k
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
-  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q --template= -b main . ) >/dev/null 2>&1
   for k in sup cnt ins; do
@@ -3030,7 +3062,7 @@ build_moved_age_fixture() { # dir -> sets AGE_R
 }
 AM="$AT/am"; build_moved_age_fixture "$AM"
 _am_own=$(git -C "$AM" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
-amout=$(run_attr_bar "$AM" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+amout=$(run_attr_bar "$AM" GATE_ATTRIBUTE="$AGE_R" GATE_VERDICT_BLOCKS=own-mixed-contended GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$amout" "moved superset" "INHERITED · offenders 2 · at ${AGE_R:0:8} · aged at R~10" \
   "F1 an old red a later landing shrank reads aged, not owned by the landing that shrank it"
 check_attr_line "$amout" "moved count" "INHERITED · offenders 2 · at ${AGE_R:0:8} · age unproven" \
@@ -3039,7 +3071,7 @@ check_attr_line "$amout" "moved inside" "INHERITED · offenders 2 · at ${AGE_R:
   "F1 a red that arrived inside the window and shrank later is owned by the landing it arrived in"
 n=$((n+1))
 _amrec=$(ls -1d "$AM"/.git/gate-run/*/ 2>/dev/null | tail -1)
-awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $9 !~ /declares no signature/) bad = 1 }
+awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $10 !~ /declares no signature/) bad = 1 }
     END { exit (bad || !seen) }' "${_amrec}attribution" 2>/dev/null \
   || { echo "canary: attribution — F1 the row for a moved count line carries an age, or a reason not naming the missing signature"; grep '^moved count' "${_amrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
 # FLIPPED by TOOL-dUnstuckLanding-16 (AC2's middle clause): every leg here reads INHERITED — one
@@ -3054,7 +3086,7 @@ n=$((n+1))
 # R copy ANNOUNCES itself and HOLDS until released, so the TERM lands inside the attribution by
 # construction rather than by a sleep (`fixed-sleep-does-not-place-a-signal`); at L it just fails.
 AX="$AT/ax"; mkdir -p "$AX/$KIT_REL" "$AX/fx" "$AX/data"
-cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/lib-verdict.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
 cp "$KITDIR/gate-fingerprint.sh" "$AX/$KIT_REL/" 2>/dev/null || true
 ( cd "$AX" && git init -q --template= -b main . ) >/dev/null 2>&1
 { printf '#!/usr/bin/env bash\n'
@@ -3384,7 +3416,7 @@ build_hv_repo() { # dir — a scratch repository carrying this runner and its si
 run_hv_bar() { # dir · manifest · VAR=value… -> HV_OUT (stdout and stderr) and HV_RC
   local d=$1 m=$2; shift 2
   HV_OUT=$( cd "$d" && env GATE_FULL= GATE_BASE= GATE_REUSE= GATE_WALL= GATE_SELFTESTS= GATE_ATTRIBUTE= \
-      GATE_INHERITED_RED= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
+      GATE_VERDICT_BLOCKS= GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal \
       GATE_TURNSTILE=0 GATE_REUSE_SAMPLE=0 GATE_REUSE_PUSH= GATE_LEGS="$m" "$@" bash $KIT_REL/run-gates.sh 2>&1 ); HV_RC=$?
 }
 check_hv_line() { # label · pattern -> one counted assertion that some line of HV_OUT matches the ERE
@@ -4201,7 +4233,7 @@ write_sc_legs() { # extra JSON fields for the uz row
 write_sc_legs ""
 ( cd "$SCR" && git init -q --template= -b main . && git add -A && git commit -qm base ) >/dev/null 2>&1
 run_sc_bar() { # VAR=value… -> SC_OUT
-  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+  SC_OUT=$( cd "$SCR" && env GATE_FULL=1 GATE_BASE= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_VERDICT_BLOCKS= \
       GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_JOBS=4 GATE_PROFILE=minimal GATE_TURNSTILE=0 \
       GATE_SELFTESTS_MAX_LAG= GATE_LEGS="$SC/legs.json" "$@" bash $KIT_REL/run-gates.sh 2>&1 )
 }
@@ -4320,7 +4352,7 @@ run_pl_legs() { # VAR=value… -- the adapter's arguments -> PL_OUT (stdout and 
   while [ "$#" -gt 0 ] && [ "$1" != -- ]; do _pl_env+=("$1"); shift; done
   shift
   rm -f "$PL/marks"/* 2>/dev/null
-  PL_OUT=$( cd "$PLR" && env GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_INHERITED_RED= \
+  PL_OUT=$( cd "$PLR" && env GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_ATTRIBUTE= GATE_VERDICT_BLOCKS= \
       GATE_INHERITED_RED_MAX_AGE= GATE_RUN_ID= GATE_PROFILES= GATE_DOCS_BASE= GATE_JOBS=4 GATE_PROFILE=minimal \
       GATE_TURNSTILE_DIR="$PL/ts" ${_pl_env[@]+"${_pl_env[@]}"} bash $KIT_REL/pass-legs.sh "$@" 2>&1 ); PL_RC=$?
 }

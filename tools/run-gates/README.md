@@ -152,6 +152,8 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
+| `lib-verdict.sh` | the block table, SOURCED and never run: `derive_red_blocks <value> <class>` prints `block` or `pass` for one attributed red under a `verdict.blocks` value. The runner sources it beside `lib-attribute.sh`, and it is in KF3's list; see "Which red blocks" |
+| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`); see "Which red blocks" |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
@@ -1361,21 +1363,21 @@ worktree of `R` under the git common dir, under `R`'s ceiling for that row — a
 red leg in manifest order, then a summary:
 
 ```
-GATE attr  <leg>  INHERITED · offenders <n> · at <R8>
-GATE attr  <leg>  MIXED · inherited <i> · own <o> · at <R8>
-GATE attr  <leg>  OWN · <reason>
-GATE attr  <leg>  CONTENDED · timed out after <n>s; not re-run at R
-GATE attr  <leg>  DEAD PROBE · <reason>
-attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>]
+GATE attr  <leg>  INHERITED · offenders <n> · at <R8> · passes
+GATE attr  <leg>  MIXED · inherited <i> · own <o> · at <R8> · blocks
+GATE attr  <leg>  OWN · <reason> · blocks
+GATE attr  <leg>  CONTENDED · timed out after <n>s; not re-run at R · blocks
+GATE attr  <leg>  DEAD PROBE · <reason> · blocks
+attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>] · verdict.blocks <value>[, none handed] · <b> blocking
 ```
 
 The same rows land in the run record as `attribution`, TAB-separated: leg, verdict, inherited, own,
-the full `R` sha, age, owner sha8, owner id, reason — the reason LAST, the three age columns `-`
-where no age was asked. **It changes no exit code**: a bar that was red is red.
-What to DO with a verdict is a policy, and the policy is not this runner's.
+the full `R` sha, age, owner sha8, owner id, blocks, reason — the reason LAST, the three age columns
+`-` where no age was asked, and `blocks` the word "Which red blocks" below derives. **It changes no
+exit code**: a bar that was red is red. What to DO with a verdict is the landing readers'.
 
 The classifier, first match wins. **OWN, forced** when the diff between `R` and the working tree
-touches this runner, `gate-fingerprint.sh`, `lib-attribute.sh` or the pre-push hook `core.hooksPath`
+touches this runner, `gate-fingerprint.sh`, `lib-attribute.sh`, `lib-verdict.sh` or the pre-push hook `core.hooksPath`
 names — a run that edited its grader cannot vouch for any verdict. **CONTENDED** when the leg's own
 ceiling fired (124 under a positive bound, or 137 under one whose seconds reached it); it is not
 re-run. **OWN** when `R` has no row for the leg, its argv differs from `R`'s, the diff touches its
@@ -1409,14 +1411,50 @@ With the bound set, each INHERITED leg runs once more at `R~n`, `R`'s n-th first
 from `R`'s row in the same scratch worktree. Red there carrying every offender L carries appends
 `aged at R~<n>`; otherwise a bisection of the window names the landing that introduced the red,
 `age <k> · owner <sha8> <id>`. A probe that cannot answer appends `age unproven`. The age decides
-no landing (ruling `TOOL-dUnstuckLanding-22`): under an exported `land` the inherited-green stamp is
-written whenever every red leg reads INHERITED, at any age and with or without a bound, its
-`max_age` empty when none was handed; the unattended driver escalates an `aged` leg's ask to
-BLOCKER. Without a `signature` the offenders are the output's
+no landing (ruling `TOOL-dUnstuckLanding-22`): the inherited-green stamp is written whenever every
+red leg's row reads `pass` under a handed `GATE_VERDICT_BLOCKS`, at any age and with or without a
+bound, its `max_age` empty when none was handed; the unattended driver escalates an `aged` leg's
+ask to BLOCKER. Without a `signature` the offenders are the output's
 non-blank lines: red with every line of L's is red there, and red with ANY other output cannot be
 answered, because text cannot tell a fixed offender from a moved count line. Such a leg is aged
 only while its text holds still or shrinks toward L's; one whose red prints a changing count
 declares a `signature` to be aged across it.
+
+### Which red blocks — `GATE_VERDICT_BLOCKS=<value>`
+
+The policy key `verdict.blocks` decides which red of a red bar blocks its landing (TOOL-dWitnessedBar-3).
+The pre-push hook and the unattended driver each read it at `R` through the policy kit's `policy.py get
+--rev`, and hand it to the bar as `GATE_VERDICT_BLOCKS`; the runner reads it once and removes it, as it
+does `GATE_ATTRIBUTE`. Each attributed red's class is joined to `block` or `pass` by `lib-verdict.sh`:
+
+| class | `own-only` | `own-mixed-contended` | `every-red` |
+|---|---|---|---|
+| OWN | block | block | block |
+| MIXED | pass | block | block |
+| CONTENDED | pass | block | block |
+| INHERITED | pass | pass | block |
+| DEAD PROBE | block | block | block |
+| no row, or an unknown class | block | block | block |
+
+An absent value reads `every-red`, said on the summary; an unknown one reads `every-red` too. A red bar
+lands only when every attribution row reads `pass`: the hook's `check_inherited_verdict` and the
+driver's `read_gates_record` read that field and never re-decide it, and `lib-verdict.sh` is in KF3's
+list, so a diff that edits the table reads every red OWN.
+
+`python verdict_flow.py route --run <run dir>` joins each red to one route by its class and writes the
+routing record `<run dir>/routing` (leg, class, blocks, route, judgment, next): a passing red routes
+`ask`; a blocking OWN or MIXED red `attribute`, the tester's; CONTENDED `quiet-rerun`; DEAD PROBE, or a
+red the attribution omits, `probe-repair`; INHERITED `fix-unit`. The unattended driver's `gates-green`
+runs it on every red bar it reads. `verdict_flow.py judge --run <run dir> --leg <name> --judgment
+<word>` records the tester's `code-miss` or `spec-wrong` on an `attribute` row and fills `next` by
+`verdict.red-route`; it reads the judgments through the loop kit's `loop_lib.py items --tag`, the verb
+`TOOL-dWitnessedBar-100` asks for, and exits 2 naming it until it lands.
+
+MIGRATION NOTE: `verdict.blocks` replaces the gate-file key `INHERITED_RED=park|land`, which the hook,
+the driver and this runner (as `GATE_INHERITED_RED`) no longer read. The govkit upgrade step
+`govkit/inherited-red-to-verdict-blocks` writes a declared `park` as `every-red` and `land` as
+`own-mixed-contended` into the target's `.governance/policy.toml` and takes the line out; an
+undeclared key leaves the catalogue default `own-only`. The age bound `INHERITED_RED_MAX_AGE` stays.
 
 ## The report tail contract
 

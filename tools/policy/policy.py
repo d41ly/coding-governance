@@ -1200,7 +1200,6 @@ HOUSE_HOME = TOOL_ROOT + "roles/" + HOUSE_ANCHOR   # the drained token is the ro
 # The gate file's keys as the clause classifies them: an owner policy dConvergedCharter folds, or a
 # mechanic that stays. A gate key this table does not name is `unmarked`, never given a default mark.
 GATE_ENV_MARKS = {
-    "INHERITED_RED": "owner-policy",
     "INHERITED_RED_MAX_AGE": "owner-policy",
     "GATE_DOC_PATHS": "owner-policy",
     "GATE_WSL_PARITY_RUNS": "owner-policy",

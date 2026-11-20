@@ -19,7 +19,9 @@
 #                                                    # back to the built-in formula (the rollback)
 #   GATE_ATTRIBUTE=<rev> bash …                      # re-run each RED leg at <rev> and say whose red
 #                                                    # it is: OWN, INHERITED, MIXED, CONTENDED or
-#                                                    # DEAD PROBE. REPORT-ONLY: no exit code moves
+#                                                    # DEAD PROBE. No exit code moves: each row's
+#                                                    # `blocks`, by GATE_VERDICT_BLOCKS and
+#                                                    # lib-verdict.sh, is what a landing reads
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
 #
@@ -27,7 +29,8 @@
 # verdict below is rendered by this file, so an edit here can move what any leg reads as and no leg
 # can see it. The attribution does not fix that and refuses to compound it (KF3): when the diff
 # between its base and the working tree touches this runner, `gate-fingerprint.sh`, the pre-push
-# hook or `lib-attribute.sh`, every red reads OWN and says why. Nobody grades their own grader.
+# hook, `lib-attribute.sh` or `lib-verdict.sh`, every red reads OWN and says why. Nobody grades their
+# own grader.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
@@ -419,16 +422,20 @@ LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # that names a commit of THIS repository and attributes its fixture's reds against nothing.
 ATTR_REV=${GATE_ATTRIBUTE:-}
 unset GATE_ATTRIBUTE
-# THE INHERITED-RED POLICY THIS BAR WAS HANDED, and the age bound it ages an INHERITED leg under
-# (TOOL-dDerivedDocket-24). Read once and removed for the base's reason above: a leg that drives a
-# nested bar over a fixture must not inherit this repository's policy. The runner DECIDES nothing
-# with either. The bound sizes the age probe, and the policy only permits the `gate-inherited-green`
-# stamp to be WRITTEN; both readers that act on a red — the pre-push hook and the unattended driver —
-# read the policy at R themselves, so a caller exporting `land` buys a stamp nobody honours without a
-# read of its own. A bound that is not a positive integer, a leading zero included, asks for no age.
-ATTR_POLICY=${GATE_INHERITED_RED:-}
+# THE `verdict.blocks` VALUE THIS BAR WAS HANDED, and the age bound it ages an INHERITED leg under
+# (TOOL-dWitnessedBar-3 S2, TOOL-dDerivedDocket-24). Read once and removed for the base's reason
+# above: a leg that drives a nested bar over a fixture must not inherit this repository's policy.
+# The value joins each red's class to `block` or `pass` through `lib-verdict.sh`, written into the
+# attribution record's ninth field, and permits the `gate-inherited-green` stamp to be WRITTEN when
+# every red reads `pass`; both readers that act on a red — the pre-push hook and the unattended driver
+# — read the value at R themselves and hand it here, so a caller exporting a looser value buys a stamp
+# nobody honours. An absent value is `every-red`, said on the summary, and an unknown one reads
+# `every-red` too. A bound that is not a positive integer, a leading zero included, asks for no age.
+ATTR_BLOCKS_HANDED=${GATE_VERDICT_BLOCKS:-}
+ATTR_BLOCKS=${GATE_VERDICT_BLOCKS:-every-red}
 ATTR_MAX_AGE=${GATE_INHERITED_RED_MAX_AGE:-}
-unset GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
+unset GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE
+case "$ATTR_BLOCKS" in own-only|own-mixed-contended|every-red) ;; *) ATTR_BLOCKS=every-red ;; esac
 case "$ATTR_MAX_AGE" in ''|0*|*[!0-9]*) ATTR_MAX_AGE="" ;; esac
 # WHAT THE HELD TIER WAS ASKED FOR, as every record of this run states it (TOOL-aSparedSpawn-12 S7):
 # empty when held, `changed` when only the legs whose kit moved run, `1` for any other non-empty
@@ -4553,11 +4560,12 @@ derive_foreign() {
 # scratch worktree of R, under R's ceiling for that row — and prints one `GATE attr` line per red leg
 # in manifest order, then `attributed N of M red legs against <R8>`. The same rows land in the run
 # record as `attribution`, TAB-separated: leg · verdict · inherited · own · R sha · age · owner sha8 ·
-# owner id · reason, the reason LAST, and a unit that extends the row inserts its columns before it,
-# never after. The three age columns are TOOL-dDerivedDocket-24's, `-` wherever no age was asked for.
+# owner id · blocks · reason, the reason LAST, and a unit that extends the row inserts its columns before it,
+# never after. The three age columns are TOOL-dDerivedDocket-24's, `-` wherever no age was asked for;
+# `blocks` is TOOL-dWitnessedBar-3's, `block` or `pass` by `lib-verdict.sh` under GATE_VERDICT_BLOCKS.
 #
-# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the policy that acts on a
-# verdict is the inherited-red policy unit's, not this one's.
+# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the landing that reads the
+# `blocks` field is the pre-push hook's and the unattended driver's, not this one's.
 #
 # R IS THE LANDING BASE, never the branch point. `TOOL-aStagedLane-6` withdrew a "not mine" claim
 # measured against a base the default branch had already moved past, and left the rule this block
@@ -4567,7 +4575,7 @@ derive_foreign() {
 #
 # THE CLASSIFIER, first match wins:
 #   1  OWN, forced — the diff between R and the working tree touches this runner, the fingerprint
-#      helper, the pre-push hook or lib-attribute.sh (KF3). Every red, a timed-out one included.
+#      helper, the pre-push hook, lib-attribute.sh or lib-verdict.sh (KF3). Every red, a timed-out one included.
 #   2  CONTENDED   — the leg's own attempt ended with its ceiling FIRED (`check_ceiling_fired`, spelled
 #      identically on the retry side). Never re-run at R. A bound-0 rc 137 is a failure and goes on.
 #   3  OWN         — no row at R · its argv differs from R's · the diff touches its COMPARATOR (every
@@ -5015,7 +5023,7 @@ derive_attribution() {
 # Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg is run once more at R~n, R's n-th
 # first-parent ancestor: red there with every offender L carries is `aged`. The age decides the
 # ESCALATION only, never the landing (TOOL-dUnstuckLanding-22, superseding that part of
-# TOOL-dDerivedDocket-24): an aged INHERITED leg lands under `land` like any other, and the driver
+# TOOL-dDerivedDocket-24): an aged INHERITED leg lands like any other where its row reads `pass`, and the driver
 # files its ask at BLOCKER instead of HIGH. Otherwise the red arrived inside (R~n, R], and a bisection of that first-parent window finds
 # the first landing whose run carries L's offenders — its sha8, and the first id its subject carries,
 # name the OWNER. With n = 10 that is at most five more runs of one leg, on a red bar only.
@@ -5023,7 +5031,7 @@ derive_attribution() {
 # THE SAME COMPARISON RULE 5 MADE AT R, run from R's own row in the SAME scratch worktree checked out
 # at each probe, so the normaliser that strips that worktree's path still strips it. A probe that
 # cannot answer — the wall, a ceiling, a checkout that fails, an output that normalises to nothing —
-# leaves the age UNPROVEN (`-`). An unproven age still lands under `land` and is never escalated,
+# leaves the age UNPROVEN (`-`). An unproven age still lands where its row reads `pass` and is never escalated,
 # because nothing proves it aged.
 #
 # WITHOUT A SIGNATURE the probe reads red there only when every non-blank line of L's output is in
@@ -5135,7 +5143,7 @@ derive_age() {
 run_attribution() {
   [ -n "${ATTR_REV:-}" ] || return 0
   [ -n "$RED_LEGS" ] || return 0
-  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary land_n=0
+  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary land_n=0 blocking=0
   ATMP="$WORK/attr"; mkdir -p "$ATMP" 2>/dev/null
   ATTR_WHY_ALL=""; ATTR_KF3=""; ATTR_CHG=""; ATTR_ROWS="$ATMP/rows-at-R"; ATTR_ROWS_STATE=ok
   ATTR_NORM="$ATMP/normalise.sed"; ATTR_WT_FAILED=0; ATTR_WT_PATH=""
@@ -5152,6 +5160,10 @@ run_attribution() {
   if [ -z "$ATTR_WHY_ALL" ] && { [ ! -f "$KITDIR/lib-attribute.sh" ] || ! . "$KITDIR/lib-attribute.sh"; }; then
     ATTR_WHY_ALL="lib-attribute.sh is missing beside the runner, so there is no normaliser to compare with"
   fi
+  # THE BLOCK TABLE (TOOL-dWitnessedBar-3 S1), sourced beside the normaliser and by the same rule. A
+  # runner without it writes `block` on every row: deny by default, never a guessed table.
+  ATTR_VERDICT_LIB=0
+  [ -f "$KITDIR/lib-verdict.sh" ] && . "$KITDIR/lib-verdict.sh" && ATTR_VERDICT_LIB=1
   if [ -z "$ATTR_WHY_ALL" ] && ! ATTR_CHG=$(git diff --name-only "$ATTR_RSHA" -- 2>/dev/null); then
     ATTR_WHY_ALL="the diff between R and this tree could not be read"
   fi
@@ -5160,7 +5172,7 @@ run_attribution() {
     # no tracked hook gates this repository's pushes, so there is no tracked hook to have edited.
     hp=$(git config --get core.hooksPath 2>/dev/null) || hp=""
     case "$hp" in ''|/*|[A-Za-z]:*) hp="" ;; *) hp="${hp%/}/pre-push" ;; esac
-    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$hp"; do
+    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$KITREL/lib-verdict.sh" "$hp"; do
       [ -n "$k" ] || continue
       if printf '%s\n' "$ATTR_CHG" | grep -qxF -- "$k"; then ATTR_KF3=$k; break; fi
     done
@@ -5264,28 +5276,42 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
                    *)    tail="$tail · age $A_AGE · owner $A_OWN8"
                          [ "$A_OWNID" != - ] && tail="$tail $A_OWNID" ;;
                  esac
-                 # EVERY INHERITED LEG COUNTS, whatever its age reads — a number, `aged`, or `-` for
-                 # unproven or not asked (TOOL-dUnstuckLanding-16 S1). The age escalates the ask; it
-                 # no longer decides whether the leg lands.
-                 land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}" ;;
+                 # The age escalates the ask; it decides nothing about whether the leg lands
+                 # (TOOL-dUnstuckLanding-16 S1). The block table below does.
+                 ;;
       MIXED)     tail="MIXED · inherited $A_I · own $A_O · at $ATTR_R8" ;;
       *)         tail="$A_V · $A_WHY" ;;
     esac
     if [ "$A_V" = "DEAD PROBE" ]; then dead=$((dead + 1)); else nattr=$((nattr + 1)); fi
+    # BLOCK OR PASS, by the table under the handed value (TOOL-dWitnessedBar-3 S2). Every leg whose
+    # row reads `pass` counts toward the inherited-green stamp, whatever its class or its age.
+    A_BLOCKS=block
+    [ "$ATTR_VERDICT_LIB" = 1 ] && A_BLOCKS=$(derive_red_blocks "$ATTR_BLOCKS" "$A_V")
+    [ "$A_BLOCKS" = pass ] || A_BLOCKS=block
+    if [ "$A_BLOCKS" = pass ]; then
+      land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}"
+      tail="$tail · passes"
+    else
+      blocking=$((blocking + 1)); tail="$tail · blocks"
+    fi
     printf 'GATE attr  %s  %s\n' "${names[$i]}" "$tail"
-    # THE ROW: leg · verdict · inherited · own · R sha · age · owner sha8 · owner id · reason, the
-    # reason LAST as the red-attribution unit requires, the three age columns inserted before it.
+    # THE ROW: leg · verdict · inherited · own · R sha · age · owner sha8 · owner id · blocks · reason,
+    # the reason LAST as the red-attribution unit requires, the three age columns and `blocks`
+    # inserted before it.
     if [ -n "$rec" ]; then
-      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
-        "$A_AGE" "$A_OWN8" "$A_OWNID" \
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
+        "$A_AGE" "$A_OWN8" "$A_OWNID" "$A_BLOCKS" \
         "$(printf '%s%s' "$A_WHY" "${A_AGE_NOTE:+; $A_AGE_NOTE}" | tr '\t\n\r' '   ')" >> "$rec" 2>/dev/null || true
     fi
   done
-  # LANDABLE, for the inherited-green stamp alone: every red leg reads INHERITED, at any age. The
-  # stamp's other preconditions are the full green's, read where it is written.
+  # LANDABLE, for the inherited-green stamp alone: every red leg reads `pass`. The stamp's other
+  # preconditions are the full green's, read where it is written.
   [ "$m" -gt 0 ] && [ "$land_n" = "$m" ] && ATTR_LANDABLE=1
   summary="attributed $nattr of $m red legs against $ATTR_R8"
   [ "$dead" -gt 0 ] && summary="$summary · DEAD PROBE $dead"
+  if [ -n "$ATTR_BLOCKS_HANDED" ]; then summary="$summary · verdict.blocks $ATTR_BLOCKS"
+  else summary="$summary · verdict.blocks every-red, none handed"; fi
+  summary="$summary · $blocking blocking"
   printf '%s\n' "$summary"
   [ -n "$rec" ] && chmod 600 "$rec" 2>/dev/null
   if [ -n "$ATTR_WT" ]; then
@@ -5969,16 +5995,17 @@ fi
 # that is the whole of its safety: no reader of `gate-full-green` can ever take it for one, and this
 # block never touches that file. It is written under EVERY precondition of the full green except
 # "failed nothing" — skipped nothing, reused nothing, no wall, an unmoved tree that was clean when the
-# run started — plus three of its own: the caller exported `land`, at least one leg failed, and every
-# failed leg read INHERITED, at any age (TOOL-dUnstuckLanding-16 S1; it required a proven age inside
-# the bound until ruling TOOL-dUnstuckLanding-22). No age bound is required either. It records R and
-# the bound it was written under, empty when none was handed, because the pre-push hook trusts it only
-# where the remote sha it receives equals `base` and the bound it reads at that sha equals `max_age`.
+# run started — plus three of its own: the caller handed a `verdict.blocks` value, at least one leg
+# failed, and every failed leg's attribution row read `pass` under it, at any age (TOOL-dWitnessedBar-3
+# S4; TOOL-dUnstuckLanding-16 S1). No age bound is required either. It records R, the bound and the
+# value it was written under, the bound empty when none was handed, because the pre-push hook trusts it
+# only where the remote sha it receives equals `base`, the bound it reads at that sha equals `max_age`,
+# and the value it reads there equals `blocks`.
 #
-# WHAT IT DOES NOT CHECK: the policy itself. `land` here is whatever the caller exported; the hook
-# reads the policy at R before it reads this file, so a stamp written under a caller's own `land`
-# selects nothing at a boundary whose R says `park`.
-if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
+# WHAT IT DOES NOT CHECK: the policy itself. The value here is whatever the caller handed; the hook
+# reads `verdict.blocks` at R before it reads this file, so a stamp written under a caller's own
+# looser value selects nothing at a boundary whose R reads another.
+if [ -n "$gd" ] && [ -n "$ATTR_BLOCKS_HANDED" ] && [ "$ATTR_LANDABLE" = 1 ] \
    && [ "$fails" -gt 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] && [ -n "${ATTR_RSHA:-}" ]; then
   derive_temp_path _tp "$gd/gate-inherited-green"
@@ -5990,6 +6017,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
+    printf 'blocks\t%s\n' "$ATTR_BLOCKS"
     printf 'legs\t%s\n' "$ATTR_LAND_LEGS"
     printf 'reused\t%s\n' "$reuses"   # predicate 9's pair, as on the full green (TOOL-aSparedSpawn-13 S8, -32 S8)
     printf 'reused_cache\t%s\n' "$cache_reuses"
@@ -5997,7 +6025,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$_tp" 2>/dev/null \
     && mv -f "$_tp" "$gd/gate-inherited-green" 2>/dev/null || true
-  echo "run-gates: inherited-green stamp written — every red leg is INHERITED at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
+  echo "run-gates: inherited-green stamp written — every red leg passes under verdict.blocks $ATTR_BLOCKS at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
 fi
 
 # THE SWEEP runs AFTER the verdict is written and NEVER before the first leg dispatches. Both

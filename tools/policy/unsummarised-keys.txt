@@ -230,12 +230,10 @@ trace.identity
 trace.rows
 transitions.record
 verdict
-verdict.blocks
 verdict.flakes
 verdict.flakes.entry
 verdict.flakes.release
 verdict.held
-verdict.red-route
 verdict.remote.pin
 verdict.remote.pin-scope
 verdict.remote.trust

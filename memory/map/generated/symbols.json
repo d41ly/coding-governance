@@ -440,6 +440,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/workflows/replay_scorer.py"
     },
     {
@@ -4503,6 +4508,11 @@
       "file": "tools/gate-lint/ps-hygiene.py"
     },
     {
+      "id": "case_judge",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "case_run",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
@@ -7958,6 +7968,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_reviewed_file",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "check_revision",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -9380,6 +9395,11 @@
     {
       "id": "cmd_down",
       "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
+      "id": "cmd_down",
+      "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
@@ -9446,6 +9466,11 @@
       "id": "cmd_journal",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_judge",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "cmd_land",
@@ -9628,6 +9653,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "cmd_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -9710,6 +9740,11 @@
     {
       "id": "cmd_up",
       "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
+      "id": "cmd_up",
+      "kind": "function",
       "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
@@ -9746,6 +9781,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "cmd_witness",
@@ -12508,6 +12548,11 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "derive_red_blocks",
+      "kind": "function",
+      "file": "tools/run-gates/lib-verdict.sh"
+    },
+    {
       "id": "derive_redacted",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -12686,6 +12731,11 @@
       "id": "derive_roster_line_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "derive_routed_candidate",
@@ -15450,6 +15500,11 @@
     {
       "id": "load_conf_to_policy",
       "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
+      "id": "load_conf_to_policy",
+      "kind": "function",
       "file": "tools/govkit/steps/review_rounds.py"
     },
     {
@@ -16105,6 +16160,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/steps/python_floor.py"
     },
     {
@@ -16651,6 +16711,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "main",
@@ -18103,6 +18168,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "parse_gate",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
       "id": "parse_gate_backstop",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18456,6 +18526,26 @@
       "id": "planned_writes",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "plant_ir_policy",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "plant_kits",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "plant_routed",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "plant_run",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "pop_guard",
@@ -19656,6 +19746,11 @@
       "id": "read_at",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_attribution",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_attribution_tokens",
@@ -21088,6 +21183,11 @@
       "file": "tools/check-install-prefix.test.sh"
     },
     {
+      "id": "read_gate_blocks",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_gate_policy",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21336,6 +21436,11 @@
       "id": "read_header_verbs",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_held",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "read_held_gates",
@@ -22403,6 +22508,11 @@
       "file": "tools/loop/loop_lib.py"
     },
     {
+      "id": "read_outcomes",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_over_cap_findings",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -23043,6 +23153,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "read_red_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_refs",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -23376,6 +23491,11 @@
       "id": "read_routed_commits",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "read_routing",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_row_at",
@@ -24596,6 +24716,11 @@
       "id": "read_verdict",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "read_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_verdict_tree",
@@ -31268,6 +31393,16 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_fixture_red_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixtures_guard_census",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -31786,6 +31921,11 @@
       "id": "run_kinds",
       "kind": "function",
       "file": "tools/playbook/core.py"
+    },
+    {
+      "id": "run_kit",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "run_kit_check",
@@ -33441,6 +33581,11 @@
       "id": "run_verb",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
+    },
+    {
+      "id": "run_verdict_route",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_vr_push",
@@ -38868,6 +39013,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_ih_policy",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_inherited_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -39661,6 +39811,11 @@
       "id": "write_routed_keys",
       "kind": "function",
       "file": "tools/memory-tree/adopt-memory-tree.sh"
+    },
+    {
+      "id": "write_routing",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_row_order",

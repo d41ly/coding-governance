@@ -10226,29 +10226,26 @@ verb_resume() { # slug
   return 0
 }
 
-# ========================================================== THE INHERITED-RED POLICY — TOOL-dDerivedDocket-24
+# ========================================================== WHICH RED BLOCKS — TOOL-dWitnessedBar-3, -dDerivedDocket-24
 # A red the landing base already carries used to leave a run two answers, both bad: override
 # `gates-green`, which spends the one check between an unattended run and its landing, or abort. This
 # section is the third, and it is a POLICY rather than a judgment the run makes about itself.
 #
 # THE POLICY IS READ AT R AND NEVER FROM THE TREE. R is the tip `observe_anchor` saw the remote
-# advertise — never local main and never any other local ref, both of which the run can write. The
-# conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED AT R, and the two keys
-# `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R.
-# Both reads PARSE and never execute: one anchored match per key, the value's trailing comment and one
-# pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
-# a run that re-points the conf key moves nothing until a gated push has landed it.
+# advertise — never local main and never any other local ref, both of which the run can write. Which
+# red blocks is the policy key `verdict.blocks`, read by the policy kit's `policy.py get --rev R`
+# (TOOL-dWitnessedBar-3 S5): no policy kit reads the catalogue default `own-only`, and a reader that
+# fails or answers outside the three values reads `every-red`, because a typo must never land a red,
+# and so does a missing R. The conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED
+# AT R, and the age bound `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R; that
+# read PARSES and never executes: one anchored match, the value's trailing comment and one pair of
+# quotes stripped. A run that loosens its own copy of either therefore enables nothing until a gated
+# push has landed it. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY:
+# a red that passes lands at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
 #
-# BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
-# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named and
-# no hook file at R, a named one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
-# bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
-# never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
-# INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
-# INHERITED red lands under `land` at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
-#
-# WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
-# from the run record of a bar whose id this driver pinned, and never re-derived.
+# WHAT THIS DOES NOT DECIDE: whether a red is inherited, or whether it blocks. Both are the runner's
+# attribution record, the class and its ninth field `blocks`, read here from the run record of a bar
+# whose id this driver pinned, and never re-derived.
 #
 # TWO COPIES OF THIS PARSER, BYTE-IDENTICAL, and the second is the pre-push hook's. The hook ships
 # verbatim through another kit and cannot source this one, so the parse is spelled twice; the two
@@ -10271,22 +10268,21 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
-# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
-# hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
-# conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
-# before it defaults to land. Defaulting first made the two readers disagree in the direction that
-# strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
-# The path is spelled as the hook derives it; a named file is still the conf's, read as before.
+GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN AGE BOUND (closing review round 1, M7 and
+# M12). The hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says,
+# so when the conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at
+# the same R. The path is spelled as the hook derives it; a named file is still the conf's.
 # GP_POST_MERGE IS READ FROM THE HOOK'S OWN FILE AT R, whatever GATE_POLICY_FILE names
 # (TOOL-aFrugalTurnstile-9 S1, spec F3): the hook binds a post-merge red and the lander starts the
 # post-merge bar only where that file declares one, so a declaration read anywhere else could buy a
-# scoped close that no post-merge bar follows.
-read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
-  local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
-  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# scoped close that no post-merge bar follows. Which red blocks is `verdict.blocks`, read by
+# `read_gate_blocks` below at the same R (TOOL-dWitnessedBar-3 S5).
+read_gate_policy() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
+  local r=$1 conf path blob="" age bnd via="" hook=".githooks/gate-env.sh"
+  GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
   if [ -z "$r" ]; then
-    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
+    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at, which reads every-red"; return 0
   fi
   GP_POST_MERGE=$(read_policy_key "$(GIT show "$r:$hook" 2>/dev/null)" GATE_POST_MERGE)
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
@@ -10296,42 +10292,67 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
     path=$(read_policy_key "$conf" GATE_POLICY_FILE)
     [ -n "$path" ] || via="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}"
   fi
-  if [ -n "$via" ]; then
-    path=$hook
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="$via, and the pre-push hook's own $path is absent there too, so the kit default land applies, with no age bound"; return 0
-    fi
-  else
-    case "$path" in
-      /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-        GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
-    esac
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
-    fi
+  [ -z "$via" ] || path=$hook
+  case "$path" in
+    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+      read_gate_blocks "$r"
+      GP_WHY="$GP_WHY, with no age bound: GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+  esac
+  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+    read_gate_blocks "$r"
+    GP_WHY="$GP_WHY, with no age bound: $path is absent at ${r:0:8}${via:+; $via}"; return 0
   fi
-  pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
-  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings"; else bnd="no age bound"; fi
-  # THE BOUND TRAVELS UNDER EITHER POLICY when one is declared: the runner ages and owns each
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings, read from $path at ${r:0:8}"
+  else bnd="no positive INHERITED_RED_MAX_AGE in $path at ${r:0:8}, so no leg is aged and nothing is escalated"; fi
+  [ -z "$via" ] || bnd="$bnd; $via, so the file the pre-push hook reads decides"
+  # THE BOUND TRAVELS UNDER EVERY VALUE when one is declared: the runner ages and owns each
   # INHERITED leg with it, and the auto-filed ask names that owner and is escalated BLOCKER when the
   # leg reads aged. Nothing lands or holds on it.
-  case "$pol" in
-    land) GP_POLICY=land; GP_MAX_AGE=$age
-          if [ -n "$age" ]; then
-            GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
-          else
-            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, so no leg is aged and nothing is escalated"
-          fi ;;
-    park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
-    '')   GP_POLICY=land; GP_MAX_AGE=$age
-          GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
-    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
+  GP_MAX_AGE=$age
+  read_gate_blocks "$r"
+  GP_WHY="$GP_WHY, with $bnd"
+}
+
+# THE `verdict.blocks` VALUE AT R (TOOL-dWitnessedBar-3 S5), read through the policy kit's own reader
+# as `read_spec_audit_switch` finds it, `--rev` the advertised tip, so a run that loosens its own
+# policy file enables nothing. No policy kit reads the catalogue default `own-only`, announced; a
+# reader that exits non-zero or answers outside the three values reads `every-red`, because a typo must
+# never land a red. The pre-push hook reads the same key the same way at the same R.
+read_gate_blocks() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red) and GP_WHY
+  local r=$1 py d out rc=0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    GP_POLICY=own-only; GP_WHY="no policy kit resolves beside this kit, so the catalogue default own-only applies"
+    return 0
+  fi
+  out=$("$py" "$d/policy.py" get verdict.blocks --rev "$r" 2>/dev/null) || rc=$?
+  out=${out%$'\r'}
+  case "$rc:$out" in
+    0:own-only|0:own-mixed-contended|0:every-red)
+      GP_POLICY=$out; GP_WHY="read by policy.py get at ${r:0:8}" ;;
+    *) GP_POLICY=every-red
+       GP_WHY="policy.py get verdict.blocks at ${r:0:8} exited $rc answering '$out', outside 'own-only own-mixed-contended every-red', which reads every-red" ;;
   esac
-  [ -z "$via" ] || GP_WHY="$GP_WHY; $via, so the file the pre-push hook reads decides"
+}
+
+# THE ROUTES OF A RED BAR (TOOL-dWitnessedBar-3 S6): the run-gates kit's `verdict_flow.py route` writes
+# the routing record beside the bar's attribution and prints one `route` line per red, relayed here.
+# It decides nothing this driver reads: the decision table reads the attribution's `blocks` field. A
+# kit or a python that does not resolve, or a route that refuses, is announced and changes nothing.
+run_verdict_route() { # run dir
+  local d=$1 py k out rc=0
+  [ -n "$d" ] && [ -f "$d/verdict" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "unattended: gates-green — no run-gates kit holding verdict_flow.py resolves beside this kit, so the reds are not routed"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_flow.py" route --run "$d" 2>&1) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
+  [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py route exited $rc, so the reds are not routed"
+  return 0
 }
 
 # THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
@@ -10339,19 +10360,20 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
 #
 #   the verdict reads tree_moved yes                  moved   UNMET, naming the move
 #   no usable record (see below)                      none    UNMET exactly as before this unit
-#   every red INHERITED, at any age, policy land       land    MET, a gates-inherited fact
-#   every red INHERITED, policy park                   hold    UNMET, the hold line
-#   any OWN, MIXED, DEAD PROBE or CONTENDED            other   UNMET, the attribution lines
+#   every row's `blocks` reads pass, at any age        land    MET, a gates-inherited fact
+#   every red INHERITED, one reading block             hold    UNMET, the hold line
+#   anything else                                      other   UNMET, the attribution lines
 #
 # A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
 # with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
-# partial record is not an all-INHERITED one. THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an
-# aged leg, and one whose age is unproven, land under `land` like any other. GR_AGED names the legs
-# whose age reads `aged` — never an unproven one, since nothing proves it aged — for the BLOCKER
-# escalation and the MET line.
+# partial record is not an all-passing one. `blocks` is the row's ninth field, the runner's under the
+# `verdict.blocks` value this driver handed it (TOOL-dWitnessedBar-3 S5); anything but `pass` blocks.
+# THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an aged leg, and one whose age is unproven,
+# land like any other. GR_AGED names the legs whose age reads `aged` — never an unproven one, since
+# nothing proves it aged — for the BLOCKER escalation and the MET line.
 GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
 read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comma-joined) and GR_WHY
-  local d=$1 pol=$2 v tm fl wb n=0 inh=0 leg ver age
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 pass=0 leg ver age blk
   GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
   if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
     GR_WHY="the bar left no run record under the id this driver pinned"; return 0
@@ -10368,21 +10390,20 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comm
   if [ "$v" != RED ] || [ "$tm" != no ] || [ -n "$wb" ] || [ ! -f "$d/attribution" ]; then
     GR_WHY="the bar's record is not a RED verdict on an unmoved tree beside an attribution record"; return 0
   fi
-  while IFS=$'\t' read -r leg ver _ _ _ age _; do
+  while IFS=$'\t' read -r leg ver _ _ _ age _ _ blk _; do
     [ -n "$leg" ] || continue
     n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
-    [ "$ver" = INHERITED ] || continue
-    inh=$((inh + 1))
+    [ "$blk" = pass ] && pass=$((pass + 1))
     [ "$age" = aged ] && GR_AGED="$GR_AGED${GR_AGED:+,}$leg"
+    [ "$ver" = INHERITED ] && inh=$((inh + 1))
   done < "$d/attribution"
   if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
     GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
   fi
-  if [ "$inh" != "$n" ]; then
-    GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
-  fi
-  if [ "$pol" = land ]; then GR_STATE=land; return 0; fi
-  GR_STATE=hold
+  if [ "$pass" = "$n" ]; then GR_STATE=land; return 0; fi
+  if [ "$inh" = "$n" ]; then GR_STATE=hold; return 0; fi
+  GR_STATE=other
+  GR_WHY="a red leg blocks under verdict.blocks ${pol:-every-red} and not every red is INHERITED, so this red is the run's to fix"
   return 0
 }
 
@@ -10754,13 +10775,16 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
 }
 
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid blk cand reused fam seq id argv file tok a s k cls
   local r8=${2:0:8} today sev filed=0
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
-  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
-    [ "$ver" = INHERITED ] || continue
+  # ONE ASK PER ROW READING `pass` (TOOL-dWitnessedBar-3 S5), the `ask` route: a red that lands still
+  # has an owner on the record. Its text names the class, `inherited red` for an INHERITED one.
+  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid blk _; do
+    [ "$blk" = pass ] || continue
+    cls=${ver,,}
     # THE SEV OWED: BLOCKER for an aged leg, HIGH for every other one, an unproven age included.
     sev=HIGH; [ "$age" = aged ] && sev=BLOCKER
     # REUSE FIRST, over this build's own filings for the same leg AND the same R, at the SEV owed.
@@ -10771,7 +10795,7 @@ write_inherited_asks() { # slug · R · run dir
         if read_ask_back "$cand" "$slug" "$sev"; then
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
-      done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
+      done < <(grep -F -- "$cls red: leg $leg red at $r8," "$bl" 2>/dev/null \
                  | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
     fi
     [ -z "$reused" ] || continue
@@ -10794,11 +10818,11 @@ write_inherited_asks() { # slug · R · run dir
     seq=$(derive_ask_seq "$fam" "$slug")
     id="$fam-$slug-$seq"
     if [ "$sev" = BLOCKER ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     elif [ "$own8" != - ] && [ -n "$own8" ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
     else
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     fi
     if [ "$sev" = BLOCKER ]; then
       s="- SEV · $id · BLOCKER · a merge-bar leg is red on the default branch, older than the age bound"
@@ -11073,7 +11097,7 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
 #
 # TOOL-dUnstuckLanding-27 S3 - THE RECORD IS NOT ALL THE CLOSE STAGES. Over an inherited-only red
-# under `land`, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
+# that passes, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
 # views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
 # The set is read from THE BAR'S OWN RUN RECORD, `staged` beside its attribution, never from the
 # run-state file (implementation review round 2, M2 and L1): a fact there was one line a run could
@@ -11131,8 +11155,8 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 }
 
 # TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
-# reads its bar MET over an inherited-only red under `land`, or prints the hold line over one under
-# `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
+# reads its bar MET over a red every row of which passes, or prints the hold line over an inherited-only
+# one that blocks (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
 # TOOL-dWitnessedBar-25 S5 - A RED BAR'S FAILING-LEG TAILS, COMMITTED AS `leg-tail` RECORDS. The run-gates
@@ -11939,13 +11963,13 @@ dod_met() { # slug · run-state file · item · checker
       local -a _genv _grb _gfrom
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
-      # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
-      # INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
+      # ref: a run's own commit on local main loosening `verdict.blocks` with its own red would sit at
+      # R, read INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
       # id is PINNED, unpredictable and cleared first, because this arm reads THAT bar's record after
       # it and a record the runner never wrote must not be mistaken for one it did.
       _gr=${ASHA:-}
       read_gate_policy "$_gr"
-      echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
+      echo "unattended: gates-green — verdict.blocks reads $GP_POLICY: $GP_WHY"
       # TOOL-dDerivedDocket-27 S4 - THE BAR'S BOUND IS THE BACKSTOP `--preflight` PINNED, because
       # GATE_WALL is a working-tree declaration the run can edit and a bound that moves between the
       # two reads is two bounds. A record that predates the fact is recomputed HERE, announced; no
@@ -11986,7 +12010,7 @@ dod_met() { # slug · run-state file · item · checker
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
         # TOOL-dWitnessedBar-25 S2 - the bar's cause, this run, in the runner's verdict.
-        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_INHERITED_RED="$GP_POLICY")
+        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_VERDICT_BLOCKS="$GP_POLICY")
         [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
         [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
         # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
@@ -12171,16 +12195,19 @@ dod_met() { # slug · run-state file · item · checker
           fi ;;
         1)
           # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
-          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED, at any
-          # age, under `land` is MET (TOOL-dUnstuckLanding-16); the same under `park` is UNMET and
-          # prints the hold line the Skill acts on; anything else is UNMET with the attribution lines
-          # exactly as before that unit. The MET line names the aged legs, whose asks are BLOCKER.
+          # `read_gates_record` states it, first matching row wins. Every red row reading `pass`, at
+          # any age, is MET (TOOL-dWitnessedBar-3 S5, TOOL-dUnstuckLanding-16); every red INHERITED
+          # and one blocking is UNMET and prints the hold line the Skill acts on; anything else is
+          # UNMET with the attribution lines. The MET line names the aged legs, whose asks are BLOCKER.
+          # TOOL-dWitnessedBar-3 S6 - every red bar read here is ROUTED first, its routing record
+          # written beside the attribution, each route printed.
+          run_verdict_route "$_gdir"
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)
               DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
             land|hold|other)
-              # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+              # S10 - an owner on the record for every red that passes, on every path whose record is usable.
               write_inherited_asks "$slug" "$_gr" "$_gdir"
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
@@ -12193,13 +12220,13 @@ dod_met() { # slug · run-state file · item · checker
                 else
                   _gesc="none aged past the ${GP_MAX_AGE}-landing age bound"
                 fi
-                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED; $_gesc"
+                DOD_OUT="gates-green MET over a red every row of which passes under verdict.blocks $GP_POLICY: $GR_LEGS red at ${_gr:0:8}; $_gesc"
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
                 # TOOL-dDeclaredLoop-17 S6: the hold's join reads this set, as the hand-off's does.
                 write_gates_staged "$_gdir" "$WI_STAGED"
-                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; verdict.blocks=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
                 DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"

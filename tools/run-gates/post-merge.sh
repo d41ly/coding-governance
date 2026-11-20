@@ -39,7 +39,7 @@ PM_SCRUB="GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNAT
 PM_DROPPED=""
 for _k in $PM_SCRUB $(compgen -e); do
   case "$_k" in
-    *_PY|GATE_INHERITED_RED*) ;;
+    *_PY|GATE_INHERITED_RED_MAX_AGE|GATE_VERDICT_BLOCKS) ;;
     *) case " ${PM_SCRUB//$'\n'/ } " in *" $_k "*) ;; *) continue ;; esac ;;
   esac
   if [ -n "${!_k+x}" ]; then
