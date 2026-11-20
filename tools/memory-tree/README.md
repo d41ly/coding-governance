@@ -214,7 +214,7 @@ its own:
 | `ratchet (never gains)` | `never-gains` | a key gained, a count raised or a ceiling exceeded against the compare base, an append-only base row edited or removed, and a `widened:` row `retrofit.widen` does not admit |
 | `ratchet (both ways)` | `both-ways` | for each registration whose `leg` names it, a measured key with no row or a row its seed no longer finds; one naming another leg prints `graded by <leg>` |
 | `ratchet (unarmed)` | `unarmed` | a `seed = []` registration, or a home recording a failed seed, whose home still holds rows |
-| `ratchet (populated)` | `populated` | an armed home holding no row; no seen-red record admits one yet |
+| `ratchet (populated)` | `populated` | an armed home holding no row, unless a seen-red line names the registration's leg, read through `seen_red.py`'s `read_seen_red_records`: it prints `admitted · seen red at <red sha8> in <record>`, and a line the reader refuses exits 2 (TOOL-dWitnessedBar-7 S10) |
 | `ratchet (seed laundering)` | `seed-laundering` | a base row re-dated or its disposition rewritten, or removed while its seed still measures it |
 | `ratchet (rename)` | `rename` | a `git mv` of a file holding `site` rows left keyed on the old path |
 | `ratchet (keys, not a scalar)` | `keys-not-scalar` | a `*_PIN` key a tracked root `.<name>.conf` assigns that `conf-scalar-pins` does not hold |

@@ -141,7 +141,8 @@ from design_lib import (  # noqa: E402  the one parser of the design, and its cl
     _CL, DESIGN_KEYS, DesignRefusal, check_audit_fold, read_chain_clauses, read_design_keys, read_design_view,
     read_spec_revisions, read_tracked_builds, scan_chain_specs, write_design_fixture)
 from tree_lib import (  # noqa: E402
-    GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at)
+    GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at,
+    read_evidence_lines)
 from build_records import (  # noqa: E402  the typed record factory: FIELD, the grammar of deviations.py:123
     FIELD, derive_stem, read_record as read_typed_record, read_records as read_typed_records)
 
@@ -610,14 +611,9 @@ def read_population(root, conf, commits):
     for rel in rels:
         if binds.get(rel, {}).get("kind") != "journal":
             continue
-        unit = None
-        for n, ln in enumerate(read_text(rel).split("\n"), 1):
-            ev = re.match(r"^\*\*Evidences:\*\* `?([^`\s]+)`?", ln)
-            if ev or ln.startswith("#"):
-                unit = ev.group(1) if ev else None
-                continue
+        for n, unit, ln in read_evidence_lines(read_text(rel)):
             a = LEDGER.match(ln)
-            if a and unit:
+            if a:
                 k = int(a.group(2))
                 members.append({"kind": "ledger", "build": derive_slug(rel), "address": f"{unit}@rev-{k - 1}",
                                 "hand": "spec-revised", "sha": read_row_commit(root, ln, rel),

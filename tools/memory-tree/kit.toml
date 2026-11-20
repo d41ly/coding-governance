@@ -1052,3 +1052,7 @@ stage = ["step.test"]
 [gate_leg.gov]
 chunk = "selftests"
 ceiling = 300
+
+[[command]]
+verb = "seen-red"
+run = "seen_red.py"

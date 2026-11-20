@@ -939,6 +939,10 @@ ledspec 147 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha
   --list etc/beta.toml` runs, `gamma` prints nothing.'
 ledspec 148 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — when `bash alpha.sh
   --list etc/beta.toml` runs, `gamma` prints nothing.'
+# 149 — TOOL-dWitnessedBar-7 S8 (AC5): the answer shares nothing with its criterion, and the seen-red line
+#       after it names the criterion's token. The line closes the answer, so the answer still reds; read
+#       as the answer's continuation, its `alpha.sh` would join the two and silence it.
+ledspec 149 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
 
 # ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
 # ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
@@ -1069,13 +1073,17 @@ write_rows_spec 182 10 '- security
 # names nothing the criterion holds.
 printf '# ledger three
 
-**Serves:** journal ARCH-tFixture-147 ARCH-tFixture-148
+**Serves:** journal ARCH-tFixture-147 ARCH-tFixture-148 ARCH-tFixture-149
 
 **Evidences:** ARCH-tFixture-147
 - AC1 — `etc/beta.toml` — observed.
 
 **Evidences:** ARCH-tFixture-148
 - AC1 — `zulu.py` — observed.
+
+**Evidences:** ARCH-tFixture-149
+- AC1 — `zulu.py` — observed.
+- seen-red — `alpha.sh` — red `3f2b31b5` — green `3f2b31b5` — the suite with its assertion inverted
 ' > "$D/build/2026-08-20-build-ARCH-tFixture-147-1-ledger.md"
 # CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
 # engine selects its population with `git ls-files`, so a fixture written after this commit is
@@ -1467,6 +1475,7 @@ hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuati
 miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
 miss 'ARCH-tFixture-147/AC1'                   # a wrapped span is one token, joined (PLAY-dOrderedCharter-77 S16)
 hit  'ARCH-tFixture-148/AC1'                   # ...and its control, sharing nothing, still reds
+hit  'ARCH-tFixture-149/AC1'                   # a seen-red line closes the answer: its tokens join no criterion (TOOL-dWitnessedBar-7 S8)
 
 # ---- TOOL-aJoinedCanon-8: the four §3 edge arms and the three `fail 12` branches the joins add.
 hit  'tFixture-160.md (§3 carries no `### Edges` block'
@@ -3484,6 +3493,21 @@ cnot 12 'memory/builds/tTen/spec/2026-08-01-spec-tTen-1.md'
 # --- mints and the bindings reader does not admit.
 out=$("$_PY" "$HERE/build_records.py" --fixture --plant typed-kinds 2>&1)
 hit 'build-records: PASS typed-kinds'
+
+# --- TOOL-dWitnessedBar-7 (AC1 AC2 AC3 AC4 AC6) — `test.seen-red`: each plant of `seen_red.py --fixture` is a
+# --- scratch repository the join runs over, its exit the join's. Red on a reader that does not parse the
+# --- seen-red line, an owed set missing an added manifest row or a `New arm:` line, an empty owed set
+# --- printed as nothing, and a malformed line skipped rather than refused.
+for _sr in 'seen:0:seen-red: fix added leg · ' 'unseen-gate:1:seen-red: fix added leg · NO RECORD' \
+           'unseen-arm:1:seen-red: fix base leg · NO RECORD' \
+           'bad-line:2:2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md:7: a seen-red line outside its grammar' \
+           'empty:0:seen-red: dFix adds or changes no gate · nothing joined'; do
+  _srp=${_sr%%:*}; _srw=${_sr#*:}; _srn=${_srw#*:}; _srw=${_srw%%:*}
+  out=$("$_PY" "$HERE/seen_red.py" --fixture --plant "$_srp" 2>&1); _src=$?
+  n=$((n+1)); [ "$_src" = "$_srw" ] || { echo "FAIL seen_red.py --fixture --plant $_srp exited $_src, expected $_srw:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1; }
+  hit "$_srn"
+  [ "$_srp" != seen ] || hit ' · memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md'   # AC1: its record named
+done
 
 # --- TOOL-dDeclaredLoop-22 S1 (AC1) — the recommendation door: a score record and the reason answering it,
 # --- each read back with every field, five refusals naming their field and writing nothing, and both

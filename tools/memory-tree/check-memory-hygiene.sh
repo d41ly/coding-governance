@@ -3628,6 +3628,10 @@ if [ -n "$alcut" ]; then
           u = (j ? $2 : ""); continue }
         if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           u = ""; continue }
+        # TOOL-dWitnessedBar-7 S8: a seen-red line is no answer, so it CLOSES the open one and its
+        # tokens join no criterion; the block stays open for the answers after it.
+        if ($0 ~ /^- seen-red/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          continue }
         if (u != "" && $0 ~ /^- *(\*\*)?AC[0-9]+/) {
           if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)

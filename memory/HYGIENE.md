@@ -830,6 +830,20 @@ Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disar
   against the records of their own build folders. A record in another build that evidences one of
   them is read only by the full run.
 
+**The seen-red line** (TOOL-dWitnessedBar-7) records a gate seen red, one line per arm the main loop
+observed red on its staged break and green once restored, under the `**Evidences:**` block of the
+unit that adds or changes the gate:
+
+```
+- seen-red — `<leg name>` — red `<sha>` — green `<sha>` — <the staged break>
+```
+
+The leg is its manifest `name`, each SHA 8 to 40 lowercase hex, the break one line of prose; `red` is
+the commit the break was staged over, `green` the one the arm read green at once restored. It is no
+answer to a criterion and no third form: it closes the answer above it, so check 23 joins none of its
+tokens to that answer's. `seen_red.py --build <slug>` reads it back, one line per gate the build adds
+or changes, and refuses a line opening `- seen-red` in any other shape.
+
 ## The harness meta-gate
 
 Every `fail` BRANCH in every gate is either ARMED — a POSITIVE assertion in that gate's own sibling
