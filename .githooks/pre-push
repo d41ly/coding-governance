@@ -1628,18 +1628,23 @@ if [ -n "$_gcd_abs" ] && [ -n "$_tip_tree" ]; then
   bar_candidates=("$(verdict_path "$_tip_tree")" "$(verdict_path "$_tip_tree").scoped")
 fi
 # read_bar_file <path> — every key a per-tree verdict or a runner stamp carries, by builtins alone, so
-# a candidate costs no process. Each is empty when the file or the key is absent.
+# a candidate costs no process. Each is empty when the file or the key is absent. `bg_sel_rows` holds
+# each `selection.<n>` value at index <n> (TOOL-dWitnessedBar-41 S2), an index of up to six digits.
 read_bar_file() {
-  local k v
+  local k v n
   bg_sha=""; bg_tree=""; bg_kind=""; bg_base=""; bg_st=""; bg_run=""; bg_by=""
   bg_fp=""; bg_blob=""; bg_man=""; bg_verdict=""; bg_reused=""; bg_reused_cache=""
+  bg_sel=""; bg_sel_rows=()
   [ -f "$1" ] || return 0
   while IFS=$'\t' read -r k v; do
     case "$k" in
       sha) bg_sha=$v ;; tree) bg_tree=$v ;; kind) bg_kind=$v ;; base) bg_base=$v ;;
       selftests) bg_st=$v ;; run_id) bg_run=$v ;; by) bg_by=$v ;; verdict) bg_verdict=$v ;;
       fingerprint) bg_fp=$v ;; manifest_blob) bg_blob=$v ;; manifest) bg_man=$v ;;
-      reused) bg_reused=$v ;; reused_cache) bg_reused_cache=$v ;;
+      reused) bg_reused=$v ;; reused_cache) bg_reused_cache=$v ;; selection) bg_sel=$v ;;
+      selection.[1-9]*)
+        n=${k#selection.}
+        case "$n" in *[!0-9]*|???????*) ;; *) bg_sel_rows[$n]=$v ;; esac ;;
     esac
   done < "$1"
 }
@@ -1762,6 +1767,64 @@ check_tree_verdict() {
   if [ -z "$bg_sha" ]; then force="it names no sha"; return 0; fi
   check_green_record "$bg_sha" "$bg_fp" "$bg_blob" "$bg_man" "$bg_st" "$1"
   [ -z "$force" ] && check_tree_reuse "$1"
+  [ -z "$force" ] && check_tree_selection "$1"
+  return 0
+}
+
+# check_selection_at_r <--run|--selection> <path> — whether R derives the selection a bar held legs by,
+# through the pushed tree's own `verdict_flow.py select --check` (TOOL-dWitnessedBar-5 S7), for the
+# run record of the bar this hook ran (`--run`) and a per-tree verdict's rebuilt rows (`--selection`,
+# TOOL-dWitnessedBar-41 S2). Sets SEL_NOT empty, or to the reason. The checker is vetted as the bar is:
+# a refusal of `check_reviewed_file` exits the hook.
+check_selection_at_r() {
+  local rel py out
+  SEL_NOT=""; rel="${GATE_RUNNER%/*}/verdict_flow.py"
+  if [ -z "$GATE_RUNNER" ]; then
+    SEL_NOT="the bar held legs by a selection and no run-gates kit resolves to re-derive it at R"
+  elif [ -z "${main_remote//0/}" ]; then
+    SEL_NOT="the bar held legs by a selection and the remote holds no tip, so there is no R to re-derive it at"
+  elif ! py=$(resolve_python 2>/dev/null); then
+    SEL_NOT="the bar held legs by a selection and no usable python can re-derive it at R"
+  elif check_reviewed_file "$rel" "$main_local" "is run to re-derive the bar's selection at R" \
+       && ! out=$(cd "$top" && "$py" "$rel" select --check "$1" "$2" --rev "$main_remote" 2>&1); then
+    SEL_NOT="the bar's selection is not what ${main_remote:0:8} derives: $(printf '%s' "$out" | tr '\n' ' ')"
+  fi
+  return 0
+}
+
+# check_tree_selection <label> — whether the selection the per-tree verdict read_bar_file last read
+# names is one R derives, for both of its readers (TOOL-dWitnessedBar-41 S2, S3). No `selection` key
+# refuses, since the record cannot say whether its bar held legs; `none` passes; a hash is checked
+# against the rows rebuilt from `selection.1` upward, `held` and a TAB before each and each ` · ` a
+# TAB again, then `select --check --selection` runs over them at R. SEL_SEEN keeps one
+# `<hash>TAB<force>` line per hash checked, so a push runs that check at most once per hash. Sets
+# `force` to the failure or empty.
+SEL_SEEN=""
+check_tree_selection() {
+  local i rows f h seen
+  force=""
+  if [ -z "$bg_sel" ]; then
+    force="the recorded $1 carries no selection, so it cannot say whether its bar held legs"; return 0
+  fi
+  [ "$bg_sel" = none ] && return 0
+  rows=""; i=1
+  while [ -n "${bg_sel_rows[$i]+x}" ]; do rows+="held"$'\t'"${bg_sel_rows[$i]// · /$'\t'}"$'\n'; i=$((i + 1)); done
+  if ! f=$(mktemp 2>/dev/null) || [ -z "$f" ]; then
+    force="the recorded $1's selection could not be rebuilt: no scratch file could be made"; return 0
+  fi
+  printf '%s' "$rows" > "$f"
+  h=$(git hash-object --stdin < "$f" 2>/dev/null)
+  if [ -z "$h" ] || [ "$h" != "$bg_sel" ]; then
+    rm -f "$f"; force="the recorded $1's selection rows do not hash to ${bg_sel:0:8}, so a row was edited or lost"; return 0
+  fi
+  while IFS=$'\t' read -r h seen; do
+    [ "$h" = "$bg_sel" ] || continue
+    rm -f "$f"; force=$seen; return 0
+  done <<<"$SEL_SEEN"
+  check_selection_at_r --selection "$f"
+  rm -f "$f"
+  force=$SEL_NOT
+  SEL_SEEN+="$bg_sel"$'\t'"$force"$'\n'
   return 0
 }
 
@@ -1799,7 +1862,7 @@ check_bar_record() {
 # write LOCAL copies here, so the caller's record is kept.
 check_bar_base() {
   local want=$1 f found="" bt
-  local bg_sha bg_tree bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man bg_verdict bg_reused bg_reused_cache
+  local bg_sha bg_tree bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man bg_verdict bg_reused bg_reused_cache bg_sel bg_sel_rows
   if [ -z "$want" ]; then force="it is a scoped green that names no base"; return 0; fi
   for f in "${green_candidates[@]}"; do
     read_bar_file "$f"
@@ -2238,6 +2301,8 @@ check_cover_record() {
     fi
     check_tree_reuse "$bg_kind tree verdict"
     if [ -n "$force" ]; then cover_why=$force; return 0; fi
+    check_tree_selection "$bg_kind tree verdict"
+    if [ -n "$force" ]; then cover_why=$force; return 0; fi
   else
     [ -n "$_tip_fp" ] || { [ -x "$kitfp" ] && _tip_fp=$(bash "$kitfp" "$main_local" 2>/dev/null); }
     if [ -z "$bg_fp" ] || [ -z "$_tip_fp" ]; then
@@ -2556,23 +2621,12 @@ PP_BAR_PID=""
 # loosening, so the run record's `selection` is derived again at R by `verdict_flow.py select --check`
 # before this hook admits that bar's verdict, green or a red that would land: a row R does not derive,
 # or a check that cannot answer, is RED here. Read whatever bar ran: a record holding a selection is
-# checked, and only the runner writes one.
+# checked, and only the runner writes one. The check is `check_selection_at_r`, which the per-tree
+# readers share (TOOL-dWitnessedBar-41 S2).
 SEL_NOT=""
 if [ -f "$gd/gate-run/$RUNLOG_GATE_RUN/selection" ]; then
-  _sel_rel="${GATE_RUNNER%/*}/verdict_flow.py"
-  if [ -z "$GATE_RUNNER" ]; then
-    SEL_NOT="the bar held legs by a selection and no run-gates kit resolves to re-derive it at R"
-  elif [ -z "${main_remote//0/}" ]; then
-    SEL_NOT="the bar held legs by a selection and the remote holds no tip, so there is no R to re-derive it at"
-  elif ! _sel_py=$(resolve_python 2>/dev/null); then
-    SEL_NOT="the bar held legs by a selection and no usable python can re-derive it at R"
-  # The checker is the pushed tree's own copy, so it is vetted as the bar is: a refusal exits here.
-  elif check_reviewed_file "$_sel_rel" "$main_local" "is run to re-derive the bar's selection at R" \
-       && ! _sel_out=$(cd "$top" && "$_sel_py" "$_sel_rel" select --check --run "$gd/gate-run/$RUNLOG_GATE_RUN" --rev "$main_remote" 2>&1); then
-    SEL_NOT="the bar's selection is not what ${main_remote:0:8} derives: $(printf '%s' "$_sel_out" | tr '\n' ' ')"
-  fi
+  check_selection_at_r --run "$gd/gate-run/$RUNLOG_GATE_RUN"
   if [ -n "$SEL_NOT" ]; then echo "pre-push: $SEL_NOT — treating it as RED"; rc=1; fi
-  unset _sel_rel _sel_py _sel_out
 fi
 if [ "$rc" -eq 0 ]; then
   case "$bar_record" in

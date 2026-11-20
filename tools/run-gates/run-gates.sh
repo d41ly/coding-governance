@@ -3094,7 +3094,13 @@ total=${#names[@]}
 # row whose source is outside those two, or whose leg this manifest lacks, is printed and ignored, and
 # ignoring a hold RUNS the leg, the safe direction. The file is copied into the run record as
 # `selection`, which the pre-push hook re-derives at R before it admits this bar's verdict (S7).
+# THE SAME ROWS RIDE ON THE PER-TREE VERDICT (TOOL-dWitnessedBar-41 S1), because the run record is this
+# worktree's and is swept: the CANONICAL TEXT is every line whose first TAB field is `held`, in file
+# order, one trailing CR cut, each LF-terminated, an ignored row kept so the hook's re-derivation names
+# it. SEL_HASH is its `git hash-object --stdin`, `none` with no file; SEL_KEYS one `selection.<n>` per
+# line, its `held` field cut and each TAB after it turned into ` · `.
 HOLD_SOURCES="kit quarantine level"
+SEL_HASH=none; SEL_KEYS=""
 declare -A SEL_SRC=() SEL_NOTE=()
 derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES) and HOLD_NOTE, or both empty
   HOLD_SRC=""; HOLD_NOTE=""
@@ -3108,10 +3114,18 @@ if [ -n "$SEL_FILE" ]; then
   else
     declare -A _sel_at=()
     for ((i=0; i<total; i++)); do [ -n "${names[$i]}" ] && _sel_at["${names[$i]}"]=$i; done
-    _sel_n=0
-    while IFS=$'\t' read -r _sel_k _sel_leg _sel_src _sel_note || [ -n "$_sel_k" ]; do
+    _sel_n=0; _sel_r=0; _sel_text=""
+    while IFS= read -r _sel_line || [ -n "$_sel_line" ]; do
       _sel_n=$((_sel_n + 1))
+      IFS=$'\t' read -r _sel_k _sel_leg _sel_src _sel_note <<<"$_sel_line"
       _sel_note=${_sel_note%$'\r'}
+      _sel_line=${_sel_line%$'\r'}
+      case "$_sel_line" in
+        held|held$'\t'*)
+          _sel_r=$((_sel_r + 1)); _sel_text+="$_sel_line"$'\n'
+          _sel_v=${_sel_line#held}; _sel_v=${_sel_v#$'\t'}
+          SEL_KEYS+="selection.$_sel_r"$'\t'"${_sel_v//$'\t'/ · }"$'\n' ;;
+      esac
       case "$_sel_k" in ''|'#'*) continue ;; esac
       if [ "$_sel_k" != held ] || [ -z "$_sel_leg" ]; then
         echo "run-gates: selection — row $_sel_n is not held · leg · source · note, ignored" >&2
@@ -3125,8 +3139,9 @@ if [ -n "$SEL_FILE" ]; then
         SEL_SRC[${_sel_at["$_sel_leg"]}]=$_sel_src; SEL_NOTE[${_sel_at["$_sel_leg"]}]=$_sel_note
       fi
     done < "$SEL_FILE"
+    SEL_HASH=$(printf '%s' "$_sel_text" | git hash-object --stdin 2>/dev/null)
     [ -n "${RUNDIR:-}" ] && { cp -f "$SEL_FILE" "$RUNDIR/selection" 2>/dev/null && chmod 600 "$RUNDIR/selection" 2>/dev/null; } || true
-    unset _sel_at _sel_n _sel_k _sel_leg _sel_src _sel_note
+    unset _sel_at _sel_n _sel_r _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note
   fi
 fi
 
@@ -6053,6 +6068,8 @@ else
        printf 'reused\t%s\n' "$reuses"
        printf 'reused_cache\t%s\n' "$cache_reuses"
        printf 'run_id\t%s\n' "$RUNID"
+       printf 'selection\t%s\n' "$SEL_HASH"
+       printf '%s' "$SEL_KEYS"
        printf 'cause\t%s\n' "$RUN_CAUSE"
        printf '%s' "$TAIL_ROWS"
        printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"

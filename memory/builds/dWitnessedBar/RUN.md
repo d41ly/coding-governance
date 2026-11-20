@@ -463,3 +463,16 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T07:50:15Z brief · item TOOL-dWitnessedBar-41 · reason 1b15e1fd53e4 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-41-build-brief.md
 
 2026-11-20T07:50:16Z brief · item TOOL-dWitnessedBar-55 · reason c3a5dd0f70d6 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-55-build-brief.md
+
+2026-11-20T07:52:16Z dispatch · item 386b3ebe TOOL-dWitnessedBar-41 · reason .githooks/pre-push .githooks/pre-push.runlog.test.sh .githooks/pre-push.test.sh memory/guides/SESSION-KICKOFF.md tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.sh tools/run-gates/verdict_flow.py memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-41-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-20T07:53:19Z dispatch · item 386b3ebe TOOL-dWitnessedBar-55 · reason help/upgrade-steps.md tools/govkit/selftest.py tools/govkit/steps/inherited_red.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-55-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md
+2026-11-20T08:00:09Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 83/180 · 20261120T080009Z-62f7af
+
+2026-11-20T08:00:09Z dispatch · item 386b3ebe TOOL-dWitnessedBar-55 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-55-deviation-552.md
+2026-11-20T08:03:06Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 84/180 · 20261120T080306Z-499776
+
+2026-11-20T08:03:06Z dispatch · item 386b3ebe TOOL-dWitnessedBar-55 · reason memory/LIVE.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+2026-11-20T08:05:07Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 85/180 · 20261120T080507Z-025b4c
+
+2026-11-20T08:05:07Z dispatch · item 386b3ebe TOOL-dWitnessedBar-55 · reason memory/map/generated/symbols.json

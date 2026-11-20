@@ -38423,6 +38423,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "write_bg_selection",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "write_bg_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"

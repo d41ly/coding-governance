@@ -723,6 +723,28 @@ rv_wgd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
   || nope "AC1 the linked worktree's per-tree verdict is missing from the common dir, written under its own git dir, or keyed by the sha"
 rm -rf "$REC_T.wt"; rec_done
 
+# --- TOOL-dWitnessedBar-41 AC1: the per-tree verdict carries the selection its run held legs by ------
+# A full run under a GATE_SELECTION holding one `quarantine` row for `guarded`, beside `one` which runs,
+# writes `selection.1` naming the held leg and a `selection` equal to `git hash-object` of the canonical
+# text, its `held` rows alone; with no GATE_SELECTION the record reads `selection none`. The file sits
+# OUTSIDE the clone, since an untracked file inside it starts the run dirty and no per-tree verdict is
+# written. Red against a writer that drops the `selection` keys.
+rec_repo
+sl_f="$REC_GD/gate-verdict/$(git -C "$REC_T" rev-parse 'HEAD^{tree}')"; sl_sel="$REC_T.sel"
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ "$(awk -F'\t' '$1=="selection.1"{print $2}' "$sl_f" 2>/dev/null)" = "guarded · quarantine · TOOL-x-7" ] \
+  && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-41 AC1 a run under a one-row selection writes selection.1 naming the held leg and selection as the hash of its canonical text" \
+  || { nope "TOOL-dWitnessedBar-41 AC1 the per-tree verdict omits the selection, or its hash is not the canonical text's"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+rec_run GATE_FULL=1 >/dev/null
+[ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = none ] \
+  && [ -z "$(awk -F'\t' '$1=="selection.1"' "$sl_f" 2>/dev/null)" ] \
+  && ok "TOOL-dWitnessedBar-41 AC1 with no GATE_SELECTION the per-tree verdict reads selection none and no selection.1" \
+  || { nope "TOOL-dWitnessedBar-41 AC1 a run with no GATE_SELECTION did not write selection none"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+rm -f "$sl_sel"; rec_done
+
 # --- TOOL-dWitnessedBar-25 AC1-AC5: the verdict names its run and cause, and a failing leg's tail is kept by hash
 # One red leg printing 100 numbered lines and a credential-shaped URL, beside a leg printing whether it
 # sees GATE_CAUSE. The verdict carries `run_id` (the header's), `cause` (the export, `attended` unset or

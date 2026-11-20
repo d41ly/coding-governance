@@ -2455,9 +2455,14 @@ write_bg_verdict() { # sha · kind · base -> the runner's per-tree verdict of s
   # common dir with a reproducible fingerprint and the manifest blob; BG_VF its path, BG_VN its name
   local t d; t=$(git rev-parse "$1^{tree}"); d="$(git rev-parse --git-common-dir)/gate-verdict"; mkdir -p "$d"
   BG_VN="gate-verdict/$t"; [ "$2" = scoped ] && BG_VN="$BG_VN.scoped"; BG_VF="${d%/gate-verdict}/$BG_VN"
-  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\t%s\nbase\t%s\nmanifest\t%s\nmanifest_blob\t%s\nfingerprint\t%s\nselftests\t\nreused\t0\nreused_cache\t0\nrun_id\tplanted\nstamped\tx\nby\trunner\n' \
+  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\t%s\nbase\t%s\nmanifest\t%s\nmanifest_blob\t%s\nfingerprint\t%s\nselftests\t\nreused\t0\nreused_cache\t0\nrun_id\tplanted\nselection\tnone\nstamped\tx\nby\trunner\n' \
     "$t" "$1" "$2" "$3" "$KIT_REL/gate-legs.json" "$(git rev-parse "$1:$KIT_REL/gate-legs.json")" \
     "$(bash "$KIT_REL/$RUN_GATES/gate-fingerprint.sh" "$1")" > "$BG_VF"
+}
+write_bg_selection() { # row, its `held` cut and TAB-separated -> BG_VF's selection keys hold that one row,
+  # hashed as the runner hashes its canonical text (TOOL-dWitnessedBar-41 S1)
+  set_bg_key "$BG_VF" selection "$(printf 'held\t%s\n' "$1" | git hash-object --stdin)"
+  printf 'selection.1\t%s\n' "${1//$'\t'/ · }" >> "$BG_VF"
 }
 read_bg_key() { awk -F'\t' -v k="$2" '$1==k{print $2}' "$1" 2>/dev/null; }
 remove_bg_key() { awk -F'\t' -v k="$2" '$1!=k' "$1" > "$1.x" && mv "$1.x" "$1"; }
@@ -2517,10 +2522,13 @@ cd "$pfx_home" || exit 2
 # cannot say whether its run reused a leg, and one with `reused 1` and no `reused_cache` cannot say
 # which kind: both run the bar, the first naming the missing pair. The control plants both at 0 and is
 # adopted. Red against a hook whose per-tree readers lack the keyless check.
+# TOOL-dWitnessedBar-41 AC3 — a verdict whose `selection.1` was edited after the run no longer hashes to
+# its `selection`, and one whose `selection` key was deleted cannot say whether its bar held legs: both
+# run the bar, naming why. Red against a hook that skips `check_tree_selection`.
 build_bg_fixture ac6 || bad "BG could not build its fixture"
 git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
 git checkout -q main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1
-for _c in verdict manifest reused_cache keyless reused selftests tree control; do
+for _c in verdict manifest reused_cache keyless reused selftests tree seledit selkeyless control; do
   write_bg_verdict "$_x" full ""; _e=()
   case $_c in
     verdict) set_bg_key "$BG_VF" verdict RED; _want="it reads verdict 'RED', not GREEN" ;;
@@ -2530,6 +2538,9 @@ for _c in verdict manifest reused_cache keyless reused selftests tree control; d
     reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
     tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
+    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; set_bg_key "$BG_VF" selection.1 'x · quarantine · TOOL-x-8'
+             _want="selection rows do not hash to" ;;
+    selkeyless) remove_bg_key "$BG_VF" selection; _want="carries no selection, so it cannot say whether its bar held legs" ;;
     control) _want="pre-push: covered on main push" ;;
   esac
   _m0=$(read_bg_marks); run_bg_push "${_e[@]}"
@@ -2539,6 +2550,49 @@ for _c in verdict manifest reused_cache keyless reused selftests tree control; d
     *) bad "BG AC6-8 the $_c case expected '$_want', got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
   esac
 done
+cd "$pfx_home" || exit 2
+
+# TOOL-dWitnessedBar-41 AC2 — a per-tree verdict carries the selection its bar held legs by, and the
+# hook re-derives it at R before adopting the record, pushed from a SECOND worktree that holds no run
+# dir of the first. R holds the selection reader beside the stand-in runner, the files
+# `build_sel_fixture` copies, a manifest giving leg x level e2e and a policy landing `unit integration`
+# under `report-unrun`, so R derives one `level` row. A record whose selection holds a row R does not
+# derive runs the bar and names the row; one whose selection R derives exactly covers the merge with no
+# bar run. `select --check --selection` exits 1 and 0 on the same two rebuilt files. Red against a hook
+# that skips `check_tree_selection`.
+build_bg_fixture sel || bad "BG could not build its fixture"
+cp "$SRC/$RUN_GATES_DIR/verdict_flow.py" "$SRC/$RUN_GATES_DIR/leg_factory.py" "$SRC/$RUN_GATES_DIR/regen.py" \
+   "$KIT_REL/$RUN_GATES/"
+mkdir -p "$KIT_REL/$PK" .governance
+cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+   "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+printf '%s\n' '[{"name":"x","argv":["bash","a.sh"],"level":"e2e"}]' > "$KIT_REL/gate-legs.json"
+printf '[tests]\nlanding-levels = ["unit", "integration"]\nwithout-cadence = "report-unrun"\n' > .governance/policy.toml
+git add -A >/dev/null 2>&1; git commit -qm "the selection reader at R"; set_bg_remote; _r=$(git rev-parse HEAD)
+git checkout -q -b X; echo 1 >> src/x.sh; git commit -qam X; _x=$(git rev-parse HEAD)
+git checkout -q -b M main; git merge -q --no-ff X -m "merge X" >/dev/null 2>&1; _mg=$(git rev-parse HEAD)
+git checkout -q main; git worktree add -q --detach "$BG_D/w2" "$_mg" >/dev/null 2>&1
+cd "$BG_D/w2" || exit 2
+bg_gd=$(git rev-parse --git-dir)
+_sel_add=$'x\tquarantine\tTOOL-x-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.landing-levels unit integration'
+for _c in adds derived; do
+  write_bg_verdict "$_x" full ""
+  if [ "$_c" = adds ]; then write_bg_selection "$_sel_add"; else write_bg_selection "$_sel_lvl"; fi
+  _m0=$(read_bg_marks); run_bg_push
+  case "$_c|$(read_bg_marks)|$BG_OUT" in
+    "adds|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7"*)
+      ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R does not derive is not adopted, names the row, and the bar runs" ;;
+    "derived|$_m0|"*"covered on main push"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*)
+      ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R derives exactly covers the merge with no bar run" ;;
+    *) bad "BG TOOL-dWitnessedBar-41 AC2 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  esac
+done
+printf 'held\t%s\n' "$_sel_add" > "$BG_D/sel-adds"; printf 'held\t%s\n' "$_sel_lvl" > "$BG_D/sel-derived"
+"$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-adds" --rev "$_r" >/dev/null 2>&1; _a=$?
+"$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-derived" --rev "$_r" >/dev/null 2>&1; _b=$?
+[ "$_a|$_b" = "1|0" ] \
+  && ok "BG TOOL-dWitnessedBar-41 AC2 select --check --selection exits 1 on the added row and 0 on the derived one" \
+  || bad "BG TOOL-dWitnessedBar-41 AC2 select --check --selection exited $_a and $_b, planted to exit 1 and 0"
 cd "$pfx_home" || exit 2
 
 # AC9, AC10 — a runner stamp covers; a scoped verdict covers only from the adopted base.
