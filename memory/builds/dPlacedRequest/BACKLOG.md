@@ -66,3 +66,24 @@
 - SEV · TOOL-dPlacedRequest-92 · LOW · the class `amendment-leaves-its-other-half-standing` recurs with no gate, so its next instance is found by review again
 - SEV · TOOL-dPlacedRequest-93 · LOW · the class `criterion-asserts-what-its-own-command-cannot-show` recurs with no gate, so its next instance is found by review again
 - SEV · TOOL-dPlacedRequest-94 · LOW · the class `two-readers-of-one-config-one-re-derived` recurs with no gate, so its next instance is found by review again
+- KEEP · TOOL-dPlacedRequest-74 · the gate for `two-answers-to-one-question` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-75 · the gate for `observed-by-claim-no-arm-discharges` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-76 · the gate for `rule-stated-with-no-check-that-fails` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-77 · the gate for `amendment-leaves-its-other-half-standing` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-78 · the gate for `decision-re-derived-by-a-second-process` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-79 · the gate for `retirement-inventory-misses-readers-by-value` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-80 · the gate for `two-guards-one-question-two-answers` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-81 · the gate for `a-folded-field-leaves-its-row-shape-docs-behind` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-82 · the gate for `criterion-asserts-what-its-own-command-cannot-show` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-83 · the gate for `spec-names-code-its-base-lacks` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-87 · the gate for `two-readers-of-one-config-one-re-derived` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- KEEP · TOOL-dPlacedRequest-90 · the gate for `a-spelling-change-strands-its-readers` is new mechanism no unit of this build carried; it stays open for the build that adds it
+- WONTDO · TOOL-dPlacedRequest-84 · duplicate of TOOL-dPlacedRequest-74, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-85 · duplicate of TOOL-dPlacedRequest-82, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-86 · duplicate of TOOL-dPlacedRequest-77, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-88 · duplicate of TOOL-dPlacedRequest-80, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-89 · duplicate of TOOL-dPlacedRequest-79, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-91 · duplicate of TOOL-dPlacedRequest-74, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-92 · duplicate of TOOL-dPlacedRequest-77, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-93 · duplicate of TOOL-dPlacedRequest-82, the same class's gate asked again by a later review round; one gate per class
+- WONTDO · TOOL-dPlacedRequest-94 · duplicate of TOOL-dPlacedRequest-87, the same class's gate asked again by a later review round; one gate per class

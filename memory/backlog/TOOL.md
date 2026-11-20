@@ -573,17 +573,8 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-81](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-folded-field-leaves-its-row-shape-docs-behind EARNED A GATE… |
 | [TOOL-dPlacedRequest-82](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
 | [TOOL-dPlacedRequest-83](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS spec-names-code-its-base-lacks EARNED A GATE AT ITS SECOND… |
-| [TOOL-dPlacedRequest-84](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
-| [TOOL-dPlacedRequest-85](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
-| [TOOL-dPlacedRequest-86](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
 | [TOOL-dPlacedRequest-87](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-readers-of-one-config-one-re-derived EARNED A GATE AT ITS… |
-| [TOOL-dPlacedRequest-88](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-guards-one-question-two-answers EARNED A GATE AT ITS… |
-| [TOOL-dPlacedRequest-89](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS retirement-inventory-misses-readers-by-value EARNED A GATE AT… |
 | [TOOL-dPlacedRequest-90](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-spelling-change-strands-its-readers EARNED A GATE AT ITS… |
-| [TOOL-dPlacedRequest-91](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-answers-to-one-question EARNED A GATE AT ITS SECOND… |
-| [TOOL-dPlacedRequest-92](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS amendment-leaves-its-other-half-standing EARNED A GATE AT ITS… |
-| [TOOL-dPlacedRequest-93](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS criterion-asserts-what-its-own-command-cannot-show EARNED A… |
-| [TOOL-dPlacedRequest-94](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-readers-of-one-config-one-re-derived EARNED A GATE AT ITS… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
