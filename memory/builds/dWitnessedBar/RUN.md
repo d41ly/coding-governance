@@ -418,3 +418,9 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T04:46:18Z dispatch · item 851afdcd TOOL-dWitnessedBar-23 · reason .claude/agents/gov-tester.md .claude/roles.json tools/govkit/selftest.py tools/roles/README.md tools/roles/agents/gov-tester.agent.md tools/roles/check_roles.py tools/roles/house/gov-tester.md tools/roles/kit.toml tools/roles/workflows.toml memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-23-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-20T04:48:23Z dispatch · item 062ab98f TOOL-dWitnessedBar-42 · reason memory/guides/SESSION-KICKOFF.md tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.sh memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-42-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md
+2026-11-20T04:54:57Z draw · re-dispatch · TOOL-dWitnessedBar-42 · 74/180 · 20261120T045457Z-a64bf7
+
+2026-11-20T04:54:57Z dispatch · item 66ad2ab3 TOOL-dWitnessedBar-42 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md
+2026-11-20T04:56:49Z draw · re-dispatch · TOOL-dWitnessedBar-42 · 75/180 · 20261120T045649Z-523cde
+
+2026-11-20T04:56:49Z dispatch · item 66ad2ab3 TOOL-dWitnessedBar-42 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-42-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md memory/guides/SESSION-KICKOFF.md tools/run-gates/README.md tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.sh

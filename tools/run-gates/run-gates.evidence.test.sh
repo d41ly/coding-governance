@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=292
+FLOOR_ASSERTIONS=297
+# RAISED 292 -> 297 by TOOL-dWitnessedBar-42: the every-worktree tail sweep, AC1's one, AC2's two, AC3's
+# one and the two-worktree control's one. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 287 -> 292 by TOOL-dWitnessedBar-40: the per-tree verdict's declines and reuse pair, AC1's two,
 # AC2's two and AC3's one. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 278 -> 287 by TOOL-dWitnessedBar-25: the verdict's run, cause and tail arms, AC1's one, AC2's
@@ -769,13 +771,58 @@ rec_run GATE_FULL=1 GATE_CAUSE=$'push:a\tb' >/dev/null
 rec_legs '[ {"name": "varied", "argv": ["bash", "fx/varied.sh"]} ]'
 [ -f "$tl_f" ] && ok "AC5 control: the first run's tail is on disk before the sweep, so its removal is the sweep's" \
                || nope "AC5 control: the first run's tail was gone before the sweep, so the arm below proves nothing"
-for tl_k in 1 2 3; do rec_run GATE_FULL=1 GATE_RUN_KEEP=2 FX_N=$tl_k >/dev/null; sleep 1; done
+# Every tail is aged past TAIL_GRACE_S before each run (TOOL-dWitnessedBar-42 S4), so the grace keeps
+# none of them and the exact named-equals-on-disk check below still reads the sweep's naming rule.
+for tl_k in 1 2 3; do
+  touch -d '8 days ago' "$REC_GD"/gate-tails/* 2>/dev/null
+  rec_run GATE_FULL=1 GATE_RUN_KEEP=2 FX_N=$tl_k >/dev/null; sleep 1
+done
 tl_named=$(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ {split($2, a, " "); print a[1]}' "$REC_GD"/gate-run/*/verdict 2>/dev/null | sort -u)
 tl_files=$(ls -1 "$REC_GD/gate-tails" 2>/dev/null | sort -u)
 [ ! -e "$tl_f" ] && [ -n "$tl_named" ] && [ "$tl_named" = "$tl_files" ] \
   && ok "AC5 the sweep past GATE_RUN_KEEP removed the swept run's tail and kept exactly the tails the kept runs name" \
   || nope "AC5 a tail outlived every run that named it, or a named tail was removed: named [$tl_named] on disk [$tl_files]"
 rec_done
+
+# --- TOOL-dWitnessedBar-42 AC1-AC3: the tail sweep keeps every worktree's named tails and every fresh one
+# A linked worktree B's red run names a tail, aged past the grace; beside it an aged tail nobody names
+# and a one-minute-old one nobody names. Worktree A then runs past GATE_RUN_KEEP: B's tail and the fresh
+# one survive, the aged unnamed one goes. A red run whose tail is on disk, aged, freshens it and leaves
+# no `tail.*` temp. Red when the sweep reads only RUNROOT, drops the grace, or drops the `touch -c`.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'echo "varied ${FX_N:-0}"' 'exit 1' > "$REC_T/fx/varied.sh"
+rec_legs '[ {"name": "varied", "argv": ["bash", "fx/varied.sh"]} ]'
+( cd "$REC_T" && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 FX_N=b \
+    bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+wt_gd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
+wt_h=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$wt_gd"/gate-run/*/verdict 2>/dev/null)
+wt_d="$REC_GD/gate-tails"
+printf 'aged\n' > "$wt_d/deadbeef" 2>/dev/null; printf 'fresh\n' > "$wt_d/cafe01" 2>/dev/null
+touch -d '8 days ago' "$wt_d/$wt_h" "$wt_d/deadbeef" 2>/dev/null; touch -d '1 minute ago' "$wt_d/cafe01" 2>/dev/null
+if [ -n "$wt_h" ] && [ -f "$wt_d/$wt_h" ] && [ -f "$wt_d/deadbeef" ]; then
+  ok "AC1 control: B's run names a tail and both aged tails are on disk before A's sweep"
+  for wt_k in 1 2 3; do rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a$wt_k >/dev/null; sleep 1; done
+  [ -f "$wt_d/$wt_h" ] && [ ! -e "$wt_d/deadbeef" ] \
+    && ok "AC1 past GATE_RUN_KEEP in A, the aged tail only B's retained run names survives and the aged unnamed one is removed" \
+    || nope "AC1 B's named tail was swept from A, or an aged unnamed tail outlived the sweep: on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+  [ -f "$wt_d/cafe01" ] \
+    && ok "AC2 a one-minute-old tail no run names survives the sweep" \
+    || nope "AC2 a fresh unnamed tail was swept, so a bar still running elsewhere loses its tail"
+else
+  nope "AC1 control: B's run kept no tail, or the planted tails are missing, so the sweep arms prove nothing"
+fi
+[ "$(grep -c 'TAIL_GRACE_S' "$ROOT/${PFX}${KIT}/run-gates.sh")" -ge 2 ] \
+  && ok "AC2 run-gates.sh spells TAIL_GRACE_S at least twice" \
+  || nope "AC2 run-gates.sh does not declare and read TAIL_GRACE_S"
+wt_a=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$(rec_dir)/verdict" 2>/dev/null)
+touch -d '8 days ago' "$wt_d/$wt_a" 2>/dev/null
+rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a3 >/dev/null
+[ -n "$wt_a" ] && [ -n "$(find "$wt_d" -maxdepth 1 -name "$wt_a" -mmin -10080 2>/dev/null)" ] \
+  && ! ls -1 "$wt_d" 2>/dev/null | grep -q '^tail\.' \
+  && ok "AC3 a red run re-hashing an aged tail freshens it inside the grace and leaves no tail.* temp" \
+  || nope "AC3 the re-hashed tail kept its old time, or a tail.* temp was left: [$wt_a] on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+rm -rf "$REC_T.wt"; rec_done
 
 # --- TOOL-dWitnessedBar-40 AC1-AC3: the per-tree verdict's two declines and its reuse pair ----------
 # Over a fixture manifest named by GATE_LEGS: a scoped run in docs mode writes no `.scoped` record and
