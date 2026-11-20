@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-43 — a peer-node verdict stands only under the source pin and from a tag its node signed
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 29 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 29 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-43-deviation-431.md](../build/2026-10-25-build-TOOL-dWitnessedBar-43-deviation-431.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-43-deviation-432.md](../build/2026-10-25-build-TOOL-dWitnessedBar-43-deviation-432.md) | deviation | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-43-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-43-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-43-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-51 |
