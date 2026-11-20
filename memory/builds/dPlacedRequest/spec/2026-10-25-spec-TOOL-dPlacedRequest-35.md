@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-35 — the bounded age walk ends a tail at its tenure before it reads an age
 
-**Status:** DEFERRED · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 23 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-4 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 23 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
