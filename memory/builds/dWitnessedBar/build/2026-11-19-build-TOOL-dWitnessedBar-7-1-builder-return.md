@@ -4,7 +4,7 @@
 
 ## Why
 
-TOOL-dWitnessedBar-7 is built as rev-6 of its spec states it and is committed as one pass commit. It carries the `Pass: TOOL-dWitnessedBar-7` trailer, and the spec header moved INPROGRESS to CLOSED in that same commit. Before writing, I checked the spec against the tree and found no divergence. Every cited symbol exists. Check 23's ledger awk has the same text as the pinned blob 2c5ed1a3a960; only its line numbers moved, by 2. BUILD-METHOD.md measured 30717 bytes against a 30720 limit. loop.toml still held `command:test.seen-red`, and no kit.toml held a `[[command]]` row. The kickoff manifest re-stamp is the one path outside the spec's Files touched. The brief said to expect it, and I declared it with `--dispatch --writes memory/guides/SESSION-KICKOFF.md`, which was admitted.
+TOOL-dWitnessedBar-7 is built as rev-6 of its spec states it and is committed as one pass commit. It carries the `Pass: TOOL-dWitnessedBar-7` trailer, and the spec header moved INPROGRESS to CLOSED in that same commit. Before writing, I checked the spec against the tree and found no divergence. Every cited symbol exists. Check 23's ledger awk has the same text as the pinned blob 2c5ed1a3a960; only its line numbers moved, by 2. BUILD-METHOD.md measured 30717 bytes against a 30720 limit. loop.toml still held `command:test.seen-red`, and no kit.toml held a `[[command]]` row. The kickoff manifest re-stamp is the one path outside the spec's Files touched. The brief said to expect it, and I declared it with `--dispatch --writes memory/guides/SESSION-KICKOFF.md`, which was admitted. (DERIVED from the builder's probe)
 
 ## Summary
 
@@ -21,7 +21,7 @@ I built TOOL-dWitnessedBar-7 and committed it as 28edeaa0b on base 0b01f7ccd. No
 - `ratchet.py`: `ratchet (populated)` now admits an empty armed population when a seen-red line names its leg, and exits 2 on a malformed line. `EMPTY_TEXT` is reworded, the new plant is `populated-seen-red`, and both docstrings plus the kit README row say the same.
 - The command factory wrote the `seen-red` row into the memory-tree `kit.toml`. In `loop.toml` the `item.test.seen-red` actor now names `command:memory-tree.seen-red`.
 - The seen-red line's grammar is stated once, in the "Acceptance ledger" section of `HYGIENE.template.md` and its render `memory/HYGIENE.md`.
-- M8's sentence in `BUILD-METHOD.template.md` and its render now records both observations as a seen-red line and names `seen_red.py --build <slug>` as the read-back. The file stays at 30717 bytes against its 30720 limit.
+- M8's sentence in `BUILD-METHOD.template.md` and its render now records both observations as a seen-red line and names `seen_red.py --build <slug>` as the read-back. The file stays at 30717 bytes against its 30720 limit. (DERIVED from the builder's probe)
 - `check-memory-hygiene.test.sh` gains fixture 149 for check 23 and an arm running the five seen_red plants.
 - The commit also carries the re-rendered `symbols.json`, the `gen_build_index --write` outputs, `RUN.md`, the acceptance ledger and the kickoff manifest re-stamp.
 
