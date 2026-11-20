@@ -15,6 +15,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-44-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-44-1-builder-return.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-44-deviation-442.md](../build/2026-11-20-build-TOOL-dWitnessedBar-44-deviation-442.md) | deviation | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-44-deviation-443.md](../build/2026-11-20-build-TOOL-dWitnessedBar-44-deviation-443.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-44-red-fix-95.md](../build/2026-11-20-build-TOOL-dWitnessedBar-44-red-fix-95.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-44-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-44-build-brief.md) | journal | — |
