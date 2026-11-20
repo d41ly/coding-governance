@@ -218,7 +218,7 @@ def run_keep(cwd, run, build, unit):
 def write_fixture_repo(top, value, tail):
     """A scratch repository at `top`: `trace.leg-output` = `value` committed on `main`, build `x`, and run
     `fx-1` whose verdict names one tail, `tail` (bytes), kept in the common dir by its hash. -> the hash."""
-    def run_git(*args):
+    def run_fixture_git(*args):
         p = run_git(top, "-c", "commit.gpgsign=false", "-c", "user.name=fixture", "-c",
                     "user.email=fixture@invalid", *args)
         if p.returncode != 0:
@@ -228,16 +228,16 @@ def write_fixture_repo(top, value, tail):
     pathlib.Path(top, ".governance", "policy.toml").write_bytes(f'[trace]\nleg-output = "{value}"\n'.encode())
     pathlib.Path(top, "memory", "builds", "x").mkdir(parents=True)
     pathlib.Path(top, "memory", "builds", "x", "README.md").write_bytes(b"# x\n")
-    run_git("init", "-q", "-b", "main")
-    run_git("add", "-A")
-    run_git("commit", "-q", "--no-verify", "-m", "fixture")
+    run_fixture_git("init", "-q", "-b", "main")
+    run_fixture_git("add", "-A")
+    run_fixture_git("commit", "-q", "--no-verify", "-m", "fixture")
     h = read_blob_hash(top, tail)
     gd = pathlib.Path(top, ".git")
     (gd / "gate-tails").mkdir()
     (gd / "gate-tails" / h).write_bytes(tail)
     run = gd / "gate-run" / "fx-1"
     run.mkdir(parents=True)
-    (run / "header").write_bytes(f"run_id\tfx-1\nhead\t{run_git('rev-parse', 'HEAD')}\n".encode())
+    (run / "header").write_bytes(f"run_id\tfx-1\nhead\t{run_fixture_git('rev-parse', 'HEAD')}\n".encode())
     (run / "verdict").write_bytes(f"verdict\tRED\nrun_id\tfx-1\ncause\tpush:fixture\ntail.1\t{h} fixture leg\n".encode())
     return h
 
