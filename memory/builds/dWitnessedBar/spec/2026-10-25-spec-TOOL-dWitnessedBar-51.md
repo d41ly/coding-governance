@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** CLOSED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-8 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -302,7 +302,7 @@ them and observes each through its criterion.
 ### Evidence
 
 - The shell-role leg grades each row exactly (`tools/gate-lint/sh_hygiene.py#run_shell_role_scan`), and
-  `tools/memory-tree/ratchet.py#run_widen` raises a widened row by one. At HEAD 24 rows differ from the
+  `tools/memory-tree/ratchet.py#run_widen` raises a widened row by one. At HEAD 24 rows (DERIVED, the shell-role seed's `--measure`) differ from the
   measure, 20 grown, 3 shrunk and 1 new file, `tools/run-gates/lib-verdict.sh` (PINNED 2026-11-20, the
   seed's `--measure . ':!memory/'` against the rows); unit 10's three `widened:` rows name a deviation
   record, each file among the grown. The build holds no widen record (DERIVED, `git ls-files
@@ -679,6 +679,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC16 AC31 · the plants `
   folded by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-51-fix1-spec-writer`: S1's one widen
   record is filed under this unit (F10); S21 and AC17 grade the kit hold, the quarantine half going to
   unit 62 (F11); Files touched names `widen-1` and SESSION-KICKOFF's re-stamp. No code moved since rev-6.
+- rev-8 · 2026-11-20 · §4 · the Evidence bullet's row count carries the DERIVED mark naming the shell-role
+  seed's measure, per the brief `2026-11-19-prompt-TOOL-dWitnessedBar-51-pin1-spec-writer`; nothing else moved.
 
 ## 10. Reuse audit
 
