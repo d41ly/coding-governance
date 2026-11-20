@@ -26,6 +26,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-1-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-1-builder-return.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-102.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-102.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
@@ -56,6 +57,8 @@
 | [2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-21 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-pin1-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-pin1-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-1-pin1-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-pin1-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-reground-spec-writer.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 |
