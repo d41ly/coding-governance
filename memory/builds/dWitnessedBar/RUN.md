@@ -507,3 +507,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T10:18:45Z draw · re-dispatch · TOOL-dWitnessedBar-59 · 90/180 · 20261120T101845Z-9fa1ee
 
 2026-11-20T10:18:45Z dispatch · item 24f541fd TOOL-dWitnessedBar-59 · reason tools/govkit/selftest.py memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-59-deviation-591.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md memory/map/generated/symbols.json memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-20T10:52:46Z brief · item TOOL-dWitnessedBar-30 · reason 8f494712e480 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-30-build-brief.md
