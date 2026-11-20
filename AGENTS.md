@@ -188,6 +188,7 @@
 - `gov-diff-reviewer`: Reviews a diff through one lens. Mandatory for every closing review. Output: findings, to its harness.
 - `gov-skeptic`: Tries to refute each finding it is handed. Mandatory for every review's findings. Output: verdicts, to its harness.
 - `gov-synthesizer`: Merges verified findings into one report. Mandatory for every review's report. Output: a report in `memory/builds/<slug>/reviews/`.
+- `gov-tester`: Judges a red the bar attributed to this build, and answers the Test step's question. Optional, when Test hands it an OWN or blocking MIXED red, a fix pass asks whether the spec is wrong, or the reason stage asks its question. Output: judgments, to its harness.
 - `gov-researcher`: Finds candidates and the test each could lose. Optional, when no seam decides a design. Output: candidates, to its caller.
 - `gov-session`: Opens a handoff to another session. Optional, when work leaves this session. Output: a prompt file in the build's `prompts/`.
 <!-- /one-line -->
