@@ -3118,17 +3118,21 @@ total=${#names[@]}
 # ignoring a hold RUNS the leg, the safe direction. The file is copied into the run record as
 # `selection`, which the pre-push hook re-derives at R before it admits this bar's verdict (S7).
 # THE SAME ROWS RIDE ON THE PER-TREE VERDICT (TOOL-dWitnessedBar-41 S1), because the run record is this
-# worktree's and is swept: the CANONICAL TEXT is every line whose first TAB field is `held`, in file
-# order, one trailing CR cut, each LF-terminated, an ignored row kept so the hook's re-derivation names
-# it. SEL_HASH is its `git hash-object --stdin`, `none` with no file; SEL_KEYS one `selection.<n>` per
-# line, its `held` field cut and each TAB after it turned into ` · `.
+# worktree's and is swept: the CANONICAL TEXT is the rows this loop ACCEPTED and only those
+# (TOOL-dWitnessedBar-56 S3), in file order, one trailing CR cut, each LF-terminated: four or five TAB
+# fields, the first `held`, a source of `quarantine` or `level`, a fifth if present `hold` or `run`, and
+# a leg the manifest carries, the field rule `verdict_flow.py`'s `read_selection` applies, so the hook
+# and `select --check --selection` read the rows the runner held. Every other row is counted in
+# SEL_IGNORED, the record's `selection_ignored`; a blank or `#` line is no row. SEL_HASH is the text's
+# `git hash-object --stdin`, `none` with no file; SEL_KEYS one `selection.<n>` per accepted row, the row
+# with its `held` field cut and its TABs KEPT (S1), so a ` · ` inside a note round-trips.
 # A ROW'S FIFTH FIELD IS ITS MODE (TOOL-dWitnessedBar-30 S1), `hold` or `run`, a four-field row `hold`.
 # A `run` leg EXECUTES in its ordinary slot, past its guard, the docs mode and the reuse cache, and
 # writes its `.leg` row, so the flake record holds its result; that result is its `held.<n>`, `ok` or
 # `fail`, counted in `held` and never in `failed` or the verdict. A mode outside the two is ignored as
 # the source is, and the leg runs.
 HOLD_SOURCES="kit quarantine level"
-SEL_HASH=none; SEL_KEYS=""
+SEL_HASH=none; SEL_KEYS=""; SEL_IGNORED=0
 declare -A SEL_SRC=() SEL_NOTE=() SEL_MODE=()
 derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES), HOLD_NOTE and HOLD_MODE, or all empty
   HOLD_SRC=""; HOLD_NOTE=""; HOLD_MODE=""
@@ -3142,37 +3146,45 @@ if [ -n "$SEL_FILE" ]; then
   else
     declare -A _sel_at=()
     for ((i=0; i<total; i++)); do [ -n "${names[$i]}" ] && _sel_at["${names[$i]}"]=$i; done
-    _sel_n=0; _sel_r=0; _sel_text=""
+    _sel_n=0; _sel_a=0; _sel_text=""
     while IFS= read -r _sel_line || [ -n "$_sel_line" ]; do
       _sel_n=$((_sel_n + 1))
-      IFS=$'\t' read -r _sel_k _sel_leg _sel_src _sel_note _sel_mode <<<"$_sel_line"
-      _sel_note=${_sel_note%$'\r'}; _sel_mode=${_sel_mode%$'\r'}
       _sel_line=${_sel_line%$'\r'}
-      case "$_sel_line" in
-        held|held$'\t'*)
-          _sel_r=$((_sel_r + 1)); _sel_text+="$_sel_line"$'\n'
-          _sel_v=${_sel_line#held}; _sel_v=${_sel_v#$'\t'}
-          SEL_KEYS+="selection.$_sel_r"$'\t'"${_sel_v//$'\t'/ · }"$'\n' ;;
-      esac
-      case "$_sel_k" in ''|'#'*) continue ;; esac
+      case "$_sel_line" in '#'*) continue ;; esac
+      [ -z "${_sel_line//[[:space:]]/}" ] && continue
+      # The fields are cut at each TAB, never by `read`, which merges a run of TABs and so reads an empty
+      # note as no field: four or five fields, `read_selection`'s count, or no field at all.
+      _sel_t=${_sel_line//[!$'\t']/}; _sel_k=""; _sel_leg=""; _sel_src=""; _sel_note=""; _sel_mode=""
+      if [ "${#_sel_t}" = 3 ] || [ "${#_sel_t}" = 4 ]; then
+        _sel_v=$_sel_line
+        _sel_k=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_leg=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_src=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_note=${_sel_v%%$'\t'*}
+        [ "${#_sel_t}" = 4 ] && _sel_mode=${_sel_v#*$'\t'}
+      fi
       if [ "$_sel_k" != held ] || [ -z "$_sel_leg" ]; then
-        echo "run-gates: selection — row $_sel_n is not held · leg · source · note, ignored" >&2
+        echo "run-gates: selection — row $_sel_n is not held · leg · source · note [· mode], ignored" >&2
       elif [ "$_sel_src" = kit ] || [[ " $HOLD_SOURCES " != *" $_sel_src "* ]]; then
         # `kit` is the row's own word and never a selection's: honoured here, a selection could hold any
         # leg as a kit self-test.
         echo "run-gates: selection — row $_sel_n holds $_sel_leg by '$_sel_src', outside quarantine level, ignored: it runs" >&2
-      elif [ -n "$_sel_mode" ] && [ "$_sel_mode" != hold ] && [ "$_sel_mode" != run ]; then
+      elif [ "${#_sel_t}" = 4 ] && [ "$_sel_mode" != hold ] && [ "$_sel_mode" != run ]; then
         echo "run-gates: selection — row $_sel_n holds $_sel_leg in mode '$_sel_mode', outside hold run, ignored: it runs" >&2
       elif [ -z "${_sel_at["$_sel_leg"]+x}" ]; then
         echo "run-gates: selection — row $_sel_n holds $_sel_leg, which the manifest lacks, ignored" >&2
       else
         SEL_SRC[${_sel_at["$_sel_leg"]}]=$_sel_src; SEL_NOTE[${_sel_at["$_sel_leg"]}]=$_sel_note
         SEL_MODE[${_sel_at["$_sel_leg"]}]=${_sel_mode:-hold}
+        _sel_a=$((_sel_a + 1)); _sel_text+="$_sel_line"$'\n'
+        SEL_KEYS+="selection.$_sel_a"$'\t'"${_sel_line#held$'\t'}"$'\n'
+        continue
       fi
+      SEL_IGNORED=$((SEL_IGNORED + 1))
     done < "$SEL_FILE"
     SEL_HASH=$(printf '%s' "$_sel_text" | git hash-object --stdin 2>/dev/null)
     [ -n "${RUNDIR:-}" ] && { cp -f "$SEL_FILE" "$RUNDIR/selection" 2>/dev/null && chmod 600 "$RUNDIR/selection" 2>/dev/null; } || true
-    unset _sel_at _sel_n _sel_r _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note _sel_mode
+    unset _sel_at _sel_n _sel_a _sel_t _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note _sel_mode
   fi
 fi
 
@@ -3805,7 +3817,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'started\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'head\t%s\n' "$RG_HEAD"
     printf 'base\t%s\n' "$BASE"
-    printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}"
+    # A third field `inherited` where the base is an inherited green (TOOL-dWitnessedBar-56 S10), so the
+    # record says why the per-tree verdict below was declined.
+    _bf=""; [ "$BASE_FROM" = inherited ] && _bf=$'\tinherited'
+    printf 'base_from\t%s%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}" "$_bf"; unset _bf
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'tree_clean\t%s\n' "$TREE_CLEAN"
     printf 'manifest\t%s\n' "$LEGS_FILE"
@@ -6234,7 +6249,7 @@ elif [ "$tree_moved" != no ] || [ -z "$FPRINT_START" ]; then
 elif [ -n "$DOCS_BASE" ]; then
   echo "run-gates: no gate-verdict written — docs mode"
 elif [ -z "${GATE_FULL:-}" ] && [ "$BASE_FROM" = inherited ]; then
-  echo "run-gates: no gate-verdict written — scoped on an inherited green"
+  echo "run-gates: no gate-verdict written — scoped on an inherited green, as the run record header's base_from row reads"
 else
   _vd=""; [ -n "$RG_COMMON_RAW" ] && _vd=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
   _vkind=scoped; _vbase=$BASE; _vverdict=RED   # GREEN or RED: a HOST or REFUSED bar is no green
@@ -6256,6 +6271,7 @@ else
        printf 'run_id\t%s\n' "$RUNID"
        printf 'selection\t%s\n' "$SEL_HASH"
        printf '%s' "$SEL_KEYS"
+       printf 'selection_ignored\t%s\n' "$SEL_IGNORED"
        printf 'cause\t%s\n' "$RUN_CAUSE"
        printf '%s' "$TAIL_ROWS"
        printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -6320,8 +6336,18 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
   # main worktree's, and `<common>/worktrees/*/gate-run/*/verdict`, each linked one's, read from git's
   # own layout rather than `git worktree list`, so an unpruned removed worktree's runs still count —
   # and every tail younger than TAIL_GRACE_S, so a tail a bar still running elsewhere wrote before its
-  # verdict names it survives. A staging name is never a hash, so a tail in flight is not swept. An
-  # age that cannot be read keeps every unnamed tail.
+  # verdict names it survives. An age that cannot be read keeps every unnamed tail.
+  # A STAGING TEMP IS SWEPT TOO (TOOL-dWitnessedBar-56 S13): the writer above stages each tail as
+  # `derive_temp_path`'s sibling of `gate-tails/tail`, `tail.<n><n>.tmp` or `tail.XXXXXXXX`, either with
+  # `.cut` while it drops a split character. Every name opening `tail.` is read as such a temp, never kept
+  # as a tail, and unlinked once older than TAIL_GRACE_S, so the temp a crashed bar left goes; a fresh
+  # one, a tail in flight, is kept. This supersedes TOOL-dWitnessedBar-42's skip of every non-hex name.
+  # THE SEAM CONSIDERED AND REJECTED (TOOL-dWitnessedBar-56 S14): the reuse cache's prune above, its
+  # 30-day `cut`. It runs only when the cache block fires, keeps no set and swallows its errors, and a
+  # tail must be kept while any retained run names it. The grace is seven days against the cache's 30
+  # because it only covers a bar still running in another worktree, or a host asleep mid-bar, past its
+  # verdict: a tail a retained run names is kept by the set whatever its age, where a cache entry's 30
+  # days is its whole life, the bound on carrying a stale verdict forward.
   # WHAT IT DOES NOT CHECK: a sweep here that reads a tail's time just before another worktree's bar
   # freshens it can still remove it.
   _td=""; [ -n "$RG_COMMON_RAW" ] && _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails
@@ -6332,8 +6358,11 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
     _tfresh=""; _tok=1; _trm=0; _tkept=0
     for _tf in "$_td"/*; do
       _th=${_tf##*/}
-      case "$_th" in ''|*[!0-9a-f]*) continue ;; esac
-      case "$_tkeep" in *" $_th "*) _tkept=$((_tkept + 1)); continue ;; esac
+      case "$_th" in
+        tail.*) [ -f "$_tf" ] || continue ;;   # a staging temp: aged out below, never kept as a tail
+        ''|*[!0-9a-f]*) continue ;;
+        *) case "$_tkeep" in *" $_th "*) _tkept=$((_tkept + 1)); continue ;; esac ;;
+      esac
       # ONE `find` per sweep, and only once an unnamed tail is met; it lists the tails modified inside
       # the grace, and a find that fails keeps them all.
       if [ "$_tok" = 1 ] && [ -z "$_tfresh" ]; then
@@ -6352,6 +6381,11 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
   # another's live verdict; the rest are removed once older than VERDICT_GRACE_DAYS past their last
   # write, so the directory shrinks. A staging name is never a tree, so a verdict in flight is kept,
   # and a `find` or a worktree list that fails keeps every verdict.
+  # THE SEAM CONSIDERED AND REJECTED (TOOL-dWitnessedBar-56 S14): the reuse cache's prune, its 30-day
+  # `cut`. It runs only when the cache block fires, keeps no set and swallows its errors, and a verdict
+  # must be kept while a retained run or a worktree head names it. VERDICT_GRACE_DAYS matches that 30,
+  # where the tail sweep's TAIL_GRACE_S is seven days: a tail's grace only covers a bar still running
+  # elsewhere past its verdict, while a verdict nothing names is still read by a later push of its tree.
   # WHAT IT DOES NOT CHECK: a worktree whose HEAD moved after the run record named its old tree keeps
   # the old one until that record is swept.
   _vc=""; [ -n "$RG_COMMON_RAW" ] && _vc=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)

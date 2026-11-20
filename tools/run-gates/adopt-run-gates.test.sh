@@ -228,7 +228,10 @@ refuse_wrong_shell() {
 refuse_wrong_shell || exit 2
 PY=$(resolve_python) || exit 2
 
-FLOOR_ASSERTIONS=17
+FLOOR_ASSERTIONS=23
+# RAISED 17 -> 23 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-45, whose pass left the
+# floor where it was: section 8's six, the no-govkit target's one, AC1's two, AC2's two and AC3's one.
+# Counted one per `ok … || nope` pair; this pass runs no suite.
 n=0
 bad=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }

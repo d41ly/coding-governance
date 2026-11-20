@@ -29,13 +29,18 @@ on a refusal. The lander and the pre-push hook ask it under `hooks.bypass = refu
 an off-node witness, because a hook on the bypassing node cannot refuse its own bypass.
 
 `local-hook` reads the runner-written per-tree verdict `<common-dir>/gate-verdict/<tree hash>`, the full
-slot only, never the `.scoped` one beside it. `peer-node` fetches `refs/gov/verdict/<sha>`, an annotated
+slot only, never the `.scoped` one beside it, and stands on a GREEN one only where the pre-push hook's two
+record predicates would adopt it (TOOL-dWitnessedBar-56 S7, S8, `check_local_record`): the reuse pair says
+no leg came from the cache, and the selection's rows hash to its `selection` and the landed revision
+derives them; NONE otherwise, DEAD PROBE where that revision or the check cannot be read. `peer-node` fetches `refs/gov/verdict/<sha>`, an annotated
 tag a second node's `verify-peer` pushed, and stands only when it points at the SHA, its `tree` line is
 the SHA's tree, its `node` line is not this node's `GOV_NODE`, and (TOOL-dWitnessedBar-43):
 - SIGNED. `git verify-tag --raw` against `verdict.peer.signers`, the owner's allowed-signers lines read at
   the landed revision and written to a temp file under the common git dir, exits 0 and its `Good "git"
-  signature for <principal>` line names the tag's `node` line. Unsigned, an unknown key or another
-  principal is NONE; no signer table is NONE; a verify that cannot run is DEAD PROBE.
+  signature for <principal>` line names the tag's `node` line. Unsigned, an unknown key, a bad signature
+  (`Signature verification failed`, a message changed after signing) or another principal is NONE; no
+  signer table is NONE; a verify that cannot run, an `ls-remote` or `fetch` that fails and a refused
+  policy read are DEAD PROBE.
 - GREEN, its `verdict` line.
 - SOURCED. `remote_verdict.py`'s `check_pin_source`, the pin over `verdict.remote.pin-scope`'s files at
   the SHA, under `verdict.remote.trust`; the `workflow` scope, which pins only a workflow no peer runs,
@@ -328,11 +333,98 @@ def read_local_verdict(backend, sha, tree, repo="."):
         return Verdict("DEAD PROBE", "", f"gate-verdict/{tree[:8]} does not read: {e}")
     if rec.get("tree") != tree:
         return Verdict("DEAD PROBE", "", f"gate-verdict/{tree[:8]} names the tree {rec.get('tree', '')[:8] or 'none'}")
-    if rec.get("verdict") == "GREEN":
-        return Verdict("GREEN", "witnessed", f"the full bar, run {rec.get('run_id', '?')}, on tree {tree[:8]}")
     if rec.get("verdict") == "RED":
         return Verdict("RED", "", f"the full bar, run {rec.get('run_id', '?')}, red on tree {tree[:8]}")
-    return Verdict("DEAD PROBE", "", f"gate-verdict/{tree[:8]} carries no GREEN or RED verdict line")
+    if rec.get("verdict") != "GREEN":
+        return Verdict("DEAD PROBE", "", f"gate-verdict/{tree[:8]} carries no GREEN or RED verdict line")
+    refused = check_local_record(rec, common, repo)
+    if refused is not None:
+        return refused
+    return Verdict("GREEN", "witnessed", f"the full bar, run {rec.get('run_id', '?')}, on tree {tree[:8]}")
+
+
+def check_local_record(rec, common, repo="."):
+    """None where a GREEN per-tree record `rec` is one the pre-push hook adopts on its own two record
+    predicates, else the NONE or DEAD PROBE Verdict saying why not (TOOL-dWitnessedBar-56 S7, S8). A
+    second copy of the hook's `check_tree_reuse` and `check_tree_selection`, since the hook ships
+    verbatim and sources no kit; the hook suite's parity arm holds the two copies to one decision.
+    - the reuse pair (TOOL-dWitnessedBar-40): neither `reused` nor `reused_cache` is NONE, a non-zero
+      `reused_cache` is NONE, and a non-zero `reused` with no `reused_cache` is NONE;
+    - the selection (TOOL-dWitnessedBar-41): no `selection` key is NONE and `none` passes; otherwise
+      `held`, a TAB and each `selection.<n>` from 1 upward, each LF-terminated, must hash to it, else
+      NONE, and `verdict_flow.py select --check --selection` over those rows at the landed revision R,
+      the policy kit's `derive_landed_revision`, must exit 0: exit 1 is NONE, and an R that does not
+      derive or a check that cannot run is DEAD PROBE."""
+    reused, cache = rec.get("reused", ""), rec.get("reused_cache", "")
+    if not reused and not cache:
+        return Verdict("NONE", "", "the record carries neither reused nor reused_cache, so it cannot say whether "
+                                   "its run reused a leg")
+    if cache and cache != "0":
+        return Verdict("NONE", "", f"the record says its run reused {cache} leg(s) from the cache, and a reused "
+                                   f"verdict proves nothing whole")
+    if not cache and reused != "0":
+        return Verdict("NONE", "", f"the record says its run reused {reused} leg(s), and a reused verdict proves "
+                                   f"nothing whole")
+    sel = rec.get("selection", "")
+    if not sel:
+        return Verdict("NONE", "", "the record carries no selection, so it cannot say whether its bar held legs")
+    if sel == "none":
+        return None
+    rows, n = [], 1
+    while f"selection.{n}" in rec:
+        rows.append(f"held\t{rec[f'selection.{n}']}\n")
+        n += 1
+    text = "".join(rows)
+    rc, h = run_git(repo, "hash-object", "--stdin", data=text)
+    if rc != 0 or not h:
+        return Verdict("DEAD PROBE", "", f"git hash-object exited {rc}, so the record's selection rows cannot be hashed")
+    if h != sel:
+        return Verdict("NONE", "", f"the record's selection rows do not hash to {sel[:8]}, so a row was edited or lost")
+    landed, why = read_landed_revision(repo)
+    if not landed:
+        return Verdict("DEAD PROBE", "", f"the landed revision does not derive, so the selection cannot be checked "
+                                         f"at R: {why}")
+    name = ""
+    try:
+        fd, name = tempfile.mkstemp(prefix="gov-selection-", dir=str(common))
+        with os.fdopen(fd, "wb") as f:
+            f.write(text.encode("utf-8"))
+        p = subprocess.run([sys.executable, str(HERE / "verdict_flow.py"), "select", "--check", "--selection", name,
+                            "--rev", landed], capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=BOUND, cwd=str(repo))
+    except (OSError, subprocess.SubprocessError) as e:
+        return Verdict("DEAD PROBE", "", f"select --check could not run at {landed[:8]}: {type(e).__name__}: {e}")
+    finally:
+        if name:
+            try:
+                os.unlink(name)
+            except OSError:
+                pass
+    said = " ".join(ln.strip() for ln in (p.stdout + p.stderr).splitlines() if ln.strip())
+    if p.returncode == 1:
+        return Verdict("NONE", "", f"the record's selection is not what {landed[:8]} derives: {said}")
+    if p.returncode != 0:
+        return Verdict("DEAD PROBE", "", f"select --check at {landed[:8]} exited {p.returncode}: {said or 'nothing said'}")
+    return None
+
+
+def read_landed_revision(repo):
+    """The landed revision R as the policy kit's `derive_landed_revision` reads it -> (sha, ''), or ('', why
+    it does not derive)."""
+    try:
+        kit = resolve_kit_dir("policy", "policy.py", HERE)
+    except LookupError as e:
+        return "", f"no policy kit resolves beside this kit: {e}"
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))
+    try:
+        policy = importlib.import_module("policy")
+    except ImportError as e:
+        return "", f"the policy kit does not load: {e}"
+    try:
+        return policy.derive_landed_revision(str(repo))[0], ""
+    except (policy.Refusal, OSError, subprocess.SubprocessError) as e:
+        return "", str(e)
 
 
 def read_node_tag():
@@ -370,6 +462,8 @@ def read_signer_principal(repo, ref, members):
         return "", Verdict("NONE", "", f"{ref} is unsigned, so no registered node key witnesses it")
     if "No principal matched" in err:
         return "", Verdict("NONE", "", f"{ref} is signed by an unknown key, one no {SIGNERS_KEY} line names")
+    if "Signature verification failed" in err:  # TOOL-dWitnessedBar-56 S15: the tag changed after it was signed
+        return "", Verdict("NONE", "", f"{ref} carries a bad signature, its message changed after it was signed")
     said = next((ln.strip() for ln in err.splitlines() if ln.strip()), "nothing on standard error")
     return "", Verdict("DEAD PROBE", "", f"git verify-tag --raw {ref} exited {rc}: {said}")
 
@@ -522,6 +616,16 @@ PLANTS = {
     "unregistered": "verdict = ci-cloud in the policy's only revision: read and the lander refuse, no push",
     "undeclared": "verdict = remote-ci over descriptors declaring no remote-ci row: read and the lander refuse, no push",
     "local-green": "a full per-tree verdict GREEN, then RED, then none, then a scoped-only GREEN",
+    "reused-cache": "a full GREEN whose reused_cache reads 1",
+    "reused-alone": "a full GREEN carrying reused 2 and no reused_cache",
+    "no-pair": "a full GREEN carrying neither reused nor reused_cache",
+    "no-selection": "a full GREEN carrying no selection key",
+    "edited-selection": "a full GREEN whose selection.1 was edited after its hash was taken",
+    "underived-selection": "a full GREEN holding a quarantine row the landed revision does not derive",
+    "clean": "a full GREEN with the reuse pair at 0 under selection none, then holding the row R derives",
+    "peer-tip-missing": "a peer ref the remote advertises whose tag names a commit the remote lacks, so the fetch fails",
+    "peer-no-ssh-keygen": "node b's signed GREEN read on node a with gpg.ssh.program at an absent path",
+    "peer-bad-signature": "a tag node b signed whose message was edited after signing, read on node a",
     "peer": "over the signed, pinned setup: a tag node b signed read on node a, one node a signed of its own, and one "
             "naming another tree",
     "peer-signed": "a GREEN node b signed with its registered key, the pinned files equal, read on node a",
@@ -698,8 +802,11 @@ def run_plant(case, top):
             for f in slot.iterdir():
                 f.unlink()
             for f, v in files.items():
-                (slot / f).write_text(f"tree\t{tree}\nsha\t{sha}\nverdict\t{v}\nkind\tfull\nrun_id\tr1\n", encoding="utf-8")
+                (slot / f).write_text(f"tree\t{tree}\nsha\t{sha}\nverdict\t{v}\nkind\tfull\nrun_id\tr1\nreused\t0\n"
+                                      f"reused_cache\t0\nselection\tnone\n", encoding="utf-8")
             run_scenario(name, work, argv, owed, [f"verdict: local-hook · {state} · {sha[:8]}"])
+    elif case in LOCAL_PLANTS:
+        run_local_plant(case, top, run_scenario)
     elif case.startswith("peer"):
         run_peer_plant(case, top, run_scenario)
     elif case == "held":
@@ -722,6 +829,75 @@ def run_plant(case, top):
     else:
         out.extend(run_remote_plant(case, top, rv))
     return out
+
+
+LOCAL_PLANTS = ("reused-cache", "reused-alone", "no-pair", "no-selection", "edited-selection", "underived-selection",
+                "clean")
+LOCAL_POLICY = '[tests]\nlanding-levels = ["unit", "integration"]\nwithout-cadence = "report-unrun"\n'
+
+
+def run_local_plant(case, top, run_scenario):
+    """The local-hook plants of TOOL-dWitnessedBar-56 S7 and S8 over one fixture pushed to its bare remote, so
+    the landed revision R is its `main`: a manifest giving leg x level e2e and a policy landing `unit
+    integration`, so R derives one `level` row, which `verdict_flow.py select` writes and the plant reads
+    rather than spells. Each plant writes the full per-tree verdict of R's tree and reads it on `local-hook`."""
+    me = [sys.executable, str(HERE / "verdict_backends.py")]
+    work = write_fixture_tree(top, {"gate-legs.json": '[{"name": "x", "argv": ["bash", "a.sh"], "level": "e2e"}]\n',
+                                    ".governance/policy.toml": LOCAL_POLICY}, kits=False)
+    sha = run_fixture_git(work, "rev-parse", "HEAD")
+    tree = read_tree_of(work, sha)
+    slot = read_common_dir(work) / "gate-verdict"
+    slot.mkdir()
+    out = pathlib.Path(top, "derived")
+    rc, said = run_fixture_command(work, [sys.executable, str(HERE / "verdict_flow.py"), "select", "--rev", sha,
+                                          "--out", str(out)])
+    derived = [ln[len("held\t"):] for ln in (out.read_text(encoding="utf-8").splitlines() if out.is_file() else [])
+               if ln.startswith("held\t")]
+    if rc != 0 or len(derived) != 1:
+        raise OSError(f"select --rev at the fixture's R derived {len(derived)} row(s), exit {rc}, not the one level "
+                      f"row the plant needs: {said.strip()}")
+
+    def write_record(pair=("reused\t0\n", "reused_cache\t0\n"), selection=("none", [])):
+        hashed, rows = selection
+        text = f"tree\t{tree}\nsha\t{sha}\nverdict\tGREEN\nkind\tfull\nrun_id\tr1\n" + "".join(pair)
+        if hashed is not None:
+            text += f"selection\t{hashed}\n" + "".join(f"selection.{n}\t{r}\n" for n, r in enumerate(rows, 1))
+        (slot / tree).write_text(text, encoding="utf-8")
+
+    def hash_rows(rows):
+        rc, h = run_git(work, "hash-object", "--stdin", data="".join(f"held\t{r}\n" for r in rows))
+        if rc != 0 or not h:
+            raise OSError("git hash-object did not answer for the planted rows")
+        return h
+
+    def read_local(name, state, needles):
+        run_scenario(name, work, [*me, "read", "--backend", "local-hook", "--sha", sha], 0 if state == "GREEN" else 1,
+                     [f"verdict: local-hook · {state} · {sha[:8]}", *needles])
+
+    underived = "x\tquarantine\tTOOL-x-7 · 3/10"
+    if case == "reused-cache":
+        write_record(pair=("reused\t1\n", "reused_cache\t1\n"))
+        read_local("reused_cache 1", "NONE", ["reused 1 leg(s) from the cache"])
+    elif case == "reused-alone":
+        write_record(pair=("reused\t2\n",))
+        read_local("reused 2 with no reused_cache", "NONE", ["reused 2 leg(s), and"])
+    elif case == "no-pair":
+        write_record(pair=())
+        read_local("neither reuse key", "NONE", ["neither reused nor reused_cache"])
+    elif case == "no-selection":
+        write_record(selection=(None, []))
+        read_local("no selection key", "NONE", ["carries no selection"])
+    elif case == "edited-selection":
+        write_record(selection=(hash_rows(derived), [derived[0] + " edited"]))
+        read_local("selection.1 edited after its hash", "NONE", ["do not hash to"])
+    elif case == "underived-selection":
+        write_record(selection=(hash_rows([underived]), [underived]))
+        read_local("a row R does not derive", "NONE", [f"is not what {sha[:8]} derives", "TOOL-x-7"])
+    else:
+        write_record()
+        read_local("the pair at 0, selection none", "GREEN", ["witness witnessed"])
+        write_record(selection=(hash_rows(derived), derived))
+        read_local("the pair at 0, the row R derives", "GREEN", ["witness witnessed"])
 
 
 def write_unsigned_tag(repo, sha, rec, node, remote):
@@ -809,6 +985,34 @@ def run_peer_plant(case, top, run_scenario):
         run_fixture_git(work, "config", "user.signingkey", "")
         run_scenario("verify-peer with user.signingkey empty", work, [*me, "verify-peer"], 2,
                      ["verify-peer refused · user.signingkey"], GOV_NODE="b", GOV_REMOTE="origin")
+    elif case == "peer-tip-missing":
+        # A tag object naming a commit nobody has, written loose into the remote, so the ref is advertised
+        # and the fetch, which must bring the commit in too, fails (TOOL-dWitnessedBar-56 S15).
+        remote = pathlib.Path(top, "remote.git")
+        body = (f"object {'1' * len(sha)}\ntype commit\ntag verdict-{sha}\n"
+                f"tagger {run_fixture_git(work, 'var', 'GIT_COMMITTER_IDENT')}\n\nverdict\tGREEN\ntree\t{tree}\nnode\tb\n")
+        rc, tag = run_git(remote, "hash-object", "-t", "tag", "-w", "--literally", "--stdin", data=body)
+        if rc != 0 or not tag:
+            raise OSError(f"git hash-object --literally exited {rc}, so no broken tag is planted")
+        run_fixture_git(remote, "update-ref", VERDICT_REF + sha, tag)
+        run_node_read("an advertised tip the fetch cannot bring in", sha, 1,
+                      [said % "DEAD PROBE", f"git fetch origin {VERDICT_REF}{sha}"])
+    elif case == "peer-no-ssh-keygen":
+        write_tag(sha, "b", "b", tree)
+        run_fixture_git(work, "config", "gpg.ssh.program", pathlib.Path(top, "absent", "ssh-keygen").as_posix())
+        run_node_read("gpg.ssh.program at an absent path", sha, 1, [said % "DEAD PROBE", "verify-tag --raw"])
+    elif case == "peer-bad-signature":
+        write_tag(sha, "b", "b", tree)
+        ref = VERDICT_REF + sha
+        signed = run_fixture_git(work, "ls-remote", "origin", ref).split("\t")[0]
+        body = run_fixture_git(work, "cat-file", "tag", signed) + "\n"
+        if "run_id\tr1\n" not in body:
+            raise OSError("the signed tag carries no run_id line to edit")
+        rc, edited = run_git(work, "hash-object", "-t", "tag", "-w", "--stdin", data=body.replace("run_id\tr1\n", "run_id\tr2\n"))
+        if rc != 0 or not edited:
+            raise OSError(f"git hash-object exited {rc}, so no edited tag is written")
+        run_fixture_git(work, "push", "-q", "--force", "--no-verify", "origin", f"{edited}:{ref}")
+        run_node_read("a tag edited after node b signed it", sha, 1, [said % "NONE", "bad signature"])
     else:
         run_fixture_git(work, "checkout", "-q", "-b", "candidate")
         pathlib.Path(work, manifest).write_text("", encoding="utf-8")

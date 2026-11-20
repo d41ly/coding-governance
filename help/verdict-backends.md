@@ -5,7 +5,9 @@ being pushed. The policy key `verdict` names which backend gives that verdict. T
 registered:
 
 - `local-hook`, the default. The bar this node's own pre-push hook runs. Nothing changes from a
-  repository with no `verdict` key.
+  repository with no `verdict` key. A green record counts only where the hook itself would adopt it:
+  no leg of its run came from the reuse cache, and the legs it held by a selection are the ones the
+  landed revision selects. Otherwise the read is `NONE`.
 - `peer-node`. A second fleet node runs the bar on the commit and publishes its verdict. Only a
   verdict from another node, for the commit's own tree, signed by that node's registered key and
   run from the pinned files, counts.
@@ -85,6 +87,8 @@ list. The verdict counts only when the key that signed the tag belongs to the no
 line names, and that node is not the reading one:
 
 - An unsigned tag, or one signed by a key no line names, is `NONE`.
+- A tag whose message was changed after it was signed has a bad signature, and is `NONE`, naming the
+  bad signature. A verify that cannot run, such as one with no `ssh-keygen`, is `DEAD PROBE`.
 - A tag whose `node` line names another node than its signer is `NONE`, naming the signer.
 - With no list set, every peer read is `NONE`, `no signer table`.
 

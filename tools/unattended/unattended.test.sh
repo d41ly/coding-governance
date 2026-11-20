@@ -20541,7 +20541,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # plus main's 29 since 5d48501da (TOOL-aPiecewiseGrade-6) = 3406. Main raised no FLOOR_SHARD_<n>
 # since 5d48501da, so each keeps this branch's figure.
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the base 3348 at 5d48501da, plus main's 58, plus this branch's 2 (TOOL-dDeclaredLoop-21) = 3408.
-FLOOR_ASSERTIONS=3408
+# RAISED 3408 -> 3410 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-51, whose pass left the
+# floor where it was: its AC16 AC31 arm's two `hit` lines in region three, the light-profile and
+# writes-fixture plants of fix_keeps.py, each unconditional, so FLOOR_SHARD_3 carries the same +2. COUNTED
+# off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3410
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -20760,7 +20764,8 @@ FLOOR_SHARD_2=229
 # RAISED 450 -> 451 by TOOL-aLightenedLoop-8: the same 1 region-three assertion, see FLOOR_ASSERTIONS.
 # RAISED 445 -> 463 by TOOL-aTrimmedWait-1: the same 18 region-three --check-specs assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 445, plus main's 6, plus this branch's 18 = 469.
-FLOOR_SHARD_3=469
+# RAISED 469 -> 471 by TOOL-dWitnessedBar-56 on 2026-11-20: TOOL-dWitnessedBar-51's AC16 AC31 arm, two `hit`s in region three, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=471
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.

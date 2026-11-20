@@ -1662,12 +1662,16 @@ fi
 # a candidate costs no process. Each is empty when the file or the key is absent. `bg_sel_rows` holds
 # each `selection.<n>` value at index <n> (TOOL-dWitnessedBar-41 S2), an index of up to six digits.
 read_bar_file() {
-  local k v n
+  local k v n ln
   bg_sha=""; bg_tree=""; bg_kind=""; bg_base=""; bg_st=""; bg_run=""; bg_by=""
   bg_fp=""; bg_blob=""; bg_man=""; bg_verdict=""; bg_reused=""; bg_reused_cache=""
   bg_sel=""; bg_sel_rows=()
   [ -f "$1" ] || return 0
-  while IFS=$'\t' read -r k v; do
+  # A `selection.<n>` value is the row past its first TAB, byte for byte (TOOL-dWitnessedBar-56 S1): `read`
+  # with a TAB IFS would drop an empty last field's TAB, and the row would no longer hash as written.
+  while IFS= read -r ln; do
+    IFS=$'\t' read -r k v <<<"$ln"
+    case "$k" in selection.[1-9]*) v=${ln#*$'\t'} ;; esac
     case "$k" in
       sha) bg_sha=$v ;; tree) bg_tree=$v ;; kind) bg_kind=$v ;; base) bg_base=$v ;;
       selftests) bg_st=$v ;; run_id) bg_run=$v ;; by) bg_by=$v ;; verdict) bg_verdict=$v ;;
@@ -1826,8 +1830,9 @@ check_selection_at_r() {
 # check_tree_selection <label> — whether the selection the per-tree verdict read_bar_file last read
 # names is one R derives, for both of its readers (TOOL-dWitnessedBar-41 S2, S3). No `selection` key
 # refuses, since the record cannot say whether its bar held legs; `none` passes; a hash is checked
-# against the rows rebuilt from `selection.1` upward, `held` and a TAB before each and each ` · ` a
-# TAB again, then `select --check --selection` runs over them at R. SEL_SEEN keeps one
+# against the rows rebuilt from `selection.1` upward, each `held` and a TAB before the value as written,
+# whose TABs the runner keeps (TOOL-dWitnessedBar-56 S1), so a ` · ` inside a note round-trips, then
+# `select --check --selection` runs over them at R. SEL_SEEN keeps one
 # `<hash>TAB<force>` line per hash checked, so a push runs that check at most once per hash. Sets
 # `force` to the failure or empty.
 SEL_SEEN=""
@@ -1839,7 +1844,7 @@ check_tree_selection() {
   fi
   [ "$bg_sel" = none ] && return 0
   rows=""; i=1
-  while [ -n "${bg_sel_rows[$i]+x}" ]; do rows+="held"$'\t'"${bg_sel_rows[$i]// · /$'\t'}"$'\n'; i=$((i + 1)); done
+  while [ -n "${bg_sel_rows[$i]+x}" ]; do rows+="held"$'\t'"${bg_sel_rows[$i]}"$'\n'; i=$((i + 1)); done
   if ! f=$(mktemp 2>/dev/null) || [ -z "$f" ]; then
     force="the recorded $1's selection could not be rebuilt: no scratch file could be made"; return 0
   fi
@@ -2252,6 +2257,15 @@ fi
 # It is set again below, on a doc-only decision and nowhere else.
 [ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
 unset GATE_DOCS_BASE
+# THE BASE'S ORIGIN AND THE SELECTION ARE THIS HOOK'S ALONE TOO (TOOL-dWitnessedBar-56 S9, §8 F2), for
+# every bar a STUB included, for the docs knob's reason: an inherited `GATE_BASE_FROM` would decide whether
+# a scoped bar writes its per-tree verdict, and an inherited `GATE_SELECTION` would hold a push bar's leg by a
+# pusher's file. `GATE_BASE_FROM` is set again below, in the inherited-green branch alone; this hook
+# sets `GATE_SELECTION` on no path today.
+for _k in GATE_BASE_FROM GATE_SELECTION; do
+  [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
+  unset "$_k"
+done
 # THE TWO PUSH-TIME REUSE KNOBS ARE THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10, -32 S6), for every
 # bar a STUB included, for the docs knob's reason: an inherited value would let the environment decide
 # which legs a vetted runner spares. Each is set again below, on the one decision that asks for it.

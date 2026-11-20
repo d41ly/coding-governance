@@ -316,7 +316,12 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=302
+FLOOR_ASSERTIONS=309
+# RAISED 304 -> 309 by TOOL-dWitnessedBar-56 on 2026-11-20: the selection's CRLF, ` · ` and ignored-row
+# arm's three, base_from's inherited field's one and the aged staging temps' one. Counted one per
+# `ok … || nope` pair; this pass runs no suite.
+# RAISED 302 -> 304 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-41, whose pass left the
+# floor where it was: its AC1 arm's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 297 -> 302 by TOOL-dWitnessedBar-51: the declarative-key quarantine's precondition and two arms,
 # the two-worktree verdict prune's one and keep_tails' fence and cut's one. Counted one per `ok … || nope`
 # pair; this pass runs no suite.
@@ -737,7 +742,7 @@ sl_f="$REC_GD/gate-verdict/$(git -C "$REC_T" rev-parse 'HEAD^{tree}')"; sl_sel="
 printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7\n' > "$sl_sel"
 sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7\n' | git hash-object --stdin)
 rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
-[ "$(awk -F'\t' '$1=="selection.1"{print $2}' "$sl_f" 2>/dev/null)" = "guarded · quarantine · TOOL-x-7" ] \
+[ "$(awk -F'\t' '$1=="selection.1"{sub(/^[^\t]*\t/, ""); print}' "$sl_f" 2>/dev/null)" = $'guarded\tquarantine\tTOOL-x-7' ] \
   && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
   && ok "TOOL-dWitnessedBar-41 AC1 a run under a one-row selection writes selection.1 naming the held leg and selection as the hash of its canonical text" \
   || { nope "TOOL-dWitnessedBar-41 AC1 the per-tree verdict omits the selection, or its hash is not the canonical text's"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
@@ -746,6 +751,26 @@ rec_run GATE_FULL=1 >/dev/null
   && [ -z "$(awk -F'\t' '$1=="selection.1"' "$sl_f" 2>/dev/null)" ] \
   && ok "TOOL-dWitnessedBar-41 AC1 with no GATE_SELECTION the per-tree verdict reads selection none and no selection.1" \
   || { nope "TOOL-dWitnessedBar-41 AC1 a run with no GATE_SELECTION did not write selection none"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+# TOOL-dWitnessedBar-56 AC1 AC2: a CRLF selection whose one accepted row's note holds ` · `, beside a
+# three-field row and a row whose source is `bogus`. The accepted row is written as four TAB fields, the
+# hash is the LF canonical text of that row alone, the two others are counted as `selection_ignored`, and
+# the LF twin holding the accepted row alone yields the same `selection`. Red against a writer joining
+# `selection.<n>` with ` · `, or one hashing an ignored row.
+printf '# planted\r\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\r\nheld\tone\tquarantine\r\nheld\tone\tbogus\tnote\r\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+sl_got=$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)
+[ "$(awk -F'\t' '$1=="selection.1"{print NF}' "$sl_f" 2>/dev/null)" = 4 ] && [ "$sl_got" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-56 AC1 a CRLF row whose note holds ' · ' is written as four TAB fields and hashed as its LF canonical text" \
+  || { nope "TOOL-dWitnessedBar-56 AC1 selection.1 is not four TAB fields, or selection is not the LF canonical text's hash"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+[ "$(grep -c '^selection\.[0-9]' "$sl_f" 2>/dev/null)|$(awk -F'\t' '$1=="selection_ignored"{print $2}' "$sl_f" 2>/dev/null)" = "1|2" ] \
+  && ok "TOOL-dWitnessedBar-56 AC2 the three-field row and the bogus-source row are left out of the keys and counted as selection_ignored 2" \
+  || { nope "TOOL-dWitnessedBar-56 AC2 an ignored row entered the keys, or selection_ignored does not read 2"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' > "$sl_sel"
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ -n "$sl_got" ] && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_got" ] \
+  && ok "TOOL-dWitnessedBar-56 AC1 the LF twin of the selection yields the same selection hash" \
+  || nope "TOOL-dWitnessedBar-56 AC1 the LF twin hashed differently from the CRLF file"
 rm -f "$sl_sel"; rec_done
 
 # --- TOOL-dWitnessedBar-25 AC1-AC5: the verdict names its run and cause, and a failing leg's tail is kept by hash
@@ -847,6 +872,15 @@ rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a3 >/dev/null
   && ! ls -1 "$wt_d" 2>/dev/null | grep -q '^tail\.' \
   && ok "AC3 a red run re-hashing an aged tail freshens it inside the grace and leaves no tail.* temp" \
   || nope "AC3 the re-hashed tail kept its old time, or a tail.* temp was left: [$wt_a] on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+# TOOL-dWitnessedBar-56 AC11 (S13): a crashed bar's staging temps, both of `derive_temp_path`'s spellings,
+# aged past the grace, are removed by the next sweep, and a fresh one, a tail in flight, is kept. Red
+# against a sweep that skips every name that is not a hash.
+: > "$wt_d/tail.123456789.tmp"; : > "$wt_d/tail.AbCd1234"; : > "$wt_d/tail.987654321.tmp"
+touch -d '8 days ago' "$wt_d/tail.123456789.tmp" "$wt_d/tail.AbCd1234" 2>/dev/null
+rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a4 >/dev/null
+[ ! -e "$wt_d/tail.123456789.tmp" ] && [ ! -e "$wt_d/tail.AbCd1234" ] && [ -f "$wt_d/tail.987654321.tmp" ] \
+  && ok "TOOL-dWitnessedBar-56 AC11 the sweep removes both aged staging temps and keeps the fresh one" \
+  || nope "TOOL-dWitnessedBar-56 AC11 an aged temp outlived the sweep or the fresh one was removed: on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
 rm -rf "$REC_T.wt"; rec_done
 
 # --- TOOL-dWitnessedBar-40 AC1-AC3: the per-tree verdict's two declines and its reuse pair ----------
@@ -876,6 +910,14 @@ rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_BASE_FROM=inherited >/dev/null
 grep -q '^base_from_seen 0' "$(rec_dir)/0.out" 2>/dev/null \
   && ok "AC2 a leg's own environment holds no GATE_BASE_FROM" \
   || nope "AC2 a leg inherited GATE_BASE_FROM, or the leg wrote no output: $(cat "$(rec_dir)/0.out" 2>/dev/null)"
+# TOOL-dWitnessedBar-56 AC8 (S10): the same decline under GATE_BASE puts `inherited` on the header's
+# `base_from` row as a third field, and the decline line names that row. Red when the record cannot show
+# why no verdict was written.
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_BASE="$(git -C "$REC_T" rev-parse HEAD)" GATE_BASE_FROM=inherited >/dev/null
+dw_bf=$(awk -F'\t' '$1=="base_from"{print NF "|" substr($2, 1, 9) "|" $3}' "$(rec_dir)/header" 2>/dev/null)
+[ "$dw_bf" = "3|GATE_BASE|inherited" ] && grep -q "scoped on an inherited green, as the run record header's base_from row reads" "$REC_OUT" \
+  && ok "TOOL-dWitnessedBar-56 AC8 an inherited base reads GATE_BASE and inherited on the header's base_from row, and the decline line names the row" \
+  || { nope "TOOL-dWitnessedBar-56 AC8 the base_from row reads '$dw_bf', or the decline line does not name it"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -3; }
 rec_run GATE_FULL=1 GATE_LEGS=fx/legs.json >/dev/null
 [ "$(awk -F'\t' '$1=="reused"||$1=="reused_cache"{printf "%s:%s ", $1, $2}' "$dw_f" 2>/dev/null)" = "reused:0 reused_cache:0 " ] \
   && ok "AC3 a full green's per-tree verdict carries reused and reused_cache with the run's counts" \

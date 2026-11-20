@@ -1182,6 +1182,21 @@ case "$_out|$rp_knob" in
   *"FULL gate on main push"*"|") ok "RP AC15 a FULL decision hands the bar no knob, inherited or not" ;;
   *) bad "RP AC15 expected a FULL decision with no knob, got knob '$rp_knob': $_out" ;;
 esac
+# TOOL-dWitnessedBar-56 AC7 (S9): GATE_BASE_FROM and GATE_SELECTION are the hook's alone, for a STUB bar
+# too. A caller exporting both on a FULL decision has each named as not honoured, the bar sees neither,
+# and the stub, which writes its record unless GATE_BASE_FROM reads `inherited` as the runner declines,
+# writes it. Red against a hook that passes either knob through.
+printf '#!/usr/bin/env bash\nprintf "%%s|%%s" "${GATE_BASE_FROM-unset}" "${GATE_SELECTION-unset}" > "%s/bf"\n[ "${GATE_BASE_FROM:-}" = inherited ] || : > "%s/bf-record"\nexit 0\n' \
+  "$rp" "$rp" > "$rp/stub-bf.sh"
+rm -f "$rp/bf-record"; printf 'none' > "$rp/bf"
+_out=$( git commit -q --allow-empty -m "rp base-from" >/dev/null 2>&1
+        env GOV_GATE_CMD="bash $rp/stub-bf.sh" GATE_BASE_FROM=inherited GATE_SELECTION="$rp/planted-selection" \
+          git push origin main 2>&1 )
+case "$(printf '%s\n' "$_out" | grep -m1 'not honoured from the environment by this bar:')|$(<"$rp/bf")|$([ -e "$rp/bf-record" ] && echo record)" in
+  *" GATE_BASE_FROM GATE_SELECTION"*"|unset|unset|record")
+    ok "RP TOOL-dWitnessedBar-56 AC7 an exported GATE_BASE_FROM and GATE_SELECTION are named as not honoured, never reach a full decision's bar, and its record is written" ;;
+  *) bad "RP TOOL-dWitnessedBar-56 AC7 expected both knobs named and cleared and the record written, got '$(<"$rp/bf")' $([ -e "$rp/bf-record" ] && echo record || echo 'no record'): $_out" ;;
+esac
 
 # AC14: predicate 9 — a planted full green whose `reused_cache` field is not 0 forces the full bar, and
 # the same record reading 0 scopes, so the arm sees the field and not the record. RE-STAGED BY
@@ -1884,12 +1899,13 @@ cd "$pfx_home" || exit 2
 #     hook exports `push:<sha>` over any inherited value on every gated push, and it selects no leg
 #     and decides no verdict (TOOL-dWitnessedBar-25 S2).
 #   GATE_BASE_FROM — where a scoped bar's base came from, read once and unset before any leg; the hook
-#     exports `inherited` on the inherited-green path, and its only effect is that a scoped run writes
-#     no per-tree verdict, which costs a saving and never a leg or a verdict (TOOL-dWitnessedBar-40 S2).
+#     clears it for every bar, a STUB included, and exports `inherited` on the inherited-green path
+#     alone (TOOL-dWitnessedBar-56 S9), and its only effect is that a scoped run writes no per-tree
+#     verdict, which costs a saving and never a leg or a verdict (TOOL-dWitnessedBar-40 S2).
 #   GATE_SELECTION — the selection record a bar holds legs by, read once and unset before any leg; a
 #     bar whose run record holds one is admitted only once `verdict_flow.py select --check` derives it
-#     again at R, so a pusher's file holds no leg R does not (TOOL-dWitnessedBar-5 S2, S7). The hook's
-#     clear of it is TOOL-dWitnessedBar-56's.
+#     again at R, so a pusher's file holds no leg R does not (TOOL-dWitnessedBar-5 S2, S7). The hook
+#     clears it for every bar, a STUB included, and sets it on no path (TOOL-dWitnessedBar-56 S9, §8 F2).
 #   GATE_RERUN — re-runs each red leg once more on the same tree after every leg is reported, read
 #     once and unset before any leg; it writes `<i>.rerun.*` beside the attempts and moves no verdict and
 #     no exit code, so it can turn no leg into a PASS or a SKIP (TOOL-dWitnessedBar-8 S1, F6).
@@ -2463,9 +2479,10 @@ write_bg_verdict() { # sha · kind · base -> the runner's per-tree verdict of s
     "$(bash "$KIT_REL/$RUN_GATES/gate-fingerprint.sh" "$1")" > "$BG_VF"
 }
 write_bg_selection() { # row, its `held` cut and TAB-separated -> BG_VF's selection keys hold that one row,
-  # hashed as the runner hashes its canonical text (TOOL-dWitnessedBar-41 S1)
+  # hashed as the runner hashes its canonical text (TOOL-dWitnessedBar-41 S1), its TABs kept as the runner
+  # keeps them (TOOL-dWitnessedBar-56 S1)
   set_bg_key "$BG_VF" selection "$(printf 'held\t%s\n' "$1" | git hash-object --stdin)"
-  printf 'selection.1\t%s\n' "${1//$'\t'/ · }" >> "$BG_VF"
+  printf 'selection.1\t%s\n' "$1" >> "$BG_VF"
 }
 read_bg_key() { awk -F'\t' -v k="$2" '$1==k{print $2}' "$1" 2>/dev/null; }
 remove_bg_key() { awk -F'\t' -v k="$2" '$1!=k' "$1" > "$1.x" && mv "$1.x" "$1"; }
@@ -2541,7 +2558,7 @@ for _c in verdict manifest reused_cache keyless reused selftests tree seledit se
     reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
     tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
-    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; set_bg_key "$BG_VF" selection.1 'x · quarantine · TOOL-x-8'
+    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; sed -i 's/^selection\.1\t.*/selection.1\tx\tquarantine\tTOOL-x-8/' "$BG_VF"
              _want="selection rows do not hash to" ;;
     selkeyless) remove_bg_key "$BG_VF" selection; _want="carries no selection, so it cannot say whether its bar held legs" ;;
     control) _want="pre-push: covered on main push" ;;
@@ -2551,6 +2568,18 @@ for _c in verdict manifest reused_cache keyless reused selftests tree seledit se
     "control|$_m0|"*"$_want"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*) ok "BG AC6-8 control: the unaltered GREEN verdict covers the merge and names its path" ;;
     "$_c|$((_m0 + 1))|"*"not covered"*"$_want"*) ok "BG AC6-8 a verdict altered by $_c is not covered, says '$_want', and the bar runs" ;;
     *) bad "BG AC6-8 the $_c case expected '$_want', got marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+  esac
+  # TOOL-dWitnessedBar-56 AC6 — PARITY: over each plant of the two record predicates the local-hook reader
+  # copies, `read --backend local-hook` stands GREEN exactly where the hook covered the push with no bar.
+  # Red against a reader that stands on `verdict GREEN` alone.
+  case $_c in
+    reused_cache|keyless|reused|seledit|selkeyless|control)
+      _hk=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _hk=GREEN
+      _lv=$("$_rkd_py" "$SRC/$RUN_GATES_DIR/verdict_backends.py" read --backend local-hook --sha "$_x" 2>&1)
+      case "$_lv" in
+        *"verdict: local-hook · $_hk · "*) ok "BG TOOL-dWitnessedBar-56 AC6 parity: over $_c the hook and read --backend local-hook both read $_hk" ;;
+        *) bad "BG TOOL-dWitnessedBar-56 AC6 parity: over $_c the hook read $_hk and local-hook said: $_lv" ;;
+      esac ;;
   esac
 done
 cd "$pfx_home" || exit 2
@@ -2578,18 +2607,41 @@ git checkout -q main; git worktree add -q --detach "$BG_D/w2" "$_mg" >/dev/null 
 cd "$BG_D/w2" || exit 2
 bg_gd=$(git rev-parse --git-dir)
 _sel_add=$'x\tquarantine\tTOOL-x-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.landing-levels unit integration'
-for _c in adds derived; do
+# TOOL-dWitnessedBar-56 S1: a note holding ` · ` round-trips, so its row reaches R's check and is named
+# there, where a rebuild turning ` · ` back into a TAB refuses it as rows that do not hash.
+_sel_dot=$'x\tquarantine\tTOOL-x-7 · 3/10'
+declare -A _sel_hk=()
+for _c in adds dot derived; do
   write_bg_verdict "$_x" full ""
-  if [ "$_c" = adds ]; then write_bg_selection "$_sel_add"; else write_bg_selection "$_sel_lvl"; fi
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; *) write_bg_selection "$_sel_lvl" ;; esac
   _m0=$(read_bg_marks); run_bg_push
+  _sel_hk[$_c]=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _sel_hk[$_c]=GREEN
   case "$_c|$(read_bg_marks)|$BG_OUT" in
     "adds|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7"*)
       ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R does not derive is not adopted, names the row, and the bar runs" ;;
+    "dot|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7 · 3/10"*)
+      ok "BG TOOL-dWitnessedBar-56 AC1 a selection row whose note holds ' · ' rebuilds to its hash and is judged at R by its whole note" ;;
     "derived|$_m0|"*"covered on main push"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*)
       ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R derives exactly covers the merge with no bar run" ;;
-    *) bad "BG TOOL-dWitnessedBar-41 AC2 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+    *) bad "BG TOOL-dWitnessedBar-41/56 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
   esac
 done
+# TOOL-dWitnessedBar-56 AC6 — PARITY AT R: the local-hook reader, copied beside the fixture's stand-in runner
+# with a descriptor declaring it, so it reads the kit's own selection checker and manifest as the hook
+# does, re-reads each plant once every push above is done and agrees with the hook's decision.
+cp "$SRC/$RUN_GATES_DIR/verdict_backends.py" "$KIT_REL/$RUN_GATES/"
+printf '[[verdict_backend]]\nname = "local-hook"\nreader = "verdict_backends:read_local_verdict"\noff_node = false\nowner = "tFix"\n' \
+  > "$KIT_REL/$RUN_GATES/kit.toml"
+for _c in adds dot derived; do
+  write_bg_verdict "$_x" full ""
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; *) write_bg_selection "$_sel_lvl" ;; esac
+  _lv=$("$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_backends.py" read --backend local-hook --sha "$_x" 2>&1)
+  case "$_lv" in
+    *"verdict: local-hook · ${_sel_hk[$_c]} · "*) ok "BG TOOL-dWitnessedBar-56 AC6 parity at R: over $_c the hook and read --backend local-hook both read ${_sel_hk[$_c]}" ;;
+    *) bad "BG TOOL-dWitnessedBar-56 AC6 parity at R: over $_c the hook read ${_sel_hk[$_c]} and local-hook said: $_lv" ;;
+  esac
+done
+rm -f "$KIT_REL/$RUN_GATES/verdict_backends.py" "$KIT_REL/$RUN_GATES/kit.toml"
 printf 'held\t%s\n' "$_sel_add" > "$BG_D/sel-adds"; printf 'held\t%s\n' "$_sel_lvl" > "$BG_D/sel-derived"
 "$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-adds" --rev "$_r" >/dev/null 2>&1; _a=$?
 "$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_flow.py" select --check --selection "$BG_D/sel-derived" --rev "$_r" >/dev/null 2>&1; _b=$?

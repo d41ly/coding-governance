@@ -5808,6 +5808,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_controls_case",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "check_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
@@ -6981,6 +6986,11 @@
       "id": "check_load_set",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "check_local_record",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "check_lock",
@@ -22263,6 +22273,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_landed_revision",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_landed_text",
       "kind": "function",
       "file": "tools/playbook/overlay.py"
@@ -27248,6 +27263,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "render_escaped",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "render_fact",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -27816,6 +27836,11 @@
       "id": "render_record_key",
       "kind": "function",
       "file": "tools/loop/loop_transition.py"
+    },
+    {
+      "id": "render_recut",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "render_redacted",
@@ -32916,6 +32941,11 @@
       "id": "run_ln_rotation",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_local_plant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_lock_fixture",

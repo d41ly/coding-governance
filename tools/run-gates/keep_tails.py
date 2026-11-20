@@ -12,7 +12,10 @@ at `<common-dir>/gate-tails/<hash>`. This verb reads `trace.leg-output` through 
                 record factory's `write_record`, into build `<slug>`'s `build/` folder under `<unit id>`:
                 fields `Leg`, `Hash`, `Run`, `Sha` (the run header's `head`) and `Cause`, then the tail in
                 one fenced block, each span runlog's `scan_secrets` finds replaced by its placeholder. The
-                tail is decoded with `errors='replace'` and its `Hash` names the stored bytes; the fence
+                tail is decoded with `errors='replace'` and its `Hash` names the stored bytes. After the
+                mask, each C0 control character but TAB and LF, CR included, and DEL is written as
+                `\\xHH`, and the text is cut again to its last whole character within TAIL_BYTES
+                (TOOL-dWitnessedBar-56 S12), so an escape or a replaced byte cannot grow it; the fence
                 is a backtick run one longer than the longest inside the tail, three at least, and a tail
                 line that would read as a record field is written behind `FIELD_SHIELD`, so no tail
                 closes the fence early or forges a field (TOOL-dWitnessedBar-51 S34). A
@@ -24,15 +27,17 @@ A run whose verdict names no tail writes nothing and says so. The factory and ru
 found by the sibling-kit resolver and imported.
 
 EXIT 0 every tail written or skipped · 1 a tail not kept: its file is gone, its bytes do not hash to
-its name, or `write_record` refused it (a line that would read as a field, or a CR), each named on
+its name, or `write_record` refused it (a line that would read as a field), each named on
 stderr with nothing written for it · 2 refused before any write: a malformed argument, no repository,
 no verdict for the run, a value outside the catalogue row, or a sibling kit that does not resolve.
 
 `--selftest` plants a scratch repository per case under the system temp directory: a run holding one
 tail, kept and then kept again once tracked; the key planted `node-local`; a tail holding a
 secret-shaped line; and a tail opening a three-backtick line, carrying a `**Hash:**` line and cut, as
-the runner cuts it, at the last whole UTF-8 character within 8192 bytes of a multibyte one. Exit 0 when
-every case reads as planted, 1 naming each that does not.
+the runner cuts it, at the last whole UTF-8 character within 8192 bytes of a multibyte one; and
+`controls`, 3000 bytes that are not UTF-8 before an ANSI colour sequence, a lone CR and a NUL, whose
+record holds each control escaped and at most TAIL_BYTES inside its fence (TOOL-dWitnessedBar-56 S12).
+Exit 0 when every case reads as planted, 1 naming each that does not.
 
 WHAT IT DOES NOT CHECK. A byte that is not UTF-8 inside the tail, which is replaced. Secret shapes
 runlog's table does not know. That the run record belongs to this build: the caller names both.
@@ -62,6 +67,7 @@ TAIL_KEY = re.compile(r"tail\.([0-9]+)")
 BOUND = 120  # seconds, each git call
 TAIL_BYTES = 8192  # the runner's cut, PINNED by TOOL-dWitnessedBar-25: its last whole UTF-8 character within these
 FIELD_SHIELD = "| "  # what a tail line that would read as a record field is written behind (S34)
+CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f]")  # every C0 control but TAB and LF, and DEL (S12)
 
 
 def run_git(top, *args, data=None):
@@ -168,6 +174,25 @@ def read_blob_hash(top, data):
     return p.stdout.strip() if p.returncode == 0 else ""
 
 
+def render_escaped(text):
+    """`text` with each C0 control character but TAB and LF, CR included, and DEL written as `\\xHH`
+    (TOOL-dWitnessedBar-56 S12), so no colour sequence, lone CR or NUL reaches the record raw."""
+    return CONTROL.sub(lambda m: "\\x%02x" % ord(m.group()), text)
+
+
+def render_recut(text):
+    """`text` cut, as the runner cuts a tail, to its last whole character within TAIL_BYTES of UTF-8: an
+    escape or a replaced byte can make the decoded text longer than the bytes the runner kept."""
+    data = text.encode("utf-8")
+    if len(data) <= TAIL_BYTES:
+        return text
+    data = data[-TAIL_BYTES:]
+    start = 0
+    while start < len(data) and 0x80 <= data[start] < 0xC0:
+        start += 1
+    return data[start:].decode("utf-8")
+
+
 def render_fenced(text, build_records):
     """`text` as the record's fenced block, a list of lines: the fence a backtick run one longer than the
     longest inside `text`, three at least, so no tail line closes it; each line the record factory would
@@ -217,7 +242,8 @@ def run_keep(cwd, run, build, unit):
             err.append(f"{SAY}: {what} — {src.as_posix()} does not hash to its name, so no record is written")
             rc = 1
             continue
-        lines = render_fenced(render_redacted(data.decode("utf-8", "replace")), build_records)
+        lines = render_fenced(render_recut(render_escaped(render_redacted(data.decode("utf-8", "replace")))),
+                              build_records)
         fields = [("Leg", leg), ("Hash", h), ("Run", run), ("Sha", header.get("head") or "-"),
                   ("Cause", verdict.get("cause") or "-")]
         try:
@@ -292,6 +318,23 @@ def check_fenced_case(top, h, tail, text, path):
     return why
 
 
+def check_controls_case(top, h, tail, text):
+    """The `controls` case's reasons, empty when it reads as planted (TOOL-dWitnessedBar-56 AC10)."""
+    why = []
+    fence = next((ln for ln in text.split("\n") if ln.startswith("```")), "")
+    inner = text[text.index(fence) + len(fence) + 1:text.rindex(fence)] if fence else text
+    raw = [c for c in ("\x1b", "\r", "\x00") if c in inner]
+    if raw:
+        why.append(f"the fenced block holds the raw byte(s) {raw!r}")
+    if not all(e in inner for e in ("\\x1b", "\\x0d", "\\x00")):
+        why.append("the fenced block does not hold \\x1b, \\x0d and \\x00 in their place")
+    if len(inner.encode("utf-8")) > TAIL_BYTES:
+        why.append(f"the fenced block measures {len(inner.encode('utf-8'))} bytes, above {TAIL_BYTES}")
+    if f"- **Hash:** {h}" not in text or h != read_blob_hash(top, tail):
+        why.append("the record's Hash does not name the tail file's bytes")
+    return why
+
+
 def run_selftest():
     """Each planted case, graded by what `run_keep` writes and prints."""
     lines, failed = [], 0
@@ -300,7 +343,8 @@ def run_selftest():
     cases = (("kept once", KEEP, b"line 1\nFAIL the fixture leg\n"),
              ("node-local", "node-local", b"FAIL the fixture leg\n"),
              ("secret masked", KEEP, f"aws configure set aws_access_key_id {secret}\n".encode()),
-             ("fenced", KEEP, render_cut_tail()))
+             ("fenced", KEEP, render_cut_tail()),
+             ("controls", KEEP, b"\xff" * 3000 + b"\nFAIL \x1b[31mred\x1b[0m the fixture leg\rover\x00\n"))
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="kt25-"))
     try:
         for i, (label, value, tail) in enumerate(cases):
@@ -330,6 +374,8 @@ def run_selftest():
                                    f"or did not skip it: {out2 + err2}")
                 elif label == "fenced":
                     why += check_fenced_case(top, h, tail, text, made[0])
+                elif label == "controls":
+                    why += check_controls_case(top, h, tail, text)
                 elif secret in text or "<redacted:aws-key>" not in text:
                     why.append("the record carries the secret, or not its placeholder")
             except Refusal as e:
