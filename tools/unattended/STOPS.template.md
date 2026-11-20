@@ -306,7 +306,10 @@ first saw it. A claim's RENEWING BEAT is the newest commit of the tip's first-pa
 walk through its current tenure, the commits whose `epoch` is the tip's (an absent `epoch` reads 0),
 whose `renews` reads `yes` or is absent, else the tenure's opening commit whatever its `renews` says;
 a migrated lease's legacy commits beneath its opener never renew it, and a fence beat writing
-`renews: no` moves the tip and leaves the beat where it was.
+`renews: no` moves the tip and leaves the beat where it was. A commit whose `renews` reads `-` is a
+stop of the same walk, tested before any age: the walk reads no further and that commit stands for
+the beat, so a tenure whose renewal policy turned to `none` reads `live` however long ago this node
+first saw its older `renews: no` commits.
 A lease is aged within its holder's tenure: a take or a take-over raises the epoch and opens a new
 one, so an earlier holder's beat never ages the new holder, and a tenure with no renewing commit,
 aged from its opener, is `live` until `leases.expiry-hours` after the new holder's first write and

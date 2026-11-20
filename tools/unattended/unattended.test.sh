@@ -19215,10 +19215,11 @@ if in_shard 8; then
 LF=$(mktemp -d); write_lease_fixture
 OC_REF=refs/gov/leases/tOc/build
 OC_TREE=$(git --git-dir="$LF/origin.git" mktree </dev/null)
-add_lease_commit() { # epoch · renews · beat-utc · [parent] · [offer-deadline] -> the tOc build lease commit, on the fixture's origin
-  local m
-  m=$(printf 'gov-claim tOc/build\n\nslug: tOc\nnode: other\nhost: h\nsession: s-o\nkeepalive: absent\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: build\nfleet-tag: b\nrenews: %s\nwitness: -\noffer: -\noffer-deadline: %s\nlast-fetch: -' \
-    "$3" "$3" "$1" "$2" "${5:--}")
+add_lease_commit() { # epoch · renews, empty for no key · beat-utc · [parent] · [offer-deadline] -> the tOc build lease commit, on the fixture's origin
+  local m rl=$'\nrenews: '"$2"
+  [ -n "$2" ] || rl=""
+  m=$(printf 'gov-claim tOc/build\n\nslug: tOc\nnode: other\nhost: h\nsession: s-o\nkeepalive: absent\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: build\nfleet-tag: b%s\nwitness: -\noffer: -\noffer-deadline: %s\nlast-fetch: -' \
+    "$3" "$3" "$1" "$rl" "${5:--}")
   if [ -n "${4:-}" ]; then git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -p "$4" -m "$m"
   else git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -m "$m"; fi
 }
@@ -19467,6 +19468,63 @@ for so_v in 90000:stale 60:live; do
   oc_row=$(read_clock_row "$oc_copy/age-first.sh"); so_red="$so_red${oc_row%% *} "
 done
 same "DPR35 AC3 RED: the copy whose awk tests the threshold first reads both stale" "$so_red" "stale stale "
+# ==================================================================================================
+# TOOL-dPlacedRequest-46 — A `renews: -` COMMIT STOPS THE WALK BEFORE ANY THRESHOLD. Over the same
+# fixture, each chain one epoch: a `-` commit above an older `renews: no` commit sighted 3600000 s ago,
+# the mixed chain a renewal-policy change to `none` mid-tenure writes, reads `live`, or `unknown` with
+# age `-` where the `-` commit is unsighted. RED is the unit-35-order copy, a scratch copy whose walk
+# `awk` lacks the `-` stop, which reads past the `-` commit and every mixed row `stale`. Waived by README
+# rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a `renews: yes` commit sighted
+# before the threshold beneath a younger `-` commit, which the same stop covers.
+# ==================================================================================================
+ds_stop='if ((c in rn) && rn[c] == "-") { stop(i, c); return }'
+printf '%s\n' "${oc_src/"$ds_stop"/}" >"$oc_copy/unit35-order.sh"
+same "DPR46 the driver carries the dash stop once and the unit-35-order copy lacks it" \
+  "$(grep -cF "$ds_stop" "$SCRIPT") $(grep -cF "$ds_stop" "$oc_copy/unit35-order.sh")" "1 0"
+# ---- AC1: a `renews: -` tip sighted 60 s ago over a `renews: no` commit sighted 3600000 s ago reads live.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 - "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR46 AC1 a renews: - tip over a renews: no commit sighted 3600000 s ago reads live" "${oc_row%% *}" "live"
+oc_row=$(read_clock_row "$oc_copy/unit35-order.sh")
+same "DPR46 AC1 RED: the unit-35-order copy reads it stale" "${oc_row%% *}" "stale"
+# ---- AC2 and AC4: a `renews: no` tip sighted 60 s ago over a `renews: -` commit, sighted 120 s ago
+# ---- (AC2) or unsighted (AC4), over a `renews: no` commit sighted 3600000 s ago reads `live`, or
+# ---- `unknown` aged `-`; the unit-35-order copy reads both stale.
+ds_red=""
+for ds_v in 120:live:AC2 gone:unknown:AC4; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 - "$(derive_claim_ago 120)" "$oc_a")
+  oc_c=$(add_lease_commit 1 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600000)"
+  [ "${ds_v%%:*}" = gone ] || add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 120)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row); ds_w=${ds_v#*:}
+  case "${ds_w%%:*}" in
+    unknown) same "DPR46 ${ds_v##*:} a renews: - commit unsighted below the tip reads unknown, aged -" "$oc_row" "unknown -" ;;
+    *) same "DPR46 ${ds_v##*:} a renews: - commit sighted 120 s ago below the tip reads live" "${oc_row%% *}" "live" ;;
+  esac
+  oc_row=$(read_clock_row "$oc_copy/unit35-order.sh"); ds_red="$ds_red${oc_row%% *} "
+done
+same "DPR46 AC2 AC4 RED: the unit-35-order copy reads past the renews: - commit, both stale" "$ds_red" "stale stale "
+# ---- AC3: one two-commit tenure per class of `renews` on its tip, `yes`, no key, `-` and `no`, sighted
+# ---- 60 s ago over a `renews: no` commit sighted 3600000 s ago: live, live, live, stale. The
+# ---- unit-35-order copy reads the `-` row stale and the other three as the driver does.
+ds_got=""; ds_red=""
+for ds_v in yes "" - no; do
+  remove_clock_refs
+  oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 "$ds_v" "$(derive_claim_ago 60)" "$oc_a")
+  git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600000)"
+  add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+  oc_row=$(read_clock_row); ds_got="$ds_got${oc_row%% *} "
+  oc_row=$(read_clock_row "$oc_copy/unit35-order.sh"); ds_red="$ds_red${oc_row%% *} "
+done
+same "DPR46 AC3 tips renews: yes, no key, - and no over an old renews: no commit read" "$ds_got" "live live live stale "
+same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale "
 rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -23113,7 +23171,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3949 -> 3957 by TOOL-dPlacedRequest-35: the stop-order block's 8 region-eight assertions (8
 # `same`, its AC3 loop's two among them, one per pass), off the diff's own lines; no skip branch. No
 # suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3957
+# RAISED 3957 -> 3965 by TOOL-dPlacedRequest-46: the dash-stop block's 8 region-eight assertions (8
+# `same`, its AC2/AC4 loop's two among them, one per pass), off the diff's own lines; no skip branch.
+# No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=3965
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23385,7 +23446,8 @@ FLOOR_SHARD_7=311
 # RAISED 1138 -> 1146 by TOOL-dPlacedRequest-40: the same 8 region-eight id-less act assertions, see FLOOR_ASSERTIONS.
 # RAISED 1146 -> 1168 by TOOL-dPlacedRequest-33: the same 22 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
 # RAISED 1168 -> 1176 by TOOL-dPlacedRequest-35: the same 8 region-eight stop-order assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1176
+# RAISED 1176 -> 1184 by TOOL-dPlacedRequest-46: the same 8 region-eight dash-stop assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1184
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

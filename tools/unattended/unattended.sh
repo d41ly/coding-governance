@@ -2450,7 +2450,8 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # reads each first-parent commit's parent, `epoch` (absent 0) and
 # `renews`; per row a walk from its own tip, while the `epoch` is the tip's, finds the RENEWING BEAT,
 # the newest commit whose `renews` is `yes` or absent, else the tenure's opening commit (§8 F5), so a
-# migrated lease's legacy commits beneath its opener never renew it. `read_first_seen` gives the
+# migrated lease's legacy commits beneath its opener never renew it; a newer commit whose `renews` is
+# `-` stops that walk first and stands for the beat (TOOL-dPlacedRequest-46). `read_first_seen` gives the
 # first sighting of the tip and of that beat, and the one `date` ages both on this node's clock:
 # field 4 is now minus the tip's sighting, and a `live` row is `stale` once its beat's sighting is
 # older than `leases.expiry-hours` (`read_lease_bound expiry`), never where that beat carries
@@ -2565,9 +2566,12 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     # every row's tip, piped to an `awk` that walks each row from its tip, the tip included, and tests
     # each commit in this order (TOOL-dPlacedRequest-35 S1): its TENURE'S END first (a commit whose epoch
     # differs from the tip's is another holder's, read no further and never aged, the oldest commit read
-    # inside the tenure standing for the beat); then its RENEWING BEAT (`renews` is `yes` or absent);
-    # then a commit the feed first sighted before `thr`, now less `leases.expiry-hours`, which makes the
-    # row `stale` whatever lies further back inside the tenure and stands for the beat. A row whose chain
+    # inside the tenure standing for the beat); then a `renews: -` commit (TOOL-dPlacedRequest-46 S1),
+    # which stops the row there and stands for the beat, so a lease whose holder's newer write declares
+    # it never expires is never aged by an older commit of the tenure; then its RENEWING BEAT (`renews`
+    # is `yes` or absent); then a commit the feed first sighted before `thr`, now less
+    # `leases.expiry-hours`, which makes the row `stale` whatever lies further back inside the tenure
+    # and stands for the beat. Any other `renews`, `no` or a value outside the four, reads on (S2). A row whose chain
     # ends first takes its oldest commit read (S2). The `awk` exits once every row is resolved, and
     # `git log` stops on the closed pipe, so a read costs each lease's commits sighted inside the bound,
     # not its history.
@@ -2591,6 +2595,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
           if (!(c in kn)) { wt[c] = wt[c] " " i; return }
           if (!(i in te)) te[i] = ep[c]
           if (ep[c] != te[i]) { stop(i, od[i]); return }
+          if ((c in rn) && rn[c] == "-") { stop(i, c); return }
           if (!(c in rn) || rn[c] == "yes") { stop(i, c); return }
           if (thr != "" && ((rf[i], c) in seen) && seen[rf[i], c] < thr) { stop(i, c); return }
           od[i] = c; c = par[c]
