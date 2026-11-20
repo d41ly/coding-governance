@@ -6265,7 +6265,8 @@ check_authorization() { # slug · base
       _pt=${_pt//$'\r'/}
       case "$_pt" in *$'\n- **Item:** item.entry.place\n'*) ;; *) continue ;; esac
       case "$_pt" in *$'\n- **Disposition:** breakpoint\n'*) ;; *) continue ;; esac
-      case "$_pt" in *$'\n- **Reason:** spec audit · '*) ;; *) continue ;; esac
+      # The name is the Reason's text before ` · request `, as `breakpoints.py`'s reader splits it.
+      case "$_pt" in *$'\n- **Reason:** spec audit · request '*|*$'\n- **Reason:** spec audit\n'*) ;; *) continue ;; esac
       AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=placement
       break
     done

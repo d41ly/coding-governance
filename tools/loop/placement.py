@@ -891,9 +891,9 @@ def write_breakpoint_declaration(root, store, key, driver=None):
         units = sorted((uid for uid, _status in read_build_specs(build, root)), key=lambda u: int(u.rsplit("-", 1)[1]))
         if not units:
             raise ValueError("the build %s has no unit spec, so no record can name its first unit" % build)
+        past = check_position_passed(root, build, position)   # every read before the one write
         rel = read_build_records().write_disposition(str(root), build, units[0], PLACE_ITEM, "breakpoint", "prompt",
                                                      "%s%s%s" % (name, PLACED_REQUEST, key))
-        past = check_position_passed(root, build, position)
     except ValueError as e:
         raise PlacementRefused(str(e)) from None
     lines = ["%s: declared — breakpoint %s · %s · %s" % (SAY, name, build, rel)]
@@ -1451,7 +1451,8 @@ def check_placement_plant(case, top, seen, bad):
         rows = ((("unnamed", {"build": FX_LIVE}, "names no breakpoint"),
                  ("unknown name", {"build": FX_LIVE, "breakpoint": "design review"}, "is none of spec audit"),
                  ("undeclared item", {"build": FX_LIVE, "breakpoint": "item item.build.nothing"}, "is not declared"),
-                 ("no build", {"breakpoint": "spec audit"}, "names no build"))
+                 ("no build", {"breakpoint": "spec audit"}, "names no build"),
+                 ("unopened build", {"build": FX_NEW, "breakpoint": "spec audit"}, "%s does not exist" % FX_NEW))
                 if case == "breakpoint-unnamed" else
                 (("closed", {"build": FX_DONE, "breakpoint": "spec audit"}, "%s is CLOSED, not live" % FX_DONE),))
         for n, (what, fields, fact) in enumerate(rows):
@@ -1498,6 +1499,17 @@ def check_placement_plant(case, top, seen, bad):
                                        "Reason": "spec audit · request %s" % key} \
                 or "**Serves:** disposition TOOL-%s-1" % FX_LIVE not in text:
             bad.append("the record reads %s, malformed %s" % (got, rec["malformed"]))
+        bare = "dBare"   # a live build whose README names no unit spec: nothing to name the record under
+        write_fixture_files(root, {"memory/builds/%s/README.md" % bare: "---\nslug: %s\nnode: a\nopened: 2026-11-01\n"
+                                   "streams: tooling\nroster: TOOL\nids: TOOL-%s-1\nstatus: OPEN\n---\n\n# %s\n"
+                                   % (bare, bare, bare)})
+        run_placed_return(key, disposition="breakpoint", build=bare, breakpoint="closing review", reason="r")
+        check_case("bare check", run_placement_command(root, "check", "--request", key, session=FX_SESSION), 0,
+                   "placement: pass — breakpoint %s" % bare)
+        check_case("no unit", run_placement_command(root, "breakpoint", "--request", key), 1,
+                   "the build %s has no unit spec" % bare)
+        if (root / "memory" / "builds" / bare / "build").exists():
+            bad.append("a build with no unit gained a record")
     elif case == "past-position":   # TOOL-dPlacedRequest-5 AC6
         key = write_typed_request(root, store, "audit the specs\n")
         run_placed_return(key, disposition="breakpoint", build=FX_LIVE, breakpoint="spec audit", reason="the owner asked")
@@ -1518,6 +1530,14 @@ def check_placement_plant(case, top, seen, bad):
                                                                                       " / ".join(lines)))
         if calls != ["--trigger %s --subject %s-specs --cause placement" % (FX_LIVE, FX_LIVE)]:
             bad.append("the stub driver recorded %s" % calls)
+        folder = root / "memory" / "builds" / FX_LIVE / "build"
+        kept = len(list(folder.glob("*-disposition-*.md")))
+        stub.write_text("echo 'UNATTENDED check 37 FAILED — the stub refuses'\nexit 1\n", encoding="utf-8", newline="\n")
+        rc, lines = write_breakpoint_declaration(root, store, key, driver=stub)
+        seen.append("refused trigger exit %d" % rc)
+        if rc != 1 or "trigger refused — %s · UNATTENDED check 37 FAILED" % FX_LIVE not in " / ".join(lines) \
+                or len(list(folder.glob("*-disposition-*.md"))) != kept + 1:
+            bad.append("a refused trigger exited %d, the record not kept: %s" % (rc, " / ".join(lines)))
 
 
 def main(argv):

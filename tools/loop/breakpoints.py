@@ -492,6 +492,12 @@ def run_breakpoint_plant(case):
                 check(rc == 0 and lines == [plan, "breakpoint: spec audit · after item.design.reason · reviewer · owed",
                                             "breakpoint: breakpoint · before item.build.unit-pass · reviewer · "
                                             "placement", closing], "the placed records read %s" % lines)
+                write_disposition(repo, FX_BUILD, FX_UNIT, PLACED_ITEM, PLACED_WORD, "prompt",
+                                  "design review%s3f9c2a7d01be" % PLACED_REQUEST)
+                write_policy(repo, None, "a placed breakpoint naming no review")
+                rc, lines = run_verb(repo, listed)
+                check(rc == 2 and len(lines) == 1 and "the placed breakpoint " in lines[0]
+                      and "'design review' is none of" in lines[0], "the unknown name read exit %d, %s" % (rc, lines))
             finally:
                 remove_tree(repo)
         elif case == "ratification":   # AC3, AC4, AC7

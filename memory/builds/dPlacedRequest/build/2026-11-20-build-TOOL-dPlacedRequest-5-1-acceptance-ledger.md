@@ -64,6 +64,22 @@ the changed code, one `python tools/loop/placement.py --fixture --plant <case>` 
   `names no breakpoint`), `owner-released`, `predicate-fails` (the draw through the moved driver call),
   `each-disposition`, `late-answer`, `claim-lines`; breakpoints `driver-optin`, `values`, `ratification`.
 
+- The checklist pass over the first commit (`destructive-step-before-its-precondition`,
+  `refusal-branch-with-no-arm`, `two-readers-of-one-config-one-re-derived`):
+  `tools/loop/placement.py#write_breakpoint_declaration` now reads the position before its one write, so a
+  read that refuses leaves no record. `--plant breakpoint-unnamed` gains a build with no README, refused
+  `dFresh does not exist`; `--plant declare` gains a live build whose README names no unit spec, refused
+  `the build dBare has no unit spec` with no `build/` folder written; `--plant past-position` gains a stub
+  that refuses, exit 1 `trigger refused — dLive · UNATTENDED check 37 FAILED`, the record kept;
+  `breakpoints.py --plant placed` gains a record naming `design review`, the list refused exit 2 naming the
+  record. The driver's reader of the record's `Reason` now matches the Python reader's split, `spec audit`
+  before ` · request ` or alone, never `spec audit · <anything else>`. Each plant printed `held` again, and
+  `--plant audit-request` over the narrowed reader.
+- Unarmed, named: `tools/loop/placement.py#check_breakpoint`'s consent read timing out or answering
+  neither 0 nor 1, and its composed rows not reading at the build's pin;
+  `tools/loop/placement.py#write_breakpoint_declaration`'s trigger bound firing and a record-factory
+  refusal; `tools/loop/placement.py#read_owner_release` over a placed record whose name refuses.
+
 **Owed at the close (main loop):** the `loop placement fixtures` leg over every plant and TOOL-dDeclaredLoop-19's
 breakpoint plants; the three `New arm:` lines of the spec's Gates section, the placement plants' failing
 cases staged by `relayed` with the provenance read removed and by `audit-request-owed-only` with the placed
