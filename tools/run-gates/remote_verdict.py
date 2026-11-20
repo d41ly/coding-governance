@@ -19,7 +19,8 @@ LIVENESS, the job's declared bar step concluded `success`, not `skipped`; SOURCE
 `app-only` the source check is skipped and a passing read is GREEN with witness `claimed`, never
 `witnessed`; under the other two values pinned files that differ read HELD. No pin set reads HELD, `no
 pin`; any other refusal of a key is a DEAD PROBE. The pinned blobs are read from the local object database
-and a SHA the clone lacks is a DEAD PROBE, never fetched.
+and a SHA the clone lacks is a DEAD PROBE, never fetched. The SOURCE field is ONE function,
+`check_pin_source`, which `peer-node`'s reader calls too (TOOL-dWitnessedBar-43).
 
 THE PIN, `derive_pin`: `git hash-object --stdin`, which writes nothing, over one `<path> <blob id>` line per
 file the scope names, sorted by path, each ending LF. `workflow` names the row's workflow, and
@@ -205,14 +206,38 @@ def read_remote_keys(repo):
     return got["verdict.remote.trust"], got["verdict.remote.pin-scope"], got["verdict.remote.pin"]
 
 
+def check_pin_source(backend, sha, keys, repo="."):
+    """THE SOURCE RULE both off-node readers apply (TOOL-dWitnessedBar-43 S1), `keys` being `read_remote_keys`'
+    triple -> Verdict: GREEN witness `claimed` under `app-only`, the check skipped; HELD `no pin` where no pin
+    is set; HELD naming the pinned files and both ids where the files `verdict.remote.pin-scope` names at
+    `sha` derive another id; GREEN witness `witnessed` where they derive the pin. A DeadProbe for a SHA this
+    clone lacks, never fetched."""
+    trust, scope, pin = keys
+    if trust == "app-only":
+        return Verdict("GREEN", "claimed", "its source unchecked under verdict.remote.trust = app-only")
+    if not pin:
+        return Verdict("HELD", "", "no pin: verdict.remote.pin is unset, so no file is pinned; the owner pins "
+                                   "it with policy_edit.py set verdict.remote.pin <id>, which `remote_verdict.py pin` prints")
+    # SOURCE, from this clone's object database: the scope's files at the SHA derive the pin.
+    if not read_tree_of(repo, sha):
+        raise DeadProbe(f"this clone lacks {sha[:8]}, so its pinned files are unread")
+    paths = read_scope_paths(backend, scope)
+    _lines, oid = derive_pin(repo, sha, paths)
+    if oid != pin:
+        ask = "until the owner re-pins" if trust == "owner-reviews-workflow-change" else "the owner re-pins or refuses it"
+        return Verdict("HELD", "", f"the files verdict.remote.pin-scope = {scope} names ({', '.join(paths)}) derive "
+                                   f"{oid[:12]} at {sha[:8]}, not the pin {pin[:12]}; {ask}")
+    return Verdict("GREEN", "witnessed", f"its pinned files at {sha[:8]} deriving the pin")
+
+
 # ------------------------------------------------------------------------------------------ the slot's reader
 def read_remote_verdict(backend, sha, tree, repo=".", responses=None):
     """`remote-ci`: the witness rule over `sha`, whose tree is `tree` -> Verdict."""
     try:
-        trust, scope, pin = read_remote_keys(repo)
+        keys = read_remote_keys(repo)
+        trust, _scope, pin = keys
         if trust != "app-only" and not pin:
-            return Verdict("HELD", "", "no pin: verdict.remote.pin is unset, so no workflow is pinned; the owner pins "
-                                       "it with policy_edit.py set verdict.remote.pin <id>, which `remote_verdict.py pin` prints")
+            return check_pin_source(backend, sha, keys, repo)
         rc, url = run_git(repo, "remote", "get-url", os.environ.get("GOV_REMOTE") or "origin")
         owner, name = read_anchor(url if rc == 0 else "")
         workflow = backend.get("workflow") or ".github/workflows/remote-ci.yml"
@@ -243,18 +268,8 @@ def read_remote_verdict(backend, sha, tree, repo=".", responses=None):
                                                                                f"concluded {concl or 'nothing'}"))
         if concl != "success":
             return Verdict("RED", "", f"run {run.get('id')}'s bar step concluded {concl}")
-        if trust == "app-only":
-            return Verdict("GREEN", "claimed", f"run {run.get('id')}, its source unchecked under verdict.remote.trust = app-only")
-        # SOURCE, from this clone's object database: the scope's files at the SHA derive the pin.
-        if not read_tree_of(repo, sha):
-            raise DeadProbe(f"this clone lacks {sha[:8]}, so its pinned files are unread")
-        paths = read_scope_paths(backend, scope)
-        _lines, oid = derive_pin(repo, sha, paths)
-        if oid != pin:
-            ask = "until the owner re-pins" if trust == "owner-reviews-workflow-change" else "the owner re-pins or refuses it"
-            return Verdict("HELD", "", f"the files verdict.remote.pin-scope = {scope} names ({', '.join(paths)}) derive "
-                                       f"{oid[:12]} at {sha[:8]}, not the pin {pin[:12]}; {ask}")
-        return Verdict("GREEN", "witnessed", f"run {run.get('id')} of {workflow}, its pinned files at {sha[:8]} deriving the pin")
+        v = check_pin_source(backend, sha, keys, repo)
+        return v._replace(why=f"run {run.get('id')} of {workflow}, {v.why}") if v.state == "GREEN" else v
     except DeadProbe as e:
         return Verdict("DEAD PROBE", "", str(e))
 

@@ -1101,7 +1101,7 @@ under that kit), `off_node` (a boolean) and `owner`, read across every `<prefix>
 | Row | Reader | `off_node` | Stands when |
 |---|---|---|---|
 | `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN`; the `.scoped` slot never counts |
-| `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `verdict` is `GREEN` and whose `node` is not this node's `GOV_NODE` |
+| `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `node` is not this node's `GOV_NODE`, signed by the key `verdict.peer.signers` registers for that `node`, whose `verdict` is `GREEN`, and whose pinned files derive `verdict.remote.pin` under `dispatch-closure` (TOOL-dWitnessedBar-43) |
 | `remote-ci` | `read_remote_verdict` in `remote_verdict.py` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
 
 **One read, five states.** `read_verdict(backend, sha, tree)` returns `Verdict(state, witness, why)`;
@@ -1125,7 +1125,25 @@ its `GOV_NODE`, lists `refs/gov/candidate/*` and `refs/gov/verdict/*` with one b
 and for each candidate with no verdict fetches it, runs this kit's `run-gates.sh` on it under
 `GATE_FULL=1` in a detached worktree of the node's own clone, and pushes an annotated tag
 `refs/gov/verdict/<sha>` whose message is the full slot's `verdict`, `tree` and `run_id` lines and a
-`node` line, in the slot's `<key>TAB<value>` grammar. `refs/gov/bar-red` is the precedent.
+`node` line, in the slot's `<key>TAB<value>` grammar. `refs/gov/bar-red` is the precedent. The tag is
+SIGNED, `git -c gpg.format=ssh tag -s` under the operator's own `user.signingkey`, its local name
+deleted once pushed; `verify-peer` refuses, exit 2, before any `ls-remote` where `user.signingkey`
+reads empty (TOOL-dWitnessedBar-43).
+
+**The peer's two checks** (TOOL-dWitnessedBar-43). SIGNER: `read_peer_verdict` reads
+`verdict.peer.signers` at the landed revision, never the working tree or the candidate, writes its
+members, one allowed-signers line `<node tag> <key type> <base64 key>` each with no options field, to a
+temp file under the common git dir, removed after, and runs `git -c gpg.ssh.allowedSignersFile=<file>
+verify-tag --raw`; the verdict stands only when that exits 0 and its `Good "git" signature for
+<principal>` line, which git writes to standard error, names the tag's `node` line and not this node.
+An unsigned tag, an unknown key or another principal reads `NONE`; the key unset reads `NONE`, `no
+signer table`; a verify that cannot run is `DEAD PROBE`. The key is owner-only: the loop guard refuses
+an agent's change to it off a live run's branch, as it does `verdict.remote.pin`. Each node's operator
+registers the node's public key with the owner. SOURCE: `check_pin_source` in `remote_verdict.py`, the
+one source rule `remote-ci` applies too, over the same three keys, so a candidate that rewrites the
+leg manifest reads `HELD`. Under `verdict.remote.pin-scope = workflow` a peer read is `HELD` naming the
+key outside `app-only`, because that scope pins only the remote workflow, which no peer runs: a peer
+verdict stands only once the owner sets `dispatch-closure` and pins under it.
 
 **The witness rule**, `remote_verdict.py`. KEY: a push run whose `head_sha` is the SHA, the SHA's tree
 resolved in this clone. WRITER: the run's check suite app slug `github-actions`, its `path` the row's
@@ -1133,7 +1151,7 @@ resolved in this clone. WRITER: the run's check suite app slug `github-actions`,
 never `skipped`. SOURCE: the files `verdict.remote.pin-scope` names (`workflow`: the workflow;
 `dispatch-closure`: also `run-gates.sh`, the leg manifest and `.githooks/gate-env.sh`) derive, at the
 SHA, the id `verdict.remote.pin` holds: `git hash-object --stdin` over their sorted `<path> <blob id>`
-lines. `verdict.remote.trust` = `pinned-workflow` or `owner-reviews-workflow-change` reads differing
+lines, through `check_pin_source`. `verdict.remote.trust` = `pinned-workflow` or `owner-reviews-workflow-change` reads differing
 files `HELD`; `app-only` skips the source and reads a pass `GREEN` with witness `claimed`. The three
 keys are read at the landed revision; no pin reads `HELD`, `no pin`; a failed read is `DEAD PROBE`.
 Every GET goes through `read_api`: https to `api.github.com` only, no redirect, no credential, 30 s,
@@ -1150,8 +1168,9 @@ before; under another value only `GREEN` lands, a `peer-node` SHA not yet green 
 read as one owner item. `verdict_backends.py --fixture --plant <case>` runs each plant in a scratch
 directory, and `run-gates.gov.test.sh` runs them.
 
-**What it does not check:** that a peer ran the bar its tag names, or that the tag is signed by a
-registered node key; that `GOV_NODE` is unique; that the pinned files are all the bar job executes.
+**What it does not check:** that a peer ran the bar its tag names, beyond the pinned files it ran it
+from; that `GOV_NODE` is unique; that a registered key is still held only by its node; that the pinned
+files are all the bar job executes.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 
