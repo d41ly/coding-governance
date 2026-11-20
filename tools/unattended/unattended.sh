@@ -10346,7 +10346,7 @@ read_gate_blocks() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red) a
 # and each `owner  <leg>  ...` line it prints is filed as the owner item, a HIGH ask through
 # `write_leg_ask`, reused while one is OPEN for that leg, with the bar's capture put back after it.
 run_verdict_route() { # run dir · slug
-  local d=$1 slug=$2 py k out rc=0 line leg rb
+  local d=$1 slug=$2 py k out rc=0 line leg rb qf
   [ -n "$d" ] && [ -f "$d/verdict" ] || return 0
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
@@ -10360,8 +10360,9 @@ run_verdict_route() { # run dir · slug
     return 0
   fi
   rc=0
-  out=$("$py" "$k/verdict_flow.py" quiet-rerun --run "$d" 2>&1) || rc=$?
-  [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
+  qf=$(mktemp) || { echo "unattended: gates-green — no scratch file for quiet-rerun, so no contended red was re-run"; return 0; }
+  "$py" "$k/verdict_flow.py" quiet-rerun --run "$d" >"$qf" 2>&1 || rc=$?
+  sed 's/^/unattended: gates-green — /' "$qf"
   [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py quiet-rerun exited $rc, so no contended red was re-run"
   rb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
   while IFS= read -r line; do
@@ -10372,7 +10373,8 @@ run_verdict_route() { # run dir · slug
       "waited past flow.wait-ceiling · ${line#owner  "$leg"  } · accept the leg is re-run alone on a quiet host, or its contention is fixed" \
       HIGH "a blocking CONTENDED red found no quiet host to re-run on within flow.wait-ceiling" \
       "filed by an unattended run as the owner item a contended red's wait raises; outside this build's goal" || :
-  done <<<"$out"
+  done <"$qf"
+  rm -f -- "$qf"
   RB_OUT=${rb[0]}; RB_STDOUT=${rb[1]}; RB_TOOK=${rb[2]}; RB_ERR=${rb[3]}
   return 0
 }
@@ -11061,11 +11063,11 @@ write_flake_releases() { # R -> one line per release: closed or refused
     return 0
   fi
   tmp=$(mktemp) || { echo "gates-green: releases — no scratch file for the selection, so no quarantined leg is released"; return 0; }
-  out=$("$py" "$k/verdict_flow.py" select --rev "$r" --out "$tmp" 2>&1) || rc=$?
+  "$py" "$k/verdict_flow.py" select --rev "$r" --out "$tmp" >"$tmp.lines" 2>&1 || rc=$?
   rm -f -- "$tmp" "$tmp.tmp"
   if [ "$rc" != 0 ]; then
     echo "gates-green: releases — verdict_flow.py select at ${r:0:8} exited $rc, so no quarantined leg is released"
-    [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/    /'
+    sed 's/^/    /' "$tmp.lines"; rm -f -- "$tmp.lines"
     return 0
   fi
   head=$(GIT rev-parse HEAD 2>/dev/null) || head=""
@@ -11079,7 +11081,8 @@ write_flake_releases() { # R -> one line per release: closed or refused
       continue
     fi
     write_ask_closing "$id" "$home" "$head" "released: leg $leg, $why" || :
-  done <<<"$out"
+  done <"$tmp.lines"
+  rm -f -- "$tmp.lines"
   return 0
 }
 

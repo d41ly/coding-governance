@@ -1942,14 +1942,14 @@ def run_fixture_contended_pair():
         repo, here, _sha = write_repo(root, "[flow]\nwait-ceiling = 72\n")
         calls = []
 
-        def rerun(run, row, n, top):
+        def run_rerun_stub(run, row, n, top):
             calls.append(row[0])
             return (None, f"stub ran {row[0]} green") if row[0] == "slow leg" else ("OWN", f"stub ran {row[0]} red")
 
-        def quiet_says(state):
+        def read_quiet_stub(state):
             return lambda: (state, "planted")
 
-        def plant(name, ago):
+        def write_run_dir(name, ago):
             run = pathlib.Path(root, "gate-run", name)
             run.mkdir(parents=True)
             (run / "verdict").write_text("verdict\tRED\nfailed\t2\n", encoding="utf-8", newline="\n")
@@ -1958,31 +1958,31 @@ def run_fixture_contended_pair():
             cmd_route(run, now - ago * hour)
             return run
 
-        def call(run, state, what):
+        def run_quiet_case(run, state, what):
             try:
-                rc, lines = cmd_quiet_rerun(run, here, repo, quiet_says(state), rerun, now)
+                rc, lines = cmd_quiet_rerun(run, here, repo, read_quiet_stub(state), run_rerun_stub, now)
             except Refusal as e:
                 rc, lines = 2, [f"refused · {e}"]
             out.extend(f"{what}: {ln}" for ln in lines)
             return rc, lines, {f[0]: f for f in read_routing(run)}
 
-        run = plant("busy", 0)
-        rc, lines, rows = call(run, "false", "busy host")
+        run = write_run_dir("busy", 0)
+        rc, lines, rows = run_quiet_case(run, "false", "busy host")
         if rc != 0 or calls or not any(ln.startswith("awaiting quiet host  slow leg  since ") for ln in lines) \
                 or rows["slow leg"][7:] != ["rerun waiting"]:
             bad.append(f"under a busy host quiet-rerun ran {calls} and printed {lines}, planted to wait and run nothing")
-        rc, lines, rows = call(run, "true", "quiet host")
+        rc, lines, rows = run_quiet_case(run, "true", "quiet host")
         if calls != ["slow leg", "loud leg"]:
             bad.append(f"under a quiet host the legs ran {calls}, planted each once")
         if rows["slow leg"][7:] != ["rerun ok"] or rows["loud leg"][7:] != ["rerun red OWN"] \
                 or rows["loud leg"][3] != "attribute":
             bad.append(f"the re-run rows read {rows}, planted rerun ok and rerun red OWN routed attribute")
-        rc, lines, rows = call(run, "true", "second call")
+        rc, lines, rows = run_quiet_case(run, "true", "second call")
         if calls != ["slow leg", "loud leg"]:
             bad.append(f"a second call over the finished rows ran {calls[2:]}: a final state was re-run")
         for ago, want in ((73, "owner"), (71, "awaiting")):
-            run = plant(f"waited-{ago}", ago)
-            rc, lines, rows = call(run, "false", f"routed {ago} h before")
+            run = write_run_dir(f"waited-{ago}", ago)
+            rc, lines, rows = run_quiet_case(run, "false", f"routed {ago} h before")
             said = [ln for ln in lines if ln.startswith(("owner  ", "awaiting quiet host  "))]
             if want == "owner" and (f"owner  slow leg  contended, no quiet host within 72 h" not in said
                                     or rows["slow leg"][7:] != ["rerun owner"]):
@@ -1996,9 +1996,9 @@ def run_fixture_contended_pair():
         old.mkdir()
         write_routing(old, [["slow leg", "CONTENDED", "block", "quiet-rerun", "-", "-", f"routed {now - 73 * hour}",
                              "rerun waiting"]])
-        run = plant("fresh", 0)
+        run = write_run_dir("fresh", 0)
         carried = {f[0]: f for f in read_routing(run)}["slow leg"][6]
-        rc, lines, rows = call(run, "false", "a sibling waiting 73 h")
+        rc, lines, rows = run_quiet_case(run, "false", "a sibling waiting 73 h")
         if carried != f"routed {now - 73 * hour}" or "owner  slow leg  contended, no quiet host within 72 h" not in lines:
             bad.append(f"over a sibling waiting since 73 h the fresh route stamped '{carried}' and printed {lines}, "
                        f"planted the carried stamp and the owner line")

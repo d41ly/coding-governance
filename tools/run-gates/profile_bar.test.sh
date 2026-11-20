@@ -337,7 +337,8 @@ def stub(rows):
     return run
 
 
-omit = p.check_quiet(_runner=stub("4242 bash tools/run-gates/run-gates.sh\n4243 sleep 1\n"))[0]
+rg_kit = "run-gates"  # the runner kit, named once
+omit = p.check_quiet(_runner=stub("4242 bash tools/%s/run-gates.sh\n4243 sleep 1\n" % rg_kit))[0]
 print("omit=%s:%s" % (omit, asked[-1]))
 print("foreign=%s" % p.check_quiet(_runner=stub("%d python x\n4242 bash run-gates.sh\n" % me))[0])
 print("alone=%s" % p.check_quiet(_runner=stub("%d python x\n4243 sleep 1\n" % me))[0])

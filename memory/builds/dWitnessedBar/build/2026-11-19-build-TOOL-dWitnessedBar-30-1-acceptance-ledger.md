@@ -40,7 +40,7 @@ loop at the close.
   ran each leg once, writing `rerun ok` and `rerun red OWN` routed `attribute`; a second call ran
   nothing. `run_quiet_leg`, its runner call stubbed, set `GATE_LEGS` to a one-row manifest,
   `GATE_FULL=1`, `GATE_SELFTESTS=1`, `GATE_RUN_ID` `<run id>-quiet-<n>` and `GATE_ATTRIBUTE` the
-  attribution row's R, dropped `GATE_SELECTION`, bounded the call at 900 s for a 300 s ceiling with no
+  attribution row's R, dropped `GATE_SELECTION`, bounded the call at 900 s for a 300 s ceiling with no (DERIVED from the builder's probe)
   pipe to the runner, read GREEN, RED attributed OWN and REFUSED as `None`, `OWN` and `-`, and read the
   bound firing as `-`.
 - AC5 — `owner`: the same fixture printed `owner  slow leg  contended, no quiet host within 72 h` and
