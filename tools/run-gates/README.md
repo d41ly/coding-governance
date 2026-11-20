@@ -96,8 +96,12 @@ install or upgrade a kit, and after that only when you edit one.
 
 **`GATE_FULL=1` does NOT unlock them.** It means *ignore every leg guard*, and a kit's own tests are
 not a guard. A green bar without `GATE_SELFTESTS=1` says nothing about the kits — and the runner
-says so itself: held legs get their own verb, are subtracted from the total, and are named in the
-summary, `gates GREEN — 43/43 legs passed (42 held: kit self-tests, GATE_SELFTESTS=1 runs them)`.
+says so itself: held legs get their own verb, `GATE held  <name>  (<source>, <note>)`, are
+subtracted from the total, and are counted by source in the summary,
+`gates GREEN — <n>/<n> legs passed (<n> held: <n> kit, <n> quarantine, <n> level; GATE_SELFTESTS=1 runs the kit ones)`,
+a source with none left out. How many legs this repository holds is read from
+`python <prefix>/run-gates/leg_factory.py --conform`, whose count line ends `· <h> held · <u> unguarded`,
+never typed here.
 
 A leg that declares no `subject` defaults to `repo` and runs, so nothing you already had changes
 behaviour by arriving here. A whole manifest of held legs is REFUSED rather than reported green,
@@ -107,11 +111,39 @@ The state reaches two other readers: the deployer, which reads a held leg as `he
 leg that vanished, and the `gate-full-green` stamp, which records whether the run covered them so a
 push boundary cannot mistake a partial bar for a whole one.
 
+A held kit leg with a `guard` still skips under `GATE_SELFTESTS=1` when nothing it guards moved; one
+with none runs whole. That choice is declared: `leg_factory.py --conform`'s `held guard` arm refuses a
+held declaration carrying neither a guard nor a descriptor-only `unguarded_why`, the reason it runs
+whole, and refuses one carrying both.
+
+### Held by policy — the hold sources, the selection record and `verdict.held`
+
+Held is a policy over any leg (TOOL-dWitnessedBar-5). One predicate, `derive_hold_source`, names the
+SOURCE a leg is held by: `kit`, derived from the row as above; `quarantine` and `level`, read only
+from the selection record `GATE_SELECTION=<path>` names. That record is written at a revision R by
+`python <prefix>/run-gates/verdict_flow.py select --rev <R> --out <path>`, from inputs read at R and
+never from the working tree: a header naming the values it read, then one TAB row per held leg,
+`held · <leg> · <source> · <note>`. A `level` row is a leg whose `level` is outside
+`tests.landing-levels`, none under `every-declared` or while `tests.without-cadence` reads
+`run-at-landing`. A selection-held leg is held whatever `GATE_SELFTESTS` says. A row whose source is
+outside `quarantine level`, `kit` included, or whose leg the manifest lacks, is printed and ignored,
+and its leg runs. The runner copies the record into the run record as `selection`, and the pre-push
+hook runs `verdict_flow.py select --check --run <run dir> --rev <R>` before it admits a verdict made
+under one: a row R does not derive refuses the push.
+
+The verdict record carries one `held.<n>` key per held leg beside the `held` count,
+`<leg> · <source> · <result>`, the result `unrun` for a leg the bar did not execute.
+
+`verdict.held` decides when held legs run: `on-demand`, the default and gov's, holds them at every bar
+unless `GATE_SELFTESTS` asks; `push-selected` makes the pre-push hook export `GATE_SELFTESTS=changed`
+for its bar when the pusher set nothing; `peer-or-cadence` holds them at the push and needs a runner
+declared elsewhere, `HELD_CI_WORKFLOW` in `.unattended.conf` at R, or `select` exits 2 naming it.
+
 ### `GATE_SELFTESTS=changed` — only the held legs whose kit moved
 
 A developer tool, and a Definition-of-Done one: no push boundary sets it (TOOL-aSparedSpawn-12, owner
-ruling F1). A held leg executes when any of these holds, and is otherwise held with
-`GATE held  <name>  (self-test, unchanged since <sha8>)`:
+ruling F1) unless `verdict.held` reads `push-selected` at R. A held leg executes when any of these
+holds, and is otherwise held with `GATE held  <name>  (kit, unchanged since <sha8>)`:
 
 - it has no last-run record, an unreadable one, one whose sha is not an ancestor of `HEAD`, or one
   earned under a different manifest row;
@@ -153,7 +185,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
 | `lib-verdict.sh` | the block table, SOURCED and never run: `derive_red_blocks <value> <class>` prints `block` or `pass` for one attributed red under a `verdict.blocks` value. The runner sources it beside `lib-attribute.sh`, and it is in KF3's list; see "Which red blocks" |
-| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`); see "Which red blocks" |
+| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`), see "Held by policy" |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |

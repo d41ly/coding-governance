@@ -4013,6 +4013,11 @@
       "file": "tools/loop/loop_items.py"
     },
     {
+      "id": "build_sel_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_self_chain",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -9663,6 +9668,16 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "cmd_select",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "cmd_select_check",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -11543,6 +11558,21 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "derive_held",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
+      "id": "derive_held_export",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "derive_hold_source",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.sh"
+    },
+    {
       "id": "derive_holder_where",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -11943,6 +11973,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "derive_level_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "derive_lexicon_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -12036,6 +12071,11 @@
       "id": "derive_manifest_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_manifest_rel",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "derive_map_block",
@@ -12916,6 +12956,11 @@
       "id": "derive_seeded_home",
       "kind": "function",
       "file": "tools/govkit/steps/conf_pins_to_ledger.py"
+    },
+    {
+      "id": "derive_selection",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "derive_self_rel",
@@ -17058,6 +17103,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_held",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
+    },
+    {
       "id": "measure_held_slots",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -19743,6 +19793,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_attribution",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -21448,6 +21503,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_held_keys",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_held_reds",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -21461,6 +21521,11 @@
       "id": "read_held_rows",
       "kind": "function",
       "file": "tools/playbook/positional.py"
+    },
+    {
+      "id": "read_held_runner",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_history_groups",
@@ -22813,6 +22878,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_policy_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_policy_blob",
       "kind": "function",
       "file": "tools/loop/guard.py"
@@ -23701,6 +23771,11 @@
       "id": "read_seed_rows",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "read_selection",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_serves_ids",
@@ -27288,6 +27363,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "render_row",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "render_row_after",
       "kind": "function",
       "file": "tools/loop/factories.py"
@@ -27371,6 +27451,11 @@
       "id": "render_seedline",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "render_selection",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "render_serves",
@@ -31403,12 +31488,32 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_fixture_held_keys",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_held_policy",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_red_route",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "run_fixture_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_select",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_selection_rows",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -31636,6 +31741,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "run_git",
@@ -33048,9 +33158,19 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "run_sel_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_select",
       "kind": "function",
       "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "run_select",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "run_self",
@@ -39766,6 +39886,11 @@
       "id": "write_replace",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "write_repo",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_rev_spec",

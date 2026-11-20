@@ -233,7 +233,6 @@ verdict
 verdict.flakes
 verdict.flakes.entry
 verdict.flakes.release
-verdict.held
 verdict.remote.pin
 verdict.remote.pin-scope
 verdict.remote.trust

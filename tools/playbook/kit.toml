@@ -213,6 +213,7 @@ name = "playbook render selftest"
 subject = "kit"
 purpose = "arms the charter render engine's own predicates"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
+unguarded_why = "an adopter receives no guard: gov's names the render engine's gov-side reads, so in an adopter it runs whole whenever GATE_SELFTESTS asks"
 stage = ["step.test"]
 enforces = ["practice.gate"]
 

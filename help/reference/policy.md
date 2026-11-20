@@ -109,6 +109,14 @@ Which red of a red bar blocks its landing, by the class the runner's attribution
 verdict.blocks = "own-mixed-contended"
 ```
 
+## `verdict.held`
+<!-- usage: policy:verdict.held dff3fa99 -->
+When a held leg runs, read at the default branch's tip: under on-demand it is held at every bar unless GATE_SELFTESTS asks for it; under push-selected the pre-push hook exports GATE_SELFTESTS=changed for its bar when the pusher set nothing, so the held legs the push moved run; under peer-or-cadence it is held at the push and runs elsewhere, a HELD_CI_WORKFLOW in .unattended.conf or a registered peer backend, and the selection refuses where neither is declared.
+
+```text
+verdict.held = "push-selected"
+```
+
 ## `tests.product`
 <!-- usage: policy:tests.product a994fddb -->
 Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all.
@@ -211,7 +219,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (235)
+## Not yet summarised (234)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -330,7 +338,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.promote`
 - `policy-file.on-missing-expansion`
 - `verdict`
-- `verdict.held`
 - `verdict.flakes`
 - `verdict.flakes.entry`
 - `verdict.flakes.release`

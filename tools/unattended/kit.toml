@@ -281,6 +281,7 @@ name = "unattended kit gate"
 subject = "kit"
 purpose = "grades the repository against the unattended-run kit"
 argv = ["bash", "{kit}/check-unattended.sh"]
+unguarded_why = "it grades run-state records, guides and the remote, which no path guard bounds, so it runs whole whenever GATE_SELFTESTS asks"
 reads = { remote = "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`." }
 guard = []
 doc_reads = ["{memory_root}/builds/", "{memory_root}/guides/", "{memory_root}/archive/"]

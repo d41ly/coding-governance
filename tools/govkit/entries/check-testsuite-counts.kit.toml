@@ -45,6 +45,7 @@ name = "testsuite counts self-test"
 subject = "kit"
 purpose = "arms each testsuite-counts refusal with a green control"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
+unguarded_why = "gov clears the row's guard: a guard naming the testsuite-counts gate would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]
 stage = ["step.test"]
 enforces = ["practice.gate"]

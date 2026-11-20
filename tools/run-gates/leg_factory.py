@@ -407,6 +407,18 @@ def read_enforce_population(root, tool_rel):
     return tags, pending
 
 
+def derive_held(row):
+    """Whether the runner holds this manifest row by the row alone: subject `kit` or chunk `selftests`,
+    the `kit` source of run-gates.sh's `derive_hold_source`."""
+    return row.get("subject") == "kit" or row.get("chunk") == "selftests"
+
+
+def measure_held(rows):
+    """(held, unguarded): the rows the `kit` source holds, and those of them with no guard."""
+    held = [r for r in rows if derive_held(r)]
+    return len(held), sum(1 for r in held if not r.get("guard"))
+
+
 def check_declarations(decls, rows):
     """[(arm, leg, message)] for every field arm of §4 "The gate" but `fresh`, `token` and `enforces`."""
     found = []
@@ -443,6 +455,29 @@ def check_declarations(decls, rows):
                 if bad:
                     found.append(("reads", nm, f"leg {nm!r} declares the read class(es) {', '.join(bad)} "
                                                f"in {side}, outside {'|'.join(READ_CLASSES)}"))
+    # THE `held guard` ARM (TOOL-dWitnessedBar-5 S8): a leg the runner holds by its row, the `kit` source
+    # of `derive_hold_source`, runs under `GATE_SELFTESTS=1` whole where it has no guard. That choice is
+    # declared: a non-empty `guard` on the row the runner reads, or a descriptor-only `unguarded_why`
+    # naming why it runs whole, never both. `unguarded_why` is no member of LEG_KEYS, so it never
+    # reaches a rendered row or an adopter. The row graded is the one this tree's runner reads: gov's
+    # render here, the declaration's own row in an adopter (`run_conform_adopter`). A declaration whose
+    # guard is split, set on its row and cleared by `[gate_leg.gov]` or the reverse, runs unguarded in
+    # one of the two forms, so its reason is true there: "both" is a guard in EVERY form beside a reason.
+    by_row = {r.get("name"): r for r in rows}
+    for dc in decls:
+        nm, row = dc["name"], by_row.get(dc["name"])
+        if not isinstance(nm, str) or row is None or not derive_held(row):
+            continue
+        why = dc["base"].get("unguarded_why")
+        own_guard = dc["base"].get("guard")
+        gov_guard = dc["gov"]["guard"] if "guard" in dc["gov"] else own_guard
+        if own_guard and gov_guard and "unguarded_why" in dc["base"]:
+            found.append(("held guard", nm, f"held leg {nm!r} in {dc['file']} carries a guard in every form "
+                                            f"and an unguarded_why: it is guarded, so the reason is false"))
+        elif not row.get("guard") and not (isinstance(why, str) and why.strip()):
+            found.append(("held guard", nm, f"held leg {nm!r} in {dc['file']} carries neither a guard nor a "
+                                            f"non-empty unguarded_why: declare the guard that skips it when "
+                                            f"nothing it reads moved, or why it runs whole under GATE_SELFTESTS"))
     purposes = {}
     for row in rows:
         nm = row["name"]
@@ -564,11 +599,13 @@ def run_conform_adopter(root):
     tool_rel = pathlib.Path(os.path.relpath(HERE.parent, root)).as_posix()
     tool_rel = "" if tool_rel == "." else tool_rel
     decls, found = read_adopter_declarations(root, tool_rel)
-    found += check_declarations(decls, [dict(dc["base"], name=dc["name"]) for dc in decls])
+    rows = [dict(dc["base"], name=dc["name"]) for dc in decls]
+    found += check_declarations(decls, rows)
+    held, unguarded = measure_held(rows)
     lines = [f"{SAY}: {arm} · {m}" for arm, _n, m in found]
     lines += [f"{SAY}: fresh: not graded here — no govkit", f"{SAY}: enforces: not graded here — no govkit",
               f"legs: {len(decls)} declared · {len(decls)} claimed · the registry's exempt rows are not "
-              f"read here — no govkit"]
+              f"read here — no govkit · {held} held · {unguarded} unguarded"]
     rc = 1 if found else 0
     lines.append(f"{SAY}: conform · {'red' if rc else 'green'}")
     return rc, lines
@@ -592,8 +629,9 @@ def run_conform(root):
     if pop is None:
         lines.append(f"{SAY}: enforces · unarmed: no playbook kit in this tree, so no tag is graded")
     claimed = sum(1 for d in decls if d["kind"] == "claimed")
+    held, unguarded = measure_held(rows)
     lines.append(f"legs: {len(decls)} declared · {claimed} claimed · {len(decls) - claimed} exempt · "
-                 f"{pend} enforces-pending")
+                 f"{pend} enforces-pending · {held} held · {unguarded} unguarded")
     rc = 1 if len(lines) > 1 + (pop is None) else 0
     lines.append(f"{SAY}: conform · {'red' if rc else 'green'}")
     return rc, lines
@@ -709,6 +747,7 @@ FIXTURE = {
     "kits/beta/kit.toml": (
         'id = "beta"\nhome = "beta"\n\n[[gate_leg]]\nname = "beta selftest"\ntag = "leg.beta.beta-selftest"\n'
         'subject = "kit"\npurpose = "arms the beta fixture red and green"\nargv = ["bash", "{kit}/beta.test.sh"]\n'
+        'unguarded_why = "a fixture suite with no path to guard"\n'
         'reads = { history = "it reads the log" }\nenforces = ["practice.gate"]\n\n'
         '[gate_leg.gov]\nchunk = "selftests"\nceiling = 120\n'),
     f"kits/{RUN_GATES_HOME}/run-gates.test.sh": f'LEG_KEYS="{" ".join(KEY_ORDER)}"\n',
@@ -751,7 +790,21 @@ def run_selftest():
     cases = [
         # (case, plant, verb, rc, needles that one output line holds, needles no line holds)
         ("control: the fixture conforms", None, run_conform, 0, ("legs: 4 declared · 2 claimed · 2 exempt · 1 "
-                                                                 "enforces-pending",), ("fresh ·",)),
+                                                                 "enforces-pending · 1 held · 1 unguarded",),
+         ("fresh ·",)),
+        # TOOL-dWitnessedBar-5 AC7: the held leg `beta selftest` declares its reason; each plant moves it.
+        ("held guard: neither a guard nor a reason", lambda t: write_planted(
+            t, be, 'unguarded_why = "a fixture suite with no path to guard"\n', ""), run_conform, 1,
+         ("held guard ·", "'beta selftest'", "neither a guard nor"), ()),
+        ("held guard: an empty reason", lambda t: write_planted(
+            t, be, '"a fixture suite with no path to guard"', '""'), run_conform, 1,
+         ("held guard ·", "'beta selftest'", "neither a guard nor"), ()),
+        ("held guard: a guard and a reason", lambda t: write_planted(
+            t, be, 'argv = ["bash", "{kit}/beta.test.sh"]\n', 'argv = ["bash", "{kit}/beta.test.sh"]\nguard = ["{kit}/"]\n'),
+         run_conform, 1, ("held guard ·", "'beta selftest'", "a guard in every form and an unguarded_why"), ()),
+        ("held guard, control: a guard alone is silent", lambda t: write_planted(
+            t, be, 'unguarded_why = "a fixture suite with no path to guard"\n', 'guard = ["{kit}/"]\n'),
+         run_conform, 0, ("1 held · 0 unguarded",), ("held guard ·",)),
         ("control: --check is green on the fresh render", None, run_check, 0, ("fresh · 4 legs",), ()),
         ("AC1 fresh: a manifest row hand-edited", lambda t: write_manifest_edit(
             t, lambda rs: [dict(r, ceiling=91) if r["name"] == "alpha check" else r for r in rs]),

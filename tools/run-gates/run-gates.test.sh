@@ -1586,7 +1586,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: 3 kit; GATE_SELFTESTS=1 runs the kit ones)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -1618,6 +1618,42 @@ o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
+# HELD BY POLICY (TOOL-dWitnessedBar-5 AC2, AC3). A selection record holding a quarantine row, a row
+# naming a leg the manifest lacks, and a `kit` row naming a repo leg. The quarantined leg is held under
+# GATE_SELFTESTS=1 too, writes no `.leg` row, and is named with its source; the unknown row prints one
+# refusal; the kit row is ignored, so its repo leg RUNS, since a selection honoured as `kit` could hold
+# any leg as a kit self-test; and the run record holds the file byte-equal as `selection`, with one
+# `held.<n>` key per held leg.
+cat > "$S2/sel.tsv" <<'SEL'
+# planted
+held	m repo one	quarantine	flaked 2 of 10
+held	ghost leg	quarantine	no such leg
+held	m repo two	kit	a selection naming the kit class
+SEL
+o=$( cd "$S2" && GATE_SELECTION="$S2/sel.tsv" GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
+vd="$S2/.git/gate-run/$(cat "$S2/.git/gate-run/current" 2>/dev/null)"
+n=$((n+1))
+printf '%s\n' "$o" | grep -qx 'GATE held  m repo one  (quarantine, flaked 2 of 10)' \
+  || { echo "canary: a quarantined leg under GATE_SELFTESTS=1 was not held with its source"; printf '%s\n' "$o" | grep 'm repo one' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+[ "$(printf '%s\n' "$o" | grep -c 'ghost leg, which the manifest lacks, ignored')" = 1 ] \
+  || { echo "canary: a selection row naming no manifest leg did not print exactly one refusal"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    m repo two' \
+  || { echo "canary: a selection's kit row held a repo leg"; printf '%s\n' "$o" | grep 'm repo two' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+cmp -s "$vd/selection" "$S2/sel.tsv" \
+  || { echo "canary: the run record does not hold the selection byte-equal"; fail=1; }
+# `m repo one` is manifest index 0, and its sibling `m repo two`, index 1, ran: the control that the
+# record holds `.leg` rows at all, so the absence below is an absence and not an unwritten directory.
+n=$((n+1))
+{ [ ! -e "$vd/0.leg" ] && [ -f "$vd/1.leg" ]; } \
+  || { echo "canary: a held leg wrote a .leg row, or the leg that ran wrote none"; fail=1; }
+n=$((n+1))
+awk -F'\t' '$1=="held" && $2==1 {c=1} $1=="held.1" && $2=="m repo one · quarantine · unrun" {k=1} END{exit !(c && k)}' "$vd/verdict" 2>/dev/null \
+  || { echo "canary: the verdict record lacks the held leg's held.<n> key"; awk -F'\t' '$1 ~ /^held/' "$vd/verdict" 2>/dev/null | sed 's/^/    /'; fail=1; }
+rm -f "$S2/sel.tsv"
 
 # 3h4. AN ALL-HELD RUN REFUSES. TOOL-dUnstalledConvoy-26 AC10. A repository whose whole manifest is
 #      kit-subject would otherwise print `gates GREEN — 0/0 legs passed` on every run forever while
@@ -4259,7 +4295,7 @@ printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/kx/engine.sh"; write_sc_
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC1 kx executes when its engine moved" '^run-gates: selftests changed: kx suite runs \(kx/engine.sh moved since [0-9a-f]{8}\)$'
 check_sc_line "AC1 ...and reports ok" '^GATE ok    kx suite$'
-check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC1 ky is held unchanged" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_value "AC1 ky does not execute" "$(printf '%s\n' "$SC_OUT" | grep -c '^GATE ok    ky suite$')" 0
 check_sc_line "AC2 the fallback line names the unowned leg" '^run-gates: selftests changed: no kit ships the suite of 1 held leg\(s\), so each selects by its guard plus its suite file: uz suite$'
 SC_OUT=""; [ -f "$SCR/.git/gate-full-green" ] && SC_OUT=$(<"$SCR/.git/gate-full-green")
@@ -4269,7 +4305,7 @@ printf '#!/usr/bin/env bash\n# moved\nexit 0\n' > "$SCR/ky/y.test.sh"; printf 'g
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC2 ky executes when only its suite file moved" '^run-gates: selftests changed: ky suite runs \(ky/y.test.sh moved since [0-9a-f]{8}\)$'
 check_sc_line "AC2 uz executes when only its guard moved" '^run-gates: selftests changed: uz suite runs \(uz/guarded.txt moved since [0-9a-f]{8}\)$'
-check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC2 kx is held" '^GATE held  kx suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_value "AC2 the fallback line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: no kit ships')" 1
 # 13d. AC3 — a deleted record, a non-ancestor sha, a manifest row that changed: each executes.
 rm -f "$SCREC/$SCKX"
@@ -4283,7 +4319,7 @@ check_sc_line "AC3 a changed manifest row executes" '^run-gates: selftests chang
 # 13e. AC4 — eleven first-parent commits with nothing moved: held under a bound of 20, executed under 10.
 for _sck in 1 2 3 4 5 6 7 8 9 10 11; do write_sc_commit "empty $_sck"; done
 run_sc_bar GATE_SELFTESTS=changed GATE_SELFTESTS_MAX_LAG=20
-check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC4 control: an 11-behind record holds under a bound of 20" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 run_sc_bar GATE_SELFTESTS=changed
 check_sc_line "AC4 an 11-behind record executes under the default bound and names the lag" '^run-gates: selftests changed: ky suite runs \(recorded [0-9a-f]{8} is 11 first-parent commits behind HEAD, beyond the bound 10\)$'
 # 13f. AC5 — a selected leg that reds loses its record; a green on a dirty tree writes none.
@@ -4303,12 +4339,12 @@ check_sc_value "AC5 a dirty-tree green writes no record" "$([ -f "$SCREC/$SCKY" 
 run_sc_bar GATE_SELFTESTS=1
 printf '#!/usr/bin/env bash\nexit 0\n' > "$SCR/ky/extra.sh"; write_sc_commit "a ky file no kit ships"
 run_sc_bar GATE_SELFTESTS=changed
-check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC6 control: with govkit reachable an unshipped ky file holds ky" '^GATE held  ky suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 check_sc_line "PLAY-dOrderedCharter-70 S13 a reachable govkit fills the deployer slot" '^run-gates: selftests changed: slot point.flow.version · filled$'
 run_sc_bar GATE_SELFTESTS=changed GOVKIT_STUB_OFF=1
 check_sc_value "AC6 the unreachable line prints once" "$(printf '%s\n' "$SC_OUT" | grep -c '^run-gates: selftests changed: govkit is not reachable .*, so every held leg selects by its guard plus its suite file$')" 1
 check_sc_line "AC6 ky selects by its guard" '^run-gates: selftests changed: ky suite runs \(ky/extra.sh moved since [0-9a-f]{8}\)$'
-check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(self-test, unchanged since [0-9a-f]{8}\)$'
+check_sc_line "AC6 kx is held on diff evidence" '^GATE held  kx suite  \(kit, unchanged since [0-9a-f]{8}\)$'
 # 13h. PLAY-dOrderedCharter-70 S13 — the stub hidden, so the resolver raises LookupError: the slot reads
 #      not-installed, and the not-reachable line follows it.
 mv "$SCR/${KIT_REL%/*}/$GK/govkit.py" "$SC/govkit.py.hidden"
