@@ -1881,8 +1881,10 @@ n=$((pass+fail))
 # orphaned grandchild, the body's two kill signals), counted by hand under the same rule.
 # 400 = 396 + the 4 rows TOOL-dPlacedRequest-95 added for its AC1 (fixtures 1 and 2 one each, fixture 3
 # its run_card row and its marker row), counted by hand under the same rule.
+# 401 = 400 + the every-host TOOL-dPlacedRequest-34 AC28 row, left out of the count until TOOL-dPlacedRequest-99 S7;
+# AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=400
+FLOOR_ASSERTIONS=401
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

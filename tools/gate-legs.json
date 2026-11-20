@@ -354,7 +354,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 4370,
+    "ceiling": 6480,
     "stage": ["step.test"]
   },
   {
@@ -2263,7 +2263,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120,
+    "ceiling": 200,
     "enforces": ["principle.p22"],
     "stage": ["step.test"]
   },

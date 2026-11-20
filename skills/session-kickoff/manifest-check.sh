@@ -1914,19 +1914,53 @@ read_card_ref() { # slug -> 0 the remote answered, 1 not
   return 1
 }
 
-# A stored build card's text, from the first store that holds one: the cache ref (as the last lookup or
-# publish left it), the cache, the newest `card` record. Written to the file; sets CARD_STORED_STEP and CARD_STORED_FROM.
-read_card_stored() { # slug · outfile -> 0 a card was found, 1 none
-  local ref="refs/gov/remote/builds/$1/card" cache="$CARD_DIR/$1.md"
+# The instant a card's `card —` header line was published, as epoch seconds: its `published <at>`
+# field, which `render_build_card` writes in local time with its offset, so two stamps from two
+# offsets compare as instants. Pure arithmetic, the days-from-civil count, so no `date -d` is needed.
+derive_card_epoch() { # header line -> epoch seconds on stdout; 1 when it carries no stamp that parses
+  local rx='published ([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})([+-])([0-9]{2})([0-9]{2})( |$)'
+  local y m d era yoe doy doe off
+  [[ ${1:-} =~ $rx ]] || return 1
+  y=$((10#${BASH_REMATCH[1]})); m=$((10#${BASH_REMATCH[2]})); d=$((10#${BASH_REMATCH[3]}))
+  [ "$m" -le 2 ] && y=$((y - 1))
+  era=$(( (y >= 0 ? y : y - 399) / 400 )); yoe=$((y - era * 400))
+  doy=$(( (153 * (m > 2 ? m - 3 : m + 9) + 2) / 5 + d - 1 )); doe=$((yoe * 365 + yoe / 4 - yoe / 100 + doy))
+  off=$(( 10#${BASH_REMATCH[8]} * 3600 + 10#${BASH_REMATCH[9]} * 60 )); [ "${BASH_REMATCH[7]}" = + ] || off=$((-off))
+  printf '%s\n' $(( (era * 146097 + doe - 719468) * 86400 + 10#${BASH_REMATCH[4]} * 3600 + 10#${BASH_REMATCH[5]} * 60 + 10#${BASH_REMATCH[6]} - off ))
+}
+
+# A stored build card's text, from the stores `card.store` selects, chosen by FRESHNESS
+# (TOOL-dPlacedRequest-99 S4) rather than a fixed ref-first order, which served an older ref over a
+# newer card published offline into the cache: (1) the cache, where its `# card-ref` is `local` and
+# no ref resolves or the cache's `published` stamp is the later instant; (2) the cache ref, as the
+# last lookup or publish left it; (3) the cache; (4) the newest `card` record. `write_card_cache`
+# stores `local` or the commit this node's own publish produced, so a sha `# card-ref` that differs
+# from the ref means another writer published later, and the ref wins as `resolve_build_card` reads
+# it; a `local` cache wins only by its stamp, a stamp that does not parse losing to one that does and
+# two that do not falling to the ref. Written to the file; sets CARD_STORED_STEP and CARD_STORED_FROM.
+read_card_stored() { # slug · outfile · the selected stores, space-padded -> 0 a card was found, 1 none
+  local ref="refs/gov/remote/builds/$1/card" cache="" cref="" refc="" ac ar
   CARD_STORED_STEP=""; CARD_STORED_FROM=""
-  if git rev-parse --verify -q "$ref^{commit}" >/dev/null 2>&1; then
-    git log -1 --format=%B "$ref" -- 2>/dev/null | tr -d '\r' | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }' > "$2"
-    CARD_STORED_STEP=$(git log -1 --format=%B "$ref" -- 2>/dev/null | sed -n '3s/^step: \([^ ]*\).*/\1/p' | tr -d '\r')
-    CARD_STORED_FROM=ref
-  elif [ -f "$cache" ]; then
+  case "$3" in *" local-clone "*) [ ! -f "$CARD_DIR/$1.md" ] || cache="$CARD_DIR/$1.md" ;; esac
+  [ -z "$cache" ] || cref=$(sed -n '1s/^# card-ref //p' "$cache" | tr -d '\r')
+  case "$3" in *" remote-ref "*) refc=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null | tr -d '\r') ;; esac
+  if [ -n "$cache" ] && [ "$cref" = local ] && [ -n "$refc" ]; then
+    if ac=$(derive_card_epoch "$(sed -n '2p' "$cache" | tr -d '\r')"); then
+      ar=$(derive_card_epoch "$(git log -1 --format=%B "$refc" -- 2>/dev/null | sed -n '6p' | tr -d '\r')") \
+        && [ "$ac" -le "$ar" ] || refc=""
+    fi
+  fi
+  if [ -n "$cache" ] && [ "$cref" = local ] && [ -z "$refc" ]; then
     tail -n +2 "$cache" | tr -d '\r' > "$2"
     CARD_STORED_FROM=cache
-  elif read_card_record "$1"; then
+  elif [ -n "$refc" ]; then
+    git log -1 --format=%B "$refc" -- 2>/dev/null | tr -d '\r' | awk 'NR > 5 { l[++n] = $0 } END { while (n > 0 && l[n] == "") n--; for (i = 1; i <= n; i++) print l[i] }' > "$2"
+    CARD_STORED_STEP=$(git log -1 --format=%B "$refc" -- 2>/dev/null | sed -n '3s/^step: \([^ ]*\).*/\1/p' | tr -d '\r')
+    CARD_STORED_FROM=ref
+  elif [ -n "$cache" ]; then
+    tail -n +2 "$cache" | tr -d '\r' > "$2"
+    CARD_STORED_FROM=cache
+  elif case "$3" in *" build-folder "*) read_card_record "$1" ;; *) false ;; esac; then
     awk '/^~~~~$/ { if (f++) exit; next } f' "$CARD_REC" | tr -d '\r' > "$2"
     CARD_STORED_STEP=$CARD_REC_STEP; CARD_STORED_FROM=record
   else
@@ -1975,7 +2009,7 @@ render_build_card() { # slug · step · tail file · writer verb -> the card on 
 # the stored card's, else `unrecorded`. Snapshot 1 writes the `card` record where build-folder is selected.
 write_build_card() { # slug · step or empty · session|stored|none · writer verb · snapshot 0|1 · terminal 0|1 -> its card — lines; 0 always
   local slug=$1 step=$2 mode=$3 verb=$4 snap=$5 term=$6 stores ref="refs/gov/remote/builds/$1/card" card="$CARD_TMP/bc.card"
-  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a
+  local tail="$CARD_TMP/bc.tail" tip="" c rc try oid=local remote=0 msg mark="" a from=""
   [ "$term" != 1 ] || mark=" · terminal"
   stores=$(read_card_policy card.store) || { printf 'card — skipped: card.store refused: %s\n' "${stores%%$'\n'*}"; return 0; }
   stores=" ${stores//$'\n'/ } "
@@ -1989,13 +2023,16 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
   for try in 1 2; do
     case "$mode" in
       session) awk -v want=tail "$CARD_PARTS_AWK" "$CARD_FILE" > "$tail" ;;
-      stored) if read_card_stored "$slug" "$CARD_TMP/bc.stored"; then awk -v want=tail "$CARD_PARTS_AWK" "$CARD_TMP/bc.stored" > "$tail"
+      # THE STORE THE TAIL CAME FROM rides each success line below (TOOL-dPlacedRequest-99 S6), in this
+      # mode alone, the one that reads a stored tail.
+      stored) from=""
+              if read_card_stored "$slug" "$CARD_TMP/bc.stored" "$stores"; then awk -v want=tail "$CARD_PARTS_AWK" "$CARD_TMP/bc.stored" > "$tail"; from=" · tail from $CARD_STORED_FROM"
               else printf 'READY — none yet\n' > "$tail"; fi ;;
       none) printf 'READY — none yet\n' > "$tail" ;;
     esac
     if [ -z "$2" ]; then
       step=unrecorded
-      ! read_card_stored "$slug" "$CARD_TMP/bc.stored" || [ -z "$CARD_STORED_STEP" ] || step=$CARD_STORED_STEP
+      ! read_card_stored "$slug" "$CARD_TMP/bc.stored" "$stores" || [ -z "$CARD_STORED_STEP" ] || step=$CARD_STORED_STEP
     fi
     render_build_card "$slug" "$step" "$tail" "$verb" > "$card" || { cat "$card"; return 0; }
     [ "$remote" = 1 ] || break
@@ -2012,7 +2049,7 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
       "0:card-ref — "*)
         c=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null | tr -d '\r')
         [ -z "$c" ] || [ "${c:0:8}" != "${a##* · }" ] || oid=$c
-        printf 'card — %s · step %s · remote-ref %s\n' "$slug" "$step" "${a##* · }"
+        printf 'card — %s · step %s · remote-ref %s%s\n' "$slug" "$step" "${a##* · }" "$from"
         break ;;
       "1:card-ref lost — "*)
         if [ "$try" = 1 ] && read_card_ref "$slug" && [ "$CARD_REF_TIP" != "$tip" ]; then
@@ -2035,13 +2072,13 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
   case "$stores" in
     *" local-clone "*)
       if write_card_cache "$slug" "$oid" "$card"; then
-        printf 'card — %s · step %s · local-clone %s\n' "$slug" "$step" "$CARD_DIR/$slug.md"
+        printf 'card — %s · step %s · local-clone %s%s\n' "$slug" "$step" "$CARD_DIR/$slug.md" "$from"
       else
         printf 'card — local-clone not written: cannot write %s\n' "$CARD_DIR/$slug.md"
       fi ;;
   esac
   case "$stores:$snap" in
-    *" build-folder "*:1) write_card_snapshot "$slug" "$step" "${oid/#local/none}" "$card" ;;
+    *" build-folder "*:1) write_card_snapshot "$slug" "$step" "${oid/#local/none}" "$card" "$from" ;;
   esac
   return 0
 }
@@ -2076,7 +2113,7 @@ try:
                        lines=["~~~~", *text, "~~~~"]))
 except (ValueError, OSError) as e:
     sys.exit(str(e))'
-write_card_snapshot() { # slug · step · ref commit or none · card file -> one card — line; 0 always
+write_card_snapshot() { # slug · step · ref commit or none · card file · [success-line suffix] -> one card — line; 0 always
   local br lt py rel why
   br=$(resolve_kit_file memory-tree build_records.py); lt=$(resolve_kit_file loop loop_transition.py)
   [ -n "$br" ] || { printf 'card — build-folder not written: no memory-tree build_records.py resolves in this tree\n'; return 0; }
@@ -2088,7 +2125,7 @@ write_card_snapshot() { # slug · step · ref commit or none · card file -> one
     || { why=${rel//$'\r'/}; why=${why#$'\n'}; why=${why%%$'\n'*}; printf 'card — build-folder not written: %s\n' "${why:0:200}"; return 0; }
   rel=${rel//$'\r'/}; rel=${rel##*$'\n'}
   if git -C "$CARD_TREE" add -- "$rel" 2>/dev/null && git -C "$CARD_TREE" commit -q -m "card snapshot($1): $2" >/dev/null 2>&1; then
-    printf 'card — %s · step %s · build-folder %s · commit %s\n' "$1" "$2" "$rel" "$(git -C "$CARD_TREE" rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r')"
+    printf 'card — %s · step %s · build-folder %s · commit %s%s\n' "$1" "$2" "$rel" "$(git -C "$CARD_TREE" rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r')" "${5:-}"
   else
     git -C "$CARD_TREE" reset -q -- "$rel" 2>/dev/null; rm -f "$CARD_TREE/$rel"
     printf 'card — build-folder not written: git could not commit %s\n' "$rel"

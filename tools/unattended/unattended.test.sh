@@ -21223,6 +21223,24 @@ ec_out=$(run_request_arm --entry-claim dZqClaim --request "$rd_key"); ec_rc=$?
 same "DPR21 AC5 a repeat with no --pieces exits 2 in one line, no claim ref created" \
   "$ec_rc $(printf '%s\n' "$ec_out" | grep -c .) $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/claims | grep -c .)" "2 1 0"
 hit  "$ec_out" "--pieces"
+# ---- TOOL-dPlacedRequest-99 S8 — THE USAGE LINE NAMES EVERY EXIT run_entry_claim RETURNS, IN ITS
+# ---- HEADER'S WORDS. Read statically from the driver: the `--entry-claim` usage line's exit list
+# ---- equals the function header's; every literal `return <n>` in the body, and every code a
+# ---- `# passes ... through:` comment pins, is on that list; and every `return "$<var>"` in the body
+# ---- carries such a comment. RED, observed at the close: the base's usage line, which omits 2 and
+# ---- 3, and a variable return with no pinning comment. WHAT THIS DOES NOT CHECK: that a pinning
+# ---- comment is true of the verb it passes through, or any verb but `--entry-claim`.
+ec_drv="$HERE/unattended.sh"
+ec_body=$(tr -d '\r' < "$ec_drv" | awk '/^run_entry_claim\(\) \{/ { f = 1 } f { print } f && /^}$/ { exit }')
+ec_hdr=$(printf '%s\n' "$ec_body" | head -n 1 | sed -n 's/.* -> //p')
+ec_use=$(tr -d '\r' < "$ec_drv" | grep -m1 '^#   unattended.sh --entry-claim ' | sed -n 's/.*; \(0 [a-z].*\)$/\1/p')
+same "TOOL-dPlacedRequest-99 S8 the --entry-claim usage line lists run_entry_claim's exits in its header's words" "${ec_use:-<no usage exit list>}" "${ec_hdr:-<no header exit list>}"
+ec_miss=$( { printf '%s\n' "$ec_body" | grep -o 'return [0-9][0-9]*' | sed 's/^return //'
+             printf '%s\n' "$ec_body" | sed -n 's/.*# passes .* through: //p' | grep -o '[0-9][0-9]*'; } \
+  | sort -u | awk -v use=", $ec_use," 'index(use, ", " $1 " ") == 0 { printf "%s ", $1 }')
+same "TOOL-dPlacedRequest-99 S8 every code run_entry_claim returns or passes through is on the usage line" "$ec_miss" ""
+ec_bare=$(printf '%s\n' "$ec_body" | grep 'return "\$' | grep -vc '# passes .* through: [0-9]')
+same "TOOL-dPlacedRequest-99 S8 every return of a variable in run_entry_claim pins the codes it passes through" "$ec_bare" "0"
 # ---- TOOL-dPlacedRequest-5 S3 — THE CONSENT PREDICATE AS A READ-ONLY VERB. r3 was recorded by session qA
 # ---- in c1: --request-consent answers 0 for qA, 1 `relayed` for qB, and its form exit 2 with no key.
 # ---- RED, observed at the close, is the verb answering 0 whatever the predicate says.

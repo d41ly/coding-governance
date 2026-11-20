@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 202 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 202 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 174 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -376,6 +376,7 @@ Inventories: gate-legs: 202 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `forwarded-arg-opens-an-unhandled-return-shape.md` | memory-tree-hygiene |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
+| `global-set-and-never-read.md` | session-kickoff |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `guard-above-a-fold-makes-its-fallback-dead.md` | govkit |
 | `guard-fed-the-value-it-supersedes.md` | unattended |
@@ -472,6 +473,7 @@ Inventories: gate-legs: 202 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `unvalidated-arg-reaches-an-agent-shell-line.md` | memory-tree-hygiene |
+| `usage-exit-list-lags-its-function.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
 | `verdict-printed-before-the-step-that-reverts-it.md` | govkit |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |

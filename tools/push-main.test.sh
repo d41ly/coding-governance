@@ -204,7 +204,9 @@ fail=0
 # runs with every block running, DERIVED from its 97 `ok` call sites plus the 14 loop's second file
 # and the 37 loop's three further plantable rows, owed the main loop's first reading of the leg;
 # every later unit adding an `ok` row that runs there raises it.
-FLOOR_ASSERTIONS=101
+# 103 = 101 + TOOL-dPlacedRequest-99 S3's two fenced-landing rows, 55 and 56, one `ok` call site run
+# twice by its loop, counted off the block; no suite ran in the pass.
+FLOOR_ASSERTIONS=103
 n=0; skipped=0
 ok()  { echo "  ok   — $1"; n=$((n + 1)); }
 bad() { echo "  FAIL — $1"; fail=1; }
@@ -1877,6 +1879,34 @@ exec bash \"$FX/real-driver\" \"\$@\""
         ok "54 a killed --after read refuses the landing unreachable, no abort remedy, the branch unmoved" ;;
       *) bad "54 a killed --after read did not refuse as unreachable with the branch unmoved: [$g54] $out54" ;;
     esac
+    # 55, 56 — TOOL-dPlacedRequest-99 S3: over 54's fixture, the lease moves inside the push's hook
+    #      again, and the stub driver answers the `--after` re-fence read with what is no refusal by
+    #      the lease: 55 an exit-2 `lease not written — x` line, 56 a fence line whose beat is the
+    #      branch tip, not parented on the lease tip. Each landing exits 1 `unreachable`, never
+    #      `fenced` and never the `claim-lost` remedy, the branch unmoved. Staged against the lander
+    #      of 95c3103ad, which returns 1 for both reads and classifies both `fenced` with claim-lost.
+    for a55 in 55 56; do
+      if [ "$a55" = 55 ]; then
+        write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease not written — x'; exit 2 ;; esac
+exec bash \"$FX/real-driver\" \"\$@\""
+      else
+        m56=$(git --git-dir="$FX/o.git" rev-parse main)
+        write_fence_stub "case \" \$* \" in *' --after '*) a=\"\$*\"; a=\${a##*--after }; echo \"fence — refs/gov/leases/fx/build \${a%% *} $m56\"; exit 0 ;; esac
+exec bash \"$FX/real-driver\" \"\$@\""
+      fi
+      m55=$(git --git-dir="$FX/o.git" rev-parse main)
+      printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+        'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+        'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+      out55=$(run_fence_land --land --slug fx); rc55=$?
+      g55="$rc55 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m55" ] && echo unchanged)"
+      case "$g55|$out55" in
+        *"push-main: fenced —"*|*"claim-lost"*) bad "$a55 TOOL-dPlacedRequest-99 S3 a re-fence read that is no refusal by the lease told the holder to abort: [$g55] $out55" ;;
+        "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+          ok "$a55 TOOL-dPlacedRequest-99 S3 an --after read answering $([ "$a55" = 55 ] && echo 'lease not written' || echo 'a bad beat') refuses the landing unreachable, never claim-lost, the branch unmoved" ;;
+        *) bad "$a55 TOOL-dPlacedRequest-99 S3 an --after read that is no refusal did not refuse as unreachable with the branch unmoved: [$g55] $out55" ;;
+      esac
+    done
   else
     bad "54 the fenced-push fixture could not be made a third time: ${fx_line//$'\n'/ · }"
   fi

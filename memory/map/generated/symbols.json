@@ -7628,6 +7628,11 @@
       "file": "tools/govkit/upgrade_walk.py"
     },
     {
+      "id": "check_plant_tokens",
+      "kind": "function",
+      "file": "tools/run-gates/run-selftests.sh"
+    },
+    {
       "id": "check_playbook_hole_modes",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -10776,6 +10781,11 @@
       "id": "derive_candidates",
       "kind": "function",
       "file": "tools/lexicon/scaffold_lexicon.py"
+    },
+    {
+      "id": "derive_card_epoch",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_card_keys",

@@ -5,6 +5,9 @@ set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null   # a runner's core.hooksPath/init.templateDir must not reach the throwaway repos
 CHECK="$(cd "$(dirname "$0")" && pwd)/manifest-check.sh"
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcheck.XXXXXX")
+# FORWARD SLASHES (TOOL-dPlacedRequest-99 S1): MSYS `mktemp` keeps an inherited backslashed TMPDIR, and
+# every card-store plant reds on a backslashed path, an awk escape warning on each read.
+if command -v cygpath >/dev/null 2>&1; then TMP=$(cygpath -m "$TMP"); fi
 trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 # NO SESSION VERSION LEAKS INTO A CARD WRITE (TOOL-aSparedSpawn-11 S6). Every `--card --write` derives
@@ -1090,6 +1093,11 @@ check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node —
 write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG1.md"
 GOV_NODE=q USERNAME=someone-else run_card "DPR49 AC23 --card --write with GOV_NODE=q under row p's user" "$CWT" 0 - --card --write --session "$NONCE-t23a"
 check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node — q · $CUSER" "$(read_cell node "$NONCE-t23a")"
+# TOOL-dPlacedRequest-99 S2 — the resolver arm TOOL-dPlacedRequest-43 S20 owed: the user is case-folded,
+# so USERNAME spelled upper case still names row q's user and its tag, never UNKNOWN. Staged against the
+# case-sensitive compare, the cell reads UNKNOWN. GOV_NODE stays unset, as the block above leaves it.
+USERNAME="${CUSER^^}" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
+check_eq "TOOL-dPlacedRequest-99 S2 node — an upper-cased USERNAME resolves row q's tag, not UNKNOWN" "node — q · $CUSER" "$(read_cell node "$NONCE-t99a")"
 GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
 check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"
 printf '## Node registry\n\n| Tag | Machine/user |\n|-----|--------------|\n| `q` | one |\n| `q` | two |\n' > "$CWT/REG3.md"
@@ -2380,15 +2388,25 @@ if [ -f "$cs_fx" ]; then
     || { echo "FAIL TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1)); }
 fi
 [ -f "$cs_fx" ] || echo "skip TOOL-dPlacedRequest-2 the card-store plants: no card-store.fixture.sh beside $CHECK, gov's fixture, which ships to no adopter"
-for cs_plant in publish publish-off publish-unwritten publish-hung follow-rerender lookup terminal-route close-follow-twice; do
-  [ -f "$cs_fx" ] || break
-  TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" > "$TMP/cs.out" 2>&1; cs_rc=$?
-  if [ "$cs_rc" = 0 ] && grep -q ' · held$' "$TMP/cs.out" && ! grep -q ' · MISSED$' "$TMP/cs.out"; then
-    echo "ok   TOOL-dPlacedRequest-2 the card-store plant $cs_plant holds"; pass=$((pass+1))
-  else
-    echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1))
-  fi
-done
+# EVERY PLANT THE FIXTURE HOLDS (TOOL-dPlacedRequest-99 S1), read from its own `--list` rather than a
+# hand list, which gated 8 of its 30 and left the rest to run nowhere; a `--list` exiting non-zero is a
+# named failure, never an empty list, and a liveness row holds the plants run to the count `--list`
+# printed, `grep -c .` over the capture, which counts an empty capture as 0 where `wc -l` reads 1.
+if [ -f "$cs_fx" ]; then
+  cs_ran=0
+  cs_list=$(bash "$cs_fx" --list 2>&1) \
+    || { echo "FAIL TOOL-dPlacedRequest-99 S1 card-store.fixture.sh --list exited non-zero: $cs_list"; fail=$((fail+1)); cs_list=""; }
+  cs_list=${cs_list//$'\r'/}
+  for cs_plant in $cs_list; do
+    TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" > "$TMP/cs.out" 2>&1; cs_rc=$?; cs_ran=$((cs_ran+1))
+    if [ "$cs_rc" = 0 ] && grep -q ' · held$' "$TMP/cs.out" && ! grep -q ' · MISSED$' "$TMP/cs.out"; then
+      echo "ok   TOOL-dPlacedRequest-2 the card-store plant $cs_plant holds"; pass=$((pass+1))
+    else
+      echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1))
+    fi
+  done
+  check_eq "TOOL-dPlacedRequest-99 S1 the suite ran every plant --list names" "$(printf '%s' "$cs_list" | grep -c .)" "$cs_ran"
+fi
 
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
@@ -2443,7 +2461,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +6: TOOL-dPlacedRequest-9 AC5's `## pockets` block, three run_card and three check_eq calls, counted off
 # the block; no suite ran in the pass, each card write was probed alone over a scratch fixture.
 # +12: TOOL-dPlacedRequest-2's build card block, its seven run_card calls (six flag refusals and the
-# cache path) and one check per card-store plant (five), counted off the block; the fixture's
+# cache path) and one check per card-store plant (five as counted, though its hand list ran eight, so
+# three rows ran uncounted, left as slack by TOOL-dPlacedRequest-99), counted off the block; the fixture's
 # unknown-case refusal is left uncounted. No suite ran in the pass: each command was run alone, each
 # plant over its own scratch remote.
 # +6: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, three run_card and three check_eq calls, counted off
@@ -2454,7 +2473,11 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +1: RAISED by TOOL-dPlacedRequest-56's scratch-directory case (AC7), one check_eq on its green branch
 # (its stage-failed branch counts a failure, never a pass), counted off the block; no suite ran in
 # the pass, the case was probed alone over a scratch slice with its stage taken and with it left.
-FLOOR_ASSERTIONS=379
+# +29: RAISED by TOOL-dPlacedRequest-99 — S1's loop over every plant `--list` prints, 34 where the hand
+# list ran 8, so 26 more ok rows, and its liveness check_eq; S2's upper-cased USERNAME arm, one
+# run_card and one check_eq. Counted off the block; no suite ran in the pass, each plant was run
+# alone by direct CLI.
+FLOOR_ASSERTIONS=408
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

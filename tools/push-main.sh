@@ -326,9 +326,12 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | refenced | fen
         echo refenced; return 0
       fi
       # THE RE-FENCE READ DID NOT ANSWER (TOOL-dPlacedRequest-43 S28): whether the lease was taken is
-      # unknown, so the holder is told to retry, never to abort; `fenced` is kept for a read that answered.
-      if [ "$rc" = 3 ]; then
-        echo "push-main: unreachable — the lease $fr moved from ${ft:0:8} and the re-fence read did not answer, so whether it was taken is unknown; nothing landed, retry when the remote answers." >&2
+      # unknown, so the holder is told to retry, never to abort. ONLY AN EXPLICIT REFUSAL BY THE LEASE
+      # IS `fenced` (TOOL-dPlacedRequest-99 S3): `read_fence_line`'s 1. Its 3 offline, its 4 for every
+      # read it could not use, a `lease not written` line and a bad beat among them, and a `none`
+      # answer are `unreachable`, a retry with no abort remedy.
+      if [ "$rc" != 1 ]; then
+        echo "push-main: unreachable — the lease $fr moved from ${ft:0:8} and the re-fence read gave no answer this lander can use (return $rc), so whether it was taken is unknown; nothing landed, retry when the remote answers." >&2
         echo unreachable; return 0
       fi
       echo "push-main: fenced — the lease $fr was taken after the fence read it at ${ft:0:8} and is now ${lt:-deleted}, so the atomic push landed nothing; end the run with --abort $SLUG --code claim-lost." >&2
@@ -517,7 +520,13 @@ check_fence_beat() {  # tip · beat -> 0 when the beat is parented on the tip an
 # refuses as unparsed: only a missing driver means no fence. A driver beside this lander that no
 # python finds refuses too, as `run_gov_first` does. Handed the tip a failed push fenced on, it asks
 # `--after <tip>`, the re-fence `derive_push_failure` reads (TOOL-dPlacedRequest-29 S2).
-read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused, 3 the read did not answer (`lease refused — offline`), its line printed
+# ITS FOUR RETURNS (TOOL-dPlacedRequest-99 S3), so a reader can tell a lease that refused from a read
+# that never answered: 0 a fence, or none; 1 an explicit `lease refused — <cause>` line other than
+# `offline`, the one answer that says the lease is another's; 3 `lease refused — offline`; 4 every
+# non-answer, an unparsed, multi-line or empty read, an exit-2 `lease not written — …` line, the
+# no-python branch and a `check_fence_beat` failure on a fence line the driver did answer. Both
+# first-fence callers test `if ! read_fence_line`, so 3 and 4 refuse the landing there as 1 does.
+read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_TIP and FENCE_BEAT set, or all empty for none; 1 refused by the lease, 3 the read did not answer (`lease refused — offline`), 4 no answer it can use; its line printed
   local got rc dir out rest fr ft fb kit=unattended anchor=unattended.sh
   FENCE_REF=""; FENCE_TIP=""; FENCE_BEAT=""
   [ -n "$SLUG" ] || return 0
@@ -525,7 +534,7 @@ read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_
   if [ "$rc" = 1 ]; then
     if [ -f "$self_dir/$kit/$anchor" ] || [ -f "$self_dir/../$kit/$anchor" ]; then
       echo "push-main: the fence read did not run — an unattended driver is beside this lander and no usable python launcher finds it, so the landing of '$SLUG' cannot be fenced; nothing was pushed." >&2
-      return 1
+      return 4
     fi
     rc=2
   fi
@@ -545,7 +554,7 @@ read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_
       rest=${out#"fence — "}; fr=${rest%% *}; rest=${rest#* }; ft=${rest%% *}; fb=${rest#* }
       if [ "$fr" = "refs/gov/leases/$SLUG/build" ] && [[ $ft =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]] && [[ $fb =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
         echo "push-main: $out" >&2
-        check_fence_beat "$ft" "$fb" || return 1
+        check_fence_beat "$ft" "$fb" || return 4
         FENCE_REF=$fr; FENCE_TIP=$ft; FENCE_BEAT=$fb
         return 0
       fi ;;
@@ -557,10 +566,13 @@ read_fence_line() {  # [tip a failed push fenced on] -> 0 with FENCE_REF, FENCE_
     "1:lease refused — "?*)
       echo "push-main: the fence refused the landing of '$SLUG', so nothing was pushed — $out" >&2
       return 1 ;;
+    "2:lease not written — "?*)
+      echo "push-main: the fence read of '$SLUG' wrote no answer, so nothing was pushed — $out" >&2
+      return 4 ;;
   esac
   rest=${out%%$'\n'*}
   echo "push-main: fence read unparsed — exit $rc · ${rest:-(empty)}" >&2
-  return 1
+  return 4
 }
 
 # `write_effect_push <refspec>` is the landing's one push. With no fence it is the single-ref push

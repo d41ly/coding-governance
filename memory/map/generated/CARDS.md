@@ -319,7 +319,7 @@ the /session-kickoff engine, its project manifest, and the ratchet that keeps th
 - decisions 0
 - gate-legs 1: `kickoff engine size <=18KiB`
 - harness-hooks 1: `SessionStart skills/session-kickoff/manifest-check.sh`
-- gotcha-classes 2: `shipped-checker-edit-is-an-adopter-contract-change.md`, `msys-grep-counts-cr-on-every-line.md`
+- gotcha-classes 3: `shipped-checker-edit-is-an-adopter-contract-change.md`, `msys-grep-counts-cr-on-every-line.md`, `global-set-and-never-read.md`
 - guides 1: `SESSION-KICKOFF.md`
 - globs 1: `memory/guides/SESSION-KICKOFF.md`
 
@@ -355,10 +355,10 @@ Unattended runs — a mandate on disk, not a block of chat
 - workflow-scripts 2: `unattended-build.js`, `unattended-unit.js`
 - skill-engines 1: `session-kickoff`
 - rendered-skills 1: `unattended`
-- gotcha-classes 28: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
+- gotcha-classes 29: `reflowed-prompt-string-reads-as-a-deleted-stop.md`, `text-mode-read-eats-a-bare-cr.md`, `assertion-between-two-derived-values.md`, `second-implementation-is-not-a-second-opinion.md`
 - guides 4
 - globs 3
-- cut 31 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
+- cut 32 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## unattended-mandate
 

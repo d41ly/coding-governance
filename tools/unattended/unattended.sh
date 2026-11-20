@@ -52,7 +52,7 @@
 #   unattended.sh --card-ref lookup <slug>                         # that ref read into this node's cache, read-only: its commit and message, `card-ref — none` or `— off`; 0 read, 2 not read
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
-#   unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]   # a placed new, patch or repeat request claimed as a build: refs/gov/claims/<slug>, its lease, plan record and first record; 0 claimed, 1 refused, 4 waiting, 5 a fresh slug owed
+#   unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]   # a placed new, patch or repeat request claimed as a build: refs/gov/claims/<slug>, its lease, plan record and first record; 0 claimed, 1 refused, 2 not written, 3 spent, 4 waiting, 5 a fresh slug owed
 #   unattended.sh --request-consent <content key>                  # the consent predicate, read-only: 0 this session typed the request here, 1 relayed
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
@@ -4871,7 +4871,7 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
   tag=$(resolve_fleet_tag) || { echo "claim not written — this node has no row in fleet.toml: $tag"; return 2; }
   msg=$("$py" "$d/claim.py" body --request "$key" --slug "$slug" --claimant "$tag:$sid" "${pa[@]}" 2>&1) && rc=0 || rc=$?
   msg=${msg//$'\r'/}
-  [ "$rc" = 0 ] || { printf '%s\n' "$msg"; return "$rc"; }
+  [ "$rc" = 0 ] || { printf '%s\n' "$msg"; return "$rc"; } # passes claim.py body's exit through: 1 refused, 2 not written
   disp=$(printf '%s\n' "$msg" | sed -n 's/^disposition: //p' | head -1)
   resolve_claim_remote >/dev/null; rc=$?
   status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
@@ -4885,7 +4885,7 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
   case "$rc:$hit" in
     0:1) read_claim_ref "$ref" "$d" "$py" && rc=1 || rc=2 ;;
     0:|2:*)
-      out=$("$py" "$d/claim.py" precheck --slug "$slug" 2>&1) || { rc=$?; printf '%s\n' "${out//$'\r'/}"; return "$rc"; }
+      out=$("$py" "$d/claim.py" precheck --slug "$slug" 2>&1) || { rc=$?; printf '%s\n' "${out//$'\r'/}"; return "$rc"; } # passes claim.py precheck's exit through: 1 refused, 2 not written
       c=$(build_gov_commit "" "$msg") || { echo "claim not written — the claim commit could not be built in this clone"; return 2; }
       write_gov_ref "$ref" "" "$c" && rc=0 || rc=$?
       case "$rc" in
@@ -4947,11 +4947,11 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
     fi
     out=$("$py" "$d/claim.py" scaffold --slug "$slug" --request "$key" "${pa[@]}" 2>&1) && rc=0 || rc=$?
     printf '%s\n' "${out//$'\r'/}"
-    [ "$rc" = 0 ] || return "$rc"
+    [ "$rc" = 0 ] || return "$rc" # passes claim.py scaffold's exit through: 1 refused, 2 not written
   fi
   out=$("$py" "$d/claim.py" record --slug "$slug" 2>&1) && rc=0 || rc=$?
   printf '%s\n' "${out//$'\r'/}"
-  [ "$rc" = 0 ] || return "$rc"
+  [ "$rc" = 0 ] || return "$rc" # passes claim.py record's exit through: 1 refused, 2 not written
   echo "entry-claim — $slug · claimed · $disp${own:+ · resumed by this claimant}"
   return 0
 }

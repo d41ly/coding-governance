@@ -25,7 +25,8 @@ CHECK="$HERE/manifest-check.sh"
 PLANTS="render publish publish-off publish-unwritten publish-late publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
 follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
-partial-ask terminal-route close-follow-twice"
+partial-ask terminal-route close-follow-twice follow-offline-publish follow-offline-publish-online
+follow-foreign-after-cached follow-foreign-after-offline"
 REF=refs/gov/builds/tFix/card
 SPEC=memory/builds/tFix/spec/2026-01-01-spec-TOOL-tFix-1.md
 BRIEF=memory/builds/tFix/prompts/2026-01-01-prompt-TOOL-tFix-1-brief.md
@@ -347,5 +348,59 @@ case "$PLANT" in
     print_card_held "AC13 the second follow keeps the snapshot, named" "$(grep -qx 'card — snapshot kept: withdrawn already recorded' "$OUT"; echo $?)"
     rec=$(ls "$R"/memory/builds/tFix/build/*-card-*.md 2>/dev/null)
     print_card_held "AC13 one card record, its Step withdrawn" "$([ "$(measure_card_records "$R")" = 1 ] && grep -qx -- '- \*\*Step:\*\* withdrawn' "$rec"; echo $?)" ;;
+  follow-offline-publish|follow-offline-publish-online|follow-foreign-after-cached|follow-foreign-after-offline)
+    # TOOL-dPlacedRequest-99 S4: a follow's stored tail is the FRESHER card of the selected stores. The
+    # two offline plants publish online, look the card up, then publish again from a later base with the
+    # remote gone, so the cache alone holds the newer card under `# card-ref local`; the follow, offline
+    # or with the remote answering again, carries that card's tail and says `tail from cache` (S6). The
+    # two foreign plants plant a second writer's publish on the ref, stamped later than the cache, after
+    # this node cached its own published sha or after an offline local write; the follow carries the
+    # foreign tail, and the lookup that `resolve_build_card` runs after it re-keys the same card. Staged
+    # against the ref-first order, each offline plant misses with the older tail; against a rule taking
+    # the cache whenever its `# card-ref` is `local` or differs from the ref, each foreign plant misses.
+    run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF"); cache="$R/.git/orientation/tFix.md"
+    old=$(read_ref_card "$O" | tail -n 1)
+    case "$PLANT" in
+      follow-offline-publish|follow-offline-publish-online)
+        run_card_engine "$R" --card --lookup --build tFix --session t1 ;;
+      follow-foreign-after-cached)
+        print_card_held "S4 the publish cached its own sha" "$(head -n 1 "$cache" | tr -d '\r' | grep -qx "# card-ref $c1"; echo $?)" ;;
+    esac
+    if [ "$PLANT" != follow-foreign-after-cached ]; then
+      sleep 1; git -C "$R" commit -q --allow-empty -m "fixture: a later base"
+      mv "$O" "$O.gone"; CARD_FETCH_BOUND=10 run_card_append
+      want=$(tail -n 1 "$cache" | tr -d '\r')
+      print_card_held "S4 the offline publish wrote the cache alone, # card-ref local, a READY line other than the ref's" \
+        "$(head -n 1 "$cache" | tr -d '\r' | grep -qx '# card-ref local' && [ -n "$want" ] && [ "$want" != "$old" ]; echo $?)"
+      [ "$PLANT" = follow-offline-publish ] || mv "$O.gone" "$O"
+    fi
+    case "$PLANT" in
+      follow-foreign-*)
+        sleep 1; printf -v at '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+        git -C "$O" log -1 --format=%B "$REF" -- | tr -d '\r' \
+          | sed -e '4s/^session: .*/session: tF/' -e "6s/ · published [^ ]* · by .*/ · published $at · by tF/" \
+                -e '/^READY — tFix/s/ · base [0-9a-f]* · / · base f0f0f0f0f0f0 · /' > "$S/foreign.msg"
+        f1=$(git -C "$O" -c user.name=foreign -c user.email=foreign@test commit-tree "$REF^{tree}" -p "$REF" -F "$S/foreign.msg") \
+          && git -C "$O" update-ref "$REF" "$f1" "$c1"
+        print_card_held "S4 a second writer's publish stands on the ref, stamped $at" "$([ "$(git -C "$O" rev-parse --verify -q "$REF")" = "$f1" ]; echo $?)"
+        want=$(grep '^READY — tFix' "$S/foreign.msg") ;;
+    esac
+    CARD_FETCH_BOUND=10 run_card_engine "$R" --card --follow --build tFix --to designing; cp "$OUT" "$S/follow.out"
+    [ -d "$O" ] || mv "$O.gone" "$O"
+    if [ "$PLANT" = follow-offline-publish ]; then
+      tail -n +2 "$cache" | tr -d '\r' > "$S/card"
+      print_card_held "S6 the follow's local-clone line says tail from cache" "$(grep -q '^card — tFix · step designing · local-clone .* · tail from cache$' "$S/follow.out"; echo $?)"
+    else
+      read_ref_card "$O" > "$S/card"
+    fi
+    print_card_held "S4 the follow's card is at step designing and carries the newer publish's tail" \
+      "$(head -n 1 "$S/card" | grep -q '^card — tFix · step designing ·' && [ "$(tail -n 1 "$S/card")" = "$want" ]; echo $?)"
+    case "$PLANT" in
+      follow-foreign-*)
+        run_card_engine "$R" --card --lookup --build tFix --session t1
+        sed -n '/^## route$/,$p' "$S/card" > "$S/card.tail"; tr -d '\r' < "$R/.git/orientation/t1.md" | sed -n '/^## route$/,$p' > "$S/t1.tail"
+        print_card_held "S4 resolve_build_card, run after the follow, re-keys that same card" \
+          "$(grep -q '^card — tFix · ' "$OUT" && [ -s "$S/card.tail" ] && cmp -s "$S/card.tail" "$S/t1.tail"; echo $?)" ;;
+    esac ;;
 esac
 exit "$MISSED"
