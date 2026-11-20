@@ -42,9 +42,10 @@ The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `
 its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
 `outcomes`, `witness`, `owner` and `routes`, an inline table naming one target per outcome: a declared
 item, `transition`, or `stand-in:{prefix}/<home>/<file>`. A `needs` entry is a tag, or a list of tags any
-one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, and the probe
-program's, tagged `item.probe.<name>`, carry the step `none` and sit in no step, each segment one of
-`PROGRAM_SEGMENTS` (TOOL-dDeclaredLoop-50, TOOL-dPlacedRequest-7). `check_program` grades the rows as one needs graph,
+one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, the probe
+program's, tagged `item.probe.<name>`, and the entry program's, tagged `item.entry.<name>`, carry the step
+`none` and sit in no step, each segment one of `PROGRAM_SEGMENTS` (TOOL-dDeclaredLoop-50,
+TOOL-dPlacedRequest-7, TOOL-dPlacedRequest-3). `check_program` grades the rows as one needs graph,
 ordered by the needs-graph helper below: every need declared, no cycle, each outcome set closed
 through `derive_outcome_set`, the rule `read_outcome_set` applies, each outcome routed once to a
 target that resolves, each input's text before its first `:` a layer tag `read_layer_tags` reads from
@@ -128,8 +129,8 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
-order, then the breakpoint program's and the probe program's as `loop: program review` and `loop: program
-probe`, or `loop: inputs unarmed` and why
+order, then the breakpoint program's, the probe program's and the entry program's as `loop: program review`,
+`loop: program probe` and `loop: program entry`, or `loop: inputs unarmed` and why
 before them where no layer tags resolve, then one `loop: item` line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
 read · <p> pending · <u> unarmed`, then one `loop: seed <tag> · <value>` line per item and `loop: seeds · <n>
 declared · <m> none`, then one `loop: map <tag> · map <value>` line per item, ending `· unfolds <words>`
@@ -198,9 +199,10 @@ STEP_TAGS = ("step.plan", "step.design", "step.build", "step.test", "step.deploy
 #: A workflow's `step` when its work sits in no gov step.
 NO_STEP = "none"
 #: The programs that sit in no step: each its rows' tag segment, `item.<segment>.<name>`, each row at step
-#: `NO_STEP`, and its key in `check_program`'s return: the breakpoint program (TOOL-dDeclaredLoop-50) and
-#: the probe program (TOOL-dPlacedRequest-7).
-PROGRAM_SEGMENTS = ("review", "probe")
+#: `NO_STEP`, and its key in `check_program`'s return: the breakpoint program (TOOL-dDeclaredLoop-50),
+#: the probe program (TOOL-dPlacedRequest-7) and the entry program, the flow's router before any step
+#: (TOOL-dPlacedRequest-3).
+PROGRAM_SEGMENTS = ("review", "probe", "entry")
 #: The route of a role item's `probe` outcome: the probe tool, whose line names the asker (TOOL-dPlacedRequest-7 S8).
 PROBE_STAND_IN = "stand-in:{prefix}/loop/probe.py"
 #: The reach words that are no gov step: the entry step and the review breakpoint.
@@ -1393,7 +1395,8 @@ def check_program(data, where, layers, stages=()):
     `step.adopter.<name>` is one of them is that stage's, and the stage's program is returned beside the
     five. An item tagged `item.<segment>.<name>`, the segment one of `PROGRAM_SEGMENTS`, is that program's,
     its `step` `none`, and the program is returned under the key `<segment>`: the breakpoint program's
-    `review` (TOOL-dDeclaredLoop-50) and the probe program's `probe` (TOOL-dPlacedRequest-7). LoopError
+    `review` (TOOL-dDeclaredLoop-50), the probe program's `probe` (TOOL-dPlacedRequest-7) and the entry
+    program's `entry` (TOOL-dPlacedRequest-3). LoopError
     naming `where`, the item and the field that does not hold: a tag opening no `item.<step>.` of a gov
     step, no `item.adopter.<stage>.` of a composed stage and no `item.<segment>.`, a `step` other than that one, or a
     tag given

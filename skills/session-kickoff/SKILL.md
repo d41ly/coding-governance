@@ -52,9 +52,12 @@ not a meeting.
 One shell call in `<repo>`: `git branch --show-current` · `status --short` · fetch +
 `merge --ff-only <remote>/<default>` (only on the default branch with a clean tree; report if
 it moved) · `rev-parse HEAD` → report as **BASE** (the immutable SHA for diff-scoping, never a
-moving ref). A card opening `orientation —` in context already carries the node tag, tree
-kind, worktree count and recent subjects: consume those, never its branch or BASE (HEAD may
-have moved since). No card → add `git worktree list` when multi-tree.
+moving ref) · `worktree list` when multi-tree. **With an `orientation —` card in context** the call
+is `rev-parse HEAD`, plus fetch + ff when its `tree —` cell reads the default branch and `clean`;
+while HEAD equals the cell's BASE, take branch, BASE, dirty count, worktree count and recent subjects
+from the card, running no `branch --show-current`, `status --short` or `worktree list`.
+A `now —` line (the replay's, never stored) is fresh for HEAD, branch and dirty count: take them from it.
+A mismatch or no card → the full call.
 
 If the ff moved the default branch AND the project has a codebase map (manifest-declared, or
 `.codebase-map.conf` at the repo root): run the manifest's map-diff command over
@@ -64,6 +67,9 @@ the rollup + coverage line, `--verbose` only if asked.
 **STOP and tell the user first** when: a foreign `MERGE_HEAD` or `UU` conflict entries exist;
 the ff-merge fails (local diverged); or the branch violates the project's stated conventions.
 A clean tree is NOT proof you're on the right branch.
+
+**Already oriented.** A card whose last READY line is not `READY — none yet` is oriented (`kickoff.runs` at `no-ready-card`, a stand-in dRankedPlan arms): re-orient from its `## task`, `## read`, `## records`, `## classes`, `## open` and `## pockets`,
+then go to Step 5's hand-back, not re-running Steps 2 to 4. No such card → the full kickoff.
 
 ## Step 2 — Load the project layer (the manifest)
 

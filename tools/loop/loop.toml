@@ -108,8 +108,8 @@
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens; "none" for a tag `item.review.<name>`, the breakpoint
-#              program's, or `item.probe.<name>`, the probe program's, each sitting in no step
-#              (TOOL-dDeclaredLoop-50, TOOL-dPlacedRequest-7)
+#              program's, `item.probe.<name>`, the probe program's, or `item.entry.<name>`, the entry
+#              program's, each sitting in no step (TOOL-dDeclaredLoop-50, TOOL-dPlacedRequest-7, -3)
 #   actor      `<kind>:<name>`, one actor of one kind: role, command, executor, hook or owner, or the
 #              bare `executor` or `owner`; a role's name is its role file's stem, such as gov-builder
 #   needs     the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
@@ -938,10 +938,6 @@ witness = "the landing containing its last unit"
 # the witnessing commit.
 
 [[stand-in]]
-item = "item.entry.claim"
-owner = "dPlacedRequest"
-
-[[stand-in]]
 item = "item.plan.dedupe"
 owner = "dRankedPlan"
 
@@ -1248,6 +1244,82 @@ stage = ["step.plan", "step.design", "step.build", "step.test", "step.deploy"]
 [[hook]]
 key = "SubagentStart {prefix}/hooks/scratch-guard.js"
 stage = ["step.plan", "step.design", "step.build"]
+
+# ---- The entry program (TOOL-dPlacedRequest-3) -------------------------------------------------------
+# The flow's router before any step (flow-steps' [entry]): orient, place by the policy key `placement`,
+# claim. Each row sits in no step. entry.orient's placing outcome is the value `policy.py get placement`
+# returns at the item boundary, one outcome per value; the three placing rows share one route table, and a
+# failed placement.check is the item's refusal, back to it by default. item.entry.intake joins
+# entry.orient's needs when dWellOiledMachine declares it.
+
+[[item]]
+tag = "item.entry.orient"
+step = "none"
+actor = "role:gov-orienter"
+map = "base"
+needs = []
+outcomes = ["agent-places", "declared-checked", "owner-places", "probe"]
+witness = { class = "history", by = "the session's card, its view key recomputing; the build card at refs/gov/builds/<slug>/card where the card routes a build" }
+owner = "dPlacedRequest"
+routes = { agent-places = "item.entry.place", declared-checked = "item.entry.place-check", owner-places = "item.entry.place-owner", probe = "stand-in:{prefix}/loop/probe.py" }
+
+[[item]]
+tag = "item.entry.place"
+step = "none"
+actor = "role:gov-orienter"
+needs = ["item.entry.orient"]
+outcomes = "dispositions"
+witness = { class = "history", by = "placement.py check over the return's facts: the newest placement block's check: line reading pass or recorded" }
+owner = "dPlacedRequest"
+routes = { new = "item.entry.claim", patch = "item.entry.claim", repeat = "item.entry.claim", amend = "stand-in:{prefix}/loop/placement.py", breakpoint = "item.review.trigger", unit = "item.entry.place", continue = "stand-in:{prefix}/unattended/unattended.sh", ask = "stand-in:{prefix}/memory-tree/backlog.py", none = "stand-in:{prefix}/roles/agents/gov-orienter.agent.md" }
+draws = { unit = "route-back" }
+
+[[item]]
+tag = "item.entry.place-check"
+step = "none"
+actor = "command:entry.place-check"
+needs = ["item.entry.orient"]
+inputs = ["layer.memory:the request's own declaration and the scout's return as evidence", "layer.runtime:the request's placement store"]
+allowance = "the request's placement block"
+returns = "the request's placement block, its check: line written by placement.py check"
+outcomes = "dispositions"
+witness = { class = "history", by = "placement.py check over the declared placement" }
+owner = "dPlacedRequest"
+routes = { new = "item.entry.claim", patch = "item.entry.claim", repeat = "item.entry.claim", amend = "stand-in:{prefix}/loop/placement.py", breakpoint = "item.review.trigger", unit = "item.entry.place", continue = "stand-in:{prefix}/unattended/unattended.sh", ask = "stand-in:{prefix}/memory-tree/backlog.py", none = "stand-in:{prefix}/roles/agents/gov-orienter.agent.md" }
+draws = { unit = "route-back" }
+
+[[item]]
+tag = "item.entry.place-owner"
+step = "none"
+actor = "owner"
+needs = ["item.entry.orient"]
+inputs = ["layer.memory:the scout's return, printed as evidence by placement.py place"]
+allowance = "the owner's disposition record naming item.entry.place-owner"
+returns = "record-kind.disposition"
+outcomes = "dispositions"
+witness = { class = "history", by = "the owner's disposition record, record-kind.disposition, naming item.entry.place-owner" }
+owner = "dPlacedRequest"
+routes = { new = "item.entry.claim", patch = "item.entry.claim", repeat = "item.entry.claim", amend = "stand-in:{prefix}/loop/placement.py", breakpoint = "item.review.trigger", unit = "item.entry.place", continue = "stand-in:{prefix}/unattended/unattended.sh", ask = "stand-in:{prefix}/memory-tree/backlog.py", none = "stand-in:{prefix}/roles/agents/gov-orienter.agent.md" }
+draws = { unit = "route-back" }
+deadline = "policy.run.owner-deadline"
+on-deadline = "ask"
+
+[[item]]
+tag = "item.entry.claim"
+step = "none"
+actor = "command:entry.claim"
+needs = [["item.entry.place", "item.entry.place-check", "item.entry.place-owner"]]
+inputs = ["layer.memory:the request's passed placement, as placement.py record prints it", "layer.runtime:the claim ref and the build lease"]
+allowance = "the claim ref; on a patch or a repeat the build lease, the derived plan record and the first transition record"
+returns = "the claim ref's body"
+outcomes = ["claimed", "slug-taken", "awaiting", "refused"]
+witness = { class = "history", by = "the claim ref refs/gov/claims/<slug> on the remote; on a patch or a repeat the lease record and the derived plan record too" }
+owner = "dPlacedRequest"
+routes = { claimed = "transition", slug-taken = "item.entry.claim", awaiting = "item.entry.claim", refused = "stand-in:{prefix}/memory-tree/backlog.py" }
+draws = { slug-taken = "route-back" }
+waits = ["awaiting"]
+deadline = "policy.flow.wait-ceiling"
+on-deadline = "refused"
 
 # ---- Plan's program ----------------------------------------------------------------------------------
 

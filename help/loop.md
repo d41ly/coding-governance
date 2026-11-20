@@ -1738,6 +1738,39 @@ no such section, a disposition that opens no build, or a block the check refuses
 continues or amends a live build is sent there rather than opened as a new one. A README opened before
 `PROMPT_BRIEF_CUTOFF` is not graded.
 
+## The entry items: orienting, placing and claiming a request
+
+Before any step, a request passes through the entry program: five items tagged `item.entry.<name>`, which
+sit in no step, as the review and probe programs' items do, and which `--check` prints as
+`loop: program entry`.
+
+| Item | Actor | Needs | Its work today |
+|---|---|---|---|
+| `item.entry.orient` | `role:gov-orienter` | none | the `/session-kickoff` orientation and its card; where the card routes a build, that build's card |
+| `item.entry.place` | `role:gov-orienter` | `item.entry.orient` | the scout's return, placed by `placement.py place --request <key> --return <file>` and checked by `placement.py check` |
+| `item.entry.place-check` | `command:entry.place-check` | `item.entry.orient` | the request's own declaration, `placement.py place --request <key> --declared <word> [<build>]`, then `placement.py check` |
+| `item.entry.place-owner` | `owner` | `item.entry.orient` | your disposition record naming `item.entry.place-owner`, read by `placement.py place --request <key> --owner <record>` |
+| `item.entry.claim` | `command:entry.claim` | any one of the three placing items | the unattended driver's `--entry-claim`, which claims the build on `refs/gov/claims/<slug>` |
+
+`item.entry.orient` answers the value of the policy key `placement`, `agent-places`, `declared-checked`
+or `owner-places`, and each value routes to the placing item it names; its `probe` goes to the probe
+tool's stand-in, as every role item's does. It reads the whole map (`map = "base"`).
+
+The three placing items answer a disposition and share one route table. `new`, `patch` and `repeat` go
+to `item.entry.claim`; `breakpoint` to `item.review.trigger`; `unit` back to `item.entry.place`,
+drawing `route-back` on the rework budget; and the dispositions whose owners have not landed go to
+today's tools: `amend` to `placement.py`, which holds it for you, `continue` to the unattended driver,
+`ask` to `backlog.py` and `none` to the orientation scout. A failed `placement.py check` is the
+item's refusal and goes back to it. Your placement waits on you until `run.owner-deadline` passes, and
+then becomes an `ask`.
+
+`item.entry.claim` answers one word per exit of `--entry-claim`: `claimed` moves the build, a `new` into
+planning and a `repeat` into designing, while a `patch` moves through `item.plan.dedupe`'s `patch`;
+`slug-taken` comes back to the claim for a fresh slug, drawing `route-back` on the request's pre-claim
+budget; `awaiting` comes back to the claim while another party holds the build, drawing nothing, until
+`flow.wait-ceiling` passes and it answers `refused`; and `refused` goes to `backlog.py`, the `ask:`
+line or owner item the driver prints.
+
 ## Testing outside Test: the probe program
 
 A probe is a test any item can ask for, outside the Test step: an owner's observation checked before it
@@ -2012,7 +2045,8 @@ outside the flow, one that lives in code with a deadline of its own.
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs, then a `loop: program review` line for the review program, whose items are tagged
-  `item.review.<name>`, carry the step `none` and sit in no step. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
+  `item.review.<name>`, carry the step `none` and sit in no step, and the same for the probe program
+  and the entry program, `loop: program probe` and `loop: program entry`. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
   and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
   its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
   prints the witness classes, one line per witness alias and per step's and item's witness, one line per
