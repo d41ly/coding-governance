@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-8 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -31,6 +31,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-brief.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md) | journal | TOOL-dWitnessedBar-5 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
@@ -583,10 +585,12 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   export and landing branch joined S5's readers, the stamp gaining `blocks` (F8);
   `check_inherited_override` keeps the class, since `--hold --code inherited-red` calls it (F7); the
   routes name the `item.test.route` row's outcomes without writing them (F9); the reader population
-  re-derived at 16 files, the policy kit's mark and fixture re-pointed (F11); the legacy list moved to
-  `memory/project/legacy-homes.txt`; the step reuses `conf_to_policy.py`; `judge` imports
+  re-derived at 16 files (DERIVED 2026-11-20), the policy kit's mark and fixture re-pointed (F11); the legacy list
+  moved to `memory/project/legacy-homes.txt`; the step reuses `conf_to_policy.py`; `judge` imports
   `resolve_kit_dir` from `leg_factory`; S9 documents both keys (F10); Files touched gains the mirror,
   the policy kit, the two ledgers and the kickoff manifest, the leg line their legs.
+- rev-8 · 2026-11-20 · §9 · rev-7's line pins the reader count it re-derived as DERIVED, per brief
+  2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-brief; nothing else moved.
 
 ## 10. Reuse audit
 
