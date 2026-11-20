@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 24 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 24 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0368@53672db0 whole
 **Carries:** node:policy-key.verdict.flakes.release
@@ -32,47 +32,77 @@ is never released, and a `CONTENDED` red is only reported.
 
 ## 2. Scope (IN)
 
-- **S1** — The held run mode: a selection row (`TOOL-dWitnessedBar-5` S2) gains a fifth field, its
-  mode, `hold` or `run`; the runner executes a `run` leg in its ordinary slot, writes its `.leg` row,
-  and records its result in `held.<n>` as `ok` or `fail` without counting it in `failed` or the
-  verdict. `select --check` compares the held set and its sources, never the mode, so a `run` row
-  cannot fail it. Observed by AC1.
+- **S1** — The held run mode: a selection row (`TOOL-dWitnessedBar-5` S2, `held · <leg> · <source> ·
+  <note>`) gains a fifth field, its mode, `hold` or `run`. Both readers take a four-field row as
+  `hold`: `verdict_flow.py#read_selection`, which today refuses any row that is not four fields, and
+  the runner's selection loop under `run-gates.sh#derive_hold_source`, whose `read` today folds a
+  fifth field into the note. The runner executes a `run` leg in its ordinary slot, never skipped by
+  its guard, the docs mode or the reuse cache, and writes its `.leg` row. It records the result in
+  `held.<n>` as `ok` or `fail`, two of the results `HELD_RESULTS` already admits, without counting it
+  in `failed` or the verdict. The leg is counted in `held`, because `verdict_flow.py#read_held_keys`
+  refuses a count its keys do not match. `select --check` (`verdict_flow.py#cmd_select_check`)
+  compares the held set, its sources and its notes, never the mode, where today it compares whole
+  rows, so a `run` row cannot fail it. Observed by AC1.
 - **S2** — At least once a day: `verdict_flow.py select` writes mode `run` for a `quarantine` row
   whose newest executed row in the flake records (`TOOL-dWitnessedBar-8` S3) since its hold is more
   than 24 hours older than the selection, or absent, whatever `verdict.held` reads; every other held
-  row is `hold`. A Test-step bar therefore executes the leg and `test.flakes` records its row.
-  Observed by AC2.
+  row is `hold`. The flake records are read at R, by `verdict_flow.py#read_flake_records` inside the
+  scratch worktree at R that `verdict_flow.py#read_asks_at` adds for the asks, so `select --check`
+  re-derives from the same records. A Test-step bar run under that selection executes the leg, and
+  the flake record `test.flakes` writes holds its row. Observed by AC2.
 - **S3** — The release: `select` releases a `quarantine` leg whose executed rows since its hold, newest
   first, open with `verdict.flakes.release` consecutive greens (first rc 0), or whose manifest row
-  at R differs from its row at the commit that filed its ask; the leg is selected as ordinary and
-  `select` prints `release  <leg>  <ask id>  <reason>`, which the driver turns into the ask's closing
-  row through `write_ask_closing` (S6), citing the streak's run ids or the row change. A red row breaks
-  the streak. Observed by AC3.
+  at R differs from its row at the commit that filed its ask. The filing commit is the oldest commit
+  adding the ask's `- <id> · filed ` row to its file, found by
+  `tools/memory-tree/deviation_join.py#read_row_commit` as `verdict_flow.py#read_flake_releases`
+  finds a closing row's. The leg is selected as ordinary and `select` prints `release  <leg>  <ask
+  id>  <reason>`. The driver's `gates-green` runs `select` after its bar on every return code and
+  turns each such line into the ask's closing row through `write_ask_closing` (S6), citing the
+  streak's run ids or the row change (§8 F5). A red row breaks the streak. Observed by AC3.
 - **S4** — The quiet-host re-run: `python tools/run-gates/verdict_flow.py quiet-rerun --run <run
-  dir>` takes each routing row routed `quiet-rerun` (`TOOL-dWitnessedBar-3` S6) with no re-run yet;
-  when `check_quiet` (`tools/run-gates/profile_bar.py:192`) reads `true`, it runs that leg once, alone,
-  under a one-row manifest and attribution against the same R, and writes the result into the row:
-  green clears the red as contention, red is re-attributed and routed by its new class, and the row is
-  marked so no later call re-runs it. The driver's `gates-green` calls it at each pass over a red bar.
-  Observed by AC4.
+  dir>` takes each routing row routed `quiet-rerun` (`TOOL-dWitnessedBar-3` S6) with no re-run yet.
+  When `profile_bar.py#check_quiet` reads `true`, it runs that leg once, alone, under a one-row
+  manifest named by `GATE_LEGS` (`tools/run-gates/run-gates.sh@a405580b:423`) and an attribution
+  against the same R by `GATE_ATTRIBUTE` (`tools/run-gates/run-gates.sh@a405580b:427`), and writes
+  the result into the row. Green clears the red as contention, red is re-attributed and routed by its
+  new class, and the row is marked so no later call re-runs it. `verdict_flow.py#read_routing`, which
+  today refuses a row that is not six fields, admits the two fields §4 adds, and `judge` keeps them.
+  The driver's `gates-green` calls the verb from `unattended.sh#run_verdict_route`, after `route`, at
+  each pass over a red bar. Observed by AC4.
 - **S5** — The wait's bound: while `check_quiet` reads `false` or `unverified`, `quiet-rerun` prints
-  `awaiting quiet host  <leg>  since <routed at>`; once the wait exceeds `flow.wait-ceiling` hours it
-  prints `owner  <leg>  contended, no quiet host within <h> h`, which the driver files as the owner
-  item, a HIGH ask through `write_leg_ask` (`TOOL-dWitnessedBar-8` S8) in the form `contended red, no
-  quiet host:`, once per leg. Observed by AC5.
+  `awaiting quiet host  <leg>  since <routed at>`. Once the wait exceeds `flow.wait-ceiling` hours it
+  prints `owner  <leg>  contended, no quiet host within <h> h`, and the driver files that line as the
+  owner item: a HIGH ask through `unattended.sh#write_leg_ask` (`TOOL-dWitnessedBar-8` S8) in the
+  form `contended red, no quiet host: leg`, once per leg. The wait spans bars, as §8 F6 decides.
+  Observed by AC5.
 - **S6** — The closing row: `write_ask_closing <ask id> <home> <by> <why>` in
   `tools/unattended/unattended.sh`, beside `write_leg_ask`, appends `- CLOSED · <id> · by <sha> ·
-  <why>` to the ask's home `BACKLOG.md` under its dispositions, the row grammar
-  `tools/memory-tree/backlog.py` reads (`:486-515`), and renders the views. Observed by AC3.
+  <why>` to the home's `BACKLOG.md` under its `## Dispositions`, where `unattended.sh#write_backlog_rows`
+  appends the SEV and KEEP rows. The row is the grammar `tools/memory-tree/backlog.py#_extract_status`
+  reads and `backlog.py#render_status_row` renders, and its `- CLOSED · <id> · ` prefix is the one
+  `read_flake_releases` dates a release by. The views are rendered and staged through
+  `unattended.sh#write_ask_views`. Observed by AC3.
 - **S7** — A POSIX arm of `check_quiet`: where no PowerShell exists it reads `ps -eo pid=,args=` with
   the same liveness assertion, its own pid's argv readable, so a Linux node can find a quiet host and
   every other host still reads `unverified`. Observed by AC6.
+- **S8** — The key's page: `verdict.flakes.release` gains a `summary` and a `usage` in
+  `tools/policy/catalogue.toml`, its row drained from `tools/policy/unsummarised-keys.txt` by
+  `policy.py lists --write`, and `help/reference/policy.md` renders its section. The `verdict.flakes`
+  summary, which says the ask holds the leg out of every bar until it closes, says instead that the
+  held leg runs once a day outside the verdict and is released after its streak. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
 - The cadence that guarantees a bar runs every day: dTendedCadence's. This unit guarantees that no
   Test-step bar skips a quarantined leg whose last execution is over a day old; the hand-over is that
   the cadence's bar is a Test-step bar, which then runs it.
+- Running `test.select` before a bar and handing its record to the bar as `GATE_SELECTION`: the loop
+  engine's, whose `item.test.select` row is `command:test.select`
+  (`tools/loop/loop.toml@b6651f21:1686`). No caller in the tree writes a selection for a bar today;
+  this unit's driver call reads `select`'s `release` lines only.
+- The green bar's flake record: `TOOL-dWitnessedBar-51` S15's record-only path. Until it lands, the
+  driver's `gates-green` writes a flake record after a red bar only, so a quarantined leg's greens
+  accrue from red bars' records alone.
 - Filing the hold, the flake record and the window: `TOOL-dWitnessedBar-8`'s.
 - The loop's owner item kind and its disposition: TOOL-dDeclaredLoop-16's disposition record answers
   an owner item; until the engine files one, the HIGH ask of S5 is the stand-in.
@@ -93,23 +123,40 @@ is never released, and a `CONTENDED` red is only reported.
 
 ### Evidence
 
-- A held leg writes no `.leg` row and no record holds its result (`tools/run-gates/run-gates.sh:3129-3131`,
-  `:4038-4047`); run records are pruned to five per git dir, so a streak of daily results cannot be
-  read from them across days.
-- `CONTENDED` is computed when a leg's own ceiling fired (`check_ceiling_fired`, `:4391`;
-  `derive_attribution`, `:4704-4710`) and is reported only.
-- `check_quiet` (`profile_bar.py:192-238`) proves its liveness by reading its own command line and
-  reports `true` only when no foreign `run-gates.sh` process is visible; it has a PowerShell arm only,
-  and `measure_legs.py` already imports it as a sibling (`tools/run-gates/measure_legs.py:101`).
+- A held leg is marked `ondemand` before dispatch, in the guard pass's `derive_hold_source` test
+  (`tools/run-gates/run-gates.sh@a405580b:3413-3417`), so it writes no `.leg` row, and
+  `run-gates.sh#report_one` records it as `held.<n>` reading `<leg> · <source> · unrun`. Run records
+  are pruned to `GATE_RUN_KEEP` per git dir, five by default
+  (`tools/run-gates/run-gates.sh@a405580b:2751`), so a streak of daily results cannot be read from
+  them across days.
+- `CONTENDED` is computed when a leg's own ceiling fired (`run-gates.sh#check_ceiling_fired`,
+  `run-gates.sh#derive_attribution`). `verdict_flow.py#derive_route` routes a blocking one
+  `quiet-rerun`, and no verb reads that route: it is only reported.
+- `profile_bar.py#check_quiet` proves its liveness by reading its own command line and reports `true`
+  only when no foreign `run-gates.sh` process is visible; it has a PowerShell arm only, and
+  `measure_legs.py` already imports it as a sibling (`tools/run-gates/measure_legs.py@d9b2a0c4:102`).
+- `verdict_flow.py#derive_selection` reads every input at R. Its `quarantine` rows are the OPEN
+  held-flaky-leg asks `verdict_flow.py#read_asks_at` reads in a scratch worktree at R, each note
+  `<count>/<window>, ask <id>`. `verdict_flow.py#read_flake_records` reads the tracked flake records
+  from a working tree through the factory's `tools/memory-tree/build_records.py#read_records`, each
+  body through `build_records.py#read_flake_body`.
+- `verdict_flow.py#read_flake_releases` dates a leg's release by the oldest commit adding `- CLOSED ·
+  <id> · ` to a CLOSED held-flaky-leg ask's file, and `verdict_flow.py#derive_flake_holds` counts only
+  the rows after it.
+- The driver's `gates-green` runs `route` (`unattended.sh#run_verdict_route`) and `flakes` after a red
+  bar only, and `unattended.sh#write_held_asks` after the bar on every return code. It writes SEV and
+  KEEP disposition rows (`unattended.sh#write_backlog_rows`) and no `CLOSED` row.
 - An ask closes by a disposition row `CLOSED · <id> · by <id or sha> · <why>`
-  (`tools/memory-tree/backlog.py:486-515`).
+  (`tools/memory-tree/backlog.py#_extract_status`).
 - v2's `[policies]`: `verdict.flakes.release` "3, or another count of consecutive greens", default 3
-  (v2:1275); `flow.wait-ceiling` is dDeclaredLoop's (v2's flow presets 48, 72, 168, 72).
+  (v2:1275); `flow.wait-ceiling` is dDeclaredLoop's (v2's flow presets 48, 72, 168, 72). The
+  catalogue defaults agree: `python tools/policy/policy.py get verdict.flakes.release` prints 3 and
+  `python tools/policy/policy.py get flow.wait-ceiling` prints 72, PINNED 2026-11-20.
 
 ### The streak and the day
 
 ```
-rows(L)  = L's executed rows in every flake record with Ended after L's hold (its ask's filing date)
+rows(L)  = L's executed rows in every flake record at R with Ended after L's hold (its ask's filing date)
 day(L)   = run  when rows(L) is empty or newest(rows(L)).Ended < now - 24 h, else hold
 streak   = the count of rows(L), newest first, before the first row whose first rc != 0
 release <=> streak >= verdict.flakes.release, or L's manifest row at R != its row at the filing commit
@@ -117,8 +164,9 @@ release <=> streak >= verdict.flakes.release, or L's manifest row at R != its ro
 
 The selection's `run` mode puts the leg in the Test-step bar, `test.flakes` writes its row, and the
 next `select` reads it, so the streak accrues one row per day at least and one per Test step at most.
-The filing commit is the first commit adding the ask's row to its `BACKLOG.md`, read by `git log
---diff-filter=A`-style search of that line at R.
+The filing commit is the oldest commit adding the ask's `- <id> · filed ` row to the ask's file, the
+`file` field its generator prints, found by `deviation_join.py#read_row_commit` through the factory
+`verdict_flow.py#load_flake_factory` loads.
 
 ### The quiet-host re-run
 
@@ -126,10 +174,11 @@ The filing commit is the first commit adding the ask's row to its `BACKLOG.md`, 
 routing row:  leg · CONTENDED · block · quiet-rerun · - · -  [· routed <epoch> · rerun <state>]
 ```
 
-`route` stamps `routed <epoch>` on a `quiet-rerun` row; `quiet-rerun` adds `rerun waiting`, then
-`rerun ok`, `rerun red <new class>` or `rerun owner`. The one-leg run writes its own run record under
-the same git dir, so its verdict and attribution are evidence like any other; a `rerun` state other
-than `waiting` is final and is never re-run.
+`route` stamps `routed <epoch>` on a `quiet-rerun` row, carrying the stamp of the newest sibling run
+record's row for the same leg whose state is `waiting` (§8 F6); `quiet-rerun` adds `rerun waiting`,
+then `rerun ok`, `rerun red <new class>` or `rerun owner`. The one-leg run writes its own run record
+under the same git dir, so its verdict and attribution are evidence like any other; a `rerun` state
+other than `waiting` is final and is never re-run.
 
 ### Inventory
 
@@ -138,12 +187,13 @@ than `waiting` is final and is never re-run.
 | the selection's mode field, `hold`, `run` | record field | none |
 | `quiet-rerun` verb, the routing row's `routed` and `rerun` fields | verb, fields | `py.function`, asked at the pass |
 | `write_ask_closing` | shell function | `sh.function`, asked at the pass |
-| `contended red, no quiet host:` | ask form | none |
+| `contended red, no quiet host: leg` | ask form | none |
 | the POSIX arm of `check_quiet` | branch | none |
 
 ### Migration
 
-Additive. A selection with four fields reads mode `hold`.
+Additive. A selection with four fields reads mode `hold`, and a routing row with six fields reads
+as not yet stamped.
 
 ### Rollout
 
@@ -158,6 +208,12 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
 - `tools/run-gates/run-gates.test.sh`
 - `tools/run-gates/README.md`
 - `tools/unattended/unattended.sh`
+- `tools/policy/catalogue.toml`: the `summary` and `usage` of `verdict.flakes.release`, and the
+  `verdict.flakes` summary (S8)
+- `tools/policy/unsummarised-keys.txt` (re-rendered by `policy.py lists --write`)
+- `help/reference/policy.md` (re-rendered by `render_playbook.py --reference`)
+- `memory/guides/SESSION-KICKOFF.md`: its `watch:` line holds `tools/run-gates/run-gates.sh`, so its
+  `last-audit` is re-stamped
 
 ### Alternatives rejected
 
@@ -172,11 +228,11 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
 
 ## 5. Production-readiness checklist
 
-- security — a release tightens the bar and its inputs are committed records; a `run` row executes a
-  leg and never holds one, so `select --check` ignores the mode; the quiet re-run grades a red again
-  and cannot land it except by its own green on a quiet host.
+- security — a release tightens the bar and its inputs are committed records read at R; a `run` row
+  executes a leg and never holds one, so `select --check` ignores the mode; the quiet re-run grades a
+  red again and cannot land it except by its own green on a quiet host.
 - perf / scale — one extra execution per quarantined leg per day; one alone-run per blocking
-  `CONTENDED` red.
+  `CONTENDED` red; one `select` per `gates-green` pass.
 - error / empty / loading states — `check_quiet` reading `unverified` counts as not quiet, so a host
   that cannot prove quiet waits and then raises the owner item, never re-runs on a busy host.
 - observability — the `release`, `awaiting quiet host` and `owner` lines, the routing row's `rerun`
@@ -185,8 +241,10 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
   that is the item's purpose (P39).
 - testing — the fixtures of §6; the suite arms of §7 at the close.
 - migration — additive, as §4 says.
-- user docs — none owed under `help/`: no help page describes quarantine; the run-gates README gains
-  the release and the quiet re-run beside the hold.
+- user docs — `help/reference/policy.md` renders the `verdict.flakes` section, which describes the
+  quarantine, and lists `verdict.flakes.release` among the keys with no section; S8 gives that key
+  its section and corrects the hold's description. The run-gates README gains the release under
+  "Held by policy" and the quiet re-run under "Which red blocks".
 
 ## 6. Acceptance criteria
 
@@ -208,7 +266,8 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
   change; `grep -c 'write_ask_closing' unattended.sh` in `tools/unattended/` prints at least 2, its
   definition and the call that writes the `CLOSED · <id> · by` row.
   Red when: a red row inside the streak is skipped rather than resetting it.
-  figure: 3 is v2's literal default of `verdict.flakes.release` (v2:1275), PINNED.
+  figure: 3 is v2's literal default of `verdict.flakes.release` (v2:1275), and the catalogue default
+  `python tools/policy/policy.py get verdict.flakes.release` prints, PINNED 2026-11-20.
 - **AC4** — When `python verdict_flow.py --fixture contended-pair` runs, over a planted routing row
   `CONTENDED · block · quiet-rerun` and a `check_quiet` stub reading `false`, it prints
   `awaiting quiet host` and runs nothing; with the stub reading `true` it runs the leg once and
@@ -217,8 +276,10 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
 - **AC5** — When the same fixture runs with the row stamped `routed` 73 hours before and
   `flow.wait-ceiling` reading 72, `quiet-rerun` prints
   `owner  <leg>  contended, no quiet host within 72 h` and marks the row `rerun owner`; at 71 hours
-  it prints `awaiting`.
+  it prints `awaiting`. With a sibling run record whose row for the leg reads `rerun waiting`,
+  stamped 73 hours before, a fresh `route` carries that stamp and the next call prints `owner`.
   Red when: the wait has no bound, so a contended red waits forever.
+  figure: 73, 72 and 71 are the fixture's planted values, PINNED 2026-11-20.
 - **AC6** — When
   `python -c "import sys; sys.path.insert(0, 'tools/run-gates'); import profile_bar as p; print(p.check_quiet(_runner=None)[0])"`
   runs on a host with no PowerShell and a readable `ps`, it prints `true` or `false`, never
@@ -226,10 +287,14 @@ Live at landing. No leg is quarantined until `TOOL-dWitnessedBar-8`'s hold files
   Red when: the POSIX arm reports `true` without reading its own command line (the liveness the
   function's docstring requires).
   fixture: a Linux node for the first half; the stub half runs anywhere.
+- **AC7** — When `grep -cx '## .verdict.flakes.release.' help/reference/policy.md` runs, it prints
+  1, and `grep -cx 'verdict.flakes.release' tools/policy/unsummarised-keys.txt` prints 0.
+  Red when: the key the release reads stays undocumented on its help page.
+  figure: 1 and 0 are DERIVED by the two commands at observation.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates evidence` · `profile-bar selftest` · `measure-legs selftest` · `unattended kit gate` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates evidence` · `profile-bar selftest` · `measure-legs selftest` · `unattended kit gate` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `policy check` · `help reference pages` · `routed-commits selftest` · `recall floor` · `recall floor arms` · `kickoff-manifest ratchet`
 
 New arm: tools/run-gates/run-gates.test.sh · covers AC1 · a fixture bar under a selection holding a failing quarantine leg in run mode, the bar GREEN and `held.1` reading fail · none
 New arm: tools/run-gates/profile_bar.test.sh · covers AC6 · the POSIX arm driven by a stub `ps` whose rows omit the caller's own pid, read `unverified` · none
@@ -256,6 +321,26 @@ New arm: tools/run-gates/profile_bar.test.sh · covers AC6 · the POSIX arm driv
   `write_leg_ask`, once per leg; (b) a parked entry in the run-state file; (c) nothing until the engine
   lands. (b) exists only under a mandate; (c) leaves the wait unbounded. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 3, the stand-in this build ships, named in §3. widens: none · relaxes: none
+- **F5 — Who turns `select`'s `release` line into the ask's closing row?** No caller in the tree runs
+  `select --rev <R> --out` at HEAD, so the line rev-3 handed to "the driver" reaches nothing. Options:
+  (a) the driver's `gates-green` runs `select` at R after its bar, on every return code beside
+  `write_held_asks`, into a scratch file it removes, and files each `release` line through
+  `write_ask_closing`; (b) leave the line to the loop engine's Test step and ship `write_ask_closing`
+  with no caller; (c) `select` writes the closing row itself. (b) fails AC3's call and leaves every
+  released leg's ask OPEN; (c) makes a derivation the pre-push hook re-runs as `select --check` into
+  a writer of `BACKLOG.md`, a write surface this unit did not price. RESOLVED (agent, 2026-11-20,
+  delegated): (a), the most feature-rich survivor, reusing the every-return-code site
+  `write_held_asks` already holds; the bar still runs under no selection, which §3 leaves to the
+  loop engine. widens: none · relaxes: none
+- **F6 — When does a contended red's wait start, when each pass runs a new bar?** `route` writes the
+  routing record of one run record, replaced whole (`verdict_flow.py#write_routing`), and each
+  `gates-green` pass runs a new bar, so a stamp read from one record restarts at every pass. Options:
+  (a) the stamp of the bar's own record alone; (b) `route` carries the stamp of the newest sibling
+  run record's row for the same leg whose state is `waiting`, else stamps now; (c) a node-local wait
+  file in the common dir keyed by leg. (a) restarts the wait every pass, so it never expires and
+  fails AC5's red case; (c) holds the routing row's fact a second time. RESOLVED (agent, 2026-11-20,
+  delegated): (b), the routing records already beside the bar's, the chain ending when the leg's red
+  is no longer a waiting contended one. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -269,18 +354,38 @@ New arm: tools/run-gates/profile_bar.test.sh · covers AC6 · the POSIX arm driv
   spec-token checker's guards join named them at `c6df3e901`, by the brief
   `2026-11-19-prompt-TOOL-dWitnessedBar-1-spec-tokens-brief`; §4 is unchanged, as the unit writes
   that path; nothing else moved.
+- rev-4 · 2026-11-20 · §2, §3, §4, §5, §6, §7, §8, §10 · re-grounded at `c68021778` over order 23 as
+  landed, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-30-reground-brief`: every bare line
+  citation re-cited by symbol or blob-pinned; S1 names the two four-field readers, `read_held_keys`'
+  count and `cmd_select_check`'s whole-row compare; S2 reads the flake records at R in
+  `read_asks_at`'s worktree; S3 dates the filing by `read_row_commit` and takes F5; S4 names
+  `GATE_LEGS`, `GATE_ATTRIBUTE`, `read_routing`'s six-field refusal and `run_verdict_route`; S5's form
+  takes `write_leg_ask`'s `<label>: <noun>` shape and F6, which AC5's carried stamp observes; S6
+  names `write_backlog_rows`, `render_status_row` and `write_ask_views`; S8 and AC7 are new, since
+  TOOL-dWitnessedBar-8's `help/reference/policy.md` now describes quarantine; §3 gains the selection
+  caller and the green bar's record as non-goals; Files touched gains the policy, help and kickoff
+  paths, and the leg line the legs whose guards those paths trip, or that grade them; §10's probes
+  re-run at HEAD.
 
 ## 10. Reuse audit
 
-The seams extended are `check_quiet` (`tools/run-gates/profile_bar.py:192`), the existing host-wide
-"no other bar" probe, given a POSIX arm; the selection and held keys of `TOOL-dWitnessedBar-5`; the
-flake records of `TOOL-dWitnessedBar-8`; and the backlog's `CLOSED` disposition row. `python
+The seams extended are `profile_bar.py#check_quiet`, the existing host-wide "no other bar" probe,
+given a POSIX arm; the selection's readers and writer (`verdict_flow.py#read_selection`,
+`verdict_flow.py#derive_selection`, `verdict_flow.py#cmd_select_check`, `run-gates.sh#derive_hold_source`)
+and the `held.<n>` keys of `TOOL-dWitnessedBar-5`; the flake records of `TOOL-dWitnessedBar-8`, read
+by `verdict_flow.py#read_flake_records` in `verdict_flow.py#read_asks_at`'s worktree at R, with
+`deviation_join.py#read_row_commit` dating the filing as `verdict_flow.py#read_flake_releases` dates a
+release; the routing record's `verdict_flow.py#read_routing` and `cmd_route`, and the runner's
+`GATE_LEGS` and `GATE_ATTRIBUTE` knobs for the alone-run; the driver's `unattended.sh#run_verdict_route`
+and the every-return-code site of `unattended.sh#write_held_asks`; `unattended.sh#write_leg_ask` for the
+owner item; and the backlog's `CLOSED` disposition row, appended where `unattended.sh#write_backlog_rows`
+appends its dispositions and rendered through `unattended.sh#write_ask_views`. `python
 tools/codebase-map/reuse_lookup.py "release a quarantined leg after consecutive greens and re-run a
-contended leg on a quiet host"` ranked `check_quiet` among generic `run` and `leg` stems, the seam
-taken. The recall probe returned the brief's unit row, which says "the turnstile's census", and scout A's
-row, which names the turnstile's `measure_held_slots`
-(`run-gates.sh:1547`) and `derive_foreign` (`:4318`) for the quiet host; both agree with source, and
-both are per-clone or after-the-fact, which §8 F3 records, and its daily-run seam, the remote's held
-matrix, is rejected there for its results reaching no flake record.
+contended leg on a quiet host"`, re-run at `c68021778`, ranked `check_quiet` among generic `run` and
+`leg` stems, the seam taken. The recall probe, re-run there, returned the brief's unit row, which says
+"the turnstile's census", and scout A's row, which names the turnstile's `run-gates.sh#measure_held_slots`
+and `run-gates.sh#derive_foreign` for the quiet host; both agree with source, and both are per-clone or
+after-the-fact, which §8 F3 records, and its daily-run seam, the remote's held matrix, is rejected there
+for its results reaching no flake record.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a quarantined leg released and a contended red re-run on a quiet host" --terms "quarantine release streak consecutive greens verdict.flakes.release quiet host CONTENDED rerun flow.wait-ceiling owner item"`

@@ -147,7 +147,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dWitnessedBar-1 — gate health measured and the reliability bar](spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md) | 23 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dWitnessedBar-59 — the inherited-red upgrade step splits a policy file's lines on LF alone, as the readers do, held by a lone-CR parity row](spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md) | 23 | 2 | CLOSED | rev-4 | 2026-11-20 |
-| [TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host](spec/2026-10-25-spec-TOOL-dWitnessedBar-30.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host](spec/2026-10-25-spec-TOOL-dWitnessedBar-30.md) | 24 | 2 | DEFERRED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-29 — every size warning a passing leg prints, shown in the runner's summary and verdict record and attributed to its unit](spec/2026-10-25-spec-TOOL-dWitnessedBar-29.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-7 — `test.seen-red` reading one seen-red record per gate a build adds or changes, the acceptance-ledger line standing in for `build.acceptance`](spec/2026-10-25-spec-TOOL-dWitnessedBar-7.md) | 26 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-21 — a fix pass that keeps its check: its allowance less the red leg's own files and the acceptance commands' own files](spec/2026-10-25-spec-TOOL-dWitnessedBar-21.md) | 27 | 2 | DEFERRED | rev-3 | 2026-10-25 |
