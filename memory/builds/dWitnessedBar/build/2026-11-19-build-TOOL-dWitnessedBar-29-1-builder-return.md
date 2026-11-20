@@ -20,7 +20,7 @@ Built and committed TOOL-dWitnessedBar-29 as b0ad989581b3 on base 60f08d3db831. 
 
 **What each check stood in for (all scratch fixtures, slices or probes)**
 - AC1 (template-size selftest): the real gate over a scratch fixture and planted high-water file printed the marker on the line after the warning; at the high-water it printed neither.
-- AC2 (census): both §4 queries named the 13 files, and each matches `git grep -c 'gate-warn'`. For the 7 Python sites that build the marker through the factory, that match is a comment word beside the call. So AC2 is only a presence check there; the AC9, load_sets and render_playbook probes are what show the marker is actually printed.
+- AC2 (census): both §4 queries named the 13 files, and each matches `git grep -c 'gate-warn'`. For the 7 Python sites that build the marker through the factory, that match is a comment word beside the call. So AC2 is only a presence check there; the AC9, load_sets and render_playbook probes are what show the marker is actually printed. (DERIVED from the builder's probe)
 - AC3 and AC6 (run-gates canary): the sliced `scan_leg_warnings` over planted work dirs showed:
   - one line for a passing leg, none for a red leg, none for a re-run copy;
   - a held leg read from its passing first attempt only, never its retry copy;
