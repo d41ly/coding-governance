@@ -961,6 +961,7 @@ sys.exit(2)
 """
 LOOP_HOME = "loop"
 POLICY_HOME = "policy"
+DRIFT_HOME = "drift-audit"
 
 STUB_POLICY = """import pathlib, sys
 print(pathlib.Path(__file__).with_name("value.txt").read_text().strip())
@@ -1279,8 +1280,8 @@ def run_fixture_flakes_record():
         with tempfile.TemporaryDirectory(prefix="vflow-") as root:
             repo, here, sha = write_flake_repo(root, f'[verdict]\nflakes = "{value}"\n')
             # a stub drift kit beside the kits, printing the argv the gate-health measurement is run with
-            (here / "drift-audit").mkdir()
-            (here / "drift-audit" / "drift_report.py").write_text(STUB_DRIFT, encoding="utf-8")
+            (here / DRIFT_HOME).mkdir()
+            (here / DRIFT_HOME / "drift_report.py").write_text(STUB_DRIFT, encoding="utf-8")
             run = pathlib.Path(root, "run")
             run.mkdir()
             (run / "verdict").write_text("ended\t2026-01-02T03:04:05Z\nverdict\tRED\nfailed\t2\ntree\t" + "a" * 40

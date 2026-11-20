@@ -11,7 +11,7 @@ TOOL-dWitnessedBar-59 is built and committed as one pass. I checked the spec aga
 I applied the first builder's saved patch to C:/projects/coding-governance/.claude/worktrees/unattended-dwitnessedbar-2ed3b3/tools/govkit/selftest.py. It applied cleanly at base b0cf02bad. It adds to `check_inherited_red_step`:
 - the AC1 target `ir59-ac1`, where the up must write `every-red` over `park<CR>INHERITED_RED=land`;
 - the AC2 target `ir59-ac2`, where the witness must exit 1 with `assigns` once and `not an assignment` nowhere, and the up must leave exactly `A=1\nB=2\n`;
-- the AC3 parity row labelled `lone-cr`, whose agreed hook value is `park\rINHERITED_RED=land`. The row-count check now expects 12 rows, and the "WHAT IT DOES NOT CHECK" comment no longer names a lone CR.
+- the AC3 parity row labelled `lone-cr`, whose agreed hook value is `park\rINHERITED_RED=land`. The row-count check now expects 12 rows, and the "WHAT IT DOES NOT CHECK" comment no longer names a lone CR. (DERIVED from the builder's probe)
 
 Commit 4657d344d contains:
 - the selftest change;
