@@ -341,8 +341,13 @@ check_claim_push_clear() {  # -> 0 always, once no live lock holds this git dir 
 # NOTHING PUSHED IS NOT UNGATED. When the remote already held the commit, git runs the hook with no ref
 # lines, the hook exits as `skip-nondefault` and writes no record, and git still exits 0; that
 # re-run of a landing that already happened is reported as such (closing review round 1).
+# THE UNGATED LANDING IS RECORDED (TOOL-dWitnessedBar-2 S3): one `bypass=ungated-landing` line through
+# `write_bypass_line`, under the `hooks.bypass` value `check_landing_verdict` read, its `tree_verdict`
+# the runner-written per-tree verdict of the pushed SHA's tree as the run-gates kit's `local-hook`
+# reader reads it: GREEN or RED as its line reads, `none` for every other state or where no reader
+# answers. So a hook killed after a green bar is told from a push no bar judged. The exit is unmoved.
 check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when the hook allowed it; else the UNGATED report and 1
-  local pushed=$1 was=$2 sha="" run=""
+  local pushed=$1 was=$2 sha="" run="" tv=none got py dir out
   if [ "$pushed" = "$was" ]; then
     echo "push-main: $remote/$def already held ${pushed:0:8} before this push, so nothing was pushed and no hook verdict is owed." >&2
     return 0
@@ -350,7 +355,37 @@ check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when
   [ -f "$allowfile" ] && IFS=$'\t' read -r sha run < "$allowfile"
   [ -n "$sha" ] && [ "$sha" = "$pushed" ] && return 0
   echo "push-main: landed UNGATED — git reports ${pushed:0:8} pushed to $remote/$def, but the pre-push hook left no allow record for it${sha:+ (its record names ${sha:0:8})} in $allowfile. The hook was killed before it decided: on Git for Windows a hook that dies by a signal reads as success. The commit is on $remote and NO bar certified it; NOT writing the lander marker. Run the bar on $remote/$def and decide whether to keep it." >&2
+  if got=$(resolve_lander_kit run-gates verdict_backends.py); then
+    py=${got%%$'\t'*} dir=${got#*$'\t'}
+    out=$(cd "$top" && "$py" "$top/$dir/verdict_backends.py" read --backend local-hook --sha "$pushed" 2>/dev/null)
+    case "$out" in
+      *"verdict: local-hook · GREEN · "*) tv=GREEN ;;
+      *"verdict: local-hook · RED · "*) tv=RED ;;
+    esac
+  fi
+  write_bypass_line ungated-landing "$pushed" "${HOOKS_BYPASS:-allowed}" "$tv"
   return 1
+}
+
+# `write_bypass_line <kind> <sha> <policy> [<tree verdict>]` records one hook bypass (TOOL-dWitnessedBar-2
+# S2): one `ev=once` line, `decision=bypass`, in the pushes journal, `runlog/pushes.log` under the git
+# common dir, in the runlog kit's grammar, and one `bypass:` line on stderr. BYTE-IDENTICAL in the
+# lander and the pre-push hook, which ships verbatim and sources no kit; the lander suite holds the
+# pair. EVIDENCE, NEVER AN INPUT: nothing branches on the line, a failed append prints one line and
+# moves no exit, and `GOV_RUNLOG=0` writes no journal line. Every value is a fixed token or hex, so
+# none needs the grammar's escaping, and the line is far under its cap.
+write_bypass_line() { # kind · sha · policy · [tree verdict] -> one journal line and one stderr line
+  local t gcd tab=$'\t'
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  echo "bypass: $1 · ${2:0:8} · hooks.bypass $3${4:+ · tree verdict $4} · recorded in runlog/pushes.log" >&2
+  [ "${GOV_RUNLOG:-}" != 0 ] || return 0
+  gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
+  if [ -n "$gcd" ] && { [ -d "$gcd/runlog" ] || mkdir "$gcd/runlog" 2>/dev/null; } \
+     && { printf '%s\n' "v=1${tab}t=$t${tab}p=pushes${tab}ev=once${tab}decision=bypass${tab}bypass=$1${tab}sha=$2${tab}policy=$3${4:+${tab}tree_verdict=$4}" >> "$gcd/runlog/pushes.log"; } 2>/dev/null; then
+    return 0
+  fi
+  echo "${0##*/}: run log — cannot append to ${gcd:-(no git dir resolved)}/runlog/pushes.log, so this bypass is not recorded there; the exit is unaffected" >&2
+  return 0
 }
 
 write_lander_marker() {  # -> 1 when the push landed but the record could not be written
@@ -1120,11 +1155,17 @@ read_verdict_tree() {
 # `verify-peer`, and the lander exits rather than polling. A reader that refuses, or a value no row
 # declares, refuses before any push. Only a lander with no policy kit beside it reads the catalogue
 # default, said on one line. What it does NOT check: that a peer will ever run.
+# `hooks.bypass` (TOOL-dWitnessedBar-2 S1, S6) is read here too, into HOOKS_BYPASS, which the UNGATED
+# record names. Under `refused` the registry's `off-node` verb is asked whether the `verdict` row is
+# off-node, before the `local-hook` return, and every landing is refused while it is not: a hook on
+# this node cannot refuse its own bypass, so `refused` stands on an off-node witness or not at all. A
+# reader that does not answer reads the catalogue default `allowed`, said on one line.
 check_landing_verdict() {  # sha -> 0 lands; 1 refused, the state or the refusal named on stderr
-  local sha=$1 got rc py dir v out state
+  local sha=$1 got rc py dir v out state b
+  HOOKS_BYPASS=allowed
   got=$(resolve_lander_kit policy policy.py); rc=$?
   if [ "$rc" != 0 ]; then
-    echo "push-main: verdict reads its catalogue default, local-hook: $got" >&2
+    echo "push-main: verdict reads its catalogue default, local-hook, and hooks.bypass its default, allowed: $got" >&2
     return 0
   fi
   py=${got%%$'\t'*} dir=${got#*$'\t'}
@@ -1133,6 +1174,28 @@ check_landing_verdict() {  # sha -> 0 lands; 1 refused, the state or the refusal
     return 1
   fi
   v=${v%$'\r'}
+  b=$(cd "$top" && "$py" "$top/$dir/policy.py" get hooks.bypass 2>/dev/null) || b=""
+  b=${b%$'\r'}
+  case "$b" in
+    allowed|refused) HOOKS_BYPASS=$b ;;
+    *) echo "push-main: hooks.bypass reads its catalogue default, allowed: the reader, policy.py get, answered '${b:-nothing}'" >&2 ;;
+  esac
+  if [ "$HOOKS_BYPASS" = refused ]; then
+    got=$(resolve_lander_kit run-gates verdict_backends.py); rc=$?
+    if [ "$rc" != 0 ]; then
+      echo "push-main: hooks.bypass is refused and no backend registry answers whether verdict $v is off-node ($got), so nothing is pushed" >&2
+      return 1
+    fi
+    out=$(cd "$top" && "$py" "$top/${got#*$'\t'}/verdict_backends.py" off-node --backend "$v" 2>&1); rc=$?
+    [ -z "$out" ] || printf '%s\n' "$out" >&2
+    case "$rc" in
+      0) ;;
+      1) echo "push-main: hooks.bypass is refused and verdict $v is no off-node backend, so nothing is pushed: a hook on this node cannot refuse its own bypass, and only an off-node witness can; set verdict to one of the off-node backends: ${out##*off-node backends: }" >&2
+         return 1 ;;
+      *) echo "push-main: hooks.bypass is refused and the backend registry refused verdict $v (named above), so nothing is pushed" >&2
+         return 1 ;;
+    esac
+  fi
   [ "$v" = local-hook ] && return 0
   got=$(resolve_lander_kit run-gates verdict_backends.py); rc=$?
   if [ "$rc" != 0 ]; then

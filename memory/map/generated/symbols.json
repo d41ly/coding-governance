@@ -2653,6 +2653,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "build_bp_fixture",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "build_brief_run",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -5456,6 +5461,11 @@
       "id": "check_built_from_history",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_byp_refused",
+      "kind": "function",
+      "file": ".githooks/pre-push.runlog.test.sh"
     },
     {
       "id": "check_calibration",
@@ -20233,6 +20243,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_bp_journal",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "read_breakpoints",
       "kind": "function",
       "file": "tools/loop/breakpoints.py"
@@ -20316,6 +20331,11 @@
       "id": "read_bundle_rows",
       "kind": "function",
       "file": "tools/playbook/tag_bundle.py"
+    },
+    {
+      "id": "read_bypass_slice",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "read_bytes",
@@ -25091,6 +25111,21 @@
       "id": "read_unbound_names",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
+    },
+    {
+      "id": "read_unchecked_commits",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "read_unchecked_commits",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "read_unchecked_commits",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "read_unit_drift",
@@ -31233,6 +31268,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_bp_push",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_breakpoint_plant",
       "kind": "function",
       "file": "tools/loop/breakpoints.py"
@@ -32946,6 +32986,11 @@
       "id": "run_normaliser",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "run_off_node",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_on_invalid_classes",
@@ -35951,6 +35996,11 @@
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "seed_witness_fixture",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
       "id": "seed_write_fixture",
@@ -39121,6 +39171,11 @@
       "id": "write_budget_rows",
       "kind": "function",
       "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "write_bypass_line",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "write_c42_conf",

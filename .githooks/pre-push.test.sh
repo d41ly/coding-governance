@@ -2891,4 +2891,76 @@ for _alt in "control:" "manifest:leg manifest elsewhere/other-legs.json" "blob:l
 done
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-dWitnessedBar-2 AC3 AC4: EACH HOOK BYPASS RECORDED, AND REFUSED UNDER hooks.bypass = refused --
+# A scratch repo whose R holds the policy kit, the memory-tree kit's trailer reader and the run-gates
+# kit's backend registry, with `hooks.bypass` and `verdict` declared in its policy file. Each push
+# carries two pass commits: one made past the commit check, with no `Commit-Checked:` trailer, and its
+# control, which carries the trailer the check writes. AC3: under `allowed` the push proceeds and the
+# journal gains one `bypass=unwitnessed-commit` line naming the first and never the control. AC4:
+# under `refused` with an off-node `verdict` the push is refused naming the first, as
+# `bypass-refused`, and its record is still written. S6: under `refused` with `verdict = local-hook`
+# no landing proceeds, naming the off-node backends. Staged red by skipping the range walk.
+MT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree commit_trailers.py "$SRC/$KIT_REL") || exit 2
+build_bp_fixture() { # tag · hooks.bypass value · verdict value -> a pushed main at R; cwd moves into its work tree
+  local d="$tmp/bp-$1"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
+  cd "$d/work" || return 1
+  git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
+  mkdir -p .githooks .governance "$KIT_REL/$PK" "$MT_DIR" "$RUN_GATES_DIR"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+  cp "$SRC/$MT_DIR/commit_trailers.py" "$MT_DIR/"
+  cp "$SRC/$RUN_GATES_DIR/verdict_backends.py" "$SRC/$RUN_GATES_DIR/remote_verdict.py" \
+     "$SRC/$RUN_GATES_DIR/leg_factory.py" "$SRC/$RUN_GATES_DIR/regen.py" "$RUN_GATES_DIR/"
+  printf '[[verdict_backend]]\nname = "%s"\nreader = "verdict_backends:read_local_verdict"\noff_node = %s\nowner = "tFix"\n\n' \
+    local-hook false peer-node true remote-ci true > "$RUN_GATES_DIR/kit.toml"
+  printf 'verdict = "%s"\n\n[hooks]\nbypass = "%s"\n' "$3" "$2" > .governance/policy.toml
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+run_bp_push() { # -> BP_OUT, BP_RC, BP_UN (the unwitnessed sha) and BP_OK (its control)
+  git commit -q --allow-empty -m "TOOL-tFix-1: past the hooks" -m "Pass: TOOL-tFix-1"; BP_UN=$(git rev-parse HEAD)
+  git commit -q --allow-empty -m "TOOL-tFix-2: through the check" -m "Pass: TOOL-tFix-2
+Commit-Checked: unattended@1.0"; BP_OK=$(git rev-parse HEAD)
+  BP_OUT=$(GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push origin main 2>&1); BP_RC=$?
+}
+read_bp_journal() { grep -F 'decision=bypass' "$(git rev-parse --git-dir)/runlog/pushes.log" 2>/dev/null; }
+build_bp_fixture allowed allowed local-hook || bad "BP could not build its allowed fixture"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$_j" in
+  "0|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=allowed"*)
+    case "$_j" in
+      *"$BP_OK"*) bad "BP AC3 the witnessed control was recorded as a bypass: $_j" ;;
+      *) ok "BP TOOL-dWitnessedBar-2 AC3 under allowed the push proceeds and the unwitnessed pass commit alone is recorded" ;;
+    esac ;;
+  *) bad "BP AC3 expected exit 0 and one unwitnessed-commit line naming ${BP_UN:0:8}, got rc $BP_RC: $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+build_bp_fixture refused refused peer-node || bad "BP could not build its refused fixture"
+run_bp_push
+_j=$(read_bp_journal)
+case "$BP_RC|$(read_token)|$_j|$BP_OUT" in
+  0*) bad "BP AC4 under refused an unwitnessed pass commit was pushed: $BP_OUT" ;;
+  *"|bypass-refused|"*"bypass=unwitnessed-commit"$'\t'"sha=$BP_UN"$'\t'"policy=refused"*"${BP_UN:0:8}"*"carry no Commit-Checked: trailer"*)
+    ok "BP TOOL-dWitnessedBar-2 AC4 under refused with an off-node verdict the push is refused naming the unwitnessed commit, and its record is still written" ;;
+  *) bad "BP AC4 expected a bypass-refused refusal naming ${BP_UN:0:8} and its record, got rc $BP_RC token $(read_token): $_j | $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+build_bp_fixture onnode refused local-hook || bad "BP could not build its on-node fixture"
+BP_OUT=$(GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git commit -q --allow-empty -m "a commit no pass names" && GOV_GATE_CMD="bash $green" git push origin main 2>&1); BP_RC=$?
+case "$BP_RC|$(read_token)|$BP_OUT" in
+  0*) bad "BP S6 under refused with verdict = local-hook a landing proceeded: $BP_OUT" ;;
+  *"|bypass-refused|"*"verdict names no off-node backend"*"off-node backends: peer-node, remote-ci"*)
+    ok "BP TOOL-dWitnessedBar-2 S6 under refused with verdict = local-hook no landing proceeds, naming the off-node backends" ;;
+  *) bad "BP S6 expected a bypass-refused refusal naming the off-node backends, got rc $BP_RC token $(read_token): $BP_OUT" ;;
+esac
+cd "$pfx_home" || exit 2
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

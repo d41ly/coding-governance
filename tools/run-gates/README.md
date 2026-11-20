@@ -1112,6 +1112,14 @@ through the policy kit's `policy.py get`, a reader's refusal passed on and never
 `local-hook`; `check_backend` refuses a value no row declares, naming it and the declared names. Only
 this kit with no policy kit beside it reads the catalogue default, saying so on one line.
 
+**Is the row off-node.** `python verdict_backends.py off-node [--backend <name>]` reads `verdict` as
+`read` does where no `--backend` is given, finds its row by `check_backend`, and prints
+`verdict-backends: off-node · <name> · <true|false> · off-node backends: <names>`, the names every
+declared row with `off_node = true`. It exits 0 when the row is off-node, 1 when it is not, 2 on a
+refusal. The lander, passing the value it already read, and the pre-push hook, passing none, ask it
+under `hooks.bypass = refused`, which refuses every landing while `verdict` names no off-node backend,
+because a hook on the bypassing node cannot refuse its own bypass (TOOL-dWitnessedBar-2).
+
 **The peer.** `python verdict_backends.py verify-peer [--remote <name>]`, run on a second node under
 its `GOV_NODE`, lists `refs/gov/candidate/*` and `refs/gov/verdict/*` with one bounded `git ls-remote`,
 and for each candidate with no verdict fetches it, runs this kit's `run-gates.sh` on it under

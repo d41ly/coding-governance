@@ -34,6 +34,9 @@
 #   DEC   the decisions AC1 does not reach: skip-delete, refuse-manifest, refuse-head, refuse-dirty, covered,
 #         scoped, branch-gated, and the other two refusals before the loop
 #   CAP   a line over the cap is fitted exactly as the runlog kit's `render_line` fits it, both steps
+#   BYP   a push under `hooks.bypass = refused`, its `verdict` off-node, carrying a pass commit with no
+#         `Commit-Checked:` trailer: END reads refuse-bypass, and the bypass line is written beside it
+#         (TOOL-dWitnessedBar-2 AC4)
 #   EXITS every `exit` in the hook maps to a decision or a named exemption, every one after the trap
 #         carries the clean-exit mark, and every decision was seen on a line (runs last for that)
 #
@@ -1103,6 +1106,54 @@ check_ac8_declarations() {
     "$(awk '/^\[\[exempt_leg\]\]/ { e = 1; next } e && $0 == "name = \"pre-push run-log line\"" { print "exempt" } /^\[/ { e = 0 }' "$GOVKIT_KIT/registry.toml")" exempt
 }
 
+# ---------------------------------------------------------------------------------------- BYP
+# TOOL-dWitnessedBar-2 AC4. The three kits the hook asks are placed BESIDE the hook copy, the second
+# place it looks, so the scratch clone commits nothing of theirs: the policy kit, the memory-tree kit's
+# trailer reader and the run-gates kit's backend registry. R is a landed commit whose policy file sets
+# `hooks.bypass = "refused"` and an off-node `verdict`; the pushed commit past it names a pass in its
+# `Pass:` trailer and carries no `Commit-Checked:`. Runs after every arm but EXITS, and removes the
+# kits it placed, so no other arm meets them.
+check_byp_refused() {
+  local kr="$SRC/$KIT_REL" k r head l0 l rel
+  cd "$REPO" || return 1
+  git checkout -q main || return 1
+  for k in "policy policy.py budgets.py catalogue.toml caps.toml" "memory-tree commit_trailers.py" \
+           "run-gates verdict_backends.py remote_verdict.py leg_factory.py regen.py"; do
+    set -- $k
+    rel=$(resolve_kit_dir "$PY" "$1" "$2" "$kr") || { check "BYP the $1 kit resolves" missing found; return 1; }
+    mkdir -p "$WORK/$1"; shift
+    for r in "$@"; do cp "$SRC/$rel/$r" "$WORK/${k%% *}/" || return 1; done
+  done
+  printf '[[verdict_backend]]\nname = "%s"\nreader = "verdict_backends:read_local_verdict"\noff_node = %s\nowner = "tFix"\n\n' \
+    local-hook false peer-node true > "$WORK/run-gates/kit.toml"
+  mkdir -p .governance && printf 'verdict = "peer-node"\n\n[hooks]\nbypass = "refused"\n' > .governance/policy.toml
+  git add .governance/policy.toml && git commit -q -m "the policy at R" || return 1
+  : > "$REPO/.git/push-main-active"; rm -f "$REPO/.git/gate-full-green"
+  run_push GOV_GATE_CMD="bash $WORK/green.sh" -- origin main
+  check "BYP R lands" "$PUSH_RC" 0
+  r=$(git rev-parse HEAD)
+  git commit -q --allow-empty -m "TOOL-tFix-1: past the hooks" -m "Pass: TOOL-tFix-1" || return 1
+  head=$(git rev-parse HEAD)
+  : > "$REPO/.git/push-main-active"
+  write_refs "$WORK/refs.byp" "refs/heads/main $head refs/heads/main $r"
+  l0=$(measure_lines)
+  run_hook "$WORK/refs.byp" origin "$WORK/remote.git" GOV_GATE_CMD="bash $WORK/green.sh"
+  l=$(measure_lines)
+  check "BYP refused" "$RC" 1
+  check "BYP by the bypass refusal, naming the commit" "$(printf '%s\n' "$ERR" | grep -c "pass commit(s) ${head:0:8} carry no Commit-Checked")" 1
+  check "BYP START, the bypass line and END" "$((l - l0))" 3
+  check "BYP the bypass line names the commit under refused" \
+    "$(read_field $((l - 1)) decision)|$(read_field $((l - 1)) bypass)|$(read_field $((l - 1)) sha)|$(read_field $((l - 1)) policy)" \
+    "bypass|unwitnessed-commit|$head|refused"
+  check "BYP END decision" "$(read_field $l decision)|$(read_field $l exit)" "refuse-bypass|clean"
+  check "BYP the refusal token" "$(cut -f1 "$REPO/.git/pre-push-refusal" 2>/dev/null)" bypass-refused
+  [ "$(read_field $l decision)" = refuse-bypass ] && add_seen refuse-bypass
+  # The runlog kit's reader, not `check_journal`: its password probe greps `pass`, which `bypass` holds.
+  check "BYP the journal reads, no bad line, every END paired" \
+    "$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" grade "$JOURNAL" | head -1)" "state=read bad=0 orphan=0"
+  rm -rf "$WORK/policy" "$WORK/memory-tree" "$WORK/run-gates" "$REPO/.git/push-main-active"
+}
+
 # ---------------------------------------------------------------------------------------- EXITS
 # THE EXIT-SITE ENUMERATION. A small lexer, because every cheaper predicate reads something else:
 # `exit` appears in this hook's messages and comments, and as a KEY in the END line's field list. It
@@ -1164,6 +1215,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-head
   printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-straggler; RUNLOG_CLEAN=1; exit 1' 1 'exempt: the straggler refusal, reachable only with straggler-guard.sh beside the hook and a transition-merge fixture this suite does not build; armed by straggler-guard.test.sh'
   printf '%s\t%s\t%s\n' 'write_refusal merge-loss "$why"; RUNLOG_CLEAN=1; exit 1' 1 'exempt: the merge-loss refusal, reachable only with a merge losing a definition under an armed .lexicon.conf, which this suite does not build; armed by pre-push.test.sh (TOOL-aMendedFleet-3)'
+  printf '%s\t%s\t%s\n' 'write_refusal bypass-refused "$why"; RUNLOG_CLEAN=1; exit 1' 2 refuse-bypass
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
   printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
   printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=covered; RUNLOG_CLEAN=1; exit 0' 1 covered
@@ -1266,6 +1318,7 @@ check_selected DEC && check_dec_rest
 check_selected CAP && check_cap_fit
 check_selected AC7 && check_ac7_spawns
 check_selected AC8 && check_ac8_declarations
+check_selected BYP && check_byp_refused
 check_selected EXITS && check_exits
 
 if [ -n "${PPRL_ARMS:-}" ]; then

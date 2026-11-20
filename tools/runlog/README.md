@@ -46,6 +46,13 @@ shared by the primary tree and every linked worktree of one clone, so all of the
 same three files. It is a data location, not a kit path, it is never pushed, and nothing in it is
 tracked.
 
+`pushes.log` also carries one `ev=once` line, `decision=bypass`, for each hook bypass
+(TOOL-dWitnessedBar-2), written by `write_bypass_line`, byte-identical in the pre-push hook and the
+lander: `bypass=ungated-landing` when the lander reports a push landed UNGATED, its `tree_verdict` the
+pushed tree's per-tree verdict (`GREEN`, `RED` or `none`), and `bypass=unwitnessed-commit` for each
+pushed pass commit with no `Commit-Checked:` trailer, each with `sha=<40 hex>` and `policy=`, the
+`hooks.bypass` value it was recorded under. The line is evidence: nothing branches on it.
+
 `resolve_journal_root` finds it with ONE `git rev-parse --path-format=absolute --git-common-dir`.
 Both halves of that spelling matter: the bare `--git-common-dir` prints a RELATIVE `.git` in the
 primary tree, and `--git-dir` in a linked worktree names `.git/worktrees/<name>`, which would split one

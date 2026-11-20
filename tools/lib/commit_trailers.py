@@ -26,6 +26,7 @@ answer who a commit is attributed to, and each consumer names its own:
               ids where the commit carries no `Pass:` trailer
 
     python commit_trailers.py tokens <git-log revision arguments>   # one tokenised line per commit
+    python commit_trailers.py unchecked <git-log revision arguments>   # each pass commit with no Commit-Checked:
     python commit_trailers.py message <file>                        # a message not yet committed
     python commit_trailers.py --print-commits                       # the commit class's members
     python commit_trailers.py --fixture                             # three planted commits, both views
@@ -137,7 +138,7 @@ def run_git(repo, argv, stdin=None):
 
 #: The keys read where no trailer key table is installed, or the one installed holds no `[[trailer]]`
 #: row (TOOL-dDeclaredLoop-40): a closed list, each a row of the playbook kit's table, never joined to it.
-FLOOR_KEYS = ("Pass", "Decided", "Gov-Transition", "Gov-Policy", "Red-fix")
+FLOOR_KEYS = ("Pass", "Decided", "Gov-Transition", "Gov-Policy", "Red-fix", "Commit-Checked")
 _floor_noted = False
 
 
@@ -205,6 +206,20 @@ def read_commits(repo, revs, keys, files=False, run=None) -> list:
 def derive_tokens(text) -> list:
     """The tokens of `text` by the one rule, in order."""
     return _SPLIT.sub(" ", text).split()
+
+
+def read_unchecked_commits(repo, revs) -> list:
+    """`(sha, ids)` for each commit `git log <revs>` names, in its order, from ONE `read_commits` call:
+    a commit with one parent whose `Pass:` values hold an id, a `none` among them holding none, and
+    whose `Commit-Checked:` values are empty, which is a pass commit the commit check never saw
+    (TOOL-dWitnessedBar-2 S5, S7). The trailer is text: a typed one reads as witnessed."""
+    out = []
+    for c in read_commits(repo, revs, ("Pass", "Commit-Checked")):
+        ids = derive_tokens(" ".join(c["trailers"]["Pass"]))
+        if len(c["parents"]) != 1 or not ids or "none" in ids or any(c["trailers"]["Commit-Checked"]):
+            continue
+        out.append((c["sha"], list(dict.fromkeys(ids))))
+    return out
 
 
 def derive_attribution(commit, view, id_re=None) -> list:
@@ -283,6 +298,15 @@ def main(argv=None) -> int:
                 # byte by byte, as `tr -c` reads: a multi-byte character is as many spaces as it has bytes
                 print(re.sub(rb"[^A-Za-z0-9-]", b" ", line.encode("utf-8")).decode("ascii"))
             return 0
+        if args[:1] == ["unchecked"]:
+            # A range git cannot read prints nothing and exits 0, as `tokens` does.
+            try:
+                commits = read_unchecked_commits(os.getcwd(), args[1:])
+            except OSError:
+                return 0
+            for sha, ids in commits:
+                print(f"{sha} {' '.join(ids)}")
+            return 0
         if args[:1] == ["message"] and len(args) == 2:
             print(read_message_ids(pathlib.Path(args[1]).read_bytes()))
             return 0
@@ -308,7 +332,8 @@ def main(argv=None) -> int:
     except (LookupError, ValueError, OSError) as exc:
         print(f"{SAY}: refused · {exc}", file=sys.stderr)
         return 2
-    print(f"{SAY}: usage: tokens <git-log revision arguments> | message <file> | --print-commits | --fixture",
+    print(f"{SAY}: usage: tokens <git-log revision arguments> | unchecked <git-log revision arguments>"
+          " | message <file> | --print-commits | --fixture",
           file=sys.stderr)
     return 2
 # <<< commit_trailers_py
