@@ -953,6 +953,17 @@ MEMORY_ROOT=memory'; do
 done
 rm -f "$TMP/mr/.memory-tree.conf"
 (ROOT="$TMP/mr" read_memory_root >/dev/null); check_eq "AC1 ...and returns 1 for a tree with no conf" "1" "$?"
+# TOOL-dPlacedRequest-56 AC7 AC8 — the `claims —` cell's skip line, staged by a FILE where the parent of
+# CARD_DIR should be, so `mkdir -p` refuses on every node; a mode-bit stage leaves the directory
+# creatable under Git Bash on NTFS. The stage is asserted to take before any cell is judged (S8), and
+# the skip returns before `run_driver_bounded`, so no driver stub is needed. CARD_DIR is derived from
+# the git common dir in the checker, so the case sets it in this shell after the eval.
+eval "$(awk '/^derive_claims_line\(\) \{/,/^}$/' "$CHECK")"
+s=$(mktemp -d "$TMP/dcl.XXXXXX"); : > "$s/f"; CARD_DIR="$s/f/sub"
+if mkdir -p "$CARD_DIR" 2>/dev/null; then echo "FAIL DPR56 AC8 the scratch-directory stage did not take"; fail=$((fail+1))
+else check_eq "DPR56 AC7 derive_claims_line skips the cell when no scratch directory can be made under CARD_DIR" \
+  "claims — skipped: no scratch directory under $CARD_DIR to capture the read in" "$(derive_claims_line write 2>/dev/null)"; fi
+unset CARD_DIR
 
 # Two fixture registries. REG1: the Remote column repeats the user on EVERY row (a row-wide match
 # hits all three), the matching Machine/user cell is BACKTICKED (equality after stripping), one
@@ -2440,7 +2451,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # registry and the cell's three GOV_NODE outcomes over scratch registries.
 # +2: RAISED by TOOL-dPlacedRequest-52 AC19's skip-signal arm, one run_card and one check_eq, counted
 # off the block; no suite ran in the pass, the four callers were probed alone over a stub driver.
-FLOOR_ASSERTIONS=378
+# +1: RAISED by TOOL-dPlacedRequest-56's scratch-directory case (AC7), one check_eq on its green branch
+# (its stage-failed branch counts a failure, never a pass), counted off the block; no suite ran in
+# the pass, the case was probed alone over a scratch slice with its stage taken and with it left.
+FLOOR_ASSERTIONS=379
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

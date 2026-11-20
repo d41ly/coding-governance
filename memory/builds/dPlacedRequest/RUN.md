@@ -425,3 +425,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T12:28:17Z dispatch · item e2d4054a TOOL-dPlacedRequest-55 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-55-1-acceptance-ledger.md
 
 2026-11-20T13:06:07Z dispatch · item 97940fea TOOL-dPlacedRequest-56 · reason tools/unattended/unattended.test.sh skills/session-kickoff/manifest-check.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-56-1-acceptance-ledger.md
+
+2026-11-20T13:08:00Z brief · item TOOL-dPlacedRequest-56 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

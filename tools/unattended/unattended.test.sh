@@ -19544,6 +19544,22 @@ same "DPR46 AC3 DPR52 AC25 AC26 tips renews: yes, no key, -, no, maybe, renews: 
   "$ds_got" "live live live stale stale stale stale "
 same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale stale stale stale "
 same "DPR52 AC25 AC26 RED: the stop-on-any copy reads the maybe tip live, the space-match copy the bare renews: tip" "$ds_oos" "live live "
+# ---- TOOL-dPlacedRequest-56 AC22: a tip carrying `renews: no` then `renews: -`, sighted 60 s ago,
+# ---- over a `renews: no` commit sighted 3600000 s ago: the walk keeps the first line, `no`, reads on
+# ---- and reads stale. RED is a copy matching every `renews:` line, which keeps the last, `-`: live.
+ds_last='/^renews:/ { cr = substr($0, 8); sub(/^[ \t]+/, "", cr); sub(/[ \t]+$/, "", cr) }'
+printf '%s\n' "${oc_src/"$ds_match"/"$ds_last"}" >"$oc_copy/last-line.sh"
+same "DPR56 the driver carries the first-line match once and the last-line copy its unguarded match instead" \
+  "$(grep -cF "$ds_match" "$SCRIPT") $(grep -cF "$ds_match" "$oc_copy/last-line.sh") $(grep -cF "$ds_last" "$oc_copy/last-line.sh")" "1 0 1"
+remove_clock_refs
+oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 $'renews: no\nrenews: -' "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR56 AC22 a tip carrying renews: no then renews: - keeps the first line and reads stale" "${oc_row%% *}" "stale"
+oc_row=$(read_clock_row "$oc_copy/last-line.sh")
+same "DPR56 AC22 RED: the copy keeping the last renews: line reads it live" "${oc_row%% *}" "live"
 # ==================================================================================================
 # TOOL-dPlacedRequest-47 — AN UNSIGHTED COMMIT IS NEVER COMPARED WITH THE THRESHOLD. Over the same
 # fixture, one epoch-1 tenure of three `renews: no` commits, its tip sighted 60 s ago on the ref's
@@ -19588,6 +19604,26 @@ add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "-"
 add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
 oc_row=$(read_clock_row)
 same "DPR47 AC3 a renewing beat whose only feed line carries - reads unknown, aged -" "$oc_row" "unknown -"
+# ---- TOOL-dPlacedRequest-56 AC20: a three-commit `renews: no` tenure whose middle commit's only feed
+# ---- line carries the torn stamp `2026-10-2`, its opener sighted 3600 s ago and its tip 60 s ago on
+# ---- the ref's newest line, reads live: the walk admits no torn stamp, so the middle is read past.
+# ---- RED is a copy whose walk keeps no ISO-shape test: the torn stamp sorts before the threshold,
+# ---- the walk stops at the middle, and `read_first_seen` still reads that beat unsighted: unknown -.
+tc_cut='!(x[2] in want) || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/'
+tc_red='!(x[2] in want)'
+printf '%s\n' "${oc_src/"$tc_cut"/"$tc_red"}" >"$oc_copy/torn.sh"
+same "DPR56 the driver carries the walk's ISO-shape clause once and the torn copy not at all" \
+  "$(grep -cF "$tc_cut" "$SCRIPT") $(grep -cF "$tc_cut" "$oc_copy/torn.sh")" "1 0"
+remove_clock_refs
+oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600)"); oc_b=$(add_lease_commit 1 no "$(derive_claim_ago 1800)" "$oc_a")
+oc_c=$(add_lease_commit 1 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 3600)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "2026-10-2"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR56 AC20 a middle commit whose only feed line carries a torn stamp is read past to the opener: live" "${oc_row%% *}" "live"
+oc_row=$(read_clock_row "$oc_copy/torn.sh")
+same "DPR56 AC20 RED: the copy with no ISO-shape test stops at the torn stamp, unknown aged -" "$oc_row" "unknown -"
 rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -23591,7 +23627,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # `mutate` staging its copy) and the renews loop's 2 new `same` (its copies row and its out-of-set
 # RED); the loop's own two rows gain passes, not assertions; no skip branch. No suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=4031
+# RAISED 4031 -> 4037 by TOOL-dPlacedRequest-56: 6 region-eight assertions off the diff's own lines,
+# the duplicate-key row's 3 `same` (its copy row, the driver's stale and the last-line copy's live)
+# and the torn-stamp row's 3 `same` (its copy row, the driver's live and the torn copy's unknown -),
+# no loop; no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4037
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23869,7 +23909,8 @@ FLOOR_SHARD_7=311
 # RAISED 1214 -> 1222 by TOOL-dPlacedRequest-48: the same 8 region-eight placed-race assertions, see FLOOR_ASSERTIONS.
 # RAISED 1222 -> 1243 by TOOL-dPlacedRequest-49: the same 21 region-eight lock-order, queued-head and status assertions, see FLOOR_ASSERTIONS.
 # RAISED 1243 -> 1250 by TOOL-dPlacedRequest-52: the same 7 region-eight race, trap and renews assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1250
+# RAISED 1250 -> 1256 by TOOL-dPlacedRequest-56: the same 6 region-eight torn-stamp and duplicate-key assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1256
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
