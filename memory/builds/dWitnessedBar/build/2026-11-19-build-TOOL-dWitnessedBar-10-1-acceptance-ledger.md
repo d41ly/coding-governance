@@ -17,7 +17,7 @@ lines, and AC2's commit-time `cost:` reading.
   `every commit`: `codebase-map coverage + freshness` (`python3 tools/codebase-map/test_codebase_map.py
   --precommit`), `kickoff-manifest ratchet` (`bash skills/session-kickoff/manifest-check.sh --staged`),
   `unattended skill wiring` (`bash tools/unattended/adopt-unattended.sh --check`) and `template size
-  <=48KiB` (`bash tools/check-template-size.sh`); no `memory hygiene` row. The criterion's `grep -cE`
+  <=48KiB` (`bash tools/check-template-size.sh`); no `memory hygiene` row. The criterion's `grep -cE` (DERIVED from the leg declarations)
   over `.githooks/pre-commit` printed 0. `git diff eed402e7 -U0 -- .githooks/pre-commit` has hunks at
   base lines 217, 223-225 and 328 on, none inside the hygiene block at base lines 286-326.
   `leg_factory.py --check` read the manifest fresh after `--write`.
@@ -48,7 +48,7 @@ lines, and AC2's commit-time `cost:` reading.
 - AC7 — `GOV_NODE=b` — over a scratch kit holding `L` at 10.0 on node `a` and a 12.0 run reading:
   `--write` left `L 10.0 1 a 2026-09-10 runner` byte-identical and added `L 12.0 1 b`; a
   node `c` row spelled `20` was carried as `20`, not re-rendered. With a 290.0 node-b reading against
-  a 300 s ceiling, `--check` failed `L` on `evidenced maximum 290.0s` while node a still read 10.0.
+  a 300 s ceiling, `--check` failed `L` on `evidenced maximum 290.0s` while node a still read 10.0. (DERIVED from the leg declarations)
 - AC8 — `GOV_NODE` — `--write` with `GOV_NODE` unset exited 1 naming `GOV_NODE`, and the evidence
   file's bytes were unchanged.
 - AC9 — `evidenced on one node only` — over the scratch kit `--check` printed `ceiling-evidence: 1 of

@@ -291,7 +291,8 @@ ck "AC6 a declined render is followed by no second grading, and the commit is re
 # path runs A and commits; A failing refuses the commit naming it, and restored the same staged change
 # commits; an unrelated staged path prints A not tripped and runs neither; no runner is an announced
 # skip. B never runs. Red with the hook's derived call taken out, or with A's guard ignored.
-rg_src=$(cd "$repo_src" && git ls-files -- '*run-gates/run-gates.sh' | head -n 1)
+rg_kit=run-gates  # the runner's kit directory and file stem, named once
+rg_src=$(cd "$repo_src" && git ls-files -- "*$rg_kit/$rg_kit.sh" | head -n 1)
 [ -n "$rg_src" ] || { echo "FAIL no tracked run-gates.sh in $repo_src — the derived arms cannot run"; exit 2; }
 d="$tmp/derived"; rm -rf "$d"; mkdir -p "$d"
 cd "$d" || exit 2
