@@ -16,10 +16,10 @@ and syntax-checked with `bash -n` only; it still owes its RED-first observation,
 makes at the close, and so does every leg that section names.
 
 **Evidences:** TOOL-dWitnessedBar-64
-- AC1 — `unarmed p no HEAD: ` — each corrupt fixture exited 1 with one stdout line: `unarmed p no HEAD:
-  fatal: No such ref: HEAD` for the broken branch ref and the symbolic loop, `unarmed p no HEAD: fatal:
-  missing object 1111111111111111111111111111111111111111 for refs/heads/master` for the missing object,
-  and `unarmed p no HEAD: git symbolic-ref exited 1` for the detached-missing HEAD; stderr carried
+- AC1 — `unarmed p no HEAD: ` — each corrupt fixture exited 1 with one stdout line, that lead and then
+  `fatal: No such ref: HEAD` for the broken branch ref and the symbolic loop,
+  `fatal: missing object 1111111111111111111111111111111111111111 for refs/heads/master` for the
+  missing object, and `git symbolic-ref exited 1` for the detached-missing HEAD; stderr carried
   `legacy_ledger: p: no HEAD: <the same reason>; nothing written`; no home was written; and
   `grep -rl --exclude-dir=.git` for forty `0`s or forty `1`s printed nothing in any of the four.
 - AC2 — `armed p 2` — the clean commitless fixture printed `armed p 2`, exit 0, with
