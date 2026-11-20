@@ -69,7 +69,7 @@ trigger = "once per build, after the last unit is terminal, over the cumulative 
 name = "gate-bar"
 driver = "program"
 harness = "bash {prefix}/run-gates/run-gates.sh"
-roles = []
+roles = ["gov-tester"]
 enforced-by = ["the pre-push hook"]
 trigger = "once, after the closing review, at the close or the push boundary"
 

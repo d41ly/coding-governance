@@ -39,7 +39,7 @@ role = "engine"
 include = ["house/gov-builder.md", "house/gov-diff-reviewer.md", "house/gov-orienter.md",
            "house/gov-researcher.md", "house/gov-reuse-scout.md", "house/gov-session.md",
            "house/gov-skeptic.md", "house/gov-spec-reviewer.md", "house/gov-spec-writer.md",
-           "house/gov-synthesizer.md", "house/policy.toml"]
+           "house/gov-synthesizer.md", "house/gov-tester.md", "house/policy.toml"]
 role = "seed"
 
 # THE ADOPTER'S SELF-TEST IS WITHHELD, by claiming the destination (TOOL-aQuenchedHarness-3): its
