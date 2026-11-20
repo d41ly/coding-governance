@@ -32,7 +32,9 @@
 # THE POPULATION IS A PREDICATE, NEVER A LIST (TOOL-dWitnessedBar-50 S1): every tracked shell file under
 # tools/, skills/ and .githooks/ (one named *.sh, or whose first line is a bash or sh shebang) that
 # carries a `# >>> resolve_python` block or calls resolve_python at command position (opening a command
-# substitution, or beginning a line) outside such a block; resolve-python.sh itself is outside it.
+# substitution, or the first word of a command after whitespace, `;`, `&`, `|`, `!`, `if`, `then`, `do`
+# or `else`, never a `resolve_python()` definition) outside such a block (TOOL-dWitnessedBar-57 S1);
+# resolve-python.sh itself is outside it, and `--coverage` names it dropped with that reason (S4).
 # A typed list missed .githooks/pre-commit, which sources the resolver from a path it derives at run
 # time. `--coverage` derives it, prints its count and each named exclusion with its reason, and exits 1
 # naming each member that neither carries this block nor sources this file, or never calls
@@ -60,8 +62,20 @@ refuse_wrong_shell() {
 }
 # <<< refuse_wrong_shell
 
+# THE CALL, read alike by both readers below (TOOL-dWitnessedBar-57 S1): a command substitution opening
+# on the name anywhere, or the name as the first word of a command, after optional whitespace, a `;`,
+# `&`, `|` or `!`, or the words `if`, `then`, `do` or `else`, so an indented call is one. A
+# `resolve_python()` definition, a test's stub included, is taken out of the line before it is read, so
+# it is never a call (S3).
+RWS_CALL_AWK='
+function check_rws_call(l) {
+  gsub(/resolve_python[ \t]*\([ \t]*\)/, "", l)
+  return l ~ /\$\(resolve_python/ || l ~ /(^|[;&|!])[ \t]*resolve_python([^A-Za-z0-9_]|$)/ \
+    || l ~ /(^|[^A-Za-z0-9_])(if|then|do|else)[ \t]+resolve_python([^A-Za-z0-9_]|$)/
+}'
+
 derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member path per line (S1)
-  (cd "$1" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE && git ls-files -- tools skills .githooks) | (cd "$1" && awk '
+  (cd "$1" && unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE && git ls-files -- tools skills .githooks) | (cd "$1" && awk "$RWS_CALL_AWK"'
     {
       f = $0; first = 1; b = 0; c = 0; i = 0
       while ((getline l < f) > 0) {
@@ -69,7 +83,7 @@ derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member p
         sub(/\r$/, "", l)
         if (l ~ /^# >>> resolve_python/) { b = 1; i = 1; continue }
         if (l ~ /^# <<< resolve_python/) { i = 0; continue }
-        if (!i && (l ~ /\$\(resolve_python/ || l ~ /^resolve_python([ \t;|&]|$)/)) c = 1
+        if (!i && check_rws_call(l)) c = 1
       }
       close(f)
       if ((b || c) && f != canon) print f
@@ -79,7 +93,7 @@ derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member p
 # A line inside a function body defined at column 0 calls nothing where it stands, so the order read
 # skips it: the first resolve_python CALL is the first one the file's own top level runs.
 scan_rws_order() {  # <repo root>, member paths on stdin -> `o <path>|<refusal line>|<first resolve_python call line>`
-  (cd "$1" && awk '
+  (cd "$1" && awk "$RWS_CALL_AWK"'
     {
       f = $0; n = 0; i = 0; fn = 0; rws = 0; rp = 0
       while ((getline l < f) > 0) {
@@ -90,7 +104,7 @@ scan_rws_order() {  # <repo root>, member paths on stdin -> `o <path>|<refusal l
         if (fn) { if (l ~ /^}/) fn = 0; continue }
         if (l ~ /^(function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*(\(\))?[ \t]*\{/) { if (l !~ /}[ \t;]*$/) fn = 1; continue }
         if (!rws && l ~ /^[ \t]*refuse_wrong_shell \|\| exit 2[ \t]*$/) rws = n
-        if (!rp && (l ~ /\$\(resolve_python/ || l ~ /^resolve_python([ \t;|&]|$)/)) rp = n
+        if (!rp && check_rws_call(l)) rp = n
       }
       close(f)
       print "o " f "|" rws "|" rp
@@ -121,7 +135,7 @@ $_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that
           git grep -l '^# >>> refuse_wrong_shell' -- tools skills .githooks | sed 's/^/b /'
           git grep -l -E '^[[:space:]]*(\.|source)[[:space:]]+[^[:space:]]*refuse-wrong-shell\.sh' -- tools skills .githooks | sed 's/^/s /'
           git grep -l -E '^[[:space:]]*refuse_wrong_shell \|\| exit 2[[:space:]]*$' -- tools skills .githooks | sed 's/^/c /'
-        } | awk '
+        } | awk -v drop="${_rws_lib}resolve-python.sh" '
           { t = substr($0, 1, 1); k = substr($0, 3); if (k == "") next }
           t == "x" { p = k; r = ""; if (index(k, "|")) { p = substr(k, 1, index(k, "|") - 1); r = substr(k, index(k, "|") + 1) }
                      if (r ~ /^[ \t]*$/) bad[++nb] = "exclusion " p " carries no reason, so it is refused"
@@ -141,6 +155,7 @@ $_rws_ux/pass-tree.test.sh|sources $_rws_ux/unattended.sh, an inline member that
             }
             print "refuse_wrong_shell coverage: " (n + 0) " members, derived from " (nm + 0) " files the predicate selects less " (nx + 0) " named exclusions"
             for (j = 1; j <= nx; j++) print "  excluded: " xo[j] " (" ex[xo[j]] ")"
+            print "  dropped: " drop " (TOOL-dWitnessedBar-27'"'"'s listed member the predicate excludes: it is only ever sourced, so it carries no refuse_wrong_shell || exit 2 its sourcer would run)"
             if (n + 0 == 0) bad[++nb] = "the predicate derived an empty population, which judges nothing"
             for (j = 1; j <= nb; j++) print "BREAK " bad[j]
             exit (nb > 0)

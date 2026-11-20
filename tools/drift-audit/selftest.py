@@ -3160,7 +3160,10 @@ def test_gate_health(tmp: pathlib.Path) -> None:
     memory-tree factory and a manifest, so the arm reads the mode as an install runs it; `short` and
     `write` stage the unarmed set by deleting one row of one leg. Red when the percentile is taken over
     every row rather than per leg, the one is not added, an unarmed measurement prints a value or writes a
-    record, or a `--with` naming no flake record is not refused."""
+    record, or a `--with` naming no flake record is not refused. Every case passes `--selection`, an empty
+    selection record, as the mode requires (TOOL-dWitnessedBar-57 S18); `held` (AC16) appends its own
+    quarantine row to it and reds where a leg that row or the kit hold holds is read as a bar leg, or the
+    mode runs with no `--selection`."""
     print("gate health, the reliability bar measured from the flake records")
     try:
         resolve_kit_dir(LEDGER_KIT_HOME, "build_records.py", KIT)
@@ -3170,9 +3173,13 @@ def test_gate_health(tmp: pathlib.Path) -> None:
     wants = {"differs": "gate-health measured 4/10 · legs 10/10 · verdicts fx-00 ",
              "lower": "gate-health measured 1/10 · legs 10/10 · verdicts fx-00 ",
              "short": "gate-health unarmed · leg 03 29/30\n",
-             "write": "drift-report: wrote memory/builds/tHealth/build/"}
+             "write": "drift-report: wrote memory/builds/tHealth/build/",
+             "held": "gate-health measured 1/10 · legs 1/1 · verdicts fx-00 "}
+    selection = tmp / "gate-health-selection"
+    selection.write_bytes(b"")
     for case, want in wants.items():
-        p = run([sys.executable, str(KIT / "drift_report.py"), "--gate-health", "--fixture", case], KIT)
+        p = run([sys.executable, str(KIT / "drift_report.py"), "--gate-health", "--fixture", case,
+                 "--selection", str(selection)], KIT)
         check(f"gate health: --fixture {case} reads every case as planted",
               p.returncode == 0 and f"gate-health fixture {case} ok" in p.stdout,
               f"rc {p.returncode}: {(p.stdout + p.stderr)[-400:]}")

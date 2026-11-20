@@ -2711,13 +2711,15 @@ def scan_bare_bash(root):
     nothing, so shape 2 skips it (S3). JavaScript is read by a regex: shape 3, `spawn`,
     `spawnSync`, `execFile` or `execFileSync` with that name first, or an `||` or `??` falling back to it.
     Shape 4 is a PATH lookup of the name, which walks PATH with no launcher filter (TOOL-dWitnessedBar-49
-    S1): in Python a `shutil.which` call whose first argument is the constant `bash` or `bash.exe`, in
-    JavaScript a `which(` call with that string or an `execSync` or `execFileSync` running `where bash`
-    or `which bash`.
+    S1): in Python a `shutil.which` call whose first argument is the constant `bash` or `bash.exe`, or
+    is not a constant and sits inside an expression comparing that same argument to one of those names
+    (TOOL-dWitnessedBar-57 S5), in JavaScript a `which(` call with that string or an `execSync` or
+    `execFileSync` running `where bash` or `which bash`.
     A language with no tracked file read is a line too, and so is a `*.py` `ast` cannot parse, so an
     empty or unread population is never a pass.
-    WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable, a conditional whose `else` is
-    `"bash"`, and a name bound to `"bash"` and launched later."""
+    WHAT THIS DOES NOT SEE: a PATH lookup of `bash` through a variable no comparison in its own
+    expression names as `bash`, a conditional whose `else` is `"bash"`, and a name bound to `"bash"`
+    and launched later."""
     names = profile_bar.BASH_NAMES
     # Shape 2's constants are derived from BASH_NAMES or compared alone, never spelled in one literal
     # beside the name, because such a literal in this file is its own shape 2 hit.
@@ -2760,6 +2762,21 @@ def scan_bare_bash(root):
             continue
         tested = {id(c) for n in ast.walk(tree) if isinstance(n, ast.Compare)
                   for op, c in zip(n.ops, n.comparators) if isinstance(op, (ast.In, ast.NotIn))}
+        parent = {id(c): n for n in ast.walk(tree) for c in ast.iter_child_nodes(n)}
+
+        def check_compared_bash(call):
+            """True when `call`'s first argument, not a constant, is compared to a bash name inside the
+            outermost expression holding `call` (TOOL-dWitnessedBar-57 S5)."""
+            arg, top = ast.dump(call.args[0]), call
+            while isinstance(parent.get(id(top)), ast.expr):
+                top = parent[id(top)]
+            for c in ast.walk(top):
+                if isinstance(c, ast.Compare):
+                    sides = [c.left, *c.comparators]
+                    if any(ast.dump(s) == arg for s in sides) and any(
+                            isinstance(s, ast.Constant) and s.value in names for s in sides):
+                        return True
+            return False
 
         def check_other_bash(e):
             if isinstance(e, ast.Constant) and isinstance(e.value, str):
@@ -2776,8 +2793,8 @@ def scan_bare_bash(root):
                         and a0.elts[0].value in names and fname != "resolve_shell_argv":
                     shape = "shape 1"
                 elif fname == "which" and isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) \
-                        and f.value.id == "shutil" and isinstance(n.args[0], ast.Constant) \
-                        and n.args[0].value in names:
+                        and f.value.id == "shutil" and (n.args[0].value in names if isinstance(n.args[0], ast.Constant)
+                                                        else check_compared_bash(n)):
                     shape = "shape 4"
             elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant) \
                     and n.values[-1].value in names:
@@ -2802,6 +2819,18 @@ def test_no_bare_bash_argv(tmp):
     hits = scan_bare_bash(top) if top else ["no repository at %s" % KITDIR]
     check_arm("AC34 no tracked *.py or *.js launches or falls back to a bare 'bash'", not hits,
               "; ".join(hits[:20]))
+    # TOOL-dWitnessedBar-57 AC4: a `shutil.which` of a variable its own expression compares to "bash"
+    # is shape 4, and one no comparison names is not. RED against shape 4 matching constants alone.
+    fx = tempfile.mkdtemp(prefix="bb.", dir=tmp)
+    with open(os.path.join(fx, "x.py"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write('x = (B if a == "bash" else "") or shutil.which(a)\ny = shutil.which(b)\n')
+    with open(os.path.join(fx, "y.js"), "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("const y = 1;\n")
+    for argv in (["init", "-q"], ["add", "-A"]):
+        subprocess.run(["git", *argv], cwd=fx, capture_output=True, timeout=60)
+    got = scan_bare_bash(fx)
+    check_arm("57 AC4 a shutil.which of a variable compared to 'bash' in its expression is shape 4",
+              got == ["x.py:1: shape 4"], repr(got))
     out = tempfile.mkdtemp(prefix="out.", dir=tmp)
     real = profile_bar.resolve_bash
     profile_bar.resolve_bash = lambda *_a, **_k: ("", ["cand-a", "cand-b"])

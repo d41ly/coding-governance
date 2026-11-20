@@ -91,7 +91,8 @@ TOOL-dWitnessedBar-30. `<run dir>` is one run record of the runner,
          skipped or reused leg wrote no `<i>.leg` and has no row. It prints `verdict-flow: wrote
          <path>`, then runs the drift kit's gate-health measurement in the repository's top within
          HEALTH_BOUND, `drift_report.py --gate-health --write --build <slug> --unit <id> --with <that
-         record>`, and prints every line it prints unchanged, so a `drift-report: wrote <path>` line is
+         record> --selection <the run's selection, or an empty temporary file where it holds none>`,
+         and prints every line it prints unchanged, so a `drift-report: wrote <path>` line is
          staged beside the flake record (TOOL-dWitnessedBar-1 S5); no drift kit, a non-zero exit or the
          bound firing prints one `flakes  gate-health · <why>` line instead. The flake body is read, and a
          row judged flaked, through the factory's `read_flake_body` and `derive_flaked`. Under
@@ -1162,17 +1163,28 @@ def read_flake_policy(top, here):
     return value, entry
 
 
-def write_gate_health(top, build, unit, rel, here=HERE):
+def write_gate_health(top, build, unit, rel, run, here=HERE):
     """-> the lines the drift kit's gate-health measurement prints, run in `top` within HEALTH_BOUND over the
     tracked flake records and `rel`, the one just written (TOOL-dWitnessedBar-1 S5), each unchanged, so the
-    driver stages the record a `drift-report: wrote <path>` line names. No drift kit, a non-zero exit or the
-    bound firing is one `flakes  gate-health · <why>` line instead, and never a refusal of `flakes`."""
+    driver stages the record a `drift-report: wrote <path>` line names. Its `--selection` is the run's copy
+    of the selection record, `<run>/selection`, or an empty temporary file, removed after the call, where
+    the run holds none (TOOL-dWitnessedBar-57 S18, §8 F5), so the bar it measures leaves out the legs the
+    run's quarantine and level rows held. No drift kit, a non-zero exit or the bound firing is one
+    `flakes  gate-health · <why>` line instead, and never a refusal of `flakes`."""
+    copy, made = pathlib.Path(run) / "selection", None
+    if not copy.is_file():
+        fd, made = tempfile.mkstemp(prefix="selection-", suffix=".empty")
+        os.close(fd)
     try:
         p = run_kit(here, "drift-audit", "drift_report.py",
-                    ["--gate-health", "--write", "--build", build, "--unit", unit, "--with", rel],
+                    ["--gate-health", "--write", "--build", build, "--unit", unit, "--with", rel,
+                     "--selection", str(made or copy)],
                     "no drift kit measures gate health", cwd=top, bound=HEALTH_BOUND)
     except Refusal as e:
         return [f"flakes  gate-health · {e}"]
+    finally:
+        if made:
+            os.unlink(made)
     if p.returncode != 0:
         why = next((ln.strip() for ln in p.stderr.splitlines() if ln.strip()), "it printed nothing on stderr")
         return [f"flakes  gate-health · drift_report.py --gate-health exited {p.returncode}: {why}"]
@@ -1206,7 +1218,7 @@ def cmd_flakes(run, build, unit, here=HERE, repo=None, record_only=False):
         flaked = sum(1 for _, first, rerun in rows if factory[0].derive_flaked(first, rerun))
         lines.append(f"{SAY}: wrote {rel} · {len(rows)} leg(s), {flaked} flake(s)")
         extra.append(rel)
-        lines += write_gate_health(top, build, unit, rel, here)
+        lines += write_gate_health(top, build, unit, rel, run, here)
     if record_only:
         return 0, lines
     if value == "record":
@@ -1601,7 +1613,10 @@ def write_flake_ask(leg, n, filed, flakes=2, window=10):
 
 
 STUB_DRIFT = """import sys
-print("stub-drift: argv " + " ".join(sys.argv[1:]))
+a = sys.argv[1:]
+print("stub-drift: argv " + " ".join(a[:-1] if a[-2:-1] == ["--selection"] else a))
+if a[-2:-1] == ["--selection"]:
+    print("stub-drift: selection %d bytes" % len(open(a[-1], "rb").read()))
 """
 
 
@@ -1640,9 +1655,19 @@ def run_fixture_flakes_record():
                 bad.append(f"under record flakes exited {rc} writing {len(written)} record(s), planted to write one: {lines}")
                 continue
             rel = written[0].relative_to(repo).as_posix()
-            want = f"--gate-health --write --build {FLAKE_BUILD} --unit {FLAKE_UNIT} --with {rel}"
-            if stub != [f"stub-drift: argv {want}"]:
-                bad.append(f"under record the gate-health measurement printed {stub}, planted one run with {want}")
+            want = f"--gate-health --write --build {FLAKE_BUILD} --unit {FLAKE_UNIT} --with {rel} --selection"
+            sized = [ln for ln in lines if ln.startswith("stub-drift: selection ")]
+            if stub != [f"stub-drift: argv {want}"] or sized != ["stub-drift: selection 0 bytes"]:
+                bad.append(f"under record the gate-health measurement printed {stub} {sized}, planted one run with "
+                           f"{want} an empty file, the run holding no selection")
+            # TOOL-dWitnessedBar-57 S18: a run holding a selection passes its own copy, `<run>/selection`.
+            (run / "selection").write_text("# fx\nheld\tsteady leg\tquarantine\t2/10\thold\n", encoding="utf-8",
+                                           newline="\n")
+            got = write_gate_health(repo, FLAKE_BUILD, FLAKE_UNIT, rel, run, here)
+            held = (run / "selection").stat().st_size
+            if got != [f"stub-drift: argv {want}", f"stub-drift: selection {held} bytes"]:
+                bad.append(f"with the run's selection the gate-health measurement printed {got}, planted "
+                           f"{want} that copy of {held} bytes")
             factory = load_flake_factory()
             rec = read_flake_record(factory[0], written[0].relative_to(repo).as_posix(),
                                     written[0].read_text(encoding="utf-8"))

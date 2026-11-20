@@ -614,11 +614,32 @@ HERE=$(cd "$(dirname "$0")/../lib" && pwd)
 . "$HERE/refuse-wrong-shell.sh"'
 printf '%s\nlate_py() {\n  py=$(resolve_python)\n}\nrefuse_wrong_shell || exit 2\npy=$(resolve_python)\n' "$rwo_head" > "$RWO/$rwo_t/x/early.sh"
 printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > "$RWO/$rwo_t/x/late.sh"
+# TOOL-dWitnessedBar-57 AC1 AC2: `indent.sh` calls resolve_python indented under `if` and never refuses,
+# so it is a member the arm names; `stub.sh` holds an indented stub definition alone, so it is none.
+# RED where the call is read at column 0 alone (indent.sh unnamed), or a definition reads as a call.
+printf '%s\nif [ -n "${X:-}" ]; then\n  resolve_python >/dev/null\nfi\n' "$rwo_head" > "$RWO/$rwo_t/x/indent.sh"
+printf '  resolve_python() { echo bash; }\n' > "$RWO/$rwo_t/x/stub.sh"
 (cd "$RWO" && git init -q && git add -A) || bad "the wrong-shell order fixture could not be staged"; ok
 rwo_out=$(cd "$RWO" && bash "$rwo_t/${HERE##*/}/refuse-wrong-shell.sh" --coverage 2>&1); rwo_rc=$?
 { [ "$rwo_rc" = 1 ] && grep -q '^BREAK tools/x/late.sh refuses only after it resolved python' <<<"$rwo_out" \
   && ! grep -q 'early.sh' <<<"$rwo_out"; } \
   || bad "refuse-wrong-shell.sh --coverage did not red the member refusing after its resolve_python call alone (rc $rwo_rc):${rwo_out//$'\n'/; }"; ok
+grep -q '^BREAK tools/x/indent.sh never calls refuse_wrong_shell' <<<"$rwo_out" \
+  || bad "57 AC1: refuse-wrong-shell.sh --coverage did not name the member whose call is indented under if:${rwo_out//$'\n'/; }"; ok
+! grep -q 'stub.sh' <<<"$rwo_out" \
+  || bad "57 AC2: refuse-wrong-shell.sh --coverage read an indented resolve_python() stub as a call:${rwo_out//$'\n'/; }"; ok
+grep -q "^  dropped: $rwo_t/${HERE##*/}/resolve-python.sh (TOOL-dWitnessedBar-27's listed member the predicate excludes: " <<<"$rwo_out" \
+  || bad "57 AC3: refuse-wrong-shell.sh --coverage did not name resolve-python.sh dropped with its reason:${rwo_out//$'\n'/; }"; ok
+# TOOL-dWitnessedBar-57 AC6: the memory-tree kit carries the resolve_bash_py block once, in tree_lib.py,
+# and row_grammar.py and corpus_ids.py import its scan_bash from there. RED where either keeps a copy.
+rbm_d="$ROOT/${PFX}memory-tree"
+rbm_n=$(for rbm_f in tree_lib row_grammar corpus_ids; do grep -c '^# >>> resolve_bash_py' "$rbm_d/$rbm_f.py"; done | tr -d '\r' | tr '\n' ' ')
+[ "$rbm_n" = "1 0 0 " ] \
+  || bad "57 AC6: the resolve_bash_py block is not carried once in tree_lib.py alone (tree_lib, row_grammar, corpus_ids: $rbm_n)"; ok
+for rbm_f in row_grammar corpus_ids; do
+  grep -qE '^from tree_lib import scan_bash( |$)' "$rbm_d/$rbm_f.py" \
+    || bad "57 AC6: $rbm_f.py does not import scan_bash from tree_lib"; ok
+done
 
 # ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
 # Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over
@@ -1327,6 +1348,22 @@ out=$(run_ll seed --population fx-nodir)
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed fx-nodir 3" <<<"$out" && [ -f "$LLR/nodir/fx-nodir.txt" ] \
   && [ -z "$(git -C "$LLR" ls-files -- nodir)" ]; } \
   || bad "2o seed 47 AC3: a home under an existing directory holding no tracked file was not seeded: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-57 AC10 — a seed home is admitted only inside the work tree, outside its git dir, and
+# where `git check-ignore` does not match it: a relative `..` home, an absolute home outside the tree and
+# a home under an ignored directory each print their reading and write nothing; an absolute home inside
+# the tree is seeded. RED against the directory-exists test alone, which admits all three.
+printf 'tmpl\n' > "$LL/tmpl.txt"; printf 'ign/\n' > "$LLR/.gitignore"; mkdir -p "$LLR/ign" "$LL/outside"
+for ll_case in "../outside/x|outside the tree " "$LL/abs-out.txt|outside the tree " "ign/x.txt|ignored ign/x.txt" \
+    ".git/x.txt|outside the tree "; do
+  out=$(run_ll seed --home "${ll_case%%|*}" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed .* ${ll_case#*|}" <<<"$out" && [ ! -e "$LL/outside/x" ] \
+    && [ ! -e "$LL/abs-out.txt" ] && [ ! -e "$LLR/ign/x.txt" ] && [ ! -e "$LLR/.git/x.txt" ]; } \
+    || bad "57 AC10: the seed home ${ll_case%%|*} was written or not read as ${ll_case#*|}: ${out//$'\n'/ | }"; ok
+done
+out=$(run_ll seed --home "$LLR/nodir/abs.txt" --copy "$LL/tmpl.txt")
+{ [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed nodir/abs.txt" <<<"$out" && [ -f "$LLR/nodir/abs.txt" ]; } \
+  || bad "57 AC10: an absolute seed home inside the work tree was not armed: ${out//$'\n'/ | }"; ok
+rm -rf "$LLR/.gitignore" "$LLR/ign" "$LLR/nodir/abs.txt" "$LL/outside" "$LL/tmpl.txt"
 run_ll_reset
 # TOOL-dWitnessedBar-17 S9, AC11 — a seed argv spelling its program `{prefix}/<kit>/<file>` runs where the
 # token resolves against the tool root above the running copy. A copy of this directory one level under the

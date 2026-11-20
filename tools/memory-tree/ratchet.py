@@ -590,7 +590,11 @@ def run_keys_not_scalar(root, measure=False):
     """`ratchet (keys, not a scalar)`: the measured pins against `conf-scalar-pins` at HEAD through
     `compare_counts`; `--measure` prints the measurement, the population's seed. An absent, unarmed or
     unregistered `conf-scalar-pins` is never green: it exits 1 printing `unarmed conf-scalar-pins` and
-    the seed command (TOOL-dWitnessedBar-46 S3), so an adopter's failed seed reds rather than passes."""
+    the seed command (TOOL-dWitnessedBar-46 S3), so an adopter's failed seed reds rather than passes.
+    An armed home holding zero rows while a root conf assigns a pin is an empty seed, never an unheld
+    pin owed a widen record: it exits 1 printing `empty seed conf-scalar-pins` and the re-seed remedy,
+    removing the home and running the seed command (TOOL-dWitnessedBar-57 S9). The home's state is read
+    through the factory's `read_home_state` alone (S10)."""
     measured = measure_scalar_pins(root)
     if measure:
         for (conf, key), n in sorted(measured.items()):
@@ -607,6 +611,11 @@ def run_keys_not_scalar(root, measure=False):
     declared, bad = LL.read_ledger(root, reg)
     if bad:
         print_line(leg, reg.population, "unresolved", LL.render_malformed(bad[0]))
+        return 1
+    if not declared and measured:
+        print_line(leg, "empty seed %s" % SCALAR_POPULATION,
+                   "its armed home %s holds no row while %d pin(s) are assigned" % (reg.home, len(measured)),
+                   "re-seed it: remove %s, then run %s" % (reg.home, render_seed_command(root)))
         return 1
     for key, n in sorted(measured.items()):
         print_line(leg, "held" if key in declared else "unheld", "%s\t%d" % (render_key(key), n))
@@ -1165,6 +1174,26 @@ def run_plant_ignored_conf(top, results):
                      ["· held · .fix.conf\tBAR_PIN", "pass"], [".x.conf"])
 
 
+def run_plant_empty_seed(top, results):
+    """S9 (TOOL-dWitnessedBar-57): an armed `conf-scalar-pins` holding zero rows beside a conf assigning a
+    pin is an empty seed naming the re-seed remedy, never an unheld pin owed a widen record."""
+    write_scalar_fixture(top)
+    write_files(top, {".fix.conf": 'ROW_DUPLICATE_PIN="0"\n',
+                      "pop/rows.txt": render_rows([], population=SCALAR_POPULATION, fields=("conf", "key"))})
+    check_plant_case(results, "empty-seed", "an armed empty home beside an assigned pin", top, ["keys-not-scalar"],
+                     1, ["empty seed %s" % SCALAR_POPULATION, "re-seed it: remove pop/rows.txt, then run python "],
+                     ["unheld", "undeclared site"])
+
+
+def run_plant_unarmed_home(top, results):
+    """S10 (TOOL-dWitnessedBar-57): a `conf-scalar-pins` home opening the factory's `UNARMED_LEAD` reads
+    unarmed through its `read_home_state`, and `keys-not-scalar` exits 1 naming it."""
+    write_scalar_fixture(top)
+    write_files(top, {"pop/rows.txt": LL.UNARMED_LEAD + "exit 1 · " + SHA_A + "\n"})
+    check_plant_case(results, "unarmed-home", "a home opening the unarmed line", top, ["keys-not-scalar"], 1,
+                     ["unarmed %s" % SCALAR_POPULATION, "its home is unarmed"], ["pass"])
+
+
 PLANTS = {
     "gain": run_plant_gain, "ceiling-raised": run_plant_ceiling_raised, "append-edited": run_plant_append_edited,
     "append-removed": run_plant_append_removed, "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
@@ -1177,7 +1206,8 @@ PLANTS = {
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
     "new-population": run_plant_new_population, "home-moved": run_plant_home_moved,
     "regrammared": run_plant_regrammared, "untracked-conf": run_plant_untracked_conf,
-    "ignored-conf": run_plant_ignored_conf,
+    "ignored-conf": run_plant_ignored_conf, "empty-seed": run_plant_empty_seed,
+    "unarmed-home": run_plant_unarmed_home,
 }
 
 
