@@ -145,7 +145,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-41 — the selection a bar ran under travels on the per-tree verdict, and the hook re-derives it before adopting](spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md) | 22 | 2 | CLOSED | rev-3 | 2026-11-20 |
 | [TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it](spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md) | 22 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | CLOSED | rev-7 | 2026-11-20 |
-| [TOOL-dWitnessedBar-1 — gate health measured and the reliability bar](spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md) | 23 | 2 | CLOSED | rev-6 | 2026-11-20 |
+| [TOOL-dWitnessedBar-1 — gate health measured and the reliability bar](spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md) | 23 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dWitnessedBar-59 — the inherited-red upgrade step splits a policy file's lines on LF alone, as the readers do, held by a lone-CR parity row](spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md) | 23 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host](spec/2026-10-25-spec-TOOL-dWitnessedBar-30.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-29 — every size warning a passing leg prints, shown in the runner's summary and verdict record and attributed to its unit](spec/2026-10-25-spec-TOOL-dWitnessedBar-29.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-20 |
