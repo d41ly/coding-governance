@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 68 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -161,13 +161,18 @@ ids TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99
 | [TOOL-dPlacedRequest-62 — unit 61's criteria read a `###` section from its heading to the next heading](spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md) | 34 | 2 | CLOSED | rev-3 | 2026-11-20 |
 | [TOOL-dPlacedRequest-63 — the round-7 promotions' minors: every inventory row names its base, the sweep places its own criteria, one run-fact clause, a CR the arm can see, and criteria that read what they amend](spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md) | 35 | 2 | CLOSED | rev-5 | 2026-11-20 |
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | CLOSED | rev-4 | 2026-11-20 |
+| [TOOL-dPlacedRequest-95 — the kickoff hook never runs a checker it resolved from its target's tree](spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-20 |
+| [TOOL-dPlacedRequest-96 — a foreign stale lease can be taken over again, and its hint prints](spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-20 |
+| [TOOL-dPlacedRequest-97 — the lease fence knows an id-less run's own claim by its keepalive](spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-20 |
+| [TOOL-dPlacedRequest-98 — the fenced-landing arms fail, never skip, when their fixture fails](spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-20 |
+| [TOOL-dPlacedRequest-99 — the closing review's minors: every plant on a gate, a resolver arm, honest re-fence and card outcomes, a re-priced row and three loose ends](spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
 Records: 313 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99.
 
 Ids whose spec moved past its audited revision: TOOL-dPlacedRequest-10@rev-3 TOOL-dPlacedRequest-12@rev-3 TOOL-dPlacedRequest-13@rev-6 TOOL-dPlacedRequest-14@rev-4 TOOL-dPlacedRequest-15@rev-4 TOOL-dPlacedRequest-16@rev-6 TOOL-dPlacedRequest-17@rev-3 TOOL-dPlacedRequest-18@rev-3
 TOOL-dPlacedRequest-19@rev-4 TOOL-dPlacedRequest-2@rev-7 TOOL-dPlacedRequest-21@rev-6 TOOL-dPlacedRequest-23@rev-2 TOOL-dPlacedRequest-24@rev-5 TOOL-dPlacedRequest-25@rev-2 TOOL-dPlacedRequest-26@rev-2 TOOL-dPlacedRequest-27@rev-1 TOOL-dPlacedRequest-28@rev-2 TOOL-dPlacedRequest-29@rev-2
@@ -180,7 +185,7 @@ TOOL-dPlacedRequest-8@rev-4 TOOL-dPlacedRequest-9@rev-3.
 
 <!-- gen:build-coverage -->
 
-Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 63 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 68 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 21
 - carried in parts: 0 (none)
@@ -199,7 +204,8 @@ Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 63 spec(s) 
   `spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md` (PLAY-dClosedLoop-2), `spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md` (PLAY-dClosedLoop-2), `spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md` (PLAY-dClosedLoop-2), `spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md` (PLAY-dClosedLoop-2), `spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0122, cl-dClosedLoop-0126, cl-dClosedLoop-0129, cl-dClosedLoop-0133, cl-dClosedLoop-0136, cl-dClosedLoop-0137
 <!-- /gen:build-coverage -->
 
@@ -242,6 +248,7 @@ Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 63 spec(s) 
 | 34 | `TOOL-dPlacedRequest-62` | no |
 | 35 | `TOOL-dPlacedRequest-63` | no |
 | 36 | `TOOL-dPlacedRequest-64` | no |
+| 37 | `TOOL-dPlacedRequest-95`, `TOOL-dPlacedRequest-96`, `TOOL-dPlacedRequest-97`, `TOOL-dPlacedRequest-98`, `TOOL-dPlacedRequest-99` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
