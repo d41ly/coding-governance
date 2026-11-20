@@ -27,8 +27,8 @@ observes, and every `New arm:` line's RED-first reading, is the close's (the bui
   (`tools/unattended/unattended.sh#print_card_ref`): read-only, the remote `resolve_claim_remote`
   resolves, the write's pruned glob fetch into `refs/gov/remote/builds/<slug>/*` with
   `--no-write-fetch-head`, then the sightings. The kickoff engine's
-  `skills/session-kickoff/manifest-check.sh#read_card_ref` runs it under `timeout -k 2
-  "$CARD_FETCH_BOUND"`, stdin closed, through `skills/session-kickoff/manifest-check.sh#resolve_card_driver`;
+  `skills/session-kickoff/manifest-check.sh#read_card_ref` runs it
+  under `timeout -k 2 "$CARD_FETCH_BOUND"`, stdin closed, through `skills/session-kickoff/manifest-check.sh#resolve_card_driver`;
   R7, the stored-card read and the replay's re-key read the cache ref; the local ref and its
   `update-ref` are gone; the engine's inline `gov_feed_sh` block is removed. The fetch spells the glob
   `+refs/gov/builds/<slug>/*` the write already uses rather than S12's single refspec, because a single
@@ -64,8 +64,8 @@ observes, and every `New arm:` line's RED-first reading, is the close's (the bui
   answered exit 2; `tools/unattended/unattended.sh#run_entry_claim` exits 2 on a route-back draw not
   recorded.
 - **S48** — `--path-tokens --files-touched --any-status` reads a terminal spec;
-  `tools/loop/loop_lib.py#resolve_item_seed` passes it and prints `unarmed — write-set: <spec> lists no
-  path` on none.
+  `tools/loop/loop_lib.py#resolve_item_seed` passes it and prints
+  `unarmed — write-set: <spec> lists no path` on none.
 - **S49, S54** — `tools/unattended/unattended.sh#check_claim_writable` refuses an offer over any open
   offer `offered` and over a build or unit tombstone `tombstone`; `run_lease_verb` refuses a `--to`
   naming the caller's own tag or session. The driver suite's unit-20 arm that read `terminal` over a

@@ -247,8 +247,8 @@ foreign holder (naming `--lease take-over` when stale); `tombstone`, a build or 
 foreign terminal lease;
 `epoch-fence`, a compare-and-swap lost to a write between the read and the push, which is also how
 one of two nodes creating one build lease learns the slug is taken; `overlap`; `offline`;
-`no-record`, a request lease whose record the remote does not hold; and an offer's two, `offered`
-and `terminal` (below). A node no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
+`no-record`, a request lease whose record the remote does not hold; and an offer's `offered` and
+`terminal` (below). A node no `fleet.toml` row names writes nothing. Seven policy keys and `leases` shape it, each read once per
 process through the policy kit, a refused read writing nothing:
 
 | key | values (default first) | what it decides |
@@ -371,8 +371,10 @@ with `offer` the target and `offer-deadline` the window `leases.offer-seconds` g
 seconds and never a timestamp, by compare-and-swap on the tip it read: over a `released` lease at its
 epoch, over an absent one as a create, which reads the feed as every create does: refused
 `tombstone` over a feed tombstone, at the feed commit's epoch plus one over any other, and at epoch 1
-where the feed names the ref nowhere. It refuses a `live` or `held` lease `live-holder`
-and a terminal one `terminal`. In the `lease` column alone, tested before every other row, a record
+where the feed names the ref nowhere. It refuses a `live` or `held` lease `live-holder`, a build
+or unit tombstone `tombstone` and a terminal cadence or legacy claim `terminal`, an offer still open,
+whoever it names, `offered`, and a `--to` naming the caller's own tag or its own session on it
+`offered`, before any read (TOOL-dPlacedRequest-34). In the `lease` column alone, tested before every other row, a record
 whose `offer` is neither `-` nor this node's tag, nor that tag, `/` and this harness's session (an
 unset, empty or `absent` session forms none), reads `offered` while this node first saw its tip at
 most `offer-deadline` seconds ago or has not seen it yet, the window opening at its first sighting.

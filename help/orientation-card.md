@@ -75,7 +75,7 @@ default:
 
 | Store | Where | What it is |
 |---|---|---|
-| `remote-ref` | the ref `refs/gov/builds/<slug>/card` on `origin` | the truth: one commit per write, each on the one before |
+| `remote-ref` | the ref `refs/gov/builds/<slug>/card` on the clone's one remote | the truth: one commit per write, each on the one before |
 | `local-clone` | `<git common dir>/orientation/<slug>.md` | a cache, its first line `# card-ref <commit>`, trusted only while that commit is the ref's |
 | `build-folder` | a `card` record in the build's `build/` folder | a snapshot, committed alone, as `card.snapshot` says |
 
@@ -112,7 +112,8 @@ with `route R7 REFUSED`.
 ## Finding the card on another session or machine
 
 `manifest-check.sh --card --lookup --build <slug> --session <sid>` reads the build's card from the
-first selected store that answers: the ref (one bounded fetch), then the cache, then the newest
+first selected store that answers: the ref (the unattended driver's `--card-ref lookup`, one bounded
+fetch into this node's cache ref that writes no `FETCH_HEAD`), then the cache, then the newest
 snapshot. It writes the card into that session's own card, with the session's header and freshly
 rendered cells, and prints one line:
 
