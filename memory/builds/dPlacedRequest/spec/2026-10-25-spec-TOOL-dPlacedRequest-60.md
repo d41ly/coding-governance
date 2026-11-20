@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-60 — unit 57's read of 34 AC59 stops at the end of that bullet
 
-**Status:** DEFERRED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
