@@ -196,7 +196,17 @@ trap 'rm -rf "$tmp"' EXIT
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
 export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 fail=0
-ok()  { echo "  ok   — $1"; }
+# THE COUNT AND ITS FLOOR (TOOL-dPlacedRequest-98). `ok` counts the rows it prints and every
+# dependency skip sets `skipped`; the closing lines compare the count with the pin only where no
+# dependency skip fired, the install where every block runs, so a block whose arms stop running
+# there reds rather than ending `all cases ok`. A skip is admissible only for a dependency genuinely
+# absent, never for a fixture step that failed. PINNED on node d, 2026-11-21: the ok rows the suite
+# runs with every block running, DERIVED from its 97 `ok` call sites plus the 14 loop's second file
+# and the 37 loop's three further plantable rows, owed the main loop's first reading of the leg;
+# every later unit adding an `ok` row that runs there raises it.
+FLOOR_ASSERTIONS=101
+n=0; skipped=0
+ok()  { echo "  ok   — $1"; n=$((n + 1)); }
 bad() { echo "  FAIL — $1"; fail=1; }
 
 # stub gate: RED iff $tmp/gate-fail; on $tmp/race-once, advance origin behind our back, then remove it.
@@ -572,7 +582,7 @@ if [ -n "$lib" ] && [ -f "$SRC/$lib" ]; then
     bad "11 before=$(cat "$tmp/bc-before" 2>/dev/null) after=$(cat "$tmp/bc-after" 2>/dev/null)"
   fi
 else
-  echo "  skip — 11 build_commit: this tree carries no unattended-kit library, so the join this case grades does not exist here"
+  skipped=1; echo "  skip — 11 build_commit: this tree carries no unattended-kit library, so the join this case grades does not exist here"
 fi
 
 # 12 — the hook refuses an unmarked worktree push; --land is accepted; and the foreign commit
@@ -866,7 +876,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ]; then
   ) && ok "24 --prepare mints runlog's next version into the prepared merge and says so once" \
     || bad "24 the prepared merge does not carry the minted runlog version (or the tree was left dirty)"
 else
-  echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
+  skipped=1; echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
 fi
 
 # 25 — TOOL-aMendedFleet-111 AC2: THIS lander run in a tree that lacks the lexicon and govkit files
@@ -905,7 +915,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
     && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
     || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
 else
-  echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
+  skipped=1; echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
 
 # ---- THE POST-MERGE BAR AFTER A LANDING — TOOL-aFrugalTurnstile-8 ---------------------------------
@@ -1047,7 +1057,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
     && ok "26 the attended mint commit names the range's newest unit and carries Pass: none, and it lands" \
     || bad "26 the attended mint subject or trailer is wrong, or the landing failed: $out26"
 else
-  echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
+  skipped=1; echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
 fi
 
 # 27 — TOOL-aRoutedQuill-12 AC16: a `--newest-unit` that REFUSES names no unit. Its refusal prints on
@@ -1198,7 +1208,7 @@ if [ -n "$_rg_k" ]; then
   #      install without one says so, as 28-32 do without regen.py.
   _pk_k=$(cd "$HERE" && for d in */; do [ -f "$d/policy.py" ] && [ -f "$d/catalogue.toml" ] && { printf '%s' "${d%/}"; break; }; done)
   if [ -z "$_pk_k" ]; then
-    echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
+    skipped=1; echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
   elif [ -z "$_py_arms" ]; then
     bad "33 no python launcher runs, so the prepared merge's checks cannot be read"
   else
@@ -1226,7 +1236,7 @@ if [ -n "$_rg_k" ]; then
     fi
   fi
 else
-  echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+  skipped=1; echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi
 
 # 34 — TOOL-dSafePassage-8 AC5: --prepare walks every declared upgrade step on gov's own tree first,
@@ -1301,7 +1311,7 @@ PY
       *) bad "36 a refused regeneration after a passing walk left the walk's files untracked, or the retry folded or refused on them: $out36" ;;
     esac
   else
-    echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
+    skipped=1; echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
   fi
   # 39 — TOOL-dSafePassage-35 AC10: a snapshot that cannot be written refuses before the walk. With
   #      TMPDIR naming a file, `mktemp` fails, so --prepare exits 1 with the gov-first stage's own
@@ -1338,7 +1348,7 @@ PY
     *) bad "39 the attended landing's unwritable snapshot fell through to the walk, or its refusal is not the full message: $out39" ;;
   esac
 else
-  echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
+  skipped=1; echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
 fi
 
 # 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
@@ -1430,7 +1440,7 @@ if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" 
     bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
   fi
 else
-  echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
+  skipped=1; echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
 fi
 n37=0
 for _row37 in "${PREPARE_REFUSALS[@]}"; do
@@ -1438,7 +1448,7 @@ for _row37 in "${PREPARE_REFUSALS[@]}"; do
   IFS='|' read -r st37 pl37 ex37 <<< "$_row37"
   case "$pl37" in unplantable:*) echo "  skip — 37 $st37: ${pl37#unplantable: }, so this refusal is NOT covered"; continue ;; esac
   if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py_arms" ]; then
-    echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
+    skipped=1; echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
     continue
   fi
   out37=$(
@@ -1590,7 +1600,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
     *) bad "40 the attended landing with a failing witness did not refuse at gov first on a clean tree, or the retry did not land: $out40" ;;
   esac
 else
-  echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
+  skipped=1; echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
 fi
 
 # 41 — PLAY-dOrderedCharter-85 AC1: --prepare folds gov first's walk into the merge BEFORE it
@@ -1618,7 +1628,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_rg_k" ] && [ -n "$_py_arms" ]; then
     *) bad "41 --prepare regenerated over gov first's uncommitted walk, or left no single clean merge holding the planted step's receipt: $out41" ;;
   esac
 else
-  echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
+  skipped=1; echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
 
 # 42-51 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
@@ -1634,16 +1644,33 @@ fi
 #      TOOL-dPlacedRequest-15's lander, which classifies both `fenced`: 52 exits 1 and lands nothing.
 #      WHAT THIS DOES NOT CHECK: a real remote's `--atomic` (the spec's AC1, at the build run), and
 #      the change-feed census over this lander, which the lib dir's own suite reads.
+#      THE FIXTURE'S OWN REGISTRY (TOOL-dPlacedRequest-98): the launcher execs a COPY of the driver's
+#      kit in a scratch kit tree under FX, beside a copy of the playbook kit whose `fleet.toml` holds
+#      the fixture's two rows, so `resolve_fleet_tag` finds that registry by its kit probe and never
+#      the live one; the tree is a git root of its own because the probe's answer is repo-relative.
+#      The launcher runs the copy with GOV_NODE unset, so every driver call made through it, the
+#      fixture's acquire, the lander's fence reads and the hook's take-over, ignores the ambient node.
 _fn_k=$(cd "$HERE" && for d in */; do [ -f "$d/unattended.sh" ] && [ -f "$d/lib-unattended.sh" ] && { printf '%s' "${d%/}"; break; }; done)
+_fn_pb=$(cd "$HERE" && for d in */; do [ -f "$d/render_playbook.py" ] && { printf '%s' "${d%/}"; break; }; done)
 FX="$tmp/fx"
-write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 when the lease could not be acquired
+write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 with the failed step's own line in fx_line
   rm -rf "$FX"; mkdir -p "$FX"
+  fx_line="no playbook kit holding render_playbook.py beside this lander, so the fixture's registry has no reader to copy"
+  [ -n "$_fn_pb" ] || return 1
+  fx_line="the fixture's kit tree could not be made under $FX/kit"
+  git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/playbook" \
+    && printf '[[node]]\ntag = "%s"\nuser = "%s"\nhost = ""\nprojects_root = "%s"\nvariances = ""\n\n' a daily-agent "$FX" b agent5 "$FX" \
+      > "$FX/kit/playbook/fleet.toml" || return 1
+  for _fn_s in policy loop; do # the driver's optional siblings its lease verbs resolve, where this install has them
+    [ ! -d "$HERE/$_fn_s" ] || cp -R "$HERE/$_fn_s" "$FX/kit/$_fn_s" || return 1
+  done
+  fx_line="the fixture's remote and clones could not be made under $FX"
   git init -q --template= --bare -b main "$FX/o.git"
   git init -q --template= -b main "$FX/a"
   ( cd "$FX/a" || exit 1
     mkdir -p "./${KIT_REL}$_fn_k" .githooks memory/builds/fx
     cp "$HERE/push-main.sh" "$lander"
-    printf '#!/usr/bin/env bash\nexec bash "%s" "$@"\n' "$HERE/$_fn_k/unattended.sh" > "${KIT_REL}$_fn_k/unattended.sh"
+    printf '#!/usr/bin/env bash\nexec env -u GOV_NODE bash "%s" "$@"\n' "$FX/kit/$_fn_k/unattended.sh" > "${KIT_REL}$_fn_k/unattended.sh"
     printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nif [ -f "%s/plant-once" ]; then mv -f "%s/plant-once" "%s/plant-ran"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && bash "%s/plant-ran" >&2 ); fi\nexit 0\n' \
       "$FX" "$FX" "$FX" "${KIT_REL}$_fn_k/unattended.sh" "$FX" "$FX" "$FX" "$FX" "$FX" > .githooks/pre-push
     printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
@@ -1654,7 +1681,8 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 whe
     git add -A && git commit -q -m base && git remote add origin "$FX/o.git" \
       && git push -q --no-verify origin main && git remote set-head origin -a >/dev/null ) || return 1
   git clone -q "$FX/o.git" "$FX/b" && git -C "$FX/b" config core.hooksPath .githooks || return 1
-  ( cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx 2>&1 ) | grep -q '^lease — fx/build · create'
+  fx_line=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx 2>&1)
+  printf '%s\n' "$fx_line" | grep -q '^lease — fx/build · create'
 }
 read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fx/build)"; }
 run_fence_land() { ( cd "$FX/a" && bash "$lander" "$@" 2>&1 ); }
@@ -1665,7 +1693,11 @@ write_fence_stub() { # stub driver body -> committed in clone A, the branch prep
 }
 _fn_u=${USERNAME-}; _fn_sid=${CLAUDE_CODE_SESSION_ID-}; _fn_gct=${GOV_GATE_CMD_TEST-}
 export GOV_RUNLOG=0 USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sA; unset GOV_GATE_CMD_TEST GATE_PUSH_BASE
-if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
+if [ -z "$_fn_k" ] || [ -z "$_py_arms" ]; then
+  skipped=1; echo "  skip — 42-54 no unattended kit beside this lander, or no python launcher, so the fenced-push arms did not run"
+elif ! write_fence_fixture; then
+  bad "42-54 the fenced-push fixture could not be made, so the fenced-push arms did not run: ${fx_line//$'\n'/ · }"
+else
   # 42 — AC4: a fenced landing moves the branch and the lease together, the beat on the tip read,
   #      `renews: no`, and clone A's feed holds one event for the lease at the beat.
   tip42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
@@ -1820,7 +1852,7 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
       *) bad "53 a take-over at the epoch plus one did not refuse as fenced with the branch unmoved: [$g53] $out53" ;;
     esac
   else
-    bad "52-53 the fenced-push fixture, made once above, could not be made again"
+    bad "52-53 the fenced-push fixture, made once above, could not be made again: ${fx_line//$'\n'/ · }"
   fi
   if write_fence_fixture; then
     # 54 — TOOL-dPlacedRequest-43 AC28: the lease moves inside the first push's hook as 52's does, and
@@ -1829,8 +1861,9 @@ if [ -n "$_fn_k" ] && [ -n "$_py_arms" ] && write_fence_fixture; then
     #      landing exits 1 `unreachable`, no abort remedy and never `fenced`, the branch unmoved.
     #      Staged against TOOL-dPlacedRequest-29's lander, which reads every refusal there `fenced`.
     git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    cp "$FX/a/${KIT_REL}$_fn_k/unattended.sh" "$FX/real-driver"
     write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease refused — offline · fx/build · the remote did not answer the claim read'; exit 1 ;; esac
-exec bash \"$HERE/$_fn_k/unattended.sh\" \"\$@\""
+exec bash \"$FX/real-driver\" \"\$@\""
     m54=$(git --git-dir="$FX/o.git" rev-parse main)
     printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
       'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
@@ -1844,12 +1877,18 @@ exec bash \"$HERE/$_fn_k/unattended.sh\" \"\$@\""
       *) bad "54 a killed --after read did not refuse as unreachable with the branch unmoved: [$g54] $out54" ;;
     esac
   else
-    bad "54 the fenced-push fixture could not be made a third time"
+    bad "54 the fenced-push fixture could not be made a third time: ${fx_line//$'\n'/ · }"
   fi
-else
-  echo "  skip — 42-53 no unattended kit beside this lander, no python launcher, or no lease the fixture's user could acquire, so the fenced-push arms did not run"
 fi
 unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
 [ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"
 
+# THE FLOOR (TOOL-dPlacedRequest-98), compared only where no dependency skip fired: an adopter whose
+# install lacks a sibling kit runs fewer rows on a healthy lander, and takes its verdict from `fail`.
+if [ "$skipped" = 0 ]; then
+  [ "$n" -ge "$FLOOR_ASSERTIONS" ] || bad "the suite ran $n assertions, below its floor of $FLOOR_ASSERTIONS with every block running, so a block's arms stopped running"
+else
+  echo "push-main.test: floor not compared — a dependency skip fired"
+fi
+[ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
