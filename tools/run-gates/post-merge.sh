@@ -307,7 +307,8 @@ run_bar() { # -> PM_VERDICT GREEN|RED|REFUSED, with PM_WHY on REFUSED
   local rc v head
   PM_VERDICT=""; PM_WHY=""
   read -ra words <<<"$BAR"
-  ( cd "$WT" && GATE_FULL=1 GATE_RUN_ID="$RUN_ID" bash "$KITDIR/run-gates.sh" --hold -- "${words[@]}" </dev/null ); rc=$?
+  # The bar's cause is the landed sha it grades (TOOL-dWitnessedBar-25 S2), in the runner's verdict.
+  ( cd "$WT" && GATE_FULL=1 GATE_RUN_ID="$RUN_ID" GATE_CAUSE="post-merge:$SHA" bash "$KITDIR/run-gates.sh" --hold -- "${words[@]}" </dev/null ); rc=$?
   head=$(git -C "$WT" rev-parse -q --verify HEAD 2>/dev/null) || head=""
   if [ "$head" != "$SHA" ]; then
     PM_VERDICT=REFUSED; PM_WHY="the scratch worktree's HEAD reads ${head:-nothing} after the bar, not ${SHA:0:8}, so no verdict describes the sha"; return 0

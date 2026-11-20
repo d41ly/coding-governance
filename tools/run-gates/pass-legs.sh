@@ -361,8 +361,9 @@ PL_RUN="-"; PL_RC="-"; PL_WALL=0
 if [ "$PL_DECLARED" -gt 0 ]; then
   TZ=UTC0 printf -v PL_RUN 'pass-%(%Y%m%dT%H%M%SZ)T-%s' -1 "$$"
   _pl_t0=$SECONDS
-  GATE_LEGS="$PL_GD/gate-pass-legs.json" GATE_BASE="$PL_BASE" GATE_RUN_ID="$PL_RUN" GATE_FULL= GATE_SELFTESTS= \
-    GATE_TURNSTILE=0 "${BASH:-bash}" "$KITDIR/run-gates.sh"
+  # `GATE_CAUSE` names this pass's head in the runner's verdict (TOOL-dWitnessedBar-25 S2).
+  GATE_LEGS="$PL_GD/gate-pass-legs.json" GATE_BASE="$PL_BASE" GATE_RUN_ID="$PL_RUN" GATE_CAUSE="pass:$PL_HEAD" \
+    GATE_FULL= GATE_SELFTESTS= GATE_TURNSTILE=0 "${BASH:-bash}" "$KITDIR/run-gates.sh"
   PL_RC=$?
   PL_WALL=$((SECONDS - _pl_t0))
 fi

@@ -2785,6 +2785,20 @@ fi
 # uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
 # leg starts.
 unset GATE_RUN_ID
+# THE CAUSE, read once and removed for the same reason (TOOL-dWitnessedBar-25 S2): the act that started
+# this bar, `<kind>:<id>` from the caller that exports it (the pre-push hook `push:<sha>`, post-merge
+# `post-merge:<sha>`, the unattended close `run:<slug>`, the pass-leg runner `pass:<sha>`), `attended`
+# when none did. A leg's nested runner inheriting it would name its caller's cause. The unset precedes
+# the environment digest, so the digest never lists it. A value outside `[A-Za-z0-9._:@-]+` reads
+# `attended` and is named on stderr, so an exported value cannot write a field separator into a record.
+RUN_CAUSE=attended
+if [ -n "${GATE_CAUSE:-}" ]; then
+  case "$GATE_CAUSE" in
+    *[!A-Za-z0-9._:@-]*) printf 'run-gates: GATE_CAUSE refused — %q is outside [A-Za-z0-9._:@-]+, so this run records cause attended\n' "$GATE_CAUSE" >&2 ;;
+    *) RUN_CAUSE=$GATE_CAUSE ;;
+  esac
+fi
+unset GATE_CAUSE
 # THE REUSE KNOBS, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4, composed by
 # TOOL-aSparedSpawn-32 S6): the pre-push hook exports `GATE_REUSE_LINEAGE` or `GATE_REUSE_PUSH` to THIS
 # bar, and a leg's nested runner inheriting either, or a hand-set `GATE_REUSE`, would reuse inside a
@@ -5735,6 +5749,39 @@ gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
 # that failed AND moved stays RED with exit 1 and its RED line names the move.
 [ "$gate_verdict" = GREEN ] && [ "$tree_moved" = yes ] && gate_verdict="TREE MOVED"
 
+# THE FAILING LEGS' TAILS, KEPT BY HASH (TOOL-dWitnessedBar-25 S3). For each failed leg, in manifest
+# order, the last 60 lines of its REDACTED output copy in the run record, at most their last 8192 bytes,
+# are hashed as git hashes a blob and written to `<common-dir>/gate-tails/<hash>` where no file holds
+# that hash, so every worktree of a clone writes one directory and the tail outlives the worktree and
+# its five-run sweep. `TAIL_ROWS` gathers `tail.<n>` lines, `<hash> <leg name>`, for the run record's
+# verdict and the per-tree verdict. A leg retried alone is cut from its retry's copy, a leg with no copy
+# from nothing, which is the empty tail's hash. The 60 lines and 8192 bytes are PINNED, the spec's
+# choice: a stack and its assertion, and a red bar of twenty legs commits under 200 KB.
+# WHAT IT DOES NOT CHECK: that the cut lands on a character boundary, or that the tail decodes; the
+# keep verb, `keep_tails.py`, is what commits a tail, and it masks runlog's secret shapes first.
+TAIL_ROWS=""
+if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
+  _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails || _td=""
+  if [ -n "$_td" ] && mkdir -p "$_td" 2>/dev/null; then
+    chmod 700 "$_td" 2>/dev/null || true
+    _tn=0
+    for i in $(printf '%s\n' $RED_LEGS | LC_ALL=C sort -n -u); do
+      _tsrc="$RUNDIR/$i.out"; [ -f "$RUNDIR/$i.retry.out" ] && _tsrc="$RUNDIR/$i.retry.out"
+      derive_temp_path _tp "$_td/tail" || continue
+      if [ -f "$_tsrc" ]; then tail -n 60 "$_tsrc" | tail -c 8192 > "$_tp" 2>/dev/null; else : > "$_tp"; fi
+      _th=$(git hash-object --stdin < "$_tp" 2>/dev/null)
+      case "$_th" in
+        ''|*[!0-9a-f]*) rm -f "$_tp" 2>/dev/null; echo "run-gates: no tail kept for ${names[$i]} — git could not hash it" >&2; continue ;;
+      esac
+      if [ -e "$_td/$_th" ]; then rm -f "$_tp" 2>/dev/null
+      else chmod 600 "$_tp" 2>/dev/null; mv -f "$_tp" "$_td/$_th" 2>/dev/null || { rm -f "$_tp" 2>/dev/null; continue; }; fi
+      _tn=$((_tn + 1))
+      printf -v _trow 'tail.%s\t%s %s\n' "$_tn" "$_th" "${names[$i]}"; TAIL_ROWS+=$_trow
+    done
+  fi
+  unset _td _tn _tsrc _th _trow
+fi
+
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
   # anywhere between the header and here leaves a directory with a header and no verdict, which
@@ -5762,6 +5809,11 @@ if [ -n "$RUNDIR" ]; then
     printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
     # The tree this run graded, `-` when it started dirty (TOOL-dWitnessedBar-4 S1).
     printf 'tree\t%s\n' "$RUN_TREE"
+    # The run this verdict closes, the act that started it, and each failing leg's tail by its hash
+    # (TOOL-dWitnessedBar-25 S1-S3).
+    printf 'run_id\t%s\n' "$RUNID"
+    printf 'cause\t%s\n' "$RUN_CAUSE"
+    printf '%s' "$TAIL_ROWS"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi
@@ -5876,6 +5928,8 @@ else
        printf 'fingerprint\t%s\n' "$FPRINT_START"
        printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
        printf 'run_id\t%s\n' "$RUNID"
+       printf 'cause\t%s\n' "$RUN_CAUSE"
+       printf '%s' "$TAIL_ROWS"
        printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
        printf 'by\trunner\n'
      } > "$_tp" 2>/dev/null && mv -f "$_tp" "$_vf" 2>/dev/null; then
@@ -5930,6 +5984,22 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
   ls -1t "$RUNROOT" 2>/dev/null | grep -v '^current$' | tail -n "+$((GATE_RUN_KEEP+1))" | while IFS= read -r old; do
     [ -n "$old" ] && [ "$old" != "$RUNID" ] && rm -rf "$RUNROOT/$old" 2>/dev/null || true
   done
+  # THE TAILS GO WITH THE RUNS THAT NAMED THEM (TOOL-dWitnessedBar-25 S4): after the sweep, the tails
+  # directory keeps exactly the hashes some retained run record's verdict names as `tail.<n>`. One
+  # directory listing, by glob, and one read of the retained verdicts; a staging name is never a hash,
+  # so a concurrent bar's tail in flight is not swept.
+  # WHAT IT DOES NOT CHECK: another worktree's retained runs, which unit 42 adds; a tail only another
+  # worktree's record names is swept here.
+  _td=""; [ -n "$RG_COMMON_RAW" ] && _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails
+  if [ -n "$_td" ] && [ -d "$_td" ]; then
+    _tkeep=" $(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ { split($2, h, " "); printf "%s ", h[1] }' "$RUNROOT"/*/verdict 2>/dev/null)"
+    for _tf in "$_td"/*; do
+      _th=${_tf##*/}
+      case "$_th" in ''|*[!0-9a-f]*) continue ;; esac
+      case "$_tkeep" in *" $_th "*) ;; *) rm -f "$_tf" 2>/dev/null ;; esac
+    done
+  fi
+  unset _td _tkeep _tf _th
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.

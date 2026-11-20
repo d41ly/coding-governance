@@ -2397,6 +2397,10 @@ else printf -v RUNLOG_GATE_RUN 'push-%(%s)T%s-%s' -1 "$RANDOM" "$$"; fi
 [ -n "$gd" ] && { [ -e "$gd/gate-run/$RUNLOG_GATE_RUN" ] || [ -L "$gd/gate-run/$RUNLOG_GATE_RUN" ]; } \
   && rm -rf "$gd/gate-run/$RUNLOG_GATE_RUN" 2>/dev/null
 export GATE_RUN_ID="$RUNLOG_GATE_RUN"
+# THE BAR'S CAUSE, the push and the sha it pushes (TOOL-dWitnessedBar-25 S2): the runner writes it into
+# its verdict and removes it before any leg starts. Exported after the reuse view above, so no reuse key
+# moves with it.
+export GATE_CAUSE="push:$main_local"
 # A RED AT THE PUSH BOUNDARY IS ATTRIBUTED against the sha the REMOTE holds for the default branch —
 # the one git fed this hook on stdin, which is the landing base and never this clone's own tip, so a
 # red is re-run against the tree the push would land on rather than against the tree that has it.

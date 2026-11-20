@@ -11135,6 +11135,40 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 # `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
+# TOOL-dWitnessedBar-25 S5 - A RED BAR'S FAILING-LEG TAILS, COMMITTED AS `leg-tail` RECORDS. The run-gates
+# kit's keep verb reads `trace.leg-output` itself and, under `tail-by-hash`, writes one record per tail of
+# the run that no tracked record holds, under the build's record anchor `derive_review_signals` derives;
+# each record it wrote is staged, so it commits with the close's records. Every line it prints is echoed.
+# WHAT IT DOES NOT CHECK: the records' content, which is the keep verb's; a miss here never moves the
+# item, it is named and the close goes on.
+write_leg_tails() { # slug · the bar's pinned run id
+  local py="" d="" kr _lt_line _lt_rel
+  derive_review_signals "$1" build
+  if [ -z "$_rs_anchor" ]; then
+    echo "unattended: gates-green — no leg-tail record written: the build's generated units region names no unit to anchor it"
+    return 0
+  fi
+  kr=$KIT_DIR
+  while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" run-gates keep_tails.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: gates-green — no leg-tail record written: no python launcher, or the run-gates kit's keep_tails.py does not resolve beside this kit"
+    return 0
+  fi
+  RB_BOUND=120 run_bounded "$py" -B "${kr:-.}/$d/keep_tails.py" --run "$2" --build "$1" --unit "$_rs_anchor"
+  while IFS= read -r _lt_line; do
+    _lt_line=${_lt_line%$'\r'}
+    [ -n "$_lt_line" ] || continue
+    echo "unattended: gates-green — $_lt_line"
+    case "$_lt_line" in
+      "keep-tails: wrote "*)
+        _lt_rel=${_lt_line#keep-tails: wrote }; _lt_rel=${_lt_rel%% *}
+        stage_runmd "$_lt_rel" || echo "unattended: gates-green — the leg-tail record git could not stage: $_lt_rel" ;;
+    esac
+  done <<<"$RB_OUT"
+  return 0
+}
+
 write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
   local p b
   local -a ps=()
@@ -11951,7 +11985,8 @@ dod_met() { # slug · run-state file · item · checker
         else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$DRIVER_PID"; fi
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
-        _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+        # TOOL-dWitnessedBar-25 S2 - the bar's cause, this run, in the runner's verdict.
+        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_INHERITED_RED="$GP_POLICY")
         [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
         [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
         # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
@@ -12083,6 +12118,13 @@ dod_met() { # slug · run-state file · item · checker
       fi
       fact "$rel" gates-run >/dev/null; if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$_fact" ]; then
         set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+      fi
+      # TOOL-dWitnessedBar-25 S5 - THE RED BAR'S TAILS COMMIT WITH THE CLOSE'S RECORDS, staged here beside
+      # the `gates-run` fact. A BARE STATEMENT with the bar's capture put back after it, as the held asks'.
+      if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+        _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+        write_leg_tails "$slug" "$_gid"
+        RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       fi
       GG_RUN_FACT=""
       DOD_OUT=$RB_OUT

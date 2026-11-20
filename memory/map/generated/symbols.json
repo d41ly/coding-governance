@@ -15528,6 +15528,11 @@
       "file": "tools/playbook/tag_index.py"
     },
     {
+      "id": "load_factory",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "load_fixture_report",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -15771,6 +15776,11 @@
       "id": "load_run_journal",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "load_scanner",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "load_scenarios",
@@ -16591,6 +16601,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "main",
@@ -19773,6 +19788,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_blob_hash",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "read_blob_id",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -21126,6 +21146,11 @@
       "id": "read_git_dirs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_git_dirs",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "read_git_grep",
@@ -23453,6 +23478,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_run_tails",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "read_runner_levels",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/run_level.py"
@@ -24068,6 +24098,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_tail_value",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
       "id": "read_target",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -24281,6 +24316,11 @@
       "id": "read_tracked_paths",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "read_tracked_tails",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "read_trailer_edges",
@@ -31430,6 +31470,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/run-gates/owed_rows.py"
     },
     {
@@ -31696,6 +31741,11 @@
       "id": "run_join",
       "kind": "function",
       "file": "tools/workflows/check-review-join.test.sh"
+    },
+    {
+      "id": "run_keep",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "run_key_shape",
@@ -32981,6 +33031,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
     },
     {
       "id": "run_selftest",
@@ -38610,6 +38665,11 @@
     {
       "id": "write_fixture_repo",
       "kind": "function",
+      "file": "tools/run-gates/keep_tails.py"
+    },
+    {
+      "id": "write_fixture_repo",
+      "kind": "function",
       "file": "tools/run-gates/product_tests.py"
     },
     {
@@ -38926,6 +38986,11 @@
       "id": "write_leg_record",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_leg_tails",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_legacy_homes",

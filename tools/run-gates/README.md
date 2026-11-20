@@ -158,6 +158,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `profile_bar.test.sh` | the profiler's own arms |
 | `bar-wall-evidence.txt` | gov's whole-bar wall time per node, written by `GOV_NODE=<tag> python profile_bar.py --record`; withheld from the payload |
 | `precommit.py` | the derived commit-time list behind `--precommit`: every manifest row's `precommit` argv its `guard` trips; see "The commit-time list is derived" below |
+| `keep_tails.py` | the keep verb: a red run's failing-leg tails, which the runner keeps by hash, committed as `leg-tail` records under `trace.leg-output = "tail-by-hash"`; see "The run record" below |
 | `product_tests.py` | the product-test contract: the rows carrying `level` graded against `tests.product`, and the runner adapters' rows the leg factory renders; see "The product-test contract" below |
 | `measure_legs.py` | the gate profiler: every manifest leg run clean and unbounded, serially or under a load cap, each in its own Windows Job Object and profiled to its processes; see "The gate profiler" below |
 | `fixtures/measure-legs/` | the fixture legs and manifests `measure_legs.py --selftest` runs |
@@ -867,6 +868,37 @@ leg starts: left set, every leg would inherit it, and a leg that drives a nested
 kit's own suites do in scratch clones, would reuse one run directory for every nested bar. A pin
 names ONE run.
 
+**The verdict names its run and its cause** (TOOL-dWitnessedBar-25). The `verdict` file carries
+`run_id`, the id its header names, and `cause`, the act that started the bar: `GATE_CAUSE` as its
+caller exports it, read once and removed before any leg starts, as `GATE_RUN_ID` is, so a leg's nested
+runner never names its caller's cause. The callers that pin a run id export one: the pre-push hook
+`push:<pushed sha>`, `post-merge.sh` `post-merge:<landed sha>`, the unattended close `run:<slug>` and
+`pass-legs.sh` `pass:<head sha>`. With none exported it reads `attended`, and a value outside
+`[A-Za-z0-9._:@-]+` reads `attended` too, with one `run-gates: GATE_CAUSE refused` line on stderr.
+
+**A failing leg's output tail is kept by its hash.** For each failed leg, in manifest order, the
+runner cuts the last 60 lines of its redacted `<i>.out` copy (its retry's copy for a leg retried alone),
+at most their last 8192 bytes, hashes them as git hashes a blob, writes them to
+`<common-dir>/gate-tails/<hash>` where no file holds that hash, and adds `tail.<n>` `<hash> <leg name>`
+to the verdict, `<n>` from 1. A failed leg with no copy keeps the empty tail. The directory is the
+COMMON dir's, so every worktree of a clone writes one directory and a tail outlives the worktree that
+produced it. After the run sweep, the tails directory keeps exactly the hashes some retained run of
+this git dir names. **What the sweep does not check:** another worktree's retained runs; a tail only
+another worktree's record names is swept.
+
+**The keep verb commits them.** `python keep_tails.py --run <run id> --build <slug> --unit <unit id>`,
+run in the repository, reads `trace.leg-output` through the policy kit's `policy.py get`, the catalogue
+default where that reader cannot run. Under `tail-by-hash`, the default, it writes one `leg-tail`
+record per `tail.<n>` of the run through the memory-tree record factory's `write_record`: fields `Leg`,
+`Hash`, `Run`, `Sha` and `Cause`, then the tail in one fenced block, each span runlog's `scan_secrets`
+finds replaced by its placeholder; a hash a tracked `leg-tail` record holds is skipped. Under
+`node-local` it writes nothing and says `trace.leg-output is node-local`. Exit 0 when every tail is
+written or skipped, 1 when one is not kept (its file gone, its bytes not hashing to its name, or a line
+`write_record` refuses), 2 on a refusal before any write. The unattended close runs it on its bar's red
+path, under the build's record anchor, and stages what it wrote with the `gates-run` fact.
+`keep_tails.py --selftest` plants its own scratch repositories. **What it does not check:** that a tail
+decodes or that its cut lands on a character boundary, or secret shapes runlog's table does not know.
+
 **Every bar also leaves one line in the run log.** From its EXIT trap the runner appends one
 `ev=once` line to `runlog/gates.log` under the git COMMON dir, in the runlog kit's grammar, so the
 primary tree and every linked worktree of a clone write one file, and a run that ran the bar
@@ -913,8 +945,8 @@ and changes no reader:
 
 | File | Written | Keys this runner writes |
 |---|---|---|
-| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise |
-| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `run_id`, `stamped`, `by` (`runner`) |
+| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; and `tail.<n>` per failing leg (see "The run record") |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `run_id`, `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
 
 The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
 written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
