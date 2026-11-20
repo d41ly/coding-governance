@@ -108,7 +108,7 @@ First-pass readings, restated one criterion per line in the block that closes th
   with no lookup, the card unchanged.
 - AC8, AC10, AC13 — the three greps over the working tree printed nothing.
 - AC9 — `--plant lookup-upstream` held: a clone whose one remote is `upstream` read the card re-derived.
-- AC11 — `--plant lookup-hung` held: `evidence` with 4 s (DERIVED) over the control, a bound of 4 s
+- AC11 — `--plant lookup-hung` held: `evidence` with 4 s (DERIVED) over the control, a bound of 4 s (PINNED, `CARD_FETCH_BOUND`)
   (PINNED) plus 3 s (PINNED).
 - AC12 — `--plant replay` held: `FETCH_HEAD`'s mtime unchanged. `lookup`, `lookup-offline`, `publish`,
   `publish-off`, `publish-unwritten` and `publish-hung` held too.
@@ -241,7 +241,7 @@ build's landing by README rule 8, and every other owed arm is the close's (the b
   `upstream` read the card (first pass).
 - AC10 — `skills/session-kickoff/manifest-check.sh` — the grep for `GOVREF_` and `write_gov_ref`
   printed nothing (first pass).
-- AC11 — `card-store.fixture.sh --plant lookup-hung` — held: `evidence` within the bound of 4 s
+- AC11 — `card-store.fixture.sh --plant lookup-hung` — held: `evidence` within the bound of 4 s (PINNED, `CARD_FETCH_BOUND`)
   (PINNED) plus 3 s (PINNED) (first pass).
 - AC12 — `card-store.fixture.sh --plant replay` — held: `FETCH_HEAD`'s mtime unchanged (first pass).
 - AC13 — `skills/` — the grep for an inline `gov_ref_sh` or `gov_feed_sh` block printed nothing
