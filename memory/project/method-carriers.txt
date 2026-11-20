@@ -47,3 +47,4 @@ tools/playbook/instruction_units.py · the held-envelope constant and its fixtur
 tools/loop/loop_witness.py · its self-test plants a stub BUILD-METHOD.md into a scratch tree; it names the method path as fixture data and restates no rule
 .governance/instructions.toml · a level-2 kickoff fact the card prints names the method file as where a multi-pass build runs
 help/orientation-card.md · its pockets example prints the first kickoff fact, which names the method file
+tools/loop/placement.py · a fixture plants a one-line stub of the method file in its scratch repository, because the driver tests only that the file exists; it restates nothing
