@@ -1,6 +1,6 @@
 # TOOL-dHomeGraded-2 — `govkit update` reaps a retired row that a live row at the same path supersedes
 
-**Status:** OPEN · rev-1 · 2026-11-20 · node d · Tier-1 · base e52614f4 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-11-20 · node d · Tier-1 · base e52614f4 · streams tooling
 
 <!-- gen:spec-records -->
 
