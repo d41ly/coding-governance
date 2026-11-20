@@ -31,11 +31,14 @@ set -u
 # reuse mode would let the caller choose a verdict; an inherited holder nonce would skip the queue.
 # `GATE_REUSE_LINEAGE` is a reuse mode too, and the one this bar's `GATE_FULL` would switch on
 # (TOOL-aSparedSpawn-33 S7). `GATE_SELFTESTS` and `GATE_TURNSTILE_DIR` stay honoured: the first is the
-# owner's switch, the second moves the queue and never a verdict.
+# owner's switch, the second moves the queue and never a verdict. Every knob the pre-push hook scrubs or
+# clears for a bar is here too (TOOL-dWitnessedBar-60 S2): an inherited `GATE_SELECTION` would hold legs
+# in a bar this records as green, and an inherited `GATE_BASE_FROM` would skip a scoped bar's verdict.
 PM_SCRUB="GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
   GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX GOV_GATE_CMD GOV_GATE_CMD_TEST GOV_PYTHON GATE_LEGS GATE_REUSE
   GATE_REUSE_LINEAGE GATE_BASE GATE_DOCS_BASE GATE_PUSH_BASE GATE_ATTRIBUTE GATE_SPAWN_CMD GATE_SPAWN_FLOOR
-  GATE_VERDICT_FAULT GATE_RUN_ID GATE_TURNSTILE_HOLDER"
+  GATE_VERDICT_FAULT GATE_RUN_ID GATE_TURNSTILE_HOLDER GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK
+  GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY"
 PM_DROPPED=""
 for _k in $PM_SCRUB $(compgen -e); do
   case "$_k" in
