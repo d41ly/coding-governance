@@ -27,7 +27,7 @@ TOOL-dPlacedRequest-1 S10 creates no ref while offline.
 No gate, suite or bar ran in this pass, and no `--selftest`. Each criterion below was observed by a probe
 of the changed code: `python tools/loop/claim.py --fixture --plant <case>` per plant, each printing `held`,
 then `python tools/loop/claim.py --fixture`, the leg's own argv, printing
-`claim: fixtures · PASS · 11 case(s) · 0 failed` (the run's node, 2026-11-20, PINNED). The leg's RED was
+`claim: fixtures · PASS · 11 case(s) · 0 failed` (the run's node, 2026-11-20, PINNED) before the checklist pass added 2 (PINNED) plants, each run by its own `--plant`. The leg's RED was
 staged once as a probe: with `derive_claim_route` sending a terminal cause to `wait` under `leases: warn`,
 `--plant tombstone-warn` printed `MISSED` naming `the refusal printed 0 ask lines, not one`, and held again
 once restored. The index generator's `--check` printed the same lines before and after its edit.
@@ -39,6 +39,8 @@ once restored. The index generator's `--check` printed the same lines before and
   `--plant patch-owner-ratified`: the owner's disposition record of `item.entry.claim` `ratified`, written
   through the record factory under `TOOL-dFixPatch-1` and committed, and the same claimant's second run
   exited 0, resumed, recording `none -> designing` with `item=item.plan.dedupe`.
+  `--plant patch-owner-rejected`: the owner's record disposing `rejected`, and the resumed claim exited 1
+  naming `rejected for good` and `patch.ratify`, no transition recorded.
 - AC2 — `--plant tombstone-warn`: the build lease's tip a `status: landed` build lease of another node,
   under the default `leases: warn`; the verb exited 1 printing `tombstone` and exactly one
   `ask: dRunAgain · tombstone · request <key>` line, the lease ref still at the tombstone's commit, 2
@@ -73,6 +75,11 @@ once restored. The index generator's `--check` printed the same lines before and
   `patch.ratify` = `auto` recorded `item=item.plan.dedupe`, `stand-in=dRankedPlan` and
   `scenario=scenario.patch`. A `new` claim probed through the same fixture recorded `none -> planning`
   under `item.entry.claim` with no scaffold commit, and its re-run wrote nothing.
+- The checklist pass's refusals — `--plant refusals`: a `continue` placement refused exit 1 naming the
+  disposition; `--pieces 2` on a patch refused exit 2; a stray staged path refused the scaffold exit 1
+  naming it, no README written, and once unstaged the same claimant's run resumed, committed the scaffold
+  and recorded `none -> designing`; under `leases.offline: refuse` with the remote renamed away a fresh
+  slug exited 1 printing `lease refused — offline · claims/dElsewhereNow`.
 - AC8 — `grep -n '"loop claim fixtures"' tools/gate-legs.json` finds the row, its argv
   `python {prefix}/loop/claim.py --fixture`, and `python -m json.tool tools/gate-legs.json` parses with that
   row's `enforces` holding `principle.p39`. `tools/playbook/core-pending.txt` holds no `principle.p39`

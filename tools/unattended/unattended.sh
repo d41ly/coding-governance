@@ -4626,11 +4626,11 @@ read_claim_ref() { # claim ref · claim.py dir · python -> 0 with CLM_KEY its c
   CLM_KEY=$(printf '%s\n' "${out//$'\r'/}" | sed -n 's/^claimant-key: //p' | head -1)
   return 0
 }
-add_claim_key() { # claim ref · slug · one `key: value` line -> 0 written on the cached tip, 2 not written, its line printed
+add_claim_key() { # claim ref · the claim header `claim.py body` rendered · one `key: value` line -> 0 written on the cached tip, 2 not written, its line printed
   local ref="$1" tip c rc
   tip=$(GIT rev-parse -q --verify "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
   [ -n "$tip" ] || { echo "claim not written — no cached tip of $ref to add '$3' to"; return 2; }
-  c=$(build_gov_commit "$tip" "$(printf 'gov-claim claims/%s\n\n%s' "$2" "$3")") \
+  c=$(build_gov_commit "$tip" "$(printf '%s\n\n%s' "$2" "$3")") \
     || { echo "claim not written — the commit adding '$3' could not be built in this clone"; return 2; }
   write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
   [ "$rc" = 0 ] || { echo "claim not written — '$3' was not added to $ref: $GOVREF_WHY"; return 2; }
@@ -4701,7 +4701,7 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
       case "$out" in
         *"sharing a path; this run is NOT blocked"*)
           line=$(printf '%s\n' "$out" | sed -n 's/^  \(..*\)$/\1/p' | head -1)
-          add_claim_key "$ref" "$slug" "overlap: ${line:-a path an unmerged branch shares}" || return 2
+          add_claim_key "$ref" "${msg%%$'\n'*}" "overlap: ${line:-a path an unmerged branch shares}" || return 2
           echo "entry-claim — $slug · overlap noted on the claim, the lease taken as held under leases warn" ;;
       esac
     elif [ "$rc" = 1 ]; then
@@ -4715,7 +4715,7 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
           echo "claim refused — $slug · $cause · never retried"; return 1 ;;
         "route · stamp"*)
           line=$(read_utc_now)
-          add_claim_key "$ref" "$slug" "wait-since: $line" || return 2
+          add_claim_key "$ref" "${msg%%$'\n'*}" "wait-since: $line" || return 2
           echo "claim waiting — $slug · $cause · wait-since $line · ${out#route · stamp · } · exit 4 (waiting)"; return 4 ;;
         "route · wait "*) echo "claim waiting — $slug · $cause · ${out#route · wait · } · exit 4 (waiting)"; return 4 ;;
         "route · expired"*) echo "owner item: $slug · $cause past flow.wait-ceiling · ${out#route · expired · } · request $key"; return 1 ;;

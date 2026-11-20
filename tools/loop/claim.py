@@ -367,6 +367,11 @@ PLANTS = {"patch-owner-unratified": "a patch under patch.ratify = owner: the own
                                     "designing refused naming patch.ratify",
           "patch-owner-ratified": "the same patch, its owner's disposition record ratified committed: the resumed claim "
                                   "records item.plan.dedupe into designing",
+          "patch-owner-rejected": "the same patch, its owner's disposition record rejected: the resumed claim held "
+                                  "for good, naming patch.ratify",
+          "refusals": "a continue placement refused, --pieces on a patch refused, a stray staged path refusing the "
+                      "scaffold and the resumed claim committing it once unstaged, and an unreachable remote under "
+                      "leases.offline refuse refused offline",
           "tombstone-warn": "a repeat whose build lease is a tombstone under leases warn: exit 1 naming tombstone, one "
                             "ask line, the lease ref unmoved",
           "claim-twice": "a repeat claimed twice by one claimant: the second skips the pre-check, exits 0 claimed by this "
@@ -409,11 +414,12 @@ def write_claim_placement(root, key, disposition, build=NO_VALUE, playbook=NO_VA
     """A passed placement block of request `key` written as `placement.py check` leaves one."""
     from placement import ENTRY_FACTS, write_placement_blocks
     store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
-    entry = ENTRY_FACTS[disposition]
+    entry = ENTRY_FACTS.get(disposition)
     block = {"placed-utc": "2026-11-20T00:00:00Z", "disposition": disposition, "build": build, "breakpoint": NO_VALUE,
              "playbook": playbook, "reason": "the owner asked for it again", "evidence": NO_VALUE,
-             "observations": NO_VALUE, "placer": "declared", "scenarios": "scenario.%s" % entry,
-             "facts": "entry=%s" % entry, "check": "pass"}
+             "observations": NO_VALUE, "placer": "declared",
+             "scenarios": "scenario.%s" % entry if entry else NO_VALUE,
+             "facts": "entry=%s" % entry if entry else NO_VALUE, "check": "pass"}
     write_placement_blocks(store / ("%s.placement" % key), [block])
 
 
@@ -486,11 +492,18 @@ def check_claim_plant(case, top, seen, bad):
 
     claim_ref = "%s/%s" % (CLAIM_NS, slug)
     readme = "memory/builds/%s/README.md" % slug
-    if case == "patch-owner-unratified" or case == "patch-owner-ratified":   # AC1
+    if case.startswith("patch-owner"):   # AC1
         got = run_entry()
         check("unratified", got, 1, "owner item: ratify %s" % slug, "patch.ratify", "TOOL-%s-1" % slug)
         if run_fixture_git(root, "log", "-1", "--format=%B").find("Gov-Transition") >= 0:
             bad.append("an unratified patch recorded a transition")
+        if case == "patch-owner-rejected":
+            read_build_records().write_disposition(str(root), slug, "TOOL-%s-1" % slug, CLAIM_ITEM, "rejected", "prompt")
+            run_fixture_git(root, "add", "-A")
+            run_fixture_git(root, "commit", "-q", "-m", "the owner's rejection")
+            check("rejected", run_entry(), 1, "rejected for good", "patch.ratify")
+            if "Gov-Transition" in run_fixture_git(root, "log", "-1", "--format=%B"):
+                bad.append("a rejected patch recorded a transition")
         if case == "patch-owner-ratified":
             read_build_records().write_disposition(str(root), slug, "TOOL-%s-1" % slug, CLAIM_ITEM, "ratified", "prompt")
             run_fixture_git(root, "add", "-A")
@@ -499,6 +512,27 @@ def check_claim_plant(case, top, seen, bad):
             trailer = run_fixture_git(root, "log", "-1", "--format=%B")
             if "none -> designing" not in trailer or "item=item.plan.dedupe" not in trailer:
                 bad.append("the ratified patch's record reads %r" % trailer[-300:])
+    elif case == "refusals":   # S1, S4 and S5's refusal branches the other plants do not reach
+        write_claim_placement(root, key, "continue", FX_DONE)
+        check("continue", run_entry(), 1, "the placement's disposition continue opens no claimed build")
+        write_claim_placement(root, key, "patch", FX_DONE)
+        check("pieces on a patch", run_entry(pieces="2"), 2, "--pieces names a repeat's count")
+        write_claim_placement(root, key, "repeat", NO_VALUE, FX_PLAYBOOK)
+        write_fixture_files(root, {"tools/zq-stray.txt": "stray\n"})
+        run_fixture_git(root, "add", "--", "tools/zq-stray.txt")
+        check("stray staged", run_entry(), 1, "a staged path beyond the scaffold's own, tools/zq-stray.txt")
+        if (root / readme).exists():
+            bad.append("the refused scaffold wrote %s" % readme)
+        run_fixture_git(root, "reset", "-q", "--", "tools/zq-stray.txt")
+        check("resumed", run_entry(), 0, "claimed by this claimant", "scaffold committed", "recorded none -> designing")
+        write_fixture_files(root, {".governance/policy.toml": '[leases]\noffline = "refuse"\n'})
+        run_fixture_git(root, "commit", "-q", "-am", "leases.offline refuse")
+        run_fixture_git(root, "push", "-q", "origin", "main")
+        run_fixture_git(root, "fetch", "-q", "origin")
+        origin.rename(top / "origin.gone")
+        got = run_entry(the_slug="dElsewhereNow")
+        origin = top / "origin.gone"
+        check("offline refused", got, 1, "lease refused — offline · claims/dElsewhereNow")
     elif case == "tombstone-warn":   # AC2
         write_foreign_lease(root, slug)
         lease = "refs/gov/leases/%s/build" % slug
