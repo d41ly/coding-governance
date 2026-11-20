@@ -1624,23 +1624,30 @@ ceiling = 300
 stage = ["step.test"]
 
 [[exempt_leg]]
-name = "encoding posture (text IO names its encoding)"
-why = "it grades GOV's own tools and skills Python against `memory/project/encoding-posture-sites.txt`, a registry of THIS repo's gov-internal sites. The scanner ships with the gate-lint kit's `**` include, but the leg does not: a declared adopter leg would red at every adopter's next pull until they seeded a registry, and whether gov's scanner replaces an adopter's own is theirs to decide. Owner ruling, TOOL-aRepatriatedFork-3 section 8 F2."
-tag = "leg.gov.encoding-posture-text-io-names-its-encoding"
-tests = ["feature.gate-lint"]
-purpose = "catches Python text IO that does not name its encoding"
-argv = [
-  "python3",
-  "{prefix}/gate-lint/encoding_posture.py",
-  "memory/project/encoding-posture-sites.txt",
-  ".",
-  "{prefix}",
-  "skills",
-]
+name = "portability (the interpreter floor, run for real)"
+why = "it runs the floor module's `census` verb, and the floor module lives in gov's `<prefix>/lib/`, which ships nothing: the floor declaration it reads is gov's alone, and an adopter's own interpreter floor is theirs to declare. It compiles every tracked *.py under a real interpreter at the declared floor and counts the version-bound features, red with the install command where no such interpreter runs, never a skip. TOOL-dWitnessedBar-24 S10, section 8 F5 and F8."
+tag = "leg.gov.portability-the-interpreter-floor-run-for-real"
+purpose = "compiles the tree at the declared interpreter floor"
+argv = ["python3", "{prefix}/lib/python_floor.py", "census"]
 chunk = "product"
 subject = "repo"
 ceiling = 300
-enforces = ["practice.portable.encoding"]
+pack = "portability"
+enforces = ["practice.portable.interpreter-floor"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "portability (a bare shell name launched)"
+why = "it runs the run-gates kit's `--bare-bash` query, which grades every launch against the `resolve_bash_py` and `resolve_bash_js` resolver blocks gov's kits carry; an adopter's own code need not use those blocks, so a shipped leg would red every adopter that launches `bash` by name with no population to carry its sites. TOOL-dWitnessedBar-24 S9, section 8 F9."
+tag = "leg.gov.portability-a-bare-shell-name-launched"
+tests = ["feature.run-gates"]
+purpose = "catches a launch of the bare name bash in Python or JS"
+argv = ["python3", "{prefix}/run-gates/measure_legs.py", "--bare-bash", "."]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+pack = "portability"
+enforces = ["practice.portable.launch"]
 stage = ["step.test"]
 
 [[exempt_leg]]

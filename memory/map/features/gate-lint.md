@@ -18,6 +18,15 @@ gate-legs = [
   "shell hygiene (a fork spent on builtin work)",
   "shell hygiene (a fixed-name temp renamed into place)",
   "spawn budget (forks per hot entrypoint)",
+  "encoding posture (an entry point writes stdout as UTF-8)",
+  "encoding posture (JavaScript text IO names its encoding)",
+  "shell hygiene (a backslashed path handed to bash)",
+  "shell hygiene (a quoting hazard)",
+  "portability (shell lines only shrink)",
+  "portability (execution-sensitive files are LF by class)",
+  "powershell hygiene selftest",
+  "portability (the interpreter floor, run for real)",
+  "portability (a bare shell name launched)",
 ]
 kits = ["gate-lint"]
 git-hooks = []
@@ -37,6 +46,11 @@ globs = [
   "memory/project/location-probe-waivers.txt",
   "memory/project/spawn-idiom-sites.txt",
   "memory/project/fork-ceilings.txt",
+  "memory/project/encoding-stdout-sites.txt",
+  "memory/project/encoding-js-sites.txt",
+  "memory/project/path-literal-sites.txt",
+  "memory/project/quoting-sites.txt",
+  "memory/project/shell-role.txt",
 ]
 ```
 
@@ -128,8 +142,17 @@ took an adopter's AST predicate whole and changed only its population (`git ls-f
 registry (keyed on the ARM, same both-directions rule as the shell registry) and its clean line,
 which prints the graded file count. The file ships with the kit's `**` include; the leg does not,
 because a declared adopter leg reds at every adopter's next pull until they seed a registry, and
-whether it replaces an adopter's own scanner is theirs to decide (that unit's §8 F2). The leg is
-therefore an `[[exempt_leg]]` row in the govkit registry, not a `[[gate_leg]]` in the descriptor.
+whether it replaces an adopter's own scanner is theirs to decide (that unit's §8 F2). The leg was
+therefore an `[[exempt_leg]]` row in the govkit registry until `TOOL-dWitnessedBar-24` moved it into
+the descriptor as a `[[gate_leg]]` of the portability pack: the ledger factory's `test.seed` now seeds
+an adopter's population at the update, which removes the first-pull red that ruling was about.
+
+**The portability pack is a row value, not a kit.** `TOOL-dWitnessedBar-24` gives each rule of the
+portable practice a leg carrying `pack = "portability"` and `enforces` naming its rule: the moved
+encoding leg, its `--stdout` and `--js` arms, the backslashed-path and quoting modes of the shell
+scanner, the `--shell-role` ledger of each shell file's code lines, `eol_class.py`'s line-ending class
+read from the attribute and the index, and the PowerShell scanner's self-test. Two pack legs are gov's
+own `[[exempt_leg]]` rows: the floor module's `census` and the run-gates kit's `--bare-bash` query.
 
 **The location-probe ban is a second MODE of the shell scanner, not a second scanner.**
 `TOOL-aGraftedHelix-45` gates `git -C <dir> rev-parse --show-*` and `cd <dir> && git rev-parse
@@ -186,7 +209,7 @@ that must land green over a non-compliant population without keying on a line nu
   fixture holding the failing form and its nearest innocent neighbour.
 - `python tools/gate-lint/ps-hygiene.py [root]` — the PowerShell scans over every tracked `.ps1`,
   refusing with 2 when there is none, and `--selftest` for the
-  same proof. Neither is on the bar.
+  same proof. The scan is on no bar; the self-test is the `powershell hygiene selftest` leg.
 - `memory/project/substitution-fed-loops.txt` — the carried sites. Delete a row when its site is
   drained; the leg reds if you delete one too early or too late.
 - `python tools/gate-lint/encoding_posture.py [registry] [root] [pathspec ...]` — the Python
@@ -219,10 +242,10 @@ that must land green over a non-compliant population without keying on a line nu
 - **The gov-internal encoding sites are carried, not drained.** Every file in that registry is one
   no adopter receives; the drain is a follow-up the owner ruled out of the unit that wired the leg.
 
-- **`ps-hygiene.py` is still on no leg.** This kit's original defect, half-closed. There are zero
-  tracked `.ps1` files in this repository, so a leg here would refuse on every run. The scanner's
-  half of the fix is built: it refuses an empty population with exit 2 (`TOOL-cListedCensus-1`).
-  The other half, a leg that an adopter with `.ps1` files receives, is not.
+- **The `ps-hygiene.py` SCAN is still on no leg.** This kit's original defect, half-closed. There are
+  zero tracked `.ps1` files in this repository, so a scan leg here would refuse on every run; its
+  `--selftest` is the `powershell hygiene selftest` leg (`TOOL-dWitnessedBar-24`), so the predicates
+  run on the bar, and an adopter with `.ps1` files adds the scan leg itself, as the kit README says.
 - **The carried sites, and nothing that schedules the drain.** The registry ratchets — the count
   can only fall — but a ratchet that never drains is a waiver wearing a ratchet's clothes. The drain
   is a backlog row against the tooling family, not a unit of the build that wired the leg.

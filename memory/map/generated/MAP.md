@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 209 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 218 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 172 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -43,6 +43,8 @@ Inventories: gate-legs: 209 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
 | `edges (every declared edge parses, is registered and resolves)` | playbook |
+| `encoding posture (JavaScript text IO names its encoding)` | gate-lint |
+| `encoding posture (an entry point writes stdout as UTF-8)` | gate-lint |
 | `encoding posture (text IO names its encoding)` | gate-lint |
 | `every held leg is budgeted, every budget row resolves` | run-gates |
 | `extract-arms self-test` | run-gates |
@@ -132,7 +134,12 @@ Inventories: gate-legs: 209 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `playbook validity gate` | playbook-mode |
 | `policy check` | policy |
 | `policy fixtures` | policy |
+| `portability (a bare shell name launched)` | gate-lint |
+| `portability (execution-sensitive files are LF by class)` | gate-lint |
+| `portability (shell lines only shrink)` | gate-lint |
+| `portability (the interpreter floor, run for real)` | gate-lint |
 | `positional (the citation check alone)` | playbook |
+| `powershell hygiene selftest` | gate-lint |
 | `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | push-main |
@@ -185,10 +192,12 @@ Inventories: gate-legs: 209 · kits: 20 · git-hooks: 4 · harness-hooks: 13 · 
 | `scratch-guard self-test` | agent-cap |
 | `selftest harness self-test` | run-gates |
 | `settings-merge selftest` | baseline |
+| `shell hygiene (a backslashed path handed to bash)` | gate-lint |
 | `shell hygiene (a fixed-name temp renamed into place)` | gate-lint |
 | `shell hygiene (a fork spent on builtin work)` | gate-lint |
 | `shell hygiene (a location probe asked from a moved directory)` | gate-lint |
 | `shell hygiene (a loop fed by a command substitution)` | gate-lint |
+| `shell hygiene (a quoting hazard)` | gate-lint |
 | `shell-hygiene selftest` | gate-lint |
 | `spawn budget (forks per hot entrypoint)` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |

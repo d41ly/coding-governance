@@ -3,6 +3,14 @@
 
 # Execution-sensitive scripts must be LF (run in bash/CI). Covers the relocated tools/ kits.
 *.sh text eol=lf
+# The rest of the execution-sensitive class (TOOL-dWitnessedBar-24 S2): every file an interpreter or a
+# parser reads, pinned by CLASS so a new file lands LF with no edit here. The gate-lint kit's
+# `eol_class.py` grades the class from the attribute and the index, never the worktree. The committed
+# blobs were already LF under `* text=auto`; these lines move only a worktree, on its next checkout.
+*.py text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
@@ -131,6 +139,12 @@ memory/project/instructions-legacy.txt merge=rows
 memory/project/landed-steps.txt merge=rows
 # TOOL-dWitnessedBar-20 S7: the legacy policy homes list, a ledger keyed by conf and key.
 memory/project/legacy-homes.txt merge=rows
+# TOOL-dWitnessedBar-24 S13: the portability pack's five populations.
+memory/project/encoding-stdout-sites.txt merge=rows
+memory/project/encoding-js-sites.txt merge=rows
+memory/project/path-literal-sites.txt merge=rows
+memory/project/quoting-sites.txt merge=rows
+memory/project/shell-role.txt merge=rows
 
 # Wholly GENERATED views: a merge takes this side, and check 9 (gen_build_index.py --check) or
 # check 17 (gotchas.py --check) then reds the stale result until `--write` re-renders it.

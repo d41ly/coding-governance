@@ -8,7 +8,25 @@ Project-agnostic. Run over any repo:
     python <this file> --location-probes [registry-path] [root] [pathspec ...]   # the second class
     python <this file> --spawn-idioms [registry-path] [root] [pathspec ...]      # the third class
     python <this file> --temp-names [registry-path] [root] [pathspec ...]        # the fourth class
+    python <this file> --path-literals [registry-path] [root] [pathspec ...]     # a backslashed path
+    python <this file> --quoting [registry-path] [root] [pathspec ...]           # two quoting hazards
+    python <this file> --shell-role [ledger-path] [root] [pathspec ...]          # shell only shrinks
+    python <this file> <mode> --measure [root] [pathspec ...]   # each key's fields, its count; grades nothing
     python <this file> --selftest                 # prove every predicate in BOTH directions
+
+THE PORTABILITY MODES (TOOL-dWitnessedBar-24), each over every tracked `*.sh` and extensionless shell
+shebang file, reading code halves only, so a comment and a quoted heredoc's body are never a site.
+`--path-literals` counts a word holding a drive letter followed by a backslash (`C:\\`), class
+`backslash-path`: bash reads the backslash as an escape. `--quoting` counts a heredoc whose
+redirection target, quoted or not, ends `.sh`, `.py` or `.js` (`heredoc-source`), and a `read` under
+the prefix `IFS=$'\\t'` (`tab-ifs-read`), where a tab is IFS whitespace and collapses an empty field.
+Both key on (path, class) in a shrink-only registry. WHAT THEY DO NOT CHECK: a path split across a
+line continuation or built in a variable; a source written by `tee` or `printf` rather than a
+heredoc redirection; an IFS set on an earlier line or spelled any other way than `$'\\t'`.
+`--shell-role` holds each shell file's code lines, every line neither blank nor a comment, on one
+ledger row per file, graded `shrink-only`: a new file, a grown file and a row whose file is gone are
+red, and so is a file that shrank (`count fell`) until its row is lowered in the same commit, so shell
+outside a shim only shrinks and a trim cannot regrow unrecorded. A file with no code line takes no row.
 
 THE FOURTH CLASS, `--temp-names` (TOOL-dRedressedBar-24). A file written at a fixed temp name and
 renamed over its destination: a process that can write the directory plants a link at that name
@@ -234,7 +252,9 @@ PROBE_CLASSES = [
 #: arm, 11 executed, every one unconditional, counted off the arms.
 #: RAISED 92 -> 125 by TOOL-dRedressedBar-26: eight temp rows, the ten-word lead arm, the 13-row
 #: boundary arm and the two one-line-per-key rows, 33 executed, every one unconditional.
-FLOOR_ASSERTIONS = 125
+#: RAISED 125 -> 137 by TOOL-dWitnessedBar-24: the portability modes, three path rows, three quoting
+#: rows, the code-line count and five shell-role ledger rows, 12 executed, every one unconditional.
+FLOOR_ASSERTIONS = 137
 
 
 def check_substitution(text: str) -> bool:
@@ -1218,6 +1238,163 @@ def run_temp_scan(args: list[str]) -> int:
     return 1
 
 
+# THE PORTABILITY MODES (TOOL-dWitnessedBar-24): `--path-literals`, `--quoting` and `--shell-role`. Each
+# reads `read_shell_sources`' population and its ledger through the shapes below, and `--measure` prints
+# the rows a ledger seed writes, each key's fields then its count, TAB-separated, grading nothing.
+PATH_LITERAL = re.compile(r"(?<![\w\\])[A-Za-z]:\\")
+PATH_KEY_SHAPE = (re.compile(r"\Abackslash-path\Z"), "the class `backslash-path`", "CLASS")
+QUOTING_CLASSES = ("heredoc-source", "tab-ifs-read")
+QUOTING_KEY_SHAPE = (re.compile(r"\A(?:heredoc-source|tab-ifs-read)\Z"),
+                     "a quoting class, `heredoc-source` or `tab-ifs-read`", "CLASS")
+# A redirection's target: `>` or `>>`, not after a digit, `&`, `<` or `>`, its word unquoted or quoted.
+REDIRECT_TARGET = re.compile(r"(?<![<>&\d])>>?[ \t]*([\"']?)([^\s;&|<>\"']+)\1")
+SOURCE_SUFFIXES = (".sh", ".py", ".js")
+TAB_IFS_READ = re.compile(r"(?<![\w$])IFS=\$'\\t'[ \t]+read(?![\w-])")
+SITE_REMEDY = {
+    "backslash-path": "spell the path with forward slashes (`/c/Users/x` or `C:/Users/x`): bash reads "
+                      "`\\U` as an escape and the backslashed path names nothing",
+    "heredoc-source": "write the source file with the edit tools, or keep it a tracked file the script "
+                      "copies: a heredoc mangles backslashes and carries the writer's line endings",
+    "tab-ifs-read": "split the line with `${line%%$'\\t'*}` and `${line#*$'\\t'}`: a tab is IFS "
+                    "whitespace, so `read` collapses an empty field and shifts every field after it",
+}
+
+
+def scan_path_literal_file(text: str) -> dict[str, list[tuple[int, str]]]:
+    """`{"backslash-path": [(line, code)]}`: each code line, outside a comment and a quoted heredoc's
+    body, holding a drive letter followed by a backslash."""
+    found: dict[str, list[tuple[int, str]]] = {"backslash-path": []}
+    for number, code, _comment in read_code_lines(text):
+        if PATH_LITERAL.search(code):
+            found["backslash-path"].append((number, code.strip()))
+    return found
+
+
+def scan_quoting_file(text: str) -> dict[str, list[tuple[int, str]]]:
+    """`{class: [(line, code)]}` for the two quoting hazards: a heredoc whose redirection target ends
+    `.sh`, `.py` or `.js`, and a `read` under `IFS=$'\\t'`."""
+    found: dict[str, list[tuple[int, str]]] = {key: [] for key in QUOTING_CLASSES}
+    for number, code, _comment in read_code_lines(text):
+        if HERESTRING not in code and HEREDOC.search(code) and any(
+                m.group(2).endswith(SOURCE_SUFFIXES) for m in REDIRECT_TARGET.finditer(code)):
+            found["heredoc-source"].append((number, code.strip()))
+        if TAB_IFS_READ.search(code):
+            found["tab-ifs-read"].append((number, code.strip()))
+    return found
+
+
+def measure_code_lines(text: str) -> int:
+    """A shell file's code lines: every line neither blank nor opening `#` once its indent is dropped."""
+    return sum(1 for line in text.split("\n") if line.strip() and not line.lstrip().startswith("#"))
+
+
+def run_site_scan(args: list[str], measure: bool, scan_file, shape: tuple, title: str) -> int:
+    """`--path-literals` or `--quoting` `[registry] [root] [pathspec ...]`: 0 clean, 1 findings, 2 refusal.
+    Under `measure` the registry positional is absent and each `(path, class)` count prints instead."""
+    if measure:
+        args = ["", *args]
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    try:
+        declared, malformed = resolve_declaration(args[0] if args and args[0] else None, shape)
+        sources = read_shell_sources(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if not sources:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    measured: dict[tuple[str, str], int] = {}
+    listing: dict[tuple[str, str], str] = {}
+    for rel, data in sources:
+        for key, sites in scan_file(data.decode("utf-8", "replace")).items():
+            for line, code in sites:
+                measured[(rel, key)] = measured.get((rel, key), 0) + 1
+                listing[(rel, key)] = listing.get((rel, key), "") + f"\n    {rel}:{line}  {code}"
+    if measure:
+        for (rel, key), count in sorted(measured.items()):
+            print(f"{rel}\t{key}\t{count}")
+        return 0
+    if not args or not args[0]:
+        print("sh-hygiene: no registry argument, so this run grades against an EMPTY declaration")
+    print(f"sh-hygiene: {title} — {len(sources)} tracked shell source(s) scanned, "
+          f"{sum(measured.values())} site(s) in {len(measured)} key(s)")
+    explained = {key: f"{key[0]}: {count} `{key[1]}` site(s) and no registry row declares them — "
+                      f"{SITE_REMEDY[key[1]]}" + listing[key] for key, count in measured.items()}
+    problems = malformed + check_registry(measured, declared, explained, listing)
+    if not problems:
+        print(f"sh-hygiene: OK — {sum(declared.values())} registered site(s) in {len(declared)} row(s) match "
+              f"the scan, and no undeclared {title} site")
+        return 0
+    print(f"sh-hygiene: {len(problems)} {title} finding(s).")
+    for problem in problems:
+        print(f"  {problem}")
+    return 1
+
+
+def run_shell_role_scan(args: list[str], measure: bool) -> int:
+    """`--shell-role [ledger] [root] [pathspec ...]`: each tracked shell file's code lines against its
+    row, graded `shrink-only` as the ledger's table declares (TOOL-dWitnessedBar-24 §8 F11). A new file,
+    a grown file and a row whose file is gone are findings, and so is a file that shrank, `count fell`,
+    until its row is lowered in the same commit: a trim left unrecorded would let the file regrow to its
+    old count with no widen row. A file with no code line has no row, since a ledger count is a positive
+    integer. 0 clean, 1 findings, 2 a refusal."""
+    if measure:
+        args = ["", *args]
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
+    if not root.is_dir():
+        print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
+        return 2
+    declared: dict[tuple[str], int] = {}
+    malformed: list[str] = []
+    try:
+        if args and args[0]:
+            path = pathlib.Path(args[0])
+            if not path.is_file():
+                raise OSError(f"no ledger at {path} — the argument was SUPPLIED and does not resolve to a file")
+            rows, refused = read_rows(path, 1, verbatim=(0,))
+            declared = {key: row[0] for key, row in rows.items()}
+            malformed = [render_malformed(entry) for entry in refused]
+        sources = read_shell_sources(root, args[2:])
+    except OSError as exc:
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
+        return 2
+    if not sources:
+        print("sh-hygiene: no tracked shell source under the root and pathspecs, so this run graded "
+              "NOTHING — that is a refusal and not a pass", file=sys.stderr)
+        return 2
+    measured = {(rel,): n for rel, data in sources
+                if (n := measure_code_lines(data.decode("utf-8", "replace")))}
+    if measure:
+        for (rel,), count in sorted(measured.items()):
+            print(f"{rel}\t{count}")
+        return 0
+    print(f"sh-hygiene: shell role — {len(sources)} tracked shell source(s), {sum(measured.values())} code line(s)")
+    problems = list(malformed)
+    for finding, (rel,), have, want in compare_counts(measured, declared, "shrink-only"):
+        if finding == "undeclared site":
+            problems.append(f"{rel}: a shell file of {have} code line(s) with no row — logic belongs in "
+                            f"Python, and a shim earns its lines through the ledger's widen route")
+        elif finding == "unmeasured row":
+            problems.append(f"{rel}: the ledger holds {want} line(s) and the file is gone — delete the row")
+        elif finding == "count fell":
+            problems.append(f"{rel}: count fell, {have} code line(s) under its row's {want} — lower the row "
+                            f"to {have} in this commit, so the trimmed lines cannot regrow unrecorded")
+        else:
+            problems.append(f"{rel}: {have} code line(s), above its row's {want} — shell outside a shim only "
+                            f"shrinks; move the logic to Python, or widen the row through the ledger")
+    if not problems:
+        print(f"sh-hygiene: OK — {len(measured)} shell file(s) at their rows")
+        return 0
+    print(f"sh-hygiene: {len(problems)} shell-role finding(s).")
+    for problem in problems:
+        print(f"  {problem}")
+    return 1
+
+
 def run_selftest() -> int:
     """Stage the break, confirm RED. A gate whose failing case has never been observed is not one."""
     ok = True
@@ -1648,6 +1825,50 @@ def run_selftest() -> int:
     test("temp [registry] a drifted key is one finding, and it ends with the key's site lines",
          (len(drift), drift[0].endswith(drift_sites) if drift else False), (1, True), say=True)
 
+    # THE PORTABILITY MODES (TOOL-dWitnessedBar-24): each planted site, and its nearest innocent twin.
+    def lines_of(found: dict[str, list[tuple[int, str]]]) -> dict[str, list[int]]:
+        return {key: [line for line, _c in sites] for key, sites in found.items() if sites}
+
+    test("path [planted] a backslashed drive path handed to cd is one site",
+         lines_of(scan_path_literal_file("cd C:\\Users\\x\n")), {"backslash-path": [1]}, say=True)
+    test("path [twin] the forward-slashed path, and the backslashed one in a comment, are none",
+         lines_of(scan_path_literal_file("cd /c/Users/x\n# cd C:\\Users\\x\ncd /tmp  # C:\\x\n")), {}, say=True)
+    test("path [heredoc] a quoted heredoc's body is data and never a site",
+         lines_of(scan_path_literal_file("cat <<'EOF'\nC:\\Users\\x\nEOF\n")), {}, say=True)
+    test("quoting [planted] a heredoc writing gen.sh and a tab-IFS read are one site each",
+         lines_of(scan_quoting_file("cat > gen.sh <<EOF\nx\nEOF\nwhile IFS=$'\\t' read -r a b; do :; done\n")),
+         {"heredoc-source": [1], "tab-ifs-read": [4]}, say=True)
+    test("quoting [planted] the target after the heredoc and a quoted .py target are sites too",
+         lines_of(scan_quoting_file("cat <<'EOF' >> \"$d/x.py\"\nx\nEOF\n")), {"heredoc-source": [1]}, say=True)
+    test("quoting [twin] a quoted heredoc writing notes.txt, a stderr redirect and a here-string are none",
+         lines_of(scan_quoting_file("cat > notes.txt <<'EOF'\nx\nEOF\ncat <<EOF 2>x.sh\nEOF\n"
+                                    "read -r a <<< \"$x\" > y.sh\nIFS=, read -r a b\n")), {}, say=True)
+    test("role [count] a blank line, a comment and the shebang are no code line",
+         measure_code_lines("#!/bin/bash\n\n  # note\necho a  # tail\n  b\n"), 2, say=True)
+    with tempfile.TemporaryDirectory() as role_dir:
+        role_root = pathlib.Path(role_dir)
+        subprocess.run(["git", "init", "-q"], cwd=role_dir, capture_output=True)
+        ledger = role_root / "role.txt"
+        ledger.write_text("a.sh\t2\tabcdef12\tseeded\n", encoding="utf-8")
+        (role_root / "a.sh").write_text("echo 1\necho 2\n", encoding="utf-8", newline="\n")
+        subprocess.run(["git", "add", "a.sh"], cwd=role_dir, capture_output=True)
+        quiet = io.StringIO()
+
+        def run_role() -> int:
+            with contextlib.redirect_stdout(quiet), contextlib.redirect_stderr(quiet):
+                return run_shell_role_scan([str(ledger), role_dir], False)
+
+        test("role [ledger] a file at its row is green", run_role(), 0, say=True)
+        (role_root / "a.sh").write_text("echo 1\necho 2\necho 3\n", encoding="utf-8", newline="\n")
+        test("role [ledger] a file grown past its row is red", run_role(), 1, say=True)
+        (role_root / "a.sh").write_text("echo 1\n", encoding="utf-8", newline="\n")
+        test("role [ledger] a file that shrank under its row is red, count fell", run_role(), 1, say=True)
+        ledger.write_text("a.sh\t1\tabcdef12\tseeded\n", encoding="utf-8")
+        test("role [ledger] a shrunk file whose row was lowered with it is green", run_role(), 0, say=True)
+        (role_root / "b.sh").write_text("# only a comment\necho b\n", encoding="utf-8", newline="\n")
+        subprocess.run(["git", "add", "b.sh"], cwd=role_dir, capture_output=True)
+        test("role [ledger] a new shell file with no row is red", run_role(), 1, say=True)
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -1664,6 +1885,14 @@ def main(argv: list[str]) -> int:
         return run_spawn_scan([arg for arg in argv[1:] if arg != "--spawn-idioms"])
     if "--temp-names" in argv:
         return run_temp_scan([arg for arg in argv[1:] if arg != "--temp-names"])
+    measure = "--measure" in argv
+    for flag, title, scan_file, shape in (("--path-literals", "path literal", scan_path_literal_file, PATH_KEY_SHAPE),
+                                          ("--quoting", "quoting", scan_quoting_file, QUOTING_KEY_SHAPE)):
+        if flag in argv:
+            return run_site_scan([a for a in argv[1:] if a not in (flag, "--measure")], measure, scan_file,
+                                 shape, title)
+    if "--shell-role" in argv:
+        return run_shell_role_scan([a for a in argv[1:] if a not in ("--shell-role", "--measure")], measure)
     args = argv[1:]
     root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():

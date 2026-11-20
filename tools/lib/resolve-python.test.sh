@@ -307,6 +307,31 @@ out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r
 [[ $out == *"note.md:1: needs Python"* ]] || bad "a planted floor statement in a tracked .md was not named: $out"; ok
 [[ $out == *"unmarked.sh:1: an unmarked multi-line definition"* ]] || bad "an unmarked multi-line resolve_python definition was not named: $out"; ok
 
+# ---- 1d2. THE CENSUS, RUN FOR REAL (TOOL-dWitnessedBar-24 S10, AC10) ------------------------------
+# A fixture repository holding a copy of the floor module: a declared floor no interpreter here runs
+# is red naming the floor and its install command, never a skip, so a census that compiled under the
+# RUNNING interpreter instead reds here; at the declared floor, a tracked file that does not compile
+# is red naming it, and a feature whose removal is announced at the floor is red naming it. WHAT THIS
+# DOES NOT CHECK: a node with no interpreter at the declared floor, where every census case but the
+# first reds as that first one does, and every feature of the table but the planted one.
+FC="$TMP/fc"; mkdir -p "$FC/$KIT_REL"
+cp "$HERE/python_floor.py" "$FC/$KIT_REL/"; printf '3.99\n' > "$FC/$KIT_REL/python-floor.txt"
+printf 'x = 1\n' > "$FC/a.py"
+git -C "$FC" init -q && git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"floor 3.99"* ]] && [[ $out == *"uv python install 3.99"* ]]; } \
+  || bad "a census at a floor no interpreter runs did not red naming 3.99 and its install command: rc=$out_rc $out"; ok
+printf '%s\n' "$FLOOR" > "$FC/$KIT_REL/python-floor.txt"
+printf 'def f(:\n' > "$FC/b.py"; git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"b.py:1:"*"does not compile at the floor $FLOOR"* ]]; } \
+  || bad "a tracked file that does not compile at the floor was not named: rc=$out_rc $out"; ok
+git -C "$FC" rm -q --cached b.py; rm "$FC/b.py"
+printf 'from locale import getdefaultlocale\n' > "$FC/c.py"; git -C "$FC" add -A
+out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
+{ [ "$out_rc" = 1 ] && [[ $out == *"locale.getdefaultlocale · removal 3.15 · 1 · RED"* ]]; } \
+  || bad "a feature removed at the floor was not named red: rc=$out_rc $out"; ok
+
 # ---- 1e. THE STEP'S DOWN (TOOL-dSafePassage-11, TOOL-dSafePassage-26 S10 S11) ----------------------
 # A fixture gov carrying the declaration, the floor kit's three files and one copy, downed on its own
 # tree, its source mode: a planted PEP 701 f-string at <to> reds the down, names its file and line

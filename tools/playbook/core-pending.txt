@@ -45,9 +45,6 @@ practice	practice.memory	dWitnessedBar
 practice	practice.records	dWitnessedBar
 practice	practice.security	dWitnessedBar
 practice	practice.risk	dWitnessedBar
-practice	practice.portable.line-endings	dWitnessedBar
-practice	practice.portable.quoting	dWitnessedBar
-practice	practice.portable.language-roles	dWitnessedBar
 practice	practice.tokens	dWitnessedBar
 practice	practice.tools	dWitnessedBar
 practice	practice.roles	dWitnessedBar
@@ -65,10 +62,9 @@ leg	build-method size	dWitnessedBar
 leg	unattended protocol size	dWitnessedBar
 leg	unattended skill size	dWitnessedBar
 leg	kickoff engine size <=18KiB	dWitnessedBar
-leg	shell hygiene (a loop fed by a command substitution)	dWitnessedBar
-leg	shell hygiene (a fork spent on builtin work)	dWitnessedBar
 leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
 leg	shell-hygiene selftest	dWitnessedBar
+leg	powershell hygiene selftest	dWitnessedBar
 leg	kit version markers	dWitnessedBar
 leg	verdict epoch (kit version dates the engine)	dWitnessedBar
 leg	manifest-check self-test	dWitnessedBar
