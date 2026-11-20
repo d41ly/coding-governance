@@ -139,6 +139,7 @@
       "process-monitor adopter selftest",
       "process-monitor census selftest",
       "process-monitor wiring",
+      "product-test contract (tests.product)",
       "profile-bar selftest",
       "push-main self-test",
       "pytest-guardrails self-test",

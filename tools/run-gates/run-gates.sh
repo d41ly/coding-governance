@@ -34,7 +34,8 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.53   # gov:kit run-gates@1.53
+KIT_RUN_GATES_VERSION=1.54   # gov:kit run-gates@1.54
+# 1.53 -> 1.54: the canary's one key set, `LEG_KEYS`, admits `level`, govkit's `LEG_KEY_FLOORS["level"]`, and `product_tests.py` grades it (TOOL-dWitnessedBar-9).
 # 1.52 -> 1.53: the canary's one key set, `LEG_KEYS`, admits `precommit`, govkit's `LEG_KEY_FLOORS["precommit"]`, and `--precommit` runs it (TOOL-dWitnessedBar-10).
 # 1.51 -> 1.52: the canary's one key set, `LEG_KEYS`, admits `purpose`, govkit's `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
 # 1.50 -> 1.51: the canary's one key set, `LEG_KEYS`, admits `tag`, govkit's `LEG_KEY_FLOORS["tag"]` (TOOL-dWitnessedBar-12).

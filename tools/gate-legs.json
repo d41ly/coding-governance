@@ -1623,6 +1623,30 @@
     ]
   },
   {
+    "name": "product-test contract (tests.product)",
+    "tag": "leg.run-gates.product-test-contract-tests-product",
+    "tests": [
+      "feature.run-gates"
+    ],
+    "purpose": "checks the product-test legs against tests.product",
+    "argv": [
+      "python3",
+      "{prefix}/run-gates/product_tests.py",
+      "check",
+      "--fixture"
+    ],
+    "guard": [],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 300,
+    "enforces": [
+      "practice.verify"
+    ],
+    "stage": [
+      "step.test"
+    ]
+  },
+  {
     "name": "runlog record schema",
     "tag": "leg.runlog.runlog-record-schema",
     "tests": [

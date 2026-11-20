@@ -225,9 +225,6 @@ runtime.restarts
 runtime.secret-home
 runtime.secret-scan
 runtime.spawn-backend
-tests.landing-levels
-tests.product
-tests.without-cadence
 trace.cost
 trace.identity
 trace.leg-output

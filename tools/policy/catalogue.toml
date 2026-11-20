@@ -887,6 +887,8 @@ owner = "dDeclaredLoop"
 name = "tests.without-cadence"
 allowed = ["run-at-landing", "report-unrun", "wait-for-expansion"]
 default = "run-at-landing"
+summary = "What a landing does with the product-test levels outside tests.landing-levels where no cadence runs them: runs them at landing anyway, reports them unrun, or waits for a cadence to be set up."
+usage = 'tests.without-cadence = "report-unrun"'
 owner = "dWitnessedBar"
 
 [[key]]
@@ -929,6 +931,8 @@ owner = "dWitnessedBar"
 name = "tests.product"
 allowed = ["declared", "declared-with-runners", "none"]
 default = "declared-with-runners"
+summary = "Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all."
+usage = 'tests.product = "declared"'
 owner = "dWitnessedBar"
 
 [[key]]
@@ -936,6 +940,8 @@ name = "tests.landing-levels"
 allowed = { type = "set", of = ["unit", "integration", "e2e", "performance"], or = ["every-declared"] }
 empty = "never"
 default = ["unit", "integration"]
+summary = "Which product-test levels a landing runs, from unit, integration, e2e and performance, or every level the manifest declares; the slower levels left out are tests.without-cadence's."
+usage = 'tests.landing-levels = ["unit", "integration", "e2e"]'
 owner = "dWitnessedBar"
 
 [[key]]
