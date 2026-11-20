@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -135,7 +135,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-10 — the pre-commit list derived from the leg rows, and cost evidence from every node](spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md) | 15 | 2 | CLOSED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-9 — the product-test contract: `level` on legs, the three `tests.*` keys, and runner adapters](spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md) | 16 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-4 — the runner-written verdict per tree, the pre-push hook reading it, and the tree Test verifies](spec/2026-10-25-spec-TOOL-dWitnessedBar-4.md) | 17 | 2 | CLOSED | rev-5 | 2026-11-20 |
-| [TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash](spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-20 |
+| [TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash](spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md) | 18 | 2 | INPROGRESS | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-40 — the per-tree verdict keeps the retired writers' two declines and carries the reuse pair the hook judges](spec/2026-10-25-spec-TOOL-dWitnessedBar-40.md) | 18 | 2 | DEFERRED | rev-6 | 2026-11-20 |
 | [TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit](spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-42 — the tail sweep keeps every tail any worktree's retained run names, and never a fresh one](spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 495 bound to this build, across 4 record folder(s).
+Records: 496 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
