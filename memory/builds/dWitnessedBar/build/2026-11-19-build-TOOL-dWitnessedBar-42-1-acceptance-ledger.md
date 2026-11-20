@@ -19,5 +19,5 @@ by dropping the grace and by dropping the `touch -c`, and unit 25's AC5 case wit
   removed it); `grep -c 'TAIL_GRACE_S' run-gates.sh` printed 4. Owed: the evidence arm's RED-first
   observation.
 - AC3 — `tail.*` — A's newest tail aged eight days, then a red run hashing it again: its age after the
-  run read 0 s, and `gate-tails/` held no `tail.*` name (the base runner left it at 691202 s). Owed:
+  run read 0 s, and `gate-tails/` held no `tail.*` name (the base runner left it at 691202 s). Owed: (DERIVED from the builder's probe)
   the evidence arm's RED-first observation.
