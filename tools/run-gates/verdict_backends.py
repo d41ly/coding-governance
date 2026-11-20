@@ -689,7 +689,11 @@ def run_remote_plant(case, top, rv):
 
 def run_fixture(case):
     """`case`'s scenarios over one scratch directory, each held or missed: the last owed exit when all held,
-    else 3."""
+    else 3. A git variable the caller inherited, a hook's GIT_DIR say, is dropped first, so no git call
+    the plant makes, its own or a child's, is retargeted at the caller's repository."""
+    for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_PREFIX"):
+        os.environ.pop(k, None)
     top = pathlib.Path(tempfile.mkdtemp(prefix="verdict-backends-")).absolute()
     try:
         print(f"{SAY}: fixture · plant {case} · {PLANTS[case]}")
