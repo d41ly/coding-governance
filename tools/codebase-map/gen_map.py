@@ -286,7 +286,7 @@ def run_declared_python() -> int | None:
     An adopter's extractors import its own application, so the map can only be built where that
     application's packages are installed. Run-gates' regen step and the lander spawn this file under
     the interpreter gov's resolver picks, floored at 3.15 for gov's own code, which an adopter's
-    application environment may sit below: inCMS's extractors import FastAPI from a 3.12 venv. The
+    application environment may sit below: adopter ic's extractors import FastAPI from a 3.12 venv. The
     key is a command, split like a shell word list, as `MAP_DIFF_CMD` is: `uv run --project
     services/api python`. The run it starts carries REEXEC_MARK and maps in place. A command that
     cannot start exits 2 naming the key; unset, nothing changes."""
