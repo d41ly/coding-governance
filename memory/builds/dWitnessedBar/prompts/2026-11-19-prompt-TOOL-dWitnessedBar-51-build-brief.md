@@ -37,3 +37,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Run no gate leg, no suite, no bar. Verify with a fixture or a probe of the code you changed.
 - A change the spec did not state is a deviation record in `build/`, as the build README's rules say; its values are
   `report` and `author-recorded`.
+
+## A resumed pass
+
+- The builder of this unit on spec rev-7 (`wf_2836d865-1aa`) stopped mid-pass on a usage limit, with no commit and no
+  return. Its edits are still in this working tree, unstaged, across 43 files; a patch of them is
+  `C:/Users/d41ly/AppData/Local/Temp/claude/06f17fbb3b45b392/0a586af7-47fb-45dc-b963-7ee82521f7da/scratchpad/unit51-partial.patch`.
+- Treat that work as unverified and possibly incomplete: read the spec whole, check each edit in the tree against it,
+  finish what is missing, and write nothing the spec does not ask for. The re-dispatch at `df15ee81e` declares every
+  path, including the root-level ones and the widen record.
+- Commit the pass through the hooks with the trailer `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
