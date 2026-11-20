@@ -8,7 +8,7 @@
 - **After:** the copy's `sed` takes its file as a separate word; the arm's comment spells `${PM_SCRUB//$'\n'/ }`; the loop owes `peer-no-ssh-keygen` exit 0, the last owed exit `run_fixture` returns, now that AC12's sweep scenario is that last one.
 - **Cause:** builder discovery
 - **Reason:** AC2 is observed only through a copy that holds `PM_SCRUB` less one name, and the brief makes any red other than the hygiene leg's this unit's to fix; the plant's exit is the last owed exit by `run_fixture`'s own rule, and AC12 extends that very scenario.
-- **Evidence:** the base's line, run as written over a scratch path, printed `sed: -e expression #1, char 48: unknown option to 's'` and wrote 0 bytes; the repaired copy, through the arm cut by its awk range over the shipped hook and driver, printed `PM_SCRUB 29` and `PM_SCRUB in … lacks GATE_SELECTION`, exit 1; `python verdict_backends.py --fixture --plant peer-no-ssh-keygen` in `tools/run-gates/` held both scenarios and exited 0.
+- **Evidence:** the base's line, run as written over a scratch path, printed `sed: -e expression #1, char 48: unknown option to 's'` and wrote 0 bytes; the repaired copy, through the arm cut by its awk range over the shipped hook and driver, printed `PM_SCRUB 29` and `PM_SCRUB in … lacks GATE_SELECTION`, exit 1; `python verdict_backends.py --fixture --plant peer-no-ssh-keygen` in `tools/run-gates/` held both scenarios and exited 0. (DERIVED from the builder's probe)
 - **Risk:** additive
 - **Approver:** author, the gov-builder pass of the unattended run, under the build README's `author-recorded` value
 - **Follow-through:** none
