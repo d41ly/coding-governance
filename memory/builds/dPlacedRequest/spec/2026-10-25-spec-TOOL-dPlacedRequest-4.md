@@ -22,6 +22,8 @@
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-20 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-4-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-4-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
@@ -80,7 +82,7 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
   past that cap. The newest block is the placement; earlier blocks are the loop's history. The
   `reenters:` line is optional: a block that re-enters a decided item, an owner's late answer placed as
   an `amend` (TOOL-dFurnishedOrders-16 S8), carries it, and `read_placement` reads a block without it,
-  or with `reenters: none`, as `none`. `place_request` writes one only when its caller passes the item,
+  or with `reenters: none`, as `none`. `add_placement` writes one only when its caller passes the item,
   refusing before any write a value `check_reenters_item` refuses. That function is the one check of
   the shape `<unit id>#<F-id>`, an `<F-id>` being `F` and digits, in `tools/loop/placement.py`, and
   TOOL-dFurnishedOrders-16 S9's `check_late_answer` calls it rather than spelling the shape again.
@@ -165,7 +167,7 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
 - **hands-off** `TOOL-dPlacedRequest-21` — `disposition`, the lines `placement.py record` prints for the claim commit
 - **hands-off** `TOOL-dPlacedRequest-3` — `disposition`, the verbs `place` and `check` the placing items name as their bodies
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
-- **hands-off** external — TOOL-dFurnishedOrders-16 S8's `place --late`, the one caller that passes `place_request` a `reenters:` item, its S9's `check_late_answer`, which calls `check_reenters_item` for the item's shape, and its S10, which finds the line present
+- **hands-off** external — TOOL-dFurnishedOrders-16 S8's `place --late`, the one caller that passes `add_placement` a `reenters:` item, its S9's `check_late_answer`, which calls `check_reenters_item` for the item's shape, and its S10, which finds the line present
 
 ## 4. Design
 
@@ -199,7 +201,7 @@ scout return ──place──▶ <git-common-dir>/requests/<key>.placement  (bl
 | Minted | Kind |
 |---|---|
 | `tools/loop/placement.py` and its verbs `place`, `check`, `record`, `--fixture` | module, CLI |
-| `place_request`, `check_placement`, `read_placement`, `print_claim_lines`, `check_reenters_item` | functions, `tools/loop/placement.py` |
+| `add_placement`, `check_placement`, `read_placement`, `print_claim_lines`, `check_reenters_item` | functions, `tools/loop/placement.py` |
 | `STAND_INS` | table, `tools/loop/placement.py` |
 | `check_prompt_placement` | bash function, `tools/unattended/unattended.sh` |
 | `## Placement` | prompt-record section |
@@ -313,7 +315,7 @@ at the first preflight after landing; a run already past its first preflight is 
   `loop placement fixtures` carries `enforces` holding `principle.p22`, and its argv names
   `placement.py --fixture`.
   Red when: the leg carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
-- **AC12** — When `python placement.py --fixture --plant late-answer` appends, through `place_request`,
+- **AC12** — When `python placement.py --fixture --plant late-answer` appends, through `add_placement`,
   a block reading `disposition: amend` and `reenters: TOOL-tFix-1#F2`, as an owner's late answer is
   placed, `read_placement` returns that item, a passing `check` keeps the line, and `record` prints
   AC8's claim lines with `reenters: TOOL-tFix-1#F2` immediately after `disposition`; a block written
@@ -386,6 +388,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode p
 - rev-7 · 2026-11-19 · §4 Files touched · §7 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
   regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- editorial · 2026-11-20 · §2 S4 · §3 Edges · §4 Inventory · §6 AC12 · no rev bump, the status stays
+  CLOSED: the function that appends a placement block is re-cited as `add_placement`, renamed for
+  the naming lexicon in an inline red fix of the pass legs, per
+  `2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief`.
 
 ## 10. Reuse audit
 
