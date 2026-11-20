@@ -203,8 +203,7 @@ ceiling = 300
 # gate-lint kit. Unlike this kit's `*.test.sh` suites it SHIPS: the tool is an engine file under
 # `**`, and its `--selftest` reads inline fixtures only, so a target holding the tool can run it.
 # `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold. UNGUARDED, so it runs on every
-# self-test bar: a guard naming this kit made the spec-tokens guards join demand that every live spec
-# touching this kit name the leg, and the self-test costs about a second (TOOL-aSightedSkeptic-9 rev-3).
+# self-test bar, for the reason its `unguarded_why` states.
 [[gate_leg]]
 tag = "leg.review-harness.review-replay-selftest"
 tests = ["feature.review-harnesses"]
@@ -212,6 +211,7 @@ name = "review-replay selftest"
 subject = "kit"
 purpose = "self-tests the review replay tool"
 argv = ["python3", "{kit}/review_replay.py", "--selftest"]
+unguarded_why = "a guard naming this kit made the spec-tokens guards join demand that every live spec touching it name the leg, and the self-test costs about a second (TOOL-aSightedSkeptic-9 rev-3)"
 guard = []
 stage = ["step.test"]
 

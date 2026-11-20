@@ -1665,6 +1665,82 @@ fi
 
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-dWitnessedBar-5: A BAR'S SELECTION AND verdict.held, READ AT R -----------------------------
+# A scratch repo whose R holds the run-gates kit's selection reader, `verdict_flow.py` and the two
+# modules it loads, and the policy kit with `verdict.held` declared. A stub bar writes a GREEN verdict
+# and a `selection` into the run record the hook pinned, and records the GATE_SELFTESTS it was handed.
+# AC5: a selection holding a row R does not derive is refused, its control a header-only selection
+# that R derives exactly. AC6: `push-selected` at R exports the `changed` selection for an unset
+# pusher value, and `on-demand` exports none.
+sel_env="$tmp/sel-env.txt"
+selstub="$tmp/selstub.sh"
+cat > "$selstub" <<'SELSTUB'
+#!/usr/bin/env bash
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+printf 'verdict\tGREEN\n' > "$d/verdict"
+printf '# planted\n%b' "${SEL_ROWS:-}" > "$d/selection"
+printf 'selftests=%s\n' "${GATE_SELFTESTS-<unset>}" > "$SEL_ENV"
+exit 0
+SELSTUB
+build_sel_fixture() { # tag · verdict.held value -> a pushed main at R; sets SEL_R
+  local tag=$1 held=$2
+  local d="$tmp/sel-$tag"
+  mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
+  git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
+  cd "$d/work" || return 1
+  git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
+  mkdir -p .githooks .governance "$RUN_GATES_DIR" "$KIT_REL/$PK"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/verdict_flow.py" "$SRC/$RUN_GATES_DIR/leg_factory.py" \
+     "$SRC/$RUN_GATES_DIR/regen.py" "$RUN_GATES_DIR/"
+  cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+     "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+  printf '[verdict]\nheld = "%s"\n' "$held" > .governance/policy.toml
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+  SEL_R=$(git rev-parse HEAD)
+}
+run_sel_push() { # [env options and assignments…] -> the push's merged output, then `rc=<n>` on its own line
+  git commit -q --allow-empty -m "sel $RANDOM" >/dev/null 2>&1
+  local o r
+  o=$( env "$@" SEL_ENV="$sel_env" GOV_GATE_CMD="bash $selstub" git push origin main 2>&1 ); r=$?
+  printf '%s\nrc=%s\n' "$o" "$r"
+}
+build_sel_fixture ac5 on-demand || bad "SEL AC5 could not build its fixture"
+_o=$(run_sel_push GATE_SELFTESTS= SEL_ROWS='held\tx\tquarantine\tplanted by the branch\n')
+case "$_o" in
+  *"the bar's selection is not what ${SEL_R:0:8} derives"*"adds x · quarantine · planted by the branch"*"treating it as RED"*"rc=1")
+    ok "SEL TOOL-dWitnessedBar-5 AC5 a run record whose selection holds a row R does not derive is refused" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC5 expected the selection refused naming its row, got: $_o" ;;
+esac
+_o=$(run_sel_push GATE_SELFTESTS= SEL_ROWS='')
+case "$_o" in
+  *"selection is not what"*) bad "SEL TOOL-dWitnessedBar-5 AC5 control: a selection R derives exactly was refused: $_o" ;;
+  *"rc=0") ok "SEL TOOL-dWitnessedBar-5 AC5 control: a selection R derives exactly is admitted" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC5 control: expected exit 0, got: $_o" ;;
+esac
+cd "$pfx_home" || exit 2
+build_sel_fixture ac6 push-selected || bad "SEL AC6 could not build its fixture"
+_o=$(run_sel_push -u GATE_SELFTESTS SEL_ROWS='')
+case "$_o|$(cat "$sel_env" 2>/dev/null)" in
+  *"verdict.held at ${SEL_R:0:8} reads push-selected"*"rc=0|selftests=changed")
+    ok "SEL TOOL-dWitnessedBar-5 AC6 push-selected at R exports the changed selection for an unset pusher value" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC6 expected the export of GATE_SELFTESTS=changed, got: $_o | $(cat "$sel_env" 2>/dev/null)" ;;
+esac
+cd "$pfx_home" || exit 2
+build_sel_fixture ac6c on-demand || bad "SEL AC6 control could not build its fixture"
+_o=$(run_sel_push -u GATE_SELFTESTS SEL_ROWS='')
+case "$_o|$(cat "$sel_env" 2>/dev/null)" in
+  *"reads push-selected"*) bad "SEL TOOL-dWitnessedBar-5 AC6 control: on-demand at R exported a selection: $_o" ;;
+  *"rc=0|selftests=<unset>") ok "SEL TOOL-dWitnessedBar-5 AC6 control: on-demand at R exports nothing" ;;
+  *) bad "SEL TOOL-dWitnessedBar-5 AC6 control: expected no export, got: $_o | $(cat "$sel_env" 2>/dev/null)" ;;
+esac
+cd "$pfx_home" || exit 2
+
 # ---- TOOL-dDerivedDocket-26: AN EXIT 0 IS NOT A VERDICT UNTIL THE RUN RECORD SAYS SO ------------------
 # A STUB RUNNER at the hook's DEFAULT command, TRACKED at the runner's own path, so the hook takes it
 # for the runner whether GOV_GATE_CMD is unset or names it (F8, below); only the declared STUB and a
@@ -1810,8 +1886,12 @@ cd "$pfx_home" || exit 2
 #   GATE_BASE_FROM — where a scoped bar's base came from, read once and unset before any leg; the hook
 #     exports `inherited` on the inherited-green path, and its only effect is that a scoped run writes
 #     no per-tree verdict, which costs a saving and never a leg or a verdict (TOOL-dWitnessedBar-40 S2).
+#   GATE_SELECTION — the selection record a bar holds legs by, read once and unset before any leg; a
+#     bar whose run record holds one is admitted only once `verdict_flow.py select --check` derives it
+#     again at R, so a pusher's file holds no leg R does not (TOOL-dWitnessedBar-5 S2, S7). The hook's
+#     clear of it is TOOL-dWitnessedBar-56's.
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_SELECTION GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

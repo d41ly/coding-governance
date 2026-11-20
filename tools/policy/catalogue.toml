@@ -909,6 +909,8 @@ owner = "dWitnessedBar"
 name = "verdict.held"
 allowed = ["peer-or-cadence", "push-selected", "on-demand"]
 default = "on-demand"
+summary = "When a held leg runs, read at the default branch's tip: under on-demand it is held at every bar unless GATE_SELFTESTS asks for it; under push-selected the pre-push hook exports GATE_SELFTESTS=changed for its bar when the pusher set nothing, so the held legs the push moved run; under peer-or-cadence it is held at the push and runs elsewhere, a HELD_CI_WORKFLOW in .unattended.conf or a registered peer backend, and the selection refuses where neither is declared."
+usage = 'verdict.held = "push-selected"'
 owner = "dWitnessedBar"
 
 [[key]]

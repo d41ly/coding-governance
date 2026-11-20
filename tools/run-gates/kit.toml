@@ -245,8 +245,7 @@ ceiling = 300
 # workflows kit. It SHIPS: `held_halves.py` is an engine file under `**`, and `--selftest` builds its
 # own synthetic manifests, halves and git dirs, so a target holding the tool can run it; its one arm
 # over the real manifest announces a skip where the declaration is withheld. `subject = "kit"` puts it
-# under the 2026-08-23 hold. UNGUARDED for the reason `review-replay selftest` gives: a guard naming
-# this kit would make every live spec touching it name the leg, and the self-test costs about a second.
+# under the 2026-08-23 hold. UNGUARDED, for the reason its `unguarded_why` states.
 [[gate_leg]]
 tag = "leg.run-gates.held-halves-selftest"
 tests = ["feature.run-gates"]
@@ -254,6 +253,7 @@ name = "held-halves selftest"
 subject = "kit"
 purpose = "self-tests the split-tier held self-test combiner"
 argv = ["python3", "{kit}/held_halves.py", "--selftest"]
+unguarded_why = "a guard naming this kit would make every live spec touching it name the leg, and the self-test costs about a second"
 guard = []
 stage = ["step.test"]
 

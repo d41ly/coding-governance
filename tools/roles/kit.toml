@@ -139,6 +139,7 @@ name = "roles render selftest"
 subject = "kit"
 purpose = "self-tests rendering roles into Claude Code agent types"
 argv = ["python", "{kit}/render_agents.py", "--selftest"]
+unguarded_why = "a guard naming the roles kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 guard = []
 ceiling = 300
 stage = ["step.test"]

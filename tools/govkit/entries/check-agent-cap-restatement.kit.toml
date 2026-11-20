@@ -65,6 +65,7 @@ name = "agent-cap restatement self-test"
 subject = "kit"
 purpose = "self-tests the agent-cap restatement gate"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]
+unguarded_why = "gov clears the row's guard: a guard naming the restatement gate would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 guard = ["{prefix}/check-agent-cap-restatement.sh"]
 stage = ["step.test"]
 enforces = ["practice.gate"]

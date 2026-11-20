@@ -1043,6 +1043,7 @@ tag = "leg.memory-tree.ratchet-selftest"
 tests = ["feature.memory-tree-hygiene"]
 purpose = "self-tests the ratchet pack's plants red and green"
 argv = ["python3", "{kit}/ratchet.py", "--fixture"]
+unguarded_why = "a guard naming the memory-tree kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 subject = "kit"
 pack = "ratchet"
 enforces = ["practice.gate"]

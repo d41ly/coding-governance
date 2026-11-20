@@ -1520,12 +1520,12 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-PP_READ_AT=""
-read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), PP_MAX_AGE (the positive bound declared, or empty) and PP_WHY
+PP_READ_AT=""; PP_HELD=on-demand
+read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), PP_MAX_AGE (the positive bound declared, or empty), PP_WHY and PP_HELD (verdict.held)
   local sha=$1 blob age="" bnd py dir="" rel tree val rc
   # READ ONCE PER SHA: the doc class and the policy line ask for the same R.
   [ -n "$sha" ] && [ "$sha" = "$PP_READ_AT" ] && return 0
-  PP_POLICY=every-red; PP_MAX_AGE=""; PP_WHY=""
+  PP_POLICY=every-red; PP_MAX_AGE=""; PP_WHY=""; PP_HELD=on-demand
   if [ -z "$sha" ] || [ -z "${sha//0/}" ]; then
     PP_WHY="the remote holds no tip for $def yet, so there is no R to read a policy at"; return 0
   fi
@@ -1543,6 +1543,11 @@ read_policy_at() { # sha -> PP_POLICY (own-only|own-mixed-contended|every-red), 
       [ "$tree" != "$top" ] || [ -z "$main_local" ] || check_reviewed_file "$rel" "$main_local" "is read for verdict.blocks"
       rc=0; val=$(cd "$top" && "$py" "$tree/$rel" get verdict.blocks --rev "$sha" 2>/dev/null) || rc=$?
       val=${val%$'\r'}
+      # `verdict.held` at the same R (TOOL-dWitnessedBar-5 S6): an answer outside its three values, or
+      # none, reads as the catalogue default `on-demand`, which exports nothing.
+      PP_HELD=$(cd "$top" && "$py" "$tree/$rel" get verdict.held --rev "$sha" 2>/dev/null) || PP_HELD=""
+      PP_HELD=${PP_HELD%$'\r'}
+      case "$PP_HELD" in peer-or-cadence|push-selected|on-demand) ;; *) PP_HELD=on-demand ;; esac
       break
     done
   fi
@@ -1870,6 +1875,18 @@ case "$PM_DECL" in
   ''|local|ci) ;;
   *) echo "pre-push: GATE_POST_MERGE at ${main_remote:0:8} is '$PM_DECL', outside 'local ci', and is read as declared" ;;
 esac
+
+# WHEN A HELD LEG RUNS AT THIS PUSH (TOOL-dWitnessedBar-5 S6): `verdict.held` read at R. Under
+# `push-selected`, where the pusher set no `GATE_SELFTESTS`, this hook exports the `changed` selection
+# for its bar, so the held legs whose kit the push moved run. Exported BEFORE the recorded greens are
+# read, so predicate 8 asks of each the coverage this push's bar would have. `on-demand`, the default,
+# exports nothing; `peer-or-cadence` holds them here, its runner elsewhere checked by
+# `verdict_flow.py select`. The rule is `verdict_flow.py#derive_held_export`'s, spelled once more here.
+read_policy_at "$main_remote"
+if [ "$PP_HELD" = push-selected ] && [ -z "${GATE_SELFTESTS:-}" ]; then
+  export GATE_SELFTESTS=changed
+  echo "pre-push: verdict.held at ${main_remote:0:8} reads push-selected, so this bar runs the held legs the push moved (GATE_SELFTESTS=changed)"
+fi
 
 # 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 9, per candidate
 #    (TOOL-dThriftyLanding-2). The FIRST candidate's refusal keeps its exact wording, so a clone with
@@ -2535,6 +2552,28 @@ PP_BAR_PID=""
 # it (`bar_record`, set where the bar was vetted). Only a bar that is not the runner goes unchecked,
 # and it is announced: a declared GATE_CMD naming another script writes no record this hook can
 # read, and the declared STUB is what every arm that stubs the bar uses.
+# A BAR THAT HELD LEGS BY A SELECTION IS ADMITTED ONLY ON R's OWN (TOOL-dWitnessedBar-5 S7). A hold is a
+# loosening, so the run record's `selection` is derived again at R by `verdict_flow.py select --check`
+# before this hook admits that bar's verdict, green or a red that would land: a row R does not derive,
+# or a check that cannot answer, is RED here. Read whatever bar ran: a record holding a selection is
+# checked, and only the runner writes one.
+SEL_NOT=""
+if [ -f "$gd/gate-run/$RUNLOG_GATE_RUN/selection" ]; then
+  _sel_rel="${GATE_RUNNER%/*}/verdict_flow.py"
+  if [ -z "$GATE_RUNNER" ]; then
+    SEL_NOT="the bar held legs by a selection and no run-gates kit resolves to re-derive it at R"
+  elif [ -z "${main_remote//0/}" ]; then
+    SEL_NOT="the bar held legs by a selection and the remote holds no tip, so there is no R to re-derive it at"
+  elif ! _sel_py=$(resolve_python 2>/dev/null); then
+    SEL_NOT="the bar held legs by a selection and no usable python can re-derive it at R"
+  # The checker is the pushed tree's own copy, so it is vetted as the bar is: a refusal exits here.
+  elif check_reviewed_file "$_sel_rel" "$main_local" "is run to re-derive the bar's selection at R" \
+       && ! _sel_out=$(cd "$top" && "$_sel_py" "$_sel_rel" select --check --run "$gd/gate-run/$RUNLOG_GATE_RUN" --rev "$main_remote" 2>&1); then
+    SEL_NOT="the bar's selection is not what ${main_remote:0:8} derives: $(printf '%s' "$_sel_out" | tr '\n' ' ')"
+  fi
+  if [ -n "$SEL_NOT" ]; then echo "pre-push: $SEL_NOT — treating it as RED"; rc=1; fi
+  unset _sel_rel _sel_py _sel_out
+fi
 if [ "$rc" -eq 0 ]; then
   case "$bar_record" in
     stub)
@@ -2554,7 +2593,7 @@ fi
 # log's decision stays the gate decision above; the landing is the printed line. An attended push
 # lands over it too: the value is this repository's policy for every push, not an unattended
 # exception, and the line says so.
-if [ "$rc" -ne 0 ]; then
+if [ "$rc" -ne 0 ] && [ -z "$SEL_NOT" ]; then
   if check_inherited_verdict "$gd/gate-run/$RUNLOG_GATE_RUN"; then
     echo "pre-push: every red passes — landing under verdict.blocks $PP_POLICY: $PP_LEGS"
     rc=0
@@ -2566,7 +2605,7 @@ fi
 # bar through the loop kit's floor.py, vetted by check_reviewed_file when it sits under the pushing
 # tree. At `off` the bar's red is advisory: the push goes through with its allow record, and the runner's
 # per-tree verdict of that bar reads RED, which this hook never adopts. Anything but `off`, a reader that does not answer or no loop kit, refuses as before.
-if [ "$rc" -ne 0 ] && _fl_py=$(resolve_python 2>/dev/null); then
+if [ "$rc" -ne 0 ] && [ -z "$SEL_NOT" ] && _fl_py=$(resolve_python 2>/dev/null); then
   for _fl_tree in "$top" "$(cd "${0%/*}/.." && pwd)"; do
     if _fl_dir=$(resolve_kit_dir "$_fl_py" loop floor.py "$_fl_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
       _fl_rel="${_fl_dir%$'\r'}/floor.py"
