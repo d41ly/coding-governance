@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=287
+FLOOR_ASSERTIONS=292
+# RAISED 287 -> 292 by TOOL-dWitnessedBar-40: the per-tree verdict's declines and reuse pair, AC1's two,
+# AC2's two and AC3's one. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 278 -> 287 by TOOL-dWitnessedBar-25: the verdict's run, cause and tail arms, AC1's one, AC2's
 # four, AC3's one, AC4's one and AC5's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 272 -> 278 by TOOL-dWitnessedBar-10: the node-keyed evidence arms, AC8's one, AC7's two,
@@ -773,6 +775,39 @@ tl_files=$(ls -1 "$REC_GD/gate-tails" 2>/dev/null | sort -u)
 [ ! -e "$tl_f" ] && [ -n "$tl_named" ] && [ "$tl_named" = "$tl_files" ] \
   && ok "AC5 the sweep past GATE_RUN_KEEP removed the swept run's tail and kept exactly the tails the kept runs name" \
   || nope "AC5 a tail outlived every run that named it, or a named tail was removed: named [$tl_named] on disk [$tl_files]"
+rec_done
+
+# --- TOOL-dWitnessedBar-40 AC1-AC3: the per-tree verdict's two declines and its reuse pair ----------
+# Over a fixture manifest named by GATE_LEGS: a scoped run in docs mode writes no `.scoped` record and
+# says why, and the same run with the docs base unset writes one; a scoped run told GATE_BASE_FROM=
+# inherited writes none, names the inherited green, and its leg's environment holds no GATE_BASE_FROM;
+# a full green's record carries `reused` and `reused_cache` with the run's counts. Red when the
+# DOCS_BASE guard is removed, a leg inherits the knob, or the record omits either key.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'echo "base_from_seen $(env | grep -c "^GATE_BASE_FROM=")"' 'exit 0' > "$REC_T/fx/basefrom.sh"
+printf '%s\n' '[ {"name": "basefrom", "argv": ["bash", "fx/basefrom.sh"]} ]' > "$REC_T/fx/legs.json"
+( cd "$REC_T" && git add -A && git commit -qm basefrom ) >/dev/null 2>&1
+dw_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); dw_f="$REC_GD/gate-verdict/$dw_tree"
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_DOCS_BASE=HEAD >/dev/null
+[ ! -e "$dw_f.scoped" ] && grep -q 'no gate-verdict written — docs mode' "$REC_OUT" \
+  && ok "AC1 a docs-mode scoped run writes no .scoped per-tree verdict and says docs mode" \
+  || { nope "AC1 a docs-mode scoped run wrote a per-tree verdict, or did not say why"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json >/dev/null
+[ "$(awk -F'\t' '$1=="kind"{print $2}' "$dw_f.scoped" 2>/dev/null)" = scoped ] \
+  && ok "AC1 control: the same scoped run with GATE_DOCS_BASE unset writes the .scoped record" \
+  || { nope "AC1 control: the scoped run wrote no .scoped record, so the decline above proves nothing"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+rm -f "$dw_f.scoped"
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_BASE_FROM=inherited >/dev/null
+[ ! -e "$dw_f.scoped" ] && grep -q 'no gate-verdict written — scoped on an inherited green' "$REC_OUT" \
+  && ok "AC2 a scoped run told GATE_BASE_FROM=inherited writes no .scoped record and names the inherited green" \
+  || { nope "AC2 a scoped run on an inherited base wrote a record, or did not say why"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+grep -q '^base_from_seen 0' "$(rec_dir)/0.out" 2>/dev/null \
+  && ok "AC2 a leg's own environment holds no GATE_BASE_FROM" \
+  || nope "AC2 a leg inherited GATE_BASE_FROM, or the leg wrote no output: $(cat "$(rec_dir)/0.out" 2>/dev/null)"
+rec_run GATE_FULL=1 GATE_LEGS=fx/legs.json >/dev/null
+[ "$(awk -F'\t' '$1=="reused"||$1=="reused_cache"{printf "%s:%s ", $1, $2}' "$dw_f" 2>/dev/null)" = "reused:0 reused_cache:0 " ] \
+  && ok "AC3 a full green's per-tree verdict carries reused and reused_cache with the run's counts" \
+  || { nope "AC3 the per-tree verdict omits reused or reused_cache, or misreads the counts"; sed 's/^/      /' "$dw_f" 2>/dev/null; }
 rec_done
 
 rec_repo

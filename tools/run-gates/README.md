@@ -946,7 +946,7 @@ and changes no reader:
 | File | Written | Keys this runner writes |
 |---|---|---|
 | `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; and `tail.<n>` per failing leg (see "The run record") |
-| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `run_id`, `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
 
 The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
 written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
@@ -954,18 +954,29 @@ written through a temp name and a rename. A full run writes the bare tree file a
 tree, and the last run of a tree in a slot wins, GREEN or RED. A run that started dirty or whose tree
 moved writes none, and says so on one line; a written one prints its path.
 
+**Two more runs write none** (TOOL-dWitnessedBar-40), each saying why on one line. A run in docs mode
+(`GATE_DOCS_BASE` resolved) ran fewer legs than a scoped bar from the same base, which the record
+cannot say: `run-gates: no gate-verdict written — docs mode`. A scoped run whose base is an inherited
+green rests on a base no full record names: `run-gates: no gate-verdict written — scoped on an
+inherited green`. The runner learns that from `GATE_BASE_FROM`, `inherited` or `full` (any other
+value reads `full`), read once and removed before any leg starts, as `GATE_RUN_ID` is; the pre-push
+hook exports it beside `GATE_BASE` in its inherited-green branch, and the unattended close on its
+scoped bar where `--decide` named `-` as the full base.
+
 **Readers.** `.githooks/pre-push` reads the pushed tree's two files as candidates, for this runner's
 own bar only, and adopts one only when it reads `verdict GREEN` and passes the predicates a
 `gate-full-green` stamp passes (ancestry, lag, fingerprint, manifest path and blob, self-tests, and a
-non-zero `reused_cache` refused); a full record covers the push and no bar runs, and a scoped one
+non-zero `reused_cache` refused), and carries at least one of `reused` and `reused_cache`: a record
+with neither cannot say whether its run reused a leg, so it is refused where a keyless runner stamp
+is not, and the `not covered` line names the missing pair. A full record covers the push and no bar runs, and a scoped one
 covers only a push scoping from its base. The loop kit's transition writer reads the full file at
 `item.test.exit` and refuses the move into deploying unless it reads GREEN. Nothing writes it but the
 runner: the hook, the unattended close and the post-merge verifier each run the runner, so none of
 them writes a record of its own. A clone's older `gate-bar-green*` files are left on disk and read by
 nothing.
 
-**What it does not check:** which legs a scoped run skipped, or whether a run reused a cached
-verdict; `kind`, `base` and the run record under `run_id` say what ran.
+**What it does not check:** which legs a scoped run skipped; `kind`, `base` and the run record under
+`run_id` say what ran.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 

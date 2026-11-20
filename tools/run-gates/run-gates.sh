@@ -2785,6 +2785,13 @@ fi
 # uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
 # leg starts.
 unset GATE_RUN_ID
+# WHERE THE SCOPED BASE CAME FROM, read once and removed for the same reason (TOOL-dWitnessedBar-40 S2):
+# `inherited` when the caller scoped this bar from an inherited green, which the pre-push hook and the
+# unattended close export beside `GATE_BASE`; anything else reads `full`. `GATE_BASE` alone cannot say
+# which, and a scoped run on an inherited base writes no per-tree verdict (see the writer below).
+BASE_FROM=full
+[ "${GATE_BASE_FROM:-}" = inherited ] && BASE_FROM=inherited
+unset GATE_BASE_FROM
 # THE CAUSE, read once and removed for the same reason (TOOL-dWitnessedBar-25 S2): the act that started
 # this bar, `<kind>:<id>` from the caller that exports it (the pre-push hook `push:<sha>`, post-merge
 # `post-merge:<sha>`, the unattended close `run:<slug>`, the pass-leg runner `pass:<sha>`), `attended`
@@ -5905,12 +5912,21 @@ fi
 # full record its base rests on. `<key>TAB<value>` lines read by key, so a key added later is additive.
 # The pre-push hook adopts one only when it reads `verdict GREEN` and passes the runner stamp's
 # predicates; the transition writer reads the full one at `item.test.exit`.
-# WHAT IT DOES NOT CHECK: which legs a scoped run skipped, or whether a run reused a cached verdict;
-# `kind`, `base` and the run record under `run_id` say what ran.
+# TWO DECLINES THE RETIRED HOOK WRITER MADE, carried here (TOOL-dWitnessedBar-40 S1, S2): a docs-mode
+# run ran fewer legs than a scoped bar from the same base, which the record cannot say, and a scoped run
+# on an inherited green rests on a base no full record names. `reused` and `reused_cache` are the
+# full-green stamp's two counts (S3), which the hook's predicate 9 reads; a record carrying neither is
+# refused there.
+# WHAT IT DOES NOT CHECK: which legs a scoped run skipped; `kind`, `base` and the run record under
+# `run_id` say what ran.
 if [ "$RUN_TREE" = - ]; then
   echo "run-gates: no per-tree verdict written — the tree was not clean when the run started"
 elif [ "$tree_moved" != no ] || [ -z "$FPRINT_START" ]; then
   echo "run-gates: no per-tree verdict written — the tree moved while the bar ran, or its fingerprint could not be read"
+elif [ -n "$DOCS_BASE" ]; then
+  echo "run-gates: no gate-verdict written — docs mode"
+elif [ -z "${GATE_FULL:-}" ] && [ "$BASE_FROM" = inherited ]; then
+  echo "run-gates: no gate-verdict written — scoped on an inherited green"
 else
   _vd=""; [ -n "$RG_COMMON_RAW" ] && _vd=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
   _vkind=scoped; _vbase=$BASE; _vverdict=RED   # GREEN or RED: a HOST or REFUSED bar is no green
@@ -5927,6 +5943,8 @@ else
        printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
        printf 'fingerprint\t%s\n' "$FPRINT_START"
        printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
+       printf 'reused\t%s\n' "$reuses"
+       printf 'reused_cache\t%s\n' "$cache_reuses"
        printf 'run_id\t%s\n' "$RUNID"
        printf 'cause\t%s\n' "$RUN_CAUSE"
        printf '%s' "$TAIL_ROWS"
