@@ -27,6 +27,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md](../build/2026-11-19-build-TOOL-dWitnessedBar-1-chain-rounds.md) | journal | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md) | deviation | — |
 | [2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-102.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-102.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-104.md](../build/2026-11-20-build-TOOL-dWitnessedBar-1-red-fix-104.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
