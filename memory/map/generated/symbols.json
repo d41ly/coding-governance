@@ -5358,6 +5358,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_bar_scrub_parity",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
       "id": "check_bar_tied",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
