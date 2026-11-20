@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-100 — the entry claim takes over a stale build lease instead of waiting on it
 
-**Status:** DEFERRED · rev-1 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 38
+**Status:** INPROGRESS · rev-1 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 38
 
 **Derived:** PLAY-dClosedLoop-2
 
