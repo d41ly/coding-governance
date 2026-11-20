@@ -10,7 +10,7 @@
   body and is not module-level.
 - **Cause:** builder discovery
 - **Reason:** the witness needs some predicate to print the row the spec mints, and the plain substring `INHERITED_RED` would name every `INHERITED_RED_MAX_AGE` line and its comments in gov's own `.githooks/gate-env.sh` as stray assignments. A separate arm function would copy the unit-44 arm's two verb helpers, the second instance the charter's reuse rule forbids, and would mint a name the Inventory does not list.
-- **Evidence:** the probe over `%TEMP%/ir55p` named `.githooks/gate-env.sh:1` for an `export` line and nothing for a file holding only assignments; `grep -n INHERITED_RED .githooks/gate-env.sh` at base prints only `INHERITED_RED_MAX_AGE` lines.
+- **Evidence:** the probe over `%TEMP%/ir55p` named `.githooks/gate-env.sh@6834ee4b:1` for an `export` line and nothing for a file holding only assignments; `grep -n INHERITED_RED .githooks/gate-env.sh` at base prints only `INHERITED_RED_MAX_AGE` lines.
 - **Risk:** additive
 - **Approver:** author, the gov-builder pass of the unattended run, under the build README's `author-recorded` value
 - **Follow-through:** none

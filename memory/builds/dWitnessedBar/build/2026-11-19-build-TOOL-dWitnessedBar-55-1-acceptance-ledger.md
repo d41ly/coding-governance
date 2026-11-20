@@ -21,7 +21,7 @@ names.
   and took both lines out.
 - AC3 — `not an assignment` — a file holding `INHERITED_RED=land`, `export INHERITED_RED=park` and
   `INHERITED_RED=park`: the up wrote `every-red` and left exactly `export INHERITED_RED=park\n`; the
-  witness exited 0 printing `not an assignment .githooks/gate-env.sh:1`, and before the up named the
+  witness exited 0 printing `not an assignment .githooks/gate-env.sh@6834ee4b:1`, and before the up named the
   same line at `:2`. The step at base printed no such row: the red.
 - AC4 — `read_policy_key` — the eleven S4 fixtures, plus a quoted value with a comment and CRLF, a
   quoted value padded with spaces and a tab, and a `#` with no whitespace before it, each read the

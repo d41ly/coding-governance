@@ -9,7 +9,7 @@ The code is built and checked, but no commit could pass the hooks while sibling 
 (1) Running `gen_build_index.py --write` rewrote memory/builds/dWitnessedBar/README.md: unit 55's row went to CLOSED and the record count from 559 to 561. Declaring that file with `--dispatch` was refused by UNATTENDED check 49, because README.md is in TOOL-dWitnessedBar-41's declared set. That refusal is binding, so README.md was not staged.
 
 (2) The pre-commit hook then failed:
-- HYGIENE check 9 found the build index stale: memory/LIVE.md, memory/backlog/TOOL.md and memory/builds/dWitnessedBar/README.md. The renderer reads the worktree, and the hook named ten render inputs with unstaged changes, among them 41's .githooks/pre-push and 41's spec. memory/backlog/TOOL.md and README.md are both 41's declared paths.
+- the memory-hygiene build-index freshness check found the build index stale: memory/LIVE.md, memory/backlog/TOOL.md and memory/builds/dWitnessedBar/README.md. The renderer reads the worktree, and the hook named ten render inputs with unstaged changes, among them 41's .githooks/pre-push and 41's spec. memory/backlog/TOOL.md and README.md are both 41's declared paths.
 - The codebase-map gate found memory/map/generated/symbols.json STALE.
 
 (3) Waiting for 41 to land was refused by scratch-guard: a role agent may not poll, and the bounded `sleep 5` loop counted as polling.
@@ -45,7 +45,7 @@ I built TOOL-dWitnessedBar-55 but did not commit it: the hooks cannot pass while
   - over fixtures at `%TEMP%/ir55p`:
     - AC1: `blocks = "every-red"` written, both lines removed.
     - AC2: neither the export-only nor the park-then-empty fixture wrote a `blocks` value.
-    - AC3: the file was left as `export INHERITED_RED=park\n` and the witness exited 0 naming `.githooks/gate-env.sh:1`.
+    - AC3: the file was left as `export INHERITED_RED=park\n` and the witness exited 0 naming `.githooks/gate-env.sh@6834ee4b:1`.
     - A file with CRLF and no final newline kept its other lines byte for byte.
 - An inline replay of the base reader (`build_line_re`) read `land` on the indented, spaced, leading-tab and BOM rows, where the hook reads `park`, `park`, `\tland` and nothing. So the new parity arm can go red.
 - The AC5 greps: "not an assignment" prints lines 442 and 461 inside the section, and "line out of each file that held one" prints nothing.
