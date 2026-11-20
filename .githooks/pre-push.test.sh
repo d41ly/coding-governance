@@ -2558,7 +2558,7 @@ for _c in verdict manifest reused_cache keyless reused selftests tree seledit se
     reused) remove_bg_key "$BG_VF" reused_cache; set_bg_key "$BG_VF" reused 1; _want="says its run reused 1 leg(s), and" ;;
     selftests) _e=(GATE_SELFTESTS=1); _want="self-tests HELD" ;;
     tree) set_bg_key "$BG_VF" tree ""; _want="could not be read" ;;
-    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; sed -i 's/^selection\.1\t.*/selection.1\tx\tquarantine\tTOOL-x-8/' "$BG_VF"
+    seledit) write_bg_selection $'x\tquarantine\tTOOL-x-7'; awk -F'\t' '$1=="selection.1"{$0="selection.1\tx\tquarantine\tTOOL-x-8"} {print}' "$BG_VF" > "$BG_VF.x" && mv "$BG_VF.x" "$BG_VF"
              _want="selection rows do not hash to" ;;
     selkeyless) remove_bg_key "$BG_VF" selection; _want="carries no selection, so it cannot say whether its bar held legs" ;;
     control) _want="pre-push: covered on main push" ;;
