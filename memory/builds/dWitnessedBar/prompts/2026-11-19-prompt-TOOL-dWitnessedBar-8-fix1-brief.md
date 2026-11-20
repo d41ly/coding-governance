@@ -35,7 +35,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    commit date of the commit that added the CLOSED row, read through git), or one this unit writes, and the case where
    no release exists; (c) `build_records.py read` over a `flake` record: add the `read` branch (or a typed-kind read)
    to S3 and to the Files touched note on `tools/memory-tree/build_records.py`, and keep AC3 observable.
-4. The spec sits near its 49152 B ceiling (48339 B at rev-6): make room by tightening prose you touch, never by
+4. The spec sits near its 49152 B ceiling (48339 B at rev-6, PINNED 2026-11-20 by the spec size check): make room by tightening prose you touch, never by
    dropping a criterion. A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`;
    keep every home under `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds.
 Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-8` and

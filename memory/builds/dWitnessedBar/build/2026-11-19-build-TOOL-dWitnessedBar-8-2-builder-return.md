@@ -59,4 +59,4 @@ The mirror commit selected only the 6 universal classes. Two residuals are named
 - **ASKS_CMD has two readers:** `verdict_flow` parses it from the conf with Python, while the driver sources the conf in shell. This is the spec's own design; the two agree for the present literal value.
 - **No idempotence key:** a manual second `flakes` run over the same run dir would write a second record. The driver can't do this, because each bar gets a fresh run id.
 
-Deviation 82 records what the spec left open: a walled bar re-runs nothing; a sampled leg prints `nondeterministic` only once; `flakes --check` uses a declared entry value as its threshold; the read-back line carries no sha for a flaky-leg ask; views are now rendered once per filed ask.
+Deviation 82 records what the spec left open: a walled bar re-runs nothing; a sampled leg prints `nondeterministic` only once; `flakes --check` uses a declared entry value as its threshold; the read-back line carries no sha for a flaky-leg ask; views are now rendered once per filed ask. (DERIVED from the builder's probe)
