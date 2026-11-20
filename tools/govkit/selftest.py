@@ -19602,6 +19602,30 @@ user_skills = "/tmp/gk-fake-skills"
               and any(k == "demo" for _n, k in read_owned13(_t5r)),
               str(read_owned13(_t5r)))
 
+        # ---- [dHG-2 S1]. A RETIRED ROW A LIVE ROW SUPERSEDES LEAVES. The receipt gains a
+        # ---- `retired-edited` row at the path an `engine` row already carries, the shape a seed rule's
+        # ---- row leaves when `apply` moves its file to an engine row; `update --write` reaps it, and
+        # ---- the sums sidecar lists the path once.
+        _g2r = build_gov13("dhg2")
+        _t2r = build_target13("dhg2")
+        run_gov13(_g2r, "apply", "--target", str(_t2r))
+        settle(_t2r, "after apply")
+        _rc2r = read_receipt13(_t2r)
+        _live2r = next(f for f in _rc2r["files"] if f.get("role") == "engine" and f.get("sha256"))
+        _rc2r["files"].append(dict(_live2r, role="retired-edited", kit="retired-seed", sha256="0" * 64))
+        (_t2r / ".governance" / "install.json").write_text(
+            json.dumps(_rc2r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t2r, "the receipt carries a superseded retired row")
+        write_vintage13(_g2r)
+        _u2r = run_gov13(_g2r, "update", "--target", str(_t2r), "--write")
+        _rows2r = [f for f in read_receipt13(_t2r)["files"] if f.get("path") == _live2r["path"]]
+        _sums2r = (_t2r / ".governance" / "install.sums").read_text(encoding="utf-8")
+        check("[dHG-2 AC1] update --write reaps the retired row a live engine row supersedes",
+              [f.get("role") for f in _rows2r] == ["engine"]
+              and f"reaped    row '{_live2r['path']}'" in _u2r.stdout
+              and _sums2r.count(" " + _live2r["path"]) == 1,
+              f"{[f.get('role') for f in _rows2r]} · " + _u2r.stdout[-1200:] + _u2r.stderr[-400:])
+
         # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
         # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,
         # ---- and until this unit `apply` passed no carry, so that kit's leg left `emitted` while its

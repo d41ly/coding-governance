@@ -13140,6 +13140,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     if withdrawn_rows:
         receipt["files"] = [f for f in receipt["files"] if f not in withdrawn_rows]
 
+    # A RETIRED ROW A LIVE ROW SUPERSEDES LEAVES (TOOL-dHomeGraded-2 S1). `apply --kits playbook-render`
+    # writes the charter template as an `engine` row at the path the retired `playbook` seed rule
+    # wrote, and the seed's row stays, so the receipt carries two rows for one path and
+    # `install.sums` two hashes for one file, one of them for bytes the tree no longer holds. A
+    # `retired-edited` row only keeps the target's bytes while nothing else claims them; once a row of
+    # another role owns the path, those bytes are that row's, and the retired row is dropped.
+    if write:
+        _live_paths = {f.get("path") for f in receipt["files"] if f.get("role") != "retired-edited"}
+        _superseded = [f for f in receipt["files"]
+                       if f.get("role") == "retired-edited" and f.get("path") in _live_paths]
+        for _f in _superseded:
+            print(f"  reaped    row '{_f.get('path')}' (retired-edited, kit {_f.get('kit')}) — a live "
+                  f"row claims the same path, so the retired row describes bytes the tree no longer holds")
+        if _superseded:
+            receipt["files"] = [f for f in receipt["files"] if f not in _superseded]
+
     # The receipt is re-stamped ONLY on a clean run. Stamping it on a run that REFUSED rows is how a
     # schema-1 receipt whose role-distrust arm fired gets promoted to schema 2 — and the next run then
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
