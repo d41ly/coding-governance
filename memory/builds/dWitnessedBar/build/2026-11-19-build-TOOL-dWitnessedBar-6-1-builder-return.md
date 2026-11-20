@@ -4,7 +4,7 @@
 
 ## Why
 
-TOOL-dWitnessedBar-6 is built and committed, and its spec is closed. The checks on whether the spec could be built held against the tree before any code was written: every citation (run-gates.sh:6224-6244, unattended.sh:11114 and 12251-12254, test.sh:16800/16832, catalogue.toml:895/986-990, push-main.sh's two landing pushes, guard.py#check_staged/check_run_mandate, policy.py#DerivedDefault, verdict_flow/leg_factory seams, remote-ci.yml job `bar` and its step name) matched, and no section contradicted another. So there was no divergence to return.
+TOOL-dWitnessedBar-6 is built and committed, and its spec is closed. The checks on whether the spec could be built held against the tree before any code was written: every citation (every line the spec's rev-7 pins at `51fb8d207`, push-main.sh's two landing pushes, guard.py#check_staged/check_run_mandate, policy.py#DerivedDefault, verdict_flow/leg_factory seams, remote-ci.yml job `bar` and its step name) matched, and no section contradicted another. So there was no divergence to return.
 
 ## Summary
 
@@ -37,7 +37,7 @@ I built TOOL-dWitnessedBar-6 in two commits, both carrying `Pass: TOOL-dWitnesse
   - AC7: the `held` plant printed two rows and the liveness line the criterion names.
   - AC9: under peer-node with no peer verdict, the lander published the candidate ref, exited 1 naming NONE, and left main unmoved.
 - **`verify-peer` end to end**, over a scratch remote with a stub bar: it published the verdict tag, skipped it on a second run, and node a then read GREEN.
-- **AC7's driver half**, by sourcing `unattended.sh` in a probe (stands in for the `unattended kit gate`). `write_held_asks` calls `remote_verdict.py held <anchor> <workflow>`, and prints one DEAD PROBE line when no kit resolves. `write_pin_ask` files a `pin held: backend remote-ci` ask under remote-ci and stays silent under local-hook. `git grep 'read_held_reds()' tools/unattended` prints nothing, and `check-arms --emit-floors` shows `unattended.sh:343:339`, so the ceiling is unmoved.
+- **AC7's driver half**, by sourcing `unattended.sh` in a probe (stands in for the `unattended kit gate`). `write_held_asks` calls `remote_verdict.py held <anchor> <workflow>`, and prints one DEAD PROBE line when no kit resolves. `write_pin_ask` files a `pin held: backend remote-ci` ask under remote-ci and stays silent under local-hook. `git grep 'read_held_reds()' tools/unattended` prints nothing, and `check-arms --emit-floors` shows the driver at 343 sites, 339 armed (DERIVED from the builder's probe), so the ceiling is unmoved.
 - **AC8**: `remote_verdict.py pin` with `dispatch-closure` printed four blobs equal to `git rev-parse` and an id equal to `git hash-object --stdin`, and wrote nothing. The guard plant `pin-owner-only` exited 1 naming the key. This stands in for `loop guard fixtures`.
 - **AC10**: all four greps hold. The lexicon answered OK for every new function name.
 

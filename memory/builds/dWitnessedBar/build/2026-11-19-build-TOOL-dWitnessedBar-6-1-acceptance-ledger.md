@@ -38,7 +38,7 @@ main loop at the close, with the legs section 7 names.
   sourced `write_held_asks` called the kit's `remote_verdict.py held https://github.com/o/r.git
   remote-ci.yml` and printed the same ask rows as before, and with no kit resolving printed one `held
   reader: DEAD PROBE` line and called nothing; `check-arms.py --emit-floors` names
-  `tools/unattended/unattended.sh:343:339`, its ceiling 343 unmoved.
+  `tools/unattended/unattended.sh@f845ad9c:343:339`, its ceiling 343 unmoved.
 - AC8 — `dispatch-closure` — `remote_verdict.py pin` over a scratch repository whose policy sets that
   scope printed four `<path> <blob>` lines, each blob equal to `git rev-parse HEAD:<path>`, and a
   `verdict.remote.pin` id equal to `git hash-object --stdin` over them, the tree left clean; the guard
