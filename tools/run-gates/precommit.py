@@ -15,8 +15,10 @@ equals it or sits under it as a directory, and a guard ending in `/` names a dir
 with no guard runs at every commit. There is no second, commit-time trigger: that would be a second
 declaration of what a leg reads beside the one the bar already uses (spec §8 F1).
 
-THE MANIFEST is `--legs <path>`, else `GATE_LEGS`, else the one beside this kit dir, as the runner
-reads it. `{prefix}` resolves against the manifest's own directory, the tool root. The staged set is
+THE MANIFEST is `--legs <path>`, else the one beside this kit dir. `GATE_LEGS` is NOT read: a hook
+fired by a fixture commit inside a bar would inherit the bar's manifest and run legs this tree never
+declared (memory/gotchas/inherited-env-retargets-a-check.md). `{prefix}` resolves against the
+manifest's own directory, the tool root. The staged set is
 listed once, from the index this process sees: the hook runs this outside the index git handed it,
 as the hand-named legs ran.
 
@@ -252,7 +254,7 @@ def run_precommit(rows, root, troot, staged):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="precommit.py", description="Run every manifest row's `precommit` argv its guard trips.")
-    ap.add_argument("--legs", default="", help="a leg manifest (default: GATE_LEGS, else the manifest beside this kit dir)")
+    ap.add_argument("--legs", default="", help="a leg manifest (default: the manifest beside this kit dir)")
     ap.add_argument("--list", action="store_true", help="print each row's name, argv and trigger, and run nothing")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
@@ -262,7 +264,7 @@ def main(argv=None):
         print(f"{SAY}: not a git work tree", file=sys.stderr)
         return 2
     root = pathlib.Path(top.stdout.strip())
-    legs = pathlib.Path(a.legs or os.environ.get("GATE_LEGS") or HERE.parent / "gate-legs.json")
+    legs = pathlib.Path(a.legs or HERE.parent / "gate-legs.json")
     legs = legs if legs.is_absolute() else pathlib.Path.cwd() / legs
     try:
         troot = pathlib.Path(os.path.abspath(legs)).parent.relative_to(os.path.abspath(root)).as_posix()
