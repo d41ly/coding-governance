@@ -296,7 +296,6 @@ policy:runtime.secret-scan	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:runtime.spawn-backend	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.cost	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.identity	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:trace.leg-output	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.rows	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:transitions.record	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
