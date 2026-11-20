@@ -23,23 +23,3 @@ skills/session-kickoff/manifest-check.test.sh	mkdir -p "$mm_dir" && printf -- '-
 {prefix}/playbook/render_playbook.py	with open(d / 'MEMORY.md', 'a', encoding='utf-8', newline='') as fh:	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 {prefix}/govkit/registry.toml	"file:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 {prefix}/govkit/registry.toml	"installable:{prefix}/agent-instructions/adopt-agent-instructions.sh",	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-.gitattributes	memory/map/baseline.toml text eol=lf	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-.gitattributes	memory/map/affordance-exempt.toml text eol=lf	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-.governance/instructions.toml	text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise."	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-AGENTS.md	- The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise.	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-WIRE-INTO-PROJECT.md	baseline from live inventories AND the shrink-only `affordance-exempt.toml` from existing	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-WIRE-INTO-PROJECT.md	— touching a graced feature's files drops its `affordance-exempt.toml` grace mechanically, so the	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-WIRE-INTO-PROJECT.md	`<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-WIRE-INTO-PROJECT.md	commit `<MAP_ROOT>/affordance-exempt.toml` in the same landing — that seed graces the existing	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-memory/gotchas/assertion-between-two-derived-values.md	shape `ARMS_FLOORS` and `baseline.toml` already use.	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-memory/map/features/codebase-map.md	`baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-memory/map/features/codebase-map.md	- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.toml`, so coverage	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/check-spec-tokens.test.sh	"  THIS unit creates, and drop the now-claimed row from `memory/map/baseline.toml`.\n")	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.py	- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.py	f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.py	added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.py	"baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.template.py	- `baseline.toml` never gains a key: the gate refuses one the baseline at the branch's base did not	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.template.py	f"substrate; baseline.toml is reserved for the initial backfill): {cov.unclaimed}\n"	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.template.py	added, note = cj.derive_baseline_additions(root, base, (m.map_root(root) / "baseline.toml").relative_to(root).as_posix())	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51
-{prefix}/codebase-map/test_codebase_map.template.py	"baseline.toml GAINED keys its base did not carry — claim each in a feature dossier, or "	1	773daf5611812b8953fbcaba094b4f005c796b3c	carried:TOOL-dWitnessedBar-51

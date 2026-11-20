@@ -8,6 +8,7 @@ selection of the legs a bar holds, and the flake record with the holds it justif
     python <this kit>/verdict_flow.py select --rev <R> --out <path>
     python <this kit>/verdict_flow.py select --check --run <run dir>|--selection <path> --rev <R>
     python <this kit>/verdict_flow.py flakes --run <run dir> --build <slug> --unit <id>
+    python <this kit>/verdict_flow.py flakes --record-only --run <run dir> --build <slug> --unit <id>
     python <this kit>/verdict_flow.py flakes --check
     python <this kit>/verdict_flow.py --fixture <one of FIXTURES>
 
@@ -103,6 +104,10 @@ TOOL-dWitnessedBar-30. `<run dir>` is one run record of the runner,
          committer date of the oldest commit adding `- CLOSED · <id> · ` to a CLOSED held-flaky-leg
          ask of the leg, the newest such, or the newest row's `Ended` where no commit adds the row
          yet. It ends `flakes  re-entry test.verdict`, or `test.select` under `quarantine`.
+         `flakes --record-only` is the green bar's call (TOOL-dWitnessedBar-51 S15): as `flakes`
+         under `verdict.flakes`, `retry-only` writing nothing, it writes the flake record, one row per
+         executed leg, and runs the gate-health measurement, then stops: no `hold` line and no
+         re-entry line, since a green bar routes nowhere.
          `flakes --check` reads this repository's asks and records and exits 1 naming each OPEN
          held-flaky-leg ask whose leg flaked fewer times, in its window at the ask's filing date,
          than the threshold in force then.
@@ -827,14 +832,20 @@ def derive_flake_streak(seen):
 
 
 def check_row_changed(ctx, leg, sha):
-    """True when `leg`'s manifest row at R differs from its row in `sha`; False where either is absent."""
+    """True when `leg`'s manifest row at R differs from its row in `sha` in a key outside
+    `DECLARATIVE_LEG_KEYS` (TOOL-dWitnessedBar-51 S36), so a `purpose` or `tag` reworded never releases a
+    quarantine; False where either is absent."""
     try:
         then = json.loads(read_at(ctx["repo"], sha, ctx["manifest_rel"]) or "null")
     except ValueError:
         return False
     then = next((r for r in then if isinstance(r, dict) and r.get("name") == leg), None) if isinstance(then, list) else None
     now = next((r for r in ctx["legs"] if r.get("name") == leg), None)
-    return then is not None and now is not None and then != now
+    if then is None or now is None:
+        return False
+    from held_halves import DECLARATIVE_LEG_KEYS  # noqa: PLC0415 - the sibling's one tuple, read where it is asked
+    return ({k: v for k, v in then.items() if k not in DECLARATIVE_LEG_KEYS}
+            != {k: v for k, v in now.items() if k not in DECLARATIVE_LEG_KEYS})
 
 
 def derive_level_rows(ctx):
@@ -1168,12 +1179,14 @@ def write_gate_health(top, build, unit, rel, here=HERE):
     return [ln for ln in p.stdout.splitlines() if ln.strip()]
 
 
-def cmd_flakes(run, build, unit, here=HERE, repo=None):
-    """-> (rc, out lines). `test.flakes` over one run record, under `verdict.flakes`."""
+def cmd_flakes(run, build, unit, here=HERE, repo=None, record_only=False):
+    """-> (rc, out lines). `test.flakes` over one run record, under `verdict.flakes`; `record_only`, a green
+    bar's call, writes the record and its gate-health measurement and prints no hold and no re-entry."""
     top = read_top(repo or pathlib.Path("."))
     value, entry = read_flake_policy(top, here)
     if value == "retry-only":
-        return 0, [f"flakes  {FLAKES_KEY} retry-only · no flake record is written", "flakes  re-entry test.verdict"]
+        return 0, [f"flakes  {FLAKES_KEY} retry-only · no flake record is written"] + (
+            [] if record_only else ["flakes  re-entry test.verdict"])
     keys, _tails = read_verdict(run)
     header = read_keys(run / "header")
     rows = read_flake_rows(run)
@@ -1194,6 +1207,8 @@ def cmd_flakes(run, build, unit, here=HERE, repo=None):
         lines.append(f"{SAY}: wrote {rel} · {len(rows)} leg(s), {flaked} flake(s)")
         extra.append(rel)
         lines += write_gate_health(top, build, unit, rel, here)
+    if record_only:
+        return 0, lines
     if value == "record":
         return 0, lines + ["flakes  re-entry test.verdict"]
     asks, said = read_repo_asks(top)
@@ -2062,6 +2077,7 @@ def main(argv=None):
     ap.add_argument("--rev")
     ap.add_argument("--out")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--record-only", action="store_true")
     a = ap.parse_args(argv)
     try:
         # `--run` is asked of route, judge and flakes, and `select --check` asks it or `--selection`, exactly
@@ -2072,6 +2088,8 @@ def main(argv=None):
             raise Refusal("--selection is asked of select --check alone")
         if (a.build is not None or a.unit is not None) and not (a.verb == "flakes" and not a.check):
             raise Refusal("--build and --unit are asked of flakes alone, never of flakes --check")
+        if a.record_only and (a.verb != "flakes" or a.check):
+            raise Refusal("--record-only is asked of flakes alone, never of flakes --check")
         if a.verb == "flakes" and a.check and a.run is not None:
             raise Refusal("flakes --check takes no --run: it reads the asks and records of this repository")
         if a.verb == "select" and a.check and (a.run is None) == (a.selection is None):
@@ -2094,7 +2112,8 @@ def main(argv=None):
             else:
                 rc, out = cmd_select(pathlib.Path("."), a.rev, a.out)
         elif a.verb == "flakes":
-            rc, out = cmd_flakes_check() if a.check else cmd_flakes(run, a.build, a.unit)
+            rc, out = cmd_flakes_check() if a.check else cmd_flakes(run, a.build, a.unit,
+                                                                    record_only=a.record_only)
         elif a.verb == "route":
             rc, out = cmd_route(run)
         elif a.verb == "quiet-rerun":

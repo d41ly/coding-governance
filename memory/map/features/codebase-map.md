@@ -45,7 +45,7 @@ in `map_extractors.py` is gone and must not be reintroduced — the kit's selfte
 `Path.resolve()` in kit code, because it follows a junction to the link target and would disagree
 with `map_lib.kit_dir()` about the prefix stamped into byte-compared artifacts.
 
-`baseline.toml` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed
+`baseline.txt` holds the shrink-only backfill of the keys no dossier claims yet: a new key must be claimed
 in a dossier, never appended to the baseline, and `test_baseline_never_gains_a_key` refuses an appended key by
 comparing the working file with the baseline at the branch's base (`map_lib.resolve_compare_base`, the merge
 bar's merge-base rule; `UNGRADED` when no `origin` default branch or no baseline at the base). The gate proved this on its own first run — adding the
@@ -82,7 +82,7 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## Gaps
 
-- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.toml`, so coverage
+- **Not every key is claimed yet.** The keys no dossier claims sit in `baseline.txt`, so coverage
   is ratcheted but not fully described. The map enforces "nothing new goes unclaimed"; it does not
   yet answer "what is this repo made of". Count `features/` and the baseline's rows for the live
   figures, never this line — no command reports the pair, and prose is where that figure rots.

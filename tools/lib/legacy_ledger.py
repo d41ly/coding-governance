@@ -8,10 +8,12 @@ its count-ratchet adapters read through; `<prefix>/lib/resolve-python.test.sh`'s
 copy that drifts. The block calls `compute_coverage` (the `coverage_join` block),
 `resolve_compare_base` (the `compare_base_py` block), `resolve_kit_dir`, through which its `seed` verb
 finds the policy kit, and `resolve_prefix_token`, through which a seed argv's `{prefix}` resolves
-against the tool root above this copy (TOOL-dWitnessedBar-17 S9). They are imported OUTSIDE the block,
+against the tool root above this copy (TOOL-dWitnessedBar-17 S9), and `scan_bash`, through which a seed
+argv's `bash` head resolves (TOOL-dWitnessedBar-51 S32). They are imported OUTSIDE the block,
 so it stays byte-identical: this file imports them from `coverage_join.py`, `compare_base.py`,
-`resolve_kit_dir.py` and `resolve_prefix_token.py` beside it, and each kit copy imports the first two
-and the fourth from its own kit's `coverage_join.py` and the third from its own kit.
+`resolve_kit_dir.py`, `resolve_prefix_token.py` and `resolve_bash.py` beside it, and each kit copy imports the
+first two and the fourth from its own kit's `coverage_join.py`, the third from its own kit, and carries
+the `resolve_bash_py` block inline outside this one.
 
 A population registers as a `[[ledger]]` table in its owning kit's `kit.toml`, or in the govkit
 registry when no kit owns it, and its ledger file opens with a header rendered from that table:
@@ -29,7 +31,8 @@ The CLI runs in the repository its working directory sits in:
 
 It prints one row or finding per line and exits 0 on no finding, 1 on any finding, 2 on a refusal.
 `seed` (TOOL-dWitnessedBar-15) prints `armed`, `present`, `widened` or `unarmed` per population and
-exits 1 when a seed left one unarmed by a failure; the memory-tree kit's copy carries it too, so an
+exits 1 when a seed left one unarmed by a failure, or `refused` and exit 2 for a home that exists but
+does not read or whose header disagrees, writing nothing (TOOL-dWitnessedBar-51 S50); the memory-tree kit's copy carries it too, so an
 adopter seeds through that copy. With no `--sha` it stamps HEAD's sha, or, where HEAD is unborn in a
 repository with no commit yet, the null SHA of forty `0`s, saying so on one line; a later seed never
 re-dates those rows (TOOL-dWitnessedBar-61). A home is admitted when its parent directory exists in the
@@ -54,6 +57,7 @@ from coverage_join import compute_coverage  # noqa: F401  (the block below calls
 from compare_base import resolve_compare_base  # noqa: F401  (the block below calls it)
 from resolve_kit_dir import resolve_kit_dir  # noqa: F401  (the block below calls it)
 from resolve_prefix_token import resolve_prefix_token  # noqa: F401  (the block below calls it)
+from resolve_bash import scan_bash  # noqa: F401  (the block below calls it)
 
 
 # >>> legacy_ledger_py -- canonical copy: legacy_ledger.py in the gov lib dir (byte-identical; gated)
@@ -470,6 +474,22 @@ def read_home_state(path):
     return "unarmed" if any(line.startswith(UNARMED_LEAD) for line in head) else "armed"
 
 
+def check_home_readable(path, header):
+    """The refusal for a registered home at `path` that exists and yet cannot be seeded over, or "": one
+    whose bytes do not read as UTF-8, `does not read: <why>`, or whose first line is neither `header`
+    nor an unarmed line, `header disagrees: <first line>`, a legacy-grammar file among them. `seed`
+    meets either by doing nothing (TOOL-dWitnessedBar-51 S50); an absent home is ""."""
+    try:
+        first = pathlib.Path(path).read_bytes().decode("utf-8").split("\n")[0].rstrip("\r")
+    except FileNotFoundError:
+        return ""
+    except (OSError, UnicodeDecodeError) as exc:
+        return "does not read: %s" % exc
+    if first == header or first.startswith(UNARMED_LEAD):
+        return ""
+    return "header disagrees: %r is not %r" % (first[:80], header)
+
+
 def check_home_admitted(root, home):
     """The refusal `no directory <parent>` for a home whose parent directory does not exist in the working
     tree, or "" for one whose does, tracked files or none (TOOL-dWitnessedBar-47): an adopter seeds into
@@ -493,13 +513,30 @@ def derive_seed_prefix(root):
         return tools.as_posix()
 
 
+def resolve_seed_head(argv):
+    """-> (argv, refusal): a seed argv's head as `regen.py`'s `run_command` maps it (TOOL-dWitnessedBar-51
+    S32). `python` or `python3` runs as `sys.executable`, never a PATH lookup that can reach the MS-Store
+    stub; `bash` runs as the `found` of the `resolve_bash_py` block's `scan_bash`, and where none runs the
+    argv is empty and `refusal` is that block's own; any other head is spelled as written."""
+    argv = list(argv)
+    if argv and argv[0] in ("python", "python3"):
+        return [sys.executable, *argv[1:]], ""
+    if argv and argv[0] == "bash":
+        found, _tried, refusal = scan_bash()
+        return ([found, *argv[1:]], "") if found else ([], refusal)
+    return argv, ""
+
+
 def run_seed_argv(argv, root):
     """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
-    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`.
-    Each argument's `{prefix}` is resolved through `resolve_prefix_token` against `derive_seed_prefix`."""
+    result, else `exit <n>`, `timed out`, `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`, or
+    `refused: <why>` where `resolve_seed_head` finds no bash. Each argument's `{prefix}` is resolved
+    through `resolve_prefix_token` against `derive_seed_prefix`, and the head through `resolve_seed_head`."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     troot = derive_seed_prefix(root)
-    argv = [resolve_prefix_token(a, troot) for a in argv]
+    argv, refusal = resolve_seed_head([resolve_prefix_token(a, troot) for a in argv])
+    if refusal:
+        return "", "refused: %s" % refusal
     try:
         p = subprocess.run(list(argv), cwd=str(root), capture_output=True, text=True, encoding="utf-8",
                            errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=SEED_TIMEOUT)
@@ -522,12 +559,18 @@ def seed_population(root, reg, sha, widen=None):
     `widened:<widen>`, never rewriting a row. A seed that exits non-zero, times out, finds a dead probe
     or prints a row `read_rows` refuses leaves the home holding the header and one unarmed line, an
     armed home untouched; a home `check_home_admitted` refuses is never written. `seed = []` is
-    reported and nothing is written: the caller asks `retrofit.unseeded` first.
+    reported and nothing is written: the caller asks `retrofit.unseeded` first. A home that exists but
+    does not read, or whose first line is neither the header `render_header` renders nor an unarmed
+    line, is refused by `check_home_readable`: nothing run, nothing written, and the second value None,
+    so such a home never reads `present` or absent (TOOL-dWitnessedBar-51 S50).
     """
     name = reg.population
     if not reg.seed:
         return "unarmed %s no seed" % name, True
     home = pathlib.Path(root, reg.home)
+    refusal = check_home_readable(home, render_header(reg))
+    if refusal:
+        return "refused %s %s" % (name, refusal), None
     state = read_home_state(home)
     if state == "armed" and widen is None:
         return "present %s" % name, True
@@ -713,7 +756,7 @@ def run_seed_cli(args, cwd):
             worst = 2
             continue
         print(line)
-        worst = max(worst, 0 if ok else 1)
+        worst = max(worst, 2 if ok is None else 0 if ok else 1)
     return worst
 # <<< legacy_ledger_py
 

@@ -40,7 +40,9 @@ too. `keys-not-scalar --measure` is the `conf-scalar-pins` seed: one TAB row per
 `*_PIN` key, its count the `<KEY>=` assignments of that key, each conf read from the working tree, tracked
 or not, so a conf copied before the first commit is seeded; an ignored one is never read (TOOL-dWitnessedBar-52).
 `measure-cutoffs` is the `date-cutoffs` seed over the same conf walk: one TAB row per `*_CUTOFF` key, its
-count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S6).
+count the date as eight digits, a blank date `99991231` (TOOL-dWitnessedBar-17 S6), and so a value that is
+no real day, `none` say, with one stderr line naming it (TOOL-dWitnessedBar-51 S37). A base leg's
+`unresolved` line with no base names the remedy, and no `GATE_` knob passes it (S33).
 
 WHAT IT DOES NOT CHECK. A widened row's count, which the record does not name. That a leg another
 registration names exists in the manifest. The rows a first seed writes, which are `test.seed`'s
@@ -51,6 +53,7 @@ emptiness is right.
 """
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import pathlib
@@ -103,6 +106,10 @@ CUTOFF_RE = re.compile(r"([A-Z0-9_]+_CUTOFF)=")
 BLANK_CUTOFF = 99991231  # a blank cutoff reads as the latest date, so disarming its rule is a raise
 UNIT_RE = re.compile(r"[A-Za-z]+-([A-Za-z0-9]+)-\d+")
 EMPTY_TEXT = "reads unarmed, no seen-red line names its leg"
+# THE REMEDY a base leg with no compare base prints on its `unresolved` line (TOOL-dWitnessedBar-51 S33).
+# No `GATE_` knob turns that line into a pass: the remedy is a base, never a waiver.
+NO_BASE_REMEDY = ("remedy: fetch the default branch so a base resolves (git fetch <remote> <branch>), or name "
+                  "the ref with GOV_REMOTE and GOV_DEFAULT_BRANCH")
 
 
 def print_line(*parts):
@@ -261,6 +268,11 @@ def derive_leg_population(regs, verb):
     return list(regs), "no [[ledger]] registration in this tree"
 
 
+def render_unresolved(why, sha):
+    """An `unresolved` line's reason: `why` alone where a base resolved, else `why` and the remedy."""
+    return str(why) if sha else "%s · %s" % (why, NO_BASE_REMEDY)
+
+
 def print_verdict(leg, red, graded, sha=None, why=""):
     """The leg's closing line: red, or its pass line naming what it graded. -> its exit."""
     against = " against %s (%s)" % (sha[:12], why) if sha else ""
@@ -288,7 +300,7 @@ def run_never_gains(root):
             continue
         findings, why_not = LL.compare_to_base(root, reg)
         if findings is None:
-            print_line(leg, reg.population, "unresolved", why_not)
+            print_line(leg, reg.population, "unresolved", render_unresolved(why_not, sha))
             red = 1
             continue
         rows, _bad = LL.read_ledger(root, reg)
@@ -430,7 +442,8 @@ def run_seed_laundering(root):
         except OSError as exc:
             base, why_not = None, "no %s in the working tree: %s" % (reg.home, exc)
         if base is None or bad:
-            print_line(leg, reg.population, "unresolved", why_not if base is None else LL.render_malformed(bad[0]))
+            print_line(leg, reg.population, "unresolved",
+                       render_unresolved(why_not, sha) if base is None else LL.render_malformed(bad[0]))
             red = 1
             continue
         removed = []
@@ -471,7 +484,7 @@ def run_rename(root):
     red = 0
     for reg in sites:
         if not sha:
-            print_line(leg, reg.population, "unresolved", why)
+            print_line(leg, reg.population, "unresolved", render_unresolved(why, sha))
             red = 1
             continue
         if check_new_at_base(root, reg, sha):
@@ -535,20 +548,24 @@ def measure_scalar_pins(root):
 def measure_cutoffs(root):
     """-> {(conf, key): date}: every `*_CUTOFF` key assigned at a line's start in each root
     `.<name>.conf` `read_root_confs` lists, its date the last assignment's `YYYY-MM-DD` as eight digits and a blank one
-    `BLANK_CUTOFF`, the `date-cutoffs` seed (TOOL-dWitnessedBar-17 S6). A value that is neither is
-    ValueError naming the conf and key, never a row. WHAT IT DOES NOT CHECK: that the date is a real day."""
+    `BLANK_CUTOFF`, the `date-cutoffs` seed (TOOL-dWitnessedBar-17 S6). A value that is neither blank
+    nor a real `%Y-%m-%d` day, `none` say, reads as `BLANK_CUTOFF` too, with one stderr line naming the
+    conf and key, so a malformed cutoff reads as the latest one and its row's `count rose`, never as a
+    seed that died (TOOL-dWitnessedBar-51 S37)."""
     dates = {}
     for conf, line in read_root_conf_lines(root):
         if not CUTOFF_RE.match(line):
             continue
         key, value = parse_conf_line(line)
-        digits = value.replace("-", "")
         if not value:
             dates[(conf, key)] = BLANK_CUTOFF
-        elif re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
-            dates[(conf, key)] = int(digits)
-        else:
-            raise ValueError("%s: %s=%r is neither a YYYY-MM-DD date nor blank" % (conf, key, value))
+            continue
+        try:
+            dates[(conf, key)] = int(datetime.datetime.strptime(value, "%Y-%m-%d").strftime("%Y%m%d"))
+        except ValueError:
+            print("%s: %s: %s=%r is neither a YYYY-MM-DD date nor blank, read as %d"
+                  % (SAY, conf, key, value, BLANK_CUTOFF), file=sys.stderr)
+            dates[(conf, key)] = BLANK_CUTOFF
     return dates
 
 
@@ -941,6 +958,30 @@ def run_plant_cutoff_blank(top, results):
                      ["fix-cutoffs · count rose · .fix.conf\tFIX_CUTOFF · measured 99991231, declared 20260102"])
 
 
+def run_plant_cutoff_none(top, results):
+    """TOOL-dWitnessedBar-51 S37: a cutoff set to `none`, or to no real day, reads as 99991231, a raise,
+    with one stderr line naming the conf and key, where the seed used to die on it."""
+    write_cutoff_fixture(top)
+    for value in ("none", "2026-02-30"):
+        write_files(top, {".fix.conf": 'FIX_CUTOFF="%s"\n' % value})
+        check_plant_case(results, "cutoff-none", "a cutoff set to %s reads as 99991231, a raise" % value, top,
+                         ["both-ways"], 1,
+                         ["fix-cutoffs · count rose · .fix.conf\tFIX_CUTOFF · measured 99991231, declared 20260102"],
+                         ["seed exit"])
+    check_plant_case(results, "cutoff-none", "the seed names the value it read as the latest", top,
+                     ["measure-cutoffs"], 0, [".fix.conf: FIX_CUTOFF='2026-02-30'", ".fix.conf\tFIX_CUTOFF\t99991231"])
+
+
+def run_plant_no_base_remedy(top, results):
+    """TOOL-dWitnessedBar-51 S33: a live base leg with its remote ref deleted exits 1 printing
+    `unresolved`, its reason and the remedy."""
+    rows = [(("a",), 1, SHA_A, "seeded")]
+    write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows(rows)})
+    run_git_in(top, "update-ref", "-d", "refs/remotes/origin/main")
+    check_plant_case(results, "no-base-remedy", "never gains with no compare base", top, ["never-gains"], 1,
+                     ["fix-pop · unresolved", NO_BASE_REMEDY], ["pass"])
+
+
 def run_plant_unarmed_green(top, results):
     rows = [(("a",), 1, SHA_A, "seeded")]
     write_fixture_repo(top, [render_table()], {"pop/rows.txt": render_rows(rows, extra=[LL.UNARMED_LEAD + "exit 1 · "
@@ -1129,6 +1170,7 @@ PLANTS = {
     "append-removed": run_plant_append_removed, "gain-widened": run_plant_gain_widened, "gain-refused": run_plant_gain_refused,
     "ceiling-widened": run_plant_ceiling_widened, "both-ways": run_plant_both_ways,
     "cutoff-later": run_plant_cutoff_later, "cutoff-blank": run_plant_cutoff_blank,
+    "cutoff-none": run_plant_cutoff_none, "no-base-remedy": run_plant_no_base_remedy,
     "unarmed-green": run_plant_unarmed_green, "populated-empty-armed": run_plant_populated_empty_armed,
     "populated-seen-red": run_plant_populated_seen_red,
     "laundering": run_plant_laundering, "rename": run_plant_rename, "key-number": run_plant_key_number,

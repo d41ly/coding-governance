@@ -3497,9 +3497,13 @@ hit 'build-records: PASS typed-kinds'
 # --- TOOL-dWitnessedBar-7 (AC1 AC2 AC3 AC4 AC6) — `test.seen-red`: each plant of `seen_red.py --fixture` is a
 # --- scratch repository the join runs over, its exit the join's. Red on a reader that does not parse the
 # --- seen-red line, an owed set missing an added manifest row or a `New arm:` line, an empty owed set
-# --- printed as nothing, and a malformed line skipped rather than refused.
+# --- printed as nothing, and a malformed line skipped rather than refused. TOOL-dWitnessedBar-51 (AC2): a
+# --- `New arm:` first field carrying a flag resolves to the leg whose argv holds the path and the flag, and
+# --- a line quoted outside the Gates section owes nothing.
 for _sr in 'seen:0:seen-red: fix added leg · ' 'unseen-gate:1:seen-red: fix added leg · NO RECORD' \
            'unseen-arm:1:seen-red: fix base leg · NO RECORD' \
+           'unseen-arm-with-args:1:seen-red: fix args leg · NO RECORD' \
+           'arm-outside-gates:0:seen-red: dFix adds or changes no gate · nothing joined' \
            'bad-line:2:2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md:7: a seen-red line outside its grammar' \
            'empty:0:seen-red: dFix adds or changes no gate · nothing joined'; do
   _srp=${_sr%%:*}; _srw=${_sr#*:}; _srn=${_srw#*:}; _srw=${_srw%%:*}

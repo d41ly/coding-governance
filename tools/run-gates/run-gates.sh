@@ -2759,6 +2759,9 @@ RUNROOT=""; RUNDIR=""; RUNID=""
 # days, PINNED by that spec's F2: a fixed bound far past any bar's wall needs no other reading to be
 # true, where a profiled wall can be zero and a turnstile beacon is not held by every bar.
 TAIL_GRACE_S=604800
+# A per-tree verdict no retained run and no worktree head names is kept this long after its last write
+# (TOOL-dWitnessedBar-51 S28), 30 days, PINNED by that spec's F4: the bound that never removes a named one.
+VERDICT_GRACE_DAYS=30
 # THE COMPLETION FILE STAYS IN THE SCRATCH DIR, and the durable record does not hold one. This is
 # the one place this unit's spec asked for something its own reasoning argues against, and the
 # arm for it is what found the disagreement rather than a reading of the text.
@@ -2924,6 +2927,15 @@ _pm_args=()
 [ "$PROCMON_CONF" = 1 ] && _pm_args=(process-monitor reap.py "$KITDIR")
 legs=$("$PYBIN" -c "$RKD_PROGRAM"'
 import hashlib, json, os, statistics, sys
+# THE DECLARATIVE KEYS the row hash leaves out (TOOL-dWitnessedBar-51 S48), imported from the sibling
+# held_halves.py in the kit dir argv[4] sits in, as measure_legs.py imports it: one tuple, one home.
+# Where no such sibling sits, a fixture holding the runner alone, the whole row is hashed: the stricter
+# reading, under which any change re-runs a leg and none reuses one.
+sys.path.insert(0, os.path.dirname(sys.argv[4]) if len(sys.argv) > 4 and os.path.dirname(sys.argv[4]) else ".")
+try:
+    from held_halves import DECLARATIVE_LEG_KEYS
+except ImportError:
+    DECLARATIVE_LEG_KEYS = ()
 # THE PROCESS-MONITOR KIT DIR (TOOL-aSparedSpawn-4 S10), asked by argv[5] to argv[7] and answered as the
 # runner wrapper of the resolver answered it: the dir relative to the nearest directory holding .git,
 # or the refusal text. A refusal never ends this program, because the manifest still has to be read.
@@ -3060,10 +3072,13 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          + "\x1e" + ("=" + ",".join(resolve_prefix_token(g, troot) for g in l["doc_reads"])
                             if isinstance(l.get("doc_reads"), list) else "")
          # THE TENTH AND ELEVENTH FIELDS, appended for the same reason, read only by the held-tier
-         # selection (TOOL-aSparedSpawn-12 S4): the row hash, the SHA-1 of this row as JSON with
-         # sorted keys, so a record earned under another row reads as stale; and the record name,
-         # the first 16 hex of the SHA-1 of the leg name, which stays put when the row changes.
-         + "\x1e" + hashlib.sha1(json.dumps(l, sort_keys=True).encode()).hexdigest()
+         # selection (TOOL-aSparedSpawn-12 S4): the row hash, the SHA-1 of this row LESS its
+         # DECLARATIVE_LEG_KEYS as JSON with sorted keys, so a record earned under another row reads as
+         # stale and a declarative key added or reworded neither releases a reuse quarantine nor re-earns
+         # a held record (TOOL-dWitnessedBar-51 S48); and the record name, the first 16 hex of the SHA-1
+         # of the leg name, which stays put when the row changes.
+         + "\x1e" + hashlib.sha1(json.dumps({k: v for k, v in l.items() if k not in DECLARATIVE_LEG_KEYS},
+                                             sort_keys=True).encode()).hexdigest()
          + "\x1e" + hashlib.sha1(str(l["name"]).encode()).hexdigest()[:16]
          for l in data]
 if pm is not None:
@@ -6043,9 +6058,11 @@ gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
 # its five-run sweep. `TAIL_ROWS` gathers `tail.<n>` lines, `<hash> <leg name>`, for the run record's
 # verdict and the per-tree verdict. A leg retried alone is cut from its retry's copy, a leg with no copy
 # from nothing, which is the empty tail's hash. The 60 lines and 8192 bytes are PINNED, the spec's
-# choice: a stack and its assertion, and a red bar of twenty legs commits under 200 KB.
-# WHAT IT DOES NOT CHECK: that the cut lands on a character boundary, or that the tail decodes; the
-# keep verb, `keep_tails.py`, is what commits a tail, and it masks runlog's secret shapes first.
+# choice: a stack and its assertion, and a red bar of twenty legs commits under 200 KB. The cut lands
+# on the last whole UTF-8 character within them (TOOL-dWitnessedBar-51 S34): the continuation bytes a
+# byte cut leaves at the front, three at most, are dropped, so the tail is hashed as it decodes.
+# WHAT IT DOES NOT CHECK: that the tail decodes, a byte that is not UTF-8 being replaced at the keep;
+# the keep verb, `keep_tails.py`, is what commits a tail, and it masks runlog's secret shapes first.
 TAIL_ROWS=""
 if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
   _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails || _td=""
@@ -6056,6 +6073,8 @@ if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
       _tsrc="$RUNDIR/$i.out"; [ -f "$RUNDIR/$i.retry.out" ] && _tsrc="$RUNDIR/$i.retry.out"
       derive_temp_path _tp "$_td/tail" || continue
       if [ -f "$_tsrc" ]; then tail -n 60 "$_tsrc" | tail -c 8192 > "$_tp" 2>/dev/null; else : > "$_tp"; fi
+      _tk=$(od -An -tx1 -N3 "$_tp" 2>/dev/null | awk '{ for (j = 1; j <= NF; j++) { if ($j ~ /^[89ab]/) k++; else exit } } END { print k + 0 }')
+      if [ "${_tk:-0}" -gt 0 ]; then tail -c "+$((_tk + 1))" "$_tp" > "$_tp.cut" 2>/dev/null && mv -f "$_tp.cut" "$_tp"; fi
       _th=$(git hash-object --stdin < "$_tp" 2>/dev/null)
       case "$_th" in
         ''|*[!0-9a-f]*) rm -f "$_tp" 2>/dev/null; echo "run-gates: no tail kept for ${names[$i]} — git could not hash it" >&2; continue ;;
@@ -6327,6 +6346,35 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
     [ $((_trm + _tkept)) -gt 0 ] && echo "run-gates: tails swept — $_trm removed, $_tkept kept (named by a retained run of any worktree, or younger than ${TAIL_GRACE_S}s)" >&2
   fi
   unset _td _tc _tkeep _tfresh _tok _trm _tkept _tf _th
+  # THE PER-TREE VERDICTS ARE PRUNED THE SAME WAY (TOOL-dWitnessedBar-51 S28, §8 F4): `gate-verdict/`
+  # keeps every tree a retained run record of ANY worktree names as its `tree`, read from the run
+  # records the tail sweep reads, and every worktree's `HEAD^{tree}`, so no worktree's sweep deletes
+  # another's live verdict; the rest are removed once older than VERDICT_GRACE_DAYS past their last
+  # write, so the directory shrinks. A staging name is never a tree, so a verdict in flight is kept,
+  # and a `find` or a worktree list that fails keeps every verdict.
+  # WHAT IT DOES NOT CHECK: a worktree whose HEAD moved after the run record named its old tree keeps
+  # the old one until that record is swept.
+  _vc=""; [ -n "$RG_COMMON_RAW" ] && _vc=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
+  if [ -n "$_vc" ] && [ -d "$_vc/gate-verdict" ]; then
+    _vold=$(find "$_vc/gate-verdict" -maxdepth 1 -type f -mtime "+$VERDICT_GRACE_DAYS" 2>/dev/null) || _vold=""
+    _vheads=$(git worktree list --porcelain 2>/dev/null | awk '$1 == "HEAD" { print $2 "^{tree}" }') || _vheads=""
+    if [ -n "$_vold" ] && [ -n "$_vheads" ]; then
+      # through `cat`, which reads on past a glob that matched nothing, where awk stops at the first
+      _vkeep=" $(cat "$_vc"/gate-run/*/verdict "$_vc"/worktrees/*/gate-run/*/verdict 2>/dev/null \
+        | awk -F'\t' '$1 == "tree" { printf "%s ", $2 }')"
+      # shellcheck disable=SC2086  # one word per worktree head, each a sha with no space
+      _vkeep+="$(git rev-parse $_vheads 2>/dev/null | tr '\n' ' ') "
+      _vrm=0
+      while IFS= read -r _vf; do
+        _vt=${_vf##*/}; _vt=${_vt%.scoped}
+        case "$_vt" in ''|*[!0-9a-f]*) continue ;; esac
+        case "$_vkeep" in *" $_vt "*) continue ;; esac
+        rm -f "$_vf" 2>/dev/null && _vrm=$((_vrm + 1))
+      done <<<"$_vold"
+      [ "$_vrm" -gt 0 ] && echo "run-gates: per-tree verdicts pruned — $_vrm older than ${VERDICT_GRACE_DAYS} days and named by no retained run or worktree head" >&2
+    fi
+  fi
+  unset _vc _vold _vheads _vkeep _vrm _vf _vt
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.

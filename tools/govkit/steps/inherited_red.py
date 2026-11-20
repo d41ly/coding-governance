@@ -27,7 +27,8 @@ tabs and of leading spaces, a leading tab kept, and stripped of one surrounding 
 single quotes. A last assignment that cleans to empty is undeclared, whatever an earlier line set.
 `GATE_POLICY_FILE` is read from `.unattended.conf` by the same rule, as the driver reads it.
 
-THE UP, in order. No file read assigns `INHERITED_RED`: exit 0, nothing written. Otherwise each file
+THE UP, in order. No file read assigns `INHERITED_RED`: exit 0, nothing written, and the `undeclared`
+line names the loosening: MIXED and CONTENDED reds the kit default `land` blocked now pass. Otherwise each file
 is read by that rule; a file that is not UTF-8 exits 1 naming it, writing nothing. The
 value is written into `[verdict] blocks` through `upgrade_steps.render_policy_text`, the one writer,
 unless the policy file already sets `verdict.blocks`: the same value writes nothing more, and another
@@ -58,6 +59,11 @@ KEY = "INHERITED_RED"
 CONF, CONF_KEY = ".unattended.conf", "GATE_POLICY_FILE"
 POLICY = ".governance/policy.toml"
 TABLE, POLICY_KEY = "verdict", "blocks"
+# The loosening v2's default makes, said where it happens (TOOL-dWitnessedBar-51 S16, §8 F2): an
+# undeclared key read the kit default `land` before the step, and the catalogue default after it is
+# `own-only`.
+UNDECLARED = ("inherited-red: undeclared — the kit default land read MIXED and CONTENDED reds as blocking; "
+              "own-only now passes them")
 VALUES = {"park": "every-red", "land": "own-mixed-contended"}
 OTHER = "every-red"  # the readers' `*` arm read any value outside `park land` as park
 STRICTNESS = ("every-red", "own-mixed-contended")  # the stricter first
@@ -187,6 +193,7 @@ def cmd_up(target: pathlib.Path) -> int:
     if not held:
         print(f"inherited-red: up · no {KEY} in {' or '.join(reads)} at {target.as_posix()}, "
               f"so there is nothing to move")
+        print(UNDECLARED)
         return 0
     pol = target / POLICY
 

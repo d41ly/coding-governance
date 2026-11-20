@@ -8,6 +8,8 @@ This kit requires no other kit, so it carries the block itself: `sh_hygiene.py` 
 block stays byte-identical: `compute_coverage`, `resolve_compare_base` and `resolve_prefix_token`, from
 this kit's own `coverage_join.py`, and `resolve_kit_dir`, through which `seed` finds the policy kit, carried inline
 below between its own markers, which the parity table's `resolve_kit_dir` row holds to its canonical.
+`scan_bash`, through which a seed argv's `bash` head resolves (TOOL-dWitnessedBar-51 S32), is carried
+inline too, as the `resolve_bash_py` block the parity table's row of that name holds.
 The CLI lives on the canonical copy and, for `seed` alone, on the memory-tree kit's.
 """
 from __future__ import annotations
@@ -62,6 +64,100 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
+
+
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
 
 
 # >>> legacy_ledger_py -- canonical copy: legacy_ledger.py in the gov lib dir (byte-identical; gated)
@@ -478,6 +574,22 @@ def read_home_state(path):
     return "unarmed" if any(line.startswith(UNARMED_LEAD) for line in head) else "armed"
 
 
+def check_home_readable(path, header):
+    """The refusal for a registered home at `path` that exists and yet cannot be seeded over, or "": one
+    whose bytes do not read as UTF-8, `does not read: <why>`, or whose first line is neither `header`
+    nor an unarmed line, `header disagrees: <first line>`, a legacy-grammar file among them. `seed`
+    meets either by doing nothing (TOOL-dWitnessedBar-51 S50); an absent home is ""."""
+    try:
+        first = pathlib.Path(path).read_bytes().decode("utf-8").split("\n")[0].rstrip("\r")
+    except FileNotFoundError:
+        return ""
+    except (OSError, UnicodeDecodeError) as exc:
+        return "does not read: %s" % exc
+    if first == header or first.startswith(UNARMED_LEAD):
+        return ""
+    return "header disagrees: %r is not %r" % (first[:80], header)
+
+
 def check_home_admitted(root, home):
     """The refusal `no directory <parent>` for a home whose parent directory does not exist in the working
     tree, or "" for one whose does, tracked files or none (TOOL-dWitnessedBar-47): an adopter seeds into
@@ -501,13 +613,30 @@ def derive_seed_prefix(root):
         return tools.as_posix()
 
 
+def resolve_seed_head(argv):
+    """-> (argv, refusal): a seed argv's head as `regen.py`'s `run_command` maps it (TOOL-dWitnessedBar-51
+    S32). `python` or `python3` runs as `sys.executable`, never a PATH lookup that can reach the MS-Store
+    stub; `bash` runs as the `found` of the `resolve_bash_py` block's `scan_bash`, and where none runs the
+    argv is empty and `refusal` is that block's own; any other head is spelled as written."""
+    argv = list(argv)
+    if argv and argv[0] in ("python", "python3"):
+        return [sys.executable, *argv[1:]], ""
+    if argv and argv[0] == "bash":
+        found, _tried, refusal = scan_bash()
+        return ([found, *argv[1:]], "") if found else ([], refusal)
+    return argv, ""
+
+
 def run_seed_argv(argv, root):
     """-> (stdout, reason) of one seed run at `root` under `SEED_TIMEOUT`: `reason` is "" for a live
-    result, else `exit <n>`, `timed out` or `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`.
-    Each argument's `{prefix}` is resolved through `resolve_prefix_token` against `derive_seed_prefix`."""
+    result, else `exit <n>`, `timed out`, `dead probe`, a line of its stdout opening `DEAD_PROBE_LEAD`, or
+    `refused: <why>` where `resolve_seed_head` finds no bash. Each argument's `{prefix}` is resolved
+    through `resolve_prefix_token` against `derive_seed_prefix`, and the head through `resolve_seed_head`."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     troot = derive_seed_prefix(root)
-    argv = [resolve_prefix_token(a, troot) for a in argv]
+    argv, refusal = resolve_seed_head([resolve_prefix_token(a, troot) for a in argv])
+    if refusal:
+        return "", "refused: %s" % refusal
     try:
         p = subprocess.run(list(argv), cwd=str(root), capture_output=True, text=True, encoding="utf-8",
                            errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=SEED_TIMEOUT)
@@ -530,12 +659,18 @@ def seed_population(root, reg, sha, widen=None):
     `widened:<widen>`, never rewriting a row. A seed that exits non-zero, times out, finds a dead probe
     or prints a row `read_rows` refuses leaves the home holding the header and one unarmed line, an
     armed home untouched; a home `check_home_admitted` refuses is never written. `seed = []` is
-    reported and nothing is written: the caller asks `retrofit.unseeded` first.
+    reported and nothing is written: the caller asks `retrofit.unseeded` first. A home that exists but
+    does not read, or whose first line is neither the header `render_header` renders nor an unarmed
+    line, is refused by `check_home_readable`: nothing run, nothing written, and the second value None,
+    so such a home never reads `present` or absent (TOOL-dWitnessedBar-51 S50).
     """
     name = reg.population
     if not reg.seed:
         return "unarmed %s no seed" % name, True
     home = pathlib.Path(root, reg.home)
+    refusal = check_home_readable(home, render_header(reg))
+    if refusal:
+        return "refused %s %s" % (name, refusal), None
     state = read_home_state(home)
     if state == "armed" and widen is None:
         return "present %s" % name, True
@@ -721,6 +856,6 @@ def run_seed_cli(args, cwd):
             worst = 2
             continue
         print(line)
-        worst = max(worst, 0 if ok else 1)
+        worst = max(worst, 2 if ok is None else 0 if ok else 1)
     return worst
 # <<< legacy_ledger_py

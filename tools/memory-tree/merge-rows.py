@@ -830,20 +830,23 @@ def measure_ledger_keys(lines: list[str], plane: tuple) -> dict[str, int]:
 
 
 def check_ledger(path: str | None, lines: list) -> bool:
-    """Are the three sides, `lines` in `%O`, `%A`, `%B` order, each a ledger opening with its rendered
-    header? The home is declared rather than path-shaped, so the header the factory wrote decides, never
-    `path`; a side with no header keeps the generic plane. Three headers that disagree raise
-    `StructureDrift`: a merge cannot choose between two registrations."""
+    """Are the sides, `lines` in `%O`, `%A`, `%B` order, a ledger opening with its rendered header? The
+    home is declared rather than path-shaped, so the header the factory wrote decides, never `path`;
+    `%A` and `%B` both carry it, and `%O` carries it too or carries none, empty or a legacy grammar, as
+    a home both sides seeded or converted from one base has none (TOOL-dWitnessedBar-51 S31). Either
+    side with no header keeps the generic plane. Headers that disagree raise `StructureDrift`: a merge
+    cannot choose between two registrations."""
     ll = resolve_ledger_factory()
     heads = []
-    for side in lines:
-        if not side:
-            return False
+    for n, side in enumerate(lines):
+        head = _split_term(side[0])[0] if side else ""
         try:
-            ll.parse_header(_split_term(side[0])[0])
+            ll.parse_header(head)
         except ValueError:
+            if n == 0:
+                continue
             return False
-        heads.append(_split_term(side[0])[0].strip())
+        heads.append(head.strip())
     if len(set(heads)) > 1:
         raise StructureDrift(f"{path or 'the merged path'}: the three ledger headers disagree "
                              f"({' | '.join(heads)}), so no one registration describes the merge")
@@ -948,6 +951,8 @@ def resolve_rows(O: dict, A: dict, B: dict, *, ledger_arity: int | None = None) 
     THE LEDGER RULE, under `ledger_arity` (TOOL-dWitnessedBar-13 S6): drained beats carried, which the
     one-sided delete branch already honours, and a key both sides changed takes the lower count with
     that side's sha and disposition. Equal counts with a different sha or disposition stay a conflict.
+    A key both sides ADDED takes the lower count too, so a widen is never dropped at a merge's choice,
+    and a key one side took out and the other changed stays a conflict region (TOOL-dWitnessedBar-51 S31).
     """
     resolved: dict[str, list[tuple]] = {}
     order = list(O) + [k for k in A if k not in O] + [k for k in B if k not in O and k not in A]
@@ -957,6 +962,8 @@ def resolve_rows(O: dict, A: dict, B: dict, *, ledger_arity: int | None = None) 
         if in_a and in_b:
             if A[k] == B[k]:
                 entries = rows(A[k])
+            elif not in_o and ledger_arity is not None and (lower := _resolve_lower_count(A[k], B[k], ledger_arity)):
+                entries = rows(lower)                 # a ledger key both added: the lower count wins
             elif not in_o:
                 entries = [_conflict(A[k], B[k])]     # both minted it, differently
             elif O[k] == A[k]:

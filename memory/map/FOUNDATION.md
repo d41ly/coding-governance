@@ -29,7 +29,7 @@ globs = [
 
 Claim here only what is genuinely shared substrate (sanitization boundaries, shared transport
 seams, ops tooling, the registries themselves). Feature-shaped items belong in
-`features/<feature>.md` dossiers. Everything else waits in `baseline.toml` (shrink-only).
+`features/<feature>.md` dossiers. Everything else waits in `baseline.txt` (shrink-only).
 
 ## What is claimed here, and why it is not a feature
 

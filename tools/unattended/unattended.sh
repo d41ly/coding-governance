@@ -12235,6 +12235,15 @@ dod_met() { # slug · run-state file · item · checker
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+        # TOOL-dWitnessedBar-51 S15 - A GREEN BAR'S FLAKE RECORD, so gate health arms and a quarantine can
+        # release: `flakes --record-only` reads `verdict.flakes` itself, writes nothing under `retry-only`,
+        # and prints no re-entry. A BARE STATEMENT with the bar's capture put back after it; a miss rides
+        # `run_leg_records`' own lines and never moves the item.
+        if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+          _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+          run_leg_records "$slug" verdict_flow.py flake flakes --record-only --run "$_gdir" || :
+          RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+        fi
         DOD_OUT=""; return 0
       fi
       fact "$rel" gates-run >/dev/null; if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$_fact" ]; then

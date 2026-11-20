@@ -8,7 +8,7 @@ gov:kit drift-audit@1.34
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
     python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
     python <prefix>/drift-audit/drift_report.py --gate-health [--write --build <slug> --unit <id>] [--with <flake record>]
-    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write
+    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write|held
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -55,6 +55,17 @@ import re
 import subprocess
 import sys
 import tempfile
+
+# >>> hold_predicate -- canonical copy: held_halves.py in the gov run-gates kit (byte-identical; gated)
+def test_held(leg):
+    """The runner's kit hold, one statement of it: a manifest row whose `subject` is `kit` or whose
+    `chunk` is `selftests`, the `kit` source of `run-gates.sh#derive_hold_source`. A `quarantine` or
+    `level` hold is a selection row, never a manifest key, so no reader of one row can see it. The
+    drift-audit kit carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy
+    that drifts (TOOL-dWitnessedBar-51 S21)."""
+    return leg.get("subject") == "kit" or leg.get("chunk") == "selftests"
+# <<< hold_predicate
+
 
 # The kit homes the gate-health fixture plants its scratch repository with, each named once.
 DRIFT_KIT = "drift-audit"
@@ -3655,8 +3666,10 @@ def build_live_builds_without_activity(ctx) -> dict:
 # bar has thirty verdicts in the flake records, one more than the 90th percentile, by nearest rank (§8 F2),
 # across the bar's legs, of each leg's flakes in its newest ten by `Ended` (cl-dClosedLoop-0339), written
 # `<count>/10`. The bar is every leg of the gate-leg manifest beside this kit's tool root that the kit hold
-# does not hold, `subject` `kit` or `chunk` `selftests` as `run-gates.sh#derive_hold_source` reads it,
-# restated here until TOOL-dWitnessedBar-51 takes it through the runner's predicate. The records are read
+# does not hold, read through `test_held`, the run-gates kit's predicate carried inline as the
+# `hold_predicate` block since this kit cannot import that one (TOOL-dWitnessedBar-51 S21). A leg a
+# `quarantine` or `level` selection row holds is not a manifest key, so it stays in this bar until
+# TOOL-dWitnessedBar-62 carries the selection reader (§8 F11 of unit 51's spec). The records are read
 # through the memory-tree factory, loaded in-process by `load_memory_tree`, and their body through its
 # `read_flake_body` and `derive_flaked`, so the row grammar has one home.
 #
@@ -3681,8 +3694,7 @@ def read_gate_health(root: pathlib.Path, extra: str | None = None):
     dl = load_memory_tree("design_lib.py", "design library", why)
     manifest = pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json"
     try:
-        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8"))
-               if not (leg.get("subject") == "kit" or leg.get("chunk") == "selftests")]
+        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8")) if not test_held(leg)]
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
         raise DriftError(f"the gate-leg manifest {manifest.as_posix()} does not read, so no bar leg is "
                          f"known: {exc}") from None
@@ -3768,14 +3780,16 @@ def run_gate_health_fixture(case: str) -> int:
     `short`: one row of one leg deleted: `unarmed` naming it at 29/30 and no held leg, and `--write` writes
     nothing. `write`: `--write` writes one gate-health record the factory's `read` passes; `--with` naming
     no flake record is refused, writing nothing; with one row deleted `--write` writes nothing; and `--with`
-    naming an unstaged thirtieth verdict arms it. Exit 0 when every case reads as planted, 1 naming each
-    that does not, 2 where no factory resolves."""
+    naming an unstaged thirtieth verdict arms it. `held` (TOOL-dWitnessedBar-51 AC17): a manifest of one
+    leg whose `subject` is `kit`, one whose `chunk` is `selftests` and one unheld, thirty records of the
+    unheld leg: `measured 1/10 · legs 1/1`, so only the unheld leg is a bar leg. Exit 0 when every case
+    reads as planted, 1 naming each that does not, 2 where no factory resolves."""
     try:
         br = load_memory_tree("build_records.py", "record factory", "the fixture plants its flake records through it")
     except DriftError as exc:
         print(f"drift-report: gate-health fixture {case} refused · {exc}", file=sys.stderr)
         return 2
-    legs = [f"leg {i:02d}" for i in range(1, 11)]
+    legs = ["leg 01"] if case == "held" else [f"leg {i:02d}" for i in range(1, 11)]
     flaked = {"differs": {"leg 09": (20, 23, 26), "leg 10": (20, 23, 26), "leg 01": (0, 3, 6, 9, 12),
                           "leg 02": (0, 3, 6, 9, 12)},
               "lower": {"leg 10": (25,)}}.get(case, {})
@@ -3793,8 +3807,11 @@ def run_gate_health_fixture(case: str) -> int:
             for f in files:
                 (repo / home / f).write_bytes((src / f).read_bytes())
         manifest = [{"name": leg, "subject": "repo", "chunk": "product", "argv": ["true"]} for leg in legs]
-        manifest += [{"name": "kit selftest", "subject": "kit", "chunk": "selftests", "argv": ["true"]},
-                     {"name": "repo selftests", "subject": "repo", "chunk": "selftests", "argv": ["true"]}]
+        manifest += ([{"name": "kit leg", "subject": "kit", "chunk": "product", "argv": ["true"]},
+                      {"name": "selftests leg", "subject": "repo", "chunk": "selftests", "argv": ["true"]}]
+                     if case == "held" else
+                     [{"name": "kit selftest", "subject": "kit", "chunk": "selftests", "argv": ["true"]},
+                      {"name": "repo selftests", "subject": "repo", "chunk": "selftests", "argv": ["true"]}])
         (repo / "gate-legs.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8", newline="\n")
         (repo / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
         (repo / "memory" / "builds" / build).mkdir(parents=True)
@@ -3839,6 +3856,11 @@ def run_gate_health_fixture(case: str) -> int:
             want = [f"{head}measured 1/10 · legs 10/10 · verdicts {runs}"]
             if rc != 0 or said != want:
                 bad.append(f"lower read rc {rc} {said}, planted {want}")
+        elif case == "held":
+            rc, said = run_mode()
+            want = [f"{head}measured 1/10 · legs 1/1 · verdicts {runs}"]
+            if rc != 0 or said != want:
+                bad.append(f"held read rc {rc} {said}, planted {want}: a held leg was read as a bar leg")
         elif case == "short":
             remove_row("leg 03")
             rc, said = run_mode(*write)
@@ -4606,7 +4628,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--unit", help="with --gate-health --write: the unit id the record serves")
     ap.add_argument("--with", dest="with_path", metavar="PATH",
                     help="with --gate-health: one flake record not yet staged, counted beside the tracked ones")
-    ap.add_argument("--fixture", choices=("differs", "lower", "short", "write"),
+    ap.add_argument("--fixture", choices=("differs", "lower", "short", "write", "held"),
                     help="with --gate-health: run one planted case over a scratch repository")
     args = ap.parse_args(argv)
 

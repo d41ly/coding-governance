@@ -7698,6 +7698,13 @@ hit "$o" "fix-of: PASS acceptance-fixture"
 o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant unknown-leg 2>&1)
 hit "$o" "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: "
 hit "$o" "fix-of: PASS unknown-leg"
+# TOOL-dWitnessedBar-51 (AC16 AC31): a light-profile spec's acceptance section is read by heading text, and
+# a file under the red leg's kit `fixtures/` is kept. RED-first: with `read_leg_files` keeping argv files
+# only, writes-fixture FAILs; with a section read by position, light-profile does.
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant light-profile 2>&1)
+hit "$o" "fix-of: PASS light-profile"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-fixture 2>&1)
+hit "$o" "fix-of: PASS writes-fixture"
 
 # ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are one parallel group, which
 # ---- the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
