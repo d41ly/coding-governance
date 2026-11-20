@@ -93,6 +93,38 @@ Documented on [help/pass-legs.md](../pass-legs.md).
 ## `memory.staged-render`
 Documented on [help/commit-render.md](../commit-render.md).
 
+## `tests.without-cadence`
+<!-- usage: policy:tests.without-cadence e2b76654 -->
+What a landing does with the product-test levels outside tests.landing-levels where no cadence runs them: runs them at landing anyway, reports them unrun, or waits for a cadence to be set up.
+
+```text
+tests.without-cadence = "report-unrun"
+```
+
+## `tests.product`
+<!-- usage: policy:tests.product a994fddb -->
+Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all.
+
+```text
+tests.product = "declared"
+```
+
+## `tests.landing-levels`
+<!-- usage: policy:tests.landing-levels a3cbde00 -->
+Which product-test levels a landing runs, from unit, integration, e2e and performance, or every level the manifest declares; the slower levels left out are tests.without-cadence's.
+
+```text
+tests.landing-levels = ["unit", "integration", "e2e"]
+```
+
+## `verdict.tree`
+<!-- usage: policy:verdict.tree e2b80358 -->
+Which tree Test verifies: the merge `push-main.sh --prepare` makes of the build onto the advertised tip, or the build's own tip pinned with no merge, `--land` then making the landing merge.
+
+```text
+verdict.tree = "build-tip"
+```
+
 ## `help.enforce`
 Documented on [help/docs-leg.md](../docs-leg.md).
 
@@ -155,7 +187,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (242)
+## Not yet summarised (238)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -273,16 +305,12 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.adapt`
 - `flow.promote`
 - `policy-file.on-missing-expansion`
-- `tests.without-cadence`
 - `verdict`
 - `verdict.blocks`
 - `verdict.held`
 - `verdict.flakes`
 - `verdict.flakes.entry`
 - `verdict.flakes.release`
-- `tests.product`
-- `tests.landing-levels`
-- `verdict.tree`
 - `verdict.red-route`
 - `verdict.remote.trust`
 - `verdict.remote.pin-scope`

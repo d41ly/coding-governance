@@ -1417,8 +1417,8 @@ case "$out35" in
   *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
 esac
 
-# 37 — TOOL-dSafePassage-28: EVERY refusal of cmd_prepare after the gov-first walk leaves a clean
-#      tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of cmd_prepare from
+# 37 — TOOL-dSafePassage-28: EVERY refusal of --prepare's merge path after the gov-first walk leaves a
+#      clean tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of write_prepared_merge from
 #      its `run_gov_first` call to its end, in source order: stage | plant | expect. The arm derives
 #      that count from the lander beside this suite and reds when the table's row count differs, so a
 #      refusal added later joins the table or reds here. A refusal spelled other than `return 1` is
@@ -1439,7 +1439,8 @@ PREPARE_REFUSALS=(
 )
 # TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
 # a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
-# mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
+# mention of the name, to the closing brace of write_prepared_merge, cmd_prepare's merge path since
+# TOOL-dWitnessedBar-4 S5, here-document and continued lines aside.
 measure37() {  # lander path -> the count on stdout
   "$_py_arms" -c '
 import importlib.util, re, sys
@@ -1447,7 +1448,7 @@ spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
 arms = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(arms)
 rows = [r for r in arms.scan_shell_lines(open(sys.argv[2], encoding="utf-8").read()) if r]
-start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
+start = next(i for i, r in enumerate(rows) if r[0].startswith("write_prepared_merge()"))
 end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
 at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
 print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
@@ -1470,8 +1471,8 @@ if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" 
        /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
     "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
   b37=$(measure37 "$tmp/lander37-blanked.sh")
-  # the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
-  measure_raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+  # the anchors occur twice in the lander, so the plant's liveness is read inside write_prepared_merge: three more lines
+  measure_raw37() { awk '/^write_prepared_merge\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
   if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(measure_raw37 "$tmp/lander37-blanked.sh")" = "$(( $(measure_raw37 "$HERE/push-main.sh") + 3 ))" ]; then
     ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
   else
@@ -1668,5 +1669,42 @@ if [ -n "$_mt_gk" ] && [ -n "$_rg_k" ] && [ -n "$_py_arms" ]; then
 else
   echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
+
+# 42 — TOOL-dWitnessedBar-4 AC7: `verdict.tree` planted as `build-tip`, through a policy reader
+#      committed beside the lander that prints FIX_VERDICT_TREE. --prepare leaves HEAD where it was and
+#      its witness line names build-tip, the tip and its tree; under `prepared-merge` it names the merge
+#      it made. --land on the pinned branch under build-tip then makes the landing merge itself, so the
+#      fixture remote's main is a merge whose first parent is the advertised tip and second the pinned
+#      tip. Its own remote, so the planted reader never reaches another case's branch. Red at the base
+#      lander, which merges at --prepare whatever the value says.
+out42=$(
+  git init -q --template= --bare "$tmp/remote42.git"
+  setup_repo "$tmp/work42" origin "$tmp/remote42.git" >/dev/null
+  git push -q --no-verify origin main && git -C "$tmp/remote42.git" symbolic-ref HEAD refs/heads/main
+  R42=$(git rev-parse HEAD)
+  git checkout -q -b feat
+  mkdir -p "./${KIT_REL}policy"
+  printf 'import os, sys\nif sys.argv[1:] != ["get", "verdict.tree"]:\n    sys.exit(2)\nprint(os.environ.get("FIX_VERDICT_TREE", "prepared-merge"))\n' > "./${KIT_REL}policy/policy.py"
+  echo "u42" > src-u42.txt
+  git add -A && git commit -q -m "TOOL-tFix-42: a unit and the planted verdict.tree reader"
+  T42=$(git rev-parse HEAD)
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --prepare --slug tFix 2>&1); echo "pin-rc=$?"
+  [ "$(git rev-parse HEAD)" = "$T42" ] && echo head-kept=1
+  case "$o" in *"push-main: test.merge build-tip ${T42:0:8} tree $(git rev-parse "$T42^{tree}")"*) echo pin-witness=1 ;; esac
+  git checkout -q -b feat-merge "$T42"
+  o=$(FIX_VERDICT_TREE=prepared-merge bash "$lander" --prepare --slug tFix 2>&1); echo "merge-rc=$?"
+  M42=$(git rev-parse HEAD)
+  [ "$(git rev-parse HEAD^1)" = "$R42" ] && case "$o" in *"push-main: test.merge prepared-merge ${M42:0:8} tree $(git rev-parse "$M42^{tree}")"*) echo merge-witness=1 ;; esac
+  git checkout -q feat
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --land --slug tFix 2>&1); echo "land-rc=$?"
+  L42=$(git -C "$tmp/remote42.git" rev-parse refs/heads/main)
+  [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^1")" = "$R42" ] && [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^2")" = "$T42" ] && echo landed-merge=1
+  printf '%s\n' "$o" | tail -5
+)
+case "$out42" in
+  *"pin-rc=0"*"head-kept=1"*"pin-witness=1"*"merge-rc=0"*"merge-witness=1"*"land-rc=0"*"landed-merge=1"*)
+    ok "42 build-tip pins the tip at --prepare with its witness line, prepared-merge names its merge, and --land makes the landing merge onto the advertised tip" ;;
+  *) bad "42 expected the pinned tip, both witness lines and a landing merge of the pinned tip onto the advertised tip: $out42" ;;
+esac
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

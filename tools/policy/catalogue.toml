@@ -948,6 +948,8 @@ owner = "dWitnessedBar"
 name = "verdict.tree"
 allowed = ["prepared-merge", "build-tip"]
 default = "prepared-merge"
+summary = "Which tree Test verifies: the merge `push-main.sh --prepare` makes of the build onto the advertised tip, or the build's own tip pinned with no merge, `--land` then making the landing merge."
+usage = 'verdict.tree = "build-tip"'
 owner = "dWitnessedBar"
 
 [[key]]

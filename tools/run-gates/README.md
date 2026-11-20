@@ -595,9 +595,9 @@ overwrite. A ref object missing locally counts as not an ancestor, which keeps t
 
 **Two records, under the git common dir.** `gate-post-merge` holds the last verdict for a reader with
 no network: `sha`, `verdict` (`GREEN`, `RED` or `REFUSED`), `run_id`, `published` (`pushed`,
-`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. A
-GREEN also writes `gate-bar-green.shared` in the boundary's record grammar with `kind full` and
-`by post-merge`. When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
+`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. The
+landed tree's verdict is the runner's own per-tree record, written from the scratch worktree into the
+same common dir (see "The verdict per tree"). When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
 the worktree goes, so a red's leg output survives, and an exit 0 counts green only when that record
 reads `verdict GREEN`.
 
@@ -903,6 +903,37 @@ started. CLEAN means
 file's name true, and an implementation that forgets one passes every arm written for the others.
 The stamp also records `manifest`, the repo-relative path of the leg manifest the run read, and the
 pre-push hook trusts it only for a runner bar reading that manifest.
+
+## The verdict per tree — `gate-verdict/<tree hash>`
+
+The record kind `verdict` (TOOL-dWitnessedBar-4) is what the latest bar said about one TREE, written
+by this runner alone, GREEN or not. It is two files of one grammar, `<key>TAB<value>` lines read by
+key, keys in the runlog grammar (an all-digit suffix is an index), so a key added later is ADDITIVE
+and changes no reader:
+
+| File | Written | Keys this runner writes |
+|---|---|---|
+| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `run_id`, `stamped`, `by` (`runner`) |
+
+The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
+written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
+`.scoped` file, so a scoped run never overwrites the full record its base rests on: two slots per
+tree, and the last run of a tree in a slot wins, GREEN or RED. A run that started dirty or whose tree
+moved writes none, and says so on one line; a written one prints its path.
+
+**Readers.** `.githooks/pre-push` reads the pushed tree's two files as candidates, for this runner's
+own bar only, and adopts one only when it reads `verdict GREEN` and passes the predicates a
+`gate-full-green` stamp passes (ancestry, lag, fingerprint, manifest path and blob, self-tests, and a
+non-zero `reused_cache` refused); a full record covers the push and no bar runs, and a scoped one
+covers only a push scoping from its base. The loop kit's transition writer reads the full file at
+`item.test.exit` and refuses the move into deploying unless it reads GREEN. Nothing writes it but the
+runner: the hook, the unattended close and the post-merge verifier each run the runner, so none of
+them writes a record of its own. A clone's older `gate-bar-green*` files are left on disk and read by
+nothing.
+
+**What it does not check:** which legs a scoped run skipped, or whether a run reused a cached
+verdict; `kind`, `base` and the run record under `run_id` say what ran.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 

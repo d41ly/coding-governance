@@ -1088,8 +1088,42 @@ write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is th
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
 # a unit by the unit id as a whole token in its subject, so a unit id here would make the landing
 # merge that unit's build commit and move every verdict derived from it.
-cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
-  local branch oldb R t dirt msg
+# `read_verdict_tree` sets VERDICT_TREE to `verdict.tree` (TOOL-dWitnessedBar-4 S5), read through the
+# policy kit's `policy.py get` (TOOL-dGroundRules-2), the kit found by `resolve_lander_kit`. Where
+# either cannot run, or the reader prints no value of the key, it is the catalogue default
+# `prepared-merge` (TOOL-dGroundRules-3), and one line on stderr says why.
+read_verdict_tree() {
+  local got rc py dir v
+  VERDICT_TREE=prepared-merge
+  got=$(resolve_lander_kit policy policy.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict.tree reads its catalogue default, prepared-merge: $got" >&2
+    return 0
+  fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
+  if ! v=$(cd "$top" && "$py" "$top/$dir/policy.py" get verdict.tree 2>/dev/null); then
+    echo "push-main: verdict.tree reads its catalogue default, prepared-merge: the reader, policy.py get, did not answer" >&2
+    return 0
+  fi
+  v=${v%$'\r'}
+  case "$v" in
+    prepared-merge|build-tip) VERDICT_TREE=$v ;;
+    *) echo "push-main: verdict.tree reads its catalogue default, prepared-merge: the reader printed '$v', which is no value of the key" >&2 ;;
+  esac
+}
+
+# `print_merge_witness` — the one line naming which tree Test verifies: the value, HEAD and its tree.
+print_merge_witness() {
+  local h tr
+  h=$(git rev-parse --verify HEAD 2>/dev/null) || h=""
+  tr=$(git rev-parse -q --verify "HEAD^{tree}" 2>/dev/null) || tr=""
+  echo "push-main: test.merge $VERDICT_TREE ${h:0:8} tree $tr"
+}
+
+# `check_run_branch` — HEAD is a run's own branch, not detached and not the default branch, over a
+# clean tree. The branch on stdout; else the refusal on stderr and 1.
+check_run_branch() {
+  local branch dirt
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -z "$branch" ]; then
     echo "push-main: HEAD is detached, and preparing a landing moves the branch it is made on — check the run's branch out first." >&2
@@ -1110,8 +1144,33 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     printf '%s\n' "$dirt" | sed 's/^/    /' >&2
     return 1
   fi
+  printf '%s\n' "$branch"
+}
+
+# `--prepare` reads `verdict.tree` first (TOOL-dWitnessedBar-4 S5, F3): under `prepared-merge` it merges
+# the run's branch onto the advertised tip, as it always did; under `build-tip` it makes no merge and
+# pins the branch tip, and `--land` makes the landing merge (F4). Either way it prints the witness line.
+cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
+  local branch R rc
+  branch=$(check_run_branch) || return 1
   R=$(resolve_tip) || return 3
   read_tip_object "$R" || return 3
+  read_verdict_tree
+  if [ "$VERDICT_TREE" = build-tip ]; then
+    echo "push-main: pinned $(git rev-parse --short=8 HEAD) — verdict.tree is build-tip, so no merge is made before the bar; --land makes the landing merge"
+  else
+    write_prepared_merge "$branch" "$R"; rc=$?
+    [ "$rc" = 0 ] || return "$rc"
+  fi
+  print_merge_witness
+  return 0
+}
+
+# `write_prepared_merge <branch> <R>` — merge <branch>, checked out, onto the advertised tip R, mint,
+# walk and regenerate into the merge, and move the branch to it: `--prepare`'s merge path, which
+# `--land` takes too under `build-tip` (F4).
+write_prepared_merge() {  # -> 0 prepared (or already was) · 1 refused
+  local branch=$1 R=$2 oldb t msg gfsnap
   oldb=$(git rev-parse --verify HEAD)
   # IDEMPOTENT. A branch whose tip is already a merge onto this very tip is already prepared, and
   # preparing it again would stack a second merge that `--land` then refuses.
@@ -1221,13 +1280,22 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   return 0
 }
 
-# `--land`: push the prepared merge, and only it, as the default branch.
+# `--land`: push the prepared merge, and only it, as the default branch. Under `verdict.tree` =
+# `build-tip` (TOOL-dWitnessedBar-4 S5, F4) `--prepare` pinned the branch tip and made no merge, so
+# where HEAD carries no prepared merge onto the advertised tip, `--land` makes it first, through
+# `--prepare`'s merge path; on a race the loop comes back here and merges onto the new tip.
 cmd_land() {
-  local attempt R t rc cls pushed
+  local attempt R t rc cls pushed branch
   attempt=1
+  read_verdict_tree
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
     read_tip_object "$R" || exit 3
+    if [ "$VERDICT_TREE" = build-tip ] && ! check_prepared_merge "$R" >/dev/null 2>&1; then
+      echo "push-main: verdict.tree is build-tip and HEAD carries no merge onto ${R:0:8}, so the landing merge is made now" >&2
+      branch=$(check_run_branch) || exit 1
+      write_prepared_merge "$branch" "$R" >&2 || exit 1
+    fi
     if ! t=$(check_prepared_merge "$R"); then
       [ "$attempt" -gt 1 ] && echo "push-main: $remote/$def moved again between the re-prepare and this attempt." >&2
       exit 1
@@ -1271,7 +1339,7 @@ cmd_land() {
         # first-parent line. Re-preparing keeps the invariant on every attempt, and the merge that
         # was already graded stays an ancestor of what is finally pushed.
         echo "push-main: push rejected — $remote/$def advanced during the gate; re-preparing onto the new tip and re-gating..." >&2
-        cmd_prepare || exit $?
+        [ "$VERDICT_TREE" = build-tip ] || cmd_prepare || exit $?
         attempt=$((attempt + 1)) ;;
       *)
         # refused, unreachable or unchanged: derive_push_failure has said which, and why.

@@ -2858,6 +2858,10 @@ rm -f "$WORK/walk"
 # cannot reproduce at any sha. A walk that FAILED is not an empty listing, and is never clean.
 TREE_CLEAN=no
 [ "$WALK_OK" = yes ] && [ "${#DIRT_ROWS[@]}" = 0 ] && TREE_CLEAN=yes
+# THE TREE THIS RUN GRADES (TOOL-dWitnessedBar-4 S1): HEAD's tree hash when the run started clean, `-`
+# otherwise. The run record's verdict names it, and it keys the per-tree verdict written at the end.
+RUN_TREE=-
+[ "$TREE_CLEAN" = yes ] && RUN_TREE=$(git rev-parse -q --verify "HEAD^{tree}" 2>/dev/null) && [ -n "$RUN_TREE" ] || RUN_TREE=-
 
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
@@ -5756,6 +5760,8 @@ if [ -n "$RUNDIR" ]; then
     # The memory pause's episodes and the seconds they held, summed (TOOL-aGraftedHelix-7).
     printf 'paused\t%s\n' "$MEMPAUSE_N"
     printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
+    # The tree this run graded, `-` when it started dirty (TOOL-dWitnessedBar-4 S1).
+    printf 'tree\t%s\n' "$RUN_TREE"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi
@@ -5838,6 +5844,47 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
         || rm -f "$_tp" 2>/dev/null || true
     fi
   fi
+fi
+
+# THE VERDICT PER TREE (TOOL-dWitnessedBar-4 S2, `record-kind.verdict`). What the latest bar said about
+# one tree, GREEN or not, written by this runner alone for every run that started clean and did not
+# move, into the COMMON dir so every worktree of a clone reads one directory: `gate-verdict/<tree>` for
+# a run under GATE_FULL, `gate-verdict/<tree>.scoped` otherwise, so a scoped run never overwrites the
+# full record its base rests on. `<key>TAB<value>` lines read by key, so a key added later is additive.
+# The pre-push hook adopts one only when it reads `verdict GREEN` and passes the runner stamp's
+# predicates; the transition writer reads the full one at `item.test.exit`.
+# WHAT IT DOES NOT CHECK: which legs a scoped run skipped, or whether a run reused a cached verdict;
+# `kind`, `base` and the run record under `run_id` say what ran.
+if [ "$RUN_TREE" = - ]; then
+  echo "run-gates: no per-tree verdict written — the tree was not clean when the run started"
+elif [ "$tree_moved" != no ] || [ -z "$FPRINT_START" ]; then
+  echo "run-gates: no per-tree verdict written — the tree moved while the bar ran, or its fingerprint could not be read"
+else
+  _vd=""; [ -n "$RG_COMMON_RAW" ] && _vd=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
+  _vkind=scoped; _vbase=$BASE; _vverdict=RED   # GREEN or RED: a HOST or REFUSED bar is no green
+  [ "$gate_verdict" = GREEN ] && _vverdict=GREEN
+  [ -n "${GATE_FULL:-}" ] && { _vkind=full; _vbase=""; }
+  _vf="$_vd/gate-verdict/$RUN_TREE"; [ "$_vkind" = scoped ] && _vf="$_vf.scoped"
+  if [ -n "$_vd" ] && mkdir -p "$_vd/gate-verdict" 2>/dev/null && derive_temp_path _tp "$_vf" && {
+       printf 'tree\t%s\n' "$RUN_TREE"
+       printf 'sha\t%s\n' "$RG_HEAD"
+       printf 'verdict\t%s\n' "$_vverdict"
+       printf 'kind\t%s\n' "$_vkind"
+       printf 'base\t%s\n' "$_vbase"
+       printf 'manifest\t%s\n' "$LEGS_REL"
+       printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
+       printf 'fingerprint\t%s\n' "$FPRINT_START"
+       printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
+       printf 'run_id\t%s\n' "$RUNID"
+       printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+       printf 'by\trunner\n'
+     } > "$_tp" 2>/dev/null && mv -f "$_tp" "$_vf" 2>/dev/null; then
+    echo "run-gates: per-tree verdict $_vverdict ($_vkind) written to $_vf"
+  else
+    [ -z "${_tp:-}" ] || rm -f "$_tp" 2>/dev/null
+    echo "run-gates: no per-tree verdict written — ${_vf} could not be written"
+  fi
+  unset _vd _vkind _vbase _vf _vverdict
 fi
 
 # THE INHERITED-GREEN STAMP (TOOL-dDerivedDocket-24, KF2). A DIFFERENT FILE from the full green, and
