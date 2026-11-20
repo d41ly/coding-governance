@@ -581,3 +581,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T23:32:22Z draw · fix-pass · TOOL-dPlacedRequest-100 · 79/130 · 20261120T233222Z-6f0835
 
 2026-11-20T23:32:22Z dispatch · item 246f7c26 TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
+2026-11-20T23:34:36Z draw · fix-pass · TOOL-dPlacedRequest-100 · 80/130 · 20261120T233436Z-366cbc
+
+2026-11-20T23:34:36Z dispatch · item 5a63fbad TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
