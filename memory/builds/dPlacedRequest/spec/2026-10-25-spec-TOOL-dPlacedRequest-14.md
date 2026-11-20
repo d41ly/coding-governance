@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-14 — the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key
 
-**Status:** DEFERRED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 18 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 18 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0132@6096ecb9 whole
 
