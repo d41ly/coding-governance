@@ -36,7 +36,7 @@ Unit TOOL-dWitnessedBar-41 is built and committed as 5a4f86e0c (base 386b3ebee),
 - The two `New arm:` lines, each observed RED on its staged break and then GREEN:
   - `.githooks/pre-push.test.sh` (AC2 and AC3), staged red by skipping `check_tree_selection`.
   - `tools/run-gates/run-gates.evidence.test.sh` (AC1), staged red by dropping the `selection` keys from the writer.
-- The section 7 legs: `measure-legs selftest`, `pre-push self-test`, `pre-push bar self-test`, `pre-push run-log line`, `run-gates canary`, `run-gates evidence`, `kickoff-manifest ratchet`, `recall floor`, `recall floor arms`, `memory hygiene`.
+- The legs of §7: `measure-legs selftest`, `pre-push self-test`, `pre-push bar self-test`, `pre-push run-log line`, `run-gates canary`, `run-gates evidence`, `kickoff-manifest ratchet`, `recall floor`, `recall floor arms`, `memory hygiene`.
 - The spec asked the pass to see whether the run-log suite's `DEC covered` checks pass at HEAD before the change. I did not run that suite, so it goes to the close, the same as the `pre-push run-log line` leg.
 
 **How the commit was made**
