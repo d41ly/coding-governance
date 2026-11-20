@@ -599,6 +599,20 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   With no session, `CLAUDE_CODE_SESSION_ID` unset, empty or `absent`, the record names `session:
   absent` as provenance, `.typed` gains no line, and the predicate prints `request — <key> · no
   session` and holds for nobody. It takes no slug.
+- `--request-draw` — `--request-draw <content key> --cause <cause> --item <item>`, one draw on a
+  request's pre-claim budget, the laps it loops at entry before any build exists: a placement after a
+  refused check or a probe round trip, and a claim retried under a fresh slug. The rows live on the
+  request record `refs/gov/requests/<content key>`, one commit per row parented on the tip read, its
+  message `gov-request <content key>` and the row. A key with no record is recorded first from this
+  clone's kept copy `<git-common-dir>/requests/<content key>.md` as `--request` records it, under no
+  session, so a draw never adds consent; with neither a record nor that copy it exits 2 naming
+  `--request <file>`. One bounded fetch reads the ref's first-parent messages, and the loop kit's
+  `budget.py draw --request <key> --rows <file>` counts them against the base of `flow.rework-budget`,
+  writing nothing: it prints `draw · <cause> · <item> · <spent>/<total>`, pushed by compare-and-swap
+  with the tip read expected (exit 0), or `exhausted · <spent>/<total>` (exit 3), or refuses a cause
+  outside the closed set (exit 2). A lost race prints `lost the race, re-read <n> of 3` (PINNED) and
+  draws again, at most three times (PINNED); an unreachable remote, a bound that fired and a fourth
+  lost race print `not drawn, contention` and draw nothing (exit 2). It takes no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,

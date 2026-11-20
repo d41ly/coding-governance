@@ -280,3 +280,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T01:45:16Z brief · item TOOL-dPlacedRequest-10 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-20T01:58:30Z dispatch · item de35faa4 TOOL-dPlacedRequest-14 · reason tools/loop/budget.py tools/loop/placement.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-14-1-acceptance-ledger.md tools/unattended/unattended.test.sh
+
+2026-11-20T02:04:36Z brief · item TOOL-dPlacedRequest-14 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T02:05:44Z draw · re-dispatch · TOOL-dPlacedRequest-14 · 36/130 · 20261120T020544Z-d65a8d
+
+2026-11-20T02:05:44Z dispatch · item 7dc12c12 TOOL-dPlacedRequest-14 · reason tools/loop/budget.py tools/loop/placement.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-14-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt

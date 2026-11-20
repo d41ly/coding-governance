@@ -20706,6 +20706,54 @@ rq_out=$(run_request_arm --request "$LF/r2.md"); rq_rc=$?
 rmdir "$rq_t" && mv "$rq_t.kept" "$rq_t"
 same "DPR31 S1 a .typed that cannot be appended to exits 2" "$rq_rc" "2"
 hit  "$rq_out" "request — $rq_k2 · not written · this session could not be added to"
+# ---- TOOL-dPlacedRequest-14 — THE PRE-CLAIM BUDGET ON THE REQUEST RECORD. Over the same origin and c1,
+# ---- a fresh request r3: a call with no item, a key that is no content key and a key with neither a
+# ---- record nor a kept text exit 2 drawing nothing; two draws land two row commits, each parented on
+# ---- the tip before it (AC3); the cause retry exits 2 adding no row (AC5); two more draws spend the base
+# ---- of 4 and the fifth exits 3 `exhausted · 4/4`, the ref unmoved (AC1); with the origin gone a draw
+# ---- exits 2 naming contention (AC4). RED, observed at the close, is a parentless row commit, which the
+# ---- chain check reads as one commit. Waived by README rule 8 with the rest of this suite. WHAT THIS
+# ---- BLOCK DOES NOT DRIVE: two nodes racing, which the loop kit's `two-nodes` plant drives, a push the
+# ---- remote answers and refuses, and a key whose kept text keys to another request.
+printf 'Bound the pre-claim loop, zq-draw-marker-14\n' > "$LF/r3.md"
+rd_out=$(run_request_arm --request "$LF/r3.md")
+rd_key=$(printf '%s\n' "$rd_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
+rd_ref="refs/gov/requests/$rd_key"
+rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back); rd_rc=$?
+same "DPR14 S3 --request-draw with no item exits 2" "$rd_rc" "2"
+hit  "$rd_out" "request-draw — not drawn · the form is --request-draw <content key> --cause <cause> --item <item>"
+rd_out=$(run_request_arm --request-draw ABC --cause route-back --item item.entry.place); rd_rc=$?
+same "DPR14 S3 a key that is no content key exits 2" "$rd_rc" "2"
+hit  "$rd_out" "request-draw — not drawn · ABC is no content key of 12 hex digits"
+rd_out=$(run_request_arm --request-draw 0123456789ab --cause route-back --item item.entry.place); rd_rc=$?
+same "DPR14 S3 a key with no record and no kept text exits 2 and creates none" \
+  "$rd_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests/0123456789ab | grep -c .)" "2 0"
+hit  "$rd_out" "no request record and no kept text: record it first with unattended.sh --request <file>"
+for rd_n in 1 2; do
+  rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item.entry.place); rd_rc=$?
+  same "DPR14 AC3 draw $rd_n exits 0 printing its row" "$rd_rc ${rd_out##*$'\n'}" "0 draw · route-back · item.entry.place · $rd_n/4"
+done
+same "DPR14 AC3 each row commit is parented on the tip before it, the create parentless" \
+  "$(git --git-dir="$LF/origin.git" log --first-parent --format='%H %P' "$rd_ref" -- | awk '{ if (NR > 1 && $1 != prev) bad = 1; prev = $2 } END { print NR, (bad || prev != "" ? "broken" : "chained") }')" "3 chained"
+same "DPR14 AC3 no object on the origin carries the request's words" \
+  "$(git -C "$LF/origin.git" cat-file --batch-all-objects --batch | grep -c zq-draw-marker-14)" "0"
+rd_out=$(run_request_arm --request-draw "$rd_key" --cause retry --item item.entry.claim); rd_rc=$?
+same "DPR14 AC5 the cause retry exits 2 and adds no row" \
+  "$rd_rc $(git --git-dir="$LF/origin.git" rev-list --count "$rd_ref" --)" "2 3"
+hit  "$rd_out" "the cause retry is outside the closed set"
+for rd_n in 3 4; do
+  rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item.entry.claim); rd_rc=$?
+  same "DPR14 AC1 draw $rd_n exits 0 printing its row" "$rd_rc ${rd_out##*$'\n'}" "0 draw · route-back · item.entry.claim · $rd_n/4"
+done
+rd_tip=$(git --git-dir="$LF/origin.git" rev-parse "$rd_ref")
+rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item.entry.place); rd_rc=$?
+same "DPR14 AC1 the fifth draw exits 3 exhausted, the ref unmoved" \
+  "$rd_rc $rd_out $(git --git-dir="$LF/origin.git" rev-parse "$rd_ref")" "3 exhausted · 4/4 $rd_tip"
+mv "$LF/origin.git" "$LF/origin.gone"
+rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item.entry.place); rd_rc=$?
+mv "$LF/origin.gone" "$LF/origin.git"
+same "DPR14 AC4 an unanswered remote exits 2" "$rd_rc" "2"
+hit  "$rd_out" "request-draw — $rd_key · not drawn, contention · "
 rm -rf "$LF"
 
 # ==================================================================================================

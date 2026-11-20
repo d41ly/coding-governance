@@ -6063,6 +6063,11 @@
       "file": "tools/lib/python_floor.py"
     },
     {
+      "id": "check_draw_cause",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "check_drive",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -12688,6 +12693,16 @@
       "file": "tools/loop/request.py"
     },
     {
+      "id": "derive_request_draw",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "derive_request_draw_cause",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "derive_request_fold",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18778,6 +18793,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "print_request_draw",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
       "id": "print_resume_orientation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20911,6 +20931,11 @@
       "id": "read_fleet_tag",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_fleet_user",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_floor",
@@ -23076,6 +23101,11 @@
       "id": "read_report",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_request_rows",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
     },
     {
       "id": "read_request_text",
@@ -31823,6 +31853,21 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_request_draw",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "run_request_draw_plant",
+      "kind": "function",
+      "file": "tools/loop/budget.py"
+    },
+    {
+      "id": "run_request_draw_verb",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "run_request_plant",
       "kind": "function",
       "file": "tools/loop/request.py"
@@ -37716,6 +37761,11 @@
       "id": "write_fixture_files",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
+    },
+    {
+      "id": "write_fixture_gov_ref",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "write_fixture_pass",

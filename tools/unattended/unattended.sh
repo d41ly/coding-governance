@@ -49,6 +49,7 @@
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
+#   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
 #   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
 #   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
@@ -135,7 +136,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --feed --overlaps --path-tokens --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --feed --overlaps --path-tokens --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -4516,6 +4517,73 @@ check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read;
     124:*) RQ_WHY="the record read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL"; return 2 ;;
     *) RQ_WHY="the remote did not answer the record read, git ls-remote exited $rc: $CR_URL"; return 2 ;;
   esac
+}
+
+# --request-draw, THE PRE-CLAIM BUDGET (TOOL-dPlacedRequest-14). A request that loops at entry before any
+# build exists, placed, refused and placed again or retried under a fresh slug, draws on a budget keyed
+# to its content key. THE ROWS LIVE ON THE REQUEST RECORD, `refs/gov/requests/<key>`: one commit per row,
+# its message `gov-request <key>`, a blank line and the row, built by `build_gov_commit` on the tip read
+# and written by `write_gov_ref` with that tip expected, so every node counts one chain. The record's
+# existence is read by `check_request_recorded`; a key with no record is created first by
+# `write_request_record` from this clone's kept copy `<git-common-dir>/requests/<key>.md`, under no
+# session, so a draw never adds a session's consent line; with neither a record nor that copy the draw is
+# refused naming `--request <file>`. Then ONE bounded fetch of the ref into its cache ref, as `read_claims`
+# fetches, its first-parent messages each opened by a \001 byte handed to the loop kit's `budget.py draw
+# --request <key> --rows <file>`, which counts and writes nothing: `exhausted · <spent>/<total>` exits 3; a
+# `draw · <cause> · <item> · <spent>/<total>` row is pushed, and a lost race re-reads and draws again, at
+# most three times. CONTENTION DRAWS NOTHING: an unreachable remote, a bound that fired and a fourth lost
+# race exit 2 with no row. -> 0 the row printed; 3 exhausted; 2 nothing drawn, its cause printed.
+# WHAT THIS DOES NOT CHECK: that the lap its caller names is the one it made; the cause and the item are
+# the caller's word, the cause held to the closed set by `budget.py`.
+run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 not drawn
+  local key="$1" cause="$2" item="$3" py d cdir s out rc tip c row n=0
+  [[ $key =~ ^[0123456789abcdef]{12}$ ]] || { echo "request-draw — not drawn · $key is no content key of 12 hex digits"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request-draw — $key · not drawn · no python resolves, so the budget cannot be counted"; return 2; }
+  d=$(resolve_kit_dir "$py" loop budget.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "request-draw — $key · not drawn · no loop kit holding budget.py resolves beside this kit"; return 2; }
+  [ -f "$d/budget.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  check_request_recorded "$key" && rc=0 || rc=$?
+  if [ "$rc" = 1 ]; then
+    cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} || cdir=""
+    [ -n "$cdir" ] && [ -f "$cdir/requests/$key.md" ] \
+      || { echo "request-draw — $key · not drawn · no request record and no kept text: record it first with unattended.sh --request <file>"; return 2; }
+    ( CLAUDE_CODE_SESSION_ID=absent; write_request_record "$cdir/requests/$key.md" ) || { echo "request-draw — $key · not drawn · the request record could not be created"; return 2; }
+    check_request_recorded "$key" && rc=0 || rc=$?
+    [ "$rc" != 1 ] || RQ_WHY="the kept text $cdir/requests/$key.md keys to another request, so no record of $key was created"
+  fi
+  case "$rc" in
+    0) ;;
+    1) echo "request-draw — $key · not drawn · $RQ_WHY"; return 2 ;;
+    *) echo "request-draw — $key · not drawn, contention · $RQ_WHY"; return 2 ;;
+  esac
+  s=$(mktemp) || { echo "request-draw — $key · not drawn · cannot create a scratch file for the rows"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  while :; do
+    observe_remote "$s" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+refs/gov/requests/$key:refs/gov/remote/requests/$key" && rc=0 || rc=$?
+    [ "$rc" = 0 ] || { rm -f "$s"; echo "request-draw — $key · not drawn, contention · the record fetch exited $rc: $CR_URL"; return 2; }
+    add_feed_sightings refs/gov/remote/
+    tip=$(GIT rev-parse -q --verify "refs/gov/remote/requests/$key^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
+    [ -n "$tip" ] && GIT log --first-parent --format='%x01%B' "$tip" -- >"$s" 2>/dev/null \
+      || { rm -f "$s"; echo "request-draw — $key · not drawn · the fetched record does not read in this clone"; return 2; }
+    out=$("$py" "$d/budget.py" draw --request "$key" --cause "$cause" --item "$item" --rows "$s") && rc=0 || rc=$?
+    out=${out//$'\r'/}
+    case "$rc" in
+      0) row=${out%%$'\n'*} ;;
+      3) rm -f "$s"; printf '%s\n' "$out"; return 3 ;;
+      *) rm -f "$s"; printf '%s\n' "${out:-request-draw — $key · not drawn · budget.py exited $rc}"; return 2 ;;
+    esac
+    c=$(build_gov_commit "$tip" "$(printf '%s %s\n\n%s' gov-request "$key" "$row")") \
+      || { rm -f "$s"; echo "request-draw — $key · not drawn · the row commit could not be built in this clone"; return 2; }
+    write_gov_ref "refs/gov/requests/$key" "$tip" "$c" && rc=0 || rc=$?
+    case "$rc" in
+      0) rm -f "$s"; printf '%s\n' "$row"; return 0 ;;
+      1) n=$((n + 1)); [ "$n" -le 3 ] || break
+         echo "request-draw — $key · lost the race, re-read $n of 3 · $GOVREF_WHY" ;;
+      *) rm -f "$s"; echo "request-draw — $key · not drawn · $GOVREF_WHY"; return 2 ;;
+    esac
+  done
+  rm -f "$s"; echo "request-draw — $key · not drawn, contention · the race was lost four times"; return 2
 }
 
 # THE CONSENT PREDICATE (TOOL-dPlacedRequest-19 S5): a request is the owner's consent only in a session
@@ -18677,6 +18745,11 @@ while [ $# -gt 0 ]; do
     # request is not yet a build.
     --request)      refuse_waive_unless_preflight --request
                     shift; write_request_record "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-14 - one row on a request's pre-claim budget; no slug, because no build exists yet.
+    --request-draw) refuse_waive_unless_preflight --request-draw
+                    if [ $# = 6 ] && [ "${3:-}" = --cause ] && [ "${5:-}" = --item ]; then run_request_draw "$2" "$4" "$6"; _rl_rc=$?
+                    else echo "request-draw — not drawn · the form is --request-draw <content key> --cause <cause> --item <item>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
     # of governance refs this clone holds; no slug, because the feed is the node's.
     --feed)         refuse_waive_unless_preflight --feed

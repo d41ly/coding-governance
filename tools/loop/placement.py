@@ -63,11 +63,23 @@ rewritten to the selection and the facts evaluated; `check` prints `placement: f
 `placement: scenario · unread · <why>` where the tree holds no scenario composition. A refused default or
 composition refuses the check, exit 1.
 
+THE PRE-CLAIM BUDGET (TOOL-dPlacedRequest-14). A placement that repeats one already made is a lap of the
+request's entry loop, and draws on the budget keyed to its content key through the unattended driver's
+`--request-draw <key> --cause <cause> --item item.entry.place` before its block is written, after every
+other refusal: `research` where the request's probe record `<key>.probe.md` exists and the newest block's
+evidence does not cite it, a probe round trip since the last placement; else `route-back` where any block's
+`check:` reads refused; the first placement and a placement under `--owner` draw nothing, the owner's route
+being no repetition, so the owner still places once the budget is spent. The driver's row is printed; on
+`exhausted` `place` prints `placement: pre-claim budget exhausted — <key> · <spent>/<total>` and exits 3,
+and where the driver drew nothing, a lost race or an unreachable remote among them, it exits 2; no block is
+written either way.
+
 RECORD. `record` prints the newest block's `disposition`, its `reenters` where it is not `none`, `build`,
 `playbook`, `reason`, `scenarios` and `facts` lines, the lines the claim commit carries, when its `check:`
 reads `pass` or `recorded`; any other block prints nothing and exits 1.
 
-Exit 0 placed, passed, recorded or held · 1 a refusal, named · 2 a usage error or a kit that does not resolve.
+Exit 0 placed, passed, recorded or held · 1 a refusal, named · 2 a usage error, a kit that does not resolve or
+a pre-claim draw that drew nothing · 3 the pre-claim budget exhausted.
 `--fixture --plant <case>` runs one case of `PLANTS` in a throwaway repository under the system temp folder,
 printing `placement: <case> · ... · held` or `MISSED`; `--fixture` alone runs every case through
 `loop_lib.run_selftest_cases`, the `loop placement fixtures` leg.
@@ -81,6 +93,7 @@ member's own facts, TOOL-dPlacedRequest-5's; and anything outside this node, the
 """
 import argparse
 import datetime
+import functools
 import os
 import pathlib
 import re
@@ -97,7 +110,7 @@ if str(KIT) not in sys.path:
 from loop_lib import (SEG, LoopError, read_dispositions, read_memory_tree, resolve_disposition,  # noqa: E402
                       resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_witness import read_clean_env, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import read_clean_env, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 from probe import ProbeRefused, read_build_records, resolve_git_paths  # noqa: E402
 from request import KEY_HEX, derive_request_content_key  # noqa: E402
 
@@ -120,6 +133,8 @@ VALUE_CAP = 240
 #: The item an owner's placement record names, and the item an owner's release of a held placement names.
 OWNER_ITEM = "item.entry.place-owner"
 PLACE_ITEM = "item.entry.place"
+#: The bound on one pre-claim draw through the unattended driver, its fetch and at most four pushes, in seconds.
+DRAW_BOUND = 900
 #: The dispositions that open or reopen a build, the ones a claim carries.
 NO_VALUE = "none"
 #: One row per route a passed placement enters while its step's items are unbuilt (C2-F7): the dispositions
@@ -164,11 +179,13 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
 
 
 class PlacementRefused(ValueError):
-    """A verb refused: its message is the line's reason; `code` its exit."""
+    """A verb refused: its message is the line's reason; `code` its exit; `line`, where given, the whole line
+    printed in place of the refusal's."""
 
-    def __init__(self, why, code=1):
+    def __init__(self, why, code=1, line=None):
         super().__init__(why)
         self.code = code
+        self.line = line
 
 
 # ------------------------------------------------------------------------------------------ the record
@@ -273,11 +290,13 @@ def write_placement_blocks(path, blocks):
     os.replace(tmp, path)
 
 
-def add_placement(store, key, fields, placer, reenters=None):
+def add_placement(store, key, fields, placer, reenters=None, before=None):
     """Append one block for request `key` to `<store>/<key>.placement`. `fields` holds the return's keys; its
     disposition is resolved to a member, its reason and evidence redacted and capped. `reenters`, when passed,
-    is held by `check_reenters_item` before any write. -> the block written. PlacementRefused naming the value
-    for a word outside the set, a missing reason or a malformed value; nothing is written then."""
+    is held by `check_reenters_item` before any write. `before`, where given, is called once every value has
+    passed and before the write, and a refusal it raises writes nothing. -> the block written.
+    PlacementRefused naming the value for a word outside the set, a missing reason or a malformed value;
+    nothing is written then."""
     if reenters is not None:
         try:
             check_reenters_item(reenters)
@@ -315,6 +334,8 @@ def add_placement(store, key, fields, placer, reenters=None):
              "evidence": render_capped_value(fields.get("evidence", "").strip() or NO_VALUE) or NO_VALUE,
              "observations": str(count), "placer": placer, "scenarios": "+".join(named) or NO_VALUE,
              "facts": render_placement_facts(facts), "check": "pending", "reenters": reenters or NO_VALUE}
+    if before is not None:
+        before()
     store.mkdir(parents=True, exist_ok=True)
     path = store / ("%s.placement" % key)
     write_placement_blocks(path, parse_placement_blocks(path) + [block])
@@ -437,10 +458,52 @@ def write_placement(args, root, store):
         more = run_observation_probes(root, store, args.request, subjects)
         if more:
             fields["evidence"] = "; ".join(x for x in [fields.get("evidence", "")] + more if x and x != NO_VALUE)
-    block = add_placement(store, args.request, fields, placer, args.reenters)
+    cause = None if placer == "owner" else derive_request_draw_cause(store, args.request)
+    draw = functools.partial(run_request_draw_verb, root, args.request, cause) if cause else None
+    block = add_placement(store, args.request, fields, placer, args.reenters, draw)
     print("%s: placed — %s %s · %s · placer %s · check pending" % (
         SAY, block["disposition"], block["build"], args.request, placer))
     return 0
+
+
+def derive_request_draw_cause(store, key):
+    """The cause a placement of request `key` draws on its pre-claim budget (TOOL-dPlacedRequest-14 S4, S5), or
+    None for its first: `research` where the request's probe record exists and the newest block's evidence does
+    not cite it, else `route-back` where any block's check reads refused, else None."""
+    blocks = parse_placement_blocks(store / ("%s.placement" % key))
+    if not blocks:
+        return None
+    if (store / ("%s.probe.md" % key)).is_file() and "requests/%s.probe.md" % key not in blocks[-1].get("evidence", ""):
+        return "research"
+    return "route-back" if any(b.get("check", "").startswith("refused") for b in blocks) else None
+
+
+def run_request_draw_verb(root, key, cause):
+    """One draw on request `key`'s pre-claim budget at `PLACE_ITEM`: the unattended driver's `--request-draw`
+    run at `root` as a process, its lines printed. -> None on a draw. PlacementRefused, exit 3 with the
+    exhausted line, on a spent budget, and exit 2 where nothing was drawn; LookupError where the driver or a
+    bash to run it does not resolve."""
+    driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+    bash = resolve_bash(driver)
+    if bash is None:
+        raise LookupError("no bash can run %s" % driver.as_posix())
+    try:
+        p = subprocess.run([bash, driver.as_posix(), "--request-draw", key, "--cause", cause, "--item", PLACE_ITEM],
+                           cwd=str(root), capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           env=read_clean_env(), timeout=DRAW_BOUND)
+    except subprocess.TimeoutExpired:
+        raise PlacementRefused("the pre-claim draw on %s did not return within %d s, so nothing was drawn and no "
+                               "block is written" % (key, DRAW_BOUND), 2) from None
+    lines = [ln.rstrip("\r") for ln in p.stdout.splitlines() if ln.strip()]
+    if p.returncode == 3:
+        spent = next((ln.split(" · ", 1)[1] for ln in lines if ln.startswith("exhausted · ")), "unread")
+        raise PlacementRefused("pre-claim budget exhausted", 3,
+                               "%s: pre-claim budget exhausted — %s · %s" % (SAY, key, spent))
+    for line in lines:
+        print(line)
+    if p.returncode != 0:
+        raise PlacementRefused("the pre-claim draw on %s drew nothing, so no block is written: %s" % (
+            key, lines[-1] if lines else (p.stderr.strip()[-300:] or "exit %d" % p.returncode)), 2)
 
 
 # ------------------------------------------------------------------------------------------ the facts
@@ -756,10 +819,26 @@ def write_foreign_lease(root, build):
         ("slug", build), ("node", "z"), ("host", "elsewhere"), ("session", "s-other"), ("keepalive", "k-other"),
         ("status", "live"), ("lease-utc", now), ("beat-utc", now), ("epoch", "1"), ("kind", "build"),
         ("fleet-tag", "z"), ("renews", "yes")))
+    write_fixture_gov_ref(root, "refs/gov/leases/%s/build" % build, msg)
+
+
+def write_fixture_gov_ref(root, ref, msg):
+    """One parentless commit over the empty tree, its message `msg`, pushed to `ref` on the fixture's remote."""
     tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True, encoding="utf-8", check=True,
                           env=read_clean_env()).stdout.strip()
     sha = run_fixture_git(root, "commit-tree", tree, "-m", msg)
-    run_fixture_git(root, "push", "-q", "origin", "%s:refs/gov/leases/%s/build" % (sha, build))
+    run_fixture_git(root, "push", "-q", "origin", "%s:%s" % (sha, ref))
+
+
+def read_fleet_user():
+    """The user of the first node row of the playbook kit's fleet registry, whom a pre-claim draw plant runs
+    as, so the driver resolves a fleet tag for the request record it creates. LookupError where the kit or a
+    row naming a user does not resolve."""
+    path = resolve_kit_dir(PLAYBOOK_HOME, "fleet.toml", KIT) / "fleet.toml"
+    rows = tomllib.loads(path.read_text(encoding="utf-8")).get("node", [])
+    if not rows or not isinstance(rows[0].get("user"), str) or not rows[0]["user"]:
+        raise LookupError("%s holds no node row naming a user" % path.as_posix())
+    return rows[0]["user"]
 
 
 def run_placement_command(root, *argv, session="absent"):
@@ -788,11 +867,14 @@ def check_placement_plant(case, top, seen, bad):
     """Run `case` in a fixture under `top`, appending each observation to `seen` and each miss to `bad`."""
     policy = {"agent-places": '', "declared-checked": 'placement = "declared-checked"\n',
               "owner-places": 'placement = "owner-places"\n'}.get(case, "")
-    driver = case in ("amend-leased", "late-answer", "prompt-continue", "continue-with-scenario", "no-admit")
+    # predicate-fails places again after a refused check, a lap its pre-claim draw takes over the remote
+    driver = case in ("amend-leased", "late-answer", "prompt-continue", "continue-with-scenario", "no-admit",
+                      "predicate-fails")
     scenarios = {"predicate-fails": (), "scenario-missing": (), "entry-mismatch": (), "continue-with-scenario": (),
                  "no-admit": ("scenario.amendment",), "claim-lines": (),
                  "scenario-refusals": ("scenario.amendment",)}.get(case)
-    root = write_placement_fixture(top, policy, driver=driver, remote=case == "amend-leased", scenarios=scenarios)
+    root = write_placement_fixture(top, policy, driver=driver, remote=case in ("amend-leased", "predicate-fails"),
+                                   scenarios=scenarios)
     store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     rets = top / "returns"
     rets.mkdir()
@@ -1051,8 +1133,11 @@ def check_placement_plant(case, top, seen, bad):
         run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", scenarios=named, facts=facts)
         check_case("refuse", run_placement_command(root, "check", "--request", FX_KEY), 1,
                    "placement: refused — new · %s" % owed)
-        if case == "predicate-fails":
-            run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", scenarios="scenario.feature")
+        if case == "predicate-fails":   # the re-placement after a refused check draws the first pre-claim lap
+            write_fixture_gov_ref(root, "refs/gov/requests/%s" % FX_KEY, "gov-request %s\n\ncontent-key: %s" % (FX_KEY, FX_KEY))
+            check_case("re-placed", run_placed_return(disposition="new", build=FX_NEW, reason="a new widget",
+                                                      scenarios="scenario.feature"),
+                       0, "draw · route-back · %s · 1/4" % PLACE_ITEM, "placed — new")
             check_case("named right", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — new")
             if read_newest_block().get("check") != "pass":
                 bad.append("the right scenario's block reads check %s" % read_newest_block().get("check"))
@@ -1143,7 +1228,7 @@ def main(argv):
             print(line)
         return rc
     except (PlacementRefused, ProbeRefused) as e:
-        print("%s — refused · %s" % (SAY, e))
+        print(getattr(e, "line", None) or "%s — refused · %s" % (SAY, e))
         return e.code
     except (LookupError, LoopError, OSError) as e:
         print("%s — refused · unarmed · %s" % (SAY, e))

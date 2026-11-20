@@ -123,6 +123,7 @@ unattended.sh --lease acquire build <slug>
 unattended.sh --register problem <subject> <item> <file>
 unattended.sh --card-ref write <slug> --message <file>
 unattended.sh --request <file>
+unattended.sh --request-draw <key> --cause <c> --item <i>
 unattended.sh --overlaps  # local
 unattended.sh --path-tokens --files-touched HEAD <spec>
 unattended.sh --beat <slug>

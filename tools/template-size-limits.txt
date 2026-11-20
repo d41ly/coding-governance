@@ -267,7 +267,12 @@ memory/guides/UNATTENDED-PROTOCOL.md	68288
 # `--path-tokens` verb, so it is a block the gate reads and no prose coming back. The render measures
 # 11293 CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four
 # terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-8).
-.claude/skills/unattended/SKILL.md	11293
+# RAISED 11293 -> 11351, 2026-11-20, by TOOL-dPlacedRequest-14: the `--request-draw <key> --cause <c> --item
+# <i>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--request-draw` verb, so it is a block the gate reads and no prose coming back. The render measures
+# 11351 CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four
+# terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-14).
+.claude/skills/unattended/SKILL.md	11351
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to
