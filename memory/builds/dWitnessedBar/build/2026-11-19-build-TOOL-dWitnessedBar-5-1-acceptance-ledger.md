@@ -9,7 +9,7 @@ probes that extracted the runner's hold block, `report_one` and the hook's admis
 blocks and ran them over planted arrays and a planted repository at `%TEMP%/v5h`. Each count below
 also read at `c9b50206`, where it read the red, and `verdict_flow.py` at `c9b50206` refused every
 new fixture name with its usage line. The three `New arm:` lines of spec section 7 were written and
-not run: their runs, their RED-first observations and the section 7 legs are owed to the main loop at
+not run: their runs, their RED-first observations and the section 7 legs are owed to the main loop at (DERIVED from the builder's probe)
 the close. The resumed pass, at base `30160e0c`, re-ran every grep and every `--fixture` below green,
 the runner's extracted hold block over a planted selection, and the `check_declarations` probes.
 

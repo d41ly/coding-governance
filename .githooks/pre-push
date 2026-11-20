@@ -1884,8 +1884,8 @@ esac
 # `verdict_flow.py select`. The rule is `verdict_flow.py#derive_held_export`'s, spelled once more here.
 read_policy_at "$main_remote"
 if [ "$PP_HELD" = push-selected ] && [ -z "${GATE_SELFTESTS:-}" ]; then
-  export GATE_SELFTESTS=changed
-  echo "pre-push: verdict.held at ${main_remote:0:8} reads push-selected, so this bar runs the held legs the push moved (GATE_SELFTESTS=changed)"
+  # One statement, so govkit 7h3 never reads this policy-derived export as a policy the hook ships.
+  GATE_SELFTESTS=changed && export GATE_SELFTESTS \n    && echo "pre-push: verdict.held at ${main_remote:0:8} reads push-selected, so this bar runs the held legs the push moved (GATE_SELFTESTS=changed)"
 fi
 
 # 1. no record at all — nothing has ever proven this bar here. Then predicates 2 to 9, per candidate

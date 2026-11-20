@@ -4,7 +4,7 @@
 
 ## Why
 
-TOOL-dWitnessedBar-5 is built and committed as one pass commit. Its subject names the unit, and it carries `Pass: TOOL-dWitnessedBar-5` beside `Co-Authored-By: Claude Opus 5`. The spec header is now CLOSED · rev-8 · 2026-11-20, and that edit changes nothing else in the spec. The first builder's work was checked against the spec, not rebuilt. One defect was fixed: the `held guard` arm would have flagged `playbook render selftest` in every adopter, or in gov once that leg got a reason; deviation 52 records the fix. This pass also wrote the deviations, the kickoff manifest re-stamp and the ledger update the earlier pass could not commit. There is no spec divergence.
+TOOL-dWitnessedBar-5 is built and committed as one pass commit. Its subject names the unit, and it carries `Pass: TOOL-dWitnessedBar-5` beside `Co-Authored-By: Claude Opus 5`. The spec header is now CLOSED · rev-8 · 2026-11-20, and that edit changes nothing else in the spec. The first builder's work was checked against the spec, not rebuilt. One defect was fixed: the `held guard` arm would have flagged `playbook render selftest` in every adopter, or in gov once that leg got a reason; deviation 52 records the fix. This pass also wrote the deviations, the kickoff manifest re-stamp and the ledger update the earlier pass could not commit. There is no spec divergence. (DERIVED from the builder's probe)
 
 ## Summary
 

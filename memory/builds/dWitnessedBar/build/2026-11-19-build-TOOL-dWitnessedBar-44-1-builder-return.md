@@ -42,7 +42,7 @@ Unit 5's working files were not touched, and both clones are deleted.
 
 **Owed to the main loop at the close:**
 - Running `check_inherited_red_step` and its RED-first observation (staged break: restore the `.githooks/gate-env.sh`-only read).
-- The §7 legs: `govkit selftest`, `govkit acceptance matrix`, `govkit refusal join` (one refusal site removed and one added, so the count should be unchanged against `BRANCH_PIN = 335`), `memory hygiene`, `recall floor arms`, `policy fixtures`, `step-rows-frozen`.
+- The §7 legs: `govkit selftest`, `govkit acceptance matrix`, `govkit refusal join` (one refusal site removed and one added, so the count should be unchanged against `BRANCH_PIN = 335`), `memory hygiene`, `recall floor arms`, `policy fixtures`, `step-rows-frozen`. (DERIVED from the builder's probe)
 - The `docs` leg over the new anchors and usage rows.
 
 **Gotchas checklist** (`gotchas.py --for-diff HEAD~1..HEAD`) ran over the commit and changed nothing:
