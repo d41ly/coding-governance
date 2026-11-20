@@ -34,6 +34,6 @@ holds the instance; review holds the rest.
 
 ## Gating
 
-The instance is gated for `--entry-claim` alone. The class rule across every verb belongs to the
+The instance is gated by the TOOL-dPlacedRequest-99 arm of the unattended kit's suite, for `--entry-claim` alone; the class has no machine gate. The class rule across every verb belongs to the
 unattended kit gate, another write set, so this record is the checklist entry, claimed by the
 unattended kit's codebase-map dossier.
