@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-7 — `test.seen-red` reading one seen-red record per gate a build adds or changes, the acceptance-ledger line standing in for `build.acceptance`
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 26 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 26 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0345@72933671 whole
 **Carries:** node:item.test.seen-red
@@ -96,7 +96,7 @@ admission TOOL-dWitnessedBar-14 left to it (§8 F7).
   `seen_red.py` is staged first. TOOL-dDeclaredLoop-12's landed `[[item]]` row in
   `tools/loop/loop.toml` names `command:test.seen-red`, so the pass re-points it to
   `command:memory-tree.seen-red`. No kit descriptor holds a `[[command]]` row yet
-  (`git grep -n '^\[\[command\]\]' -- 'tools/*/kit.toml'` finds none at `a4fd535ed`), so this row
+  (`git grep -n '^\[\[command\]\]' -- 'tools/*/kit.toml'` finds none at `174f9d9e5`), so this row
   turns that leg from `unarmed` to green. The item's `[[stand-in]]` row stays: `loop.toml`'s header
   holds a stand-in until its owning build lands, and no landed unit of this build has edited the file
   (`git log cdfbd1cf..HEAD -- tools/loop/loop.toml` lists dDeclaredLoop commits only). Observed by
@@ -110,7 +110,7 @@ admission TOOL-dWitnessedBar-14 left to it (§8 F7).
   `seen_red.py --build <slug>` as the read-back, rendered from
   `tools/memory-tree/BUILD-METHOD.template.md`. The paragraph pays for its words in its own: the
   render measures 30717 bytes (PINNED 2026-11-20, `wc -c memory/guides/BUILD-METHOD.md` at
-  `a4fd535ed`) against the 30720 its row in `tools/template-size-limits.txt` holds, so the paragraph
+  `174f9d9e5`) against the 30720 its row in `tools/template-size-limits.txt` holds, so the paragraph
   grows by at most 3 bytes (DERIVED, the difference) and no other text of the method moves (§8 F6).
   Observed by AC7.
 - **S10** — `ratchet (populated)` admits an empty armed population a seen-red record vouches for,
@@ -205,7 +205,7 @@ Minted: the seen-red line grammar; `read_evidence_lines`; `tools/memory-tree/see
 `--plant`; the command row `seen-red` of the memory-tree kit; the ratchet plant
 `populated-seen-red`. Naming cells: `read_evidence_lines`, `read_seen_red_records` and
 `derive_owed_gates` each read OK from `python tools/lexicon/lexicon.py --suggest <name> --as
-py.function` at `a4fd535ed`; the pass asks it of any other name it mints.
+py.function` at `174f9d9e5`; the pass asks it of any other name it mints.
 
 ### Migration
 
@@ -238,9 +238,13 @@ header of `tools/memory-tree/check-verdict-epoch.sh` states.
   which the unguarded `codebase-map coverage + freshness` leg reads)
 
 Shared with sibling units: `tools/memory-tree/tree_lib.py`, `tools/memory-tree/HYGIENE.template.md`,
-`memory/HYGIENE.md` and `memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-1` (order 23),
-and `tools/memory-tree/check-memory-hygiene.sh` with `TOOL-dWitnessedBar-29` (order 25), each of
-which lands before this unit; nothing with `TOOL-dWitnessedBar-59`.
+`memory/HYGIENE.md` and `memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-1` (order 23,
+landed at `ad3949b5f`, its edits the `gate-health` entry of `TYPED_RECORD_KINDS` and of the record-kind
+list, neither the `**Evidences:**` walk nor the "Acceptance ledger" section);
+`memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-30` (order 24, landed at `7b918f7e0`);
+and `tools/memory-tree/check-memory-hygiene.sh` with `TOOL-dWitnessedBar-29` (order 25, its
+`check_cap_findings` and not check 23's awk), each of which lands before this unit; nothing with
+`TOOL-dWitnessedBar-59`, `TOOL-dWitnessedBar-21` or `TOOL-dWitnessedBar-6`.
 
 ### Alternatives rejected
 
@@ -271,7 +275,7 @@ which lands before this unit; nothing with `TOOL-dWitnessedBar-59`.
 - migration — none, per §4.
 - user docs — none owed: no page under `help/` names the ledger, the seen-red line or
   `ratchet (populated)` (`git grep -n -i 'acceptance ledger\|seen-red\|ratchet (populated)' -- help`
-  finds none at `a4fd535ed`); `memory/HYGIENE.md` is the ledger's page.
+  finds none at `174f9d9e5`); `memory/HYGIENE.md` is the ledger's page.
 
 ## 6. Acceptance criteria
 
@@ -398,6 +402,13 @@ New arm: tools/memory-tree/ratchet.py · covers AC8 · the plant `populated-seen
   `verdict epoch (kit version dates the engine)`, `ratchet selftest`, `ratchet (populated)`,
   `loop definition`, `loop command conformance` and `codebase-map coverage + freshness`; the version
   bump is the lander's.
+- rev-6 · 2026-11-20 · S7 S9 · §4 · §5 · §10 · re-grounded on the tree at `174f9d9e5`, every unit
+  through order 24 landed, by the brief `2026-11-19-prompt-TOOL-dWitnessedBar-7-reground3-brief`:
+  every cited path, symbol, section and blob re-read and unchanged, every PINNED fact re-derived at
+  the same value and its stamp moved to HEAD; Files touched's shared-paths sentence names
+  `symbols.json` with TOOL-dWitnessedBar-30 and the landed shape of TOOL-dWitnessedBar-1's edits;
+  §10 names `read_flake_body` found and not taken and bounds the `Evidences` grep to the kit tree;
+  nothing else moved.
 
 ## 10. Reuse audit
 
@@ -413,11 +424,14 @@ kind's factory, `core.py new command`. The seams called, each in the memory-tree
 and `tools/memory-tree/tree_lib.py#read_bindings`. Found and not taken:
 `tools/check-spec-tokens.py#read_arm_lines`, a `New arm:` walk gov alone runs, `[[exempt]]` from
 shipping in `tools/govkit/registry.toml`, its inline carry TOOL-dWitnessedBar-51 S20's; the two
-`read_run_fact` copies of §8 F5, in kits this one does not require; and the `acceptance` record kind,
+`read_run_fact` copies of §8 F5, in kits this one does not require; the `acceptance` record kind,
 `tools/memory-tree/build_records.py#read_acceptance`, whose record holds `run ·` lines of re-run
-commands. `python tools/codebase-map/reuse_lookup.py "read the acceptance ledger lines that record a
-gate seen red"`, re-run at `a4fd535ed`, ranks generic `read` stems, `read_blobs_at` among them, and no
-reader of a seen-red observation; the walk in `deviation_join.py` was found by `git grep Evidences`,
-which still finds no other Python walk.
+commands; and `tools/memory-tree/build_records.py#read_flake_body`, landed by TOOL-dWitnessedBar-1,
+which reads a flake record's TAB rows and no ledger line. `python tools/codebase-map/reuse_lookup.py
+"read the acceptance ledger lines that record a gate seen red"`, re-run at `174f9d9e5`, ranks generic
+`read` stems, `read_blobs_at` among them, and no reader of a seen-red observation; the walk in
+`deviation_join.py` was found by `git grep -n Evidences -- '*.py'`, which finds no other walk under
+`tools/`, its other hits being build records' one-off scripts under `memory/builds/dClosedLoop/`
+and `memory/builds/dTracedLedger/`, no kit's code.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a gate's staged red observation recorded in the acceptance ledger and read back" --terms "seen-red record acceptance ledger staged break arm red green New arm observe Evidences journal"`

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-29 — every size warning a passing leg prints, shown in the runner's summary and verdict record and attributed to its unit
 
-**Status:** DEFERRED · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 25 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 25 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0367@c53d0fb3 whole
 
@@ -41,7 +41,7 @@ halves).
   (`tools/check-template-size.sh@c76defce:520`), subject `$key`, detail
   `<recorded> -> <bytes> (+<delta>) over high-water`. Observed by AC1.
 - **S2** — Every size-warning emitter the census of §4 names carries the marker, the thirteen files of
-  §4's site table at HEAD `a4fd535ed` (PINNED, measured 2026-11-20). A `BUDGET WARN` site's detail is
+  §4's site table at HEAD `174f9d9e5` (PINNED, measured 2026-11-20). A `BUDGET WARN` site's detail is
   `<cap> · <measured> <unit> over <value>`, the tail of the grammar `tools/policy/README.md` states
   (`tools/policy/README.md@76690102:493`). Python sites build the line through S9's factory and the
   four shell sites print it with one `printf` each (§8 F6). A site that gathers its lines into a list
@@ -51,9 +51,12 @@ halves).
   retry, the reuse sample and the red legs' same-tree re-run, ONE `grep -F` over the copies of the
   legs that passed, `<i>.out` where `<i>.rc` reads `0` and `<i>.retry.out` where `<i>.retry.rc` reads
   `0`, keeping every line that opens with the marker, in manifest order, as rows
-  `<leg index><TAB><class><TAB><subject><TAB><detail>`. A marker line from a failed, skipped, held or
-  reused leg, from a sample's second look (`<i>.sample.out`) or from a red leg's re-run
-  (`<i>.rerun.out`) is not read. Observed by AC3 and AC4.
+  `<leg index><TAB><class><TAB><subject><TAB><detail>`. A held leg a selection's `run` row executed
+  (`<i>.heldrun`, TOOL-dWitnessedBar-30, `tools/run-gates/run-gates.sh#report_one`) is read from its
+  first attempt alone, `<i>.out` where `<i>.rc` reads `0`, the attempt its `held.<n>` reads `ok` by,
+  and never from `<i>.retry.out` (§8 F7). A marker line from a failed, skipped, unrun held or reused
+  leg, from a sample's second look (`<i>.sample.out`) or from a red leg's re-run (`<i>.rerun.out`) is
+  not read. Observed by AC3 and AC4.
 - **S4** — Attribution: for each distinct subject, `routed_commits.py --newest-unit HEAD <subject>`,
   the unit id of the newest non-merge commit touching that path whose id a spec defines, or `-` with
   the reason when the memory-tree kit is absent, the attribution fails, or no commit names a specced
@@ -68,9 +71,11 @@ halves).
 - **S7** — The verdict record (shared interface I8): `warned<TAB><n>` and one
   `warn.<k><TAB><leg name><TAB><class><TAB><subject><TAB><unit>` per warning, `<k>` from 1, written
   in the block that writes `verdict` to the run record
-  (`tools/run-gates/run-gates.sh@a405580b:5943-5979`), after unit 25's `run_id`, `cause` and
+  (`tools/run-gates/run-gates.sh@e044bc9f:5979-6016`), after unit 25's `run_id`, `cause` and
   `tail.<n>` keys. The keys are additive and `schema` does not bump, the reasoning the header block
-  states (`tools/run-gates/run-gates.sh@a405580b:3807-3808`). Observed by AC4.
+  states (`tools/run-gates/run-gates.sh@e044bc9f:3820-3821`); the verdict's readers keep the first
+  of each key and ignore a key they do not name (`tools/run-gates/verdict_flow.py#read_verdict`,
+  `tools/run-gates/verdict_flow.py#read_keys`). Observed by AC4.
 - **S8** — `tools/run-gates/README.md` states the marker grammar, the `GATE warn` line and the two
   keys; `tools/check-template-size.sh`'s header names the marker it prints; and `help/size-caps.md`
   shows the marker beside its `BUDGET WARN` example and says a passing bar shows it as `GATE warn`.
@@ -129,7 +134,7 @@ git grep -nE 'check_cap|verdict\.line|budgets\.py" check' -- tools .githooks ski
 
 The first query finds every line that writes a size warning, the two that compose the word `WARN`
 from a variable included. The second finds the printers of `check_cap`'s verdict line, which the
-first cannot see. At HEAD `a4fd535ed` the first prints thirteen lines in twelve files, and the second
+first cannot see. At HEAD `174f9d9e5` the first prints thirteen lines in twelve files, and the second
 adds one file, `tools/check-spec-tokens.py` (PINNED, measured 2026-11-20). The pathspec exclusion of
 `tools/policy/check_policy.py` drops eleven expected-output strings of the switch fixtures (PINNED,
 measured 2026-11-20); a comment or docstring naming `BUDGET WARN` carries no dash after it and is not
@@ -186,7 +191,7 @@ Minted: the marker prefix `gate-warn`, its class word `size`; `scan_leg_warnings
 `--newest-unit`; `render_warn_marker`. Naming cells:
 `python tools/lexicon/lexicon.py --suggest scan_leg_warnings --as sh.function` and
 `python tools/lexicon/lexicon.py --suggest render_warn_marker --as py.function` each print OK at HEAD
-`a4fd535ed`, measured 2026-11-20. The rev-3 name `collect_leg_warnings` is refused there, since
+`174f9d9e5`, measured 2026-11-20. The rev-3 name `collect_leg_warnings` is refused there, since
 `collect` is not a declared verb.
 
 ### Migration
@@ -268,8 +273,11 @@ pass moves each version it names at the kit's own version home.
 - **AC3** — When the slice of `scan_leg_warnings` is run over a planted work directory holding
   `0.rc` = `0` and a `0.out` with one marker line, under a planted name list, it prints one `GATE warn`
   line naming the leg, the subject and the detail; with `0.rc` = `1` it prints none, and a marker line
-  in a `0.rerun.out` beside a red `0.rc` prints none.
-  Red when: a failed leg's marker is shown, or a passing leg's marker is dropped.
+  in a `0.rerun.out` beside a red `0.rc` prints none. With a `0.heldrun` planted beside `0.rc` = `0` it
+  prints the line, and beside `0.rc` = `1` with a `0.retry.out` marker under `0.retry.rc` = `0` it
+  prints none.
+  Red when: a failed leg's marker is shown, or a passing leg's marker is dropped, or a held leg run
+  outside the verdict is read from an attempt other than the one its `held.<n>` reads.
   fixture: the planted directory is built by the probe under the run's scratch path.
 - **AC4** — When the planted breach of AC3 is run through the verdict-write block's slice, the
   written `verdict` file holds `warned` `1` and a `warn.1` line whose value's fourth TAB field is the
@@ -332,7 +340,9 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   matched comments, docstrings and fixture strings and missed the two lines composing `WARN` from a
   variable, so §4 now states two queries, which name the thirteen files of its table. Liveness: the
   first query prints three lines of `.test.sh` files when that exclusion is dropped, so it can find a
-  hit. RESOLVED (agent, 2026-11-20, delegated): S2 marks every site the census names at the pass's
+  hit. Re-observed again 2026-11-20 at HEAD `174f9d9e5`, after units 1, 59 and 30 landed: the same
+  thirteen lines in twelve files and the one added file, none of them moved since `a4fd535ed`.
+  RESOLVED (agent, 2026-11-20, delegated): S2 marks every site the census names at the pass's
   base. widens: none · relaxes: none
 - **F4 — Which stream carries the marker?** The runner's capture writes the leg's stderr into the same
   file as its stdout (`tools/run-gates/run-gates.sh#runleg`, `2>&1`), so either stream reaches the
@@ -358,6 +368,16 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   kind once per site, which the charter's reuse rule refuses. RESOLVED
   (agent, 2026-11-20, delegated): (b), the tie-break's seam reuse, the module those sites already
   import. widens: none · relaxes: none
+- **F7 — Is a held leg a selection's `run` row executed read for markers?** TOOL-dWitnessedBar-30
+  landed a held leg that runs outside the verdict: it writes `<i>.heldrun`, `<i>.out` and `<i>.rc`,
+  and `report_one` reads its first attempt's rc as its `held.<n>` result, `ok` or `fail`
+  (`tools/run-gates/run-gates.sh#report_one`), so S3's `<i>.rc` reads `0` now matches a leg rev-4's
+  word "held" meant to exclude. Options: (a) never read a `.heldrun` leg; (b) read it from its first
+  attempt alone, where its `held.<n>` reads `ok`; (c) read it as any other leg, its retry copy
+  included. (a) leaves a size warning a leg printed on a run that passed unseen, against the Goal's
+  "every"; (c) shows a warning from an attempt its held result does not read, so a leg reported
+  `fail` would carry a `GATE warn` line. RESOLVED (agent, 2026-11-20, delegated): (b), the most
+  feature-rich survivor; no option moves a verdict, so none trips §3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -380,18 +400,23 @@ New arm: tools/memory-tree/routed_commits.py · covers AC5 · a `--selftest` fix
   limit; S8 and AC7 add `help/size-caps.md`; AC9 added; Rollout derives the kit versions; the run-gates
   arm moves `FLOOR_ASSERTIONS`; the leg line gains the thirteen legs the new paths' guards and the
   profile reader name (PINNED, measured 2026-11-20 by the spec-token checker's guards join).
+- rev-5 · 2026-11-20 · §2 · §4 · §6 · §8 · §10 · S2 S3 S7 · AC3 · re-grounded over HEAD `174f9d9e5`
+  per brief 2026-11-19-prompt-TOOL-dWitnessedBar-29-reground3-brief, after units 1, 59 and 30
+  landed: the verdict block and header citations re-pinned to the runner's blob `e044bc9f`; S3 and
+  AC3 settle unit 30's held leg run outside the verdict (F7); the census, its counts and the lexicon
+  cells re-derived unchanged and re-pinned; nothing else moved.
 
 ## 10. Reuse audit
 
 The seams extended: the runner's leg report and verdict write (`tools/run-gates/run-gates.sh#report_one`,
-the verdict block at `tools/run-gates/run-gates.sh@a405580b:5943-5979`,
+the verdict block at `tools/run-gates/run-gates.sh@e044bc9f:5979-6016`,
 `tools/run-gates/run-gates.sh#read_record_keys`), the high-water advisory at
 `tools/check-template-size.sh@c76defce:520`, the policy kit's cap verdict
 (`tools/policy/budgets.py#check_cap`), which gains its marker factory beside it, the profile reader's
 verb pin (`tools/run-gates/profile_bar.py#derive_runner_verbs`), and the unit reader
 `tools/memory-tree/routed_commits.py#read_newest_unit`, whose CLI takes exactly two arguments today
 (`tools/memory-tree/routed_commits.py#main`). `python tools/codebase-map/reuse_lookup.py "show a
-warning a passing gate leg prints in the runner summary"`, re-run at HEAD `a4fd535ed` on 2026-11-20,
+warning a passing gate leg prints in the runner summary"`, re-run at HEAD `174f9d9e5` on 2026-11-20,
 ranked generic stems (`legs`, `leg`, `print_report`) and named `derive_runner_verbs`, the verb pin S10
 extends; it named no seam that carries warnings, which agrees with scout A: no reader of a passing
 leg's output exists. The recall probe, re-run the same day, returned this spec, this build's brief and
