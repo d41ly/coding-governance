@@ -476,3 +476,11 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T08:05:07Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 85/180 · 20261120T080507Z-025b4c
 
 2026-11-20T08:05:07Z dispatch · item 386b3ebe TOOL-dWitnessedBar-55 · reason memory/map/generated/symbols.json
+2026-11-20T08:10:29Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 86/180 · 20261120T081029Z-ee5cad
+
+2026-11-20T08:10:30Z dispatch · item 5a4f86e0 TOOL-dWitnessedBar-55 · reason help/upgrade-steps.md tools/govkit/selftest.py tools/govkit/steps/inherited_red.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-55-1-acceptance-ledger.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-55-deviation-552.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-55-deviation-553.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md memory/map/generated/symbols.json memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T08:11:50Z draw · re-dispatch · TOOL-dWitnessedBar-55 · 87/180 · 20261120T081150Z-26df9a
+
+2026-11-20T08:11:50Z dispatch · item 5a4f86e0 TOOL-dWitnessedBar-55 · reason help/upgrade-steps.md tools/govkit/selftest.py tools/govkit/steps/inherited_red.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-55-1-acceptance-ledger.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-55-deviation-552.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-55-deviation-553.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md memory/map/generated/symbols.json memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-20T08:11:50Z brief · item TOOL-dWitnessedBar-55 · reason 1751ac98bf62 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-55-build-brief.md
