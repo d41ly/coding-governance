@@ -604,17 +604,18 @@ grep -q '^refuse_wrong_shell coverage: [1-9][0-9]* members' <<<"$rws_cov" \
 # and the refusal, one calling `refuse_wrong_shell || exit 2` before its first `resolve_python` call and
 # one after it; `--coverage` there exits 1 naming the late one alone, and a call inside a function body
 # defined above the refusal is no call where it stands. RED where the order is not read: exit 0.
-RWO="$TMP/rws-order"; mkdir -p "$RWO/tools/lib" "$RWO/tools/x" "$RWO/tools/unattended"
-cp "$HERE/refuse-wrong-shell.sh" "$HERE/resolve-python.sh" "$RWO/tools/lib/"
-for rwo_f in lib-unattended.sh pass-tree.sh pass-tree.test.sh; do : > "$RWO/tools/unattended/$rwo_f"; done
+rwo_t=tools  # the fixture tree's tool root, named once
+RWO="$TMP/rws-order"; mkdir -p "$RWO/$rwo_t/lib" "$RWO/$rwo_t/x" "$RWO/$rwo_t/unattended"
+cp "$HERE/refuse-wrong-shell.sh" "$HERE/resolve-python.sh" "$RWO/$rwo_t/lib/"
+for rwo_f in lib-unattended.sh pass-tree.sh pass-tree.test.sh; do : > "$RWO/$rwo_t/unattended/$rwo_f"; done
 rwo_head='#!/usr/bin/env bash
 HERE=$(cd "$(dirname "$0")/../lib" && pwd)
 . "$HERE/resolve-python.sh"
 . "$HERE/refuse-wrong-shell.sh"'
-printf '%s\nlate_py() {\n  py=$(resolve_python)\n}\nrefuse_wrong_shell || exit 2\npy=$(resolve_python)\n' "$rwo_head" > "$RWO/tools/x/early.sh"
-printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > "$RWO/tools/x/late.sh"
+printf '%s\nlate_py() {\n  py=$(resolve_python)\n}\nrefuse_wrong_shell || exit 2\npy=$(resolve_python)\n' "$rwo_head" > "$RWO/$rwo_t/x/early.sh"
+printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > "$RWO/$rwo_t/x/late.sh"
 (cd "$RWO" && git init -q && git add -A) || bad "the wrong-shell order fixture could not be staged"; ok
-rwo_out=$(cd "$RWO" && bash tools/lib/refuse-wrong-shell.sh --coverage 2>&1); rwo_rc=$?
+rwo_out=$(cd "$RWO" && bash "$rwo_t/${HERE##*/}/refuse-wrong-shell.sh" --coverage 2>&1); rwo_rc=$?
 { [ "$rwo_rc" = 1 ] && grep -q '^BREAK tools/x/late.sh refuses only after it resolved python' <<<"$rwo_out" \
   && ! grep -q 'early.sh' <<<"$rwo_out"; } \
   || bad "refuse-wrong-shell.sh --coverage did not red the member refusing after its resolve_python call alone (rc $rwo_rc):${rwo_out//$'\n'/; }"; ok

@@ -128,7 +128,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    say under which unit the records are filed and what `Caused-by` names, so that no CLOSED spec's generated region is
    rewritten, and list every record path in Files touched; (c) add `memory/guides/SESSION-KICKOFF.md`'s `last-audit`
    re-stamp to Files touched, since the unit edits files on its `watch:` line.
-4. The spec sits over its 49152 B ceiling in warn mode: tighten prose you touch, never by dropping a criterion. A
+4. The spec sits over its 49152 B ceiling (PINNED 2026-11-20 by the spec size check) in warn mode: tighten prose you touch, never by dropping a criterion. A
    `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`; keep every home under
    `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds.
 Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-51` and
