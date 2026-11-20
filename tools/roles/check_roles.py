@@ -96,6 +96,7 @@ BODY_CEILINGS = {
     "gov-orienter": 3072, "gov-researcher": 3072, "gov-reuse-scout": 1536,
     "gov-spec-writer": 4096, "gov-spec-reviewer": 4096, "gov-builder": 4096,
     "gov-diff-reviewer": 4096, "gov-skeptic": 3072, "gov-synthesizer": 3072, "gov-session": 2048,
+    "gov-tester": 3072,
 }
 WORKFLOW_NAMES = ("orient", "research", "reuse", "handoff", "spec-write", "spec-review", "build",
                   "closing-review", "gate-bar", "bookkeeping")

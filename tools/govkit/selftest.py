@@ -3080,9 +3080,10 @@ def check_roles_default() -> None:
 
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
-    kit — the role index, nine agent types, ten seeded house overlays and the `/build` Skill — its
-    `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then `UNWIRED`
-    once the index is gone. The target holds a governing doc at the path the memory-tree seed writes
+    kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
+    Skill — its `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then
+    `UNWIRED` once the index is gone. Both roster counts are the source kit's, read rather than typed
+    (TOOL-dWitnessedBar-23 S6). The target holds a governing doc at the path the memory-tree seed writes
     as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
@@ -3148,9 +3149,25 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
         return
     agents = sorted(p.name for p in (t / ".claude" / "agents").glob("gov-*.md"))
     check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(agents))
-    check("OC8 AC4 ...renders nine agent types, one per agent role", len(agents) == 9, str(agents))
-    check("OC8 AC4 ...seeds ten house overlays", len(list((kit / "house").glob("*.md"))) == 10,
-          str(sorted(p.name for p in (kit / "house").glob("*.md"))))
+    # TOOL-dWitnessedBar-23 S6: the roster is DERIVED from the source kit, never typed beside it — the
+    # agent-true roles of its `agents/*.agent.md`, read by the kit's own loader, and the `house/*.md`
+    # entries of its descriptor's seed list. Both are read from the gov tree, not the target, so the
+    # install is graded against what it was handed.
+    import tomllib  # noqa: PLC0415
+    _rspec = importlib.util.spec_from_file_location("roles_lib_roster", KIT_DIRS["roles"] / "roles_lib.py")
+    _rlib = importlib.util.module_from_spec(_rspec)
+    _rspec.loader.exec_module(_rlib)
+    want_agents = sorted("%s.md" % s for s, r in _rlib.load_roles(KIT_DIRS["roles"]).items()
+                         if r["keys"].get("agent", "true") != "false")
+    _seeds = [x for f in tomllib.loads((KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8"))["files"]
+              if f.get("role") == "seed"
+              for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
+    want_house = sorted(x[len("house/"):] for x in _seeds if x.startswith("house/") and x.endswith(".md"))
+    check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(want_agents), agents == want_agents,
+          "rendered %s, agent roles %s" % (agents, want_agents))
+    house = sorted(p.name for p in (kit / "house").glob("*.md"))
+    check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(want_house),
+          bool(want_house) and house == want_house, "seeded %s, seed list %s" % (house, want_house))
     check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
           "absent")
     ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
@@ -10108,8 +10125,9 @@ user_skills = "/tmp/gk-fake-skills"
             # `windows-only-legs.txt` and agent-cap withholds `format-guard.test.sh` by the same
             # `project-owned` mechanism; both landed after this pin and moved no row out.
             # Measured by a default `plan` into a scratch target on 2026-10-13 (TOOL-aSweptBar-1 S10).
+            # seed 14 -> 15, TOOL-dWitnessedBar-23 S6: `roles` seeds `house/gov-tester.md`; the close observes it.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 15
                   and marks.get("ORDER|project-owned") == 34,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
