@@ -433,3 +433,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T13:25:32Z brief · item TOOL-dPlacedRequest-57 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-20T13:34:48Z dispatch · item 890178ea TOOL-dPlacedRequest-58 · reason tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-58-1-acceptance-ledger.md
+
+2026-11-20T13:37:28Z brief · item TOOL-dPlacedRequest-58 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

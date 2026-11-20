@@ -21749,7 +21749,10 @@ hit  "$dm_out" "lease — off · tFix/build"
 # `requests.lock`, overran the placement: it prints its seconds and the event, is discarded and the
 # placement re-runs, up to three attempts; the DPR48 rows are judged on the first attempt kept, and
 # every attempt overrunning reds `request race placed past the lock bound`. `request race never
-# placed` stops the attempts at once. WHAT THIS BLOCK DOES NOT DRIVE: a race between two nodes.
+# placed` stops the attempts at once. THE RESET (TOOL-dPlacedRequest-58 S2): after the clear and
+# before A starts, any of `once`, `held` and `release` still present stops the attempts, and the
+# `DPR58 AC1` row reds `request race state not reset`, so a `held` the wait sees is this attempt's
+# A's. WHAT THIS BLOCK DOES NOT DRIVE: a race between two nodes.
 # ==================================================================================================
 pr_h="$LF/pr"; mkdir -p "$pr_h/bin"; pr_cp=$(command -v cp)
 printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
@@ -21760,9 +21763,10 @@ printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
 chmod +x "$pr_h/bin/cp"
 pr_bound=$(awk -F= '/^NODE_LOCK_BOUND=/{print $2; exit}' "$SCRIPT")
 pr_hl="$(git -C "$dm_c1" rev-parse --path-format=absolute --git-common-dir | tr -d '\r')/health.log"
-pr_kept=""; pr_gone=""; pr_out=""; pr_rb=""; pr_ra=""; pr_t0=0; pr_t1=0
+pr_kept=""; pr_gone=""; pr_dirty=""; pr_out=""; pr_rb=""; pr_ra=""; pr_t0=0; pr_t1=0
 for pr_n in 1 2 3; do
   rm -rf "$pr_h/once" "$pr_h/held" "$pr_h/release"
+  if [ -e "$pr_h/once" ] || [ -e "$pr_h/held" ] || [ -e "$pr_h/release" ]; then pr_dirty=$pr_n; break; fi
   printf 'Place the request race, zq-race-marker-48-%s, on 2026-11-19\n' "$pr_n" > "$LF/a.md"
   printf 'Place the request race, zq-race-marker-48-%s, on 2026-11-20\n' "$pr_n" > "$LF/b.md"
   pr_e0=0; [ ! -f "$pr_hl" ] || pr_e0=$(grep -c '' "$pr_hl")
@@ -21777,6 +21781,8 @@ for pr_n in 1 2 3; do
   if [ "$((pr_t1 - pr_t0))" -le "${pr_bound:-0}" ] && [ "$pr_broke" = 0 ]; then pr_kept=$pr_n; break; fi
   echo "DPR52 placed race attempt $pr_n discarded as a placement overrun: B ended $((pr_t1 - pr_t0)) s after the hold, the bound ${pr_bound:-unread} s$([ "$pr_broke" = 0 ] || echo ", node-lock-broken on requests.lock")"
 done
+same "DPR58 AC1 every attempt started with no handshake file" \
+  "$([ -z "$pr_dirty" ] && echo reset || echo "request race state not reset at attempt $pr_dirty")" "reset"
 same "DPR48 AC3 call A announced its copy from inside its window" \
   "$([ -z "$pr_gone" ] && echo placed || echo 'request race never placed')" "placed"
 same "DPR52 AC4 an attempt was placed inside the lock bound, its B ending under NODE_LOCK_BOUND with no break" \
@@ -23631,7 +23637,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the duplicate-key row's 3 `same` (its copy row, the driver's stale and the last-line copy's live)
 # and the torn-stamp row's 3 `same` (its copy row, the driver's live and the torn copy's unknown -),
 # no loop; no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4037
+# RAISED 4037 -> 4038 by TOOL-dPlacedRequest-58: the placed race's 1 region-eight `same`, its reset
+# row, off the diff's own lines; the loop's new line is a test, not an assertion; no skip branch. No
+# suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4038
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23910,7 +23919,8 @@ FLOOR_SHARD_7=311
 # RAISED 1222 -> 1243 by TOOL-dPlacedRequest-49: the same 21 region-eight lock-order, queued-head and status assertions, see FLOOR_ASSERTIONS.
 # RAISED 1243 -> 1250 by TOOL-dPlacedRequest-52: the same 7 region-eight race, trap and renews assertions, see FLOOR_ASSERTIONS.
 # RAISED 1250 -> 1256 by TOOL-dPlacedRequest-56: the same 6 region-eight torn-stamp and duplicate-key assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1256
+# RAISED 1256 -> 1257 by TOOL-dPlacedRequest-58: the same 1 region-eight placed-race reset assertion, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1257
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
