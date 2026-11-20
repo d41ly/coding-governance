@@ -241,3 +241,38 @@ round 3 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-59 · unit
 round 3 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-61 · unit TOOL-dPlacedRequest-61 · rev 5
 round 3 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-63 · unit TOOL-dPlacedRequest-63 · rev 4
 round 3 · finding 17 · MEDIUM · local · specs TOOL-dPlacedRequest-64 · unit TOOL-dPlacedRequest-64 · rev 3
+round 4 · subject dPlacedRequest-spec-set-r4 · audited TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99
+round 4 · finding 1 · HIGH · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 2 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 3 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 4 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 5 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 6 · MEDIUM · local · specs TOOL-dPlacedRequest-98 · unit TOOL-dPlacedRequest-98 · rev 2
+round 4 · finding 7 · MEDIUM · local · specs TOOL-dPlacedRequest-97 · unit TOOL-dPlacedRequest-97 · rev 2
+round 4 · finding 8 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 9 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 10 · LOW · local · specs TOOL-dPlacedRequest-95 · unit TOOL-dPlacedRequest-95 · rev 2
+round 4 · finding 11 · HIGH · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 12 · MEDIUM · local · specs TOOL-dPlacedRequest-96 · unit TOOL-dPlacedRequest-96 · rev 2
+round 4 · finding 13 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 14 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 15 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 16 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 17 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 18 · MEDIUM · local · specs TOOL-dPlacedRequest-95 · unit TOOL-dPlacedRequest-95 · rev 2
+round 4 · finding 19 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 20 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 21 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 22 · HIGH · local · specs TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-98 · rev 2
+round 4 · finding 23 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 24 · MEDIUM · local · specs TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-95 · rev 2
+round 4 · finding 25 · MEDIUM · local · specs TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-95 · rev 2
+round 4 · finding 26 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 27 · LOW · local · specs TOOL-dPlacedRequest-95 · unit TOOL-dPlacedRequest-95 · rev 2
+round 4 · finding 29 · HIGH · new-mechanism · specs TOOL-dPlacedRequest-96 · unit TOOL-dPlacedRequest-100 · rev 1
+round 4 · finding 30 · MEDIUM · local · specs TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-98 · rev 2
+round 4 · finding 31 · HIGH · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 32 · MEDIUM · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · finding 33 · LOW · local · specs TOOL-dPlacedRequest-99 · unit TOOL-dPlacedRequest-99 · rev 2
+round 4 · sibling · unit TOOL-dPlacedRequest-96 · rev 2
+round 4 · sibling · unit TOOL-dPlacedRequest-99 · rev 2
