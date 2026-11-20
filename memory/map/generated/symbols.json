@@ -118,6 +118,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "DeadProbe",
+      "kind": "class",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
       "id": "DerivedDefault",
       "kind": "class",
       "file": "tools/policy/policy.py"
@@ -440,12 +445,22 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "Refusal",
       "kind": "class",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "RefuseRedirect",
+      "kind": "class",
+      "file": "tools/run-gates/remote_verdict.py"
     },
     {
       "id": "Refused",
@@ -5318,6 +5333,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_backend",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "check_backlog_mode_shift",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6801,6 +6821,11 @@
       "id": "check_landing_carry",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_landing_verdict",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "check_layers",
@@ -12475,6 +12500,11 @@
     {
       "id": "derive_pin",
       "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "derive_pin",
+      "kind": "function",
       "file": "tools/workflows/review_pin.py"
     },
     {
@@ -12811,6 +12841,11 @@
       "id": "derive_requires_closure",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_response_name",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
     },
     {
       "id": "derive_retired_rows",
@@ -16890,6 +16925,16 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
@@ -19833,6 +19878,16 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_anchor",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "read_api",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
       "id": "read_args",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -19971,6 +20026,16 @@
       "id": "read_b1_token",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "read_backend_name",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "read_backends",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "read_backlog",
@@ -20571,6 +20636,11 @@
       "id": "read_commits",
       "kind": "function",
       "file": "tools/unattended/commit_trailers.py"
+    },
+    {
+      "id": "read_common_dir",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "read_composed_items",
@@ -21723,16 +21793,6 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
-      "id": "read_held_reds",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "read_held_reds",
-      "kind": "function",
-      "file": "tools/unattended/unattended.test.sh"
-    },
-    {
       "id": "read_held_rows",
       "kind": "function",
       "file": "tools/playbook/positional.py"
@@ -21741,6 +21801,11 @@
       "id": "read_held_runner",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_held_runs",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
     },
     {
       "id": "read_history_groups",
@@ -22473,6 +22538,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_local_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_lock",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
@@ -22763,6 +22833,11 @@
       "file": "tools/playbook/tag_bundle.py"
     },
     {
+      "id": "read_node_tag",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_note_refs",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -22941,6 +23016,11 @@
       "id": "read_pauses",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "read_peer_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "read_pending",
@@ -23201,6 +23281,11 @@
       "id": "read_policy_value",
       "kind": "function",
       "file": "tools/playbook/policy_value.py"
+    },
+    {
+      "id": "read_policy_value",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "read_policy_values",
@@ -23603,9 +23688,24 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_remote_keys",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "read_remote_module",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_remote_red",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "read_remote_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
     },
     {
       "id": "read_renames",
@@ -23996,6 +24096,11 @@
       "id": "read_scenario_rows",
       "kind": "function",
       "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "read_scope_paths",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
     },
     {
       "id": "read_scope_reds",
@@ -24553,6 +24658,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "read_tag_lines",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_tag_policy",
       "kind": "function",
       "file": "tools/loop/composition.py"
@@ -24888,6 +24998,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_tree_of",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_tree_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -25096,6 +25211,11 @@
       "id": "read_verdict",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "read_verdict",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "read_verdict",
@@ -27728,6 +27848,11 @@
       "file": "tools/run-gates/leg_factory.py"
     },
     {
+      "id": "render_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "render_rx_literal",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
@@ -28461,6 +28586,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "resolve_bash",
@@ -31800,6 +31930,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/unattended/fix_keeps.py"
     },
     {
@@ -31811,6 +31946,11 @@
       "id": "run_fixture_command",
       "kind": "function",
       "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "run_fixture_command",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_fixture_contended_pair",
@@ -31856,6 +31996,11 @@
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_fixture_git",
@@ -32156,6 +32301,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_git",
@@ -32893,6 +33043,11 @@
       "file": "tools/playbook/positional.py"
     },
     {
+      "id": "run_pin",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
       "id": "run_pinned_read",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
@@ -32971,6 +33126,11 @@
       "id": "run_plant",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_plant_append_edited",
@@ -33288,6 +33448,16 @@
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
+      "id": "run_read",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
+      "id": "run_read",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "run_reader_coverage",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -33351,6 +33521,11 @@
       "id": "run_remote",
       "kind": "function",
       "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "run_remote_plant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_rename",
@@ -34168,6 +34343,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "run_verify_peer",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "run_vr_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -34621,6 +34801,11 @@
       "id": "scan_bash",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "scan_bash",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "scan_bash",
@@ -39468,6 +39653,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "write_fixture_tree",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "write_flake_ask",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -40063,6 +40253,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "write_peer_tag",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "write_pfx_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -40076,6 +40271,11 @@
       "id": "write_pg6_pid",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_pin_ask",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_pins",
@@ -40431,6 +40631,11 @@
       "id": "write_repo",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_responses",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "write_rev_spec",
@@ -41351,6 +41556,11 @@
       "id": "wrong_shell_at",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.test.sh"
+    },
+    {
+      "id": "wrong_shell_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "wrong_shell_at",

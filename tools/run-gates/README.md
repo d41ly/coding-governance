@@ -1090,6 +1090,61 @@ nothing.
 **What it does not check:** which legs a scoped run skipped; `kind`, `base` and the run record under
 `run_id` say what ran.
 
+## Verdict backends — `[[verdict_backend]]`
+
+TOOL-dWitnessedBar-6. The policy key `verdict` names the backend a landing's verdict comes from. A
+backend is a `[[verdict_backend]]` row in a kit descriptor, `name`, `reader` (`<module>:<function>`
+under that kit), `off_node` (a boolean) and `owner`, read across every `<prefix>/*/kit.toml` by
+`verdict_backends.py#read_backends`. govkit's install does not read the table, as with `[[drive]]` and
+`[[command]]`, and a name declared twice is refused naming both descriptors. This kit declares three:
+
+| Row | Reader | `off_node` | Stands when |
+|---|---|---|---|
+| `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN`; the `.scoped` slot never counts |
+| `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `verdict` is `GREEN` and whose `node` is not this node's `GOV_NODE` |
+| `remote-ci` | `remote_verdict.py#read_remote_verdict` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
+
+**One read, five states.** `read_verdict(backend, sha, tree)` returns `Verdict(state, witness, why)`;
+`python verdict_backends.py read [--backend <name>] --sha <sha>` prints `verdict: <backend> · <state>
+· <sha8> · <why>` and exits 0 on `GREEN`, 1 otherwise, 2 on a refusal. `GREEN`, `RED`, `NONE`, `HELD`
+and `DEAD PROBE`: only `GREEN` stands. With no `--backend` it reads `verdict` at the landed revision
+through the policy kit's `policy.py get`, a reader's refusal passed on and never read as
+`local-hook`; `check_backend` refuses a value no row declares, naming it and the declared names. Only
+this kit with no policy kit beside it reads the catalogue default, saying so on one line.
+
+**The peer.** `python verdict_backends.py verify-peer [--remote <name>]`, run on a second node under
+its `GOV_NODE`, lists `refs/gov/candidate/*` and `refs/gov/verdict/*` with one bounded `git ls-remote`,
+and for each candidate with no verdict fetches it, runs this kit's `run-gates.sh` on it under
+`GATE_FULL=1` in a detached worktree of the node's own clone, and pushes an annotated tag
+`refs/gov/verdict/<sha>` whose message is the full slot's `verdict`, `tree` and `run_id` lines and a
+`node` line, in the slot's `<key>TAB<value>` grammar. `refs/gov/bar-red` is the precedent.
+
+**The witness rule**, `remote_verdict.py`. KEY: a push run whose `head_sha` is the SHA, the SHA's tree
+resolved in this clone. WRITER: the run's check suite app slug `github-actions`, its `path` the row's
+`workflow`, its event `push`, and the row's `job`. LIVENESS: that job's `step` concluded `success`,
+never `skipped`. SOURCE: the files `verdict.remote.pin-scope` names (`workflow`: the workflow;
+`dispatch-closure`: also `run-gates.sh`, the leg manifest and `.githooks/gate-env.sh`) derive, at the
+SHA, the id `verdict.remote.pin` holds: `git hash-object --stdin` over their sorted `<path> <blob id>`
+lines. `verdict.remote.trust` = `pinned-workflow` or `owner-reviews-workflow-change` reads differing
+files `HELD`; `app-only` skips the source and reads a pass `GREEN` with witness `claimed`. The three
+keys are read at the landed revision; no pin reads `HELD`, `no pin`; a failed read is `DEAD PROBE`.
+Every GET goes through `read_api`: https to `api.github.com` only, no redirect, no credential, 30 s,
+4 MiB. `--responses <dir>` points it at canned files named by `derive_response_name`, an arm seam.
+`python remote_verdict.py pin` prints the pinned lines and id at HEAD and writes nothing.
+
+**The held reader** moved here too: `python remote_verdict.py held <anchor URL> <workflow file>`,
+`read_held_runs`, prints what the unattended kit's retired `read_held_reds` printed, one TAB row per
+`held <suite>` job and one liveness line, or one DEAD PROBE line; `write_held_asks` files the reds.
+
+**Its readers.** `push-main.sh#check_landing_verdict` before each landing push: `local-hook` lands as
+before; under another value only `GREEN` lands, a `peer-node` SHA not yet green published as
+`refs/gov/candidate/<sha>` first. The unattended driver's gates-green term files a `remote-ci` `HELD`
+read as one owner item. `verdict_backends.py --fixture --plant <case>` runs each plant in a scratch
+directory, and `run-gates.gov.test.sh` runs them.
+
+**What it does not check:** that a peer ran the bar its tag names, or that the tag is signed by a
+registered node key; that `GOV_NODE` is unique; that the pinned files are all the bar job executes.
+
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 
 **`"ceiling": <seconds>`, a positive integer, per leg row in the manifest.** A leg that outlives it

@@ -331,3 +331,28 @@ why = "the runner parses it through python with LF-only byte writes, and the can
 [[lf_pin]]
 pattern = "{kit}/gate-profiles.txt"
 why = "the declared profile table is parsed at runtime with a TAB field separator, so a stray CR lands inside the last field and turns a knob value into one the runner refuses"
+
+# THE VERDICT BACKENDS (TOOL-dWitnessedBar-6 S1), read across every descriptor by
+# `verdict_backends.py#read_backends`, a table govkit's install does not read: `[[drive]]` and
+# `[[command]]` are the precedent. The policy key `verdict` names one; an expansion registers its own
+# backend by declaring a row in its own kit, and a name declared twice is refused naming both.
+[[verdict_backend]]
+name = "local-hook"
+reader = "verdict_backends:read_local_verdict"
+off_node = false
+owner = "dWitnessedBar"
+
+[[verdict_backend]]
+name = "peer-node"
+reader = "verdict_backends:read_peer_verdict"
+off_node = true
+owner = "dWitnessedBar"
+
+[[verdict_backend]]
+name = "remote-ci"
+reader = "remote_verdict:read_remote_verdict"
+off_node = true
+owner = "dWitnessedBar"
+workflow = ".github/workflows/remote-ci.yml"
+job = "bar"
+step = "the merge bar, every leg guard ignored, walled inside the job limit"

@@ -1708,4 +1708,21 @@ case "$out42" in
   *) bad "42 expected the pinned tip, both witness lines and a landing merge of the pinned tip onto the advertised tip: $out42" ;;
 esac
 
+# 43 — TOOL-dWitnessedBar-6 AC9: under `verdict = "peer-node"` with no peer verdict, the fixture lander
+#      of `verdict_backends.py --fixture --plant lander-peer` publishes refs/gov/candidate/<sha> and
+#      exits 1 naming NONE, its remote's main unmoved. The plant builds the fixture repository and its
+#      bare remote in the system temp dir, beside a copy of THIS lander, and owes its all-held line.
+#      Red at a lander that skips the verdict read before its push and lands on its own hook.
+_vb_k=$(cd "$HERE" && for d in */; do [ -f "$d/verdict_backends.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_vb_k" ] && [ -n "$_py_arms" ]; then
+  out43=$("$_py_arms" "$HERE/$_vb_k/verdict_backends.py" --fixture --plant lander-peer 2>&1); rc43=$?
+  case "$rc43:$out43" in
+    "0:"*"plant lander-peer · "*"all held"*)
+      ok "43 under peer-node with no peer verdict the lander publishes its candidate, exits 1 naming NONE and lands nothing" ;;
+    *) bad "43 the lander-peer plant exited $rc43 or missed a scenario: $(printf '%s\n' "$out43" | grep -E 'MISSED|not run' | tr '\n' ' ')" ;;
+  esac
+else
+  echo "  skip — 43 no run-gates kit holding verdict_backends.py beside this lander, or no python launcher, so the peer-node landing arm did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

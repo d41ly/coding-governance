@@ -17,6 +17,7 @@ One task-oriented page per user-facing feature: what it is, how to use it, a sho
 - [Spec-audit chains](spec-audit.md) — how a spec audit's round disposes its findings, how `--record-round` and `--chain-verdict` record a round and answer CONTINUE, STOP or HOLD, and what `review.spec-audit.disposal`, `.chain-stop` and `.chain-ceiling` do.
 - [The idle-wake's `--wake` tick](idle-wake.md) — the one-line verb an unattended run's idle-wake runs first, what `HEALTHY` and each `FULL` reason mean, and the cadence it names.
 - [The pass legs](pass-legs.md) — the gate legs the main loop runs after each unit pass's commit: how to run them, how the list is declared and budgeted, and what `pass.fast-legs` does.
+- [Verdict backends](verdict-backends.md) — which backend's verdict a landing stands on under the policy key `verdict`: the local hook, a peer node's `verify-peer`, or a remote CI run under its witness rule and pin.
 - [The commit render](commit-render.md) — how the pre-commit hook renders and stages the build index when check 9 refuses a commit, what the policy key `memory.staged-render` does, and when the render declines.
 - [The red-fix lane](red-fix-lane.md) — how a leg recorded red is fixed with no spec: what opens the lane, the `Red-fix:` trailer, the four limits, the record, and what `bar.inline-red-fixes` does.
 - [The charter's practices](charter.md) — what the practice catalogue is, how to read the active set, how `charter.practices` chooses it, and what stops a render.
