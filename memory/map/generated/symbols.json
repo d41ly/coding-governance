@@ -308,6 +308,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "PlacementRefused",
+      "kind": "class",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "PolicyRefusal",
       "kind": "class",
       "file": "tools/policy/policy-mirror.js"
@@ -5328,6 +5333,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "check_ask_filed",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6006,6 +6016,11 @@
       "id": "check_dispatch_specs",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_disposition_fact",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "check_disposition_fields",
@@ -7543,6 +7558,16 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "check_placement",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "check_placement_plant",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_plan_line",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -7709,6 +7734,11 @@
     },
     {
       "id": "check_prompt_heading",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_prompt_placement",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
@@ -7911,6 +7941,11 @@
       "id": "check_reds",
       "kind": "function",
       "file": "tools/playbook/overlay_rows.py"
+    },
+    {
+      "id": "check_reenters_item",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "check_ref",
@@ -10646,6 +10681,11 @@
       "id": "derive_build_counts",
       "kind": "function",
       "file": "tools/playbook/gov_tag.py"
+    },
+    {
+      "id": "derive_build_status",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "derive_bullet_keys",
@@ -16135,6 +16175,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/policy_edit.py"
     },
     {
@@ -18003,6 +18048,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "parse_placement_blocks",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "parse_policy",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -18208,6 +18258,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "place_request",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "plan",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -18346,6 +18401,11 @@
       "id": "print_checks",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "print_claim_lines",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "print_claims",
@@ -19696,6 +19756,11 @@
       "id": "read_build_items",
       "kind": "function",
       "file": "tools/loop/position.py"
+    },
+    {
+      "id": "read_build_lease",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_build_records",
@@ -21143,6 +21208,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_held_prompt",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "read_held_reds",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -22173,6 +22243,16 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_owner_record",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "read_owner_release",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "read_packs",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -22356,6 +22436,16 @@
       "id": "read_pl_token",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_placement",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "read_placement_policy",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_plain_stat",
@@ -22591,6 +22681,11 @@
       "id": "read_probe_trigger",
       "kind": "function",
       "file": "tools/memory-tree/build_records.py"
+    },
+    {
+      "id": "read_probe_verdict",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_proc_ledger",
@@ -23243,6 +23338,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "read_scout_return",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "read_scouted_population",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
@@ -23291,6 +23391,11 @@
       "id": "read_session_record",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "read_session_route",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_set",
@@ -23841,6 +23946,11 @@
       "id": "read_terminal_set",
       "kind": "function",
       "file": "tools/loop/loop_table.py"
+    },
+    {
+      "id": "read_terminal_statuses",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "read_termination_inputs",
@@ -25573,6 +25683,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "render_capped_value",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "render_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -26166,6 +26281,11 @@
       "id": "render_pin_rows",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "render_placement_block",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "render_planted_row",
@@ -31158,6 +31278,11 @@
       "file": "tools/loop/loop_witness.py"
     },
     {
+      "id": "run_observation_probes",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "run_offer_arm",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -31286,6 +31411,16 @@
       "id": "run_pl_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_placement_command",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "run_placement_plant",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "run_plan",
@@ -37608,6 +37743,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_foreign_lease",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "write_fork_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -38216,6 +38356,21 @@
       "id": "write_pl_orphan",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_placement",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "write_placement_blocks",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "write_placement_fixture",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "write_plant",

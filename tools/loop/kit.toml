@@ -81,6 +81,12 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # `read_policy_kit` and `probe.points` at a build's pin through composition.py's `read_tag_policy`, and re-runs
 # a method through loop_witness.py's `rerun` beside it, so it takes no edge to the policy kit: a kit that does
 # not resolve exits 2 `unarmed`. Its leg, `loop probe fixtures`, is gov's own [[exempt_leg]], no row here.
+# The placement predicate (TOOL-dPlacedRequest-4): placement.py reads a build's status through the memory-tree
+# kit's index generator and record factory under the edge above, the placement keys through the policy kit by
+# `read_policy_kit`, the runlog kit's `render_redacted` and a build lease through the unattended driver's
+# `--claims`, each found by `resolve_kit_dir`, so it takes no edge to any of them: a kit that does not resolve
+# exits 2 `unarmed`, never a default, and an unreadable lease is a refused fact. The driver's prompt-mode
+# preflight finds it the same way. Its leg, `loop placement fixtures`, is gov's own [[exempt_leg]], no row here.
 # The code seed (TOOL-dPlacedRequest-8): loop_lib.py's `resolve_item_seed` runs the unattended driver's
 # `--path-tokens`, found by `resolve_kit_dir`, so it takes no edge, the driver's kit requiring this one,
 # and prints `unarmed` where the driver does not resolve; its plants ride the `loop definition` leg.

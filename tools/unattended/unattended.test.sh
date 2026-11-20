@@ -5815,7 +5815,12 @@ write_default_conf() { # conf lines -> appended on main at BASE, pushed, and mer
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 }
 _qb_rec=memory/builds/tBr/prompts/2026-10-09-prompt-mandate.md
-_qb_bare=$'# Run mandate\n\n## The prompt\n\n> Build the widget.\n'
+# ---- TOOL-dPlacedRequest-4 S9: every prompt record past the cutoff carries its `## Placement`, and the
+# ---- node-local block it names, planted once in this clone's requests store, which no reset touches.
+_qb_bare=$'# Run mandate\n\n## The prompt\n\n> Build the widget.\n\n## Placement\n\nrequest: 0123456789ab\ndisposition: new\nbuild: tBr\n'
+_qb_store="$(git rev-parse --path-format=absolute --git-common-dir)/requests"
+mkdir -p "$_qb_store"; printf 'Build the widget.\n' > "$_qb_store/0123456789ab.md"
+printf 'placed-utc: 2026-10-09T00:00:00Z\ndisposition: new\nbuild: tBr\nplaybook: none\nreason: the prompt opens the widget build\nevidence: none\nobservations: 0\nplacer: agent\ncheck: pending\n' > "$_qb_store/0123456789ab.placement"
 _qb_brief=$'\n## The brief\n\n### Goal\nBuild the widget.\n\n### Items\n1. The widget. [stale it renders at BASE]\n\n### Acceptance\nIt renders.\n\n### Gates\nThe bar.\n\n### Non-goals\nNothing else.\n'
 _qb_ok="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\nnone\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
 _qb_unasked="$_qb_bare$_qb_brief"$'\n## Drawn from the session\n\n> yes, spec it as a build\n— owner, turn 4\n\n## Owner confirmation\n\nnot asked — the brief draws on nothing outside the prompt\n'
@@ -5892,6 +5897,19 @@ git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin 
 out=$(run --preflight tBr --keepalive-id k1)
 hit  "$out" "preflight OK"
 miss "$out" "does not stand on its own"
+miss "$out" "UNATTENDED check 119 FAILED"
+# ---- TOOL-dPlacedRequest-4 AC10: the same record whose `## Placement` reads `continue` onto a live build
+# ---- refuses at check 119, naming the disposition and the build, and writes no RUN.md; AC4's `new` above
+# ---- is the admitted half. Owed RED with check_prompt_placement's call staged out of the preflight.
+reset_tree; write_default_conf 'PROMPT_BRIEF_CUTOFF="2026-07-01"'; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+mkdir -p memory/builds/tBr/prompts; printf '%s' "$_qb_ok" > "$_qb_rec"
+mutate "$_qb_rec" 's/^disposition: new$/disposition: continue/; s/^build: tBr$/build: tLive/'
+scope published
+git add -A >/dev/null && git commit -q -m br --no-verify; git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit  "$out" "UNATTENDED check 119 FAILED — a prompt record at the pinned BASE is not placed as a request that opens a build, so a prompt continuing or amending a live build would open a new one; place it with the loop kit's placement.py and write the passed block under ## Placement in the record - why, then the record: the disposition continue opens no build, and it names the build tLive: $_qb_rec"
+miss "$out" "preflight OK"
+same "TOOL-dPlacedRequest-4 AC10 a continue placement created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
 # ---- Closing review round 1, B1: a build brief with no `## The prompt` that SORTS AFTER the conforming
 # ---- record is the layout every prompt-mode build reaches after its first pass. Its `skip` verdict
 # ---- must not survive the loop into the join, which refused with the bare word as its reason.

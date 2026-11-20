@@ -942,6 +942,12 @@ the run, which makes "the owner was asked at the start" a property of the commit
    `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
    the first preflight refuses a record that breaks this shape and a build with no such record.
    A `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
+   **Before writing the build folder, place the prompt**: record it with `--request <file>`, place it
+   under the content key that prints with the loop kit's `placement.py place` and `check`, and write
+   the passed block under a `## Placement` section of the record, its `request: <content key>` line
+   first. From `PROMPT_BRIEF_CUTOFF` the first preflight refuses at check 119 a record with no such
+   section, a disposition that opens no build (anything but `new`, `patch` and `repeat`) and a block
+   `check` refuses, so a prompt that continues or amends a live build is routed there instead.
 4. **Commit, then PUSH THE BRANCH**, in that order, under `published`. Skip the push and preflight
    refuses with `the remote advertises no tip for the branch this run is on, so nothing published
    authorizes it`. Under `local` the commit is enough and no push is owed.

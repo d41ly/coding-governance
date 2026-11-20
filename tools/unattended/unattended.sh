@@ -5942,6 +5942,52 @@ check_prompt_brief() { # slug · base
   return 1
 }
 
+# TOOL-dPlacedRequest-4 S9 - A PROMPT IS PLACED BEFORE IT OPENS A BUILD. The prompt path's step 3
+# records the prompt with `--request`, places it under the content key that prints with the loop
+# kit's placement.py, and writes the passed block under `## Placement` in the prompt record, its
+# `request: <content key>` line first. Graded at the FIRST preflight only, beside check_prompt_brief
+# and under its cutoff rule: a README `opened:` before PROMPT_BRIEF_CUTOFF, or a blank cutoff, is not
+# graded; an unknowable cutoff was check 116 there. Every record at BASE carrying `## The prompt` must
+# hold the section, its disposition one that opens a build (`new`, `patch` or `repeat`), and
+# `placement.py check --request <key>` must exit 0 over the node-local block, so a prompt that
+# continues or amends a live build is routed there, never opened as a new one. A placement.py that
+# does not resolve is a refusal, never a pass. WHAT THIS DOES NOT CHECK: that the section's block is
+# the store's newest, which `check` re-reads, nor that its build is the slug the README opens.
+check_prompt_placement() { # slug · base
+  local base="$2" rel dir cut opened rec txt sec key word build why="" py d out
+  [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
+  cut=$(read_brief_cutoff "$AUTH_CONF_AT") || return 1
+  case "$cut" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
+  readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
+  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
+  esac
+  while IFS= read -r rec; do
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    check_prompt_heading <<<"$txt" || continue
+    sec=$(printf '%s\n' "$txt" | awk '{ sub(/\r$/, "") } /^## / { on = ($0 == "## Placement"); next } on && /^[a-z-]+: / { print }')
+    key=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "request" { v = $2 } END { print v }')
+    word=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "disposition" { v = $2 } END { print v }')
+    build=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "build" { v = $2 } END { print v }')
+    if [ -z "$sec" ]; then why="no ## Placement section, $rec"; break; fi
+    case "$word" in
+      new|patch|repeat) ;;
+      *) why="the disposition ${word:-none} opens no build, and it names the build ${build:-none}: $rec"; break ;;
+    esac
+    if [[ ! $key =~ ^[0123456789abcdef]{12}$ ]]; then why="the section names no request: content key, $rec"; break; fi
+    py=$(resolve_python 2>/dev/null) || py=""
+    d=""; [ -z "$py" ] || d=$(resolve_kit_dir "$py" loop placement.py "$KIT_DIR" 2>/dev/null) || d=""
+    [ -z "$d" ] || [ -f "$d/placement.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+    if [ -z "$d" ] || [ ! -f "$d/placement.py" ]; then why="the loop kit's placement.py does not resolve, so the block cannot be checked: $rec"; break; fi
+    out=$("$py" "$d/placement.py" check --request "$key" 2>&1) && continue
+    out=${out//$'\r'/}; why="placement.py check refused it, ${out##*$'\n'}: $rec"; break
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
+  [ -z "$why" ] && return 0
+  fail 119 "a prompt record at the pinned BASE is not placed as a request that opens a build, so a prompt continuing or amending a live build would open a new one; place it with the loop kit's placement.py and write the passed block under ## Placement in the record - why, then the record: $why"
+  return 1
+}
+
 # TOOL-aQuotedBrief-2 S1 - A FIRST PREFLIGHT REFUSES A CARRIED BRANCH. Under `ANCHOR_SCOPE=published`
 # the commits a session's branch already carried sit below the pinned BASE, outside every population
 # the run's checks grade (`read_run_commits` reads `endpoint ^BASE`), so they would land with the run
@@ -8676,11 +8722,10 @@ verb_landed() { # slug
     done <<WTS
 $(GIT worktree list --porcelain 2>/dev/null)
 WTS
-    if [ -n "$_elsewhere" ]; then
-      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
-    else
-      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
-    fi
+    # ONE SITE, its tail naming the other tree where there is one (TOOL-dPlacedRequest-4 merged the two
+    # sites, byte for byte, to pay for check 119 under the driver's refusal ceiling).
+    [ -z "$_elsewhere" ] || _elsewhere=" here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
+    fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur$_elsewhere"
     return 1
   fi
   # TOOL-dDerivedDocket-22 S7 - UNDER `in-place` THIS VERB IS AN OBSERVATION AND WRITES NOTHING TO
@@ -9900,6 +9945,7 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-aQuotedBrief-6 S1 - at a FIRST preflight only, check_branch_carried's gate: a re-preflight
   # derives a moved BASE, and a roster grown mid-run would fail rule 3 there (round 1 M3).
   [ -z "$_pf_first" ] || check_prompt_brief "$slug" "${base:-}" || true
+  [ -z "$_pf_first" ] || check_prompt_placement "$slug" "${base:-}" || true
   # TOOL-aQuotedBrief-2 S1 and S3 - a FIRST preflight refuses a branch carrying commits the default
   # branch lacks outside the build folder; before the write gate, so a refusal writes no RUN.md.
   [ -z "$_pf_first" ] || check_branch_carried "$slug" || true

@@ -1643,6 +1643,54 @@ The list does not fire a review: you, or the run, fire each review line through 
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
 can write a disposition record releases a gate.
 
+## Placing a request: a disposition, its reason and its check
+
+Every request a session or an unattended run receives gets one disposition from the loop's closed set,
+`continue`, `amend`, `new`, `patch`, `repeat`, `unit`, `breakpoint`, `ask` or `none`, recorded with its
+reason. The tool is `placement.py` in the loop kit, run in your repository, keyed by the request's
+content key, the one `--request <file>` of the unattended driver prints. Each placement is a block
+appended to `<key>.placement` in your git directory's `requests/` store, which is never pushed: the
+newest block is the placement and the earlier ones are its history. Its `reason` and `evidence` are
+redacted of secrets and cut to the module's `VALUE_CAP`, since those lines reach the claim commit.
+
+Who places is the key `placement` in `.governance/policy.toml`:
+
+- `agent-places`, the default: the orientation scout's return is the placement, given as
+  `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
+  `reason`, `evidence` and `observations` lines, the scout's `returns:` shape.
+- `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
+  <word> [<build>]`, and the scout's return is evidence only.
+- `owner-places`: `place` writes no disposition and prints the scout's return as evidence and
+  `placement: owner item — <key>`; your disposition record naming `item.entry.place-owner` is the
+  placement, read by `placement.py place --request <key> --owner <record>`.
+
+An alias is written as the member it means, `attach` as `amend`, and any other word is refused with no
+block written. Where the return names an observation and `probe.observations` reads
+`verify-before-place`, `place` opens a probe for it first, and the check below waits for its verdict.
+
+**The check**, `placement.py check --request <key>`, re-reads every fact the disposition rests on from
+its source, never from the scout's text: the build exists and is live, and its build lease is free or
+yours, for `continue` and `amend`; the request's words are held for `new`; the build is terminal for
+`patch`; the playbook is in the tree for `repeat`; the ask is filed for `ask`; your session card routes
+no unit for `none`. `unit` is refused until units can be held apart from their build's driver, and
+`breakpoint` until its own check is built. The key `placement.check` says what a failed fact does:
+`refuse`, the default, prints `placement: refused — <disposition> · <fact>` and exits 1, back to placing;
+`record` writes the failure into the block and exits 0. A passed `new`, `amend`, `patch` or `repeat` is
+then held for you, `placement: held-owner`, while the Plan or Design item it enters is unbuilt, and once
+its claim exists the owner item names `refs/gov/claims/<slug>`; your disposition record of that build
+naming `item.entry.place` releases it.
+
+**The record**, `placement.py record --request <key>`, prints the passed block's `disposition`,
+`build`, `playbook` and `reason` lines, with `reenters` after `disposition` for an owner's late answer,
+the lines the claim commit carries; a block whose check did not pass prints nothing and exits 1.
+
+**An unattended prompt is placed the same way.** Before its build folder is written, the prompt is
+recorded, placed and checked, and the passed block is written under `## Placement` in the prompt record,
+its `request: <key>` line first. A prompt-mode run's first preflight refuses at check 119 a record with
+no such section, a disposition that opens no build, or a block the check refuses, so a prompt that
+continues or amends a live build is sent there rather than opened as a new one. A README opened before
+`PROMPT_BRIEF_CUTOFF` is not graded.
+
 ## Testing outside Test: the probe program
 
 A probe is a test any item can ask for, outside the Test step: an owner's observation checked before it

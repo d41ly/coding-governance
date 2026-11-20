@@ -98,6 +98,7 @@ loop factories fixtures	kit	selftests
 loop guard fixtures	kit	selftests
 loop item kind	repo	selftests
 loop parent routes	kit	selftests
+loop placement fixtures	kit	selftests
 loop position fixtures	kit	selftests
 loop probe fixtures	kit	selftests
 loop request fixtures	kit	selftests

@@ -2255,6 +2255,19 @@
     "stage": ["step.test"]
   },
   {
+    "name": "loop placement fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/placement.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p22"],
+    "stage": ["step.test"]
+  },
+  {
     "name": "loop position fixtures",
     "argv": [
       "python",
