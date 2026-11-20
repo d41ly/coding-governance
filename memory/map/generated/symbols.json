@@ -4508,11 +4508,6 @@
       "file": "tools/gate-lint/ps-hygiene.py"
     },
     {
-      "id": "case_judge",
-      "kind": "function",
-      "file": "tools/run-gates/verdict_flow.py"
-    },
-    {
       "id": "case_run",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
@@ -18528,26 +18523,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "plant_ir_policy",
-      "kind": "function",
-      "file": ".githooks/pre-push.test.sh"
-    },
-    {
-      "id": "plant_kits",
-      "kind": "function",
-      "file": "tools/run-gates/verdict_flow.py"
-    },
-    {
-      "id": "plant_routed",
-      "kind": "function",
-      "file": "tools/run-gates/verdict_flow.py"
-    },
-    {
-      "id": "plant_run",
-      "kind": "function",
-      "file": "tools/run-gates/verdict_flow.py"
-    },
-    {
       "id": "pop_guard",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
@@ -31883,6 +31858,11 @@
       "file": "tools/workflows/check-review-join.test.sh"
     },
     {
+      "id": "run_judge",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_keep",
       "kind": "function",
       "file": "tools/run-gates/keep_tails.py"
@@ -39038,6 +39018,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "write_ir_policy",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "write_ir_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -39096,6 +39081,11 @@
       "id": "write_kits",
       "kind": "function",
       "file": "tools/playbook/instruction_units.py"
+    },
+    {
+      "id": "write_kits",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_landed_observation",
@@ -39808,6 +39798,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "write_routed",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "write_routed_keys",
       "kind": "function",
       "file": "tools/memory-tree/adopt-memory-tree.sh"
@@ -39856,6 +39851,11 @@
       "id": "write_ru_legs",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_run",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_run_branch",

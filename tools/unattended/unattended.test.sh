@@ -16397,7 +16397,8 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" IHLIB="$HERE/../run-gates/lib-verdict.sh" && run_main_at_head run_driver "$@" 2>&1 ); }
+IH_RGK=run-gates  # the runner kit, named once
+run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" IHLIB="$HERE/../$IH_RGK/lib-verdict.sh" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
 # R's policy on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets IH_R to
@@ -16891,8 +16892,9 @@ fi
 # reader answers there (TOOL-dWitnessedBar-3), with an age bound of 10.
 slice_fn read_policy_key; slice_fn read_gate_policy; slice_fn read_gate_blocks; slice_fn resolve_python
 eval "$(sed -n '/^resolve_kit_dir() {/,/^}/p' "$HERE/lib-unattended.sh")"
+IH_PK=policy  # the policy kit, named once
 _ih_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
-_w=$( cd "$_ih_top" && python "$HERE/../policy/policy.py" get verdict.blocks --rev HEAD 2>/dev/null ); _w=${_w%$'\r'}
+_w=$( cd "$_ih_top" && python "$HERE/../$IH_PK/policy.py" get verdict.blocks --rev HEAD 2>/dev/null ); _w=${_w%$'\r'}
 _o=$( cd "$_ih_top" && CONF=".unattended.conf" KIT_DIR="$HERE" \
       && read_gate_policy "$(git rev-parse HEAD)" && printf '%s %s' "$GP_POLICY" "$GP_MAX_AGE" )
 same "AC11 this repository at HEAD reads its own verdict.blocks with a bound of 10" "$_o" "${_w:-own-only} 10"
