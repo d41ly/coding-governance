@@ -712,3 +712,4 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-39](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | TOOL-dGroundRules-7 S2 TO S4 CHANGE ONCE TOOL-dWitnessedBar-20 LANDS.… |
 | [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS (DERIVED) ENFORCE NOTHING THE RULE CAN NAME.… |
 | [TOOL-dWitnessedBar-99](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | FIVE REGISTRIES STAY IN THEIR GRAMMAR. TOOL-dWitnessedBar-16 §8 F16… |
+| [TOOL-dWitnessedBar-100](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE LOOP HAS NO VERB THAT PRINTS ONE ITEM'S OUTCOMES.… |
