@@ -135,7 +135,6 @@ policy:flow.scenario-default	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:flow.wait-ceiling	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:help.atlas	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:help.explanation	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:hooks.bypass	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:install.from	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:install.guards	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:install.steps	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

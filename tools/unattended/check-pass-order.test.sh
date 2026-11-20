@@ -997,7 +997,7 @@ for wv in refused allowed; do
   if [ "$wv" = refused ]; then
     same  "unwitnessed under refused: the leg reds" "$rc" "1"
     has   "unwitnessed under refused: it names the commit made past the hooks" "$o" "$W_UN — a pass commit naming ARCH-tWit-1"
-    has   "unwitnessed under refused: the FAILED line says why" "$o" "hooks.bypass is refused at HEAD"
+    has   "unwitnessed under refused: the FAILED line says why" "$o" "pass-order FAILED — hooks.bypass is refused at HEAD, and these pass commits carry no Commit-Checked: trailer, so each was made past the commit check"
   else
     same  "unwitnessed under allowed: the leg stays green" "$rc" "0"
     has   "unwitnessed under allowed: it lists the commit as a note" "$o" "pass-order: note — hooks.bypass is allowed at HEAD"
