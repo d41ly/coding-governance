@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing
 
-**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-101..103
 
 **Carries:** cl-dClosedLoop-0366@337938da whole
 
@@ -182,6 +182,7 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
 - Writing a repository's overlay for it: the conversion of a legacy row into a `[[gate-leg]]` row is the
   owner's edit through the overlay's door, never an emitter's write.
 - Gov's own manifest: it has no overlay, and its rows stay TOOL-dWitnessedBar-11's declarations.
+- The round-1 minors ids 7 and 46 (`leg sources`' `enforces`, `product_tests.py`'s composition) wait here with this unit.
 
 ### Edges
 
@@ -192,7 +193,6 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
 - **consumes-from** `TOOL-dWitnessedBar-15` — `test.seed`, which seeds the hand-added population once from `leg_factory.py --legacy-rows`
 - **consumes-from** external — PLAY-dOrderedCharter-35 S1, S3, S5 to S8, S10 and S12, PLAY-dOrderedCharter-36 S1 to S7, PLAY-dOrderedCharter-33 S3 and S7, PLAY-dOrderedCharter-46 S1, S2 and S6, PLAY-dOrderedCharter-17 S9, TOOL-dSafePassage-9 S4 and TOOL-dSafePassage-10 S1 to S4, landed by the chain before this build run; and TOOL-dDeclaredLoop-24 S3, the per-kind composition `render_playbook.py`'s delta report runs over every kind with a `schema` (§8 F8)
 - **consumes-from** `TOOL-dWitnessedBar-45` — the govkit-free path of `leg_factory.py`, on which `--sources`, `--legacy-rows` and the composition must stay so that an adopter's bar can run them (id 33)
-- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 7 and 46: `leg sources`' `enforces`, and the composition `product_tests.py` detects before it reads `declared-with-runners`, each a scope item of that unit
 
 ## 4. Design
 
@@ -478,9 +478,8 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   would still compose the kind a second time. Recommendation: (a), since the drift verb is already
   the one composition per update, writing every kind's orders and holding the update under `refuse`
   before a byte is written. RESOLVED (owner, 2026-11-05): (a) the drift verb governs, by an ask to
-  dOrderedCharter. The ask this build run files in `memory/builds/dOrderedCharter/BACKLOG.md` is
-  (a)'s three changes, beside TOOL-dDeclaredLoop-26 F5's. Re-grounded at `fed256d71`, the ruling
-  unchanged: (b)'s `compose` verb has since landed and serves neither S5 nor S8 (§2 S8), and (a)'s
+  dOrderedCharter, filed as TOOL-dWitnessedBar-101: (a)'s three changes, beside TOOL-dDeclaredLoop-26
+  F5's. Re-grounded at `fed256d71`, the ruling unchanged: (b)'s `compose` verb has since landed and serves neither S5 nor S8 (§2 S8), and (a)'s
   changes are all still owed (§2 S5).
 - **F7 — Does a refused overlay row withhold the leg step?** PLAY-dOrderedCharter-36 S7 makes a check
   finding refuse the whole composition, so under the parents as written a patch to a fixed leg, an
@@ -494,8 +493,8 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   refused composition, write gov's rows as shipped with no overlay row, which drops the adopter's valid
   rows with the bad one. (b) misses §1's "every other leg lands"; (c) loses legs the adopter
   wrote correctly. Recommendation: (a). RESOLVED (owner, 2026-11-05): (a) a row-level hold, by an
-  ask to dOrderedCharter. The ask this build run files in `memory/builds/dOrderedCharter/BACKLOG.md`
-  is (a)'s row-level hold, recorded as a deviation of 36 S7 until it lands.
+  ask to dOrderedCharter, filed as TOOL-dWitnessedBar-102: (a)'s row-level hold, recorded as a
+  deviation of 36 S7 until it lands.
 - **F8 — Does the render compose the gate-leg kind once S1 gives it a `schema`?** Forced by the
   re-ground at `fed256d71`. `tools/playbook/render_playbook.py#read_kind_rows` composes every kind the
   register lists with a `schema` through `tools/playbook/overlay_rows.py#derive_kind_composition`
@@ -511,8 +510,8 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   namespace `source`. (b) puts a per-kind branch in a reader every kind shares ([core]); (c) has no
   file to name, since gov's rows are the selected kits' declarations, not one file at `HEAD`.
   Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), by M3: the one option that
-  keeps one composition and adds no per-kind branch, and the tie-break's reuse of F6's ask.
-  widens: none · relaxes: none
+  keeps one composition and adds no per-kind branch, and the tie-break's reuse of F6's ask; filed
+  as TOOL-dWitnessedBar-103. widens: none · relaxes: none
 - **F9 — What lands where the legacy list's home has no directory?** Forced by the re-ground's
   brief `2026-11-19-prompt-TOOL-dWitnessedBar-28-reground-brief`, which keeps every `[[ledger]]` home
   under `memory/project/`. `seed` refuses a home whose directory is absent
@@ -572,6 +571,7 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   symbol; the landed composer, field reader and order writer named; S11 reuses the shared witness;
   unit 12's tags fill S3; the ledger home moves under `memory/project/`; Files touched gains the
   paths S4, S8 and §7 write; F8 to F10 resolved, delegated. Goal and Scope intent unchanged.
+- rev-7 · 2026-11-20 · header · §3 · §8 F6 to F8 · by `2026-11-19-prompt-TOOL-dWitnessedBar-28-defer-brief`.
 
 ## 10. Reuse audit
 
