@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-20-build-TOOL-dSkippedRecord-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dSkippedRecord-1-agent-ledger.md) | journal | TOOL-dSkippedRecord-1 |
 | [2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix.md) | research | — |
