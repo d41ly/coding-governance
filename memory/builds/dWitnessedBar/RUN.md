@@ -491,3 +491,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T08:53:37Z draw · re-dispatch · TOOL-dWitnessedBar-8 · 88/180 · 20261120T085337Z-9e853a
 
 2026-11-20T08:53:37Z dispatch · item 531336dc TOOL-dWitnessedBar-8 · reason .githooks/pre-push.test.sh .governance/policy.json help/reference/policy.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt tools/run-gates/README.md tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/verdict_flow.py tools/unattended/unattended.sh memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-8-deviation-81.md memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-8-deviation-82.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-8-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-20T09:48:09Z brief · item TOOL-dWitnessedBar-1 · reason 2ae724760d05 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-1-build-brief.md
+
+2026-11-20T09:48:09Z brief · item TOOL-dWitnessedBar-59 · reason cbc2208a1e3d memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-59-build-brief.md
