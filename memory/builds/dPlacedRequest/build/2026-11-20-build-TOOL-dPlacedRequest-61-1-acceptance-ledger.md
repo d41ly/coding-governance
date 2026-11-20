@@ -40,6 +40,10 @@ after.
 - A label no bullet carries, `bullet 59 AC99`, and a heading no section opens each read empty, so every `holds` above is a read that can come back without its token. (DERIVED)
 - The first swap staged for AC20 moved S21's prose line, which names both tokens on one line, so the swap was confined to the oracle's section, the population the criterion reads. (DERIVED)
 - Unit 59's ledger records its AC3 red half as diverged; this unit's AC3 reads that bullet's text only and is unaffected. (DERIVED)
+- The bug-class checklist over the pass commit selected `fixture-passes-by-finding-nothing`: every hold above has a read that came back without its token, the empty label and heading, or a scratch copy. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line, each contained in a token its criterion names. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: AC20's swap moves the shipped lines themselves, and the other copies cut or respell the shipped phrase. (DERIVED)
+- It selected `inline-fence-swallows-the-rest-of-the-file` and `pipe-in-a-code-span-splits-a-table-cell`: this record holds no fence and no table. (DERIVED)
 
 ## Items diverged
 
