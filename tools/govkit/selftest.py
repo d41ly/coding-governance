@@ -19567,6 +19567,41 @@ user_skills = "/tmp/gk-fake-skills"
               and "the gate-leg step refused" not in _u13c.stdout,
               _u13c.stdout[-1400:] + _u13c.stderr[-600:])
 
+        # ---- [dHG-1 S5]. A RETIRED KIT'S LEG LEAVES WITH THE KIT. The receipt records two legs of a
+        # ---- kit no descriptor declares, both in the runner: one at its recorded argv, one the
+        # ---- target edited. `update --write` removes the first from the runner and both from the
+        # ---- receipt; the edited one stays in the runner as the target's own.
+        _g5r = build_gov13("dhg5")
+        _t5r = build_target13("dhg5")
+        run_gov13(_g5r, "apply", "--target", str(_t5r))
+        settle(_t5r, "after apply")
+        _gone = [{"name": "retired wiring", "kit": "retired-kit", "argv": ["bash", "scripts/retired/check.sh"]},
+                 {"name": "retired edited", "kit": "retired-kit", "argv": ["bash", "scripts/retired/edit.sh"]}]
+        _rc5r = read_receipt13(_t5r)
+        _rc5r["gate_runner"]["emitted"] += [dict(e, guard=[], subject="repo") for e in _gone]
+        (_t5r / ".governance" / "install.json").write_text(
+            json.dumps(_rc5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        _lg5r = json.loads((_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+        _lg5r += [{"name": _gone[0]["name"], "argv": _gone[0]["argv"]},
+                  {"name": _gone[1]["name"], "argv": [*_gone[1]["argv"], "--theirs"]}]
+        (_t5r / "scripts" / "gate-legs.json").write_text(
+            json.dumps(_lg5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t5r, "the receipt records a retired kit's legs")
+        write_vintage13(_g5r)
+        _u5r = run_gov13(_g5r, "update", "--target", str(_t5r), "--write")
+        _left5r = [e.get("name") for e in json.loads(
+            (_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))]
+        check("[dHG-1 AC5] update --write drops a retired kit's untouched leg from the runner and keeps "
+              "the one the target edited",
+              "retired wiring" not in _left5r and "retired edited" in _left5r
+              and "dropped   leg 'retired wiring'" in _u5r.stdout
+              and "released  leg 'retired edited'" in _u5r.stdout,
+              f"{_left5r} · " + _u5r.stdout[-1400:] + _u5r.stderr[-600:])
+        check("[dHG-1 AC5] ...and the restamped receipt claims neither, while the live kit's leg stays",
+              not any(n.startswith("retired ") for n, _k in read_owned13(_t5r))
+              and any(k == "demo" for _n, k in read_owned13(_t5r)),
+              str(read_owned13(_t5r)))
+
         # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
         # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,
         # ---- and until this unit `apply` passed no carry, so that kit's leg left `emitted` while its

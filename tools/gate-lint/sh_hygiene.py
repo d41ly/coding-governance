@@ -154,6 +154,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -384,6 +385,59 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
     return found
 
 
+# >>> home_graded_py — canonical copy: home_graded.py in gov's lib dir (byte-identical; gated)
+def derive_home_graded(root):
+    """The set of tracked paths under `root` that a `.governance/install.json` `engine` row installed
+    at gov's own bytes (`oid` == `gov_oid`) and that still hash to them. Empty when there is no
+    receipt, it does not read, or the hash fails: the caller then grades every path, as before."""
+    import json
+    import pathlib
+    import subprocess
+    root = pathlib.Path(root)
+    try:
+        rows = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    want = {}
+    for row in rows:
+        if not isinstance(row, dict) or row.get("role") != "engine":
+            continue
+        path, oid = row.get("path"), row.get("oid")
+        if isinstance(path, str) and isinstance(oid, str) and oid and oid == row.get("gov_oid") \
+                and ".." not in path.split("/") and (root / path).is_file():
+            want[path] = oid
+    if not want:
+        return set()
+    paths = sorted(want)
+    try:
+        out = subprocess.run(["git", "hash-object", "--stdin-paths"], cwd=str(root),
+                             input="".join(p + "\n" for p in paths), capture_output=True,
+                             text=True, encoding="utf-8")
+    except OSError:
+        return set()
+    got = out.stdout.split()
+    if out.returncode != 0 or len(got) != len(paths):
+        return set()
+    return {p for p, oid in zip(paths, got) if oid == want[p]}
+# <<< home_graded_py
+
+
+_HOME_TOLD: set = set()
+
+
+def remove_home_graded(root: pathlib.Path, rels: list[str]) -> list[str]:
+    """`rels` less the files gov installed here at its own bytes (TOOL-dHomeGraded-1 S2). Those are
+    gov's code, graded on gov's bar against gov's registries; grading them here against this tree's
+    declaration lists sites nobody in this tree wrote. Said once per root, with the count."""
+    home = derive_home_graded(root)
+    kept = [rel for rel in rels if rel not in home]
+    if len(kept) != len(rels) and str(root) not in _HOME_TOLD:
+        _HOME_TOLD.add(str(root))
+        print(f"sh-hygiene: {len(home)} file(s) .governance/install.json installed at gov's own bytes "
+              f"are gov's to grade and are not graded here; an edited one is")
+    return kept
+
+
 def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]], int]:
     """Every tracked `*.sh` under `root`, classified. Returns (findings, files scanned).
 
@@ -399,7 +453,7 @@ def scan_tree(root: pathlib.Path) -> tuple[dict[str, list[tuple[str, int, str]]]
         # zero files; only one of them means "there is nothing here to grade".
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
-    paths = [p for p in listing.stdout.split("\0") if p]
+    paths = remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])
     total: dict[str, list[tuple[str, int, str]]] = {key: [] for key, _l, _g in CLASSES}
     scanned = 0
     for rel in sorted(paths):
@@ -923,7 +977,7 @@ def read_shell_sources(root: pathlib.Path, pathspecs: list[str]) -> list[tuple[s
         raise OSError("git ls-files failed, so the population could not be derived at all: "
                       + (listing.stderr or "").strip())
     sources = []
-    for rel in sorted(p for p in listing.stdout.split("\0") if p):
+    for rel in sorted(remove_home_graded(root, [p for p in listing.stdout.split("\0") if p])):
         full = root / rel
         name = rel.rsplit("/", 1)[-1]
         if not full.is_file() or not (name.endswith(".sh") or "." not in name):
@@ -2036,6 +2090,41 @@ def run_selftest() -> int:
     test("stage [registry] an undeclared key and a stale row are two findings, the first in the mode's words",
          (len(stage_problems), stage_problems[0] == STAGE_UNDECLARED.format(rel="a.sh", count=1),
           "no longer finds" in stage_problems[1]), (2, True, True), say=True)
+
+    # HOME-GRADED (TOOL-dHomeGraded-1 S2). Two files carrying the same fixed-name temp, one claimed by a
+    # receipt `engine` row at gov's bytes: only the other is named. Then the claimed one is edited, and
+    # both are: a receipt row excuses gov's bytes, never a file this tree changed.
+    held = {name: os.environ.pop(name) for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")
+            if name in os.environ}
+    try:
+        with tempfile.TemporaryDirectory() as scratch:
+            tree = pathlib.Path(scratch)
+            site = b'printf x >"$dst.tmp"\nmv "$dst.tmp" "$dst"\n'
+            (tree / "kit.sh").write_bytes(site)
+            (tree / "own.sh").write_bytes(site)
+            (tree / "reg.txt").write_text("", encoding="utf-8")
+            for argv in (["git", "init", "-q", "."], ["git", "add", "-A"]):
+                subprocess.run(argv, cwd=str(tree), capture_output=True, check=True)
+            oid = subprocess.run(["git", "hash-object", "kit.sh"], cwd=str(tree), capture_output=True,
+                                 text=True, check=True).stdout.strip()
+            (tree / ".governance").mkdir()
+            (tree / ".governance" / "install.json").write_text(json.dumps({"files": [
+                {"path": "kit.sh", "role": "engine", "oid": oid, "gov_oid": oid}]}), encoding="utf-8")
+            homed = []
+            for body in (site, site + b"# edited here\n"):
+                (tree / "kit.sh").write_bytes(body)
+                _HOME_TOLD.clear()
+                said = io.StringIO()
+                with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+                    code = run_temp_scan([str(tree / "reg.txt"), str(tree)])
+                homed.append((code, "kit.sh:" in said.getvalue(), "own.sh:" in said.getvalue(),
+                              "gov's own bytes" in said.getvalue()))
+            test("home-graded: a receipt engine row at gov's bytes leaves its file out, the other named",
+                 homed[0], (1, False, True, True), say=True)
+            test("home-graded: the same file edited here is graded again",
+                 homed[1], (1, True, True, False), say=True)
+    finally:
+        os.environ.update(held)
 
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")

@@ -11123,6 +11123,26 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_home_graded",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "derive_home_graded",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "derive_home_graded",
+      "kind": "function",
+      "file": "tools/lib/home_graded.py"
+    },
+    {
+      "id": "derive_home_graded",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
       "id": "derive_home_line",
       "kind": "function",
       "file": "tools/policy/budgets.py"
@@ -19698,6 +19718,11 @@
       "file": "tools/playbook/instructions_edit.py"
     },
     {
+      "id": "read_declared_runner",
+      "kind": "function",
+      "file": "tools/run-gates/pass_legs.py"
+    },
+    {
       "id": "read_default_tree",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -23911,6 +23936,11 @@
       "id": "remove_group_residue",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "remove_home_graded",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "remove_ih_tip",

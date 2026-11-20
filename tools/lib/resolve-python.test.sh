@@ -405,6 +405,7 @@ needs_graph_py|$ROOT/$KIT_REL/needs_graph.py|$KIT_REL/needs_graph
 run_tree_kill_py|$ROOT/$KIT_REL/run_tree_kill.py|$KIT_REL/run_tree_kill
 guarded_write_py|$ROOT/$KIT_REL/guarded_write.py|$KIT_REL/guarded_write
 read_open_py|$ROOT/$KIT_REL/read_open.py|$KIT_REL/read_open
+home_graded_py|$ROOT/$KIT_REL/home_graded.py|$KIT_REL/home_graded
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.

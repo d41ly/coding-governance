@@ -4541,6 +4541,28 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 if dropped and not guards:
                     print(f"govkit {verb} — gate leg '{nm}': UNGUARDED "
                           f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
+        # A RETIRED KIT'S LEG LEAVES WITH THE KIT (TOOL-dHomeGraded-1 S5). The carry below keeps every
+        # prior row whose kit is outside this run's scope, and a retired kit is outside every scope,
+        # so its row stayed in the runner after its files were withdrawn and ran a deleted script:
+        # agent-instructions' wiring leg exited 127 on every adopter that took its retirement. A row
+        # is ORPHANED when its kit is in no descriptor gov reads AND no descriptor declares a leg of
+        # its name, so a renamed kit whose successor carries the leg keeps it through the claim path
+        # above. An orphan whose runner row still holds the recorded argv is gov's and is removed;
+        # one the target changed is left in the runner as theirs. Either way the receipt stops
+        # claiming it, since gov no longer ships anything that could stand behind it.
+        _declared = {leg.get("name") for _d, _p in descs.values() for leg in _d.get("gate_leg", [])}
+        _orphaned = {e.get("name") for e in prior
+                     if e.get("kit") and e.get("kit") not in descs and e.get("name") not in _declared}
+        for _e in (e for e in prior if e.get("name") in _orphaned):
+            _at = next((i for i, row in enumerate(existing) if row.get("name") == _e.get("name")), None)
+            if _at is not None and existing[_at].get("argv") == _e.get("argv"):
+                del existing[_at]
+                print(f"  dropped   leg '{_e.get('name')}' — kit {_e.get('kit')} is in no descriptor "
+                      f"gov reads and no descriptor declares the leg")
+            elif _at is not None:
+                print(f"  released  leg '{_e.get('name')}' — kit {_e.get('kit')} is in no descriptor, "
+                      f"and the runner's row differs from the one recorded, so it stays as the "
+                      f"target's own")
         if len(r.problems) == _legs_problems_before:
             rf.parent.mkdir(parents=True, exist_ok=True)
             # S6, AND SINCE DEPL-cMendedVintage-21 IT IS ONE HELPER RATHER THAN THIS SITE'S OWN
@@ -4564,7 +4586,8 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
             # carried too, which is the safe direction: this run cannot prove it owns one.
             if carry_out_of_scope:
                 _scope = set(selection)
-                emitted = [e for e in prior if e.get("kit") not in _scope] + emitted
+                emitted = [e for e in prior if e.get("kit") not in _scope
+                           and e.get("name") not in _orphaned] + emitted
         else:
             # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
             # and a receipt claiming N emitted legs it never wrote.

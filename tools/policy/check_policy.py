@@ -967,6 +967,17 @@ def arm_cap_census(repo, kit):
         else:
             rel = budgets.resolve_prefix_token(cap.installed, held.get("prefix"))
             missing = f"its enforcer is not a file at {rel}, where kit {cap.kit} installs it"
+            # A KIT HOMED ELSEWHERE IS FOUND THROUGH THE RECEIPT (TOOL-dHomeGraded-1 S4). The prefix
+            # path is the default home; an adopter that installs the memory-tree kit flat under its
+            # prefix has the enforcer one directory up, and the receipt's `source` column is the only
+            # record of where it went. `resolve_kit_dir` reads that column, as the readers above do.
+            _home = cap.installed.split("/")
+            if not Path(repo, rel).is_file() and len(_home) == 3 and _home[0] == "{prefix}":
+                try:
+                    found = resolve_kit_dir(_home[1], _home[2], repo) / _home[2]
+                    rel = found.relative_to(Path(repo).absolute()).as_posix()
+                except (LookupError, ValueError):
+                    pass
         path = Path(repo, rel) if rel else None
         if path and not path.is_file():
             out.append((cap.name, missing))
@@ -1741,6 +1752,34 @@ def run_census_default_adopter(name):
                            bool(dest) and want in said.getvalue().splitlines()
                            and "cap census: manifest-bytes ·" not in said.getvalue() and not found,
                            f"{render_said(said.getvalue(), 'line-length ·')} · {found or 'no finding'}"))
+            # TOOL-dHomeGraded-1 S4: an enforcer an adopter homes flat, one directory above its kit's
+            # default home, is found through the receipt row that records where it went; with that row
+            # gone too, the census names the default path it looked at.
+            prefix = json.loads(Path(t, RECEIPT_REL).read_text(encoding="utf-8")).get("prefix")
+            census = budgets.read_cap_census(t)
+            cap = next((c for c in census.values() if c.ships and c.installed.count("/") == 2
+                        and Path(t, budgets.resolve_prefix_token(c.installed, prefix)).is_file()), None)
+            checks.append(("the flat-home plant", "an installed census enforcer under a kit home", cap is not None,
+                           cap.name if cap else "none"))
+            if cap is not None:
+                home_rel = budgets.resolve_prefix_token(cap.installed, prefix)
+                flat_rel = posixpath.join(posixpath.dirname(posixpath.dirname(home_rel)), posixpath.basename(home_rel))
+                Path(t, home_rel).rename(Path(t, flat_rel))
+                rec = json.loads(Path(t, RECEIPT_REL).read_text(encoding="utf-8"))
+                for row in rec.get("files") or []:
+                    if row.get("path") == home_rel:
+                        row["path"] = flat_rel
+                Path(t, RECEIPT_REL).write_text(json.dumps(rec), encoding="utf-8")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    _n, _pop, found = arm_cap_census(t, KIT)
+                checks.append(("a flat-homed enforcer", f"{cap.name} found at {flat_rel} through the receipt",
+                               not any(k == cap.name for k, _w in found), f"{found or 'no finding'}"))
+                rec["files"] = [row for row in rec.get("files") or [] if row.get("path") != flat_rel]
+                Path(t, RECEIPT_REL).write_text(json.dumps(rec), encoding="utf-8")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    _n, _pop, found = arm_cap_census(t, KIT)
+                checks.append(("...with its receipt row gone", f"{cap.name} named at {home_rel}",
+                               any(k == cap.name and home_rel in w for k, w in found), f"{found or 'no finding'}"))
     except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
         checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
     finally:
