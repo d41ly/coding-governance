@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-6 — the verdict backends registered under `verdict`: the local hook, the peer-node verifier and the `remote-ci` slot with its witness rule and pin
 
-**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-7 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0344@5cea08b4 whole
 **Carries:** node:policy-key.verdict
@@ -69,7 +69,7 @@ moves into the slot as its reader.
   `DEAD PROBE` are no verdict and never green. Observed by AC2 and AC5.
 - **S4** — `local-hook`'s reader reads the runner-written per-tree verdict
   `<common-dir>/gate-verdict/<tree hash>` (shared interface I8, unit 4's, written in `<key>TAB<value>`
-  lines at `tools/run-gates/run-gates.sh@174f9d9e5:6125-6145`) for the SHA's tree, the full slot only
+  lines at `tools/run-gates/run-gates.sh@51fb8d207:6224-6244`) for the SHA's tree, the full slot only
   and never the `.scoped` slot the same writer keeps beside it, and stands when its `verdict` line
   reads `GREEN`. Observed by AC3.
 - **S5** — `peer-node`: the verb `python verdict_backends.py verify-peer [--remote <name>]`, run on
@@ -99,9 +99,9 @@ moves into the slot as its reader.
   kit that does not resolve prints one `held reader: DEAD PROBE` line and files nothing. It keeps
   filing each red through `write_leg_ask` (unit 8's, shared interface I13), as it does at HEAD. The bash
   function leaves `unattended.sh`. Its name is spelled at the definition, at its one call inside
-  `write_held_asks` (`tools/unattended/unattended.sh@174f9d9e5:11112`), at the suite's stub
-  (`tools/unattended/unattended.test.sh@174f9d9e5:16776`) and at its `unset -f`
-  (`tools/unattended/unattended.test.sh@174f9d9e5:16808`), and nowhere else outside `memory/`
+  `write_held_asks` (`tools/unattended/unattended.sh@51fb8d207:11114`), at the suite's stub
+  (`tools/unattended/unattended.test.sh@51fb8d207:16800`) and at its `unset -f`
+  (`tools/unattended/unattended.test.sh@51fb8d207:16832`), and nowhere else outside `memory/`
   (DERIVED by `git grep -n read_held_reds`). Observed by AC7.
   **Readers:**
   by name: `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`.
@@ -113,7 +113,7 @@ moves into the slot as its reader.
   under `app-only` the source check is skipped and a passing read is `GREEN` with witness `claimed`,
   never `witnessed`. The owner item: the unattended driver's gates-green term, the site in
   `tools/unattended/unattended.sh#dod_met` that calls `write_held_asks` and then
-  `write_flake_releases` (`tools/unattended/unattended.sh@174f9d9e5:12249-12252`), reads the slot
+  `write_flake_releases` (`tools/unattended/unattended.sh@51fb8d207:12251-12254`), reads the slot
   under `verdict = remote-ci` after them, inside the same capture put back, and files a pin `HELD`
   through `write_leg_ask <slug> remote-ci 'pin held: backend' ...` (unit 8's), reused while open;
   outside a run the lander's refusal line names it. Observed by AC6.
@@ -215,7 +215,7 @@ GET /repos/<o>/<r>/check-suites/<check_suite_id>
 ```
 
 The owner and repository come from the anchor URL, as `read_held_reds` parses them today
-(`tools/unattended/unattended.sh@174f9d9e5:10917`). Every request goes through `read_api`, the same
+(`tools/unattended/unattended.sh@51fb8d207:10919`). Every request goes through `read_api`, the same
 bounded GET the held reader uses; a non-200, an oversize body or a non-JSON body is `DEAD PROBE`. The
 pinned blobs at `head_sha` are read from the local object database (`git rev-parse <sha>:<path>`); a
 SHA the clone lacks is `DEAD PROBE`, never fetched implicitly.
@@ -232,7 +232,7 @@ SHA the clone lacks is `DEAD PROBE`, never fetched implicitly.
 
 `--responses <dir>` points `read_api` at canned JSON files named by request path, an arm seam and
 not a conf key, as `GATE_VERDICT_FAULT` is one for the runner
-(`tools/run-gates/run-gates.sh@174f9d9e5:4052`, `tools/run-gates/run-gates.sh@174f9d9e5:5983`).
+(`tools/run-gates/run-gates.sh@51fb8d207:4052`, `tools/run-gates/run-gates.sh@51fb8d207:6078`).
 
 ### Inventory
 
@@ -285,15 +285,21 @@ pass moves each version it names at the kit's own version home.
 - `memory/guides/SESSION-KICKOFF.md`: its `watch:` line holds `tools/run-gates/run-gates.sh`, so its
   `last-audit` is re-stamped
 
-Shared with sibling units: `tools/run-gates/run-gates.sh`, `tools/run-gates/README.md`,
-`tools/policy/policy.py` and `memory/guides/SESSION-KICKOFF.md` with `TOOL-dWitnessedBar-29` (order
-25); `memory/map/generated/symbols.json` with `TOOL-dWitnessedBar-7` (order 26);
-`tools/unattended/unattended.sh` and `tools/unattended/unattended.test.sh` with
-`TOOL-dWitnessedBar-21` (order 27). Each lands before this unit, at order 28. Of the landed units,
-`tools/run-gates/README.md` was moved by `TOOL-dWitnessedBar-1` and `TOOL-dWitnessedBar-30`, and
-`tools/unattended/unattended.sh`, `tools/policy/catalogue.toml`, `tools/policy/unsummarised-keys.txt`
-and `help/reference/policy.md` by `TOOL-dWitnessedBar-30`, whose `write_flake_releases` now sits
-beside `write_held_asks` at S8's call site.
+Shared with landed sibling units, settled at `51fb8d207`; this unit builds alone at order 28.
+`TOOL-dWitnessedBar-29` (`b0ad98958`) moved `tools/run-gates/run-gates.sh` (`scan_leg_warnings`,
+whose `warn.<k>` rows go to the run record, never to S4's per-tree writer),
+`tools/run-gates/README.md` and `memory/guides/SESSION-KICKOFF.md`'s `last-audit`;
+`tools/policy/policy.py` moved under none of them (`git diff 174f9d9e5 HEAD` prints nothing for it).
+`memory/map/generated/symbols.json` moved under `TOOL-dWitnessedBar-29`, `TOOL-dWitnessedBar-7`
+(`28edeaa0b`) and `TOOL-dWitnessedBar-21` (`cd03e4e75`), whose driver and suite hunks sit in
+`--dispatch`, `--check-commit` and their arms, away from S7's and S8's sites. The driver gains no
+refusal site: S7's and S8's lines print and return 0, never `exit 1` or `status=1`, and
+`read_held_reds` holds none, so `check-arms.py --emit-floors` keeps the driver at
+343 sites, 339 armed, its `REFUSAL_CEILINGS` row 343 (TOOL-dDeclaredLoop-52) unmoved (DERIVED
+2026-11-20 at `51fb8d207`). Earlier, `tools/run-gates/README.md` was moved by `TOOL-dWitnessedBar-1`
+and `TOOL-dWitnessedBar-30`, and `tools/unattended/unattended.sh`, `tools/policy/catalogue.toml`,
+`tools/policy/unsummarised-keys.txt` and `help/reference/policy.md` by `TOOL-dWitnessedBar-30`, whose
+`write_flake_releases` now sits beside `write_held_asks` at S8's call site.
 
 ### Alternatives rejected
 
@@ -358,7 +364,9 @@ beside `write_held_asks` at S8's call site.
 - **AC7** — When `python remote_verdict.py held --responses <dir> https://github.com/o/r remote-ci.yml`
   runs over a fixture of two held jobs, one `failure`, it prints two `held` rows and the liveness line
   `held reader: run <id> at <sha8> · 2 held job(s) read · 1 red`; and
-  `git grep -n 'read_held_reds()' tools/unattended` prints nothing.
+  `git grep -n 'read_held_reds()' tools/unattended` prints nothing; and
+  `python tools/memory-tree/check-arms.py --emit-floors` names `tools/unattended/unattended.sh` at
+  no more sites than its ceiling (TOOL-dDeclaredLoop-52).
   Red when: the moved reader's rows differ from the bash function's, or the function stays.
 - **AC8** — When `python remote_verdict.py pin` runs at HEAD with `verdict.remote.pin-scope` at
   `dispatch-closure`, it prints four `<path> <blob>` lines whose blobs equal `git rev-parse
@@ -496,6 +504,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · the h9 arm re-poin
   kickoff manifest, the gov arm suite and the policy and loop kits' version lines; the leg line gains
   the legs those paths' guards name (PINNED, measured 2026-11-20 by the spec-token checker's guards
   join).
+- rev-7 · 2026-11-20 · S4 S7 S8 · §4 · AC7 · §10 · re-grounded over HEAD `51fb8d207` past the
+  landed TOOL-dWitnessedBar-29, TOOL-dWitnessedBar-7 and TOOL-dWitnessedBar-21 by the brief
+  `2026-11-19-prompt-TOOL-dWitnessedBar-6-reground4-brief`: the moved runner, driver and suite
+  citations re-pinned there; Files touched's shared paragraph names what each landed unit moved,
+  `tools/policy/policy.py` moved by none, and the driver's refusal-site census unmoved at its
+  ceiling (DERIVED), observed by AC7; the registry's absence re-pinned; nothing else moved.
 
 ## 10. Reuse audit
 
@@ -516,6 +530,6 @@ tools/codebase-map/reuse_lookup.py "read a remote CI verdict for a commit sha fr
 ranked generic stems (`read_text`, `read`, `git`, `run_git`) and missed `read_held_reds`, whose body
 is a Python program inside a bash function, outside the symbol tier (re-run 2026-11-20); scout A found
 it by reading. No registry of verdict backends exists at HEAD: `git grep -n verdict_backend --
-':!memory'` prints nothing (PINNED 2026-11-20 at `174f9d9e5`).
+':!memory'` prints nothing (PINNED 2026-11-20 at `51fb8d207`).
 
 Recall terms used: `python tools/memory-recall/query.py "when does a remote CI verdict stand as a witness for a landing and what backends exist" --terms "verdict backend remote-ci peer-node local-hook head_sha workflow pin trust held reader registry"`
