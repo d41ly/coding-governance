@@ -299,12 +299,10 @@ policy:trace.identity	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.rows	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:transitions.record	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:verdict.blocks	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.flakes	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.flakes.entry	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.flakes.release	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.held	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:verdict.red-route	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.pin	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.pin-scope	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.trust	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

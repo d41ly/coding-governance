@@ -7,6 +7,7 @@ SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a
 # The kit root is the one the hook itself reads: GOV_KITROOT as `.githooks/gate-env.sh` declares it
 # (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
 KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
+PK=policy  # the policy kit, named once
 [ -n "$KIT_REL" ] || { echo "pre-push.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
 # TOOL-aRepatriatedFork-46: the run-gates kit is named by the NAME its directory has under that kit
@@ -1401,7 +1402,7 @@ printf 'x\t%s\t1\t0\t%s\t%s\t-\t-\t%s\tstub\n' "${IR_VERDICT:-INHERITED}" "${GAT
 printf 'policy=%s age=%s attr=%s\n' "${GATE_VERDICT_BLOCKS:-}" "${GATE_INHERITED_RED_MAX_AGE:-}" "${GATE_ATTRIBUTE:-}" > "$IR_ENV"
 echo "FAKE LEG failed"; exit 1
 IRSTUB
-plant_ir_policy() { # value | "" (a policy file with no [verdict]) -> .governance/policy.toml in the cwd
+write_ir_policy() { # value | "" (a policy file with no [verdict]) -> .governance/policy.toml in the cwd
   mkdir -p .governance
   if [ -n "$1" ]; then printf '[verdict]\nblocks = "%s"\n' "$1" > .governance/policy.toml
   else printf '[runtime]\nagents-in-flight = 6\n' > .governance/policy.toml; fi
@@ -1417,12 +1418,12 @@ build_ir_fixture() { # tag · kit (kit:<value>, kit: for no key, nokit, broken) 
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
   case "$kit" in
-    kit:*) mkdir -p "$KIT_REL/policy"
-           cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
-              "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/"
-           plant_ir_policy "${kit#kit:}" ;;
-    broken) mkdir -p "$KIT_REL/policy"
-            printf 'import sys\nsys.exit(3)\n' > "$KIT_REL/policy/policy.py" ;;
+    kit:*) mkdir -p "$KIT_REL/$PK"
+           cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+              "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+           write_ir_policy "${kit#kit:}" ;;
+    broken) mkdir -p "$KIT_REL/$PK"
+            printf 'import sys\nsys.exit(3)\n' > "$KIT_REL/$PK/policy.py" ;;
   esac
   printf '%b' "$body" > .githooks/gate-env.sh
   # The kit root, on the rung this hook reads it from when no receipt or root install names it.
@@ -1447,7 +1448,7 @@ write_ir_stamp() { # sha · base · max_age · blocks -> a planted gate-inherite
 # AC1, the hook's half: R reads every-red and the pushed branch loosens its OWN copy to own-only. The
 # policy line reads every-red, and an inherited-only red is blocked. A reader of the pushed tree would land it.
 build_ir_fixture ac1 kit:every-red 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
-plant_ir_policy own-only
+write_ir_policy own-only
 git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself own-only" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
@@ -1476,7 +1477,7 @@ case "$_o" in
 esac
 # … and admitted under own-only at R, the value read there and not from the pushed tree.
 build_ir_fixture ac2o kit:own-only 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its fixture"
-plant_ir_policy every-red
+write_ir_policy every-red
 git add -A >/dev/null 2>&1; git commit -q -m "the branch tightens its own copy" >/dev/null 2>&1
 _o=$(run_ir_push IR_VERDICT=MIXED)
 case "$_o" in
@@ -1523,7 +1524,7 @@ done
 # reads every-red — a broken reader must never land a red. The branch's own copy says something else
 # each time, so a reader of the pushed tree is graded too.
 build_ir_fixture ac3d kit: 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
-plant_ir_policy every-red
+write_ir_policy every-red
 git add -A >/dev/null 2>&1; git commit -q -m "the branch declares every-red in its own copy" >/dev/null 2>&1
 _o=$(run_ir_push IR_AGE=aged)
 case "$_o" in
@@ -1629,7 +1630,7 @@ read_ir_policy() { # <repo> <sha> -> "<value> <bound>" as the sliced hook reader
     && read_policy_at "$2" && printf '%s %s' "$PP_POLICY" "$PP_MAX_AGE" )
 }
 _ir_want=$( cd "$SRC" || exit 1
-  _p=$(python "$KIT_REL/policy/policy.py" get verdict.blocks --rev HEAD 2>/dev/null) || _p=every-red
+  _p=$(python "$KIT_REL/$PK/policy.py" get verdict.blocks --rev HEAD 2>/dev/null) || _p=every-red
   _p=${_p%$'\r'}
   case "$_p" in own-only|own-mixed-contended|every-red) ;; *) _p=every-red ;; esac
   if _b=$(git show HEAD:.githooks/gate-env.sh 2>/dev/null); then
@@ -1647,13 +1648,13 @@ else
 fi
 # AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
 # every-red with a bound of 7 and one with no gate-env.sh and no key, which reads own-only, unbounded.
-_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks" "$_d/$KIT_REL/policy"
+_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks" "$_d/$KIT_REL/$PK"
 ( cd "$_d" && git init -q --template= && git config core.autocrlf false \
-  && cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
-        "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/" \
-  && plant_ir_policy every-red && printf 'INHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
+  && cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+        "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/" \
+  && write_ir_policy every-red && printf 'INHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
   && git add -A && git commit -q -m every-red7 \
-  && plant_ir_policy "" && git rm -q .githooks/gate-env.sh && git add -A && git commit -q -m absent ) >/dev/null 2>&1
+  && write_ir_policy "" && git rm -q .githooks/gate-env.sh && git add -A && git commit -q -m absent ) >/dev/null 2>&1
 _o1=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD~1 2>/dev/null)")
 _o2=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD 2>/dev/null)")
 if [ "$_o1" = "every-red 7" ] && [ "$_o2" = "own-only " ]; then
@@ -2067,10 +2068,10 @@ build_docs_fixture() { # tag · gate-env body (printf %b) · [verdict.blocks at 
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
   if [ -n "${3:-}" ]; then
-    git config core.autocrlf false; mkdir -p "$KIT_REL/policy"
-    cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
-       "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/"
-    plant_ir_policy "$3"
+    git config core.autocrlf false; mkdir -p "$KIT_REL/$PK"
+    cp "$SRC/$KIT_REL/$PK/policy.py" "$SRC/$KIT_REL/$PK/budgets.py" \
+       "$SRC/$KIT_REL/$PK/catalogue.toml" "$SRC/$KIT_REL/$PK/caps.toml" "$KIT_REL/$PK/"
+    write_ir_policy "$3"
   fi
   printf '%b' "$2" > .githooks/gate-env.sh
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh

@@ -231,7 +231,7 @@ def cmd_judge(run, leg, judgment, here=HERE):
 
 # ---- the fixtures ----------------------------------------------------------------------------------
 
-def plant_run(root, attribution, tails, failed):
+def write_run(root, attribution, tails, failed):
     run = pathlib.Path(root, "run")
     run.mkdir(parents=True)
     verdict = f"verdict\tRED\nfailed\t{failed}\ntree_moved\tno\n" + "".join(
@@ -250,7 +250,7 @@ def run_fixture_route():
         att = [(leg, cls, "1", "0", r, "-", "-", "-", blocks, "planted")
                for leg, cls, blocks in (("o", "OWN", "block"), ("m", "MIXED", "pass"), ("c", "CONTENDED", "pass"),
                                         ("i", "INHERITED", "pass"), ("d", "DEAD PROBE", "block"))]
-        run = plant_run(root, att, ["o", "m", "c", "i", "d", "gone"], 6)
+        run = write_run(root, att, ["o", "m", "c", "i", "d", "gone"], 6)
         rc, lines = cmd_route(run)
         out += lines
         want = {"o": "attribute", "m": "ask", "c": "ask", "i": "ask", "d": "probe-repair", "gone": "probe-repair"}
@@ -277,33 +277,36 @@ STUB_LOOP_NO_VERB = """import sys
 print("usage: python loop_lib.py --check | --scopes | --selftest")
 sys.exit(2)
 """
+LOOP_HOME = "loop"
+POLICY_HOME = "policy"
+
 STUB_POLICY = """import pathlib, sys
 print(pathlib.Path(__file__).with_name("value.txt").read_text().strip())
 """
 
 
-def plant_kits(root, loop, value):
+def write_kits(root, loop, value):
     here = pathlib.Path(root, "here")
     here.mkdir(parents=True)
     if loop is not None:
-        (here / "loop").mkdir()
-        (here / "loop" / "loop_lib.py").write_text(loop, encoding="utf-8")
-    (here / "policy").mkdir()
-    (here / "policy" / "policy.py").write_text(STUB_POLICY, encoding="utf-8")
-    (here / "policy" / "value.txt").write_text(value, encoding="utf-8")
+        (here / LOOP_HOME).mkdir()
+        (here / LOOP_HOME / "loop_lib.py").write_text(loop, encoding="utf-8")
+    (here / POLICY_HOME).mkdir()
+    (here / POLICY_HOME / "policy.py").write_text(STUB_POLICY, encoding="utf-8")
+    (here / POLICY_HOME / "value.txt").write_text(value, encoding="utf-8")
     return here
 
 
-def plant_routed(root):
+def write_routed(root):
     r = "0" * 40
     att = [(leg, "OWN", "1", "0", r, "-", "-", "-", "block", "planted") for leg in ("a", "b")]
     att.append(("p", "INHERITED", "1", "0", r, "-", "-", "-", "pass", "planted"))
-    run = plant_run(root, att, ["a", "b", "p"], 3)
+    run = write_run(root, att, ["a", "b", "p"], 3)
     cmd_route(run)
     return run
 
 
-def case_judge(run, leg, word, here):
+def run_judge(run, leg, word, here):
     try:
         return cmd_judge(run, leg, word, here)
     except Refusal as e:
@@ -315,9 +318,9 @@ def run_fixture_red_route():
     for value, want in (("fix-pass-or-design", {"code-miss": "fix-pass", "spec-wrong": "new-unit"}),
                         ("always-new-unit", {"code-miss": "new-unit", "spec-wrong": "new-unit"})):
         with tempfile.TemporaryDirectory(prefix="vflow-") as root:
-            here, run = plant_kits(root, STUB_LOOP, value), plant_routed(root)
+            here, run = write_kits(root, STUB_LOOP, value), write_routed(root)
             for leg, word in (("a", "code-miss"), ("b", "spec-wrong")):
-                rc, lines = case_judge(run, leg, word, here)
+                rc, lines = run_judge(run, leg, word, here)
                 out.append(f"{value}: " + " ".join(lines))
                 if rc != 0 or not lines[0].startswith(f"judge  {leg}  {word} -> {want[word]} "):
                     bad.append(f"under {value}, {word} read rc {rc}: {lines}")
@@ -332,8 +335,8 @@ def run_fixture_red_route():
                 ("a row not routed attribute", STUB_LOOP, "p", "code-miss", "routed ask, not attribute"))
     for what, loop, leg, word, said in refusals:
         with tempfile.TemporaryDirectory(prefix="vflow-") as root:
-            here, run = plant_kits(root, loop, RED_ROUTE_DEFAULT), plant_routed(root)
-            rc, lines = case_judge(run, leg, word, here)
+            here, run = write_kits(root, loop, RED_ROUTE_DEFAULT), write_routed(root)
+            rc, lines = run_judge(run, leg, word, here)
             out.append(f"{what}: rc {rc} · " + " ".join(lines))
             if rc != 2 or said not in " ".join(lines):
                 bad.append(f"{what} read rc {rc}, planted to exit 2 naming '{said}': {lines}")

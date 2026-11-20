@@ -48,7 +48,7 @@ TOOL-dWitnessedBar-3 is committed as 930a5289d on top of 2123e2146. The spec hea
 
 **Checks that ran** — none is a gate or suite. They stand in for the runner, hook, unattended and policy suite legs.
 - AC1: the section 6 command printed the four rows of the table; the `bogus` row equals every-red.
-- AC2: the grep counted 7 lines naming `lib-verdict.sh` in `run-gates.sh`.
+- AC2: the grep counted 7 lines naming `lib-verdict.sh` in `run-gates.sh` (DERIVED from the builder's probe).
 - AC3: `--fixture route` passed, including a red the attribution leaves out.
 - AC4:
   - The section 6 `eval` printed `rc 0` over the all-pass dir and `rc 1 y reads OWN and blocks` over the other.
