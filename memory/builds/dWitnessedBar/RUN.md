@@ -414,3 +414,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T04:43:45Z brief · item TOOL-dWitnessedBar-23 · reason 6b1e737aeb57 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-23-build-brief.md
 
 2026-11-20T04:43:46Z brief · item TOOL-dWitnessedBar-42 · reason d4a6a76f6550 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-42-build-brief.md
+
+2026-11-20T04:46:18Z dispatch · item 851afdcd TOOL-dWitnessedBar-23 · reason .claude/agents/gov-tester.md .claude/roles.json tools/govkit/selftest.py tools/roles/README.md tools/roles/agents/gov-tester.agent.md tools/roles/check_roles.py tools/roles/house/gov-tester.md tools/roles/kit.toml tools/roles/workflows.toml memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-23-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
