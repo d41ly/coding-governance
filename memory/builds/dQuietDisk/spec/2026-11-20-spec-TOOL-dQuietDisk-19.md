@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-19 — the before and after measurements, with their instruments
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling · order 5 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-20-build-TOOL-dQuietDisk-19-analysis.md](../build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md) | research | — |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 |
+| [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-17 TOOL-dQuietDisk-26 |
 
 <!-- /gen:spec-records -->
 
@@ -26,8 +27,8 @@ comparison derived from those readings.
 - **S2** — The B0 readings. Before the first unit pass, the main loop runs the instrument over
   subjects M1, M2 (cold and warm) and M3 at the run's pinned BASE. It commits the rows as the
   record's first version in a records commit carrying `Pass: none`. Observed by AC2 and AC3.
-- **S3** — The A readings. After the last order-3 unit is terminal and before this unit is
-  dispatched, the main loop takes two row sets at one sha A: A-off, with every switch this build
+- **S3** — The A readings. After every unit at orders 1 to 4 is terminal, TOOL-dQuietDisk-26 among
+  them, and before this unit is dispatched, the main loop takes two row sets at one sha A: A-off, with every switch this build
   added held at its today value, and A-on, with every switch at its default. It re-takes the A-on
   M2 rows once to show the instrument repeats, and commits all rows into the record in a records
   commit carrying `Pass: none`. Observed by AC2, AC3 and AC8.
@@ -35,7 +36,10 @@ comparison derived from those readings.
   Readings table, and every row names the unit that owns the saving and quotes the bound that
   unit's spec promises. Observed by AC4, AC5 and AC6.
 - **S5** — The unit pass writes the nicocares seed-suite section from the nicocares session's own
-  record, cited by repository, commit and path, or as F1 resolves. Observed by AC7.
+  record, cited by repository, commit and path. While that record does not exist, the section holds
+  the line `awaiting: fix4-nicocares-landed.md`, naming the nicocares session and the readings it
+  owes, and the unit closes; a records commit adds the readings when they land (F1). Observed by
+  AC7.
 - **S6** — The record carries the binding line, the dated filename and the seven sections §4 names
   in order, its Limits section included. Observed by AC9.
 
@@ -55,6 +59,8 @@ comparison derived from those readings.
 - A `--shard` reading of `tools/govkit/selftest.py`. The suite takes no shard flag at BASE or at
   `609cd40b1` (`grep -c shard` prints 0 over both), so M3 is the whole leg.
 - Commits the closing review folds in after A. They are not re-measured.
+- The units ordered after the A readings: TOOL-dQuietDisk-17 at order 5 and TOOL-dQuietDisk-9 at
+  order 6 land after A, so their savings are not read here. The Limits section says so.
 
 ### Edges
 
@@ -65,6 +71,8 @@ comparison derived from those readings.
   its today value for M1 and M3
 - **consumes-from** `TOOL-dQuietDisk-10` — the bound M1's saving is held to
 - **consumes-from** `TOOL-dQuietDisk-11` — the bound M3's saving is held to
+- **consumes-from** `TOOL-dQuietDisk-26` — the checker's one listing per invocation, which A's M1
+  rows hold because A is taken after it lands
 - **consumes-from** external — the nicocares session's record of its seed-suite readings
 
 ## 4. Design
@@ -81,8 +89,9 @@ another sha.
   line "the unit pass takes the after readings" cannot be built, and S3 gives them to the main loop.
 - `tools/unattended/gate-guard.js#readHeadRef` returns null for a detached HEAD, "because a
   detached HEAD keys nothing" (`tools/unattended/gate-guard.js@1252442ee677:708`). Its rows deny
-  a suite only where a run record's `run-branch:` equals the ref HEAD names. F2 is the question
-  this raises.
+  a suite only where a run record's `run-branch:` equals the ref HEAD names. F2 resolved (a) on
+  that reading: the main loop takes the M1 and M3 readings during RUNNING, in a detached scratch
+  clone.
 - The pass-order leg reads the remote's advertised tip, and a clone with no remote reads "this
   clone declares no remote to observe" (`tools/unattended/lib-unattended.sh@fe144f47d848:1470`).
   `read_history_range` then grades the whole history (`:1520-1536`), and the leg's summary line
@@ -210,7 +219,7 @@ Its sections, in this order:
 | `## Readings` | B0, then A commit | the header row, then the instrument's rows as printed, AC8's re-take included |
 | `## Switches set for A-off` | A commit | one row per key: the unit, the key, the value set, the subjects it governs |
 | `## Comparison` | unit pass | the table below |
-| `## nicocares seed suite` | unit pass | a `source:` line and its readings, or as F1 resolves |
+| `## nicocares seed suite` | unit pass | the `awaiting:` line, until a records commit puts a `source:` line and its readings in its place |
 | `## Limits` | unit pass | one line per limit below, and one `rc differs: <subject>` line per pair AC5 finds |
 
 The Readings header is `| label | sha | subject | run | rc | wall ms | git processes | peak temp | residual temp | top git subcommands | last line |`.
@@ -247,6 +256,10 @@ for a frozen oracle.
   environment is undercounted, and it is undercounted the same way at every label.
 - Wall time is indicative. Other sessions share the host, and this record does not read the load.
 - A direct suite run builds no per-bar snapshot, so `TOOL-dQuietDisk-8`'s saving does not show here.
+- `TOOL-dQuietDisk-26` carries no switch, so A-off holds its saving as A-on does. M1's saving between
+  A-off and A-on is `TOOL-dQuietDisk-10`'s alone; unit 26's shows in B0 against A, beside the history
+  the run adds, and in that unit's own acceptance ledger.
+- `TOOL-dQuietDisk-17` and `TOOL-dQuietDisk-9` land after A, so neither saving is read here.
 - Commits folded in after A are not measured.
 
 ### Files touched (estimate)
@@ -361,7 +374,7 @@ print("probe done")
 - **AC3** — When the block below runs, it prints `B0 is BASE` and `A is one ancestor of HEAD`, and
   no `late` line.
   Red when: B0 was taken at another sha than the pinned BASE, the A rows name two shas, or a commit
-  of units 1 to 18 lands after A, so A does not hold the work it is said to measure.
+  of a unit at orders 1 to 4 lands after A, so A does not hold the work it is said to measure.
 
   ```bash
   BASE=$(sed -n 's/^base:[[:space:]]*//p' memory/builds/dQuietDisk/RUN.md | head -1)
@@ -370,7 +383,7 @@ print("probe done")
   if [ -n "$B0" ] && [ "${BASE#"$B0"}" != "$BASE" ]; then echo "B0 is BASE"; else echo "B0 is not BASE"; fi
   [ "$(printf '%s\n' "$A" | wc -l)" = 1 ] && git merge-base --is-ancestor "$A" HEAD \
     && echo "A is one ancestor of HEAD"
-  git log --format='%H %s' "$BASE..HEAD" | grep -E ' .*TOOL-dQuietDisk-([1-9]|1[0-8])([^0-9]|$)' \
+  git log --format='%H %s' "$BASE..HEAD" | grep -E ' .*TOOL-dQuietDisk-([1-8]|1[0-6]|18|26)([^0-9]|$)' \
     | while read -r c _; do git merge-base --is-ancestor "$c" "$A" || echo "late $c"; done
   ```
 
@@ -450,6 +463,9 @@ history legs grade this unit's pass and brief. No arm is added or moved.
     suite the brief gives to another session, under another repository's governance.
   Recommendation: (b). Fix 4 is parked in this build (brief item 22), so its numbers are not this
   run's to take or wait on. AC7 is written for both (a) and (b).
+  RESOLVED (agent, 2026-11-20, delegated): (b). The section writes
+  `awaiting: fix4-nicocares-landed.md`, names the session and what it owes, and the unit closes; a
+  records commit adds the nicocares readings when they land.
 - **F2 — May the main loop take the M1 and M3 readings while the run is in RUNNING?**
   gate-guard denies a suite only on a branch whose run is before VERIFYING, and a detached clone
   keys nothing (`tools/unattended/gate-guard.js@1252442ee677:708`). The instrument launches each
@@ -461,6 +477,9 @@ history legs grade this unit's pass and brief. No arm is added or moved.
   - (c) Park it for the owner.
   Recommendation: (a). It is what the prompt and the brief ask for, in the clone the prompt
   prescribes, and the record's Shas section says where each reading ran.
+  RESOLVED (agent, 2026-11-20, delegated): (a). The main loop takes the M1 and M3 readings during
+  RUNNING, in a detached scratch clone, and this unit moves from order 4 to order 5, after
+  TOOL-dQuietDisk-26.
 
 ## 8. Revision log
 
@@ -469,6 +488,11 @@ history legs grade this unit's pass and brief. No arm is added or moved.
   BASE. It diverges from the brief in one place: the after readings are the main loop's, because
   the builder role may not run a suite or a leg (§4 Evidence). It also adds A-off, so that the
   saving is read at one tree.
+- rev-2 · 2026-11-20 · S3 · S5 · §3 · §4 · AC3 · §7 · F1 resolved (b) and F2 resolved (a) under
+  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`. The unit moves to order 5, after
+  TOOL-dQuietDisk-26, so A waits for every unit at orders 1 to 4, and AC3's late set is those units.
+  The nicocares section writes the `awaiting:` line. The Limits name unit 26's missing switch and
+  units 17 and 9, which land after A.
 
 ## 9. Reuse audit
 

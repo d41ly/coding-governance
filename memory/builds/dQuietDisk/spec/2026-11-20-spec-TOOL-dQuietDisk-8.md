@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 2 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
+| [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-10 TOOL-dQuietDisk-17 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 
 <!-- /gen:spec-records -->
 
@@ -53,7 +54,8 @@ its reason and left as today. Every reader's verdict and output stay what they w
   records, so either may read any tracked path.
 - No change to what any reader tests, to the prefix moves, or to the policy snapshot's commit of the
   working tree.
-- No runner-built snapshot under F1's recommendation, so `tools/run-gates/run-gates.sh` is untouched.
+- No runner-built snapshot, by F1's pick (b), so `tools/run-gates/run-gates.sh` is untouched and no
+  path or environment variable is handed between legs.
 - No cache and no switch: a clone that borrows objects and a checkout that omits unread paths are
   how a fixture is made, not stored answers.
 - The upgrade walk's design is dSafePassage's (its unit 5, CLOSED); only its clone flags move here.
@@ -87,8 +89,8 @@ up to 13,206 checked-out files per sparse reader per run.
 
 Every reader in the table mutates its copy, so none can be handed a shared checkout by path. A
 runner-built `clone --shared --no-checkout` holds no files to share, and a reader cloning from it
-with `--shared` pays exactly what it pays cloning `--shared` from the repository itself. F1 records
-the choice.
+with `--shared` pays exactly what it pays cloning `--shared` from the repository itself. F1 is
+resolved (b): each reader takes its own `--shared` clone of the repository.
 
 ### `--shared` and its one hazard
 
@@ -176,10 +178,15 @@ re-observe it at the close.
     Section 4 shows (a) saves nothing (b) does not, because every reader mutates its copy.
   - Recommendation: (b). It satisfies every criterion here, adds no surface, and keeps the unit at
     order 2.
+  - RESOLVED (agent, 2026-11-20, delegated): (b). Every reader mutates its copy, so (a) saves
+    nothing over (b) and would add a runner surface.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-20 · §3 · §4 · §8 · F1 resolved (b) under
+  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: each reader takes its own `--shared` clone, and
+  nothing is handed between legs.
 
 ## 10. Reuse audit
 

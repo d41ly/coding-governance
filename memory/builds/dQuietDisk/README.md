@@ -76,7 +76,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 19 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** SPECCED · 20 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
 ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26
 
@@ -90,8 +90,8 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-4 — routed-commits reads only the commits its store does not already hold](spec/2026-11-20-spec-TOOL-dQuietDisk-4.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-5 — one `git diff --name-only BASE` decides every plain-guarded leg of a bar](spec/2026-11-20-spec-TOOL-dQuietDisk-5.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-7 — one suite template cache: each base repository built once, keyed by its inputs, and cloned per case](spec/2026-11-20-spec-TOOL-dQuietDisk-7.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
-| [TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read](spec/2026-11-20-spec-TOOL-dQuietDisk-8.md) | 2 | 2 | SPECCED | rev-1 | 2026-11-20 |
-| [TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache](spec/2026-11-20-spec-TOOL-dQuietDisk-10.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-20 |
+| [TOOL-dQuietDisk-8 — the whole-tree readers clone without copying objects and check out only what they read](spec/2026-11-20-spec-TOOL-dQuietDisk-8.md) | 2 | 2 | SPECCED | rev-2 | 2026-11-20 |
+| [TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache](spec/2026-11-20-spec-TOOL-dQuietDisk-10.md) | 3 | 2 | SPECCED | rev-2 | 2026-11-20 |
 | [TOOL-dQuietDisk-12 — `pre-push.test.sh` builds each repeated pushed-main fixture once and copies it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-12.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-13 — the run-gates suites build each repeated scratch repository once and copy it per arm](spec/2026-11-20-spec-TOOL-dQuietDisk-13.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-18 — `govkit apply` reads both of its verdict maps through the target's reuse cache](spec/2026-11-20-spec-TOOL-dQuietDisk-18.md) | 3 | 2 | SPECCED | rev-1 | 2026-11-20 |
@@ -99,19 +99,20 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-11 — govkit's scratch targets come from the template cache, so `selftest.py` builds each distinct target once](spec/2026-11-20-spec-TOOL-dQuietDisk-11.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-15 — a kit self-test leg is held where gov's attestation matches the vendored bytes](spec/2026-11-20-spec-TOOL-dQuietDisk-15.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-20 |
 | [TOOL-dQuietDisk-16 — `govkit update` reads every gov blob through one `cat-file --batch` handle](spec/2026-11-20-spec-TOOL-dQuietDisk-16.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-20 |
-| [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 4 | 1 | SPECCED | rev-1 | 2026-11-20 |
-| [TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline](spec/2026-11-20-spec-TOOL-dQuietDisk-17.md) | 5 | 2 | SPECCED | rev-1 | 2026-11-20 |
+| [TOOL-dQuietDisk-26 — `check-wiring.sh` lists the tree once per invocation](spec/2026-11-20-spec-TOOL-dQuietDisk-26.md) | 4 | 2 | SPECCED | rev-1 | 2026-11-20 |
+| [TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline](spec/2026-11-20-spec-TOOL-dQuietDisk-17.md) | 5 | 2 | SPECCED | rev-2 | 2026-11-20 |
+| [TOOL-dQuietDisk-19 — the before and after measurements, with their instruments](spec/2026-11-20-spec-TOOL-dQuietDisk-19.md) | 5 | 1 | SPECCED | rev-2 | 2026-11-20 |
 | [TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper](spec/2026-11-20-spec-TOOL-dQuietDisk-9.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dQuietDisk-1 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3
-TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9.
+Ids no `spec-audit` record has ever named: TOOL-dQuietDisk-1 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-2 TOOL-dQuietDisk-26
+TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 20 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -121,8 +122,8 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 | 1 | `TOOL-dQuietDisk-1`, `TOOL-dQuietDisk-14` | yes |
 | 2 | `TOOL-dQuietDisk-2`, `TOOL-dQuietDisk-3`, `TOOL-dQuietDisk-4`, `TOOL-dQuietDisk-5`, `TOOL-dQuietDisk-7`, `TOOL-dQuietDisk-8` | no |
 | 3 | `TOOL-dQuietDisk-10`, `TOOL-dQuietDisk-12`, `TOOL-dQuietDisk-13`, `TOOL-dQuietDisk-18`, `TOOL-dQuietDisk-6` | yes |
-| 4 | `TOOL-dQuietDisk-11`, `TOOL-dQuietDisk-15`, `TOOL-dQuietDisk-16`, `TOOL-dQuietDisk-19` | no |
-| 5 | `TOOL-dQuietDisk-17` | no |
+| 4 | `TOOL-dQuietDisk-11`, `TOOL-dQuietDisk-15`, `TOOL-dQuietDisk-16`, `TOOL-dQuietDisk-26` | yes |
+| 5 | `TOOL-dQuietDisk-17`, `TOOL-dQuietDisk-19` | yes |
 | 6 | `TOOL-dQuietDisk-9` | no |
 <!-- /gen:build-order -->
 

@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-10 — `check-wiring.test.sh` takes its scratch repositories from the template cache
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 3 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
+| [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-8 TOOL-dQuietDisk-17 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 
 <!-- /gen:spec-records -->
 
@@ -49,7 +50,8 @@ processes for the same 255 arms with the same RED and GREEN results.
 - `tools/check-wiring.sh` itself. Of the 3,786 git processes the analysis measured in one run, 1,679
   are `ls-files` (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`,
   §2). Those come from the checker re-listing the tree on each of its 133 invocations
-  (`chk`/`chke`, counted at `609cd40b1`), not from fixtures. Whether to add a unit for it is F1.
+  (`chk`/`chke`, counted at `609cd40b1`), not from fixtures. TOOL-dQuietDisk-26 carries that one
+  listing per invocation, at order 4, after this unit has moved the suite (F1).
 - A read-only checkout shared by reading arms. The suite's header names an auto-fix mode
   (`tools/check-wiring.test.sh@609cd40b1:2`), so which arms write is a per-arm question. Every
   `newrepo` arm keeps its own copy.
@@ -63,7 +65,7 @@ processes for the same 255 arms with the same RED and GREEN results.
 
 - **consumes-from** `TOOL-dQuietDisk-7` — the bash face that builds a template once per runner invocation and hands back its path, its key composition admitting a caller's discriminator, its switch, and a form a copy-installed suite can carry inline. Without the inline form a shipped copy of this suite reds on arrival, the class `tools/govkit/entries/check-line-length.kit.toml@609cd40b1:29-35` records.
 - **hands-off** `TOOL-dQuietDisk-19` — the suite's before and after readings, taken in a scratch `git clone --shared`.
-- **hands-off** external — the checker's per-invocation `ls-files` listing, filed or added as F1 resolves.
+- **hands-off** `TOOL-dQuietDisk-26` — the checker's per-invocation `ls-files`, `ls-tree` and `check-attr` reads, one each per invocation, and the two arms that pin them, added to the suite this unit moves.
 
 ## 4. Design
 
@@ -109,7 +111,8 @@ A clone spends one more process for one fewer entry and adds remote state the re
 
 The bound: a run spends at least 7 fewer git processes than before, and more where a wired site sits
 in a loop or a repeated function. Temp entries rise by at most the second template's 28. The figure
-is DERIVED from these static counts; unit 19 measures the real one.
+is DERIVED from these static counts; unit 19 measures the real one. The suite's larger cost, the
+checker's own per-check listing, is TOOL-dQuietDisk-26's, so this bound counts fixtures only.
 
 ### Files touched (estimate)
 
@@ -197,10 +200,16 @@ New arm: tools/check-wiring.test.sh · covers AC2 · a `newrepo wired` arm stage
     follow-up and is a separate mechanism, so it is its own unit (BUILD-METHOD M2).
   - Recommendation: (b). It is the most feature-rich option, and no veto applies: it adds no
     dependency, surface or carrier change, and widens no write surface.
+  - RESOLVED (agent, 2026-11-20, delegated): (b). TOOL-dQuietDisk-26 now carries
+    `check-wiring.sh`'s one listing at order 4, and this unit stays on the suite's fixtures at
+    order 3.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-20 · initial draft.
+- rev-2 · 2026-11-20 · §3 · §4 · §8 · F1 resolved (b) under
+  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: the listing non-goal and the bound point at
+  TOOL-dQuietDisk-26, and the external hand-off becomes an edge to it.
 
 ## 10. Reuse audit
 

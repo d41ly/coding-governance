@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-17 — `govkit update` skips a kit's verify check when nothing moved since its baseline
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 5 · ratified 2026-11-20
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
+| [2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task.md) | research | TOOL-dQuietDisk-8 TOOL-dQuietDisk-10 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 
 <!-- /gen:spec-records -->
 
@@ -18,8 +19,8 @@ the first byte moves, and once in the verify pass after the writes. The analysis
 at 10 to 16 s each, twice (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`,
 row G4). This unit keeps the baseline's result keyed by the kit's installed bytes and a fingerprint
 of the target, and reuses it in the verify pass when neither moved and no target-side program ran in
-between. Every receipt, write, rollback decision and tally is unchanged. Section 8 records that this
-saving is narrow, and why.
+between. Every receipt, write, rollback decision and tally is unchanged. Section 4 says why this
+saving is narrow, and section 6 states what it buys.
 
 ## 2. Scope (IN)
 
@@ -115,6 +116,15 @@ a key that would skip verifying real writes, which would move a rollback verdict
 
 ## 6. Acceptance criteria
 
+The saving the reuse buys, stated as a count. Each reused verify saves exactly one `run_kit_check`
+call, the kit's own `[check]` argv and every process it starts, which the analysis puts at 10 to 16 s
+(row G4, PINNED 2026-11-20). The run's saving is the `reused <n>` field of the tally, so `n` calls.
+It costs §5's one `hash-object` and one `status` per touched kit, at the baseline and again in
+verify, whether or not the reuse fires. On an ordinary version-bump update every touched kit's
+writes land, every key moves, `n` is 0, and the unit saves nothing and costs those reads. It pays
+back only on an update that holds, declines or refuses a touched kit's writes and runs no
+target-side program, where it saves one kit check per such kit.
+
 - **AC1** — When `python tools/govkit/govkit.py update --target <fixture> --write` runs on an adopter
   fixture built from `tools/govkit/fixtures/release-0` where one touched kit's only row is held back,
   that kit's verify line carries the `baseline reused` tail, the tally reads `reused 1`, and the
@@ -122,6 +132,8 @@ a key that would skip verifying real writes, which would move a rollback verdict
   `install.check-reuse = "rerun"`.
   Red when: the reused kit's state differs from a run that re-checks it, or the reuse is silent.
   fixture: built by govkit's own fixture factory in a scratch directory under `%TEMP%`.
+  figure: the saving is the tally's `reused 1`: one `run_kit_check` call fewer than the `rerun` run,
+  which reuses none, makes. DERIVED at observation from the two runs' tallies.
 - **AC2** — When the same fixture's update also runs a `[[regenerate]]` argv, no verify is reused,
   and the output equals the `rerun` run's.
   Red when: a target-side program ran and a baseline was still reused.
@@ -154,6 +166,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · an update over a fixt
   - Recommendation: (b). The charter's YAGNI rule is level 0 and a skip that seldom fires is
     machinery for its own sake; M3's feature-rich rule would pick (a), so the resolver should weigh
     the two openly.
+  - RESOLVED (agent, 2026-11-20, delegated): (a), build S1 to S5 as written. It is the most
+    feature-rich option, it is what the owner's prompt asked for, and P18 ranks the decision rule
+    above the YAGNI practice in an unattended fork; section 6 states the saving it buys.
 
 ## 9. Revision log
 
@@ -161,6 +176,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · an update over a fixt
   written by TOOL-dQuietDisk-16 at order 1 and TOOL-dQuietDisk-18 at order 3, and every order-2 and
   order-4 sibling whose acceptance installs kits through govkit reads it, so this unit runs alone
   after them.
+- rev-2 · 2026-11-20 · §1 · §6 · AC1 · §8 · F1 resolved (a) under
+  `2026-11-20-prompt-TOOL-dQuietDisk-26-spec-task`: S1 to S5 are built as written, and §6 now states
+  the saving the narrow reuse buys, with a `figure:` line on AC1.
 
 ## 10. Reuse audit
 
