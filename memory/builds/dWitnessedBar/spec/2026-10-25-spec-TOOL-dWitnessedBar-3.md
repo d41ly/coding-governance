@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-8 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-8 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -29,6 +29,7 @@
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-3-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-3-reground-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-3-pin-brief.md) | journal | — |
