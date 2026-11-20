@@ -606,7 +606,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   message `gov-request <content key>` and the row. A key with no record is recorded first from this
   clone's kept copy `<git-common-dir>/requests/<content key>.md` as `--request` records it, under no
   session, so a draw never adds consent; with neither a record nor that copy it exits 2 naming
-  `--request <file>`. One bounded fetch reads the ref's first-parent messages, and the loop kit's
+  `--request <file>`, and a copy keying to another key exits 2 naming both, nothing written. One bounded fetch reads the ref's first-parent messages, and the loop kit's
   `budget.py draw --request <key> --rows <file>` counts them against the base of `flow.rework-budget`,
   writing nothing: it prints `draw · <cause> · <item> · <spent>/<total>`, pushed by compare-and-swap
   with the tip read expected (exit 0), or `exhausted · <spent>/<total>` (exit 3), or refuses a cause

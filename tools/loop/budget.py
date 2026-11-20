@@ -259,8 +259,10 @@ REQUEST_PLANTS = {"placement-loop": "one recorded request placed, its check refu
                   "rows-on-ref": "two draws on a recorded request: two row commits, each parented on the tip before "
                                  "it, and no line of the request's text on the remote",
                   "two-nodes": "two clones drawing on one key at once, the second's push held until the first wrote",
-                  "unreachable": "a draw with the remote unreachable",
-                  "slug-retry": "the claiming item's slug retry drawn as entry.claim draws it, then the cause retry",
+                  "unreachable": "a draw and a re-placement with the remote unreachable, then a kept text keying to "
+                                 "another request",
+                  "slug-retry": "the claiming item's slug retry drawn as entry.claim draws it, the cause retry, then "
+                                "budget.py's own request refusals and a malformed row",
                   "owner-after-exhausted": "a spent request placed again, then placed by the owner's record"}
 PLANTS.update(REQUEST_PLANTS)
 PLANT_RUN = "# %s run\n\n## Run facts\nphase: BUILDING\n" % FX_BUILD
@@ -807,18 +809,43 @@ def run_request_draw_plant(case):
                   "the second clone did not re-read once and draw 2/4: %r" % out[-300:])
             counts = [m.strip().split(" · ")[-1] for _s, _p, m in read_ref_rows()[:2]]
             check(counts == ["2/4", "1/4"], "the ref's rows read %r, not 2/4 over 1/4" % counts)
-        elif case == "unreachable":   # AC4
+        elif case == "unreachable":   # AC4, then the placement that draws nothing writes no block (S6)
+            place = ("place", "--declared", "continue", FX_DONE)
+            run_placement_verb(*place)
+            run_placement_verb("check")
             run_fixture_git(root, "remote", "set-url", "origin", (top / "gone.git").as_posix())
             rc, out = run_draw()
+            check(rc == 2 and "not drawn, contention" in out, "an unreachable remote answered %d %r" % (rc, out[-200:]))
+            rc, out = run_placement_verb(*place)
+            check(rc == 2 and "drew nothing, so no block is written" in out and read_block_count() == 1,
+                  "a re-placement with the remote unreachable answered %d, %d blocks: %r" % (rc, read_block_count(), out[-200:]))
             run_fixture_git(root, "remote", "set-url", "origin", origin.as_posix())
-            check(rc == 2 and "contention" in out, "an unreachable remote answered %d %r" % (rc, out[-200:]))
             check(len(read_ref_rows()) == 1, "an unreachable draw added a row")
+            write_fixture_files(store, {"abcdefabcdef.md": "Words that key to another request\n"})
+            rc, out = run_driver_verb("--request-draw", "abcdefabcdef", "--cause", "route-back", "--item", PLACE_ITEM)
+            check(rc == 2 and ", not abcdefabcdef, so no record is created" in out and len(read_git(origin, "for-each-ref", "refs/gov/requests")[1].splitlines()) == 1,
+                  "a kept text keying to another request answered %d %r" % (rc, out[-200:]))
         elif case == "slug-retry":   # AC5: the draw entry.claim makes before a fresh slug, TOOL-dPlacedRequest-21's site
             rc, out = run_draw(item=CLAIM_ITEM)
             check(rc == 0 and out.endswith("draw · route-back · %s · 1/4" % CLAIM_ITEM), "the slug retry drew %r" % out)
             rc, out = run_draw(cause="retry", item=CLAIM_ITEM)
             check(rc == 2 and "the cause retry is outside the closed set" in out, "the cause retry answered %r" % out)
             check(len(read_ref_rows()) == 2, "the refused cause added a row")
+            rows = top / "rows.txt"   # the record's messages, one malformed row and one under another key appended
+            rows.write_bytes((read_git(origin, "log", "--first-parent", "--format=%x01%B", ref)[1] +
+                              "\n\x01%s %s\n\ndraw · route-back · %s · two/4\n\x01%s 0123456789ab\n\ndraw · route-back · "
+                              "%s · 1/4\n" % (REQUEST_HEADER, key, PLACE_ITEM, REQUEST_HEADER, PLACE_ITEM)).encode("utf-8"))
+            budget = [sys.executable, str(KIT / "budget.py"), "draw"]
+            for argv, owed in ((["--request", key, "--rows", str(rows)], (0, "draw · route-back · %s · 2/4" % PLACE_ITEM)),
+                               (["--request", "XYZ", "--rows", str(rows)], (2, "'XYZ' is no content key")),
+                               (["--request", key], (2, "takes --rows <file>")),
+                               (["--build", FX_LIVE, "--rows", str(rows)], (2, "--rows is a request's record"))):
+                rc, out = run_tool(budget + argv + ["--cause", "route-back", "--item", PLACE_ITEM])
+                check(rc == owed[0] and owed[1] in out, "budget.py draw %s answered %d %r" % (" ".join(argv[:2]), rc, out[-300:]))
+                if argv[2:3] == ["--rows"] and argv[0] == "--request" and rc == 0:
+                    check("malformed request row, not counted · draw · route-back · %s · two/4" % PLACE_ITEM in out
+                          and "not counted · %s 0123456789ab" % REQUEST_HEADER in out,
+                          "the malformed rows were not named: %r" % out[-300:])
         elif case == "owner-after-exhausted":   # AC6
             place = ("place", "--declared", "continue", FX_DONE)
             run_placement_verb(*place)

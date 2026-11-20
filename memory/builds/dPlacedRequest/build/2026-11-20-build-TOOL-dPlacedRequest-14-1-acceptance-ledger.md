@@ -62,6 +62,20 @@ the cause in `tools/loop/placement.py#write_placement` forced to none, `--plant 
   the draw `1/4`. The budget plants `unknown-cause`, `patch-draw`, `value` and `no-own-conf-read` printed
   `held` over the moved cause check.
 
+- The checklist pass over the first commit (`refusal-branch-with-no-arm`,
+  `destructive-step-before-its-precondition`): `--plant unreachable` now also re-places with the remote
+  unreachable, exit 2 printing `drew nothing, so no block is written` with the block count unchanged (S6),
+  and draws on a key whose kept text keys to another request, which the driver now refuses before any write,
+  exit 2 naming both keys, the origin gaining no record; the first commit created the other key's record
+  before refusing. `--plant slug-retry` now drives `budget.py draw`'s own refusals, a key that is no content
+  key, no `--rows` and `--rows` beside `--build`, each exit 2, and a draw over rows holding a malformed row
+  and a message under another key, each named on stderr as not counted, the count reading `2/4`. The
+  `unattended.test.sh` block gains the kept-text refusal.
+- Unarmed, named: the driver's branches for no python, no loop kit, a scratch file it cannot create, a
+  fetch failing after the record read answered, a fetched record that does not read, a row commit git
+  cannot build, a push the remote answers and refuses, and a race lost four times; and
+  `tools/loop/placement.py#run_request_draw_verb`'s bound firing.
+
 **Owed at the close (main loop):** the `loop budget fixtures` and `loop placement fixtures` legs over every
 plant; the two `New arm:` lines of the spec's Gates section, the budget plants' failing case staged by
 `placement-loop` with the draw site removed from `place`, and the `unattended.test.sh` block `DPR14`, its

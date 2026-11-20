@@ -20708,13 +20708,13 @@ same "DPR31 S1 a .typed that cannot be appended to exits 2" "$rq_rc" "2"
 hit  "$rq_out" "request — $rq_k2 · not written · this session could not be added to"
 # ---- TOOL-dPlacedRequest-14 — THE PRE-CLAIM BUDGET ON THE REQUEST RECORD. Over the same origin and c1,
 # ---- a fresh request r3: a call with no item, a key that is no content key and a key with neither a
-# ---- record nor a kept text exit 2 drawing nothing; two draws land two row commits, each parented on
+# ---- record nor a kept text, and a kept text keying to another key, exit 2 drawing nothing; two draws land two row commits, each parented on
 # ---- the tip before it (AC3); the cause retry exits 2 adding no row (AC5); two more draws spend the base
 # ---- of 4 and the fifth exits 3 `exhausted · 4/4`, the ref unmoved (AC1); with the origin gone a draw
 # ---- exits 2 naming contention (AC4). RED, observed at the close, is a parentless row commit, which the
 # ---- chain check reads as one commit. Waived by README rule 8 with the rest of this suite. WHAT THIS
 # ---- BLOCK DOES NOT DRIVE: two nodes racing, which the loop kit's `two-nodes` plant drives, a push the
-# ---- remote answers and refuses, and a key whose kept text keys to another request.
+# ---- remote answers and refuses, and a race lost four times.
 printf 'Bound the pre-claim loop, zq-draw-marker-14\n' > "$LF/r3.md"
 rd_out=$(run_request_arm --request "$LF/r3.md")
 rd_key=$(printf '%s\n' "$rd_out" | sed -n 's/^request — \([0-9a-f]\{12\}\) · recorded .*/\1/p')
@@ -20729,6 +20729,12 @@ rd_out=$(run_request_arm --request-draw 0123456789ab --cause route-back --item i
 same "DPR14 S3 a key with no record and no kept text exits 2 and creates none" \
   "$rd_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests/0123456789ab | grep -c .)" "2 0"
 hit  "$rd_out" "no request record and no kept text: record it first with unattended.sh --request <file>"
+rd_n=$(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests | grep -c .)
+printf 'Words that key to another request\n' > "$LF/c1/.git/requests/abcdefabcdef.md"
+rd_out=$(run_request_arm --request-draw abcdefabcdef --cause route-back --item item.entry.place); rd_rc=$?
+same "DPR14 S3 a kept text keying to another key exits 2 and creates no record" \
+  "$rd_rc $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/requests | grep -c .)" "2 $rd_n"
+hit  "$rd_out" ", not abcdefabcdef, so no record is created"
 for rd_n in 1 2; do
   rd_out=$(run_request_arm --request-draw "$rd_key" --cause route-back --item item.entry.place); rd_rc=$?
   same "DPR14 AC3 draw $rd_n exits 0 printing its row" "$rd_rc ${rd_out##*$'\n'}" "0 draw · route-back · item.entry.place · $rd_n/4"

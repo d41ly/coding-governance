@@ -4527,7 +4527,8 @@ check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read;
 # existence is read by `check_request_recorded`; a key with no record is created first by
 # `write_request_record` from this clone's kept copy `<git-common-dir>/requests/<key>.md`, under no
 # session, so a draw never adds a session's consent line; with neither a record nor that copy the draw is
-# refused naming `--request <file>`. Then ONE bounded fetch of the ref into its cache ref, as `read_claims`
+# refused naming `--request <file>`, and a copy that `request.py key` keys to another key is refused
+# before any write, naming both. Then ONE bounded fetch of the ref into its cache ref, as `read_claims`
 # fetches, its first-parent messages each opened by a \001 byte handed to the loop kit's `budget.py draw
 # --request <key> --rows <file>`, which counts and writes nothing: `exhausted · <spent>/<total>` exits 3; a
 # `draw · <cause> · <item> · <spent>/<total>` row is pushed, and a lost race re-reads and draws again, at
@@ -4547,9 +4548,11 @@ run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 n
     cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} || cdir=""
     [ -n "$cdir" ] && [ -f "$cdir/requests/$key.md" ] \
       || { echo "request-draw — $key · not drawn · no request record and no kept text: record it first with unattended.sh --request <file>"; return 2; }
+    out=$("$py" "$d/request.py" key "$cdir/requests/$key.md" 2>&1) || out=""
+    [ "${out//$'\r'/}" = "$key" ] \
+      || { echo "request-draw — $key · not drawn · the kept text $cdir/requests/$key.md keys to ${out:-nothing}, not $key, so no record is created"; return 2; }
     ( CLAUDE_CODE_SESSION_ID=absent; write_request_record "$cdir/requests/$key.md" ) || { echo "request-draw — $key · not drawn · the request record could not be created"; return 2; }
     check_request_recorded "$key" && rc=0 || rc=$?
-    [ "$rc" != 1 ] || RQ_WHY="the kept text $cdir/requests/$key.md keys to another request, so no record of $key was created"
   fi
   case "$rc" in
     0) ;;
