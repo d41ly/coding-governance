@@ -54,7 +54,9 @@ cut from the suite and sourced, under the node's short temp path.
   that row's tag from `derive_node_tag`, `resolve_node_tag` and `resolve_fleet_tag` alike, rows a to
   d; `GOV_NODE=a` under row b's user read `a|a|a`; `GOV_NODE=w` read `node — UNKNOWN: GOV_NODE w
   names no Tag cell in AGENTS.md`. The base engine read `b|a|a` and `node — b · agent5 @
-  DESKTOP-3J1O6CD` for the same two.
+  DESKTOP-3J1O6CD` for the same two. Over scratch registries shaped as the kickoff suite's,
+  `GOV_NODE=q` under row p's user read `node — q · me` where the user alone read row p, and over a
+  registry with two rows tagged `q` it read `node — UNKNOWN: 2 Tag cells in REG3.md read GOV_NODE q`. (DERIVED)
 - AC26 — an offline `--lease release build tOff --as withdrawn` over a newest queued line naming
   an absent sha, and over that line cut to three fields, each printed `lease not written —
   tOff/build · queued commit unreadable; nothing queued`, exited 2 and left `gov-queue.log` (DERIVED)
@@ -86,6 +88,13 @@ cut from the suite and sourced, under the node's short temp path.
   file, to the driver's cut read each one moving its line: the owner and until swap, the two plants
   after the first write, the plant after `_fl_mine=1`, the trap moved after the take and the trap's
   guard cut; the new block's two driver copies read `1 0` for their staged lines. (DERIVED)
+- The bug-class checklist over the pass commit selected 56 classes by anchor and 6 universal. One (DERIVED)
+  needed a change: `refusal-branch-with-no-arm`, since the node cell's branch for a `GOV_NODE` that
+  several Tag cells carry had no arm; the kickoff suite now drives it over a two-row scratch registry,
+  and the probe above read its line. The rest needed none: every new `sed` plant anchors on a line the
+  cut holds once, and the AC5 plants on the first match alone; each count is `grep -c` over a file or
+  over a capture whose empty case reads 0; the kickoff suite unsets an ambient `GOV_NODE`; the
+  refusal the help page and the VERBS guide name is the driver's echo, byte for byte.
 
 ## Items diverged
 
@@ -103,7 +112,7 @@ cut from the suite and sourced, under the node's short temp path.
   region-eight assertions, `FLOOR_ASSERTIONS` 4003 to 4024 and `FLOOR_SHARD_8` 1222 to 1243, (DERIVED)
   waived for this build's landing by README rule 8; `tools/lib/resolve-python.test.sh` section 2a's
   three new rows (AC8, AC20, AC32); and `skills/session-kickoff/manifest-check.test.sh`'s AC23 rows, (DERIVED)
-  its `FLOOR_ASSERTIONS` 370 to 374, with `GOV_NODE` unset at the fixture's top so the AC4 rows keep (DERIVED)
+  its `FLOOR_ASSERTIONS` 370 to 376, with `GOV_NODE` unset at the fixture's top so the AC4 rows keep (DERIVED)
   reading the user. Each RED-first observation is the close's.
 - The positional citations of the three carriers past the `gov_feed_sh` block, which the restated
   comments move, read by the pass legs.

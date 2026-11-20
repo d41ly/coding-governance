@@ -1081,6 +1081,11 @@ GOV_NODE=q USERNAME=someone-else run_card "DPR49 AC23 --card --write with GOV_NO
 check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node — q · $CUSER" "$(read_cell node "$NONCE-t23a")"
 GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
 check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"
+printf '## Node registry\n\n| Tag | Machine/user |\n|-----|--------------|\n| `q` | one |\n| `q` | two |\n' > "$CWT/REG3.md"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG3.md"
+GOV_NODE=q run_card "DPR49 AC23 --card --write with GOV_NODE=q over two rows tagged q" "$CWT" 0 - --card --write --session "$NONCE-t23c"
+check_eq "DPR49 AC23 node — a GOV_NODE two Tag cells carry is UNKNOWN, never the first" "node — UNKNOWN: 2 Tag cells in REG3.md read GOV_NODE q" "$(read_cell node "$NONCE-t23c")"
+rm -f "$CWT/REG3.md"
 
 # AC5 — replay: the playbook kit's instruction map (PLAY-dOrderedCharter-4), the stored bytes, one
 # `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
@@ -2420,9 +2425,10 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # cache path) and one check per card-store plant (five), counted off the block; the fixture's
 # unknown-case refusal is left uncounted. No suite ran in the pass: each command was run alone, each
 # plant over its own scratch remote.
-# +4: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, two run_card and two check_eq calls, counted off the
-# block; no suite ran in the pass, the three node resolvers were probed alone over the real registry.
-FLOOR_ASSERTIONS=374
+# +6: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, three run_card and three check_eq calls, counted off
+# the block; no suite ran in the pass, the three node resolvers were probed alone over the real
+# registry and the cell's three GOV_NODE outcomes over scratch registries.
+FLOOR_ASSERTIONS=376
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
