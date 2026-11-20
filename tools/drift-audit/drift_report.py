@@ -3895,8 +3895,9 @@ def run_gate_health_fixture(case: str, selection) -> int:
             want = [f"{head}measured 1/10 · legs 1/1 · verdicts {runs}"]
             if rc != 0 or said != want:
                 bad.append(f"held read rc {rc} {said}, planted {want}: a held leg was read as a bar leg")
+            n = len(out)
             rc, said = run_mode(selected=False)
-            if rc != 2 or not any("--selection" in ln for ln in out[-3:]):
+            if rc != 2 or not any(ln.startswith(f"{case}: stderr · ") and "takes --selection" in ln for ln in out[n:]):
                 bad.append(f"held with no --selection read rc {rc} {said}, planted 2 naming the flag")
         elif case == "short":
             remove_row("leg 03")
