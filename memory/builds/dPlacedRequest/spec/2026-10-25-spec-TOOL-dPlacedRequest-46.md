@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-46 — the bounded age walk stops on a `renews: -` commit before any threshold test
 
-**Status:** INPROGRESS · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
