@@ -7,7 +7,8 @@ registered:
 - `local-hook`, the default. The bar this node's own pre-push hook runs. Nothing changes from a
   repository with no `verdict` key.
 - `peer-node`. A second fleet node runs the bar on the commit and publishes its verdict. Only a
-  verdict from another node, for the commit's own tree, counts.
+  verdict from another node, for the commit's own tree, signed by that node's registered key and
+  run from the pinned files, counts.
 - `remote-ci`. A push run of the repository's remote CI workflow, `.github/workflows/remote-ci.yml`,
   read from GitHub's public API. It counts only under the witness rule below.
 
@@ -28,7 +29,7 @@ one line:
 | `GREEN` | The backend's bar passed on this commit's tree. The only state a landing stands on. |
 | `RED` | The backend's bar failed on this commit's tree. |
 | `NONE` | The backend holds no verdict for this commit, or holds one that does not count. |
-| `HELD` | `remote-ci` only: the run passed, but the files it is pinned to differ, or no pin is set. |
+| `HELD` | `remote-ci` or `peer-node`: the bar passed, but the pinned files differ, no pin is set, or, for `peer-node`, `verdict.remote.pin-scope` is `workflow`. |
 | `DEAD PROBE` | The read itself failed, so nothing is known. |
 
 `NONE`, `HELD` and `DEAD PROBE` are never green. The read exits 0 on `GREEN`, 1 on any other state
@@ -60,7 +61,43 @@ tag's message carries the bar's `verdict`, `tree` and `run_id`, and a `node` lin
 <name>` names the remote; the default is `origin`. Nothing schedules it: the peer's operator runs
 it, by hand or from its own cadence.
 
+The tag is signed with the node's SSH key, `git -c gpg.format=ssh tag -s`, under the operator's
+own `user.signingkey`. With `user.signingkey` empty, `verify-peer` refuses, exit 2, before it reads
+the remote.
+
 The reading node needs `GOV_NODE` set too, because a tag from its own node is `NONE`.
+
+## Registering a node's key
+
+A peer verdict counts only when the node that signed it is registered. `verdict.peer.signers` holds
+one line per node, in git's allowed-signers form with no options field:
+
+    verdict.peer.signers = ["b ssh-ed25519 AAAAC3Nza..."]
+
+The first field is the node's tag, its `GOV_NODE`. The rest is the node's public key, the first two
+fields of its `.pub` file. Each node's operator sends that public key to the owner, and the owner
+sets the list from a terminal, or through the loop kit's `policy_edit.py set` on a live run's
+branch. The loop guard refuses an agent's change to the list anywhere else.
+
+The reader takes the list at the landed revision, never from the commit being judged, so a landing
+node cannot register its own key by editing what it lands. It runs `git verify-tag` against the
+list. The verdict counts only when the key that signed the tag belongs to the node the tag's `node`
+line names, and that node is not the reading one:
+
+- An unsigned tag, or one signed by a key no line names, is `NONE`.
+- A tag whose `node` line names another node than its signer is `NONE`, naming the signer.
+- With no list set, every peer read is `NONE`, `no signer table`.
+
+## How the pin covers a peer verdict
+
+A peer runs the candidate's own runner and leg manifest, so the source check `remote-ci` applies
+applies to a peer verdict too: the pinned files, read at the commit, must derive
+`verdict.remote.pin`. A candidate that empties `tools/gate-legs.json` reads `HELD`, naming the files.
+
+`peer-node` needs `verdict.remote.pin-scope = "dispatch-closure"`. The default, `workflow`, pins
+only `.github/workflows/remote-ci.yml`, which no peer runs, so under it a peer read is `HELD`,
+naming `verdict.remote.pin-scope`. Under `verdict.remote.trust = "app-only"` the source check is
+skipped and a passing peer read is `GREEN` with witness `claimed`.
 
 ## The remote-ci witness rule
 
@@ -87,7 +124,7 @@ and files a `HELD` read as one owner item, reused while it stays open.
 
 ## Setting the pin
 
-`verdict.remote.pin-scope` names the pinned files. `workflow`, the default, pins
+`verdict.remote.pin-scope` names the pinned files, for `remote-ci` and `peer-node` alike. `workflow`, the default, pins
 `.github/workflows/remote-ci.yml`. `dispatch-closure` adds `tools/run-gates/run-gates.sh`,
 `tools/gate-legs.json` and `.githooks/gate-env.sh`.
 
@@ -102,8 +139,9 @@ anywhere else, whatever `policy-file.guard` reads.
 
 ## What it does not check
 
-- That a peer ran the bar its tag names, or that the tag is signed by a registered node key.
-- That `GOV_NODE` is unique across the fleet.
+- That a peer ran the bar its tag names, beyond the pinned files it ran it from.
+- That `GOV_NODE` is unique across the fleet, or that a registered key is still held only by its
+  node.
 - That the pinned files are everything the bar job runs. `dispatch-closure` pins what decides the
   bar's dispatch, never the floor preflight or a leg's own script.
 - A repository setting that makes the remote job a required check. That is the owner's.

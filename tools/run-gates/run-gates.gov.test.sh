@@ -774,9 +774,13 @@ a=$((a+1))
 # --fixture`, which drives `read`, the fixture lander and `remote_verdict.py --responses`, and owes
 # its last scenario's exit and its all-held line. Arms: a duplicate descriptor row, an unregistered and
 # an undeclared value, the full slot against the scoped one, a node's own or another tree's peer tag,
-# and the witness rule's writer, liveness, failed-read and source fields. WHAT THIS DOES NOT CHECK: a
+# and the witness rule's writer, liveness, failed-read and source fields. The peer plants
+# (TOOL-dWitnessedBar-43 AC1, AC2, AC4) run over throwaway SSH keys: a signed GREEN standing, an unsigned
+# tag, a node line another node's key signed, and a candidate emptying the leg manifest read HELD under
+# dispatch-closure and workflow; each prints `not run` where no ssh-keygen runs. WHAT THIS DOES NOT CHECK: a
 # real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
-for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 peer:1 remote-green:0 \
+for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 peer:1 peer-signed:0 peer-unsigned:2 \
+               peer-self-tag:1 peer-swapped-manifest:0 remote-green:0 \
                swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
   a=$((a+1))
   vb_plant=${vb_case%%:*}

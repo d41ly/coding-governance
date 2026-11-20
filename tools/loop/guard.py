@@ -14,7 +14,7 @@ agent's commit. It wraps dGroundRules-6's minimal guard, the policy kit's `guard
 1. The touch set, the minimal guard's `read_guarded_paths` met with the staged names, less a merge's
    parent sides. Empty: exit 0.
 2. Owner-only, under every value of `floor.guard-self` and of `policy-file.guard`: a staged change of a
-   leaf `OWNER_ONLY_KEYS` holds, `verdict.remote.pin`, is refused naming the key unless the minimal
+   leaf `OWNER_ONLY_KEYS` holds, `verdict.remote.pin` or `verdict.peer.signers`, is refused naming the key unless the minimal
    guard's `check_run_mandate` admits the branch, the owner's 2026-11-12 ruling (TOOL-dWitnessedBar-6).
    Then guard-self, at `floor.guard-self` `on`: a staged change of the list file, or of a leaf of
    `policy-file.guard`, `policy-file.proof` or `floor`, is refused naming the key and `floor.guard-self`
@@ -128,8 +128,9 @@ ZERO_SHA = re.compile(r"0{40}|0{64}")
 #: the leaves the guard's own switch holds, each a key path prefix
 SELF_KEYS = (("policy-file", "guard"), ("policy-file", "proof"), ("floor",))
 #: the leaves only the owner, or a live run on its own branch, may change (TOOL-dWitnessedBar-6 S9): the
-#: remote-ci backend's pin, which decides the workflow a remote verdict may stand on
-OWNER_ONLY_KEYS = (("verdict", "remote", "pin"),)
+#: off-node backends' pin, which decides the files a remote or peer verdict may stand on, and the peer
+#: signer list, whose keys alone may sign a peer verdict (TOOL-dWitnessedBar-43 S2); a set is one leaf
+OWNER_ONLY_KEYS = (("verdict", "remote", "pin"), ("verdict", "peer", "signers"))
 #: a change record's name, the change kind's grammar under any memory root
 CHANGE_NAME = re.compile(r"(?:^|/)builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-[A-Za-z]+-[A-Za-z0-9]+-\d+-change-\d+\.md$")
 REMEDY = ("loop-guard: the owner commits from a terminal, or an agent writes through the loop kit's policy_edit.py: "
@@ -587,6 +588,7 @@ FX_RUN, FX_DRIVER, FX_BRANCH = "memory/builds/tRun/RUN.md", "drv/unattended.sh",
 FX_ROW = "- %s · %s cap 100 -> 120: the fixture's file measured 118 bytes\n" % (FX_UNIT, FX_CAP)
 FX_REVIEW = "[review]\nmax-rounds = 4\n"
 FX_PIN = '[verdict.remote]\npin = "%s"\n' % ("a" * 40)
+FX_SIGNERS = '[verdict.peer]\nsigners = ["b ssh-ed25519 %s"]\n' % ("A" * 68)
 PLANTS = {
     "raise-admitted": "policy_edit.py raise AGENTS.md 120 and its decision row",
     "raise-no-record": "the cap raised by hand with its RAISED line and decision row, no change record",
@@ -599,6 +601,8 @@ PLANTS = {
     "mandate-live": "agents-within-mandate on a live run's branch",
     "mandate-none": "agents-within-mandate on a branch no run names",
     "pin-owner-only": "verdict.remote.pin under agents-with-reason, recorded with its decision row, on a branch no run names",
+    "signers-owner-only": "verdict.peer.signers under agents-with-reason, recorded with its decision row, on a branch no "
+                          "run names",
     "owner-only-live": "owner-only on a live run's branch",
     "push-no-trailer": "a commit changing the policy file with no Gov-Policy: line, graded by --push-range",
     "push-merge-carries-trailered": "a --no-ff merge taking a side's trailered, recorded policy change whole",
@@ -767,7 +771,7 @@ def run_guard_plant(case, top):
 
     guard_value = {"with-reason-admitted": "agents-with-reason", "with-reason-no-row": "agents-with-reason",
                    "mandate-live": "agents-within-mandate", "mandate-none": "agents-within-mandate",
-                   "pin-owner-only": "agents-with-reason"}.get(case)
+                   "pin-owner-only": "agents-with-reason", "signers-owner-only": "agents-with-reason"}.get(case)
     expansion = 'on-missing-expansion = "fallback-reported"\n' if case == "proof-signed-fallback" else ""
     head = "[policy-file]\n%s%s" % ('guard = "%s"\n' % guard_value if guard_value else "", expansion)
     list_rel = write_guard_plant(top, head if (guard_value or expansion) else "")
@@ -812,11 +816,13 @@ def run_guard_plant(case, top):
             write_staged(top, {mguard.DECISIONS: add_text("- %s · review.max-rounds 3 -> 4: the fixture\n" % FX_UNIT)})
         owed = 0 if case in ("with-reason-admitted", "mandate-live", "owner-only-live") else 1
         run_scenario("judged", me + ["--staged"], owed, "loop-guard: admitted" if not owed else "policy-file.guard")
-    elif case == "pin-owner-only":
-        write_staged(top, {mguard.POLICY: add_text(FX_PIN)})
-        write_fixture_record(top, "policy.verdict.remote.pin")
-        write_staged(top, {mguard.DECISIONS: add_text("- %s · verdict.remote.pin set: the fixture\n" % FX_UNIT)})
-        run_scenario("judged", me + ["--staged"], 1, "verdict.remote.pin: owner-only")
+    elif case in ("pin-owner-only", "signers-owner-only"):
+        key, text = (("verdict.remote.pin", FX_PIN) if case == "pin-owner-only" else
+                     ("verdict.peer.signers", FX_SIGNERS))
+        write_staged(top, {mguard.POLICY: add_text(text)})
+        write_fixture_record(top, "policy." + key)
+        write_staged(top, {mguard.DECISIONS: add_text("- %s · %s set: the fixture\n" % (FX_UNIT, key))})
+        run_scenario("judged", me + ["--staged"], 1, "%s: owner-only" % key)
     elif case == "push-no-trailer":
         base = run_fixture_git(top, "rev-parse", "HEAD")
         write_staged(top, {mguard.POLICY: add_text(FX_REVIEW)})
@@ -1368,7 +1374,8 @@ def run_fixture(case):
 def run_selftest():
     """Every plant through `run_selftest_cases`: each owes its last scenario's exit and the all-held line."""
     owed = {"raise-no-record": 1, "raise-lowered": 1, "floor-off-agent": 1, "floor-off-run": 1,
-            "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "pin-owner-only": 1, "push-no-trailer": 1,
+            "other-write-owner-only": 1, "with-reason-no-row": 1, "mandate-none": 1, "pin-owner-only": 1, "signers-owner-only": 1,
+            "push-no-trailer": 1,
             "proof-signed-refuse": 2, "proof-signed-fallback": 1, "push-merge-resolution-edit": 1,
             "push-merge-revert-to-unchanged-side": 1, "push-merge-conflict-elsewhere": 1,
             "push-merge-resurrect-deleted-policy": 1, "push-merge-resurrect-deleted-policy-conflict-elsewhere": 1,

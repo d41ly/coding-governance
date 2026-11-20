@@ -7483,6 +7483,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "check_pin_source",
+      "kind": "function",
+      "file": "tools/run-gates/remote_verdict.py"
+    },
+    {
       "id": "check_pinned_facts",
       "kind": "function",
       "file": "tools/playbook/writing_practice.py"
@@ -24298,6 +24303,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_signer_principal",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_site_edges",
       "kind": "function",
       "file": "tools/playbook/edge_grammar.py"
@@ -33078,6 +33088,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "run_peer_plant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "run_pfx_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -41156,6 +41171,11 @@
       "id": "write_unit_usage_plant",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_unsigned_tag",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "write_untracked_snapshot",

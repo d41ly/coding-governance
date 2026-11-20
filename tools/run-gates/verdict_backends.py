@@ -31,11 +31,20 @@ an off-node witness, because a hook on the bypassing node cannot refuse its own 
 `local-hook` reads the runner-written per-tree verdict `<common-dir>/gate-verdict/<tree hash>`, the full
 slot only, never the `.scoped` one beside it. `peer-node` fetches `refs/gov/verdict/<sha>`, an annotated
 tag a second node's `verify-peer` pushed, and stands only when it points at the SHA, its `tree` line is
-the SHA's tree, its `verdict` line reads GREEN and its `node` line is not this node's `GOV_NODE`.
-`remote-ci`'s reader is `remote_verdict.py`'s.
+the SHA's tree, its `node` line is not this node's `GOV_NODE`, and (TOOL-dWitnessedBar-43):
+- SIGNED. `git verify-tag --raw` against `verdict.peer.signers`, the owner's allowed-signers lines read at
+  the landed revision and written to a temp file under the common git dir, exits 0 and its `Good "git"
+  signature for <principal>` line names the tag's `node` line. Unsigned, an unknown key or another
+  principal is NONE; no signer table is NONE; a verify that cannot run is DEAD PROBE.
+- GREEN, its `verdict` line.
+- SOURCED. `remote_verdict.py`'s `check_pin_source`, the pin over `verdict.remote.pin-scope`'s files at
+  the SHA, under `verdict.remote.trust`; the `workflow` scope, which pins only a workflow no peer runs,
+  reads HELD naming the key outside `app-only`.
+`verify-peer` signs its tag with `git -c gpg.format=ssh tag -s` under the operator's `user.signingkey`,
+and refuses, exit 2, where that reads empty. `remote-ci`'s reader is `remote_verdict.py`'s.
 
-WHAT THIS DOES NOT CHECK: that the peer ran the bar it names, or that its tag is signed by a registered
-node key (TOOL-dWitnessedBar-43); that `GOV_NODE` is unique across the fleet.
+WHAT THIS DOES NOT CHECK: that the peer ran the bar it names, beyond the pinned files it ran it from;
+that `GOV_NODE` is unique across the fleet; that a registered key is still held only by its node.
 """
 import argparse
 import collections
@@ -67,6 +76,8 @@ BOUND = 60  # seconds, every git call that reaches a remote and every policy rea
 NAME = re.compile(r"[a-z][a-z0-9-]*")
 READER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*:[A-Za-z_][A-Za-z0-9_]*")
 SHA = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
+SIGNERS_KEY = "verdict.peer.signers"
+GOOD_SIGNATURE = re.compile(r'Good "git" signature for (\S+) with ')
 
 Verdict = collections.namedtuple("Verdict", "state witness why")
 
@@ -176,17 +187,19 @@ def resolve_bash(script):
 
 
 # ------------------------------------------------------------------------------------------ shared reads
-def run_git(repo, *args, bound=BOUND, data=None):
-    """`git -C <repo> <args>` -> (exit, stdout stripped); exit 124 where it outlived `bound` seconds. Bytes
-    on both pipes, so `data` reaches git with LF line endings on every host."""
+def run_git(repo, *args, bound=BOUND, data=None, both=False):
+    """`git -C <repo> <args>` -> (exit, stdout stripped), and with `both` (exit, stdout, stderr) stripped;
+    exit 124 where it outlived `bound` seconds. Bytes on both pipes, so `data` reaches git with LF line
+    endings on every host."""
     try:
         p = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, timeout=bound,
                            input=None if data is None else data.encode("utf-8"))
     except subprocess.TimeoutExpired:
-        return 124, ""
+        return (124, "", f"git outlived its {bound} s bound") if both else (124, "")
     except OSError as e:
-        return 127, str(e)
-    return p.returncode, p.stdout.decode("utf-8", "replace").strip()
+        return (127, "", str(e)) if both else (127, str(e))
+    out = p.stdout.decode("utf-8", "replace").strip()
+    return (p.returncode, out, p.stderr.decode("utf-8", "replace").strip()) if both else (p.returncode, out)
 
 
 def read_backends(tool_root):
@@ -227,9 +240,10 @@ def check_backend(name, backends):
     raise Refusal(f"verdict = {name} names no declared verdict backend; the descriptors declare {names}")
 
 
-def read_policy_value(repo, key):
+def read_policy_value(repo, key, every=False):
     """`key` at the landed revision, by the policy kit's `policy.py get` run in `repo` -> (value or None,
-    the reader's refusal line or ''); (None, '') where no policy kit resolves beside this kit."""
+    the reader's refusal line or ''); (None, '') where no policy kit resolves beside this kit. With `every`
+    the value is the list of every line it printed, a set's members one per line."""
     try:
         kit = resolve_kit_dir("policy", "policy.py", HERE)
     except LookupError:
@@ -243,7 +257,7 @@ def read_policy_value(repo, key):
     if p.returncode != 0 or not said:
         why = [ln.strip() for ln in (p.stderr + p.stdout).splitlines() if ln.strip()]
         return None, why[0] if why else f"policy.py get {key} exited {p.returncode} and printed nothing"
-    return said[0], ""
+    return (said if every else said[0]), ""
 
 
 def read_backend_name(repo):
@@ -327,9 +341,44 @@ def read_node_tag():
     return node if re.fullmatch(r"[A-Za-z0-9._-]+", node) else ""
 
 
+def read_signer_principal(repo, ref, members):
+    """`ref` verified by `git verify-tag --raw` against the allowed-signers lines `members`, written to a temp
+    file under the common git dir and removed after -> (the principal its `Good "git" signature` line names,
+    None), or ('', the NONE or DEAD PROBE Verdict saying why none stands). Git writes that line to standard
+    error, so both streams are read."""
+    common = read_common_dir(repo)
+    if common is None:
+        return "", Verdict("DEAD PROBE", "", "no git common dir resolves here, so no signer file can be written")
+    try:
+        fd, name = tempfile.mkstemp(prefix="gov-signers-", dir=str(common))
+        with os.fdopen(fd, "wb") as f:
+            f.write("".join(m + "\n" for m in members).encode("utf-8"))
+    except OSError as e:
+        return "", Verdict("DEAD PROBE", "", f"the signer file under the common git dir does not write: {e}")
+    try:
+        rc, _out, err = run_git(repo, "-c", "gpg.ssh.allowedSignersFile=" + pathlib.Path(name).as_posix(),
+                                "verify-tag", "--raw", ref, both=True)
+    finally:
+        try:
+            os.unlink(name)
+        except OSError:
+            pass
+    good = GOOD_SIGNATURE.search(err)
+    if rc == 0 and good:
+        return good.group(1), None
+    if "no signature found" in err:
+        return "", Verdict("NONE", "", f"{ref} is unsigned, so no registered node key witnesses it")
+    if "No principal matched" in err:
+        return "", Verdict("NONE", "", f"{ref} is signed by an unknown key, one no {SIGNERS_KEY} line names")
+    said = next((ln.strip() for ln in err.splitlines() if ln.strip()), "nothing on standard error")
+    return "", Verdict("DEAD PROBE", "", f"git verify-tag --raw {ref} exited {rc}: {said}")
+
+
 def read_peer_verdict(backend, sha, tree, repo="."):
     """`peer-node`: `refs/gov/verdict/<sha>` fetched from the remote, standing only when it is an annotated
-    tag on `sha` whose `tree` is `tree`, whose `verdict` is GREEN and whose `node` is not this node's."""
+    tag on `sha` whose `tree` is `tree`, whose `node` is not this node's, signed by the key
+    `verdict.peer.signers` registers for that node, whose `verdict` is GREEN, and whose pinned files at
+    `sha` derive the pin (TOOL-dWitnessedBar-43)."""
     node = read_node_tag()
     if not node:
         return Verdict("DEAD PROBE", "", "GOV_NODE names no node tag here, so no peer verdict can be told off-node")
@@ -357,25 +406,58 @@ def read_peer_verdict(backend, sha, tree, repo="."):
                                    f"not {tree[:8]}")
     if not peer or peer == node:
         return Verdict("NONE", "", f"the verdict is node {peer or '(unnamed)'}'s, this node's own, so it is not off-node")
-    if rec.get("verdict") == "GREEN":
-        return Verdict("GREEN", "witnessed", f"node {peer}'s full bar, run {rec.get('run_id', '?')}, on tree {tree[:8]}")
+    # SIGNED: the owner's list at the landed revision, never the working tree or the candidate.
+    rvm = read_remote_module()
+    members, refused = read_policy_value(repo, SIGNERS_KEY, every=True)
+    if refused and rvm.DERIVED_REFUSAL not in refused:
+        return Verdict("DEAD PROBE", "", f"{SIGNERS_KEY} does not read: {refused}")
+    if not members:
+        return Verdict("NONE", "", f"no signer table: {SIGNERS_KEY} registers no node key; the owner sets it with "
+                                   f"policy_edit.py set {SIGNERS_KEY}")
+    principal, refusal = read_signer_principal(repo, ref, members)
+    if refusal is not None:
+        return refusal
+    if principal != peer:
+        return Verdict("NONE", "", f"signer {principal} is not node {peer}: the tag's node line names another node")
+    if principal == node:
+        return Verdict("NONE", "", f"signer {principal} is this node, so the verdict is its own")
     if rec.get("verdict") == "RED":
         return Verdict("RED", "", f"node {peer}'s full bar, run {rec.get('run_id', '?')}, red on tree {tree[:8]}")
-    return Verdict("DEAD PROBE", "", f"node {peer}'s tag carries no GREEN or RED verdict line")
+    if rec.get("verdict") != "GREEN":
+        return Verdict("DEAD PROBE", "", f"node {peer}'s tag carries no GREEN or RED verdict line")
+    # SOURCED: the one source rule remote-ci applies, through its own function.
+    try:
+        keys = rvm.read_remote_keys(repo)
+        trust, scope, _pin = keys
+        if trust != "app-only" and scope == "workflow":
+            return Verdict("HELD", "", "verdict.remote.pin-scope = workflow pins only the remote workflow, which no "
+                                       "peer runs; the owner sets verdict.remote.pin-scope = dispatch-closure and pins "
+                                       "under it")
+        v = rvm.check_pin_source(backend, sha, keys, repo)
+    except rvm.DeadProbe as e:
+        return Verdict("DEAD PROBE", "", str(e))
+    if v.state != "GREEN":
+        return v
+    return v._replace(why=f"node {peer}'s full bar, run {rec.get('run_id', '?')}, on tree {tree[:8]}, signed by "
+                          f"its registered key, {v.why}")
 
 
 # ------------------------------------------------------------------------------------------ the peer verb
 def write_peer_tag(repo, sha, rec, node, remote):
-    """An annotated tag on `sha` whose message is `rec`'s verdict, tree and run_id lines and `node`'s, pushed
-    as `refs/gov/verdict/<sha>` -> '' pushed, else why not."""
-    rc, ident = run_git(repo, "var", "GIT_COMMITTER_IDENT")
-    if rc != 0 or not ident:
-        return "no committer identity resolves for the tag"
+    """An annotated tag on `sha` whose message is `rec`'s verdict, tree and run_id lines and `node`'s, signed
+    by `git -c gpg.format=ssh tag -s` under the operator's own `user.signingkey` and pushed as
+    `refs/gov/verdict/<sha>`, its local name deleted -> '' pushed, else why not."""
     message = "".join(f"{k}\t{rec.get(k, '')}\n" for k in ("verdict", "tree", "run_id")) + f"node\t{node}\n"
-    body = f"object {sha}\ntype commit\ntag verdict-{sha}\ntagger {ident}\n\n{message}"
-    rc, tag = run_git(repo, "mktag", data=body)
-    if rc != 0 or not tag:
-        return f"git mktag exited {rc}"
+    name = f"verdict-{sha}"
+    rc, _out, err = run_git(repo, "-c", "gpg.format=ssh", "tag", "-s", "-f", "--cleanup=verbatim", "-F", "-", name,
+                            sha, data=message, both=True)
+    rc_tag, tag = run_git(repo, "rev-parse", "--verify", "-q", f"refs/tags/{name}") if rc == 0 else (rc, "")
+    run_git(repo, "tag", "-d", name)
+    if rc != 0:
+        said = next((ln.strip() for ln in err.splitlines() if ln.strip()), "nothing on standard error")
+        return f"git tag -s exited {rc}: {said}"
+    if rc_tag != 0 or not tag:
+        return f"the signed tag {name} does not resolve"
     rc, _ = run_git(repo, "push", "-q", "--force", remote, f"{tag}:{VERDICT_REF}{sha}")
     return "" if rc == 0 else f"git push {remote} {VERDICT_REF}{sha[:8]} exited {rc}"
 
@@ -386,6 +468,10 @@ def run_verify_peer(remote, repo="."):
     node = read_node_tag()
     if not node:
         print(f"{SAY}: verify-peer refused · GOV_NODE names no node tag here, so no verdict could name its node")
+        return 2
+    if not run_git(repo, "config", "user.signingkey")[1]:
+        print(f"{SAY}: verify-peer refused · user.signingkey reads empty, so no tag could be signed with this node's "
+              f"key; set it to the key the owner registered under {SIGNERS_KEY}")
         return 2
     rc, out = run_git(repo, "ls-remote", remote, CANDIDATE_REF + "*", VERDICT_REF + "*")
     if rc != 0:
@@ -436,7 +522,13 @@ PLANTS = {
     "unregistered": "verdict = ci-cloud in the policy's only revision: read and the lander refuse, no push",
     "undeclared": "verdict = remote-ci over descriptors declaring no remote-ci row: read and the lander refuse, no push",
     "local-green": "a full per-tree verdict GREEN, then RED, then none, then a scoped-only GREEN",
-    "peer": "a tag from node b read on node a, the same tag from node a, and one naming another tree",
+    "peer": "over the signed, pinned setup: a tag node b signed read on node a, one node a signed of its own, and one "
+            "naming another tree",
+    "peer-signed": "a GREEN node b signed with its registered key, the pinned files equal, read on node a",
+    "peer-unsigned": "an unsigned tag from node b read on node a, then verify-peer with user.signingkey empty",
+    "peer-self-tag": "a tag whose node line reads b, signed by node a's key, read on node a",
+    "peer-swapped-manifest": "a GREEN node b signed over a candidate emptying the leg manifest, under dispatch-closure, "
+                             "then workflow pinning the workflow alone, then app-only",
     "lander-peer": "the lander under verdict = peer-node with no peer verdict: a candidate published, nothing landed",
     "lander-refused": "off-node asked of local-hook, then the lander under hooks.bypass = refused and verdict = local-hook: "
                       "both name the off-node backends, no push",
@@ -608,19 +700,8 @@ def run_plant(case, top):
             for f, v in files.items():
                 (slot / f).write_text(f"tree\t{tree}\nsha\t{sha}\nverdict\t{v}\nkind\tfull\nrun_id\tr1\n", encoding="utf-8")
             run_scenario(name, work, argv, owed, [f"verdict: local-hook · {state} · {sha[:8]}"])
-    elif case == "peer":
-        work = write_fixture_tree(top, {"a.txt": "a\n"}, kits=False)
-        sha = run_fixture_git(work, "rev-parse", "HEAD")
-        tree = read_tree_of(work, sha)
-        argv = [*me, "read", "--backend", "peer-node", "--sha", sha]
-        for name, node, rec_tree, state in (("node b's tag read on node a", "b", tree, "GREEN"),
-                                            ("node a's own tag", "a", tree, "NONE"),
-                                            ("a tag naming another tree", "b", "0" * len(tree), "NONE")):
-            why = write_peer_tag(work, sha, {"verdict": "GREEN", "tree": rec_tree, "run_id": "r1"}, node, "origin")
-            if why:
-                raise OSError(why)
-            run_scenario(name, work, argv, 0 if state == "GREEN" else 1, [f"verdict: peer-node · {state} · {sha[:8]}"],
-                         GOV_NODE="a", GOV_REMOTE="origin")
+    elif case.startswith("peer"):
+        run_peer_plant(case, top, run_scenario)
     elif case == "held":
         resp = pathlib.Path(top, "responses")
         resp.mkdir()
@@ -641,6 +722,107 @@ def run_plant(case, top):
     else:
         out.extend(run_remote_plant(case, top, rv))
     return out
+
+
+def write_unsigned_tag(repo, sha, rec, node, remote):
+    """The tag `write_peer_tag` writes, built by `git mktag` with no signature, the fixture's forger -> '' pushed,
+    else why not."""
+    rc, ident = run_git(repo, "var", "GIT_COMMITTER_IDENT")
+    if rc != 0 or not ident:
+        return "no committer identity resolves for the tag"
+    message = "".join(f"{k}\t{rec.get(k, '')}\n" for k in ("verdict", "tree", "run_id")) + f"node\t{node}\n"
+    rc, tag = run_git(repo, "mktag", data=f"object {sha}\ntype commit\ntag verdict-{sha}\ntagger {ident}\n\n{message}")
+    if rc != 0 or not tag:
+        return f"git mktag exited {rc}"
+    rc, _ = run_git(repo, "push", "-q", "--force", remote, f"{tag}:{VERDICT_REF}{sha}")
+    return "" if rc == 0 else f"git push {remote} {VERDICT_REF}{sha[:8]} exited {rc}"
+
+
+def run_peer_plant(case, top, run_scenario):
+    """The peer plants over ONE signed, pinned setup (TOOL-dWitnessedBar-43): throwaway keys for nodes a and b,
+    made by `ssh-keygen -N ""` under `top`, both registered in `verdict.peer.signers`, and the files
+    `dispatch-closure` names pinned, committed on `main` and pushed so the landed revision carries them. Each
+    tag is signed by `write_peer_tag` under the key its scenario names, and read on node a."""
+    me = [sys.executable, str(HERE / "verdict_backends.py")]
+    rvm = read_remote_module()
+    members = []
+    for n in ("a", "b"):
+        key = pathlib.Path(top, f"key-{n}")
+        try:
+            p = subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", n, "-f", str(key)],
+                               capture_output=True, text=True, timeout=BOUND, stdin=subprocess.DEVNULL)
+        except (OSError, subprocess.SubprocessError) as e:
+            raise OSError(f"no ssh-keygen runs, so no throwaway node key is made: {e}") from None
+        if p.returncode != 0:
+            raise OSError(f"ssh-keygen exited {p.returncode}: {p.stderr.strip()}")
+        kind, body = pathlib.Path(top, f"key-{n}.pub").read_text(encoding="utf-8").split()[:2]
+        members.append(f"{n} {kind} {body}")
+    paths = rvm.read_scope_paths({}, "dispatch-closure")
+    manifest = next(p for p in paths if p.endswith("gate-legs.json"))
+    work = write_fixture_tree(top, {p: f"{p}\n" for p in paths}, kits=False)
+    for k, v in (("user.name", "t"), ("user.email", "t@e")):
+        run_fixture_git(work, "config", k, v)
+    base = run_fixture_git(work, "rev-parse", "HEAD")
+    pins = {scope: rvm.derive_pin(work, base, rvm.read_scope_paths({}, scope))[1] for scope in rvm.SCOPES}
+
+    def write_policy(scope="dispatch-closure", trust=""):
+        signers = ", ".join(f'"{m}"' for m in members)
+        pathlib.Path(work, ".governance").mkdir(exist_ok=True)
+        pathlib.Path(work, ".governance/policy.toml").write_text(
+            f'[verdict.remote]\n{trust}pin-scope = "{scope}"\npin = "{pins[scope]}"\n\n'
+            f'[verdict.peer]\nsigners = [{signers}]\n', encoding="utf-8")
+        run_fixture_git(work, "add", "-A")
+        run_fixture_git(work, "commit", "-q", "--no-verify", "-m", f"the policy, {scope} {trust.strip()}")
+        run_fixture_git(work, "push", "-q", "--no-verify", "origin", "main")
+
+    def write_tag(sha, node_line, signer, tree, signed=True):
+        rec = {"verdict": "GREEN", "tree": tree, "run_id": "r1"}
+        if signed:
+            run_fixture_git(work, "config", "user.signingkey", pathlib.Path(top, f"key-{signer}").as_posix())
+        why = (write_peer_tag if signed else write_unsigned_tag)(work, sha, rec, node_line, "origin")
+        if why:
+            raise OSError(why)
+
+    def run_node_read(name, sha, owed, needles):
+        run_scenario(name, work, [*me, "read", "--backend", "peer-node", "--sha", sha], owed, needles,
+                     GOV_NODE="a", GOV_REMOTE="origin")
+
+    write_policy()
+    sha = run_fixture_git(work, "rev-parse", "HEAD")
+    tree = read_tree_of(work, sha)
+    said = f"verdict: peer-node · %s · {sha[:8]}"
+    if case == "peer":
+        for name, node_line, signer, rec_tree, state in (("node b's tag read on node a", "b", "b", tree, "GREEN"),
+                                                         ("node a's own tag", "a", "a", tree, "NONE"),
+                                                         ("a tag naming another tree", "b", "b", "0" * len(tree), "NONE")):
+            write_tag(sha, node_line, signer, rec_tree)
+            run_node_read(name, sha, 0 if state == "GREEN" else 1, [said % state])
+    elif case == "peer-signed":
+        write_tag(sha, "b", "b", tree)
+        run_node_read("node b's signed GREEN, the pin derived", sha, 0, [said % "GREEN" + " · witness witnessed"])
+    elif case == "peer-self-tag":
+        write_tag(sha, "b", "a", tree)
+        run_node_read("node line b, node a's key", sha, 1, [said % "NONE", "signer a is not node b"])
+    elif case == "peer-unsigned":
+        write_tag(sha, "b", "b", tree, signed=False)
+        run_node_read("an unsigned tag from node b", sha, 1, [said % "NONE", "unsigned"])
+        run_fixture_git(work, "config", "user.signingkey", "")
+        run_scenario("verify-peer with user.signingkey empty", work, [*me, "verify-peer"], 2,
+                     ["verify-peer refused · user.signingkey"], GOV_NODE="b", GOV_REMOTE="origin")
+    else:
+        run_fixture_git(work, "checkout", "-q", "-b", "candidate")
+        pathlib.Path(work, manifest).write_text("", encoding="utf-8")
+        run_fixture_git(work, "commit", "-q", "--no-verify", "-am", "the leg manifest emptied")
+        cand = run_fixture_git(work, "rev-parse", "HEAD")
+        run_fixture_git(work, "checkout", "-q", "main")
+        write_tag(cand, "b", "b", read_tree_of(work, cand))
+        said = f"verdict: peer-node · %s · {cand[:8]}"
+        run_node_read("under dispatch-closure", cand, 1, [said % "HELD", manifest])
+        write_policy("workflow")
+        run_node_read("under workflow, the workflow alone pinned", cand, 1,
+                 [said % "HELD", "verdict.remote.pin-scope = workflow pins only"])
+        write_policy("dispatch-closure", 'trust = "app-only"\n')
+        run_node_read("under app-only", cand, 0, [said % "GREEN" + " · witness claimed"])
 
 
 def read_remote_module():
