@@ -723,8 +723,8 @@ function resolveKickoffChecker(cwd) {
 
 /**
  * The bash that can SEE `checker`, by RUNNING each candidate (TOOL-dPlacedRequest-34 S28), in
- * `tools/lib/resolve_bash.py#resolve_bash`'s order as `tools/policy/policy-mirror.js#resolveBash` ports
- * it: GOV_BASH, then each `bash` PATH names in order, then Git for Windows' two, then the bare name,
+ * the order of `resolve_bash` in the lib kit's resolve_bash.py, as the policy kit's policy-mirror.js
+ * `resolveBash` ports it: GOV_BASH, then each `bash` PATH names in order, then Git for Windows' two, then the bare name,
  * each kept only when `test -f "$1"` on the checker exits 0 under it, so a WSL launcher or a stub on
  * PATH is skipped rather than trusted. null with none, `why` naming the last miss.
  */

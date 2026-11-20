@@ -48,7 +48,7 @@ to = "{prefix}/{relpath}"
 # Machine-scoped: the engine installs ONCE PER MACHINE as a junction outside the target repo, so
 # `apply` writes nothing for it and emits an order instead.
 [[files]]
-include = ["SKILL.md"]
+include = ["SKILL.md", "RESUME.md"]
 role = "engine"
 scope = "machine"
 link = true
