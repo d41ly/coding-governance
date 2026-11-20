@@ -19,45 +19,34 @@ the fold compare, the copy and the `.typed` append). The guides and help pages n
 No gate, suite or bar ran in this pass: every reading below is a probe of the unit's own code or its
 CLI over a scratch fixture, the fixture repositories under the node's short temp path.
 
+THE BLOCK PROBE, the reading the lines below cite as "the block": the new region-eight block of
+`tools/unattended/unattended.test.sh`, run alone over the suite's own prelude and fixture helpers,
+never the suite, printed no failing row; it executes 25 rows, 24 `same` and `hit` lines and (DERIVED)
+the one `mutate` of `build_claim_held`. Over the base driver `3fc16744c` the AC14, AC33 and AC30 rows
+fail, four in all; the other rows observe code landed units built and read the same there. (DERIVED)
+
 **Evidences:** TOOL-dPlacedRequest-43
-- AC1, AC2, AC3, AC4, AC7, AC14, AC15, AC30, AC32 and AC33 — the new region-eight block of
-  `tools/unattended/unattended.test.sh`, run alone over the suite's own prelude and fixture helpers,
-  never the suite: every assertion passed and none failed, its executions (DERIVED)
-  25, of which 24 are `same` and `hit` lines and one the `mutate` of `build_claim_held`. (DERIVED)
-- AC14, AC33 and AC30 RED — the same block over the base driver `3fc16744c`: the `.typed` blob is the
-  filtered hash, the CRLF rewrite still consents `|0`, and `--request` records under a held lock,
-  four rows failing (DERIVED). AC1 to AC4, AC7, AC15 and AC32 are observations of built code and read the same
-  on the base, as the spec's narrowing to observations says.
-- AC9 — `grep 'leases.offline' memory/guides/UNATTENDED-STOPS.md | grep -c 'entry-claim'` printed
-  `1`, and the guide is byte-identical to `tools/unattended/STOPS.template.md`. (DERIVED)
-- AC11 — the naming line sits in this unit's spec, `## 4. Design`, "The closing mechanism (S11)", and
-  the pass's diff touches no spec but this unit's status cell.
-- AC16 — `awk` read `CARD_PUBLISH_BOUND` 140 and `REMOTE_BOUND` 60, the first over twice the (DERIVED)
-  second plus 5; `CARD_FETCH_BOUND` reads 20 at the base and at the pass. (DERIVED)
-- AC17 — `card-store.fixture.sh --plant publish-late` printed three `held` rows: the append names the
-  store `remote-ref unknown: no answer within 2s`, never `not written`, and the bare remote holds the (PINNED)
-  ref. RED: with the base engine under `CARD_FETCH_BOUND=2` the first two rows print `MISSED`. (PINNED) The
-  `publish`, `publish-unwritten`, `publish-hung` and `lookup-hung` plants each still print `held`.
-- AC18 — a `node -e` probe of `readCard` with a stub checker that never answers, and one that
-  backgrounds a sleeping child and exits, each returned no card, named, in about 10040 ms against (DERIVED)
-  the bound of 10000 ms read from `CARD_PATH_BOUND_MS` plus 1 s; the body count printed `2`, (DERIVED)
-  and `0` on the base hook, its red. On Windows node's own timeout already bounds both stubs on the
-  base hook too, so the count is the red there; the new arm's three rows passed when run alone.
-- AC19 — `grep -cE 'timeout -k 2 .* bash '` printed `1` on the engine, the line inside
-  `run_driver_bounded`, and `4` on the base engine. (DERIVED) A scratch repository with no `.unattended.conf`
-  still writes `overlaps — skipped: no .unattended.conf in this tree` and the `claims —` twin.
-- AC20 — with `USERNAME` set to each `fleet.toml` row's user, in its own case and upper case,
-  `derive_node_tag`, `resolve_node_tag` and `resolve_fleet_tag` each printed that row's tag, `a` to
-  `d`; `daily-agent2` reads UNKNOWN and no tag. RED on the base: `DAILY-AGENT` reads UNKNOWN in
-  `derive_node_tag` while `daily-agent2` reads `a` in `resolve_node_tag`.
-- AC23 — `python tools/loop/placement.py --fixture --plant relayed` printed `relayed exit 1 · typed
-  exit 0 · held` and exited 0; the `--no-filters` grep prints `1`. (DERIVED)
-- AC24 — `TOOL-dPlacedRequest-44`'s oracle text, run on the branch tip, took the merge-base form and
-  printed its `version oracle:` line naming 232 commits and no `KIT_` line after it; its (DERIVED)
-  prepared-merge form is the landing's.
-- AC28 — the new arm 54 of `tools/push-main.test.sh`, run alone over its fixture helpers: `ok`, the
-  landing exits 1 printing `push-main: unreachable —`. RED: the same arm over the base lander prints
-  `push-main: fenced —` and names `claim-lost`.
+- AC1 — `check 109` — the block: a take-over `--resume` and `--close`, the claims fetch failed by a git shim and `warn` planted, each exit non-zero printing `check 109`, no queue file made; see Items diverged for the renamed-away origin.
+- AC2 — `add_gov_queue` — the block: a logging `add_gov_queue` stub in process logs no call from `--claims`, `--preflight`, the take-over `--resume` or `--close`, and logs one from a staged `read_claims` that queues on its failure, the stub's liveness.
+- AC3 — `git rev-list --parents -n1` — the block: `--lease acquire` and `--lease take-over` over a `released` lease the feed sighted and the origin no longer holds each write epoch 5 parented on the feed's commit.
+- AC4 — `tombstone` — the block: `--lease take-over` over a sighted, deleted build tombstone exits 1 printing `lease refused — tombstone`, the origin holding no such ref.
+- AC7 — `IFS=$'\t' read -r ref tip commit utc` — the block: an offline create's queue line splits with a 40-hex `commit` field.
+- AC9 — `grep 'leases.offline' memory/guides/UNATTENDED-STOPS.md | grep -c 'entry-claim'` — printed `1`, the guide byte-identical to `tools/unattended/STOPS.template.md`. (DERIVED)
+- AC11 — `TOOL-dPlacedRequest-33` — the naming line sits in this unit's spec, section 4's "The closing mechanism (S11)", and the pass's diff touches no spec but this unit's status cell.
+- AC14 — `core.autocrlf=true` — the block: a CRLF request's `.typed` blob equals `git hash-object --no-filters`, apart from the filtered blob; RED on the base driver.
+- AC15 — `CW_CLS` — the block: `check_claim_writable` in `take-over` mode over a record of session `s1` and keepalive `k1`, read from `s2` under `k1`, sets a `foreign-` class.
+- AC16 — `CARD_PUBLISH_BOUND` — `awk` read it 140 and `REMOTE_BOUND` 60, over twice that plus 5, and `CARD_FETCH_BOUND` 20 at the base and at the pass. (DERIVED)
+- AC17 — `card — remote-ref unknown` — `bash skills/session-kickoff/card-store.fixture.sh --plant publish-late` printed three `held` rows, the remote holding the ref; RED, the base engine under `CARD_FETCH_BOUND=2` prints two `MISSED` rows. (DERIVED)
+- AC18 — `readCard` — a `node -e` probe with a never-answering stub and an orphaning stub returned no card, named, in about 10040 ms against `CARD_PATH_BOUND_MS` 10000 plus 1 s; the body's kill-signal count is `2`, and `0` on the base hook. (DERIVED)
+- AC19 — `run_driver_bounded` — `grep -cE 'timeout -k 2 .* bash ' skills/session-kickoff/manifest-check.sh` printed `1`, the line inside `run_driver_bounded`, and `4` on the base engine. (DERIVED)
+- AC20 — `derive_node_tag` — with `USERNAME` each `fleet.toml` row's user, as given and upper-cased, `derive_node_tag`, `resolve_node_tag` and `resolve_fleet_tag` each printed the row's tag; on the base `DAILY-AGENT` read UNKNOWN in the first and `daily-agent2` read `a` in the second.
+- AC22 — `gen_build_index.py --write` — the pre-commit hook rendered the records regions at this pass, and this spec, the build's one live spec, measured 48028 bytes by `wc -c` under the 49152 cap the spec pins; the checker's own `size join` line is owed to the close, see below. (DERIVED)
+- AC23 — `python tools/loop/placement.py --fixture --plant relayed` — printed `relayed exit 1 · typed exit 0 · held` and exited 0; the `--no-filters` grep prints `1`. (DERIVED)
+- AC24 — `version oracle:` — `TOOL-dPlacedRequest-44`'s oracle text on the branch tip took the merge-base form and printed 232 commits and no `KIT_` line; its prepared-merge form is the landing's. (DERIVED)
+- AC28 — `unreachable` — the new arm 54 of `tools/push-main.test.sh`, run alone over its fixture helpers, printed `ok`, the landing exiting 1 `push-main: unreachable —`; over the base lander it prints `fenced` and names `claim-lost`.
+- AC30 — `requests.lock busy` — the block: a live `requests.lock` refuses `--request` with exit 2 within 6 s, the store and the origin unchanged, and the freed lock lets it record; RED on the base driver. (PINNED)
+- AC32 — `lease — off` — the block: `env -u CLAUDE_CODE_SESSION_ID` `--lease acquire build tFix` with `RUN_CLAIMS` off exits 0 printing `lease — off · tFix/build`.
+- AC33 — `check_request_consent` — the block: qA's LF request consents, and its stored copy rewritten to CRLF reads `relayed`, exit 1; RED on the base driver.
 
 ## Items diverged
 
@@ -74,8 +63,8 @@ CLI over a scratch fixture, the fixture repositories under the node's short temp
   is the close's. Waived for this build's landing by README rule 8.
 - `New arm:` `tools/push-main.test.sh` arm 54; `tools/hooks/scratch-guard.test.sh`'s three AC18 rows,
   `FLOOR_ASSERTIONS` raised to 396; `skills/session-kickoff/card-store.fixture.sh`'s (DERIVED)
-  `publish-late` plant. Each RED-first observation is the close's.
-- AC22 — `python tools/check-spec-tokens.py` after `gen_build_index.py --write`, a gate this role may
-  not run: its `size join` line and any row naming a spec of this build go to the close. This spec
-  measured 48028 bytes by `wc -c` at the pass, under the cap of 49152 the spec pins. (DERIVED)
+  `publish-late` plant, which `skills/session-kickoff/manifest-check.test.sh`'s plant list does not
+  name, so the close runs it directly. Each RED-first observation is the close's.
+- AC22's checker, `python tools/check-spec-tokens.py`, a gate this role may not run: its `size join`
+  line and any row naming a spec of this build go to the close.
 - The legs the spec's Gates section names, run once by the main loop.
