@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it
 
-**Status:** DEFERRED · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-55-deviation-551.md](../build/2026-10-25-build-TOOL-dWitnessedBar-55-deviation-551.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-55-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-55-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-55-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
