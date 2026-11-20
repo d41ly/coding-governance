@@ -33,6 +33,12 @@ run's scratch directory.
 - The read of 54's current oracle-head section runs to the next heading and holds prose naming the ancestor and subject tests, so its zero count reads a body, not an empty section. (DERIVED)
 - The read of 52's `### The oracle` section holds no `git rev-list` either, as 59's AC13 states. (DERIVED)
 - The scratch copy of 54 at rev-3 keeps its `# ` comment line inside the fence within the `sec` read, the line the next-heading-of-any-level closer would stop on. (DERIVED)
+- The bug-class checklist over the pass commit selected `fixture-passes-by-finding-nothing`: every zero above is paired with a read of the same population that printed its token, and every hold with an empty heading, label or token, or a scratch copy that reads otherwise. (DERIVED)
+- It selected `criterion-asserts-what-its-own-command-cannot-show`: 59's `bullet`, given a heading as its label, matches no bullet line and prints nothing, so its zero over the scratch copy holds whatever the section says; unit 60's form, which opens on the heading, is the read that shows the heading line alone, and it was run beside it. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: AC3's swap moves the shipped lines, AC4's wrap rewraps the shipped entry, and AC2's copy is the historical blob. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line. (DERIVED)
+- It selected `inline-fence-swallows-the-rest-of-the-file` and `pipe-in-a-code-span-splits-a-table-cell`: this record holds no fence, no table and no pipe. (DERIVED)
+- It selected `heredoc-escape-reaches-the-regex`: the probe's two Python steps ran from quoted heredocs with raw-string patterns, and this record was written by the edit tools. (DERIVED)
 
 ## Items diverged
 
