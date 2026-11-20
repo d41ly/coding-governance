@@ -6,7 +6,7 @@
 last-audit: 2026-11-20T20:15:34+02:00 @ 0e8b8d989bf5947211b30236a8637b6183fe3967
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: b6656244c1f3bdb34eeca8b58f7f51bb4290536c
+last-body-change: 5a2e3cae992b1a687f568cb7ea71ff0fd3f612ba
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -55,7 +55,7 @@ lives where each bullet points.
 - A `Red-fix:` commit carries the fix alone: its record goes in the next commit, since the index regen writes it into a spec and limit L3 of `tools/memory-tree/routed_commits.py` refuses the push (`dDeclaredLoop`).
 - The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
 - An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in the order `tools/loop/loop.toml` gives them (`KICK-aOrientedCast-2`, `TOOL-dDeclaredLoop-1`).
-- Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
+- Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`.
 - Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
 - Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
 - An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
@@ -83,6 +83,7 @@ lives where each bullet points.
 - A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
 - The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`).
 - Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`).
+- A red leg re-runs once on the same tree (`GATE_RERUN=1`), a flaky one is held as `quarantine`, and each gate a build adds or changes owes a seen-red line (`TOOL-dWitnessedBar-8`, `-30`, `-7`).
 
 ### Pointer map (load the row(s) the task touches)
 
