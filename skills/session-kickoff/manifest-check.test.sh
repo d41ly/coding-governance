@@ -2234,6 +2234,16 @@ check_eq "DL56 AC5 the five-field row is placed and its key prints -" \
   "  zFive · n1 · live · beat 60s · live · key -" "$(grep -m1 '^  zFive · ' "$CARD_HOME/$NONCE-c56.md" 2>/dev/null)"
 git -C "$CWT" checkout -q -- "$CLDRV_REL"
 
+# TOOL-dPlacedRequest-52 AC19 — the skip signal: a driver whose own `--claims` prints `FAILED: boom` and
+# exits 125 reaches the failure branch and its first line, never a skip with an empty or stale reason;
+# AGH2 AC3 below holds the true skip, no .unattended.conf, to its reason. RED against callers that
+# read rc 125 alone: the cell prints `claims — skipped: ` and whatever CARD_REF_WHY last held.
+printf '%s\n' '#!/bin/sh' '[ "$1" = --claims ] || exit 0' 'echo "FAILED: boom"' 'exit 125' > "$CLDRV"
+run_card "DPR52 AC19 --card --write over a driver whose --claims exits 125" "$CWT" 0 - --card --write --session "$NONCE-c52"
+check_eq "DPR52 AC19 the driver's own 125 prints its first line, not a skip reason" \
+  "claims — skipped: FAILED: boom" "$(grep -m1 '^claims — ' "$CARD_HOME/$NONCE-c52.md" 2>/dev/null)"
+git -C "$CWT" checkout -q -- "$CLDRV_REL"
+
 # AC11 — ten kept claims, nine terminal ones and a live one whose slug sorts last: exactly
 # CARD_CLAIMS_ROWS rows, read from the checker, the live one first, then one more row.
 remove_claims
@@ -2428,7 +2438,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +6: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, three run_card and three check_eq calls, counted off
 # the block; no suite ran in the pass, the three node resolvers were probed alone over the real
 # registry and the cell's three GOV_NODE outcomes over scratch registries.
-FLOOR_ASSERTIONS=376
+# +2: RAISED by TOOL-dPlacedRequest-52 AC19's skip-signal arm, one run_card and one check_eq, counted
+# off the block; no suite ran in the pass, the four callers were probed alone over a stub driver.
+FLOOR_ASSERTIONS=378
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

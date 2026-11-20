@@ -394,3 +394,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T10:48:24Z dispatch · item a49d6946 TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
 
 2026-11-20T11:19:10Z dispatch · item 15f92838 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
+
+2026-11-20T11:21:01Z brief · item TOOL-dPlacedRequest-52 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T11:25:44Z draw · re-dispatch · TOOL-dPlacedRequest-52 · 54/130 · 20261120T112544Z-3c7062
+
+2026-11-20T11:25:44Z dispatch · item ce4a81a9 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md

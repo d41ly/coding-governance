@@ -582,7 +582,7 @@ write_feed_plant '    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")
   '    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"' "$fp/root.sh" || bad "the ROOT plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/root.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/root.sh: "*"ROOT: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose break reads an unset ROOT (rc $fc_rc): $fc_got" ;; esac
-fc_rel=$'    trap \'[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }\' EXIT'
+fc_rel=$'    trap \'[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }\' EXIT'
 write_feed_plant "$fc_rel" "${fc_rel/remove_dir_lock/release_feed_lock}" "$fp/cmd.sh" || bad "the command plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/cmd.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/cmd.sh: "*"command not found") ok ;; *) bad "the carrier arm passed a copy that calls no command (rc $fc_rc): $fc_got" ;; esac

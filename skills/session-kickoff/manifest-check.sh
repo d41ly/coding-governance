@@ -654,8 +654,8 @@ derive_overlaps_line() {
   sf=$(mkdir -p "$CARD_DIR" && mktemp "$CARD_DIR/.overlaps.XXXXXX") \
     || { printf 'overlaps — skipped: no scratch file under %s to capture the read in\n' "$CARD_DIR"; return 0; }
   run_driver_bounded "$CARD_OVERLAP_BOUND" "$sf" /dev/null --overlaps; rc=$?
-  case "$rc" in
-    125)
+  case "$rc${CARD_REF_WHY:+:skip}" in
+    125:skip)
       printf 'overlaps — skipped: %s\n' "$CARD_REF_WHY" ;;
     0)
       # ponytail: a cut that splits a UTF-8 character drops the high bytes it left.
@@ -779,8 +779,8 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
   sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.claims.XXXXXX") \
     || { printf 'claims — skipped: no scratch directory under %s to capture the read in\n' "$CARD_DIR"; return 0; }
   run_driver_bounded "$CARD_CLAIMS_BOUND" "$sd/out" "$sd/err" --claims --with-key; rc=$?
-  case "$rc" in
-    125)
+  case "$rc${CARD_REF_WHY:+:skip}" in
+    125:skip)
       printf 'claims — skipped: %s\n' "$CARD_REF_WHY" ;;
     0)
       # Split on the TAB in awk, never `read`: an empty field collapses under `read`. Ordered by
@@ -1875,10 +1875,14 @@ resolve_card_driver() { # -> 0 with CARD_DRV, 1 with CARD_REF_WHY
 # `resolve_card_driver`'s three checks, then the driver under the caller's bound with stdin closed,
 # GOV_RUNLOG=0 and its output into the caller's files, a kill into a file and never a `$( )` capture a
 # grandchild could hold open. -> the verb's exit, 124 or 137 the kill; 125 where no driver resolves,
-# CARD_REF_WHY saying why and the caller printing its own skip line.
+# CARD_REF_WHY saying why and the caller printing its own skip line. THE SKIP SIGNAL
+# (TOOL-dPlacedRequest-52 S19): CARD_REF_WHY is emptied on entry and set only by a skip, so each
+# caller reads a skip from 125 with CARD_REF_WHY non-empty alone, and a driver's own 125, or
+# `timeout`'s, reaches the caller's failure branch with the driver's first line.
 run_driver_bounded() { # bound · out file · err file · verb args -> the verb's exit, 125 not run
   local b=$1 o=$2 e=$3
   shift 3
+  CARD_REF_WHY=""
   resolve_card_driver || return 125
   GOV_RUNLOG=0 timeout -k 2 "$b" bash "$CARD_DRV" "$@" </dev/null >"$o" 2>"$e"
 }
@@ -1894,7 +1898,7 @@ read_card_ref() { # slug -> 0 the remote answered, 1 not
   local o="$CARD_TMP/lookup" rc a
   CARD_REF_TIP=""; CARD_REF_WHY=""
   run_driver_bounded "$CARD_FETCH_BOUND" "$o" /dev/null --card-ref lookup "$1"; rc=$?
-  [ "$rc" != 125 ] || return 1
+  [ "$rc" != 125 ] || [ -z "$CARD_REF_WHY" ] || return 1
   a=$(tr -d '\r' < "$o" 2>/dev/null | grep -m1 '^card-ref ')
   case "$rc:$a" in
     124:*|137:*) CARD_REF_WHY="no answer within ${CARD_FETCH_BOUND}s" ;;
@@ -2001,8 +2005,8 @@ write_build_card() { # slug · step or empty · session|stored|none · writer ve
     a=$(tr -d '\r' < "$CARD_TMP/bc.ref" 2>/dev/null | grep -m1 '^card-ref ')
     # A KILLED PUBLISH MAY HAVE LANDED (TOOL-dPlacedRequest-43 S17): the write can reach the remote before
     # the bound fires, and a landed one reaches the feed at the next sighting, so its outcome is unknown.
-    case "$rc:$a" in
-      125:*) printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2; break ;;
+    case "$rc${CARD_REF_WHY:+:skip}:$a" in
+      125:skip:*) printf 'card — remote-ref not written: %s\n' "$CARD_REF_WHY"; remote=2; break ;;
       124:*|137:*) printf 'card — remote-ref unknown: no answer within %ss\n' "$CARD_PUBLISH_BOUND"; remote=2; break ;;
       "0:card-ref — off") printf 'card — remote-ref not written: RUN_CLAIMS is off\n'; remote=2; break ;;
       "0:card-ref — "*)

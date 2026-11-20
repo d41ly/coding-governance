@@ -19215,9 +19215,10 @@ if in_shard 8; then
 LF=$(mktemp -d); write_lease_fixture
 OC_REF=refs/gov/leases/tOc/build
 OC_TREE=$(git --git-dir="$LF/origin.git" mktree </dev/null)
-add_lease_commit() { # epoch · renews, empty for no key · beat-utc · [parent] · [offer-deadline] -> the tOc build lease commit, on the fixture's origin
+add_lease_commit() { # epoch · renews, empty for no key, or a whole line beginning `renews:` · beat-utc · [parent] · [offer-deadline] -> the tOc build lease commit, on the fixture's origin
   local m rl=$'\nrenews: '"$2"
   [ -n "$2" ] || rl=""
+  [[ $2 != renews:* ]] || rl=$'\n'"$2"
   m=$(printf 'gov-claim tOc/build\n\nslug: tOc\nnode: other\nhost: h\nsession: s-o\nkeepalive: absent\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: build\nfleet-tag: b%s\nwitness: -\noffer: -\noffer-deadline: %s\nlast-fetch: -' \
     "$3" "$3" "$1" "$rl" "${5:--}")
   if [ -n "${4:-}" ]; then git --git-dir="$LF/origin.git" commit-tree "$OC_TREE" -p "$4" -m "$m"
@@ -19513,8 +19514,20 @@ same "DPR46 AC2 AC4 RED: the unit-35-order copy reads past the renews: - commit,
 # ---- AC3: one two-commit tenure per class of `renews` on its tip, `yes`, no key, `-` and `no`, sighted
 # ---- 60 s ago over a `renews: no` commit sighted 3600000 s ago: live, live, live, stale. The
 # ---- unit-35-order copy reads the `-` row stale and the other three as the driver does.
-ds_got=""; ds_red=""
-for ds_v in yes "" - no; do
+# ---- TOOL-dPlacedRequest-52 AC25 and AC26 add three tips outside the four in the same shape, `maybe`,
+# ---- a bare `renews:` line and a `renews: ` line, each read on to the old commit: stale. RED for AC25
+# ---- is a copy whose walk stops on any value but `no`, reading the `maybe` tip live; for AC26 a copy
+# ---- matching `renews: ` with its space alone, reading the bare `renews:` tip as no key: live.
+ds_yes='if (!(c in rn) || rn[c] == "yes") { stop(i, c); return }'
+ds_any='if (!(c in rn) || rn[c] != "no") { stop(i, c); return }'
+printf '%s\n' "${oc_src/"$ds_yes"/"$ds_any"}" >"$oc_copy/stop-on-any.sh"
+ds_match='/^renews:/ && cr == "\001" { cr = substr($0, 8); sub(/^[ \t]+/, "", cr); sub(/[ \t]+$/, "", cr) }'
+ds_space='/^renews: / && cr == "\001" { cr = substr($0, 9) }'
+printf '%s\n' "${oc_src/"$ds_match"/"$ds_space"}" >"$oc_copy/space-match.sh"
+same "DPR52 the driver carries the yes stop and the trimmed match once, each copy its staged line instead" \
+  "$(grep -cF "$ds_yes" "$SCRIPT") $(grep -cF "$ds_match" "$SCRIPT") $(grep -cF "$ds_any" "$oc_copy/stop-on-any.sh") $(grep -cF "$ds_space" "$oc_copy/space-match.sh")" "1 1 1 1"
+ds_got=""; ds_red=""; ds_oos=""
+for ds_v in yes "" - no maybe "renews:" "renews: "; do
   remove_clock_refs
   oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 "$ds_v" "$(derive_claim_ago 60)" "$oc_a")
   git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
@@ -19522,9 +19535,15 @@ for ds_v in yes "" - no; do
   add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
   oc_row=$(read_clock_row); ds_got="$ds_got${oc_row%% *} "
   oc_row=$(read_clock_row "$oc_copy/unit35-order.sh"); ds_red="$ds_red${oc_row%% *} "
+  case "$ds_v" in
+    maybe) oc_row=$(read_clock_row "$oc_copy/stop-on-any.sh"); ds_oos="$ds_oos${oc_row%% *} " ;;
+    renews:) oc_row=$(read_clock_row "$oc_copy/space-match.sh"); ds_oos="$ds_oos${oc_row%% *} " ;;
+  esac
 done
-same "DPR46 AC3 tips renews: yes, no key, - and no over an old renews: no commit read" "$ds_got" "live live live stale "
-same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale "
+same "DPR46 AC3 DPR52 AC25 AC26 tips renews: yes, no key, -, no, maybe, renews: and renews:+space over an old renews: no commit read" \
+  "$ds_got" "live live live stale stale stale stale "
+same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale stale stale stale "
+same "DPR52 AC25 AC26 RED: the stop-on-any copy reads the maybe tip live, the space-match copy the bare renews: tip" "$ds_oos" "live live "
 # ==================================================================================================
 # TOOL-dPlacedRequest-47 — AN UNSIGHTED COMMIT IS NEVER COMPARED WITH THE THRESHOLD. Over the same
 # fixture, one epoch-1 tenure of three `renews: no` commits, its tip sighted 60 s ago on the ref's
@@ -19934,6 +19953,29 @@ for ca_v in busy flagless; do
 done
 same "DPR49 AC6 a busy call over a live lock with no owner yet leaves it" "$ca_k6" "after 1 kept"
 same "DPR49 AC6 RED: a trap without the _fl_mine guard clears the holder's lock" "$ca_f6" "after 1 cleared"
+# ---- TOOL-dPlacedRequest-52 AC20: the trap after this writer's own take and a staged peer's break,
+# ---- each run in its own shell that sources the cut and arms the trap line read from it. A peer
+# ---- holding the `.break` guard over a re-made lock with no `owner` leaves it; with no guard and no
+# ---- `owner` the lock is cleared; with `owner` another token's it is left; this writer's own, with
+# ---- nothing staged, is released. RED is a copy whose trap drops the guard test: the first is cleared.
+cp "$ca_d/cut.sh" "$ca_d/unguarded.sh"
+mutate "$ca_d/unguarded.sh" 's/ || \[ -e "\$d\/gov-feed.lock.break" \]//'
+ca_tcall='set -u; . "$1"; d=$2; tok=mine; _fl_mine=; eval "$(grep -m1 "^    trap " "$1")"; write_dir_lock "$d/gov-feed.lock" "$tok" 10 node || exit 9; eval "$3"; exit 0'
+for ca_v in cut unguarded; do
+  ca_r=""
+  for ca_s in 'mkdir "$d/gov-feed.lock.break"; rm -rf "$d/gov-feed.lock"; mkdir "$d/gov-feed.lock"' \
+              'rm -rf "$d/gov-feed.lock"; mkdir "$d/gov-feed.lock"' \
+              'rm -rf "$d/gov-feed.lock"; mkdir "$d/gov-feed.lock"; echo other >"$d/gov-feed.lock/owner"' ':'; do
+    rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.lock.break"
+    env -i PATH="$PATH" bash -c "$ca_tcall" _ "$ca_d/$ca_v.sh" "$ca_c" "$ca_s"; ca_x=$?
+    ca_r="$ca_r$([ -d "$ca_c/gov-feed.lock" ] && echo kept || echo cleared)/$ca_x "
+  done
+  case "$ca_v" in cut) ca_g20=$ca_r ;; *) ca_u20=$ca_r ;; esac
+done
+rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.lock.break"
+same "DPR52 AC20 the trap leaves a breaker's guarded lock and another's, clears a bare one, releases its own" \
+  "${ca_g20//\/0/}" "kept cleared kept cleared "
+same "DPR52 AC20 RED: a trap without the guard test clears the breaker's guarded lock" "${ca_u20%% *}" "cleared/0"
 rm -rf "$ca_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -21663,8 +21705,15 @@ hit  "$dm_out" "lease — off · tFix/build"
 # names each exit and B's seconds after the hold: B must reach the lock inside its 5 s wait of A's
 # take, or A's 10 s hold runs out and B breaks it as stale. RED, observed at the close: `SCRIPT` set to
 # the driver of a worktree at 3fc16744c, before the lock, where B copies and exits 0. Waived by README
-# rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: a B that overruns A's hold,
-# TOOL-dPlacedRequest-52's re-run, and a race between two nodes.
+# rule 8 with the rest of this suite. THE RE-RUN (TOOL-dPlacedRequest-52 S3, S4): each attempt clears
+# `once`, `held` and `release`, writes A's and B's texts with an attempt-numbered marker so their key
+# is new to the store, stamps `pr_t0` at `held` and `pr_t1` at B's end, and counts the clone's
+# `health.log` before A and after B. An attempt whose B ends more than NODE_LOCK_BOUND, read from the
+# driver's own line, after the hold, or whose log gained a `node-lock-broken` line naming
+# `requests.lock`, overran the placement: it prints its seconds and the event, is discarded and the
+# placement re-runs, up to three attempts; the DPR48 rows are judged on the first attempt kept, and
+# every attempt overrunning reds `request race placed past the lock bound`. `request race never
+# placed` stops the attempts at once. WHAT THIS BLOCK DOES NOT DRIVE: a race between two nodes.
 # ==================================================================================================
 pr_h="$LF/pr"; mkdir -p "$pr_h/bin"; pr_cp=$(command -v cp)
 printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
@@ -21673,16 +21722,30 @@ printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
   '    until [ -e "$h/release" ] || [ "$EPOCHSECONDS" -ge "$e" ]; do sleep 0.05; done; fi ;;' \
   'esac' "exec '$pr_cp' \"\$@\"" >"$pr_h/bin/cp"
 chmod +x "$pr_h/bin/cp"
-printf 'Place the request race, zq-race-marker-48, on 2026-11-19\n' > "$LF/a.md"
-printf 'Place the request race, zq-race-marker-48, on 2026-11-20\n' > "$LF/b.md"
-PATH="$pr_h/bin:$PATH" RQ_SID=qA run_request_arm --request "$LF/a.md" >"$pr_h/a.out" & pr_pa=$!
-pr_end=$((EPOCHSECONDS + 30))
-until [ -e "$pr_h/held" ] || [ "$EPOCHSECONDS" -ge "$pr_end" ]; do sleep 0.05; done
-pr_t0=$EPOCHSECONDS
+pr_bound=$(awk -F= '/^NODE_LOCK_BOUND=/{print $2; exit}' "$SCRIPT")
+pr_hl="$(git -C "$dm_c1" rev-parse --path-format=absolute --git-common-dir | tr -d '\r')/health.log"
+pr_kept=""; pr_gone=""; pr_out=""; pr_rb=""; pr_ra=""; pr_t0=0; pr_t1=0
+for pr_n in 1 2 3; do
+  rm -rf "$pr_h/once" "$pr_h/held" "$pr_h/release"
+  printf 'Place the request race, zq-race-marker-48-%s, on 2026-11-19\n' "$pr_n" > "$LF/a.md"
+  printf 'Place the request race, zq-race-marker-48-%s, on 2026-11-20\n' "$pr_n" > "$LF/b.md"
+  pr_e0=0; [ ! -f "$pr_hl" ] || pr_e0=$(grep -c '' "$pr_hl")
+  PATH="$pr_h/bin:$PATH" RQ_SID=qA run_request_arm --request "$LF/a.md" >"$pr_h/a.out" & pr_pa=$!
+  pr_end=$((EPOCHSECONDS + 30))
+  until [ -e "$pr_h/held" ] || [ "$EPOCHSECONDS" -ge "$pr_end" ]; do sleep 0.05; done
+  pr_t0=$EPOCHSECONDS
+  if [ ! -e "$pr_h/held" ]; then touch "$pr_h/release"; wait "$pr_pa"; pr_gone=1; break; fi
+  pr_out=$(PATH="$pr_h/bin:$PATH" RQ_SID=qB run_request_arm --request "$LF/b.md"); pr_rb=$?; pr_t1=$EPOCHSECONDS
+  touch "$pr_h/release"; wait "$pr_pa"; pr_ra=$?
+  pr_broke=0; [ ! -f "$pr_hl" ] || pr_broke=$(tail -n "+$((pr_e0 + 1))" "$pr_hl" | grep 'node-lock-broken' | grep -c 'requests\.lock')
+  if [ "$((pr_t1 - pr_t0))" -le "${pr_bound:-0}" ] && [ "$pr_broke" = 0 ]; then pr_kept=$pr_n; break; fi
+  echo "DPR52 placed race attempt $pr_n discarded as a placement overrun: B ended $((pr_t1 - pr_t0)) s after the hold, the bound ${pr_bound:-unread} s$([ "$pr_broke" = 0 ] || echo ", node-lock-broken on requests.lock")"
+done
 same "DPR48 AC3 call A announced its copy from inside its window" \
-  "$([ -e "$pr_h/held" ] && echo placed || echo 'request race never placed')" "placed"
-pr_out=$(PATH="$pr_h/bin:$PATH" RQ_SID=qB run_request_arm --request "$LF/b.md"); pr_rb=$?; pr_t1=$EPOCHSECONDS
-touch "$pr_h/release"; wait "$pr_pa"; pr_ra=$?
+  "$([ -z "$pr_gone" ] && echo placed || echo 'request race never placed')" "placed"
+same "DPR52 AC4 an attempt was placed inside the lock bound, its B ending under NODE_LOCK_BOUND with no break" \
+  "$([ -n "$pr_kept" ] || [ -n "$pr_gone" ] && echo kept || echo 'request race placed past the lock bound')" "kept"
+same "DPR52 AC4 A was waited for on every attempt, no job left" "$(jobs -p)" ""
 pr_ao=$(<"$pr_h/a.out"); pr_key=""; [[ $pr_ao =~ $dm_re ]] && pr_key=${BASH_REMATCH[1]}
 pr_cmp=$(cmp -s "$LF/a.md" "$dm_c1/.git/requests/$pr_key.md" && echo a.md || echo differs)
 same "DPR48 AC1 B, run while A holds requests.lock, exits 2" "$pr_rb" "2"
@@ -21695,7 +21758,7 @@ same "DPR48 AC1 the stored copy is A's, .typed holds qA's one line, the origin o
 pr_out=$(run_request_arm --request "$LF/b.md"); pr_rc=$?
 same "DPR48 AC2 a third call with B's text, after A ends, exits 2" "$pr_rc" "2"
 hit  "$pr_out" "collision: a different text keys alike"
-echo "DPR48 placed race: A exited $pr_ra, B exited $pr_rb $((pr_t1 - pr_t0)) s after the hold, C exited $pr_rc, the stored copy $pr_cmp"
+echo "DPR48 placed race, attempt ${pr_kept:-none} kept of 3: A exited $pr_ra, B exited $pr_rb $((pr_t1 - pr_t0)) s after the hold, C exited $pr_rc, the stored copy $pr_cmp"
 rm -rf "$LF"
 # ---- AC1: a take-over --resume and --close, the claims fetch failing and `warn` planted, refuse at
 # ---- check 109 and queue nothing. The run is aged so the second keepalive takes it over (AC8's way).
@@ -23523,7 +23586,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the AC5 loop's two plants among them) and 8 `same` in the new block (AC28's 2, AC26's 5 of its 6
 # loop passes, and its staged-copy row); no skip branch. No suite ran, and its RED-first observation
 # is the close's.
-FLOOR_ASSERTIONS=4024
+# RAISED 4024 -> 4031 by TOOL-dPlacedRequest-52: 7 region-eight assertions off the diff's own lines,
+# the placed race's 2 new `same` (its bound and its jobs row), the trap arm's 3 (2 `same` and 1
+# `mutate` staging its copy) and the renews loop's 2 new `same` (its copies row and its out-of-set
+# RED); the loop's own two rows gain passes, not assertions; no skip branch. No suite ran, and its
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=4031
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23800,7 +23868,8 @@ FLOOR_SHARD_7=311
 # RAISED 1189 -> 1214 by TOOL-dPlacedRequest-43: the same 25 region-eight minors executions, see FLOOR_ASSERTIONS.
 # RAISED 1214 -> 1222 by TOOL-dPlacedRequest-48: the same 8 region-eight placed-race assertions, see FLOOR_ASSERTIONS.
 # RAISED 1222 -> 1243 by TOOL-dPlacedRequest-49: the same 21 region-eight lock-order, queued-head and status assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1243
+# RAISED 1243 -> 1250 by TOOL-dPlacedRequest-52: the same 7 region-eight race, trap and renews assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1250
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

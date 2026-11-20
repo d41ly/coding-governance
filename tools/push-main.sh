@@ -731,14 +731,18 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
 # in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
 # `EXIT` trap is armed BEFORE the take (TOOL-dPlacedRequest-49 S6) and acts only once `write_dir_lock`
-# has set `_fl_mine`, which the subshell empties first: it then clears the lock directory where its
-# `owner` is absent or reads this call's token. So an abort anywhere after the `mkdir`, an unbound
+# has set `_fl_mine`, which the subshell empties first: it then releases the lock directory where its
+# `owner` reads this call's token, and clears one with no `owner` only while no `gov-feed.lock.break`
+# guard exists (TOOL-dPlacedRequest-52 S20); every other lock it leaves. A breaker in `write_dir_lock`
+# holds that guard from before its `rm -rf` until after it writes `owner`, so a breaker's window is
+# never cleared. So an abort anywhere after the `mkdir`, an unbound
 # name under a carrier's `set -u`, a function no carrier defines or a failed write, ends the subshell
 # alone: the append prints `feed: NOTE - <ref>: the append exited <rc>` and returns 0, and no lock is
 # left for the next writer to wait out; a busy take, exit 3, finds the flag empty and leaves the
-# holder's lock. The subshell sets no global a caller reads. WHAT THIS DOES NOT CHECK: a holder that
-# outlives its deadline can find, at its exit, a lock another writer broke and re-made but has not yet
-# stamped with its `owner`, and clears it; an abort after the line is written reads as a NOTE all the same.
+# holder's lock. The subshell sets no global a caller reads. WHAT THIS DOES NOT CHECK: the one window
+# left is a third writer's own `mkdir`-to-`owner` window, after a peer broke this writer's lock and
+# released it, which a holder that outlives NODE_LOCK_BOUND and a full peer cycle can find at its exit
+# and clear; an abort after the line is written reads as a NOTE all the same.
 # THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
 # and this is the one take a carrier with no driver reaches, so where it is unset the append prints
 # one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
@@ -773,7 +777,7 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
   fi
   tok="$BASHPID.$RANDOM"
   ( _fl_mine=
-    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
+    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
     write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
     if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
         BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
