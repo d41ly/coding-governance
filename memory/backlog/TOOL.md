@@ -713,3 +713,6 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS (DERIVED) ENFORCE NOTHING THE RULE CAN NAME.… |
 | [TOOL-dWitnessedBar-99](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | FIVE REGISTRIES STAY IN THEIR GRAMMAR. TOOL-dWitnessedBar-16 §8 F16… |
 | [TOOL-dWitnessedBar-100](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE LOOP HAS NO VERB THAT PRINTS ONE ITEM'S OUTCOMES.… |
+| [TOOL-dWitnessedBar-101](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | THE DRIFT VERB DOES NOT COMPOSE A KIND'S ROWS FROM ITS CALLER.… |
+| [TOOL-dWitnessedBar-102](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | A REFUSED OVERLAY ROW WITHHOLDS EVERY LEG. TOOL-dWitnessedBar-28 §8 F7… |
+| [TOOL-dWitnessedBar-103](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-20 | THE RENDER COMPOSES A KIND WHOSE GOV ROWS ITS CALLER SUPPLIES.… |
