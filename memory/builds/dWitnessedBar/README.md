@@ -152,9 +152,9 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-7 — `test.seen-red` reading one seen-red record per gate a build adds or changes, the acceptance-ledger line standing in for `build.acceptance`](spec/2026-10-25-spec-TOOL-dWitnessedBar-7.md) | 26 | 2 | CLOSED | rev-6 | 2026-11-20 |
 | [TOOL-dWitnessedBar-21 — a fix pass that keeps its check: its allowance less the red leg's own files and the acceptance commands' own files](spec/2026-10-25-spec-TOOL-dWitnessedBar-21.md) | 27 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-6 — the verdict backends registered under `verdict`: the local hook, the peer-node verifier and the `remote-ci` slot with its witness rule and pin](spec/2026-10-25-spec-TOOL-dWitnessedBar-6.md) | 28 | 2 | CLOSED | rev-7 | 2026-11-20 |
-| [TOOL-dWitnessedBar-2 — each hook bypass recorded under `hooks.bypass`, and `refused` held by an off-node witness](spec/2026-10-25-spec-TOOL-dWitnessedBar-2.md) | 29 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-43 — a peer-node verdict stands only under the source pin and from a tag its node signed](spec/2026-10-25-spec-TOOL-dWitnessedBar-43.md) | 29 | 2 | DEFERRED | rev-4 | 2026-10-25 |
-| [TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing](spec/2026-10-25-spec-TOOL-dWitnessedBar-28.md) | 30 | 2 | DEFERRED | rev-5 | 2026-11-05 |
+| [TOOL-dWitnessedBar-2 — each hook bypass recorded under `hooks.bypass`, and `refused` held by an off-node witness](spec/2026-10-25-spec-TOOL-dWitnessedBar-2.md) | 29 | 2 | DEFERRED | rev-4 | 2026-11-20 |
+| [TOOL-dWitnessedBar-43 — a peer-node verdict stands only under the source pin and from a tag its node signed](spec/2026-10-25-spec-TOOL-dWitnessedBar-43.md) | 29 | 2 | DEFERRED | rev-5 | 2026-11-20 |
+| [TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing](spec/2026-10-25-spec-TOOL-dWitnessedBar-28.md) | 30 | 2 | DEFERRED | rev-6 | 2026-11-20 |
 | [TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb](spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md) | 31 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dWitnessedBar-56 — the round-1 audit of units 40 to 51, verdict-boundary minors batched: a lossless selection, one adoption rule on both readers, honest peer reads, and floors under the new arms](spec/2026-10-25-spec-TOOL-dWitnessedBar-56.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dWitnessedBar-57 — the round-1 audit of units 40 to 51, resolver, ledger and adopter minors batched: one stated wrong-shell predicate, contained seed homes, readers that see what the runner holds, and observations that can red](spec/2026-10-25-spec-TOOL-dWitnessedBar-57.md) | 32 | 2 | DEFERRED | rev-4 | 2026-10-25 |
@@ -276,7 +276,7 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 88 spec(s) a
 | 26 | `TOOL-dWitnessedBar-7` | no |
 | 27 | `TOOL-dWitnessedBar-21` | no |
 | 28 | `TOOL-dWitnessedBar-6` | no |
-| 29 | `TOOL-dWitnessedBar-2`, `TOOL-dWitnessedBar-43` | yes |
+| 29 | `TOOL-dWitnessedBar-2`, `TOOL-dWitnessedBar-43` | no |
 | 30 | `TOOL-dWitnessedBar-28` | no |
 | 31 | `TOOL-dWitnessedBar-51` | no |
 | 32 | `TOOL-dWitnessedBar-56`, `TOOL-dWitnessedBar-57` | yes |
