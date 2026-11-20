@@ -175,6 +175,14 @@ What the render gate does with the list of instruction files not yet rendered fr
 instructions.legacy = "refuse"
 ```
 
+## `trace.leg-output`
+<!-- usage: policy:trace.leg-output b5f47620 -->
+Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`.
+
+```text
+trace.leg-output = "node-local"
+```
+
 ## `platforms.provision`
 Documented on [help/python-floor.md](../python-floor.md).
 
@@ -187,7 +195,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (238)
+## Not yet summarised (237)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -417,7 +425,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `commits.squash`
 - `trace.identity`
 - `trace.cost`
-- `trace.leg-output`
 - `trace.rows`
 - `runtime.binary`
 - `runtime.owner-harness`

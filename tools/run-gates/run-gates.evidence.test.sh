@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=278
+FLOOR_ASSERTIONS=287
+# RAISED 278 -> 287 by TOOL-dWitnessedBar-25: the verdict's run, cause and tail arms, AC1's one, AC2's
+# four, AC3's one, AC4's one and AC5's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 272 -> 278 by TOOL-dWitnessedBar-10: the node-keyed evidence arms, AC8's one, AC7's two,
 # AC9's one, and AC10's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 253 -> 270 by TOOL-aNimbleMend-15: the pass-leg rule arms over fixtures F and B, S8's thirteen,
@@ -716,6 +718,62 @@ rv_wgd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
   && ok "AC1 a linked worktree's run writes gate-verdict/<tree> in the common dir, not its own git dir, and keys it by the tree" \
   || nope "AC1 the linked worktree's per-tree verdict is missing from the common dir, written under its own git dir, or keyed by the sha"
 rm -rf "$REC_T.wt"; rec_done
+
+# --- TOOL-dWitnessedBar-25 AC1-AC5: the verdict names its run and cause, and a failing leg's tail is kept by hash
+# One red leg printing 100 numbered lines and a credential-shaped URL, beside a leg printing whether it
+# sees GATE_CAUSE. The verdict carries `run_id` (the header's), `cause` (the export, `attended` unset or
+# refused) and `tail.1`; the tail file is the redacted copy's last 60 lines, named by its blob hash; and
+# the sweep past GATE_RUN_KEEP removes a tail only a swept run named.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'for i in $(seq 1 100); do echo "line $i"; done' \
+  'echo "see https://user:secret@example.com/x"' 'exit 1' > "$REC_T/fx/hundred.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'env | grep -c "^GATE_CAUSE=" || true' 'exit 0' > "$REC_T/fx/cause.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'echo "varied ${FX_N:-0}"' 'exit 1' > "$REC_T/fx/varied.sh"
+rec_legs '[ {"name": "hundred", "argv": ["bash", "fx/hundred.sh"]}, {"name": "cause", "argv": ["bash", "fx/cause.sh"]} ]'
+tl_sha=$(git -C "$REC_T" rev-parse HEAD); tl_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}')
+rec_run GATE_FULL=1 GATE_CAUSE="push:$tl_sha" >/dev/null
+tl_d=$(rec_dir); tl_v="$tl_d/verdict"
+tl_id=$(awk -F'\t' '$1=="run_id"{print $2}' "$tl_d/header" 2>/dev/null)
+[ -n "$tl_id" ] && [ "$(awk -F'\t' '$1=="run_id"{print $2}' "$tl_v" 2>/dev/null)" = "$tl_id" ] \
+  && ok "AC1 the run record's verdict names run_id, the id its header names" \
+  || { nope "AC1 the verdict names no run_id, or another run's"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+[ "$(awk -F'\t' '$1=="cause"{print $2}' "$tl_v" 2>/dev/null)|$(awk -F'\t' '$1=="cause"{print $2}' "$REC_GD/gate-verdict/$tl_tree" 2>/dev/null)" = "push:$tl_sha|push:$tl_sha" ] \
+  && ok "AC2 the verdict and the per-tree verdict both read cause push:<sha>" \
+  || { nope "AC2 the verdict or the per-tree verdict does not read the exported cause"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+[ "$(tr -d '\r\n ' < "$tl_d/1.out" 2>/dev/null)" = 0 ] \
+  && ok "AC2 a leg's own environment holds no GATE_CAUSE" \
+  || nope "AC2 a leg inherited GATE_CAUSE, or the cause leg wrote no output: $(cat "$tl_d/1.out" 2>/dev/null)"
+tl_h=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$tl_v" 2>/dev/null)
+tl_f="$REC_GD/gate-tails/$tl_h"
+[ -n "$tl_h" ] && [ "$(awk -F'\t' '$1=="tail.1"{print $2}' "$tl_v")" = "$tl_h hundred" ] && [ -f "$tl_f" ] \
+  && [ "$(wc -l < "$tl_f")" -eq 60 ] && [ "$(head -n 1 "$tl_f")" = "line 42" ] \
+  && [ "$(git -C "$REC_T" hash-object --stdin < "$tl_f")" = "$tl_h" ] \
+  && ok "AC3 tail.1 names the red leg, and gate-tails/<hash> holds its last 60 lines under its own blob hash" \
+  || { nope "AC3 no tail.1 for the red leg, or its file is not the last 60 lines named by their hash"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+grep -q '://\*\*\*:\*\*\*@' "$tl_f" 2>/dev/null && ! grep -q 'secret' "$tl_f" 2>/dev/null \
+  && ok "AC4 the tail holds the masked credential and not the secret, so it was cut from the redacted copy" \
+  || nope "AC4 the tail carries the secret, or holds no masked form to prove it was read"
+rec_run GATE_FULL=1 >/dev/null
+tl_unset="$(awk -F'\t' '$1=="cause"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)|$(awk -F'\t' '$1=="cause"{print $2}' "$REC_GD/gate-verdict/$tl_tree" 2>/dev/null)"
+[ "$tl_unset" = "attended|attended" ] \
+  && ok "AC2 with GATE_CAUSE unset the verdict and the per-tree verdict read cause attended" \
+  || nope "AC2 an unset GATE_CAUSE did not read attended: $tl_unset"
+rec_run GATE_FULL=1 GATE_CAUSE=$'push:a\tb' >/dev/null
+[ "$(awk -F'\t' '$1=="cause"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)" = attended ] && grep -q 'GATE_CAUSE refused' "$REC_OUT" \
+  && ok "AC2 a tabbed GATE_CAUSE reads attended and stderr names the refusal" \
+  || { nope "AC2 a malformed GATE_CAUSE reached the record, or nothing named the refusal"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+# AC5: the first run's tail is named by no other run, and two runs are kept: three more red runs, each
+# naming a tail of its own, sweep the first run and its tail with it, and keep every tail a kept run names.
+rec_legs '[ {"name": "varied", "argv": ["bash", "fx/varied.sh"]} ]'
+[ -f "$tl_f" ] && ok "AC5 control: the first run's tail is on disk before the sweep, so its removal is the sweep's" \
+               || nope "AC5 control: the first run's tail was gone before the sweep, so the arm below proves nothing"
+for tl_k in 1 2 3; do rec_run GATE_FULL=1 GATE_RUN_KEEP=2 FX_N=$tl_k >/dev/null; sleep 1; done
+tl_named=$(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ {split($2, a, " "); print a[1]}' "$REC_GD"/gate-run/*/verdict 2>/dev/null | sort -u)
+tl_files=$(ls -1 "$REC_GD/gate-tails" 2>/dev/null | sort -u)
+[ ! -e "$tl_f" ] && [ -n "$tl_named" ] && [ "$tl_named" = "$tl_files" ] \
+  && ok "AC5 the sweep past GATE_RUN_KEEP removed the swept run's tail and kept exactly the tails the kept runs name" \
+  || nope "AC5 a tail outlived every run that named it, or a named tail was removed: named [$tl_named] on disk [$tl_files]"
+rec_done
 
 rec_repo
 rc=$(rec_run GATE_FULL=)     # guards live: the guarded leg is unchanged vs origin/main

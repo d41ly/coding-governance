@@ -195,6 +195,11 @@ KINDS = {
         "required": ("Population", "Keys", "Reason", "Caused-by"),
         "closed": (),
     },
+    "leg-tail": {   # TOOL-dWitnessedBar-25 S6: written by the run-gates kit's `keep_tails.py`, no `new` door;
+        # the tail itself is one fenced block after the fields
+        "required": ("Leg", "Hash", "Run", "Sha", "Cause"),
+        "closed": (),
+    },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
     raise ImportError("build_records: the kind table and tree_lib.TYPED_RECORD_KINDS differ on "

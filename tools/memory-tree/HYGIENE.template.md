@@ -676,7 +676,8 @@ carry it too:
   records") · `transition` (one build stage move, in the grammar under "Transition records") ·
   `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
   records") · `widen` (a population's growth admitted with its reason, written by the ratchet pack's
-  `ratchet.py widen` door). The ten after `research` are the typed kinds: each record is named
+  `ratchet.py widen` door) · `leg-tail` (a failing leg's output tail kept by its hash, written by the
+  run-gates kit's `keep_tails.py`). The eleven after `research` are the typed kinds: each record is named
   `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.

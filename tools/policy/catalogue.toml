@@ -1678,6 +1678,8 @@ owner = "dWellOiledMachine"
 name = "trace.leg-output"
 allowed = ["tail-by-hash", "node-local"]
 default = "tail-by-hash"
+summary = "Where a failing leg's output tail lives: kept by its hash in the common dir and named in the verdict under either value, and under `tail-by-hash` also committed as a `leg-tail` record by the run-gates kit's `keep_tails.py`."
+usage = 'trace.leg-output = "node-local"'
 owner = "dWitnessedBar"
 
 [[key]]

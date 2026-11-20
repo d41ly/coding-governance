@@ -227,7 +227,6 @@ runtime.secret-scan
 runtime.spawn-backend
 trace.cost
 trace.identity
-trace.leg-output
 trace.rows
 transitions.record
 verdict
