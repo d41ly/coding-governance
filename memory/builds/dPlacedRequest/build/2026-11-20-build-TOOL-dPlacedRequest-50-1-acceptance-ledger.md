@@ -19,7 +19,7 @@ default, and reads the `tOc` row over the HEAD driver, then over the copy, in th
 - printed `1 1`. (DERIVED)
 - The feed lines the probe planted for the middle commit, so it is absent from `seen`: (DERIVED)
 - 0 (DERIVED)
-- AC1 — `derive_claim_ago` planted the tip and the opener at the PINNED ages of spec 47 rev-7, the middle unsighted: (PINNED)
+- AC1 — the tenure `read_clock_row` reads, its tip and opener planted by `derive_claim_ago` at the PINNED ages of spec 47 rev-7, its middle unsighted: (PINNED)
 - 60 s (PINNED)
 - 90000 s (PINNED)
 - AC1 — `read_clock_row` over `$SCRIPT` printed `stale`, aged from its tip: (PINNED)
