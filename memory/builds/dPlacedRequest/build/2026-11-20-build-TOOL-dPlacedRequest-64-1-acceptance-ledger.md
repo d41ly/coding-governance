@@ -50,6 +50,14 @@ amendments, taken by `git show`. The items the spec marks NOT OBSERVED or resolv
 - The tree's 61 already wraps its rev-6 entry between the id and `to AC13`, so AC18's scratch copy is the tree's bytes, and the respelled copy is the one that changes them. (DERIVED)
 - The text 59's rows section states is the shipped code: `tools/unattended/unattended.test.sh#slice_fn` holds the guard `[ "${2:-}" = var ]`, and the same file's `read_kv_row` prints `%s|%d` and is followed by `slice_fn CLAIM_KV_AWK var`. (DERIVED)
 - The unit's commits change no file outside the build folder and the spec's status cell, so no function is minted, renamed or deleted. (DERIVED)
+- A count of how often a read "names" or "holds" a token is a fixed-string occurrence count; a count a command "printed" is that command's own output, a `grep -c` line count where the criterion names one. (DERIVED)
+- The bug-class checklist over the pass commit selected `fixture-passes-by-finding-nothing`: every zero above is paired with a read that printed its token, AC15's empty grep over its one-file population with the whole folder and the pre-re-grounding copies, over which it printed files. (DERIVED)
+- It selected `criterion-asserts-what-its-own-command-cannot-show`: AC15's and AC17's greps run over this spec, which quotes each pattern; neither quotation matches its own pattern, the backslash before `^` and the parenthesised alternation keeping each one out, so this spec's zero is not broken by its own text. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: AC9's copy respells the shipped AC21, AC18's respells the shipped rev-6 id, and AC5's rewraps the shipped Evidence sentence into the claim for both input paths the finding named. (DERIVED)
+- It selected `heredoc-escape-reaches-the-regex`: the probes ran from files written by the edit tools, the `tr '\n' ' '` count reading the backslash literally, and its control over the readers section printed the join. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line, and a probe found each answer's first token in its criterion's joined text. (DERIVED)
+- It selected `inline-fence-swallows-the-rest-of-the-file` and `pipe-in-a-code-span-splits-a-table-cell`: this record holds no fence and no table, so its pipes sit in list items. (DERIVED)
+- It selected `one-value-field-records-a-mixed-outcome` and `amendment-leaves-its-other-half-standing`: every criterion held, so the outcome is one value, and the items with no criterion are the ones the spec marks NOT OBSERVED or resolved. (DERIVED)
 
 ## Items diverged
 
