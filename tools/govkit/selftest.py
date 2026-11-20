@@ -4229,12 +4229,31 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
           and w1.returncode == 0 and f"not an assignment {gate}:1" in w1.stdout,
           up.stdout + up.stderr + w1.stdout + w1.stderr)
 
+    # TOOL-dWitnessedBar-59 AC1 AC2: LF alone separates lines, as the hook's here-string read does, so
+    # a lone CR stays inside its line for every verb. RED against a step splitting its text with
+    # `str.splitlines()`: AC1's up takes the second half's land, and AC2's up keeps the indented half
+    # while its witness names that half as not an assignment. `run_step` reads stdout in text mode,
+    # which turns the CR into a line break, so the witness is graded by substring counts, not lines.
+    t = build_target(tmp, None, "ir59-ac1", {gate: b"A=1\nINHERITED_RED=park\rINHERITED_RED=land\nB=2\n"})
+    up = run_step("up", t)
+    check("[dWB-59 AC1] park<CR>INHERITED_RED=land on one LF line: the up reads the hook's one value "
+          "and writes every-red, never the land after the lone CR",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir59-ac2", {gate: b"A=1\nINHERITED_RED=park\r INHERITED_RED=land\nB=2\n"})
+    w0, up = run_step("witness", t), run_step("up", t)
+    check("[dWB-59 AC2] park<CR> INHERITED_RED=land on one LF line: the witness exits 1 naming one "
+          "assignment and no stray line, and the up deletes the line whole, leaving A=1 and B=2",
+          w0.returncode == 1 and w0.stdout.count("assigns") == 1 and "not an assignment" not in w0.stdout
+          and up.returncode == 0 and (t / gate).read_bytes() == b"A=1\nB=2\n",
+          w0.stdout + up.stdout + up.stderr)
+
     # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key`, cut from
     # `.githooks/pre-push` from its `read_policy_key() {` line to the first column-0 `}` and run under
     # the resolved bash, read one fixture set alike. A sentinel through the cut function proves bash
     # ran it before any row is graded. RED against the reader over `build_line_re` on the indented,
     # spaced, leading-tab and BOM rows, and against a reader taking the first assignment on the first.
-    # WHAT IT DOES NOT CHECK: spellings outside the set, a lone CR, the driver's copy of the parser
+    # TOOL-dWitnessedBar-59 AC3 adds the `lone-cr` row, RED against a reader splitting on a lone CR.
+    # WHAT IT DOES NOT CHECK: spellings outside the set, the driver's copy of the parser
     # (the push-main suite holds it to the hook's), and the value mapping the step applies after.
     hook = (GOV_ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8").splitlines()
     start = next((i for i, ln in enumerate(hook) if ln.startswith("read_policy_key() {")), None)
@@ -4270,15 +4289,21 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
             b'INHERITED_RED="land"\n', b"INHERITED_RED=park  # was\n", b"INHERITED_RED=land\r\n",
             b"INHERITED_RED=park\nINHERITED_RED=\n", b"INHERITED_RED=park\nINHERITED_RED = land\n",
             b"INHERITED_RED=\tland\n", "﻿INHERITED_RED=land\n".encode())
+    lone_cr = b"INHERITED_RED=park\rINHERITED_RED=land\n"  # TOOL-dWitnessedBar-59 S3: one LF line
+    rows += (lone_cr,)
+    named = {lone_cr: ("lone-cr", "park\rINHERITED_RED=land")}  # row name, the hook's agreed value
     graded = 0
     for body in rows:
         want, err = read_hook_value(body, "INHERITED_RED")
         mine = step.read_value(body, gate, "INHERITED_RED") or ""
-        check(f"[dWB-55 AC4] the step's read_value and the hook's read_policy_key agree on {body!r}",
-              want is not None and mine == want, f"hook {want!r} step {mine!r} {err}".strip())
+        name, agreed = named.get(body, ("", None))
+        check(f"[dWB-55 AC4] the step's read_value and the hook's read_policy_key agree on "
+              f"{name + ' ' if name else ''}{body!r}",
+              want is not None and mine == want and (agreed is None or want == agreed),
+              f"hook {want!r} step {mine!r} {err}".strip())
         graded += 1
-    check("[dWB-55 AC4] every row of the reader parity set was graded", graded == len(rows) == 11,
-          f"{graded} of {len(rows)}")
+    check("[dWB-55 AC4] every row of the reader parity set was graded, lone-cr included",
+          graded == len(rows) == 12, f"{graded} of {len(rows)}")
 
 
 def check_steps_recordable() -> None:
