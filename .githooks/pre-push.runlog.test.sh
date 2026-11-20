@@ -1124,8 +1124,9 @@ check_byp_refused() {
     mkdir -p "$WORK/$1"; shift
     for r in "$@"; do cp "$SRC/$rel/$r" "$WORK/${k%% *}/" || return 1; done
   done
+  rgk=run-gates  # the runner kit, named once
   printf '[[verdict_backend]]\nname = "%s"\nreader = "verdict_backends:read_local_verdict"\noff_node = %s\nowner = "tFix"\n\n' \
-    local-hook false peer-node true > "$WORK/run-gates/kit.toml"
+    local-hook false peer-node true > "$WORK/$rgk/kit.toml"
   mkdir -p .governance && printf 'verdict = "peer-node"\n\n[hooks]\nbypass = "refused"\n' > .governance/policy.toml
   git add .governance/policy.toml && git commit -q -m "the policy at R" || return 1
   : > "$REPO/.git/push-main-active"; rm -f "$REPO/.git/gate-full-green"
