@@ -67,6 +67,42 @@ def test_held(leg):
 # <<< hold_predicate
 
 
+# >>> selection_row -- canonical copy: verdict_flow.py in the gov run-gates kit (byte-identical; gated)
+# THE HOLD (TOOL-dWitnessedBar-5). The runner's `HOLD_SOURCES` is `kit` and these two: `kit` it derives
+# from the manifest row itself, so a selection holding a `kit` row is ignored and its leg runs.
+SELECTION_SOURCES = ("quarantine", "level")
+# A selection row's fifth field (TOOL-dWitnessedBar-30 S1): `run` executes the leg outside the verdict.
+SELECTION_MODES = ("hold", "run")
+
+
+def read_selection(text, names=None):
+    """(rows [(leg, source, note, mode)], refusals [line]) of a selection record's text. A row that is
+    not `held` and three or four fields, whose source is outside SELECTION_SOURCES, whose mode is outside
+    SELECTION_MODES, or whose leg `names` lacks is refused and its leg runs; a row with no mode is `hold`
+    (TOOL-dWitnessedBar-30 S1). `#` lines are the header. The drift-audit kit's `drift_report.py`
+    carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy that drifts
+    (TOOL-dWitnessedBar-62 S17)."""
+    rows, refusals = [], []
+    for n, ln in enumerate(text.splitlines(), 1):
+        if not ln.strip() or ln.startswith("#"):
+            continue
+        f = ln.split("\t")
+        if len(f) not in (4, 5) or f[0] != "held" or not f[1]:
+            refusals.append(f"selection row {n} is not `held` · leg · source · note [· mode], ignored")
+        elif f[2] not in SELECTION_SOURCES:
+            refusals.append(f"selection row {n} holds {f[1]} by '{f[2]}', outside "
+                            f"{' '.join(SELECTION_SOURCES)}, ignored: it runs")
+        elif len(f) == 5 and f[4] not in SELECTION_MODES:
+            refusals.append(f"selection row {n} holds {f[1]} in mode '{f[4]}', outside "
+                            f"{' '.join(SELECTION_MODES)}, ignored: it runs")
+        elif names is not None and f[1] not in names:
+            refusals.append(f"selection row {n} holds {f[1]}, which the manifest lacks, ignored")
+        else:
+            rows.append((f[1], f[2], f[3], f[4] if len(f) == 5 else "hold"))
+    return rows, refusals
+# <<< selection_row
+
+
 # The kit homes the gate-health fixture plants its scratch repository with, each named once.
 DRIFT_KIT = "drift-audit"
 TREE_KIT = "memory-tree"
@@ -3687,20 +3723,18 @@ SELECTION_HOLDS = ("quarantine", "level")  # the selection sources that hold a l
 
 
 def read_selection_holds(path) -> set:
-    """The legs the selection record at `path` holds: each `held` row of four or five TAB fields whose
-    source is in SELECTION_HOLDS, whatever its mode, since a `run` row too runs outside the verdict
-    (TOOL-dWitnessedBar-57 S18). `#` lines are its header; any other row holds nothing. An empty file
-    holds nothing. A DriftError where the file does not read."""
+    """The legs the selection record at `path` holds: each row the runner's own row reader, the
+    `selection_row` block's `read_selection` carried inline above (TOOL-dWitnessedBar-62 S17), accepts
+    and whose source is in SELECTION_HOLDS, in either mode, since a `run` row too runs outside the
+    verdict (TOOL-dWitnessedBar-57 S18). A row it refuses, a mode outside `hold` and `run` included,
+    holds nothing, as the runner ignores it and the leg runs. An empty file holds nothing. A DriftError
+    where the file does not read."""
     try:
         text = pathlib.Path(path).read_bytes().decode("utf-8")
     except (OSError, UnicodeDecodeError) as exc:
         raise DriftError(f"--selection {path} does not read, so the runner's holds are unknown: {exc}") from None
-    held = set()
-    for ln in text.splitlines():
-        f = ln.split("\t")
-        if not ln.startswith("#") and len(f) in (4, 5) and f[0] == "held" and f[1] and f[2] in SELECTION_HOLDS:
-            held.add(f[1])
-    return held
+    rows, _refused = read_selection(text)
+    return {leg for leg, source, _note, _mode in rows if source in SELECTION_HOLDS}
 
 
 def read_gate_health(root: pathlib.Path, extra: str | None = None, selection=None):

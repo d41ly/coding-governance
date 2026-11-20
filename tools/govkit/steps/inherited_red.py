@@ -38,8 +38,9 @@ writing nothing, since two keys deciding one landing must not be resolved by a s
 line kept byte for byte and the file kept, LAST, so the witness changes last. A re-run over a killed
 up recomputes from the first before-image and converges. The DOWN restores every file
 byte-identical. The WITNESS prints one line per file read, naming it, the value found and the value
-written, and one `not an assignment <file>:<line>` line per line that spells the key and is no
-assignment by that rule, which does not fail it; it exits 0 when no `INHERITED_RED` assignment is
+written, and one `not an assignment <file>:<line>` line per line that opens with the key and an `=`,
+indented, spaced or after `export`, and is no assignment by that rule, which does not fail it; a
+`#`-led doc line spelling the key is no such line (TOOL-dWitnessedBar-62 S38); it exits 0 when no `INHERITED_RED` assignment is
 left in either file, or neither is present, which is the step applied.
 
 Exit 0 done, 1 refused naming the file or the conflict (nothing written), 2 a usage error.
@@ -244,7 +245,7 @@ def cmd_witness(target: pathlib.Path) -> int:
         now = any(check_policy_assignment(ln, KEY) for ln in lines)
         was = image.get(rel)
         stray = [f"not an assignment {rel}:{n}" for n, ln in enumerate(lines, 1)
-                 if re.search(rf"(?<!\w){KEY}\s*=", ln) and not check_policy_assignment(ln, KEY)]
+                 if re.match(rf"\s*(export\s+)?{KEY}\s*=", ln) and not check_policy_assignment(ln, KEY)]
         if not now and not (was is not None and any(
                 check_policy_assignment(ln, KEY) for ln in was.decode("utf-8", "replace").split("\n"))):
             rows.append(f"{rel} " + ("is absent or unreadable" if data is None else f"assigns no {KEY}")

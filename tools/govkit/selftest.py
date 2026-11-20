@@ -1758,80 +1758,111 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
 
 
 def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
-    """TOOL-dWitnessedBar-54 S3 — a `[[generated]]` row's `when` has three readers: run-gates'
-    `regen.check_when` through `build_items`, the unattended kit's `resolve_generated_indexes`, and
-    selfcheck 6c. One row per form is planted in a COPY of gov's run-gates descriptor; regen and the
-    shell reader must keep the same rows, and selfcheck must refuse exactly the rows regen refuses.
-    regen reads each row ALONE, because one refused row refuses its whole descriptor there. WHAT IT
-    DOES NOT CHECK: a fourth reader of the key, which this arm holds only once it joins it."""
+    """TOOL-dWitnessedBar-54 S3, TOOL-dWitnessedBar-62 S1 to S3 and S22 — a `[[generated]]` row's `when`
+    has three readers: run-gates' `regen.check_when` through `build_items`, the unattended kit's
+    `resolve_generated_indexes`, and selfcheck 6c. Rows are planted in a COPY of gov's run-gates
+    descriptor, one tree at a time. The ADMISSIBLE tree holds conf true, conf false, `exists:` present
+    and `exists:` absent, each carrying `write`, `check` and `stage`, and no refused form: regen reads
+    them TOGETHER, and its kept paths must equal the shell reader's kept pairs, with selfcheck refusing
+    none. Each REFUSED form, an unknown token, an empty `exists:` path, a `when` of neither form, an
+    absolute `exists:` path and one holding a `..` segment, sits ALONE in its own tree beside one
+    conf-true row, because one refused row refuses its whole descriptor in regen: regen raises naming
+    the row, the shell reader names the descriptor and the `when` on stderr and keeps the conf-true
+    row, and selfcheck refuses the row. A row lacking `write`, `check` and `stage` is skipped by regen
+    before its `when` is read and kept by the shell reader, so the two cannot be compared on it: it is
+    printed `not compared <descriptor> <path>` and left out. WHAT IT DOES NOT CHECK: that disagreement
+    on such a row, which the memory-tree descriptor's own comment names (the shell readers match only
+    `path`, `generator` and `when`); and a fourth reader of the key, which this arm holds only once it
+    joins it."""
+    import tomllib  # noqa: PLC0415
     rk = KIT_NAMES["run-gates"]
     kit_rel = f"{PFX}{rk}"
     desc = gcopy / kit_rel / "kit.toml"
+    here = f"{kit_rel}/kit.toml"
     conf = gcopy / "w54.conf"
     keep = desc.read_bytes()
-    forms = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
-             "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt",
-             "unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:"}
+    admissible = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
+                  "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt"}
+    # The `..` form names a file that exists, so a reader without the containment test KEEPS it.
+    refused = {"unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:", "no-colon": "W54=on",
+               "absolute": f"exists:/{rk}/regen.py", "dotdot": f"exists:{{kit}}/../{rk}/regen.py"}
     conf.write_text("W54=on\n", encoding="utf-8", newline="\n")
-    # AC2 rides the same selfcheck run: the leg factory's own row, its `when` emptied to `exists:`.
-    factory_when = 'when = "exists:{prefix}/govkit/govkit.py"'
-    check("[dWB-54 AC2] LIVENESS the run-gates descriptor carries the factory row's when once",
-          keep.decode("utf-8").count(factory_when) == 1, f"no single match in {desc.name}")
-    desc.write_text(keep.decode("utf-8").replace(factory_when, 'when = "exists:"', 1) + "".join(
-        f'\n[[generated]]\npath = "{{kit}}/w54-{lbl}.out"\ngenerator = "leg_factory.py"\n'
-        f'why = "the when-form parity fixture"\nwrite = ["python", "{{kit}}/leg_factory.py", "--write"]\n'
-        f'check = ["python", "{{kit}}/leg_factory.py", "--check"]\nstage = 1\nwhen = "{w}"\n'
-        for lbl, w in forms.items()), encoding="utf-8", newline="\n")
-    try:
-        import tomllib  # noqa: PLC0415
+
+    def render_w62_rows(forms: dict, bare: bool) -> str:
+        text = "".join(
+            f'\n[[generated]]\npath = "{{kit}}/w54-{lbl}.out"\ngenerator = "leg_factory.py"\n'
+            f'why = "the when-form parity fixture"\nwrite = ["python", "{{kit}}/leg_factory.py", "--write"]\n'
+            f'check = ["python", "{{kit}}/leg_factory.py", "--check"]\nstage = 1\nwhen = "{w}"\n'
+            for lbl, w in forms.items())
+        if bare:
+            text += ('\n[[generated]]\npath = "{kit}/w54-bare.out"\ngenerator = "leg_factory.py"\n'
+                     'why = "the when-form parity fixture, a row regen never reads"\nwhen = "w54.conf:W54=on"\n')
+        return text
+
+    def read_w62_tree(forms: dict, bare: bool = False):
+        """-> (regen's kept labels or its Refusal text, the shell run, the selfcheck run, not compared)."""
+        desc.write_bytes(keep + render_w62_rows(forms, bare).encode("utf-8"))
         spec = importlib.util.spec_from_file_location("w54_regen", gcopy / kit_rel / "regen.py")
         rg = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(rg)
         planted = [r for r in tomllib.loads(desc.read_text(encoding="utf-8")).get("generated", [])
                    if "/w54-" in str(r.get("path"))]
-        by_regen = {}
-        for row in planted:
-            lbl = row["path"].split("/w54-", 1)[1].removesuffix(".out")
-            try:
-                kept = rg.build_items(gcopy, PFX.rstrip("/"), [(kit_rel, {"generated": [row]})], [])
-                by_regen[lbl] = "kept" if kept else "skipped"
-            except rg.Refusal:
-                by_regen[lbl] = "refused"
-        check("[dWB-54 S3] LIVENESS regen read every planted when form", set(by_regen) == set(forms),
-              str(by_regen))
+        uncompared = [r for r in planted if not any(k in r for k in ("write", "check", "stage"))]
+        for r in uncompared:
+            print(f"      not compared {here} {r['path']}")
+        try:
+            items = rg.build_items(gcopy, PFX.rstrip("/"), [(kit_rel, {"generated": planted})], [])
+            by_regen = {o.split("/w54-", 1)[1].removesuffix(".out")
+                        for i in items for o in i["outputs"] if "/w54-" in o}
+        except rg.Refusal as e:
+            by_regen = str(e)
         argv = govkit_module().resolve_shell_argv(
             ["bash", "-c", f'. ./{PFX}{KIT_NAMES["unattended"]}/lib-unattended.sh && '
              'resolve_generated_indexes "$PWD" "" memory'])
         sh = subprocess.run(argv, cwd=str(gcopy), capture_output=True, text=True, encoding="utf-8",
                             errors="replace", timeout=120)
-        # A skip line names the descriptor and the `when`, not the row, and the staged factory row
-        # shares the empty-path row's `when`: so a form counts as refused only on one line per row.
-        named = [ln for ln in sh.stderr.splitlines() if "[[generated]] when" in ln]
-        by_shell = {lbl: "kept" if f"{kit_rel}/w54-{lbl}.out:" in sh.stdout else
-                    "refused" if sum(ln.endswith(f"skipped: {w}") for ln in named)
-                    == 1 + (w == "exists:") else "skipped" for lbl, w in forms.items()}
-        sc = run_selfcheck(gcopy)
-        by_selfcheck = {lbl: "refused" if f"[[generated]] row {{kit}}/w54-{lbl}.out:" in sc.stdout
-                        else "admitted" for lbl in forms}
+        return by_regen, sh, run_selfcheck(gcopy), {r["path"].split("/w54-", 1)[1][:-4] for r in uncompared}
 
-        def extract_labels(says: dict, verdict: str) -> set:
-            return {lbl for lbl, v in says.items() if v == verdict}
-        check("[dWB-54 AC3] regen keeps the conf-true and present-path rows only",
-              extract_labels(by_regen, "kept") == {"conf-true", "present"}, str(by_regen))
-        check("[dWB-54 AC3] the shell reader keeps the rows regen keeps",
-              extract_labels(by_shell, "kept") == extract_labels(by_regen, "kept"),
-              f"shell {by_shell} vs regen {by_regen}\n{sh.stderr[-800:]}")
-        check("[dWB-54 AC3] the shell reader names on stderr exactly the rows regen refuses",
-              extract_labels(by_shell, "refused") == extract_labels(by_regen, "refused"),
-              f"shell {by_shell} vs regen {by_regen}\n{sh.stderr[-800:]}")
-        check("[dWB-54 AC3] selfcheck refuses the unknown-token and empty-path rows only, as regen does",
-              sc.returncode != 0 and extract_labels(by_selfcheck, "refused")
-              == extract_labels(by_regen, "refused") == {"unknown-token", "empty-path"},
-              f"selfcheck {by_selfcheck} vs regen {by_regen}")
-        check("[dWB-54 AC2] selfcheck refuses the factory row's empty exists: when, naming both forms",
-              any("entry 'run-gates' [[generated]] row {kit}/../gate-legs.json:" in ln
-                  and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
-                  for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+    def extract_labels(sh, forms) -> set:
+        return {lbl for lbl in forms if f"{kit_rel}/w54-{lbl}.out:" in sh.stdout}
+
+    def extract_refused(sc, forms) -> set:
+        return {lbl for lbl in forms if f"[[generated]] row {{kit}}/w54-{lbl}.out:" in sc.stdout}
+    try:
+        # S2 — the admissible tree, read together, beside one row no regen reads.
+        by_regen, sh, sc, uncompared = read_w62_tree(admissible, bare=True)
+        check("[dWB-62 AC1] regen reads the admissible tree together and keeps the conf-true and "
+              "present-path rows only", by_regen == {"conf-true", "present"}, str(by_regen))
+        check("[dWB-62 AC1] the shell reader keeps the rows regen keeps",
+              extract_labels(sh, admissible) == by_regen, f"shell {extract_labels(sh, admissible)} vs "
+              f"regen {by_regen}\n{sh.stdout[-800:]}\n{sh.stderr[-800:]}")
+        check("[dWB-62 AC1] the row lacking write, check and stage is printed not compared and left out",
+              uncompared == {"bare"} and "bare" not in (by_regen if isinstance(by_regen, set) else set()),
+              str(uncompared))
+        check("[dWB-62 AC1] the shell reader names no admissible row on stderr, and selfcheck refuses none",
+              not any(f"{here} declares" in ln for ln in sh.stderr.splitlines())
+              and not extract_refused(sc, admissible), sh.stderr[-800:] + sc.stdout[-800:])
+        # S3, S21, S22 — each refused form alone beside one conf-true row.
+        graded = 0
+        for lbl, w in refused.items():
+            forms = {"conf-true": admissible["conf-true"], lbl: w}
+            by_regen, sh, sc, _u = read_w62_tree(forms)
+            check(f"[dWB-62 AC2] regen raises Refusal naming the {lbl} row",
+                  isinstance(by_regen, str) and f"w54-{lbl}.out" in by_regen, str(by_regen))
+            check(f"[dWB-62 AC2] the shell reader names the descriptor and the {lbl} when on stderr and "
+                  f"keeps the conf-true row only",
+                  any(f"{here} declares" in ln and ln.endswith(f"skipped: {w}") for ln in sh.stderr.splitlines())
+                  and extract_labels(sh, forms) == {"conf-true"}, f"{sh.stdout[-600:]}\n{sh.stderr[-800:]}")
+            check(f"[dWB-62 AC2] selfcheck refuses the {lbl} row and no other planted row",
+                  sc.returncode != 0 and extract_refused(sc, forms) == {lbl}, sc.stdout[-1200:])
+            if lbl == "empty-path":
+                check("[dWB-54 AC2] selfcheck refuses the empty exists: when, naming both forms",
+                      any(f"[[generated]] row {{kit}}/w54-{lbl}.out:" in ln
+                          and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
+                          for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+            graded += 1
+        check("[dWB-62 AC2] every refused form was read in its own tree", graded == len(refused) == 5,
+              f"{graded} of {len(refused)}")
     finally:
         desc.write_bytes(keep)
         conf.unlink(missing_ok=True)
@@ -4260,31 +4291,41 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
               f"other line byte for byte, its {tag.upper()} line ends and its unended last line included",
               up.returncode == 0 and got == eol.join([*kept, b"D=4"]), repr(got) + up.stdout + up.stderr)
 
-    # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key`, cut from
-    # `.githooks/pre-push` from its `read_policy_key() {` line to the first column-0 `}` and run under
-    # the resolved bash, read one fixture set alike. A sentinel through the cut function proves bash
-    # ran it before any row is graded. RED against the reader over `build_line_re` on the indented,
-    # spaced, leading-tab and BOM rows, and against a reader taking the first assignment on the first.
-    # TOOL-dWitnessedBar-59 AC3 adds the `lone-cr` row, RED against a reader splitting on a lone CR.
-    # WHAT IT DOES NOT CHECK: spellings outside the set, the driver's copy of the parser
-    # (the push-main suite holds it to the hook's), and the value mapping the step applies after.
-    hook = (GOV_ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8").splitlines()
-    start = next((i for i, ln in enumerate(hook) if ln.startswith("read_policy_key() {")), None)
-    end = next((i for i in range(start, len(hook)) if hook[i].startswith("}")), None) if start is not None else None
-    if end is None:
-        check("[dWB-55 AC4] .githooks/pre-push holds a read_policy_key() { ... } function to cut", False,
-              f"start {start} end {end}")
-        return
+    # TOOL-dWitnessedBar-62 AC25 (S38): `witness` names a line `not an assignment` only where it opens
+    # `INHERITED_RED =`, `export` allowed, and is no assignment, so a `#`-led doc line spelling the key
+    # and an `INHERITED_RED_MAX_AGE` line are not named and an `export` line is. RED against a witness
+    # matching the key anywhere on a line, which names the doc line.
+    t = build_target(tmp, None, "ir62-ac25", {gate: "#   INHERITED_RED=park|land\nINHERITED_RED_MAX_AGE=10\n"
+                                                   "export INHERITED_RED=park\n"})
+    w62 = run_step("witness", t)
+    check("[dWB-62 AC25] the witness names the export line and neither the commented doc line nor the "
+          "INHERITED_RED_MAX_AGE line",
+          f"not an assignment {gate}:3" in w62.stdout and f"{gate}:1" not in w62.stdout
+          and f"{gate}:2" not in w62.stdout, w62.stdout + w62.stderr)
+
+    # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key` read one
+    # fixture set alike. The hook's function is cut by an awk range from its `read_policy_key()` line to
+    # the first column-0 `}`, UNDER the resolved bash, as the hook suite and the push-main suite's
+    # `read_parser_slice` cut it (TOOL-dWitnessedBar-62 S37): one slice rule, not a third in Python. A
+    # sentinel through the cut function proves bash ran it, and that the cut held it, before any row is
+    # graded. RED against the reader over `build_line_re` on the indented, spaced, leading-tab and BOM
+    # rows, and against a reader taking the first assignment on the first. TOOL-dWitnessedBar-59 AC3
+    # adds the `lone-cr` row, RED against a reader splitting on a lone CR. WHAT IT DOES NOT CHECK:
+    # spellings outside the set, the driver's copy of the parser (the push-main suite holds it to the
+    # hook's), and the value mapping the step applies after.
+    hook = (GOV_ROOT / ".githooks" / "pre-push").as_posix()
     ir = importlib.util.spec_from_file_location("inherited_red_parity", step_py)
     step = importlib.util.module_from_spec(ir)
     ir.loader.exec_module(step)
     d = tmp / "ir55-ac4"
     d.mkdir(parents=True, exist_ok=True)
-    (d / "r.sh").write_bytes(("\n".join(hook[start:end + 1]) + '\nread_policy_key "$(cat ./f)" "$1"\n').encode())
+    (d / "r.sh").write_bytes(rb"""eval "$(awk '/^read_policy_key\(\)/,/^}/' "$2")"
+read_policy_key "$(cat ./f)" "$1"
+""")
 
     def read_hook_value(body: bytes, key: str) -> tuple[str | None, str]:
         (d / "f").write_bytes(body)
-        argv = govkit_module().resolve_shell_argv(["bash", "r.sh", key])
+        argv = govkit_module().resolve_shell_argv(["bash", "r.sh", key, hook])
         try:
             p = subprocess.run(argv, cwd=str(d), capture_output=True, timeout=60)
         except (OSError, subprocess.SubprocessError) as e:
@@ -4294,7 +4335,7 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
 
     got, err = read_hook_value(b"K=plain\n", "K")
     if got != "plain":
-        check("[dWB-55 AC4] the hook's cut read_policy_key reads the sentinel K=plain as plain", False,
+        check("[dWB-55 AC4] the hook's awk-cut read_policy_key reads the sentinel K=plain as plain", False,
               f"read {got!r} {err}")
         return
     rows = (b"INHERITED_RED=land\nINHERITED_RED=park\n", b"export INHERITED_RED=park\n",

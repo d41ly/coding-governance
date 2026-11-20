@@ -437,24 +437,30 @@ def read_signer_principal(repo, ref, members):
     """`ref` verified by `git verify-tag --raw` against the allowed-signers lines `members`, written to a temp
     file under the common git dir and removed after -> (the principal its `Good "git" signature` line names,
     None), or ('', the NONE or DEAD PROBE Verdict saying why none stands). Git writes that line to standard
-    error, so both streams are read."""
+    error, so both streams are read. The file is created, written, read and unlinked inside ONE
+    `try`/`finally`, so no outcome after `mkstemp`, a failed write, a timeout or a signal included,
+    leaves it behind (TOOL-dWitnessedBar-62 S39)."""
     common = read_common_dir(repo)
     if common is None:
         return "", Verdict("DEAD PROBE", "", "no git common dir resolves here, so no signer file can be written")
+    name = None
     try:
         fd, name = tempfile.mkstemp(prefix="gov-signers-", dir=str(common))
-        with os.fdopen(fd, "wb") as f:
-            f.write("".join(m + "\n" for m in members).encode("utf-8"))
-    except OSError as e:
-        return "", Verdict("DEAD PROBE", "", f"the signer file under the common git dir does not write: {e}")
-    try:
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write("".join(m + "\n" for m in members).encode("utf-8"))
+        except OSError as e:
+            return "", Verdict("DEAD PROBE", "", f"the signer file under the common git dir does not write: {e}")
         rc, _out, err = run_git(repo, "-c", "gpg.ssh.allowedSignersFile=" + pathlib.Path(name).as_posix(),
                                 "verify-tag", "--raw", ref, both=True)
+    except OSError as e:
+        return "", Verdict("DEAD PROBE", "", f"the signer file under the common git dir does not write: {e}")
     finally:
-        try:
-            os.unlink(name)
-        except OSError:
-            pass
+        if name is not None:
+            try:
+                os.unlink(name)
+            except OSError:
+                pass
     good = GOOD_SIGNATURE.search(err)
     if rc == 0 and good:
         return good.group(1), None
@@ -1001,6 +1007,13 @@ def run_peer_plant(case, top, run_scenario):
         write_tag(sha, "b", "b", tree)
         run_fixture_git(work, "config", "gpg.ssh.program", pathlib.Path(top, "absent", "ssh-keygen").as_posix())
         run_node_read("gpg.ssh.program at an absent path", sha, 1, [said % "DEAD PROBE", "verify-tag --raw"])
+        # TOOL-dWitnessedBar-62 AC26: the failed read leaves no allowed-signers temp in the common git dir,
+        # listed by a process of its own as `ls <git-dir>` would, exiting 1 on any.
+        run_scenario("no signer temp left after the failed read", work,
+                     [sys.executable, "-c", "import pathlib, sys; left = sorted(p.name for p in "
+                      "pathlib.Path(sys.argv[1]).glob('gov-signers-*')); "
+                      "print('signer temps left:', len(left), *left); sys.exit(1 if left else 0)",
+                      str(read_common_dir(work))], 0, ["signer temps left: 0"])
     elif case == "peer-bad-signature":
         write_tag(sha, "b", "b", tree)
         ref = VERDICT_REF + sha

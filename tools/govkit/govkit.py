@@ -2422,14 +2422,16 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     if _regen is not None:
         _rg_spec.loader.exec_module(_regen)
 
+    # A resolved path that is absolute or holds a `..` segment is refused too, by the containment
+    # pattern regen's `check_when` and the shell reader apply (TOOL-dWitnessedBar-62 S22).
     def _check_exists_refused(w):
         if _regen is None or not w:
             return True
         try:
-            _regen.resolve_argv([w], {t: "x" for t in _regen.TOKENS}, "when")
+            rel = _regen.resolve_argv([w], {t: "x" for t in _regen.TOKENS}, "when")[0]
         except _regen.Refusal:
             return True
-        return False
+        return rel.startswith("/") or bool(re.match(r"[A-Za-z]:", rel)) or ".." in rel.split("/")
     _n_gen = 0
     for eid, (d, _dpath) in sorted(descs.items()):
         _gtoml = [(str(_r.get("path") or ""), str(_r.get("generator") or ""), str(_r.get("when") or ""))
@@ -2453,7 +2455,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                 r.fail(f"entry '{eid}' [[generated]] row {_gp or '(no path)'}: needs a path whose only "
                        f"tokens are {sorted(_gen_tokens)} (left after them: '{_gleft}'), a generator "
                        f"file beside the descriptor (got '{_gg}'), a when shaped <conf>:<KEY>=<value> "
-                       f"or exists:<path>, its path non-empty with no token outside run-gates' "
+                       f"or exists:<path>, its path non-empty, repo-relative with no '..' segment and "
+                       f"with no token outside run-gates' "
                        f"regen.TOKENS{'' if _regen is not None else ' (no regen.py to read them from)'}, "
                        f"if any (got {_gw!r}), and a why")
     r.note(f"generated outputs: {_n_gen} [[generated]] row(s) declared across the descriptors")

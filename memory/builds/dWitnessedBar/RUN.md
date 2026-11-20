@@ -599,3 +599,14 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T20:55:20Z dispatch · item db4b2b67 TOOL-dWitnessedBar-60 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-60-widen-4.md
 
 2026-11-20T21:28:31Z brief · item TOOL-dWitnessedBar-62 · reason e9781df155ab memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-62-build-brief.md
+
+2026-11-20T21:30:36Z dispatch · item b82c0f53 TOOL-dWitnessedBar-62 · reason .githooks/pre-push.test.sh memory/HYGIENE.md tools/drift-audit/README.md tools/drift-audit/drift_report.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/steps/inherited_red.py tools/lib/refuse-wrong-shell.sh tools/lib/resolve-python.test.sh tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/ratchet.py tools/run-gates/README.md tools/run-gates/adopt-run-gates.test.sh tools/run-gates/regen.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/verdict_backends.py tools/run-gates/verdict_flow.py tools/unattended/README.md tools/unattended/lib-unattended.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-62-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-62.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T21:49:25Z draw · re-dispatch · TOOL-dWitnessedBar-62 · 103/180 · 20261120T214925Z-f73404
+
+2026-11-20T21:49:25Z dispatch · item b82c0f53 TOOL-dWitnessedBar-62 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-62-widen-5.md
+2026-11-20T21:51:37Z draw · re-dispatch · TOOL-dWitnessedBar-62 · 104/180 · 20261120T215137Z-e63448
+
+2026-11-20T21:51:37Z dispatch · item b82c0f53 TOOL-dWitnessedBar-62 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-62-deviation-622.md
+2026-11-20T21:54:16Z draw · re-dispatch · TOOL-dWitnessedBar-62 · 105/180 · 20261120T215416Z-08d578
+
+2026-11-20T21:54:16Z dispatch · item b82c0f53 TOOL-dWitnessedBar-62 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

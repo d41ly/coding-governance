@@ -217,7 +217,7 @@ its own:
 | `ratchet (populated)` | `populated` | an armed home holding no row, unless a seen-red line names the registration's leg, read through `seen_red.py`'s `read_seen_red_records`: it prints `admitted · seen red at <red sha8> in <record>`, and a line the reader refuses exits 2 (TOOL-dWitnessedBar-7 S10) |
 | `ratchet (seed laundering)` | `seed-laundering` | a base row re-dated or its disposition rewritten, or removed while its seed still measures it |
 | `ratchet (rename)` | `rename` | a `git mv` of a file holding `site` rows left keyed on the old path |
-| `ratchet (keys, not a scalar)` | `keys-not-scalar` | a `*_PIN` key a tracked root `.<name>.conf` assigns that `conf-scalar-pins` does not hold |
+| `ratchet (keys, not a scalar)` | `keys-not-scalar` | a `*_PIN` key a root `.<name>.conf` in the working tree, ignored ones excluded, assigns that `conf-scalar-pins` does not hold |
 | `ratchet (key shape)` | `key-shape` | a key field holding a number where its kind holds a label |
 | `ratchet selftest` | `--fixture` | every plant of `--fixture --plant <case>`, `untouched quiet` and `merge` among them |
 
@@ -259,7 +259,7 @@ are keyed populations: `ORPHAN_ID_PIN` and `DEAD_PATH_PIN` fold into `id-orphan-
 are `row-duplicates`, `unbound-records` and `dossier-decisions-empty`, seeded by `row_grammar.py
 --list-duplicates`, `corpus_ids.py --list-unbound` and the codebase-map kit's `map_diff.py
 --list-empty-decisions`; `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` are `severity-unlabelled` and
-`live-rows`, registered with `seed = []`. Every `*_CUTOFF` date of a tracked root conf is a row of the
+`live-rows`, registered with `seed = []`. Every `*_CUTOFF` date of the root confs in the working tree, ignored ones excluded, is a row of the
 `ceiling` population `date-cutoffs`, seeded by `ratchet.py measure-cutoffs`, its count the date as
 eight digits and a blank one `99991231`: a date moved later reds in `both ways` as `count rose`, and
 in `never gains` as `above ceiling` unless a widen record admits it. A seed argv spells its program

@@ -2829,81 +2829,65 @@ n=$((n+1))
 _src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$HERE/build-readme-slot-limits.txt" 2>/dev/null || echo 0)
 [ "$_src_valued" -gt 0 ] || { echo "FAIL adopt --scaffold blanked the SOURCE kit's ceilings; the only write in that script may land under \$ROOT and this one did not"; st=1; }
 
-# ---- TOOL-dWitnessedBar-46 AC2 AC3 AC4 — THE ADOPTER'S SCALAR PINS. A tree made from the EXAMPLE conf,
-# ---- the kit staged as `govkit apply` leaves it, is scaffolded and committed; `ratchet (keys, not a
-# ---- scalar)` then holds every `*_PIN` the example assigns, reds `unarmed` with its home removed, and
-# ---- is green again after `--seed-pins`, whose second run leaves the home byte-identical. The kit sits
-# ---- where the registration's seed argv names it, read from the descriptor rather than spelled here.
-# ---- The example assigns no pin since TOOL-dWitnessedBar-17 S3, so the copied conf gains one planted
-# ---- `FOO_PIN="3"` and the arm holds its one row (that unit's section 8 F7).
-n=$((n+1))
-P=$TMP/scalar-pins
-_sk=$(sed -n 's/^seed = \["python", "\([^"]*\)\/ratchet\.py", "keys-not-scalar".*/\1/p' "$HERE/kit.toml")
-mkdir -p "$P/$_sk"
-cp -r "$HERE/." "$P/$_sk/" 2>/dev/null; rm -rf "$P/$_sk/__pycache__"
-( cd "$P" && git init -q --template= . && git config core.autocrlf false &&
-  cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && printf 'FOO_PIN="3"\n' >> .memory-tree.conf && git add -A &&
-  bash "$_sk/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 &&
-  git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL AC2 the example-made tree did not scaffold and commit"; st=1; }
-run_scalar_leg() { ( cd "$P" && "$_PY" "$_sk/ratchet.py" keys-not-scalar 2>&1 ); }
-_npins=$(grep -cE '^[A-Z_]+_PIN=' "$P/.memory-tree.conf")
-_ko=$(run_scalar_leg); _krc=$?
-_held=$(printf '%s\n' "$_ko" | grep -c ' · held · \.memory-tree\.conf	[A-Z_]*_PIN	' || true)
-{ [ "$_krc" = 0 ] && [ "$_held" = "$_npins" ] && [ "$_npins" = 1 ] \
-  && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
-  || { echo "FAIL AC2 keys-not-scalar over the example-made tree exited $_krc holding $_held of $_npins pins: $_ko"; st=1; }
-_h3=$(cd "$P" && bash "$SCRIPT" 2>&1)
-{ [ -f "$P/memory/project/conf-scalar-pins.txt" ] && ! printf '%s\n' "$_h3" | grep -q 'memory/project/conf-scalar-pins\.txt'; } \
-  || { echo "FAIL AC2 the seeded conf-scalar-pins.txt is absent or check 3 names it"; st=1; }
-n=$((n+1))
-rm -f "$P/memory/project/conf-scalar-pins.txt"
-_ko=$(run_scalar_leg); _krc=$?
-{ [ "$_krc" = 1 ] && printf '%s\n' "$_ko" | grep -q 'unarmed conf-scalar-pins' \
-  && printf '%s\n' "$_ko" | grep -q 'legacy_ledger\.py seed --population conf-scalar-pins'; } \
-  || { echo "FAIL AC3 keys-not-scalar over an absent conf-scalar-pins exited $_krc, not 1 naming the seed: $_ko"; st=1; }
-n=$((n+1))
-( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
-cp "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" 2>/dev/null
-_ko=$(run_scalar_leg); _krc=$?
-{ grep -q '^\.memory-tree\.conf	FOO_PIN	' "$P/memory/project/conf-scalar-pins.txt" 2>/dev/null && [ "$_krc" = 0 ]; } \
-  || { echo "FAIL AC4 --seed-pins did not reseed the home, or keys-not-scalar then exited $_krc: $_ko"; st=1; }
-( cd "$P" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
-cmp -s "$P/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" \
-  || { echo "FAIL AC4 a second --seed-pins rewrote an armed conf-scalar-pins home"; st=1; }
-
-# ---- TOOL-dWitnessedBar-53 AC1 AC2 — EVERY POPULATION AN UNCOMMITTED SCAFFOLD SEEDS EQUALS ITS SEED
-# ---- AFTER THE FIRST COMMIT. The arm above commits before it looks, so a seed that reads tracked files
-# ---- only passes it. Here the kit is staged as `govkit apply` leaves it and the planted conf stays
-# ---- UNTRACKED, as the adopter's seed-and-stop leaves it, and nothing is committed before the scaffold.
-# ---- P is every population an `armed <population> <n>` line of the scaffold's own output names, so a
-# ---- registration the scaffold seeds through the factory joins P with no edit here; an empty P fails.
-# ---- Each home of P is saved, the tree committed, the home removed and re-seeded by `seed
-# ---- --population`, and its key and count columns compared, the SHA and disposition columns dropped
-# ---- because the first seed stamps the null SHA and the re-seed the commit. WHAT IT DOES NOT CHECK: a
-# ---- home the scaffold writes by a shell block, which no `armed` line names (that unit's section 8 F4).
+# ---- TOOL-dWitnessedBar-46 AC2 AC3 AC4, TOOL-dWitnessedBar-53 AC1 AC2 AND TOOL-dWitnessedBar-62 AC3 AC4 — ONE
+# ---- SCAFFOLD SERVES BOTH (62 S36). A tree is made from the EXAMPLE conf, the kit staged as `govkit apply`
+# ---- leaves it and the planted conf left UNTRACKED, as the adopter's seed-and-stop leaves it; nothing is
+# ---- committed before the scaffold. The example assigns no pin since TOOL-dWitnessedBar-17 S3, so the
+# ---- copied conf gains one planted `FOO_PIN="3"` (that unit's section 8 F7). The kit sits where the
+# ---- registration's seed argv names it, read from the descriptor rather than spelled here. Beside it the
+# ---- fixture tracks one registration no adopter seeds, `seed-across-fixture`, homed under memory/project/,
+# ---- whose seed lists the root confs tracked AND untracked (62 S6), so a seed reading tracked files only
+# ---- re-seeds it unequal after the commit (62 S7).
+# ---- BEFORE THE COMMIT: the scaffold arms conf-scalar-pins and `keys-not-scalar` holds FOO_PIN; a `seed
+# ---- --all` listing run then arms what the scaffold did not. P is every population an `armed
+# ---- <population> <n>` line of the scaffold or of the listing run names (62 S5), so a registration
+# ---- either seeds joins P with no edit here; `present` lines stay out, because a read-back registration
+# ---- cannot rebuild a removed home (53 §8 F4, 62 §8 F4). Each home of P is saved; the tree is committed.
+# ---- AFTER IT: `keys-not-scalar` holds FOO_PIN, asserted once for both units, and check 3 is quiet on the
+# ---- seeded home (46 AC2); the home removed reads unarmed naming the seed (46 AC3); `--seed-pins`
+# ---- re-seeds it and a second run leaves it byte-identical (46 AC4). Then every home of P is cleared,
+# ---- re-seeded by `seed --population` and compared on its key and count columns (53 AC1), each saved row
+# ---- carrying the null SHA of TOOL-dWitnessedBar-61 and each re-seeded row the commit's HEAD (62 S4), the
+# ---- fixture registration among them (62 AC4). An empty P fails. WHAT IT DOES NOT CHECK: a home the
+# ---- scaffold writes by a shell block, which no `armed` line names (53 §8 F4).
 n=$((n+1))
 W=$TMP/seed-across
-mkdir -p "$W/$_sk" "$TMP/seed-across.keep"
-cp -r "$HERE/." "$W/$_sk/" 2>/dev/null; rm -rf "$W/$_sk/__pycache__"
-_wo=$(cd "$W" && git init -q --template= . && git config core.autocrlf false && git add -- "$_sk" &&
+_sk=$(sed -n 's/^seed = \["python", "\([^"]*\)\/ratchet\.py", "keys-not-scalar".*/\1/p' "$HERE/kit.toml")
+mkdir -p "$W/$_sk" "$W/fx" "$TMP/seed-across.keep"
+cp -r "$HERE/." "$W/$_sk/" 2>/dev/null; rm -rf "${W:?}/${_sk:?}/__pycache__"
+printf '[[ledger]]\npopulation = "seed-across-fixture"\nleg = "the seed-across fixture"\nseed = ["python", "fx/seed.py"]\nkey = "site"\nfields = ["path"]\ndrain = "hunk"\ndirection = "shrink-only"\nhome = "memory/project/seed-across-fixture.txt"\n' > "$W/fx/kit.toml"
+printf '%s\n' 'import subprocess' \
+  'out = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard", "--", ":(glob)*.conf"],' \
+  '                     capture_output=True, text=True).stdout' \
+  'for p in out.split():' '    print(p + "\t1")' > "$W/fx/seed.py"
+_wo=$(cd "$W" && git init -q --template= . && git config core.autocrlf false && git add -- "$_sk" fx &&
   cp "$_sk/.memory-tree.conf.example" .memory-tree.conf && printf 'FOO_PIN="3"\n' >> .memory-tree.conf &&
   bash "$_sk/adopt-memory-tree.sh" --scaffold 2>&1) || { echo "FAIL AC1 the uncommitted example-made tree did not scaffold: $_wo"; st=1; }
-_wp=$(printf '%s\n' "$_wo" | tr -d '\r' | sed -n 's/^armed \([^ ]*\) [0-9][0-9]*$/\1/p')
+_wa=$(printf '%s\n' "$_wo" | tr -d '\r' | sed -n 's/^armed \([^ ]*\) [0-9][0-9]*$/\1/p')
 _wu=$(cd "$W" && git status --porcelain -- .memory-tree.conf)
-{ printf '%s\n' "$_wp" | grep -qx 'conf-scalar-pins' && [ "$_wu" = '?? .memory-tree.conf' ] \
+{ printf '%s\n' "$_wa" | grep -qx 'conf-scalar-pins' && [ "$_wu" = '?? .memory-tree.conf' ] \
   && ! (cd "$W" && git rev-parse -q --verify HEAD >/dev/null); } \
-  || { echo "FAIL AC1 the scaffold over an uncommitted tree with an untracked conf armed {$(printf '%s' "$_wp" | tr '\n' ' ')}, not conf-scalar-pins (conf: $_wu): $_wo"; st=1; }
+  || { echo "FAIL AC1 the scaffold over an uncommitted tree with an untracked conf armed {$(printf '%s' "$_wa" | tr '\n' ' ')}, not conf-scalar-pins (conf: $_wu): $_wo"; st=1; }
 run_across_leg() { ( cd "$W" && "$_PY" "$_sk/ratchet.py" keys-not-scalar 2>&1 ); }
 n=$((n+1))
 _ko=$(run_across_leg); _krc=$?
 { [ "$_krc" = 0 ] && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
   || { echo "FAIL AC2 keys-not-scalar before the first commit exited $_krc or did not hold FOO_PIN: $_ko"; st=1; }
+n=$((n+1))
+_wl=$(cd "$W" && "$_PY" "$_sk/legacy_ledger.py" seed --all 2>&1 | tr -d '\r')
+_wp=$(printf '%s\n%s\n' "$_wa" "$(printf '%s\n' "$_wl" | sed -n 's/^armed \([^ ]*\) [0-9][0-9]*$/\1/p')" | sed '/^$/d' | sort -u)
+{ printf '%s\n' "$_wl" | grep -qx 'armed seed-across-fixture [0-9]*' && printf '%s\n' "$_wl" | grep -qx 'present conf-scalar-pins' \
+  && printf '%s\n' "$_wp" | grep -qx 'seed-across-fixture' && printf '%s\n' "$_wp" | grep -qx 'conf-scalar-pins'; } \
+  || { echo "FAIL 62 AC3 the listing run before the commit did not arm seed-across-fixture beside the scaffold's conf-scalar-pins, or P left one out {$(printf '%s' "$_wp" | tr '\n' ' ')}: $_wl"; st=1; }
 # One reader for save, clear and compare: the kit copy's own factory, through the registrations the
-# target tracks, so a home is the one its descriptor declares and a row is what `read_rows` reads.
-_wpy='import pathlib, shutil, sys
+# target tracks, so a home is the one its descriptor declares and a row is what `read_rows` reads. The
+# compare also prints, per population, whether every saved row carries the null SHA and every re-seeded
+# row HEAD (62 S4), the SHA column being the one the key and count compare drops.
+_wpy='import pathlib, shutil, subprocess, sys
 sys.path.insert(0, sys.argv[2]); import legacy_ledger as L
 mode, keep = sys.argv[1], pathlib.Path(sys.argv[3])
 regs = {r.population: r for r in L.read_registrations(".")}
+head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
 bad = 0
 for p in sys.argv[4:]:
     reg = regs[p]
@@ -2913,21 +2897,46 @@ for p in sys.argv[4:]:
         pathlib.Path(reg.home).unlink()
     else:
         at = tuple(i for i, f in enumerate(reg.fields) if f in reg.verbatim)
-        new = {k: v[0] for k, v in L.read_ledger(".", reg)[0].items()}
-        old = {k: v[0] for k, v in L.read_rows(keep / p, len(reg.fields), verbatim=at)[0].items()}
+        new_rows = L.read_ledger(".", reg)[0]
+        old_rows = L.read_rows(keep / p, len(reg.fields), verbatim=at)[0]
+        new = {k: v[0] for k, v in new_rows.items()}
+        old = {k: v[0] for k, v in old_rows.items()}
         print("compared %s %d rows" % (p, len(old)))
         if new != old:
             print("unequal %s: saved %r, re-seeded %r" % (p, sorted(old.items()), sorted(new.items())))
             bad = 1
+        shas = all(v[1][0] == "0" * 40 for v in old_rows.values()) and all(v[1][0] == head for v in new_rows.values())
+        print("shas %s %s" % (p, "null-then-head" if shas else "wrong"))
 sys.exit(bad)'
 # shellcheck disable=SC2086  # P is one population name per word, the factory's own token
 ( cd "$W" && "$_PY" -c "$_wpy" save "$_sk" "$TMP/seed-across.keep" $_wp ) \
   || { echo "FAIL AC1 could not save the seeded homes of {$_wp}"; st=1; }
 ( cd "$W" && git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL AC1 the scaffolded tree did not commit"; st=1; }
 n=$((n+1))
+_npins=$(grep -cE '^[A-Z_]+_PIN=' "$W/.memory-tree.conf")
 _ko=$(run_across_leg); _krc=$?
-{ [ "$_krc" = 0 ] && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
-  || { echo "FAIL AC2 keys-not-scalar after the first commit exited $_krc or did not hold FOO_PIN: $_ko"; st=1; }
+_held=$(printf '%s\n' "$_ko" | grep -c ' · held · \.memory-tree\.conf	[A-Z_]*_PIN	' || true)
+{ [ "$_krc" = 0 ] && [ "$_held" = "$_npins" ] && [ "$_npins" = 1 ] \
+  && printf '%s\n' "$_ko" | grep -q 'held · \.memory-tree\.conf	FOO_PIN	'; } \
+  || { echo "FAIL AC2 keys-not-scalar after the first commit exited $_krc holding $_held of $_npins pins, not FOO_PIN alone: $_ko"; st=1; }
+_h3=$(cd "$W" && bash "$SCRIPT" 2>&1)
+{ [ -f "$W/memory/project/conf-scalar-pins.txt" ] && ! printf '%s\n' "$_h3" | grep -q 'memory/project/conf-scalar-pins\.txt'; } \
+  || { echo "FAIL AC2 the seeded conf-scalar-pins.txt is absent or check 3 names it"; st=1; }
+n=$((n+1))
+rm -f "$W/memory/project/conf-scalar-pins.txt"
+_ko=$(run_across_leg); _krc=$?
+{ [ "$_krc" = 1 ] && printf '%s\n' "$_ko" | grep -q 'unarmed conf-scalar-pins' \
+  && printf '%s\n' "$_ko" | grep -q 'legacy_ledger\.py seed --population conf-scalar-pins'; } \
+  || { echo "FAIL AC3 keys-not-scalar over an absent conf-scalar-pins exited $_krc, not 1 naming the seed: $_ko"; st=1; }
+n=$((n+1))
+( cd "$W" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
+cp "$W/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" 2>/dev/null
+_ko=$(run_across_leg); _krc=$?
+{ grep -q '^\.memory-tree\.conf	FOO_PIN	' "$W/memory/project/conf-scalar-pins.txt" 2>/dev/null && [ "$_krc" = 0 ]; } \
+  || { echo "FAIL AC4 --seed-pins did not reseed the home, or keys-not-scalar then exited $_krc: $_ko"; st=1; }
+( cd "$W" && bash "$_sk/adopt-memory-tree.sh" --seed-pins >/dev/null 2>&1 )
+cmp -s "$W/memory/project/conf-scalar-pins.txt" "$TMP/scalar-pins.keep" \
+  || { echo "FAIL AC4 a second --seed-pins rewrote an armed conf-scalar-pins home"; st=1; }
 n=$((n+1))
 # shellcheck disable=SC2086
 ( cd "$W" && "$_PY" -c "$_wpy" clear "$_sk" "$TMP/seed-across.keep" $_wp ) \
@@ -2938,9 +2947,14 @@ for _p in $_wp; do
 done
 # shellcheck disable=SC2086
 _wc=$(cd "$W" && "$_PY" -c "$_wpy" compare "$_sk" "$TMP/seed-across.keep" $_wp 2>&1); _wrc=$?
-printf '%s\n' "$_wc" | tr -d '\r' | grep '^compared ' | sed 's/^/      seed-across: /'
+_wc=$(printf '%s\n' "$_wc" | tr -d '\r')
+printf '%s\n' "$_wc" | grep '^compared ' | sed 's/^/      seed-across: /'
 { [ "$_wrc" = 0 ] && [ -n "$_wp" ]; } \
-  || { echo "FAIL AC1 a population the uncommitted scaffold seeded re-seeds unequal after the first commit: $_wc"; st=1; }
+  || { echo "FAIL AC1 a population the uncommitted scaffold or the listing run armed re-seeds unequal after the first commit: $_wc"; st=1; }
+n=$((n+1))
+{ printf '%s\n' "$_wc" | grep -q '^compared seed-across-fixture ' && ! printf '%s\n' "$_wc" | grep -q '^shas .* wrong$' \
+  && [ "$(printf '%s\n' "$_wc" | grep -c '^shas .* null-then-head$')" = "$(printf '%s\n' "$_wp" | grep -c .)" ]; } \
+  || { echo "FAIL 62 AC3 AC4 the fixture registration was not compared, or a saved row lacks the null SHA or a re-seeded row HEAD: $_wc"; st=1; }
 
 # ---- TOOL-aRoutedQuill-5 AC5 + AC6 — the two routed keys the adopter APPENDS, derived from the tree
 # ---- it runs in. The fixture tracks two product directories, a dot-directory and the memory root,
@@ -5251,7 +5265,11 @@ done
 # RAISED 792 -> 796 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-51, whose pass left the
 # floor where it was: its AC2 arm's two seen_red plants, `unseen-arm-with-args` and `arm-outside-gates`,
 # each one `n=$((n+1))` and one `hit` in the loop. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=796
+# RAISED 796 -> 797 by TOOL-dWitnessedBar-62 on 2026-11-20: unit 46's scalar-pins arm and unit 53's
+# seed-across arm become one scaffold, so the after-commit FOO_PIN assertion is made once (-1), and the
+# arm gains the listing run's armed set and the null-then-HEAD SHA and fixture-compared assertion (+2),
+# each one top-level `n=$((n+1))`, never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=797
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

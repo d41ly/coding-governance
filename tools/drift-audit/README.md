@@ -289,7 +289,11 @@ record it read) and `Legs`, through the factory's `write_record`, and prints `dr
 an unarmed one writes nothing. Exit 0 measured or unarmed, 2 refused with nothing written. The run-gates
 kit's `verdict_flow.py flakes` runs it with `--write` and `--with` after each flake record it writes, and
 reads the newest gate-health record's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
-`--gate-health --fixture differs|lower|short|write` runs one planted case over a scratch repository.
+`--gate-health` requires `--selection <path>`, the selection record whose `quarantine` and `level`
+rows the runner held, read through the runner's own row reader carried inline as the `selection_row`
+block (TOOL-dWitnessedBar-62), an empty file holding nothing.
+`--gate-health --fixture differs|lower|short|write --selection <an empty file>` runs one planted case
+over a scratch repository.
 
 ## What "landed" is measured against — the base ladder
 

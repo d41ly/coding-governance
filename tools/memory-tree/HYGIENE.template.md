@@ -158,8 +158,8 @@ never parsed by hand; a row's reason is the conversion record's or its widen rec
   one row per tolerated duplicate `(shard, id)` and per graded unbound record. Shrink-only; an
   offender with no row reds, and so does a row no offender matches.
 - **`dossier-decisions-empty.txt`** — the feature dossiers declaring no decisions, one row per
-  feature, graded by `ratchet (both ways)`. **`date-cutoffs.txt`** — every `*_CUTOFF` date of a
-  tracked root conf as an eight-digit ceiling, a blank one `99991231`, so a date moved later reds.
+  feature, graded by `ratchet (both ways)`. **`date-cutoffs.txt`** — every `*_CUTOFF` date of the
+  root confs in the working tree, ignored ones excluded, as an eight-digit ceiling, a blank one `99991231`, so a date moved later reds.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
 - **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
