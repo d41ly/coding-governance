@@ -2822,7 +2822,8 @@ def test_no_bare_bash_argv(tmp):
     # TOOL-dWitnessedBar-57 AC4: a `shutil.which` of a variable its own expression compares to "bash"
     # is shape 4, and one no comparison names is not. RED against shape 4 matching constants alone.
     fx = tempfile.mkdtemp(prefix="bb.", dir=tmp)
-    with open(os.path.join(fx, "x.py"), "w", encoding="utf-8", newline="\n") as fh:
+    fx_name = "x.py"  # the planted file, named once
+    with open(os.path.join(fx, fx_name), "w", encoding="utf-8", newline="\n") as fh:
         fh.write('x = (B if a == "bash" else "") or shutil.which(a)\ny = shutil.which(b)\n')
     with open(os.path.join(fx, "y.js"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("const y = 1;\n")
@@ -2830,7 +2831,7 @@ def test_no_bare_bash_argv(tmp):
         subprocess.run(["git", *argv], cwd=fx, capture_output=True, timeout=60)
     got = scan_bare_bash(fx)
     check_arm("57 AC4 a shutil.which of a variable compared to 'bash' in its expression is shape 4",
-              got == ["x.py:1: shape 4"], repr(got))
+              got == [fx_name + ":1: shape 4"], repr(got))
     out = tempfile.mkdtemp(prefix="out.", dir=tmp)
     real = profile_bar.resolve_bash
     profile_bar.resolve_bash = lambda *_a, **_k: ("", ["cand-a", "cand-b"])

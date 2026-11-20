@@ -23,7 +23,7 @@ observation of its six `New arm:` lines, and AC14 and AC18, which only the close
   excludes: ...)` on the tree and in the fixture.
 - AC4 — `scan_bare_bash` — over a fixture repository whose `x.py` holds
   `x = (B if a == "bash" else "") or shutil.which(a)` and `y = shutil.which(b)` it returned
-  `['x.py:1: shape 4']`, and over the gov tree `[]`; `regen.run_command(['bash', '-c', 'exit 0'], '.', 30)`
+  the one shape-4 hit on the planted `x.py`'s first line, and over the gov tree `[]`; `regen.run_command(['bash', '-c', 'exit 0'], '.', 30)`
   with `regen.BASH` empty returned status 127.
 - AC5 — `shell_used.append(found)` — the `sed -n` range shows it the line before `return out[-1]`, and
   `shell_refused.append(refusal)` the line before the first `return None`; present at HEAD.
