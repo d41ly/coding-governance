@@ -38,8 +38,8 @@ the changed code, one `python tools/loop/placement.py --fixture --plant <case>` 
 - AC1 — `--plant audit-request`: a build tRun in designing with no `spec-audit:` key and no
   `SPEC_AUDIT_DEFAULT`, the prompt "audit the specs" kept as the session's own words, placed, checked and
   declared, each exit 0, the record committed and pushed; the copied conf's `--preflight tRun` exited 0
-  printing `unattended: spec-audit — opted in by placement, the owner's placed spec audit at BASE, so it is
-  owed: 2026-11-20`. `--plant audit-request-owed-only`, its policy `review.blocks = "owed-only"`: the list
+  printing its spec-audit line, opted in `by placement` and `so it is owed: 2026-11-20`.
+  `--plant audit-request-owed-only`, its policy `review.blocks = "owed-only"`: the list
   read `spec audit · after item.design.reason · owed`, and `--trigger tRun --subject tRun-specs --cause owed`
   exited 0 with `"trigger": "owed"` and `"blocks": "yes"`.
 - AC2 — `--plant breakpoint-unnamed`: no `breakpoint:` key refused `names no breakpoint`, `design review`
@@ -51,8 +51,8 @@ the changed code, one `python tools/loop/placement.py --fixture --plant <case>` 
   it exited 0 `placement: pass — breakpoint dLive`.
 - AC4 — `--plant declare`: `breakpoint` before `check` exited 1 naming no passed placement; after it, exit 0
   and one record `2026-11-20-build-TOOL-dLive-1-disposition-1.md`, `Item` `item.entry.place`, `Disposition`
-  `breakpoint`, `Channel` `prompt`, `Reason` `spec audit · request <key>`, served `disposition
-  TOOL-dLive-1`. `--plant declare-held`: another node's live lease, `breakpoint` exited 1
+  `breakpoint`, `Channel` `prompt`, `Reason` `spec audit · request <key>`, served
+  `disposition TOOL-dLive-1`. `--plant declare-held`: another node's live lease, `breakpoint` exited 1
   `placement: refused — breakpoint · live-holder`, the folder holding no record.
 - AC5 — `breakpoints.py --plant placed`: two records, `spec audit` and `item item.build.unit-pass`, listed
   as `breakpoint: spec audit · after item.design.reason · reviewer · owed` and
