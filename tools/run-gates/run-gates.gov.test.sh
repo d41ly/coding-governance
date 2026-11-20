@@ -832,7 +832,7 @@ check_bar_scrub_parity() {   # hook · post-merge · driver -> one line per miss
   printf '%s' "$out"
   [ -z "$out" ]
 }
-bsp_hook="$ROOT/.githooks/pre-push"; bsp_pm="$KITDIR/post-merge.sh"; bsp_drv="$ROOT/${PFX}unattended/unattended.sh"
+bsp_hook="$ROOT/.githooks/pre-push"; bsp_pm="$KITDIR/post-merge.sh"; bsp_uk=unattended; bsp_drv="$ROOT/${PFX}$bsp_uk/$bsp_uk.sh"  # the driver kit, named once
 a=$((a+1))
 bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_pm" "$bsp_drv") \
   || { echo "gov-canary: a bar caller does not scrub every knob the pre-push hook scrubs or clears:"; printf '%s\n' "$bsp_out" | sed 's/^/  /'; fail=1; }
