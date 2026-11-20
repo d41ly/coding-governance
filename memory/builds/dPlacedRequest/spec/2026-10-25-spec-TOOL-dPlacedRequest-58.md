@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-58 — every attempt of the placed race starts with no handshake file an earlier attempt left
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-5 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
