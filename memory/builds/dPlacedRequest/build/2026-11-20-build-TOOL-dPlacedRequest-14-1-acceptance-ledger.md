@@ -10,8 +10,8 @@ from the request record's first-parent messages, and answering through
 `tools/loop/budget.py#record_draw` moved into `tools/loop/budget.py#check_draw_cause`, which both draws call.
 The unattended driver gains `--request-draw <content key> --cause <cause> --item <item>` in
 `tools/unattended/unattended.sh#run_request_draw`: `check_request_recorded`, a create through
-`write_request_record` from the kept copy where no record exists, one bounded fetch, `budget.py draw
---request`, and the row built by `build_gov_commit` on the tip read and written by `write_gov_ref` with
+`write_request_record` from the kept copy where no record exists, one bounded fetch,
+`budget.py draw --request`, and the row built by `build_gov_commit` on the tip read and written by `write_gov_ref` with
 that tip expected, a lost race re-read at most three times (PINNED). `tools/loop/placement.py#write_placement`
 draws before `tools/loop/placement.py#add_placement` writes, through its new `before` hook, the cause from
 `tools/loop/placement.py#derive_request_draw_cause` and the call in
@@ -37,8 +37,8 @@ the cause in `tools/loop/placement.py#write_placement` forced to none, `--plant 
   the record 5 (DERIVED) commits, the create and 4 (DERIVED) rows. The spec's "the fifth `place`" is read
   as the fifth re-placement, the sixth call, since the fourth re-placement is the fifth call and draws 4/4.
 - AC2 — `--plant no-intake`: no `--request` ran and the origin held no request ref; the first re-placement
-  printed `request — <key> · recorded refs/gov/requests/<key>` then `draw · route-back · item.entry.place ·
-  1/4`, the key the one `derive_request_content_key` gives the text, and the loop was refused at the same
+  printed `request — <key> · recorded refs/gov/requests/<key>` then
+  `draw · route-back · item.entry.place · 1/4`, the key the one `derive_request_content_key` gives the text, and the loop was refused at the same
   lap; `budget.py draw --request-text <the kept text> --rows <the record's messages>` printed
   `exhausted · 4/4`, exit 3.
 - AC3 — `--plant rows-on-ref`: two draws printed `1/4` and `2/4`; the origin's
@@ -46,8 +46,8 @@ the cause in `tools/loop/placement.py#write_placement` forced to none, `--plant 
   the create parentless, every message opening `gov-request <key>`, and no object on the origin carried
   the request text's marker.
 - AC4 — `--plant two-nodes`: the second clone's push was held by a `git` shim until the first clone drew
-  `1/4`; the second then printed `lost the race, re-read 1 of 3 · lost the race on the lease: [rejected]
-  (stale info)` and `draw · route-back · item.entry.place · 2/4`, exit 0, the record's rows reading 2/4 over
+  `1/4`; the second then printed
+  `lost the race, re-read 1 of 3 · lost the race on the lease: [rejected] (stale info)` and `draw · route-back · item.entry.place · 2/4`, exit 0, the record's rows reading 2/4 over
   1/4. `--plant unreachable`: with the remote's URL pointing nowhere the draw exited 2 printing
   `not drawn, contention · the remote did not answer the record read`, and the record kept its create alone.
 - AC5 — `--plant slug-retry`: the draw the claiming step makes before a fresh slug, made as
