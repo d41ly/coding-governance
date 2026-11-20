@@ -593,7 +593,7 @@ def read_build_lease(root, build):
     from breakpoints import run_sourced   # it runs the driver, so here and only for the facts that read a lease
     try:
         rc, out = run_sourced(root, '( load_driver_conf && main --lease status build %s ); rc=$?; '
-                                    't=$(resolve_fleet_tag 2>/dev/null) || t=-; printf "fleet-tag\\t%s\\n" "$t"; exit $rc'
+                                    't=$(resolve_fleet_tag 2>/dev/null) || t=-; printf "fleet-tag\\t%%s\\n" "$t"; exit $rc'
                                     % shlex.quote(build))
     except (LookupError, OSError, subprocess.TimeoutExpired) as e:
         return "the build lease of %s could not be read: %s" % (build, e)
