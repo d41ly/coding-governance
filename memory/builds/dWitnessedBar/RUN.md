@@ -504,3 +504,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T10:06:16Z dispatch · item 609cd40b TOOL-dWitnessedBar-1 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-1-deviation-13.md
 
 2026-11-20T10:13:33Z brief · item TOOL-dWitnessedBar-59 · reason b8a465fa7261 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-59-build-brief.md
+2026-11-20T10:18:45Z draw · re-dispatch · TOOL-dWitnessedBar-59 · 90/180 · 20261120T101845Z-9fa1ee
+
+2026-11-20T10:18:45Z dispatch · item 24f541fd TOOL-dWitnessedBar-59 · reason tools/govkit/selftest.py memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-59-deviation-591.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-59-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md memory/map/generated/symbols.json memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
