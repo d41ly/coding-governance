@@ -29,7 +29,8 @@ loop at the close.
   ARCH-tFlake-1  3 green since its hold, verdict.flakes.release 3 · runs run-3 run-2 run-1`, nothing for
   Q (green, red, green, green), and `release  fast suite  ARCH-tFlake-3  its manifest row at R differs
   from its row at <sha8>, which filed the ask` once its row changed. Mutated so the streak skips a red,
-  the fixture went red on Q. `grep -c 'write_ask_closing' unattended.sh` in `tools/unattended/` printed 4.
+  the fixture went red on Q; a `verdict.flakes.release` of `x` at R made `select` exit 2 naming the key.
+  `grep -c 'write_ask_closing' unattended.sh` in `tools/unattended/` printed 4.
   A slice of `write_flake_releases` over a stub kit wrote `- CLOSED · ARCH-tFx-3 · by <40-hex> ·
   released: leg P, ...` under `## Dispositions`, staged it, said an ask its home does not file and a
   malformed line, and left the file unchanged on a second call; `backlog.py#extract_row` read the row
@@ -39,13 +40,14 @@ loop at the close.
   ran each leg once, writing `rerun ok` and `rerun red OWN` routed `attribute`; a second call ran
   nothing. `run_quiet_leg`, its runner call stubbed, set `GATE_LEGS` to a one-row manifest,
   `GATE_FULL=1`, `GATE_SELFTESTS=1`, `GATE_RUN_ID` `<run id>-quiet-<n>` and `GATE_ATTRIBUTE` the
-  attribution row's R, dropped `GATE_SELECTION`, bounded the call at 900 s for a 300 s ceiling, and read
-  GREEN, RED attributed OWN and REFUSED as `None`, `OWN` and `-`.
+  attribution row's R, dropped `GATE_SELECTION`, bounded the call at 900 s for a 300 s ceiling with no
+  pipe to the runner, read GREEN, RED attributed OWN and REFUSED as `None`, `OWN` and `-`, and read the
+  bound firing as `-`.
 - AC5 — `owner`: the same fixture printed `owner  slow leg  contended, no quiet host within 72 h` and
   wrote `rerun owner` with the row routed 73 hours before under `flow.wait-ceiling` 72, `awaiting` at
   71, and over a sibling record whose row read `rerun waiting` stamped 73 hours before, the fresh
-  `route` carried that stamp and the next call printed `owner` for that leg alone. Mutated to an
-  unbounded ceiling, the fixture went red. A slice of `run_verdict_route` over a stub kit filed the
+  `route` carried that stamp and the next call printed `owner` for that leg alone; a `flow.wait-ceiling`
+  of 0 made `quiet-rerun` exit 2 naming the key. Mutated to an unbounded ceiling, the fixture went red. A slice of `run_verdict_route` over a stub kit filed the
   `owner` line through `write_leg_ask` as `contended red, no quiet host: leg slow leg` HIGH, and put the
   bar's capture back.
 - AC6 — `unverified`: with PATH emptied, `check_quiet` took the POSIX arm and, under a stub runner
