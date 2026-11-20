@@ -2883,11 +2883,11 @@ _wp=$(printf '%s\n%s\n' "$_wa" "$(printf '%s\n' "$_wl" | sed -n 's/^armed \([^ ]
 # target tracks, so a home is the one its descriptor declares and a row is what `read_rows` reads. The
 # compare also prints, per population, whether every saved row carries the null SHA and every re-seeded
 # row HEAD (62 S4), the SHA column being the one the key and count compare drops.
-_wpy='import pathlib, shutil, subprocess, sys
+_wpy='import pathlib, shutil, sys
 sys.path.insert(0, sys.argv[2]); import legacy_ledger as L
 mode, keep = sys.argv[1], pathlib.Path(sys.argv[3])
 regs = {r.population: r for r in L.read_registrations(".")}
-head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+head = L.read_head_sha(".")[0]  # the factory drops an inherited GIT_DIR, as the seed it compares does
 bad = 0
 for p in sys.argv[4:]:
     reg = regs[p]
