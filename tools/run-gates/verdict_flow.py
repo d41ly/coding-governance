@@ -674,8 +674,8 @@ def write_repo(root, policy, conf=None):
         if rc != 0:
             raise Refusal(f"the fixture's git {args[0]} exited {rc}")
     here = pathlib.Path(root, "here")
-    (here / "policy").mkdir(parents=True)
-    (here / "policy" / "policy.py").write_text(STUB_POLICY_AT, encoding="utf-8")
+    (here / POLICY_HOME).mkdir(parents=True)
+    (here / POLICY_HOME / "policy.py").write_text(STUB_POLICY_AT, encoding="utf-8")
     return repo, here, run_git(repo, "rev-parse", "HEAD")[1].strip()
 
 
