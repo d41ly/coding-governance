@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** INPROGRESS · rev-13 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** INPROGRESS · rev-14 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,6 +27,8 @@
 | [2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-11-05-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-16 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-12-pass-red-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-12-pass-red-fix-brief.md) | research | TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-34-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-34-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-34-item-divergence-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-34-item-divergence-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
 | [2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-63 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
@@ -162,9 +164,11 @@ item amends its named unit's code. ACn observes Sn.
 - **S40** — finding 57 (M31). The offline queue writes `-` for an empty cached tip, as `CLAIM_ROWS`
   does (`tools/unattended/unattended.sh:2112-2113`), and the flush maps `-` back to empty. Observed by
   AC40.
-- **S41** — finding 58 (M32). `--request-draw <content key> --cause <c> --item <tag> [--request-text
-  <file>]` passes the file to unit 19's `--request` when the ref is absent; with neither it refuses
-  naming `--request`. Observed by AC41.
+- **S41** — finding 58 (M32), F-S41. With no record, `--request-draw` creates it from the kept copy
+  `<git-common-dir>/requests/<key>.md` that `--request` wrote, by `write_request_record` under no
+  session once `request.py key` keys it to `<key>`; with neither it exits 2 naming `--request
+  <file>`, creating nothing (`tools/unattended/unattended.sh#run_request_draw`, unit 14). No flag is
+  added. Observed by AC41.
 - **S42** — finding 59 (M33). A draw site reading exit 2 stops: `place` prints `placement: pre-claim
   draw not recorded — <why>` and writes no block, and `entry.claim` exits 2. Observed by AC42.
 - **S43** — finding 60 (M34). The age pass is one streaming `git log --first-parent` over the cached
@@ -437,9 +441,11 @@ Fixtures are the named unit's own unless an item names one.
   it prints a `claims —` count line, not `skipped:`. Red when: `released` hides the cell.
 - **AC40** — When unit 1's AC7 queues an offline create and the origin returns, `--lease flush` lands
   it. Red when: the empty field shifts the line.
-- **AC41** — When `--request-draw <key> --cause refused --item item.entry.place --request-text req.md`
-  runs with no ref, the ref is created; with neither, it exits 2 naming `--request`. Red when: the
-  branch has no file to pass.
+- **AC41** — When unit 14's fixture runs `--request-draw 0123456789ab --cause route-back --item
+  item.entry.place` with no record and no kept copy, it exits 2 naming `--request <file>` and the
+  origin holds no such ref; when it deletes a recorded key's ref from the origin, keeping the kept
+  copy, the same draw exits 0 printing its row over a re-created parentless record. Red when: a
+  kept copy creates no record, or a draw with neither writes one.
 - **AC42** — When unit 14's fixture plants `--plant unreachable`, `place` prints `pre-claim draw not
   recorded` and writes no block. Red when: placement proceeds.
 - **AC43** — When `--claims` reads a planted 10,000-commit lease chain whose last 50 commits were
@@ -509,6 +515,12 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
 - **F4 — Does `read_path_tokens` admit a backslash (S48)?** (a) No, unit 8's AC7 kept; (b) yes,
   amending a reader every caller of `read_files_touched` shares. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 3. widens: none · relaxes: none
+- **F-S41 — How does a draw create a request record it cannot find, when the landed draw already
+  reads the clone's kept copy?** (a) S41 and AC41 are rewritten around the kept copy: the draw
+  creates the record from `<git-common-dir>/requests/<key>.md` and refuses, naming the request verb,
+  when no kept copy exists; (b) a `--request-text` flag as a second path. RESOLVED (agent,
+  2026-11-20, delegated): (a), rung 3; one path for one act, the landed draw already holds it, and
+  the kept copy is what the request verb wrote. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -544,6 +556,9 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
 - rev-13 · 2026-11-19 · §2 S28, S38 · §3 · §4 · §5 · §6 AC28 · §7 · §8 · §10 · folds
   `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: findings 11 (M5, S28, AC28), 16 (M7, `docs`)
   and 17 (M8, S38 a final re-check only).
+- rev-14 · 2026-11-20 · §2 S41 · §6 AC41 · §8 F-S41 · folds
+  `2026-11-20-prompt-TOOL-dPlacedRequest-34-item-divergence-brief`: S41 and AC41 restated over the
+  kept copy `run_request_draw` already reads, the `--request-text` flag dropped; no other item moved.
 
 ## 10. Reuse audit
 
