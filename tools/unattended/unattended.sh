@@ -10341,8 +10341,12 @@ read_gate_blocks() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red) a
 # the routing record beside the bar's attribution and prints one `route` line per red, relayed here.
 # It decides nothing this driver reads: the decision table reads the attribution's `blocks` field. A
 # kit or a python that does not resolve, or a route that refuses, is announced and changes nothing.
-run_verdict_route() { # run dir
-  local d=$1 py k out rc=0
+# TOOL-dWitnessedBar-30 S4, S5 - THEN THE QUIET RE-RUN, after a route that wrote: `verdict_flow.py
+# quiet-rerun` runs each blocking CONTENDED red once alone on a quiet host, or waits, its lines relayed,
+# and each `owner  <leg>  ...` line it prints is filed as the owner item, a HIGH ask through
+# `write_leg_ask`, reused while one is OPEN for that leg, with the bar's capture put back after it.
+run_verdict_route() { # run dir · slug
+  local d=$1 slug=$2 py k out rc=0 line leg rb
   [ -n "$d" ] && [ -f "$d/verdict" ] || return 0
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
      || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
@@ -10351,7 +10355,25 @@ run_verdict_route() { # run dir
   fi
   out=$("$py" "$k/verdict_flow.py" route --run "$d" 2>&1) || rc=$?
   [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
-  [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py route exited $rc, so the reds are not routed"
+  if [ "$rc" != 0 ]; then
+    echo "unattended: gates-green — verdict_flow.py route exited $rc, so the reds are not routed"
+    return 0
+  fi
+  rc=0
+  out=$("$py" "$k/verdict_flow.py" quiet-rerun --run "$d" 2>&1) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
+  [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py quiet-rerun exited $rc, so no contended red was re-run"
+  rb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "owner  "*) ;; *) continue ;; esac
+    leg=${line#owner  }; leg=${leg%%  *}
+    write_leg_ask "$slug" "$leg" "contended red, no quiet host: leg" \
+      "waited past flow.wait-ceiling · ${line#owner  "$leg"  } · accept the leg is re-run alone on a quiet host, or its contention is fixed" \
+      HIGH "a blocking CONTENDED red found no quiet host to re-run on within flow.wait-ceiling" \
+      "filed by an unattended run as the owner item a contended red's wait raises; outside this build's goal" || :
+  done <<<"$out"
+  RB_OUT=${rb[0]}; RB_STDOUT=${rb[1]}; RB_TOOK=${rb[2]}; RB_ERR=${rb[3]}
   return 0
 }
 
@@ -10545,6 +10567,8 @@ derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> 
   printf '%s' "$((hi + 1))"
 }
 
+# An EMPTY ask or KEEP row is not written, so an existing file takes one disposition row alone, under its
+# `## Dispositions`, as `write_ask_closing`'s `CLOSED` row (TOOL-dWitnessedBar-30 S6).
 write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP row
   local f=$1 tmp
   tmp=$(mktemp) || return 1
@@ -10563,13 +10587,14 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
                   for (i = ai + 1; i < stop; i++) if (line[i] ~ /[^ \t]/) at = i }
         if (di) { dl = di; for (i = di + 1; i <= n; i++) if (line[i] ~ /[^ \t]/) dl = i }
         for (i = 1; i <= n; i++) {
-          if (!ai && di && i == di) { print "## Asks"; print a; print "" }
+          if (!ai && di && i == di && a != "") { print "## Asks"; print a; print "" }
           print line[i]
-          if (ai && i == at) print a
-          if (di && i == dl) { print s; print k }
+          if (ai && i == at && a != "") print a
+          if (di && i == dl) { print s; if (k != "") print k }
         }
-        if (!ai && !di) { print ""; print "## Asks"; print a; print ""; print "## Dispositions"; print s; print k }
-        else if (!di)   { print ""; print "## Dispositions"; print s; print k }
+        if (!ai && !di) { if (a != "") { print ""; print "## Asks"; print a }
+                          print ""; print "## Dispositions"; print s; if (k != "") print k }
+        else if (!di)   { print ""; print "## Dispositions"; print s; if (k != "") print k }
       }' "$f" > "$tmp"
   fi
   mv "$tmp" "$f"
@@ -10991,6 +11016,70 @@ write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP
   write_ask_rows "$bl" "$slug" "$id" "${form#*: } $leg" "$at8" "$a" "$s" "$k" "$sev" || return 1
   write_ask_views 1 || :
   [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S6 - THE CLOSING ROW, beside `write_leg_ask`: `- CLOSED · <id> · by <by> · <why>`
+# appended under the home's `## Dispositions` by `write_backlog_rows`, the grammar `backlog.py`'s
+# `_extract_status` reads, and the prefix `verdict_flow.py#read_flake_releases` dates a release by. Staged,
+# and the views rendered and staged through `write_ask_views`. An ask its home's BACKLOG.md does not file,
+# or one a CLOSED row already closes, is named and left as it is.
+# WHAT IT DOES NOT CHECK: that the ask is OPEN anywhere else, or that `why` is true: the caller's.
+write_ask_closing() { # ask id · home build slug · by (sha or id) · why -> 0 written or already closed, 1 not; one line each
+  local id=$1 home=$2 by=$3 why=$4 bl
+  bl="$M/builds/$home/BACKLOG.md"
+  if [ ! -f "$bl" ] || ! grep -qF -- "- $id · filed " "$bl"; then
+    echo "gates-green: ask $id not closed — $bl files no such ask"
+    return 1
+  fi
+  if grep -qF -- "- CLOSED · $id · " "$bl"; then
+    echo "gates-green: ask $id is already CLOSED in $bl · unchanged"
+    return 0
+  fi
+  if ! write_backlog_rows "$bl" "$home" "" "- CLOSED · $id · by $by · $why" "" || ! GIT add -- "$bl" 2>/dev/null; then
+    echo "gates-green: ask $id not closed — its CLOSED row could not be written and staged in $bl"
+    return 1
+  fi
+  echo "gates-green: closed ask $id, by $by, staged in $bl"
+  case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S3, §8 F5 - THE RELEASES, after the bar on every return code beside
+# `write_held_asks`: the run-gates kit's `verdict_flow.py select` at R into a scratch file removed after,
+# each `release  <leg>  <ask id>  <reason>` line it prints turned into that ask's closing row by
+# `write_ask_closing`, by this tree's HEAD, its home the build the id names. A kit or a python that does
+# not resolve, or a select that refuses, is announced and closes nothing; never a verdict.
+write_flake_releases() { # R -> one line per release: closed or refused
+  local r=$1 py k out rc=0 tmp line rest leg id why home head
+  [ -n "$r" ] || { echo "gates-green: releases — no advertised tip was observed, so there is no R to select at"; return 0; }
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: releases — no run-gates kit holding verdict_flow.py resolves beside this kit, so no quarantined leg is released"
+    return 0
+  fi
+  tmp=$(mktemp) || { echo "gates-green: releases — no scratch file for the selection, so no quarantined leg is released"; return 0; }
+  out=$("$py" "$k/verdict_flow.py" select --rev "$r" --out "$tmp" 2>&1) || rc=$?
+  rm -f -- "$tmp" "$tmp.tmp"
+  if [ "$rc" != 0 ]; then
+    echo "gates-green: releases — verdict_flow.py select at ${r:0:8} exited $rc, so no quarantined leg is released"
+    [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/    /'
+    return 0
+  fi
+  head=$(GIT rev-parse HEAD 2>/dev/null) || head=""
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "release  "*) ;; *) continue ;; esac
+    rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
+    home=${id#*-}; home=${home%-*}
+    if [[ ! $id =~ ^[A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
+      echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
+      continue
+    fi
+    write_ask_closing "$id" "$home" "$head" "released: leg $leg, $why" || :
+  done <<<"$out"
   return 0
 }
 
@@ -12155,6 +12244,9 @@ dod_met() { # slug · run-state file · item · checker
       # the writer's outcome reaches neither DOD_OUT nor this item's return.
       _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR"); WI_STAGED=""
       write_held_asks "$slug" "$_gr" "$_gdir"
+      # TOOL-dWitnessedBar-30 S3 - AND THE RELEASES, on the same every-return-code site: each quarantined
+      # leg `select` at R releases has its held-flaky-leg ask closed.
+      write_flake_releases "$_gr"
       RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
@@ -12233,7 +12325,7 @@ dod_met() { # slug · run-state file · item · checker
           # UNMET with the attribution lines. The MET line names the aged legs, whose asks are BLOCKER.
           # TOOL-dWitnessedBar-3 S6 - every red bar read here is ROUTED first, its routing record
           # written beside the attribution, each route printed.
-          run_verdict_route "$_gdir"
+          run_verdict_route "$_gdir" "$slug"
           # TOOL-dWitnessedBar-8 S6 - AND ITS FLAKES, beside the route: `verdict_flow.py flakes` reads
           # `verdict.flakes` itself, writes the run's flake record, staged by `run_leg_records`, and under
           # `quarantine` prints one `hold  <leg>  <flakes>/<window>  <record ids>` line per leg to hold,

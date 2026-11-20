@@ -397,6 +397,7 @@ case "${1:-}" in
   --precommit)   shift; exec "$PYBIN" "$KITDIR/precommit.py" "$@" ;;
 esac
 fails=0; n=0; skips=0; ondemands=0; HELD_KIT=0; HELD_QUARANTINE=0; HELD_LEVEL=0; HELD_KEYS=""
+HELD_N=0; HELD_RAN=0; HELD_RAN_FAIL=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
@@ -3106,12 +3107,17 @@ total=${#names[@]}
 # order, one trailing CR cut, each LF-terminated, an ignored row kept so the hook's re-derivation names
 # it. SEL_HASH is its `git hash-object --stdin`, `none` with no file; SEL_KEYS one `selection.<n>` per
 # line, its `held` field cut and each TAB after it turned into ` · `.
+# A ROW'S FIFTH FIELD IS ITS MODE (TOOL-dWitnessedBar-30 S1), `hold` or `run`, a four-field row `hold`.
+# A `run` leg EXECUTES in its ordinary slot, past its guard, the docs mode and the reuse cache, and
+# writes its `.leg` row, so the flake record holds its result; that result is its `held.<n>`, `ok` or
+# `fail`, counted in `held` and never in `failed` or the verdict. A mode outside the two is ignored as
+# the source is, and the leg runs.
 HOLD_SOURCES="kit quarantine level"
 SEL_HASH=none; SEL_KEYS=""
-declare -A SEL_SRC=() SEL_NOTE=()
-derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES) and HOLD_NOTE, or both empty
-  HOLD_SRC=""; HOLD_NOTE=""
-  if [ -n "${SEL_SRC[$1]:-}" ]; then HOLD_SRC=${SEL_SRC[$1]}; HOLD_NOTE=${SEL_NOTE[$1]}; return 0; fi
+declare -A SEL_SRC=() SEL_NOTE=() SEL_MODE=()
+derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES), HOLD_NOTE and HOLD_MODE, or all empty
+  HOLD_SRC=""; HOLD_NOTE=""; HOLD_MODE=""
+  if [ -n "${SEL_SRC[$1]:-}" ]; then HOLD_SRC=${SEL_SRC[$1]}; HOLD_NOTE=${SEL_NOTE[$1]}; HOLD_MODE=${SEL_MODE[$1]:-hold}; return 0; fi
   { [ "${subjects[$1]}" = kit ] || [ "${chunks[$1]}" = selftests ]; } && HOLD_SRC=kit
   return 0
 }
@@ -3124,8 +3130,8 @@ if [ -n "$SEL_FILE" ]; then
     _sel_n=0; _sel_r=0; _sel_text=""
     while IFS= read -r _sel_line || [ -n "$_sel_line" ]; do
       _sel_n=$((_sel_n + 1))
-      IFS=$'\t' read -r _sel_k _sel_leg _sel_src _sel_note <<<"$_sel_line"
-      _sel_note=${_sel_note%$'\r'}
+      IFS=$'\t' read -r _sel_k _sel_leg _sel_src _sel_note _sel_mode <<<"$_sel_line"
+      _sel_note=${_sel_note%$'\r'}; _sel_mode=${_sel_mode%$'\r'}
       _sel_line=${_sel_line%$'\r'}
       case "$_sel_line" in
         held|held$'\t'*)
@@ -3140,15 +3146,18 @@ if [ -n "$SEL_FILE" ]; then
         # `kit` is the row's own word and never a selection's: honoured here, a selection could hold any
         # leg as a kit self-test.
         echo "run-gates: selection — row $_sel_n holds $_sel_leg by '$_sel_src', outside quarantine level, ignored: it runs" >&2
+      elif [ -n "$_sel_mode" ] && [ "$_sel_mode" != hold ] && [ "$_sel_mode" != run ]; then
+        echo "run-gates: selection — row $_sel_n holds $_sel_leg in mode '$_sel_mode', outside hold run, ignored: it runs" >&2
       elif [ -z "${_sel_at["$_sel_leg"]+x}" ]; then
         echo "run-gates: selection — row $_sel_n holds $_sel_leg, which the manifest lacks, ignored" >&2
       else
         SEL_SRC[${_sel_at["$_sel_leg"]}]=$_sel_src; SEL_NOTE[${_sel_at["$_sel_leg"]}]=$_sel_note
+        SEL_MODE[${_sel_at["$_sel_leg"]}]=${_sel_mode:-hold}
       fi
     done < "$SEL_FILE"
     SEL_HASH=$(printf '%s' "$_sel_text" | git hash-object --stdin 2>/dev/null)
     [ -n "${RUNDIR:-}" ] && { cp -f "$SEL_FILE" "$RUNDIR/selection" 2>/dev/null && chmod 600 "$RUNDIR/selection" 2>/dev/null; } || true
-    unset _sel_at _sel_n _sel_r _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note
+    unset _sel_at _sel_n _sel_r _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note _sel_mode
   fi
 fi
 
@@ -3411,6 +3420,10 @@ for ((i=0; i<total; i++)); do
   # A `quarantine` or `level` leg is held whatever `GATE_SELFTESTS` says: a request to run the kit
   # class is not a request to run a flaky or deferred leg (TOOL-dWitnessedBar-5).
   derive_hold_source "$i"
+  # A `run` ROW EXECUTES PAST EVERY RULE BELOW (TOOL-dWitnessedBar-30 S1): no guard, docs mode or reuse
+  # decides it, so its `.leg` row is written whatever moved. The marker is what `report_one` and both
+  # reuse passes read.
+  if [ "$HOLD_MODE" = run ]; then : > "$WORK/$i.heldrun"; continue; fi
   if { [ "$HOLD_SRC" = kit ] && { [ -z "${GATE_SELFTESTS:-}" ] || [ -f "$WORK/$i.unchanged" ]; }; } \
      || [ "$HOLD_SRC" = quarantine ] || [ "$HOLD_SRC" = level ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
@@ -3881,6 +3894,7 @@ if [ "$REUSE_MODE" = env ] || [ "$REUSE_MODE" = push ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
+    [ -f "$WORK/$i.heldrun" ] && continue            # a selection's `run` row executes (TOOL-dWitnessedBar-30)
     _cls=",${legreads[$i]},"
     # A LEGACY `impure` is never reused, on any tree, however identical: it says the verdict is a
     # function of something outside the tree and says nothing about what, so no key can carry it.
@@ -3966,6 +3980,7 @@ if [ "$REUSE_MODE" = lineage ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
+    [ -f "$WORK/$i.heldrun" ] && continue            # a selection's `run` row executes (TOOL-dWitnessedBar-30)
     # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
     # something outside the tree, so a byte-identical tree is not the same question twice. The
     # declaration is the manifest's legacy `impure`, which the cache block above refuses the same way,
@@ -4323,6 +4338,23 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   # leave to a stderr note. `-f` is a builtin test, so the read spawns nothing.
   if [ -f "$WORK/$i.sampled" ]; then rtail="  (sampled against a cached ok)"
   elif [ -f "$WORK/$i.aged" ]; then rtail="  (executed: reused on 10 runs in a row)"; fi
+  if [ -f "$WORK/$i.heldrun" ]; then
+    # A HELD LEG RUN OUTSIDE THE VERDICT (TOOL-dWitnessedBar-30 S1): its first attempt's result is its
+    # `held.<n>`, `ok` or `fail`, no result reading `fail`, counted in `held` and in its chunk's held
+    # tally, never in what ran, `failed`, the deferral or the red attribution. Its output is printed
+    # under a red result, as a failed leg's is.
+    local hres=fail
+    rc=""; { IFS= read -r rc < "$WORK/$i.rc"; } 2>/dev/null
+    derive_hold_source "$i"
+    c_ondemand=$((c_ondemand+1)); HELD_N=$((HELD_N+1)); HELD_RAN=$((HELD_RAN+1))
+    case "$HOLD_SRC" in level) HELD_LEVEL=$((HELD_LEVEL+1)) ;; *) HELD_QUARANTINE=$((HELD_QUARANTINE+1)) ;; esac
+    [ "$rc" = 0 ] && hres=ok
+    [ "$hres" = ok ] || HELD_RAN_FAIL=$((HELD_RAN_FAIL+1))
+    printf 'GATE held  %s  (%s, %s; run outside the verdict: %s)\n' "${names[$i]}" "$HOLD_SRC" "$HOLD_NOTE" "$hres"
+    [ "$hres" = ok ] || sed 's/^/    /' "$WORK/$i.out" 2>/dev/null
+    HELD_KEYS+="held.${HELD_N}"$'\t'"${names[$i]} · $HOLD_SRC · $hres"$'\n'
+    return
+  fi
   if [ ! -f "$WORK/$i.rc" ]; then
     RED_LEGS="$RED_LEGS $i"
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
@@ -4336,9 +4368,10 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
     # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
-    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
+    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1)); HELD_N=$((HELD_N+1))
     # ONE HELD LINE, `(<source>, <note>)` (TOOL-dWitnessedBar-5 S3), and one `held.<n>` key per held leg
-    # for the verdict record, numbered as `ondemands` counts them so the count and the keys agree (S4).
+    # for the verdict record, numbered as `HELD_N` counts them, the held legs that ran outside the
+    # verdict among them (TOOL-dWitnessedBar-30), so the count and the keys agree (S4).
     local since="" htail
     derive_hold_source "$i"; [ -n "$HOLD_SRC" ] || HOLD_SRC=kit
     { IFS= read -r since < "$WORK/$i.unchanged"; } 2>/dev/null
@@ -4349,7 +4382,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
       *) htail="$HOLD_SRC, $HOLD_NOTE"; HELD_QUARANTINE=$((HELD_QUARANTINE+1)) ;;
     esac
     printf 'GATE held  %s  (%s)\n' "${names[$i]}" "$htail"
-    HELD_KEYS+="held.${ondemands}"$'\t'"${names[$i]} · $HOLD_SRC · unrun"$'\n'
+    HELD_KEYS+="held.${HELD_N}"$'\t'"${names[$i]} · $HOLD_SRC · unrun"$'\n'
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = docskip ]; then
@@ -5643,13 +5676,16 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
 # Counted BY SOURCE (TOOL-dWitnessedBar-5 S3): only the kit ones are what GATE_SELFTESTS=1 runs.
-if [ "${ondemands:-0}" -gt 0 ]; then
+# A held leg a selection's `run` row executed is held too, its result outside the verdict, and so is
+# out of `ran` below (TOOL-dWitnessedBar-30).
+if [ "${HELD_N:-0}" -gt 0 ]; then
   _hby=""
   for _hs in "kit:$HELD_KIT" "quarantine:$HELD_QUARANTINE" "level:$HELD_LEVEL"; do
     [ "${_hs#*:}" -gt 0 ] && _hby="$_hby${_hby:+, }${_hs#*:} ${_hs%%:*}"
   done
   [ "$HELD_KIT" -gt 0 ] && _hby="$_hby; GATE_SELFTESTS=1 runs the kit ones"
-  skipnote="$skipnote (${ondemands} held: $_hby)"
+  [ "$HELD_RAN" -gt 0 ] && _hby="$_hby; $HELD_RAN run outside the verdict, $HELD_RAN_FAIL of them red"
+  skipnote="$skipnote (${HELD_N} held: $_hby)"
   unset _hby _hs
 fi
 # A RETRIED LEG IS NAMED IN THE TOTAL TOO (TOOL-dDerivedDocket-26 S2): a green that needed a second
@@ -5660,7 +5696,7 @@ fi
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
 # the one a reader quotes. A leg that was held did not run, so counting it in the total is the
 # green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
-ran=$((n-skips-${ondemands:-0}))
+ran=$((n-skips-${ondemands:-0}-${HELD_RAN:-0}))
 
 # A BAR THAT RAN NOTHING BECAUSE EVERYTHING WAS HELD IS NOT A GREEN BAR. It is the loudest possible
 # green-by-absence: a repository whose whole manifest is kit-subject would print `gates GREEN` on
@@ -5723,7 +5759,7 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'ran\t%s\n' "$ran"
       printf 'failed\t%s\n' "$fails"
       printf 'skipped\t%s\n' "$skips"
-      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'held\t%s\n' "${HELD_N:-0}"
       printf '%s' "$HELD_KEYS"
       printf 'reused\t%s\n' "$reuses"
       printf 'retried\t%s\n' "${RETRIED:-0}"
@@ -5753,7 +5789,7 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'ran\t0\n'
       printf 'failed\t0\n'
       printf 'skipped\t%s\n' "$skips"
-      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'held\t%s\n' "${HELD_N:-0}"
       printf '%s' "$HELD_KEYS"
       printf 'reused\t0\n'
       printf 'retried\t0\n'
@@ -5955,8 +5991,9 @@ if [ -n "$RUNDIR" ]; then
     printf 'ran\t%s\n' "$ran"
     printf 'failed\t%s\n' "$fails"
     printf 'skipped\t%s\n' "$skips"
-    printf 'held\t%s\n' "${ondemands:-0}"
-    # One `held.<n>` per held leg, `<leg> · <source> · unrun` (TOOL-dWitnessedBar-5 S4).
+    printf 'held\t%s\n' "${HELD_N:-0}"
+    # One `held.<n>` per held leg, `<leg> · <source> · unrun` (TOOL-dWitnessedBar-5 S4), or `ok` or
+    # `fail` for one a selection's `run` row executed outside the verdict (TOOL-dWitnessedBar-30 S1).
     printf '%s' "$HELD_KEYS"
     printf 'reused\t%s\n' "$reuses"
     printf 'fingerprint_end\t%s\n' "$FPRINT_END"

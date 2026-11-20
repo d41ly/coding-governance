@@ -205,13 +205,17 @@ def check_quiet(_runner=None):
     with its command line took long enough on a loaded node to dominate the profiler's own runtime,
     which matters because a probe nobody can afford to run is a probe that gets removed.
 
+    THE POSIX ARM (TOOL-dWitnessedBar-30 S7): where no PowerShell is on PATH it reads `ps -eo
+    pid=,args=` under the same liveness assertion, so a Linux node can find a quiet host. MSYS `ps`
+    reads no argv, and a Windows host has PowerShell, so every other host still reads `unverified`.
+
     `_runner` is the subprocess entry point, injected so the self-test can drive this function
     against a query that returns rows it cannot read. It is not a knob: no caller passes it.
     """
     runner = _runner or subprocess.run
     ps = shutil.which("powershell") or shutil.which("pwsh")
     if not ps:
-        return "unverified", "no powershell on PATH, cannot read process command lines on this host"
+        return check_quiet_posix(runner)
     script = (
         "Get-CimInstance Win32_Process -Filter \"Name='bash.exe' or ProcessId=%d\" | "
         "ForEach-Object { \"$($_.ProcessId)|$($_.CommandLine)\" }" % os.getpid()
@@ -237,6 +241,29 @@ def check_quiet(_runner=None):
         return "false", "%d foreign run-gates process(es) visible, read %d row(s)" % (
             len(foreign), len(rows))
     return "true", "read %d row(s) including this process, no foreign run-gates among them" % len(rows)
+
+
+def check_quiet_posix(runner):
+    """`check_quiet` where no PowerShell exists: one `ps -eo pid=,args=`, each row `<pid> <argv>`, under
+    the same liveness assertion, this process's own row present with a non-empty command line."""
+    try:
+        out = runner(["ps", "-eo", "pid=,args="], capture_output=True, text=True, timeout=120,
+                     encoding="utf-8", errors="replace")
+    except Exception as exc:   # a PROBE reports that it could not look; it never raises
+        return "unverified", "no powershell on PATH, and ps failed: %s" % exc
+    if getattr(out, "returncode", 1) != 0:
+        return "unverified", "no powershell on PATH, and ps exited %s" % getattr(out, "returncode", "?")
+    rows = [l.strip().split(None, 1) for l in (out.stdout or "").split("\n") if l.strip()]
+    mypid = str(os.getpid())
+    mine = [r for r in rows if r[0] == mypid]
+    if not mine or len(mine[0]) < 2 or not mine[0][1].strip():
+        return ("unverified",
+                "ps returned %d row(s) but not this process's own command line, so a zero from it "
+                "proves nothing" % len(rows))
+    foreign = [r for r in rows if len(r) > 1 and "run-gates.sh" in r[1] and r[0] != mypid]
+    if foreign:
+        return "false", "%d foreign run-gates process(es) visible, read %d row(s) by ps" % (len(foreign), len(rows))
+    return "true", "read %d row(s) by ps including this process, no foreign run-gates among them" % len(rows)
 
 
 def check_packing(wall, ideal):

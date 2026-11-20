@@ -119,7 +119,7 @@ verdict.held = "push-selected"
 
 ## `verdict.flakes`
 <!-- usage: policy:verdict.flakes cbd3373b -->
-What a red bar's flakes do, read by the run-gates kit's `verdict_flow.py flakes` after a bar run under GATE_RERUN=1, which re-runs each red leg once on the same tree: under retry-only nothing is written; under record each such run writes one `flake` record, a row per executed leg with its first rc and its re-run rc; under quarantine it also holds each leg whose flakes reach verdict.flakes.entry and no OPEN held-flaky-leg ask names, and the unattended close files that ask, which holds the leg out of every bar through the selection's quarantine row until it closes.
+What a red bar's flakes do, read by the run-gates kit's `verdict_flow.py flakes` after a bar run under GATE_RERUN=1, which re-runs each red leg once on the same tree: under retry-only nothing is written; under record each such run writes one `flake` record, a row per executed leg with its first rc and its re-run rc; under quarantine it also holds each leg whose flakes reach verdict.flakes.entry and no OPEN held-flaky-leg ask names, and the unattended close files that ask, which holds the leg through the selection's quarantine row: the held leg still runs at least once a day, outside the verdict, so its greens accrue in the flake records, and it is released, its ask closed, after verdict.flakes.release consecutive greens.
 
 ```text
 verdict.flakes = "record"
@@ -131,6 +131,14 @@ How many flakes in a leg's last window of verdicts hold it under verdict.flakes 
 
 ```text
 verdict.flakes.entry = "3/10"
+```
+
+## `verdict.flakes.release`
+<!-- usage: policy:verdict.flakes.release 81b1e216 -->
+How many consecutive greens release a leg held under verdict.flakes quarantine, read at the default branch's tip by the run-gates kit's `verdict_flow.py select`: the leg's executed rows in the tracked flake records since its held-flaky-leg ask was filed, newest first, must open with this many greens, a red resetting the count; a leg whose manifest row changed since that filing is released too. The unattended close then writes the ask's CLOSED row.
+
+```text
+verdict.flakes.release = 5
 ```
 
 ## `tests.product`
@@ -235,7 +243,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (232)
+## Not yet summarised (231)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -354,7 +362,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.promote`
 - `policy-file.on-missing-expansion`
 - `verdict`
-- `verdict.flakes.release`
 - `verdict.remote.trust`
 - `verdict.remote.pin-scope`
 - `verdict.remote.pin`
