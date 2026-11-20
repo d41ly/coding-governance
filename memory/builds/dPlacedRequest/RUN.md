@@ -404,3 +404,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T11:42:31Z dispatch · item 4834fe05 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
 
 2026-11-20T11:50:58Z dispatch · item b9591fb7 TOOL-dPlacedRequest-53 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-53-1-acceptance-ledger.md
+
+2026-11-20T11:53:47Z brief · item TOOL-dPlacedRequest-53 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
