@@ -2428,6 +2428,20 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
   return 0
 }
 
+# THE ONE CLAIM-LINE READER (TOOL-dPlacedRequest-59 S7): both `awk` programs of `read_claims` below
+# prepend this text, so a claim body's `key: value` line is split in one place. `read_kv` strips a
+# trailing CR, and keeps a key of `keys` not already in `v`, its tabs read as spaces. STRICT (`loose`
+# 0) splits at the first `": "` and trims nothing: the record read. LOOSE (1) ends the key at the
+# first colon and trims the value of blanks, so a bare `renews:`, two spaces or a tab read the empty
+# value: the walk. WHAT IT DOES NOT SERVE: the other hand reads of the claim grammar in this driver.
+CLAIM_KV_AWK='function read_kv(line, keys, v, loose,   s, p, k, x) {
+    sub(/\r$/, "", line); s = loose ? ":" : ": "
+    p = index(line, s); if (p < 2) return
+    k = substr(line, 1, p - 1); x = substr(line, p + length(s))
+    if (loose) { sub(/^[[:blank:]]+/, "", x); sub(/[[:blank:]]+$/, "", x) }
+    if ((k in keys) && !(k in v)) { gsub(/\t/, " ", x); v[k] = x } }
+'
+
 # EVERY CLAIM, IN ONE BOUNDED FETCH into this clone's private cache namespace - no FETCH_HEAD, no
 # branch, no remote-tracking ref - then ONE `for-each-ref`, ONE `date` for every age and two `awk`
 # passes, so no claim spawns a process of its own (memory/gotchas/process-creation-is-the-suite-cost.md).
@@ -2523,7 +2537,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
   fi
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
-  CL_TIPS="$d/tips" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" -v rfe="$CLAIM_NS/" -v lfe="$LEASE_NS/" '
+  CL_TIPS="$d/tips" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" -v rfe="$CLAIM_NS/" -v lfe="$LEASE_NS/" "$CLAIM_KV_AWK"'
     function dash(x) { return x == "" ? "-" : x }
     function flush(  k, ok, st, i, nm, kd, sl, f2, ep, ko) {
       if (ref == "") return
@@ -2549,14 +2563,14 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
       old[nr] = !lease; who[nr] = nm; tip[nr] = sha
     }
     BEGIN { split("slug node host session keepalive status lease-utc beat-utc", K, " "); for (j in K) want[K[j]] = 1
-            split("epoch kind fleet-tag renews witness offer offer-deadline last-fetch", E, " "); for (j in E) more[E[j]] = 1 }
+            split("epoch kind fleet-tag renews witness offer offer-deadline last-fetch", E, " "); for (j in E) more[E[j]] = 1
+            for (j in want) rk[j] = 1; for (j in more) rk[j] = 1 }
     /^\001/ { flush(); split(substr($0, 2), a, "\t"); ref = a[1]; sha = a[2]
               lease = (index(ref, lns) == 1); tail = substr(ref, length(lease ? lns : rns) + 1)
               split("", v); hdr = ""; head = 1; next }
     { sub(/\r$/, "")
       if (head) { hdr = $0; head = 0; next }
-      p = index($0, ": ")
-      if (p > 1) { k = substr($0, 1, p - 1); if (((k in want) || (k in more)) && !(k in v)) { x = substr($0, p + 2); gsub(/\t/, " ", x); v[k] = x } } }
+      read_kv($0, rk, v, 0) }
     END { flush(); for (j = 1; j <= nr; j++) if (!(old[j] && (who[j] in lb))) { print row[j]; print tip[j] > ENVIRON["CL_TIPS"] } }' "$d/refs" >"$d/rows"
   if [ -s "$d/rows" ]; then
     read_lease_bound expiry >/dev/null || LB_VALUE=""
@@ -2572,7 +2586,8 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     # is `yes` or absent); then a commit the feed first sighted before `thr`, now less
     # `leases.expiry-hours`, which makes the row `stale` whatever lies further back inside the tenure
     # and stands for the beat. Any other `renews`, `no` or a value outside the four, reads on (S2). The
-    # key is read on a line beginning `renews:`, its value trimmed, so a bare `renews:` or `renews: ` is
+    # `epoch` and `renews` keys are read by `CLAIM_KV_AWK`'s loose mode, the first line of each kept,
+    # its value trimmed, so a bare `renews:` or `renews: ` is
     # the empty value, outside the four, and reads on, never a missing key (TOOL-dPlacedRequest-52 S26). A row whose chain
     # ends first takes its oldest commit read (S2). The `awk` exits once every row is resolved, and
     # `git log` stops on the closed pipe, so a read costs each lease's commits sighted inside the bound,
@@ -2590,7 +2605,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
     [ -z "${GOVFEED_DIR%$'\r'}" ] || fd="${GOVFEED_DIR%$'\r'}/gov-feed.log"
     { GIT log --first-parent --format='%x01%H %P%n%B' --stdin <"$d/tips" 2>/dev/null; printf '\002%s\n' "$?"; } 2>/dev/null \
       | CL_ROWS="$d/rows" CL_FEED="$fd" CL_NEVER="$d/never" CL_BEATS="$d/beats" CL_PAIRS="$d/pairs" CL_WALK="$d/walk" \
-        awk -v thr="$thr" '
+        awk -v thr="$thr" "$CLAIM_KV_AWK"'
       function stop(i, b) { if (i in bt) return; bt[i] = b; nd++ }
       function step(i, c) {
         while (1) {
@@ -2606,12 +2621,13 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
       }
       function read_commit(  n, w, j) {
         if (cc == "") return
-        kn[cc] = 1; par[cc] = cp; ep[cc] = ce + 0; if (cr != "\001") rn[cc] = cr
+        kn[cc] = 1; par[cc] = cp; ep[cc] = cv["epoch"] + 0; if ("renews" in cv) rn[cc] = cv["renews"]
         w = wt[cc]; delete wt[cc]; n = split(w, ws, " ")
         for (j = 1; j <= n; j++) step(ws[j] + 0, cc)
         cc = ""
       }
-      BEGIN { while ((getline l < ENVIRON["CL_ROWS"]) > 0) {
+      BEGIN { wk["epoch"] = 1; wk["renews"] = 1
+              while ((getline l < ENVIRON["CL_ROWS"]) > 0) {
                 sub(/\r$/, "", l); split(l, f, "\t"); nr++; tp[nr] = f[4]; rf[nr] = f[11]; od[nr] = f[4]; want[f[11]] = 1
                 if (f[10] != 1) stop(nr, f[4]); else wt[f[4]] = wt[f[4]] " " nr }
               if (ENVIRON["CL_FEED"] != "") while ((getline l < ENVIRON["CL_FEED"]) > 0) {
@@ -2621,11 +2637,10 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
               if (nd == nr) exit }
       { sub(/\r$/, "") }
       substr($0, 1, 1) == "\001" { read_commit(); if (nd == nr) exit
-                                   split(substr($0, 2), h, " "); cc = h[1]; cp = h[2]; ce = 0; ge = 0; cr = "\001"; next }
+                                   split(substr($0, 2), h, " "); cc = h[1]; cp = h[2]; split("", cv); next }
       substr($0, 1, 1) == "\002" { read_commit(); rc = substr($0, 2); next }
       cc == "" { next }
-      /^epoch: / && !ge { ge = 1; ce = substr($0, 8) + 0; next }
-      /^renews:/ && cr == "\001" { cr = substr($0, 8); sub(/^[ \t]+/, "", cr); sub(/[ \t]+$/, "", cr) }
+      { read_kv($0, wk, cv, 1) }
       END { read_commit()
             print ((nd == nr || rc == "0") ? "ok" : "dead") > ENVIRON["CL_WALK"]
             for (i = 1; i <= nr; i++) { b = (i in bt) ? bt[i] : od[i]

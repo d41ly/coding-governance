@@ -21733,6 +21733,11 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "read_kv_row",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "read_kwarg",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"

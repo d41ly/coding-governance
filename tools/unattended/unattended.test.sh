@@ -856,12 +856,13 @@ bcrestore() { git checkout -q main; git reset -q --hard "$BASE"; git push -q -f 
 # after it never wrote the stub its arms name; its original site calls it, and so does the entry
 # of the region that reads it.
 scope() { printf 'ANCHOR_SCOPE="%s"\n' "$1" >> .unattended.conf; }
-slice_fn() { # <name> -> eval that function out of the SHIPPED driver bytes
-  local s e
-  s=$(grep -n "^$1()" "$SCRIPT" | cut -d: -f1)
-  [ -n "$s" ] || { echo "FAIL cannot find $1() in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
-  e=$(awk -v s="$s" 'NR>s && /^}/ {print NR; exit}' "$SCRIPT")
-  [ -n "$e" ] || { echo "FAIL cannot find the closing brace of $1() in the driver, so the slice below would be a fragment"; st=1; return 1; }
+slice_fn() { # <name> [var] -> eval that function, or that quoted variable, out of the SHIPPED driver bytes
+  local s e o='()' c='^}' n='closing brace'
+  [ "${2:-}" = var ] && { o="='"; c="'\$"; n='closing quote'; }
+  s=$(grep -n "^$1$o" "$SCRIPT" | cut -d: -f1)
+  [ -n "$s" ] || { echo "FAIL cannot find $1$o in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
+  e=$(awk -v s="$s" -v c="$c" 'NR>s && $0 ~ c {print NR; exit}' "$SCRIPT")
+  [ -n "$e" ] || { echo "FAIL cannot find the $n of $1$o in the driver, so the slice below would be a fragment"; st=1; return 1; }
   eval "$(sed -n "${s},${e}p" "$SCRIPT")"
 }
 read_lease_hash() { grep -E '^(keepalive|session|pid|host|pid-image|lease-utc): ' memory/builds/tRun/RUN.md | git hash-object --stdin; }
@@ -19518,16 +19519,18 @@ same "DPR46 AC2 AC4 RED: the unit-35-order copy reads past the renews: - commit,
 # ---- a bare `renews:` line and a `renews: ` line, each read on to the old commit: stale. RED for AC25
 # ---- is a copy whose walk stops on any value but `no`, reading the `maybe` tip live; for AC26 a copy
 # ---- matching `renews: ` with its space alone, reading the bare `renews:` tip as no key: live.
+# ---- TOOL-dPlacedRequest-59 S7 adds the two-space and the tab tips, each stale, and moves the AC26 copy
+# ---- onto `CLAIM_KV_AWK`, the shared reader the walk now prepends: its loose split staged as strict.
 ds_yes='if (!(c in rn) || rn[c] == "yes") { stop(i, c); return }'
 ds_any='if (!(c in rn) || rn[c] != "no") { stop(i, c); return }'
 printf '%s\n' "${oc_src/"$ds_yes"/"$ds_any"}" >"$oc_copy/stop-on-any.sh"
-ds_match='/^renews:/ && cr == "\001" { cr = substr($0, 8); sub(/^[ \t]+/, "", cr); sub(/[ \t]+$/, "", cr) }'
-ds_space='/^renews: / && cr == "\001" { cr = substr($0, 9) }'
+ds_match='s = loose ? ":" : ": "'
+ds_space='s = ": "'
 printf '%s\n' "${oc_src/"$ds_match"/"$ds_space"}" >"$oc_copy/space-match.sh"
 same "DPR52 the driver carries the yes stop and the trimmed match once, each copy its staged line instead" \
   "$(grep -cF "$ds_yes" "$SCRIPT") $(grep -cF "$ds_match" "$SCRIPT") $(grep -cF "$ds_any" "$oc_copy/stop-on-any.sh") $(grep -cF "$ds_space" "$oc_copy/space-match.sh")" "1 1 1 1"
 ds_got=""; ds_red=""; ds_oos=""
-for ds_v in yes "" - no maybe "renews:" "renews: "; do
+for ds_v in yes "" - no maybe "renews:" "renews: " "renews:  " $'renews:\t'; do
   remove_clock_refs
   oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 "$ds_v" "$(derive_claim_ago 60)" "$oc_a")
   git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
@@ -19540,17 +19543,19 @@ for ds_v in yes "" - no maybe "renews:" "renews: "; do
     renews:) oc_row=$(read_clock_row "$oc_copy/space-match.sh"); ds_oos="$ds_oos${oc_row%% *} " ;;
   esac
 done
-same "DPR46 AC3 DPR52 AC25 AC26 tips renews: yes, no key, -, no, maybe, renews: and renews:+space over an old renews: no commit read" \
-  "$ds_got" "live live live stale stale stale stale "
-same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale stale stale stale "
+same "DPR46 AC3 DPR52 AC25 AC26 DPR59 AC7 tips renews: yes, no key, -, no, maybe, renews:, renews:+space, renews:+two spaces and renews:+tab over an old renews: no commit read" \
+  "$ds_got" "live live live stale stale stale stale stale stale "
+same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale stale stale stale stale stale "
 same "DPR52 AC25 AC26 RED: the stop-on-any copy reads the maybe tip live, the space-match copy the bare renews: tip" "$ds_oos" "live live "
 # ---- TOOL-dPlacedRequest-56 AC22: a tip carrying `renews: no` then `renews: -`, sighted 60 s ago,
 # ---- over a `renews: no` commit sighted 3600000 s ago: the walk keeps the first line, `no`, reads on
 # ---- and reads stale. RED is a copy matching every `renews:` line, which keeps the last, `-`: live.
-ds_last='/^renews:/ { cr = substr($0, 8); sub(/^[ \t]+/, "", cr); sub(/[ \t]+$/, "", cr) }'
-printf '%s\n' "${oc_src/"$ds_match"/"$ds_last"}" >"$oc_copy/last-line.sh"
+# ---- TOOL-dPlacedRequest-59 S7 stages it on `CLAIM_KV_AWK`: the copy keeps every key of the set.
+ds_first='(k in keys) && !(k in v)'
+ds_last='(k in keys)'
+printf '%s\n' "${oc_src/"$ds_first"/"$ds_last"}" >"$oc_copy/last-line.sh"
 same "DPR56 the driver carries the first-line match once and the last-line copy its unguarded match instead" \
-  "$(grep -cF "$ds_match" "$SCRIPT") $(grep -cF "$ds_match" "$oc_copy/last-line.sh") $(grep -cF "$ds_last" "$oc_copy/last-line.sh")" "1 0 1"
+  "$(grep -cF "$ds_first" "$SCRIPT") $(grep -cF "$ds_first" "$oc_copy/last-line.sh") $(grep -cF "$ds_last" "$oc_copy/last-line.sh")" "1 0 1"
 remove_clock_refs
 oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 3600000)"); oc_b=$(add_lease_commit 1 $'renews: no\nrenews: -' "$(derive_claim_ago 60)" "$oc_a")
 git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
@@ -19560,6 +19565,28 @@ oc_row=$(read_clock_row)
 same "DPR56 AC22 a tip carrying renews: no then renews: - keeps the first line and reads stale" "${oc_row%% *}" "stale"
 oc_row=$(read_clock_row "$oc_copy/last-line.sh")
 same "DPR56 AC22 RED: the copy keeping the last renews: line reads it live" "${oc_row%% *}" "live"
+# ---- TOOL-dPlacedRequest-59 AC7: THE ONE CLAIM-LINE READER, LIFTED. `CLAIM_KV_AWK` is cut out of the
+# ---- shipped driver by `slice_fn`'s variable mode, and each row runs it through `read_kv_row` under
+# ---- `awk -v BINMODE=3`, the one form that hands a piped CR to the program, printing the value read
+# ---- and its length: a CRLF and a trailing-blank line in strict mode, the bare, two-space and tab
+# ---- `renews:` lines and a duplicate key in loose mode. A mismatch's FAIL line holds the `od -c` of
+# ---- what the row read. Waived by README rule 8 with the rest of this suite. WHAT THESE ROWS DO NOT
+# ---- DRIVE: the two programs of `read_claims` that prepend the text, which the rows above read.
+read_kv_row() { printf "$1" | awk -v BINMODE=3 "$CLAIM_KV_AWK"'BEGIN { K["'"$2"'"] = 1 }
+  { read_kv($0, K, v, '"$3"') } END { printf "%s|%d", v["'"$2"'"], length(v["'"$2"'"]) }'; }
+CLAIM_KV_AWK=""
+slice_fn CLAIM_KV_AWK var   # a failed lift prints its FAIL line, and every row below reads empty
+kv_rows=('the CRLF row' 'status: live\r\n' status 0 'live|4'
+  'the trailing-blank row' 'status: live \n' status 0 'live |5'
+  'the bare row' 'renews:\n' renews 1 '|0'
+  'the two-space row' 'renews:  \n' renews 1 '|0'
+  'the tab row' 'renews:\t\n' renews 1 '|0'
+  'the duplicate row' 'renews: no\nrenews: -\n' renews 1 'no|2')
+for ((kv_i = 0; kv_i < ${#kv_rows[@]}; kv_i += 5)); do
+  kv_got=$(read_kv_row "${kv_rows[kv_i+1]}" "${kv_rows[kv_i+2]}" "${kv_rows[kv_i+3]}")
+  same "DPR59 AC7 ${kv_rows[kv_i]} reads ${kv_rows[kv_i+4]}, od -c of what it read: $(printf '%s' "$kv_got" | od -c | tr -s ' \n' ' ')" \
+    "$kv_got" "${kv_rows[kv_i+4]}"
+done
 # ==================================================================================================
 # TOOL-dPlacedRequest-47 — AN UNSIGHTED COMMIT IS NEVER COMPARED WITH THE THRESHOLD. Over the same
 # fixture, one epoch-1 tenure of three `renews: no` commits, its tip sighted 60 s ago on the ref's
@@ -23642,7 +23669,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4037 -> 4038 by TOOL-dPlacedRequest-58: the placed race's 1 region-eight `same`, its reset
 # row, off the diff's own lines; the loop's new line is a test, not an assertion; no skip branch. No
 # suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4038
+# RAISED 4038 -> 4044 by TOOL-dPlacedRequest-59: the claim-line reader's 6 region-eight `same`, one
+# per pass of the `DPR59 AC7` rows' loop, off the diff's own lines; the renews loop's two new tips
+# gain passes, not assertions, and the restaged copies' rows are rewritten, not added; no skip
+# branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4044
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23922,7 +23953,8 @@ FLOOR_SHARD_7=311
 # RAISED 1243 -> 1250 by TOOL-dPlacedRequest-52: the same 7 region-eight race, trap and renews assertions, see FLOOR_ASSERTIONS.
 # RAISED 1250 -> 1256 by TOOL-dPlacedRequest-56: the same 6 region-eight torn-stamp and duplicate-key assertions, see FLOOR_ASSERTIONS.
 # RAISED 1256 -> 1257 by TOOL-dPlacedRequest-58: the same 1 region-eight placed-race reset assertion, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1257
+# RAISED 1257 -> 1263 by TOOL-dPlacedRequest-59: the same 6 region-eight claim-line reader assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1263
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
