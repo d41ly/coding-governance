@@ -6,7 +6,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md) | research | — |
 
 <!-- /gen:spec-records -->
 

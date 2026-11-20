@@ -21,20 +21,20 @@ hold-code: owner-decision
 held-from: BUILDING
 refreshed-at: 781244bae321d9a64abd41740d264eb5aae2b032 · handoff · 82 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e267d213c519be813ae092b62742e16961c70136
-phase: HELD
+witness: 6277b70848ba4179ec4ec801b8d45c0da95c03ee
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dplacedrequest-42a7be
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-19T15:04:39Z
+lease-utc: 2026-11-20T20:52:19Z
 pid-image: claude.exe
 host: compeeto
 pid: 27268
 session: dec54915-9f6d-416a-abf5-d4658b7ca977
-keepalive: 447082a8
+keepalive: 65b12df9
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 9e21ac760dc0a43d6ed007396922722ccee98d57
 anchor-ref: refs/heads/main
@@ -528,3 +528,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T18:37:42Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
 
 2026-11-20T18:37:42Z hold · item owner-decision · reason until owner · reaped 447082a8 · resume none(owner)
+
+2026-11-20T20:52:25Z resume · item dPlacedRequest · reason held · keepalive 65b12df9 · manual
