@@ -42,7 +42,7 @@ tools/check-testsuite-counts.test.sh	306	7a787b95c6b545ee206c4efe75f5c268c7bb725
 tools/check-wiring.sh	1306	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/check-wiring.test.sh	1654	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/codebase-map/adopt-codebase-map.sh	277	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/codebase-map/adopt-codebase-map.test.sh	349	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
+tools/codebase-map/adopt-codebase-map.test.sh	353	3e20f8e4c2f87831a99f72d7207d863720a65b98	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/drift-audit/adopt-drift-audit.sh	262	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/gate-lint/fork-count.sh	344	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/govkit/census.test.sh	241	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
@@ -59,10 +59,10 @@ tools/lib/lib-selftest.sh	126	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/lib-selftest.test.sh	115	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/pyrun.sh	7	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/python-floor.sh	24	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/lib/refuse-wrong-shell.sh	109	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
+tools/lib/refuse-wrong-shell.sh	116	3e20f8e4c2f87831a99f72d7207d863720a65b98	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/lib/render-doc.sh	205	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/resolve-python.sh	133	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/lib/resolve-python.test.sh	1138	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
+tools/lib/resolve-python.test.sh	1167	3e20f8e4c2f87831a99f72d7207d863720a65b98	widened:2026-11-20-build-TOOL-dWitnessedBar-57-widen-2
 tools/lib/resolve-remote.sh	33	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/loop/adopt-loop.sh	147	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded

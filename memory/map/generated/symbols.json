@@ -24238,6 +24238,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "read_selection_holds",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_serves_ids",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -33343,6 +33348,11 @@
       "file": "tools/unattended/fix_keeps.py"
     },
     {
+      "id": "run_plant_empty_seed",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
       "id": "run_plant_gain",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
@@ -33419,6 +33429,11 @@
     },
     {
       "id": "run_plant_unarmed_green",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_unarmed_home",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -34945,17 +34960,12 @@
     {
       "id": "scan_bash",
       "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "scan_bash",
-      "kind": "function",
       "file": "tools/memory-tree/legacy_ledger.py"
     },
     {
       "id": "scan_bash",
       "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "scan_bash",
@@ -41615,11 +41625,6 @@
     {
       "id": "wrong_shell_at",
       "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "wrong_shell_at",
-      "kind": "function",
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
     },
     {
@@ -41640,7 +41645,7 @@
     {
       "id": "wrong_shell_at",
       "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "wrong_shell_at",

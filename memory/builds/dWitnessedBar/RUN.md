@@ -572,3 +572,14 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T19:09:06Z dispatch · item 01e95d21 TOOL-dWitnessedBar-56 · reason .githooks/pre-push .githooks/pre-push.test.sh help/verdict-backends.md memory/guides/SESSION-KICKOFF.md tools/memory-tree/check-memory-hygiene.test.sh tools/run-gates/README.md tools/run-gates/adopt-run-gates.test.sh tools/run-gates/keep_tails.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.sh tools/run-gates/verdict_backends.py tools/unattended/unattended.test.sh memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-56-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-56.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-20T19:44:50Z brief · item TOOL-dWitnessedBar-57 · reason 6976372b513d memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-57-build-brief.md
+
+2026-11-20T19:46:56Z dispatch · item 3e20f8e4 TOOL-dWitnessedBar-57 · reason memory/guides/SESSION-KICKOFF.md memory/project/shell-role.txt tools/check-spec-tokens.py tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/gate-lint/legacy_ledger.py tools/govkit/selftest.py tools/govkit/steps/inherited_red.py tools/lib/legacy_ledger.py tools/lib/refuse-wrong-shell.sh tools/lib/resolve-python.sh tools/lib/resolve-python.test.sh tools/memory-tree/corpus_ids.py tools/memory-tree/legacy_ledger.py tools/memory-tree/ratchet.py tools/memory-tree/row_grammar.py tools/memory-tree/tree_lib.py tools/run-gates/measure_legs.py tools/run-gates/regen.py tools/run-gates/verdict_flow.py tools/runlog/record.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-57-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-57.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T20:03:32Z draw · re-dispatch · TOOL-dWitnessedBar-57 · 98/180 · 20261120T200332Z-25d769
+
+2026-11-20T20:03:32Z dispatch · item 3e20f8e4 TOOL-dWitnessedBar-57 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-57-widen-1.md
+2026-11-20T20:05:00Z draw · re-dispatch · TOOL-dWitnessedBar-57 · 99/180 · 20261120T200500Z-8e1e72
+
+2026-11-20T20:05:00Z dispatch · item 3e20f8e4 TOOL-dWitnessedBar-57 · reason memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-57-widen-2.md
+2026-11-20T20:08:04Z draw · re-dispatch · TOOL-dWitnessedBar-57 · 100/180 · 20261120T200804Z-01a6ba
+
+2026-11-20T20:08:05Z dispatch · item 3e20f8e4 TOOL-dWitnessedBar-57 · reason memory/map/generated/symbols.json

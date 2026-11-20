@@ -559,13 +559,37 @@ def check_home_readable(path, header):
 
 
 def check_home_admitted(root, home):
-    """The refusal `no directory <parent>` for a home whose parent directory does not exist in the working
-    tree, or "" for one whose does, tracked files or none (TOOL-dWitnessedBar-47): an adopter seeds into
-    a directory it has just created, before anything in the target is committed, and `seed` never
-    creates one. WHAT IT DOES NOT CHECK: a file name the hygiene check's structure check refuses inside
-    an existing directory, which is written and reds at that check's next run, never silently."""
-    parent = pathlib.PurePosixPath(home.replace("\\", "/")).parent.as_posix()
-    if pathlib.Path(root, parent).is_dir():
+    """The refusal for a seed home the work tree does not admit, or "" for one it does. Resolved with
+    symlinks followed, the home must lie under `root`, the work tree's top, and outside the git dir, else
+    `outside the tree <path>`; `git check-ignore` must not match it, else `ignored <path>`
+    (TOOL-dWitnessedBar-57 S11); and its parent directory must exist in the working tree, tracked files or
+    none, else `no directory <parent>` (TOOL-dWitnessedBar-47): an adopter seeds into a directory it has
+    just created, before anything in the target is committed, and `seed` never creates one. An absolute
+    home resolving inside the work tree is admitted. WHAT IT DOES NOT CHECK: a file name the hygiene
+    check's structure check refuses inside an existing directory, which is written and reds at that
+    check's next run, never silently."""
+    top = os.path.realpath(str(root))
+    path = os.path.realpath(os.path.join(top, str(home)))
+    shown = pathlib.Path(path).as_posix()
+    try:
+        rel = os.path.relpath(path, top)
+    except ValueError:  # another drive on Windows
+        return "outside the tree %s" % shown
+    parts = pathlib.PurePath(rel).parts
+    if rel == os.curdir or parts[:1] == (os.pardir,) or ".git" in [p.lower() for p in parts]:
+        return "outside the tree %s" % shown
+    rc, git_dir = _run_git(top, "rev-parse", "--absolute-git-dir")
+    if rc != 0 or not git_dir.strip():
+        return "outside the tree %s: no git dir resolves at %s" % (shown, pathlib.Path(top).as_posix())
+    git_dir = os.path.normcase(os.path.realpath(git_dir.strip()))
+    if os.path.normcase(path) == git_dir or os.path.normcase(path).startswith(git_dir.rstrip(os.sep) + os.sep):
+        return "outside the tree %s" % shown
+    rel = pathlib.PurePath(rel).as_posix()
+    rc, _out = _run_git(top, "check-ignore", "-q", "--", rel)
+    if rc != 1:
+        return "ignored %s" % rel if rc == 0 else "ignored %s: git check-ignore exited %d" % (rel, rc)
+    parent = pathlib.PurePosixPath(rel).parent.as_posix()
+    if pathlib.Path(top, parent).is_dir():
         return ""
     return "no directory %s" % parent
 
@@ -642,7 +666,7 @@ def seed_population(root, reg, sha, widen=None):
     state = read_home_state(home)
     if state == "armed" and widen is None:
         return "present %s" % name, True
-    if state != "armed":
+    if state != "armed" or widen is not None:
         refusal = check_home_admitted(root, reg.home)
         if refusal:
             print("legacy_ledger: %s: %s; nothing written" % (reg.home, refusal), file=sys.stderr)
@@ -678,18 +702,16 @@ def seed_home(root, home, sha, argv=None, template=None):
     """-> (line, False when left unarmed by a failure): the unregistered form for a population not yet in
     the ledger grammar. Only an absent or unarmed `home` is written: `argv`, each `{out}` in it replaced
     by a sibling temp path, writes the population there and a live run moves it into place; `template`
-    is copied. Either is atomic; a failed run leaves one unarmed line, a refused home no file."""
-    refusal = check_home(home)
+    is copied. Either is atomic; a failed run leaves one unarmed line, a refused home no file. A home
+    `check_home_admitted` refuses, one outside the work tree or ignored included, is read and written
+    by nothing (TOOL-dWitnessedBar-57 S11)."""
+    refusal = check_home_admitted(root, home) or check_home(home)
     if refusal:
-        print("legacy_ledger: %s; nothing written" % refusal, file=sys.stderr)
+        print("legacy_ledger: %s: %s; nothing written" % (home, refusal), file=sys.stderr)
         return "unarmed %s %s" % (home, refusal), False
     target = pathlib.Path(root, home)
     if read_home_state(target) == "armed":
         return "present %s" % home, True
-    refusal = check_home_admitted(root, home)
-    if refusal:
-        print("legacy_ledger: %s: %s; nothing written" % (home, refusal), file=sys.stderr)
-        return "unarmed %s %s" % (home, refusal), False
     if template is not None:
         _write_atomic(target, pathlib.Path(template).read_bytes())
         return "armed %s" % home, True
@@ -775,7 +797,10 @@ def run_seed_cli(args, cwd):
     unborn = "--sha" not in opts and sha == NULL_SHA
     try:
         if homed:
-            home = pathlib.Path(os.path.relpath(pathlib.Path(cwd, opts["--home"]), root)).as_posix()
+            try:
+                home = pathlib.Path(os.path.relpath(pathlib.Path(cwd, opts["--home"]), root)).as_posix()
+            except ValueError:  # another drive on Windows: `check_home_admitted` reads it outside the tree
+                home = pathlib.Path(cwd, opts["--home"]).as_posix()
             if no_head:
                 print("unarmed %s %s" % (home, no_head))
                 return 1

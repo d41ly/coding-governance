@@ -7,8 +7,8 @@ gov:kit drift-audit@1.34
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
     python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
     python <prefix>/drift-audit/drift_report.py --escape-ratio 2026-09   # on demand, minutes, never the bar
-    python <prefix>/drift-audit/drift_report.py --gate-health [--write --build <slug> --unit <id>] [--with <flake record>]
-    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write|held
+    python <prefix>/drift-audit/drift_report.py --gate-health --selection <path> [--write --build <slug> --unit <id>] [--with <flake record>]
+    python <prefix>/drift-audit/drift_report.py --gate-health --fixture differs|lower|short|write|held --selection <path>
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -3667,9 +3667,10 @@ def build_live_builds_without_activity(ctx) -> dict:
 # across the bar's legs, of each leg's flakes in its newest ten by `Ended` (cl-dClosedLoop-0339), written
 # `<count>/10`. The bar is every leg of the gate-leg manifest beside this kit's tool root that the kit hold
 # does not hold, read through `test_held`, the run-gates kit's predicate carried inline as the
-# `hold_predicate` block since this kit cannot import that one (TOOL-dWitnessedBar-51 S21). A leg a
-# `quarantine` or `level` selection row holds is not a manifest key, so it stays in this bar until
-# TOOL-dWitnessedBar-62 carries the selection reader (§8 F11 of unit 51's spec). The records are read
+# `hold_predicate` block since this kit cannot import that one (TOOL-dWitnessedBar-51 S21), less each leg
+# a `quarantine` or `level` row of the selection record named by `--selection <path>` holds, which
+# `--gate-health` requires, an empty file holding nothing (TOOL-dWitnessedBar-57 S18); the drift report's
+# own `gate_health` signal names no selection and reads none. The records are read
 # through the memory-tree factory, loaded in-process by `load_memory_tree`, and their body through its
 # `read_flake_body` and `derive_flaked`, so the row grammar has one home.
 #
@@ -3682,19 +3683,43 @@ def build_live_builds_without_activity(ctx) -> dict:
 # which bounds a hold and not the bar's health; a window other than ten.
 
 
-def read_gate_health(root: pathlib.Path, extra: str | None = None):
+SELECTION_HOLDS = ("quarantine", "level")  # the selection sources that hold a leg, the runner's own pair
+
+
+def read_selection_holds(path) -> set:
+    """The legs the selection record at `path` holds: each `held` row of four or five TAB fields whose
+    source is in SELECTION_HOLDS, whatever its mode, since a `run` row too runs outside the verdict
+    (TOOL-dWitnessedBar-57 S18). `#` lines are its header; any other row holds nothing. An empty file
+    holds nothing. A DriftError where the file does not read."""
+    try:
+        text = pathlib.Path(path).read_bytes().decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise DriftError(f"--selection {path} does not read, so the runner's holds are unknown: {exc}") from None
+    held = set()
+    for ln in text.splitlines():
+        f = ln.split("\t")
+        if not ln.startswith("#") and len(f) in (4, 5) and f[0] == "held" and f[1] and f[2] in SELECTION_HOLDS:
+            held.add(f[1])
+    return held
+
+
+def read_gate_health(root: pathlib.Path, extra: str | None = None, selection=None):
     """-> (rows, bar, runs, skipped). `rows` is {leg: [(ended, run, flaked), ...]} over every tracked flake
     record of `root`, read through the factory's `read_records`, plus `extra`, one repo-relative flake record
-    not yet staged (§8 F5); `bar` the manifest's legs the kit hold does not hold, in manifest order; `runs`
-    the `Run` of every record read, oldest `Ended` first; `skipped` [(path, why)] for each record the
-    factory grades malformed or whose `Ended` does not read. A DriftError where no factory resolves, the
-    manifest does not read, or the tracked records do not."""
+    not yet staged (§8 F5); `bar` the manifest's legs the kit hold does not hold, less the legs the
+    `quarantine` and `level` rows of the selection record at `selection` hold (TOOL-dWitnessedBar-57 S18),
+    in manifest order; `runs` the `Run` of every record read, oldest `Ended` first; `skipped` [(path,
+    why)] for each record the factory grades malformed or whose `Ended` does not read. A DriftError where
+    no factory resolves, the manifest or the selection does not read, or the tracked records do not.
+    `selection` None, the drift report's own signal, reads no selection hold."""
     why = "drift measures gate health from the flake records through it"
     br = load_memory_tree("build_records.py", "record factory", why)
     dl = load_memory_tree("design_lib.py", "design library", why)
     manifest = pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json"
+    selected = read_selection_holds(selection) if selection is not None else set()
     try:
-        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8")) if not test_held(leg)]
+        bar = [leg["name"] for leg in json.loads(manifest.read_text(encoding="utf-8"))
+               if not test_held(leg) and leg["name"] not in selected]
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
         raise DriftError(f"the gate-leg manifest {manifest.as_posix()} does not read, so no bar leg is "
                          f"known: {exc}") from None
@@ -3770,7 +3795,7 @@ def measure_gate_health(ctx) -> dict:
     return rec
 
 
-def run_gate_health_fixture(case: str) -> int:
+def run_gate_health_fixture(case: str, selection) -> int:
     """`--gate-health --fixture <case>` (TOOL-dWitnessedBar-1 AC1 to AC4): a scratch repository holding this
     kit, the memory-tree factory and a manifest of ten bar legs, one `kit` leg and one `selftests` leg, its
     flake records planted through the factory and the mode run there as a subprocess, where it finds its
@@ -3781,12 +3806,16 @@ def run_gate_health_fixture(case: str) -> int:
     nothing. `write`: `--write` writes one gate-health record the factory's `read` passes; `--with` naming
     no flake record is refused, writing nothing; with one row deleted `--write` writes nothing; and `--with`
     naming an unstaged thirtieth verdict arms it. `held` (TOOL-dWitnessedBar-51 AC17): a manifest of one
-    leg whose `subject` is `kit`, one whose `chunk` is `selftests` and one unheld, thirty records of the
-    unheld leg: `measured 1/10 · legs 1/1`, so only the unheld leg is a bar leg. Exit 0 when every case
-    reads as planted, 1 naming each that does not, 2 where no factory resolves."""
+    leg whose `subject` is `kit`, one whose `chunk` is `selftests`, one a `quarantine` selection row holds
+    (TOOL-dWitnessedBar-57 AC16) and one unheld, thirty records of the unheld leg: `measured 1/10 · legs
+    1/1`, so only the unheld leg is a bar leg; and the mode run with no `--selection` exits 2 naming the
+    flag. Every run passes `--selection`, a copy of `selection`, the caller's selection record, the `held`
+    case's quarantine row appended to it. Exit 0 when every case reads as planted, 1 naming each that does
+    not, 2 where no factory resolves or `selection` does not read."""
     try:
         br = load_memory_tree("build_records.py", "record factory", "the fixture plants its flake records through it")
-    except DriftError as exc:
+        given = pathlib.Path(selection).read_bytes()
+    except (DriftError, OSError) as exc:
         print(f"drift-report: gate-health fixture {case} refused · {exc}", file=sys.stderr)
         return 2
     legs = ["leg 01"] if case == "held" else [f"leg {i:02d}" for i in range(1, 11)]
@@ -3808,13 +3837,17 @@ def run_gate_health_fixture(case: str) -> int:
                 (repo / home / f).write_bytes((src / f).read_bytes())
         manifest = [{"name": leg, "subject": "repo", "chunk": "product", "argv": ["true"]} for leg in legs]
         manifest += ([{"name": "kit leg", "subject": "kit", "chunk": "product", "argv": ["true"]},
-                      {"name": "selftests leg", "subject": "repo", "chunk": "selftests", "argv": ["true"]}]
+                      {"name": "selftests leg", "subject": "repo", "chunk": "selftests", "argv": ["true"]},
+                      {"name": "quarantined leg", "subject": "repo", "chunk": "product", "argv": ["true"]}]
                      if case == "held" else
                      [{"name": "kit selftest", "subject": "kit", "chunk": "selftests", "argv": ["true"]},
                       {"name": "repo selftests", "subject": "repo", "chunk": "selftests", "argv": ["true"]}])
         (repo / "gate-legs.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8", newline="\n")
         (repo / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
         (repo / "memory" / "builds" / build).mkdir(parents=True)
+        sel = pathlib.Path(td, "selection")
+        sel.write_bytes(given + ((b"" if not given or given.endswith(b"\n") else b"\n")
+                                 + b"held\tquarantined leg\tquarantine\t2/10\thold\n" if case == "held" else b""))
 
         def write_flake(k, rows):
             return br.write_record(repo, build, unit, "flake", f"run fx-{k:02d}",
@@ -3826,7 +3859,8 @@ def run_gate_health_fixture(case: str) -> int:
         for args in (("init", "-q"), ("add", "-A")):
             subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, check=True)
 
-        def run_mode(*flags):
+        def run_mode(*flags, selected=True):
+            flags = (*flags, "--selection", str(sel)) if selected else flags
             p = subprocess.run([sys.executable, str(repo / DRIFT_KIT / "drift_report.py"), "--gate-health", *flags],
                                cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace",
                                env=env, timeout=120)
@@ -3861,6 +3895,9 @@ def run_gate_health_fixture(case: str) -> int:
             want = [f"{head}measured 1/10 · legs 1/1 · verdicts {runs}"]
             if rc != 0 or said != want:
                 bad.append(f"held read rc {rc} {said}, planted {want}: a held leg was read as a bar leg")
+            rc, said = run_mode(selected=False)
+            if rc != 2 or not any("--selection" in ln for ln in out[-3:]):
+                bad.append(f"held with no --selection read rc {rc} {said}, planted 2 naming the flag")
         elif case == "short":
             remove_row("leg 03")
             rc, said = run_mode(*write)
@@ -4630,14 +4667,24 @@ def main(argv: list[str] | None = None) -> int:
                     help="with --gate-health: one flake record not yet staged, counted beside the tracked ones")
     ap.add_argument("--fixture", choices=("differs", "lower", "short", "write", "held"),
                     help="with --gate-health: run one planted case over a scratch repository")
+    ap.add_argument("--selection", metavar="PATH",
+                    help="with --gate-health, required: the run's selection record, whose quarantine and level "
+                         "rows hold legs out of the bar; an empty file where the run holds none")
     args = ap.parse_args(argv)
 
-    if args.gate_health or args.write or args.build or args.unit or args.with_path or args.fixture:
+    if (args.gate_health or args.write or args.build or args.unit or args.with_path or args.fixture
+            or args.selection is not None):
         # TOOL-dWitnessedBar-1 S4: a mode of its own, as --escape-ratio is. It reads the conf through the
         # factory, the manifest and the records alone: no project layer and no base ref.
         if not args.gate_health:
-            print("drift-report: --write, --build, --unit, --with and --fixture are asked of --gate-health alone",
-                  file=sys.stderr)
+            print("drift-report: --write, --build, --unit, --with, --fixture and --selection are asked of "
+                  "--gate-health alone", file=sys.stderr)
+            return 2
+        if args.selection is None:
+            # TOOL-dWitnessedBar-57 S18: the runner's quarantine and level holds are no manifest key, so a
+            # bar read without the run's selection would count them; its `--fixture` cases included.
+            print("drift-report: --gate-health takes --selection <path>, the run's selection record or an empty "
+                  "file where the run holds none", file=sys.stderr)
             return 2
         clash = [f for f, on in (("--check", args.check), ("--offenders", args.offenders),
                                  ("--delta", args.delta), ("--escape-ratio", args.escape_ratio is not None)) if on]
@@ -4650,7 +4697,7 @@ def main(argv: list[str] | None = None) -> int:
                 print("drift-report: --fixture plants its own records and takes no --write, --build, --unit "
                       "or --with", file=sys.stderr)
                 return 2
-            return run_gate_health_fixture(args.fixture)
+            return run_gate_health_fixture(args.fixture, args.selection)
         if bool(args.build or args.unit or args.write) and not (args.write and args.build and args.unit):
             print("drift-report: --write takes --build <slug> and --unit <id>, the record's build and unit, and "
                   "they are asked of --write alone", file=sys.stderr)
@@ -4670,7 +4717,7 @@ def main(argv: list[str] | None = None) -> int:
                 if not path.is_file() or not br.derive_record_name("flake").search(extra):
                     raise DriftError(f"--with {args.with_path} is no flake record: a file named "
                                      f"<date>-build-<unit id>-flake-<n>.md in a build's build/ folder")
-            rows, bar, runs, skipped = read_gate_health(root, extra)
+            rows, bar, runs, skipped = read_gate_health(root, extra, args.selection)
         except DriftError as exc:
             print(f"drift-report: --gate-health refused, nothing written · {exc}", file=sys.stderr)
             return 2

@@ -4247,6 +4247,19 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
           and up.returncode == 0 and (t / gate).read_bytes() == b"A=1\nB=2\n",
           w0.stdout + up.stdout + up.stderr)
 
+    # TOOL-dWitnessedBar-57 AC12: the up reads and writes bytes, so over an LF file and a CRLF file every
+    # line it keeps is byte-identical to the before-image, line ends included, and a last line with no
+    # end stays without one. RED against a text-mode write, which turns the LF file CRLF on Windows.
+    for tag, eol in (("lf", b"\n"), ("crlf", b"\r\n")):
+        kept = [b"A=1", b"B=2  # kept", b"\tC='3'"]
+        t = build_target(tmp, None, f"ir57-ac12-{tag}",
+                         {gate: eol.join([kept[0], b"INHERITED_RED=park", kept[1], kept[2], b"D=4"])})
+        up = run_step("up", t)
+        got = (t / gate).read_bytes()
+        check(f"[dWB-57 AC12] a {tag.upper()} gate file: the up takes the assignment out and keeps every "
+              f"other line byte for byte, its {tag.upper()} line ends and its unended last line included",
+              up.returncode == 0 and got == eol.join([*kept, b"D=4"]), repr(got) + up.stdout + up.stderr)
+
     # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key`, cut from
     # `.githooks/pre-push` from its `read_policy_key() {` line to the first column-0 `}` and run under
     # the resolved bash, read one fixture set alike. A sentinel through the cut function proves bash
