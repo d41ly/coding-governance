@@ -15,7 +15,9 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-46-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-46-2-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-2-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-46-divergence-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-divergence-brief.md) | research | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
@@ -100,8 +102,8 @@ than the `-` one must never decide the row.
   (`tools/unattended/unattended.sh@87ec5c35d720:2626`). The verdict pass reads that flag as `live`
   (`tools/unattended/unattended.sh@87ec5c35d720:2644`) before the bound compare
   (`tools/unattended/unattended.sh@87ec5c35d720:2646`).
-- The builder's probe, PINNED by run `wf_5cc8df6e-de1` on 2026-11-20: a `-` tip sighted 60 s ago
-  over a `renews: no` commit of the same epoch sighted 3600000 s ago reads `stale` on the
+- The builder's probe, PINNED by run `wf_5cc8df6e-de1` on 2026-11-20: a `-` tip sighted 60 s (PINNED) ago
+  over a `renews: no` commit of the same epoch sighted 3600000 s (PINNED) ago reads `stale` on the
   unit-35-order copy and `live` with the stop.
 - Read from `step`, not measured: a `renews: yes` commit sighted before the threshold beneath a
   younger `-` commit of the same tenure stops the row as its renewing beat and reads `stale` too. The
@@ -157,25 +159,25 @@ The fixture is the observer clock's fixture in `tools/unattended/unattended.test
 default of 24. The unit-35-order copy is a scratch copy of the driver whose walk `awk` lacks the `-`
 stop, so it holds `TOOL-dPlacedRequest-35` S1's order.
 
-- **AC1** — When a tenure's tip carries `renews: -`, sighted 60 s ago, over a `renews: no` commit of
-  the same epoch sighted 3600000 s ago, `--claims` prints the row `live`.
+- **AC1** — When a tenure's tip carries `renews: -`, sighted 60 s (PINNED) ago, over a `renews: no` commit of
+  the same epoch sighted 3600000 s (PINNED) ago, `--claims` prints the row `live`.
   Red when: the walk reads past a `-` tip to an older sighting; the unit-35-order copy prints the row
   `stale`.
   figure: 60 s and 3600000 s are PINNED, the builder's probe of run `wf_5cc8df6e-de1`; the
   24-hour bound is DERIVED by `read_lease_bound expiry` at observation time.
-- **AC2** — When the tip carries `renews: no`, sighted 60 s ago, over a `renews: -` commit sighted
-  120 s ago, over a `renews: no` commit sighted 3600000 s ago, all of one epoch, `--claims` prints
+- **AC2** — When the tip carries `renews: no`, sighted 60 s (PINNED) ago, over a `renews: -` commit sighted
+  120 s (PINNED) ago, over a `renews: no` commit sighted 3600000 s (PINNED) ago, all of one epoch, `--claims` prints
   the row `live`.
   Red when: the walk reads past a `-` commit below the tip; the unit-35-order copy prints `stale`.
   figure: 60 s, 120 s and 3600000 s are PINNED literals of this rev.
 - **AC3** — When four two-commit tenures, planted in turn, carry tips reading `renews: yes`, no
-  `renews` key, `renews: -` and `renews: no`, each tip sighted 60 s ago over a `renews: no` commit of
-  its epoch sighted 3600000 s ago, `--claims` prints them `live`, `live`, `live` and `stale`.
+  `renews` key, `renews: -` and `renews: no`, each tip sighted 60 s (PINNED) ago over a `renews: no` commit of
+  its epoch sighted 3600000 s (PINNED) ago, `--claims` prints them `live`, `live`, `live` and `stale`.
   Red when: a class of `renews` reaches a stop the walk does not name; the unit-35-order copy prints
   the `-` row `stale` and the other three as the pass does.
   figure: 60 s and 3600000 s are PINNED literals of this rev.
-- **AC4** — When the tip carries `renews: no`, sighted 60 s ago, over an unsighted `renews: -`
-  commit, over a `renews: no` commit sighted 3600000 s ago, all of one epoch, `--claims` prints the
+- **AC4** — When the tip carries `renews: no`, sighted 60 s (PINNED) ago, over an unsighted `renews: -`
+  commit, over a `renews: no` commit sighted 3600000 s (PINNED) ago, all of one epoch, `--claims` prints the
   row `unknown` with age `-`.
   Red when: the walk reads past an unsighted `-` commit to an older sighting; the unit-35-order copy
   prints `stale`.
@@ -224,6 +226,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · mixed 
   AC4 the unsighted `-` commit; F2 records the ruling and F1's (b) rationale is corrected; S3 and AC5
   bring section 7 of the stops guide current with the stop, under the charter's `[docs]` rule; code
   is cited as `path#symbol` or blob pin.
+- editorial · 2026-11-20 · §4 Evidence · AC1 AC2 AC3 AC4 · no rev bump, the status stays CLOSED:
+  each line carrying the probe's ages of 60, 120 and 3600000 seconds marks every figure PINNED on
+  that line, an inline red fix of the pinned-facts leg, per
+  `2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief`.
 
 ## 10. Reuse audit
 
