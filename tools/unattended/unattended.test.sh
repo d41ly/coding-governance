@@ -20801,7 +20801,7 @@ ec_out=$(run_request_arm --entry-claim dZqClaim --request "$rd_key"); ec_rc=$?
 same "DPR21 S1 a request with no passed placement exits 1" "$ec_rc" "1"
 hit  "$ec_out" "no passed placement"
 ec_cd=$(git -C "$LF/c1" rev-parse --path-format=absolute --git-common-dir)
-printf 'placed-utc: 2026-11-20T00:00:00Z\ndisposition: repeat\nbuild: none\nplaybook: tools/x.md\nreason: again\nevidence: none\nobservations: none\nplacer: declared\nscenarios: scenario.playbook-run\nfacts: entry=playbook-run\ncheck: pass\n\n' > "$ec_cd/requests/$rd_key.placement"
+printf 'placed-utc: 2026-11-20T00:00:00Z\ndisposition: repeat\nbuild: none\nplaybook: docs/x.md\nreason: again\nevidence: none\nobservations: none\nplacer: declared\nscenarios: scenario.playbook-run\nfacts: entry=playbook-run\ncheck: pass\n\n' > "$ec_cd/requests/$rd_key.placement"
 ec_out=$(run_request_arm --entry-claim dZqClaim --request "$rd_key"); ec_rc=$?
 same "DPR21 AC5 a repeat with no --pieces exits 2 in one line, no claim ref created" \
   "$ec_rc $(printf '%s\n' "$ec_out" | grep -c .) $(git --git-dir="$LF/origin.git" for-each-ref refs/gov/claims | grep -c .)" "2 1 0"
