@@ -129,7 +129,10 @@ never from the working tree: a header naming the values it read, then one TAB ro
 outside `quarantine level`, `kit` included, or whose leg the manifest lacks, is printed and ignored,
 and its leg runs. The runner copies the record into the run record as `selection`, and the pre-push
 hook runs `verdict_flow.py select --check --run <run dir> --rev <R>` before it admits a verdict made
-under one: a row R does not derive refuses the push.
+under one: a row R does not derive refuses the push. The run record is the worktree's own and is swept,
+so the per-tree verdict carries the same rows as `selection` and `selection.<n>` (TOOL-dWitnessedBar-41,
+see "The verdict per tree"), and the hook re-derives them with `select --check --selection <path>`
+before it adopts that record from any worktree.
 
 The verdict record carries one `held.<n>` key per held leg beside the `held` count,
 `<leg> · <source> · <result>`, the result `unrun` for a leg the bar did not execute.
@@ -185,7 +188,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
 | `lib-verdict.sh` | the block table, SOURCED and never run: `derive_red_blocks <value> <class>` prints `block` or `pass` for one attributed red under a `verdict.blocks` value. The runner sources it beside `lib-attribute.sh`, and it is in KF3's list; see "Which red blocks" |
-| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`), see "Held by policy" |
+| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`, or `--selection <path>` for a per-tree verdict's rebuilt rows), see "Held by policy" |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
@@ -984,13 +987,22 @@ and changes no reader:
 | File | Written | Keys this runner writes |
 |---|---|---|
 | `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; and `tail.<n>` per failing leg (see "The run record") |
-| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `selection` and `selection.<n>` (below), `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
 
 The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
 written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
 `.scoped` file, so a scoped run never overwrites the full record its base rests on: two slots per
 tree, and the last run of a tree in a slot wins, GREEN or RED. A run that started dirty or whose tree
 moved writes none, and says so on one line; a written one prints its path.
+
+**The selection it ran under** (TOOL-dWitnessedBar-41). `selection` is the `git hash-object --stdin` of
+the CANONICAL TEXT of the file `GATE_SELECTION` named: every line whose first TAB field is `held`, in
+file order, one trailing CR cut, each LF-terminated, a row the runner printed and ignored kept. It reads
+`none` when the run read no `GATE_SELECTION` or the knob named no file. One `selection.<n>` per line of
+that text, `<n>` from 1, holds `<leg> · <source> · <note>`, the line's `held` field cut and each TAB
+after it turned into ` · `. The hook rebuilds the text from `selection.1` upward, hashes it the same way,
+and runs `verdict_flow.py select --check --selection` over it at R, at most once per hash per push: a
+record with no `selection` key, rows that do not hash to it, or a row R does not derive is not adopted.
 
 **Two more runs write none** (TOOL-dWitnessedBar-40), each saying why on one line. A run in docs mode
 (`GATE_DOCS_BASE` resolved) ran fewer legs than a scoped bar from the same base, which the record
@@ -1006,7 +1018,7 @@ own bar only, and adopts one only when it reads `verdict GREEN` and passes the p
 `gate-full-green` stamp passes (ancestry, lag, fingerprint, manifest path and blob, self-tests, and a
 non-zero `reused_cache` refused), and carries at least one of `reused` and `reused_cache`: a record
 with neither cannot say whether its run reused a leg, so it is refused where a keyless runner stamp
-is not, and the `not covered` line names the missing pair. A full record covers the push and no bar runs, and a scoped one
+is not, and the `not covered` line names the missing pair; and whose `selection` R derives, as above. A full record covers the push and no bar runs, and a scoped one
 covers only a push scoping from its base. The loop kit's transition writer reads the full file at
 `item.test.exit` and refuses the move into deploying unless it reads GREEN. Nothing writes it but the
 runner: the hook, the unattended close and the post-merge verifier each run the runner, so none of

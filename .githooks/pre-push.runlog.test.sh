@@ -871,7 +871,7 @@ check_dec_rest() {
   mkdir -p "$rgk" && printf '#!/usr/bin/env bash\nexit 0\n' > "$rgk/$rgk.sh" && printf '[]\n' > gate-legs.json
   git add "$rgk/$rgk.sh" gate-legs.json && git commit -q -m "a root install's runner"
   cov_t=$(git rev-parse 'HEAD^{tree}'); mkdir -p "$REPO/.git/gate-verdict"
-  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\tfull\nbase\t\nmanifest\tgate-legs.json\nmanifest_blob\t%s\nselftests\t\nrun_id\tplanted\nby\trunner\n' \
+  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\tfull\nbase\t\nmanifest\tgate-legs.json\nmanifest_blob\t%s\nselftests\t\nreused\t0\nreused_cache\t0\nrun_id\tplanted\nselection\tnone\nby\trunner\n' \
     "$cov_t" "$(git rev-parse HEAD)" "$(git rev-parse HEAD:gate-legs.json)" > "$REPO/.git/gate-verdict/$cov_t"
   write_refs "$WORK/refs.cov" "refs/heads/main $(git rev-parse HEAD) refs/heads/main $ZERO"
   run_hook "$WORK/refs.cov" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD= GATE_SELFTESTS=

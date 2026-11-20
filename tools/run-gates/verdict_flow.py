@@ -5,7 +5,7 @@ selection of the legs a bar holds.
     python <this kit>/verdict_flow.py route --run <run dir>
     python <this kit>/verdict_flow.py judge --run <run dir> --leg <name> --judgment <word>
     python <this kit>/verdict_flow.py select --rev <R> --out <path>
-    python <this kit>/verdict_flow.py select --check --run <run dir> --rev <R>
+    python <this kit>/verdict_flow.py select --check --run <run dir>|--selection <path> --rev <R>
     python <this kit>/verdict_flow.py --fixture route|red-route|selection-rows|held-keys|select|held-policy
 
 TOOL-dWitnessedBar-3 S6, S7; `select` TOOL-dWitnessedBar-5 S5 to S7. `<run dir>` is one run record of
@@ -47,6 +47,9 @@ the runner, `<git dir>/gate-run/<run id>`. Run in the repository whose revision 
          no `GATE_SELFTESTS`. A leg name holding ` · ` is never written; its leg runs.
          `--check` derives the record again at R and exits 1 naming each row the run record's
          `selection` adds or lacks; the hook runs it before it admits a verdict made under one.
+         `--selection <path>` checks that file instead of `<run dir>/selection`, exactly one of the
+         two: the hook rebuilds a per-tree verdict's `selection.<n>` rows into one
+         (TOOL-dWitnessedBar-41 S4).
          The runner reads the record `GATE_SELECTION` names and copies it into the run record.
 
 A kit imports no sibling kit: both are run as subprocesses, each found through the kit's inline copy
@@ -455,23 +458,29 @@ def cmd_select(repo, rev, out, here=HERE, manifest_rel=None, pusher=None):
     return 0, lines
 
 
-def cmd_select_check(repo, run, rev, here=HERE, manifest_rel=None):
-    """-> (rc, out lines): 1 naming each row the run's `selection` adds or lacks against R."""
-    path = run / "selection"
-    if not path.is_file():
-        raise Refusal(f"{path.as_posix()} is absent, so this run held nothing by a selection")
+def cmd_select_check(repo, run, rev, here=HERE, manifest_rel=None, selection=None):
+    """-> (rc, out lines): 1 naming each row the selection adds or lacks against R. The selection is
+    `<run>/selection`, or the file `selection` names when it is given (TOOL-dWitnessedBar-41 S4)."""
+    if selection is None:
+        path, who = run / "selection", "the run's selection"
+        if not path.is_file():
+            raise Refusal(f"{path.as_posix()} is absent, so this run held nothing by a selection")
+    else:
+        path, who = pathlib.Path(selection), "the selection"
+        if not path.is_file():
+            raise Refusal(f"{path.as_posix()} is no file, so there is no selection to check")
     manifest_rel = manifest_rel or derive_manifest_rel(repo)
     _held, _header, rows, _said = derive_selection(repo, rev, here, manifest_rel)
     fresh = render_selection("", rows).splitlines()[1:]
     recorded = [ln for ln in path.read_text(encoding="utf-8", errors="replace").splitlines()
                 if ln.strip() and not ln.startswith("#")]
-    diff = [f"select --check  the run's selection adds {render_row(ln)}, which {rev} does not derive"
+    diff = [f"select --check  {who} adds {render_row(ln)}, which {rev} does not derive"
             for ln in recorded if ln not in fresh]
-    diff += [f"select --check  the run's selection lacks {render_row(ln)}, which {rev} derives"
+    diff += [f"select --check  {who} lacks {render_row(ln)}, which {rev} derives"
              for ln in fresh if ln not in recorded]
     if diff:
         return 1, diff
-    return 0, [f"select --check  the run's selection is what {rev} derives: {len(rows)} row(s)"]
+    return 0, [f"select --check  {who} is what {rev} derives: {len(rows)} row(s)"]
 
 
 # ---- the fixtures ----------------------------------------------------------------------------------
@@ -780,6 +789,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="verdict_flow.py", description=__doc__.split("\n")[0])
     ap.add_argument("verb", choices=("route", "judge", "select"))
     ap.add_argument("--run")
+    ap.add_argument("--selection")
     ap.add_argument("--leg")
     ap.add_argument("--judgment")
     ap.add_argument("--rev")
@@ -787,9 +797,14 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args(argv)
     try:
-        # `--run` is asked of route, judge and `select --check` alone: `select` writes no run record.
+        # `--run` is asked of route and judge, and `select --check` asks it or `--selection`, exactly one
+        # (TOOL-dWitnessedBar-41 S4): `select` writes no run record.
         run = None
-        if a.verb != "select" or a.check:
+        if a.selection is not None and not (a.verb == "select" and a.check):
+            raise Refusal("--selection is asked of select --check alone")
+        if a.verb == "select" and a.check and (a.run is None) == (a.selection is None):
+            raise Refusal("select --check takes exactly one of --run <run dir> and --selection <path>")
+        if (a.verb != "select" or a.check) and a.selection is None:
             if not a.run:
                 raise Refusal(f"{a.verb}{' --check' if a.check else ''} takes --run <run dir>")
             run = pathlib.Path(a.run)
@@ -799,7 +814,7 @@ def main(argv=None):
             if not a.rev:
                 raise Refusal("select takes --rev <R>: its inputs are read there, never from the tree")
             if a.check:
-                rc, out = cmd_select_check(pathlib.Path("."), run, a.rev)
+                rc, out = cmd_select_check(pathlib.Path("."), run, a.rev, selection=a.selection)
             elif not a.out:
                 raise Refusal("select takes --out <path>, the selection record it writes")
             else:
