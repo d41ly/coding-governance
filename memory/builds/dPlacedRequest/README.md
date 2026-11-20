@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -133,7 +133,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason](spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md) | 16 | 2 | CLOSED | rev-7 | 2026-11-20 |
 | [TOOL-dPlacedRequest-10 — a build's scenarios chosen at `entry.place`, every admission predicate re-evaluated by `placement.check`](spec/2026-10-25-spec-TOOL-dPlacedRequest-10.md) | 17 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dPlacedRequest-14 — the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key](spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md) | 18 | 2 | CLOSED | rev-6 | 2026-11-20 |
-| [TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`](spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md) | 19 | 2 | DEFERRED | rev-7 | 2026-11-19 |
+| [TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`](spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md) | 19 | 2 | INPROGRESS | rev-7 | 2026-11-19 |
 | [TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause](spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md) | 20 | 2 | DEFERRED | rev-8 | 2026-11-19 |
 | [TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim](spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks](spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md) | 22 | 2 | DEFERRED | rev-13 | 2026-11-19 |
