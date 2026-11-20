@@ -4,7 +4,7 @@
 
 ## Why
 
-TOOL-dWitnessedBar-51 is built from spec rev-7 and committed as one pass commit. The pass picked up the unverified partial edits the earlier builder left in 43 files, checked each one against the spec, and finished what was missing. The commit carries the `Pass: TOOL-dWitnessedBar-51` trailer and sets the spec status header to CLOSED, dated 2026-11-20.
+TOOL-dWitnessedBar-51 is built from spec rev-7 and committed as one pass commit. The pass picked up the unverified partial edits the earlier builder left in 43 files, checked each one against the spec, and finished what was missing. The commit carries the `Pass: TOOL-dWitnessedBar-51` trailer and sets the spec status header to CLOSED, dated 2026-11-20. (DERIVED from the builder's probe)
 
 ## Summary
 
@@ -16,12 +16,12 @@ Pass commit 7b649d671 on base fc999262b. 57 files changed. Every hook passed on 
 - I fixed one defect in its work. The S32/AC28 fixture line in `tools/lib/resolve-python.test.sh` used a `printf` that wrote a Python file with an unterminated string. It is now written line by line.
 
 **Added in this pass:**
-- **S1:** I measured shell-role after all edits: 23 files grown, 1 new (`tools/run-gates/lib-verdict.sh`), 3 shrunk. All 24 grown or new keys went through one `ratchet.py widen shell-role ... --unit TOOL-dWitnessedBar-51`, which wrote `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md`. Every owed row was then set to its measured count. A re-measure shows no difference, and all 24 `widened:` rows name `widen-1`.
+- **S1:** I measured shell-role after all edits: 23 files grown, 1 new (`tools/run-gates/lib-verdict.sh`), 3 shrunk. All 24 grown or new keys went through one `ratchet.py widen shell-role ... --unit TOOL-dWitnessedBar-51`, which wrote `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-51-widen-1.md`. Every owed row was then set to its measured count. A re-measure shows no difference, and all 24 `widened:` rows name `widen-1`. (DERIVED from the builder's probe)
 - **AC27 arm:** three new cases (1m) in `tools/memory-tree/merge-rows.test.sh`.
 - **Deviation records:** `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-514.md` (S15, departs from the dClosedLoop `test.flakes` row) and `memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-51-deviation-515.md` (F2: Bound, Tier, Reason). Both pass `build_records.py read`.
 - **Acceptance ledger:** `memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-51-1-acceptance-ledger.md`, one line per criterion.
 - **Records and regenerated files:** `memory/guides/SESSION-KICKOFF.md` `last-audit` re-stamped at the base, the codebase map's `symbols.json` regenerated, and `gen_build_index.py --write` output committed.
-- `owed_rows.py --base HEAD` reported 0 rows owed and one size breach that the warn setting admits.
+- `owed_rows.py --base HEAD` reported 0 rows owed and one size breach that the warn setting admits. (DERIVED from the builder's probe)
 
 **Write set:** my `--dispatch` for the five added paths replaced the earlier declared set instead of adding to it, so the commit hook (check 49) refused the first commit. I re-declared the union the refusal printed, all paths already in the spec's Files touched, and the second commit passed.
 
@@ -36,9 +36,9 @@ Pass commit 7b649d671 on base fc999262b. 57 files changed. Every hook passed on 
 - AC25: `refuse-wrong-shell.sh --coverage` over a scratch repo exited 1 naming `late.sh` only; over the real tree it read 93 members and exited 0. Stands in for `python resolver`.
 - AC28, AC40, AC41: seed probes in `%TEMP%/ll51` printed `armed p 1` under `sys.executable` at the root, and `refused p header disagrees` with exit 2 and the home unchanged. The `conf-scalar-pins` argv resolves `{prefix}`.
 - AC27: `merge-rows.py` over the three planted cases.
-- AC30: `render_cut_tail` and `render_fenced` (8191 bytes that decode, a 4-backtick fence, forged field lines shielded).
+- AC30: `render_cut_tail` and `render_fenced` (8191 bytes that decode, a 4-backtick fence, forged field lines shielded). (DERIVED from the builder's probe)
 - AC5: `check_declarations` with no `purpose` names the leg.
-- AC35: tags re-derived for the 16 rows with no mismatch.
+- AC35: tags re-derived for the 16 rows with no mismatch. (DERIVED from the builder's probe)
 - AC3, AC11, AC14, AC15, AC19, AC20, AC23, AC36–AC39: greps and the AC15 probe.
 - The naming lexicon passed all 11 new names.
 

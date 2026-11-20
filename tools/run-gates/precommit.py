@@ -174,10 +174,10 @@ def resolve_bash_launcher():
 def read_manifest(path):
     """The manifest's rows through `held_halves.load_manifest`, the kit's one leg-manifest reader, or
     exit 2 naming its refusal: an unreadable manifest is never an empty list (TOOL-dWitnessedBar-51 S47)."""
-    def refuse(msg):
+    def print_refusal(msg):
         print(f"{SAY}: {msg}", file=sys.stderr)
         raise SystemExit(2)
-    return held_halves.load_manifest(str(path), refuse=refuse)
+    return held_halves.load_manifest(str(path), refuse=print_refusal)
 
 
 def read_staged(root):

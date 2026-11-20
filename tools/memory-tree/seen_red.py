@@ -246,7 +246,7 @@ PLANTS = ("seen", "unseen-gate", "unseen-arm", "unseen-arm-with-args", "arm-outs
 FIX_SLUG = "dFix"
 FIX_BASE_LEG = {"name": "fix base leg", "argv": ["bash", "tools/fix/base.test.sh"]}
 FIX_ADDED_LEG = {"name": "fix added leg", "argv": ["bash", "tools/fix/added.test.sh"]}
-FIX_ARGS_LEG = {"name": "fix args leg", "argv": ["python", "tools/x.py", "--selftest"]}
+FIX_ARGS_LEG = {"name": "fix args leg", "argv": ["python", "fix/x.py", "--selftest"]}
 FIX_LEDGER = "memory/builds/dFix/build/2026-01-01-build-TOOL-dFix-1-1-acceptance-ledger.md"
 FIX_SPEC = "memory/builds/dFix/spec/2026-01-01-spec-TOOL-dFix-1.md"
 
@@ -306,7 +306,7 @@ def build_fixture(top, plant):
                            "New arm: tools/fix/base.test.sh · covers AC1 · the plant, staged red by its inverse · none\n")
     elif plant == "unseen-arm-with-args":
         files[FIX_SPEC] = ("# TOOL-dFix-1 — a unit\n\n## 7. Gates\n\n`fix args leg`\n\n"
-                           "New arm: tools/x.py --selftest · covers AC1 · the plant, staged red by its inverse · none\n")
+                           "New arm: fix/x.py --selftest · covers AC1 · the plant, staged red by its inverse · none\n")
     elif plant == "arm-outside-gates":
         files[FIX_SPEC] = ("# TOOL-dFix-1 — a unit\n\n## 4. Design\n\nThe arm this spec quotes:\n\n"
                            "New arm: tools/fix/base.test.sh · covers AC1 · quoted, not declared · none\n\n"

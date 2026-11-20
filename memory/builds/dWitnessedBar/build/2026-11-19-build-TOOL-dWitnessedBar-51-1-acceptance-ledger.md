@@ -25,7 +25,7 @@ every leg of section 7 and the RED-first observation of each of its seven `New a
 - AC4 — `flake` — present at HEAD: `tree_lib.TYPED_RECORD_KINDS` holds `flake` and `gate-health`; the
   `--print-bindings` fixture is owed to the close (`build-index selftest`).
 - AC5 — `purpose presence` — `check_declarations` over a row with no `purpose` returned `('purpose presence',
-  'alpha check', ...)`; every one of the 219 rows of `tools/gate-legs.json` carries `purpose`. The
+  'alpha check', ...)`; every one of the 219 rows of `tools/gate-legs.json` carries `purpose`. The (DERIVED from the builder's probe)
   `--selftest` case is owed to the close.
 - AC6 — `count rose` — `ratchet.py --fixture --plant cutoff-later` (later exit 1, earlier exit 0),
   `--plant cutoff-blank` and `--plant cutoff-none` (`none` and `2026-02-30` each exit 1 printing `count
@@ -56,7 +56,7 @@ every leg of section 7 and the RED-first observation of each of its seven `New a
 - AC18 — `Pass: none` — the last commit touching `readme-contract.txt` carries `Pass: none`; `gen_build_index.py
   --check` is owed to the close.
 - AC19 — `"fix-of"` — the grep prints 1 for each file.
-- AC20 — `UNATTENDED-PROTOCOL.md` — both measure 68283 bytes against the 68288 row; this pass did not
+- AC20 — `UNATTENDED-PROTOCOL.md` — both measure 68283 bytes against the 68288 row; this pass did not (DERIVED from the builder's probe)
   touch either.
 - AC21 — `Refusal` — `run_probe_in_empty_dir` with `resolve_shell_argv` patched to raise `Refusal` returned
   None; the no-bash `govkit.py selfcheck` run is owed to the close.
@@ -76,7 +76,7 @@ every leg of section 7 and the RED-first observation of each of its seven `New a
   running interpreter and the root as its cwd.
 - AC29 — `unresolved` — `ratchet.py --fixture --plant no-base-remedy` exited 0, its `never-gains` exiting 1
   printing `unresolved` and the remedy.
-- AC30 — `keep_tails.py --selftest` — `render_cut_tail` cut 8191 bytes that decode whole, and `render_fenced`
+- AC30 — `keep_tails.py --selftest` — `render_cut_tail` cut 8191 bytes that decode whole, and `render_fenced` (DERIVED from the builder's probe)
   wrote a four-backtick fence with the forged `**Hash:**` and `**Leg:**` lines shielded; the `--selftest`
   run is owed to the close.
 - AC31 — `writes-fixture` — `fix_keeps.py --fixture --plant writes-fixture` refused the fixture file, and
@@ -85,7 +85,7 @@ every leg of section 7 and the RED-first observation of each of its seven `New a
   quarantine arms in `run-gates.evidence.test.sh` are owed to the close.
 - AC33 — `run_id` — present at HEAD (S39); owed to the close.
 - AC34 — `warn.1` — present at HEAD (S40); owed to the close.
-- AC35 — `derive_leg_tag` — re-deriving the 16 rows' tags printed no mismatch.
+- AC35 — `derive_leg_tag` — re-deriving the 16 rows' tags printed no mismatch. (DERIVED from the builder's probe)
 - AC36 — `grants: PLAY-dClosedLoop-3` — the grep names §8 F3.
 - AC37 — `Manifest order drives` — each grep names the sentence S44 and S45 add.
 - AC38 — `write_bypass_line` — the two bodies `diff` to nothing; the `GOV_RUNLOG=0` fixture is owed to the
