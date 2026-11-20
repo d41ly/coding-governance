@@ -23,7 +23,7 @@ for the principal; and the keep's `controls` case, staged red by skipping the es
   the close, by the hook suite's `dot` and `derived` cases.
 - AC2 — `selection_ignored 2` — the same file's three-field row and `bogus`-source row: the record held one
   `selection.<n>`, `selection_ignored 2`, and a `selection` hashed over the accepted row alone.
-- AC3 — `reused_cache.t0.*selection.tnone` — the grep named `.githooks/pre-push.test.sh:2477`, the one plant
+- AC3 — `reused_cache.t0.*selection.tnone` — the grep named `.githooks/pre-push.test.sh@e054b306:2477`, the one plant
   line of `write_bg_verdict`.
 - AC4 — `GATE_BASE_FROM=inherited` — NOT OBSERVED here: `TOOL-dWitnessedBar-58`'s stub-bar and
   runner-boundary arms, order 33, observe it, and its S3 writes it observed.

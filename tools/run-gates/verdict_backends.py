@@ -864,7 +864,7 @@ def run_local_plant(case, top, run_scenario):
             text += f"selection\t{hashed}\n" + "".join(f"selection.{n}\t{r}\n" for n, r in enumerate(rows, 1))
         (slot / tree).write_text(text, encoding="utf-8")
 
-    def hash_rows(rows):
+    def derive_rows_hash(rows):
         rc, h = run_git(work, "hash-object", "--stdin", data="".join(f"held\t{r}\n" for r in rows))
         if rc != 0 or not h:
             raise OSError("git hash-object did not answer for the planted rows")
@@ -888,15 +888,15 @@ def run_local_plant(case, top, run_scenario):
         write_record(selection=(None, []))
         read_local("no selection key", "NONE", ["carries no selection"])
     elif case == "edited-selection":
-        write_record(selection=(hash_rows(derived), [derived[0] + " edited"]))
+        write_record(selection=(derive_rows_hash(derived), [derived[0] + " edited"]))
         read_local("selection.1 edited after its hash", "NONE", ["do not hash to"])
     elif case == "underived-selection":
-        write_record(selection=(hash_rows([underived]), [underived]))
+        write_record(selection=(derive_rows_hash([underived]), [underived]))
         read_local("a row R does not derive", "NONE", [f"is not what {sha[:8]} derives", "TOOL-x-7"])
     else:
         write_record()
         read_local("the pair at 0, selection none", "GREEN", ["witness witnessed"])
-        write_record(selection=(hash_rows(derived), derived))
+        write_record(selection=(derive_rows_hash(derived), derived))
         read_local("the pair at 0, the row R derives", "GREEN", ["witness witnessed"])
 
 
