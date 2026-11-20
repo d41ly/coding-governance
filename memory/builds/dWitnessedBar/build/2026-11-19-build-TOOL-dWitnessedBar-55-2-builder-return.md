@@ -31,7 +31,7 @@ Committed TOOL-dWitnessedBar-55 as 599c23cef, starting from da5eef59a. The step 
   - AC4: the sentinel read `plain`, and all 11 rows plus 3 extra rows gave the same value from the step and from the hook's function. (DERIVED from the builder's probe)
   - AC1: wrote `every-red` and removed both lines.
   - AC2: neither fixture wrote a `blocks` value.
-  - AC3: left exactly `export INHERITED_RED=park\n`, and the witness exited 0 naming `.githooks/gate-env.sh:1`.
+  - AC3: left exactly `export INHERITED_RED=park\n`, and the witness exited 0 naming `.githooks/gate-env.sh@6834ee4b:1`.
   - A CRLF file with no final newline kept its other lines byte for byte.
 - **AC5 greps**, standing in for the `docs` leg: "not an assignment" prints lines 442 and 461, inside the section that runs from line 430 to 474. The old wording "line out of each file that held one" is gone.
 - **Bug-class checklist** (`gotchas.py --for-diff HEAD~1..HEAD`): it selected 33 classes plus 6 universal. I checked the ones that apply and none needed a change:
