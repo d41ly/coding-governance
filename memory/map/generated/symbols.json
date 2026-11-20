@@ -7643,6 +7643,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_quiet_posix",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "check_raise",
       "kind": "function",
       "file": "tools/loop/termination.py"
@@ -8056,6 +8061,11 @@
       "id": "check_routed_commits",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "check_row_changed",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "check_row_on_default",
@@ -9608,6 +9618,11 @@
       "file": "tools/runlog/runlog.py"
     },
     {
+      "id": "cmd_quiet_rerun",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "cmd_read",
       "kind": "function",
       "file": "tools/lib/legacy_ledger.py"
@@ -10833,6 +10848,11 @@
       "file": "tools/playbook/pins.py"
     },
     {
+      "id": "derive_check_row",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "derive_ci_file",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -11359,6 +11379,11 @@
     },
     {
       "id": "derive_flake_holds",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "derive_flake_streak",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -11973,6 +11998,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_leg_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "derive_leg_tag",
       "kind": "function",
       "file": "tools/run-gates/leg_factory.py"
@@ -12536,6 +12566,11 @@
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_quarantine_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "derive_quarantine_rows",
@@ -19803,6 +19838,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_ask_filing",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_ask_row",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -21928,6 +21968,11 @@
       "file": "tools/unattended/commit_trailers.py"
     },
     {
+      "id": "read_keys",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_kind_members",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -23443,6 +23488,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "read_release_count",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_release_pin",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -23699,6 +23749,11 @@
     },
     {
       "id": "read_routing",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_routing_rows",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -24981,6 +25036,16 @@
       "id": "read_visit_facts",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_wait_ceiling",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_waiting_stamp",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_waivers",
@@ -26996,6 +27061,11 @@
       "id": "render_id_run",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "render_instant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "render_instruction_map",
@@ -31598,6 +31668,16 @@
       "file": "tools/loop/guard.py"
     },
     {
+      "id": "run_fixture_contended_pair",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_daily",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_flakes_record",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -31648,6 +31728,11 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "run_fixture_held_run",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_measured_check",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
@@ -31664,6 +31749,11 @@
     },
     {
       "id": "run_fixture_red_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_release",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -33018,6 +33108,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "run_quiet_leg",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_raise",
       "kind": "function",
       "file": "tools/loop/policy_edit.py"
@@ -33349,6 +33444,11 @@
     },
     {
       "id": "run_select",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_select_at_head",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -38553,6 +38653,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "write_ask_closing",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_ask_rows",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -39166,6 +39271,11 @@
       "id": "write_flake_ask",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_flake_releases",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_flake_repo",
@@ -39976,6 +40086,11 @@
       "id": "write_python_stubs",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "write_quarantine_repo",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_range_spec",

@@ -315,7 +315,9 @@ fail=0
 # 460 -> 461, TOOL-dWitnessedBar-9: arm 1a's `level` control. Not gated. Counted by reading.
 # 461 -> 465, TOOL-dWitnessedBar-8: arm 9n's four, behind the `timeout` gate and counted on a host
 # without one as well (41 -> 45). Counted by reading; this pass runs no suite.
-FLOOR_ASSERTIONS=465
+# 465 -> 468, TOOL-dWitnessedBar-30: arm 3h3r's three, a quarantined leg run outside the verdict. Not
+# gated. Counted by reading; this pass runs no suite.
+FLOOR_ASSERTIONS=468
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -1656,6 +1658,38 @@ n=$((n+1))
 awk -F'\t' '$1=="held" && $2==1 {c=1} $1=="held.1" && $2=="m repo one · quarantine · unrun" {k=1} END{exit !(c && k)}' "$vd/verdict" 2>/dev/null \
   || { echo "canary: the verdict record lacks the held leg's held.<n> key"; awk -F'\t' '$1 ~ /^held/' "$vd/verdict" 2>/dev/null | sed 's/^/    /'; fail=1; }
 rm -f "$S2/sel.tsv"
+
+# 3h3r. A QUARANTINED LEG IN `run` MODE RUNS OUTSIDE THE VERDICT. TOOL-dWitnessedBar-30 AC1. A selection
+#      row's fifth field `run` executes the leg in its ordinary slot, past the guard that would skip it
+#      on this unmoved tree, so it writes its `.leg` row for the flake record; its red is its `held.1`
+#      result, `fail`, and never a failed leg, so the bar beside one green leg is GREEN.
+S2R="$SCRATCH/heldrun"
+mkdir -p "$S2R/${PFX}${KIT}" "$S2R/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$S2R/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2R/${PFX}${KIT}/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S2R/fx/a.sh"
+cp "$SCRATCH/fx/bad.sh" "$S2R/fx/red.sh"
+cat > "$S2R/${PFX}gate-legs.json" <<'JSON'
+[
+  {"name": "r steady", "argv": ["bash", "fx/a.sh"], "subject": "repo"},
+  {"name": "r flaky",  "argv": ["bash", "fx/red.sh"], "subject": "repo", "guard": ["fx/red.sh"]}
+]
+JSON
+( cd "$S2R" && git init -q --template= -b main . \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+printf '# planted\nheld\tr flaky\tquarantine\t2/10, ask ARCH-tFx-1\trun\n' > "$SCRATCH/heldrun.sel"
+o=$( cd "$S2R" && GATE_SELECTION="$SCRATCH/heldrun.sel" GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
+vd="$S2R/.git/gate-run/$(cat "$S2R/.git/gate-run/current" 2>/dev/null)"
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN'; } \
+  || { echo "canary: a failing quarantined leg in run mode moved the verdict (exit $rc), so a quarantined flake still blocks"; printf '%s\n' "$o" | grep -E '^(gates|GATE)' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+[ -f "$vd/1.leg" ] \
+  || { echo "canary: a quarantined leg in run mode wrote no .leg row, so no flake record can hold its result"; printf '%s\n' "$o" | grep 'r flaky' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+awk -F'\t' '$1=="held" && $2==1 {c=1} $1=="held.1" && $2=="r flaky · quarantine · fail" {k=1} END{exit !(c && k)}' "$vd/verdict" 2>/dev/null \
+  || { echo "canary: the verdict record does not read held.1 ending quarantine · fail for the run-mode leg"; awk -F'\t' '$1 ~ /^(held|failed|verdict)/' "$vd/verdict" 2>/dev/null | sed 's/^/    /'; fail=1; }
+rm -f "$SCRATCH/heldrun.sel"
 
 # 3h4. AN ALL-HELD RUN REFUSES. TOOL-dUnstalledConvoy-26 AC10. A repository whose whole manifest is
 #      kit-subject would otherwise print `gates GREEN — 0/0 legs passed` on every run forever while

@@ -4,6 +4,7 @@ selection of the legs a bar holds, and the flake record with the holds it justif
 
     python <this kit>/verdict_flow.py route --run <run dir>
     python <this kit>/verdict_flow.py judge --run <run dir> --leg <name> --judgment <word>
+    python <this kit>/verdict_flow.py quiet-rerun --run <run dir>
     python <this kit>/verdict_flow.py select --rev <R> --out <path>
     python <this kit>/verdict_flow.py select --check --run <run dir>|--selection <path> --rev <R>
     python <this kit>/verdict_flow.py flakes --run <run dir> --build <slug> --unit <id>
@@ -11,7 +12,8 @@ selection of the legs a bar holds, and the flake record with the holds it justif
     python <this kit>/verdict_flow.py --fixture <one of FIXTURES>
 
 TOOL-dWitnessedBar-3 S6, S7; `select` TOOL-dWitnessedBar-5 S5 to S7; `flakes`, the `flakes` route and
-the `quarantine` row TOOL-dWitnessedBar-8. `<run dir>` is one run record of the runner,
+the `quarantine` row TOOL-dWitnessedBar-8; the selection's mode, the release and `quiet-rerun`
+TOOL-dWitnessedBar-30. `<run dir>` is one run record of the runner,
 `<git dir>/gate-run/<run id>`. Run in the repository whose revision `--rev` names.
 
   route  reads `<run dir>/verdict` and `<run dir>/attribution` and writes the routing record
@@ -31,7 +33,19 @@ the `quarantine` row TOOL-dWitnessedBar-8. `<run dir>` is one run record of the 
            any                 pass    ask            non-blocking
 
          The record writes the route word, never the outcome; nothing checks the join (§8 F9). Prints
-         `route  <leg>  <class> · <blocks> · <route>` per row.
+         `route  <leg>  <class> · <blocks> · <route>` per row. A `quiet-rerun` row gains a seventh
+         field, `routed <epoch>`: the stamp this run's record already held for the leg, else the one
+         of the newest sibling run record naming the leg when its row there still reads `rerun
+         waiting`, else now, so a contended red's wait spans bars and ends when its red stops waiting.
+  quiet-rerun  takes each `quiet-rerun` row whose eighth field is absent or `rerun waiting`. When
+         `profile_bar.py#check_quiet` reads `true` it runs that leg once, alone, through this kit's
+         runner under a one-row manifest (`GATE_LEGS`), `GATE_FULL=1` and `GATE_SELFTESTS=1`, and
+         attributed against the attribution row's R (`GATE_ATTRIBUTE`), its run record a sibling of
+         `<run dir>`: green writes `rerun ok`, and red re-attributes the row by the class that run
+         read, routes it by that class and writes `rerun red <class>`. Otherwise it prints `awaiting
+         quiet host  <leg>  since <routed at>` and writes `rerun waiting`, or, once the wait exceeds
+         `flow.wait-ceiling` hours, prints `owner  <leg>  contended, no quiet host within <h> h` and
+         writes `rerun owner`. A state other than `waiting` is final and is never re-run.
   judge  records the tester's judgment on a row routed `attribute`. The word must be one of the
          outcomes of the loop definition's `item.test.attribute` row, read by running the loop kit's
          `loop_lib.py items --tag item.test.attribute`, the verb TOOL-dWitnessedBar-100 asks for; its
@@ -41,8 +55,16 @@ the `quarantine` row TOOL-dWitnessedBar-8. `<run dir>` is one run record of the 
            always-new-unit     code-miss -> new-unit, spec-wrong -> new-unit
          Prints `judge  <leg>  <judgment> -> <next>`.
   select writes the selection record (`test.select`): a header naming the values it read, then one
-         TAB row per held leg, `held · <leg> · <source> · <note>`, the source a word of
-         SELECTION_SOURCES. Every input is read at R and never from the working tree: the manifest by
+         TAB row per held leg, `held · <leg> · <source> · <note> · <mode>`, the source a word of
+         SELECTION_SOURCES and the mode one of SELECTION_MODES, a four-field row reading `hold`. A
+         `run` leg is executed by the runner and its result kept out of the verdict. A `level` row is
+         `hold`; a `quarantine` row is `run` when its leg's newest executed row in the flake records
+         at R since its hold, the committer date of the commit filing its ask, ended more than 24
+         hours before the selection, or there is none, whatever `verdict.held` reads; else `hold`. A
+         quarantined leg whose rows since its hold open, newest first, with `verdict.flakes.release`
+         greens (first rc 0), or whose manifest row at R differs from its row at that filing commit,
+         is released: no row, and a `release  <leg>  <ask id>  <reason>` line naming the streak's run
+         ids or the row change. Every input is read at R and never from the working tree: the manifest by
          `git show`, the policy by the policy kit's `policy.py get <key> --rev <R>`, the catalogue
          defaults where no policy kit resolves. One row source per SELECT_SOURCES pair: `level`, a
          leg whose `level` is outside `tests.landing-levels`, none under `every-declared`, and none
@@ -54,7 +76,8 @@ the `quarantine` row TOOL-dWitnessedBar-8. `<run dir>` is one run record of the 
          `push-selected` prints the export the pre-push hook makes for its bar where the pusher set
          no `GATE_SELFTESTS`. A leg name holding ` · ` is never written; its leg runs.
          `--check` derives the record again at R and exits 1 naming each row the run record's
-         `selection` adds or lacks; the hook runs it before it admits a verdict made under one.
+         `selection` adds or lacks, comparing leg, source and note and never the mode, so a `run` row
+         cannot fail it; the hook runs it before it admits a verdict made under one.
          `--selection <path>` checks that file instead of `<run dir>/selection`, exactly one of the
          two: the hook rebuilds a per-tree verdict's `selection.<n>` rows into one
          (TOOL-dWitnessedBar-41 S4).
@@ -94,7 +117,8 @@ verdict, a verdict that is not RED, a malformed attribution or routing record, a
 or one not routed `attribute`, a word outside the outcome set, no loop kit or one whose `loop_lib.py`
 does not answer the verb, a policy read that fails or answers outside its key's values, a revision or
 manifest that cannot be read, `peer-or-cadence` with no runner declared elsewhere, an ask generator
-that fails, a factory that does not resolve, or one that refuses the record.
+that fails, a factory that does not resolve, or one that refuses the record, a `verdict.flakes.release`
+that is no count, or a `flow.wait-ceiling` that is no positive count of hours.
 
 `--fixture route` plants a run dir under the system temp directory whose attribution holds one row of
 each class under `own-only` and whose verdict counts one more red the attribution omits.
@@ -115,7 +139,16 @@ table for that case alone, and holds no leg released after its flakes. `--fixtur
 quarantine-source` reads a quarantine row from an ask at R and none from the working tree. `--fixture
 quarantine-check` reds a hold below 2/10 and passes one at it. `--fixture measured-check` reds a hold at
 2 flakes filed after a gate-health record held 3/10, and passes it with that record dated after the
-filing. Each exits 0 when every case reads as planted, 1 naming each that does not.
+filing. `--fixture held-run` writes a five-field `run` row and reads it back, reads a four-field row
+as `hold`, refuses a mode outside the two, and compares a `run` row equal to its `hold` twin under
+`--check`. `--fixture daily` selects under each `verdict.held` value a leg whose newest row ended 25
+hours before the selection as `run` and one at 23 hours as `hold`. `--fixture release` releases a leg
+with three greens since its hold naming their run ids, not one with green, red, green, green, and one
+whose manifest row changed since its ask. `--fixture contended-pair` routes a blocking CONTENDED red,
+waits under a quiet stub reading `false`, runs it once under `true`, writes `rerun ok` and `rerun red
+<class>`, runs nothing on a second call, raises the owner line at 73 hours under a 72-hour ceiling and
+not at 71, and carries a sibling record's waiting stamp. Each exits 0 when every case reads as planted,
+1 naming each that does not.
 
 WHAT IT DOES NOT CHECK. That the attribution was made against the landing base, or that its `blocks`
 words were derived by `lib-verdict.sh`: the runner writes both, and the readers that land a red read
@@ -123,7 +156,9 @@ them. Spawning the tester or acting on `next`: the loop's engine runs the item t
 a held leg ran anywhere else: `peer-or-cadence` checks a runner is DECLARED, never that it ran.
 `select --check` compares rows, never the header, which only names what was read. That the flake
 record's rows are true: the runner wrote the `.leg` rows, and `flakes --check` re-derives a hold from
-the records, never from the runs. That a released leg's streak was run: TOOL-dWitnessedBar-30's.
+the records, never from the runs. That a `run` leg was run: the runner's, and only a Test-step bar's
+flake record holds its row. That the host stayed quiet while the alone-run ran: `check_quiet` reads it
+once, before. That the closing row a `release` line asks for was written: the driver's.
 """
 import argparse
 import datetime
@@ -136,6 +171,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = pathlib.Path(os.path.abspath(__file__)).parent
 if str(HERE) not in sys.path:
@@ -157,6 +193,8 @@ ASK_ID = "TOOL-dWitnessedBar-100"
 # THE HOLD (TOOL-dWitnessedBar-5). The runner's `HOLD_SOURCES` is `kit` and these two: `kit` it derives
 # from the manifest row itself, so a selection holding a `kit` row is ignored and its leg runs.
 SELECTION_SOURCES = ("quarantine", "level")
+# A selection row's fifth field (TOOL-dWitnessedBar-30 S1): `run` executes the leg outside the verdict.
+SELECTION_MODES = ("hold", "run")
 HELD_RESULTS = ("unrun", "ok", "fail")
 SEP = " · "
 HELD_KEY = "verdict.held"
@@ -187,6 +225,15 @@ HEALTH_BOUND = 60  # seconds, the gate-health measurement `flakes` runs, inside 
 FLAKY_FORM = "held flaky leg: leg"
 FLAKY_ASK = re.compile(r"held flaky leg: leg (.+?) flaked ([0-9]+) in its last ([0-9]+) verdicts")
 LEG_ROW = re.compile(r"([0-9]+)\.leg")
+# THE RELEASE AND THE QUIET RE-RUN (TOOL-dWitnessedBar-30).
+RELEASE_KEY = "verdict.flakes.release"
+RELEASE_DEFAULT = 3  # v2:1275's literal default, the catalogue's
+DAY = datetime.timedelta(hours=24)
+WAIT_KEY = "flow.wait-ceiling"
+WAIT_DEFAULT = 72  # hours, the catalogue's default
+ROUTED = re.compile(r"routed ([0-9]+)")
+RERUN = re.compile(r"rerun (waiting|ok|owner|red .+)")
+QUIET_BOUND = 3600  # seconds, an alone-run of a leg that declares no ceiling
 
 
 class Refusal(Exception):
@@ -229,23 +276,27 @@ def read_held_keys(keys):
 
 
 def read_selection(text, names=None):
-    """(rows [(leg, source, note)], refusals [line]) of a selection record's text. A row that is not
-    `held` and three fields, whose source is outside SELECTION_SOURCES, or whose leg `names` lacks is
-    refused and its leg runs; `#` lines are the header."""
+    """(rows [(leg, source, note, mode)], refusals [line]) of a selection record's text. A row that is
+    not `held` and three or four fields, whose source is outside SELECTION_SOURCES, whose mode is outside
+    SELECTION_MODES, or whose leg `names` lacks is refused and its leg runs; a row with no mode is `hold`
+    (TOOL-dWitnessedBar-30 S1). `#` lines are the header."""
     rows, refusals = [], []
     for n, ln in enumerate(text.splitlines(), 1):
         if not ln.strip() or ln.startswith("#"):
             continue
         f = ln.split("\t")
-        if len(f) != 4 or f[0] != "held" or not f[1]:
-            refusals.append(f"selection row {n} is not `held` · leg · source · note, ignored")
+        if len(f) not in (4, 5) or f[0] != "held" or not f[1]:
+            refusals.append(f"selection row {n} is not `held` · leg · source · note [· mode], ignored")
         elif f[2] not in SELECTION_SOURCES:
             refusals.append(f"selection row {n} holds {f[1]} by '{f[2]}', outside "
                             f"{' '.join(SELECTION_SOURCES)}, ignored: it runs")
+        elif len(f) == 5 and f[4] not in SELECTION_MODES:
+            refusals.append(f"selection row {n} holds {f[1]} in mode '{f[4]}', outside "
+                            f"{' '.join(SELECTION_MODES)}, ignored: it runs")
         elif names is not None and f[1] not in names:
             refusals.append(f"selection row {n} holds {f[1]}, which the manifest lacks, ignored")
         else:
-            rows.append((f[1], f[2], f[3]))
+            rows.append((f[1], f[2], f[3], f[4] if len(f) == 5 else "hold"))
     return rows, refusals
 
 
@@ -314,19 +365,54 @@ def write_routing(run, rows):
 
 
 def read_routing(run):
+    """[[field]] of `<run>/routing`: six fields, then a `quiet-rerun` row's `routed <epoch>` and its
+    `rerun <state>` (TOOL-dWitnessedBar-30 S4); a row of six reads as not yet stamped."""
     path = run / "routing"
     if not path.is_file():
         raise Refusal(f"{path.as_posix()} is absent: run `verdict_flow.py route --run` first")
     rows = []
     for n, ln in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         f = ln.split("\t")
-        if len(f) != 6 or f[3] not in ROUTES:
-            raise Refusal(f"{path.as_posix()}:{n} is not a routing row of six fields")
+        if (len(f) not in (6, 7, 8) or f[3] not in ROUTES or (len(f) > 6 and not ROUTED.fullmatch(f[6]))
+                or (len(f) == 8 and not RERUN.fullmatch(f[7]))):
+            raise Refusal(f"{path.as_posix()}:{n} is not a routing row of six fields, then `routed <epoch>` "
+                          f"and `rerun <state>`")
         rows.append(f)
     return rows
 
 
-def cmd_route(run):
+def read_routing_rows(run):
+    """{leg: [field]} of `<run>/routing`, {} where it is absent or does not read."""
+    try:
+        return {f[0]: f for f in read_routing(run)}
+    except (Refusal, OSError, UnicodeDecodeError):
+        return {}
+
+
+def read_waiting_stamp(run, leg):
+    """The `routed <epoch>` field of `leg`'s row in the newest sibling run record whose routing record
+    names the leg, when that row still reads `rerun waiting`; else None (§8 F6). The newest is the routing
+    record last written, so a leg whose red stopped waiting there ends the chain."""
+    best = None
+    try:
+        siblings = [d for d in run.parent.iterdir() if d.is_dir() and d.name != run.name]
+    except OSError:
+        return None
+    for d in siblings:
+        try:
+            mtime = (d / "routing").stat().st_mtime
+        except OSError:
+            continue
+        f = read_routing_rows(d).get(leg)
+        if f is not None and (best is None or mtime > best[0]):
+            best = (mtime, f)
+    if best is None:
+        return None
+    f = best[1]
+    return f[6] if len(f) == 8 and f[3] == "quiet-rerun" and f[7] == "rerun waiting" else None
+
+
+def cmd_route(run, now=None):
     """-> (rc, out lines)."""
     keys, tails = read_verdict(run)
     if keys.get("verdict") != "RED":
@@ -346,10 +432,22 @@ def cmd_route(run):
         k += 1
         rows.append((f"unnamed.{k}", "-", "block"))
     attempts = read_leg_attempts(run)
-    out_rows = [(leg, cls, blocks, derive_route(cls, blocks, attempts.get(leg, {}).get(".rerun", ("",))[0]),
-                 "-", "-") for leg, cls, blocks in rows]
+    out_rows = [[leg, cls, blocks, derive_route(cls, blocks, attempts.get(leg, {}).get(".rerun", ("",))[0]),
+                 "-", "-"] for leg, cls, blocks in rows]
+    # THE WAIT'S START (TOOL-dWitnessedBar-30 S4, §8 F6): this record's own stamp and state where a route
+    # already ran over it, else a sibling's still-waiting stamp, else now.
+    prior = read_routing_rows(run)
+    stamp = f"routed {int(time.time() if now is None else now)}"
+    for r in out_rows:
+        if r[3] != "quiet-rerun":
+            continue
+        own = prior.get(r[0])
+        if own is not None and own[3] == "quiet-rerun" and len(own) > 6:
+            r.extend(own[6:])
+        else:
+            r.append(read_waiting_stamp(run, r[0]) or stamp)
     write_routing(run, out_rows)
-    return 0, [f"route  {leg}  {cls} · {blocks} · {route}" for leg, cls, blocks, route, _, _ in out_rows]
+    return 0, [f"route  {r[0]}  {r[1]} · {r[2]} · {r[3]}" + (f" · {r[6]}" if len(r) > 6 else "") for r in out_rows]
 
 
 def run_kit(here, home, anchor, args, what, cwd=None, bound=BOUND):
@@ -411,6 +509,131 @@ def cmd_judge(run, leg, judgment, here=HERE):
     hit[0][4], hit[0][5] = judgment, nxt
     write_routing(run, rows)
     return 0, [f"judge  {leg}  {judgment} -> {nxt} · {RED_ROUTE_KEY} {value}, {where}"]
+
+
+# ---- the quiet-host re-run (TOOL-dWitnessedBar-30 S4, S5, S7) -----------------------------------------
+
+def read_wait_ceiling(top, here):
+    """`flow.wait-ceiling` in hours, read at HEAD by the policy kit, its catalogue default where none
+    resolves; a value that is no positive count is a Refusal."""
+    value = read_policy_at(top, "HEAD", here, WAIT_KEY, [str(WAIT_DEFAULT)])[0]
+    if not value.isdigit() or int(value) < 1:
+        raise Refusal(f"{WAIT_KEY} reads '{value}', not a positive count of hours")
+    return int(value)
+
+
+def read_keys(path):
+    """{key: value} of a TAB record such as a run's `header` or `verdict`, the first of each key; {}
+    where it does not read. Extracted from `cmd_flakes`' header read at its second reader."""
+    keys = {}
+    try:
+        for ln in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            k, _, v = ln.partition("\t")
+            keys.setdefault(k, v)
+    except OSError:
+        pass
+    return keys
+
+
+def run_quiet_leg(run, row, n, top, here=HERE):
+    """(new class or None where green, said line): `row`'s leg run once, alone, by this kit's runner in
+    `top` under a one-row manifest, `GATE_FULL=1` and `GATE_SELFTESTS=1` so no guard, hold or kit rule
+    skips it, attributed against the R its attribution row names; its run record `<run id>-quiet-<n>`
+    beside `run`. A leg the run's manifest lacks, a runner that does not answer within the leg's
+    bound, or a record with no RED or GREEN verdict reads class `-`, which routes `probe-repair`."""
+    leg = row[0]
+    manifest = read_keys(run / "header").get("manifest", "")
+    path = pathlib.Path(manifest) if manifest else None
+    if path is not None and not path.is_absolute():
+        path = pathlib.Path(top, manifest)
+    try:
+        legs = json.loads(path.read_text(encoding="utf-8")) if path is not None else []
+    except (OSError, ValueError):
+        legs = []
+    one = next((r for r in legs if isinstance(r, dict) and r.get("name") == leg), None) if isinstance(legs, list) else None
+    if one is None:
+        return "-", f"quiet-rerun  {leg}  the run's manifest '{manifest}' does not read or names no such leg, so it was not run"
+    r_sha = ""
+    try:
+        for ln in (run / "attribution").read_text(encoding="utf-8", errors="replace").splitlines():
+            f = ln.split("\t")
+            if len(f) > 4 and f[0] == leg:
+                r_sha = f[4]
+                break
+    except OSError:
+        pass
+    ceiling = one.get("ceiling")
+    bound = 2 * ceiling + 300 if isinstance(ceiling, int) and ceiling > 0 else QUIET_BOUND
+    rid = f"{run.name}-quiet-{n}"
+    root = tempfile.mkdtemp(prefix="vflow-q-")
+    try:
+        legs_file = pathlib.Path(root, MANIFEST)
+        legs_file.write_text(json.dumps([one], indent=2) + "\n", encoding="utf-8", newline="\n")
+        import profile_bar  # noqa: PLC0415 - the sibling, as measure_legs.py imports it
+        runner = HERE / "run-gates.sh"
+        bash, _tried = profile_bar.resolve_bash(str(runner))
+        if not bash:
+            return "-", f"quiet-rerun  {leg}  no bash that can read {runner.as_posix()} resolves, so it was not run"
+        env = {k: v for k, v in os.environ.items() if k not in ("GATE_SELECTION", "GATE_ATTRIBUTE", "GATE_RERUN")}
+        env.update(GATE_LEGS=legs_file.as_posix(), GATE_FULL="1", GATE_SELFTESTS="1", GATE_RUN_ID=rid)
+        if re.fullmatch(r"[0-9a-f]{40}", r_sha):
+            env["GATE_ATTRIBUTE"] = r_sha
+        try:
+            subprocess.run([bash, str(runner)], cwd=str(top), env=env, capture_output=True, encoding="utf-8",
+                           errors="replace", timeout=bound, stdin=subprocess.DEVNULL)
+        except (OSError, subprocess.TimeoutExpired) as e:
+            return "-", f"quiet-rerun  {leg}  the alone-run did not answer within {bound}s: {e}"
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+    rec = run.parent / rid
+    verdict = read_keys(rec / "verdict").get("verdict")
+    if verdict == "GREEN":
+        return None, f"quiet-rerun  {leg}  ran alone as {rid}: GREEN"
+    if verdict != "RED":
+        return "-", f"quiet-rerun  {leg}  ran alone as {rid}, whose record reads verdict '{verdict or 'none'}'"
+    cls = next((c for leg_, c, _b in read_attribution(rec) if leg_ == leg), "-")
+    return cls, f"quiet-rerun  {leg}  ran alone as {rid}: RED, attributed {cls}"
+
+
+def cmd_quiet_rerun(run, here=HERE, repo=None, quiet=None, rerun=None, now=None):
+    """-> (rc, out lines). Each `quiet-rerun` row not yet re-run: run alone on a quiet host, or waited on
+    until `flow.wait-ceiling` and then raised to the owner. `quiet` stands in for `check_quiet` and
+    `rerun` for `run_quiet_leg`, the fixture's seams; no caller passes them."""
+    rows = read_routing(run)
+    pending = [(n, r) for n, r in enumerate(rows, 1)
+               if r[3] == "quiet-rerun" and (len(r) < 8 or r[7] == "rerun waiting")]
+    if not pending:
+        return 0, [f"quiet-rerun  no contended red waits in {run.as_posix()}"]
+    now = int(time.time() if now is None else now)
+    top = read_top(repo or pathlib.Path("."))
+    ceiling = read_wait_ceiling(top, here)
+    if quiet is None:
+        import profile_bar  # noqa: PLC0415 - the sibling, as measure_legs.py imports it
+        quiet = profile_bar.check_quiet
+    state, detail = quiet()
+    lines = [f"quiet-rerun  quiet host {state} · {detail}"]
+    for n, r in pending:
+        if len(r) == 6:
+            r.append(f"routed {now}")
+        since = int(ROUTED.fullmatch(r[6]).group(1))
+        if state == "true":
+            cls, said = (rerun or run_quiet_leg)(run, r, n, top)
+            lines.append(said)
+            if cls is None:
+                r[7:] = ["rerun ok"]
+            else:
+                r[1], r[3] = cls, derive_route(cls, r[2])
+                r[7:] = [f"rerun red {cls}"]
+            lines.append(f"quiet-rerun  {r[0]}  {r[7]}")
+        elif now - since > ceiling * 3600:
+            r[7:] = ["rerun owner"]
+            lines.append(f"owner  {r[0]}  contended, no quiet host within {ceiling} h")
+        else:
+            r[7:] = ["rerun waiting"]
+            when = datetime.datetime.fromtimestamp(since, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            lines.append(f"awaiting quiet host  {r[0]}  since {when}")
+        write_routing(run, rows)
+    return 0, lines
 
 
 # ---- the selection (TOOL-dWitnessedBar-5) -----------------------------------------------------------
@@ -488,9 +711,11 @@ def read_asks(cwd, cmd):
     return [a for a in asks if isinstance(a, dict)]
 
 
-def read_asks_at(repo, sha):
+def read_asks_at(repo, sha, then=None):
     """[ask] the `ASKS_CMD` generator `.unattended.conf` declares at `sha` prints, run in a scratch
-    worktree at `sha` as `lib-attribute.sh#add_scratch_worktree` adds one; [] where none is declared."""
+    worktree at `sha` as `lib-attribute.sh#add_scratch_worktree` adds one; [] where none is declared.
+    With `then`, `then(<worktree>, asks)`'s answer instead, read in that same worktree before it is
+    removed: the flake records at R are read there (TOOL-dWitnessedBar-30 S2)."""
     cmd = read_conf_at(repo, sha, ASKS_KEY)
     if not cmd:
         return []
@@ -500,7 +725,8 @@ def read_asks_at(repo, sha):
         rc, _ = run_git(repo, "worktree", "add", "--detach", str(wt), sha)
         if rc != 0:
             raise Refusal(f"no scratch worktree could be added at {sha[:8]}, so the asks at R are unread")
-        return read_asks(wt, cmd)
+        asks = read_asks(wt, cmd)
+        return asks if then is None else then(wt, asks)
     finally:
         run_git(repo, "worktree", "remove", "--force", str(wt))
         shutil.rmtree(root, ignore_errors=True)
@@ -517,28 +743,110 @@ def read_flaky_asks(asks, status):
 
 
 def derive_quarantine_rows(ctx):
-    """[(leg, note)] for each leg an OPEN held-flaky-leg ask at R names, the note `<count>/<window>, ask
-    <id>`: the asks the generator R declares prints at R, never the working tree's (TOOL-dWitnessedBar-8
-    S6), so a branch cannot quarantine a leg it breaks."""
+    """[(leg, note, mode)] for each leg an OPEN held-flaky-leg ask at R names, the note `<count>/<window>,
+    ask <id>`: the asks the generator R declares prints at R, never the working tree's (TOOL-dWitnessedBar-8
+    S6), so a branch cannot quarantine a leg it breaks. Read with the flake records in one scratch
+    worktree at R, which decide each leg's mode and its release (TOOL-dWitnessedBar-30 S2, S3)."""
+    return read_asks_at(ctx["repo"], ctx["sha"], lambda wt, asks: derive_quarantine_at(ctx, wt, asks))
+
+
+def derive_quarantine_at(ctx, wt, asks):
+    """`derive_quarantine_rows` over the `asks` read in the worktree `wt` at R: a released leg is no row
+    and one `release` line in ctx["said"]; every other leg's mode is `run` when its newest row since its
+    hold is more than a day older than the selection, or absent, else `hold`."""
+    flaky = []
+    for leg, flakes, window, a in read_flaky_asks(asks, "OPEN"):
+        if leg not in [f[0] for f in flaky]:
+            flaky.append((leg, flakes, window, a))
+    if not flaky:
+        return []
+    factory = load_flake_factory()
+    records = read_flake_records(wt, factory)
+    need = read_release_count(ctx)
     rows = []
-    for leg, flakes, window, a in read_flaky_asks(read_asks_at(ctx["repo"], ctx["sha"]), "OPEN"):
-        if leg not in [r[0] for r in rows]:
-            rows.append((leg, f"{flakes}/{window}, ask {a.get('id')}"))
+    for leg, flakes, window, a in flaky:
+        filing, hold = read_ask_filing(wt, factory, a)
+        seen = derive_leg_rows(records, leg, hold)
+        streak = derive_flake_streak(seen)
+        why = None
+        if len(streak) >= need:
+            why = f"{len(streak)} green since its hold, {RELEASE_KEY} {need} · runs {' '.join(streak)}"
+        elif filing and check_row_changed(ctx, leg, filing):
+            why = f"its manifest row at R differs from its row at {filing[:8]}, which filed the ask"
+        if why:
+            ctx["said"].append(f"release  {leg}  {a.get('id')}  {why}")
+            continue
+        mode = "run" if not seen or seen[0][0] < ctx["now"] - DAY else "hold"
+        rows.append((leg, f"{flakes}/{window}, ask {a.get('id')}", mode))
     return rows
 
 
+def read_release_count(ctx):
+    """`verdict.flakes.release` at R by the policy kit, its catalogue default where none resolves."""
+    value = read_policy_at(ctx["repo"], ctx["sha"], ctx["here"], RELEASE_KEY, [str(RELEASE_DEFAULT)])[0]
+    if not value.isdigit():
+        raise Refusal(f"{RELEASE_KEY} reads '{value}' at {ctx['sha'][:8]}, not a count of consecutive greens")
+    return int(value)
+
+
+def read_ask_filing(top, factory, a):
+    """(sha or None, UTC instant or None) of the commit filing ask `a`: the oldest commit at HEAD adding
+    its `- <id> · filed ` row to its file, by `deviation_join.read_row_commit`, dated by its committer
+    date; the ask's `filed` day at midnight UTC where no commit adds the row."""
+    _, _, deviation_join = factory
+    sha = deviation_join.read_row_commit(str(top), f"- {a.get('id')} · filed ", str(a.get("file", "")))
+    when = None
+    if sha:
+        rc, said = run_git(top, "log", "-1", "--format=%cI", sha)
+        when = read_instant(said) if rc == 0 else None
+    if when is None and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(a.get("filed", ""))):
+        when = read_instant(f"{a['filed']}T00:00:00Z")
+    return sha, when
+
+
+def derive_leg_rows(records, leg, hold):
+    """[(ended, run id, first rc)] of `leg`'s executed rows in `records` that ended after `hold`, newest
+    first; none where the hold has no date, so an undated hold never releases."""
+    if hold is None:
+        return []
+    out = [(r["ended"], str(r.get("Run") or r["id"]).strip("`"), row[1]) for r in records if r["ended"] > hold
+           for row in r["rows"] if row[0] == leg]
+    return sorted(out, key=lambda x: (x[0], x[1]), reverse=True)
+
+
+def derive_flake_streak(seen):
+    """[run id] of the rows of `seen`, newest first, before the first whose first rc is not 0."""
+    streak = []
+    for _ended, run, first in seen:
+        if first != "0":
+            break
+        streak.append(run)
+    return streak
+
+
+def check_row_changed(ctx, leg, sha):
+    """True when `leg`'s manifest row at R differs from its row in `sha`; False where either is absent."""
+    try:
+        then = json.loads(read_at(ctx["repo"], sha, ctx["manifest_rel"]) or "null")
+    except ValueError:
+        return False
+    then = next((r for r in then if isinstance(r, dict) and r.get("name") == leg), None) if isinstance(then, list) else None
+    now = next((r for r in ctx["legs"] if r.get("name") == leg), None)
+    return then is not None and now is not None and then != now
+
+
 def derive_level_rows(ctx):
-    """[(leg, note)] for each leg whose `level` is outside `tests.landing-levels`. None under
-    `every-declared`, and none under `run-at-landing`: no cadence is installed here, so that value runs
-    every level at landing (dTendedCadence's Maintain is what would run them instead)."""
+    """[(leg, note, mode)] for each leg whose `level` is outside `tests.landing-levels`, each `hold`. None
+    under `every-declared`, and none under `run-at-landing`: no cadence is installed here, so that value
+    runs every level at landing (dTendedCadence's Maintain is what would run them instead)."""
     levels = ctx["levels"]
     if LEVELS_EVERY in levels or ctx["cadence"] == CADENCE_DEFAULT:
         return []
-    return [(r["name"], f"{r['level']}, outside {LEVELS_KEY} {' '.join(levels)}") for r in ctx["legs"]
+    return [(r["name"], f"{r['level']}, outside {LEVELS_KEY} {' '.join(levels)}", "hold") for r in ctx["legs"]
             if isinstance(r.get("level"), str) and r["level"] and r["level"] not in levels]
 
 
-# (source word, reader): each reader takes the inputs read at R and answers [(leg, note)].
+# (source word, reader): each reader takes the inputs read at R and answers [(leg, note, mode)].
 SELECT_SOURCES = (("quarantine", derive_quarantine_rows), ("level", derive_level_rows))
 
 
@@ -552,9 +860,10 @@ def derive_manifest_rel(repo):
     return MANIFEST
 
 
-def derive_selection(repo, rev, here, manifest_rel):
-    """(verdict.held value, header, [(leg, source, note)], [refusal line]) derived at `rev`, every input
-    read in that commit and none from the working tree."""
+def derive_selection(repo, rev, here, manifest_rel, now=None):
+    """(verdict.held value, header, [(leg, source, note, mode)], [refusal or release line]) derived at
+    `rev`, every input read in that commit and none from the working tree; `now`, the selection's
+    instant, decides a quarantined leg's daily run."""
     rc, out = run_git(repo, "rev-parse", "--verify", "-q", f"{rev}^{{commit}}")
     sha = out.strip()
     if rc != 0 or not sha or rev.startswith("-"):
@@ -576,27 +885,36 @@ def derive_selection(repo, rev, here, manifest_rel):
         raise Refusal(f"{HELD_KEY} peer-or-cadence at {sha[:8]} declares no runner elsewhere: no "
                       f"{HELD_RUNNER_KEY} in {UNATTENDED_CONF} there and no registered peer backend, so "
                       f"the held legs would run nowhere")
-    ctx = {"legs": legs, "levels": levels, "cadence": cadence, "repo": repo, "sha": sha}
-    rows, said = [], []
+    said = []
+    ctx = {"legs": legs, "levels": levels, "cadence": cadence, "repo": repo, "sha": sha, "here": here,
+           "manifest_rel": manifest_rel, "said": said,
+           "now": now or datetime.datetime.now(datetime.timezone.utc)}
+    rows = []
     for source, reader in SELECT_SOURCES:
-        for leg, note in reader(ctx):
+        for leg, note, mode in reader(ctx):
             if SEP in leg or "\t" in leg or "\n" in leg:
                 said.append(f"{SAY}: select refused a row · leg {leg!r} holds ` · `, a TAB or a newline, "
                             f"so it is not held and runs")
                 continue
-            rows.append((leg, source, note))
+            rows.append((leg, source, note, mode))
     header = (f"# {HELD_KEY} {held}{SEP}{LEVELS_KEY} {' '.join(levels)}{SEP}{CADENCE_KEY} {cadence}"
               f"{SEP}rev {sha}")
     return held, header, rows, said
 
 
 def render_selection(header, rows):
-    return header + "\n" + "".join(f"held\t{leg}\t{src}\t{note}\n" for leg, src, note in rows)
+    return header + "\n" + "".join(f"held\t{leg}\t{src}\t{note}\t{mode}\n" for leg, src, note, mode in rows)
 
 
 def render_row(ln):
-    """A selection record row as `<leg> · <source> · <note>`, its `held` word dropped."""
-    return ln.split("\t", 1)[-1].replace("\t", SEP)
+    """A selection record row as `<leg> · <source> · <note>`, its `held` word and its mode dropped."""
+    return derive_check_row(ln).split("\t", 1)[-1].replace("\t", SEP)
+
+
+def derive_check_row(ln):
+    """The part of a selection row `select --check` compares: `held`, leg, source and note, never the
+    mode (TOOL-dWitnessedBar-30 S1), so a `run` row and its four-field `hold` twin compare equal."""
+    return "\t".join(ln.split("\t")[:4])
 
 
 def derive_held_export(value, pusher):
@@ -605,16 +923,16 @@ def derive_held_export(value, pusher):
     return None if pusher else HELD_EXPORT.get(value)
 
 
-def cmd_select(repo, rev, out, here=HERE, manifest_rel=None, pusher=None):
+def cmd_select(repo, rev, out, here=HERE, manifest_rel=None, pusher=None, now=None):
     """-> (rc, out lines). Writes the selection record at `out`."""
     manifest_rel = manifest_rel or derive_manifest_rel(repo)
     pusher = os.environ.get("GATE_SELFTESTS", "") if pusher is None else pusher
-    held, header, rows, said = derive_selection(repo, rev, here, manifest_rel)
+    held, header, rows, said = derive_selection(repo, rev, here, manifest_rel, now)
     path = pathlib.Path(out)
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_bytes(render_selection(header, rows).encode("utf-8"))
     os.replace(tmp, path)
-    lines = said + [f"select  {leg}  {src} · {note}" for leg, src, note in rows]
+    lines = said + [f"select  {leg}  {src} · {note} · {mode}" for leg, src, note, mode in rows]
     export = derive_held_export(held, pusher)
     if export:
         lines.append(f"select  export {export} · {HELD_KEY} {held} and the pusher set no GATE_SELFTESTS, "
@@ -636,8 +954,8 @@ def cmd_select_check(repo, run, rev, here=HERE, manifest_rel=None, selection=Non
             raise Refusal(f"{path.as_posix()} is no file, so there is no selection to check")
     manifest_rel = manifest_rel or derive_manifest_rel(repo)
     _held, _header, rows, _said = derive_selection(repo, rev, here, manifest_rel)
-    fresh = render_selection("", rows).splitlines()[1:]
-    recorded = [ln for ln in path.read_text(encoding="utf-8", errors="replace").splitlines()
+    fresh = [derive_check_row(ln) for ln in render_selection("", rows).splitlines()[1:]]
+    recorded = [derive_check_row(ln) for ln in path.read_text(encoding="utf-8", errors="replace").splitlines()
                 if ln.strip() and not ln.startswith("#")]
     diff = [f"select --check  {who} adds {render_row(ln)}, which {rev} does not derive"
             for ln in recorded if ln not in fresh]
@@ -855,13 +1173,7 @@ def cmd_flakes(run, build, unit, here=HERE, repo=None):
     if value == "retry-only":
         return 0, [f"flakes  {FLAKES_KEY} retry-only · no flake record is written", "flakes  re-entry test.verdict"]
     keys, _tails = read_verdict(run)
-    header = {}
-    try:
-        for ln in (run / "header").read_text(encoding="utf-8", errors="replace").splitlines():
-            k, _, v = ln.partition("\t")
-            header.setdefault(k, v)
-    except OSError:
-        pass
+    header = read_keys(run / "header")
     rows = read_flake_rows(run)
     lines, extra = [], []
     if not rows:
@@ -1037,12 +1349,12 @@ def run_fixture_selection_rows():
                         "held\tghost leg\tquarantine\tno such leg\n", encoding="utf-8", newline="\n")
         text = path.read_text(encoding="utf-8")
         rows, _ = read_selection(text)
-        out += [f"row  {leg} · {src} · {note}" for leg, src, note in rows]
+        out += [f"row  {leg} · {src} · {note} · {mode}" for leg, src, note, mode in rows]
         if [r[0] for r in rows] != ["flaky leg", "ghost leg"]:
             bad.append(f"the file re-read as {rows}, planted with two rows")
         held, refusals = read_selection(text, names)
         out += [f"refusal  {r}" for r in refusals]
-        if held != [("flaky leg", "quarantine", "flaked 2 of 10")]:
+        if held != [("flaky leg", "quarantine", "flaked 2 of 10", "hold")]:
             bad.append(f"against the manifest it held {held}, planted to hold the quarantined leg alone")
         if len(refusals) != 1 or "ghost leg, which the manifest lacks" not in refusals[0]:
             bad.append(f"the leg the manifest lacks read {refusals}, planted to be one refusal")
@@ -1088,7 +1400,8 @@ head, _, tail = key.partition(".")
 value = (table.get(head) or {}).get(tail)
 value = {"verdict.held": "on-demand", "tests.landing-levels": ["unit", "integration"],
          "tests.without-cadence": "run-at-landing", "verdict.flakes": "quarantine",
-         "verdict.flakes.entry": "measured"}[key] if value is None else value
+         "verdict.flakes.entry": "measured", "verdict.flakes.release": 3, "flow.wait-ceiling": 72}[key] \\
+    if value is None else value
 for v in value if isinstance(value, list) else [value]:
     print(v)
 """
@@ -1133,7 +1446,7 @@ LANDS_UNIT_INTEGRATION = '[tests]\nlanding-levels = ["unit", "integration"]\nwit
 
 def run_fixture_select():
     out, bad = [], []
-    want = [("slow suite", "level", f"e2e, outside {LEVELS_KEY} unit integration")]
+    want = [("slow suite", "level", f"e2e, outside {LEVELS_KEY} unit integration", "hold")]
     with tempfile.TemporaryDirectory(prefix="vflow-") as root:
         repo, here, sha = write_repo(root, LANDS_UNIT_INTEGRATION)
         sel = pathlib.Path(root, "selection")
@@ -1240,12 +1553,13 @@ print(json.dumps({"asks": list(asks.values())}))
 BACKLOG_HEAD = "# tFlake — asks\n\n## Asks\n"
 
 
-def write_flake_repo(root, policy, backlog=""):
+def write_flake_repo(root, policy, backlog="", conf=""):
     """(repo, here, sha): `write_repo`'s repository holding a memory tree with build `tFlake`, whose
-    BACKLOG.md holds `backlog`, and `ASKS_CMD` declared as a planted generator reading every BACKLOG.md."""
+    BACKLOG.md holds `backlog`, and `ASKS_CMD` declared as a planted generator reading every BACKLOG.md,
+    after `conf`'s lines."""
     extra = {"asks.py": STUB_ASKS, ".memory-tree.conf": "MEMORY_ROOT=memory\n",
              f"memory/builds/{FLAKE_BUILD}/BACKLOG.md": BACKLOG_HEAD + backlog}
-    return write_repo(root, policy, f'{ASKS_KEY}="python asks.py"\n', extra)
+    return write_repo(root, policy, f'{conf}{ASKS_KEY}="python asks.py"\n', extra)
 
 
 def write_fixture_commit(repo, message):
@@ -1256,10 +1570,10 @@ def write_fixture_commit(repo, message):
             raise Refusal(f"the fixture's git {' '.join(args[-4:])} exited {rc}")
 
 
-def write_flake_rows(factory, repo, ended, rows):
-    """One flake record of the fixture build, `Ended` `ended`, its `rows` -> its id."""
+def write_flake_rows(factory, repo, ended, rows, run="planted"):
+    """One flake record of the fixture build, `Run` `run`, `Ended` `ended`, its `rows` -> its id."""
     rel = factory[0].write_record(repo, FLAKE_BUILD, FLAKE_UNIT, FLAKE_KIND, "planted",
-                                  [("Run", "planted"), ("Ended", ended), ("Sha", "-"), ("Tree", "-"),
+                                  [("Run", run), ("Ended", ended), ("Sha", "-"), ("Tree", "-"),
                                    ("Legs", str(len(rows)))], lines=["```tsv", *("\t".join(r) for r in rows), "```"])
     return pathlib.PurePosixPath(rel).stem
 
@@ -1415,9 +1729,10 @@ def run_fixture_quarantine_source():
             _held, _header, rows, said = derive_selection(repo, sha, here, MANIFEST)
         except Refusal as e:
             rows, said = [], [f"refused · {e}"]
-        out += said + [f"select  {leg}  {src} · {note}" for leg, src, note in rows]
+        out += said + [f"select  {leg}  {src} · {note} · {mode}" for leg, src, note, mode in rows]
         got = [r for r in rows if r[1] == "quarantine"]
-        if got != [("A", "quarantine", "2/10, ask ARCH-tFlake-2")]:
+        # no flake row since its hold, so its mode is `run` (TOOL-dWitnessedBar-30 S2)
+        if got != [("A", "quarantine", "2/10, ask ARCH-tFlake-2", "run")]:
             bad.append(f"the quarantine rows at R read {got}, planted A's alone")
     return out, bad
 
@@ -1473,12 +1788,223 @@ def run_fixture_measured_check():
     return out, bad
 
 
+def run_fixture_held_run():
+    """TOOL-dWitnessedBar-30 AC1, the pass half: the selection's mode is written, read back, defaulted and
+    refused, and `select --check` compares a `run` row equal to its `hold` twin."""
+    out, bad = [], []
+    text = render_selection("# planted", [("flaky leg", "quarantine", "2/10, ask ARCH-tFlake-1", "run")])
+    out.append("written: " + text.splitlines()[1].replace("\t", SEP))
+    if len(text.splitlines()[1].split("\t")) != 5:
+        bad.append(f"the row was written as {text.splitlines()[1]!r}, planted as five fields")
+    rows, refusals = read_selection(text, {"flaky leg"})
+    out += [f"read back  {SEP.join(r)}" for r in rows]
+    if rows != [("flaky leg", "quarantine", "2/10, ask ARCH-tFlake-1", "run")] or refusals:
+        bad.append(f"the five-field row read back as {rows}, refusals {refusals}, planted in mode run")
+    rows, refusals = read_selection("held\tflaky leg\tquarantine\t2/10, ask ARCH-tFlake-1\n", {"flaky leg"})
+    out += [f"four fields  {SEP.join(r)}" for r in rows]
+    if [r[3] for r in rows] != ["hold"] or refusals:
+        bad.append(f"a four-field row read as {rows}, refusals {refusals}, planted to read hold")
+    rows, refusals = read_selection("held\tflaky leg\tquarantine\t2/10\tmaybe\n", {"flaky leg"})
+    out += [f"mode maybe: refusal  {r}" for r in refusals]
+    if rows or len(refusals) != 1 or "outside hold run" not in refusals[0]:
+        bad.append(f"a mode outside hold run read as {rows}, refusals {refusals}, planted to be refused")
+    run_row = "held\tflaky leg\tquarantine\t2/10, ask ARCH-tFlake-1\trun"
+    if derive_check_row(run_row) != derive_check_row(run_row.rsplit("\t", 1)[0]):
+        bad.append("select --check compares a run row unequal to its four-field twin: the mode moved the check")
+    if derive_check_row(run_row) == derive_check_row(run_row.replace("2/10", "3/10")):
+        bad.append("select --check compares rows whose notes differ as equal: the control reads nothing")
+    with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+        run = pathlib.Path(root, "run")
+        run.mkdir()
+        (run / "verdict").write_text(f"verdict\tGREEN\nheld\t1\nheld.1\tflaky leg{SEP}quarantine{SEP}fail\n",
+                                     encoding="utf-8", newline="\n")
+        try:
+            got = read_held_keys(read_verdict(run)[0])
+        except Refusal as e:
+            got = [f"refused · {e}"]
+        out.append(f"held keys  {got}")
+        if got != [("flaky leg", "quarantine", "fail")]:
+            bad.append(f"a GREEN verdict holding a run leg's fail read {got}, planted as held.1 quarantine fail")
+    return out, bad
+
+
+NOW = datetime.datetime(2026, 1, 10, 12, 0, tzinfo=datetime.timezone.utc)
+
+
+def render_instant(t):
+    return t.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def write_quarantine_repo(root, policy, asks, conf=""):
+    """(repo, here, factory): `write_flake_repo`'s repository whose first commit, dated 2026-01-01, files
+    `asks` [(leg, n)], each a held-flaky-leg ask, with the memory-tree factory loaded."""
+    backlog = "".join(write_flake_ask(leg, n, "2026-01-01") for leg, n in asks)
+    dated = "2026-01-01T00:00:00Z"
+    prior = {k: os.environ.get(k) for k in ("GIT_COMMITTER_DATE", "GIT_AUTHOR_DATE")}
+    os.environ.update(GIT_COMMITTER_DATE=dated, GIT_AUTHOR_DATE=dated)
+    try:
+        repo, here, _ = write_flake_repo(root, policy, backlog, conf)
+    finally:
+        for k, v in prior.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    return repo, here, load_flake_factory()
+
+
+def run_select_at_head(repo, here, root, now=NOW):
+    """(rc, lines, rows) of `select` at the fixture repository's HEAD, at the instant `now`."""
+    sel = pathlib.Path(root, "selection")
+    try:
+        rc, lines = cmd_select(repo, run_git(repo, "rev-parse", "HEAD")[1].strip(), sel, here, MANIFEST, "", now)
+    except Refusal as e:
+        return 2, [f"{SAY}: select refused · {e}"], []
+    rows, _ = read_selection(sel.read_text(encoding="utf-8"))
+    return rc, lines, rows
+
+
+def run_fixture_daily():
+    """TOOL-dWitnessedBar-30 AC2: under each `verdict.held` value a quarantined leg whose newest row since its
+    hold ended 25 hours before the selection is `run`, one at 23 hours `hold`, one with no row `run`."""
+    out, bad = [], []
+    for value in HELD_VALUES:
+        conf = f'{HELD_RUNNER_KEY}="remote-ci.yml"\n' if value == "peer-or-cadence" else ""
+        with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+            repo, here, factory = write_quarantine_repo(root, f'[verdict]\nheld = "{value}"\n',
+                                                        [("A", 1), ("B", 2), ("C", 3)], conf)
+            write_flake_rows(factory, repo, render_instant(NOW - datetime.timedelta(hours=25)), [("A", "0", "-")], "a-1")
+            write_flake_rows(factory, repo, render_instant(NOW - datetime.timedelta(hours=23)), [("B", "0", "-")], "b-1")
+            write_fixture_commit(repo, "A's and B's rows")
+            rc, lines, rows = run_select_at_head(repo, here, root)
+            out += [f"{value}: {ln}" for ln in lines]
+            got = {r[0]: r[3] for r in rows if r[1] == "quarantine"}
+            want = {"A": "run", "B": "hold", "C": "run"}
+            if rc != 0 or got != want:
+                bad.append(f"under {value} select exited {rc} with modes {got}, planted {want}")
+    return out, bad
+
+
+def run_fixture_release():
+    """TOOL-dWitnessedBar-30 AC3: three greens since the hold release a leg naming their run ids; green, red,
+    green, green does not; a manifest row changed since the ask releases its leg naming the change."""
+    out, bad = [], []
+    with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+        repo, here, factory = write_quarantine_repo(root, "", [("P", 1), ("Q", 2), ("fast suite", 3)])
+        for k, q in enumerate(("0", "1", "0", "0")):
+            ended = render_instant(NOW - datetime.timedelta(hours=10 - k))
+            rows = [("Q", q, "-")] + ([("P", "0", "-")] if k else [])
+            write_flake_rows(factory, repo, ended, rows, f"run-{k}")
+        write_fixture_commit(repo, "P's and Q's rows")
+        rc, lines, rows = run_select_at_head(repo, here, root)
+        out += [f"rows unchanged: {ln}" for ln in lines]
+        released = {ln.split("  ")[1]: ln for ln in lines if ln.startswith("release  ")}
+        want_p = "release  P  ARCH-tFlake-1  3 green since its hold"
+        if rc != 0 or not released.get("P", "").startswith(want_p) or "runs run-3 run-2 run-1" not in released.get("P", ""):
+            bad.append(f"P with three greens since its hold printed {released.get('P')}, planted '{want_p} ... runs run-3 run-2 run-1'")
+        if "P" in [r[0] for r in rows]:
+            bad.append("P was released and still selected as held")
+        if "Q" in released or [r[0] for r in rows if r[0] == "Q"] != ["Q"]:
+            bad.append(f"Q, green red green green, printed {released.get('Q')} and rows {rows}: a red inside the streak was skipped")
+        if "fast suite" in released:
+            bad.append(f"fast suite's row is unchanged, and it printed {released['fast suite']}")
+        moved = [dict(r, argv=["false"]) if r["name"] == "fast suite" else r for r in FIXTURE_LEGS]
+        (repo / MANIFEST).write_text(json.dumps(moved, indent=2) + "\n", encoding="utf-8", newline="\n")
+        write_fixture_commit(repo, "fast suite's row changed")
+        rc, lines, rows = run_select_at_head(repo, here, root)
+        out += [f"a row changed: {ln}" for ln in lines]
+        got = next((ln for ln in lines if ln.startswith("release  fast suite  ARCH-tFlake-3  ")), "")
+        if rc != 0 or "manifest row at R differs" not in got:
+            bad.append(f"fast suite, its manifest row changed since its ask, printed '{got}', planted a release naming the change")
+    return out, bad
+
+
+def run_fixture_contended_pair():
+    """TOOL-dWitnessedBar-30 AC4, AC5: a blocking CONTENDED red waits while the host is busy, runs once alone
+    when it is quiet, is never run again, raises the owner past `flow.wait-ceiling`, and carries a sibling
+    record's waiting stamp."""
+    out, bad = [], []
+    hour = 3600
+    now = int(NOW.timestamp())
+    r = "0" * 40
+    att = [(leg, "CONTENDED", "-", "-", r, "-", "-", "-", "block", "planted") for leg in ("slow leg", "loud leg")]
+    with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+        repo, here, _sha = write_repo(root, "[flow]\nwait-ceiling = 72\n")
+        calls = []
+
+        def rerun(run, row, n, top):
+            calls.append(row[0])
+            return (None, f"stub ran {row[0]} green") if row[0] == "slow leg" else ("OWN", f"stub ran {row[0]} red")
+
+        def quiet_says(state):
+            return lambda: (state, "planted")
+
+        def plant(name, ago):
+            run = pathlib.Path(root, "gate-run", name)
+            run.mkdir(parents=True)
+            (run / "verdict").write_text("verdict\tRED\nfailed\t2\n", encoding="utf-8", newline="\n")
+            (run / "attribution").write_text("".join("\t".join(a) + "\n" for a in att), encoding="utf-8",
+                                             newline="\n")
+            cmd_route(run, now - ago * hour)
+            return run
+
+        def call(run, state, what):
+            try:
+                rc, lines = cmd_quiet_rerun(run, here, repo, quiet_says(state), rerun, now)
+            except Refusal as e:
+                rc, lines = 2, [f"refused · {e}"]
+            out.extend(f"{what}: {ln}" for ln in lines)
+            return rc, lines, {f[0]: f for f in read_routing(run)}
+
+        run = plant("busy", 0)
+        rc, lines, rows = call(run, "false", "busy host")
+        if rc != 0 or calls or not any(ln.startswith("awaiting quiet host  slow leg  since ") for ln in lines) \
+                or rows["slow leg"][7:] != ["rerun waiting"]:
+            bad.append(f"under a busy host quiet-rerun ran {calls} and printed {lines}, planted to wait and run nothing")
+        rc, lines, rows = call(run, "true", "quiet host")
+        if calls != ["slow leg", "loud leg"]:
+            bad.append(f"under a quiet host the legs ran {calls}, planted each once")
+        if rows["slow leg"][7:] != ["rerun ok"] or rows["loud leg"][7:] != ["rerun red OWN"] \
+                or rows["loud leg"][3] != "attribute":
+            bad.append(f"the re-run rows read {rows}, planted rerun ok and rerun red OWN routed attribute")
+        rc, lines, rows = call(run, "true", "second call")
+        if calls != ["slow leg", "loud leg"]:
+            bad.append(f"a second call over the finished rows ran {calls[2:]}: a final state was re-run")
+        for ago, want in ((73, "owner"), (71, "awaiting")):
+            run = plant(f"waited-{ago}", ago)
+            rc, lines, rows = call(run, "false", f"routed {ago} h before")
+            said = [ln for ln in lines if ln.startswith(("owner  ", "awaiting quiet host  "))]
+            if want == "owner" and (f"owner  slow leg  contended, no quiet host within 72 h" not in said
+                                    or rows["slow leg"][7:] != ["rerun owner"]):
+                bad.append(f"routed 73 h before under a 72 h ceiling it printed {said}, planted the owner line")
+            if want == "awaiting" and not all(ln.startswith("awaiting quiet host  ") for ln in said):
+                bad.append(f"routed 71 h before under a 72 h ceiling it printed {said}, planted awaiting")
+        # the chain: a sibling record still waiting, stamped 73 h before, carried by a fresh route
+        for leftover in pathlib.Path(root, "gate-run").iterdir():
+            shutil.rmtree(leftover)
+        old = pathlib.Path(root, "gate-run", "old")
+        old.mkdir()
+        write_routing(old, [["slow leg", "CONTENDED", "block", "quiet-rerun", "-", "-", f"routed {now - 73 * hour}",
+                             "rerun waiting"]])
+        run = plant("fresh", 0)
+        carried = {f[0]: f for f in read_routing(run)}["slow leg"][6]
+        rc, lines, rows = call(run, "false", "a sibling waiting 73 h")
+        if carried != f"routed {now - 73 * hour}" or "owner  slow leg  contended, no quiet host within 72 h" not in lines:
+            bad.append(f"over a sibling waiting since 73 h the fresh route stamped '{carried}' and printed {lines}, "
+                       f"planted the carried stamp and the owner line")
+        if "owner  loud leg  contended, no quiet host within 72 h" in lines:
+            bad.append("loud leg, which no sibling names, carried a stamp it never had")
+    return out, bad
+
+
 FIXTURES = {"route": run_fixture_route, "red-route": run_fixture_red_route,
             "selection-rows": run_fixture_selection_rows, "held-keys": run_fixture_held_keys,
             "select": run_fixture_select, "held-policy": run_fixture_held_policy,
             "route-flaky": run_fixture_route_flaky, "flakes-record": run_fixture_flakes_record,
             "flakes-window": run_fixture_flakes_window, "quarantine-source": run_fixture_quarantine_source,
-            "quarantine-check": run_fixture_quarantine_check, "measured-check": run_fixture_measured_check}
+            "quarantine-check": run_fixture_quarantine_check, "measured-check": run_fixture_measured_check,
+            "held-run": run_fixture_held_run, "daily": run_fixture_daily, "release": run_fixture_release,
+            "contended-pair": run_fixture_contended_pair}
 
 
 def main(argv=None):
@@ -1503,7 +2029,7 @@ def main(argv=None):
         print(f"{SAY}: fixture {argv[1]} " + ("FAILED" if bad else "ok"))
         return 1 if bad else 0
     ap = argparse.ArgumentParser(prog="verdict_flow.py", description=__doc__.split("\n")[0])
-    ap.add_argument("verb", choices=("route", "judge", "select", "flakes"))
+    ap.add_argument("verb", choices=("route", "judge", "select", "flakes", "quiet-rerun"))
     ap.add_argument("--run")
     ap.add_argument("--selection")
     ap.add_argument("--build")
@@ -1548,6 +2074,8 @@ def main(argv=None):
             rc, out = cmd_flakes_check() if a.check else cmd_flakes(run, a.build, a.unit)
         elif a.verb == "route":
             rc, out = cmd_route(run)
+        elif a.verb == "quiet-rerun":
+            rc, out = cmd_quiet_rerun(run)
         elif not (a.leg and a.judgment):
             raise Refusal("judge takes --leg and --judgment")
         else:

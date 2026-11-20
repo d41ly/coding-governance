@@ -152,6 +152,24 @@ before it adopts that record from any worktree.
 The verdict record carries one `held.<n>` key per held leg beside the `held` count,
 `<leg> · <source> · <result>`, the result `unrun` for a leg the bar did not execute.
 
+A row's fifth field is its MODE, `hold` or `run`, a four-field row reading `hold` (TOOL-dWitnessedBar-30).
+A `run` leg executes in its ordinary slot, past its guard, the docs mode and the reuse cache, and
+writes its `.leg` row, so the flake record of a bar it ran in holds its result; that result is its
+`held.<n>`, `ok` or `fail`, printed `GATE held  <leg>  (quarantine, <note>; run outside the verdict:
+<result>)`, counted in `held` and never in `failed`, what ran or the verdict. `select` writes a
+`quarantine` row `run` when the leg's newest executed row in the flake records at R since its hold, the
+committer date of the commit filing its ask, ended more than 24 hours before the selection, or there is
+none, whatever `verdict.held` reads, so a quarantined leg runs at least once a day in any Test-step bar
+and its greens accrue; every other row is `hold`. `select --check` compares leg, source and note, never
+the mode. THE RELEASE: a quarantined leg whose rows since its hold open, newest first, with
+`verdict.flakes.release` greens (first rc 0; three by default, a red resetting the count), or whose
+manifest row at R differs from its row at that filing commit, is selected as ordinary, and `select`
+prints `release  <leg>  <ask id>  <reason>` naming the streak's run ids or the row change. The
+unattended driver's `gates-green` runs `select` at R after its bar on every return code, beside its
+held-job reader, and writes each such ask's `- CLOSED · <id> · by <HEAD> · <why>` row through its
+`write_ask_closing`, staged with the views it moves. No caller hands a bar a selection yet: that is the
+loop engine's Test step.
+
 `verdict.held` decides when held legs run: `on-demand`, the default and gov's, holds them at every bar
 unless `GATE_SELFTESTS` asks; `push-selected` makes the pre-push hook export `GATE_SELFTESTS=changed`
 for its bar when the pusher set nothing; `peer-or-cadence` holds them at the push and needs a runner
@@ -1509,6 +1527,21 @@ runs it on every red bar it reads. `verdict_flow.py judge --run <run dir> --leg 
 <word>` records the tester's `code-miss` or `spec-wrong` on an `attribute` row and fills `next` by
 `verdict.red-route`; it reads the judgments through the loop kit's `loop_lib.py items --tag`, the verb
 `TOOL-dWitnessedBar-100` asks for, and exits 2 naming it until it lands.
+
+THE QUIET-HOST RE-RUN (TOOL-dWitnessedBar-30). `route` stamps a `quiet-rerun` row `routed <epoch>`, the
+stamp of the newest sibling run record naming the leg when its row there still reads `rerun waiting`,
+else now, so a contended red's wait spans the bars each pass runs. `python verdict_flow.py quiet-rerun
+--run <run dir>` takes each such row not yet re-run: when `profile_bar.py#check_quiet` reads `true`, no
+foreign bar visible on the host by PowerShell or, where none exists, `ps -eo pid=,args=`, both under the
+liveness assertion that this process's own command line is read, it runs the leg once, alone, through
+this runner under a one-row manifest (`GATE_LEGS`), `GATE_FULL=1` and `GATE_SELFTESTS=1`, attributed
+against the R its attribution row names (`GATE_ATTRIBUTE`), its run record `<run id>-quiet-<n>` beside
+the bar's. Green writes `rerun ok`, the red cleared as contention; red re-attributes the row and routes
+it by its new class, `rerun red <class>`. Otherwise it prints `awaiting quiet host  <leg>  since
+<routed at>`, and once the wait exceeds `flow.wait-ceiling` hours `owner  <leg>  contended, no quiet host
+within <h> h`, writing `rerun owner`. A state other than `waiting` is final and never re-run. The
+unattended driver runs it after `route` on every red bar it reads and files each `owner` line as a HIGH
+`contended red, no quiet host: leg <leg>` ask through `write_leg_ask`, once per leg while it is OPEN.
 
 `python verdict_flow.py flakes --run <run dir> --build <slug> --unit <id>` is `test.flakes`
 (TOOL-dWitnessedBar-8), and acts as `verdict.flakes` reads: under `retry-only` it writes nothing; under
