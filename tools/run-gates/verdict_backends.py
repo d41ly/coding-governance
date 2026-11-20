@@ -446,6 +446,8 @@ FIX_ROWS = (("local-hook", "verdict_backends:read_local_verdict", "false"),
             ("remote-ci", "remote_verdict:read_remote_verdict", "true"))
 FIX_KIT_FILES = ("verdict_backends.py", "remote_verdict.py", "leg_factory.py", "regen.py")
 FIX_WORKFLOW = ".github/workflows/remote-ci.yml"
+FIX_TOOLS = TOOL_ROOT.name  # the fixture tree mirrors this tool root's name
+FIX_KIT = f"{FIX_TOOLS}/{HERE.name}"  # this kit, as the fixture tree spells it
 
 
 def run_fixture_git(top, *args):
@@ -472,12 +474,12 @@ def write_fixture_tree(top, files, remote=True, kits=True):
     put = dict(files)
     if kits:
         policy = resolve_kit_dir("policy", "policy.py", HERE)
-        put["tools/push-main.sh"] = (TOOL_ROOT / "push-main.sh").read_text(encoding="utf-8")
+        put[f"{FIX_TOOLS}/push-main.sh"] = (TOOL_ROOT / "push-main.sh").read_text(encoding="utf-8")
         for name in ("policy.py", "budgets.py", "caps.toml", "catalogue.toml"):
-            put["tools/policy/" + name] = (policy / name).read_text(encoding="utf-8")
+            put[f"{FIX_TOOLS}/{policy.name}/" + name] = (policy / name).read_text(encoding="utf-8")
         for name in FIX_KIT_FILES:
-            put["tools/run-gates/" + name] = (HERE / name).read_text(encoding="utf-8")
-        put.setdefault("tools/run-gates/kit.toml", render_rows([n for n, _r, _o in FIX_ROWS]))
+            put[f"{FIX_KIT}/" + name] = (HERE / name).read_text(encoding="utf-8")
+        put.setdefault(f"{FIX_KIT}/kit.toml", render_rows([n for n, _r, _o in FIX_ROWS]))
     for rel, text in put.items():
         path = work / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -533,23 +535,23 @@ def run_plant(case, top):
         except Refusal as e:
             said, rc = f"{SAY}: refused · {e}\n", 2
         sys.stdout.write(said)
-        out.append(("local-hook declared twice", rc, 2, ["tools/other/kit.toml", "tools/run-gates/kit.toml"], said))
+        out.append(("local-hook declared twice", rc, 2, [f"{FIX_TOOLS}/other/kit.toml", f"{FIX_KIT}/kit.toml"], said))
     elif case in ("unregistered", "undeclared", "lander-peer"):
         value = {"unregistered": "ci-cloud", "undeclared": "remote-ci", "lander-peer": "peer-node"}[case]
         names = ["local-hook", "peer-node"] if case == "undeclared" else [n for n, _r, _o in FIX_ROWS]
         work = write_fixture_tree(top, {".governance/policy.toml": f'verdict = "{value}"\n',
-                                        "tools/run-gates/kit.toml": render_rows(names)})
+                                        f"{FIX_KIT}/kit.toml": render_rows(names)})
         (work / "unit.txt").write_text("a unit to land\n", encoding="utf-8")
         run_fixture_git(work, "add", "-A")
         run_fixture_git(work, "commit", "-q", "--no-verify", "-m", "a unit to land")
         sha = run_fixture_git(work, "rev-parse", "HEAD")
         remote = pathlib.Path(top, "remote.git")
         before = run_fixture_git(remote, "for-each-ref")
-        reader = ["tools/run-gates/verdict_backends.py", "read", "--sha", sha]
-        bash = resolve_bash(work / "tools/push-main.sh")
+        reader = [f"{FIX_KIT}/verdict_backends.py", "read", "--sha", sha]
+        bash = resolve_bash(work / FIX_TOOLS / "push-main.sh")
         if bash is None:
             raise OSError("no bash runs that can see the fixture lander")
-        lander = [bash, "tools/push-main.sh"]
+        lander = [bash, f"{FIX_TOOLS}/push-main.sh"]
         if case == "unregistered":
             needles = ["ci-cloud", "local-hook", "peer-node", "remote-ci"]
             run_scenario("read", work, [sys.executable, *reader], 2, needles)

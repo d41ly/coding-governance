@@ -1095,14 +1095,14 @@ nothing.
 TOOL-dWitnessedBar-6. The policy key `verdict` names the backend a landing's verdict comes from. A
 backend is a `[[verdict_backend]]` row in a kit descriptor, `name`, `reader` (`<module>:<function>`
 under that kit), `off_node` (a boolean) and `owner`, read across every `<prefix>/*/kit.toml` by
-`verdict_backends.py#read_backends`. govkit's install does not read the table, as with `[[drive]]` and
+`read_backends` in `verdict_backends.py`. govkit's install does not read the table, as with `[[drive]]` and
 `[[command]]`, and a name declared twice is refused naming both descriptors. This kit declares three:
 
 | Row | Reader | `off_node` | Stands when |
 |---|---|---|---|
 | `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN`; the `.scoped` slot never counts |
 | `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `verdict` is `GREEN` and whose `node` is not this node's `GOV_NODE` |
-| `remote-ci` | `remote_verdict.py#read_remote_verdict` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
+| `remote-ci` | `read_remote_verdict` in `remote_verdict.py` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
 
 **One read, five states.** `read_verdict(backend, sha, tree)` returns `Verdict(state, witness, why)`;
 `python verdict_backends.py read [--backend <name>] --sha <sha>` prints `verdict: <backend> · <state>
@@ -1136,7 +1136,7 @@ Every GET goes through `read_api`: https to `api.github.com` only, no redirect, 
 `read_held_runs`, prints what the unattended kit's retired `read_held_reds` printed, one TAB row per
 `held <suite>` job and one liveness line, or one DEAD PROBE line; `write_held_asks` files the reds.
 
-**Its readers.** `push-main.sh#check_landing_verdict` before each landing push: `local-hook` lands as
+**Its readers.** `check_landing_verdict` in `push-main.sh` before each landing push: `local-hook` lands as
 before; under another value only `GREEN` lands, a `peer-node` SHA not yet green published as
 `refs/gov/candidate/<sha>` first. The unattended driver's gates-green term files a `remote-ci` `HELD`
 read as one owner item. `verdict_backends.py --fixture --plant <case>` runs each plant in a scratch

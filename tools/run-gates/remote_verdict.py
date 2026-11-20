@@ -170,7 +170,7 @@ def read_scope_paths(backend, scope):
     paths = [backend.get("workflow") or ".github/workflows/remote-ci.yml"]
     if scope == "dispatch-closure":
         rc, kit_rel = run_git(HERE, "rev-parse", "--show-prefix")
-        kit_rel = kit_rel if rc == 0 else "tools/run-gates/"
+        kit_rel = kit_rel if rc == 0 else f"{HERE.parent.name}/{HERE.name}/"
         tool_rel = kit_rel.rstrip("/").rpartition("/")[0]
         paths += [kit_rel + "run-gates.sh", (tool_rel + "/" if tool_rel else "") + "gate-legs.json",
                   ".githooks/gate-env.sh"]
