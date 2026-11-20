@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-8 — flake quarantine
 
-**Status:** DEFERRED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0346@c53fd58e whole
 **Carries:** node:item.test.flakes
@@ -48,7 +48,7 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
   writes no `gate-logs` file, so the `log:` pointer keeps naming the attempt that redded the run
   (`runleg`'s `.sample` test, `tools/run-gates/run-gates.sh#runleg`). A red-then-green leg prints
   `nondeterministic · <leg>`, the line the sample already prints
-  (`tools/run-gates/run-gates.sh@d9c0c2e8:5491`). The unattended driver's `gates-green` bar, Test's
+  (`tools/run-gates/run-gates.sh@eb878971:5506`). The unattended driver's `gates-green` bar, Test's
   invocation today, sets it in the environment it hands the bar (`_genv`,
   `tools/unattended/unattended.sh@25bc472b:12013`). `GATE_RERUN` is classified inert in the hook
   suite's `BAR_INERT_KNOBS`, the class whose arm `H49 class` reds on any runner knob classified
@@ -80,7 +80,10 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
   <slug> --unit <id>` acts as `verdict.flakes` says: under `retry-only` it writes nothing and prints
   the re-entry to `test.verdict`; under `record` it writes the flake record and prints the same
   re-entry; under `quarantine` it writes the record, prints one `hold` line per leg past the entry
-  threshold, and prints the re-entry to `test.select`. Observed by AC3 and AC4.
+  threshold, and prints the re-entry to `test.select`. `flakes` joins the verbs of
+  `tools/run-gates/verdict_flow.py#main` under the `--run` rule unit 41 left there, and `--build`
+  and `--unit` are refused outside it, as `--selection` is outside `select --check` (§8 F10).
+  Observed by AC3 and AC4.
 - **S5** — The entry threshold: `verdict.flakes.entry` is `measured` or `<count>/<window>`; under
   `measured` the threshold is the `Measured` field of the newest gate-health record (I12, written by
   `TOOL-dWitnessedBar-1`), else `2/10`. Unit 1 registers the `gate-health` kind at order 23, after
@@ -100,12 +103,14 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
   the landed `SELECT_SOURCES` table (`TOOL-dWitnessedBar-5` S5,
   `tools/run-gates/verdict_flow.py#derive_selection`), whose context gains the repository and R so its reader can read there. Each row's note is
   `<count>/<window>, ask <id>`, and the landed runner already prints a `quarantine` row as
-  `GATE held  <leg>  (quarantine, <note>)` (`tools/run-gates/run-gates.sh#report_one`). Observed by
-  AC5.
+  `GATE held  <leg>  (quarantine, <note>)` (`tools/run-gates/run-gates.sh#report_one`). The hook's
+  `select --check` callers, `check_selection_at_r` and unit 41's `.githooks/pre-push#check_tree_selection`,
+  re-derive the row at R through `derive_selection`, so the hook takes no edit. Observed by AC5.
 - **S7** — The hold's own check: `verdict_flow.py flakes --check` reds an OPEN held-flaky-leg ask
   whose leg had fewer flakes, in its window at the ask's filing date, than the threshold in force
   then (the gate-health record newest at that date, else `2/10`), naming the leg, the count and the
-  threshold. Observed by AC6.
+  threshold. It takes no `--run`, `--build` or `--unit`, and reads the asks and records of the
+  repository it runs in (§8 F10). Observed by AC6.
 - **S8** — The leg ask (shared interface I13, respelled by §8 F4): `write_leg_ask <slug> <leg> <form>
   <ask text> <sev> <sev reason> <keep reason>` in `tools/unattended/unattended.sh`, beside
   `write_ask_rows`, extracted from `tools/unattended/unattended.sh#write_held_asks` at this, its
@@ -130,7 +135,7 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
   least daily: `TOOL-dWitnessedBar-30`.
 - The re-run of a blocking `CONTENDED` red on a quiet host: `TOOL-dWitnessedBar-30`.
 - The bar's reuse quarantine, `quarantine.<name key>` in the reuse cache
-  (`tools/run-gates/run-gates.sh@d9c0c2e8:5505`): it keeps a leg out of the reuse cache and is
+  (`tools/run-gates/run-gates.sh@eb878971:5520`): it keeps a leg out of the reuse cache and is
   unchanged; the flow's quarantine is a held leg.
 - The green bar's flake record, `flakes --record-only` after every Test-step bar: `TOOL-dWitnessedBar-51`
   S15. This unit's driver call runs on a red bar, the one whose legs were re-run.
@@ -154,16 +159,16 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
 
 - `run_leg_retry` re-runs only a leg whose own ceiling fired
   (`tools/run-gates/run-gates.sh#run_leg_retry`); the sample's second look, `runleg "$i" .sample`
-  (`tools/run-gates/run-gates.sh@d9c0c2e8:5487`), runs only for a cached-green leg a reuse run drew. The serial retry is called at
-  `tools/run-gates/run-gates.sh@d9c0c2e8:5462` and `run_attribution` at
-  `tools/run-gates/run-gates.sh@d9c0c2e8:5512`, the sample block between them.
+  (`tools/run-gates/run-gates.sh@eb878971:5502`), runs only for a cached-green leg a reuse run drew. The serial retry is called at
+  `tools/run-gates/run-gates.sh@eb878971:5477` and `run_attribution` at
+  `tools/run-gates/run-gates.sh@eb878971:5527`, the sample block between them.
 - `runleg` takes an attempt suffix and writes `<i><sfx>.leg` beside the first attempt's, an
   eight-field row: name, status, rc, seconds, start, end, key, foreign
   (`tools/run-gates/run-gates.sh#runleg`). A held leg's `.rc` reads `ondemand`, and a skipped or
   reused one's `skip`, `docskip` or `reuse`, so none is a numeric red.
 - Nothing records a flake; the ledger keeps each leg's last row only
-  (`tools/run-gates/run-gates.sh@d9c0c2e8:5516-5591`), and run records are kept five per git dir
-  (`GATE_RUN_KEEP`, `tools/run-gates/run-gates.sh@d9c0c2e8:2749`), so no per-leg history of thirty
+  (`tools/run-gates/run-gates.sh@eb878971:5531-5606`), and run records are kept five per git dir
+  (`GATE_RUN_KEEP`, `tools/run-gates/run-gates.sh@eb878971:2749`), so no per-leg history of thirty
   verdicts exists.
 - The run record holds the flake record's fields: `ended`, `tree` and `run_id` in its `verdict`, and
   `head` in its `header`, the key `tools/run-gates/keep_tails.py#run_keep` already reads for a
@@ -179,7 +184,10 @@ fired, says `nondeterministic` only for a reuse sample Test never draws, and rec
 - The hook suite's `H49 class` arm (`.githooks/pre-push.test.sh#check_knob_classes`) reds when a
   `GATE_` or `GOV_` name the runner reads is not in exactly one of the hook's `ENV_DROPPED_KNOBS` and
   `BAR_SCRUBBED_KNOBS` and the suite's own `BAR_INERT_KNOBS`
-  (`.githooks/pre-push.test.sh@a2e9b064:1894`), each inert name beside a line saying why it is inert.
+  (`.githooks/pre-push.test.sh@ed0d49b9:1894`), each inert name beside a line saying why it is inert.
+- `tools/run-gates/verdict_flow.py#main` takes the verbs `route`, `judge` and `select`, and asks
+  `--run` of every verb but a bare `select`. Unit 41 added `--selection`, refused outside
+  `select --check`, and asks `select --check` for exactly one of `--run` and `--selection`.
 - v2's `[policies]`: `verdict.flakes` values `quarantine`, `record`, `retry-only`, default
   `quarantine` (v2:1273); `verdict.flakes.entry` `measured` or `<count>/<window>`, default `measured`,
   2 flakes in 10 until every leg of the bar has 30 verdicts in the flake records (v2:1274).
@@ -280,13 +288,15 @@ window is empty and nothing is held until a leg flakes twice.
 - `memory/guides/SESSION-KICKOFF.md`: its `watch:` line holds `tools/run-gates/run-gates.sh`, so its
   `last-audit` is re-stamped
 
-`TOOL-dWitnessedBar-41` builds beside this unit at order 22 and also lists
-`tools/run-gates/run-gates.sh`, `tools/run-gates/verdict_flow.py` and `.githooks/pre-push.test.sh`;
-its spec names none of the runner's retry and sample blocks, `route`, `ROUTES` or `BAR_INERT_KNOBS`,
-the regions this unit edits there, but both add arguments to `tools/run-gates/verdict_flow.py#main`,
-unit 41 its `--selection` and this unit the `flakes` verb with `--build` and `--unit`.
-The kickoff manifest's stamp is owed by both. `TOOL-dWitnessedBar-55`'s two paths are disjoint from
-these.
+`TOOL-dWitnessedBar-41` landed at `5a4f86e0c` in paths this unit also edits. In the runner it moved
+the selection read loop and the per-tree verdict's writer, and in the hook suite its per-tree plants
+and its AC2 and AC3 arms. This unit edits neither region: it edits the runner's retry and sample
+blocks and the suite's `BAR_INERT_KNOBS`. In `verdict_flow.py` it moved `cmd_select_check`, the docstring's `select` lines
+and `main`'s `--run` rule, which the `flakes` verb extends (§8 F10). In the README it moved "Held by
+policy", "The verdict per tree" and the `verdict_flow.py` row of "The pieces", which this unit
+extends (§5). Unit 41 re-stamped the kickoff manifest at its pass; this unit's runner edit owes its
+own stamp. `TOOL-dWitnessedBar-55` landed at `599c23cef` in the govkit kit's inherited-red step and
+its help page, none of them a path this unit edits.
 
 ### Alternatives rejected
 
@@ -302,7 +312,8 @@ these.
 - security — a hold is a loosening, so the quarantine set is read at R from committed asks, and
   `flakes --check` reds a hold the records do not justify.
 - perf / scale — the re-run costs one more execution of each red leg, on the red path only; the
-  window reads every flake record once per `flakes` run, one small file per Test-step verdict.
+  window reads every flake record once per `flakes` run, one small file per Test-step verdict; the
+  hook's `select --check` runs the ask generator at R once per selection it checks.
 - error / empty / loading states — no gate-health record reads `2/10`; a run dir with no `.leg` rows
   writes no record and says so; an ask the driver cannot file is printed, as `write_held_asks` does.
 - observability — the `nondeterministic` line, the `hold` lines and the ask carry the counts.
@@ -312,7 +323,8 @@ these.
 - migration — additive, as §4 says.
 - user docs — `help/reference/policy.md` gains the rendered sections of `verdict.flakes` and
   `verdict.flakes.entry` (S9); no other help page describes the bar's retries; the run-gates README
-  gains the re-run mode beside the retry and the `flakes` verb beside `route`.
+  gains the re-run mode in "A leg killed by its own ceiling gets one serial retry", the `flakes` verb
+  in "Which red blocks" and the pieces row, and the `quarantine` row beside `level` in "Held by policy".
 
 ## 6. Acceptance criteria
 
@@ -410,11 +422,11 @@ extraction directly.
 
 - **FACT-QUESTION · F4 — Can the leg ask keep the brief's spelling, file_leg_ask?** Probe:
   `python tools/lexicon/lexicon.py --suggest file_leg_ask --as sh.function` and `lexicon.py --measure`,
-  run 2026-10-25. Observation: `file` is not a declared verb, so the name is a new P1 offender in
-  `tools/unattended/unattended.sh`, whose 128 offenders the lexicon already lists (PINNED 2026-10-25),
-  and the measured count equals `VERB_OFFENDER_PIN="1211"` (`.lexicon.conf@c47f8658:312`), so one
-  more reds `lexicon naming predicates`; `write_leg_ask` reads `OK`, and read `OK` again at the
-  2026-11-20 re-ground. Liveness: the probe printed `OK` for `derive_flake_holds` in
+  run 2026-10-25 and again 2026-11-20. Observation: `file` is not a declared verb, so the name is a
+  new P1 offender in `tools/unattended/unattended.sh`, whose 100 offenders `lexicon.py --list` lists
+  (PINNED 2026-11-20), and the measured count equals `VERB_OFFENDER_PIN="1417"`
+  (`.lexicon.conf@6c80f32a:409`, PINNED 2026-11-20), so one more reds `lexicon naming predicates`;
+  `write_leg_ask` reads `OK` in both runs. Liveness: the probe printed `OK` for `derive_flake_holds` in
   the same run. Options: (a) `write_leg_ask`; (b) keep the spelling and raise the pin, a key
   dMindYourWords owns; (c) keep it and red the naming leg. RESOLVED (agent, 2026-10-25, delegated):
   (a), rung 2; `TOOL-dWitnessedBar-6` and `TOOL-dWitnessedBar-30` read the respelled name, the first
@@ -436,8 +448,8 @@ extraction directly.
   the hook's bar; (c) dropped, a row of `ENV_DROPPED_KNOBS`. The re-run moves no verdict and no exit
   code (S1), which is the inert class's test; (b) and (c) are for a knob that would move a trusted
   verdict or select a leg, and each edits the hook itself. RESOLVED (agent, 2026-11-20, delegated):
-  (a), rung 1, the inert class's own definition. Its file, `.githooks/pre-push.test.sh`, is also
-  `TOOL-dWitnessedBar-41`'s, at a region that unit's spec does not name. widens: none · relaxes: none
+  (a), rung 1, the inert class's own definition. Unit 41 edited `.githooks/pre-push.test.sh` at
+  `5a4f86e0c` in its per-tree plants and arms, never `BAR_INERT_KNOBS`. widens: none · relaxes: none
 - **F7 — Does this unit owe `verdict.flakes` and `verdict.flakes.entry` their reference sections?**
   Both sit in `tools/policy/unsummarised-keys.txt` and in the unsummarised list of
   `help/reference/policy.md`, and this unit makes them act. Options: (a) give both a `summary` and a
@@ -466,6 +478,16 @@ extraction directly.
   2026-11-20, delegated): (a), rung 3, the most feature-rich survivor; it appends to I13, whose other
   readers, `TOOL-dWitnessedBar-6` and `TOOL-dWitnessedBar-30`, spell no arity. widens: none ·
   relaxes: none
+- **F10 — How does `main` take `flakes` beside unit 41's argument rules?** Unit 41 left
+  `tools/run-gates/verdict_flow.py#main` asking `--run` of every verb but a bare `select`, so an
+  unedited rule asks it of `flakes --check`, which reads no run (S7). Options: (a) `flakes` asks
+  `--run`, `--build` and `--unit`, `flakes --check` asks none and reads the repository it runs in,
+  and `--build` and `--unit` are refused elsewhere, as `--selection` is; (b) `flakes --check` takes
+  `--run` too, leaving the rule as it is; (c) `flakes --check --rev <R>` reads the asks and records
+  at R. Each meets AC6. (b) asks an argument nothing reads; (c) adds a read at R that no scope item
+  states and leaves open which R a caller names. RESOLVED (agent, 2026-11-20, delegated): (a), rung 3,
+  tie-broken by fewer open questions and by reuse of unit 41's refusal shape. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -492,18 +514,26 @@ extraction directly.
   ask's reasons and reuse key (F9); the driver's call staged as `write_leg_tails` stages; AC8 on the
   landed typed-kinds plant; Files touched gains the hook suite, the policy files, the page, the
   mirror and the kickoff manifest, with the paths shared with `TOOL-dWitnessedBar-41`.
+- rev-6 · 2026-11-20 · §2 S1 S4 S6 S7 · §3 · §4 Evidence, Files touched · §5 · §8 F4 F6 F10 · §10 ·
+  re-grounded at HEAD `387241cf1` over units 41 and 55 as landed, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-8-reground2-brief: the runner's and hook suite's line
+  citations re-pinned to their HEAD blobs; `main`'s argument handling as unit 41 left it, and the
+  `flakes` verb's place in it (F10); the hook's two `select --check` callers named as re-deriving the
+  `quarantine` row; the shared regions and README sections settled; F4's lexicon figures re-pinned.
 
 ## 10. Reuse audit
 
 The seams extended are the runner's attempt suffixes, `runleg "$i" <sfx>` with `.retry` and `.sample`
-(`tools/run-gates/run-gates.sh#runleg`, `tools/run-gates/run-gates.sh@d9c0c2e8:5487`), and the
+(`tools/run-gates/run-gates.sh#runleg`, `tools/run-gates/run-gates.sh@eb878971:5502`), and the
 driver's per-leg ask, `tools/unattended/unattended.sh#write_held_asks`, extracted here at its second
 instance; the record is a kind of PLAY-dOrderedCharter-7 S7's factory and a member of its
 `TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42), written as unit 25's `leg-tail` is, through
 `tools/run-gates/keep_tails.py#load_factory` and `write_record`. Re-verified at HEAD `cb1494fc`, four
 more landed seams are extended: `tools/run-gates/verdict_flow.py#derive_route` and its `ROUTES` for
 S2, the `SELECT_SOURCES` table unit 5 left for the `quarantine` row, `write_leg_tails` for the
-driver's run-and-stage, and `read_held_runner` for the conf read at R. `python
+driver's run-and-stage, and `read_held_runner` for the conf read at R. Re-verified at HEAD
+`387241cf1`, unit 41's argument rules in `tools/run-gates/verdict_flow.py#main` are the seam the
+`flakes` verb extends (§8 F10). `python
 tools/codebase-map/reuse_lookup.py "re-run a red leg once on the same tree and record a flaky leg"`,
 re-run at HEAD, ranks generic stems (`run`, `tree`, `legs`, `records`), `build_records` and
 `read_records`, none of which re-runs a leg; the runner's own suffix mechanism was found by reading
