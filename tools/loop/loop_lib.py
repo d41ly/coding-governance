@@ -42,8 +42,9 @@ The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `
 its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
 `outcomes`, `witness`, `owner` and `routes`, an inline table naming one target per outcome: a declared
 item, `transition`, or `stand-in:{prefix}/<home>/<file>`. A `needs` entry is a tag, or a list of tags any
-one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, carry the step
-`none` and sit in no step (TOOL-dDeclaredLoop-50). `check_program` grades the rows as one needs graph,
+one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, and the probe
+program's, tagged `item.probe.<name>`, carry the step `none` and sit in no step, each segment one of
+`PROGRAM_SEGMENTS` (TOOL-dDeclaredLoop-50, TOOL-dPlacedRequest-7). `check_program` grades the rows as one needs graph,
 ordered by the needs-graph helper below: every need declared, no cycle, each outcome set closed
 through `derive_outcome_set`, the rule `read_outcome_set` applies, each outcome routed once to a
 target that resolves, each input's text before its first `:` a layer tag `read_layer_tags` reads from
@@ -74,6 +75,13 @@ or one `unarmed — <source>: <why>` line: `write-set` the unit spec's Files tou
 the question's backticked paths, each through the unattended driver's `--path-tokens`, the one path-token
 rule, run as a subprocess where that driver resolves; `scope-paths` reads unarmed until a plan record
 carries a scope. `seed <item tag>` prints it.
+
+Every role item outside the probe program asks for a test through the outcome `probe`, routed to
+`PROBE_STAND_IN`, the probe tool, never into the probe program, whose items sit in no step; the probe
+program's own items carry no `probe` outcome, so a probe never asks for a probe of itself
+(TOOL-dPlacedRequest-7 S8). `check_probe_outcomes` refuses either break, naming the item. The probe
+program's trigger causes are `[[trigger-cause]]` rows, `program` and `cause`, which `read_trigger_causes`
+returns for one program in file order.
 
 A role item also declares its map slot (TOOL-dPlacedRequest-6): `map`, whether its work order's `map`
 slot is filled, `none`, absent reading the same, or `base`, the `widens` order of the schema's `map` row
@@ -120,12 +128,14 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
-order, then the breakpoint program's as `loop: program review`, or `loop: inputs unarmed` and why
+order, then the breakpoint program's and the probe program's as `loop: program review` and `loop: program
+probe`, or `loop: inputs unarmed` and why
 before them where no layer tags resolve, then one `loop: item` line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
 read · <p> pending · <u> unarmed`, then one `loop: seed <tag> · <value>` line per item and `loop: seeds · <n>
 declared · <m> none`, then one `loop: map <tag> · map <value>` line per item, ending `· unfolds <words>`
 where it unfolds, `loop: maps · <n> declared · <m> none`, and `loop: unfolds · <n> word(s) checked against
-<m> namespace(s)` or `loop: unfolds · unarmed — no namespace registry resolves`. It then prints the witness classes, one line per witness alias and per witness, one
+<m> namespace(s)` or `loop: unfolds · unarmed — no namespace registry resolves`, then `loop: probe outcomes ·
+<n> role item(s) route probe to <target> · <m> probe item(s) carry none`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
 builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
 <class> · writer <writer> · armed by <build>` line per computed witness, then `review_bounds.py`'s
@@ -145,7 +155,9 @@ exits 0, 1 on a refused definition, or 2 naming an item no row declares or the r
 plants, `SEED_PLANTS` and `seed-bad`, run `seed` as a process in a scratch repository and break the
 definition's seeds. The map's plants, `map-bad`, `unfold-unregistered`, `unfold-no-map` and
 `unfold-not-list`, break the declarations, `no-registry` resolves the registry from an empty scratch
-directory and `registry-bad` from one whose registry is no TOML. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
+directory and `registry-bad` from one whose registry is no TOML. `probe-step` adds a row of a gov
+step's tag at step `none`, `role-no-probe` takes the `probe` outcome off a role item and `probe-self`
+gives one to the probe program's design item. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
@@ -185,9 +197,12 @@ ACTOR_LIST = "actor-witnesses.txt"
 STEP_TAGS = ("step.plan", "step.design", "step.build", "step.test", "step.deploy")
 #: A workflow's `step` when its work sits in no gov step.
 NO_STEP = "none"
-#: The breakpoint program: its rows' tag segment, `item.review.<name>`, each at step `NO_STEP`, and its
-#: key in `check_program`'s return (TOOL-dDeclaredLoop-50).
-REVIEW_PROGRAM = "review"
+#: The programs that sit in no step: each its rows' tag segment, `item.<segment>.<name>`, each row at step
+#: `NO_STEP`, and its key in `check_program`'s return: the breakpoint program (TOOL-dDeclaredLoop-50) and
+#: the probe program (TOOL-dPlacedRequest-7).
+PROGRAM_SEGMENTS = ("review", "probe")
+#: The route of a role item's `probe` outcome: the probe tool, whose line names the asker (TOOL-dPlacedRequest-7 S8).
+PROBE_STAND_IN = "stand-in:{prefix}/loop/probe.py"
 #: The reach words that are no gov step: the entry step and the review breakpoint.
 REACH_WORDS = ("entry", "review")
 #: One word of a disposition set or an outcome set: the segment a tag is composed of.
@@ -263,7 +278,10 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
                          "empty scratch directory",
           "unfold-not-list": "item.design.inventory's unfolds set to the string kit, no list",
           "registry-bad": "the namespace registry resolved from a scratch directory whose namespaces.toml is no "
-                          "TOML"}
+                          "TOML",
+          "probe-step": "a copy of item.probe.trigger tagged item.plan.x, at step none",
+          "role-no-probe": "item.plan.research's probe outcome and its route taken out",
+          "probe-self": "item.probe.design given the probe outcome, routed to the probe tool"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -323,7 +341,11 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves"),
               "unfold-not-list": (1, "loop: refused · ", "the item item.design.inventory unfolds 'kit', which is no "
                                                           "list of namespace words"),
-              "registry-bad": (1, "loop: refused · ", "namespaces.toml does not read: ")}
+              "registry-bad": (1, "loop: refused · ", "namespaces.toml does not read: "),
+              "probe-step": (1, "loop: ", "the item item.plan.x step 'none' is not step.plan"),
+              "role-no-probe": (1, "loop: refused · ", "the item item.plan.research, a role item, carries no probe "
+                                                       "outcome"),
+              "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome")}
 #: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
 NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
@@ -1366,10 +1388,11 @@ def check_program(data, where, layers, stages=()):
     which leaves the inputs unchecked. `stages` are the composed repository stage tags,
     `step.adopter.<name>` (TOOL-dDeclaredLoop-25): an item tagged `item.adopter.<name>.<item>` whose
     `step.adopter.<name>` is one of them is that stage's, and the stage's program is returned beside the
-    five. An item tagged `item.review.<name>` is the breakpoint program's, its `step` `none`, and that
-    program is returned under the key `review` (TOOL-dDeclaredLoop-50). LoopError naming `where`, the item
-    and the field that does not hold: a tag opening no `item.<step>.` of a gov step, no
-    `item.adopter.<stage>.` of a composed stage and no `item.review.`, a `step` other than that one, or a
+    five. An item tagged `item.<segment>.<name>`, the segment one of `PROGRAM_SEGMENTS`, is that program's,
+    its `step` `none`, and the program is returned under the key `<segment>`: the breakpoint program's
+    `review` (TOOL-dDeclaredLoop-50) and the probe program's `probe` (TOOL-dPlacedRequest-7). LoopError
+    naming `where`, the item and the field that does not hold: a tag opening no `item.<step>.` of a gov
+    step, no `item.adopter.<stage>.` of a composed stage and no `item.<segment>.`, a `step` other than that one, or a
     tag given
     twice; a need naming no declared item, or a needs cycle, each cycle named once; an outcome set that
     does not hold; routes that are not exactly the outcomes, or a target that is no declared item,
@@ -1390,10 +1413,10 @@ def check_program(data, where, layers, stages=()):
             if row.get("step") != stage:
                 raise LoopError(where, "the item %s step %r is not %s, the stage its tag opens" % (
                     tag, row.get("step"), stage))
-        elif len(parts) == 3 and parts[:2] == ["item", REVIEW_PROGRAM] and parts[2]:
+        elif len(parts) == 3 and parts[0] == "item" and parts[1] in PROGRAM_SEGMENTS and parts[2]:
             if row.get("step") != NO_STEP:
-                raise LoopError(where, "the item %s step %r is not %s, the breakpoint program's step" % (
-                    tag, row.get("step"), NO_STEP))
+                raise LoopError(where, "the item %s step %r is not %s, the %s program's step" % (
+                    tag, row.get("step"), NO_STEP, parts[1]))
         elif len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
             raise LoopError(where, "item row %d tag %r opens no item.<step>. of a gov step: %s" % (
                 n, tag, " ".join(steps)))
@@ -1451,7 +1474,8 @@ def check_program(data, where, layers, stages=()):
         if exit_tag not in declared or declared[exit_tag]["step"] != row.get("tag"):
             raise LoopError(where, "the step %s exit %r is no declared item of that step" % (row.get("tag"), exit_tag))
     program = {s: [t for t in order if declared[t]["step"] == s] for s in (*STEP_TAGS, *stages)}
-    program[REVIEW_PROGRAM] = [t for t in order if declared[t]["step"] == NO_STEP]
+    for segment in PROGRAM_SEGMENTS:
+        program[segment] = [t for t in order if t.split(".")[1] == segment]
     return program
 
 
@@ -1642,6 +1666,56 @@ def check_item_maps(items, namespaces):
     else:
         lines.append("loop: unfolds · %d word(s) checked against %d namespace(s)" % (words, len(namespaces)))
     return lines, refusals
+
+
+def check_probe_outcomes(items):
+    """`(lines, refusals)` of the `[[item]]` rows `items` (TOOL-dPlacedRequest-7 S8): each role item whose
+    `outcomes` is a list and whose tag opens no `item.probe.` carries the outcome `probe` routed to
+    `PROBE_STAND_IN`, and no `item.probe.` row carries it, so a probe never asks for a probe of itself. One
+    refusal per item that does not hold, naming it; the line `loop: probe outcomes · <n> role item(s) route
+    probe to <target> · <m> probe item(s) carry none`."""
+    refusals, asking, probes = [], 0, 0
+    for row in items:
+        tag, actor, outcomes = row.get("tag"), row.get("actor"), row.get("outcomes")
+        routes = row.get("routes") if isinstance(row.get("routes"), dict) else {}
+        listed = isinstance(outcomes, list)
+        if isinstance(tag, str) and tag.startswith("item.probe."):
+            probes += 1
+            if (listed and "probe" in outcomes) or "probe" in routes:
+                refusals.append("the item %s carries the probe outcome: a probe never asks for a probe of itself" % tag)
+            continue
+        if not (isinstance(actor, str) and actor.startswith("role:") and listed):
+            continue
+        if "probe" not in outcomes:
+            refusals.append("the item %s, a role item, carries no probe outcome: it could not ask for a test" % tag)
+        elif routes.get("probe") != PROBE_STAND_IN:
+            refusals.append("the item %s routes probe to %r, not %s" % (tag, routes.get("probe"), PROBE_STAND_IN))
+        else:
+            asking += 1
+    lines = ["loop: probe outcomes · %d role item(s) route probe to %s · %d probe item(s) carry none" % (
+        asking, PROBE_STAND_IN, probes)]
+    return lines, refusals
+
+
+def read_trigger_causes(program):
+    """The causes the `[[trigger-cause]]` rows of the definition beside this file admit for `program`, in file
+    order (TOOL-dPlacedRequest-7 S3). LoopError where the definition does not read, a row's `program` or
+    `cause` is not one word of `SEG`, or a cause is given twice for one program."""
+    data, where = read_definition(pathlib.Path(__file__).absolute().parent)
+    rows = data.get("trigger-cause", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise LoopError(where, "'trigger-cause' is not an array of tables")
+    causes = []
+    for n, row in enumerate(rows, 1):
+        prog, cause = row.get("program"), row.get("cause")
+        if not all(isinstance(v, str) and SEG.fullmatch(v) for v in (prog, cause)):
+            raise LoopError(where, "trigger-cause row %d carries no program and cause, each one word" % n)
+        if prog != program:
+            continue
+        if cause in causes:
+            raise LoopError(where, "trigger-cause row %d gives the %s cause %s twice" % (n, program, cause))
+        causes.append(cause)
+    return causes
 
 
 def resolve_seed_path(value):
@@ -1950,6 +2024,14 @@ def write_loop_plant(data, case, rows, base_rows):
         elif case == "unfold-no-map":
             items["item.build.unit-pass"]["map"] = SEED_NONE
             items["item.build.unit-pass"]["unfolds"] = ["kit"]
+        elif case == "probe-step":
+            data["item"].append(dict(items["item.probe.trigger"], tag="item.plan.x", step=NO_STEP))
+        elif case == "role-no-probe":
+            items["item.plan.research"]["outcomes"].remove("probe")
+            items["item.plan.research"]["routes"].pop("probe")
+        elif case == "probe-self":
+            items["item.probe.design"]["outcomes"].append("probe")
+            items["item.probe.design"]["routes"]["probe"] = PROBE_STAND_IN
         else:
             plan["exit"] = "item.design.exit"
 
@@ -2103,7 +2185,10 @@ def main(argv):
         map_lines, map_refusals = [], ["the namespace registry %s does not read: %s" % (registry.as_posix(), e)]
     for line in map_lines:
         print(line)
-    item_refusals = item_refusals + seed_refusals + map_refusals
+    probe_lines, probe_refusals = check_probe_outcomes(read_item_rows(data, where))   # TOOL-dPlacedRequest-7 S8
+    for line in probe_lines:
+        print(line)
+    item_refusals = item_refusals + seed_refusals + map_refusals + probe_refusals
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):

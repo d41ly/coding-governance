@@ -95,6 +95,10 @@
 #            canonical JSON. A row whose fields hash moved while its version did not is refused: a bump
 #            re-pins it. An untyped kind reads version 1 and has no row.
 #
+# One [[trigger-cause]] row per cause a program's trigger admits, the closed set held as data
+# (TOOL-dPlacedRequest-7): `program`, the program's tag segment, and `cause`, one word; loop_lib.py's
+# `read_trigger_causes` reads a program's causes in file order, and probe.py's `trigger` refuses any other.
+#
 # One [[hook]] row per key of the codebase map's `git-hooks` and `harness-hooks` inventories, the stage
 # claim of that hook (TOOL-dDeclaredLoop-4); stage_coverage.py beside this file joins them both ways:
 #   key    the inventory key, a git hook's name or `<event> <script>`, a script under the tool root
@@ -104,7 +108,8 @@
 # One [[item]] row per item of a gov step's program (TOOL-dDeclaredLoop-12), after every table above:
 #   tag        the item's tag, `item.<step>.<name>`, a member of the `item` namespace
 #   step       the [[step]] tag its tag opens; "none" for a tag `item.review.<name>`, the breakpoint
-#              program's, which sits in no step (TOOL-dDeclaredLoop-50)
+#              program's, or `item.probe.<name>`, the probe program's, each sitting in no step
+#              (TOOL-dDeclaredLoop-50, TOOL-dPlacedRequest-7)
 #   actor      `<kind>:<name>`, one actor of one kind: role, command, executor, hook or owner, or the
 #              bare `executor` or `owner`; a role's name is its role file's stem, such as gov-builder
 #   needs     the items it waits for: each entry a tag, or a list of tags any one of which meets it; []
@@ -193,7 +198,7 @@ armed-by = "dWellOiledMachine"
 
 [[computed-witness]]
 name = "probe-rerun"
-serves = "none"
+serves = "item.probe.run"
 writer = "stand-in:{prefix}/loop/loop_witness.py"
 armed-by = "dPlacedRequest"
 
@@ -1138,6 +1143,40 @@ kind = "record-kind.recommendation"
 version = 1
 fields = "ad896b7b"
 
+[[record-version]]
+kind = "record-kind.probe-trigger"
+version = 1
+fields = "06f96147"
+
+[[record-version]]
+kind = "record-kind.probe"
+version = 1
+fields = "fb9eb079"
+
+# The probe program's trigger causes (TOOL-dPlacedRequest-7 S3, I17): a point the policy key probe.points
+# names, the owner, an owner's observation at placement, a role's raised probe, and a patch build's red-first
+# reproduction.
+
+[[trigger-cause]]
+program = "probe"
+cause = "point"
+
+[[trigger-cause]]
+program = "probe"
+cause = "owner"
+
+[[trigger-cause]]
+program = "probe"
+cause = "observation"
+
+[[trigger-cause]]
+program = "probe"
+cause = "raised"
+
+[[trigger-cause]]
+program = "probe"
+cause = "reproduction"
+
 # The hooks' stage claims (TOOL-dDeclaredLoop-4): one row per git and harness hook the map inventories.
 # A git hook serves the step its act sits in; a harness hook on an event every session raises serves all
 # five, and the SubagentStart one the steps of the workflows that have roles.
@@ -1257,20 +1296,20 @@ step = "step.plan"
 actor = "role:gov-planner"
 map = "base"
 needs = ["item.plan.triage-rule"]
-outcomes = ["select", "defer", "retire", "refuse"]
+outcomes = ["select", "defer", "retire", "refuse", "probe"]
 witness = { class = "history", by = "the schema check over its return, its choice joined to the triage record" }
 owner = "dRankedPlan"
-routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/backlog.py", retire = "stand-in:{prefix}/memory-tree/backlog.py", refuse = "transition" }
+routes = { select = "item.plan.record", defer = "stand-in:{prefix}/memory-tree/backlog.py", retire = "stand-in:{prefix}/memory-tree/backlog.py", refuse = "transition", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.plan.record"
 step = "step.plan"
 actor = "role:gov-planner"
 needs = [["item.plan.triage-judge", "item.plan.triage-rule"]]
-outcomes = ["drafted", "research", "owner-question"]
+outcomes = ["drafted", "research", "owner-question", "probe"]
 witness = { class = "history", by = "the plan-record schema check" }
 owner = "dRankedPlan"
-routes = { drafted = "item.plan.place", research = "item.plan.research", owner-question = "stand-in:{prefix}/memory-tree/build_records.py" }
+routes = { drafted = "item.plan.place", research = "item.plan.research", owner-question = "stand-in:{prefix}/memory-tree/build_records.py", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.plan.research"
@@ -1279,10 +1318,10 @@ actor = "role:gov-researcher"
 seed = "question-paths"
 map = "base"
 needs = ["item.plan.record"]
-outcomes = ["answered"]
+outcomes = ["answered", "probe"]
 witness = { class = "history", by = "the research record's schema check" }
 owner = "dRankedPlan"
-routes = { answered = "item.plan.record" }
+routes = { answered = "item.plan.record", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.plan.place"
@@ -1329,10 +1368,10 @@ step = "step.plan"
 actor = "role:gov-planner"
 map = "base"
 needs = ["item.plan.recommend"]
-outcomes = ["review", "no-review"]
+outcomes = ["review", "no-review", "probe"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
 owner = "dDeclaredLoop"
-routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.plan.exit" }
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.plan.exit", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.plan.exit"
@@ -1383,10 +1422,10 @@ seed = "scope-paths"
 map = "base"
 unfolds = ["kit", "policy"]
 needs = ["item.design.input"]
-outcomes = ["inventoried"]
+outcomes = ["inventoried", "probe"]
 witness = { class = "history", by = "the inventory joined to every built unit" }
 owner = "dIndexedDesign"
-routes = { inventoried = "item.design.decompose" }
+routes = { inventoried = "item.design.decompose", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.seams"
@@ -1394,10 +1433,10 @@ step = "step.design"
 actor = "role:gov-reuse-scout"
 map = "base"
 needs = ["item.design.input"]
-outcomes = ["found"]
+outcomes = ["found", "probe"]
 witness = { class = "history", by = "the seams' probe digests, re-derived by the executor" }
 owner = "dIndexedDesign"
-routes = { found = "item.design.decompose" }
+routes = { found = "item.design.decompose", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.decompose"
@@ -1406,10 +1445,10 @@ actor = "role:gov-architect"
 seed = "scope-paths"
 map = "base"
 needs = [["item.design.inventory", "item.design.reentry", "item.design.seams"]]
-outcomes = ["decomposed", "fact-fork", "goal-fork"]
+outcomes = ["decomposed", "fact-fork", "goal-fork", "probe"]
 witness = { class = "history", by = "the roster and interface schema check, every raised feature fork joined to its fork record" }
 owner = "dIndexedDesign"
-routes = { decomposed = "item.design.overlaps", fact-fork = "item.design.research", goal-fork = "transition" }
+routes = { decomposed = "item.design.overlaps", fact-fork = "item.design.research", goal-fork = "transition", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.research"
@@ -1418,10 +1457,10 @@ actor = "role:gov-researcher"
 seed = "question-paths"
 map = "base"
 needs = ["item.design.decompose"]
-outcomes = ["answered"]
+outcomes = ["answered", "probe"]
 witness = { class = "history", by = "the research record's schema check" }
 owner = "dIndexedDesign"
-routes = { answered = "item.design.decompose" }
+routes = { answered = "item.design.decompose", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.overlaps"
@@ -1441,10 +1480,10 @@ tag = "item.design.streams"
 step = "step.design"
 actor = "role:gov-planner"
 needs = ["item.design.overlaps"]
-outcomes = ["grouped"]
+outcomes = ["grouped", "probe"]
 witness = { class = "history", by = "the stream plan, each stream's units re-derived against the order and the overlap record" }
 owner = "dIndexedDesign"
-routes = { grouped = "item.design.unit-spec" }
+routes = { grouped = "item.design.unit-spec", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.unit-spec"
@@ -1453,10 +1492,10 @@ actor = "role:gov-spec-writer"
 seed = "write-set"
 map = "base"
 needs = [["item.design.input", "item.design.overlaps", "item.design.streams"]]
-outcomes = ["authored", "feature-fork"]
+outcomes = ["authored", "feature-fork", "probe"]
 witness = { class = "history", by = "the format check on the spec at its SHA, every raised fork joined to its fork record" }
 owner = "dIndexedDesign"
-routes = { authored = "item.design.recommend", feature-fork = "item.design.decompose" }
+routes = { authored = "item.design.recommend", feature-fork = "item.design.decompose", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.recommend"
@@ -1479,10 +1518,10 @@ seed = "scope-paths"
 map = "base"
 needs = ["item.design.recommend"]
 allowance = "none"
-outcomes = ["review", "no-review"]
+outcomes = ["review", "no-review", "probe"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
 owner = "dDeclaredLoop"
-routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.design.ready" }
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.design.ready", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.design.ready"
@@ -1547,10 +1586,10 @@ step = "step.build"
 actor = "role:gov-builder"
 seed = "write-set"
 needs = ["item.build.unit-lease"]
-outcomes = ["committed", "spec-wrong", "interface-change", "fork"]
+outcomes = ["committed", "spec-wrong", "interface-change", "fork", "probe"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
 owner = "dScopedBuild"
-routes = { committed = "item.build.acceptance", spec-wrong = "transition", interface-change = "transition", fork = "stand-in:{prefix}/memory-tree/build_records.py" }
+routes = { committed = "item.build.acceptance", spec-wrong = "transition", interface-change = "transition", fork = "stand-in:{prefix}/memory-tree/build_records.py", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.build.acceptance"
@@ -1572,10 +1611,10 @@ step = "step.build"
 actor = "role:gov-builder"
 seed = "write-set"
 needs = [["item.build.acceptance", "item.build.reuse-check", "item.test.attribute", "item.test.seen-red"]]
-outcomes = ["committed"]
+outcomes = ["committed", "probe"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
 owner = "dScopedBuild"
-routes = { committed = "item.build.acceptance" }
+routes = { committed = "item.build.acceptance", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.build.scope"
@@ -1597,20 +1636,20 @@ step = "step.build"
 actor = "role:gov-builder"
 seed = "write-set"
 needs = ["item.build.scope"]
-outcomes = ["reverted", "descoped"]
+outcomes = ["reverted", "descoped", "probe"]
 witness = { class = "history", by = "the commit, resolved by the executor" }
 owner = "dScopedBuild"
-routes = { reverted = "item.build.scope", descoped = "item.build.core" }
+routes = { reverted = "item.build.scope", descoped = "item.build.core", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.build.reuse-check"
 step = "step.build"
 actor = "role:gov-reuse-scout"
 needs = ["item.build.scope"]
-outcomes = ["clean", "duplicate", "disputed", "overflow", "non-converging"]
+outcomes = ["clean", "duplicate", "disputed", "overflow", "non-converging", "probe"]
 witness = { class = "history", by = "a computed join: every listed unit and every MUST has one row" }
 owner = "dScopedBuild"
-routes = { clean = "item.build.recommend", duplicate = "item.build.fix-pass", disputed = "stand-in:{prefix}/workflows/tier2-review.js", overflow = "item.build.reuse-check", non-converging = "stand-in:{prefix}/memory-tree/backlog.py" }
+routes = { clean = "item.build.recommend", duplicate = "item.build.fix-pass", disputed = "stand-in:{prefix}/workflows/tier2-review.js", overflow = "item.build.reuse-check", non-converging = "stand-in:{prefix}/memory-tree/backlog.py", probe = "stand-in:{prefix}/loop/probe.py" }
 draws = { duplicate = "fix-pass" }
 
 [[item]]
@@ -1684,10 +1723,10 @@ step = "step.build"
 actor = "role:gov-builder"
 seed = "write-set"
 needs = ["item.test.merge"]
-outcomes = ["resolved", "interface-clash"]
+outcomes = ["resolved", "interface-clash", "probe"]
 witness = { class = "history", by = "the resolution commit, resolved by the executor, and the routing record" }
 owner = "dScopedBuild"
-routes = { resolved = "item.test.merge", interface-clash = "transition" }
+routes = { resolved = "item.test.merge", interface-clash = "transition", probe = "stand-in:{prefix}/loop/probe.py" }
 
 # ---- Test's program ----------------------------------------------------------------------------------
 
@@ -1749,10 +1788,10 @@ step = "step.test"
 actor = "role:gov-tester"
 seed = "write-set"
 needs = ["item.test.route"]
-outcomes = ["code-miss", "spec-wrong"]
+outcomes = ["code-miss", "spec-wrong", "probe"]
 witness = { class = "history", by = "a computed join: every such red has one judgment, and the artifact its route names exists" }
 owner = "dWitnessedBar"
-routes = { code-miss = "item.build.fix-pass", spec-wrong = "transition" }
+routes = { code-miss = "item.build.fix-pass", spec-wrong = "transition", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.test.flakes"
@@ -1799,10 +1838,10 @@ step = "step.test"
 actor = "role:gov-tester"
 seed = "write-set"
 needs = ["item.test.recommend"]
-outcomes = ["review", "no-review"]
+outcomes = ["review", "no-review", "probe"]
 witness = { class = "history", by = "the schema check, its answer joined to the recommendation record" }
 owner = "dDeclaredLoop"
-routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.test.exit" }
+routes = { review = "stand-in:{prefix}/workflows/tier2-review.js", no-review = "item.test.exit", probe = "stand-in:{prefix}/loop/probe.py" }
 
 [[item]]
 tag = "item.test.exit"
@@ -2058,10 +2097,10 @@ actor = "role:gov-spec-writer"
 seed = "write-set"
 map = "base"
 needs = ["item.review.dispose"]
-outcomes = ["next-round", "released", "at-bound"]
+outcomes = ["next-round", "released", "at-bound", "probe"]
 witness = { class = "history", by = "each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's prevSubjects pins" }
 owner = "dDeclaredLoop"
-routes = { next-round = "item.review.trigger", released = "stand-in:{prefix}/unattended/unattended.sh", at-bound = "item.review.dispose" }
+routes = { next-round = "item.review.trigger", released = "stand-in:{prefix}/unattended/unattended.sh", at-bound = "item.review.dispose", probe = "stand-in:{prefix}/loop/probe.py" }
 draws = { next-round = "review-round" }
 
 [[item]]
@@ -2076,6 +2115,107 @@ outcomes = ["done"]
 witness = { class = "history", by = "the review-shape line's cost fields" }
 owner = "dDeclaredLoop"
 routes = { done = "stand-in:{prefix}/unattended/unattended.sh" }
+
+# ---- The probe program (TOOL-dPlacedRequest-7) -------------------------------------------------------
+# Testing outside Test: placed at an item boundary by probe.points or the owner, or raised by a role's probe
+# outcome. Each row sits in no step; an unbuilt part rides its row's owner, the build that lands it. A route
+# to the probe tool's stand-in is the line probe.py prints ending `· to <asker>`, the asker re-entered with
+# it as its input; the owner item is the unattended driver's stand-in.
+
+[[item]]
+tag = "item.probe.trigger"
+step = "none"
+actor = "command:probe.trigger"
+needs = []
+inputs = ["layer.flow:the probe policy keys and the probe program's trigger-cause rows"]
+allowance = "the probe-trigger record"
+returns = "record-kind.probe-trigger"
+outcomes = ["opened", "not-opened"]
+witness = { class = "history", by = "the probe-trigger record" }
+owner = "dPlacedRequest"
+routes = { opened = "item.probe.pin", not-opened = "stand-in:{prefix}/loop/probe.py" }
+
+[[item]]
+tag = "item.probe.pin"
+step = "none"
+actor = "command:probe.pin"
+needs = ["item.probe.trigger"]
+inputs = ["layer.memory:the probe-trigger record and the commit it pins"]
+allowance = "the probe record's head"
+returns = "record-kind.probe"
+outcomes = ["verification", "reproduction", "experiment"]
+witness = { class = "history", by = "the head, recorded before any run" }
+owner = "dPlacedRequest"
+routes = { verification = "item.probe.design", reproduction = "item.probe.design", experiment = "item.probe.experiment" }
+
+[[item]]
+tag = "item.probe.design"
+step = "none"
+actor = "role:gov-tester"
+needs = ["item.probe.pin"]
+outcomes = ["done"]
+witness = { class = "history", by = "the method's schema check" }
+owner = "dWitnessedBar"
+routes = { done = "item.probe.run" }
+
+[[item]]
+tag = "item.probe.experiment"
+step = "none"
+actor = "role:gov-researcher"
+needs = ["item.probe.pin"]
+outcomes = ["done", "beyond-authority"]
+witness = { class = "history", by = "the method's schema check" }
+owner = "dBoundRoles"
+routes = { done = "item.probe.run", beyond-authority = "stand-in:{prefix}/unattended/unattended.sh" }
+
+[[item]]
+tag = "item.probe.run"
+step = "none"
+actor = "executor"
+needs = [["item.probe.design", "item.probe.experiment"]]
+inputs = ["layer.memory:the probe record's pinned commit and method"]
+allowance = "the probe record's run lines"
+returns = "record-kind.probe"
+outcomes = ["done", "unrunnable"]
+witness = { class = "history", by = "the run lines by hash" }
+owner = "dWellOiledMachine"
+routes = { done = "item.probe.judge", unrunnable = "item.probe.return" }
+
+[[item]]
+tag = "item.probe.judge"
+step = "none"
+actor = "command:probe.judge"
+needs = ["item.probe.run"]
+inputs = ["layer.memory:the probe record's method and run lines"]
+allowance = "the probe record's verdict"
+returns = "record-kind.probe"
+outcomes = ["judged", "claimed"]
+witness = { class = "history", by = "the computed verdict" }
+owner = "dPlacedRequest"
+routes = { judged = "item.probe.return", claimed = "item.probe.judge-claimed" }
+
+[[item]]
+tag = "item.probe.judge-claimed"
+step = "none"
+actor = "role:gov-tester"
+needs = ["item.probe.judge"]
+outcomes = ["done"]
+witness = { class = "history", by = "the judgment's schema check, held as claimed" }
+owner = "dWitnessedBar"
+routes = { done = "item.probe.return" }
+
+[[item]]
+tag = "item.probe.return"
+step = "none"
+actor = "command:probe.return"
+needs = ["item.probe.judge"]
+inputs = ["layer.memory:the judged probe record"]
+allowance = "the probe record's writer"
+returns = "record-kind.probe"
+outcomes = ["returned", "claimed", "unrunnable"]
+witness = { class = "history", by = "the probe record" }
+owner = "dTotalRecall"
+routes = { returned = "stand-in:{prefix}/loop/probe.py", claimed = "stand-in:{prefix}/unattended/unattended.sh", unrunnable = "stand-in:{prefix}/unattended/unattended.sh" }
 
 # One [[selects]] row per policy value that selects a component a layer point stands for
 # (TOOL-dDeclaredLoop-2 S8): `key` the policy key, `value` its value, `point` the layer point the value

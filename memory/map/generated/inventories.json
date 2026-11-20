@@ -92,6 +92,7 @@
       "loop item kind",
       "loop parent routes",
       "loop position fixtures",
+      "loop probe fixtures",
       "loop request fixtures",
       "loop review bounds fixtures",
       "loop scenario fixtures",

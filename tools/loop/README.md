@@ -107,17 +107,18 @@ a later build names today's stand-in under `{prefix}`, which keeps the row clear
 ban. `routes` is inline, never an `[item.routes]` table, so the tag index reads one span per row.
 
 `check_program(data, where, layers)` grades the rows as one needs graph, an any-of entry an edge to
-each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50): its
-`step` is `NO_STEP`, `none`, and any other step on it is refused, while `none` on a gov step's row
-stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
+each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50), and a
+tag `item.probe.<name>` the probe program's (TOOL-dPlacedRequest-7), each segment one of
+`PROGRAM_SEGMENTS`: its `step` is `NO_STEP`, `none`, and any other step on it is refused, while `none`
+on a gov step's row stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
 that one, a tag declared twice, a need naming no declared item, and a needs cycle, each cycle named
 once and a self-need a cycle of one. Per item it refuses an outcome set `derive_outcome_set` refuses,
 empty or with a word twice; routes that are not exactly the outcomes; a target that is no declared
 item, `transition` or a stand-in; and, where `layers` is not `None`, an input whose text before its
 first `:` is no layer tag. Each `[[step]]` row's `exit` must be a declared item of that step. It
-returns `{step tag: [item tags in needs order]}`, one order filtered per step, and the review
-program's tags under the key `review`, `REVIEW_PROGRAM`, which `--check` prints as `loop: program
-review`. A review row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
+returns `{step tag: [item tags in needs order]}`, one order filtered per step, and each program of
+`PROGRAM_SEGMENTS` under its segment, which `--check` prints as `loop: program review` and `loop:
+program probe`. A review or probe row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
 cycles come from the needs-graph helper, `derive_needs_order` and `scan_cycles`, the `needs_graph_py`
 block this module carries inline beside govkit's and the memory-tree kit's backlog copies.
 
@@ -523,6 +524,26 @@ that key. `--fixture --plant <case>` runs one of `PLANTS`, and `--selftest` runs
 ```bash
 python <prefix>/loop/request.py key <file>
 python <prefix>/loop/request.py --selftest
+```
+
+## The probe program
+
+`probe.py` (TOOL-dPlacedRequest-7) is the tool of the probe program, the eight `item.probe.*` rows at step
+`none`. `trigger` opens a probe for a cause the `[[trigger-cause]]` rows of the program `probe` hold,
+read by `read_trigger_causes`, where the policy keys `probe.points`, `probe.raise` and
+`probe.observations` admit it, and writes a `probe-trigger` record through the memory-tree kit's
+`write_record`, or, for a request before placement, `<key>.probe-trigger.md` beside the request's text in
+the git common dir's `requests/` store. `pin` writes the `probe` record's head and commits it alone before
+any command runs; `design` appends one method entry until a run line freezes the record; `run` calls
+`loop_witness.py rerun` once at the pinned commit; `judge` computes the verdict from the run lines against
+the predictions; `return` prints the line the asking item is re-entered with. A role item's `probe`
+outcome routes to `PROBE_STAND_IN`, and `check_probe_outcomes` refuses a role item without it and a probe
+item with it. `--fixture --plant <case>` runs one of `PLANTS` in a throwaway repository and `--selftest`
+runs every case through `run_selftest_cases`; it is gov's `loop probe fixtures` leg.
+
+```bash
+python <prefix>/loop/probe.py trigger --cause owner --asker <item tag> --subject <text> --build <slug> --unit <id>
+python <prefix>/loop/probe.py --selftest
 ```
 
 ## The position engine

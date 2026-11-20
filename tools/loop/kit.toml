@@ -76,6 +76,11 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # beside it; the unattended driver finds it by `resolve_kit_dir` for `--request` and refuses the verb
 # naming it where it does not resolve. Its leg, `loop request fixtures`, is gov's own [[exempt_leg]], no
 # row here.
+# The probe program (TOOL-dPlacedRequest-7): probe.py writes the probe-trigger and probe records through the
+# memory-tree kit's `write_record` under the edge above, reads the probe policy keys through the policy kit by
+# `read_policy_kit` and `probe.points` at a build's pin through composition.py's `read_tag_policy`, and re-runs
+# a method through loop_witness.py's `rerun` beside it, so it takes no edge to the policy kit: a kit that does
+# not resolve exits 2 `unarmed`. Its leg, `loop probe fixtures`, is gov's own [[exempt_leg]], no row here.
 # The code seed (TOOL-dPlacedRequest-8): loop_lib.py's `resolve_item_seed` runs the unattended driver's
 # `--path-tokens`, found by `resolve_kit_dir`, so it takes no edge, the driver's kit requiring this one,
 # and prints `unarmed` where the driver does not resolve; its plants ride the `loop definition` leg.

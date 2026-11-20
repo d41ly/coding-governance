@@ -1643,6 +1643,63 @@ The list does not fire a review: you, or the run, fire each review line through 
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
 can write a disposition record releases a gate.
 
+## Testing outside Test: the probe program
+
+A probe is a test any item can ask for, outside the Test step: an owner's observation checked before it
+is placed, a reported bug made red before its fix, or an experiment that sets a measured reference. Its
+eight items, `item.probe.trigger`, `.pin`, `.design`, `.experiment`, `.run`, `.judge`, `.judge-claimed`
+and `.return`, sit in no step, as the review program's do, and `--check` prints them as
+`loop: program probe`.
+
+A probe has two ways in. It is **placed** at an item boundary, by a point `probe.points` names or by
+you; or it is **raised** by a role whose item answers `probe`, an outcome every role item outside the
+probe program carries, routed to the probe tool. No role returns `probe` until the role templates
+carry it, so today probes are placed, never raised. Four keys in `.governance/policy.toml` decide what
+opens:
+
+- `probe.points`, default empty: the item tags where a probe opens with the cause `point`. A tag the
+  build's items do not declare is refused by `probe.py points --build <slug>`, naming the key.
+- `probe.raise`, default `roles-and-owner`: `owner-only` refuses a raised probe, and `off` refuses
+  yours as well.
+- `probe.observations`, default `verify-before-place`: where an owner's observation is probed,
+  at `item.entry.place` under `verify-before-place`, at `item.plan.input` under `verify-at-plan`, and
+  nowhere under `on-request`, where you open the probe yourself with the cause `owner`.
+- `probe.experiment.authority`, default `within-cap`: named, with its value, on the owner item an
+  experiment routes to while the experiment shape is unbuilt; `within-cap` is the agent cap the hooks
+  kit enforces.
+
+A cause outside `point`, `owner`, `observation`, `raised` and `reproduction`, the rows of the
+definition's `[[trigger-cause]]` table, is refused. A patch build's `reproduction` always opens.
+
+The tool is `probe.py` in the loop kit, run in your repository, one verb per item it serves:
+
+- **`trigger`**, `probe.py trigger --cause <cause> --asker <item tag> --subject <text>` with `--build <slug>
+  --unit <id>` or `--request <content key>`, and `--at <item tag>` for a point or an observation, opens
+  the probe and writes a `probe-trigger` record in the build's `build/` folder, or,
+  given a request's content key before any build folder exists, `<key>.probe-trigger.md` beside the
+  request's text in your git directory's `requests/` store, which is never pushed. A second
+  observation of the same request joins its probe and prints `probe — joined`. A refused cause writes
+  nothing and prints `probe — not opened · <key>: <why> · to <asker>`.
+- **`pin`**, `probe.py pin --trigger <record> --sha <commit> --kind verification|reproduction|experiment
+  --question <text> --losing <text>`, writes the `probe` record's head, the commit, the kind, the question and the losing
+  outcome, before anything runs, and commits it alone as `probe pin(<asker>): <kind>`; a request's
+  head stays in the store. A commit that does not resolve exits 2. An experiment routes to the owner
+  item naming dBoundRoles, which builds its shape.
+- **`design`**, `probe.py design --probe <record> --cmd <command> --expect <exit>:<hash>`, with `--mark
+  visual` or `--mark "judge claimed"`, appends one `- method · <exit>:<hash> · <command>` entry to the record's `## Method`
+  section, the prediction made before anything runs. Once `run` has written a run line the method is
+  frozen and `design` exits 2, leaving the record as it was.
+- **`run`**, `probe.py run --probe <record>`, re-runs every entry at the pinned commit through `loop_witness.py rerun` and writes one
+  `run · <exit> · <hash> · <command>` line each. An entry marked `visual` needs a capture adapter not
+  yet built, so nothing runs and the record reads `Verdict: unrunnable`.
+- **`judge`**, `probe.py judge --probe <record>`, computes the verdict from the run lines against the predictions: `confirmed`, `refuted`
+  or `inconclusive`, with `Judged: computed`. An entry marked `judge claimed` is written
+  `Judged: claimed` with no verdict, and goes to you rather than to a gate.
+- **`return`**, `probe.py return --probe <record>`, writes `Writer: stand-in` and prints `probe — <verdict> · <record> · to <asker>`, the line
+  the asking item is re-entered with; a claimed or unrunnable probe goes to you instead.
+
+No probe verdict gates a landing: only Test's verdict does.
+
 ## How much rework a build may do
 
 Every build has one rework budget, the policy key `flow.rework-budget`, and every repetition draws on

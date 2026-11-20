@@ -660,7 +660,10 @@ carry it too:
   records") · `transition` (one build stage move, in the grammar under "Transition records") ·
   `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
   records") · `card` (a build's orientation card at one step, its snapshot, fields `Build`, `Step` and
-  `Ref` and the card's text in one `~~~~` fenced block). The ten after `research` are the typed
+  `Ref` and the card's text in one `~~~~` fenced block) · `probe-trigger` (a probe opened at an item
+  boundary, fields `Cause`, `Asker`, `Subject`, `At` and `Key`) · `probe` (the probe it opened: its pinned
+  head, its `## Method` entries, its run lines and its `Verdict` beside `Judged`, written by the loop kit's
+  `probe.py`). The twelve after `research` are the typed
   kinds: each record is named `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.

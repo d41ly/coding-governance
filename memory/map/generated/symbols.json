@@ -318,6 +318,11 @@
       "file": "tools/playbook/policy_value.py"
     },
     {
+      "id": "ProbeRefused",
+      "kind": "class",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "Problem",
       "kind": "class",
       "file": "tools/memory-tree/backlog.py"
@@ -7623,9 +7628,29 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_probe_fields",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "check_probe_landed",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_probe_outcomes",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
+    },
+    {
+      "id": "check_probe_plant",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "check_probe_points",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "check_probe_scrubbed",
@@ -7841,6 +7866,11 @@
       "id": "check_record_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_record_value",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "check_record_versions",
@@ -8811,6 +8841,11 @@
       "id": "check_tree_progressing",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_trigger_cause",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "check_true",
@@ -12353,6 +12388,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "derive_probe_verdict",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "derive_problem_id",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -12476,6 +12516,11 @@
       "id": "derive_record_roots",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "derive_record_shown",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "derive_redacted",
@@ -16100,6 +16145,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/loop/request.py"
     },
     {
@@ -19648,6 +19698,11 @@
       "file": "tools/loop/position.py"
     },
     {
+      "id": "read_build_records",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -20511,6 +20566,11 @@
       "id": "read_expand_rows",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_experiment_line",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "read_export_cap",
@@ -22503,9 +22563,34 @@
       "file": "tools/playbook/tag_bundle.py"
     },
     {
+      "id": "read_probe",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
+    },
+    {
       "id": "read_probe_allow",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_probe_points",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "read_probe_policy",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "read_probe_record",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "read_probe_trigger",
+      "kind": "function",
+      "file": "tools/memory-tree/build_records.py"
     },
     {
       "id": "read_proc_ledger",
@@ -22656,6 +22741,11 @@
       "id": "read_record_copies",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_record_fields",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "read_record_head",
@@ -23996,6 +24086,11 @@
       "id": "read_tree_text",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_trigger_causes",
+      "kind": "function",
+      "file": "tools/loop/loop_lib.py"
     },
     {
       "id": "read_ts_angle_end",
@@ -27293,6 +27388,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "resolve_git_paths",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -28166,6 +28266,11 @@
       "id": "resolve_prefix_token",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "resolve_probe_path",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "resolve_procs_path",
@@ -31333,9 +31438,29 @@
       "file": "tools/run-gates/owed_rows.py"
     },
     {
+      "id": "run_probe_command",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "run_probe_git",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "run_probe_in_empty_dir",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "run_probe_plant",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "run_probe_rerun",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "run_probe_scan",
@@ -37948,6 +38073,11 @@
       "file": "tools/hooks/format-guard.test.sh"
     },
     {
+      "id": "write_method_entry",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "write_model_copy",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -38203,6 +38333,36 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_probe_fields",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_probe_fixture",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_probe_pin",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_probe_return",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_probe_trigger",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
+      "id": "write_probe_verdict",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
+    },
+    {
       "id": "write_proc_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -38396,6 +38556,11 @@
       "id": "write_replace",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "write_request_record",
+      "kind": "function",
+      "file": "tools/loop/probe.py"
     },
     {
       "id": "write_request_record",
