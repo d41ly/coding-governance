@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-5 · 2026-11-05 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -29,6 +29,7 @@
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md](../prompts/2026-11-05-prompt-TOOL-dWitnessedBar-3-owner-forks.md) | research | TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-28 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief.md) | journal | TOOL-dWitnessedBar-5 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -117,6 +118,7 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
 - **consumes-from** `TOOL-dWitnessedBar-23` — `gov-tester`, the slot `test.attribute` names, and its closed judgments `code-miss` and `spec-wrong`, which `judge` refuses any other word than
 - **hands-off** `TOOL-dWitnessedBar-8` — `verdict.blocks` and the routing record, into which the nondeterministic route to `test.flakes` is written ahead of the class routes
 - **hands-off** `TOOL-dWitnessedBar-30` — `verdict.blocks` and the `quiet-rerun` route a blocking `CONTENDED` red takes, which that unit arms
+- **hands-off** `TOOL-dWitnessedBar-5` — `tools/run-gates/verdict_flow.py`, the file this unit mints with its `route` and `judge` verbs and its `--fixture` cases, to which unit 5 adds `select`, `select --check` and their fixture cases
 - **consumes-from** external — dGroundRules' `policy.py get` (TOOL-dGroundRules-2 S7) and its catalogue rows for `verdict.blocks` and `verdict.red-route`, and TOOL-dSafePassage-1's step rows
 - **consumes-from** external — TOOL-dDeclaredLoop-12's `item.test.attribute` row, which `judge` reads through `loop_lib.py items --tag` run as a subprocess, the verb §8 F6's ask adds
 - **hands-off** `TOOL-dWitnessedBar-44` — the step script `inherited_red.py`, whose reads and value mapping unit 44 widens to both policy files and every value (id 62)
@@ -397,6 +399,9 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   run from the root, sources the new library through `$KITDIR` as `tools/run-gates/run-gates.sh@7c21a741:5097` sources its own, in
   place of the bare name, which resolved against the working directory; per brief
   2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
+- rev-6 · 2026-11-20 · §3 Edges · the Edges block gains the hands-off bullet mirroring
+  TOOL-dWitnessedBar-5's consumes-from edge for `verdict_flow.py`, per brief
+  2026-11-20-prompt-TOOL-dWitnessedBar-5-edges-brief; nothing else moved.
 
 ## 10. Reuse audit
 
