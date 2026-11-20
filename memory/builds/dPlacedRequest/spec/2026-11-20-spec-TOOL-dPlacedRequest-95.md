@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-95 — the kickoff hook never runs a checker it resolved from its target's tree
 
-**Status:** INPROGRESS · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 

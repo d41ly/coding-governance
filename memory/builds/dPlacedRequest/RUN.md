@@ -534,3 +534,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T21:02:47Z dispatch · item bbcea9f6 TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
 
 2026-11-20T21:03:51Z brief · item TOOL-dPlacedRequest-95 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T21:16:21Z draw · fix-pass · TOOL-dPlacedRequest-95 · 71/130 · 20261120T211621Z-85cabd
+
+2026-11-20T21:16:21Z dispatch · item bc91001f TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
