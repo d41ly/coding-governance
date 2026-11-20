@@ -43,8 +43,12 @@ dots), or walk `--ancestry-path` from the branch's own start. Never `--first-par
 
 | Shape, run on that merge | Reads the branch's commits |
 |---|---|
-| `git log --first-parent <base>..HEAD` | no — the default branch's line only |
+| `git log --first-parent --no-merges <base>..HEAD` | no, the default branch's commits only (the vacuous oracle) |
+| `git log --first-parent -p <base>..HEAD`, or `--name-status` | yes, the whole branch diff, attributed to the merge |
 | `git log --no-merges HEAD^1..HEAD^2` | yes, every one |
+
+Measured 2026-11-20 (PINNED) over a base, two branch commits, the first bumping a version line, one
+commit on the default branch past the branch point, and a --no-ff merge of the branch onto it.
 
 The fix: name the parent. A check on a prepared merge walks `HEAD^1..HEAD^2`.
 
