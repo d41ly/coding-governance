@@ -161,7 +161,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-58 — the hook's inherited-base export observed where the knob is still visible: the stub bar's environment and the runner's decline, with every leg proven blind to it](spec/2026-10-25-spec-TOOL-dWitnessedBar-58.md) | 33 | 2 | CLOSED | rev-3 | 2026-11-20 |
 | [TOOL-dWitnessedBar-60 — every bar caller that records a trusted green scrubs every knob the hook clears, held by one parity arm over the three lists](spec/2026-10-25-spec-TOOL-dWitnessedBar-60.md) | 33 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-62 — the round-1 audit of units 52 to 57, its 39 minors batched: readers that agree on every form, arms that compare what they arm, floors and greps that can red, and contained, lossless reads](spec/2026-10-25-spec-TOOL-dWitnessedBar-62.md) | 34 | 2 | CLOSED | rev-5 | 2026-11-20 |
-| [TOOL-dWitnessedBar-63 — the round-1 audit of units 58 to 62, its 34 minors batched: readers that read the whole list and every path form, criteria graded on what the built tree derives, honest failure paths, and observed sequences](spec/2026-10-25-spec-TOOL-dWitnessedBar-63.md) | 35 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-63 — the round-1 audit of units 58 to 62, its 34 minors batched: readers that read the whole list and every path form, criteria graded on what the built tree derives, honest failure paths, and observed sequences](spec/2026-10-25-spec-TOOL-dWitnessedBar-63.md) | 35 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [TOOL-dWitnessedBar-64 — the seed reads HEAD as unborn only when it names a branch that does not exist, so a HEAD git cannot resolve takes the no-HEAD path](spec/2026-10-25-spec-TOOL-dWitnessedBar-64.md) | 36 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-65 — the round-1 audit of unit 63, its 22 minors batched: one containment rule in three readers, plants a leg runs, a seed order that never stalls, honest seed and sweep failures, and readers that keep every normalisation](spec/2026-10-25-spec-TOOL-dWitnessedBar-65.md) | 37 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-66 — the CRLF record arm plants its CR on a key `read_green_file` reads, so removing the hook's CR strip turns the arm red](spec/2026-10-25-spec-TOOL-dWitnessedBar-66.md) | 38 | 2 | DEFERRED | rev-2 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 730 bound to this build, across 4 record folder(s).
+Records: 732 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
