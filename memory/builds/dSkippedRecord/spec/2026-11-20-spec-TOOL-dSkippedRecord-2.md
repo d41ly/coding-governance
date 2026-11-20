@@ -7,7 +7,6 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md) | journal | — |
-| [2026-11-20-build-TOOL-dSkippedRecord-2-red-fix-4.md](../build/2026-11-20-build-TOOL-dSkippedRecord-2-red-fix-4.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
