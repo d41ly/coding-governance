@@ -12,7 +12,11 @@ beside the review and probe programs. Kickoff's Step 1 in `skills/session-kickof
 branch, BASE, dirty count, worktree count and recent subjects from an `orientation —` card while HEAD
 equals its `tree —` cell's BASE, and a paragraph before Step 2 states the `no-ready-card` stand-in.
 `help/loop.md` gains the section "The entry items: orienting, placing and claiming a request" and names
-`loop: program entry` in its `--check` paragraph. No function, file or leg was minted.
+`loop: program entry` in its `--check` paragraph. No function, file or leg was minted. The bug-class
+checklist over the pass commit named `two-answers-to-one-question`: the loop kit's `tools/loop/README.md`
+still listed the no-step programs as the review and probe programs alone, so its `check_program`
+paragraph names the entry program too, in a path declared for it; and
+`ledger-token-wrapped-across-a-line-joins-nothing`, which joined AC5's command onto one line here.
 
 No gate, suite or bar ran in this pass, and no `--selftest`. Each criterion below was observed by a probe
 of the changed definition and code on the run's node, 2026-11-20: the loop kit's own reader and checks run
@@ -40,8 +44,8 @@ rather than over a copy of `tools/` on disk.
   entry tag's `loop: seed` line read `none`; and the `loop: probe outcomes` line refused nothing. In
   process, `item.entry.orient`'s `probe` routed to `item.probe.trigger` drew the refusal
   `routes probe to 'item.probe.trigger', not stand-in:{prefix}/loop/probe.py`.
-- AC5 — `python loop_table.py move --level build --from none --item item.entry.claim --outcome claimed
-  --fact disposition=new` printed `move — build · none → planning · item.entry.claim · lateral`, with no
+- AC5 — `python loop_table.py move --level build --from none --item item.entry.claim --outcome claimed --fact disposition=new`
+  printed `move — build · none → planning · item.entry.claim · lateral`, with no
   `stand-in` field (before the build it printed `stand-in dPlacedRequest`); `disposition=repeat` printed
   the move to `designing`; `disposition=patch` exited 1 printing `no row`; `python loop_table.py check`
   exited 0 printing no `loop: stand-in item.entry.claim` line.

@@ -107,8 +107,9 @@ a later build names today's stand-in under `{prefix}`, which keeps the row clear
 ban. `routes` is inline, never an `[item.routes]` table, so the tag index reads one span per row.
 
 `check_program(data, where, layers)` grades the rows as one needs graph, an any-of entry an edge to
-each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50), and a
-tag `item.probe.<name>` the probe program's (TOOL-dPlacedRequest-7), each segment one of
+each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50), a
+tag `item.probe.<name>` the probe program's (TOOL-dPlacedRequest-7), and a tag `item.entry.<name>` the
+entry program's, the flow's router before any step (TOOL-dPlacedRequest-3), each segment one of
 `PROGRAM_SEGMENTS`: its `step` is `NO_STEP`, `none`, and any other step on it is refused, while `none`
 on a gov step's row stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
 that one, a tag declared twice, a need naming no declared item, and a needs cycle, each cycle named
@@ -117,8 +118,8 @@ empty or with a word twice; routes that are not exactly the outcomes; a target t
 item, `transition` or a stand-in; and, where `layers` is not `None`, an input whose text before its
 first `:` is no layer tag. Each `[[step]]` row's `exit` must be a declared item of that step. It
 returns `{step tag: [item tags in needs order]}`, one order filtered per step, and each program of
-`PROGRAM_SEGMENTS` under its segment, which `--check` prints as `loop: program review` and `loop:
-program probe`. A review or probe row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
+`PROGRAM_SEGMENTS` under its segment, which `--check` prints as `loop: program review`,
+`loop: program probe` and `loop: program entry`. A review, probe or entry row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
 cycles come from the needs-graph helper, `derive_needs_order` and `scan_cycles`, the `needs_graph_py`
 block this module carries inline beside govkit's and the memory-tree kit's backlog copies.
 

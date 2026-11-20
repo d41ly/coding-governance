@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim
 
-**Status:** INPROGRESS · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0122@938c9643 whole
 
