@@ -283,7 +283,9 @@ health log under the git common dir that the orientation card counts; the driver
 lock's guard, or `spec-tokens-guard-cleared` when it removes a guard a crashed writer left
 (`TOOL-aGraftedHelix-37`, `TOOL-aPiecewiseGrade-6`); the node locks, `gov-feed.lock`,
 `gov-queue.lock` and `--request`'s `requests.lock` in the common dir, append `node-lock-broken` and
-`node-guard-cleared` on the same terms (`TOOL-dPlacedRequest-24`, `TOOL-dPlacedRequest-43`). The line format is the
+`node-guard-cleared` on the same terms (`TOOL-dPlacedRequest-24`, `TOOL-dPlacedRequest-43`); and a flush of
+the offline queue appends `lease-yielded` for each queued write it yields because the remote moved
+first (`TOOL-dPlacedRequest-41`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

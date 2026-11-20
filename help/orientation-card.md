@@ -7,6 +7,10 @@ and the health log, then `recent —`, the last commits, and the kickoff's `READ
 appended. A resumed or compacted session reads it back through the replay. Every cell is derived;
 nothing on the card is typed by hand.
 
+The `node —` cell names your machine's row of the node registry: the row whose tag `GOV_NODE` names
+when you set it, as the gate runner and the unattended driver read it, else the row whose user is
+yours; a `GOV_NODE` that names no row reads `node — UNKNOWN:` with the reason.
+
 ## The `## pockets` section
 
 The card carries the repository's orientation facts under `## pockets`, immediately above

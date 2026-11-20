@@ -442,13 +442,16 @@ getval() {
 # (TOOL-dPlacedRequest-43 S20): the table is the one the playbook kit's `derive_node_table` renders
 # from `fleet.toml`, and the user is case-folded and equal to the row's, `read_fleet_tag`'s rule, which
 # the unattended driver's `resolve_fleet_tag` asks. It stays a read of the rendered table because this
-# kit is copy-installed and carries no playbook kit.
+# kit is copy-installed and carries no playbook kit. GOV_NODE FIRST (TOOL-dPlacedRequest-49 S23, F4):
+# a set GOV_NODE names the row whose Tag cell it equals, as `resolve_node_tag` and `resolve_fleet_tag`
+# answer it first, so the three resolvers agree on a node that sets it; one naming no row is UNKNOWN
+# with the reason, and the user is not read.
 derive_node_tag() {
-  local reg="$1" user="${USERNAME:-${USER:-}}" hits tag mu
+  local reg="$1" user="${USERNAME:-${USER:-}}" node="${GOV_NODE:-}" hits tag mu
   [ -n "$reg" ] || { printf 'node — UNKNOWN: no registry\n'; return 0; }
   [ -f "$reg" ] || { printf 'node — UNKNOWN: registry %s is not a file in this tree\n' "$reg"; return 0; }
-  [ -n "$user" ] || { printf 'node — UNKNOWN: neither USERNAME nor USER names a user\n'; return 0; }
-  IFS=$'\t' read -r hits tag mu < <(awk -v user="$user" '
+  [ -n "$node$user" ] || { printf 'node — UNKNOWN: neither USERNAME nor USER names a user\n'; return 0; }
+  IFS=$'\t' read -r hits tag mu < <(awk -v user="$user" -v node="$node" '
     { ln=$0; sub(/\r$/,"",ln) }
     !intab && ln ~ /^## Node registry/ { sect=1; next }
     sect && !intab && ln ~ /^## / { exit }
@@ -459,11 +462,13 @@ derive_node_tag() {
       gsub(/^[ \t]+|[ \t]+$/,"",tag); gsub(/^[ \t]+|[ \t]+$/,"",mu)
       if (tag=="Tag" || tag ~ /^:?-+:?$/) next
       mt=mu; i=index(mt, " @"); if (i) mt=substr(mt, 1, i-1)
-      if (tolower(mt)==tolower(user)) { hits++; found=tag; foundmu=mu } }
+      if (node != "" ? (tag == node) : (tolower(mt) == tolower(user))) { hits++; found=tag; foundmu=mu } }
     END { printf "%d\t%s\t%s\n", hits+0, found, foundmu }' "$reg")
-  case "$hits" in
-    1) printf 'node — %s · %s\n' "$tag" "$mu" ;;
-    0) printf 'node — UNKNOWN: no Machine/user cell in %s matches %s\n' "$reg" "$user" ;;
+  case "$hits:${node:+node}" in
+    1:*) printf 'node — %s · %s\n' "$tag" "$mu" ;;
+    0:node) printf 'node — UNKNOWN: GOV_NODE %s names no Tag cell in %s\n' "$node" "$reg" ;;
+    0:) printf 'node — UNKNOWN: no Machine/user cell in %s matches %s\n' "$reg" "$user" ;;
+    *:node) printf 'node — UNKNOWN: %s Tag cells in %s read GOV_NODE %s\n' "$hits" "$reg" "$node" ;;
     *) printf 'node — UNKNOWN: %s Machine/user cells in %s match %s\n' "$hits" "$reg" "$user" ;;
   esac
 }
@@ -1796,7 +1801,10 @@ check_card() {
 # policy kit's reader coverage counts (as `read_spec_audit_switch` in the unattended driver does).
 # WHAT THIS DOES NOT CHECK: that the card's text is true, which its cells derive; who may publish a build's
 # card, which the lease and the claim decide.
-CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-20}   # seconds each lookup of the card ref may take; the env override is the fixture's
+# THE LOOKUP BOUND (TOOL-dPlacedRequest-49 S2): a reader's bound sits inside the claims cell's, so
+# CARD_FETCH_BOUND defaults to CARD_CLAIMS_BOUND's, the kill bound of a remote read
+# (TOOL-aGraftedHelix-2): 15 s, PINNED. A lookup the bound kills still reads the next store.
+CARD_FETCH_BOUND=${CARD_FETCH_BOUND:-15}   # seconds each lookup of the card ref may take; the env override is the fixture's
 # THE PUBLISH BOUND (TOOL-dPlacedRequest-43 S16): the driver's `--card-ref write` alone, a writer, so it
 # sits above that verb's worst case, two REMOTE_BOUND calls and the feed lock's wait, and never kills a
 # write the remote is still answering; the lookup, a reader the session waits on, keeps the fetch bound.

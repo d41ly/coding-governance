@@ -914,6 +914,9 @@ git clone -q --local "$GOVROOT" "$CCLONE" \
   || { echo "FAIL card fixture: cannot clone $GOVROOT, commit the fixture and add two worktrees under $TMP"; fail=$((fail+1)); }
 CARD_HOME="$CCLONE/.git/orientation"
 CUSER="${USERNAME:-${USER:-}}"
+# The node cell answers GOV_NODE first (TOOL-dPlacedRequest-49 S23), so an ambient one would move every
+# user-matched node row below; the GOV_NODE arm sets it per call.
+unset GOV_NODE
 
 # run_card <name> <repo> <want_exit> <want_grep|-> [args...] — stdout+stderr to $CARD_OUT, stdin
 # from /dev/null so the hook channel is provably empty; `run` cannot serve here because it strips
@@ -1071,6 +1074,13 @@ check_eq "AC4 node — a registry path that is not a file is UNKNOWN, and the ca
 write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md"
 run_card "AC4 --card --write with no registry key" "$CWT" 0 - --card --write --session "$NONCE-t4d"
 check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node — UNKNOWN: no registry" "$(read_cell node "$NONCE-t4d")"
+# TOOL-dPlacedRequest-49 AC23 — GOV_NODE first: naming row `q` under row `p`'s user, the cell names `q`,
+# where a cell reading the user alone names `p`; naming no row, the cell is UNKNOWN and says so.
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG1.md"
+GOV_NODE=q USERNAME=someone-else run_card "DPR49 AC23 --card --write with GOV_NODE=q under row p's user" "$CWT" 0 - --card --write --session "$NONCE-t23a"
+check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node — q · $CUSER" "$(read_cell node "$NONCE-t23a")"
+GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
+check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"
 
 # AC5 — replay: the playbook kit's instruction map (PLAY-dOrderedCharter-4), the stored bytes, one
 # `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
@@ -2410,7 +2420,9 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # cache path) and one check per card-store plant (five), counted off the block; the fixture's
 # unknown-case refusal is left uncounted. No suite ran in the pass: each command was run alone, each
 # plant over its own scratch remote.
-FLOOR_ASSERTIONS=370
+# +4: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, two run_card and two check_eq calls, counted off the
+# block; no suite ran in the pass, the three node resolvers were probed alone over the real registry.
+FLOOR_ASSERTIONS=374
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

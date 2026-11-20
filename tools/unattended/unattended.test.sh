@@ -19822,25 +19822,32 @@ if in_shard 8; then
 # TOOL-dPlacedRequest-39 — A FEED APPEND THAT ABORTS NEVER TAKES ITS CARRIER DOWN. The `gov_feed_sh`
 # block the driver carries is cut and sourced under `env -i` and `set -u` inside a scratch repository,
 # and `add_feed_event refs/gov/bar-red` runs with a marker echoed after it. AC1: a copy with
-# `: "$GOVFEED_PLANT_UNSET"` planted on the line after the trap's arming prints bash's unbound-name
+# `: "$GOVFEED_PLANT_UNSET"` planted on the line after the take (since TOOL-dPlacedRequest-49 S6 the
+# trap is armed before the take, so the plant follows the take's line) prints bash's unbound-name
 # line, one `feed: NOTE - refs/gov/bar-red: the append exited 1` line and the marker, and leaves no
 # `gov-feed.lock`. AC2: the unplanted cut appends one line with `seq` 1, and a retry appends none.
 # The busy exit, 3, prints the lock-busy NOTE alone and leaves the holder's lock.
 # RED for AC1 is the planted copy with its subshell turned into a brace group, the uncontained body:
 # the abort ends the carrier and the marker never prints; and the planted copy with its trap cut: the
 # carrier runs on but the lock stays held. RED for AC2 is a copy whose key check falls through: the
-# retry appends a second line. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK
-# DOES NOT DRIVE: an abort between the take and the trap's arming, which leaves the lock to its
-# deadline; the 5 s wait before the lock-busy NOTE, since the busy copies take with no wait.
+# retry appends a second line. Waived by README rule 8 with the rest of this suite.
+# TOOL-dPlacedRequest-49 AC5 and AC6 ride on the same cut. AC5: the plant on the line after
+# `write_dir_lock`'s first write aborts a fresh take that has written `owner` and no `until`; RED, a
+# copy writing `until` first, leaves a lock with no owner. AC6: the plant between the take's `mkdir`
+# and its first write prints the marker and leaves no lock, and a second clean call appends one line;
+# RED, the trap armed after the take, as TOOL-dPlacedRequest-39 built it, leaves the lock. A busy call
+# over a live lock with no `owner`, a holder between its `mkdir` and its first write, leaves it; RED,
+# a trap without the `_fl_mine` guard, clears it. WHAT THIS BLOCK DOES NOT DRIVE: the 5 s wait before
+# the lock-busy NOTE, since the busy copies take with no wait.
 # ==================================================================================================
 ca_d=$(mktemp -d)
 awk '/^# >>> gov_feed_sh/{f=1} f{print} /^# <<< gov_feed_sh/{exit}' "$SCRIPT" >"$ca_d/cut.sh"
 cp "$ca_d/cut.sh" "$ca_d/plant.sh"; cp "$ca_d/cut.sh" "$ca_d/keyless.sh"
-mutate "$ca_d/plant.sh" '/^    trap .remove_dir_lock "\$d\/gov-feed.lock" "\$tok". EXIT$/a\    : "$GOVFEED_PLANT_UNSET"'
+mutate "$ca_d/plant.sh" '/^    write_dir_lock_wait "\$d\/gov-feed.lock" "\$tok" "\$NODE_LOCK_BOUND" node 5 || exit 3$/a\    : "$GOVFEED_PLANT_UNSET"'
 cp "$ca_d/plant.sh" "$ca_d/unheld.sh"; cp "$ca_d/plant.sh" "$ca_d/untrapped.sh"
-mutate "$ca_d/unheld.sh" 's/^  ( write_dir_lock_wait/  { write_dir_lock_wait/'
+mutate "$ca_d/unheld.sh" 's/^  ( _fl_mine=$/  { _fl_mine=/'
 mutate "$ca_d/unheld.sh" 's/^    exit 0 ) || rc=\$?$/    exit 0; } || rc=$?/'
-mutate "$ca_d/untrapped.sh" '/^    trap .remove_dir_lock "\$d\/gov-feed.lock" "\$tok". EXIT$/d'
+mutate "$ca_d/untrapped.sh" '/^    trap .\[ -z "\$_fl_mine" \] || { .*; }. EXIT$/d'
 mutate "$ca_d/keyless.sh" 's/^      exit 0$/      :/'
 (unset GIT_DIR GIT_WORK_TREE; git init -q "$ca_d/r" && git -C "$ca_d/r" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -q --allow-empty -m ca --no-verify)
 ca_c=$(unset GIT_DIR GIT_WORK_TREE; git -C "$ca_d/r" rev-parse --path-format=absolute --git-common-dir); ca_c=${ca_c%$'\r'}
@@ -19885,6 +19892,48 @@ for ca_v in busy busy4; do
 done
 same "DPR39 a busy lock prints the lock-busy NOTE alone, runs on, and leaves the holder's lock" "$ca_b" "after 1 0 other"
 same "DPR39 RED: a busy take exiting 4 reads as an abort, not as busy" "$ca_b4" "after 0 1 other"
+# ---- TOOL-dPlacedRequest-49 AC5: owner first. The plant follows the first write of `write_dir_lock`;
+# ---- RED is a copy whose two writes are swapped back, `until` first.
+cp "$ca_d/cut.sh" "$ca_d/own.sh"; cp "$ca_d/cut.sh" "$ca_d/until1st.sh"
+mutate "$ca_d/until1st.sh" '/^  printf .%s\\n. "\$2" >"\$lk\/owner" 2>\/dev\/null || :$/{h;d}; /^  printf .%s\\n. .*>"\$lk\/until" 2>\/dev\/null || :$/G'
+for ca_v in own until1st; do
+  mutate "$ca_d/$ca_v.sh" '0,/^  printf .%s\\n. .*>"\$lk\/\(owner\|until\)" 2>\/dev\/null || :$/s//&\n  : "$GOVFEED_PLANT_UNSET"/'
+  rm -rf "$ca_d/w.lock"
+  (cd "$ca_d" && env -i PATH="$PATH" bash -c 'set -u; . "$1"; write_dir_lock "$2/w.lock" tok-1 10 node' _ "$ca_d/$ca_v.sh" "$ca_d") 2>/dev/null
+  ca_r="$(cat "$ca_d/w.lock/owner" 2>/dev/null || echo no-owner) $([ -e "$ca_d/w.lock/until" ] && echo until || echo no-until)"
+  case "$ca_v" in own) ca_o5=$ca_r ;; *) ca_u5=$ca_r ;; esac
+done
+same "DPR49 AC5 an abort after the take's first write leaves a lock carrying its owner and no until" "$ca_o5" "tok-1 no-until"
+same "DPR49 AC5 RED: a copy writing until first leaves a lock with no owner" "$ca_u5" "no-owner until"
+# ---- AC6: the plant between the take's `mkdir` and its first write; RED is the trap moved after the take.
+cp "$ca_d/cut.sh" "$ca_d/early.sh"
+mutate "$ca_d/early.sh" '/^  _fl_mine=1$/a\  : "$GOVFEED_PLANT_UNSET"'
+cp "$ca_d/early.sh" "$ca_d/late.sh"
+mutate "$ca_d/late.sh" '/^    trap .\[ -z "\$_fl_mine" \] || { .*; }. EXIT$/{h;d}; /^    write_dir_lock_wait "\$d\/gov-feed.lock" "\$tok" "\$NODE_LOCK_BOUND" node 5 || exit 3$/G'
+for ca_v in early late; do
+  rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>"$ca_d/$ca_v.err")
+  ca_r="${ca_o:-no-after} $(grep -c '^feed: NOTE - refs/gov/bar-red: the append exited 1$' "$ca_d/$ca_v.err")"
+  ca_r="$ca_r $([ -e "$ca_c/gov-feed.lock" ] && echo lock || echo no-lock)"
+  case "$ca_v" in early) ca_e6=$ca_r ;; *) ca_l6=$ca_r ;; esac
+done
+same "DPR49 AC6 an abort between the take's mkdir and its first write runs on and leaves no lock" "$ca_e6" "after 1 no-lock"
+same "DPR49 AC6 RED: the same abort under a trap armed after the take leaves the lock" "$ca_l6" "after 1 lock"
+rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/cut.sh" "$ca_h" 2>/dev/null)
+same "DPR49 AC6 a second, clean call appends one line" "$ca_o $(grep -c . "$ca_c/gov-feed.log" 2>/dev/null)" "after 1"
+# ---- ...and a busy call over a live lock with no owner yet leaves it; RED is a trap without the flag.
+cp "$ca_d/busy.sh" "$ca_d/flagless.sh"
+mutate "$ca_d/flagless.sh" 's/^    trap .\[ -z "\$_fl_mine" \] || { \(.*\); }. EXIT$/    trap '"'"'\1'"'"' EXIT/'
+for ca_v in busy flagless; do
+  rm -rf "$ca_c/gov-feed.lock" "$ca_c/gov-feed.log" "$ca_c/gov-feed.seq"
+  mkdir "$ca_c/gov-feed.lock"; echo "$((EPOCHSECONDS + 60))" >"$ca_c/gov-feed.lock/until"
+  ca_o=$(cd "$ca_d/r" && env -i PATH="$PATH" bash -c "$ca_call" _ "$ca_d/$ca_v.sh" "$ca_h" 2>"$ca_d/$ca_v.err")
+  ca_r="${ca_o:-no-after} $(grep -c '^feed: NOTE - the feed lock in .* was held for 5s' "$ca_d/$ca_v.err") $([ -d "$ca_c/gov-feed.lock" ] && echo kept || echo cleared)"
+  case "$ca_v" in busy) ca_k6=$ca_r ;; *) ca_f6=$ca_r ;; esac
+done
+same "DPR49 AC6 a busy call over a live lock with no owner yet leaves it" "$ca_k6" "after 1 kept"
+same "DPR49 AC6 RED: a trap without the _fl_mine guard clears the holder's lock" "$ca_f6" "after 1 cleared"
 rm -rf "$ca_d"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
@@ -19974,6 +20023,63 @@ done
 same "DPR41 S3 a line after a kept line of its ref stays queued, by the chain's rule: exit 2, two lines" "$ch_kg" "2 2 1"
 same "DPR41 S3 RED: the copy without the rule keeps both lines by the bound alone" "$ch_kr" "2 2 0"
 rm -rf "$LF" "$ch_copy"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
+# TOOL-dPlacedRequest-49 — AN ID-LESS STATUS READS, AND AN UNREADABLE QUEUED HEAD REFUSES. Over a fresh
+# lease fixture: `--lease status build tFix` with CLAUDE_CODE_SESSION_ID unset exits 0 and prints one
+# `lease —` line, since the `--lease` arm sends `status` to `print_lease_status` before
+# `run_lease_verb`'s session gate (AC28); RED, a copy whose `status` branch is cut, meets the verb's
+# act check and exits 2. Then, the origin renamed away after tOn's online acquire, an offline acquire
+# of tOff queues one line; with that newest line's commit replaced by a sha no object holds, or cut to
+# three fields, an offline `--lease release build tOff --as withdrawn` prints `queued commit
+# unreadable`, exits 2 and leaves `gov-queue.log` unchanged, and over the readable line it queues a
+# second (AC26); RED, a copy whose head read takes the newest line's third field unchecked, as the
+# base did, chains on it: refused on an empty record, or queued on the cut line. Waived by README rule
+# 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: an empty commit field, which the
+# same shape check refuses.
+# ==================================================================================================
+LF=$(mktemp -d); LF_GIT=$(command -v git); uq_copy=$(mktemp -d); uq_q="$LF/c1/.git/gov-queue.log"
+uq_src=$(<"$SCRIPT")
+uq_cut='KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"'
+uq_src=${uq_src/"$uq_cut"/"KIT_DIR=\"$HERE\""}
+uq_cut='                    elif [ "$LV_ACT" = status ]; then'
+printf '%s\n' "${uq_src/"$uq_cut"/                    elif false; then}" >"$uq_copy/nostatus.sh"
+uq_cut=$'  [[ $l =~ $rx ]] || return 1\n  l=${BASH_REMATCH[2]}\n  GIT cat-file -e "$l^{commit}" 2>/dev/null || return 1\n'
+uq_new=$'  l=${l#*\t}; l=${l#*\t}; l=${l%%\t*}\n'
+printf '%s\n' "${uq_src/"$uq_cut"/"$uq_new"}" >"$uq_copy/unchecked.sh"
+same "DPR49 the scratch copies carry their staged lines" \
+  "$(grep -c '^                    elif false; then$' "$uq_copy/nostatus.sh") $(grep -c 'cat-file -e "$l^{commit}"' "$uq_copy/unchecked.sh")" "1 0"
+write_lease_fixture
+uq_out=$(run_offer_arm "$LF/c1" daily-agent - status build tFix); uq_rc=$?
+same "DPR49 AC28 with no session, --lease status exits 0 and prints one lease line" "$uq_rc $(printf '%s\n' "$uq_out" | grep -c '^lease — ')" "0 1"
+uq_out=$(SCRIPT="$uq_copy/nostatus.sh" run_offer_arm "$LF/c1" daily-agent - status build tFix); uq_rc=$?
+same "DPR49 AC28 RED: a copy with the status branch cut meets the act check and exits 2" "$uq_rc $(printf '%s\n' "$uq_out" | grep -cF "not 'status'")" "2 1"
+for uq_drv in "$SCRIPT" "$uq_copy/unchecked.sh"; do
+  for uq_v in absent three readable; do
+    write_lease_fixture
+    SCRIPT=$uq_drv run_lease_arm acquire build tOn >/dev/null
+    mv "$LF/origin.git" "$LF/away.git"
+    SCRIPT=$uq_drv run_lease_arm acquire build tOff >/dev/null
+    case "$uq_v" in
+      absent) awk -F'\t' -v OFS='\t' '$1 == "refs/gov/leases/tOff/build" { $3 = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" } { print }' "$uq_q" >"$uq_q.t" && mv "$uq_q.t" "$uq_q" ;;
+      three) awk -F'\t' -v OFS='\t' '$1 == "refs/gov/leases/tOff/build" { print $1, $2, $3; next } { print }' "$uq_q" >"$uq_q.t" && mv "$uq_q.t" "$uq_q" ;;
+    esac
+    uq_b=$(git hash-object "$uq_q")
+    uq_out=$(SCRIPT=$uq_drv run_lease_arm release build tOff --as withdrawn); uq_rc=$?
+    uq_r="$uq_rc $(grep -c '' "$uq_q") $([ "$(git hash-object "$uq_q")" = "$uq_b" ] && echo unchanged || echo changed) $(printf '%s\n' "$uq_out" | grep -c 'queued commit unreadable; nothing queued$')"
+    case "$uq_drv:$uq_v" in
+      "$SCRIPT:absent") same "DPR49 AC26 a queued head naming an absent commit refuses: exit 2, the queue unchanged" "$uq_r" "2 1 unchanged 1" ;;
+      "$SCRIPT:three") same "DPR49 AC26 a queued head cut to three fields refuses: exit 2, the queue unchanged" "$uq_r" "2 1 unchanged 1" ;;
+      "$SCRIPT:readable") same "DPR49 AC26 control: over a readable head the release queues one line" "$uq_r" "0 2 changed 0" ;;
+      *:absent) same "DPR49 AC26 RED: the unchecked head chains on the absent commit's empty record and is refused" "$uq_r" "1 1 unchanged 0" ;;
+      *:three) same "DPR49 AC26 RED: the unchecked head chains on the cut line and queues" "$uq_r" "0 2 changed 0" ;;
+    esac
+    mv "$LF/away.git" "$LF/origin.git"
+  done
+done
+rm -rf "$LF" "$uq_copy"
 fi   # ---- region 8 continues below, past a seam of its own for the block above
 if in_shard 8; then
 
@@ -21064,8 +21170,8 @@ if in_shard 8; then
 # `live-holder`, not `no session`, and one whose default arm is exempt reads `seize` past the gate; a
 # copy refusing every `--lease` act with no session at the verb's dispatch reds AC1, AC2 and AC3, the
 # base driver AC2 alone, since its prune and fence run outside `run_lease_verb`. Waived by README rule
-# 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: `status`, which no act dispatch
-# reaches until TOOL-dPlacedRequest-34 mints it.
+# 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE: `status`, whose id-less read the
+# TOOL-dPlacedRequest-49 block drives (AC28).
 # ==================================================================================================
 LF=$(mktemp -d); LF_GIT=$(command -v git); write_lease_fixture
 il_out=$(run_offer_arm "$LF/c1" daily-agent - fence build tFix); il_rc=$?
@@ -23412,7 +23518,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3995 -> 4003 by TOOL-dPlacedRequest-48: the placed-race block's 8 region-eight assertions (5
 # `same` and 3 `hit`, no loop), off the diff's own lines; no skip branch. No suite ran, and its
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=4003
+# RAISED 4003 -> 4024 by TOOL-dPlacedRequest-49: 21 region-eight assertions, off the diff's own lines:
+# 13 in the contained-append block (7 `same` for AC5 and AC6 and 6 `mutate` staging their copies,
+# the AC5 loop's two plants among them) and 8 `same` in the new block (AC28's 2, AC26's 5 of its 6
+# loop passes, and its staged-copy row); no skip branch. No suite ran, and its RED-first observation
+# is the close's.
+FLOOR_ASSERTIONS=4024
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23688,7 +23799,8 @@ FLOOR_SHARD_7=311
 # RAISED 1184 -> 1189 by TOOL-dPlacedRequest-47: the same 5 region-eight sighted-guard assertions, see FLOOR_ASSERTIONS.
 # RAISED 1189 -> 1214 by TOOL-dPlacedRequest-43: the same 25 region-eight minors executions, see FLOOR_ASSERTIONS.
 # RAISED 1214 -> 1222 by TOOL-dPlacedRequest-48: the same 8 region-eight placed-race assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1222
+# RAISED 1222 -> 1243 by TOOL-dPlacedRequest-49: the same 21 region-eight lock-order, queued-head and status assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1243
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

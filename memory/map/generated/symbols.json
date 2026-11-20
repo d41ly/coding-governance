@@ -20818,6 +20818,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_feed_carriers",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "read_feed_lease_tip",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

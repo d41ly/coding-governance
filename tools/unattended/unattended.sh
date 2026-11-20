@@ -3026,12 +3026,20 @@ remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref'
 # THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
 # feed's log and the offline queue's, is read and written only under a lock directory beside it in
 # the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
-# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold:
-# a pinned literal, because a holder does local file work alone and never pushes while it holds.
+# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold,
+# a pinned literal over every section it covers (TOOL-dPlacedRequest-49 S33): the feed append,
+# `add_feed_event`; the queue's append, `add_gov_queue`, and its flush's two file passes,
+# `write_gov_queue`, which pushes with no lock held; the offline write's hold through
+# `write_gov_queue_hold`, from its read of the queue through its append, which builds the commit but
+# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The longest is the
+# offline write's hold, measured once on node d on 2026-11-20 over the lease fixture:
+# 1.412 s, PINNED, under this bound.
 NODE_LOCK_BOUND=10
 # THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
 # block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
-# lock with `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# lock with `mkdir`, sets `_fl_mine=1` in the caller's shell, then writes the caller's token into
+# `owner` and only then its deadline into `until` (TOOL-dPlacedRequest-49 S5), so a taken lock always
+# carries the token `remove_dir_lock` matches, even where an abort stops the take. A lock it cannot
 # make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
 # or none and a directory older than two minutes - and only by the writer that takes the guard
 # `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
@@ -3126,8 +3134,9 @@ write_dir_lock() { # lock dir · owner token · seconds it may hold · health-ev
     mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
     broke=1
   fi
-  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
+  _fl_mine=1
   printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
   if [ -n "$broke" ]; then
     rmdir "$g" 2>/dev/null
     add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"
@@ -3163,12 +3172,15 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # returns 0, as the health log's appender does: the governance write already landed.
 # THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
 # in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
-# `EXIT` trap, armed once the lock is taken, calls `remove_dir_lock` with this call's token. So an
-# abort inside it, an unbound name under a carrier's `set -u`, a function no carrier defines or a
-# failed write, ends the subshell alone: the append prints `feed: NOTE - <ref>: the append exited
-# <rc>` and returns 0, and no lock is left for the next writer to wait out. The subshell sets no
-# global a caller reads. WHAT THIS DOES NOT CHECK: an abort between the take and the trap's arming
-# leaves the lock to its deadline; an abort after the line is written reads as a NOTE all the same.
+# `EXIT` trap is armed BEFORE the take (TOOL-dPlacedRequest-49 S6) and acts only once `write_dir_lock`
+# has set `_fl_mine`, which the subshell empties first: it then clears the lock directory where its
+# `owner` is absent or reads this call's token. So an abort anywhere after the `mkdir`, an unbound
+# name under a carrier's `set -u`, a function no carrier defines or a failed write, ends the subshell
+# alone: the append prints `feed: NOTE - <ref>: the append exited <rc>` and returns 0, and no lock is
+# left for the next writer to wait out; a busy take, exit 3, finds the flag empty and leaves the
+# holder's lock. The subshell sets no global a caller reads. WHAT THIS DOES NOT CHECK: a holder that
+# outlives its deadline can find, at its exit, a lock another writer broke and re-made but has not yet
+# stamped with its `owner`, and clears it; an abort after the line is written reads as a NOTE all the same.
 # THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
 # and this is the one take a carrier with no driver reaches, so where it is unset the append prints
 # one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
@@ -3202,8 +3214,9 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
   fi
   tok="$BASHPID.$RANDOM"
-  ( write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
-    trap 'remove_dir_lock "$d/gov-feed.lock" "$tok"' EXIT
+  ( _fl_mine=
+    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
+    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
     if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
         BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
         $2 == ev[1] { p = $4 "\t" $5 }
@@ -3923,9 +3936,20 @@ read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
 # yields with it, its own `yield` and `lease-yielded` event, since its expected tip never reached the
 # remote. WHAT THIS DOES NOT CHECK: an offline write that outlives the lock's own `NODE_LOCK_BOUND`,
 # whose hold a waiter may then break as stale.
-read_gov_queue_head() { # ref · queue file -> the ref's newest queued commit on stdout, nothing where none
+# THE HEAD IS READ WHOLE (TOOL-dPlacedRequest-49 S26): the ref's NEWEST line, whatever its commit
+# field, is the head. It must hold the four fields, a tip of `-` or 40 hex, a commit of 40 hex that
+# `cat-file -e` finds as a commit and a `queued-utc` stamp; any other line returns 1 with nothing
+# printed, so an offline write refuses rather than chaining on garbage, an older line or the cached
+# tip. `add_gov_queue`'s dedupe read ignores the return, so a head it cannot read never dedupes.
+read_gov_queue_head() { # ref · queue file -> the ref's newest queued commit on stdout and 0; nothing and 0 where none; nothing and 1 where the newest line is unreadable
+  local l rx=$'^\\+[^\t]+\t(-|[0-9a-f]{40})\t([0-9a-f]{40})\t[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$'
   [ -f "$2" ] || return 0
-  GQ_REF="$1" awk -F'\t' '{ sub(/\r$/, "") } $1 == ENVIRON["GQ_REF"] && $3 != "" { c = $3 } END { if (c != "") print c }' "$2" 2>/dev/null
+  l=$(GQ_REF="$1" awk -F'\t' '{ sub(/\r$/, "") } $1 == ENVIRON["GQ_REF"] { l = $0; n = 1 } END { if (n) print "+" l }' "$2" 2>/dev/null) || return 1
+  [ -n "$l" ] || return 0
+  [[ $l =~ $rx ]] || return 1
+  l=${BASH_REMATCH[2]}
+  GIT cat-file -e "$l^{commit}" 2>/dev/null || return 1
+  printf '%s\n' "$l"
   return 0
 }
 write_gov_queue_hold() { # -> 0 with GQ_HOLD and GQ_DIR, the queue's lock held; 1 the common dir does not resolve or the lock is busy
@@ -4167,7 +4191,10 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
       # THE CHAIN (TOOL-dPlacedRequest-41 S1): the hold spans the read of the ref's newest queued
       # commit, which stands for its cached tip, through the append.
       *) write_gov_queue_hold || { echo "lease not written — gov-queue.lock busy"; return 2; }
-         CL_QUEUED="$ref"$'\t'"$(read_gov_queue_head "$ref" "$GQ_DIR/gov-queue.log")"
+         # TOOL-dPlacedRequest-49 S26: a newest queued line it cannot read refuses, nothing appended.
+         hd=$(read_gov_queue_head "$ref" "$GQ_DIR/gov-queue.log") \
+           || { remove_gov_queue_hold; echo "lease not written — $tail · queued commit unreadable; nothing queued"; return 2; }
+         CL_QUEUED="$ref"$'\t'"$hd"
          read_claims cached; rc=$?; CL_QUEUED=""
          [ "$rc" = 0 ] || { remove_gov_queue_hold; echo "lease not written — $CL_WHY"; return 2; }
          WL_QUEUE=1 ;;

@@ -498,21 +498,40 @@ done <<<"$PARITY_ROWS"
 # ---- 2a. EVERY gov_feed_sh COPY RUNS ALONE (TOOL-dPlacedRequest-38 S1, S2) -------------------------
 # Parity holds each copy byte-identical to the canonical; a byte-identical copy still dies in a carrier
 # that lacks a name its body reads. So every file carrying the block, the canonical included, has its
-# cut sourced after the canonical `health_log_sh` cut in an empty environment under `set -u`, inside a
-# scratch repository: a fresh take of `gov-feed.lock` and its release, the break of a planted stale
-# lock and its release, and one `add_feed_event`. A call that exits non-zero, `unbound variable` or
+# cut sourced after the `health_log_sh` cut THAT CARRIER REACHES (TOOL-dPlacedRequest-49 S8): its own
+# inline block, else the block in the one sibling it sources by a column-0 `. "$KIT_DIR/<name>"` line,
+# as the driver sources `lib-unattended.sh`, and for the canonical `gov-feed.sh` the canonical
+# `health-log.sh` beside it; a carrier with none prints `<file>: no health_log_sh beside gov_feed_sh`.
+# The two cuts run in an empty environment under `set -u`, inside a scratch repository holding one
+# commit: a fresh take of `gov-feed.lock` and its release, the break of a planted stale lock and its
+# release, and one `add_feed_event` of that commit. A call that exits non-zero, `unbound variable` or
 # `command not found` on stderr (a `$( )` dies alone and its caller runs on), or a lock directory left
-# behind prints `<file>: <first stderr line>`. An empty population is its own red (S2).
+# behind prints `<file>: <first stderr line>`; and the append must grow the scratch common dir's
+# `gov-feed.log` by one line, else `<file>: add_feed_event appended <n> lines` (S20), since a
+# `feed: NOTE` line exits 0. An empty population is its own red (S2), and the population is read with
+# the parity loop's pathspec, the canonical kept in it (S32), so no record carrying the marker joins.
 # WHAT THIS DOES NOT CHECK: a name the block reads only on a path the five calls do not take, such as
-# the guard-cleared branch; carrier code outside the block; that the event reached the feed log, since
-# a `feed: NOTE` line exits 0.
+# the guard-cleared branch; carrier code outside the block; a sibling sourced by any other spelling.
+read_feed_carriers() { # -> every tracked file under the parity loop's pathspec carrying the gov_feed_sh block, one per line
+  git grep -l '^# >>> gov_feed_sh' -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md | tr -d '\r'
+}
 check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per copy that fails alone, rc 1; none, rc 0
-  local f rc e1 fc="$TMP/feed-copies" out=""
+  local f rc e1 hs s n fc="$TMP/feed-copies" out=""
   [ "$#" -gt 0 ] || { echo "no inline copy of 'gov_feed_sh' found — the carrier arm would be judging an empty population"; return 1; }
-  mkdir -p "$fc"; blk health_log_sh "$HERE/health-log.sh" > "$fc/health.cut"
+  mkdir -p "$fc"
   for f in "$@"; do
     rm -rf "$fc/run"; mkdir -p "$fc/run"
     blk gov_feed_sh "$f" > "$fc/feed.cut"
+    hs=""
+    if grep -q '^# >>> health_log_sh' "$f"; then hs=$f
+    elif [ "$f" -ef "$HERE/gov-feed.sh" ]; then hs=$HERE/health-log.sh
+    else
+      s=$(awk '/^\. "\$KIT_DIR\/[^"\/]+"[ \t]*$/ { s = $0; sub(/^\. "\$KIT_DIR\//, "", s); sub(/".*$/, "", s); print s; exit }' "$f")
+      case "$f" in */*) s="${f%/*}/$s" ;; *) s="./$s" ;; esac
+      [ "${s##*/}" = "" ] || ! grep -q '^# >>> health_log_sh' "$s" 2>/dev/null || hs=$s
+    fi
+    [ -n "$hs" ] || { out="$out$f: no health_log_sh beside gov_feed_sh"$'\n'; continue; }
+    blk health_log_sh "$hs" > "$fc/health.cut"
     (unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; cd "$fc/run" && git init -q . \
       && git -c user.name=t -c user.email=t@x -c commit.gpgsign=false -c core.hooksPath="$fc/no-hooks" \
          commit -q --no-verify --allow-empty -m feed) >/dev/null 2>&1 || { out="$out$f: the scratch repository could not be made"$'\n'; continue; }
@@ -530,21 +549,31 @@ check_feed_copies() { # carrier file… -> `<file>: <first stderr line>` per cop
       out="$out$f: ${e1:-exited $rc}"$'\n'
     elif [ -e "$fc/run/.git/gov-feed.lock" ] || [ -e "$fc/run/.git/gov-feed.lock.break" ]; then
       out="$out$f: a gov-feed.lock directory remains after the calls"$'\n'
+    else
+      n=0; [ ! -f "$fc/run/.git/gov-feed.log" ] || n=$(grep -c '' "$fc/run/.git/gov-feed.log")
+      [ "$n" = 1 ] || out="$out$f: add_feed_event appended $n lines"$'\n'
     fi
   done
   [ -z "$out" ] && return 0
   printf '%s' "$out"; return 1
 }
-write_feed_plant() { # from line · to line · out file -> the canonical cut with that one line replaced; rc 1 when no line matched
-  blk gov_feed_sh "$HERE/gov-feed.sh" | awk -v from="$1" -v to="$2" '$0 == from { $0 = to; hit = 1 } { print } END { exit !hit }' > "$3"
+# A plant is a carrier of its own: the canonical `health_log_sh` cut, then the canonical `gov_feed_sh`
+# cut with one line replaced, so the S8 lookup finds its appender inline.
+write_feed_plant() { # from line · to line · out file -> the plant written; rc 1 when no line matched
+  { blk health_log_sh "$HERE/health-log.sh"
+    blk gov_feed_sh "$HERE/gov-feed.sh" | awk -v from="$1" -v to="$2" '$0 == from { $0 = to; hit = 1 } { print } END { exit !hit }'; } > "$3"
 }
-mapfile -t fc_pop < <(cd "$ROOT" && git grep -l '^# >>> gov_feed_sh' | tr -d '\r')
+mapfile -t fc_pop < <(cd "$ROOT" && read_feed_carriers)
 fc_got=$(cd "$ROOT" && check_feed_copies "${fc_pop[@]}"); fc_rc=$?
 { [ "$fc_rc" = 0 ] && [ -z "$fc_got" ]; } || bad "a gov_feed_sh copy fails run alone under set -u: ${fc_got//$'\n'/ | }"; ok
 # ...and each red FIRES on a plant: the bound reading the driver's REMOTE_BOUND (AC1), the base's bare
 # `$ROOT` inside a `$( )` that exits 0, a release through no command, a release that is no call, and
 # an empty population (AC3). Each plant reds when its line is not in the canonical, so none is a no-op.
-# The two release plants edit the append's EXIT trap, its one release since TOOL-dPlacedRequest-39.
+# The two release plants edit the append's EXIT trap, its one release since TOOL-dPlacedRequest-39,
+# armed before the take since TOOL-dPlacedRequest-49 S6. TOOL-dPlacedRequest-49 adds three: a carrier
+# holding the block with no appender inline and no sibling sourced (AC8), an append that skips quietly
+# where `ROOT` is unset, on the line after the trap, so only the line count reds it (AC20), and a
+# scratch repository whose Markdown record carries the marker, which the population leaves out (AC32).
 fp="$TMP/feed-plants"; mkdir -p "$fp"
 write_feed_plant 'NODE_LOCK_BOUND=10' 'NODE_LOCK_BOUND=$(( REMOTE_BOUND + 10 ))' "$fp/bound.sh" || bad "the bound plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/bound.sh"); fc_rc=$?
@@ -553,13 +582,23 @@ write_feed_plant '    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")
   '    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"' "$fp/root.sh" || bad "the ROOT plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/root.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/root.sh: "*"ROOT: unbound variable") ok ;; *) bad "the carrier arm passed a copy whose break reads an unset ROOT (rc $fc_rc): $fc_got" ;; esac
-fc_rel=$'    trap \'remove_dir_lock "$d/gov-feed.lock" "$tok"\' EXIT'
+fc_rel=$'    trap \'[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }\' EXIT'
 write_feed_plant "$fc_rel" "${fc_rel/remove_dir_lock/release_feed_lock}" "$fp/cmd.sh" || bad "the command plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/cmd.sh"); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|$fp/cmd.sh: "*"command not found") ok ;; *) bad "the carrier arm passed a copy that calls no command (rc $fc_rc): $fc_got" ;; esac
 write_feed_plant "$fc_rel" '    :' "$fp/held.sh" || bad "the release plant matched no line of the canonical gov_feed_sh"; ok
 fc_got=$(check_feed_copies "$fp/held.sh"); fc_rc=$?
 [ "$fc_rc|$fc_got" = "1|$fp/held.sh: a gov-feed.lock directory remains after the calls" ] || bad "the carrier arm passed a copy that leaves its lock (rc $fc_rc): $fc_got"; ok
+blk gov_feed_sh "$HERE/gov-feed.sh" > "$fp/bare.sh"
+fc_got=$(check_feed_copies "$fp/bare.sh"); fc_rc=$?
+[ "$fc_rc|$fc_got" = "1|$fp/bare.sh: no health_log_sh beside gov_feed_sh" ] || bad "the carrier arm passed a carrier with no appender it reaches (rc $fc_rc): $fc_got"; ok
+fc_take='    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3'
+write_feed_plant "$fc_take" "    [ -n \"\${ROOT:-}\" ] || exit 0; ${fc_take#    }" "$fp/rootless.sh" || bad "the ROOT-skip plant matched no line of the canonical gov_feed_sh"; ok
+fc_got=$(check_feed_copies "$fp/rootless.sh"); fc_rc=$?
+[ "$fc_rc|$fc_got" = "1|$fp/rootless.sh: add_feed_event appended 0 lines" ] || bad "the carrier arm passed a copy whose append never writes (rc $fc_rc): $fc_got"; ok
+mkdir -p "$fp/pop" && printf '# >>> gov_feed_sh\n' > "$fp/pop/a.sh" && printf '# >>> gov_feed_sh\n' > "$fp/pop/notes.md"
+fc_got=$(unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; cd "$fp/pop" && git init -q . && git add a.sh notes.md && read_feed_carriers)
+[ "$fc_got" = a.sh ] || bad "the carrier population read a Markdown record carrying the marker: ${fc_got//$'\n'/ | }"; ok
 fc_got=$(check_feed_copies); fc_rc=$?
 case "$fc_rc|$fc_got" in "1|no inline copy of 'gov_feed_sh'"*) ok ;; *) bad "the carrier arm read an empty population as a pass (rc $fc_rc): $fc_got" ;; esac
 # ...and its two guards: a scratch repository git cannot make, and a plant line in no canonical.

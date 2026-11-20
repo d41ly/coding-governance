@@ -525,7 +525,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `lease not written — <why>` (exit 2: no session, `CLAUDE_CODE_SESSION_ID` unset, empty or
   `absent`, at a holder act, `acquire`, `take-over`, `renew`, `release` or `offer`, before any read,
   while `flush`, `prune` and `fence` run with no session; a bad segment, a level `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
-  that records no transition and is no open question). An acquisition runs the overlap probe first.
+  that records no transition and is no open question, or an offline write whose ref's newest queued
+  line is no readable queued commit, `<tail> · queued commit unreadable; nothing queued`, nothing
+  queued). An acquisition runs the overlap probe first.
   An acquisition of a request lease first reads `refs/gov/requests/<content key>` alone, one bounded
   `ls-remote` that fetches nothing: a remote holding no such record refuses it `no-record` (exit 1)
   and writes nothing, and a read that does not answer is `lease not written` (exit 2). Its record
