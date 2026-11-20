@@ -3793,12 +3793,12 @@ def run_gate_health_fixture(case: str) -> int:
         (repo / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
         (repo / "memory" / "builds" / build).mkdir(parents=True)
 
-        def plant(k, rows):
+        def write_flake(k, rows):
             return br.write_record(repo, build, unit, "flake", f"run fx-{k:02d}",
                                    [("Run", f"fx-{k:02d}"), ("Ended", f"2026-{1 + k // 28:02d}-{1 + k % 28:02d}T00:00:00Z"),
                                     ("Sha", "-"), ("Tree", "-"), ("Legs", str(len(rows)))],
                                    lines=["```tsv", *rows, "```"])
-        planted = [plant(k, [f"{leg}\t1\t0" if k in flaked.get(leg, ()) else f"{leg}\t0\t-" for leg in legs])
+        planted = [write_flake(k, [f"{leg}\t1\t0" if k in flaked.get(leg, ()) else f"{leg}\t0\t-" for leg in legs])
                    for k in range(30)]
         for args in (("init", "-q"), ("add", "-A")):
             subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, check=True)
@@ -3812,10 +3812,10 @@ def run_gate_health_fixture(case: str) -> int:
             out.extend(f"{case}: stderr · {ln}" for ln in p.stderr.splitlines() if ln.strip())
             return p.returncode, said
 
-        def written():
+        def read_health_records():
             return sorted(repo.joinpath("memory", "builds", build, "build").glob("*-gate-health-*.md"))
 
-        def drop_row(leg):
+        def remove_row(leg):
             newest = repo / planted[-1]
             newest.write_text(newest.read_text(encoding="utf-8").replace(f"{leg}\t0\t-\n", ""),
                               encoding="utf-8", newline="\n")
@@ -3834,16 +3834,16 @@ def run_gate_health_fixture(case: str) -> int:
             if rc != 0 or said != want:
                 bad.append(f"lower read rc {rc} {said}, planted {want}")
         elif case == "short":
-            drop_row("leg 03")
+            remove_row("leg 03")
             rc, said = run_mode(*write)
             want = [f"{head}unarmed · leg 03 29/30"]
-            if rc != 0 or said != want or written():
-                bad.append(f"short read rc {rc} {said} writing {len(written())} record(s), planted {want} and none")
+            if rc != 0 or said != want or read_health_records():
+                bad.append(f"short read rc {rc} {said} writing {len(read_health_records())} record(s), planted {want} and none")
         else:
             rc, said = run_mode(*write)
             name = f"memory/builds/{build}/build/{datetime.date.today().isoformat()}-build-{unit}-gate-health-1.md"
             want = [f"{head}measured 4/10 · legs 10/10 · verdicts {runs}", f"drift-report: wrote {name}"]
-            if rc != 0 or said != want or [p.relative_to(repo).as_posix() for p in written()] != [name]:
+            if rc != 0 or said != want or [p.relative_to(repo).as_posix() for p in read_health_records()] != [name]:
                 bad.append(f"armed --write read rc {rc} {said}, planted {want} and that one record")
             else:
                 p = subprocess.run([sys.executable, str(repo / "memory-tree" / "build_records.py"), "read",
@@ -3854,14 +3854,14 @@ def run_gate_health_fixture(case: str) -> int:
                 if p.returncode != 0 or not all(f in p.stdout for f in fields):
                     bad.append(f"the factory's read of {name} exited {p.returncode}, wanting {fields}: {p.stdout[:300]}")
             rc, said = run_mode(*write, "--with", "gate-legs.json")
-            if rc != 2 or len(written()) != 1:
-                bad.append(f"--with naming no flake record exited {rc} with {len(written())} record(s), planted 2 and one")
-            drop_row("leg 03")
+            if rc != 2 or len(read_health_records()) != 1:
+                bad.append(f"--with naming no flake record exited {rc} with {len(read_health_records())} record(s), planted 2 and one")
+            remove_row("leg 03")
             rc, said = run_mode(*write)
-            if rc != 0 or said != [f"{head}unarmed · leg 03 29/30"] or len(written()) != 1:
-                bad.append(f"one row deleted, --write read rc {rc} {said} with {len(written())} record(s), planted "
+            if rc != 0 or said != [f"{head}unarmed · leg 03 29/30"] or len(read_health_records()) != 1:
+                bad.append(f"one row deleted, --write read rc {rc} {said} with {len(read_health_records())} record(s), planted "
                            f"unarmed and one")
-            extra = plant(30, ["leg 03\t0\t-"])
+            extra = write_flake(30, ["leg 03\t0\t-"])
             rc, said = run_mode("--with", extra)
             if rc != 0 or said != [f"{head}measured 4/10 · legs 10/10 · verdicts {runs} fx-30"]:
                 bad.append(f"--with naming the unstaged thirtieth verdict read rc {rc} {said}, planted it armed")
