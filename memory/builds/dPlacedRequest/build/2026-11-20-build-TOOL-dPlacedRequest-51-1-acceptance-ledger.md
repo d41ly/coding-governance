@@ -21,10 +21,10 @@ a detached `--no-ff` merge of the branch onto main with the subject
 - AC1 — `--first-parent --no-merges <base>..HEAD` — `grep -cF -e` over the record printed 1, and before the edit it printed 0, the red the criterion names. (DERIVED)
 - AC1 — `--first-parent -p <base>..HEAD` — `grep -cF -e` over the record printed 1, and its row reads `yes, the whole branch diff, attributed to the merge`. (DERIVED)
 - AC1 — `--no-merges HEAD^1..HEAD^2` — `grep -cF -e` over the record printed 1. (DERIVED)
-- AC2 — `git log --first-parent --no-merges --format=%s <base>..HEAD` on the fixture's merge listed `m1` alone, the default-branch commit. (PINNED)
-- AC2 — `git log --first-parent -p <base>..HEAD` printed `-KIT_UNATTENDED_VERSION=1.110` and `+KIT_UNATTENDED_VERSION=1.111` under the merge, and `--name-status` printed `A b2` and `M tools/unattended/unattended.sh` there. (PINNED)
-- AC2 — `git log --no-merges --format=%s HEAD^1..HEAD^2` listed `b2` and `bump`, the 2 branch commits. (PINNED)
 - AC2 — `grep -c '^Measured 2026-11-20'` over the record printed 1. (DERIVED)
+- AC2 — `KIT_UNATTENDED_VERSION` — `git log --first-parent -p <base>..HEAD` on the fixture's merge printed `-KIT_UNATTENDED_VERSION=1.110` and `+KIT_UNATTENDED_VERSION=1.111` under the merge, and `--name-status` printed `A b2` and `M tools/unattended/unattended.sh` there. (PINNED)
+- AC2 — `git log --first-parent --no-merges --format=%s <base>..HEAD` on the fixture's merge listed `m1` alone, the default-branch commit. (PINNED)
+- AC2 — `git log --no-merges --format=%s HEAD^1..HEAD^2` listed `b2` and `bump`, the 2 branch commits. (PINNED)
 
 ## Readings beside the criteria
 
