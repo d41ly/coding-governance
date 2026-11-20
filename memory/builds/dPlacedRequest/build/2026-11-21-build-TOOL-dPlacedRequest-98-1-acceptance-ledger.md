@@ -73,6 +73,8 @@ reads the pin from the `FLOOR_ASSERTIONS=` line, and evaluates the cut with `n` 
 - It selected `an-attested-count-must-count-what-the-grader-counts` and `insert-after-a-key-that-occurs-twice`: no `ok` sits in a subshell, a pipe or a helper called more than once, and `FLOOR_ASSERTIONS` is assigned on one line only. (DERIVED)
 - It selected `ledger-token-wrapped-across-a-line-joins-nothing` and `empty-field-collapses-unless-it-is-last`: every answer keeps its tokens on one line, and the budget row keeps its empty third field between two tabs, as before. (DERIVED)
 
+- Both probes re-ran over a fresh scratch worktree of the committed tip `190aaad26`, its suite blob `31a8fa373`, the registry edited as above: the fixture returned 0 with `fleet-tag:` reading `a`, and the floor probe printed the `FAIL` line under `skipped=0` and `floor not compared` under `skipped=1`. (DERIVED)
+
 ## Items diverged
 
 None.

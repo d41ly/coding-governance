@@ -558,3 +558,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T22:14:42Z draw · re-dispatch · TOOL-dPlacedRequest-98 · 74/130 · 20261120T221442Z-59d479
 
 2026-11-20T22:14:42Z dispatch · item 6d4c35b4 TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md memory/gotchas/INDEX.md
+2026-11-20T22:21:17Z draw · fix-pass · TOOL-dPlacedRequest-98 · 75/130 · 20261120T222117Z-bf2b20
+
+2026-11-20T22:21:17Z dispatch · item 190aaad2 TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md memory/gotchas/INDEX.md
