@@ -324,7 +324,7 @@ out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$
 printf '%s\n' "$FLOOR" > "$FC/$KIT_REL/python-floor.txt"
 printf 'def f(:\n' > "$FC/b.py"; git -C "$FC" add -A
 out=$(cd "$FC" && "$REALPY" -I "$KIT_REL/python_floor.py" census 2>&1); out_rc=$?; out=${out//$'\r'/}
-{ [ "$out_rc" = 1 ] && [[ $out == *"b.py:1:"*"does not compile at the floor $FLOOR"* ]]; } \
+{ [ "$out_rc" = 1 ] && [[ $out == *"b.py"":1:"*"does not compile at the floor $FLOOR"* ]]; } \
   || bad "a tracked file that does not compile at the floor was not named: rc=$out_rc $out"; ok
 git -C "$FC" rm -q --cached b.py; rm "$FC/b.py"
 printf 'from locale import getdefaultlocale\n' > "$FC/c.py"; git -C "$FC" add -A

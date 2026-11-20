@@ -1826,22 +1826,22 @@ def run_selftest() -> int:
          (len(drift), drift[0].endswith(drift_sites) if drift else False), (1, True), say=True)
 
     # THE PORTABILITY MODES (TOOL-dWitnessedBar-24): each planted site, and its nearest innocent twin.
-    def lines_of(found: dict[str, list[tuple[int, str]]]) -> dict[str, list[int]]:
+    def read_finding_lines(found: dict[str, list[tuple[int, str]]]) -> dict[str, list[int]]:
         return {key: [line for line, _c in sites] for key, sites in found.items() if sites}
 
     test("path [planted] a backslashed drive path handed to cd is one site",
-         lines_of(scan_path_literal_file("cd C:\\Users\\x\n")), {"backslash-path": [1]}, say=True)
+         read_finding_lines(scan_path_literal_file("cd C:\\Users\\x\n")), {"backslash-path": [1]}, say=True)
     test("path [twin] the forward-slashed path, and the backslashed one in a comment, are none",
-         lines_of(scan_path_literal_file("cd /c/Users/x\n# cd C:\\Users\\x\ncd /tmp  # C:\\x\n")), {}, say=True)
+         read_finding_lines(scan_path_literal_file("cd /c/Users/x\n# cd C:\\Users\\x\ncd /tmp  # C:\\x\n")), {}, say=True)
     test("path [heredoc] a quoted heredoc's body is data and never a site",
-         lines_of(scan_path_literal_file("cat <<'EOF'\nC:\\Users\\x\nEOF\n")), {}, say=True)
+         read_finding_lines(scan_path_literal_file("cat <<'EOF'\nC:\\Users\\x\nEOF\n")), {}, say=True)
     test("quoting [planted] a heredoc writing gen.sh and a tab-IFS read are one site each",
-         lines_of(scan_quoting_file("cat > gen.sh <<EOF\nx\nEOF\nwhile IFS=$'\\t' read -r a b; do :; done\n")),
+         read_finding_lines(scan_quoting_file("cat > gen.sh <<EOF\nx\nEOF\nwhile IFS=$'\\t' read -r a b; do :; done\n")),
          {"heredoc-source": [1], "tab-ifs-read": [4]}, say=True)
     test("quoting [planted] the target after the heredoc and a quoted .py target are sites too",
-         lines_of(scan_quoting_file("cat <<'EOF' >> \"$d/x.py\"\nx\nEOF\n")), {"heredoc-source": [1]}, say=True)
+         read_finding_lines(scan_quoting_file("cat <<'EOF' >> \"$d/x.py\"\nx\nEOF\n")), {"heredoc-source": [1]}, say=True)
     test("quoting [twin] a quoted heredoc writing notes.txt, a stderr redirect and a here-string are none",
-         lines_of(scan_quoting_file("cat > notes.txt <<'EOF'\nx\nEOF\ncat <<EOF 2>x.sh\nEOF\n"
+         read_finding_lines(scan_quoting_file("cat > notes.txt <<'EOF'\nx\nEOF\ncat <<EOF 2>x.sh\nEOF\n"
                                     "read -r a <<< \"$x\" > y.sh\nIFS=, read -r a b\n")), {}, say=True)
     test("role [count] a blank line, a comment and the shebang are no code line",
          measure_code_lines("#!/bin/bash\n\n  # note\necho a  # tail\n  b\n"), 2, say=True)
