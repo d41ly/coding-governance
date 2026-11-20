@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-5 — held legs by policy
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0343@3d7be760 whole
 **Carries:** node:item.test.select
@@ -18,6 +18,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-5-deviation-51.md](../build/2026-10-25-build-TOOL-dWitnessedBar-5-deviation-51.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief.md) | journal | TOOL-dWitnessedBar-23 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -34,35 +35,48 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
 ## 2. Scope (IN)
 
 - **S1** — One hold predicate: `derive_hold_source <leg index>` in `tools/run-gates/run-gates.sh`
-  sets `HOLD_SRC` to a held-source word or empty, and the three spellings at `:2982`, `:3129` and
-  `:5429` call it. The words are a closed list, `HOLD_SOURCES="kit quarantine level"` (shared
-  interface I11, with `level` added by §8 F1): `kit` is derived by the runner from the row, as today;
-  `quarantine` and `level` come only from the selection record. Observed by AC1.
+  sets `HOLD_SRC` to a held-source word or empty, and the three spellings at
+  tools/run-gates/run-gates.sh@5119eed3:3146, tools/run-gates/run-gates.sh@5119eed3:3303 and
+  tools/run-gates/run-gates.sh@5119eed3:5618 call it. The words are a closed list,
+  `HOLD_SOURCES="kit quarantine level"` (shared interface I11, with `level` added by §8 F1): `kit`
+  is derived by the runner from the row, as today; `quarantine` and `level` come only from the
+  selection record. Observed by AC1.
 - **S2** — The selection record (`record-kind.selection`): `GATE_SELECTION=<path>`, read once and
   unset as `GATE_ATTRIBUTE` is, names a TAB file of `held` rows, `held · <leg name> · <source> ·
   <note>`; the runner holds each named leg whose source is `quarantine` or `level`, prints and
   ignores a row whose source is outside them or whose leg the manifest lacks (ignoring a hold runs
   the leg, the safe direction), and copies the file into the run record as `<run dir>/selection`.
   Observed by AC2.
-- **S3** — One held line: `GATE held  <leg>  (<source>, <note>)`, the kit tails becoming `(kit, set
-  GATE_SELFTESTS=1 to run)` and `(kit, unchanged since <sha8>)`, a quarantined leg `(quarantine,
-  <note>)` and a level-held leg `(level <level>, <note>)`; the summary's held note
-  (`run-gates.sh:5293`) counts by source. Observed by AC3.
-  **Readers:** by name: `tools/run-gates/run-gates.test.sh` (its `(self-test, unchanged since` and
-  `(self-test, set GATE_SELFTESTS=1 to run)` patterns) and `tools/run-gates/README.md:112` ·
-  by value: NO VALUE READERS — every other reader (`tools/run-gates/kit.toml:209`,
-  `tools/run-gates/profile_bar.test.sh:363`, `tools/govkit/selftest.py:15633-15636`) matches the
-  `GATE held  ` prefix only, which is unchanged.
-- **S4** — Held results in the verdict record (shared interface I8): one `held.<n>` key per held leg,
-  `<n>` an index from 1, its value `<leg name> · <source> · <result>`, the result `unrun` for a leg
-  the bar did not execute and `ok` or `fail` for one it executed without counting it (the mode
-  `TOOL-dWitnessedBar-30` adds); the `held` count key is unchanged. Observed by AC4.
+- **S3** — One held line: `GATE held  <leg>  (<source>, <note>)`, the kit tails becoming
+  `(kit, set GATE_SELFTESTS=1 to run)` and `(kit, unchanged since <sha8>)`, a quarantined leg
+  `(quarantine, <note>)` and a level-held leg `(level <level>, <note>)`; the summary's held note
+  (tools/run-gates/run-gates.sh@5119eed3:5482) counts by source. Observed by AC3.
+  **Readers:** by name: `tools/run-gates/run-gates.test.sh` (its `(self-test, unchanged since`
+  pattern, in the checks of the `changed` selection) and `tools/run-gates/README.md` (its `changed`
+  section's held line); the `(self-test, set GATE_SELFTESTS=1 to run)` tail is spelled by the
+  runner alone ·
+  by value: NO VALUE READERS — every other reader matches the `GATE held  ` prefix only, which is
+  unchanged: the run-gates descriptor's `observed_held` (tools/run-gates/kit.toml@1ad6398f:321), the
+  profile fixture line (tools/run-gates/profile_bar.test.sh@5ad0d75b:363) and govkit's planted bar
+  (tools/govkit/selftest.py@6da1d6ee:18980-18983), whose fixtures print a `(kit self-test, …)` tail
+  of their own.
+- **S4** — Held results in the verdict record (shared interface I8): one `held.<n>` key per held
+  leg, `<n>` an index from 1, its value `<leg name> · <source> · <result>`, the result `unrun` for a
+  leg the bar did not execute and `ok` or `fail` for one it executed without counting it (the mode
+  `TOOL-dWitnessedBar-30` adds); the `held` count key is unchanged. The runner writes that count in
+  each of its verdict writers, the wall breach's, the all-held refusal's and the final one
+  (tools/run-gates/run-gates.sh@5119eed3:5554, tools/run-gates/run-gates.sh@5119eed3:5583,
+  tools/run-gates/run-gates.sh@5119eed3:5749), and each writes the `held.<n>` keys beside it.
+  Observed by AC4.
 - **S5** — `test.select`: `python tools/run-gates/verdict_flow.py select --rev <R> --out <path>`
   writes the selection record from inputs read at R and never from the working tree: a `level` row for
-  each manifest leg whose `level` (`TOOL-dWitnessedBar-9`) is outside `tests.landing-levels`, unless
+  each manifest leg whose `level` (`TOOL-dWitnessedBar-9`) is outside `tests.landing-levels`, none
+  where that key reads `every-declared`, unless
   `tests.without-cadence` reads `run-at-landing` while no cadence is installed; a row for each source
   in its `SELECT_SOURCES` table, which `TOOL-dWitnessedBar-8` extends with `quarantine`; and a header
-  naming the values it read. Observed by AC5.
+  naming the values it read. `verdict_flow.py` is not in the tree at HEAD `8a98c9cf`: unit 3, at
+  order 20, mints it with its `route` and `judge` verbs and its `--fixture` cases, and `select` is a
+  verb added to that file (§8 F4). Observed by AC5.
 - **S6** — `verdict.held` decides when a held leg runs, read at R through `policy.py get verdict.held
   --rev <R>`: `on-demand` holds at every bar unless `GATE_SELFTESTS` asks, as today;
   `push-selected` makes the pre-push hook export `GATE_SELFTESTS=changed` for its bar when the pusher
@@ -73,20 +87,24 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
 - **S7** — The selection's witness: `verdict_flow.py select --check --run <run dir> --rev <R>` exits 1
   when the run record's `selection` differs from a fresh derivation at R; the hook runs it before it
   admits a verdict whose run record holds a `selection`. Observed by AC5.
-- **S8** — gap-test-09's two remaining parts, the PowerShell scan being `TOOL-dWitnessedBar-24`'s S12.
-  (a) Every declaration the hold predicate's `kit` source selects, subject `kit` or chunk `selftests`,
-  carries a non-empty `guard`, or a descriptor-only `unguarded_why` holding the reason it runs whole
-  whenever `GATE_SELFTESTS` asks, never both: the arm `held guard` in the conformance table of
-  `tools/run-gates/leg_factory.py --conform` (`TOOL-dWitnessedBar-11` S4) refuses a held declaration
-  with neither, or with an empty reason, and its count line gains `<h> held · <u> unguarded`. The
-  eight held legs with no guard at `19d6aae6` each gain a guard or a reason; `held-halves selftest`
-  and `review-replay selftest` move the reason their comments already state
-  (`tools/run-gates/kit.toml:161-166`, `tools/workflows/kit.toml:161-163`) into the key. (b) The
-  typed figure at `tools/run-gates/README.md:98`, `43/43 legs passed (42 held: kit self-tests, …)`,
-  which the manifest's 71 held rows and the runner's own note (`run-gates.sh:5293`) both contradict,
-  becomes the summary line's shape with `<n>` placeholders and S3's per-source wording, and the
-  README names `leg_factory.py --conform`'s count line as where the held figure is read. Observed by
-  AC7.
+- **S8** — gap-test-09's two remaining parts, the PowerShell scan being `TOOL-dWitnessedBar-24`'s
+  S12. (a) Every declaration the hold predicate's `kit` source selects, subject `kit` or chunk
+  `selftests`, carries a non-empty `guard`, or a descriptor-only `unguarded_why` holding the reason
+  it runs whole whenever `GATE_SELFTESTS` asks, never both: the arm `held guard`, one more field arm
+  of `tools/run-gates/leg_factory.py#check_declarations`, which `--conform` runs
+  (`TOOL-dWitnessedBar-11` S4), refuses a held declaration with neither, or with an empty reason,
+  and the count line `run_conform` prints,
+  `legs: <n> declared · <c> claimed · <e> exempt · <p> enforces-pending`, gains
+  `· <h> held · <u> unguarded`. The 36 held legs with no guard at HEAD `8a98c9cf`, listed in §4
+  "Held legs guarded (S8)", each gain a guard or a reason; `held-halves selftest` and
+  `review-replay selftest` move the reason their comments already state
+  (tools/run-gates/kit.toml@1ad6398f:248-249, tools/workflows/kit.toml@0e164a5f:205-207) into the
+  key. (b) The typed figure in the run-gates README's held section (tools/run-gates/README.md:100),
+  `43/43 legs passed (42 held: kit self-tests, …)`, which the manifest's 101 held rows (PINNED
+  2026-11-20, §4) and the
+  runner's own note (tools/run-gates/run-gates.sh@5119eed3:5482) both contradict, becomes the
+  summary line's shape with `<n>` placeholders and S3's per-source wording, and the README names
+  `leg_factory.py --conform`'s count line as where the held figure is read. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -123,17 +141,36 @@ leg's history. Today the predicate "subject `kit` or chunk `selftests`" is spell
 
 ### Evidence
 
+Read at HEAD `8a98c9cf` with `git show HEAD:<path>`: `tools/run-gates/run-gates.sh` is modified in
+the working tree by unit 4's builder, and no line below is read from that copy.
+
 - The predicate `{ [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; }` is spelled at
-  `run-gates.sh:2982` (the `changed` selection), `:3129` (the hold, writing `ondemand` to the leg's
-  `.rc`) and `:5429` (the last-run record writer).
-- `report_one` prints `GATE held  <name>  (self-test, …)` (`:4038-4047`); the verdict record counts
-  `held` (`:5560`) and names no held leg; the summary note says "subject kit or chunk selftests"
-  (`:5293`).
-- `GATE_SELFTESTS=changed` selects held legs by their kit's shipped bytes (`:2950-2990`), and owner
-  ruling F1 keeps every push boundary from setting it (`tools/run-gates/README.md:108-111`).
-- The verdict record grammar is `<key>TAB<value>`, read by `read_record_keys` (`:2387`), whose
-  reader takes only the keys it names, so new keys are additive; an all-digit suffix is an index
-  (`tools/runlog/README.md:22`).
+  tools/run-gates/run-gates.sh@5119eed3:3146 (the `changed` selection),
+  tools/run-gates/run-gates.sh@5119eed3:3303 (the hold, writing `ondemand` to the leg's `.rc`) and
+  tools/run-gates/run-gates.sh@5119eed3:5618 (the last-run record writer), each at the top level of
+  the script and in no function.
+- `report_one` prints `GATE held  <name>  (self-test, …)` in two forms
+  (`tools/run-gates/run-gates.sh#report_one`); the verdict record counts `held` in each of its writers
+  (tools/run-gates/run-gates.sh@5119eed3:5554, tools/run-gates/run-gates.sh@5119eed3:5583,
+  tools/run-gates/run-gates.sh@5119eed3:5749) and names no held leg; the summary note says "subject
+  kit or chunk selftests" (tools/run-gates/run-gates.sh@5119eed3:5482).
+- `GATE_SELFTESTS=changed` selects held legs by their kit's shipped bytes
+  (tools/run-gates/run-gates.sh@5119eed3:3114-3154), and owner ruling F1 keeps every push boundary
+  from setting it (tools/run-gates/README.md:112-113).
+- Under `GATE_SELFTESTS=1` a held leg with a guard still skips when nothing it guards moved, and one
+  with none runs whole (tools/run-gates/run-gates.sh@5119eed3:3303-3320).
+- The verdict record grammar is `<key>TAB<value>`, read by `read_record_keys`
+  (`tools/run-gates/run-gates.sh#read_record_keys`), whose reader takes only the keys it names, so
+  new keys are additive; an all-digit suffix is an index (tools/runlog/README.md:22).
+- The leg factory's field arms are `check_declarations`, run by `--conform` in gov's tree and by the
+  adopter form `run_conform_adopter` where no govkit sits
+  (`tools/run-gates/leg_factory.py#run_conform`). A declaration key outside the manifest's key set
+  never reaches a rendered row (`tools/run-gates/leg_factory.py#render_rows`), which is what lets
+  `unguarded_why` stay descriptor-only.
+- `tests.landing-levels` admits `every-declared` beside its four levels, and `tests.without-cadence`
+  defaults to `run-at-landing` (`tools/policy/catalogue.toml`, their `[[key]]` rows, landed by
+  TOOL-dWitnessedBar-9). No manifest row carries `level` at HEAD (DERIVED by reading
+  `tools/gate-legs.json`), so `select` holds no leg by `level` in gov's tree until one does.
 - v2's `[policies]`: `verdict.held` values `peer-or-cadence`, `push-selected`, `on-demand`, default
   `on-demand` (v2:1272).
 
@@ -150,7 +187,8 @@ derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES) and HOLD
 ```
 
 `SEL_SRC` and `SEL_NOTE` are filled once from `GATE_SELECTION`, keyed by the leg's manifest index
-through its `name`, the join key of every name-keyed file (I2). The hold site at `:3129` holds a
+through its `name`, the join key of every name-keyed file (I2). The hold site
+(tools/run-gates/run-gates.sh@5119eed3:3303) holds a
 `kit` leg exactly as today; a `quarantine` or `level` leg is held whatever `GATE_SELFTESTS` says,
 because a request to run the kit class is not a request to run a flaky or deferred leg.
 
@@ -191,23 +229,42 @@ TAB or a newline, and `select` refuses to write a row whose leg name holds ` · 
 
 ### Held legs guarded (S8)
 
-The eight held legs with no guard at `19d6aae6`, measured as the manifest rows whose `subject` is
-`kit` or whose `chunk` is `selftests` and whose `guard` is absent or empty (71 held rows of 142, PINNED
-2026-10-25): `template size gate selftest` and `method-carriers self-test` and `roles adopter
-self-test` (`[[exempt_leg]]` rows of `tools/govkit/registry.toml`), `review-replay selftest`,
-`held-halves selftest`, `agent-cap restatement self-test`, `testsuite counts self-test` and `roles
-render selftest`. Under `GATE_SELFTESTS=1` a held leg with a guard still skips when nothing it guards
-moved (`run-gates.sh:3129-3146`), and one with none runs whole; the arm makes that choice a declared
-one. A guard is not free: it makes every live spec whose Files touched trips it name the leg, the cost
-`tools/workflows/kit.toml:161-163` records, so the pass picks per leg and writes the reason where it
-keeps none. `unguarded_why` is descriptor-only, as `history_depth` is, so it never reaches the
-manifest or an adopter.
+The held legs with no guard at HEAD `8a98c9cf`, measured as the manifest rows whose `subject` is
+`kit` or whose `chunk` is `selftests` and whose `guard` is absent or empty, PINNED 2026-11-20: 36
+of 101 held rows, of 219 rows, by reading `tools/gate-legs.json` at HEAD, each declaration found by
+`python tools/run-gates/leg_factory.py --list`. The eight the base draft counted at `19d6aae6` are
+all still here; the other 28 joined the population since (both PINNED 2026-11-20).
+
+| Declared in | Held legs with no guard |
+|---|---|
+| `tools/govkit/registry.toml`, `[[exempt_leg]]` rows | `template size gate selftest`, `method-carriers self-test`, `spec-audit opt-in pack self-test`, `roles adopter self-test`, `instruction edits selftest`, `instruction units selftest`, `core selftest`, `tags positional selftest`, `tags bundle selftest`, `upgrade-walk`, `leg-factory selftest` |
+| `tools/govkit/registry.toml`, the loop kit's `[[exempt_leg]]` rows | `loop computed witness`, `loop item kind`, `loop splice check`, `loop factories fixtures`, `loop definition fixtures`, `loop parent routes`, `loop transition record`, `loop guard fixtures`, `loop claims fixtures`, `loop position fixtures`, `loop upstream fixtures`, `loop review bounds fixtures`, `loop composition fixtures`, `loop adapt fixtures`, `loop budget fixtures`, `loop termination`, `loop breakpoint fixtures`, `loop scenario fixtures` |
+| `tools/govkit/entries/check-agent-cap-restatement.kit.toml` | `agent-cap restatement self-test` |
+| `tools/govkit/entries/check-testsuite-counts.kit.toml` | `testsuite counts self-test` |
+| `tools/memory-tree/kit.toml` | `ratchet selftest` |
+| `tools/roles/kit.toml` | `roles render selftest` |
+| `tools/run-gates/kit.toml` | `held-halves selftest` |
+| `tools/unattended/kit.toml` | `unattended kit gate` |
+| `tools/workflows/kit.toml` | `review-replay selftest` |
+
+Two are held by `subject = "kit"` outside the `selftests` chunk, `upgrade-walk` in `e2e` and
+`unattended kit gate` in `declarations`, and five, DERIVED from the table, are held by the
+`selftests` chunk with
+`subject = "repo"`, the loop's `item kind`, `splice check`, `transition record`, `termination` and
+`scenario fixtures` rows; the `kit` source selects both kinds, so the arm grades both. Under
+`GATE_SELFTESTS=1` a held leg with a guard still skips when nothing it guards moved, and one with
+none runs whole (§4 Evidence); the arm makes that choice a declared one. A guard is not free: it
+makes every live spec whose Files touched trips it name the leg, the cost the review-replay comment
+records (tools/workflows/kit.toml@0e164a5f:205-207), so the pass picks per leg and writes the reason
+where it keeps none. `unguarded_why` is descriptor-only, as `history_depth` is, so it never reaches
+the manifest or an adopter.
 
 ### Migration
 
 Additive. A run with no `GATE_SELECTION` holds exactly the legs it holds today, with the new tail
 word; a reader of `held` reads the same count. S8 adds a key no existing declaration carries, and the
-eight rows it touches gain a guard or a reason in the commit that adds the arm.
+36 rows it touches (PINNED 2026-11-20, §4 "Held legs guarded (S8)") gain a guard or a reason in the
+commit that adds the arm.
 
 ### Rollout
 
@@ -226,6 +283,8 @@ Live at landing. Gov's `verdict.held` stays the catalogue default `on-demand`.
 - `tools/run-gates/kit.toml`
 - `tools/workflows/kit.toml`
 - `tools/roles/kit.toml`
+- `tools/memory-tree/kit.toml`
+- `tools/unattended/kit.toml`
 - `tools/govkit/registry.toml`
 - `tools/govkit/entries/check-agent-cap-restatement.kit.toml`
 - `tools/govkit/entries/check-testsuite-counts.kit.toml`
@@ -258,8 +317,9 @@ Live at landing. Gov's `verdict.held` stays the catalogue default `on-demand`.
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -c '= selftests \]' run-gates.sh` runs in `tools/run-gates/` it prints 1, the
-  predicate's one body (it prints 3 at base), and `grep -c 'derive_hold_source' run-gates.sh` prints
-  at least 4, the definition and its three callers.
+  predicate's one body (it prints 3 at HEAD `8a98c9cf`), and
+  `grep -c 'derive_hold_source' run-gates.sh` prints at least 4, the definition and its three
+  callers.
   Red when: a call site keeps its own copy of the predicate.
 - **AC2** — When the `run-gates canary` arm of §7 runs a fixture bar under a selection file holding
   one `quarantine` row and one row naming a leg the manifest lacks, the quarantined leg prints
@@ -271,7 +331,7 @@ Live at landing. Gov's `verdict.held` stays the catalogue default `on-demand`.
   kit self-test.
 - **AC3** — When `grep -c "printf 'GATE held  " run-gates.sh` runs in `tools/run-gates/`, it prints
   1, the one format `report_one` emits every held line through, and
-  `grep -c "(self-test," run-gates.sh` prints 0.
+  `grep -c "(self-test," run-gates.sh` prints 0; each prints 2 at HEAD `8a98c9cf`.
   Red when: a second held-line format survives beside the first.
 - **AC4** — When `python verdict_flow.py --fixture held-keys` runs, it reads a planted verdict
   record holding `held.1` to `held.3` through the runner's key grammar and prints each as leg,
@@ -288,8 +348,8 @@ Live at landing. Gov's `verdict.held` stays the catalogue default `on-demand`.
   `peer-or-cadence` with no `HELD_CI_WORKFLOW` at R exits 2 naming the value.
   Red when: `peer-or-cadence` passes with no runner declared, so held legs run nowhere and nothing
   says so.
-- **AC7** — When `python leg_factory.py --conform` runs in `tools/run-gates/` on the landed tree, it exits 0
-  and its count line prints `<h> held · <u> unguarded`, `<h>` equal to the manifest rows whose
+- **AC7** — When `python leg_factory.py --conform` runs in `tools/run-gates/` on the landed tree, it
+  exits 0 and its count line prints `<h> held · <u> unguarded`, `<h>` equal to the manifest rows whose
   `subject` is `kit` or `chunk` is `selftests`; in a scratch clone with one held declaration planted
   with no guard and no `unguarded_why`, it exits 1 naming that leg and the arm `held guard`, and
   with `unguarded_why = ""` it does the same; and `grep -nE '[0-9]+/[0-9]+ legs passed' README.md`
@@ -311,10 +371,10 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
 - **F1 — Is a leg whose `level` is not a landing level a held leg, and under which word?** Options:
   (a) held, under a third source word `level`; (b) skipped; (c) held as `kit`. (b) breaks the
   full-green stamp and states a false reason; (c) lets `GATE_SELFTESTS` run deferred levels and
-  mislabels them. I11, which this unit owns, names `kit` and `quarantine`. RESOLVED (agent, 2026-10-25,
-  delegated): (a), rung 1: flow-steps' `test.select` leaves those levels to the cadence, which is what
-  holding means here; I11 gains `level` and keeps its other two words as spelled. widens: none ·
-  relaxes: none
+  mislabels them. I11, which this unit owns, names `kit` and `quarantine`. RESOLVED (agent,
+  2026-10-25, delegated): (a), rung 1: flow-steps' `test.select` leaves those levels to the cadence,
+  which is what holding means here; I11 gains `level` and keeps its other two words as spelled.
+  widens: none · relaxes: none
 - **F2 — Who runs `test.select` for a push?** Options: (a) the Test step runs it and the hook checks
   the run record's selection at R before admitting the verdict; (b) the hook runs `select` itself
   before its own bar; (c) the runner derives holds itself. (c) decides a loosening inside the code it
@@ -325,6 +385,16 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
   `TOOL-dWitnessedBar-6` lands. (b) lets held legs run nowhere silently; (c) leaves the value unusable
   where a cadence exists today. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, P39 "every wait
   expires" and the existing scheduled held job. widens: none · relaxes: none
+- **F4 — `verdict_flow.py`, which S5 to S7 extend, is not in the tree: how does this spec take it?**
+  Options: (a) a §3 `consumes-from` edge naming `TOOL-dWitnessedBar-3`, which mints the file at
+  order 20; (b) this unit creates the file where it is absent; (c) name the dependency in S5's prose
+  and in §10, and leave the reciprocal edge pair to the dispatcher. (a) is the declared form, but the
+  edge join reds a one-way edge and unit 3's spec declares no `hands-off` back, which is outside this
+  re-ground's write grant; (b) makes two units mint one file, whichever lands second meeting a
+  conflict. RESOLVED (agent, 2026-11-20, delegated): (c), M3 veto 1 strikes (a) here, since the
+  hygiene gate this spec must pass reds it, and (b) strikes on the order the headers already declare;
+  the pair is named in the return of brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief so
+  the next spec edit can add both lines in one commit. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -341,20 +411,39 @@ New arm: .githooks/pre-push.test.sh · covers AC5 AC6 · a planted push whose ru
 - rev-5 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else
   moved.
+- rev-6 · 2026-11-20 · §4 · §8 · §10 · S1 · S3 · S4 · S5 · S8 · AC1 · AC3 · AC7 · re-grounded at
+  `8a98c9cf` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-23-reground-brief, reading the runner
+  at HEAD while unit 4's builder holds it modified: runner, README and descriptor lines blob-pinned
+  and the rest cited as `path#symbol`; S8's population re-derived, 36 unguarded of 101 held rows
+  where it was 8 of 71, listed in §4, with `tools/memory-tree/kit.toml` and
+  `tools/unattended/kit.toml` added to Files touched; the `held guard` arm joins
+  `check_declarations` and its count joins `run_conform`'s line; S3's by-name readers corrected to
+  the one pattern the suite spells; S4 names the three verdict writers; S5 reads `every-declared`
+  and names `verdict_flow.py` as unit 3's, by the new §8 F4; AC1 and AC3 state their HEAD counts.
 
 ## 10. Reuse audit
 
-The seam extended is the runner's own hold, the predicate at `tools/run-gates/run-gates.sh:3129`, the
-`ondemand` verb `report_one` prints (`:4038-4047`) and the `changed` selection (`:2950-2990`); the
-record is the existing verdict record and its `read_record_keys` grammar. `python
-tools/codebase-map/reuse_lookup.py "hold a gate leg out of the bar by a policy and record its
-result"` ranked `load_policy` (`tools/roles/roles_lib.py`, the roles kit's effort policy, no seam
-here), `write_record` and `render_record` (`tools/runlog/record.py`, the run model's committed record,
-not a per-bar record) and generic `leg` stems; none holds a leg, so the predicate is extracted at its
-third spelling rather than built anew. The recall probe returned scout A's rows for this unit and for
-`TOOL-dWitnessedBar-30`, the brief's unit row, and the design's fold follow-up review
-(`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md:233`), which
-reads the re-entry to `test.verdict` holding a newly held leg, as S2 does; scout A's `:3129-3131` and `:4038-4048` agree with source within a line, and it did not
-list the third spelling at `:5429`, found by grep.
+The seam extended is the runner's own hold, the predicate at
+tools/run-gates/run-gates.sh@5119eed3:3303, the `ondemand` verb `report_one` prints
+(`tools/run-gates/run-gates.sh#report_one`) and the `changed` selection
+(tools/run-gates/run-gates.sh@5119eed3:3114-3154); the record is the existing verdict record and its
+`read_record_keys` grammar. The guard arm extends the leg factory's field arms,
+`tools/run-gates/leg_factory.py#check_declarations`, landed by TOOL-dWitnessedBar-11.
+`python tools/codebase-map/reuse_lookup.py "hold a gate leg out of the bar by a policy and record its result"`,
+re-run at HEAD `8a98c9cf`, ranked generic `leg` and `record` stems (`legs` in
+`run-gates.turnstile.test.sh`, `records` in `tools/memory-tree/gotchas.py`), the cross-kit policy
+readers `read_policy_value` (`tools/playbook/policy_value.py`) and `load_policy`
+(`tools/roles/roles_lib.py`), and `write_record` and `render_record` (`tools/runlog/record.py`, the
+run model's committed record, not a per-bar record). None holds a leg, and a run-gates file imports
+no sibling kit's reader, so the predicate is extracted at its third spelling rather than built anew.
+The landed in-kit policy read is `tools/run-gates/product_tests.py#read_product_value`, which asks
+`policy.py get` with no `--rev` and so reads the tree, not R; the hook's read at R is
+`.githooks/pre-push#read_policy_at`, which S6's push-side read of `verdict.held` extends. The recall
+probe returned scout A's rows for this unit and for `TOOL-dWitnessedBar-30`, the brief's unit row,
+and the design's fold follow-up review
+(memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-followup.md:102), whose
+M-finding has a quarantined leg re-enter `test.select` so the selection is rebuilt with it held, as
+S2 and S5 do. Scout A's runner cites were taken at base `cdfbd1cf` and are superseded by §4's HEAD
+citations; at base the scout did not list the last-run writer's spelling, found by grep.
 
 Recall terms used: `python tools/memory-recall/query.py "how does the bar hold a leg and when does a held leg run" --terms "held leg ondemand kit selftests GATE_SELFTESTS changed verdict.held test.select selection record held.n"`

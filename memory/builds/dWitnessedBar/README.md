@@ -137,11 +137,11 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-4 — the runner-written verdict per tree, the pre-push hook reading it, and the tree Test verifies](spec/2026-10-25-spec-TOOL-dWitnessedBar-4.md) | 17 | 2 | INPROGRESS | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash](spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md) | 18 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dWitnessedBar-40 — the per-tree verdict keeps the retired writers' two declines and carries the reuse pair the hook judges](spec/2026-10-25-spec-TOOL-dWitnessedBar-40.md) | 18 | 2 | DEFERRED | rev-5 | 2026-10-25 |
-| [TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit](spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md) | 19 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit](spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md) | 19 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-42 — the tail sweep keeps every tail any worktree's retained run names, and never a fresh one](spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-3 — attribution deciding what blocks](spec/2026-10-25-spec-TOOL-dWitnessedBar-3.md) | 20 | 2 | DEFERRED | rev-5 | 2026-11-05 |
 | [TOOL-dWitnessedBar-44 — the inherited-red upgrade step reads both policy files and maps every value today's readers accept](spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | DEFERRED | rev-5 | 2026-10-25 |
+| [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | DEFERRED | rev-6 | 2026-11-20 |
 | [TOOL-dWitnessedBar-41 — the selection a bar ran under travels on the per-tree verdict, and the hook re-derives it before adopting](spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it](spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md) | 22 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | DEFERRED | rev-4 | 2026-10-26 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 482 bound to this build, across 4 record folder(s).
+Records: 484 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
