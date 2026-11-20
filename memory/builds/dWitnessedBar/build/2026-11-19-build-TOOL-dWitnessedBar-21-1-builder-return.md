@@ -34,7 +34,7 @@ TOOL-dWitnessedBar-21 is built and committed in two commits. The pass commit is 
 - **Red observation:** I ran the plants from a scratch copy of the kit with both `check_fix_keeps` calls deleted. `writes-test-file`, `commit-test-file` and `unknown-leg` all printed FAIL.
 - **Shape refusal:** probed by sourcing the driver; it refused `bogus`, an empty red, `leg:`, and a red carrying the bypass flag.
 - **AC7 and AC8:** the greps and the record probe gave the expected output (`True False`, and 1 for each file). Stands in for `drift-audit selftest`, `runlog selftest` and `runlog record schema`.
-- **Arms census:** `check-arms.py --emit-floors` printed `unattended.sh:343:339`. Stands in for `harness arms`.
+- **Arms census:** `check-arms.py --emit-floors` printed the driver at 343 sites, 339 armed (DERIVED from the builder's probe). Stands in for `harness arms`.
 - **Inline parity:** a Python byte comparison of the four blocks. Stands in for `python resolver`.
 - **Naming lexicon:** asked for every new name.
 - **gotchas.py:** run over both commits and acted on.
@@ -49,4 +49,4 @@ TOOL-dWitnessedBar-21 is built and committed in two commits. The pass commit is 
 - The fixture finds bash with `resolve_bash_py` and strips git location variables with `git_env_leaks_py`.
 - The shape refusal also rejects a red containing a line end or the bypass flag, so `park()` cannot refuse the `fix-of` row after the dispatch row is already written.
 
-The commit hook printed an existing warn-only BUDGET WARN: `UNATTENDED-VERBS.md` is 117306 bytes against a 98304 budget. It was already over before this unit (115736 bytes); this unit's paragraph adds about 1.6 KB. I left the unrelated `help/` working-copy changes unstaged.
+The commit hook printed an existing warn-only BUDGET WARN: `UNATTENDED-VERBS.md` is 117306 bytes against a 98304 budget. It was already over before this unit (115736 bytes); this unit's paragraph adds about 1.6 KB. I left the unrelated `help/` working-copy changes unstaged. (DERIVED from the builder's probe)
