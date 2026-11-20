@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-58 — the hook's inherited-base export observed where the knob is still visible: the stub bar's environment and the runner's decline, with every leg proven blind to it
 
-**Status:** DEFERRED · rev-3 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 33 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-3 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 33 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-58-round3-fix-return.md) | research | TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-58-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-58-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-58-round3-fix-brief.md) | research | TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-58-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-58-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-58-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-58-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 |
