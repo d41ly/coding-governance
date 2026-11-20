@@ -1,12 +1,13 @@
 # TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built
 
-**Status:** CLOSED · rev-1 · 2026-11-20 · node d · Tier-2 · base 81657e77 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 81657e77 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dSkippedRecord-2-1-acceptance-ledger.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dSkippedRecord-2-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix.md) | research | — |
 | [2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md](../prompts/2026-11-20-prompt-TOOL-dSkippedRecord-2-promotion-brief.md) | research | — |
 
@@ -251,7 +252,7 @@ diff <(git show 922413ff1:tools/unattended/unattended.test.sh | sed -n "$s") <(s
   description the review's item 2 names, PINNED at `922413ff1`.
 - **AC6** — When `git diff --quiet 922413ff1 <p2> -- memory/builds/dSkippedRecord/spec/2026-11-20-spec-TOOL-dSkippedRecord-1.md`
   runs, it exits 0.
-  Red when: unit 1's §4 rows are rewritten in place, and the diff exits 1. A change confined to its
+  Red when: unit 1's mode table is rewritten in place, and the diff exits 1. A change confined to its
   `gen:spec-records` region is the index generator's, not this unit's, and the ledger names it.
 
 ## 7. Gates
@@ -281,6 +282,10 @@ none
   describes `addfail` and `difffail` through two shell function definitions named `GIT`. Red fix
   26f99cdb0 built them as one `git` shim on PATH instead, because those definitions broke the
   `lexicon naming predicates` and `lexicon wiring` pins. §4 states the shim as built.
+- rev-2 · 2026-11-20 · from the pass-leg fix record 2026-11-20-prompt-TOOL-dSkippedRecord-2-pass-legs-fix,
+  for the `writing practice (records and units)` leg: AC6's Red-when clause names unit 1's mode
+  table, where its section number and the word after it read as a count. No meaning, criterion,
+  figure or status moves.
 
 ## 10. Reuse audit
 

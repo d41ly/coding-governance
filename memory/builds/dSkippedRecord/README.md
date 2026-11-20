@@ -55,10 +55,10 @@ ids TOOL-dSkippedRecord-1 TOOL-dSkippedRecord-2
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dSkippedRecord-1 — the close's run-record commit is made only when staging left a diff](spec/2026-11-20-spec-TOOL-dSkippedRecord-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-20 |
-| [TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built](spec/2026-11-20-spec-TOOL-dSkippedRecord-2.md) | 2 | 2 | CLOSED | rev-1 | 2026-11-20 |
+| [TOOL-dSkippedRecord-2 — the `same` arm reads the skip line's commit hash, and the failed-stage modes are recorded as built](spec/2026-11-20-spec-TOOL-dSkippedRecord-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-11-20 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
