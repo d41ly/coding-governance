@@ -2252,34 +2252,26 @@ if [ "$bar_class" != stub ]; then
     [ -f "$top/$_legs" ] && check_reviewed_file "$_legs" "$main_local" "is the leg manifest the bar's runner reads"
   fi
 fi
-# THE DOCS KNOB IS THIS HOOK'S ALONE, for every bar a STUB included (TOOL-dThriftyLanding-3): it can
-# only narrow a run, and the STUB exemption above exists for fixture manifests, which it has no part in.
-# It is set again below, on a doc-only decision and nowhere else.
-[ -n "${GATE_DOCS_BASE+x}" ] && ENV_CLEARED+=" GATE_DOCS_BASE"
-unset GATE_DOCS_BASE
-# THE BASE'S ORIGIN AND THE SELECTION ARE THIS HOOK'S ALONE TOO (TOOL-dWitnessedBar-56 S9, §8 F2), for
-# every bar a STUB included, for the docs knob's reason: an inherited `GATE_BASE_FROM` would decide whether
-# a scoped bar writes its per-tree verdict, and an inherited `GATE_SELECTION` would hold a push bar's leg by a
-# pusher's file. `GATE_BASE_FROM` is set again below, in the inherited-green branch alone; this hook
-# sets `GATE_SELECTION` on no path today.
-for _k in GATE_BASE_FROM GATE_SELECTION; do
-  [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
-  unset "$_k"
-done
-# THE TWO PUSH-TIME REUSE KNOBS ARE THIS HOOK'S ALONE TOO (TOOL-aSparedSpawn-13 S10, -32 S6), for every
-# bar a STUB included, for the docs knob's reason: an inherited value would let the environment decide
-# which legs a vetted runner spares. Each is set again below, on the one decision that asks for it.
-# `GATE_REUSE_DIGEST_ENV` (TOOL-aSparedSpawn-33) goes with them: it names the environment the push
-# digest reads, so an inherited one would let the caller hand the runner a key.
-for _k in GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV; do
-  [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
-  unset "$_k"
-done
-# ITS TWO SEAMS GO WITH IT (TOOL-aSparedSpawn-16 S6), for every bar a STUB included: `GATE_REUSE_SAMPLE`
-# sets how often a reused leg is re-executed and `GATE_REUSE_DAY` pins the day a `clock` leg is keyed
-# on, so either, inherited, decides what a push bar spares. The runner keeps reading both; they are
-# its own suite's seams, and that suite drives the runner directly.
-for _k in GATE_REUSE_SAMPLE GATE_REUSE_DAY; do
+# BAR_CLEARED_KNOBS ARE THIS HOOK'S ALONE, for every bar a STUB included, and each is set again only on
+# a decision of its own (TOOL-dWitnessedBar-60 S1). Every bar caller that records a trusted green scrubs
+# these and BAR_SCRUBBED_KNOBS too, `PM_SCRUB` in post-merge.sh and the driver's `_gknobs`; the gov
+# canary's `check_bar_scrub_parity` reds when either lacks a name this hook holds.
+# - `GATE_DOCS_BASE` (TOOL-dThriftyLanding-3) can only narrow a run, and the STUB exemption above exists
+#   for fixture manifests, which it has no part in. It is set again below, on a doc-only decision alone.
+# - `GATE_BASE_FROM` and `GATE_SELECTION` (TOOL-dWitnessedBar-56 S9, §8 F2): an inherited `GATE_BASE_FROM`
+#   would decide whether a scoped bar writes its per-tree verdict, and an inherited `GATE_SELECTION` would
+#   hold a push bar's leg by a pusher's file. `GATE_BASE_FROM` is set again below, in the inherited-green
+#   branch alone; this hook sets `GATE_SELECTION` on no path today.
+# - `GATE_REUSE_PUSH` and `GATE_REUSE_LINEAGE` (TOOL-aSparedSpawn-13 S10, -32 S6): an inherited value
+#   would let the environment decide which legs a vetted runner spares. Each is set again below, on the
+#   one decision that asks for it. `GATE_REUSE_DIGEST_ENV` (TOOL-aSparedSpawn-33) names the environment
+#   the push digest reads, so an inherited one would let the caller hand the runner a key.
+# - `GATE_REUSE_SAMPLE` and `GATE_REUSE_DAY` (TOOL-aSparedSpawn-16 S6): the first sets how often a reused
+#   leg is re-executed and the second pins the day a `clock` leg is keyed on, so either, inherited,
+#   decides what a push bar spares. The runner keeps reading both; they are its own suite's seams, and
+#   that suite drives the runner directly.
+BAR_CLEARED_KNOBS="GATE_DOCS_BASE GATE_BASE_FROM GATE_SELECTION GATE_REUSE_PUSH GATE_REUSE_LINEAGE GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY"
+for _k in $BAR_CLEARED_KNOBS; do
   [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
   unset "$_k"
 done

@@ -592,3 +592,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T20:39:43Z dispatch · item d463c624 TOOL-dWitnessedBar-58 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-58-widen-3.md
 
 2026-11-20T20:47:26Z brief · item TOOL-dWitnessedBar-60 · reason 29c83f5bf64e memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-60-build-brief.md
+
+2026-11-20T20:49:23Z dispatch · item db4b2b67 TOOL-dWitnessedBar-60 · reason .githooks/pre-push tools/run-gates/post-merge.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/unattended/unattended.sh memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-60-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-60.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-20T20:55:20Z draw · re-dispatch · TOOL-dWitnessedBar-60 · 102/180 · 20261120T205520Z-e87c4b
+
+2026-11-20T20:55:20Z dispatch · item db4b2b67 TOOL-dWitnessedBar-60 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-20-build-TOOL-dWitnessedBar-60-widen-4.md

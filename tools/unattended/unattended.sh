@@ -12079,7 +12079,7 @@ dod_met() { # slug · run-state file · item · checker
       # from the driver would certify the whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
       # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
       # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
-      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
+      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY" _gset=""
       local -a _gscrub=(-u GATE_WALL)
       for _gk in $_gknobs; do
         _gscrub+=(-u "$_gk")

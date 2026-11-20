@@ -243,7 +243,9 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=35
+FLOOR_ASSERTIONS=38
+# RAISED 35 -> 38 by TOOL-dWitnessedBar-60 on 2026-11-20: the bar-scrub parity arm over the shipped files
+# and its two staged copies, one assertion each. Counted by reading; no suite ran.
 # RAISED 25 -> 35 by TOOL-dWitnessedBar-56 on 2026-11-20: its seven local-hook plants and three peer
 # plants in the verdict backends' plant loop, one assertion each. Counted by reading; no suite ran.
 # RAISED 21 -> 25 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-43, whose pass left the
@@ -803,6 +805,51 @@ for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache
        printf '%s\n' "$vb_out" | grep -E 'MISSED|not run|Traceback' | sed 's/^/  /'; fail=1 ;;
   esac
 done
+
+# ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
+# The pre-push hook scrubs `BAR_SCRUBBED_KNOBS` and clears `BAR_CLEARED_KNOBS` before its bar; post-merge's
+# `PM_SCRUB` and the unattended driver's `_gknobs` run bars whose green is trusted for the whole tree, so
+# each must carry every one of those names. The hook's two lists and `_gknobs` are read by the one-line
+# cuts the driver suite's parity arm uses; `PM_SCRUB` spans lines and is read as a range, quotes stripped
+# and newlines folded to spaces, the fold post-merge itself applies. A list that reads empty is named
+# too, so a moved or reworded line cannot pass this over nothing. Two staged copies prove it can fail.
+# WHAT THIS DOES NOT CHECK: that either caller honours its list at run time (the evidence suite's
+# post-merge arm observes one), the hook's `ENV_DROPPED_KNOBS`, or the policy keys set from R's file.
+check_bar_scrub_parity() {   # hook · post-merge · driver -> one line per missing name or empty list
+  local sk ck pm dr k out=""
+  sk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
+  ck=$(sed -n 's/^BAR_CLEARED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
+  pm=$(sed -n '/^PM_SCRUB="/,/"$/p' "$2" 2>/dev/null | sed -e 's/^PM_SCRUB=//' -e 's/"//g' | tr '\n' ' ')
+  dr=$(sed -n 's/^ *local _gk _gknobs="\([^"]*\)".*/\1/p' "$3" 2>/dev/null)
+  [ -n "${sk// /}" ] || out+="BAR_SCRUBBED_KNOBS reads empty in $1"$'\n'
+  [ -n "${ck// /}" ] || out+="BAR_CLEARED_KNOBS reads empty in $1"$'\n'
+  [ -n "${pm// /}" ] || out+="PM_SCRUB reads empty in $2"$'\n'
+  [ -n "${dr// /}" ] || out+="_gknobs reads empty in $3"$'\n'
+  for k in $sk $ck; do
+    case " $pm " in *" $k "*) ;; *) out+="PM_SCRUB in $2 lacks $k"$'\n' ;; esac
+    case " $dr " in *" $k "*) ;; *) out+="_gknobs in $3 lacks $k"$'\n' ;; esac
+  done
+  printf '%s' "$out"
+  [ -z "$out" ]
+}
+bsp_hook="$ROOT/.githooks/pre-push"; bsp_pm="$KITDIR/post-merge.sh"; bsp_drv="$ROOT/${PFX}unattended/unattended.sh"
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_pm" "$bsp_drv") \
+  || { echo "gov-canary: a bar caller does not scrub every knob the pre-push hook scrubs or clears:"; printf '%s\n' "$bsp_out" | sed 's/^/  /'; fail=1; }
+bsp_t=$(mktemp -d)
+sed '/^PM_SCRUB="/,/"$/s/ GATE_SELECTION\([ "]\)/\1/'"$bsp_pm" > "$bsp_t/post-merge.sh"
+sed '/^BAR_CLEARED_KNOBS=/d' "$bsp_hook" > "$bsp_t/pre-push"
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/post-merge.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* lacks GATE_SELECTION$' \
+  || { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut was not named for it: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_t/pre-push" "$bsp_pm" "$bsp_drv") \
+  && { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^BAR_CLEARED_KNOBS reads empty' \
+  || { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line was not named as an empty list: $bsp_out"; fail=1; }
+rm -rf "$bsp_t"
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then

@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=310
+FLOOR_ASSERTIONS=311
+# RAISED 310 -> 311 by TOOL-dWitnessedBar-60 on 2026-11-20: the post-merge run under an inherited
+# GATE_SELECTION and GATE_BASE_FROM. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 309 -> 310 by TOOL-dWitnessedBar-58 on 2026-11-20: the leg-output and no-.scoped assertion after
 # unit 56's AC8 run. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 304 -> 309 by TOOL-dWitnessedBar-56 on 2026-11-20: the selection's CRLF, ` · ` and ignored-row
@@ -3145,6 +3147,14 @@ pm_rc=$(PM_X="GATE_REUSE=lineage" run_pm "$pm_c4")
   && ! grep -q '^GATE_REUSE=' "$PM_PROBE" && grep -qx "$pm_c4" "$PM_PROBE" && grep -q 'gate-pm\.[0-9]*$' "$PM_PROBE" \
   && ok "AC5 the declared bar saw GATE_FULL=1, a holder, no GATE_REUSE, HEAD at the sha and a gate-pm. cwd" \
   || { nope "AC5 the declared bar ran outside the hold verb, unfull, with reuse, or elsewhere (rc=$pm_rc)"; print_pm_out; }
+# TOOL-dWitnessedBar-60 AC3 — a caller's GATE_SELECTION and GATE_BASE_FROM never reach the bar post-merge
+# records as green: the first would hold legs by the caller's file, the second skip a scoped verdict.
+rm -f "$PM_PROBE"
+pm_rc=$(PM_X="GATE_SELECTION=$PM_T/planted-selection GATE_BASE_FROM=inherited" run_pm "$pm_c4")
+[ "$pm_rc" = 0 ] && [ -f "$PM_PROBE" ] && [ "$(grep -c '^GATE_SELECTION=\|^GATE_BASE_FROM=' "$PM_PROBE")" = 0 ] \
+  && grep -q 'not honoured from the environment:.* GATE_BASE_FROM' "$PM_OUT" \
+  && ok "TOOL-dWitnessedBar-60 AC3 an inherited GATE_SELECTION and GATE_BASE_FROM are named as not honoured and the declared bar sees neither" \
+  || { nope "TOOL-dWitnessedBar-60 AC3 post-merge's bar inherited GATE_SELECTION or GATE_BASE_FROM, or ran no bar (rc=$pm_rc)"; print_pm_out; }
 
 # AC6 — a remote that rejects the ref fails the publication, loudly, and the record still lands.
 printf '#!/bin/sh\nwhile read o n r; do case "$r" in refs/gov/*) echo "no gov refs here"; exit 1 ;; esac; done\nexit 0\n' \
