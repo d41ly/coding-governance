@@ -49,7 +49,7 @@ Built TOOL-dWitnessedBar-56 in C:/projects/coding-governance/.claude/worktrees/u
 - AC4 is not observed here; `TOOL-dWitnessedBar-58` observes it.
 
 **Things to know**
-- **Dispatch timed out:** `--dispatch --writes memory/map/generated/symbols.json` hit its 110 s bound and recorded no row. It was not re-run. Before timing out, it said that path is a generated output `--check-commit` accepts undeclared, so the file was committed.
+- **Dispatch timed out:** `--dispatch --writes memory/map/generated/symbols.json` hit its 110 s bound and recorded no row. It was not re-run. Before timing out, it said that path is a generated output `--check-commit` accepts undeclared, so the file was committed. (DERIVED from the builder's probe)
 - **`base_from` value bug, not fixed:** this predates the unit. Under `GATE_BASE`, the row's second field reads `GATE_BASE` immediately followed by the base sha. S10 only adds the third field, so I left it; the commit's `Decided:` line records this.
 - **Branches no arm reaches:** in `check_local_record`, the `DEAD PROBE` cases (a landed revision that does not derive, a `select --check` that cannot run, a failed `hash-object`) are not reached by any arm. The spec names no plant for them.
 - **Files I did not touch:** help/reference/drive.md and help/reference/units.md were already dirty before this pass and differ only in line endings; I left them unstaged.
