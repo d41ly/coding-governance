@@ -21752,7 +21752,9 @@ hit  "$dm_out" "lease — off · tFix/build"
 # placed` stops the attempts at once. THE RESET (TOOL-dPlacedRequest-58 S2): after the clear and
 # before A starts, any of `once`, `held` and `release` still present stops the attempts, and the
 # `DPR58 AC1` row reds `request race state not reset`, so a `held` the wait sees is this attempt's
-# A's. WHAT THIS BLOCK DOES NOT DRIVE: a race between two nodes.
+# A's. The test sits under the clear on purpose: it reads the clear's effect, so a clear that does
+# not take, or one cut, is named as a reset and never as a lock defect. WHAT THIS BLOCK DOES NOT
+# DRIVE: a race between two nodes.
 # ==================================================================================================
 pr_h="$LF/pr"; mkdir -p "$pr_h/bin"; pr_cp=$(command -v cp)
 printf '%s\n' '#!/usr/bin/env bash' "h='$pr_h'" \
