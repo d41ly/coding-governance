@@ -33,8 +33,8 @@ cut from the suite and sourced, under the node's short temp path.
   lock with no `owner`, each printed the lock-busy NOTE and kept the holder's lock. RED: the base
   cut, its trap armed after the take, left the lock; the new cut with the `_fl_mine` guard cut
   cleared the ownerless holder's lock.
-- AC8 — the carrier arm cut from the resolver suite, run over a scratch carrier holding the block
-  with no appender and sourcing nothing, printed `<file>: no health_log_sh beside gov_feed_sh` and
+- AC8 — `check_feed_copies` and `blk`, cut from the resolver suite and run over a scratch carrier
+  holding the block with no appender and sourcing nothing, printed `<file>: no health_log_sh beside gov_feed_sh` and
   returned 1; over the real population, the canonical, the lander, the post-merge hook and the
   driver, read through its `lib-unattended.sh`, it returned 0 and printed nothing. The base arm
   passed the bare carrier.
