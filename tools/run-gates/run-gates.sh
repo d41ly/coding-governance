@@ -2739,6 +2739,10 @@ GATE_RUN_KEEP=${GATE_RUN_KEEP:-5}
 # before they come back to look at it, and small enough that a header, one row per leg and a verdict
 # cannot grow the git dir without practical limit.
 RUNROOT=""; RUNDIR=""; RUNID=""
+# A tail no retained run names is kept this long after its last write (TOOL-dWitnessedBar-42 S2), seven
+# days, PINNED by that spec's F2: a fixed bound far past any bar's wall needs no other reading to be
+# true, where a profiled wall can be zero and a turnstile beacon is not held by every bar.
+TAIL_GRACE_S=604800
 # THE COMPLETION FILE STAYS IN THE SCRATCH DIR, and the durable record does not hold one. This is
 # the one place this unit's spec asked for something its own reasoning argues against, and the
 # arm for it is what found the disagreement rather than a reading of the text.
@@ -5780,7 +5784,9 @@ if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
       case "$_th" in
         ''|*[!0-9a-f]*) rm -f "$_tp" 2>/dev/null; echo "run-gates: no tail kept for ${names[$i]} — git could not hash it" >&2; continue ;;
       esac
-      if [ -e "$_td/$_th" ]; then rm -f "$_tp" 2>/dev/null
+      # A hash already on disk is FRESHENED (TOOL-dWitnessedBar-42 S3), so the sweep's grace runs from
+      # the newest bar that produced it; `-c` so a file another sweep removed meanwhile is not made empty.
+      if [ -e "$_td/$_th" ]; then touch -c "$_td/$_th" 2>/dev/null; rm -f "$_tp" 2>/dev/null
       else chmod 600 "$_tp" 2>/dev/null; mv -f "$_tp" "$_td/$_th" 2>/dev/null || { rm -f "$_tp" 2>/dev/null; continue; }; fi
       _tn=$((_tn + 1))
       printf -v _trow 'tail.%s\t%s %s\n' "$_tn" "$_th" "${names[$i]}"; TAIL_ROWS+=$_trow
@@ -6002,22 +6008,38 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
   ls -1t "$RUNROOT" 2>/dev/null | grep -v '^current$' | tail -n "+$((GATE_RUN_KEEP+1))" | while IFS= read -r old; do
     [ -n "$old" ] && [ "$old" != "$RUNID" ] && rm -rf "$RUNROOT/$old" 2>/dev/null || true
   done
-  # THE TAILS GO WITH THE RUNS THAT NAMED THEM (TOOL-dWitnessedBar-25 S4): after the sweep, the tails
-  # directory keeps exactly the hashes some retained run record's verdict names as `tail.<n>`. One
-  # directory listing, by glob, and one read of the retained verdicts; a staging name is never a hash,
-  # so a concurrent bar's tail in flight is not swept.
-  # WHAT IT DOES NOT CHECK: another worktree's retained runs, which unit 42 adds; a tail only another
-  # worktree's record names is swept here.
+  # THE TAILS GO WITH THE RUNS THAT NAMED THEM (TOOL-dWitnessedBar-25 S4), IN EVERY WORKTREE
+  # (TOOL-dWitnessedBar-42 S1, S2): after the sweep, the tails directory keeps every hash a retained
+  # run record of ANY worktree of the clone names as `tail.<n>` — `<common>/gate-run/*/verdict`, the
+  # main worktree's, and `<common>/worktrees/*/gate-run/*/verdict`, each linked one's, read from git's
+  # own layout rather than `git worktree list`, so an unpruned removed worktree's runs still count —
+  # and every tail younger than TAIL_GRACE_S, so a tail a bar still running elsewhere wrote before its
+  # verdict names it survives. A staging name is never a hash, so a tail in flight is not swept. An
+  # age that cannot be read keeps every unnamed tail.
+  # WHAT IT DOES NOT CHECK: a sweep here that reads a tail's time just before another worktree's bar
+  # freshens it can still remove it.
   _td=""; [ -n "$RG_COMMON_RAW" ] && _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails
   if [ -n "$_td" ] && [ -d "$_td" ]; then
-    _tkeep=" $(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ { split($2, h, " "); printf "%s ", h[1] }' "$RUNROOT"/*/verdict 2>/dev/null)"
+    _tc=${_td%/gate-tails}
+    _tkeep=" $(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ { split($2, h, " "); printf "%s ", h[1] }' \
+      "$_tc"/gate-run/*/verdict "$_tc"/worktrees/*/gate-run/*/verdict 2>/dev/null)"
+    _tfresh=""; _tok=1; _trm=0; _tkept=0
     for _tf in "$_td"/*; do
       _th=${_tf##*/}
       case "$_th" in ''|*[!0-9a-f]*) continue ;; esac
-      case "$_tkeep" in *" $_th "*) ;; *) rm -f "$_tf" 2>/dev/null ;; esac
+      case "$_tkeep" in *" $_th "*) _tkept=$((_tkept + 1)); continue ;; esac
+      # ONE `find` per sweep, and only once an unnamed tail is met; it lists the tails modified inside
+      # the grace, and a find that fails keeps them all.
+      if [ "$_tok" = 1 ] && [ -z "$_tfresh" ]; then
+        _tfresh=$(find "$_td" -maxdepth 1 -type f -mmin "-$((TAIL_GRACE_S / 60))" 2>/dev/null) || _tok=0
+        _tfresh=$'\n'"$_tfresh"$'\n'
+      fi
+      case "$_tok$_tfresh" in 0*|*$'\n'"$_tf"$'\n'*) _tkept=$((_tkept + 1)); continue ;; esac
+      rm -f "$_tf" 2>/dev/null && _trm=$((_trm + 1))
     done
+    [ $((_trm + _tkept)) -gt 0 ] && echo "run-gates: tails swept — $_trm removed, $_tkept kept (named by a retained run of any worktree, or younger than ${TAIL_GRACE_S}s)" >&2
   fi
-  unset _td _tkeep _tf _th
+  unset _td _tc _tkeep _tfresh _tok _trm _tkept _tf _th
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.

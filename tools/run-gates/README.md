@@ -879,12 +879,16 @@ runner never names its caller's cause. The callers that pin a run id export one:
 **A failing leg's output tail is kept by its hash.** For each failed leg, in manifest order, the
 runner cuts the last 60 lines of its redacted `<i>.out` copy (its retry's copy for a leg retried alone),
 at most their last 8192 bytes, hashes them as git hashes a blob, writes them to
-`<common-dir>/gate-tails/<hash>` where no file holds that hash, and adds `tail.<n>` `<hash> <leg name>`
-to the verdict, `<n>` from 1. A failed leg with no copy keeps the empty tail. The directory is the
-COMMON dir's, so every worktree of a clone writes one directory and a tail outlives the worktree that
-produced it. After the run sweep, the tails directory keeps exactly the hashes some retained run of
-this git dir names. **What the sweep does not check:** another worktree's retained runs; a tail only
-another worktree's record names is swept.
+`<common-dir>/gate-tails/<hash>` where no file holds that hash (where one does, it sets that file's
+modification time to now with `touch -c`), and adds `tail.<n>` `<hash> <leg name>` to the verdict, `<n>`
+from 1. A failed leg with no copy keeps the empty tail. The directory is the COMMON dir's, so every
+worktree of a clone writes one directory and a tail outlives the worktree that produced it. After the
+run sweep, the tails directory keeps every hash a retained run of ANY worktree of the clone names, read
+from `<common-dir>/gate-run/*/verdict` and `<common-dir>/worktrees/*/gate-run/*/verdict`, and every
+tail modified less than `TAIL_GRACE_S` ago, seven days, so a tail a bar still running in another
+worktree wrote before its verdict names it survives; the sweep prints one `run-gates: tails swept` line
+with the counts it removed and kept. **What the sweep does not check:** a sweep that reads a tail's
+time just before another worktree's bar freshens it can still remove it.
 
 **The keep verb commits them.** `python keep_tails.py --run <run id> --build <slug> --unit <unit id>`,
 run in the repository, reads `trace.leg-output` through the policy kit's `policy.py get`, the catalogue
