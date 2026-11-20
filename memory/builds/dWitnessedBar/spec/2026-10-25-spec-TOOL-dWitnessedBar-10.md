@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-10 — the pre-commit list derived from the leg rows, and cost evidence from every node
 
-**Status:** INPROGRESS · rev-4 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 15 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 15 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0348@ca24547a whole
 
@@ -16,6 +16,8 @@
 | [2026-11-19-prompt-TOOL-dWitnessedBar-10-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-10-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-10-2-build-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-10-2-build-brief.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-10-alias-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-10-alias-brief.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dWitnessedBar-10-alias-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-10-alias-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-10-spec-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-10-spec-fix-brief.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dWitnessedBar-10-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dWitnessedBar-10-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
@@ -310,7 +312,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · the floor pair for `precommit
   none
 - **F3 — Where does the hygiene block's check-9 render go, when the hook's hygiene leg is a grade, a
   render and a regrade and a derived row is one argv?** The block (`.githooks/pre-commit@d74505ac:286`)
-  runs `check-memory-hygiene.sh --staged`, and on a `HYGIENE check 9 FAILED` line runs
+  runs `check-memory-hygiene.sh --staged`, and on the line that script prints when its check 9 fails runs
   `gen_build_index.py --write-staged` into the index git handed the hook and grades again
   (TOOL-aTrimmedWait-3 S5); its `else` runs the red-fix join's staged form (TOOL-aNimbleMend-15 S12).
   Options: (a) the render moves into `precommit.py`; (b) it moves into the hygiene leg's `--staged`
@@ -344,6 +346,9 @@ New arm: tools/govkit/selftest.py · covers AC6 · the floor pair for `precommit
   the red-fix join stay in the hook (F3), so four legs are derived; S1 states the floor row's
   version, the emitter's travel and the selftest pair; Files touched gains the four declaring files
   and `tools/govkit/selftest.py`; stale citations re-pointed as `path#symbol` or blob-pinned.
+- rev-5 · 2026-11-20 · §8 F3 · the hygiene block's check-9 failure line is described in words rather
+  than quoted in the alias form the positional check reads, per brief
+  2026-11-20-prompt-TOOL-dWitnessedBar-10-alias-brief; nothing else moved.
 
 ## 10. Reuse audit
 
