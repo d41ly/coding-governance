@@ -18,17 +18,27 @@ patterns, read `park`: it maps to `every-red`, and the step neither reads nor ed
 names. Where the two files map to different values the stricter, `every-red`, is written. A blank
 value maps to nothing, so where every file read is blank the catalogue default `own-only` applies.
 
+THE READER is the pre-step readers' own `read_policy_key` (TOOL-dWitnessedBar-55), and not
+`conf_to_policy.py`'s sourced-conf grammar. Each line, split on LF with one trailing CR cut, is an
+assignment only where it begins exactly `INHERITED_RED=`: an `export` line, an indented, commented or
+`INHERITED_RED =` spaced one, and a first line opening with a BOM are not. The LAST assignment wins;
+its value is cut at the first whitespace character followed by `#`, stripped of trailing spaces and
+tabs and of leading spaces, a leading tab kept, and stripped of one surrounding pair of double or of
+single quotes. A last assignment that cleans to empty is undeclared, whatever an earlier line set.
+`GATE_POLICY_FILE` is read from `.unattended.conf` by the same rule, as the driver reads it.
+
 THE UP, in order. No file read assigns `INHERITED_RED`: exit 0, nothing written. Otherwise each file
-is read in `conf_to_policy.py`'s line grammar, the last assignment winning, a trailing ` # comment`
-and one pair of quotes stripped; a file that is not UTF-8 exits 1 naming it, writing nothing. The
+is read by that rule; a file that is not UTF-8 exits 1 naming it, writing nothing. The
 value is written into `[verdict] blocks` through `upgrade_steps.render_policy_text`, the one writer,
 unless the policy file already sets `verdict.blocks`: the same value writes nothing more, and another
 value is a conflict, printed as `conflict · verdict.blocks · policy <value> · gate <value>`, exit 1
 writing nothing, since two keys deciding one landing must not be resolved by a step. Every
-`INHERITED_RED` line is then taken out of each file that held one, which is kept, LAST, so the
-witness changes last. A re-run over a killed up recomputes from the first before-image and
-converges. The DOWN restores every file byte-identical. The WITNESS prints one line per file read,
-naming it, the value found and the value written, and exits 0 when no `INHERITED_RED` assignment is
+`INHERITED_RED` assignment by that rule is then taken out of each file that held one, every other
+line kept byte for byte and the file kept, LAST, so the witness changes last. A re-run over a killed
+up recomputes from the first before-image and converges. The DOWN restores every file
+byte-identical. The WITNESS prints one line per file read, naming it, the value found and the value
+written, and one `not an assignment <file>:<line>` line per line that spells the key and is no
+assignment by that rule, which does not fail it; it exits 0 when no `INHERITED_RED` assignment is
 left in either file, or neither is present, which is the step applied.
 
 Exit 0 done, 1 refused naming the file or the conflict (nothing written), 2 a usage error.
@@ -71,21 +81,38 @@ C2P = load_conf_to_policy()
 Refusal = C2P.Refusal
 
 
+def check_policy_assignment(line: str, key: str) -> bool:
+    """True where `line`, one trailing CR cut, begins exactly `<key>=`: the pre-step readers'
+    `read_policy_key` case arm, so an `export`, indented, commented, spaced or BOM-led line is not."""
+    return line.removesuffix("\r").startswith(f"{key}=")
+
+
 def read_value(data: bytes, rel: str, key: str) -> str | None:
-    """The value the last `key` line of `rel`'s bytes assigns, a trailing comment and one pair of
-    quotes stripped; None where no line assigns it. Bytes that are not UTF-8 refuse, naming `rel`."""
+    """The value the last `key` assignment of `rel`'s bytes carries, cleaned as `read_policy_key`
+    cleans it: cut at the first whitespace before a `#`, trailing spaces and tabs and leading spaces
+    stripped, one pair of quotes removed. None where no line assigns it. Bytes that are not UTF-8
+    refuse, naming `rel`."""
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError as e:
         raise Refusal(f"{rel}: not UTF-8 ({e}), so its {key} cannot be read") from None
-    line, found = C2P.build_line_re(key), None
-    for ln in text.removeprefix("﻿").split("\n"):
-        m = line.match(ln.rstrip("\r"))
-        if m:
-            found = re.sub(r"\s+#.*$", "", m[1]).strip()
+    found = None
+    for ln in text.split("\n"):
+        if check_policy_assignment(ln, key):
+            found = ln.removesuffix("\r")[len(key) + 1:]
     if found is None:
         return None
+    cut = re.search(r"[ \t\n\v\f\r]#", found)
+    found = (found[:cut.start()] if cut else found).rstrip(" \t").lstrip(" ")
     return found[1:-1] if len(found) >= 2 and found[0] == found[-1] and found[0] in "\"'" else found
+
+
+def render_gate_rest(data: bytes, key: str) -> bytes:
+    """`data` with every `key` assignment by `check_policy_assignment` taken out, split on LF where
+    `read_value` splits, each other line byte for byte. The file is kept where nothing remains."""
+    parts = data.decode("utf-8").split("\n")
+    lines = [p + "\n" for p in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
+    return "".join(ln for ln in lines if not check_policy_assignment(ln.removesuffix("\n"), key)).encode("utf-8")
 
 
 def parse_gate(data: bytes, rel: str):
@@ -155,7 +182,8 @@ def read_held(before: bytes | None):
 
 def cmd_up(target: pathlib.Path) -> int:
     reads, off = derive_reads(target)
-    held = [rel for rel in reads if (b := read_file(target, rel)) is not None and C2P.check_assigned(b, KEY)]
+    held = [rel for rel in reads if (b := read_file(target, rel)) is not None
+            and any(check_policy_assignment(ln, KEY) for ln in b.decode("utf-8", "replace").split("\n"))]
     if not held:
         print(f"inherited-red: up · no {KEY} in {' or '.join(reads)} at {target.as_posix()}, "
               f"so there is nothing to move")
@@ -168,7 +196,7 @@ def cmd_up(target: pathlib.Path) -> int:
         for rel in rels:
             data = read_file(target, rel) if before is None else before[rel]
             values.append(parse_gate(data, rel))
-            after[rel] = C2P.render_conf_rest(data, KEY)
+            after[rel] = render_gate_rest(data, KEY)
         if before is not None and POLICY not in before:
             return after  # the first up wrote no policy key, so a re-run writes none either
         pol_bytes = (pol.read_bytes() if pol.is_file() else None) if before is None else before[POLICY]
@@ -205,21 +233,26 @@ def cmd_witness(target: pathlib.Path) -> int:
     rows, values, pending = [], [], False
     for rel in reads:
         data = read_file(target, rel)
-        now = data is not None and C2P.check_assigned(data, KEY)
+        lines = [] if data is None else data.decode("utf-8", "replace").split("\n")
+        now = any(check_policy_assignment(ln, KEY) for ln in lines)
         was = image.get(rel)
-        if not now and not (was is not None and C2P.check_assigned(was, KEY)):
+        stray = [f"not an assignment {rel}:{n}" for n, ln in enumerate(lines, 1)
+                 if re.search(rf"(?<!\w){KEY}\s*=", ln) and not check_policy_assignment(ln, KEY)]
+        if not now and not (was is not None and any(
+                check_policy_assignment(ln, KEY) for ln in was.decode("utf-8", "replace").split("\n"))):
             rows.append(f"{rel} " + ("is absent or unreadable" if data is None else f"assigns no {KEY}")
                         + ": applied")
+            rows.extend(stray)
             continue
         pending |= now
         try:
             raw = read_value(data if now else was, rel, KEY)
             mapped = parse_gate(data if now else was, rel)
+            values.append(mapped)
+            rows.append((rel, raw, mapped, now))
         except Refusal as e:
             rows.append(f"{e}: {'not applied' if now else 'applied'}")
-            continue
-        values.append(mapped)
-        rows.append((rel, raw, mapped, now))
+        rows.extend(stray)
     if off and values:
         values.append(OTHER)
     written = derive_stricter(values) or f"nothing, {POLICY} unchanged"

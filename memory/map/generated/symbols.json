@@ -7498,6 +7498,11 @@
       "file": "tools/playbook/instruction_units.py"
     },
     {
+      "id": "check_policy_assignment",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
+    },
+    {
       "id": "check_policy_home_family",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -26781,6 +26786,11 @@
       "id": "render_gate_line",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_gate_rest",
+      "kind": "function",
+      "file": "tools/govkit/steps/inherited_red.py"
     },
     {
       "id": "render_get",

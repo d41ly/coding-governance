@@ -4146,7 +4146,8 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
     and maps every value the pre-step readers accepted: `land` alone to `own-mixed-contended`, any
     other value and an off-tree `GATE_POLICY_FILE` to `every-red`, two files to the stricter. Each
     verb runs under `-I` as the runner runs it. RED against the step that read the gate file alone:
-    AC1's custom file writes nothing, and an off-table value refuses."""
+    AC1's custom file writes nothing, and an off-table value refuses. TOOL-dWitnessedBar-55 AC1 to
+    AC4 follow: the line rule of the hook's `read_policy_key`, held to a live cut of that function."""
     import tomllib  # noqa: PLC0415
     step_py = HERE / "steps" / "inherited_red.py"
 
@@ -4203,6 +4204,81 @@ def check_inherited_red_step(tmp: pathlib.Path) -> None:
     down = run_step("down", t)
     check("[dWB-44 AC3] the down restores both files byte for byte",
           down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+    # TOOL-dWitnessedBar-55 AC1 to AC3: the step takes the line the pre-step readers took, the last
+    # one beginning exactly `INHERITED_RED=`. RED against the reader over `build_line_re`, which
+    # read the indented and spaced lines and named no line it skipped.
+    gate = ".githooks/gate-env.sh"
+    t = build_target(tmp, None, "ir55-ac1", {gate: "INHERITED_RED=land\nINHERITED_RED=park\n"})
+    up = run_step("up", t)
+    check("[dWB-55 AC1] land then park: the up writes every-red, the last assignment, and takes both out",
+          up.returncode == 0 and read_blocks(t) == "every-red" and b"INHERITED_RED" not in (t / gate).read_bytes(),
+          up.stdout + up.stderr)
+    for tag, body in (("export", "export INHERITED_RED=park\n"),
+                      ("empty-last", "INHERITED_RED=park\nINHERITED_RED=\n")):
+        t = build_target(tmp, None, f"ir55-ac2-{tag}", {gate: body})
+        up = run_step("up", t)
+        check(f"[dWB-55 AC2] {body!r}: the up writes no verdict.blocks",
+              up.returncode == 0 and read_blocks(t) is None, up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir55-ac3",
+                     {gate: "INHERITED_RED=land\nexport INHERITED_RED=park\nINHERITED_RED=park\n"})
+    up, w1 = run_step("up", t), run_step("witness", t)
+    check("[dWB-55 AC3] the up takes both assignments out and keeps the export line byte for byte; the "
+          "witness exits 0 naming that line as not an assignment",
+          up.returncode == 0 and (t / gate).read_bytes() == b"export INHERITED_RED=park\n"
+          and w1.returncode == 0 and f"not an assignment {gate}:1" in w1.stdout,
+          up.stdout + up.stderr + w1.stdout + w1.stderr)
+
+    # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key`, cut from
+    # `.githooks/pre-push` from its `read_policy_key() {` line to the first column-0 `}` and run under
+    # the resolved bash, read one fixture set alike. A sentinel through the cut function proves bash
+    # ran it before any row is graded. RED against the reader over `build_line_re` on the indented,
+    # spaced, leading-tab and BOM rows, and against a reader taking the first assignment on the first.
+    # WHAT IT DOES NOT CHECK: spellings outside the set, a lone CR, the driver's copy of the parser
+    # (the push-main suite holds it to the hook's), and the value mapping the step applies after.
+    hook = (GOV_ROOT / ".githooks" / "pre-push").read_text(encoding="utf-8").splitlines()
+    start = next((i for i, ln in enumerate(hook) if ln.startswith("read_policy_key() {")), None)
+    end = next((i for i in range(start, len(hook)) if hook[i].startswith("}")), None) if start is not None else None
+    if end is None:
+        check("[dWB-55 AC4] .githooks/pre-push holds a read_policy_key() { ... } function to cut", False,
+              f"start {start} end {end}")
+        return
+    ir = importlib.util.spec_from_file_location("inherited_red_parity", step_py)
+    step = importlib.util.module_from_spec(ir)
+    ir.loader.exec_module(step)
+    d = tmp / "ir55-ac4"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "r.sh").write_bytes(("\n".join(hook[start:end + 1]) + '\nread_policy_key "$(cat ./f)" "$1"\n').encode())
+
+    def read_hook_value(body: bytes, key: str) -> tuple[str | None, str]:
+        (d / "f").write_bytes(body)
+        argv = govkit_module().resolve_shell_argv(["bash", "r.sh", key])
+        try:
+            p = subprocess.run(argv, cwd=str(d), capture_output=True, timeout=60)
+        except (OSError, subprocess.SubprocessError) as e:
+            return None, f"{argv!r} {e.__class__.__name__}: {e}"
+        out = p.stdout.decode("utf-8", "replace")
+        return (out if p.returncode == 0 else None), f"{argv!r} {p.stderr.decode('utf-8', 'replace')}"
+
+    got, err = read_hook_value(b"K=plain\n", "K")
+    if got != "plain":
+        check("[dWB-55 AC4] the hook's cut read_policy_key reads the sentinel K=plain as plain", False,
+              f"read {got!r} {err}")
+        return
+    rows = (b"INHERITED_RED=land\nINHERITED_RED=park\n", b"export INHERITED_RED=park\n",
+            b"# INHERITED_RED=park\n", b"INHERITED_RED=park\n  INHERITED_RED=land\n",
+            b'INHERITED_RED="land"\n', b"INHERITED_RED=park  # was\n", b"INHERITED_RED=land\r\n",
+            b"INHERITED_RED=park\nINHERITED_RED=\n", b"INHERITED_RED=park\nINHERITED_RED = land\n",
+            b"INHERITED_RED=\tland\n", "﻿INHERITED_RED=land\n".encode())
+    graded = 0
+    for body in rows:
+        want, err = read_hook_value(body, "INHERITED_RED")
+        mine = step.read_value(body, gate, "INHERITED_RED") or ""
+        check(f"[dWB-55 AC4] the step's read_value and the hook's read_policy_key agree on {body!r}",
+              want is not None and mine == want, f"hook {want!r} step {mine!r} {err}".strip())
+        graded += 1
+    check("[dWB-55 AC4] every row of the reader parity set was graded", graded == len(rows) == 11,
+          f"{graded} of {len(rows)}")
 
 
 def check_steps_recordable() -> None:
