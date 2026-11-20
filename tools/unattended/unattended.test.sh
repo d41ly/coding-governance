@@ -19525,6 +19525,50 @@ for ds_v in yes "" - no; do
 done
 same "DPR46 AC3 tips renews: yes, no key, - and no over an old renews: no commit read" "$ds_got" "live live live stale "
 same "DPR46 AC3 RED: the unit-35-order copy reads the - row stale and the rest as the driver" "$ds_red" "live live stale stale "
+# ==================================================================================================
+# TOOL-dPlacedRequest-47 — AN UNSIGHTED COMMIT IS NEVER COMPARED WITH THE THRESHOLD. Over the same
+# fixture, one epoch-1 tenure of three `renews: no` commits, its tip sighted 60 s ago on the ref's
+# newest feed line, its middle commit with no feed line and its opener sighted 90000 s ago, reads
+# `stale`: the walk reads on past the unsighted middle to the opener. RED is a scratch copy whose
+# threshold test drops the `in seen` clause, so the middle's empty stamp compares below the threshold,
+# stops the row there, and the unsighted beat reads `unknown -`. A tip, and a renewing beat, whose only
+# feed line carries `-` each read `unknown -` on the driver, and the same on the copy, so neither is
+# the red case. Waived by README rule 8 with the rest of this suite. WHAT THIS BLOCK DOES NOT DRIVE:
+# an emptied or deleted feed, TOOL-dPlacedRequest-17's AC6, and a tip with no feed line at all, which
+# `add_feed_sightings` sights at the read's own clock with or without the guard.
+# ==================================================================================================
+ug_age='if (thr != "" && seen[rf[i], c] < thr) { stop(i, c); return }'
+printf '%s\n' "${oc_src/"$so_age"/"$ug_age"}" >"$oc_copy/unguarded.sh"
+same "DPR47 the driver carries the guarded threshold test once and the unguarded copy its unguarded test once" \
+  "$(grep -cF "$so_age" "$SCRIPT") $(grep -cF "$ug_age" "$oc_copy/unguarded.sh")" "1 1"
+# ---- AC1: the mixed tenure, opener sighted 90000 s ago, middle unsighted, tip sighted 60 s ago last.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 90000)"); oc_b=$(add_lease_commit 1 no "$(derive_claim_ago 3600)" "$oc_a")
+oc_c=$(add_lease_commit 1 no "$(derive_claim_ago 60)" "$oc_b"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_c"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_c" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR47 AC1 an unsighted middle commit is read past to an opener sighted 90000 s ago: stale" "${oc_row%% *}" "stale"
+oc_row=$(read_clock_row "$oc_copy/unguarded.sh")
+same "DPR47 AC1 RED: the unguarded copy stops at the unsighted middle commit, unknown aged -" "$oc_row" "unknown -"
+# ---- AC2: a `renews: no` tip whose only feed line, the ref's newest, carries `-`, over a `renews: no`
+# ---- opener sighted 90000 s ago, reads unknown aged -.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 no "$(derive_claim_ago 90000)"); oc_b=$(add_lease_commit 1 no "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "-"
+oc_row=$(read_clock_row)
+same "DPR47 AC2 a tip whose only feed line carries - reads unknown, aged -" "$oc_row" "unknown -"
+# ---- AC3: a `renews: yes` beat whose only feed line carries `-`, under a `renews: no` tip sighted
+# ---- 60 s ago on the ref's newest line, reads unknown aged -.
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 3600)"); oc_b=$(add_lease_commit 1 no "$(derive_claim_ago 60)" "$oc_a")
+git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_b"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "-"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_b" "$(derive_claim_ago 60)"
+oc_row=$(read_clock_row)
+same "DPR47 AC3 a renewing beat whose only feed line carries - reads unknown, aged -" "$oc_row" "unknown -"
 rm -rf "$LF" "$oc_copy"
 fi   # ---- region 8 continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -23174,7 +23218,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3957 -> 3965 by TOOL-dPlacedRequest-46: the dash-stop block's 8 region-eight assertions (8
 # `same`, its AC2/AC4 loop's two among them, one per pass), off the diff's own lines; no skip branch.
 # No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=3965
+# RAISED 3965 -> 3970 by TOOL-dPlacedRequest-47: the sighted-guard block's 5 region-eight assertions
+# (5 `same`, no loop), off the diff's own lines; no skip branch. No suite ran, and its RED-first
+# observation is the close's.
+FLOOR_ASSERTIONS=3970
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23447,7 +23494,8 @@ FLOOR_SHARD_7=311
 # RAISED 1146 -> 1168 by TOOL-dPlacedRequest-33: the same 22 region-eight card-ref assertions, see FLOOR_ASSERTIONS.
 # RAISED 1168 -> 1176 by TOOL-dPlacedRequest-35: the same 8 region-eight stop-order assertions, see FLOOR_ASSERTIONS.
 # RAISED 1176 -> 1184 by TOOL-dPlacedRequest-46: the same 8 region-eight dash-stop assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1184
+# RAISED 1184 -> 1189 by TOOL-dPlacedRequest-47: the same 5 region-eight sighted-guard assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1189
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
