@@ -56,6 +56,10 @@ import subprocess
 import sys
 import tempfile
 
+# The kit homes the gate-health fixture plants its scratch repository with, each named once.
+DRIFT_KIT = "drift-audit"
+TREE_KIT = "memory-tree"
+
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
@@ -3804,7 +3808,7 @@ def run_gate_health_fixture(case: str) -> int:
             subprocess.run(["git", "-C", str(repo), *args], capture_output=True, env=env, check=True)
 
         def run_mode(*flags):
-            p = subprocess.run([sys.executable, str(repo / "drift-audit" / "drift_report.py"), "--gate-health", *flags],
+            p = subprocess.run([sys.executable, str(repo / DRIFT_KIT / "drift_report.py"), "--gate-health", *flags],
                                cwd=str(repo), capture_output=True, text=True, encoding="utf-8", errors="replace",
                                env=env, timeout=120)
             said = [ln for ln in p.stdout.splitlines() if ln.strip()]
@@ -3846,7 +3850,7 @@ def run_gate_health_fixture(case: str) -> int:
             if rc != 0 or said != want or [p.relative_to(repo).as_posix() for p in read_health_records()] != [name]:
                 bad.append(f"armed --write read rc {rc} {said}, planted {want} and that one record")
             else:
-                p = subprocess.run([sys.executable, str(repo / "memory-tree" / "build_records.py"), "read",
+                p = subprocess.run([sys.executable, str(repo / TREE_KIT / "build_records.py"), "read",
                                     str(repo / name)], capture_output=True, text=True, encoding="utf-8",
                                    errors="replace", env=env, timeout=120)
                 out.extend(f"write: build_records.py read: rc {p.returncode} · {ln}" for ln in p.stdout.splitlines())
