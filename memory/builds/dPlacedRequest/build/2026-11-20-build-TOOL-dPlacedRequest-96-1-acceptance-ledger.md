@@ -33,12 +33,19 @@ and the liveness pair; never the suite.
 ## Readings beside the criteria
 
 - The read set the join collects from `run_lease_verb` and `write_fence_beat`: `CW_ACT CW_CAUSE CW_CLS CW_DRAW CW_EPOCH CW_HINT CW_KIND CW_NODE CW_SHA CW_TAG CW_WHO CW_WIT`, twelve names. (DERIVED)
-- The block's assertions counted off its lines: three `same` and four `hit` for the probe arm, two `same` for the join, nine in all, each moving the executed count by one. (DERIVED)
-- The floors as written: `FLOOR_ASSERTIONS` from 4044 to 4053. (DERIVED)
-- `FLOOR_SHARD_8` from 1263 to 1272. (DERIVED)
+- The block's assertions counted off its lines: four `same`, five `hit` and one `miss` for the probe arm, two `same` for the join, twelve in all, each moving the executed count by one. (DERIVED)
+- The floors as written: `FLOOR_ASSERTIONS` from 4044 to 4056. (DERIVED)
+- `FLOOR_SHARD_8` from 1263 to 1272 at the pass commit, then to 1275 with the checklist's renew row. (DERIVED)
 - `bash -n` over both edited files exited 0. (DERIVED)
 - The arm `DPR1 AC2` of the lease grammar's block, a take-over of a planted stale lease to epoch two, reads the row this unit restores, so its reading moves with this pass; it is not re-observed here. (DERIVED)
 - The unattended kit's version carrier was not moved by hand: the kit-epoch rule has the lander mint it at the push boundary, as `KIT_UNATTENDED_VERSION`'s history of `mint:` commits shows and as this build's earlier driver moves carry no hand bump. (DERIVED)
+
+- The bug-class checklist over the pass commit selected `refusal-branch-with-no-arm`: the restored row's third branch, every act but take-over and acquire, had no arm, the claim table's lease column driving acquire alone, so it could be collapsed into a write with every arm green. The probe arm gains a second session's renew before the acquire, exit 1, `live-holder` and no hint; the probe printed renew exit 1 `lease refused — live-holder · tStale/build · … · verdict stale` with no hint, the origin's tip unmoved at `epoch: 1`. That row cannot tell the row from the catch-all, which refuses the same; it pins the branch against a write. (DERIVED)
+- It selected `fixture-passes-by-finding-nothing` and `liveness-negative-from-another-population`: the arm's first row asserts the planted lease reads stale before any act, and the join's last row asserts its read set holds `CW_HINT` and its reset block sets it, the very population whose missing name the base driver showed. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value` and `test-oracle-read-from-a-historical-sha`: both RED readings ran the driver as committed at `95c3103ad`, and the arm reads no sha. (DERIVED)
+- It selected `second-implementation-is-not-a-second-opinion`: the join probe runs the arm's own pipeline text, so its two readings show the pipeline moves and are no second opinion on the arm; the arm's RED-first reading inside the suite stays owed. (DERIVED)
+- It selected `an-attested-count-must-count-what-the-grader-counts` and `insert-after-a-key-that-occurs-twice`: each `same`, `hit` and `miss` moves the suite's `n` by one, and the floor edited is the effective `FLOOR_ASSERTIONS`, not the shadowed one above it. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line. (DERIVED)
 
 ## Items diverged
 
@@ -46,5 +53,5 @@ None.
 
 ## Owed at the close
 
-- `New arm:` `tools/unattended/unattended.test.sh`, the TOOL-dPlacedRequest-96 block, nine rows, the floors raised; its RED-first observation against the lease column at `95c3103ad` and its GREEN reading inside the suite are the close's, its clean reading owed with PLAY-dClosedLoop-14 under README rule 8. (DERIVED)
+- `New arm:` `tools/unattended/unattended.test.sh`, the TOOL-dPlacedRequest-96 block, twelve rows, the floors raised; its RED-first observation against the lease column at `95c3103ad` and its GREEN reading inside the suite are the close's, its clean reading owed with PLAY-dClosedLoop-14 under README rule 8. (DERIVED)
 - The legs the spec's Gates section names, run once by the main loop.

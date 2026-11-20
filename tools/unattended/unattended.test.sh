@@ -19370,6 +19370,11 @@ oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); git --git-dir="$LF/o
 add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
 oc_row=$(read_clock_row)
 same "DPR96 AC1 a build lease first seen 25 h ago reads stale" "${oc_row%% *}" "stale"
+# ---- the row's third branch, every other act: a second session's renew is refused live-holder with no hint.
+fs_out=$(LA_SID=s2 run_lease_arm renew build tOc); fs_rc=$?
+same "DPR96 a second session's renew of it exits 1" "$fs_rc" "1"
+hit  "$fs_out" "lease refused — live-holder · tOc/build"
+miss "$fs_out" "stale, so --lease take-over takes it"
 fs_out=$(LA_SID=s2 run_lease_arm acquire build tOc); fs_rc=$?
 same "DPR96 AC1 a second session's acquire of it exits 1" "$fs_rc" "1"
 hit  "$fs_out" "lease refused — live-holder · tOc/build"
@@ -23717,10 +23722,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # per pass of the `DPR59 AC7` rows' loop, off the diff's own lines; the renews loop's two new tips
 # gain passes, not assertions, and the restaged copies' rows are rewritten, not added; no skip
 # branch. No suite ran, and its RED-first observation is the close's.
-# RAISED 4044 -> 4053 by TOOL-dPlacedRequest-96: the stale take-over's 9 region-eight assertions off
-# the diff's own lines, 3 `same` and 4 `hit` for the probe arm and 2 `same` for the static CW_* join,
-# no loop over an assertion and no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4053
+# RAISED 4044 -> 4056 by TOOL-dPlacedRequest-96: the stale take-over's 12 region-eight assertions off
+# the diff's own lines, 4 `same`, 5 `hit` and 1 `miss` for the probe arm and 2 `same` for the static
+# CW_* join, no loop over an assertion and no skip branch. No suite ran, and its RED-first observation
+# is the close's.
+FLOOR_ASSERTIONS=4056
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24001,8 +24007,8 @@ FLOOR_SHARD_7=311
 # RAISED 1250 -> 1256 by TOOL-dPlacedRequest-56: the same 6 region-eight torn-stamp and duplicate-key assertions, see FLOOR_ASSERTIONS.
 # RAISED 1256 -> 1257 by TOOL-dPlacedRequest-58: the same 1 region-eight placed-race reset assertion, see FLOOR_ASSERTIONS.
 # RAISED 1257 -> 1263 by TOOL-dPlacedRequest-59: the same 6 region-eight claim-line reader assertions, see FLOOR_ASSERTIONS.
-# RAISED 1263 -> 1272 by TOOL-dPlacedRequest-96: the same 9 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1272
+# RAISED 1263 -> 1275 by TOOL-dPlacedRequest-96: the same 12 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1275
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.
