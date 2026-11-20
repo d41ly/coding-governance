@@ -19,7 +19,7 @@ hold-reason: the spec audit chain holds at its 4-round ceiling: unit TOOL-dPlace
 hold-until: owner
 hold-code: owner-decision
 held-from: BUILDING
-refreshed-at: 781244bae321d9a64abd41740d264eb5aae2b032 · handoff · 82 touching
+refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · park · 84 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 6277b70848ba4179ec4ec801b8d45c0da95c03ee
 phase: BUILDING
@@ -584,3 +584,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T23:34:36Z draw · fix-pass · TOOL-dPlacedRequest-100 · 80/130 · 20261120T233436Z-366cbc
 
 2026-11-20T23:34:36Z dispatch · item 5a63fbad TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
+
+2026-11-20T23:39:49Z decision · item landing-merge-protected-skills: the landing must merge origin/main (173 commits past the merge base 9e21ac760, 7 conflicted files), and the merge changes the sandbox-protected .claude/skills/lexicon/SKILL.md and .claude/skills/unattended/SKILL.md; options: (a) the owner confirms the pinned git origin in the app (Help, Troubleshooting, Review Pinned Git Origins) and the run merges, (b) the owner rules a plain git merge acceptable, (c) the owner merges main into the run branch · reason the app takes protected .claude/skills files only from an origin the owner confirmed, and a raw git merge or the lander's --prepare writes the same files, so taking either routes around that guard; no resolver the mandate delegates may confirm an origin
