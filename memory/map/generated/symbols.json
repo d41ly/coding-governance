@@ -618,6 +618,11 @@
       "file": "tools/loop/loop_table.py"
     },
     {
+      "id": "TreeUnverified",
+      "kind": "class",
+      "file": "tools/loop/loop_transition.py"
+    },
+    {
       "id": "Unit",
       "kind": "class",
       "file": "tools/playbook/instruction_units.py"
@@ -8053,6 +8058,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "check_run_branch",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "check_run_call",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8701,6 +8711,11 @@
       "id": "check_tree_progressing",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_tree_verdict",
+      "kind": "function",
+      "file": "tools/loop/loop_transition.py"
     },
     {
       "id": "check_true",
@@ -18698,6 +18713,11 @@
       "file": "tools/runlog/runlog.py"
     },
     {
+      "id": "print_merge_witness",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "print_name_hits",
       "kind": "function",
       "file": "tools/run-gates/py_reads.py"
@@ -24536,6 +24556,11 @@
       "id": "read_verdict",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
+    },
+    {
+      "id": "read_verdict_tree",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "read_version_row",
@@ -38043,16 +38068,6 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
-      "id": "write_bar_green",
-      "kind": "function",
-      "file": "tools/run-gates/post-merge.sh"
-    },
-    {
-      "id": "write_bar_green",
-      "kind": "function",
-      "file": "tools/unattended/unattended.sh"
-    },
-    {
       "id": "write_base_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -38068,12 +38083,12 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
-      "id": "write_bg_record",
+      "id": "write_bg_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
     },
     {
-      "id": "write_bg_stamp",
+      "id": "write_bg_verdict",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
     },
@@ -39311,6 +39326,11 @@
       "id": "write_preflight_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_prepared_merge",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "write_proc_record",

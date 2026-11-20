@@ -21,7 +21,9 @@ unit id a tracked spec H1 under the build defines. A move made before the build'
 record, and the writer's next move after it back-fills one per earlier trailer, oldest first.
 
 `record` (`write_transition`) reads the set at HEAD, the move's parent; answers the move by the build
-table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it; resolves `--witness`
+table's `derive_move`, printing `refused — ...` and exiting 1 where no row holds it, and where Test's exit
+into deploying (`TREE_GATED_MOVE`) carries no `--field tree=<hash>` whose full per-tree verdict, the
+runner's `<common dir>/gate-verdict/<hash>`, reads GREEN (TOOL-dWitnessedBar-4 S6); resolves `--witness`
 to HEAD or an ancestor of it, adding `stand-in=<owner>` where the item has a `[[stand-in]]` row and
 `composition=<sha8>`, the commit HEAD names (`composition.py`, TOOL-dDeclaredLoop-26), which a `--field`
 may not give; adds `scenario=<tags>`, the scenarios the build runs under joined by `+`, and
@@ -110,7 +112,14 @@ BUDGET_FIELDS = ("budget", "draw")
 #: The extension fields a trailer and a record may carry after `build`, `item` and `sha`, in the order
 #: they are written; later units extend it. `composition`, `scenario`, `scenario-settled` and the
 #: `BUDGET_FIELDS` it ends with are derived by the writer, never given.
-TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS
+TRANSITION_FIELDS = ("stand-in", "composition", "scenario", "scenario-settled") + BUDGET_FIELDS + ("tree",)
+#: The move whose `tree` field must name a GREEN full per-tree verdict (TOOL-dWitnessedBar-4 S6): Test's
+#: exit, `item.test.exit` from testing into deploying, and the runner's directory it reads under the
+#: common dir.
+TREE_GATED_MOVE = ("testing", "item.test.exit", "deploying")
+VERDICT_DIR = "gate-verdict"
+#: A tree hash, SHA-1 or SHA-256: the one shape that may name a file under the verdict directory.
+TREE_HASH = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 #: The fields `scenario.py`'s `derive_move_scenarios` derives for each move (TOOL-dDeclaredLoop-27).
 DERIVED_SCENARIO_FIELDS = ("scenario", "scenario-settled")
 #: The micro-format definition `render_transition_line` fills, held equal to `AGENTS.md`'s by `check`.
@@ -362,6 +371,37 @@ def read_transitions(build, repo):
 
 
 # ------------------------------------------------------------------------------------------ the writer
+class TreeUnverified(TransitionRefused):
+    """Test's exit asked for a tree no GREEN full per-tree verdict covers; the message names the tree."""
+
+    def __init__(self, tree, why):
+        Exception.__init__(self, "%s · tree %s: %s" % (TREE_GATED_MOVE[1], tree or "-", why))
+
+
+def check_tree_verdict(root, tree):
+    """None where the runner's full per-tree verdict `<common dir>/gate-verdict/<tree>` in the repository
+    at `root` reads `verdict GREEN` for `tree`; else why not. WHAT IT DOES NOT CHECK: that `tree` is the
+    one `verdict.tree` selects, the prepared merge's or the build tip's; the caller names it."""
+    if not tree:
+        return "the move names no tree; give --field tree=<tree hash>"
+    if not TREE_HASH.fullmatch(tree):
+        return "%s is no tree hash" % tree
+    rc, common = read_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    if rc != 0 or not common:
+        return "the git common dir of %s does not resolve" % root.as_posix()
+    path = pathlib.Path(common, VERDICT_DIR, tree)
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return "no full per-tree verdict at %s" % path.as_posix()
+    keys = dict(ln.split("\t", 1) for ln in text.splitlines() if "\t" in ln)
+    if keys.get("tree") != tree:
+        return "%s names tree %s" % (path.as_posix(), keys.get("tree") or "none")
+    if keys.get("verdict") != "GREEN":
+        return "%s reads verdict %s, not GREEN" % (path.as_posix(), keys.get("verdict") or "none")
+    return None
+
+
 def write_transition_record(root, anchor, move, lines=()):
     """The next transition record of the move's build, under `anchor`, from `move`'s fields, then `lines`,
     the rework budget's rows: its path."""
@@ -404,6 +444,10 @@ def write_transition(root, build, state, item, outcome, witness, facts, fields):
             raise ValueError("--field %s is derived: the writer places the move's rework budget rows on the trailer "
                              "where no log record holds them, so it is never given" % name)
         move[name] = value
+    if (state, item, to) == TREE_GATED_MOVE:
+        why = check_tree_verdict(root, move.get("tree"))
+        if why:
+            raise TreeUnverified(move.get("tree"), why)
     owner = {r.get("item"): r.get("owner") for r in read_stand_ins(data, where)}.get(item)
     if owner:
         move["stand-in"] = owner

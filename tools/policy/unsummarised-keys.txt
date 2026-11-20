@@ -240,4 +240,3 @@ verdict.red-route
 verdict.remote.pin
 verdict.remote.pin-scope
 verdict.remote.trust
-verdict.tree

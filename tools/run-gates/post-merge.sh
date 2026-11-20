@@ -13,10 +13,10 @@
 # the host turnstile like any bar, and publishes: a RED pushes `<sha>:refs/gov/bar-red` when that ref
 # is absent or an ancestor of <sha>; a GREEN deletes the ref when it names <sha> or an ancestor of it.
 # Every push is leased on the sha it observed, so a ref that moved in between is a lost race, never
-# an overwrite. It keeps the last verdict in `<common-dir>/gate-post-merge`, writes a GREEN's record
-# to `<common-dir>/gate-bar-green.shared` (design D3, `by post-merge`) only when the scratch worktree is
-# still clean after the bar (TOOL-aFrugalTurnstile-17), and copies the bar's run
-# record to `<common-dir>/gate-run/<run id>/` before the worktree goes.
+# an overwrite. It keeps the last verdict in `<common-dir>/gate-post-merge` and copies the bar's run
+# record to `<common-dir>/gate-run/<run id>/` before the worktree goes. The verdict per tree is the
+# runner's own record, `<common-dir>/gate-verdict/<tree hash>`, which the bar's runner writes from the
+# scratch worktree into the one common dir (TOOL-dWitnessedBar-4 S4); this script writes none.
 #
 # WHAT THIS DOES NOT CHECK: it grades the tree at `<sha>` alone, never the push that landed it; it
 # trusts this clone's remote-tracking ref for "landed"; it applies three keys of the gate-env file
@@ -334,25 +334,6 @@ write_run_record() { # -> PM_RUN_COPY, the copy of the bar's run record under th
   fi
 }
 
-write_bar_green() { # -> <common-dir>/gate-bar-green.shared in design D3's grammar, by post-merge
-  local tree w paths="" dirty t
-  local -a words=()
-  # The hook's and the driver's writers refuse a dirty tree, and so does this one: a bar judged on rc
-  # and HEAD alone may have rewritten tracked files, and the record would certify the pristine tree.
-  if ! dirty=$(git -C "$WT" status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
-    echo "post-merge: no gate-bar-green.shared written — the scratch worktree is not clean after the bar"
-    return 0
-  fi
-  tree=$(git rev-parse -q --verify "$SHA^{tree}" 2>/dev/null) || tree=""
-  read -ra words <<<"$BAR"
-  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
-  t=$(mktemp -u "$CDIR/gate-bar-green.shared.XXXXXXXX" 2>/dev/null)
-  { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\tfull\nbase\t\nselftests\t%s\nrun_id\t%s\nby\tpost-merge\nstamped\t%s\n' \
-      "$SHA" "$tree" "$BAR" "$paths" "${GATE_SELFTESTS:+1}" "$RUN_ID" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-      > "$t" && mv -f "$t" "$CDIR/gate-bar-green.shared"; } 2>/dev/null \
-    || { [ -z "$t" ] || rm -f "$t" 2>/dev/null; echo "post-merge: $CDIR/gate-bar-green.shared could not be written"; }
-}
-
 # ---- 4. the scratch worktree, and its cleanup ------------------------------------------------------
 if [ -n "${EPOCHREALTIME:-}" ]; then RUN_ID="post-merge-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
 else printf -v RUN_ID 'post-merge-%(%s)T%s-%s' -1 "$RANDOM" "$$"; fi
@@ -397,7 +378,6 @@ else
 fi
 
 # ---- 7. the records, and the exit ------------------------------------------------------------------
-[ "$PM_VERDICT" = GREEN ] && write_bar_green
 if [ "$PM_PUB" = failed ]; then
   echo "post-merge: publish FAILED — $PM_PUB_WHY"
 elif [ "$PM_VERDICT" = GREEN ]; then

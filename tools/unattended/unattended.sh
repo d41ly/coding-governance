@@ -11868,50 +11868,6 @@ check_phase_gates() { # slug · from · to -> 0 where the move crosses no held e
   return 1
 }
 
-# write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
-# green, by tree (TOOL-aFrugalTurnstile-3 S1, design D3). The grammar is the pre-push hook's function
-# of the same name (TOOL-aFrugalTurnstile-2): the same preconditions, the same ten keys in the same
-# order, the same `.tmp` rename and the same `.shared` copy into the common dir from a linked worktree;
-# only `by` differs. The hook ships verbatim and sources no kit, so the grammar is spelled twice and
-# held together by a parity arm in this kit's suite, as `read_policy_key` is. SILENT on a red rc, whose
-# output is already the item's; otherwise ONE line, recorded or declined with why. A `kind scoped`
-# record goes to `gate-bar-green.scoped` (and `.scoped.shared`), the hook's slot rule
-# (TOOL-aFrugalTurnstile-11 S1), so it never replaces the full record its base names.
-write_bar_green() {
-  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs f=gate-bar-green
-  local -a words=()
-  local no="unattended: gates-green — no gate-bar-green written:"
-  [ "$rc" = 0 ] || return 0
-  case "$kind" in
-    full) ;;
-    scoped) f=gate-bar-green.scoped ;;
-    "") echo "$no the bar did not run full"; return 0 ;;
-    *) echo "$no the kind '$kind' is neither full nor scoped"; return 0 ;;
-  esac
-  case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
-  if [ "$(GIT rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
-  if ! dirty=$(GIT status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
-    echo "$no the tree is not clean"; return 0
-  fi
-  tree=$(GIT rev-parse -q --verify "$h^{tree}" 2>/dev/null)
-  if [ -z "$tree" ]; then echo "$no the tree of ${h:0:8} could not be read"; return 0; fi
-  read -ra words <<<"$bar"
-  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
-  if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tunattended\nstamped\t%s\n' \
-           "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-           > "$g/$f.tmp" && mv -f "$g/$f.tmp" "$g/$f"; } 2>/dev/null; then
-    echo "$no $g/$f could not be written"; return 0
-  fi
-  cdir=$(GIT rev-parse --git-common-dir 2>/dev/null) || cdir=""
-  cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
-  g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
-  if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
-    cp "$g/$f" "$cdir_abs/$f.shared.tmp" 2>/dev/null \
-      && mv -f "$cdir_abs/$f.shared.tmp" "$cdir_abs/$f.shared" 2>/dev/null
-  fi
-  echo "unattended: gates-green — recorded $f for ${h:0:8} (kind $kind)"
-}
-
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
@@ -11944,7 +11900,7 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
       local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
       local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
@@ -11974,9 +11930,8 @@ dod_met() { # slug · run-state file · item · checker
       fi
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
       # TOOL-aFrugalTurnstile-12 S1 - THE BAR'S KNOBS ARE SCRUBBED FROM EVERY CALL BELOW. Its rc-0
-      # result is recorded as a trusted gate-bar-green that stores neither the manifest nor the reuse
-      # mode, so a GATE_LEGS subset or a GATE_REUSE run inherited from the driver would certify the
-      # whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
+      # result is a gates-green the close trusts, so a GATE_LEGS subset or a GATE_REUSE run inherited
+      # from the driver would certify the whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
       # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
       # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
       local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
@@ -12080,7 +12035,6 @@ dod_met() { # slug · run-state file · item · checker
             esac
           fi
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           case "$_gdec" in
             scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
@@ -12093,7 +12047,6 @@ dod_met() { # slug · run-state file · item · checker
           # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
           # was: the project declares a command line, not a path.
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           run_bounded env "${_gscrub[@]}" "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
@@ -12116,29 +12069,12 @@ dod_met() { # slug · run-state file · item · checker
       # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
       # writes nothing new and an older record can never answer for a newer bar.
       _gh=$(GIT rev-parse HEAD 2>/dev/null)
-      # TOOL-aFrugalTurnstile-3 S2 - THE BAR'S GREEN IS RECORDED BY TREE, in the grammar the push
-      # boundary writes, so a wrapper bar that never earns a usable runner stamp still leaves a green
-      # the boundary can read. `full` under `in-place`, whose bar always runs with GATE_FULL=1; under
-      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty
-      # except on the scoped arm below.
-      # WHAT THIS RECORD DOES NOT CHECK: it says this bar exited 0 on this tree, never that the push
-      # boundary will run the same bar; that equality is the reader's, which compares the bar string
-      # byte for byte.
-      # TOOL-aFrugalTurnstile-9 S5 - the kind and base are the bar that RAN: `scoped` with the base the
-      # boundary picked, and a `covered` close ran none, so it writes no record and no `gates-run` fact.
+      # THE BAR'S VERDICT PER TREE IS THE RUNNER'S OWN RECORD (TOOL-dWitnessedBar-4 S4): the runner
+      # this bar runs writes `<common-dir>/gate-verdict/<tree hash>`, so the close writes none.
+      # TOOL-aFrugalTurnstile-9 S5 - a `covered` close ran no bar, so it writes no `gates-run` fact.
       if [ "$_gdec" = covered ]; then
         echo "unattended: gates-green — met without a bar: the boundary reads this tree as covered by $_grec"
         GG_RUN_FACT=""; DOD_OUT=""; return 0
-      fi
-      _gkind=""
-      if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
-      if [ "$_gdec" = scoped ]; then _gkind=scoped; fi
-      # TOOL-aFrugalTurnstile-16 S1/S3: a scoped record names the FULL base the hook's writer would,
-      # and none is written over an inherited green, which no later push can adopt as a base.
-      if [ "$_gdec" = scoped ] && [ "$_gfull" = - ]; then
-        echo "unattended: gates-green — no gate-bar-green written: the boundary scoped from an inherited green, which no later push can adopt as a base"
-      else
-        [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gfull" "$GATE_CMD" "$_gid"
       fi
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then

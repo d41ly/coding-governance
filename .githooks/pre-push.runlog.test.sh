@@ -862,16 +862,25 @@ check_dec_rest() {
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
   l=$(measure_lines)
   check "DEC bar: a tracked bar is recorded as tracked" "$RC|$(read_field $l bar)" "0|tracked"
-  # COVERED (TOOL-aFrugalTurnstile-2 AC11): that green wrote gate-bar-green for this tree and bar, so
-  # the same push again runs no bar, still names the vetted bar for the lander, and ends clean.
-  run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash tracked-bar.sh"
+  # COVERED (TOOL-aFrugalTurnstile-2 AC11, TOOL-dWitnessedBar-4 S3): the runner's GREEN verdict of the
+  # pushed tree, planted in its grammar, covers a push of the runner's own bar, so no bar runs, the line
+  # still names the vetted bar for the lander, and the push ends clean. On a side branch carrying a root
+  # install's stand-in runner and manifest, so main's later arms read the tree they always read.
+  git checkout -q -b cov
+  mkdir -p run-gates && printf '#!/usr/bin/env bash\nexit 0\n' > run-gates/run-gates.sh && printf '[]\n' > gate-legs.json
+  git add run-gates/run-gates.sh gate-legs.json && git commit -q -m "a root install's runner"
+  cov_t=$(git rev-parse 'HEAD^{tree}'); mkdir -p "$REPO/.git/gate-verdict"
+  printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\tfull\nbase\t\nmanifest\tgate-legs.json\nmanifest_blob\t%s\nselftests\t\nrun_id\tplanted\nby\trunner\n' \
+    "$cov_t" "$(git rev-parse HEAD)" "$(git rev-parse HEAD:gate-legs.json)" > "$REPO/.git/gate-verdict/$cov_t"
+  write_refs "$WORK/refs.cov" "refs/heads/main $(git rev-parse HEAD) refs/heads/main $ZERO"
+  run_hook "$WORK/refs.cov" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD= GATE_SELFTESTS=
   l=$(measure_lines)
   check "DEC covered: the push lands with no bar" "$RC|$(printf '%s\n' "$OUT" | grep -c 'pre-push: covered on main push')" "0|1"
   check "DEC covered: decision" "$(read_field $l decision)|$(read_field $l exit)" "covered|clean"
   check "DEC covered: pre-push-bar holds the vetted bar's three fields" \
-    "$(awk -F'\t' '{ print NF "|" $1 }' "$REPO/.git/pre-push-bar" 2>/dev/null)" "3|tracked"
+    "$(awk -F'\t' '{ print NF "|" $1 }' "$REPO/.git/pre-push-bar" 2>/dev/null)" "3|default"
   [ "$(read_field $l decision)" = covered ] && add_seen covered
-  rm -f "$REPO/.git/gate-bar-green"
+  git checkout -q main && git branch -q -D cov; rm -rf "$REPO/.git/gate-verdict"
   run_hook "$WORK/refs.bar" origin "$WORK/remote.git" GOV_GATE_CMD_TEST= GOV_GATE_CMD=
   l=$(measure_lines)
   check "DEC bar: no override is recorded as the default bar" "$(read_field $l bar)" default

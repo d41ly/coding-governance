@@ -676,6 +676,47 @@ else
 fi
 rm -rf "$REC_T.wt"; rec_done
 
+# --- TOOL-dWitnessedBar-4 AC1-AC3: the runner's verdict per tree ------------------------------------
+# A full green writes `<common-dir>/gate-verdict/<tree>` reading GREEN, kind full, by runner, and the run
+# record's verdict names the same tree; a red leg rewrites it RED; a dirty start writes none and says
+# why; a scoped run after the full green of the same tree writes the `.scoped` slot and leaves the full
+# one; and a linked worktree's run writes into the COMMON dir, keyed by the tree, never by the sha.
+rec_repo
+rv_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); rv_f="$REC_GD/gate-verdict/$rv_tree"
+rec_run GATE_FULL=1 >/dev/null
+rv_rec=$(rec_dir)/verdict
+[ "$(awk -F'\t' '$1=="verdict"||$1=="kind"||$1=="by"{print $2}' "$rv_f" 2>/dev/null | tr '\n' ' ')" = "GREEN full runner " ] \
+  && [ "$(awk -F'\t' '$1=="tree"{print $2}' "$rv_rec" 2>/dev/null)" = "$rv_tree" ] \
+  && ok "AC1 a full green writes gate-verdict/<tree> reading GREEN, kind full, by runner, and the run record names the tree" \
+  || { nope "AC1 no full per-tree verdict, or the run record names another tree"; sed 's/^/      /' "$rv_f" "$REC_OUT" 2>/dev/null; }
+rec_run GATE_FULL= >/dev/null
+[ "$(awk -F'\t' '$1=="kind"{print $2}' "$rv_f.scoped" 2>/dev/null)|$(awk -F'\t' '$1=="kind"{print $2}' "$rv_f" 2>/dev/null)" = "scoped|full" ] \
+  && ok "AC3 a scoped run after the full green writes the .scoped slot and the full record still reads kind full" \
+  || { nope "AC3 the scoped run overwrote the full record or wrote no .scoped slot"; sed 's/^/      /' "$rv_f" "$rv_f.scoped" 2>/dev/null; }
+rec_legs '[ {"name": "red", "argv": ["bash", "fx/red.sh"]} ]'
+rv_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); rv_f="$REC_GD/gate-verdict/$rv_tree"
+rec_run GATE_FULL=1 >/dev/null
+[ "$(awk -F'\t' '$1=="verdict"{print $2}' "$rv_f" 2>/dev/null)" = RED ] \
+  && ok "AC2 a red leg's full run writes the per-tree verdict reading RED" \
+  || { nope "AC2 a red run wrote no RED per-tree verdict"; sed 's/^/      /' "$rv_f" 2>/dev/null; }
+rm -f "$rv_f"; touch "$REC_T/scratch.tmp"
+rec_run GATE_FULL=1 >/dev/null
+[ ! -e "$rv_f" ] && grep -q 'no per-tree verdict written — the tree was not clean when the run started' "$REC_OUT" \
+  && [ "$(awk -F'\t' '$1=="tree"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)" = - ] \
+  && ok "AC2 a dirty start writes no per-tree verdict, says why, and the run record's tree reads -" \
+  || nope "AC2 a dirty start wrote a per-tree verdict for a tree nobody tested, or said nothing"
+rm -f "$REC_T/scratch.tmp"
+( cd "$REC_T" && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+( cd "$REC_T.wt" && printf 'wt\n' > fx/wt.txt && git add fx/wt.txt && git commit -qm wt ) >/dev/null 2>&1
+rv_wtree=$(git -C "$REC_T.wt" rev-parse 'HEAD^{tree}'); rv_wsha=$(git -C "$REC_T.wt" rev-parse HEAD)
+( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 \
+    bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+rv_wgd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
+[ -f "$REC_GD/gate-verdict/$rv_wtree" ] && [ ! -e "$rv_wgd/gate-verdict" ] && [ ! -e "$REC_GD/gate-verdict/$rv_wsha" ] \
+  && ok "AC1 a linked worktree's run writes gate-verdict/<tree> in the common dir, not its own git dir, and keys it by the tree" \
+  || nope "AC1 the linked worktree's per-tree verdict is missing from the common dir, written under its own git dir, or keyed by the sha"
+rm -rf "$REC_T.wt"; rec_done
+
 rec_repo
 rc=$(rec_run GATE_FULL=)     # guards live: the guarded leg is unchanged vs origin/main
 if grep -q 'GATE skip' "$REC_OUT"; then
@@ -2852,17 +2893,16 @@ pm_rc=$(run_pm "$pm_c2"); pm_id=$(read_pm_key "$PM_REC" run_id)
   && ok "AC1 gate-run/<run_id>/ in the common dir holds the failing leg's output after the scratch worktree is gone" \
   || { nope "AC1 the run record went with the worktree, or the worktree survived (id=$pm_id)"; git -C "$PM_C" worktree list | sed 's/^/      /'; }
 
-# AC2 — a green descendant clears it and writes D3's record, by post-merge.
+# AC2 — a green descendant clears it, and the runner's per-tree verdict of c3's tree is the record:
+# post-merge writes none of its own (TOOL-dWitnessedBar-4 S4).
 pm_rc=$(run_pm "$pm_c3"); git ls-remote --exit-code "$PM_B" "$PM_REF" >/dev/null 2>&1; pm_lr=$?
 [ "$pm_rc" = 0 ] && [ "$pm_lr" = 2 ] \
   && ok "AC2 a green descendant exits 0 and git ls-remote --exit-code of refs/gov/bar-red exits 2" \
   || { nope "AC2 the green did not clear the ref (rc=$pm_rc, ls-remote rc=$pm_lr)"; print_pm_out; }
-PM_BG="$PM_GD/gate-bar-green.shared"
-[ "$(cut -f1 "$PM_BG" 2>/dev/null | tr '\n' ' ')" = "sha tree bar bar_paths kind base selftests run_id by stamped " ] \
-  && [ "$(read_pm_key "$PM_BG" kind)" = full ] && [ "$(read_pm_key "$PM_BG" by)" = post-merge ] && [ "$(read_pm_key "$PM_BG" sha)" = "$pm_c3" ] \
-  && [ "$(read_pm_key "$PM_BG" bar)" = "bash $PM_K/run-gates.sh" ] \
-  && ok "AC2 gate-bar-green.shared carries exactly D3's keys, kind full, by post-merge, and the default bar string" \
-  || { nope "AC2 gate-bar-green.shared differs from D3's grammar"; sed 's/^/      /' "$PM_BG" 2>/dev/null; }
+PM_BG="$PM_GD/gate-bar-green.shared"; PM_TV="$PM_GD/gate-verdict/$(git -C "$PM_C" rev-parse "$pm_c3^{tree}")"
+[ ! -e "$PM_BG" ] && [ "$(read_pm_key "$PM_TV" verdict)|$(read_pm_key "$PM_TV" kind)|$(read_pm_key "$PM_TV" by)|$(read_pm_key "$PM_TV" sha)" = "GREEN|full|runner|$pm_c3" ] \
+  && ok "AC2 the common dir's gate-verdict/<c3 tree> reads GREEN, kind full, by runner, sha c3, and no gate-bar-green.shared is written" \
+  || { nope "AC2 the runner's per-tree verdict of c3 is missing or wrong, or a hand-written record appeared"; sed 's/^/      /' "$PM_TV" "$PM_BG" 2>/dev/null; }
 [ -f "$PM_GD/gate-full-green.shared" ] && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
   && ok "AC2 the runner's gate-full-green.shared is present and no gate-pm. worktree is left" \
   || nope "AC2 gate-full-green.shared is absent, or a gate-pm. worktree survived"
@@ -2889,8 +2929,6 @@ pm_rc=$(PM_X="GATE_REUSE=lineage" run_pm "$pm_c4")
   && ! grep -q '^GATE_REUSE=' "$PM_PROBE" && grep -qx "$pm_c4" "$PM_PROBE" && grep -q 'gate-pm\.[0-9]*$' "$PM_PROBE" \
   && ok "AC5 the declared bar saw GATE_FULL=1, a holder, no GATE_REUSE, HEAD at the sha and a gate-pm. cwd" \
   || { nope "AC5 the declared bar ran outside the hold verb, unfull, with reuse, or elsewhere (rc=$pm_rc)"; print_pm_out; }
-[ "$(read_pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
-  && ok "AC5 the green record's bar reads bash bar.sh" || nope "AC5 the green record's bar reads '$(read_pm_key "$PM_BG" bar)'"
 
 # AC6 — a remote that rejects the ref fails the publication, loudly, and the record still lands.
 printf '#!/bin/sh\nwhile read o n r; do case "$r" in refs/gov/*) echo "no gov refs here"; exit 1 ;; esac; done\nexit 0\n' \
@@ -2912,7 +2950,8 @@ pm_rc=$(run_pm "$pm_c5")
   && ok "AC7 an unlanded commit exits 2 with REFUSING, no bar ran and no ref was pushed" \
   || { nope "AC7 an unlanded commit was not refused before the bar (rc=$pm_rc)"; print_pm_out; }
 
-# AC8 — the export form is refused; the hook's accepted forms all read bash bar.sh.
+# AC8 — the export form is refused; the hook's accepted forms all run bash bar.sh, whose probe file and
+# the bar line are the witness now that post-merge writes no record naming the bar (TOOL-dWitnessedBar-4 S4).
 pm_c6=$(build_pm_commit green 'export GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
 pm_rc=$(run_pm "$pm_c6")
 [ "$pm_rc" = 2 ] && grep -q 'export GOV_GATE_CMD' "$PM_OUT" && [ ! -f "$PM_PROBE" ] \
@@ -2920,22 +2959,17 @@ pm_rc=$(run_pm "$pm_c6")
   || { nope "AC8 the export form was not refused (rc=$pm_rc)"; print_pm_out; }
 for pm_form in "GOV_GATE_CMD='bash bar.sh'\\n" 'GOV_GATE_CMD="bash bar.sh" # the bar\n' 'GOV_GATE_CMD="bash bar.sh"\r\n' \
                'GOV_GATE_CMD=bash nothing.sh\nGOV_GATE_CMD="bash bar.sh"\n'; do
-  pm_c=$(build_pm_commit green "$pm_form"); rm -f "$PM_BG"
+  pm_c=$(build_pm_commit green "$pm_form"); rm -f "$PM_PROBE"
   pm_rc=$(run_pm "$pm_c")
-  [ "$pm_rc" = 0 ] && [ "$(read_pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+  [ "$pm_rc" = 0 ] && [ -f "$PM_PROBE" ] && grep -q 'bar: bash bar.sh' "$PM_OUT" \
     && ok "AC8 the accepted form $(printf '%q' "$pm_form") resolves to bash bar.sh" \
-    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") resolved to '$(read_pm_key "$PM_BG" bar)' (rc=$pm_rc)"; print_pm_out; }
+    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") did not run bash bar.sh (rc=$pm_rc)"; print_pm_out; }
 done
 
-# TOOL-aFrugalTurnstile-17 AC1-AC3 — a wrapper bar that dirties the tree earns no green record, a
-# runner's exit 0 without verdict GREEN is RED, and a bar that moves the worktree's HEAD is refused.
+# TOOL-aFrugalTurnstile-17 AC2-AC3 — a runner's exit 0 without verdict GREEN is RED, and a bar that
+# moves the worktree's HEAD is refused. AC1, a dirtied tree's declined record, left with post-merge's
+# own writer (TOOL-dWitnessedBar-4 S4).
 git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
-printf '#!/usr/bin/env bash\necho dirtied >> verdict.txt\n' > "$PM_C/dirty.sh"
-pm_c=$(build_pm_commit green 'GOV_GATE_CMD="bash dirty.sh"\n'); rm -f "$PM_BG"
-pm_rc=$(run_pm "$pm_c")
-[ "$pm_rc" = 0 ] && [ ! -f "$PM_BG" ] && grep -q 'no gate-bar-green.shared written .* not clean' "$PM_OUT" \
-  && ok "TOOL-17 AC1 a wrapper bar that edits a tracked file and exits 0 writes no gate-bar-green.shared and names the dirty tree" \
-  || { nope "TOOL-17 AC1 a dirty tree's green was recorded, or the decline is silent (rc=$pm_rc)"; print_pm_out; }
 git -C "$PM_C" push -q -f "$PM_R" "$pm_c1:$PM_REF" 2>/dev/null
 cp "$PM_C/$PM_K/run-gates.sh" "$PM_T/run-gates.real"
 printf '#!/usr/bin/env bash\nd=$(git rev-parse --absolute-git-dir)/gate-run/$GATE_RUN_ID; mkdir -p "$d"; printf "verdict\\tRED\\n" > "$d/verdict"\nexit 0\n' \
