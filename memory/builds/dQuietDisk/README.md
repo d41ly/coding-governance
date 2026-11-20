@@ -5,7 +5,7 @@ opened: 2026-11-20
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26
+ids: TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27
 ---
 
 # dQuietDisk — gov's bars and suites stop churning the disk
@@ -78,7 +78,7 @@ none
 <!-- gen:build-index -->
 **Build status:** SPECCED · 20 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dQuietDisk-1 TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16
-ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26
+ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 TOOL-dQuietDisk-21 TOOL-dQuietDisk-22 TOOL-dQuietDisk-23 TOOL-dQuietDisk-24 TOOL-dQuietDisk-25 TOOL-dQuietDisk-26 TOOL-dQuietDisk-27
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
