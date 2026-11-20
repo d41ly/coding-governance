@@ -9453,6 +9453,16 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "cmd_flakes",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "cmd_flakes_check",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "cmd_for_diff",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -11348,6 +11358,11 @@
       "file": "tools/memory-tree/build_records.py"
     },
     {
+      "id": "derive_flake_holds",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "derive_floor_breaches",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -11569,6 +11584,11 @@
     },
     {
       "id": "derive_held_export",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "derive_hold_lines",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -12506,6 +12526,11 @@
       "id": "derive_push_failure",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_quarantine_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "derive_reach",
@@ -15661,6 +15686,11 @@
       "id": "load_fixture_target",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "load_flake_factory",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "load_fork_cutoff",
@@ -19768,9 +19798,19 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "read_asks",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_asks_args",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_asks_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_asks_key",
@@ -20461,6 +20501,11 @@
       "id": "read_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_conf_at",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_conf_at_rev",
@@ -21173,6 +21218,41 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_flake_policy",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flake_record",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flake_records",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flake_releases",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flake_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flake_threshold",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "read_flaky_asks",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_fleet",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -21723,6 +21803,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_instant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_inventory",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -22026,6 +22111,11 @@
       "id": "read_leg_argv",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_leg_attempts",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_leg_edges",
@@ -23388,6 +23478,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "read_repo_asks",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "read_repo_root",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -24486,6 +24581,11 @@
       "id": "read_tools",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_top",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "read_toplevel",
@@ -31468,6 +31568,16 @@
       "file": "tools/loop/guard.py"
     },
     {
+      "id": "run_fixture_flakes_record",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_flakes_window",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -31508,12 +31618,27 @@
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
+      "id": "run_fixture_quarantine_check",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_quarantine_source",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "run_fixture_red_route",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "run_fixture_route",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "run_fixture_route_flaky",
       "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
@@ -32111,6 +32236,11 @@
       "id": "run_leg_reap",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "run_leg_records",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "run_leg_retry",
@@ -38933,6 +39063,11 @@
       "file": "tools/playbook/core.py"
     },
     {
+      "id": "write_fixture_commit",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
       "id": "write_fixture_files",
       "kind": "function",
       "file": "tools/loop/loop_witness.py"
@@ -38981,6 +39116,21 @@
       "id": "write_fixture_schema_step",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_flake_ask",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_flake_repo",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
+    },
+    {
+      "id": "write_flake_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_fleet_claim",
@@ -39293,6 +39443,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "write_leg_ask",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_leg_capture",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -39301,6 +39456,11 @@
       "id": "write_leg_record",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_leg_rows",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_flow.py"
     },
     {
       "id": "write_leg_tails",

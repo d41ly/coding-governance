@@ -24,6 +24,8 @@
 #                                                    # lib-verdict.sh, is what a landing reads
 #   GATE_SELECTION=<path> bash …                     # hold each leg the selection record names by
 #                                                    # quarantine or level (verdict_flow.py select)
+#   GATE_RERUN=1 bash …                              # run each red leg once more on this tree, into
+#                                                    # <i>.rerun.leg; moves no verdict and no exit code
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
 #
@@ -2823,6 +2825,11 @@ if [ -n "${GATE_CAUSE:-}" ]; then
   esac
 fi
 unset GATE_CAUSE
+# THE SAME-TREE RE-RUN (TOOL-dWitnessedBar-8 S1), read once and removed for the same reason: a nested
+# bar over a fixture re-runs its own reds only when its caller asks it to. `1` arms it; anything else
+# leaves the bar as it was.
+RERUN_RED=""; [ "${GATE_RERUN:-}" = 1 ] && RERUN_RED=1
+unset GATE_RERUN
 # THE REUSE KNOBS, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4, composed by
 # TOOL-aSparedSpawn-32 S6): the pre-push hook exports `GATE_REUSE_LINEAGE` or `GATE_REUSE_PUSH` to THIS
 # bar, and a leg's nested runner inheriting either, or a hand-set `GATE_REUSE`, would reuse inside a
@@ -4129,7 +4136,8 @@ unset _sf_bounded
 runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
   # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
-  # reads that first attempt exactly as it was written.
+  # reads that first attempt exactly as it was written. `.sample` is the reuse sample's second look and
+  # `.rerun` the same-tree re-run of a red leg (TOOL-dWitnessedBar-8 S1), beside them the same way.
   local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown _tp
   local -a chunks_out=()
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
@@ -4214,7 +4222,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # NOT FOR THE SAMPLE'S SECOND LOOK (TOOL-aSparedSpawn-16 S16): the `log:` pointer `FAILED_LEGS` already
   # carries names this file, and it must keep naming the attempt that redded the run. The look's own
   # output stays in the run directory below.
-  if [ -n "$lf" ] && [ "$sfx" != .sample ]; then
+  if [ -n "$lf" ] && [ "$sfx" != .sample ] && [ "$sfx" != .rerun ]; then
     { write_redacted "$lf" "$logged"; } 2>/dev/null || true
   fi
   printf '%s\n' "$out" > "$WORK/$i$sfx.out"
@@ -5522,6 +5530,29 @@ if [ -n "$REUSE_CACHE" ]; then
   done
 fi
 unset _key _src _rc _rc2 _st
+# THE SAME-TREE RE-RUN (TOOL-dWitnessedBar-8 S1), under `GATE_RERUN=1`, after the serial retry and the
+# sample and inside the wall: each leg whose effective result is a numeric red runs once more, alone, on
+# this tree, into `<i>.rerun.*` beside its attempts, so `verdict_flow.py route` and `flakes` read a
+# red-then-green leg from its run record. IT MOVES NOTHING: every leg was reported above, the verdict
+# and the exit code are counted from those reports, and `runleg` writes no `gate-logs` file for the
+# attempt, so `log:` keeps naming the attempt that redded the run. A leg whose own ceiling fired, one
+# with a `.defer` marker or a serial retry, is left to the quiet-host re-run (TOOL-dWitnessedBar-30),
+# and a bar whose wall fired re-runs nothing. Green the second time prints the sample's
+# `nondeterministic` line, once: a sampled leg whose look already printed it does not print it again.
+if [ -n "$RERUN_RED" ] && [ ! -f "$WORK/wall.breach" ]; then
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    { [ -f "$WORK/$i.defer" ] || [ -f "$WORK/$i.retry.rc" ]; } && continue
+    _rc=""; { IFS= read -r _rc < "$WORK/$i.rc"; } 2>/dev/null
+    case "$_rc" in ''|0|*[!0-9]*) continue ;; esac
+    runleg "$i" .rerun &
+    wait "$!" 2>/dev/null
+    _rc2=""; { IFS= read -r _rc2 < "$WORK/$i.rerun.rc"; } 2>/dev/null
+    _rc=""; { IFS= read -r _rc < "$WORK/$i.sample.rc"; } 2>/dev/null
+    [ "$_rc2" = 0 ] && [ "$_rc" != 0 ] && printf 'nondeterministic · %s\n' "${names[$i]}"
+  done
+fi
+unset _rc _rc2
 # AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
