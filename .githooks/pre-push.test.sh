@@ -2620,10 +2620,15 @@ _sel_add=$'x\tquarantine\tTOOL-x-7'; _sel_lvl=$'x\tlevel\te2e, outside tests.lan
 # TOOL-dWitnessedBar-56 S1: a note holding ` · ` round-trips, so its row reaches R's check and is named
 # there, where a rebuild turning ` · ` back into a TAB refuses it as rows that do not hash.
 _sel_dot=$'x\tquarantine\tTOOL-x-7 · 3/10'
+# TOOL-dWitnessedBar-62 S13: a `quarantine` row whose note is EMPTY, its last field, rebuilds to its hash
+# and is judged at R by its whole row, as the ` · ` row is, never refused as rows that do not hash. R
+# derives no empty-note row, so it is judged and never adopted. Red against a rebuild that reads
+# `selection.<n>` with a TAB IFS, which drops the trailing TAB.
+_sel_empty=$'x\tquarantine\t'
 declare -A _sel_hk=()
-for _c in adds dot derived; do
+for _c in adds dot empty derived; do
   write_bg_verdict "$_x" full ""
-  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; *) write_bg_selection "$_sel_lvl" ;; esac
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; empty) write_bg_selection "$_sel_empty" ;; *) write_bg_selection "$_sel_lvl" ;; esac
   _m0=$(read_bg_marks); run_bg_push
   _sel_hk[$_c]=NONE; [ "$(read_bg_marks)" = "$_m0" ] && _sel_hk[$_c]=GREEN
   case "$_c|$(read_bg_marks)|$BG_OUT" in
@@ -2631,9 +2636,11 @@ for _c in adds dot derived; do
       ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R does not derive is not adopted, names the row, and the bar runs" ;;
     "dot|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · TOOL-x-7 · 3/10"*)
       ok "BG TOOL-dWitnessedBar-56 AC1 a selection row whose note holds ' · ' rebuilds to its hash and is judged at R by its whole note" ;;
+    "empty|$((_m0 + 1))|"*"not covered"*"the bar's selection is not what ${_r:0:8} derives"*"adds x · quarantine · , which"*)
+      ok "BG TOOL-dWitnessedBar-62 AC8 a selection row whose note is empty rebuilds to its hash and is judged at R by its whole row" ;;
     "derived|$_m0|"*"covered on main push"*"$BG_VN sha ${_x:0:8}"*"no bar runs"*)
       ok "BG TOOL-dWitnessedBar-41 AC2 from a second worktree, a verdict whose selection R derives exactly covers the merge with no bar run" ;;
-    *) bad "BG TOOL-dWitnessedBar-41/56 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
+    *) bad "BG TOOL-dWitnessedBar-41/56/62 the $_c case got rc $BG_RC marker $(read_bg_marks) from $_m0: $BG_OUT" ;;
   esac
 done
 # TOOL-dWitnessedBar-56 AC6 — PARITY AT R: the local-hook reader, copied beside the fixture's stand-in runner
@@ -2642,9 +2649,9 @@ done
 cp "$SRC/$RUN_GATES_DIR/verdict_backends.py" "$KIT_REL/$RUN_GATES/"
 printf '[[verdict_backend]]\nname = "local-hook"\nreader = "verdict_backends:read_local_verdict"\noff_node = false\nowner = "tFix"\n' \
   > "$KIT_REL/$RUN_GATES/kit.toml"
-for _c in adds dot derived; do
+for _c in adds dot empty derived; do
   write_bg_verdict "$_x" full ""
-  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; *) write_bg_selection "$_sel_lvl" ;; esac
+  case $_c in adds) write_bg_selection "$_sel_add" ;; dot) write_bg_selection "$_sel_dot" ;; empty) write_bg_selection "$_sel_empty" ;; *) write_bg_selection "$_sel_lvl" ;; esac
   _lv=$("$_rkd_py" "$KIT_REL/$RUN_GATES/verdict_backends.py" read --backend local-hook --sha "$_x" 2>&1)
   case "$_lv" in
     *"verdict: local-hook · ${_sel_hk[$_c]} · "*) ok "BG TOOL-dWitnessedBar-56 AC6 parity at R: over $_c the hook and read --backend local-hook both read ${_sel_hk[$_c]}" ;;

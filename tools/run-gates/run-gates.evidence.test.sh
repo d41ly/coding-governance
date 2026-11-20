@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=311
+FLOOR_ASSERTIONS=312
+# RAISED 311 -> 312 by TOOL-dWitnessedBar-62 on 2026-11-20: the runner's record of an empty-note selection
+# row. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 310 -> 311 by TOOL-dWitnessedBar-60 on 2026-11-20: the post-merge run under an inherited
 # GATE_SELECTION and GATE_BASE_FROM. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 309 -> 310 by TOOL-dWitnessedBar-58 on 2026-11-20: the leg-output and no-.scoped assertion after
@@ -775,6 +777,17 @@ rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
 [ -n "$sl_got" ] && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_got" ] \
   && ok "TOOL-dWitnessedBar-56 AC1 the LF twin of the selection yields the same selection hash" \
   || nope "TOOL-dWitnessedBar-56 AC1 the LF twin hashed differently from the CRLF file"
+# TOOL-dWitnessedBar-62 AC8 (S13): a `quarantine` row whose note is EMPTY, its last field. The record's
+# `selection.1` keeps the empty field, four TAB fields the last one empty, and its `selection` is the
+# hash of the row's own text. Red against a runner cutting the row with a TAB-IFS `read`, which merges
+# the trailing TAB away and refuses or rewrites the row.
+printf '# planted\nheld\tguarded\tquarantine\t\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\t\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ "$(awk -F'\t' '$1=="selection.1"{print NF "|" $2 "|" $3 "|" $4}' "$sl_f" 2>/dev/null)" = "4|guarded|quarantine|" ] \
+  && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-62 AC8 an empty-note quarantine row keeps its empty last field in selection.1 and hashes as its own text" \
+  || { nope "TOOL-dWitnessedBar-62 AC8 selection.1 lost the empty note, or selection is not the row's hash"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
 rm -f "$sl_sel"; rec_done
 
 # --- TOOL-dWitnessedBar-25 AC1-AC5: the verdict names its run and cause, and a failing leg's tail is kept by hash

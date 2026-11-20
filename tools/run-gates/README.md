@@ -279,7 +279,7 @@ and neither runs a command; any other spelling is refused (TOOL-dWitnessedBar-45
 | `when` | holds when |
 |---|---|
 | `"<conf file>:<KEY>=<value>"` | the conf at the repo root reads that value for the key |
-| `"exists:<path>"` | the path, its tokens resolved as an argv's are, exists in the tree |
+| `"exists:<path>"` | the path, its tokens resolved as an argv's are, exists in the tree; resolved to an absolute path (`/…`, `X:…`) or one holding a `..` segment, it is refused (TOOL-dWitnessedBar-62) |
 
 The leg factory's row carries `when = "exists:{prefix}/govkit/govkit.py"`: its render reads govkit,
 which never reaches an adopter, so an adopter's `--regen-list` names the row skipped and its bar
@@ -1681,8 +1681,9 @@ unattended driver runs it after `route` on every red bar it reads and files each
 <first rc> · <re-run rc or ->`. A flake is a row whose first rc is not 0 and whose re-run rc is, as the
 factory's `derive_flaked` says, and the rows are read through its `read_flake_body`. It then runs the
 drift kit's gate-health measurement in the repository's top, bounded at 60 seconds, `drift_report.py
---gate-health --write --build <slug> --unit <id> --with <the record it wrote>`, and prints every line it
-prints, so a `drift-report: wrote <path>` line's gate-health record is staged beside the flake record;
+--gate-health --selection <the run's selection record, or an empty temporary file> --write --build <slug>
+--unit <id> --with <the record it wrote>`, and prints every line it prints, so a `drift-report: wrote
+<path>` line's gate-health record is staged beside the flake record;
 no drift kit, a non-zero exit or the bound firing prints one `flakes  gate-health · <why>` line, and
 `flakes` still exits 0. The holds it prints read the threshold in force before that record. Under
 `quarantine` it prints `hold  <leg>  <flakes>/<window>  <record ids>` for each leg whose flakes in its

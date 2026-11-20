@@ -196,11 +196,7 @@ RED_ROUTES = {"fix-pass-or-design": {"code-miss": "fix-pass", "spec-wrong": "new
 ATTRIBUTE_TAG = "item.test.attribute"
 LOOP_VERB = "items --tag"
 ASK_ID = "TOOL-dWitnessedBar-100"
-# THE HOLD (TOOL-dWitnessedBar-5). The runner's `HOLD_SOURCES` is `kit` and these two: `kit` it derives
-# from the manifest row itself, so a selection holding a `kit` row is ignored and its leg runs.
-SELECTION_SOURCES = ("quarantine", "level")
-# A selection row's fifth field (TOOL-dWitnessedBar-30 S1): `run` executes the leg outside the verdict.
-SELECTION_MODES = ("hold", "run")
+# SELECTION_SOURCES and SELECTION_MODES sit inside the `selection_row` block beside `read_selection`.
 HELD_RESULTS = ("unrun", "ok", "fail")
 SEP = " · "
 HELD_KEY = "verdict.held"
@@ -281,11 +277,21 @@ def read_held_keys(keys):
     return out
 
 
+# >>> selection_row -- canonical copy: verdict_flow.py in the gov run-gates kit (byte-identical; gated)
+# THE HOLD (TOOL-dWitnessedBar-5). The runner's `HOLD_SOURCES` is `kit` and these two: `kit` it derives
+# from the manifest row itself, so a selection holding a `kit` row is ignored and its leg runs.
+SELECTION_SOURCES = ("quarantine", "level")
+# A selection row's fifth field (TOOL-dWitnessedBar-30 S1): `run` executes the leg outside the verdict.
+SELECTION_MODES = ("hold", "run")
+
+
 def read_selection(text, names=None):
     """(rows [(leg, source, note, mode)], refusals [line]) of a selection record's text. A row that is
     not `held` and three or four fields, whose source is outside SELECTION_SOURCES, whose mode is outside
     SELECTION_MODES, or whose leg `names` lacks is refused and its leg runs; a row with no mode is `hold`
-    (TOOL-dWitnessedBar-30 S1). `#` lines are the header."""
+    (TOOL-dWitnessedBar-30 S1). `#` lines are the header. The drift-audit kit's `drift_report.py`
+    carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy that drifts
+    (TOOL-dWitnessedBar-62 S17)."""
     rows, refusals = [], []
     for n, ln in enumerate(text.splitlines(), 1):
         if not ln.strip() or ln.startswith("#"):
@@ -304,6 +310,7 @@ def read_selection(text, names=None):
         else:
             rows.append((f[1], f[2], f[3], f[4] if len(f) == 5 else "hold"))
     return rows, refusals
+# <<< selection_row
 
 
 def read_attribution(run):

@@ -438,6 +438,7 @@ legacy_ledger_py|$ROOT/$KIT_REL/legacy_ledger.py|$KIT_REL/legacy_ledger
 acceptance_reader|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
 arm_walk|$ROOT/${KIT_REL%/*}/check-spec-tokens.py|${KIT_REL%/*}/check-spec-tokens
 hold_predicate|$ROOT/$RUNGATES_DIR/held_halves.py|$RUNGATES_DIR/held_halves
+selection_row|$ROOT/$RUNGATES_DIR/verdict_flow.py|$RUNGATES_DIR/verdict_flow
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -517,6 +518,9 @@ hold_predicate|$ROOT/$RUNGATES_DIR/held_halves.py|$RUNGATES_DIR/held_halves
 # heading text and its `New arm:` walk, which the memory-tree kit's seen_red.py carries. hold_predicate
 # (S21) is the run-gates kit's hold predicate, `held_halves.py#test_held`, which drift-audit's
 # drift_report.py carries because that kit cannot import run-gates.
+# selection_row (TOOL-dWitnessedBar-62 S17) is the runner's selection-row reader, `verdict_flow.py#read_selection`
+# with the source and mode tuples it reads, which drift_report.py carries so its gate-health bar holds
+# exactly the legs the runner holds.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -619,6 +623,18 @@ printf '%s\npy=$(resolve_python)\nrefuse_wrong_shell || exit 2\n' "$rwo_head" > 
 # RED where the call is read at column 0 alone (indent.sh unnamed), or a definition reads as a call.
 printf '%s\nif [ -n "${X:-}" ]; then\n  resolve_python >/dev/null\nfi\n' "$rwo_head" > "$RWO/$rwo_t/x/indent.sh"
 printf '  resolve_python() { echo bash; }\n' > "$RWO/$rwo_t/x/stub.sh"
+# TOOL-dWitnessedBar-62 AC17 (S26): one file per call spelling unit 57's contexts missed, none refusing,
+# so each is a member the arm names; `hashed.sh` spells the name only after a `#`, so it is none. The
+# name is spelled through `rwo_rp` so this suite's own lines hold no call. RED where the call reader
+# misses `elif`, `while`, a group, a backtick or `$(` and whitespace (that member unnamed), or reads a
+# commented spelling as a call.
+rwo_rp=resolve_python
+printf 'if false; then :\nelif %s >/dev/null; then :\nfi\n' "$rwo_rp" > "$RWO/$rwo_t/x/elif.sh"
+printf 'while %s >/dev/null; do break; done\n' "$rwo_rp" > "$RWO/$rwo_t/x/while.sh"
+printf 'py=$( %s )\n' "$rwo_rp" > "$RWO/$rwo_t/x/dollar.sh"
+printf 'py=`%s`\n' "$rwo_rp" > "$RWO/$rwo_t/x/backtick.sh"
+printf '{ %s; } >/dev/null\n' "$rwo_rp" > "$RWO/$rwo_t/x/group.sh"
+printf '# %s\n: # then %s\n' "$rwo_rp" "$rwo_rp" > "$RWO/$rwo_t/x/hashed.sh"
 (cd "$RWO" && git init -q && git add -A) || bad "the wrong-shell order fixture could not be staged"; ok
 rwo_out=$(cd "$RWO" && bash "$rwo_t/${HERE##*/}/refuse-wrong-shell.sh" --coverage 2>&1); rwo_rc=$?
 { [ "$rwo_rc" = 1 ] && grep -q '^BREAK tools/x/late.sh refuses only after it resolved python' <<<"$rwo_out" \
@@ -630,6 +646,12 @@ grep -q '^BREAK tools/x/indent.sh never calls refuse_wrong_shell' <<<"$rwo_out" 
   || bad "57 AC2: refuse-wrong-shell.sh --coverage read an indented resolve_python() stub as a call:${rwo_out//$'\n'/; }"; ok
 grep -q "^  dropped: $rwo_t/${HERE##*/}/resolve-python.sh (TOOL-dWitnessedBar-27's listed member the predicate excludes: " <<<"$rwo_out" \
   || bad "57 AC3: refuse-wrong-shell.sh --coverage did not name resolve-python.sh dropped with its reason:${rwo_out//$'\n'/; }"; ok
+for rwo_f in elif while dollar backtick group; do
+  grep -q "^BREAK tools/x/$rwo_f.sh never calls refuse_wrong_shell" <<<"$rwo_out" \
+    || bad "62 AC17: refuse-wrong-shell.sh --coverage did not read the $rwo_f.sh call as a member's:${rwo_out//$'\n'/; }"; ok
+done
+! grep -q 'hashed.sh' <<<"$rwo_out" \
+  || bad "62 AC17: refuse-wrong-shell.sh --coverage read a spelling after a # as a call:${rwo_out//$'\n'/; }"; ok
 # TOOL-dWitnessedBar-57 AC6: the memory-tree kit carries the resolve_bash_py block once, in tree_lib.py,
 # and row_grammar.py and corpus_ids.py import its scan_bash from there. RED where either keeps a copy.
 rbm_d="$ROOT/${PFX}memory-tree"
@@ -1363,6 +1385,26 @@ done
 out=$(run_ll seed --home "$LLR/nodir/abs.txt" --copy "$LL/tmpl.txt")
 { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed nodir/abs.txt" <<<"$out" && [ -f "$LLR/nodir/abs.txt" ]; } \
   || bad "57 AC10: an absolute seed home inside the work tree was not armed: ${out//$'\n'/ | }"; ok
+# TOOL-dWitnessedBar-62 AC18 (S27, S35) — inside a `git worktree add` fixture, whose `.git` is a gitlink
+# FILE naming the common dir, `--home .git` and `--home` naming the git dir of a nested repository each
+# print `outside the tree` and leave the gitlink byte-identical; a relative and an absolute in-tree home
+# each print `armed`. RED against a string-prefix compare (the absolute in-tree home refused) and against
+# a git-dir test alone (the gitlink, no git dir, overwritten).
+LLW="$LL/wt"; rm -rf "${LLW:?}"
+git -C "$LLR" worktree add -q --detach "$LLW" >/dev/null 2>&1 || bad "62 AC18: the linked worktree could not be added"; ok
+mkdir -p "$LLW/wtdir" "$LLW/nested" && git -C "$LLW/nested" init -q && cp "$LLW/.git" "$LL/wt.gitlink"
+run_llw() { (cd "$LLW" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH "$REALPY" -B "$HERE/legacy_ledger.py" "$@") 2>&1 | tr -d '\r'; echo "rc=${PIPESTATUS[0]}"; }
+for ll_home in .git nested/.git; do
+  out=$(run_llw seed --home "$ll_home" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=1 ] && grep -q "^unarmed .* outside the tree " <<<"$out" && cmp -s "$LL/wt.gitlink" "$LLW/.git"; } \
+    || bad "62 AC18: in a linked worktree the seed home $ll_home was written or not read outside the tree: ${out//$'\n'/ | }"; ok
+done
+for ll_home in wtdir/rel.txt "$LLW/wtdir/abs.txt"; do
+  out=$(run_llw seed --home "$ll_home" --copy "$LL/tmpl.txt")
+  { [ "${out##*$'\n'}" = rc=0 ] && grep -qxF "armed wtdir/${ll_home##*/}" <<<"$out" && [ -f "$LLW/wtdir/${ll_home##*/}" ]; } \
+    || bad "62 AC18: in a linked worktree the in-tree seed home $ll_home was not armed: ${out//$'\n'/ | }"; ok
+done
+git -C "$LLR" worktree remove --force "$LLW" >/dev/null 2>&1; rm -rf "${LLW:?}" "$LL/wt.gitlink"
 rm -rf "$LLR/.gitignore" "$LLR/ign" "$LLR/nodir/abs.txt" "$LL/outside" "$LL/tmpl.txt"
 run_ll_reset
 # TOOL-dWitnessedBar-17 S9, AC11 — a seed argv spelling its program `{prefix}/<kit>/<file>` runs where the

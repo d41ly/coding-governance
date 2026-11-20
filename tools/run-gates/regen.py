@@ -141,13 +141,20 @@ def resolve_argv(argv, ctx, where):
 def check_when(root, when, ctx, where):
     """True when a row's `when` holds at the repo root: `<conf>:<KEY>=<value>` when the conf's key reads
     that value, `exists:<path>` when the path, its tokens resolved as an argv's are, exists in the tree
-    (TOOL-dWitnessedBar-45 S1). Neither form runs a command; any other spelling is a Refusal."""
+    (TOOL-dWitnessedBar-45 S1). Neither form runs a command; any other spelling is a Refusal, and so is
+    an `exists:` path that, resolved, is absolute (`/…`, `X:…`) or holds a `..` segment, by the pattern
+    the unattended kit's `read_gate_policy` refuses (TOOL-dWitnessedBar-62 S22)."""
     shape = f"{where}: a when must read <conf file>:<KEY>=<value> or exists:<path>, got {when!r}"
     w = str(when)
     if w.startswith("exists:"):
         if not w[len("exists:"):]:
             raise Refusal(shape)
-        return (root / resolve_argv([w[len("exists:"):]], ctx, where)[0]).exists()
+        rel = resolve_argv([w[len("exists:"):]], ctx, where)[0]
+        if rel.startswith("/") or (rel[1:2] == ":" and rel[:1].isascii() and rel[:1].isalpha()) \
+                or ".." in rel.split("/"):
+            raise Refusal(f"{where}: an exists: path must be repo-relative inside the tree, with no '..' "
+                          f"segment, got {when!r}")
+        return (root / rel).exists()
     conf, _, kv = w.partition(":")
     key, eq, want = kv.partition("=")
     if not conf or not key or not eq:

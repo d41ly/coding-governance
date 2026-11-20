@@ -510,14 +510,22 @@ def read_root_confs(root):
     """-> the root `.<name>.conf` files of `root`'s working tree, tracked or not: what
     `git ls-files --cached --others --exclude-standard -- ':(glob).*.conf'` lists, so a conf an adopter has
     copied but not yet committed is read before its first commit (TOOL-dWitnessedBar-52 S1). The glob
-    magic keeps `*` from crossing `/`, so a nested conf is not one. WHAT IT DOES NOT CHECK: a root conf
-    the repository ignores is never read, so a pin assigned only in a machine-local ignored conf is
-    neither seeded nor held."""
+    magic keeps `*` from crossing `/`, so a nested conf is not one. Each listed path is kept once, and
+    only when it is a regular file in the work tree: a staged conf removed from the work tree is
+    printed `not in the work tree <path>` on stderr and not read (TOOL-dWitnessedBar-62 S23). WHAT IT
+    DOES NOT CHECK: a root conf the repository ignores is never read, so a pin assigned only in a
+    machine-local ignored conf is neither seeded nor held."""
     rc, out = LL._run_git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--",
                           ":(glob).*.conf")
     if rc != 0:
         raise ValueError("git ls-files of the root confs failed at %s" % root)
-    return sorted({p for p in out.split("\0") if p})
+    kept = []
+    for p in sorted({p for p in out.split("\0") if p}):
+        if pathlib.Path(root, p).is_file():
+            kept.append(p)
+        else:
+            print("not in the work tree %s" % p, file=sys.stderr)
+    return kept
 
 
 def read_root_conf_lines(root):
@@ -1164,6 +1172,20 @@ def run_plant_untracked_conf(top, results):
                      ["undeclared site · .x.conf\tFOO_PIN"], ["undeclared site · .fix.conf"])
 
 
+def run_plant_deleted_conf(top, results):
+    """S23 (TOOL-dWitnessedBar-62): a root conf staged and then removed from the work tree is named
+    `not in the work tree` and never opened, by the seed's measure and by the leg."""
+    write_scalar_fixture(top)
+    write_files(top, {".x.conf": 'FOO_PIN="3"\n'})
+    run_git_in(top, "add", "--", ".x.conf")
+    write_files(top, {".x.conf": None})
+    check_plant_case(results, "deleted-conf", "a staged root conf absent from the work tree, measured", top,
+                     ["keys-not-scalar", "--measure"], 0, ["not in the work tree .x.conf", ".fix.conf\tBAR_PIN\t1"],
+                     ["Traceback", "FOO_PIN"])
+    check_plant_case(results, "deleted-conf", "the leg over it", top, ["keys-not-scalar"], 0,
+                     ["not in the work tree .x.conf", "· held · .fix.conf\tBAR_PIN"], ["Traceback", "FOO_PIN"])
+
+
 def run_plant_ignored_conf(top, results):
     """S3 (TOOL-dWitnessedBar-52): a root conf the repository ignores is never measured."""
     write_scalar_fixture(top)
@@ -1206,7 +1228,7 @@ PLANTS = {
     "untouched-quiet": run_plant_untouched_quiet, "merge": run_plant_merge,
     "new-population": run_plant_new_population, "home-moved": run_plant_home_moved,
     "regrammared": run_plant_regrammared, "untracked-conf": run_plant_untracked_conf,
-    "ignored-conf": run_plant_ignored_conf, "empty-seed": run_plant_empty_seed,
+    "ignored-conf": run_plant_ignored_conf, "deleted-conf": run_plant_deleted_conf, "empty-seed": run_plant_empty_seed,
     "unarmed-home": run_plant_unarmed_home,
 }
 

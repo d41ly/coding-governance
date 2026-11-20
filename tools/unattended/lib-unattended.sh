@@ -868,7 +868,11 @@ derive_self_rel() {
 # OR `when = "exists:<path>"` (TOOL-dWitnessedBar-54 S1): it applies only when that path exists under
 # the repo root, its `{prefix}`, `{kit}`, `{memory_root}` and `{map_root}` resolved as `regen.py`'s
 # `resolve_argv` resolves them, `{prefix}` being this reader's tool root or `.`. A `when` of neither
-# shape, or one left holding a token, is named on stderr and skipped, as `regen.py` refuses it.
+# shape, an `exists:` with an empty path, one left holding a token, and one whose resolved path is
+# absolute (`/…`, `X:…`) or holds a `..` segment, by `read_gate_policy`'s containment pattern
+# (TOOL-dWitnessedBar-62 S22), is named on stderr with its descriptor and its `when` and skipped, as
+# `regen.py` and govkit selfcheck refuse it. A false conf `when`, and an `exists:` path absent from
+# the tree, is a silent skip: the row does not apply, which is no reader failure.
 #
 # WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
 # grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
@@ -926,6 +930,7 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
           _rg_kv=${_rg_kv//\{memory_root\}/$_rg_mem}; _rg_kv=${_rg_kv//\{map_root\}/$_rg_map}
           case "$_rg_kv" in
             *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] when with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+            /*|[A-Za-z]:*|..|../*|*/..|*/../*) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
           esac
           [ -e "$_rg_root/$_rg_kv" ] || continue ;;
         *:*=*)

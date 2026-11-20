@@ -24240,6 +24240,11 @@
     {
       "id": "read_selection",
       "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_selection",
+      "kind": "function",
       "file": "tools/run-gates/verdict_flow.py"
     },
     {
@@ -32933,6 +32938,11 @@
       "file": "tools/lib/resolve-python.test.sh"
     },
     {
+      "id": "run_llw",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "run_ln",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -33344,6 +33354,11 @@
     },
     {
       "id": "run_plant_cutoff_none",
+      "kind": "function",
+      "file": "tools/memory-tree/ratchet.py"
+    },
+    {
+      "id": "run_plant_deleted_conf",
       "kind": "function",
       "file": "tools/memory-tree/ratchet.py"
     },
@@ -33871,11 +33886,6 @@
       "id": "run_sc_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "run_scalar_leg",
-      "kind": "function",
-      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "run_scenario_plant",

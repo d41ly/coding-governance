@@ -31,9 +31,11 @@
 #
 # THE POPULATION IS A PREDICATE, NEVER A LIST (TOOL-dWitnessedBar-50 S1): every tracked shell file under
 # tools/, skills/ and .githooks/ (one named *.sh, or whose first line is a bash or sh shebang) that
-# carries a `# >>> resolve_python` block or calls resolve_python at command position (opening a command
-# substitution, or the first word of a command after whitespace, `;`, `&`, `|`, `!`, `if`, `then`, `do`
-# or `else`, never a `resolve_python()` definition) outside such a block (TOOL-dWitnessedBar-57 S1);
+# carries a `# >>> resolve_python` block or calls resolve_python at command position (opening a `$(` or
+# backtick command substitution, or the first word of a command after whitespace, `;`, `&`, `|`, `!`, a
+# group's `{` or `(`, `if`, `then`, `do`, `else`, `elif`, `while` or `until`, with no `#` before it on its
+# line, never a `resolve_python()` definition) outside such a block (TOOL-dWitnessedBar-57 S1,
+# TOOL-dWitnessedBar-62 S25);
 # resolve-python.sh itself is outside it, and `--coverage` names it dropped with that reason (S4).
 # A typed list missed .githooks/pre-commit, which sources the resolver from a path it derives at run
 # time. `--coverage` derives it, prints its count and each named exclusion with its reason, and exits 1
@@ -62,16 +64,21 @@ refuse_wrong_shell() {
 }
 # <<< refuse_wrong_shell
 
-# THE CALL, read alike by both readers below (TOOL-dWitnessedBar-57 S1): a command substitution opening
-# on the name anywhere, or the name as the first word of a command, after optional whitespace, a `;`,
-# `&`, `|` or `!`, or the words `if`, `then`, `do` or `else`, so an indented call is one. A
-# `resolve_python()` definition, a test's stub included, is taken out of the line before it is read, so
-# it is never a call (S3).
+# THE CALL, read alike by both readers below (TOOL-dWitnessedBar-57 S1, widened by TOOL-dWitnessedBar-62
+# S25): the name opening a command substitution, `$(` or a backtick, after optional whitespace; or the
+# name as the first word of a command, after optional whitespace, at the line's start or after a `;`,
+# `&`, `|` or `!`, after a `{` or `(` opening a group, or after the words `if`, `then`, `do`, `else`,
+# `elif`, `while` or `until`, so an indented call is one. A match with a `#` before it on its line is no
+# call: the line is cut at its first `#` before it is read. A `resolve_python()` definition, a test's
+# stub included, is taken out of the line before it is read, so it is never a call (S3).
 RWS_CALL_AWK='
-function check_rws_call(l) {
+function check_rws_call(l,   h) {
+  h = index(l, "#"); if (h) l = substr(l, 1, h - 1)
   gsub(/resolve_python[ \t]*\([ \t]*\)/, "", l)
-  return l ~ /\$\(resolve_python/ || l ~ /(^|[;&|!])[ \t]*resolve_python([^A-Za-z0-9_]|$)/ \
-    || l ~ /(^|[^A-Za-z0-9_])(if|then|do|else)[ \t]+resolve_python([^A-Za-z0-9_]|$)/
+  return l ~ /(\$\(|`)[ \t]*resolve_python([^A-Za-z0-9_]|$)/ \
+    || l ~ /(^|[;&|!])[ \t]*resolve_python([^A-Za-z0-9_]|$)/ \
+    || l ~ /(^|[ \t;&|])[({][ \t]*resolve_python([^A-Za-z0-9_]|$)/ \
+    || l ~ /(^|[^A-Za-z0-9_])(if|then|do|else|elif|while|until)[ \t]+resolve_python([^A-Za-z0-9_]|$)/
 }'
 
 derive_rws_population() {  # <repo root> <resolve-python.sh rel> -> one member path per line (S1)
