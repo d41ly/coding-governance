@@ -570,17 +570,19 @@ def run_quiet_leg(run, row, n, top, here=HERE):
         legs_file = pathlib.Path(root, MANIFEST)
         legs_file.write_text(json.dumps([one], indent=2) + "\n", encoding="utf-8", newline="\n")
         import profile_bar  # noqa: PLC0415 - the sibling, as measure_legs.py imports it
-        runner = HERE / "run-gates.sh"
-        bash, _tried = profile_bar.resolve_bash(str(runner))
+        runner = profile_bar.RUNNER  # this kit's runner, spelled with forward slashes
+        bash, _tried = profile_bar.resolve_bash(runner)
         if not bash:
-            return "-", f"quiet-rerun  {leg}  no bash that can read {runner.as_posix()} resolves, so it was not run"
+            return "-", f"quiet-rerun  {leg}  no bash that can read {runner} resolves, so it was not run"
         env = {k: v for k, v in os.environ.items() if k not in ("GATE_SELECTION", "GATE_ATTRIBUTE", "GATE_RERUN")}
         env.update(GATE_LEGS=legs_file.as_posix(), GATE_FULL="1", GATE_SELFTESTS="1", GATE_RUN_ID=rid)
         if re.fullmatch(r"[0-9a-f]{40}", r_sha):
             env["GATE_ATTRIBUTE"] = r_sha
+        # NO PIPE to the runner: a leg it starts that outlives a kill at the bound would hold a captured
+        # stdout open, and the wait for it would outlast the bound. Its record is what is read.
         try:
-            subprocess.run([bash, str(runner)], cwd=str(top), env=env, capture_output=True, encoding="utf-8",
-                           errors="replace", timeout=bound, stdin=subprocess.DEVNULL)
+            subprocess.run([bash, runner], cwd=str(top), env=env, stdin=subprocess.DEVNULL,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=bound)
         except (OSError, subprocess.TimeoutExpired) as e:
             return "-", f"quiet-rerun  {leg}  the alone-run did not answer within {bound}s: {e}"
     finally:
@@ -1916,6 +1918,14 @@ def run_fixture_release():
         got = next((ln for ln in lines if ln.startswith("release  fast suite  ARCH-tFlake-3  ")), "")
         if rc != 0 or "manifest row at R differs" not in got:
             bad.append(f"fast suite, its manifest row changed since its ask, printed '{got}', planted a release naming the change")
+        # a release count that is no count is refused, never read as a streak no leg can reach
+        (repo / ".governance" / "policy.toml").write_text('[verdict]\n"flakes.release" = "x"\n', encoding="utf-8",
+                                                            newline="\n")
+        write_fixture_commit(repo, "a release count that is no count")
+        rc, lines, _rows = run_select_at_head(repo, here, root)
+        out += [f"release x: {ln}" for ln in lines]
+        if rc != 2 or RELEASE_KEY not in " ".join(lines):
+            bad.append(f"under {RELEASE_KEY} x select exited {rc}: {lines}, planted a refusal naming the key")
     return out, bad
 
 
@@ -1994,6 +2004,19 @@ def run_fixture_contended_pair():
                        f"planted the carried stamp and the owner line")
         if "owner  loud leg  contended, no quiet host within 72 h" in lines:
             bad.append("loud leg, which no sibling names, carried a stamp it never had")
+    # a ceiling that is no positive count of hours is refused, never read as an unbounded wait
+    with tempfile.TemporaryDirectory(prefix="vflow-") as root:
+        repo, here, _sha = write_repo(root, "[flow]\nwait-ceiling = 0\n")
+        run = pathlib.Path(root, "gate-run", "zero")
+        run.mkdir(parents=True)
+        write_routing(run, [["slow leg", "CONTENDED", "block", "quiet-rerun", "-", "-", f"routed {now}"]])
+        try:
+            rc, lines = cmd_quiet_rerun(run, here, repo, lambda: ("false", "planted"), None, now)
+        except Refusal as e:
+            rc, lines = 2, [f"refused · {e}"]
+        out += [f"wait-ceiling 0: {ln}" for ln in lines]
+        if rc != 2 or WAIT_KEY not in " ".join(lines):
+            bad.append(f"under {WAIT_KEY} 0 quiet-rerun exited {rc}: {lines}, planted a refusal naming the key")
     return out, bad
 
 
