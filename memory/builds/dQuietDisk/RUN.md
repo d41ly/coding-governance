@@ -29,3 +29,5 @@ anchor-ref: refs/heads/main
 base: c95ef6216483338ec4c2b9b18817188b74d95d8d
 
 ## Parked
+
+2026-11-20T11:11:30Z rescope · item add TOOL-dQuietDisk-26 · reason TOOL-dQuietDisk-10 F1 resolved (b): check-wiring.sh re-lists the tree per check (1,679 ls-files and 421 check-attr of the suite's 3,786 git processes); one listing per invocation is its own mechanism (M2)
