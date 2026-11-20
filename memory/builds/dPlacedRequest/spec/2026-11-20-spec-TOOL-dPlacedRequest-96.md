@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-96 — a foreign stale lease can be taken over again, and its hint prints
 
-**Status:** DEFERRED · rev-1 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** DEFERRED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md) | research | — |
+| [2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 |
 
 <!-- /gen:spec-records -->
 
@@ -19,9 +20,11 @@ The closing diff review of this build, round 1
 confirmed item **H2** at HIGH, finding id 3, and the round-2 exit promoted it to this unit. Commit
 b7e369eeb put the `lease:foreign-released` row of `check_claim_writable` in place of the
 `lease:foreign-stale` row instead of beside it, so a dead holder's lease falls to the `lease:*`
-catch-all for every act. `--lease take-over` can no longer take a stale lease, `--lease acquire` never
-prints its take-over hint, and `--entry-claim` waits on a stale build lease as on a live one. This unit
-restores the row and gates the class.
+catch-all for every act. `--lease take-over` can no longer take a stale lease, and `--lease acquire`
+never prints its take-over hint. This unit restores the row and gates the class. The third loss the
+record names, `--entry-claim` waiting on a stale build lease as on a live one, is not cured by the row
+alone: the entry claim routes the refusal's cause word, which stays `live-holder`. That route is
+`TOOL-dPlacedRequest-100`'s, which reads the hint this row sets.
 
 ## 2. Scope (IN)
 
@@ -41,11 +44,15 @@ restores the row and gates the class.
   `TOOL-dPlacedRequest-17`'s.
 - No new act and no new refusal cause; the row restores what `tools/unattended/STOPS.template.md`
   section 7's table already states.
+- No change to `tools/unattended/unattended.sh#run_entry_claim`: its routing of a stale build lease is
+  `TOOL-dPlacedRequest-100`'s.
 
 ### Edges
 
 - **consumes-from** external — the lease column this build's lease-grammar and hand-over units built
   and CLOSED; this unit restores one row in the landed code, and those specs stay frozen
+- **hands-off** `TOOL-dPlacedRequest-100` — the entry claim's route for a stale build lease, which reads
+  the take-over hint this unit's row sets on an acquire refusal and runs the take-over it lets write
 
 ## 4. Design
 
@@ -84,7 +91,12 @@ announced take is `tools/unattended/unattended.sh#write_claim`'s; the run column
   `foreign-stale` stays; it cannot see this loss, because acquire refuses either way.
 - **Static arm.** Every `CW_*` name the lease verbs read, collected from the bodies of
   `run_lease_verb` and `write_fence_beat` by one `grep -o`, is assigned at least once inside
-  `check_claim_writable`'s body, beyond the reset line at its head.
+  `check_claim_writable`'s body, outside the reset block at its head. The reset block is defined by
+  content, not by a line count: every line after the `local` lines whose every statement is a bare
+  `CW_<NAME>=` assignment, up to the first line that is not. At the base it is two lines, and
+  `CW_HINT=` sits only on the second, so a one-line exclusion would count it assigned. Staged against
+  the column at 95c3103ad, the arm names `CW_HINT` as read and never assigned; that reading is
+  recorded as its RED-first one.
 
 The unattended kit's own suites are waived for this build's landing (README rule 8): the arms are
 written and their clean reading is owed with PLAY-dClosedLoop-14, and AC1 observes the change by a
@@ -132,7 +144,7 @@ direct probe of the driver.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · the stale build lease taken over and the static CW_* join, staged against the lease column at 95c3103ad that lacks the stale row · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 · the stale build lease taken over and the static CW_* join, staged against the lease column at 95c3103ad that lacks the stale row, where the static arm names CW_HINT read and never assigned · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -142,6 +154,11 @@ none
 
 - rev-1 · 2026-11-20 · initial draft, promoted from the closing diff review round 1, item H2 (HIGH,
   finding id 3), by the round-2 exit's disposition.
+- rev-2 · 2026-11-20 · §4 · §7 · folded 2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit finding
+  id 12 (M8): the static arm's reset exclusion is defined by content, and its red reading at
+  95c3103ad names `CW_HINT`. §1 · §3 · repair unit `TOOL-dPlacedRequest-100`, promoted by the same
+  record's finding id 29 (H4): the Goal no longer claims the entry claim is repaired here, a non-goal
+  leaves `run_entry_claim` to that unit, and the edge to it is declared.
 
 ## 10. Reuse audit
 

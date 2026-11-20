@@ -575,6 +575,9 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-83](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS spec-names-code-its-base-lacks EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPlacedRequest-87](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS two-readers-of-one-config-one-re-derived EARNED A GATE AT ITS… |
 | [TOOL-dPlacedRequest-90](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | THE CLASS a-spelling-change-strands-its-readers EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-102](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-inherits-ambient-machine-state EARNED A GATE AT ITS… |
+| [TOOL-dPlacedRequest-103](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS budget-row-not-remeasured-after-added-arms EARNED A GATE AT… |
+| [TOOL-dPlacedRequest-105](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |

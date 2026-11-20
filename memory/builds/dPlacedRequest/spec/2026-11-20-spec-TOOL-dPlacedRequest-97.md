@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-97 — the lease fence knows an id-less run's own claim by its keepalive
 
-**Status:** DEFERRED · rev-1 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** DEFERRED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-20-prompt-TOOL-dPlacedRequest-97-closing-review-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-97-closing-review-spec-brief.md) | research | — |
+| [2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 |
 
 <!-- /gen:spec-records -->
 
@@ -88,9 +89,15 @@ In the unattended kit's suite, over a scratch clone with a bare origin and `RUN_
 lease of this node's fleet tag with `session: absent` and `keepalive: K`, and the slug's run-state
 file holding `keepalive: K` under its run facts. With `CLAUDE_CODE_SESSION_ID` unset, `--lease fence
 build <slug>` prints a `fence — <ref> <tip> <beat>` line and exits 0. The twin writes `keepalive: K2`
-into the run-state file and asserts `lease refused — live-holder`, exit 1. A third row asserts an
-id-less `--lease acquire` over the same record still refuses, so the `--lease` verbs gained no
-identity. The class rule the record states, an identity fallback a spec states owes an arm that
+into the run-state file and asserts `lease refused — live-holder`, exit 1. A third row guards the
+non-goal that the `--lease` verbs gain no identity, and it must reach the column to do so: an
+id-less `--lease acquire` is stopped by `run_lease_verb`'s session gate, which prints `lease not
+written — no session` and exits 2 before `check_claim_writable` runs, so it would pass whatever the new
+row does. The row therefore runs `CLAUDE_CODE_SESSION_ID=s2 --lease acquire build <slug>`, a present
+session that is not the record's, over the same `session: absent`, `keepalive: K` record of this
+node's tag, with the run-state file still holding `keepalive: K`. The `--lease` verbs hand no
+run-state file, so the new row's `c_sess` absent branch is live and cannot match, and the row asserts
+`lease refused — live-holder`, exit 1. The class rule the record states, an identity fallback a spec states owes an arm that
 removes the primary identity and asserts the fallback answers, is what this arm is.
 
 The unattended kit's own suites are waived for this build's landing (README rule 8): the arm is written
@@ -143,7 +150,7 @@ and its clean reading is owed with PLAY-dClosedLoop-14, and AC1 observes the cha
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · the id-less run claim fenced, its mismatched-keepalive twin and the id-less acquire, staged against the lease column at 95c3103ad that compares no keepalive · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 · the id-less run claim fenced, its mismatched-keepalive twin and an acquire by a present session that is not the record's, staged against the lease column at 95c3103ad that compares no keepalive · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -153,6 +160,9 @@ none
 
 - rev-1 · 2026-11-20 · initial draft, promoted from the closing diff review round 2, item H1 (HIGH,
   finding id 7), by its exit's disposition.
+- rev-2 · 2026-11-20 · §4 · §7 · folded 2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit finding
+  id 7 (M6): the arm's third row runs under a present session that is not the record's, so it passes
+  `run_lease_verb`'s session gate and reaches the column, and asserts `live-holder`, exit 1.
 
 ## 10. Reuse audit
 

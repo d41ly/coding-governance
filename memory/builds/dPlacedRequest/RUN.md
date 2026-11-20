@@ -504,3 +504,10 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T16:47:28Z rescope · item add TOOL-dPlacedRequest-98 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-98-closing-review-spec-brief.md)
 
 2026-11-20T16:47:29Z rescope · item add TOOL-dPlacedRequest-99 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-99-closing-review-spec-brief.md)
+
+2026-11-20T18:07:09Z rescope · item add TOOL-dPlacedRequest-100 · reason finding 29 HIGH of 2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit, entry-claim routes a stale build lease as a live holder
+
+2026-11-20T18:34:40Z rescope · item add TOOL-dPlacedRequest-100 · reason promoted by the spec audit of units 95 to 99 (finding 29, a new mechanism on spec 96): memory/builds/dPlacedRequest/reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md
+2026-11-20T18:35:01Z draw · review-round · dPlacedRequest-spec-set-r4 · 70/130 · 20261120T183501Z-d748b4
+
+2026-11-20T18:35:01Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 27 · folded 31 · promoted 1 · to units · disposition promote
