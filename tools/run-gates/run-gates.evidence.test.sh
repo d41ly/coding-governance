@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=309
+FLOOR_ASSERTIONS=310
+# RAISED 309 -> 310 by TOOL-dWitnessedBar-58 on 2026-11-20: the leg-output and no-.scoped assertion after
+# unit 56's AC8 run. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 304 -> 309 by TOOL-dWitnessedBar-56 on 2026-11-20: the selection's CRLF, ` · ` and ignored-row
 # arm's three, base_from's inherited field's one and the aged staging temps' one. Counted one per
 # `ok … || nope` pair; this pass runs no suite.
@@ -918,6 +920,13 @@ dw_bf=$(awk -F'\t' '$1=="base_from"{print NF "|" substr($2, 1, 9) "|" $3}' "$(re
 [ "$dw_bf" = "3|GATE_BASE|inherited" ] && grep -q "scoped on an inherited green, as the run record header's base_from row reads" "$REC_OUT" \
   && ok "TOOL-dWitnessedBar-56 AC8 an inherited base reads GATE_BASE and inherited on the header's base_from row, and the decline line names the row" \
   || { nope "TOOL-dWitnessedBar-56 AC8 the base_from row reads '$dw_bf', or the decline line does not name it"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -3; }
+# TOOL-dWitnessedBar-58 AC2 (S2): that run carries the hook's real export pair, GATE_BASE and
+# GATE_BASE_FROM=inherited, and its leg still reads no GATE_BASE_FROM, since the runner read the knob and
+# unset it before any leg started, and the decline wrote no .scoped record for the tree. Red when the
+# runner's unset is dropped, so the leg reads base_from_seen 1, or the decline writes a .scoped record.
+[ ! -e "$dw_f.scoped" ] && grep -q '^base_from_seen 0' "$(rec_dir)/0.out" 2>/dev/null \
+  && ok "TOOL-dWitnessedBar-58 AC2 under the hook's GATE_BASE and GATE_BASE_FROM=inherited pair no .scoped record is written and the leg reads base_from_seen 0" \
+  || nope "TOOL-dWitnessedBar-58 AC2 a .scoped record was written ($([ -e "$dw_f.scoped" ] && echo yes || echo no)), or the leg read: $(cat "$(rec_dir)/0.out" 2>/dev/null || echo 'no output')"
 rec_run GATE_FULL=1 GATE_LEGS=fx/legs.json >/dev/null
 [ "$(awk -F'\t' '$1=="reused"||$1=="reused_cache"{printf "%s:%s ", $1, $2}' "$dw_f" 2>/dev/null)" = "reused:0 reused_cache:0 " ] \
   && ok "AC3 a full green's per-tree verdict carries reused and reused_cache with the run's counts" \
