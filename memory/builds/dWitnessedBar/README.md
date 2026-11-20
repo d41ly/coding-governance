@@ -142,9 +142,9 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-3 — attribution deciding what blocks](spec/2026-10-25-spec-TOOL-dWitnessedBar-3.md) | 20 | 2 | CLOSED | rev-8 | 2026-11-20 |
 | [TOOL-dWitnessedBar-44 — the inherited-red upgrade step reads both policy files and maps every value today's readers accept](spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md) | 21 | 2 | CLOSED | rev-4 | 2026-11-20 |
 | [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | CLOSED | rev-8 | 2026-11-20 |
-| [TOOL-dWitnessedBar-41 — the selection a bar ran under travels on the per-tree verdict, and the hook re-derives it before adopting](spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-25 |
-| [TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it](spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md) | 22 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dWitnessedBar-41 — the selection a bar ran under travels on the per-tree verdict, and the hook re-derives it before adopting](spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-20 |
+| [TOOL-dWitnessedBar-55 — the inherited-red upgrade step takes the line today's readers take: the last column-0 assignment, cleaned as they clean it](spec/2026-10-25-spec-TOOL-dWitnessedBar-55.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-20 |
+| [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dWitnessedBar-1 — gate health measured and the reliability bar](spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md) | 23 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dWitnessedBar-59 — the inherited-red upgrade step splits a policy file's lines on LF alone, as the readers do, held by a lone-CR parity row](spec/2026-10-25-spec-TOOL-dWitnessedBar-59.md) | 23 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host](spec/2026-10-25-spec-TOOL-dWitnessedBar-30.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
