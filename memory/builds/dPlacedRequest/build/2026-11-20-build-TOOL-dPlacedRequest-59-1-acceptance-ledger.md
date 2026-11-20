@@ -29,7 +29,7 @@ scratch directory, or under `%TEMP%` for the git fixture, and removed after.
 - AC13 — `### The oracle's head`: each of the two specs carries exactly one heading its prefix opens, by `grep -c` printing 1 for each. (DERIVED)
 - AC13 — `6df7a970`: over 54 at rev-3, `git show 6df7a970:<path>`, the read of the head section held it once. (DERIVED)
 - AC13 — `^t=\$\(git rev-list`: the `grep -lE` over the specs neither CLOSED nor WONTDO printed this spec alone. (DERIVED)
-- AC18 — `msg="merge: $SLUG — land onto `: `grep -cF` over the lander printed 1, and over a scratch copy whose `msg=` line names another subject it printed 0. (DERIVED)
+- AC18 — `msg="merge: $SLUG — land onto`: `grep -cF` over the lander printed 1, and over a scratch copy whose `msg=` line names another subject it printed 0. (DERIVED)
 - AC18 — `"merge: dPlacedRequest — land onto "*`: the section of the one version oracle, read by `sec`, held it once. (DERIVED)
 - AC20 — `pr_e0=0; [ ! -f "$pr_hl" ] ||`: the criterion's cut of the race block holds it, and `pr_broke=0; [ ! -f "$pr_hl" ] ||`, at cut lines 44 and 52. (DERIVED)
 - AC20 — `$pr_h/once`: the loop's test of it sits at cut line 41, before both. (DERIVED)
@@ -41,6 +41,9 @@ scratch directory, or under `%TEMP%` for the git fixture, and removed after.
 - AC21 — `[ "$own" = 0 ]`: in that section it sits on line 9 of the read, before `merge-base --is-ancestor` on line 10. (DERIVED)
 
 ## Readings beside the criteria
+
+- The bug-class checklist over the pass commit selected `a-helper-extraction-blinds-a-per-function-rule`: no suite arm, gate or tool outside the driver cuts any line the rewire removed, and the arms that call `read_claims` in process source the whole driver, whose sourcing returns well below `CLAIM_KV_AWK`'s assignment. (DERIVED)
+- It selected `ledger-token-wrapped-across-a-line-joins-nothing` too: every answer above keeps its token on its own line, and the AC18 token was cut so it ends on no trailing blank. (DERIVED)
 
 - The pass mints the suite helper `read_kv_row` and the awk function `read_kv`; the codebase map was regenerated and its one new symbol staged. (DERIVED)
 - The lexicon accepted both names for cell `sh.function`, and neither was defined before. (DERIVED)
