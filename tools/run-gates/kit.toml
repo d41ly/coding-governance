@@ -279,7 +279,7 @@ stage = ["step.test"]
 
 [gate_leg.gov]
 argv = ["python3", "{kit}/product_tests.py", "check", "--fixture"]
-chunk = "selftests"
+chunk = "declarations"
 ceiling = 300
 
 # The seed for a target's own [gate_runner] declaration. `cmd_intake` emits this block when this
