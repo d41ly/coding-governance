@@ -134,7 +134,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
 3. S6 cites bare `row_grammar.py` line numbers that have moved; cite them as `path#symbol`.
    Its consumes-from-51 bullet names ids 38 and 46: settle both as item 1 says.
 4. A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`; keep every home under
-   `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds. A spec over its 49152 B ceiling
+   `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds. A spec over its 49152 B ceiling (PINNED 2026-11-20 by the spec size check) (PINNED 2026-11-20 by the spec size check)
    is tightened in prose you touch, never by dropping a criterion.
 Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-57` and
 `python tools/check-spec-tokens.py --spec <path>` over each spec, and fix every finding either names. Write no

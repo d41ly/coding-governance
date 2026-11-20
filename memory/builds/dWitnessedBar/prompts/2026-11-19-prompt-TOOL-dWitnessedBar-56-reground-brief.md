@@ -42,7 +42,7 @@ a builder can build it as written over HEAD. Where every claim already holds, ch
    drop S4's `selection none` test plants, which unit 41 rev-3 moved into its own pass and built; and settle S13's tail
    temp names against the landed writer, which names them `tail.<random>.tmp`, not `<hash>.<suffix>`.
 4. A `[[ledger]]` home spelled under `tools/<kit>/` reds `install-prefix (shipped surface)`; keep every home under
-   `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds. A spec over its 49152 B ceiling
+   `memory/project/`. Blob-pin code-file line citations only at a commit HEAD holds. A spec over its 49152 B ceiling (PINNED 2026-11-20 by the spec size check) (PINNED 2026-11-20 by the spec size check)
    is tightened in prose you touch, never by dropping a criterion.
 Before returning, run `bash tools/unattended/unattended.sh --check-specs dWitnessedBar TOOL-dWitnessedBar-56` and
 `python tools/check-spec-tokens.py --spec <path>` over each spec, and fix every finding either names. Write no
