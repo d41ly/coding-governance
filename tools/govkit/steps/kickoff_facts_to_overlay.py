@@ -129,8 +129,10 @@ def derive_facts_bullet(write: str) -> str:
 
 def parse_fact_bullets(text: str):
     """`(lines, bullets)` of §B, or None with no `## §B` heading: `lines` the text's lines with their
-    endings, each bullet `(first, end, text)`, a top-level `- ` line and its indented continuation lines
-    `lines[first:end]`, up to the first `###` sub-head or next `## ` heading."""
+    endings, each bullet `(first, end, text)`, a top-level `- ` line and each following line indented two or
+    more spaces, `lines[first:end]`, up to the next bullet, a blank line, the first `###` sub-head or next `## `
+    heading; `text` is those lines joined by single spaces, each stripped, the `- ` dropped
+    (TOOL-dPlacedRequest-34 S50), so a wrapped bullet's row carries the whole bullet."""
     lines = text.splitlines(keepends=True)
     head = next((i for i, ln in enumerate(lines) if ln.startswith(SECTION)), None)
     if head is None:
@@ -139,9 +141,10 @@ def parse_fact_bullets(text: str):
     while i < len(lines) and not lines[i].startswith(("###", "## ")):
         if lines[i].startswith("- "):
             end = i + 1
-            while end < len(lines) and lines[end][:1] in (" ", "\t") and lines[end].strip():
+            while end < len(lines) and lines[end].startswith("  ") and lines[end].strip():
                 end += 1
-            bullets.append((i, end, lines[i].rstrip("\r\n")[2:]))
+            text = " ".join(ln.strip() for ln in [lines[i][2:]] + lines[i + 1:end])
+            bullets.append((i, end, text))
             i = end
         else:
             i += 1

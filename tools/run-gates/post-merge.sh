@@ -293,10 +293,10 @@ read_remote_red() { # -> rc 0 with PM_RED_STATE present|absent and PM_RED_SHA; r
 # `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
 # The stamp is a scratch file of its own, never the push's output file, which git writes after the
 # hook ran and so would read every token as stale.
-# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it sets this node's cache ref
-# `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, then calls `add_feed_event`
-# from the `gov_feed_sh` block every carrier of this one carries beside it. A lost or uncompleted
-# write appends nothing.
+# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it calls `write_feed_success` from
+# the `gov_feed_sh` block every carrier of this one carries beside it (TOOL-dPlacedRequest-34 S5), which
+# sets this node's cache ref `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, and
+# appends the event. A lost or uncompleted write appends nothing.
 # WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
 # omitted; a token another push wrote during this call reads as fresh and is printed beside this
 # push's own cause, never as it.
@@ -340,10 +340,7 @@ write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost,
   fi
   rm -f "$s" "$f"
   [ "$rc" = 0 ] || return "$rc"
-  if [ -n "$src" ]; then git update-ref "refs/gov/remote/${ref#refs/gov/}" "$src" 2>/dev/null
-  else git update-ref -d "refs/gov/remote/${ref#refs/gov/}" 2>/dev/null; fi \
-    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${ref#refs/gov/}" >&2
-  add_feed_event "$ref" "$src"
+  write_feed_success "$ref" "$src"
   return 0
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
@@ -482,7 +479,8 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
 # `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
 # and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
-# commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
+# commit. `write_gov_ref`'s success exit calls `write_feed_success`, which calls `add_feed_event`, so every
+# writer joins by construction.
 # APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
 # equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
 # event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
@@ -562,6 +560,18 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
     *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
   esac
+  return 0
+}
+# THE ONE SUCCESS EXIT (TOOL-dPlacedRequest-34 S5): a governance write that landed sets this node's cache
+# ref `refs/gov/remote/<tail>` to the commit it wrote, or clears it on a deletion, then appends the event,
+# so the cache always names what this node last wrote or fetched. `write_gov_ref` calls it, and so does a
+# carrier whose push is no `write_gov_ref` call, the lander's fenced beat (S6). A cache ref git cannot
+# move prints ONE `feed: NOTE -` line and the event is appended all the same: the write already landed.
+write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the cache ref set or cleared, the event appended
+  if [ -n "${2:-}" ]; then git update-ref "refs/gov/remote/${1#refs/gov/}" "$2" 2>/dev/null
+  else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
+    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
+  add_feed_event "$1" "${2:-}"
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first

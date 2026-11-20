@@ -139,7 +139,8 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
 # `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
 # and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
-# commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
+# commit. `write_gov_ref`'s success exit calls `write_feed_success`, which calls `add_feed_event`, so every
+# writer joins by construction.
 # APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
 # equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
 # event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
@@ -219,6 +220,18 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
     *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
   esac
+  return 0
+}
+# THE ONE SUCCESS EXIT (TOOL-dPlacedRequest-34 S5): a governance write that landed sets this node's cache
+# ref `refs/gov/remote/<tail>` to the commit it wrote, or clears it on a deletion, then appends the event,
+# so the cache always names what this node last wrote or fetched. `write_gov_ref` calls it, and so does a
+# carrier whose push is no `write_gov_ref` call, the lander's fenced beat (S6). A cache ref git cannot
+# move prints ONE `feed: NOTE -` line and the event is appended all the same: the write already landed.
+write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the cache ref set or cleared, the event appended
+  if [ -n "${2:-}" ]; then git update-ref "refs/gov/remote/${1#refs/gov/}" "$2" 2>/dev/null
+  else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
+    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
+  add_feed_event "$1" "${2:-}"
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
@@ -332,50 +345,64 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 # <<< gov_feed_sh
 
 # THE WRITER CENSUS (TOOL-dPlacedRequest-13 S9), outside the block, so no carrier ships it. The shape is
-# check 51's in the unattended kit gate: ONE declared helper level. Limb 1: a non-comment line carrying
-# the whole word `push` and a lease flag must sit in a function whose body calls a name on
-# FEED_WRITER_HELPER_FNS; each other one prints `<file>:<line>` unless FEED_WRITER_EXEMPT_FNS names its
-# function. Limb 2: a non-comment line carrying the word `push` and a governance ref prefix and no
-# lease flag prints `<file>:<line>` in any function, since such a write is no compare-and-swap. Both
+# check 51's in the unattended kit gate: ONE declared helper level. THE LINES IT READS
+# (TOOL-dPlacedRequest-34 S17): each `\`-continued line is joined to the lines it continues, one space
+# between, and reported at its first line; a line whose first non-blank byte is `#` is skipped. THE
+# SCOPES IT JUDGES (S16): each `name() {` (or `function name`) to the column-0 `}` that closes it, and
+# each file's top-level body, every line outside a function, as one more. Limb 1: a scope holding a
+# line carrying the whole word `push` and, on any line of the scope, a lease flag, the push's own or a
+# variable or array assigned it, must call a name on FEED_WRITER_HELPER_FNS; otherwise each of its
+# push lines prints `<file>:<line>` unless FEED_WRITER_EXEMPT_FNS names its function. Limb 2: a joined
+# line carrying the word `push` and a governance ref prefix and no lease flag prints `<file>:<line>` in
+# any scope, since such a write is no compare-and-swap. Both
 # lists are graded both ways: a helper entry that is no function of the files read, or whose body
 # neither appends to the feed log nor calls another entry, and an exempt entry naming a function
-# limb 1 would not hit, each print a line naming the entry; a scan that finds no lease-carrying line
-# prints one line saying so, never a pass. Returns 1 when it printed anything.
+# limb 1 would not hit, each print a line naming the entry; a scan that finds no scope holding a push
+# and a lease prints one line saying so, never a pass. Returns 1 when it printed anything.
 # The tokens it matches are assembled from pieces, so this file's own source never matches them.
 # WHAT THIS DOES NOT CHECK: a push whose ref is spelled through a variable and carries no lease; a
-# push assembled across `\`-continued lines; a writer in Python; a helper of a helper.
-FEED_WRITER_HELPER_FNS="add_feed_event write_gov_ref"
+# lease flag spelled in another file than its push; a writer in Python; a helper of a helper.
+FEED_WRITER_HELPER_FNS="add_feed_event write_feed_success write_gov_ref"
 FEED_WRITER_EXEMPT_FNS=""
 scan_feed_writers() { # file… -> one line per hit, rc 1; nothing, rc 0
   local out
   out=$(FW_HELPERS="$FEED_WRITER_HELPER_FNS" FW_EXEMPT="$FEED_WRITER_EXEMPT_FNS" awk '
-    function write_held_fn() {
-      if (fn != "") seen[fn] = 1
-      if (np > 0 && (fn == "" || !hc)) { if (fn != "") cand[fn] = 1; if (fn == "" || !(fn in ex)) hits = hits pend }
-      fn = ""; hc = 0; np = 0; pend = ""
+    function write_held_scope(sc,   name) {
+      name = (sc == "F" ? fn : "")
+      if (sc == "F" && fn != "") seen[fn] = 1
+      if (sp[sc] != "" && sl[sc]) {
+        nl++
+        if (!sh[sc]) { if (name != "") cand[name] = 1; if (name == "" || !(name in ex)) hits = hits sp[sc] }
+      }
+      sp[sc] = ""; sl[sc] = 0; sh[sc] = 0
+      if (sc == "F") fn = ""
     }
-    function scan(s, at,   h) {
-      for (h in helper) if (h != fn && match(s, "(^|[^A-Za-z0-9_])" h "([^A-Za-z0-9_]|$)")) { hc = 1; if (fn != "") calls[fn] = 1 }
+    function scan(s, at, sc,   h) {
+      for (h in helper) if (h != fn && match(s, "(^|[^A-Za-z0-9_])" h "([^A-Za-z0-9_]|$)")) { sh[sc] = 1; if (fn != "") calls[fn] = 1 }
       if (fn != "" && s ~ />>/ && index(s, LOG) > 0) apnd[fn] = 1
+      if (index(s, LEASE) > 0) sl[sc] = 1
       if (s !~ PW) return
-      if (index(s, LEASE) > 0) { nl++; np++; pend = pend "\n" at }
-      else if (index(s, GOV) > 0) lim2 = lim2 "\n" at
+      if (index(s, LEASE) == 0 && index(s, GOV) > 0) lim2 = lim2 "\n" at
+      else sp[sc] = sp[sc] "\n" at
     }
     BEGIN { LEASE = "--force-" "with-lease"; GOV = "refs/" "gov/"; LOG = "gov-" "feed.log"
-            PW = "(^|[^A-Za-z0-9_])p" "ush([^A-Za-z0-9_]|$)"
+            PW = "(^|[^-A-Za-z0-9_])p" "ush([^-A-Za-z0-9_]|$)"
             k = split(ENVIRON["FW_HELPERS"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") helper[a[i]] = 1
             k = split(ENVIRON["FW_EXEMPT"], a, /[ \t]+/); for (i = 1; i <= k; i++) if (a[i] != "") ex[a[i]] = 1 }
-    FNR == 1 { write_held_fn() }
-    { ln = $0; gsub(/\r/, "", ln); c = ln; sub(/^[ \t]+/, "", c); at = FILENAME ":" FNR }
-    c ~ /^#/ { next }
+    FNR == 1 { if (fn != "") write_held_scope("F"); write_held_scope("T"); jb = "" }
+    { ln = $0; gsub(/\r/, "", ln)
+      if (jb == "") { c = ln; sub(/^[ \t]+/, "", c); if (c ~ /^#/) next; jat = FILENAME ":" FNR }
+      if (substr(ln, length(ln)) == "\\") { jb = jb substr(ln, 1, length(ln) - 1) " "; next }
+      ln = jb ln; jb = ""; at = jat; c = ln; sub(/^[ \t]+/, "", c) }
     ln ~ /^function[ \t]+[A-Za-z_][A-Za-z0-9_:-]*/ || ln ~ /^[A-Za-z_][A-Za-z0-9_:-]*[ \t]*\(\)[ \t]*\{/ {
-      write_held_fn(); fn = ln; sub(/^function[ \t]+/, "", fn); sub(/[ \t(].*$/, "", fn); sub(/\{.*$/, "", fn)
-      body = ln; sub(/^[^{]*\{/, "", body); scan(body, at)
-      if (ln ~ /\}[ \t;]*$/) write_held_fn()
+      if (fn != "") write_held_scope("F")
+      fn = ln; sub(/^function[ \t]+/, "", fn); sub(/[ \t(].*$/, "", fn); sub(/\{.*$/, "", fn)
+      body = ln; sub(/^[^{]*\{/, "", body); scan(body, at, "F")
+      if (ln ~ /\}[ \t;]*$/) write_held_scope("F")
       next }
-    ln ~ /^\}/ { write_held_fn(); next }
-    { scan(c, at) }
-    END { write_held_fn()
+    ln ~ /^\}/ { if (fn != "") write_held_scope("F"); next }
+    { scan(c, at, fn != "" ? "F" : "T") }
+    END { if (fn != "") write_held_scope("F"); write_held_scope("T")
           for (e in ex) if (!(e in cand)) hits = hits "\nFEED_WRITER_EXEMPT_FNS names " e "(), which is no function holding a lease-carrying line without a feed call"
           for (h in helper) {
             if (!(h in seen)) hits = hits "\nFEED_WRITER_HELPER_FNS names " h "(), which is no function of the files read"

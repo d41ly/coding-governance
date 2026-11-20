@@ -541,8 +541,17 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   chain and the new tip's `epoch` is `<tip>`'s; a later epoch, a tip off that chain, leases off and
   no lease on the remote are each `lease refused — epoch-fence` (exit 1), a foreign holder keeping
   its own cause word. `--after` on any other act, or no full sha, exits 2.
-  Dark behind `RUN_CLAIMS` like every claim; `UNATTENDED-STOPS.md` §7 is the grammar, the record,
-  the epoch and the four `leases.*` keys.
+  `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line,
+  `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>` (exit 0); a
+  read that does not answer is `lease not written` (exit 2). `placement.py check` reads it, never
+  `--claims`, which names no session. An offer is refused `offered` over an offer still open, whoever
+  it names, and when `--to` names the caller's own tag or its own session on it, and `tombstone` over
+  a build or unit tombstone, `terminal` kept for a cadence or legacy claim. A create whose feed commit
+  git cannot read is refused `epoch-fence` for a build or unit lease and is a plain create at epoch 1
+  for a cadence run (TOOL-dPlacedRequest-34).
+  Dark behind `RUN_CLAIMS` like every claim: while it is not `on` every act but `fence` prints
+  `lease — off · <tail>` and exits 0, writing nothing; `UNATTENDED-STOPS.md` §7 is the grammar, the
+  record, the epoch and the four `leases.*` keys.
 - `--register` — two create-only registers on the remote, each entry ONE parentless commit written
   by compare-and-swap with an empty expected sha, so a second write of one ref is refused, never
   written beside the first. `--register decision <build> <item> <fork> <file>` writes
@@ -572,7 +581,12 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   on the tip read is written by compare-and-swap, joining the change feed. It prints ONE line:
   `card-ref — builds/<slug>/card · <sha8>` (exit 0); `card-ref lost — <sha8 of the remote tip,
   re-read once>` (exit 1), on which the engine re-renders once and calls again; or `card-ref not
-  written — <why>` (exit 2). Neither refusal is a numbered one.
+  written — <why>` (exit 2). Neither refusal is a numbered one. `--card-ref lookup <slug>` is the
+  engine's one read of that ref, read-only: one bounded, pruned fetch from the remote the claims
+  resolve, never a literal `origin`, into this node's cache `refs/gov/remote/builds/<slug>/card`,
+  with `--no-write-fetch-head`, its sightings appended to the feed; it prints `card-ref — <commit>`
+  and the commit's message, `card-ref — none` where the remote holds no card, `card-ref — off`, or
+  `card-ref not read — <why>` (exit 2). The engine reads that cache ref and no local card ref.
 - `--request` — `--request <file>`, an owner's request that is not yet a build, recorded by its
   content key: the first 12 hex digits (PINNED) of the SHA-256 over the loop kit's `request.py key`
   normalisation of the text, case, whitespace, ISO dates, emphasis and links folded, the file

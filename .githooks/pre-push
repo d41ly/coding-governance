@@ -983,8 +983,10 @@ fi
 #
 # SET UP ONLY WHERE A PUSHED REF CAN CARRY A DELTA (TOOL-aBriskPreflight-6). The candidates are listed
 # ONCE, by the three tests the loop used to apply itself, and the loop walks that list. Before any
-# setup, one `cat-file --batch-check` asks every candidate for its tree and its first parent. A root
-# commit over the EMPTY tree, the shape of an unattended run's claim, changes no path, so
+# setup, one `cat-file --batch-check` asks every candidate for its tree, its first parent and that
+# parent's tree. A commit over the EMPTY tree whose first parent is missing or is over the empty tree
+# too, the shape of an unattended run's claim, parentless or parented on its last beat
+# (TOOL-dPlacedRequest-34 S24), changes no path, so
 # `check_has_delta` can only answer "no delta" for it and the loop would print nothing. When every
 # candidate has that shape, or there is none, the library is not sourced and nothing is resolved, which
 # was most of a claim push's cost. Any other shape, a failed batch or a short answer runs the layer as
@@ -998,16 +1000,17 @@ while read -r _ _sha _ref _; do
   [ "$_ref" = "refs/heads/$def" ] && continue
   [ -z "${_sha//0/}" ] && continue
   _sg_cands+=("$_sha $_ref")
-  _sg_q+="$_sha^{tree}"$'\n'"$_sha^"$'\n'
+  _sg_q+="$_sha^{tree}"$'\n'"$_sha^"$'\n'"$_sha^^{tree}"$'\n'
 done <<< "$push_refs"
 if [ "${#_sg_cands[@]}" -gt 0 ]; then
   _sg_need=1
   if _sg_ans=$(git cat-file --batch-check='%(objecttype) %(objectsize)' <<< "${_sg_q%$'\n'}" 2>/dev/null); then
     mapfile -t _sg_rows <<< "$_sg_ans"
-    if [ "${#_sg_rows[@]}" = $((2 * ${#_sg_cands[@]})) ]; then
+    if [ "${#_sg_rows[@]}" = $((3 * ${#_sg_cands[@]})) ]; then
       _sg_need=""
-      for ((_sg_i = 0; _sg_i < ${#_sg_rows[@]}; _sg_i += 2)); do
-        [ "${_sg_rows[_sg_i]}" = "tree 0" ] && [ "${_sg_rows[_sg_i + 1]}" = "${_sg_cands[_sg_i / 2]%% *}^ missing" ] \
+      for ((_sg_i = 0; _sg_i < ${#_sg_rows[@]}; _sg_i += 3)); do
+        [ "${_sg_rows[_sg_i]}" = "tree 0" ] \
+          && { [ "${_sg_rows[_sg_i + 1]}" = "${_sg_cands[_sg_i / 3]%% *}^ missing" ] || [ "${_sg_rows[_sg_i + 2]}" = "tree 0" ]; } \
           || { _sg_need=1; break; }
       done
     fi

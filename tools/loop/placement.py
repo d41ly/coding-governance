@@ -38,8 +38,9 @@ added to the evidence instead.
 
 CHECK. `check` re-evaluates the newest block's facts from their sources, never from the scout's text, and
 writes its verdict into that block's `check:` line: `continue` and `amend` a build that exists, is not
-terminal by the memory-tree kit's `derive_status`, and whose build lease the unattended driver's `--claims`
-prints free, released, stale or held under this node's fleet tag; `new` the request's words held, its local
+terminal by the memory-tree kit's `derive_status`, and whose build lease the unattended driver's `--lease
+status` prints free, released, stale or held under this node's fleet tag and this session
+(TOOL-dPlacedRequest-34 S22), never `--claims`, which names no session; `new` the request's words held, its local
 text or a prompt record of the named build whose `## The prompt` keys alike; `patch` a terminal build;
 `repeat` a playbook path present at HEAD; `unit` refused while `build.unit-holders` is unlanded; `breakpoint`
 by `check_breakpoint` (TOOL-dPlacedRequest-5): a `breakpoint:` name `breakpoints.py`'s
@@ -77,8 +78,8 @@ evidence does not cite it, a probe round trip since the last placement; else `ro
 `check:` reads refused; the first placement and a placement under `--owner` draw nothing, the owner's route
 being no repetition, so the owner still places once the budget is spent. The driver's row is printed; on
 `exhausted` `place` prints `placement: pre-claim budget exhausted — <key> · <spent>/<total>` and exits 3,
-and where the driver drew nothing, a lost race or an unreachable remote among them, it exits 2; no block is
-written either way.
+and where the driver drew nothing, a lost race or an unreachable remote among them, it prints `placement:
+pre-claim draw not recorded — <why>` and exits 2 (TOOL-dPlacedRequest-34 S42); no block is written either way.
 
 BREAKPOINT (TOOL-dPlacedRequest-5). `breakpoint` declares a passed `breakpoint` block on its build: with the
 build's lease free or this node's, read as `check` reads `amend`'s and refused `live-holder` otherwise, it
@@ -105,8 +106,7 @@ printing `placement: <case> · ... · held` or `MISSED`; `--fixture` alone runs 
 
 WHAT THIS DOES NOT CHECK: that the scout's reason is true, which is why `check` re-reads the facts; that the
 request facts the scout read but `entry` are the request's, `check` re-running the predicates over them as
-written, so a predicate on a fact the scout never supplies never admits; that two
-sessions of one node hold one lease apart, since the claims reader prints a fleet tag and no session; that a
+written, so a predicate on a fact the scout never supplies never admits; that a
 stand-in's later item has landed, its row being deleted by the build that lands it; that a session's own
 consent was typed rather than relayed into `--request`, the driver's predicate's own limit; and anything
 outside this node, the record being node-local.
@@ -529,8 +529,9 @@ def run_request_draw_verb(root, key, cause):
         rc, lines, err = run_unattended_verb(root, DRAW_BOUND, "--request-draw", key, "--cause", cause,
                                              "--item", PLACE_ITEM)
     except subprocess.TimeoutExpired:
-        raise PlacementRefused("the pre-claim draw on %s did not return within %d s, so nothing was drawn and no "
-                               "block is written" % (key, DRAW_BOUND), 2) from None
+        why = "the draw on %s did not return within %d s, so nothing was drawn and no block is written" % (
+            key, DRAW_BOUND)
+        raise PlacementRefused(why, 2, "%s: pre-claim draw not recorded — %s" % (SAY, why)) from None
     if rc == 3:
         spent = next((ln.split(" · ", 1)[1] for ln in lines if ln.startswith("exhausted · ")), "unread")
         raise PlacementRefused("pre-claim budget exhausted", 3,
@@ -538,8 +539,9 @@ def run_request_draw_verb(root, key, cause):
     for line in lines:
         print(line)
     if rc != 0:
-        raise PlacementRefused("the pre-claim draw on %s drew nothing, so no block is written: %s" % (
-            key, lines[-1] if lines else (err or "exit %d" % rc)), 2)
+        why = "the draw on %s drew nothing, so no block is written: %s" % (
+            key, lines[-1] if lines else (err or "exit %d" % rc))
+        raise PlacementRefused(why, 2, "%s: pre-claim draw not recorded — %s" % (SAY, why))
 
 
 def run_unattended_verb(root, bound, *argv, driver=None, env=None):
@@ -583,12 +585,16 @@ def read_terminal_statuses():
 
 
 def read_build_lease(root, build):
-    """None where the build lease of `build` is free or held under this node's fleet tag, as the unattended
-    driver's `--claims` prints it, else the fact that fails. An unreadable lease is a fact, never a pass."""
+    """None where the build lease of `build` is free, or held under this node's fleet tag by this session, as
+    the unattended driver's `--lease status build <build>` prints it (TOOL-dPlacedRequest-34 S22), else the
+    fact that fails. An unreadable lease is a fact, never a pass; a session the harness exposes none of holds
+    no lease."""
+    import shlex
     from breakpoints import run_sourced   # it runs the driver, so here and only for the facts that read a lease
     try:
-        rc, out = run_sourced(root, '( load_driver_conf && main --claims ); rc=$?; t=$(resolve_fleet_tag 2>/dev/null)'
-                                    ' || t=-; printf "fleet-tag\\t%s\\n" "$t"; exit $rc')
+        rc, out = run_sourced(root, '( load_driver_conf && main --lease status build %s ); rc=$?; '
+                                    't=$(resolve_fleet_tag 2>/dev/null) || t=-; printf "fleet-tag\\t%s\\n" "$t"; exit $rc'
+                                    % shlex.quote(build))
     except (LookupError, OSError, subprocess.TimeoutExpired) as e:
         return "the build lease of %s could not be read: %s" % (build, e)
     lines = [ln.rstrip("\r") for ln in out.splitlines()]
@@ -596,14 +602,18 @@ def read_build_lease(root, build):
     if rc != 0:
         return "the build lease of %s could not be read: %s" % (build, next(
             (ln for ln in reversed(lines) if ln and not ln.startswith("fleet-tag\t")), "exit %d" % rc))
-    if any(ln in ("claims: off", "claims: none") for ln in lines):
+    if any(ln.startswith(("lease — off · ", "lease — none · ")) for ln in lines):
         return None
-    row = next((ln.split("\t") for ln in lines if ln.split("\t")[0] == build and ln.count("\t") >= 4), None)
-    if row is None or row[4] in FREE_VERDICTS:
+    row = next((ln.split("\t") for ln in lines if ln.startswith("%s/build\t" % build) and ln.count("\t") == 5), None)
+    if row is None:
+        return "the build lease of %s could not be read: --lease status printed no row" % build
+    _tail, tag, sess, _status, verdict, _epoch = row
+    if verdict in FREE_VERDICTS:
         return None
-    if row[4] in ("live", "held") and row[1] == mine and mine != "-":
+    me = os.environ.get("CLAUDE_CODE_SESSION_ID") or "absent"
+    if verdict in ("live", "held") and tag == mine and mine != "-" and sess == me and me != "absent":
         return None
-    return "the build lease of %s reads %s, held by %s" % (build, row[4], row[1])
+    return "the build lease of %s reads %s, held by %s session %s" % (build, verdict, tag, sess)
 
 
 def read_held_prompt(root, build, key):

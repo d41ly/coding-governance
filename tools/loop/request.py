@@ -39,7 +39,7 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import read_memory_tree, run_selftest_cases  # noqa: E402
+from loop_lib import load_tree_lib, run_selftest_cases  # noqa: E402
 
 SAY = "request"
 #: The key's length in hex digits, the twelve-hex convention of the roles kit's `derive_section_sha`.
@@ -64,11 +64,10 @@ def read_request_text(path):
 
 def derive_request_content_key(text):
     """`request_content_key` (I11): the first twelve hex digits of the SHA-256 over the UTF-8 bytes of
-    `derive_content_key(text)`. ValueError on a text that normalises to nothing; LookupError where the
-    memory-tree kit does not resolve."""
-    read_memory_tree("row_grammar.py")
-    from row_grammar import derive_content_key
-    norm = derive_content_key(text)
+    `derive_content_key(text)`. ValueError on a text that normalises to nothing, and `loop_lib`'s LoopError,
+    a ValueError naming the module, where the memory-tree kit does not resolve or lacks the normaliser
+    (TOOL-dPlacedRequest-34 S34)."""
+    norm = load_tree_lib("row_grammar", ("derive_content_key",)).derive_content_key(text)
     if not norm:
         raise ValueError("the request is empty once normalised")
     return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:KEY_HEX]

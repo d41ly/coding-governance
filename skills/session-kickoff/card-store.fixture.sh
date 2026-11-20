@@ -23,7 +23,7 @@ case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
 HERE=$(CDPATH= cd -- "$HERE" && pwd) || exit 2
 CHECK="$HERE/manifest-check.sh"
 PLANTS="render publish publish-off publish-unwritten publish-hung store-remote store-local store-folder store-empty follow-rerender follow-per-step
-follow-fixed snapshot-terminal snapshot-every lookup lookup-offline context-idle context-always-resume
+follow-fixed snapshot-terminal snapshot-every lookup lookup-offline lookup-upstream lookup-hung replay context-idle context-always-resume
 context-always-fresh context-fixture-red context-transcript-absent partial-continue partial-restart
 partial-ask terminal-route close-follow-twice"
 REF=refs/gov/builds/tFix/card
@@ -239,7 +239,9 @@ case "$PLANT" in
     fi ;;
   lookup|lookup-offline)
     run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
-    git clone -q "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks"
+    # The lookup is the driver's (TOOL-dPlacedRequest-34 S12), so the clone checks out main, its kits and
+    # its `.unattended.conf` with it: the bare remote's HEAD names no branch the fixture pushed.
+    git clone -q -b main "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks"
     mkdir -p "$S/clone2/.git/orientation" && printf '# card-ref 0000000000000000000000000000000000000000\ncard — tFix · step stale · published - · by t0\n' > "$S/clone2/.git/orientation/tFix.md"
     run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
     print_card_held "AC6 a stale cache is not trusted: re-derived" "$(grep -q '^card — tFix · re-derived · ref ' "$OUT"; echo $?)"
@@ -250,6 +252,32 @@ case "$PLANT" in
       CARD_FETCH_BOUND=10 run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
       print_card_held "AC6 the remote unreachable: evidence, read the cache" "$(grep -q '^card — tFix · evidence · ref  · read the cache' "$OUT"; echo $?)"
     fi ;;
+  lookup-upstream)
+    # TOOL-dPlacedRequest-34 AC9: the lookup fetches from the remote the driver resolves, never `origin`.
+    run_card_append; c1=$(git -C "$O" rev-parse --verify -q "$REF")
+    git clone -q -b main "$O" "$S/clone2" 2>/dev/null && git -C "$S/clone2" config core.hooksPath "$S/hooks" \
+      && git -C "$S/clone2" remote rename origin upstream
+    run_card_engine "$S/clone2" --card --lookup --build tFix --session t2
+    print_card_held "AC9 a clone whose one remote is upstream reads the card: re-derived at ${c1:0:8}" "$(grep -q "^card — tFix · re-derived · ref ${c1:0:8} " "$OUT"; echo $?)" ;;
+  lookup-hung)
+    # TOOL-dPlacedRequest-34 AC11: a driver that never answers the lookup; the clock is the excess over a
+    # control lookup whose stub answers at once, as publish-hung measures, and the cache answers.
+    run_card_append
+    f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file unattended unattended.sh); [ -n "$f" ] || { echo "card-store: no driver resolves in $R"; exit 2; }
+    printf '%s\n' 'case "${1:-}" in --card-ref) echo "card-ref — none"; exit 0 ;; esac' 'echo "claims: off"' > "$f"
+    t0=$EPOCHSECONDS; CARD_FETCH_BOUND=4 run_card_engine "$R" --card --lookup --build tFix --session t2; t1=$EPOCHSECONDS
+    printf '%s\n' 'case "${1:-}" in --card-ref) exec sleep 60 ;; esac' 'echo "claims: off"' > "$f"
+    t2=$EPOCHSECONDS; CARD_FETCH_BOUND=4 run_card_engine "$R" --card --lookup --build tFix --session t2; t3=$EPOCHSECONDS
+    print_card_held "AC11 a silent driver reads the next store: evidence" "$(grep -q '^card — tFix · evidence · ' "$OUT"; echo $?)"
+    print_card_held "AC11 the lookup took $((t3 - t2 - t1 + t0))s over the control, within the bound plus 3s" "$([ $((t3 - t2 - t1 + t0)) -le 7 ]; echo $?)" ;;
+  replay)
+    # TOOL-dPlacedRequest-34 AC12: the replay's lookup is the driver's, which writes no FETCH_HEAD.
+    run_card_append
+    : > "$R/.git/FETCH_HEAD"; touch -d '2001-01-01 00:00:00' "$R/.git/FETCH_HEAD"; m0=$(stat -c %Y "$R/.git/FETCH_HEAD")
+    printf -v payload '{"session_id":"t1","cwd":"%s"}' "$R"
+    (cd "$R" && printf '%s' "$payload" | bash "$CHECK" --card --replay) > "$OUT" 2>&1
+    print_card_held "AC12 the replay re-keyed the routed build's card" "$(grep -q '^card — tFix · ' "$OUT"; echo $?)"
+    print_card_held "AC12 FETCH_HEAD's mtime is unchanged" "$([ "$(stat -c %Y "$R/.git/FETCH_HEAD")" = "$m0" ]; echo $?)" ;;
   context-*|partial-*|terminal-route)
     run_card_append
     case "$PLANT" in
@@ -296,7 +324,7 @@ case "$PLANT" in
       partial-*)
         v=${PLANT#partial-}; case "$v" in continue) v=continue-item ;; restart) v=restart-item ;; ask) v=ask-owner ;; esac
         print_card_held "AC8 the partial line counts 2 paths and names $v" "$(grep -q "^partial — 2 uncommitted path(s) · resume.partial: $v · " "$OUT"; echo $?)"
-        [ "$v" != restart-item ] || print_card_held "AC8 the kickoff skill states the restart act" "$(grep -q 'partial/<slug>/<sid8>' "$HERE/SKILL.md"; echo $?)" ;;
+        [ "$v" != restart-item ] || print_card_held "AC8 the kickoff's RESUME.md states the restart act (TOOL-dPlacedRequest-34 S36)" "$(grep -q 'partial/<slug>/<sid8>' "$HERE/RESUME.md"; echo $?)" ;;
       terminal-route) print_card_held "AC9 a replay over the card routed there re-checks R7" "$(grep -qx 'route — re-checked · R7' "$OUT"; echo $?)" ;;
     esac ;;
   close-follow-twice)

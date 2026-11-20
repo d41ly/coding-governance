@@ -30,10 +30,10 @@
 # `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
 # The stamp is a scratch file of its own, never the push's output file, which git writes after the
 # hook ran and so would read every token as stale.
-# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it sets this node's cache ref
-# `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, then calls `add_feed_event`
-# from the `gov_feed_sh` block every carrier of this one carries beside it. A lost or uncompleted
-# write appends nothing.
+# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it calls `write_feed_success` from
+# the `gov_feed_sh` block every carrier of this one carries beside it (TOOL-dPlacedRequest-34 S5), which
+# sets this node's cache ref `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, and
+# appends the event. A lost or uncompleted write appends nothing.
 # WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
 # omitted; a token another push wrote during this call reads as fresh and is printed beside this
 # push's own cause, never as it.
@@ -77,10 +77,7 @@ write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost,
   fi
   rm -f "$s" "$f"
   [ "$rc" = 0 ] || return "$rc"
-  if [ -n "$src" ]; then git update-ref "refs/gov/remote/${ref#refs/gov/}" "$src" 2>/dev/null
-  else git update-ref -d "refs/gov/remote/${ref#refs/gov/}" 2>/dev/null; fi \
-    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${ref#refs/gov/}" >&2
-  add_feed_event "$ref" "$src"
+  write_feed_success "$ref" "$src"
   return 0
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion

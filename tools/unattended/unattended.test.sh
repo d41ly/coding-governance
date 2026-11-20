@@ -19884,8 +19884,8 @@ hit  "$of_out" "lease refused — live-holder · tFix/unit/u1 · "
 same "DPR20 AC1 an offer over a live lease moves no tip" "$(read_offer_tip u1)" "$of_t0"
 run_offer_arm "$LF/c2" agent5 s1 release unit tFix u1 --as withdrawn >/dev/null
 of_t0=$(read_offer_tip u1); of_out=$(run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u1 --to b)
-hit  "$of_out" "lease refused — terminal · tFix/unit/u1 · "
-same "DPR20 S1 an offer over a tombstone moves no tip" "$(read_offer_tip u1)" "$of_t0"
+hit  "$of_out" "lease refused — tombstone · tFix/unit/u1 · "
+same "DPR20 S1 an offer over a tombstone moves no tip, refused tombstone (TOOL-dPlacedRequest-34 S54)" "$(read_offer_tip u1)" "$of_t0"
 # ---- AC5: the window is the observer clock's: a sighting 301 s old frees it, none holds it.
 run_offer_arm "$LF/c1" daily-agent sa offer unit tFix u3 --to b >/dev/null
 awk -F'\t' -v OFS='\t' -v c="$(read_offer_tip u3)" -v s="$(derive_claim_ago 301)" '$5 == c { $6 = s } { print }' "$of_feed" >"$of_feed.t" && mv -f "$of_feed.t" "$of_feed"
@@ -19948,8 +19948,9 @@ cg_red=$( eval "$(declare -f check_cadence_segment | sed 's/\^\[a-z0-9\]\[a-z0-9
 same "DPR18 AC4 RED: the predicate planted with [a-z][a-z0-9-]* refuses 9am" "$cg_red" "0 0 1 1 1 1 0 1 "
 cg_rel=$(resolve_kit_dir "$_rkd_py" playbook tag_index.py "$HERE" 2>/dev/null) || cg_rel=""
 if [ -z "$cg_rel" ]; then
-  n=$((n+2))
-  echo "  SKIP the cadence parity arm: no playbook kit resolves beside this one, so parse_tag cannot be asked; its 2 assertions are counted, not run"
+  # UNARMED IS NO PASS (TOOL-dPlacedRequest-34 S55): with no tag_index.py the parity cannot be asked, so
+  # the arm reds naming why rather than counting two assertions it never ran.
+  same "DPR18 AC4 the parity probe is armed" "unarmed — tag_index.py does not resolve" "armed"
 else
   [ -f "$cg_rel/tag_index.py" ] || cg_rel="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$cg_rel"
   cg_tag=$("$_rkd_py" -B -c 'import sys
@@ -20230,7 +20231,7 @@ mv "$LF/origin.git" "$LF/away.git"; dt_out=$(run_lease_arm prune); dt_rc=$?; mv 
 same "DPR16 a prune whose remote does not answer exits 2" "$dt_rc" "2"; hit "$dt_out" "lease not written — the remote did not answer"
 sed -i 's/^RUN_CLAIMS="on"$/RUN_CLAIMS="off"/' "$LF/c1/.unattended.conf"; dt_out=$(run_lease_arm prune); dt_rc=$?
 git -C "$LF/c1" checkout -q -- .unattended.conf
-same "DPR16 a prune with RUN_CLAIMS off exits 2" "$dt_rc" "2"; hit "$dt_out" "so no lease is read or pruned"
+same "DPR16 a prune with RUN_CLAIMS off exits 0, off an outcome (TOOL-dPlacedRequest-34 S23)" "$dt_rc" "0"; hit "$dt_out" "lease — off · prune"
 # ---- A REFUSED BOUND: a write queued under the catalogue defaults, then a first policy revision whose
 # ---- `leases.queued-claim-days` is out of range: the flush keeps the line and the prune writes nothing.
 mv "$LF/origin.git" "$LF/away.git"; run_lease_arm acquire build tPq >/dev/null; mv "$LF/away.git" "$LF/origin.git"

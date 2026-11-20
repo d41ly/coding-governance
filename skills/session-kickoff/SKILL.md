@@ -52,12 +52,8 @@ not a meeting.
 One shell call in `<repo>`: `git branch --show-current` · `status --short` · fetch +
 `merge --ff-only <remote>/<default>` (only on the default branch with a clean tree; report if
 it moved) · `rev-parse HEAD` → report as **BASE** (the immutable SHA for diff-scoping, never a
-moving ref) · `worktree list` when multi-tree. **With an `orientation —` card in context** the call
-is `rev-parse HEAD`, plus fetch + ff when its `tree —` cell reads the default branch and `clean`;
-while HEAD equals the cell's BASE, take branch, BASE, dirty count, worktree count and recent subjects
-from the card, running no `branch --show-current`, `status --short` or `worktree list`.
-A `now —` line (the replay's, never stored) is fresh for HEAD, branch and dirty count: take them from it.
-A mismatch or no card → the full call.
+moving ref) · `worktree list` when multi-tree. **With a card in context**, `RESUME.md` beside this file
+is the call, the already-oriented path, Step 2b's `## pockets` repair and Step 5's resume act.
 
 If the ff moved the default branch AND the project has a codebase map (manifest-declared, or
 `.codebase-map.conf` at the repo root): run the manifest's map-diff command over
@@ -67,9 +63,6 @@ the rollup + coverage line, `--verbose` only if asked.
 **STOP and tell the user first** when: a foreign `MERGE_HEAD` or `UU` conflict entries exist;
 the ff-merge fails (local diverged); or the branch violates the project's stated conventions.
 A clean tree is NOT proof you're on the right branch.
-
-**Already oriented.** A card whose last READY line is not `READY — none yet` is oriented (`kickoff.runs` at `no-ready-card`, a stand-in dRankedPlan arms): re-orient from its `## task`, `## read`, `## records`, `## classes`, `## open` and `## pockets`,
-then go to Step 5's hand-back, not re-running Steps 2 to 4. No such card → the full kickoff.
 
 ## Step 2 — Load the project layer (the manifest)
 
@@ -121,10 +114,8 @@ proceed unaudited and say so in one clause. Relay a version WARN without blockin
 On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a
 flagged §A task instead) and STAGE it; Step 5 commits it after the append: for each file the
 drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
-map ← moved dirs · traps/corrections ← toolchain files): a §B fact that is a level-2 unit the card prints under
-`## pockets` is repaired by proposal, a stale one with `propose edit` and a missing one with
-`instructions_edit.py propose add --manifest overlay`; in the sub-sections that stay guide text, fix or DELETE
-stale rows, and delete dated entries whose prune-when condition now holds.
+map ← moved dirs · traps/corrections ← toolchain files): a `## pockets` fact as `RESUME.md` says; else fix or
+DELETE stale rows, and delete dated entries whose prune-when condition now holds.
 Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
@@ -216,15 +207,6 @@ AFTER that append, THEN hand control back:
 confirms. Quote that answer under the brief's `## Owner confirmation`; its skeleton says when to
 append its `## route`.
 On go, a code build continues in `/build` where the project ships it.
-
-**Resume.** A replayed card whose `## route` names a build is first re-keyed from that build's card,
-then the replay prints `route — re-checked · <verdict>`, a `resume —` line (resume.context) and
-`partial — <n> uncommitted path(s) · resume.partial: <value>`. Take that value's act before any new
-work: `continue-item` keeps the work and continues the routed item, its witness still owed;
-`restart-item` commits the work to the side branch `partial/<slug>/<sid8>` (`<sid8>` the session id's
-first eight characters) and only then restores the tree to `HEAD`, so nothing is lost; `ask-owner`
-asks the owner what to do with it, or, under a mandate, parks the item with the paths named. A
-re-check other than `ok` is a route that no longer holds: kick off again.
 
 ## Step 5b — the unattended hand-back (only inside a run actually started as one)
 

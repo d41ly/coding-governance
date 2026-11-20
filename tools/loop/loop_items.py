@@ -591,7 +591,7 @@ def write_fixture_plant(top, case, pins, bad):
         from build_records import KINDS
         req = KINDS["acceptance"]["required"]
         spelled = '"required": (%s)' % ", ".join(json.dumps(f) for f in req)
-        rel = top / pathlib.Path(defn).parent.parent / resolve_kit_dir("memory-tree", "build_records.py", KIT).name
+        rel = top / pathlib.Path(defn).parent.parent / read_memory_tree("build_records.py").name
         table = (rel / "build_records.py").read_text(encoding="utf-8")
         if table.count(spelled) != 1:
             raise ValueError("the record table spells the acceptance kind's fields other than %s" % spelled)

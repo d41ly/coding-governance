@@ -797,12 +797,9 @@ def read_actor_base(kit_dir):
     if top is None or prefix is None:
         return None, "the loop kit sits in no git work tree"
     try:
-        mt_dir = resolve_kit_dir("memory-tree", "coverage_join.py", kit_dir)
-    except LookupError as e:
+        resolve_compare_base = load_tree_lib("coverage_join", ("resolve_compare_base",)).resolve_compare_base
+    except LoopError as e:
         return None, str(e)
-    if str(mt_dir) not in sys.path:
-        sys.path.insert(0, str(mt_dir))
-    from coverage_join import resolve_compare_base
     base, why = resolve_compare_base(top.strip())
     if not base:
         return None, why
@@ -820,12 +817,9 @@ def read_builds_dir(kit_dir, root):
     root:` reason as the why (TOOL-dDeclaredLoop-116). The memory-tree kit's `read_design_conf` is
     imported inside the function, as `read_actor_base` imports its compare base."""
     try:
-        mt_dir = resolve_kit_dir("memory-tree", "design_lib.py", kit_dir)
-    except LookupError as e:
+        read_design_conf = load_tree_lib("design_lib", ("read_design_conf",)).read_design_conf
+    except LoopError as e:
         return None, str(e)
-    if str(mt_dir) not in sys.path:
-        sys.path.insert(0, str(mt_dir))
-    from design_lib import read_design_conf
     conf = read_design_conf(root)
     if not str(conf.get("DESIGN_RECORD") or "").strip():
         return None, "%s sets no DESIGN_RECORD, or is absent, so the chain's builds are not this tree's" % (
@@ -1042,30 +1036,33 @@ def derive_conf_rebinds(tree, docs):
 TREE_LIB_SYMBOLS = ("derive_docstring_ids", "derive_constant_charges")
 
 
-def load_tree_lib():
-    """The memory-tree kit's `tree_lib`, found through `read_memory_tree` and imported inside the call,
-    never at this module's import: the one route by which this module reaches it, which
-    `derive_conf_reads` and `derive_conf_constants` call. One LoopError naming the loaded file, every
-    name of `TREE_LIB_SYMBOLS` the module lacks, in tuple order joined by `, `, and
+def load_tree_lib(module="tree_lib", need=TREE_LIB_SYMBOLS):
+    """The memory-tree kit's module `module`, `tree_lib` by default, found through `read_memory_tree` and
+    imported inside the call, never at this module's import: the one route by which the loop kit reaches a
+    memory-tree module (TOOL-dPlacedRequest-34 S34), which `derive_conf_reads`, `derive_conf_constants`,
+    `read_actor_base`, `read_builds_dir`, `request.py` and `budget.py` call. One LoopError naming the loaded
+    file, every name of `need`, `TREE_LIB_SYMBOLS` by default, the module lacks, in tuple order joined by
+    `, `, and
     `govkit update --kits memory-tree` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6,
     TOOL-dDeclaredLoop-90 S4, TOOL-dDeclaredLoop-94 S21), so a memory-tree kit older than the charge
     walk refuses by name, never by an AttributeError; LoopError naming the same command where
     `read_memory_tree` cannot locate the kit, keeping its message and the places it looked, or where
     the import raises any other exception, naming its class (TOOL-dDeclaredLoop-88 S33,
     TOOL-dDeclaredLoop-94 S21)."""
+    import importlib
     try:
-        read_memory_tree("tree_lib.py")
-        import tree_lib
+        read_memory_tree("%s.py" % module)
+        mod = importlib.import_module(module)
     except LookupError as e:
         raise LoopError("memory-tree kit", "%s — govkit update --kits memory-tree" % e) from None
-    except Exception as e:   # noqa: BLE001  a damaged tree_lib.py raises anything at import; named, never a traceback
+    except Exception as e:   # noqa: BLE001  a damaged module raises anything at import; named, never a traceback
         raise LoopError("memory-tree kit", "%s: %s — govkit update --kits memory-tree" % (
             type(e).__name__, e)) from None
-    missing = [name for name in TREE_LIB_SYMBOLS if not hasattr(tree_lib, name)]
+    missing = [name for name in need if not hasattr(mod, name)]
     if missing:
-        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
+        raise LoopError(pathlib.Path(mod.__file__).as_posix(),
                         "has no %s — govkit update --kits memory-tree" % ", ".join(missing))
-    return tree_lib
+    return mod
 
 
 def derive_conf_constants(loop_lib_path):
@@ -1742,7 +1739,9 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
     `none`, or no `seed`, is the empty list. `scope-paths` is `SEED_SCOPE_UNARMED` until a plan record
     carries a scope. `write-set` finds the unit's spec as the file under `<records root>/builds/<build>/spec/`
     whose H1's first token is `unit`, the memory-tree kit's `parse_spec_h1` deciding, and hands its path to
-    the unattended driver's `--path-tokens --files-touched HEAD <spec>`; `question-paths` hands `question`
+    the unattended driver's `--path-tokens --files-touched --any-status HEAD <spec>`, a spec of any status
+    (TOOL-dPlacedRequest-34 S48), and a spec listing no path is `unarmed — write-set: <spec> lists no path`;
+    `question-paths` hands `question`
     to that verb's stdin form. The driver is an optional sibling found by `resolve_kit_dir` and run by the
     bash `loop_witness.py`'s `resolve_bash` finds, both imported inside the function: where neither
     resolves, the source is `unarmed`. ValueError naming why on a missing `unit` or `build` for `write-set`,
@@ -1801,7 +1800,7 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
         if len(hits) != 1:
             raise ValueError("%d spec(s) under %s/builds/%s/spec/ define %s, where one owes it%s" % (
                 len(hits), memory_root, build, unit, (": " + " ".join(hits)) if hits else ""))
-        argv += ["--files-touched", "HEAD", hits[0]]
+        argv += ["--files-touched", "--any-status", "HEAD", hits[0]]
     try:
         driver = resolve_kit_dir("unattended", "unattended.sh", pathlib.Path(__file__).absolute().parent)
     except LookupError:
@@ -1830,6 +1829,8 @@ def resolve_item_seed(item, *, build=None, unit=None, question=None):
         path = resolve_seed_path(line)
         if path and path not in paths:
             paths.append(path)
+    if seed == "write-set" and not paths:   # TOOL-dPlacedRequest-34 S48: an empty write set is no seed
+        return "unarmed — write-set: %s lists no path" % hits[0]
     return paths
 
 

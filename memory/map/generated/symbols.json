@@ -750,11 +750,6 @@
     {
       "id": "add_feed_event",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "add_feed_event",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -771,11 +766,6 @@
       "id": "add_feed_event",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "add_feed_sightings",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "add_feed_sightings",
@@ -6010,11 +6000,6 @@
     {
       "id": "check_dir_lock_stale",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "check_dir_lock_stale",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -6296,11 +6281,6 @@
       "id": "check_fanout_step",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
-    },
-    {
-      "id": "check_feed",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "check_feed",
@@ -7741,11 +7721,6 @@
       "id": "check_probe_scrubbed",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
-    },
-    {
-      "id": "check_proc_gone",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "check_proc_gone",
@@ -11351,11 +11326,6 @@
       "id": "derive_farm_row",
       "kind": "function",
       "file": "tools/loop/scenario.py"
-    },
-    {
-      "id": "derive_feed_events",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "derive_feed_events",
@@ -18498,6 +18468,11 @@
       "file": "skills/session-kickoff/card-store.fixture.sh"
     },
     {
+      "id": "print_card_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_chain_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -18605,11 +18580,6 @@
     {
       "id": "print_feed",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "print_feed",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -18671,6 +18641,11 @@
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "print_lease_status",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "print_leg_window",
@@ -20955,11 +20930,6 @@
     {
       "id": "read_first_seen",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "read_first_seen",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -22856,11 +22826,6 @@
       "id": "read_proc_ledger",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "read_proc_token",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "read_proc_token",
@@ -24911,11 +24876,6 @@
       "id": "remove_descendants",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
-    },
-    {
-      "id": "remove_dir_lock",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "remove_dir_lock",
@@ -27138,6 +27098,11 @@
       "file": "tools/policy/policy-mirror.js"
     },
     {
+      "id": "resolveCardBash",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveCheckoutRoot",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -27441,6 +27406,11 @@
       "id": "resolve_caps",
       "kind": "function",
       "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "resolve_card_driver",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "resolve_card_path",
@@ -37635,11 +37605,6 @@
     {
       "id": "write_dir_lock",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "write_dir_lock",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -37665,11 +37630,6 @@
     {
       "id": "write_dir_lock_pid",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "write_dir_lock_pid",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -37686,11 +37646,6 @@
       "id": "write_dir_lock_pid",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "write_dir_lock_wait",
-      "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
       "id": "write_dir_lock_wait",
@@ -37825,11 +37780,6 @@
     {
       "id": "write_feed",
       "kind": "function",
-      "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "write_feed",
-      "kind": "function",
       "file": "tools/lib/gov-feed.sh"
     },
     {
@@ -37851,6 +37801,26 @@
       "id": "write_feed_plant",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "write_feed_success",
+      "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "write_feed_success",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_feed_success",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "write_feed_success",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "write_fence_beat",

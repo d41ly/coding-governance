@@ -592,17 +592,25 @@ def check_user_clash(user: str, held: list[tuple[str, str]]) -> str:
     return ''
 
 
-def read_fleet_tag(path: Path, user: str, host: str = '') -> str:
+def read_fleet_tag(path: Path, user: str, node: str = '') -> str:
     """The tag of the fleet row naming `user`, matched as every reader matches it: the user alone,
-    case-folded (`check_user_clash`). `host` only names the node in the refusal. TOOL-dPlacedRequest-1
-    S11: the unattended driver's `resolve_fleet_tag` asks this, so a lease names a fleet tag and
-    `read_fleet` stays the registry's one reader. Refuses naming the registry when no row matches."""
+    case-folded (`check_user_clash`), never the host, so a row whose `host` is empty or another
+    machine's still resolves (TOOL-dPlacedRequest-34 S30). `node`, the driver's GOV_NODE, names the tag
+    outright and must be a tag of the registry. TOOL-dPlacedRequest-1 S11: the unattended driver's
+    `resolve_fleet_tag` asks this, so a lease names a fleet tag and `read_fleet` stays the registry's
+    one reader. Refuses naming the registry when no row matches, or a `node` no row carries."""
+    rows = read_fleet(path)
+    if node.strip():
+        if any(row['tag'] == node.strip() for row in rows):
+            return node.strip()
+        raise Refusal(f'GOV_NODE {node!r} is no tag of {FLEET_NAME} at {path.as_posix()}, so this node '
+                      f'carries no fleet tag')
     u = user.strip().lower()
-    for row in read_fleet(path):
+    for row in rows:
         if u and row['user'].strip().lower() == u:
             return row['tag']
-    raise Refusal(f'no row of {FLEET_NAME} at {path.as_posix()} names user {user!r} '
-                  f'(host {host or "<none>"}), so this node carries no fleet tag')
+    raise Refusal(f'no row of {FLEET_NAME} at {path.as_posix()} names user {user!r}, so this node carries '
+                  f'no fleet tag')
 
 
 def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
@@ -2716,15 +2724,24 @@ def run_selftest() -> int:
     # names is a refusal naming the registry, never a guessed tag.
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
-        tag_got = read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1].upper(), 'H')
+        tag_got = read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1].upper())
         try:
-            read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here', 'H')
+            read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here')
             tag_miss = 'no refusal'
         except Refusal as e:
             tag_miss = str(e)
-    check_arm(tag_got == fleet_rows[1][0] and FLEET_NAME in tag_miss and 'nobody-here' in tag_miss,
-              '--fleet-tag names the user\'s row and refuses a user no row names, naming the registry',
-              f'got {tag_got!r} miss {tag_miss!r}')
+        # TOOL-dPlacedRequest-34 AC30: GOV_NODE names a registered tag outright; an unregistered one refuses.
+        node_got = read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here', fleet_rows[0][0])
+        try:
+            read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1], 'zz')
+            node_miss = 'no refusal'
+        except Refusal as e:
+            node_miss = str(e)
+    check_arm(tag_got == fleet_rows[1][0] and FLEET_NAME in tag_miss and 'nobody-here' in tag_miss
+              and node_got == fleet_rows[0][0] and 'GOV_NODE' in node_miss,
+              '--fleet-tag names the user\'s row, or GOV_NODE\'s registered tag, and refuses a user no row '
+              'names or an unregistered GOV_NODE, naming the registry',
+              f'got {tag_got!r} miss {tag_miss!r} node {node_got!r} node miss {node_miss!r}')
     arm_fixture('a legacy drop_blocks member with no fence is noted with the descriptor\'s why',
                 trailer_desc + '\n[[block]]\nname = "node-table"\nlegacy = "v3"\nwhy = "WHY-X"\n',
                 'plain\n', 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
@@ -3771,6 +3788,9 @@ def main(argv: list[str]) -> int:
     # TOOL-aDistilledCharter-2: a new node claims its tag once, in gov's own checkout.
     ap.add_argument('--claim-node', action='store_true')
     ap.add_argument('--fleet-tag', action='store_true')
+    # TOOL-dPlacedRequest-34 S29, S30: the registry a fixture plants, and the GOV_NODE the driver hands on.
+    ap.add_argument('--fleet', type=Path)
+    ap.add_argument('--node', default='')
     ap.add_argument('--user', default='')
     ap.add_argument('--host', default='')
     ap.add_argument('--projects-root', default='')
@@ -3819,7 +3839,7 @@ def main(argv: list[str]) -> int:
             return 1
     if a.fleet_tag:
         try:
-            print(read_fleet_tag(Path(__file__).resolve().parent / FLEET_NAME, a.user, a.host))
+            print(read_fleet_tag(a.fleet or Path(__file__).resolve().parent / FLEET_NAME, a.user, a.node))
         except Refusal as e:
             print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
             return 1

@@ -817,7 +817,8 @@ def run_request_draw_plant(case):
             rc, out = run_draw()
             check(rc == 2 and "not drawn, contention" in out, "an unreachable remote answered %d %r" % (rc, out[-200:]))
             rc, out = run_placement_verb(*place)
-            check(rc == 2 and "drew nothing, so no block is written" in out and read_block_count() == 1,
+            check(rc == 2 and "pre-claim draw not recorded — " in out and "drew nothing, so no block is written" in out
+                  and read_block_count() == 1,
                   "a re-placement with the remote unreachable answered %d, %d blocks: %r" % (rc, read_block_count(), out[-200:]))
             run_fixture_git(root, "remote", "set-url", "origin", origin.as_posix())
             check(len(read_ref_rows()) == 1, "an unreachable draw added a row")

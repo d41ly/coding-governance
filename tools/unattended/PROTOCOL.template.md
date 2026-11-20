@@ -521,7 +521,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `PROCMON_CMD` | the reaper, called `<cmd> --kill-msys <pid>` once per recorded orphan. OPTIONAL: blank turns reaping off, announced. `UNATTENDED-STOPS.md` |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
-| `RUN_CLAIMS` | `on` or `off`: whether every run claims its slug on the remote as `refs/gov/runs/<slug>`, so a second node is refused at `--preflight` rather than met at the merge. OPTIONAL: blank or absent is `off`, announced on stderr; any other value is refused. `UNATTENDED-STOPS.md` §7 |
+| `RUN_CLAIMS` | `on` or `off`: whether every run claims its slug on the remote as `refs/gov/leases/<slug>/build`, so a second node is refused at `--preflight`, not met at the merge. OPTIONAL: blank or absent is `off`, announced on stderr; any other is refused. `UNATTENDED-STOPS.md` §7 |
 | `HELD_CI_WORKFLOW` | the workflow file whose daily held job's red suites each file one HIGH ask. OPTIONAL: blank is DARK, announced. `UNATTENDED-STOPS.md` §13 |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |
 | `GENERATED_INDEXES` | `index:generator` pairs ADDED to the `[[generated]]` rows the kits declare. An index ALONE is fine; only the index TOGETHER WITH its generator is refused |

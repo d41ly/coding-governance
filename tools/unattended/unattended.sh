@@ -43,11 +43,13 @@
 #   unattended.sh --claims [--with-key]                            # every run claim and lease on the remote: name, node or fleet tag, status, beat-age-s, verdict[, key]
 #   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit, cadence run or request, by compare-and-swap; one line
 #   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
+#   unattended.sh --lease status <kind> <name> [<sub>]             # one lease read, read-only: tail, fleet tag, session, status, verdict, epoch, TAB-separated; or `lease — none · <tail>`
 #   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
 #   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
 #   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
 #   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
 #   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
+#   unattended.sh --card-ref lookup <slug>                         # that ref read into this node's cache, read-only: its commit and message, `card-ref — none` or `— off`; 0 read, 2 not read
 #   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
 #   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
 #   unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]   # a placed new, patch or repeat request claimed as a build: refs/gov/claims/<slug>, its lease, plan record and first record; 0 claimed, 1 refused, 4 waiting, 5 a fresh slug owed
@@ -59,7 +61,7 @@
 #   unattended.sh --version                                        # the kit version, then exit
 #   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
 #   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
-#   unattended.sh --path-tokens [--files-touched <rev> <spec> ...]  # the path tokens of stdin, or the specs' Files touched paths at <rev>; writes nothing
+#   unattended.sh --path-tokens [--files-touched [--any-status] <rev> <spec> ...]  # the path tokens of stdin, or the specs' Files touched paths at <rev>, a terminal spec's under --any-status; writes nothing
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -2755,8 +2757,10 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     # tombstone, BEFORE the identity rows, so its releaser takes a hand-over at the epoch plus one and
     # nobody, its writer included, revives a tombstone; a draw's hold after them, below. An open offer
     # to another node or session (TOOL-dPlacedRequest-20) is tested before all of them.
-    if [ "$mode" = lease ] && [ -n "$c_offer" ] && [ "$c_offer" != - ] && [ "$c_offer" != "$ka" ] \
-      && { [ -z "$me" ] || [ "$me" = absent ] || [ "$c_offer" != "$ka/$me" ]; }; then
+    # TOOL-dPlacedRequest-34 S49: the `offer` act reads an open offer to ANY target, this node's own
+    # included, as `offered`, so no node re-offers over an offer still running.
+    if [ "$mode" = lease ] && [ -n "$c_offer" ] && [ "$c_offer" != - ] \
+      && { [ "$la" = offer ] || { [ "$c_offer" != "$ka" ] && { [ -z "$me" ] || [ "$me" = absent ] || [ "$c_offer" != "$ka/$me" ]; }; }; }; then
       c_tail=$c_slug; [ "$c_kind" != build ] || c_tail="$c_slug/build"
       case "$c_odl" in
         ""|*[!0-9]*) ;;
@@ -2817,8 +2821,12 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     fi
   fi
   if [ "$la" = offer ]; then
+    # TOOL-dPlacedRequest-34 S49 and S54: an open offer is `offered`; a build or unit tombstone, a
+    # draw's hold included, is `tombstone`, and `terminal` stays a cadence or legacy claim's.
     case "$cls:${c_status:-}" in
       none:*) CW_ACT=create ;;
+      offered:*) CW_CAUSE=offered; return 1 ;;
+      foreign-tombstone:*) CW_CAUSE=tombstone; return 1 ;;
       *:released) CW_ACT=write ;;
       *:landed|*:aborted|*:withdrawn) CW_CAUSE=terminal; return 1 ;;
       *) CW_CAUSE=live-holder; return 1 ;;
@@ -2904,10 +2912,10 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
 # The stamp is a scratch file of its own, never the push's output file, which git writes after the
 # hook ran and so would read every token as stale.
-# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it sets this node's cache ref
-# `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, then calls `add_feed_event`
-# from the `gov_feed_sh` block every carrier of this one carries beside it. A lost or uncompleted
-# write appends nothing.
+# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it calls `write_feed_success` from
+# the `gov_feed_sh` block every carrier of this one carries beside it (TOOL-dPlacedRequest-34 S5), which
+# sets this node's cache ref `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, and
+# appends the event. A lost or uncompleted write appends nothing.
 # WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
 # omitted; a token another push wrote during this call reads as fresh and is printed beside this
 # push's own cause, never as it.
@@ -2951,10 +2959,7 @@ write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost,
   fi
   rm -f "$s" "$f"
   [ "$rc" = 0 ] || return "$rc"
-  if [ -n "$src" ]; then git update-ref "refs/gov/remote/${ref#refs/gov/}" "$src" 2>/dev/null
-  else git update-ref -d "refs/gov/remote/${ref#refs/gov/}" 2>/dev/null; fi \
-    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${ref#refs/gov/}" >&2
-  add_feed_event "$ref" "$src"
+  write_feed_success "$ref" "$src"
   return 0
 }
 remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
@@ -3093,7 +3098,8 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
 # `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
 # and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
-# commit. `write_gov_ref`'s success exit calls `add_feed_event`, so every writer joins by construction.
+# commit. `write_gov_ref`'s success exit calls `write_feed_success`, which calls `add_feed_event`, so every
+# writer joins by construction.
 # APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
 # equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
 # event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
@@ -3173,6 +3179,18 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
     *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
   esac
+  return 0
+}
+# THE ONE SUCCESS EXIT (TOOL-dPlacedRequest-34 S5): a governance write that landed sets this node's cache
+# ref `refs/gov/remote/<tail>` to the commit it wrote, or clears it on a deletion, then appends the event,
+# so the cache always names what this node last wrote or fetched. `write_gov_ref` calls it, and so does a
+# carrier whose push is no `write_gov_ref` call, the lander's fenced beat (S6). A cache ref git cannot
+# move prints ONE `feed: NOTE -` line and the event is appended all the same: the write already landed.
+write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the cache ref set or cleared, the event appended
+  if [ -n "${2:-}" ]; then git update-ref "refs/gov/remote/${1#refs/gov/}" "$2" 2>/dev/null
+  else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
+    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
+  add_feed_event "$1" "${2:-}"
   return 0
 }
 derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
@@ -3287,15 +3305,17 @@ read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` 
 
 # THE EPOCH FOR LIFE (TOOL-dPlacedRequest-16 S5), read once for every create (TOOL-dPlacedRequest-28
 # S1): the newest commit this node's feed holds for a lease ref the remote does not hold, one awk and
-# one cat-file. It prints nothing where the feed holds no commit for the ref, or names one this clone
-# cannot read; `tombstone <commit>` where that commit is a build or unit tombstone; and otherwise
+# one cat-file. It prints nothing where the feed holds no commit for the ref; `unreadable <commit>`
+# where it names one this clone cannot read, `git prune` having taken it (TOOL-dPlacedRequest-34 S4);
+# `tombstone <commit>` where that commit is a build or unit tombstone; and otherwise
 # `<commit> <epoch>`, the epoch its record carries, 0 where that is no whole number. Its one caller is
 # `write_claim`, on a create whose tip read is empty.
-read_feed_lease_tip() { # lease ref -> nothing, `tombstone <commit>` or `<commit> <epoch>`
+read_feed_lease_tip() { # lease ref -> nothing, `unreadable <commit>`, `tombstone <commit>` or `<commit> <epoch>`
   local ref="$1" fc="" fm fe
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   [ ! -f "${GOVFEED_DIR%$'\r'}/gov-feed.log" ] || fc=$(LF_REF="$ref" awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $2 == ENVIRON["LF_REF"] && $5 ~ /^[0-9a-f]+$/ && $5 !~ /^0+$/ { c = $5 } END { print c }' "${GOVFEED_DIR%$'\r'}/gov-feed.log")
-  [ -n "$fc" ] && fm=$(GIT cat-file commit "$fc" 2>/dev/null) || return 0
+  [ -n "$fc" ] || return 0
+  fm=$(GIT cat-file commit "$fc" 2>/dev/null) || { printf 'unreadable %s\n' "$fc"; return 0; }
   fe=$(printf '%s\n' "$fm" | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^kind: / && k == "" { k = substr($0, 7) } /^status: / && s == "" { s = substr($0, 9) } END { print e " " k " " s }')
   case "${fe#* }" in
     "build landed"|"build withdrawn"|"unit landed"|"unit withdrawn") printf 'tombstone %s\n' "$fc"; return 0 ;;
@@ -3381,7 +3401,11 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   # TOOL-dPlacedRequest-28); a ref that does not derive reads nothing and refuses below.
   pt=$CW_SHA; pe=$CW_EPOCH
   [ -z "$ref" ] || [ "$CW_ACT" != create ] || [ -n "$pt" ] || ft=$(read_feed_lease_tip "$ref")
-  case "$ft" in ""|"tombstone "*) ;; *) pt=${ft%% *}; pe=${ft#* } ;; esac
+  # AN UNREADABLE FEED COMMIT (TOOL-dPlacedRequest-34 S4): a build or unit lease cannot know the epoch
+  # it would continue, so its create is refused below, `epoch-fence` at the verb; a cadence `run` or a
+  # legacy claim takes the plain create at epoch 1.
+  case "$ft:$kd" in "unreadable "*:build|"unreadable "*:unit) ;; "unreadable "*) ft="" ;; esac
+  case "$ft" in ""|"tombstone "*|"unreadable "*) ;; *) pt=${ft%% *}; pe=${ft#* } ;; esac
   case "$CW_ACT" in create|take|take-announced) ep=$((pe + 1)) ;; *) ep=$pe ;; esac
   [ "$ep" -ge 1 ] 2>/dev/null || ep=1
   rv=""; ! read_lease_policy leases.renewal >/dev/null || rv=$LP_VALUE
@@ -3400,6 +3424,8 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
     WC_WHY="no lease ref derives for $slug: $LEASE_WHY"; rc=2
   elif [ "${ft%% *}" = tombstone ]; then
     WC_WHY="the remote no longer holds it, and this node's feed last saw its tombstone ${ft#tombstone }"; rc=3
+  elif [ "${ft%% *}" = unreadable ]; then
+    WC_WHY="the remote no longer holds it, and this node's feed names ${ft#unreadable }, which this clone cannot read, so the epoch a create would continue is unknown"; rc=1
   else
     msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: %s\noffer-deadline: %s\nlast-fetch: %s' \
       "${ref#"$LEASE_NS"/}" "$sl" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT" \
@@ -3986,7 +4012,13 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
 # this verb, and no read here asks for an identity they do not need.
 run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
   local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la ot os odl=""
-  [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or written"; return 2; }
+  # OFF IS AN OUTCOME (TOOL-dPlacedRequest-34 S23): with RUN_CLAIMS not on, every act this verb runs
+  # prints `lease — off · <tail>`, the act's own word where it names no lease, reads and writes
+  # nothing and exits 0, so a caller never reads the switch as a refusal; `fence` keeps its line.
+  if [ "$RUN_CLAIMS" != on ]; then
+    tail=$act; ! derive_lease_ref "$kind" "$name" "$sub" >/dev/null 2>&1 || tail=${LEASE_REF#"$LEASE_NS"/}
+    echo "lease — off · $tail"; return 0
+  fi
   case "$act" in
     prune|flush|fence|status) ;;
     acquire|take-over|renew|release|offer|*)
@@ -4049,6 +4081,11 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   esac
   tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it writes no lease: $tag"; return 2; }
   FLEET_TAG=$tag; sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  # NO OFFER TO ITSELF (TOOL-dPlacedRequest-34 S49): a `--to` naming this node's bare tag or this
+  # session on it hands nothing over; another session on this tag is a hand-over and lands.
+  if [ "$act" = offer ] && { [ "$to" = "$tag" ] || [ "$to" = "$tag/$sid" ]; }; then
+    echo "lease refused — offered · $tail · --to $to names this session, and an offer hands the lease to another"; return 1
+  fi
   # A REQUEST IS CLAIMED ONLY OVER ITS RECORD (TOOL-dPlacedRequest-19 S4, F5): one bounded read of
   # that one ref, before the claim read and apart from it, so the claim read fetches no request record.
   if [ "$act:$kind" = acquire:request ]; then
@@ -4145,6 +4182,30 @@ run_lease_verb() { # act · kind · name · sub · witness · release status · 
   esac
 }
 
+# --lease status, ONE LEASE READ (TOOL-dPlacedRequest-34 S22): read-only, so a reader that must tell two
+# sessions of one node apart, `placement.py check` among them, asks for the one lease it needs and never
+# parses `--claims`, which prints a fleet tag and no session. One read of the remote's leases, then ONE
+# TAB-separated line `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, exit 0; `lease — none ·
+# <tail>` where the remote holds none, exit 0; `lease — off · <tail>` with RUN_CLAIMS off, exit 0; or
+# `lease not written — <why>`, exit 2, for a shape that derives no ref or a read that did not answer.
+# A slug holding only a legacy claim prints that claim's row, its node in the fleet-tag field.
+print_lease_status() { # kind · name · [sub] -> 0 one line, 2 not read
+  local ref tail lname row c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_rest
+  derive_lease_ref "$1" "$2" "${3:-}" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  [ "$RUN_CLAIMS" = on ] || { echo "lease — off · $tail"; return 0; }
+  case "$1" in build) lname=$2 ;; *) lname=$tail ;; esac
+  read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }
+  row=""
+  case $'\n'"$CLAIM_ROWS" in
+    *$'\n'"$lname"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$lname"$'\t'}; row="$lname"$'\t'"${row%%$'\n'*}" ;;
+  esac
+  [ -n "$row" ] || { echo "lease — none · $tail"; return 0; }
+  IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_rest <<<"$row"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$tail" "${c_node:--}" "${c_sess:--}" "${c_status:--}" "${c_verdict:--}" "${c_epoch:-0}"
+  return 0
+}
+
 # THE OFFER WRITE (TOOL-dPlacedRequest-20 S1): the record `released`, `offer` the target and
 # `offer-deadline` the window `read_lease_bound offer` read at this write, a window in seconds and
 # never a timestamp, by `write_claim` through the one compare-and-swap writer on the tip
@@ -4173,7 +4234,10 @@ write_lease_offer() { # name · target · window seconds -> write_claim's rc, WC
 write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refused, 2 not written
   local want="" rc=0 n=0 l ref sha bd
   local -a cand=()
-  [ "$RUN_CLAIMS" = on ] || { echo "lease not written — RUN_CLAIMS is not on in $CONF, so no lease is read or pruned"; return 2; }
+  if [ "$RUN_CLAIMS" != on ]; then   # TOOL-dPlacedRequest-34 S23: off is `lease — off`, exit 0, as every act but fence
+    if [ $# -ge 2 ] && derive_lease_ref "$@" >/dev/null 2>&1; then echo "lease — off · ${LEASE_REF#"$LEASE_NS"/}"; else echo "lease — off · prune"; fi
+    return 0
+  fi
   if [ $# -gt 0 ]; then
     derive_lease_ref "$@" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
     case "$1" in build|unit) echo "prune refused — tombstone · ${LEASE_REF#"$LEASE_NS"/} · a $1 lease is never pruned"; return 1 ;; esac
@@ -4415,6 +4479,37 @@ write_card_ref() { # slug · message file -> 0 written, 1 lost, 2 not written
        tip=${tip:0:8}; rm -rf "$d"; echo "card-ref lost — ${tip:-unread}"; return 1 ;;
     *) rm -rf "$d"; echo "card-ref not written — $GOVREF_WHY"; return 2 ;;
   esac
+}
+
+# --card-ref lookup, THE BUILD CARD'S ONE READ (TOOL-dPlacedRequest-34 S12, S5, S9): read-only, so the
+# kickoff engine holds no fetch, no feed block and no local card ref of its own. Dark as the write is:
+# `card-ref — off`, exit 0, reading nothing. With RUN_CLAIMS on, the slug is held to the build-folder
+# grammar, the remote is the one `resolve_claim_remote` resolves (check 24), never a literal `origin`,
+# and `refs/gov/builds/<slug>/*` is read by the write's ONE bounded, pruned fetch, `--no-write-fetch-head`
+# included, into this node's cache `refs/gov/remote/builds/<slug>/*`, then sighted into the feed. It
+# prints `card-ref — <commit>` and then the commit's message, exit 0; `card-ref — none`, exit 0, where
+# the remote holds no card, the pruned fetch having cleared the cache ref; or `card-ref not read —
+# <why>`, exit 2, writing nothing past the cache. WHAT THIS DOES NOT CHECK: that the message is a card.
+print_card_ref() { # slug -> 0 read or off, 2 not read
+  local slug="$1" tail d rc c
+  [ "$RUN_CLAIMS" = on ] || { echo "card-ref — off"; return 0; }
+  check_slug_shape "$slug" || { echo "card-ref not read — the build is no build-folder name: $slug"; return 2; }
+  tail="builds/$slug/card"
+  resolve_claim_remote >/dev/null || { echo "card-ref not read — the clone does not declare exactly one remote, check 24"; return 2; }
+  d=$(mktemp -d) || { echo "card-ref not read — no scratch directory to bound the read in"; return 2; }
+  observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*" && rc=0 || rc=$?
+  rm -rf "$d"
+  case "$rc" in
+    0) ;;
+    124) echo "card-ref not read — the read was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; return 2 ;;
+    *) echo "card-ref not read — the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
+  esac
+  add_feed_sightings refs/gov/remote/
+  c=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || c=""; c=${c%$'\r'}
+  [ -n "$c" ] || { echo "card-ref — none"; return 0; }
+  echo "card-ref — $c"
+  GIT log -1 --format=%B "$c" -- 2>/dev/null | tr -d '\r'
+  return 0
 }
 
 # --request, THE PROJECT-LEVEL REQUEST RECORD (TOOL-dPlacedRequest-19). An owner's request that is not
@@ -4681,6 +4776,8 @@ run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 c
     if [ "$CLM_KEY" != "$tag:$sid" ]; then
       run_request_draw "$key" route-back item.entry.claim; rc=$?
       [ "$rc" != 3 ] || { echo "claim refused — $slug · claimed under another key, and the request's pre-claim budget is spent"; return 3; }
+      # A DRAW NOT RECORDED STOPS (TOOL-dPlacedRequest-34 S42): a route-back no row counts is no lap.
+      [ "$rc" = 0 ] || { echo "claim not written — $slug · claimed under another key, and the pre-claim draw was not recorded, so no fresh slug is owed yet"; return 2; }
       echo "claim refused — $slug · claimed under another key, $CLM_KEY · a fresh slug owed · exit 5 (a fresh slug owed)"; return 5
     fi
     own=1; echo "entry-claim — $slug · claimed by this claimant · resuming at the first step not witnessed"
@@ -5661,17 +5758,19 @@ OV_WHY=""
 # one word of path characters holding a `/` or ending in an extension: prose spans in the section
 # such as a function name or an id are not paths. Its status is git's, so an unreadable ref is
 # counted as unreadable rather than as clean. The token test is `read_path_tokens`, the one rule
-# (TOOL-dPlacedRequest-8 S5): this function hands it the section's lines and nothing else.
-read_files_touched() { # rev · file of spec paths -> one declared path per line
-  local _rf_ps=() _rf_p
+# (TOOL-dPlacedRequest-8 S5): this function hands it the section's lines and nothing else. A third
+# argument `any` reads a spec of any status, a CLOSED or WONTDO one included (TOOL-dPlacedRequest-34
+# S48), for a seed that asks what a finished unit wrote; every other caller skips terminal specs.
+read_files_touched() { # rev · file of spec paths · [any] -> one declared path per line
+  local _rf_ps=() _rf_p _rf_any="${3:-}"
   while IFS= read -r _rf_p; do
     _rf_p=${_rf_p%$'\r'}
     case "$_rf_p" in *.md) _rf_ps+=("$1:$_rf_p") ;; esac
   done < "$2"
   [ "${#_rf_ps[@]}" -gt 0 ] || return 0
-  GIT show "${_rf_ps[@]}" 2>/dev/null | awk '
+  GIT show "${_rf_ps[@]}" 2>/dev/null | awk -v any="$_rf_any" '
     { sub(/\r$/, "") }
-    /^\*\*Status:\*\* / { term = ($2 == "CLOSED" || $2 == "WONTDO"); ft = 0; next }
+    /^\*\*Status:\*\* / { term = (any != "any" && ($2 == "CLOSED" || $2 == "WONTDO")); ft = 0; next }
     /^#/ { ft = ($0 ~ /^### Files touched/); next }
     ft && !term { print }' | read_path_tokens
   return "${PIPESTATUS[0]}"
@@ -5689,16 +5788,19 @@ read_path_tokens() { # stdin text -> one path token per line, in text order
       }
     }'
 }
-# `print_path_tokens <rev> <spec>...` - `--path-tokens --files-touched`: the specs' declared paths at
-# <rev>, exactly as `read_files_touched` reads them, through a scratch file holding the spec list, so
-# a terminal spec and a path not ending `.md` print nothing. 2 with one `path-tokens not read` line
-# where no scratch file is made, or git cannot read <rev> or a spec at it.
-print_path_tokens() { # rev · spec... -> one declared path per line
-  local _pt_rev="$1" _pt_list _pt_rc
+# `print_path_tokens [--any-status] <rev> <spec>...` - `--path-tokens --files-touched`: the specs'
+# declared paths at <rev>, exactly as `read_files_touched` reads them, through a scratch file holding
+# the spec list, so a terminal spec and a path not ending `.md` print nothing; `--any-status` reads a
+# terminal spec too (TOOL-dPlacedRequest-34 S48). 2 with one `path-tokens not read` line where no
+# scratch file is made, or git cannot read <rev> or a spec at it.
+print_path_tokens() { # [--any-status] · rev · spec... -> one declared path per line
+  local _pt_rev _pt_list _pt_rc _pt_any=""
+  [ "${1:-}" != --any-status ] || { _pt_any=any; shift; }
+  _pt_rev="$1"
   shift
   _pt_list=$(mktemp) || { echo "path-tokens not read — cannot create a scratch file for the spec list"; return 2; }
   printf '%s\n' "$@" > "$_pt_list"
-  read_files_touched "$_pt_rev" "$_pt_list"; _pt_rc=$?
+  read_files_touched "$_pt_rev" "$_pt_list" "$_pt_any"; _pt_rc=$?
   rm -f "$_pt_list"
   [ "$_pt_rc" = 0 ] || { echo "path-tokens not read — git cannot read $_pt_rev or a spec at it: exit $_pt_rc"; return 2; }
   return 0
@@ -18891,6 +18993,11 @@ while [ $# -gt 0 ]; do
                       if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
                         echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
                       else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = status ]; then
+                      # TOOL-dPlacedRequest-34 S22 - one lease read, read-only, its holder's session named.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                        echo "lease not written — --lease status takes <kind> <name> [<sub>] and nothing else"; _rl_rc=2
+                      else print_lease_status "${LV_POS[@]}"; _rl_rc=$?; fi
                     elif [ "$LV_ACT" = fence ]; then
                       # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line; TOOL-dPlacedRequest-29
                       # S1 - `--after <tip>`, the re-fence after a fenced push failed on a moved tip.
@@ -18911,7 +19018,8 @@ while [ $# -gt 0 ]; do
     # verb, because `write` comes first and the slug second.
     --card-ref)     refuse_waive_unless_preflight --card-ref
                     if [ $# = 5 ] && [ "${2:-}" = write ] && [ "${4:-}" = --message ]; then write_card_ref "$3" "$5"; _rl_rc=$?
-                    else echo "card-ref not written — the form is --card-ref write <slug> --message <file>"; _rl_rc=2; fi
+                    elif [ $# = 3 ] && [ "${2:-}" = lookup ]; then print_card_ref "$3"; _rl_rc=$?
+                    else echo "card-ref not written — the form is --card-ref write <slug> --message <file>, or --card-ref lookup <slug>"; _rl_rc=2; fi
                     RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # TOOL-dPlacedRequest-19 - an owner's request recorded by its content key; no slug, because a
     # request is not yet a build.
@@ -18957,7 +19065,7 @@ while [ $# -gt 0 ]; do
     # text or the specs it is handed and no build. The loop kit's seed resolver calls it.
     --path-tokens)  refuse_waive_unless_preflight --path-tokens
                     if [ "${2:-}" = --files-touched ]; then
-                      if [ $# -lt 4 ]; then echo "path-tokens not read — the form is --path-tokens --files-touched <rev> <spec> [<spec> ...]"; _rl_rc=2
+                      if [ $# -lt 4 ] || { [ "${3:-}" = --any-status ] && [ $# -lt 5 ]; }; then echo "path-tokens not read — the form is --path-tokens --files-touched [--any-status] <rev> <spec> [<spec> ...]"; _rl_rc=2
                       else shift 2; print_path_tokens "$@"; _rl_rc=$?; fi
                     elif [ $# = 1 ]; then read_path_tokens; _rl_rc=0
                     else echo "path-tokens not read — --path-tokens takes --files-touched <rev> <spec> [<spec> ...] or nothing: ${2:-}"; _rl_rc=2; fi

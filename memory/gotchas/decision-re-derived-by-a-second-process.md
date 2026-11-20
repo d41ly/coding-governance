@@ -63,21 +63,31 @@ sits in that git dir, returning its not-completed code with a reason naming the 
 That guard was itself a check-then-act (`TOOL-aGraftedHelix-36`, from the rotated closing review's
 L1): a claim push that tested the marker a moment before push-main touched it went on to push, and
 its hook cleared the files the lander had just cleared and was about to have rewritten. The window is
-closed by a lock both sides honour in the same git dir. `write_claim` takes `claim-push.lock` before
-it tests the marker, records its deadline in it, and releases it on every path; push-main touches
-its marker, then waits for no live lock, then clears its verdict files and pushes, and clears the
-marker only after it has read them. Whichever side moves second sees the other.
+closed by a lock both sides honoured in the same git dir: `write_claim` took it before it tested the
+marker, recording its deadline and releasing it on every path; push-main touched its marker, then
+waited for no live lock, then cleared its verdict files and pushed, and cleared the marker only after
+it had read them. Whichever side moved second saw the other.
 
 ## The third instance: a stale lock broken on a stale read
 
 `TOOL-aGraftedHelix-37`, a discovery of unit 36's builder. That lock's own break was the class again:
-a writer finding `claim-push.lock` stale removed it and made it afresh, acting on a staleness it had
+a writer finding the claim lock stale removed it and made it afresh, acting on a staleness it had
 read before the removal. Two writers reading one stale deadline both broke it, the lagging one
 removing the fresh lock the first had just made, and both pushed. Measured on node `a`: every trial
 in which the second writer lagged the first by about one process spawn let both in. The decision to
 break is now taken under a guard directory only one writer can make, and the guard's holder re-reads
 the deadline before it removes anything, so the act follows a reading taken where no other breaker
 can move it. A release removes the lock only while its `owner` file holds the releaser's token.
+
+## 2026-11-20: the lock retired (TOOL-dPlacedRequest-11)
+
+`TOOL-dPlacedRequest-11` S6 removed `claim-push.lock`, the claim write's test of `push-main-active`
+and the lander's wait on the lock, because the second writer is gone rather than serialised: the tracked pre-push hook
+now clears `pre-push-refusal`, `pre-push-bar` and `pre-push-allow` only below its ref loop and only on
+a push that carries the default branch (its S4). A claim, a beat or any other `refs/gov/*` push never
+carries it, so it never clears a verdict a landing is about to read, and the two pushes need no
+order between them. What serialises two landings is the default-branch push itself, one per git dir
+through push-main; what keeps two claim writes apart is the compare-and-swap on the claim's tip.
 
 ## Its gate
 
