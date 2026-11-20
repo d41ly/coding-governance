@@ -49,13 +49,14 @@ KIT_GOVKIT_VERSION = "1.14"  # gov:kit govkit@1.14 — kit identity; set HERE, n
 RECEIPT_SCHEMA = 4  # readers accept 1 to 4; 4 is reached by the step govkit/receipt-schema-4, or by a first install's apply or adopt
 
 # The REPO-LOCAL GATE POLICY keys, one tuple that check 7h3's predicate compiles its alternation from
-# (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED` and
-# `INHERITED_RED_MAX_AGE` are the inherited-red policy, whose gov value is `land` — a choice no
-# adopter may inherit by a kit copying the file that makes it. A key typed into the pattern instead
+# (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED_MAX_AGE`
+# is the inherited-red age bound, whose gov value is 10 — a choice no adopter may inherit by a kit
+# copying the file that makes it. Which red blocks moved to the policy key `verdict.blocks`
+# (TOOL-dWitnessedBar-3), which no gate file assigns. A key typed into the pattern instead
 # would be a second list of what a policy is, and the one a new key forgets.
 # `GATE_DOC_PATHS` joined with TOOL-dThriftyLanding-3: which paths a repository calls non-code decides
 # which legs its doc-only pushes skip, so it is that repository's answer and no kit may carry gov's.
-POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS")
+POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS")
 
 
 def build_policy_re() -> "re.Pattern[str]":
@@ -2931,9 +2932,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     # form (`: ${GATE_SELFTESTS:=1}`), which assigns exactly as hard as `=`. Re-run over the tracked
     # tree after widening: still one hit, still no invocation matched.
     # THE KEYS ARE `POLICY_KEYS`, compiled into one alternation (TOOL-dDerivedDocket-24 S14), so the
-    # inherited-red pair is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked tree
-    # after widening: one policy file, `.githooks/gate-env.sh`, now assigning two of the three keys,
-    # and still no invocation matched. The first capture that matched names the key in the refusal.
+    # inherited-red age bound is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked
+    # tree after widening: one policy file, `.githooks/gate-env.sh`, and still no invocation matched. The first capture that matched names the key in the refusal.
     policy_re = build_policy_re()
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the

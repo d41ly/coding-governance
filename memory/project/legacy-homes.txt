@@ -14,7 +14,6 @@
 .githooks/gate-env.sh	GOV_GATE_CMD	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .githooks/gate-env.sh	GOV_KITROOT	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .githooks/gate-env.sh	GOV_PYTHON	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-.githooks/gate-env.sh	INHERITED_RED	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .githooks/gate-env.sh	INHERITED_RED_MAX_AGE	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .lexicon.conf	BANNED_SUFFIXES	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 .lexicon.conf	LANGS	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded

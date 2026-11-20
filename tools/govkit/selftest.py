@@ -9522,17 +9522,17 @@ user_skills = "/tmp/gk-fake-skills"
               in _pol.stdout, _pol.stdout + _pol.stderr)
         check("AC2: and the refusal names the file and the kit that would ship it",
               f"'{PFX}demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
-        # TOOL-dDerivedDocket-24 AC22: the inherited-red pair rides the same predicate. Gov's value is
-        # `land`, and a kit that copied the file carrying it would land every adopter over its reds.
+        # TOOL-dDerivedDocket-24 AC22: the inherited-red age bound rides the same predicate. Gov's value
+        # is 10, and a kit that copied the file carrying it would age every adopter's reds by gov's bound.
         # The trailing-comment spelling is the evasion the first predicate admitted for GATE_SELFTESTS.
-        for _line, _key in (("INHERITED_RED=land", "INHERITED_RED"),
+        for _line, _key in (("INHERITED_RED_MAX_AGE=10", "INHERITED_RED_MAX_AGE"),
                             ("export INHERITED_RED_MAX_AGE=10  # gov only", "INHERITED_RED_MAX_AGE")):
             (pg / PFX / "demo" / "policy.sh").write_text(
                 "#!/usr/bin/env sh\n" + _line + "\n", encoding="utf-8", newline="\n")
             git(pg, "add", "-A")
             git(pg, "commit", "-qm", f"{_key} in the payload")
             _irp = run_in(pg)
-            check(f"AC22: a bare {_key} assignment inside a kit's payload REDS, naming the file",
+            check(f"AC22: a bare {_key} assignment, {_line!r}, inside a kit's payload REDS, naming the file",
                   _irp.returncode == 1 and f"carries a bare {_key} assignment AND is shipped" in _irp.stdout
                   and f"'{PFX}demo/policy.sh'" in _irp.stdout, _irp.stdout + _irp.stderr)
 
@@ -9772,9 +9772,8 @@ user_skills = "/tmp/gk-fake-skills"
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("M5: the predicate this arm grades is the one check 7h3 actually calls",
               "policy_re = build_policy_re()" in _gk_src, "")
-        check("M5: POLICY_KEYS names the self-test switch, both inherited-red keys and the doc class",
-              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE",
-                                           "GATE_DOC_PATHS"},
+        check("M5: POLICY_KEYS names the self-test switch, the inherited-red age bound and the doc class",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS"},
               repr(_gk_mod.POLICY_KEYS))
         check("M5: a doc-class line is caught as policy — 'GATE_DOC_PATHS=\"memory/\"'",
               bool(_pol_re.match('GATE_DOC_PATHS="memory/"')), "")
@@ -9792,13 +9791,13 @@ user_skills = "/tmp/gk-fake-skills"
               not _pol_re.match('GATE_DOC_PATHS="a b" bash x'), "")
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
-                   "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
-                   ": ${INHERITED_RED:=land}"):
+                   "INHERITED_RED_MAX_AGE=10", "export INHERITED_RED_MAX_AGE=10  # gov only",
+                   ": ${INHERITED_RED_MAX_AGE:=10}"):
             check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
         for _s in (f"GATE_SELFTESTS=1 bash {PFX}{KIT_NAMES['run-gates']}/run-gates.sh",
                    'if [ -n "${GATE_SELFTESTS:-}" ]; then',
                    'echo "set GATE_SELFTESTS=1 to run"',
-                   "INHERITED_RED=land bash .githooks/pre-push"):
+                   "INHERITED_RED_MAX_AGE=10 bash .githooks/pre-push"):
             check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
                   not _pol_re.match(_s), _s)
 

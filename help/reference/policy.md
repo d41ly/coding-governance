@@ -101,6 +101,14 @@ What a landing does with the product-test levels outside tests.landing-levels wh
 tests.without-cadence = "report-unrun"
 ```
 
+## `verdict.blocks`
+<!-- usage: policy:verdict.blocks 2f0b7c25 -->
+Which red of a red bar blocks its landing, by the class the runner's attribution reads each red at: under own-only an OWN or DEAD PROBE red blocks, under own-mixed-contended a MIXED or CONTENDED red blocks too, and under every-red an INHERITED red blocks as well. Read at the default branch's tip by the pre-push hook and the unattended driver; a red bar lands only when every red passes.
+
+```text
+verdict.blocks = "own-mixed-contended"
+```
+
 ## `tests.product`
 <!-- usage: policy:tests.product a994fddb -->
 Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all.
@@ -123,6 +131,14 @@ Which tree Test verifies: the merge `push-main.sh --prepare` makes of the build 
 
 ```text
 verdict.tree = "build-tip"
+```
+
+## `verdict.red-route`
+<!-- usage: policy:verdict.red-route ad9f8979 -->
+Where the tester's judgment of a blocking OWN or MIXED red sends it: under fix-pass-or-design a code-miss goes to a fix pass and a spec-wrong to a new unit through Design, and under always-new-unit both go to a new unit. Read by run-gates' verdict_flow.py judge.
+
+```text
+verdict.red-route = "always-new-unit"
 ```
 
 ## `help.enforce`
@@ -195,7 +211,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (237)
+## Not yet summarised (235)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -314,12 +330,10 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.promote`
 - `policy-file.on-missing-expansion`
 - `verdict`
-- `verdict.blocks`
 - `verdict.held`
 - `verdict.flakes`
 - `verdict.flakes.entry`
 - `verdict.flakes.release`
-- `verdict.red-route`
 - `verdict.remote.trust`
 - `verdict.remote.pin-scope`
 - `verdict.remote.pin`

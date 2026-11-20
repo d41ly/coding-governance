@@ -203,14 +203,14 @@ MAP_CLI=""
 # so the dispatch is the one point that sees a spec while it can still be changed.
 SPEC_TOKENS_CLI=""
 
-# OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads `INHERITED_RED=park|land` and
-# `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
+# OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads the age bound
+# `INHERITED_RED_MAX_AGE=<n>` from, which escalates the ask of a red the landing base carries.
 # Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
-# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK names no
-# policy file, so the pre-push hook's own .githooks/gate-env.sh is read at that tip instead, exactly
-# as the hook reads it; where that is absent too, the kit default `land` applies with no age bound,
-# announced: every inherited red lands, and nothing is escalated (ruling TOOL-dUnstuckLanding-22).
-# Declare `park` in the file to hold.
+# PARSED, never sourced, so a run cannot loosen anything by editing either. BLANK names no policy
+# file, so the pre-push hook's own .githooks/gate-env.sh is read at that tip instead, exactly as the
+# hook reads it; where that is absent too, no leg is aged and nothing is escalated, announced. Which
+# red blocks a landing is the policy key `verdict.blocks` in .governance/policy.toml, read at the same
+# tip (TOOL-dWitnessedBar-3); declare `every-red` there to hold on every red.
 GATE_POLICY_FILE=""
 
 # OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver

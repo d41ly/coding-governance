@@ -1380,30 +1380,50 @@ case "$(cat "$dg/gep" 2>/dev/null)" in
   *) ok "TOOL-aSparedSpawn-33 AC3 the legs keep the hook's environment: pa saw GIT_EXEC_PATH during the push" ;;
 esac
 cd "$pfx_home" || exit 2
-# ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
-# A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
-# test, and a stub gate that writes the run record a real runner would: a RED verdict and one
-# attribution row in the nine-column order, reading `GATE_RUN_ID` and `GATE_ATTRIBUTE` from the hook.
-# The stub also records the policy the hook exported, so an arm can grade what reached the runner.
+# ---- TOOL-dWitnessedBar-3, TOOL-dDerivedDocket-24: WHICH RED BLOCKS, READ AT R --------------------
+# A scratch repo whose `.governance/policy.toml` at the pushed remote tip R declares `verdict.blocks`,
+# read through a copy of the policy kit committed beside it, and whose `.githooks/gate-env.sh` there
+# declares the age bound. A stub gate writes the run record a real runner would: a RED verdict and one
+# attribution row in the ten-column order, its ninth field `blocks` derived by the run-gates kit's own
+# `lib-verdict.sh` under the GATE_VERDICT_BLOCKS the hook handed it, reading `GATE_RUN_ID` and
+# `GATE_ATTRIBUTE` from the hook. The stub also records what the hook exported, so an arm can grade
+# what reached the runner.
 ir_env="$tmp/ir-env.txt"
 irstub="$tmp/irstub.sh"
+ir_lib="$SRC/$RUN_GATES_DIR/lib-verdict.sh"
 cat > "$irstub" <<'IRSTUB'
 #!/usr/bin/env bash
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+. "$IR_LIB"
+b=$(derive_red_blocks "${GATE_VERDICT_BLOCKS:-}" "${IR_VERDICT:-INHERITED}")
 printf 'verdict\tRED\nfailed\t1\ntree_moved\t%s\n' "${IR_MOVED:-no}" > "$d/verdict"
-printf 'x\t%s\t1\t0\t%s\t%s\t-\t-\tstub\n' "${IR_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:-none}" "${IR_AGE:-3}" > "$d/attribution"
-printf 'policy=%s age=%s attr=%s\n' "${GATE_INHERITED_RED:-}" "${GATE_INHERITED_RED_MAX_AGE:-}" "${GATE_ATTRIBUTE:-}" > "$IR_ENV"
+printf 'x\t%s\t1\t0\t%s\t%s\t-\t-\t%s\tstub\n' "${IR_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:-none}" "${IR_AGE:-3}" "$b" > "$d/attribution"
+printf 'policy=%s age=%s attr=%s\n' "${GATE_VERDICT_BLOCKS:-}" "${GATE_INHERITED_RED_MAX_AGE:-}" "${GATE_ATTRIBUTE:-}" > "$IR_ENV"
 echo "FAKE LEG failed"; exit 1
 IRSTUB
-build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R carries that body; sets IR_R
-  local tag=$1 body=$2
+plant_ir_policy() { # value | "" (a policy file with no [verdict]) -> .governance/policy.toml in the cwd
+  mkdir -p .governance
+  if [ -n "$1" ]; then printf '[verdict]\nblocks = "%s"\n' "$1" > .governance/policy.toml
+  else printf '[runtime]\nagents-in-flight = 6\n' > .governance/policy.toml; fi
+}
+build_ir_fixture() { # tag · kit (kit:<value>, kit: for no key, nokit, broken) · gate-env body (printf %b) -> a pushed main at R; sets IR_R
+  local tag=$1 kit=$2 body=$3
   local d="$tmp/ir-$tag"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
   git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
   cd "$d/work" || return 1
   git config core.hooksPath "$d/hooks"
+  git config core.autocrlf false
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  case "$kit" in
+    kit:*) mkdir -p "$KIT_REL/policy"
+           cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
+              "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/"
+           plant_ir_policy "${kit#kit:}" ;;
+    broken) mkdir -p "$KIT_REL/policy"
+            printf 'import sys\nsys.exit(3)\n' > "$KIT_REL/policy/policy.py" ;;
+  esac
   printf '%b' "$body" > .githooks/gate-env.sh
   # The kit root, on the rung this hook reads it from when no receipt or root install names it.
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
@@ -1416,44 +1436,57 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
 run_ir_push() { # [env assignments…] -> the push's merged output, then `rc=<n>` on its own line
   git commit -q --allow-empty -m "ir $RANDOM" >/dev/null 2>&1
   local o r
-  o=$( env GATE_SELFTESTS= IR_ENV="$ir_env" GOV_GATE_CMD="bash $irstub" "$@" git push origin main 2>&1 ); r=$?
+  o=$( env GATE_SELFTESTS= IR_ENV="$ir_env" IR_LIB="$ir_lib" GOV_GATE_CMD="bash $irstub" "$@" git push origin main 2>&1 ); r=$?
   printf '%s\nrc=%s\n' "$o" "$r"
 }
-write_ir_stamp() { # sha · base · max_age -> a planted gate-inherited-green
-  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nselftests\t\nbase\t%s\nmax_age\t%s\nlegs\tx\nrun_id\ttest\n' \
-    "$1" "$2" "$3" > "$(git rev-parse --git-dir)/gate-inherited-green"
+write_ir_stamp() { # sha · base · max_age · blocks -> a planted gate-inherited-green
+  printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nselftests\t\nbase\t%s\nmax_age\t%s\nblocks\t%s\nlegs\tx\nrun_id\ttest\n' \
+    "$1" "$2" "$3" "$4" > "$(git rev-parse --git-dir)/gate-inherited-green"
 }
 
-# AC1, the hook's half: R says park and the pushed branch commits `land` into its OWN copy. The policy
-# line reads park, and an inherited-only red is blocked. A reader of the working tree would land it.
-build_ir_fixture ac1 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
-printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+# AC1, the hook's half: R reads every-red and the pushed branch loosens its OWN copy to own-only. The
+# policy line reads every-red, and an inherited-only red is blocked. A reader of the pushed tree would land it.
+build_ir_fixture ac1 kit:every-red 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
+plant_ir_policy own-only
+git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself own-only" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR AC1 a branch-committed land is not read: R's park binds and the red is blocked" ;;
-  *) bad "IR AC1 expected R's park and a blocked push, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads every-red"*"this red does not land under verdict.blocks every-red — x reads INHERITED and blocks"*"rc=1")
+    ok "IR AC1 a branch-committed own-only is not read: R's every-red binds and the red is blocked" ;;
+  *) bad "IR AC1 expected R's every-red and a blocked push, got: $_o" ;;
 esac
 
-# AC2: under land at R, a red whose one leg reads INHERITED and not aged lands, naming the leg; the
-# same bar with the leg MIXED is blocked. The export reaches the runner too.
-build_ir_fixture ac2 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
+# AC2: under own-mixed-contended at R, a red whose one leg reads INHERITED and not aged lands, naming
+# the leg; the same bar with the leg MIXED is blocked. The value and the bound reach the runner too.
+build_ir_fixture ac2 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC2 could not build its fixture"
 _o=$(run_ir_push)
 case "$_o" in
-  *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC2 an inherited-only red within its age lands under land" ;;
+  *"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0") ok "IR AC2 an inherited-only red within its age lands under own-mixed-contended" ;;
   *) bad "IR AC2 expected the landing line and exit 0, got: $_o" ;;
 esac
 case "$(cat "$ir_env" 2>/dev/null)" in
-  "policy=land age=10 attr=${IR_R}") ok "IR AC2 the runner is handed land, the bound 10 and R" ;;
+  "policy=own-mixed-contended age=10 attr=${IR_R}") ok "IR AC2 the runner is handed own-mixed-contended, the bound 10 and R" ;;
   *) bad "IR AC2 the runner was handed: $(cat "$ir_env" 2>/dev/null)" ;;
 esac
+# TOOL-dWitnessedBar-3 AC4, the hook's arm: one MIXED leg is refused under own-mixed-contended at R …
 _o=$(run_ir_push IR_VERDICT=MIXED)
 case "$_o" in
-  *"this red does not land under INHERITED_RED=land — x reads MIXED"*"rc=1") ok "IR AC2 a MIXED leg is blocked under land" ;;
-  *) bad "IR AC2 a MIXED leg must block, got: $_o" ;;
+  *"this red does not land under verdict.blocks own-mixed-contended — x reads MIXED and blocks"*"rc=1") ok "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg is blocked under own-mixed-contended" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg must block under own-mixed-contended, got: $_o" ;;
+esac
+# … and admitted under own-only at R, the value read there and not from the pushed tree.
+build_ir_fixture ac2o kit:own-only 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its fixture"
+plant_ir_policy every-red
+git add -A >/dev/null 2>&1; git commit -q -m "the branch tightens its own copy" >/dev/null 2>&1
+_o=$(run_ir_push IR_VERDICT=MIXED)
+case "$_o" in
+  *"verdict.blocks at ${IR_R:0:8} reads own-only"*"every red passes — landing under verdict.blocks own-only: x"*"rc=0")
+    ok "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg lands under the own-only read at R" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 a MIXED leg must land under the own-only read at R, got: $_o" ;;
 esac
 
 # AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is blocked, naming it.
+build_ir_fixture ac15 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC15 could not build its fixture"
 _o=$(run_ir_push IR_MOVED=yes)
 case "$_o" in
   *"the tree moved while the bar ran, so no verdict describes the pushed commit"*"rc=1") ok "IR AC15 a moved tree blocks an inherited-only red" ;;
@@ -1461,80 +1494,85 @@ case "$_o" in
 esac
 
 # AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): an aged row, and an
-# age-unproven one, LAND under land — the age escalates the driver's ask and decides no landing. Land
-# beside a blank, zero or non-numeric bound reads land with NO bound, announced, and lands too; the
-# runner is handed no bound.
+# age-unproven one, LAND — the age escalates the driver's ask and decides no landing. A blank, zero
+# or non-numeric bound reads NO bound, announced, and lands too; the runner is handed no bound.
 for _a in aged -; do
   _o=$(run_ir_push IR_AGE="$_a")
   case "$_o" in
-    *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands under land" ;;
-    *) bad "IR AC17 an inherited leg with age '$_a' must land under land, got: $_o" ;;
+    *"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands" ;;
+    *) bad "IR AC17 an inherited leg with age '$_a' must land, got: $_o" ;;
   esac
 done
 for _b in "" 0 ten; do
-  build_ir_fixture "ac17$_b" "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
+  build_ir_fixture "ac17$_b" kit:own-mixed-contended "INHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
   _o=$(run_ir_push)
   case "$_o" in
-    *"reads land — declared, with no age bound, so no leg is aged"*"landing under INHERITED_RED=land: x"*"rc=0")
-      ok "IR AC17 land with the bound '$_b' reads land with no bound, announced, and lands" ;;
-    *) bad "IR AC17 land with the bound '$_b' must read land with no bound, got: $_o" ;;
+    *"reads own-mixed-contended — read by policy.py get, with no age bound in .githooks/gate-env.sh there, so no leg is aged"*"landing under verdict.blocks own-mixed-contended: x"*"rc=0")
+      ok "IR AC17 the bound '$_b' reads no bound, announced, and lands" ;;
+    *) bad "IR AC17 the bound '$_b' must read no bound and land, got: $_o" ;;
   esac
   case "$(cat "$ir_env" 2>/dev/null)" in
-    "policy=land age= attr=${IR_R}") ok "IR AC17 land with the bound '$_b' hands the runner no bound" ;;
-    *) bad "IR AC17 land with the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+    "policy=own-mixed-contended age= attr=${IR_R}") ok "IR AC17 the bound '$_b' hands the runner no bound" ;;
+    *) bad "IR AC17 the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
   esac
 done
 
-# TOOL-dUnstuckLanding-16 AC3: R's policy file declares ONLY a bound. The kit default is land, so the
-# policy line names it, and an aged inherited-only red lands. `park` declared beside the same bound
-# blocks it, and a malformed value reads park and blocks it — a typo must never land a red. The
-# branch's own copy says something else each time, so a reader of the pushed tree is graded too.
-build_ir_fixture ac3d 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
-printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-git add -A >/dev/null 2>&1; git commit -q -m "the branch declares park in its own copy" >/dev/null 2>&1
+# TOOL-dUnstuckLanding-16 AC3, re-pointed by TOOL-dWitnessedBar-3: R's policy file sets no
+# `verdict.blocks`, so the policy kit's reader answers the catalogue default own-only and an aged
+# inherited-only red lands. every-red at R blocks it, and so does a policy reader that fails, which
+# reads every-red — a broken reader must never land a red. The branch's own copy says something else
+# each time, so a reader of the pushed tree is graded too.
+build_ir_fixture ac3d kit: 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+plant_ir_policy every-red
+git add -A >/dev/null 2>&1; git commit -q -m "the branch declares every-red in its own copy" >/dev/null 2>&1
 _o=$(run_ir_push IR_AGE=aged)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads land — no INHERITED_RED is declared in .githooks/gate-env.sh there, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
-    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy reads the kit default land and an aged inherited red lands" ;;
-  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy must read the kit default land and land, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads own-only — read by policy.py get"*"every red passes — landing under verdict.blocks own-only: x"*"rc=0")
+    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared key reads the catalogue default own-only and an aged inherited red lands" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared key must read own-only and land, got: $_o" ;;
 esac
 case "$(cat "$ir_env" 2>/dev/null)" in
-  "policy=land age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the kit default hands the runner land and the declared bound 2" ;;
-  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the kit default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+  "policy=own-only age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the default hands the runner own-only and the declared bound 2" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
 esac
-for _p in park lnad; do
-  build_ir_fixture "ac3$_p" "INHERITED_RED=$_p\nINHERITED_RED_MAX_AGE=2\n" || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
-  printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
-  git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+for _p in kit:every-red broken; do
+  build_ir_fixture "ac3${_p#kit:}" "$_p" 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
   _o=$(run_ir_push IR_AGE=aged)
   case "$_o" in
-    *"red on inherited legs only"*) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R landed an inherited red: $_o" ;;
-    *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R reads park and blocks the red" ;;
-    *) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R must read park and block, got: $_o" ;;
+    *"every red passes"*) bad "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R landed an inherited red: $_o" ;;
+    *"verdict.blocks at ${IR_R:0:8} reads every-red"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R reads every-red and blocks the red" ;;
+    *) bad "IR TOOL-dUnstuckLanding-16 AC3 '$_p' at R must read every-red and block, got: $_o" ;;
   esac
 done
+# No policy kit at all: the catalogue default own-only, said as such.
+build_ir_fixture ac3n nokit 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dWitnessedBar-3 could not build its no-kit fixture"
+_o=$(run_ir_push)
+case "$_o" in
+  *"verdict.blocks at ${IR_R:0:8} reads own-only — no policy kit resolves, so the catalogue default own-only applies"*"rc=0")
+    ok "IR TOOL-dWitnessedBar-3 no policy kit reads the catalogue default own-only, announced" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 no policy kit must read own-only, announced, got: $_o" ;;
+esac
 
-# Closing review round 1 M12 (id 18), the hook's flipped branch: R carries NO .githooks/gate-env.sh,
-# so the policy reads the kit default land, naming the absence, and an inherited-only red lands. The
-# branch restores its own copy, which the hook sources and never reads a policy from. RED against a
-# hook whose absent branch read park, staged in a scratch copy and restored.
-build_ir_fixture m12 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
+# Closing review round 1 M12 (id 18), re-pointed: R carries NO .githooks/gate-env.sh, so no age bound
+# is read, naming the file, and an inherited-only red still lands under the value at R. The branch
+# restores its own copy, which the hook sources and never reads a bound from.
+build_ir_fixture m12 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
 git rm -q .githooks/gate-env.sh >/dev/null 2>&1; git commit -q -m "R carries no gate-env" >/dev/null 2>&1
 git push -q --no-verify origin main >/dev/null 2>&1; IR_R=$(git rev-parse HEAD)
 mkdir -p .githooks; printf 'INHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
 git add -A >/dev/null 2>&1; git commit -q -m "the branch restores its own copy" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
-  *"inherited-red policy at ${IR_R:0:8} reads land — .githooks/gate-env.sh is absent at ${IR_R:0:8}, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
-    ok "IR M12 a gate-env absent at R reads the kit default land and an inherited red lands" ;;
-  *) bad "IR M12 a gate-env absent at R must read the kit default land and land, got: $_o" ;;
+  *"verdict.blocks at ${IR_R:0:8} reads own-mixed-contended — read by policy.py get, with no age bound in .githooks/gate-env.sh there"*"every red passes — landing under verdict.blocks own-mixed-contended: x"*"rc=0")
+    ok "IR M12 a gate-env absent at R reads no bound and an inherited red lands" ;;
+  *) bad "IR M12 a gate-env absent at R must read no bound and land, got: $_o" ;;
 esac
 
-# AC4: an inherited green whose base IS the remote sha selects the scoped gate and names itself; once
-# the remote moves past that base, the same stamp forces FULL.
-build_ir_fixture ac4 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
+# AC4: an inherited green whose base IS the remote sha, written under the value at R, selects the
+# scoped gate and names itself; once the remote moves past that base, the same stamp forces FULL.
+build_ir_fixture ac4 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"
 git commit -q --allow-empty -m c1 >/dev/null 2>&1
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c2 && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"at base ${IR_R:0:8}"*) ok "IR AC4 an inherited green at the remote sha scopes the gate" ;;
@@ -1546,9 +1584,20 @@ case "$_o" in
   *) bad "IR AC4 expected FULL naming the stale base, got: $_o" ;;
 esac
 
+# TOOL-dWitnessedBar-3 AC4 (§8 F8): a stamp written under own-only while the value at R is
+# own-mixed-contended forces FULL, naming both: a MIXED red that boundary blocks must not scope the gate.
+build_ir_fixture acb kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR TOOL-dWitnessedBar-3 AC4 could not build its stamp fixture"
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-only
+_o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
+case "$_o" in
+  *"FULL gate on main push"*"written under verdict.blocks own-only and the value at ${IR_R:0:8} is own-mixed-contended"*)
+    ok "IR TOOL-dWitnessedBar-3 AC4 a stamp written under another value is refused" ;;
+  *) bad "IR TOOL-dWitnessedBar-3 AC4 expected FULL naming both values, got: $_o" ;;
+esac
+
 # AC14: a stamp written under max_age 50 while the bound at R is 10 forces FULL, naming both.
-build_ir_fixture ac14 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 50
+build_ir_fixture ac14 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC14 could not build its fixture"
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 50 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
   *"FULL gate on main push"*"written under max_age 50 and the bound at ${IR_R:0:8} is 10"*) ok "IR AC14 a stamp's wider window is not trusted" ;;
@@ -1556,10 +1605,10 @@ case "$_o" in
 esac
 
 # AC16: a STALE full green that predicate 2 refuses does not hide a usable inherited green.
-build_ir_fixture ac16 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
+build_ir_fixture ac16 kit:own-mixed-contended 'INHERITED_RED_MAX_AGE=10\n' || bad "IR AC16 could not build its fixture"
 git checkout -q -b elsewhere; git commit -q --allow-empty -m off >/dev/null 2>&1; _off=$(git rev-parse HEAD); git checkout -q main
 printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' "$_off" > "$(git rev-parse --git-dir)/gate-full-green"
-write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10
+write_ir_stamp "$(git rev-parse HEAD)" "$IR_R" 10 own-mixed-contended
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" bash -c 'git commit -q --allow-empty -m c && git push origin main' 2>&1 )
 case "$_o" in
   *"scoped gate on main push"*"inherited green"*"is not an ancestor of the pushed tip"*) ok "IR AC16 a stale full green still reaches the inherited green" ;;
@@ -1567,45 +1616,50 @@ case "$_o" in
 esac
 
 # AC11, the hook's half: its own reader, sliced out of the SHIPPED hook, run over this repository at
-# HEAD, resolves the policy THIS repository declares. ADOPTER-CORRECT (TOOL-aClassedKnob-1): the
-# expectation is derived, never gov's own `land 10`, because an adopter may declare park. The oracle is
-# the shell's own reading, the committed gate-env.sh SOURCED in a subshell as KIT_REL is above, mapped
-# through the kit contract the hook states: an absent file or a blank key reads land, a value outside
-# `park land` reads park, and a bound that is not a positive integer reads none. A declaration the
-# hook's line reader and the shell read differently reds here, naming both.
-_ir_fns=$(awk '/^read_policy_key\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
-read_ir_policy() { # <repo> <sha> -> "<policy> <bound>" as the sliced hook reader resolves it
-  ( cd "$1" && _gate_env_rel=".githooks/gate-env.sh" && def=main && eval "$_ir_fns" \
+# HEAD, resolves the value THIS repository declares. ADOPTER-CORRECT (TOOL-aClassedKnob-1): the
+# expectation is derived, never gov's own value, because an adopter may declare another. The oracle is
+# the policy kit's own reader at HEAD for the value, and the committed gate-env.sh SOURCED in a
+# subshell as KIT_REL is above for the bound, mapped through the kit contract the hook states: a bound
+# that is not a positive integer reads none. A declaration the hook and the oracle read differently
+# reds here, naming both.
+_ir_fns=$(awk '/^resolve_python\(\)/,/^}/; /^resolve_kit_dir\(\)/,/^}/; /^read_policy_key\(\)/,/^}/; /^read_policy_at\(\)/,/^}/' "$SRC/.githooks/pre-push")
+read_ir_policy() { # <repo> <sha> -> "<value> <bound>" as the sliced hook reader resolves it
+  ( cd "$1" && top=$PWD && main_local="" && PP_READ_AT="" && _gate_env_rel=".githooks/gate-env.sh" && def=main \
+    && GOV_KITROOT=$KIT_REL && eval "$_ir_fns" && check_reviewed_file() { :; } \
     && read_policy_at "$2" && printf '%s %s' "$PP_POLICY" "$PP_MAX_AGE" )
 }
 _ir_want=$( cd "$SRC" || exit 1
+  _p=$(python "$KIT_REL/policy/policy.py" get verdict.blocks --rev HEAD 2>/dev/null) || _p=every-red
+  _p=${_p%$'\r'}
+  case "$_p" in own-only|own-mixed-contended|every-red) ;; *) _p=every-red ;; esac
   if _b=$(git show HEAD:.githooks/gate-env.sh 2>/dev/null); then
-    unset INHERITED_RED INHERITED_RED_MAX_AGE
+    unset INHERITED_RED_MAX_AGE
     eval "$_b" >/dev/null 2>&1
-    _p=${INHERITED_RED:-}; _a=${INHERITED_RED_MAX_AGE:-}
-  else _p=""; _a=""; fi
-  case "$_p" in ''|land) _p=land ;; park) ;; *) _p=park ;; esac
+    _a=${INHERITED_RED_MAX_AGE:-}
+  else _a=""; fi
   case "$_a" in ''|0*|*[!0-9]*) _a="" ;; esac
   printf '%s %s' "$_p" "$_a" )
 _o=$(read_ir_policy "$SRC" "$(cd "$SRC" && git rev-parse HEAD)")
 if [ -n "${_ir_want% }" ] && [ "$_o" = "$_ir_want" ]; then
-  ok "IR AC11 this repository at HEAD reads the policy its own gate-env.sh declares: '$_o'"
+  ok "IR AC11 this repository at HEAD reads the value and bound it declares: '$_o'"
 else
-  bad "IR AC11 this repository at HEAD read '${_o:-<nothing>}', its committed gate-env.sh declares '$_ir_want'"
+  bad "IR AC11 this repository at HEAD read '${_o:-<nothing>}', its policy kit and gate-env.sh declare '$_ir_want'"
 fi
 # AC11, the reader's failing case: two fixture commits gov's own values cannot satisfy, one declaring
-# park with a bound of 7 and one with no gate-env.sh at all, which reads the kit default land, unbounded.
-_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks"
-( cd "$_d" && git init -q --template= \
-  && printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
-  && git add .githooks/gate-env.sh && git commit -q -m park7 \
-  && git rm -q .githooks/gate-env.sh && git commit -q -m absent ) >/dev/null 2>&1
+# every-red with a bound of 7 and one with no gate-env.sh and no key, which reads own-only, unbounded.
+_d="$tmp/ir-ac11-reader"; mkdir -p "$_d/.githooks" "$_d/$KIT_REL/policy"
+( cd "$_d" && git init -q --template= && git config core.autocrlf false \
+  && cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
+        "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/" \
+  && plant_ir_policy every-red && printf 'INHERITED_RED_MAX_AGE=7\n' > .githooks/gate-env.sh \
+  && git add -A && git commit -q -m every-red7 \
+  && plant_ir_policy "" && git rm -q .githooks/gate-env.sh && git add -A && git commit -q -m absent ) >/dev/null 2>&1
 _o1=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD~1 2>/dev/null)")
 _o2=$(read_ir_policy "$_d" "$(git -C "$_d" rev-parse HEAD 2>/dev/null)")
-if [ "$_o1" = "park 7" ] && [ "$_o2" = "land " ]; then
-  ok "IR AC11 the hook's reader reads park 7 where it is declared, and land unbounded where gate-env.sh is absent"
+if [ "$_o1" = "every-red 7" ] && [ "$_o2" = "own-only " ]; then
+  ok "IR AC11 the hook's reader reads every-red 7 where it is declared, and own-only unbounded where nothing is"
 else
-  bad "IR AC11 the hook's reader read '${_o1:-<nothing>}' for park 7 and '${_o2:-<nothing>}' for an absent gate-env.sh"
+  bad "IR AC11 the hook's reader read '${_o1:-<nothing>}' for every-red 7 and '${_o2:-<nothing>}' for nothing declared"
 fi
 
 cd "$pfx_home" || exit 2
@@ -1722,7 +1776,7 @@ cd "$pfx_home" || exit 2
 #     GATE_FULL only widens the run, and GATE_FULL=1 makes GATE_BASE irrelevant.
 #   GATE_SELFTESTS — adds legs, and predicate 8 forces a full bar for it.
 #   the rest — width, timeouts, the wall, the turnstile, reaping and the run log: a breach is RED.
-#   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
+#   GATE_ATTRIBUTE GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
 #     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
 #   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
 #   GATE_DOCS_BASE — the hook clears it for every bar, a STUB included, and sets it only on a doc-only
@@ -1756,7 +1810,7 @@ cd "$pfx_home" || exit 2
 #     exports `inherited` on the inherited-green path, and its only effect is that a scoped run writes
 #     no per-tree verdict, which costs a saving and never a leg or a verdict (TOOL-dWitnessedBar-40 S2).
 # Classified by TOOL-aSparedSpawn-33 S8.
-BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+BAR_INERT_KNOBS="GATE_BASE_FROM GATE_CAUSE GOV_REMOTE GOV_DEFAULT_BRANCH GATE_CALIBRATION_RATES GATE_PUSH_BASE GATE_REUSE_DAY GATE_REUSE_DIGEST_ENV GATE_REUSE_LINEAGE GATE_REUSE_PUSH GATE_REUSE_SAMPLE GATE_SELFTESTS_MAX_LAG GATE_SPAWN_NOW GATE_AMBIENT_TMP GATE_DOCS_BASE GATE_ATTRIBUTE GATE_HOST_RATIO GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CENSUS_EVERY GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_MEMINFO GATE_MEMPAUSE GATE_MEMPAUSE_HOLD GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_DIR GATE_TURNSTILE_HELD GATE_TURNSTILE_HOLDER GATE_TURNSTILE_SLOTS GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n
@@ -2004,7 +2058,7 @@ cd "$pfx_home" || exit 2
 docs_env="$tmp/docs-env.txt"
 docstub="$tmp/docstub.sh"
 printf '#!/usr/bin/env bash\nprintf "docs=%%s\\n" "${GATE_DOCS_BASE:-}" > "$DOCS_ENV"\nexit 0\n' > "$docstub"
-build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R carrying that body
+build_docs_fixture() { # tag · gate-env body (printf %b) · [verdict.blocks at R, through a policy kit copy] -> a pushed main at R carrying that body
   local d="$tmp/docs-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
   git init -q --template= --bare "$d/remote.git"; git init -q --template= "$d/work"
@@ -2012,6 +2066,12 @@ build_docs_fixture() { # tag · gate-env body (printf %b) -> a pushed main at R 
   git config core.hooksPath "$d/hooks"
   mkdir -p .githooks "$KIT_REL" notes src
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
+  if [ -n "${3:-}" ]; then
+    git config core.autocrlf false; mkdir -p "$KIT_REL/policy"
+    cp "$SRC/$KIT_REL/policy/policy.py" "$SRC/$KIT_REL/policy/budgets.py" \
+       "$SRC/$KIT_REL/policy/catalogue.toml" "$SRC/$KIT_REL/policy/caps.toml" "$KIT_REL/policy/"
+    plant_ir_policy "$3"
+  fi
   printf '%b' "$2" > .githooks/gate-env.sh
   printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'b\n' > notes/b.md; printf 'x\n' > src/x.sh
@@ -2127,22 +2187,23 @@ case "$_o" in
   *"not a plain repo path"*"gate on main push"*) ok "DOCS M5 a '.' element voids the doc class and the hook says so" ;;
   *) bad "DOCS M5 expected the invalid-element notice, got: $_o" ;;
 esac
-# TOOL-dThriftyLanding-12, closing review M2: under INHERITED_RED=park at R a doc push is not scoped as
-# doc-only, because the docs base may sit above an unproven record; the hook names the policy.
-build_docs_fixture park 'GATE_DOC_PATHS="notes/"\nINHERITED_RED=park\n' || bad "DOCS M2 could not build its fixture"
+# TOOL-dThriftyLanding-12, closing review M2, re-pointed by TOOL-dWitnessedBar-3 §8 F8: under
+# verdict.blocks every-red at R a doc push is not scoped as doc-only, because the docs base may sit
+# above an unproven record; the hook names the value.
+build_docs_fixture park 'GATE_DOC_PATHS="notes/"\n' every-red || bad "DOCS M2 could not build its fixture"
 set_docs_stamp
 printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
 _o=$(run_docs_push)
 case "$_o" in
-  *"docs-only"*) bad "DOCS M2 a doc push under park was scoped as doc-only: $_o" ;;
-  *"reads park, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under park a doc push keeps today's decision, and the hook names the policy" ;;
-  *) bad "DOCS M2 expected the park notice, got: $_o" ;;
+  *"docs-only"*) bad "DOCS M2 a doc push under every-red was scoped as doc-only: $_o" ;;
+  *"verdict.blocks at "*" reads every-red, so it is not scoped as doc-only"*"gate on main push"*) ok "DOCS M2 under every-red a doc push keeps today's decision, and the hook names the value" ;;
+  *) bad "DOCS M2 expected the every-red notice, got: $_o" ;;
 esac
 # TOOL-dThriftyLanding-12, closing review L3: the inherited-green branch exports the docs base too.
 build_docs_fixture inh 'GATE_DOC_PATHS="notes/"\n' || bad "DOCS L3a could not build its fixture"
 _r=$(read_docs_tip)
 rm -f "$(git rev-parse --git-dir)/gate-full-green"
-write_ir_stamp "$_r" "$_r" ""
+write_ir_stamp "$_r" "$_r" "" own-only   # no policy kit here, so the value at R is the default own-only
 printf 'a2\n' > notes/a.md; git commit -qam "doc edit"
 _o=$(run_docs_push)
 case "$_o" in
@@ -2286,7 +2347,7 @@ case "${BG_MODE:-green}" in
   green) printf 'verdict\tGREEN\n' > "$d/verdict"; exit 0 ;;
   red) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"; exit 1 ;;
   inh) printf 'verdict\tRED\ntree_moved\tno\nfailed\t1\n' > "$d/verdict"
-       printf 'leg x\tINHERITED\t-\t-\t%s\t-\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
+       printf 'leg x\tINHERITED\t-\t-\t%s\t-\t-\t-\tpass\tstub\n' "$GATE_ATTRIBUTE" > "$d/attribution"; exit 1 ;;
 esac
 BGSTUB
   # A WRAPPER BAR, adopter ic's gov-bar shape (TOOL-aFrugalTurnstile-2 AC17): a tracked script that hands the runner a derived manifest.
@@ -2294,7 +2355,7 @@ BGSTUB
     "$KIT_REL/$RUN_GATES/run-gates.sh" > wrap-bar.sh
   printf '#!/usr/bin/env bash\nexec bash %s "$@"\n' "$KIT_REL/$RUN_GATES/run-gates.sh" > other-bar.sh
   printf 'GATE_CMD="bash wrap-bar.sh"\n' > .unattended.conf
-  printf 'GOV_KITROOT=%s\nINHERITED_RED=land\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
+  printf 'GOV_KITROOT=%s\nGATE_DOC_PATHS="notes/"\n%b' "$KIT_REL" "${2:-}" > .githooks/gate-env.sh
   printf 'a\n' > notes/a.md; printf 'x\n' > src/x.sh; printf '* text eol=lf\n' > .gitattributes
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$BG_D/remote.git"; git push -q --no-verify origin main >/dev/null 2>&1
@@ -2424,11 +2485,12 @@ case "$(read_bg_marks)|$BG_OUT" in
 esac
 cd "$pfx_home" || exit 2
 
-# AC14, AC15 — an inherited red lands under land; a doc-only push scopes doc-only.
+# AC14, AC15 — an inherited red lands under the value at R, here the catalogue default own-only, since
+# the fixture carries no policy kit; a doc-only push scopes doc-only.
 build_bg_fixture ac14 || bad "BG could not build its fixture"
 echo 1 >> src/x.sh; git commit -qam c; run_bg_push BG_MODE=inh
 case "$BG_RC|$BG_OUT" in
-  "0|"*"red on inherited legs only"*) ok "BG AC14 an inherited red lands under INHERITED_RED=land" ;;
+  "0|"*"every red passes — landing under verdict.blocks own-only"*) ok "BG AC14 an inherited red lands under verdict.blocks own-only" ;;
   *) bad "BG AC14 expected the inherited landing, got rc $BG_RC: $BG_OUT" ;;
 esac
 git reset -q --hard origin/main; write_bg_stamp "$(git rev-parse HEAD)"; echo b >> notes/a.md; git commit -qam doc; run_bg_push
@@ -2657,7 +2719,7 @@ cd "$pfx_home" || exit 2
 # 9873a25f, which printed base C.
 build_bg_fixture t16inh 'INHERITED_RED_MAX_AGE=10\n' || bad "T16 could not build its fixture"
 _r=$(git rev-parse HEAD); echo 1 >> src/x.sh; git commit -qam c1; _c=$(git rev-parse HEAD); write_bg_stamp "$_c"
-mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\n' "$_r" >> "$bg_gd/gate-inherited-green"
+mv "$bg_gd/gate-full-green" "$bg_gd/gate-inherited-green"; printf 'base\t%s\nmax_age\t10\nblocks\town-only\n' "$_r" >> "$bg_gd/gate-inherited-green"
 echo 2 >> src/x.sh; git commit -qam c2; run_pm_decide -- "$(git rev-parse HEAD)" "$_r"; run_bg_push
 case "$PM_OUT|$BG_OUT" in
   "scoped $_c -|"*"scoped gate on main push"*) ok "T16 AC4 an inherited-green scope prints '-' as its full base" ;;

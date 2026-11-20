@@ -901,6 +901,8 @@ owner = "dWitnessedBar"
 name = "verdict.blocks"
 allowed = ["own-mixed-contended", "every-red", "own-only"]
 default = "own-only"
+summary = "Which red of a red bar blocks its landing, by the class the runner's attribution reads each red at: under own-only an OWN or DEAD PROBE red blocks, under own-mixed-contended a MIXED or CONTENDED red blocks too, and under every-red an INHERITED red blocks as well. Read at the default branch's tip by the pre-push hook and the unattended driver; a red bar lands only when every red passes."
+usage = 'verdict.blocks = "own-mixed-contended"'
 owner = "dWitnessedBar"
 
 [[key]]
@@ -956,6 +958,8 @@ owner = "dWitnessedBar"
 name = "verdict.red-route"
 allowed = ["fix-pass-or-design", "always-new-unit"]
 default = "fix-pass-or-design"
+summary = "Where the tester's judgment of a blocking OWN or MIXED red sends it: under fix-pass-or-design a code-miss goes to a fix pass and a spec-wrong to a new unit through Design, and under always-new-unit both go to a new unit. Read by run-gates' verdict_flow.py judge."
+usage = 'verdict.red-route = "always-new-unit"'
 owner = "dWitnessedBar"
 
 [[key]]

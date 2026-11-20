@@ -2600,7 +2600,7 @@ def run_guard_case(name):
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
 
 LEGACY_CONF = 'GATE_BOUND="3"\nKEPT_KEY="1"\n'
-LEGACY_GATE = "#!/usr/bin/env sh\n# The fixture's gate file.\n#   GOV_PYTHON=<launcher>  a documented key\nINHERITED_RED=land\n"
+LEGACY_GATE = "#!/usr/bin/env sh\n# The fixture's gate file.\n#   GOV_PYTHON=<launcher>  a documented key\nINHERITED_RED_MAX_AGE=10\n"
 LEGACY_HOUSE = '[effort]\ndefault = "medium"\n\n[gates]\n'
 LEGACY_REPORT = "  legacy homes: "
 LEGACY_CASES = ("today", "planted-row", "growth", "widened", "shrink", "retrofit", "unmarked", "absent-homes",
@@ -2694,7 +2694,7 @@ def check_legacy_lists(case, kit, verb, want_rc, want_reports, label=None):
 def check_legacy_drain_merge(kit, repo, listed):
     """`drain-merge` (TOOL-dWitnessedBar-20 S8, AC9): the row-keyed driver gov wires, `merge-rows.py`,
     configured as `merge.rows.driver` with the list's `merge=rows` attribute in the repository's own
-    attributes file; branch `x` drains the gate key INHERITED_RED and branch `y` the conf key
+    attributes file; branch `x` drains the gate key INHERITED_RED_MAX_AGE and branch `y` the conf key
     GATE_BOUND, two adjacent rows of the list, each by `lists --write`; `y` merged into `x` must exit 0
     with no conflict marker and both rows gone, every other row as seeded, and `lists --check` green
     after it. -> [checks]."""
@@ -2706,7 +2706,7 @@ def check_legacy_drain_merge(kit, repo, listed):
     Path(repo, ".git", "info").mkdir(parents=True, exist_ok=True)
     Path(repo, ".git", "info", "attributes").write_text(f"{rel} merge=rows\n", encoding="utf-8", newline="\n")
     before = listed.read_text(encoding="utf-8").split("\n")
-    for branch, path, line in (("x", Path(repo, policy.GATE_FILE), "INHERITED_RED=land\n"),
+    for branch, path, line in (("x", Path(repo, policy.GATE_FILE), "INHERITED_RED_MAX_AGE=10\n"),
                                ("y", repo / ".unattended.conf", 'GATE_BOUND="3"\n')):
         run_fixture_git(repo, "checkout", "-q", "-b", branch, "main")
         write_edit(path, lambda s, line=line: s.replace(line, ""))
@@ -2719,7 +2719,7 @@ def check_legacy_drain_merge(kit, repo, listed):
     except subprocess.CalledProcessError as exc:
         said = f"merge exited {exc.returncode}: {(exc.stdout or '').strip()} {(exc.stderr or '').strip()}".strip()
     after = listed.read_text(encoding="utf-8")
-    drained = {f"{policy.GATE_FILE}\tINHERITED_RED\t", ".unattended.conf\tGATE_BOUND\t"}
+    drained = {f"{policy.GATE_FILE}\tINHERITED_RED_MAX_AGE\t", ".unattended.conf\tGATE_BOUND\t"}
     want = "\n".join(ln for ln in before if not any(ln.startswith(d) for d in drained))
     ok = said == "merged" and "<<<<<<<" not in after and after == want
     checks = [(f"case {case}: {'green' if ok else 'red'}", "two drains merged by the row driver", ok,
