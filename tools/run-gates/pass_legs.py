@@ -81,7 +81,7 @@ def read_declared_runner():
     """The leg manifest `.governance/deploy.toml` names, or None (TOOL-dHomeGraded-1 S6).
 
     An adopter whose own bar is not gov's runner keeps gov's legs in a manifest of their own, and
-    names it in `[gate_runner].file`: inCMS's sibling `gate-legs.json` is its OWN object-shaped
+    names it in `[gate_runner].file`: adopter ic's sibling `gate-legs.json` is its OWN object-shaped
     manifest, and reading that refused every pass-leg run there. Read from the working directory,
     which is the root for every caller. A kind other than `manifest`, a path that climbs out, or a
     file that does not exist answers None, and the sibling stands as before."""
