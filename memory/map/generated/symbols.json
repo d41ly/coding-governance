@@ -7573,6 +7573,11 @@
       "file": "tools/loop/placement.py"
     },
     {
+      "id": "check_placement_scenarios",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "check_plan_line",
       "kind": "function",
       "file": "tools/loop/position.py"
@@ -11173,6 +11178,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_entry_fact",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
       "id": "derive_entry_ops",
       "kind": "function",
       "file": "tools/playbook/row_checks.py"
@@ -12366,6 +12376,11 @@
       "id": "derive_pin_state",
       "kind": "function",
       "file": "tools/playbook/pins.py"
+    },
+    {
+      "id": "derive_placed_scenarios",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "derive_plant_needle",
@@ -18054,6 +18069,16 @@
     },
     {
       "id": "parse_placement_blocks",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "parse_placement_facts",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "parse_placement_scenarios",
       "kind": "function",
       "file": "tools/loop/placement.py"
     },
@@ -26289,6 +26314,11 @@
     },
     {
       "id": "render_placement_block",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
+    },
+    {
+      "id": "render_placement_facts",
       "kind": "function",
       "file": "tools/loop/placement.py"
     },
@@ -38881,6 +38911,11 @@
       "id": "write_scenario",
       "kind": "function",
       "file": "tools/loop/factories.py"
+    },
+    {
+      "id": "write_scenario_composition",
+      "kind": "function",
+      "file": "tools/loop/placement.py"
     },
     {
       "id": "write_scenario_plant",

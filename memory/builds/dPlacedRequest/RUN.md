@@ -276,3 +276,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T01:20:58Z brief · item TOOL-dPlacedRequest-4 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
 2026-11-20T01:41:24Z dispatch · item 053c89c7 TOOL-dPlacedRequest-10 · reason tools/loop/placement.py tools/roles/agents/gov-orienter.agent.md .claude/agents/gov-orienter.md tools/roles/README.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-10.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-10-1-acceptance-ledger.md
+
+2026-11-20T01:45:16Z brief · item TOOL-dPlacedRequest-10 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md

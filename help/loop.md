@@ -749,8 +749,9 @@ None of gov's five activates a row or hands over to another, so a gov build's fl
 gov's five before yours. Where none holds, it is placed under the default, `scenario.<value>` for the
 value of `flow.scenario-default` in `.governance/policy.toml`, `feature` when unset. A default naming no
 scenario the composition holds, one your `instructions.exclude` leaves out for instance, and a value the
-policy kit refuses are each refused, naming the key and the value. Until placement supplies a request's
-facts, they are the `--fact <name>=<value>` flags of `select` and of the transition writer.
+policy kit refuses are each refused, naming the key and the value. A request's facts come from its
+placement, where the scout names them and the check re-runs this selection (see "Placing a request"
+below); `select` and the transition writer take them as `--fact <name>=<value>` flags.
 
 **Your own scenario.** Add a `[[scenario]]` row to your overlay, `.governance/instructions.toml`, tagged
 with `adopter` at its second segment. `extends` names the scenario whose facts, entry step, activated
@@ -1657,7 +1658,7 @@ Who places is the key `placement` in `.governance/policy.toml`:
 
 - `agent-places`, the default: the orientation scout's return is the placement, given as
   `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
-  `reason`, `evidence` and `observations` lines, the scout's `returns:` shape.
+  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the scout's `returns:` shape.
 - `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
   <word> [<build>]`, and the scout's return is evidence only.
 - `owner-places`: `place` writes no disposition and prints the scout's return as evidence and
@@ -1681,9 +1682,28 @@ its claim exists the owner item names `refs/gov/claims/<slug>`; your disposition
 naming `item.entry.place` with the placement's own word releases it, and any other word refuses it,
 back to placing.
 
+**The scenarios**, chosen once here. The scout's return names `scenarios`, each scenario it finds
+admitted joined by `+` (`scenario.feature+scenario.design-only`), and `facts`, the request facts it read
+as `<name>=<value>` pairs joined by `; ` (`design-only=true`), each name and value one lower-case word;
+any other shape is refused at `place` with no block written. The `entry` fact is never taken from the
+scout: `new` is `entry=feature`, `amend` `entry=amendment`, `patch` `entry=patch` and `repeat`
+`entry=playbook-run`, and a typed `entry` that disagrees fails as `entry-mismatch <typed> <derived>`.
+The check then re-runs the selection of "Choosing a build's scenario" above over those facts and your
+composition at HEAD: a named scenario whose predicate fails is `scenario-predicate <tag>`, an admitted
+one the scout left out `scenario-missing <tag>`, and the same scenarios in another order
+`scenario-order`. Each failed fact prints its own line, so one round trip names them all, and
+`placement.check` treats them as it treats the others; under `record` the block's `scenarios` is
+rewritten to the selection. Where no scenario admits the request, the default is the selection,
+written `scenarios: scenario.feature (default)`, and a return naming none passes. The other
+dispositions open no build and select no scenario, so a return naming one for them fails as
+`scenario-not-placed`. The check prints `placement: facts — <facts>`, the facts it evaluated, and where
+your tree has no scenario composition it prints `placement: scenario · unread · <why>` and checks none;
+a default naming no composed scenario refuses the check, exit 1.
+
 **The record**, `placement.py record --request <key>`, prints the passed block's `disposition`,
-`build`, `playbook` and `reason` lines, with `reenters` after `disposition` for an owner's late answer,
-the lines the claim commit carries; a block whose check did not pass prints nothing and exits 1.
+`build`, `playbook`, `reason`, `scenarios` and `facts` lines, with `reenters` after `disposition` for an
+owner's late answer, the lines the claim commit carries; a block whose check did not pass prints nothing
+and exits 1.
 
 **An unattended prompt is placed the same way.** Before its build folder is written, the prompt is
 recorded, placed and checked, and the passed block is written under `## Placement` in the prompt record,

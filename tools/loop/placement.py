@@ -13,7 +13,8 @@ hex digits `request.py` derives, and its record is the node-local file `<git-com
 beside the request's local text `<key>.md`: one block per `place`, appended, the newest the placement and the
 earlier ones the loop's history. A block is `key: value` lines, ending at a blank line:
 
-    placed-utc · disposition · build · playbook · reason · evidence · observations · placer · check · reenters
+    placed-utc · disposition · build · playbook · reason · evidence · observations · placer · scenarios ·
+    facts · check · reenters
 
 `disposition` is one member of the loop definition's one closed set, read through `loop_lib.read_dispositions`
 and resolved through `resolve_disposition`, so an alias such as `attach` is written as the member it means and
@@ -23,8 +24,9 @@ caller passes it, its shape held by `check_reenters_item`, and a block without i
 
 PLACE. Who places is the policy key `placement`, read through the policy kit's `resolve` at the landed
 revision. Under `agent-places` the orientation scout's return, `--return <file>`, is the placement: a block of
-`disposition`, `build`, `playbook`, `reason`, `evidence` and `observations` lines, the observations `; `
-joined or `none`. Under `declared-checked` the request's own declaration, `--declared <word> [<build>]`, is
+`disposition`, `build`, `playbook`, `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the
+observations `; ` joined or `none`, the scenarios the scout found admitted `+` joined, and the request facts
+it read as `<name>=<value>` pairs `; ` joined, each name and value one tag segment (TOOL-dPlacedRequest-10). Under `declared-checked` the request's own declaration, `--declared <word> [<build>]`, is
 the placement and a return is evidence only. Under `owner-places` `place` writes nothing without `--owner`:
 it prints the return as evidence and `placement: owner item — <key>`; with `--owner` the owner's disposition
 record naming `item.entry.place-owner` is the placement. Where the return names observations and
@@ -47,9 +49,23 @@ exits 0. A passed placement whose route enters Plan or Design is held by its `ST
 `placement: held-owner`, and the owner item naming the claim ref once `refs/gov/claims/<slug>` exists, until
 an owner's disposition record of that build names `item.entry.place` with its word; another word refuses it.
 
+SCENARIOS. `check` re-evaluates every scenario predicate too (TOOL-dPlacedRequest-10). `new`, `amend`,
+`patch` and `repeat` select scenarios: the `entry` fact is derived from the disposition by
+`derive_entry_fact`, never read from the scout, and a typed `entry` that disagrees is the failed fact
+`entry-mismatch <typed> <derived>`. Over the block's facts with that `entry`, the scenario kit's
+`derive_admitted_scenarios` answers at HEAD from the scenario composition, gov's pack and the overlay, and
+`flow.scenario-default`: a named scenario it does not admit is `scenario-predicate <tag>`, an admitted one
+the block does not name `scenario-missing <tag>`, and the shared ones in another order `scenario-order`.
+Where none admits, the default is the selection, written `<tag> (default)`, and a block naming none passes.
+The other five dispositions select none: a block naming a scenario for one is `scenario-not-placed`. Every
+failed fact prints its own line. On a pass, and under `record`, the block's `scenarios:` and `facts:` are
+rewritten to the selection and the facts evaluated; `check` prints `placement: facts — <facts>`, and
+`placement: scenario · unread · <why>` where the tree holds no scenario composition. A refused default or
+composition refuses the check, exit 1.
+
 RECORD. `record` prints the newest block's `disposition`, its `reenters` where it is not `none`, `build`,
-`playbook` and `reason` lines, the lines the claim commit carries, when its `check:` reads `pass` or
-`recorded`; any other block prints nothing and exits 1.
+`playbook`, `reason`, `scenarios` and `facts` lines, the lines the claim commit carries, when its `check:`
+reads `pass` or `recorded`; any other block prints nothing and exits 1.
 
 Exit 0 placed, passed, recorded or held · 1 a refusal, named · 2 a usage error or a kit that does not resolve.
 `--fixture --plant <case>` runs one case of `PLANTS` in a throwaway repository under the system temp folder,
@@ -70,12 +86,13 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).absolute().parent
 if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
-from loop_lib import (LoopError, read_dispositions, read_memory_tree, resolve_disposition,  # noqa: E402
+from loop_lib import (SEG, LoopError, read_dispositions, read_memory_tree, resolve_disposition,  # noqa: E402
                       resolve_kit_dir, resolve_memory_root, run_selftest_cases)
 from loop_parents import read_policy_kit  # noqa: E402
 from loop_witness import read_clean_env, remove_tree, run_fixture_git, write_fixture_files  # noqa: E402
@@ -87,9 +104,15 @@ SAY = "placement"
 REQUEST_KEY = re.compile(r"[0-9a-f]{%d}" % KEY_HEX)
 #: A block's keys, in the order they are written; `reenters` only where a caller passed an item.
 BLOCK_KEYS = ("placed-utc", "disposition", "build", "playbook", "reason", "evidence", "observations", "placer",
-              "check", "reenters")
+              "scenarios", "facts", "check", "reenters")
 #: The keys a scout's return may carry.
-RETURN_KEYS = ("disposition", "build", "playbook", "reason", "evidence", "observations")
+RETURN_KEYS = ("disposition", "build", "playbook", "reason", "evidence", "observations", "scenarios", "facts")
+#: Shared interface I20: the `entry` fact each disposition that selects scenarios derives; the rest select none.
+ENTRY_FACTS = {"new": "feature", "amend": "amendment", "patch": "patch", "repeat": "playbook-run"}
+#: The mark a selection carries where no scenario admits the request and the default places it.
+DEFAULT_MARK = " (default)"
+#: The kit home of the kinds register and the namespaces table the fixture's scenario composition copies.
+PLAYBOOK_HOME = "playbook"
 #: The byte cap on `reason` and `evidence`, after redaction.
 VALUE_CAP = 240
 #: The item an owner's placement record names, and the item an owner's release of a held placement names.
@@ -117,13 +140,24 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
           "continue-closed": "continue onto a CLOSED build: refused under refuse, recorded under record",
           "amend-leased": "amend onto a build another node's lease holds: refused under refuse, recorded under record",
           "observation": "a claimed observation refused unverified until its probe record carries a verdict",
-          "claim-lines": "record prints a passed new block's four lines, and nothing for a refused block",
+          "claim-lines": "record prints a passed new and a passed patch block's six lines, scenarios and facts after "
+                         "reason, and nothing for a refused block",
           "routes-to-plan": "a passed new placement held for the owner, the owner item naming the claim ref",
           "owner-released": "the owner disposing another word refuses the placement; disposing its own word releases it",
           "prompt-continue": "the driver's prompt-mode check refuses a continue placement and admits a new one",
           "refusals": "each refusal branch the other plants do not reach: a bad key, an unreadable return, a bad "
                       "slug or path, a mismatched mode, each disposition's failing fact and a bad owner record",
-          "late-answer": "a re-entering amend kept by check and printed after disposition; a malformed item refused"}
+          "late-answer": "a re-entering amend kept by check and printed after disposition; a malformed item refused",
+          "predicate-fails": "a new placement naming scenario.patch refused scenario-predicate; naming scenario.feature "
+                             "it passes",
+          "scenario-missing": "a design-only new placement naming scenario.feature alone refused scenario-missing; "
+                              "under record its scenarios rewritten to the selection",
+          "entry-mismatch": "a new placement typing entry=patch refused entry-mismatch patch feature",
+          "continue-with-scenario": "a continue placement naming scenario.feature refused scenario-not-placed",
+          "no-admit": "an amend placement over a pack admitting no entry=amendment placed under scenario.feature "
+                      "(default) and passed",
+          "scenario-refusals": "each scenario refusal the other plants do not reach: a malformed tag or fact, a tag or "
+                               "fact twice, the shared scenarios out of order and a default the pack holds no row of"}
 
 
 class PlacementRefused(ValueError):
@@ -141,6 +175,46 @@ def check_reenters_item(value):
     if not isinstance(value, str) or not re.fullmatch(r"(%s)#F[0-9]+" % read_build_records().ID, value):
         raise ValueError("%r is no <unit id>#<F-id> item, an F-id being F and digits" % (value,))
     return value
+
+
+def parse_placement_scenarios(text):
+    """The scenario tags of a `scenarios:` value, `+` joined, its `(default)` mark dropped; [] for `none` or
+    nothing. ValueError naming a tag that is no `scenario.<segment>...` or a tag given twice."""
+    text = (text or "").strip()
+    if text.endswith(DEFAULT_MARK.strip()):
+        text = text[:-len(DEFAULT_MARK.strip())].strip()
+    if text in ("", NO_VALUE):
+        return []
+    tags = [t.strip() for t in text.split("+")]
+    for tag in tags:
+        head, _sep, rest = tag.partition(".")
+        if head != "scenario" or not rest or not all(SEG.fullmatch(s) for s in rest.split(".")):
+            raise ValueError("scenarios: %r is no scenario.<segment> tag" % tag)
+    if len(set(tags)) != len(tags):
+        raise ValueError("scenarios: %s names a scenario twice" % text)
+    return tags
+
+
+def parse_placement_facts(text):
+    """`{name: value}` of a `facts:` value, `<name>=<value>` pairs `; ` joined, each name and value one tag
+    segment; {} for `none` or nothing. ValueError naming a pair of another shape or a name given twice."""
+    text = (text or "").strip()
+    if text in ("", NO_VALUE):
+        return {}
+    facts = {}
+    for pair in (p.strip() for p in text.split(";")):
+        name, eq, value = pair.partition("=")
+        if not (eq and SEG.fullmatch(name) and SEG.fullmatch(value)):
+            raise ValueError("facts: %r is no <name>=<value> pair of two tag segments" % pair)
+        if name in facts:
+            raise ValueError("facts: %s is given twice" % name)
+        facts[name] = value
+    return facts
+
+
+def render_placement_facts(facts):
+    """`facts`, `{name: value}`, as a `facts:` value: `<name>=<value>` pairs `; ` joined, or `none`."""
+    return "; ".join("%s=%s" % kv for kv in facts.items()) or NO_VALUE
 
 
 def render_capped_value(text):
@@ -227,12 +301,17 @@ def add_placement(store, key, fields, placer, reenters=None):
         raise PlacementRefused("playbook %r is no repo-relative path" % playbook)
     observations = fields.get("observations", "").strip()
     count = 0 if observations in ("", NO_VALUE) else len([o for o in observations.split(";") if o.strip()])
+    try:
+        named = parse_placement_scenarios(fields.get("scenarios"))
+        facts = parse_placement_facts(fields.get("facts"))
+    except ValueError as e:
+        raise PlacementRefused(str(e)) from None
     block = {"placed-utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
              "disposition": member, "build": build, "playbook": playbook,
              "reason": render_capped_value(reason) or "-",
              "evidence": render_capped_value(fields.get("evidence", "").strip() or NO_VALUE) or NO_VALUE,
-             "observations": str(count), "placer": placer, "check": "pending",
-             "reenters": reenters or NO_VALUE}
+             "observations": str(count), "placer": placer, "scenarios": "+".join(named) or NO_VALUE,
+             "facts": render_placement_facts(facts), "check": "pending", "reenters": reenters or NO_VALUE}
     store.mkdir(parents=True, exist_ok=True)
     path = store / ("%s.placement" % key)
     write_placement_blocks(path, parse_placement_blocks(path) + [block])
@@ -503,9 +582,57 @@ def read_owner_release(root, build):
     return read_disposition_release(root, build, PLACE_ITEM, ())
 
 
+def derive_entry_fact(disposition):
+    """The `entry` fact `disposition` derives by shared interface I20, `ENTRY_FACTS`; None for a disposition
+    that selects no scenario."""
+    return ENTRY_FACTS.get(disposition)
+
+
+def derive_placed_scenarios(facts, rows, default):
+    """`(tags, defaulted)`: the scenario kit's `derive_admitted_scenarios` over `facts` and the composed
+    `rows`, and whether no row admitted the request, so the default's tag alone is the selection. ValueError
+    where `default` names no composed scenario."""
+    from scenario import check_default, derive_admitted_scenarios
+    fallback = check_default(default, rows)
+    probe = "%s(default)" % NO_VALUE   # a row with no predicate, so it is answered only where none admits
+    tags = derive_admitted_scenarios(facts, rows + [{"tag": "scenario.%s" % probe}], probe)
+    return ([fallback], True) if tags == ["scenario.%s" % probe] else (tags, False)
+
+
+def check_placement_scenarios(root, block):
+    """`(failed facts, scenarios value, facts value, notes)` of `block`'s scenarios re-evaluated: the
+    selection's `scenarios:` and the evaluated `facts:` value, both None where nothing was selected, and the
+    lines `check` prints before its verdict. PlacementRefused where the composition or the default is
+    refused; LookupError where the policy kit does not resolve."""
+    from scenario import DEFAULT_KEY, read_scenario_policy, read_scenario_rows
+    named = parse_placement_scenarios(block.get("scenarios"))
+    entry = derive_entry_fact(block.get("disposition"))
+    if entry is None:
+        return (["scenario-not-placed %s" % "+".join(named)] if named else []), None, None, []
+    facts = parse_placement_facts(block.get("facts"))
+    failed = ["entry-mismatch %s %s" % (facts["entry"], entry)] if facts.get("entry", entry) != entry else []
+    facts["entry"] = entry
+    evaluated = render_placement_facts(facts)
+    notes = ["%s: facts — %s" % (SAY, evaluated)]
+    try:
+        rows = read_scenario_rows(root)
+        if rows is None:
+            return failed, None, evaluated, notes + [
+                "%s: scenario · unread · the scenario composition at HEAD answers unarmed" % SAY]
+        want, defaulted = derive_placed_scenarios(facts, rows, read_scenario_policy(root, DEFAULT_KEY, "HEAD"))
+    except ValueError as e:
+        raise PlacementRefused(str(e)) from None
+    failed += ["scenario-predicate %s" % t for t in named if t not in want]
+    if not (defaulted and not named):
+        failed += ["scenario-missing %s" % t for t in want if t not in named]
+    if [t for t in named if t in want] != [t for t in want if t in named]:
+        failed.append("scenario-order")
+    return failed, "+".join(want) + (DEFAULT_MARK if defaulted else ""), evaluated, notes
+
+
 def check_placement(root, common, store, key):
     """The `check` verb over request `key`'s newest block. -> `(exit, lines)`, the verdict written into the
-    block's `check:` line first."""
+    block's `check:` line first, and its `scenarios:` and `facts:` rewritten on a pass or under `record`."""
     path = store / ("%s.placement" % key)
     blocks = parse_placement_blocks(path)
     if not blocks:
@@ -517,12 +644,20 @@ def check_placement(root, common, store, key):
             and read_probe_verdict(store, key) is None:
         fact = "observations-unverified: requests/%s.probe.md carries no verdict" % key
     fact = fact or check_disposition_fact(root, common, store, key, block)
+    try:
+        failed, chosen, evaluated, notes = check_placement_scenarios(root, block)
+    except ValueError as e:   # a malformed line in a block written by hand
+        raise PlacementRefused(str(e)) from None
+    failed = ([fact] if fact else []) + failed
     word, build = block.get("disposition", "-"), block.get("build", NO_VALUE)
-    if fact:
-        recorded = value["placement.check"] == "record"
-        block["check"] = "%s %s" % ("recorded" if recorded else "refused", fact)
+    recorded = value["placement.check"] == "record"
+    if not failed or recorded:
+        block.update({k: v for k, v in (("scenarios", chosen), ("facts", evaluated)) if v is not None})
+    if failed:
+        block["check"] = "%s %s" % ("recorded" if recorded else "refused", " · ".join(failed))
         write_placement_blocks(path, blocks)
-        return (0 if recorded else 1), ["%s: %s — %s · %s" % (SAY, "recorded" if recorded else "refused", word, fact)]
+        return (0 if recorded else 1), notes + ["%s: %s — %s · %s" % (SAY, "recorded" if recorded else "refused",
+                                                                         word, f) for f in failed]
     block["check"] = "pass"
     write_placement_blocks(path, blocks)
     row = next((r for r in STAND_INS if word in r["dispositions"]), None)
@@ -530,9 +665,10 @@ def check_placement(root, common, store, key):
     if answer and answer[1] != word:   # the owner disposed otherwise: a rejection, back to placing
         block["check"] = "refused the owner disposed %s by %s" % (answer[1], answer[0])
         write_placement_blocks(path, blocks)
-        return 1, ["%s: refused — %s · the owner disposed %s by %s" % (SAY, word, answer[1], answer[0])]
+        return 1, notes + ["%s: refused — %s · the owner disposed %s by %s" % (SAY, word, answer[1], answer[0])]
     if row is None or answer:
-        return 0, ["%s: pass — %s %s%s" % (SAY, word, build, " · released by %s" % answer[0] if answer else "")]
+        return 0, notes + ["%s: pass — %s %s%s" % (SAY, word, build,
+                                                   " · released by %s" % answer[0] if answer else "")]
     lines = []
     claim = "refs/gov/claims/%s" % build
     held = build != NO_VALUE and subprocess.run(["git", "show-ref", "--verify", "--quiet", claim], cwd=str(root),
@@ -543,24 +679,42 @@ def check_placement(root, common, store, key):
                  "disposition record naming %s%s" % (SAY, word, build if build != NO_VALUE else key, word, row["route"],
                                                       row["item"], row["owner"], PLACE_ITEM,
                                                       "" if held else " · the owner item follows the claim"))
-    return 0, lines
+    return 0, notes + lines
 
 
 def print_claim_lines(block):
-    """The claim lines of `block`: `disposition`, `reenters` where it is not `none`, `build`, `playbook` and
-    `reason`. -> `(exit, lines)`: 1 and no line for a block whose `check:` is neither `pass` nor `recorded`."""
+    """The claim lines of `block`: `disposition`, `reenters` where it is not `none`, `build`, `playbook`,
+    `reason`, `scenarios` and `facts`, the last two `none` for a block written before TOOL-dPlacedRequest-10.
+    -> `(exit, lines)`: 1 and no line for a block whose `check:` is neither `pass` nor `recorded`."""
     if block is None or not (block.get("check") == "pass" or block.get("check", "").startswith("recorded")):
         return 1, []
     keys = ["disposition"] + (["reenters"] if block.get("reenters", NO_VALUE) != NO_VALUE else []) + [
-        "build", "playbook", "reason"]
+        "build", "playbook", "reason", "scenarios", "facts"]
     return 0, ["%s: %s" % (k, block.get(k, NO_VALUE)) for k in keys]
 
 
 # ------------------------------------------------------------------------------------------ the fixture
-def write_placement_fixture(top, policy="", driver=False, remote=False):
+def write_scenario_composition(root, drop=()):
+    """A scenario composition written into the fixture `root`, uncommitted: the kinds register and the
+    namespaces table of the playbook kit this tree resolves, the scenario schema and gov's pack beside this
+    file, each at its place under the tool root, the pack without the scenarios `drop` tags."""
+    from loop_items import derive_definition_rel
+    from scenario import PACK, render_scenario_row
+    kit_rel = pathlib.PurePosixPath(derive_definition_rel()).parent
+    playbook = resolve_kit_dir(PLAYBOOK_HOME, "kinds.toml", KIT)
+    rows = tomllib.loads((KIT / PACK).read_text(encoding="utf-8")).get("scenario", [])
+    files = {(kit_rel.parent / playbook.name / n).as_posix(): (playbook / n).read_text(encoding="utf-8")
+             for n in ("kinds.toml", "namespaces.toml")}
+    files[(kit_rel / "scenario-schema.toml").as_posix()] = (KIT / "scenario-schema.toml").read_text(encoding="utf-8")
+    files[(kit_rel / PACK).as_posix()] = "\n".join(render_scenario_row(r) for r in rows if r.get("tag") not in drop)
+    write_fixture_files(root, files)
+
+
+def write_placement_fixture(top, policy="", driver=False, remote=False, scenarios=None):
     """A repository under `top` holding a live build and a closed one, the stub policy file `policy` and, with
     `driver`, the unattended driver's conf copied from this tree with `RUN_CLAIMS` on where `remote`, a bare
-    remote beside it then. -> the repository."""
+    remote beside it then; with `scenarios`, the tags gov's pack drops there, a scenario composition by
+    `write_scenario_composition`, else none. -> the repository."""
     root = top / "repo"
     run_fixture_git(top, "init", "-q", "--template=", str(root))
     run_fixture_git(root, "symbolic-ref", "HEAD", "refs/heads/main")
@@ -580,6 +734,8 @@ def write_placement_fixture(top, policy="", driver=False, remote=False):
         files[".unattended.conf"] = (src / ".unattended.conf").read_text(encoding="utf-8") + \
             '\nSPEC_TOKENS_CLI=""\nRUN_CLAIMS="%s"\n' % ("on" if remote else "off")
     write_fixture_files(root, files)
+    if scenarios is not None:
+        write_scenario_composition(root, scenarios)
     run_fixture_git(root, "add", "-A")
     run_fixture_git(root, "commit", "-q", "-m", "the placement fixture")
     if remote:
@@ -629,8 +785,11 @@ def check_placement_plant(case, top, seen, bad):
     """Run `case` in a fixture under `top`, appending each observation to `seen` and each miss to `bad`."""
     policy = {"agent-places": '', "declared-checked": 'placement = "declared-checked"\n',
               "owner-places": 'placement = "owner-places"\n'}.get(case, "")
-    driver = case in ("amend-leased", "late-answer", "prompt-continue")
-    root = write_placement_fixture(top, policy, driver=driver, remote=case == "amend-leased")
+    driver = case in ("amend-leased", "late-answer", "prompt-continue", "continue-with-scenario", "no-admit")
+    scenarios = {"predicate-fails": (), "scenario-missing": (), "entry-mismatch": (), "continue-with-scenario": (),
+                 "no-admit": ("scenario.amendment",), "claim-lines": (),
+                 "scenario-refusals": ("scenario.amendment",)}.get(case)
+    root = write_placement_fixture(top, policy, driver=driver, remote=case == "amend-leased", scenarios=scenarios)
     store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     rets = top / "returns"
     rets.mkdir()
@@ -741,17 +900,29 @@ def check_placement_plant(case, top, seen, bad):
             bad.append("no probe was opened for the observation")
         check_case("unverified", run_placement_command(root, "check", "--request", FX_KEY), 1, "observations-unverified")
         (store / ("%s.probe.md" % FX_KEY)).write_text("# probe\n\n- **Verdict:** confirmed\n", encoding="utf-8")
-        check_case("verified", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — new")
-    elif case == "claim-lines":   # AC8
+        check_case("verified", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — new",
+                   "placement: scenario · unread")   # the fixture holds no scenario composition
+    elif case == "claim-lines":   # AC8, and TOOL-dPlacedRequest-10 AC7
         write_request_text()
-        run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", evidence="memory/x.md:1-2")
+        run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", evidence="memory/x.md#widget",
+                          scenarios="scenario.feature")
         run_placement_command(root, "check", "--request", FX_KEY)
         got = run_placement_command(root, "record", "--request", FX_KEY)
-        owed = ["disposition: new", "build: %s" % FX_NEW, "playbook: none", "reason: a new widget"]
+        owed = ["disposition: new", "build: %s" % FX_NEW, "playbook: none", "reason: a new widget",
+                "scenarios: scenario.feature", "facts: entry=feature"]
         check_case("record pass", got, 0, *owed)
         if got[1].splitlines() != owed:
             bad.append("record printed %r, not exactly %r" % (got[1].splitlines(), owed))
-        run_placed_return(disposition="patch", build=FX_LIVE, reason="r")
+        run_placed_return(disposition="patch", build=FX_DONE, reason="the landed fix regressed",
+                          scenarios="scenario.patch", facts="entry=patch; design-only=false")
+        check_case("patch check", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — patch")
+        got = run_placement_command(root, "record", "--request", FX_KEY)
+        owed = ["disposition: patch", "build: %s" % FX_DONE, "playbook: none", "reason: the landed fix regressed",
+                "scenarios: scenario.patch", "facts: entry=patch; design-only=false"]
+        check_case("record patch", got, 0)
+        if got[1].splitlines() != owed:
+            bad.append("record printed %r, not exactly %r" % (got[1].splitlines(), owed))
+        run_placed_return(disposition="patch", build=FX_LIVE, reason="r", scenarios="scenario.patch")
         check_case("refused", run_placement_command(root, "check", "--request", FX_KEY), 1, "refused — patch")
         got = run_placement_command(root, "record", "--request", FX_KEY)
         check_case("record refused", got, 1)
@@ -868,6 +1039,59 @@ def check_placement_plant(case, top, seen, bad):
         check_case("record plain", got, 0, "disposition: amend", "reason: a plain amend")
         if "reenters:" in got[1]:
             bad.append("a block without the line printed one: %s" % got[1])
+    elif case in ("predicate-fails", "scenario-missing", "entry-mismatch"):   # TOOL-dPlacedRequest-10 AC1 to AC3
+        write_request_text()
+        named, facts, owed = {"predicate-fails": ("scenario.patch", "none", "scenario-predicate scenario.patch"),
+                              "scenario-missing": ("scenario.feature", "design-only=true",
+                                                   "scenario-missing scenario.design-only"),
+                              "entry-mismatch": ("scenario.feature", "entry=patch", "entry-mismatch patch feature")}[case]
+        run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", scenarios=named, facts=facts)
+        check_case("refuse", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                   "placement: refused — new · %s" % owed)
+        if case == "predicate-fails":
+            run_placed_return(disposition="new", build=FX_NEW, reason="a new widget", scenarios="scenario.feature")
+            check_case("named right", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — new")
+            if read_newest_block().get("check") != "pass":
+                bad.append("the right scenario's block reads check %s" % read_newest_block().get("check"))
+        elif case == "scenario-missing":
+            write_policy_commit('[placement]\ncheck = "record"\n')
+            check_case("record", run_placement_command(root, "check", "--request", FX_KEY), 0,
+                       "placement: recorded — new · %s" % owed)
+            got = read_newest_block().get("scenarios")
+            seen.append("scenarios %s" % got)
+            if got != "scenario.feature+scenario.design-only":
+                bad.append("under record the block's scenarios read %s, not the selection" % got)
+    elif case == "continue-with-scenario":   # TOOL-dPlacedRequest-10 AC4
+        run_placed_return(disposition="continue", build=FX_LIVE, reason="r")
+        check_case("no scenario", run_placement_command(root, "check", "--request", FX_KEY), 0, "pass — continue")
+        run_placed_return(disposition="continue", build=FX_LIVE, reason="r", scenarios="scenario.feature")
+        check_case("named", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                   "placement: refused — continue · scenario-not-placed scenario.feature")
+    elif case == "no-admit":   # TOOL-dPlacedRequest-10 AC6
+        run_placed_return(disposition="amend", build=FX_LIVE, reason="widen the live build")
+        check_case("check", run_placement_command(root, "check", "--request", FX_KEY), 0, "held-owner — amend",
+                   "facts — entry=amendment")
+        got = read_newest_block()
+        seen.append("scenarios %s" % got.get("scenarios"))
+        if (got.get("scenarios"), got.get("check")) != ("scenario.feature (default)", "pass"):
+            bad.append("the block reads scenarios %s check %s, owed scenario.feature (default) pass" % (
+                got.get("scenarios"), got.get("check")))
+    elif case == "scenario-refusals":   # every scenario refusal branch the plants above do not reach
+        write_request_text()
+        for what, fields, owed in (("tag", {"scenarios": "feature"}, "no scenario.<segment> tag"),
+                                   ("tag twice", {"scenarios": "scenario.feature+scenario.feature"}, "twice"),
+                                   ("fact", {"facts": "design only"}, "no <name>=<value> pair"),
+                                   ("fact twice", {"facts": "a=b; a=c"}, "facts: a is given twice")):
+            check_case(what, run_placed_return(disposition="new", build=FX_NEW, reason="r", **fields), 1, owed)
+        if (store / ("%s.placement" % FX_KEY)).exists():
+            bad.append("a malformed scenario or fact wrote a block")
+        run_placed_return(disposition="new", build=FX_NEW, reason="r", facts="design-only=true",
+                          scenarios="scenario.design-only+scenario.feature")
+        check_case("order", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                   "placement: refused — new · scenario-order")
+        write_policy_commit('[flow]\nscenario-default = "amendment"\n')   # a value the pack here holds no row of
+        check_case("default", run_placement_command(root, "check", "--request", FX_KEY), 1, "flow.scenario-default",
+                   "scenario.amendment is not in the scenario composition")
 
 
 def main(argv):
