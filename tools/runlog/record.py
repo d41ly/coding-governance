@@ -118,7 +118,10 @@ EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED
 # against the set it was written under; a new record renders the full set, the first template.
 # The set a record committed before `refusal` (TOOL-dDeclaredLoop-14) and `fix-pass` (TOOL-dDeclaredLoop-32)
 # joined the park kinds was rendered with, read the same way.
-EXCLUDED_KINDS_BEFORE_REFUSAL = tuple(k for k in EXCLUDED_KINDS if k not in ("refusal", "fix-pass"))
+# The set a record committed before `fix-of` (TOOL-dWitnessedBar-21) joined was rendered with, and the
+# older sets derive from it.
+EXCLUDED_KINDS_BEFORE_FIX_OF = tuple(k for k in EXCLUDED_KINDS if k != "fix-of")
+EXCLUDED_KINDS_BEFORE_REFUSAL = tuple(k for k in EXCLUDED_KINDS_BEFORE_FIX_OF if k not in ("refusal", "fix-pass"))
 EXCLUDED_KINDS_BEFORE_HOLD = tuple(k for k in EXCLUDED_KINDS_BEFORE_REFUSAL if k not in ("hold", "resume"))
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
 # The coverage states under which a count the model derives from a source is KNOWN (spec S4). It read
@@ -287,6 +290,7 @@ RECORD_SCHEMA = {
                 ("spec marks", ("owner-before {int} · owner-inside {int} · agent-before {int} · "
                                 "agent-inside {int}",)),
                 ("excluded rows", (" · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS),
+                                   " · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS_BEFORE_FIX_OF),
                                    " · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS_BEFORE_REFUSAL),
                                    " · ".join(f"{k} {{int}}" for k in EXCLUDED_KINDS_BEFORE_HOLD))),
                 ("review rounds", ("{int} · shown {int} · aggregated {yes-no}",)),

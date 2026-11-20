@@ -20,7 +20,7 @@
 #   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
-#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...] [--fix-of <red>]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...   # fire a review: print its call's pin, trigger and review policy
@@ -1040,7 +1040,9 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass"
+# `fix-of` joined in TOOL-dWitnessedBar-21: `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against, read back by `check_fix_keeps`; not owed. The two held copies move with it.
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass fix-of"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -15546,7 +15548,8 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py _fk_re _fk_a
+  local -a _fk_st=()
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -15640,6 +15643,19 @@ check_commit_message() { # commit message file
     if [ -z "${decl// /}" ]; then
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
+    fi
+    # TOOL-dWitnessedBar-21 S4 - A FIX PASS'S KEEPS, before the walk's undeclared-path refusal, so a
+    # staged kept file meets the route and never a widening command the keeps would refuse. Only a
+    # key holding a `fix-of` row loads the spec facts and spawns the module; any other commit asks git
+    # nothing more than this one grep.
+    _fk_re=$'\n''o '"$u"' ([0-9a-f]+) '
+    if [[ $'\n'"$rows" =~ $_fk_re ]]; then
+      _fk_a=${BASH_REMATCH[1]}
+      if grep -qF -- " fix-of · item $_fk_a $u · reason " "$rel" 2>/dev/null; then
+        load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+        _fk_st=(); [ -z "$st" ] || mapfile -t _fk_st <<<"$st"
+        check_fix_keeps --check-commit "$rel" "$_fk_a $u" "" "" "${SPEC_PATH[$u]:-}" "${_fk_st[@]}" || return 1
+      fi
     fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
     uncov=""; uncovl=""
@@ -16016,6 +16032,86 @@ check_dispatch_specs() { # slug · unit... -> 0 clean, 1 after the refusals it p
   echo "unattended: --check-specs $slug — $*: none carries a refusal --dispatch makes from its spec files"
 }
 
+# ------------------------------------------------- TOOL-dWitnessedBar-21, A FIX PASS KEEPS ITS CHECK
+# A fix pass declared with `--dispatch --fix-of <red>`, `<red>` one of `leg:<leg name>` or
+# `acceptance`, may not write the red check's own files: the leg's argv words that name tracked files,
+# its gate script first, or the check files the unit's acceptance commands name. `fix_keeps.py` beside
+# this script derives them, run under the launcher `resolve_python` answers; its stdout is the kept
+# paths and its stderr `fix-of:` notes, `fix-of: tests <tags>|none` naming the leg's `tests` targets.
+# ONE HELPER HOLDS EVERY REFUSAL SITE this unit adds, three, so the driver's census stays under its
+# refusal ceiling: the red's shape, the module's refusal relayed (no launcher included), and a kept
+# path. It is asked for the red given now AND every red a `fix-of` row recorded at this key, so a
+# later `--dispatch` of the key without `--fix-of`, and `--check-commit` on it, are held to the same
+# keeps. The route both path refusals print is FIX_ROUTE. WHAT IT DOES NOT CHECK: a write that is
+# never declared or staged, and a key the unit takes after a commit moves HEAD, which is a new pass
+# with no keeps unless it is declared against a red again.
+FIX_ROUTE="a red check's own files change only through the tester, gov-tester, judging the red spec-wrong, which routes to Design as a new unit, whose own --dispatch is no fix pass and holds no keeps"
+check_fix_keeps() { # verb · run-state file · key · given (1 or empty) · red · spec · paths... -> 0, or 1 after check 49
+  local _fk_verb="$1" _fk_rel="$2" _fk_key="$3" _fk_given="$4" _fk_red="$5" _fk_spec="$6"
+  local _fk_shown _fk_l _fk_r _fk_py="" _fk_out _fk_why _fk_tests _fk_route _fk_p _fk_k
+  local -a _fk_reds=() _fk_lines=() _fk_kept=() _fk_args=()
+  shift 6
+  if [ -n "$_fk_given" ]; then
+    _fk_shown=${_fk_red:-(empty)}; _fk_shown=${_fk_shown//[$'\r\n']/ }
+    if case "$_fk_red" in acceptance|leg:?*) false ;; *) true ;; esac \
+       || case "$_fk_red" in *$'\n'*|*$'\r'*) true ;; *) false ;; esac \
+       || { [ -n "$BYPASS_BAN" ] && case "$_fk_red" in *"$BYPASS_BAN"*) true ;; *) false ;; esac; }; then
+      fail 49 "--fix-of names a red that is neither leg:<leg name> nor acceptance, or one carrying a line end or the declared bypass flag, so no kept file can be derived from it and nothing is recorded: $_fk_shown"
+      return 1
+    fi
+    _fk_reds+=("$_fk_red")
+  fi
+  _fk_l=$(grep -F -- " fix-of · item $_fk_key · reason " "$_fk_rel" 2>/dev/null)
+  [ -z "$_fk_l" ] || mapfile -t _fk_lines <<<"$_fk_l"
+  for _fk_l in "${_fk_lines[@]}"; do
+    _fk_r=${_fk_l#* · reason }; _fk_r=${_fk_r%$'\r'}
+    [ -n "$_fk_given" ] && [ "$_fk_r" = "$_fk_red" ] && continue
+    _fk_reds+=("$_fk_r")
+  done
+  [ "${#_fk_reds[@]}" -gt 0 ] || return 0
+  _fk_py=$(resolve_python 2>/dev/null) || _fk_py=""
+  for _fk_r in "${_fk_reds[@]}"; do
+    _fk_args=(--keeps "$_fk_r")
+    [ "$_fk_r" != acceptance ] || _fk_args+=(--spec "$_fk_spec")
+    _fk_why=""
+    if [ -z "$_fk_py" ]; then
+      _fk_why="no python launcher resolved, so fix_keeps.py did not run"
+    elif ! _fk_out=$("$_fk_py" "$KIT_DIR/fix_keeps.py" "${_fk_args[@]}" 2>&1); then
+      _fk_why=${_fk_out//[$'\r\n']/ }
+    fi
+    if [ -n "$_fk_why" ]; then
+      fail 49 "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: $_fk_r · $_fk_why"
+      return 1
+    fi
+    _fk_kept=(); _fk_lines=(); _fk_tests=""
+    [ -z "$_fk_out" ] || mapfile -t _fk_lines <<<"$_fk_out"
+    for _fk_l in "${_fk_lines[@]}"; do
+      _fk_l=${_fk_l%$'\r'}
+      case "$_fk_l" in
+        "") ;;
+        "fix-of: tests "*) _fk_tests=${_fk_l#fix-of: tests } ;;
+        "fix-of: "*) echo "unattended: $_fk_verb — $_fk_r · $_fk_l" >&2 ;;
+        *) _fk_kept+=("$_fk_l") ;;
+      esac
+    done
+    _fk_route=""
+    case "$_fk_tests" in
+      "") ;;
+      none) _fk_route="; the leg ${_fk_r#leg:} declares no tests edge" ;;
+      *) _fk_route="; the leg's tests edge names $_fk_tests, each the feature whose dossier names the code a code-miss fix belongs in" ;;
+    esac
+    for _fk_p in "$@"; do
+      [ -n "$_fk_p" ] || continue
+      for _fk_k in "${_fk_kept[@]}"; do
+        overlaps "$_fk_p" "$_fk_k" || continue
+        fail 49 "a fix pass keeps the red check's own files out of its write set, so $_fk_verb refuses $_fk_p, which covers or sits under $_fk_k, kept by the red $_fk_r: $FIX_ROUTE$_fk_route"
+        return 1
+      done
+    done
+  done
+  return 0
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk _c1_own _c1_gen
@@ -16255,6 +16351,10 @@ verb_dispatch() { # slug · unit · writes...
   # when both appear, in this declaration or in a sibling's within the same group.
   grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
   [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
+  # TOOL-dWitnessedBar-21 S3 - THE KEEPS, after the per-path shape loop and above the spec-token window,
+  # the claim, the rework budget's draw and the row, so a refused fix pass draws and records nothing.
+  # A key already holding a `fix-of` row is held to its keeps whether or not this call names a red.
+  check_fix_keeps --dispatch "$rel" "$grp $unit" "${DP_FIX_OF_SET:-}" "${DP_FIX_OF:-}" "$_d_spec" "$@" || return 1
   # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
   # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
   # empties the sibling set at the moment the second pass declares, and condition 1 then passes by
@@ -16433,6 +16533,10 @@ SIBS
     fi
   fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
+  # The red this fix pass is declared against, at its key, read back by `check_fix_keeps` (S3).
+  if [ -n "${DP_FIX_OF_SET:-}" ]; then
+    park "$rel" fix-of "$grp $unit" "$DP_FIX_OF" || return 1
+  fi
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
   # THE SET NOW IN FORCE, which is the key's union and not the row just parked: a declaration naming
@@ -16815,7 +16919,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""; RS_FLOW=""; RS_ROW=""
-DP_WRITES=()
+DP_WRITES=(); DP_FIX_OF=""; DP_FIX_OF_SET=""
 RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=(); RR_OWNER_STOP=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
@@ -16862,6 +16966,8 @@ while [ $# -gt 0 ]; do
                       _dw_n=$((_dw_n+1)); shift
                     done
                     [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
+    # SET is recorded apart from the value, so `--fix-of` with an empty value meets the shape refusal.
+    --fix-of)       DP_FIX_OF="${2:-}"; DP_FIX_OF_SET=1; shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --flow)         RS_FLOW="${2:-}"; shift 2 || shift ;;

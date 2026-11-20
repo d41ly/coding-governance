@@ -318,6 +318,22 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
   local refusal and before the row: another session's claim is check 108 and no row is written.
+  A FIX PASS KEEPS ITS CHECK: `--fix-of <red>`, `<red>` one of `leg:<leg name>` or `acceptance`,
+  declares the pass a fix of that red. The kit's `fix_keeps.py` derives the red check's own files:
+  for a leg, every word of its manifest `argv`, `{prefix}` resolved, that names a tracked file, its
+  gate script first; for `acceptance`, the check files (`*.test.sh`, a name ending `selftest.py`,
+  `test_*.py`, a file under `fixtures/`) the unit spec's acceptance commands name. Every `--writes`
+  path that covers or sits under a kept file is refused under check 49, after the per-path shape
+  refusals and before the rework budget's draw and the row, so a refused fix pass draws and records
+  nothing; so is a red of any other shape and a red the module cannot read, an unknown leg among
+  them. On success one `fix-of` row records the red at the pass's key, a history kind, and a later
+  `--dispatch` of that key without `--fix-of` is held to the same keeps, as `--check-commit` is: it
+  refuses a staged kept file before its undeclared-path refusal. Both refusals print the route: a
+  red check's own files change only through the tester, `gov-tester`, judging the red `spec-wrong`,
+  which routes to Design as a new unit whose own `--dispatch` is no fix pass; for a leg they also
+  name the `feature.<f>` targets of its `tests` edge, where a `code-miss` fix belongs. An empty keep
+  set prints `fix-of: no kept file` and admits every path. A leg whose gate script is also product
+  code keeps that file out of a fix pass too, so a code miss there goes to a new unit.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
   `CONVERGING`, `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED`. The round is an append-only
   `review` line in the parked region, a `history` kind, so it never inflates the count of decisions

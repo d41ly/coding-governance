@@ -7675,6 +7675,30 @@ git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
 
+# ---- TOOL-dWitnessedBar-21 - A FIX PASS KEEPS ITS CHECK. The shape refusal of `check_fix_keeps`,
+# ---- called directly on the READY unit above, records no row; then each plant of `fix_keeps.py
+# ---- --fixture`, which builds its own repository with the leg `fx canary` and drives a copy of this
+# ---- kit's driver: the leg's suite file refused at --dispatch and at --check-commit, the product file
+# ---- admitted with one fix-of row, an acceptance fixture kept and its product not, an unknown leg
+# ---- refused by name. RED-first: with the helper's two calls deleted, every refusing plant FAILs.
+_fk_before=$(git hash-object memory/builds/tRun/RUN.md)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --fix-of bogus)
+hit "$o" "--fix-of names a red that is neither leg:<leg name> nor acceptance, or one carrying a line end or the declared bypass flag, so no kept file can be derived from it and nothing is recorded: "
+same "a --fix-of of the wrong shape records nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$_fk_before"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-test-file 2>&1)
+hit "$o" "a fix pass keeps the red check's own files out of its write set, so "
+hit "$o" "fix-of: PASS writes-test-file"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-product 2>&1)
+hit "$o" "fix-of: PASS writes-product"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant commit-test-file 2>&1)
+hit "$o" "so --check-commit refuses tools/fx/fx.test.sh"
+hit "$o" "fix-of: PASS commit-test-file"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant acceptance-fixture 2>&1)
+hit "$o" "fix-of: PASS acceptance-fixture"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant unknown-leg 2>&1)
+hit "$o" "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: "
+hit "$o" "fix-of: PASS unknown-leg"
+
 # ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are one parallel group, which
 # ---- the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
 # ---- is refused while that producer is OPEN, even though its pass was dispatched just above, and
