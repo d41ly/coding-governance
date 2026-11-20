@@ -84,7 +84,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 63 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13
 ids TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-22 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25
 ids TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37
@@ -151,7 +151,7 @@ ids TOOL-dPlacedRequest-86 TOOL-dPlacedRequest-87 TOOL-dPlacedRequest-88 TOOL-dP
 | [TOOL-dPlacedRequest-53 — unit 52's "named twice" criteria count occurrences, never lines of squeezed text](spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md) | 28 | 2 | CLOSED | rev-3 | 2026-11-20 |
 | [TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge](spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md) | 28 | 2 | CLOSED | rev-6 | 2026-11-20 |
 | [TOOL-dPlacedRequest-55 — the version oracle's verdict reads its walk's own exit status](spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md) | 28 | 2 | CLOSED | rev-3 | 2026-11-20 |
-| [TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md) | 29 | 2 | DEFERRED | rev-8 | 2026-11-20 |
+| [TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md) | 29 | 2 | INPROGRESS | rev-8 | 2026-11-20 |
 | [TOOL-dPlacedRequest-57 — the version oracle's base is the observing run's own pinned BASE, never a sha a spec pins](spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md) | 29 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dPlacedRequest-58 — every attempt of the placed race starts with no handshake file an earlier attempt left](spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md) | 30 | 2 | DEFERRED | rev-5 | 2026-11-20 |
 | [TOOL-dPlacedRequest-60 — unit 57's read of 34 AC59 stops at the end of that bullet](spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md) | 30 | 2 | DEFERRED | rev-6 | 2026-11-20 |
