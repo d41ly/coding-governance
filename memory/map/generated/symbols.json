@@ -29198,6 +29198,11 @@
       "file": "tools/loop/termination.py"
     },
     {
+      "id": "run_declared_python",
+      "kind": "function",
+      "file": "tools/codebase-map/gen_map.py"
+    },
+    {
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -34144,6 +34149,11 @@
     },
     {
       "id": "test_gate_template_finds_the_kit",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gen_map_declared_python",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
