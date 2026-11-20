@@ -48,13 +48,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node d · opened 2026-11-20 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-20 · streams tooling
 ids TOOL-dHomeGraded-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close](spec/2026-11-20-spec-TOOL-dHomeGraded-1.md) | — | 1 | OPEN | rev-2 | 2026-11-20 |
+| [TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close](spec/2026-11-20-spec-TOOL-dHomeGraded-1.md) | — | 1 | CLOSED | rev-2 | 2026-11-20 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

@@ -1,6 +1,6 @@
 # TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close
 
-**Status:** OPEN · rev-2 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-1 · base a0ae4dca · streams tooling
 
 <!-- gen:spec-records -->
 
