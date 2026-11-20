@@ -1096,7 +1096,7 @@ check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node 
 # TOOL-dPlacedRequest-99 S2 — the resolver arm TOOL-dPlacedRequest-43 S20 owed: the user is case-folded,
 # so USERNAME spelled upper case still names row q's user and its tag, never UNKNOWN. Staged against the
 # case-sensitive compare, the cell reads UNKNOWN. GOV_NODE stays unset, as the block above leaves it.
-USERNAME="${CUSER^^}" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
+USERNAME="$(printf '%s' "$CUSER" | tr '[:lower:]' '[:upper:]')" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
 check_eq "TOOL-dPlacedRequest-99 S2 node — an upper-cased USERNAME resolves row q's tag, not UNKNOWN" "node — q · $CUSER" "$(read_cell node "$NONCE-t99a")"
 GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
 check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"

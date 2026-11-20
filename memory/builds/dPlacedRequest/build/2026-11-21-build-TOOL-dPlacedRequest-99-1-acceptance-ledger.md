@@ -62,6 +62,12 @@ row's plants run alone as `python <the module> --fixture --plant <name>` over th
 - The run-gates suite pins `SELFTEST_FLOOR`, not `FLOOR_ASSERTIONS`, so by S2's wording its new arms move no floor; the pin is a minimum and the arms do not lower the count. (DERIVED)
 - The kit-epoch rule binds at the push boundary, where the lander mints each moved kit's version, so no version carrier moved in this pass. (DERIVED)
 
+- The bug-class checklist over the pass commit `f1b6cd352` selected `portability-sweep`: the kickoff arm upper-cased the user with a bash-4 case expansion the suite used nowhere else, now `tr '[:lower:]' '[:upper:]'`, probed to print the user upper-cased. (DERIVED)
+- It selected `refusal-branch-with-no-arm`: `check_plant_tokens`'s import-failure finding had no arm, so the run-gates suite gains one, a scratch module raising at import; the same function, cut and run over that module, printed `which did not import` and returned 1. (DERIVED)
+- It selected `fixture-passes-by-finding-nothing`: the S8 arm's first row compares named placeholders rather than two captures that could both be empty, a fix made before the pass commit from the same checklist read over the paths, and over an empty stand-in driver it fails. The S1 liveness row and the S5 control's graded count hold their populations. (DERIVED)
+- It selected `a-spelling-change-strands-its-readers`: no file under `skills/`, `tools/` or `help/` quotes a `card —` success line or the lander's re-fence `unreachable` wording; arm 54 matches the line's unchanged prefix. (DERIVED)
+- It selected `an-attested-count-must-count-what-the-grader-counts`: the kickoff floor counts `pass`, the lander floor `n` from `ok`, and the scratch-guard floor `n` as `pass` plus `fail`; each raise counts the rows its own counter takes. (DERIVED)
+
 ## Items diverged
 
 None.

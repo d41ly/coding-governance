@@ -719,6 +719,11 @@ arm "TOOL-dPlacedRequest-99 S5 a mismatched plants= token reds, naming the row a
     "row 'zq fixtures' carries plants=4, and $PT_LOOP/zq_plants.py's PLANTS holds 3 plant(s) once imported" \
     "$PT_MOD && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=4 a fixture row\n' >> $B && git add -A" \
     "$R --check"
+# A module that fails to import is a finding naming it, never a row passed over as running no plants.
+arm "TOOL-dPlacedRequest-99 S5 a loop-kit module that fails to import reds, naming the row and the module" 1 \
+    "row 'zq fixtures' runs $PT_LOOP/zq_plants.py, which did not import" \
+    "$PT_MOD && printf 'raise RuntimeError(\"zq import refused\")\n' >> $PT_LOOP/zq_plants.py && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=3 a fixture row\n' >> $B && git add -A" \
+    "$R --check"
 
 # ---------------------------------------------------------------- the shard token, TOOL-aBatchedArm-4 S1
 # `--shard 1/8` carries a slash and is not a path. The predicate that admits it is a REGEX over the
