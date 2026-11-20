@@ -4,7 +4,7 @@ node: d
 opened: 2026-11-20
 streams: tooling
 roster: TOOL
-ids: TOOL-dHomeGraded-1
+ids: TOOL-dHomeGraded-1 TOOL-dHomeGraded-2
 ---
 
 # dHomeGraded — an adopter's bar grades the adopter, not gov's own installed kit files
@@ -44,26 +44,28 @@ None.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dHomeGraded-1` | 1 | adopter scans skip gov's unmodified kit files, and four deployer defects found by the 608aa364 re-adoption close |
+| 2 | `TOOL-dHomeGraded-2` | 1 | `govkit update` reaps a retired row that a live row at the same path supersedes |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-20 · streams tooling
-ids TOOL-dHomeGraded-1
+**Build status:** OPEN · 2 unit(s) · node d · opened 2026-11-20 · streams tooling
+ids TOOL-dHomeGraded-1 TOOL-dHomeGraded-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dHomeGraded-1 — adopter scans skip gov's unmodified kit files, and four re-adoption defects close](spec/2026-11-20-spec-TOOL-dHomeGraded-1.md) | — | 1 | CLOSED | rev-2 | 2026-11-20 |
+| [TOOL-dHomeGraded-2 — `govkit update` reaps a retired row that a live row at the same path supersedes](spec/2026-11-20-spec-TOOL-dHomeGraded-2.md) | — | 1 | OPEN | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: TOOL-dHomeGraded-1.
+Ids no record names: TOOL-dHomeGraded-1 TOOL-dHomeGraded-2.
 
-Ids no `spec-audit` record has ever named: TOOL-dHomeGraded-1.
+Ids no `spec-audit` record has ever named: TOOL-dHomeGraded-1 TOOL-dHomeGraded-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
