@@ -41,17 +41,20 @@ over each of the 21 (DERIVED) plants of `tools/loop/placement.py#PLANTS`, every 
   `python tools/roles/check_roles.py --write` reported 0 (DERIVED) defects with the catalogue region of
   `tools/roles/README.md` re-rendered.
 - AC6 — `--plant no-admit`: over a pack with `scenario.amendment` dropped, an `amend` block naming no
-  scenario exited 0 printing `facts — entry=amendment`, and the block read `scenarios: scenario.feature
-  (default)` with `check: pass`.
+  scenario exited 0 printing `facts — entry=amendment`, and the block read
+  `scenarios: scenario.feature (default)` with `check: pass`.
 - AC7 — `--plant claim-lines`: `record` on the passed `patch` block printed exactly `disposition`,
-  `build`, `playbook`, `reason`, then `scenarios: scenario.patch` and `facts: entry=patch;
-  design-only=false`; the passed `new` block printed its `scenarios` and `facts` lines after `reason`, and
-  a refused block printed nothing, exit 1.
+  `build`, `playbook`, `reason`, then `scenarios: scenario.patch` and
+  `facts: entry=patch; design-only=false`; the passed `new` block printed its `scenarios` and `facts`
+  lines after `reason`, and a refused block printed nothing, exit 1.
 - The checklist's refusal branches — `--plant scenario-refusals`: a tag outside `scenario.<segment>`, a
   tag twice, a fact of another shape and a fact twice each exited 1 at `place` with no block written; a
   block naming the shared scenarios out of order exited 1 printing `scenario-order`; and a
-  `flow.scenario-default` naming a scenario the plant's pack lacks exited 1 naming the key.
-  `--plant observation` printed `placement: scenario · unread` over a tree with no composition.
+  `flow.scenario-default` naming a scenario the plant's pack lacks exited 1 naming the key; a block
+  appended by hand with a malformed tag exited 1 at `check`. `--plant observation` printed
+  `placement: scenario · unread` over a tree with no composition. These two plants were extended by the
+  checklist pass over the first commit, and the module's docstring now states that the scout's facts
+  but `entry` are evaluated as written.
 
 **Owed at the close (main loop):** the `loop placement fixtures` leg over every plant; the `New arm:` line
 of the spec's Gates section, its failing case staged by `predicate-fails` with the predicate re-run

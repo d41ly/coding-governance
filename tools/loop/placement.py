@@ -72,7 +72,9 @@ Exit 0 placed, passed, recorded or held · 1 a refusal, named · 2 a usage error
 printing `placement: <case> · ... · held` or `MISSED`; `--fixture` alone runs every case through
 `loop_lib.run_selftest_cases`, the `loop placement fixtures` leg.
 
-WHAT THIS DOES NOT CHECK: that the scout's reason is true, which is why `check` re-reads the facts; that two
+WHAT THIS DOES NOT CHECK: that the scout's reason is true, which is why `check` re-reads the facts; that the
+request facts the scout read but `entry` are the request's, `check` re-running the predicates over them as
+written, so a predicate on a fact the scout never supplies never admits; that two
 sessions of one node hold one lease apart, since the claims reader prints a fleet tag and no session; that a
 stand-in's later item has landed, its row being deleted by the build that lands it; the `breakpoint`
 member's own facts, TOOL-dPlacedRequest-5's; and anything outside this node, the record being node-local.
@@ -157,7 +159,8 @@ PLANTS = {"each-disposition": "one request placed per member of the set, each wi
           "no-admit": "an amend placement over a pack admitting no entry=amendment placed under scenario.feature "
                       "(default) and passed",
           "scenario-refusals": "each scenario refusal the other plants do not reach: a malformed tag or fact, a tag or "
-                               "fact twice, the shared scenarios out of order and a default the pack holds no row of"}
+                               "fact twice, the shared scenarios out of order, a default the pack holds no row of and a "
+                               "hand-written block's malformed tag at check"}
 
 
 class PlacementRefused(ValueError):
@@ -1092,6 +1095,11 @@ def check_placement_plant(case, top, seen, bad):
         write_policy_commit('[flow]\nscenario-default = "amendment"\n')   # a value the pack here holds no row of
         check_case("default", run_placement_command(root, "check", "--request", FX_KEY), 1, "flow.scenario-default",
                    "scenario.amendment is not in the scenario composition")
+        hand = store / ("%s.placement" % FX_KEY)   # a block written by hand, past place's own refusal
+        hand.write_bytes(hand.read_bytes() + ("\ndisposition: new\nbuild: %s\nreason: r\nscenarios: feature\n"
+                                              % FX_NEW).encode("utf-8"))
+        check_case("hand-written", run_placement_command(root, "check", "--request", FX_KEY), 1,
+                   "no scenario.<segment> tag")
 
 
 def main(argv):
