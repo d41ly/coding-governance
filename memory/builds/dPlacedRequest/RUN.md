@@ -537,3 +537,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-20T21:16:21Z draw · fix-pass · TOOL-dPlacedRequest-95 · 71/130 · 20261120T211621Z-85cabd
 
 2026-11-20T21:16:21Z dispatch · item bc91001f TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
+
+2026-11-20T21:27:34Z dispatch · item 9f93ba4b TOOL-dPlacedRequest-96 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-96-1-acceptance-ledger.md
