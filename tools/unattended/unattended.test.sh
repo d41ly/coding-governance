@@ -19394,7 +19394,7 @@ fs_cut=$(sed -n '/^check_claim_writable() {/,/^}/p' "$SCRIPT" | awk '
   { print }')
 fs_set=$(grep -v $'^RESET\t' <<<"$fs_cut" | grep -o 'CW_[A-Z_]*=' | sort -u)
 fs_miss=""
-for fs_w in $fs_read; do grep -qx "$fs_w=" <<<"$fs_set" || fs_miss="$fs_miss$fs_w "; done
+for fs_w in $fs_read; do case $'\n'"$fs_set"$'\n' in *$'\n'"$fs_w="$'\n'*) ;; *) fs_miss="$fs_miss$fs_w " ;; esac; done
 same "DPR96 every CW_* name the lease verbs read is assigned in check_claim_writable past its reset block" "$fs_miss" ""
 same "DPR96 ...a join over a read set holding CW_HINT and a reset block that sets it" \
   "$(grep -cx CW_HINT <<<"$fs_read") $(grep $'^RESET\t' <<<"$fs_cut" | grep -c 'CW_HINT=')" "1 1"
