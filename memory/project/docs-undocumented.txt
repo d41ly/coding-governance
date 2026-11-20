@@ -294,9 +294,6 @@ policy:runtime.restarts	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:runtime.secret-home	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:runtime.secret-scan	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:runtime.spawn-backend	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:tests.landing-levels	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:tests.product	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:tests.without-cadence	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.cost	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.identity	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:trace.leg-output	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
@@ -312,7 +309,6 @@ policy:verdict.red-route	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.pin	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.pin-scope	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 policy:verdict.remote.trust	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
-policy:verdict.tree	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 verb:govkit.py:adopt	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 verb:govkit.py:apply	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded
 verb:govkit.py:check	1	7dbe0c8d9d2ca46a849065c73ad9cf721c44ab45	seeded

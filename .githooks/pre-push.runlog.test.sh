@@ -867,8 +867,9 @@ check_dec_rest() {
   # still names the vetted bar for the lander, and the push ends clean. On a side branch carrying a root
   # install's stand-in runner and manifest, so main's later arms read the tree they always read.
   git checkout -q -b cov
-  mkdir -p run-gates && printf '#!/usr/bin/env bash\nexit 0\n' > run-gates/run-gates.sh && printf '[]\n' > gate-legs.json
-  git add run-gates/run-gates.sh gate-legs.json && git commit -q -m "a root install's runner"
+  rgk=run-gates  # the stand-in runner's kit directory and file stem, named once
+  mkdir -p "$rgk" && printf '#!/usr/bin/env bash\nexit 0\n' > "$rgk/$rgk.sh" && printf '[]\n' > gate-legs.json
+  git add "$rgk/$rgk.sh" gate-legs.json && git commit -q -m "a root install's runner"
   cov_t=$(git rev-parse 'HEAD^{tree}'); mkdir -p "$REPO/.git/gate-verdict"
   printf 'tree\t%s\nsha\t%s\nverdict\tGREEN\nkind\tfull\nbase\t\nmanifest\tgate-legs.json\nmanifest_blob\t%s\nselftests\t\nrun_id\tplanted\nby\trunner\n' \
     "$cov_t" "$(git rev-parse HEAD)" "$(git rev-parse HEAD:gate-legs.json)" > "$REPO/.git/gate-verdict/$cov_t"
