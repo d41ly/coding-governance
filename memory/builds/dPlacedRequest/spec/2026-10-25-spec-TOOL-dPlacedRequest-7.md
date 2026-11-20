@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys
 
-**Status:** INPROGRESS · rev-8 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-69
+**Status:** INPROGRESS · rev-9 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-69
 
 **Carries:** cl-dClosedLoop-0125@4e0727e5 whole
 **Carries:** node:item.probe.trigger
@@ -37,6 +37,8 @@
 | [2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-20 |
 | [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-7-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-7-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-7-2-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-7-2-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-7-divergence-2-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-7-divergence-2-brief.md) | research | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-7-divergence-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-7-divergence-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
@@ -68,20 +70,33 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   two items spell their actor `role:gov-tester`, the slot the Test rows already spell
   (`tools/loop/loop.toml@b6651f21:1725`) and TOOL-dWitnessedBar-23 S7 writes. Observed by AC1 and
   AC13.
-- **S2** — The stand-ins, flow-steps.md:666-675, as `[[stand-in]]` rows (TOOL-dDeclaredLoop-13's
-  table, read by `read_stand_ins`): `item.probe.design` and `item.probe.judge-claimed` owned by
-  dWitnessedBar's tester, `item.probe.experiment` by dBoundRoles' `experiment` shape, each routing
-  its work to an owner item until its owner lands; `item.probe.run` by dWellOiledMachine's executor,
-  its stand-in TOOL-dDeclaredLoop-17 S4's re-run; `item.probe.return` by dTotalRecall's `record`
-  command, its stand-in S5's write through the record factory; and a method entry marked `visual`,
-  which needs dWellOiledMachine's capture adapter, `unrunnable` (F7). Observed by AC1 and AC6.
+- **S2** — The stand-ins, flow-steps.md:666-675, ride the item rows and add no `[[stand-in]]` row
+  (F10). That table names the owner of a row item, one a `[[transition]]` row names, and
+  `tools/loop/loop_table.py#check_transition_tables` refuses a stand-in row naming no row item as
+  stale; no transition row names a probe item. Each unbuilt part rides its item's own `owner` field,
+  the build that lands it, and a `stand-in:{prefix}/<home>/<file>` route where its work leaves the
+  program today:
+
+  | Item | `owner` | Today's stand-in |
+  |---|---|---|
+  | `item.probe.design` | `dWitnessedBar` | the tester role is pending, and the owner writes the method through `probe.py design` |
+  | `item.probe.judge-claimed` | `dWitnessedBar` | the same pending role; the claimed judgment reaches the owner item by `item.probe.return`'s `claimed` route |
+  | `item.probe.experiment` | `dBoundRoles` | its `beyond-authority` route to the owner item, which `probe.py` prints naming `dBoundRoles` while the `experiment` shape is unbuilt |
+  | `item.probe.run` | `dWellOiledMachine` | `probe.py run`, calling TOOL-dDeclaredLoop-17 S4's re-run |
+  | `item.probe.return` | `dTotalRecall` | S5's write through the record factory, `Writer: stand-in`, and its `returned` route to `stand-in:{prefix}/loop/probe.py` |
+
+  The other three items' `owner` is `dPlacedRequest`. A method entry marked `visual`, which needs
+  dWellOiledMachine's capture adapter, is `unrunnable` (F7). Observed by AC1 and AC6.
 - **S3** — `probe.trigger`, the verb `python tools/loop/probe.py trigger --cause <c> --asker <item tag>
-  --subject <text> (--build <slug> | --request <content key>) [--at <item tag>]`, in
-  `review.trigger`'s flag shape (TOOL-dDeclaredLoop-20 S2). `<c>` is one of the closed set I17 names,
+  --subject <text> (--build <slug> --unit <id> | --request <content key>) [--at <item tag>]`, in
+  `review.trigger`'s flag shape (TOOL-dDeclaredLoop-20 S2). `--unit` stands beside `--build`, since
+  `tools/memory-tree/build_records.py#write_record` names a build-folder record by its unit id (F14);
+  `--build` without `--unit` exits 2. `<c>` is one of the closed set I17 names,
   `point`, `owner`, `observation`, `raised` and `reproduction`, held as data: `[[trigger-cause]]` rows
   of `tools/loop/loop.toml`, each `program = "probe"` and `cause`, read by `read_trigger_causes(program)`.
-  It opens the probe and writes a `probe-trigger` record, or prints `probe — not opened · <key>: <why>`
-  when a key below refuses the cause, writing nothing. Observed by AC2 and AC3.
+  It opens the probe and writes a `probe-trigger` record, or, when a key below refuses the cause,
+  writes nothing and prints `probe — not opened · <key>: <why> · to <asker>`, its route
+  `stand-in:{prefix}/loop/probe.py` (F13). Observed by AC2 and AC3.
 - **S4** — `probe.pin`, `python tools/loop/probe.py pin --trigger <record> --sha <sha> --kind
   verification|reproduction|experiment --question <text> --losing <text>`, writes the `probe` record's
   head (`Sha`, `Kind`, `Question`, `Losing`, `Asker`, `Trigger`) and records it, committed where the
@@ -122,10 +137,11 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   both are added to `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, which the factory's
   kind table must equal at import (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
   `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a `-probe-<n>.md` or
-  `-probe-trigger-<n>.md` file served as any other kind is malformed. `probe.py` passes the factory
-  `--build`, `--unit` and the fields; whether the factory's `new` verb is generic per kind is unknown
-  until PLAY-dOrderedCharter-7 builds, so this unit claims no `new probe` or `new probe-trigger`
-  door, and the build run re-grounds the call on the landed factory. Observed by AC7.
+  `-probe-trigger-<n>.md` file served as any other kind is malformed. `probe.py` writes each
+  build-folder record through `tools/memory-tree/build_records.py#write_record`, passing the
+  `--build` slug, the `--unit` id, a title and the fields, in the shape §4's records show. The
+  factory's `DOORS` lists the kinds `new <kind>` writes, every other kind being `write_record`'s
+  alone, so this unit claims no `new probe` or `new probe-trigger` door. Observed by AC7.
 - **S7** — The entry-time probe. Before `entry.claim` no build folder exists, so a trigger given
   `--request <content key>`, the key `tools/loop/request.py#derive_request_content_key` derives (I11),
   writes its records beside that request's local text (I12):
@@ -136,10 +152,16 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   same subject again exits 1 as already opened. The design then declares a command per subject, and
   the judge's aggregate verdict covers them all. Observed by AC8.
 - **S8** — The `probe` outcome on every role item: each `[[item]]` row whose actor is a role and whose
-  `outcomes` is a list gains `probe`, routed to `item.probe.trigger` (flow-steps.md:35-36); a check
-  `check_probe_outcomes(items)` in `tools/loop/loop_lib.py` refuses a role item lacking it. Until
-  dBoundRoles puts the outcome on the role templates, no role returns it, so probes are placed, never
-  raised (flow-steps.md:672). Observed by AC9.
+  `outcomes` is a list gains `probe`, routed to `stand-in:{prefix}/loop/probe.py` (flow-steps.md:35-36),
+  never to `item.probe.trigger` (F11). A role item sits in a gov step and the probe program in none,
+  so a route to a probe item would cross a step, and the route join of
+  `tools/loop/loop_table.py#check_transition_tables` refuses a cross-step route that no build row and
+  no `[[owed-row]]` covers. The probe program's own role items, `item.probe.design`,
+  `item.probe.experiment` and `item.probe.judge-claimed`, take no `probe` outcome (F12). A check
+  `check_probe_outcomes(items)` in `tools/loop/loop_lib.py` refuses a role item outside the probe
+  program that lacks the outcome or routes it to another target, and an `item.probe.*` row that
+  carries it. Until dBoundRoles puts the outcome on the role templates, no role returns it, so probes
+  are placed, never raised (flow-steps.md:672). Observed by AC9.
 - **S9** — The keys, each read through dGroundRules' `policy.py get` (I24), with v2's catalogue
   default until that reader lands. Their four rows already exist in `tools/policy/catalogue.toml`,
   owner `dPlacedRequest`, landed by TOOL-dGroundRules-1 at `c9bd97720`; this unit adds no row through
@@ -152,8 +174,9 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   loop definition does not declare refused naming the key; `probe.raise` (`roles-and-owner`,
   `owner-only`, `off`), refusing `raised` under `owner-only` and `off`, and `owner` under `off`;
   `probe.observations` (`verify-before-place`, `verify-at-plan`, `on-request`), admitting the cause
-  `observation` at `--at item.entry.place` under `verify-before-place`, at `item.plan.input` under
-  `verify-at-plan`, and only with the owner's request under `on-request`; and
+  `observation` at `--at item.entry.place` under `verify-before-place` and at `item.plan.input` under
+  `verify-at-plan`, and refusing it at every position under `on-request`, where the owner opens a
+  probe with `--cause owner`, which `probe.raise` governs, and no request flag is minted (F15); and
   `probe.experiment.authority` (`within-cap`, `owner-opts-in`, `free`), named with its value on the
   owner item an experiment routes to, the cap under `within-cap` being the agent cap
   `tools/hooks/agent-cap.js` enforces (:61-71). Observed by AC3 and AC10.
@@ -162,10 +185,20 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
   observation. `python tools/loop/probe.py --selftest` runs every case through
   `tools/loop/loop_lib.py#run_selftest_cases`, printing the count line the `testsuite counts (every
   bar self-test prints one)` leg reads, as `tools/loop/request.py --selftest` does. The leg `loop
-  probe fixtures`, argv `python {prefix}/loop/probe.py --selftest`, runs it, with the rows a new leg
-  owes in `tools/gate-legs.json`, `tools/govkit/registry.toml`, `tools/run-gates/selftest-budgets.txt`
-  and `tools/run-gates/ceiling-evidence.txt`, as `loop request fixtures` holds them, and `enforces =
-  ["principle.p31"]` among them. The page `help/loop.md` gains the probe's section. P31 is the
+  probe fixtures`, argv `python {prefix}/loop/probe.py --selftest`, runs it. It holds the rows
+  `loop request fixtures` holds, each read at writing:
+
+  | Where | The row |
+  |---|---|
+  | `tools/gate-legs.json` | its leg row, `chunk = "selftests"`, `subject = "kit"`, `stage = ["step.test"]`, a `ceiling` the builder pins from the leg's first reading, and `enforces = ["principle.p31"]` (`tools/gate-legs.json@9934afd2:2232`) |
+  | `tools/govkit/registry.toml` | an `[[exempt_leg]]` row with its `why`: the leg is gov's own and no `[[gate_leg]]` of the loop kit's descriptor (`tools/govkit/registry.toml@3c7b9224:898`) |
+  | `tools/govkit/subject-pins.tsv` | its `<name>`, `kit`, `selftests` row, written by `govkit.py selfcheck --write` (`tools/govkit/subject-pins.tsv@33c34be4:102`) |
+  | `tools/run-gates/selftest-budgets.txt` | its budget row, the seconds PINNED from a reading the row names (`tools/run-gates/selftest-budgets.txt@9b31304a:82`) |
+  | `memory/map/features/loop.md` | its name in the dossier's `gate-legs` list (`memory/map/features/loop.md@801045ca:13`) |
+
+  `tools/run-gates/ceiling-evidence.txt` gains no row: `derive-ceilings.py --write` generates it from
+  run records, and it holds none for `loop request fixtures`. The page `help/loop.md` gains the
+  probe's section. P31 is the
   principle whose v2 `[enforcement]` row names this unit's clause `cl-dClosedLoop-0125` (v2:1853).
   The pending list holds the row `principle.p31`, armed by `dPlacedRequest`
   (`tools/playbook/core-pending.txt@6e02f812:22`), and this pass deletes it, since
@@ -196,8 +229,8 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
 
 - **consumes-from** `TOOL-dPlacedRequest-19` — `tools/loop/request.py#derive_request_content_key`, the key an entry-time trigger and its records are filed under beside the request's local text
 - **hands-off** `TOOL-dPlacedRequest-4` — `item.probe.trigger`, which `entry.place` routes an owner's observation to under `probe.observations`, receiving the probe's record back
-- **hands-off** `TOOL-dPlacedRequest-3` — `item.probe.trigger`, the route target of the entry items' `probe` outcome, which the entry rows declare
-- **consumes-from** external — dDeclaredLoop, built before this build run: the item rows and `check_program` (TOOL-dDeclaredLoop-12, -50 S3), `read_stand_ins` (TOOL-dDeclaredLoop-13), `loop_witness.py rerun` (TOOL-dDeclaredLoop-17 S4), `review.trigger`'s flag shape (TOOL-dDeclaredLoop-20 S2), `read_tag_policy` (TOOL-dDeclaredLoop-26 S6), the policy-key factory (TOOL-dDeclaredLoop-6 S4)
+- **hands-off** `TOOL-dPlacedRequest-3` — `stand-in:{prefix}/loop/probe.py`, the route target of the entry items' `probe` outcome, which the entry rows declare
+- **consumes-from** external — dDeclaredLoop, built before this build run: the item rows and `check_program` (TOOL-dDeclaredLoop-12, -50 S3), the route join of `check_transition_tables` (TOOL-dDeclaredLoop-13), the `[[record-version]]` join (TOOL-dDeclaredLoop-24), `loop_witness.py rerun` (TOOL-dDeclaredLoop-17 S4), `review.trigger`'s flag shape (TOOL-dDeclaredLoop-20 S2), `read_tag_policy` (TOOL-dDeclaredLoop-26 S6), the policy-key factory (TOOL-dDeclaredLoop-6 S4)
 - **consumes-from** external — the record factory (PLAY-dOrderedCharter-7 S7), its kind list `TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42 S2), the meta-check that reds a leg with no `enforces` (PLAY-dOrderedCharter-7 S3) and dGroundRules' `policy.py get`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 
@@ -205,22 +238,44 @@ entry-time probe keyed by content as triage is, the four keys, and a stand-in fo
 
 ### The items
 
-| Item | Actor | Needs | Witness | Routes |
-|---|---|---|---|---|
-| `item.probe.trigger` | `command:probe.trigger` | none | the `probe-trigger` record | opened → `item.probe.pin`; not-opened → the asker's next item |
-| `item.probe.pin` | `command:probe.pin` | `item.probe.trigger` | the head, recorded before any run | verification, reproduction → `item.probe.design`; experiment → `item.probe.experiment` |
-| `item.probe.design` | `role:gov-tester` | `item.probe.pin` | the method's schema check | done → `item.probe.run` |
-| `item.probe.experiment` | `role:gov-researcher` | `item.probe.pin` | the method's schema check | done → `item.probe.run`; beyond-authority → owner item |
-| `item.probe.run` | `executor` | `item.probe.design` or `item.probe.experiment` | the `run` lines by hash | done → `item.probe.judge`; unrunnable → `item.probe.return` |
-| `item.probe.judge` | `command:probe.judge` | `item.probe.run` | the computed verdict | judged → `item.probe.return`; claimed → `item.probe.judge-claimed` |
-| `item.probe.judge-claimed` | `role:gov-tester` | `item.probe.judge` | the judgment's schema check, held as claimed | done → `item.probe.return` |
-| `item.probe.return` | `command:probe.return` | `item.probe.judge` | the `probe` record | returned → the asker's re-entry; claimed, unrunnable → owner item |
+| Item | Actor | `owner` | Needs | Witness | Routes |
+|---|---|---|---|---|---|
+| `item.probe.trigger` | `command:probe.trigger` | `dPlacedRequest` | none | the `probe-trigger` record | opened → `item.probe.pin`; not-opened → `stand-in:{prefix}/loop/probe.py` |
+| `item.probe.pin` | `command:probe.pin` | `dPlacedRequest` | `item.probe.trigger` | the head, recorded before any run | verification, reproduction → `item.probe.design`; experiment → `item.probe.experiment` |
+| `item.probe.design` | `role:gov-tester` | `dWitnessedBar` | `item.probe.pin` | the method's schema check | done → `item.probe.run` |
+| `item.probe.experiment` | `role:gov-researcher` | `dBoundRoles` | `item.probe.pin` | the method's schema check | done → `item.probe.run`; beyond-authority → owner item |
+| `item.probe.run` | `executor` | `dWellOiledMachine` | `item.probe.design` or `item.probe.experiment` | the `run` lines by hash | done → `item.probe.judge`; unrunnable → `item.probe.return` |
+| `item.probe.judge` | `command:probe.judge` | `dPlacedRequest` | `item.probe.run` | the computed verdict | judged → `item.probe.return`; claimed → `item.probe.judge-claimed` |
+| `item.probe.judge-claimed` | `role:gov-tester` | `dWitnessedBar` | `item.probe.judge` | the judgment's schema check, held as claimed | done → `item.probe.return` |
+| `item.probe.return` | `command:probe.return` | `dTotalRecall` | `item.probe.judge` | the `probe` record | returned → `stand-in:{prefix}/loop/probe.py`; claimed, unrunnable → owner item |
 
 Each command actor is `command:probe.<verb>`, the shape `tools/loop/loop_lib.py#ACTOR_FORM` admits,
 as the review program's `command:review.trigger` and `command:review.pin` rows of
-`tools/loop/loop.toml` spell theirs (F4). "Owner item" is the route
-`stand-in:tools/unattended/unattended.sh`, its `--park` under a mandate and the owner's own turn when
-attended, until the owner gate of dDeclaredLoop's breakpoints arms it.
+`tools/loop/loop.toml` spell theirs (F4). Every target is a declared item or a stand-in path, the two
+forms `tools/loop/loop_lib.py#ROUTE_STAND_IN` and `check_program` admit beside `transition`, and
+none crosses a step, since every probe item sits at `step = "none"` (F13). "Owner item" is the route
+`stand-in:{prefix}/unattended/unattended.sh`, as the review program's `item.review.trigger` row
+routes `refused` (`tools/loop/loop.toml@d70457cc:2013`): its `--park` under a mandate and the
+owner's own turn when attended, until the owner gate of dDeclaredLoop's breakpoints arms it. A
+route to `stand-in:{prefix}/loop/probe.py` is the line `probe.py` prints ending `· to <asker>`: the
+asker's next item is the asker itself, re-entered with that line as its input (flow-steps.md:35-36),
+since the probe left the asker's own work unfinished.
+
+### The record versions
+
+`item.probe.trigger` declares `returns = "record-kind.probe-trigger"`, and `item.probe.pin`,
+`item.probe.run`, `item.probe.judge` and `item.probe.return` declare `returns = "record-kind.probe"`.
+`tools/loop/loop_items.py#check_record_versions` refuses an item whose `returns` or input names a
+typed kind no `[[record-version]]` row pins, so `tools/loop/loop.toml` gains two rows after the four
+it holds (`tools/loop/loop.toml@d70457cc:1121`):
+
+| `kind` | `version` | `fields` |
+|---|---|---|
+| `record-kind.probe-trigger` | `1` | DERIVED: `tools/loop/loop_items.py#derive_record_hash` over the kind's `required` and `closed` in `build_records.py`'s `KINDS` |
+| `record-kind.probe` | `1` | DERIVED, the same way |
+
+The builder copies each `fields` value from the `loop: record-version` line `loop_items.py check`
+prints once the kind rows land.
 
 The `[[computed-witness]]` row `probe-rerun` of `tools/loop/loop.toml` switches its `serves` from
 `none` to `item.probe.run`, whose witness class is `history`, a class
@@ -232,40 +287,50 @@ The `[[computed-witness]]` row `probe-rerun` of `tools/loop/loop.toml` switches 
 |---|---|
 | `point` | `--at` is not in `probe.points` |
 | `owner` | `probe.raise` is `off` |
-| `observation` | `--at` is not the position `probe.observations` admits |
+| `observation` | `--at` is not the position `probe.observations` admits, and at every position under `on-request` |
 | `raised` | `probe.raise` is `owner-only` or `off` |
 | `reproduction` | never; a patch build's red-first reproduction (`cl-dClosedLoop-0408`) |
 
 ### The records
 
+Each record is written as `tools/memory-tree/build_records.py#write_record` writes one: a
+`# <unit> <kind> <n> — <title>` head, the `**Serves:**` line, then each field as a `- **Key:** value`
+bullet, the shape `build_records.py#FIELD` reads, then the lines after one blank line. The title is
+`<cause> from <asker>` for a trigger and `<kind> for <asker>` for a probe. A run line is written bare,
+`run · <exit> · <hash> · <command>`, the shape `build_records.py#RUN_LINE` reads.
+
 ```
+# TOOL-dExample-2 probe-trigger 1 — observation from item.entry.place
+
 **Serves:** probe-trigger TOOL-dExample-2
 
-**Cause:** observation
-**Asker:** item.entry.place
-**Subject:** the owner reports the card drops its route after a compaction
-**At:** item.entry.place
-**Key:** 3f9c2a71d0e4
+- **Cause:** observation
+- **Asker:** item.entry.place
+- **Subject:** the owner reports the card drops its route after a compaction
+- **At:** item.entry.place
+- **Key:** 3f9c2a71d0e4
 ```
 
 ```
+# TOOL-dExample-2 probe 1 — reproduction for item.entry.place
+
 **Serves:** probe TOOL-dExample-2
 
-**Sha:** 3f9c2a71
-**Kind:** reproduction
-**Question:** does a compaction drop the card's route?
-**Losing:** the replayed card keeps its ## route
-**Asker:** item.entry.place
-**Trigger:** 2026-10-25-build-TOOL-dExample-2-probe-trigger-1
-**Verdict:** confirmed
-**Judged:** computed
-**Writer:** stand-in
+- **Sha:** 3f9c2a71
+- **Kind:** reproduction
+- **Question:** does a compaction drop the card's route?
+- **Losing:** the replayed card keeps its route section
+- **Asker:** item.entry.place
+- **Trigger:** 2026-10-25-build-TOOL-dExample-2-probe-trigger-1
+- **Verdict:** confirmed
+- **Judged:** computed
+- **Writer:** stand-in
 
 ## Method
 
 - method · 1:9c0e5a1b2f33 · bash replay-case.sh
 
-- run · 1 · 9c0e5a1b2f33 · bash replay-case.sh
+run · 1 · 9c0e5a1b2f33 · bash replay-case.sh
 ```
 
 ### Inventory
@@ -275,6 +340,7 @@ The `[[computed-witness]]` row `probe-rerun` of `tools/loop/loop.toml` switches 
 | `tools/loop/probe.py` | module | none declared for files |
 | `trigger`, `pin`, `design`, `run`, `judge`, `return`, `points` | verbs of `probe.py` | none |
 | `--probe`, `--cmd`, `--expect`, `--mark` | flags of `design`, as `run`, `loop_witness.py rerun` and `build_records.py` spell them | none declared for flags |
+| `--cause`, `--asker`, `--subject`, `--build`, `--unit`, `--request`, `--at` | flags of `trigger`, `--build` and `--unit` as `build_records.py` spells them | none declared for flags |
 | `--selftest` | flag of `probe.py`, as `request.py` spells it | none declared for flags |
 | `read_trigger_causes`, `check_probe_outcomes` | functions | `py.function`, OK |
 | `PROGRAM_SEGMENTS` | constant | none declared |
@@ -315,7 +381,6 @@ pass; `TOOL-dPlacedRequest-34` S38 is the final re-check only.
 - `tools/govkit/registry.toml`
 - `tools/govkit/subject-pins.tsv`
 - `tools/run-gates/selftest-budgets.txt`
-- `tools/run-gates/ceiling-evidence.txt`
 - `memory/map/features/loop.md`
 - `help/loop.md`
 - `memory/map/generated/`
@@ -347,17 +412,23 @@ pass; `TOOL-dPlacedRequest-34` S38 is the final re-check only.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python loop_lib.py --check` runs over the tree, it passes with the eight
-  `item.probe.*` rows at `step = "none"` and the five `[[stand-in]]` rows of S2, and the plant
-  `probe-step` with an `item.plan.x` row at `step = "none"` exits 1 naming it.
-  Red when: a probe row is refused for its step, or the admission widens past the two segments.
+  `item.probe.*` rows at `step = "none"`, each carrying the `owner` of §4's table, and the plant
+  `probe-step` with an `item.plan.x` row at `step = "none"` exits 1 naming it; and
+  `python loop_table.py check`, run in the loop kit's directory, exits 0 and prints no
+  `stand-in item.probe.` line.
+  Red when: a probe row is refused for its step, the admission widens past the two segments, or a
+  `[[stand-in]]` row names a probe item, which the stand-in arm refuses as stale.
 - **AC2** — When `python probe.py --fixture --plant trigger-causes` runs `trigger --cause hunch`, it
-  exits 2 naming the five causes `read_trigger_causes("probe")` returns, and `trigger --cause owner`
-  writes one `probe-trigger` record.
-  Red when: a cause outside the rows opens a probe, or the set is typed in `probe.py`.
-- **AC3** — When the plants `raise-owner-only`, `raise-off`, `points-unlisted` and
-  `observation-at-plan` run their refused cause, each prints `probe — not opened` naming its key and
-  `git status --porcelain` prints nothing; each value's admitted case opens.
-  Red when: a key's value does not move what opens.
+  exits 2 naming the five causes `read_trigger_causes("probe")` returns, `trigger --cause owner
+  --build <slug> --unit TOOL-dExample-2` writes one `probe-trigger` record named
+  `<date>-build-TOOL-dExample-2-probe-trigger-1.md`, and the same call without `--unit` exits 2.
+  Red when: a cause outside the rows opens a probe, the set is typed in `probe.py`, or a build-folder
+  record is written with no unit id.
+- **AC3** — When the plants `raise-owner-only`, `raise-off`, `points-unlisted`,
+  `observation-at-plan` and `observation-on-request` run their refused cause, each prints
+  `probe — not opened` naming its key and ending `· to <asker>`, and `git status --porcelain` prints
+  nothing; each value's admitted case opens, and under `on-request` the `--cause owner` case opens.
+  Red when: a key's value does not move what opens, or `on-request` admits an observation.
 - **AC4** — When the plant `pin` pins a verification, `git log -1 --format=%s` in the fixture reads
   `probe pin(item.entry.place): verification` and that commit holds the record's `Losing` field while
   no `run` line exists yet; an unresolvable `--sha` exits 2. Pinned from the `entry-time` plant's
@@ -389,10 +460,15 @@ pass; `TOOL-dPlacedRequest-34` S38 is the final re-check only.
   `probe — joined` and adds its `Subject` line to that record, and the first trigger again exits 1 as
   already opened.
   Red when: an entry-time probe mints an id or writes into a build folder.
-- **AC9** — When the plant `role-no-probe` removes `probe` from one role item's outcomes,
-  `loop_lib.py --check` exits 1 naming the item, and over the tree every role item with a listed
-  outcome set routes `probe` to `item.probe.trigger`.
-  Red when: a role item cannot ask for a test.
+- **AC9** — When `python loop_lib.py --fixture --plant role-no-probe` removes `probe` from one role
+  item's outcomes, it exits 1 naming the item, and the plant `probe-self`, giving
+  `item.probe.design` the outcome, exits 1 naming that item. Over the tree, every role item with a
+  listed outcome set, `item.probe.design`, `item.probe.experiment` and `item.probe.judge-claimed`
+  excepted, routes `probe` to the probe tool's stand-in target S8 names; `python loop_table.py check` exits 0
+  with no cross-step route refused, and `python termination.py check`, both run in the loop kit's
+  directory, exits 0 naming no counted cycle through a probe item.
+  Red when: a role item cannot ask for a test, a probe item asks for a probe of itself, or the
+  `probe` route crosses a step.
 - **AC10** — When `python -c "import tomllib, sys; print(sorted(r['name'] for r in tomllib.load(open(sys.argv[1], 'rb'))['key'] if r['name'].startswith('probe.')))" catalogue.toml`
   runs in the policy kit's directory, it prints `probe.experiment.authority`, `probe.observations`,
   `probe.points` and `probe.raise`, and the same read of the `probe.points` row prints its `allowed`
@@ -433,7 +509,7 @@ pass; `TOOL-dPlacedRequest-34` S38 is the final re-check only.
 
 New arm: tools/loop/probe.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC14 · the `loop probe fixtures` leg running `probe.py --selftest` over every case, its failing case staged by `run-refuted` against a predicted `confirmed` · none
 
-New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step` and `role-no-probe` cases under the `loop definition` leg, the failing case staged by `role-no-probe` · none
+New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step`, `role-no-probe` and `probe-self` cases under the `loop definition` leg, the failing case staged by `role-no-probe` · none
 
 ## 8. Open questions
 
@@ -486,6 +562,45 @@ New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step` and `role-
   carried item order stands (design after pin, predicting at the pinned SHA), and refusing once the
   record holds a run line still puts every prediction before any output exists. widens: none ·
   relaxes: none
+- **F10 — F-stand-in: where do the unbuilt parts' stand-ins live, when the stand-in table holds row
+  items alone?** Options: (a) no `[[stand-in]]` row; each unbuilt part rides its item's own `owner`
+  field and a `stand-in:{prefix}/<home>/<file>` route where its work leaves the program, an item
+  whose unbuilt part is its actor keeping declared-item routes with its stand-in the `probe.py` verb
+  that does the work; (b) the five rows kept, each with a `[[transition]]` row minted so the stand-in
+  arm reads it as a row item, a move no level of the tables makes. Recommendation: (a). RESOLVED
+  (agent, 2026-11-20, delegated): (a), rung 3; the stand-in table is one row per row item by its own
+  grammar, and the probe items are no row items. widens: none · relaxes: none
+- **F11 — F-route: where does a role item's `probe` outcome route?** Options: (a) to
+  `stand-in:{prefix}/loop/probe.py`, so no route crosses a step and the route join owes no build row;
+  (b) to `item.probe.trigger` with an `[[owed-row]]` per role item, a row no unit or build writes.
+  Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; a gov-step item routing
+  into a program at no step is a cross-step route, and the stand-in target is the form the loop's
+  grammar gives a route into a tool. The entry rows of TOOL-dPlacedRequest-3 spell the same target
+  `item.probe.trigger` in that unit's own spec, which this pass does not edit. widens: none · relaxes:
+  none
+- **F12 — F-cycle: do the probe program's own role items carry `probe`?** Options: (a) no; S8 and
+  AC9 exclude them by name and `check_probe_outcomes` refuses the outcome on an `item.probe.*` row;
+  (b) yes, each route set aside from the counted check by a pending `cycle` row. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; a probe never asks for a probe of itself, so
+  no counted cycle is formed. widens: none · relaxes: none
+- **F13 — F-targets: how are the routes to the asker spelled?** Options: (a) `not-opened` and
+  `returned` route to `stand-in:{prefix}/loop/probe.py`, the line `probe.py` prints naming the asker,
+  re-entered as its own next item; the owner item is spelled `stand-in:{prefix}/unattended/unattended.sh`,
+  as the review program's rows spell it, rev-8's spelling lacking the install prefix
+  `ROUTE_STAND_IN` requires; (b) a new route word for the asker, which `check_program` would have to
+  admit. Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; the asker is a
+  runtime value no static target can name, and the tool that knows it prints it. widens: none ·
+  relaxes: none
+- **F14 — F-unit: where does a build-folder record's unit id come from?** Options: (a) `trigger`
+  takes `--unit <id>` beside `--build`; (b) `trigger` derives the unit from the build's live spec,
+  a guess when more than one is INPROGRESS. Recommendation: (a). RESOLVED (agent, 2026-11-20,
+  delegated): (a), rung 3; `write_record` names the record's file by its unit id, and the caller
+  that knows the unit says it. widens: none · relaxes: none
+- **F15 — F-observation: what admits an observation under `probe.observations=on-request`?**
+  Options: (a) nothing; the cause is refused at every position, and the owner opens a probe with
+  `--cause owner`; (b) a new request flag on `trigger`. Recommendation: (a). RESOLVED (agent,
+  2026-11-20, delegated): (a), rung 3; the owner's own cause already carries the owner's request,
+  so no flag is minted. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -521,11 +636,19 @@ New arm: tools/loop/loop_lib.py · covers AC1 AC9 · the `probe-step` and `role-
   re-grounded; the leg runs `probe.py --selftest`, with registry and budget rows. F9, the freeze
   point on which the F5 ruling and the carried item order disagreed, is resolved by the main loop's
   ruling as (a).
+- rev-9 · 2026-11-20 · §2 S2, S3, S6, S8, S9, S10 · §3 Edges · §4 · §6 AC1, AC2, AC3, AC9 · §7 · §8
+  F10 to F15 · §10 · folds the brief `2026-11-20-prompt-TOOL-dPlacedRequest-7-divergence-2-brief`,
+  the main loop's rulings on the builder's second DIVERGENCE in run `wf_1b6a10b9-c12`, as F10 to F15:
+  no stand-in rows, the `probe` route and the asker routes to the probe tool, no `probe` on the
+  program's own items, `--unit` on `trigger`, no observation under `on-request`. The records take
+  `write_record`'s head and bullet shape, the leg's rows are those `loop request fixtures` holds with
+  the generated ceiling file dropped, and the two `[[record-version]]` rows are named.
 
 ## 10. Reuse audit
 
-The seams extended are the item rows and their program check (TOOL-dDeclaredLoop-12, -50 S3), the
-stand-in table (TOOL-dDeclaredLoop-13), the re-run primitive `loop_witness.py rerun`
+The seams extended are the item rows and their program check (TOOL-dDeclaredLoop-12, -50 S3),
+their `owner` field and stand-in routes, the `[[record-version]]` table by two rows
+(TOOL-dDeclaredLoop-24), the record writer `build_records.py#write_record`, the re-run primitive `loop_witness.py rerun`
 (TOOL-dDeclaredLoop-17 S4), whose §3 names `probe.run` and `probe.judge` as this build's, the
 trigger verb's shape (TOOL-dDeclaredLoop-20 S2), `read_tag_policy` (TOOL-dDeclaredLoop-26 S6) for
 `probe.points` in `review.breakpoints`' grammar, and the record factory (PLAY-dOrderedCharter-7 S7)
