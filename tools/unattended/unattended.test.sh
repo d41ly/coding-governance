@@ -19353,6 +19353,50 @@ fi   # ---- region 8 continues below: one compound block past about 3000 command
 if in_shard 8; then
 
 # ==================================================================================================
+# TOOL-dPlacedRequest-96 — A FOREIGN STALE LEASE IS TAKEN OVER AGAIN. Over the observer clock's fixture
+# above: a build lease written by another session and first sighted 25 h ago, past the catalogue's 24 h
+# `leases.expiry-hours`, is refused to a second session's acquire with the stale hint, and that
+# session's take-over takes it at the epoch plus one, announced. The static arm joins every `CW_*`
+# name the lease verbs read, one `grep -o` over the bodies of `run_lease_verb` and `write_fence_beat`,
+# to an assignment inside `check_claim_writable` outside the reset block at its head, that block read
+# by content: every line after the `local` lines whose every statement is a bare `CW_<NAME>=`
+# assignment, up to the first that is not. Waived by README rule 8 with the rest of this suite; its
+# RED-first reading, against the lease column at 95c3103ad that lacks the stale row, is the close's.
+# WHAT THIS BLOCK DOES NOT DRIVE: the entry claim's route over a stale lease, TOOL-dPlacedRequest-100's,
+# and a name assigned only on a row no lease act reaches, which the static join counts as assigned.
+# ==================================================================================================
+remove_clock_refs
+oc_a=$(add_lease_commit 1 yes "$(derive_claim_ago 90000)"); git --git-dir="$LF/origin.git" update-ref "$OC_REF" "$oc_a"
+add_claim_sighting "$LF/c1" "$OC_REF" "$OC_TREE" "$oc_a" "$(derive_claim_ago 90000)"
+oc_row=$(read_clock_row)
+same "DPR96 AC1 a build lease first seen 25 h ago reads stale" "${oc_row%% *}" "stale"
+fs_out=$(LA_SID=s2 run_lease_arm acquire build tOc); fs_rc=$?
+same "DPR96 AC1 a second session's acquire of it exits 1" "$fs_rc" "1"
+hit  "$fs_out" "lease refused — live-holder · tOc/build"
+hit  "$fs_out" "stale, so --lease take-over takes it"
+fs_out=$(LA_SID=s2 run_lease_arm take-over build tOc); fs_rc=$?
+same "DPR96 AC1 ...and its take-over exits 0, the epoch one above the planted 1" "$fs_rc $(read_lease_field tOc/build epoch)" "0 2"
+hit  "$fs_out" "lease — tOc/build · take-announced · epoch 2"
+hit  "$fs_out" "unattended: claim taken over — tOc"
+fs_read=$(sed -n '/^run_lease_verb() {/,/^}/p; /^write_fence_beat() {/,/^}/p' "$SCRIPT" | grep -o 'CW_[A-Z_]*' | sort -u)
+fs_cut=$(sed -n '/^check_claim_writable() {/,/^}/p' "$SCRIPT" | awk '
+  NR == 1 { next }
+  !h && /^[ \t]*local / { next }
+  !h { n = split($0, s, ";"); r = 1
+       for (i = 1; i <= n; i++) { x = s[i]; gsub(/^[ \t]+|[ \t]+$/, "", x); if (x != "" && x !~ /^CW_[A-Z_]+=/) r = 0 }
+       if (r) { print "RESET\t" $0; next }
+       h = 1 }
+  { print }')
+fs_set=$(grep -v $'^RESET\t' <<<"$fs_cut" | grep -o 'CW_[A-Z_]*=' | sort -u)
+fs_miss=""
+for fs_w in $fs_read; do grep -qx "$fs_w=" <<<"$fs_set" || fs_miss="$fs_miss$fs_w "; done
+same "DPR96 every CW_* name the lease verbs read is assigned in check_claim_writable past its reset block" "$fs_miss" ""
+same "DPR96 ...a join over a read set holding CW_HINT and a reset block that sets it" \
+  "$(grep -cx CW_HINT <<<"$fs_read") $(grep $'^RESET\t' <<<"$fs_cut" | grep -c 'CW_HINT=')" "1 1"
+fi   # ---- region 8 continues below, past a seam of its own for the block above
+if in_shard 8; then
+
+# ==================================================================================================
 # TOOL-dPlacedRequest-26 — THE WALK STOPS AT THE HOLDER'S TENURE. Over the observer clock's fixture
 # above, each chain an epoch-1 `renews: yes` commit first seen 26 h ago beneath an epoch-2 tenure: a
 # take-over is aged from its own opener, never from the earlier holder's beat, and a tenure with no
@@ -23673,7 +23717,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # per pass of the `DPR59 AC7` rows' loop, off the diff's own lines; the renews loop's two new tips
 # gain passes, not assertions, and the restaged copies' rows are rewritten, not added; no skip
 # branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4044
+# RAISED 4044 -> 4053 by TOOL-dPlacedRequest-96: the stale take-over's 9 region-eight assertions off
+# the diff's own lines, 3 `same` and 4 `hit` for the probe arm and 2 `same` for the static CW_* join,
+# no loop over an assertion and no skip branch. No suite ran, and its RED-first observation is the close's.
+FLOOR_ASSERTIONS=4053
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -23954,7 +24001,8 @@ FLOOR_SHARD_7=311
 # RAISED 1250 -> 1256 by TOOL-dPlacedRequest-56: the same 6 region-eight torn-stamp and duplicate-key assertions, see FLOOR_ASSERTIONS.
 # RAISED 1256 -> 1257 by TOOL-dPlacedRequest-58: the same 1 region-eight placed-race reset assertion, see FLOOR_ASSERTIONS.
 # RAISED 1257 -> 1263 by TOOL-dPlacedRequest-59: the same 6 region-eight claim-line reader assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_8=1263
+# RAISED 1263 -> 1272 by TOOL-dPlacedRequest-96: the same 9 region-eight stale take-over assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_8=1272
 # MERGED with local main's reconcile (a30f4589), which raised the unsharded region two's floor by
 # aMendedFleet's 28 arms (2350 -> 2378). Those arms now fall inside regions 2 to 8 and are not
 # re-apportioned here: each shard floor above is a MINIMUM, so arms added on top of it cannot red it.

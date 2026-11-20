@@ -2910,6 +2910,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     lease:mine) case "$la" in release) CW_ACT=write ;; *) CW_ACT=renew ;; esac ;;
     lease:same) case "$la" in take-over) CW_ACT=take ;; release) CW_ACT=write ;; *) CW_ACT=rewrite ;; esac ;;
     lease:foreign-released) case "$la" in acquire|take-over|draw) CW_ACT=take ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:foreign-stale) case "$la" in take-over) CW_ACT=take-announced ;; acquire) CW_CAUSE=live-holder; CW_HINT=take-over; return 1 ;; *) CW_CAUSE=live-holder; return 1 ;; esac ;;
     # THE DRAW (S4): `--for draw` takes a tombstone, and a draw's hold once its renewing beat is stale by
     # `check_deadline_passed` over `leases.expiry-hours` (its F6); a beat writing `renews: -`, one the
     # feed has not sighted or a refused bound keeps the hold `live-holder`. Every other act is refused.
