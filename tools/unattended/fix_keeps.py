@@ -511,12 +511,12 @@ def check_fixture_plant(plant, root, bad):
         print("%s: %s · unarmed · %s" % (SAY, plant, scan_bash(str(driver))[2]))
         return 2
 
-    def drive(*argv):
+    def run_driver(*argv):
         return run_plant_driver(bash, driver, repo, *argv)
 
     # a FIRST preflight refuses a carried branch, so local main stands at HEAD for that call alone
     run_fixture_git(repo, "update-ref", "refs/heads/main", "HEAD")
-    rc, said = drive("--preflight", "tFix", "--keepalive-id", "k1")
+    rc, said = run_driver("--preflight", "tFix", "--keepalive-id", "k1")
     run_fixture_git(repo, "update-ref", "refs/heads/main", base)
     if rc != 0:
         bad.append("--preflight exited %d: %s" % (rc, said[-600:]))
@@ -531,7 +531,7 @@ def check_fixture_plant(plant, root, bad):
         red, needles = ((leg, ("UNATTENDED check 49 FAILED", FX_SUITE, "gov-tester", "spec-wrong", "feature.fx"))
                         if plant == "writes-test-file" else ("leg:nope", ("UNATTENDED check 49 FAILED", "nope")))
         writes = FX_SUITE if plant == "writes-test-file" else FX_PRODUCT
-        rc, said = drive(*dispatch, "--writes", writes, "--fix-of", red)
+        rc, said = run_driver(*dispatch, "--writes", writes, "--fix-of", red)
         if rc == 0 or not all(n in said for n in needles):
             bad.append("--dispatch --fix-of %s --writes %s exited %d, not non-zero printing %s" % (
                 red, writes, rc, " and ".join(needles)))
@@ -539,7 +539,7 @@ def check_fixture_plant(plant, root, bad):
             bad.append("the refused dispatch changed %s, so it recorded something" % FX_RUN)
         return None
     if plant in ("writes-product", "commit-test-file"):
-        rc, said = drive(*dispatch, "--writes", FX_PRODUCT, "--fix-of", leg)
+        rc, said = run_driver(*dispatch, "--writes", FX_PRODUCT, "--fix-of", leg)
         rows = read_run_rows(repo, "fix-of")
         if rc != 0 or "dispatch declared" not in said:
             bad.append("--dispatch --fix-of %s --writes %s exited %d, not 0 declaring it" % (leg, FX_PRODUCT, rc))
@@ -552,12 +552,12 @@ def check_fixture_plant(plant, root, bad):
         write_fixture_files(root, {"msg.txt": "fix(tFix): %s, the product fixed\n\nPass: %s\n" % (FX_UNIT, FX_UNIT)})
         write_fixture_files(repo, {FX_PRODUCT: "#!/usr/bin/env bash\n[ -f \"$1\" ] && echo ok && exit 0\n"})
         run_fixture_git(repo, "add", "--", FX_PRODUCT)
-        rc, said = drive("--check-commit", str(msg))
+        rc, said = run_driver("--check-commit", str(msg))
         if rc != 0:
             bad.append("--check-commit refused the product file alone, exit %d" % rc)
         write_fixture_files(repo, {FX_SUITE: "#!/usr/bin/env bash\nexit 0\n"})
         run_fixture_git(repo, "add", "--", FX_SUITE)
-        rc, said = drive("--check-commit", str(msg))
+        rc, said = run_driver("--check-commit", str(msg))
         needles = ("UNATTENDED check 49 FAILED", FX_SUITE, "gov-tester", "spec-wrong")
         if rc == 0 or not all(n in said for n in needles):
             bad.append("--check-commit with %s staged exited %d, not non-zero printing %s" % (
@@ -571,10 +571,10 @@ def check_fixture_plant(plant, root, bad):
     if p.returncode != 0 or p.stdout.split() != [FX_FIXTURE]:
         bad.append("--keeps acceptance exited %d printing [%s], not 0 printing %s alone" % (
             p.returncode, " ".join(p.stdout.split()), FX_FIXTURE))
-    rc, said = drive(*dispatch, "--writes", FX_FIXTURE, "--fix-of", "acceptance")
+    rc, said = run_driver(*dispatch, "--writes", FX_FIXTURE, "--fix-of", "acceptance")
     if rc == 0 or "UNATTENDED check 49 FAILED" not in said or FX_FIXTURE not in said:
         bad.append("--dispatch --fix-of acceptance --writes %s exited %d, not non-zero naming it" % (FX_FIXTURE, rc))
-    rc, said = drive(*dispatch, "--writes", FX_PRODUCT, "--fix-of", "acceptance")
+    rc, said = run_driver(*dispatch, "--writes", FX_PRODUCT, "--fix-of", "acceptance")
     if rc != 0 or len(read_run_rows(repo, "fix-of")) != 1:
         bad.append("--dispatch --fix-of acceptance --writes %s exited %d, not 0 with one fix-of row" % (FX_PRODUCT, rc))
     return None
