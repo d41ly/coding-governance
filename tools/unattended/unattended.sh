@@ -10738,7 +10738,7 @@ read_roster_family() { # slug -> the first family of the build README's front-ma
 # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
 # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
 # file is not a backup.
-write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
+write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 or empty · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
   local bl=$1 slug=$2 id=$3 what=$4 at8=$5 sev=${9:-HIGH} prior="" had=0 restored rc=0
   if [ -f "$bl" ]; then
     had=1
@@ -10750,7 +10750,7 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
   fi
   mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$6" "$7" "$8" && GIT add -- "$bl" 2>/dev/null
   if read_ask_back "$id" "$slug" "$sev"; then
-    echo "gates-green: filed ask $id for $what red at $at8, $sev, staged in $bl"
+    echo "gates-green: filed ask $id for $what${at8:+ red at $at8}, $sev, staged in $bl"
     case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
   else
     rc=1
@@ -10945,9 +10945,58 @@ print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:
 ' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
 }
 
+# TOOL-dWitnessedBar-8 S8 - THE LEG ASK, extracted from `write_held_asks` at its second instance, the
+# held flaky leg `gates-green` files on a red bar's `hold` line. The summary is `<form> <leg> <ask text>`.
+# REUSE FIRST, across every tracked BACKLOG.md: an OPEN ask of that SEV whose summary opens `<form> <leg> `
+# and the ask text's first word, so a leg whose name another extends (`recall floor arms`, `recall
+# floor`) is never taken for it. Else the id is minted in the build's roster family and the ask, SEV
+# and KEEP rows are written and read back through `write_ask_rows`, the two reasons their text, and the
+# views rendered. With ASKS_CMD blank nothing is written and the rows it would have filed are printed.
+# WHAT IT DOES NOT CHECK: that the leg is a leg of the bar, or that the text is true: the caller's.
+write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP reason -> 0 filed or reused, 1 not; one line each
+  local slug=$1 leg=$2 form=$3 text=$4 sev=$5 bl f home cand fam id a s k at8=""
+  bl="$M/builds/$slug/BACKLOG.md"
+  if [ -n "${ASKS_CMD:-}" ]; then
+    for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
+      [ -f "$f" ] || continue
+      home=${f%/BACKLOG.md}; home=${home##*/}
+      while IFS= read -r cand; do
+        [ -n "$cand" ] || continue
+        if read_ask_back "$cand" "$home" "$sev"; then
+          echo "gates-green: ask $cand already OPEN $sev for ${form#*: } $leg in $f · reused"; return 0
+        fi
+      done < <(WLA_KEY="$form $leg ${text%% *} " awk '
+                 /^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed [^ ]+ · / {
+                   r = $0; sub(/^- [^ ]+ · filed [^ ]+ · /, "", r)
+                   if (substr(r, 1, length(ENVIRON["WLA_KEY"])) == ENVIRON["WLA_KEY"]) print $2
+                 }' "$f" 2>/dev/null)
+    done
+  fi
+  fam=$(read_roster_family "$slug")
+  if [ -z "$fam" ]; then
+    echo "gates-green: no ask filed for ${form#*: } $leg — the build README names no roster family, so there is no family to mint the id in"
+    return 1
+  fi
+  id="$fam-$slug-$(derive_ask_seq "$fam" "$slug")"
+  a="- $id · filed $(date -u +%Y-%m-%d) · $form $leg $text"
+  s="- SEV · $id · $sev · $6"
+  k="- KEEP · $id · $7"
+  if [ -z "${ASKS_CMD:-}" ]; then
+    echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
+    printf '    %s\n' "$a" "$s" "$k"
+    return 1
+  fi
+  # The read-back line names where the red was seen, which a held suite's text opens with.
+  case "$text" in "red at "*) at8=${text#red at }; at8=${at8%% *} ;; esac
+  write_ask_rows "$bl" "$slug" "$id" "${form#*: } $leg" "$at8" "$a" "$s" "$k" "$sev" || return 1
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
 write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
-  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8 bl f home cand reused fam seq id
-  local argv file tok seen a s k today filed=0
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8
+  local argv file tok seen
   local -a rows=()
   if [ -z "$r" ]; then
     echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
@@ -10969,8 +11018,6 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
       ?*) echo "gates-green: $line" ;;
     esac
   done < <(read_held_reds "${AURL:-}" "$wf")
-  bl="$M/builds/$slug/BACKLOG.md"
-  today=$(date -u +%Y-%m-%d)
   for line in "${rows[@]}"; do
     IFS=$'\t' read -r _ suite sha run concl <<< "$line"
     case "$concl" in failure|timed_out) ;; *) continue ;; esac
@@ -10988,27 +11035,6 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
       echo "gates-green: no ask filed for held suite $suite — its head sha $sha is not an ancestor of R $r8 here, so the red is not proven on the default branch"
       continue
     fi
-    reused=""
-    if [ -n "${ASKS_CMD:-}" ]; then
-      for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
-        [ -f "$f" ] || continue
-        home=${f%/BACKLOG.md}; home=${home##*/}
-        while IFS= read -r cand; do
-          [ -n "$cand" ] || continue
-          if read_ask_back "$cand" "$home" HIGH; then
-            echo "gates-green: ask $cand already OPEN HIGH for held suite $suite in $f · reused"; reused=1; break
-          fi
-        done < <(grep -F -- "held red: suite $suite red at " "$f" 2>/dev/null \
-                   | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
-        [ -z "$reused" ] || break
-      done
-    fi
-    [ -z "$reused" ] || continue
-    fam=$(read_roster_family "$slug")
-    if [ -z "$fam" ]; then
-      echo "gates-green: no ask filed for held suite $suite — the build README names no roster family, so there is no family to mint the id in"
-      continue
-    fi
     # THE LOCATOR: the suite's own script at that sha when the leg manifest the bar's header names
     # resolves it there, else the workflow file at that sha, which is where the suite's job is defined.
     if argv=$(read_leg_argv "$d" "$sha" "$suite") && [ -n "$argv" ]; then
@@ -11019,21 +11045,12 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     else
       seen="seen \`.github/workflows/$wf\`@$sha8"
     fi
-    seq=$(derive_ask_seq "$fam" "$slug")
-    id="$fam-$slug-$seq"
-    a="- $id · filed $today · held red: suite $suite red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip"
-    s="- SEV · $id · HIGH · a held self-test is red on the default branch's daily job"
-    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
-    if [ -z "${ASKS_CMD:-}" ]; then
-      echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
-      printf '    %s\n' "$a" "$s" "$k"
-      continue
-    fi
-    write_ask_rows "$bl" "$slug" "$id" "held suite $suite" "$sha8" "$a" "$s" "$k" && filed=$((filed + 1))
+    # THE ONE LEG ASK (TOOL-dWitnessedBar-8 S8): reuse, mint, rows, read-back and views are its.
+    write_leg_ask "$slug" "$suite" "held red: suite" \
+      "red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip" \
+      HIGH "a held self-test is red on the default branch's daily job" \
+      "filed by an unattended run for the owning build; outside this build's goal" || :
   done
-  [ "$filed" -gt 0 ] || return 0
-  write_ask_views "$filed" || :
-  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
   return 0
 }
 
@@ -11166,28 +11183,41 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 # WHAT IT DOES NOT CHECK: the records' content, which is the keep verb's; a miss here never moves the
 # item, it is named and the close goes on.
 write_leg_tails() { # slug · the bar's pinned run id
-  local py="" d="" kr _lt_line _lt_rel
-  derive_review_signals "$1" build
+  run_leg_records "$1" keep_tails.py leg-tail --run "$2"
+  return 0
+}
+
+# TOOL-dWitnessedBar-8 S6 - ONE RUN-AND-STAGE for a run-gates verb that writes build records, extracted
+# from `write_leg_tails` at its second instance, `verdict_flow.py flakes`. The verb runs bounded under the
+# build's record anchor, `--build <slug> --unit <anchor>` appended to its arguments; every line it prints
+# is echoed, and each `<say>: wrote <path>` line's path is staged so it commits with the close's records.
+# RB_OUT holds what it printed for a caller that reads more of it. A miss is named and returns 1; it
+# never moves the item.
+run_leg_records() { # slug · the run-gates script · the record kind it writes · its arguments… -> 0 ran, 1 not run
+  local slug=$1 script=$2 kind=$3 py="" d="" kr _lt_line _lt_rel
+  shift 3
+  derive_review_signals "$slug" build
   if [ -z "$_rs_anchor" ]; then
-    echo "unattended: gates-green — no leg-tail record written: the build's generated units region names no unit to anchor it"
-    return 0
+    echo "unattended: gates-green — no $kind record written: the build's generated units region names no unit to anchor it"
+    return 1
   fi
   kr=$KIT_DIR
   while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
   if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
-     || ! d=$(resolve_kit_dir "$py" run-gates keep_tails.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
-    echo "unattended: gates-green — no leg-tail record written: no python launcher, or the run-gates kit's keep_tails.py does not resolve beside this kit"
-    return 0
+     || ! d=$(resolve_kit_dir "$py" run-gates "$script" "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: gates-green — no $kind record written: no python launcher, or the run-gates kit's $script does not resolve beside this kit"
+    return 1
   fi
-  RB_BOUND=120 run_bounded "$py" -B "${kr:-.}/$d/keep_tails.py" --run "$2" --build "$1" --unit "$_rs_anchor"
+  RB_BOUND=120 run_bounded "$py" -B "${kr:-.}/$d/$script" "$@" --build "$slug" --unit "$_rs_anchor"
   while IFS= read -r _lt_line; do
     _lt_line=${_lt_line%$'\r'}
     [ -n "$_lt_line" ] || continue
     echo "unattended: gates-green — $_lt_line"
     case "$_lt_line" in
-      "keep-tails: wrote "*)
-        _lt_rel=${_lt_line#keep-tails: wrote }; _lt_rel=${_lt_rel%% *}
-        stage_runmd "$_lt_rel" || echo "unattended: gates-green — the leg-tail record git could not stage: $_lt_rel" ;;
+      [a-z]*": wrote "*)
+        case "${_lt_line%%: wrote *}" in *[!a-z-]*) continue ;; esac
+        _lt_rel=${_lt_line#*: wrote }; _lt_rel=${_lt_rel%% *}
+        stage_runmd "$_lt_rel" || echo "unattended: gates-green — the $kind record git could not stage: $_lt_rel" ;;
     esac
   done <<<"$RB_OUT"
   return 0
@@ -11959,7 +11989,7 @@ dod_met() { # slug · run-state file · item · checker
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
-      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
+      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok _gfl _gfr _gfleg _gff
       local -a _genv _grb _gfrom
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -12010,7 +12040,9 @@ dod_met() { # slug · run-state file · item · checker
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
         # TOOL-dWitnessedBar-25 S2 - the bar's cause, this run, in the runner's verdict.
-        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_VERDICT_BLOCKS="$GP_POLICY")
+        # TOOL-dWitnessedBar-8 S1 - and each red leg re-run once on the same tree, which moves no verdict
+        # and lets `verdict_flow.py route` and `flakes` read a red-then-green leg from the run record.
+        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_VERDICT_BLOCKS="$GP_POLICY" GATE_RERUN=1)
         [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
         [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
         # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
@@ -12202,6 +12234,31 @@ dod_met() { # slug · run-state file · item · checker
           # TOOL-dWitnessedBar-3 S6 - every red bar read here is ROUTED first, its routing record
           # written beside the attribution, each route printed.
           run_verdict_route "$_gdir"
+          # TOOL-dWitnessedBar-8 S6 - AND ITS FLAKES, beside the route: `verdict_flow.py flakes` reads
+          # `verdict.flakes` itself, writes the run's flake record, staged by `run_leg_records`, and under
+          # `quarantine` prints one `hold  <leg>  <flakes>/<window>  <record ids>` line per leg to hold,
+          # each filed as the held-flaky-leg ask through `write_leg_ask`, reused while one is OPEN for
+          # that leg. The OPEN ask is the hold: the selection's `quarantine` row reads it at R. A BARE
+          # STATEMENT with the bar's capture put back after it, as the held asks'; a miss never moves it.
+          if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+            _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+            if run_leg_records "$slug" verdict_flow.py flake flakes --run "$_gdir"; then
+              while IFS= read -r _gfl; do
+                _gfl=${_gfl%$'\r'}
+                case "$_gfl" in "hold  "*) ;; *) continue ;; esac
+                _gfr=${_gfl#hold  }; _gfleg=${_gfr%%  *}; _gfr=${_gfr#*  }; _gff=${_gfr%%  *}; _gfr=${_gfr#*  }
+                case "$_gff" in
+                  [0-9]*/[0-9]*) ;;
+                  *) echo "unattended: gates-green — no held-flaky-leg ask filed: the line is not hold  <leg>  <flakes>/<window>  <record ids>: $_gfl"; continue ;;
+                esac
+                write_leg_ask "$slug" "$_gfleg" "held flaky leg: leg" \
+                  "flaked ${_gff%/*} in its last ${_gff#*/} verdicts · seen $_gfr · accept the leg is released after its streak, or its flake is fixed" \
+                  MED "a merge-bar leg flaked at the entry threshold and is held from the bar until its ask closes" \
+                  "filed under verdict.flakes, which holds a leg while its held-flaky-leg ask is OPEN; closing it releases the leg" || :
+              done <<<"$RB_OUT"
+            fi
+            RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+          fi
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)

@@ -117,6 +117,22 @@ When a held leg runs, read at the default branch's tip: under on-demand it is he
 verdict.held = "push-selected"
 ```
 
+## `verdict.flakes`
+<!-- usage: policy:verdict.flakes cbd3373b -->
+What a red bar's flakes do, read by the run-gates kit's `verdict_flow.py flakes` after a bar run under GATE_RERUN=1, which re-runs each red leg once on the same tree: under retry-only nothing is written; under record each such run writes one `flake` record, a row per executed leg with its first rc and its re-run rc; under quarantine it also holds each leg whose flakes reach verdict.flakes.entry and no OPEN held-flaky-leg ask names, and the unattended close files that ask, which holds the leg out of every bar through the selection's quarantine row until it closes.
+
+```text
+verdict.flakes = "record"
+```
+
+## `verdict.flakes.entry`
+<!-- usage: policy:verdict.flakes.entry abdb1ee4 -->
+How many flakes in a leg's last window of verdicts hold it under verdict.flakes quarantine, counted across the tracked flake records, newest first and after the leg's last release: a declared count/window such as 3/10, or measured, the Measured field of the newest gate-health record, and 2/10 until one exists.
+
+```text
+verdict.flakes.entry = "3/10"
+```
+
 ## `tests.product`
 <!-- usage: policy:tests.product a994fddb -->
 Which product-test legs, the legs carrying a level, the manifest holds: the repository's own declared ones, those plus one leg per level each detected runner adapter declares, or none at all.
@@ -219,7 +235,7 @@ Documented on [help/shims.md](../shims.md).
 ## `install.retired-edits`
 Documented on [help/update-edits.md](../update-edits.md).
 
-## Not yet summarised (234)
+## Not yet summarised (232)
 - `preset`
 - `design.forks`
 - `design.reentry`
@@ -338,8 +354,6 @@ Documented on [help/update-edits.md](../update-edits.md).
 - `flow.promote`
 - `policy-file.on-missing-expansion`
 - `verdict`
-- `verdict.flakes`
-- `verdict.flakes.entry`
 - `verdict.flakes.release`
 - `verdict.remote.trust`
 - `verdict.remote.pin-scope`

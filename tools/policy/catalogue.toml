@@ -917,12 +917,16 @@ owner = "dWitnessedBar"
 name = "verdict.flakes"
 allowed = ["quarantine", "record", "retry-only"]
 default = "quarantine"
+summary = "What a red bar's flakes do, read by the run-gates kit's `verdict_flow.py flakes` after a bar run under GATE_RERUN=1, which re-runs each red leg once on the same tree: under retry-only nothing is written; under record each such run writes one `flake` record, a row per executed leg with its first rc and its re-run rc; under quarantine it also holds each leg whose flakes reach verdict.flakes.entry and no OPEN held-flaky-leg ask names, and the unattended close files that ask, which holds the leg out of every bar through the selection's quarantine row until it closes."
+usage = 'verdict.flakes = "record"'
 owner = "dWitnessedBar"
 
 [[key]]
 name = "verdict.flakes.entry"
 allowed = { type = "pattern", regex = "[0-9]+/[0-9]+", or = ["measured"] }
 default = "measured"
+summary = "How many flakes in a leg's last window of verdicts hold it under verdict.flakes quarantine, counted across the tracked flake records, newest first and after the leg's last release: a declared count/window such as 3/10, or measured, the Measured field of the newest gate-health record, and 2/10 until one exists."
+usage = 'verdict.flakes.entry = "3/10"'
 owner = "dWitnessedBar"
 
 [[key]]

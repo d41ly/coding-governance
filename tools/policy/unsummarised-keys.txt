@@ -230,8 +230,6 @@ trace.identity
 trace.rows
 transitions.record
 verdict
-verdict.flakes
-verdict.flakes.entry
 verdict.flakes.release
 verdict.remote.pin
 verdict.remote.pin-scope

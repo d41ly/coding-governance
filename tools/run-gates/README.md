@@ -81,6 +81,17 @@ own, `fail` or `timeout`, so the ledger holds the leg's final verdict; reuse acc
 red row carries no key. The drift report sums `retried` across the run records as
 `legs_retried_after_timeout`.
 
+**The same-tree re-run, `GATE_RERUN=1`** (TOOL-dWitnessedBar-8). Every other red is re-run only when
+the bar is asked: after the serial retry and the reuse sample, inside the wall, each leg whose
+effective result is a numeric red runs once more, alone, on the same tree, into `<i>.rerun.*` beside
+its attempts and a `<i>.rerun.leg` row. A leg whose own ceiling fired is not, its quiet-host re-run
+being `TOOL-dWitnessedBar-30`'s, and a bar whose wall fired re-runs nothing. The re-run moves no
+verdict and no exit code, and writes no `gate-logs` file, so `log:` keeps naming the attempt that
+redded the run; a red-then-green leg prints `nondeterministic · <leg>`, as the sample does. The
+runner reads the knob once and unsets it, so a nested bar never inherits it; the unattended driver's
+`gates-green` bar sets it, and `verdict_flow.py route` and `flakes` read the rows it leaves (see "Which
+red blocks").
+
 ## The switch every adopter needs to know about
 
 **A leg declaring `subject = "kit"` is HELD.** It does not run on your bar unless you ask:
@@ -123,7 +134,11 @@ SOURCE a leg is held by: `kit`, derived from the row as above; `quarantine` and 
 from the selection record `GATE_SELECTION=<path>` names. That record is written at a revision R by
 `python <prefix>/run-gates/verdict_flow.py select --rev <R> --out <path>`, from inputs read at R and
 never from the working tree: a header naming the values it read, then one TAB row per held leg,
-`held · <leg> · <source> · <note>`. A `level` row is a leg whose `level` is outside
+`held · <leg> · <source> · <note>`. A `quarantine` row is a leg an OPEN held-flaky-leg ask names
+(TOOL-dWitnessedBar-8), its note `<count>/<window>, ask <id>`, printed `GATE held  <leg>  (quarantine,
+<note>)`: the asks are those the `ASKS_CMD` generator `.unattended.conf` declares at R prints, run in a
+scratch worktree at R, so a branch cannot quarantine a leg it breaks, and none where R declares no
+generator. A `level` row is a leg whose `level` is outside
 `tests.landing-levels`, none under `every-declared` or while `tests.without-cadence` reads
 `run-at-landing`. A selection-held leg is held whatever `GATE_SELFTESTS` says. A row whose source is
 outside `quarantine level`, `kit` included, or whose leg the manifest lacks, is printed and ignored,
@@ -188,7 +203,7 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
 | `lib-verdict.sh` | the block table, SOURCED and never run: `derive_red_blocks <value> <class>` prints `block` or `pass` for one attributed red under a `verdict.blocks` value. The runner sources it beside `lib-attribute.sh`, and it is in KF3's list; see "Which red blocks" |
-| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`, or `--selection <path>` for a per-tree verdict's rebuilt rows), see "Held by policy" |
+| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`, or `--selection <path>` for a per-tree verdict's rebuilt rows), see "Held by policy"; and a red bar's `flake` record with the holds it justifies (`flakes --run <run dir> --build <slug> --unit <id>`, and `flakes --check`), see "Which red blocks" |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
@@ -1486,13 +1501,31 @@ driver's `read_gates_record` read that field and never re-decide it, and `lib-ve
 list, so a diff that edits the table reads every red OWN.
 
 `python verdict_flow.py route --run <run dir>` joins each red to one route by its class and writes the
-routing record `<run dir>/routing` (leg, class, blocks, route, judgment, next): a passing red routes
+routing record `<run dir>/routing` (leg, class, blocks, route, judgment, next): a red whose same-tree
+re-run reads `ok` routes `flakes`, ahead of every other row; a passing red routes
 `ask`; a blocking OWN or MIXED red `attribute`, the tester's; CONTENDED `quiet-rerun`; DEAD PROBE, or a
 red the attribution omits, `probe-repair`; INHERITED `fix-unit`. The unattended driver's `gates-green`
 runs it on every red bar it reads. `verdict_flow.py judge --run <run dir> --leg <name> --judgment
 <word>` records the tester's `code-miss` or `spec-wrong` on an `attribute` row and fills `next` by
 `verdict.red-route`; it reads the judgments through the loop kit's `loop_lib.py items --tag`, the verb
 `TOOL-dWitnessedBar-100` asks for, and exits 2 naming it until it lands.
+
+`python verdict_flow.py flakes --run <run dir> --build <slug> --unit <id>` is `test.flakes`
+(TOOL-dWitnessedBar-8), and acts as `verdict.flakes` reads: under `retry-only` it writes nothing; under
+`record` and `quarantine` it writes one `flake` record through the memory-tree factory's
+`write_record`, `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one TAB row per executed leg, `<leg> ·
+<first rc> · <re-run rc or ->`. A flake is a row whose first rc is not 0 and whose re-run rc is. Under
+`quarantine` it prints `hold  <leg>  <flakes>/<window>  <record ids>` for each leg whose flakes in its
+last `<window>` rows, newest `Ended` first across every tracked flake record and after its last
+release, reach `verdict.flakes.entry`, and that no OPEN held-flaky-leg ask names: a declared
+`<count>/<window>`, or under `measured` the newest gate-health record's `Measured`, 2/10 until the
+factory registers that kind and one is tracked. A release is the committer date of the commit adding
+the CLOSED row of the leg's held-flaky-leg ask. The unattended driver's `gates-green` runs it beside
+`route` on every red bar, under the build's record anchor, stages the record, and files each `hold`
+line as a MED `held flaky leg: leg <leg> flaked <n> in its last <window> verdicts` ask through its
+`write_leg_ask`; that OPEN ask is the hold the selection's `quarantine` row reads. `flakes --check`
+reds an OPEN held-flaky-leg ask whose leg had fewer flakes, in its window at the ask's filing date,
+than the threshold in force then.
 
 MIGRATION NOTE: `verdict.blocks` replaces the gate-file key `INHERITED_RED=park|land`, which the hook,
 the driver and this runner (as `GATE_INHERITED_RED`) no longer read. The govkit upgrade step

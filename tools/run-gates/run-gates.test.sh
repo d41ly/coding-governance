@@ -313,7 +313,9 @@ fail=0
 # 458 -> 459, TOOL-dWitnessedBar-19: arm 1a's `purpose` control. Not gated. Counted by reading.
 # 459 -> 460, TOOL-dWitnessedBar-10: arm 1a's `precommit` control. Not gated. Counted by reading.
 # 460 -> 461, TOOL-dWitnessedBar-9: arm 1a's `level` control. Not gated. Counted by reading.
-FLOOR_ASSERTIONS=461
+# 461 -> 465, TOOL-dWitnessedBar-8: arm 9n's four, behind the `timeout` gate and counted on a host
+# without one as well (41 -> 45). Counted by reading; this pass runs no suite.
+FLOOR_ASSERTIONS=465
 # MERGED 309 / 293 -> 324 at the reconcile with origin/main 290d0d2d5: base 278, plus this branch's 31, plus main's 15.
 # NOT RAISED by TOOL-aGraftedHelix-8: its two retry-passed assertions sit inside section 9's
 # `HAVE_TIMEOUT` branch, which a host with no runnable `timeout -k` skips, and this is that host's count.
@@ -3783,8 +3785,27 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
     "$(case "$_hvts$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvts" -lt "$_hvse" ] && echo in-tail || echo after-drain ;; esac)" in-tail
   check_hv_value "aSS3 AC4 the deciding attempt started after the drain ($_hvrs, $_hvse)" \
     "$(case "$_hvrs$_hvse" in ''|*[!0-9]*) echo unread ;; *) [ "$_hvrs" -ge "$_hvse" ] && echo after-drain || echo in-tail ;; esac)" after-drain
+
+  # 9n. TOOL-dWitnessedBar-8 AC1 — THE SAME-TREE RE-RUN. Under `GATE_RERUN=1` a leg that reds on its first
+  #     run and greens on its second keeps the bar RED, writes `<i>.rerun.leg` reading ok and prints the
+  #     sample's `nondeterministic` line; a leg whose own ceiling fired takes its serial retry and no
+  #     re-run, which is TOOL-dWitnessedBar-30's quiet-host re-run. Gated with the ceiling arms for the
+  #     second half, and counted on a host without one as well (41 -> 45).
+  H16="$HV/r16"; build_hv_repo "$H16"
+  export HV_ONCE="$HV/flaky.flag"; rm -f "$HV_ONCE"
+  printf '#!/usr/bin/env bash\n[ -f "$HV_ONCE" ] && exit 0\n: > "$HV_ONCE"\necho "FAIL the first run"\nexit 1\n' > "$H16/fx/flaky.sh"
+  ( cd "$H16" && git add -A && git commit -qm legs ) >/dev/null 2>&1
+  printf '[{"name": "flaky", "argv": ["bash", "fx/flaky.sh"]},\n {"name": "stall", "argv": ["bash", "fx/hang.sh"], "ceiling": 1}]\n' > "$HV/rerun.json"
+  run_hv_bar "$H16" "$HV/rerun.json" GATE_RERUN=1
+  _hvrec=$(ls -1td "$H16"/.git/gate-run/*/ 2>/dev/null | head -1)
+  check_hv_value "dWB8 AC1 a re-run that greens leaves the bar RED" "$HV_RC" 1
+  check_hv_value "dWB8 AC1 the flaky leg's re-run row reads ok" "$(awk -F'\t' '{ print $2 }' "${_hvrec}0.rerun.leg" 2>/dev/null)" ok
+  check_hv_line "dWB8 AC1 the output names it nondeterministic" '^nondeterministic · flaky$'
+  check_hv_value "dWB8 AC1 the leg whose ceiling fired took its serial retry and no re-run" \
+    "$([ -f "${_hvrec}1.retry.leg" ] && [ ! -f "${_hvrec}1.rerun.leg" ] && echo retried-only)" retried-only
+  unset HV_ONCE
 else
-  n=$((n+41))
+  n=$((n+45))
   echo "canary: SKIP the ceiling arms of section 9 — this host has no runnable 'timeout -k', so no ceiling can fire and nothing can be deferred, retried or read HOST here"
 fi
 rm -rf "$HV" 2>/dev/null || true

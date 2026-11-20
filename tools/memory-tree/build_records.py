@@ -98,8 +98,15 @@ holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so n
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
 the same way, and so is a line that reads as a field.
 
+THE FLAKE KIND (TOOL-dWitnessedBar-8 S3): `<date>-build-<unit id>-flake-<n>.md`, one `test.flakes` run's
+verdicts: `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one fenced block of TAB rows, `<leg> · <first rc> ·
+<re-run rc or ->`, one per leg the run executed. It has no `new` door: the run-gates kit's `verdict_flow.py
+flakes` loads this factory as `keep_tails.py` does and calls `write_record`.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
-2 an unreadable path or a pending kind.
+2 an unreadable path or a pending kind. A kind with a reader of its own is read by it; `exception` by
+`read_exception`; every other kind, `widen`, `leg-tail` and `flake` among them, by `read_record` and its
+`KINDS` entry alone.
 
 ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
 bindings reader admits and joins to their file names, and an import whose table differs from that tuple
@@ -198,6 +205,11 @@ KINDS = {
     "leg-tail": {   # TOOL-dWitnessedBar-25 S6: written by the run-gates kit's `keep_tails.py`, no `new` door;
         # the tail itself is one fenced block after the fields
         "required": ("Leg", "Hash", "Run", "Sha", "Cause"),
+        "closed": (),
+    },
+    "flake": {   # TOOL-dWitnessedBar-8 S3: written by the run-gates kit's `verdict_flow.py flakes`, no `new` door;
+        # one TAB row per executed leg in a fenced block after the fields
+        "required": ("Run", "Ended", "Sha", "Tree", "Legs"),
         "closed": (),
     },
 }
@@ -1212,8 +1224,10 @@ def main(argv):
         bad = read_transition(rel, text)["malformed"]
     elif kind == "recommendation":
         bad = read_recommendation(rel, text)["malformed"]
-    else:
+    elif kind == "exception":
         bad = read_exception(rel, text)["malformed"]
+    else:   # TOOL-dWitnessedBar-8 §8 F12: a kind with no rules of its own reads by its `KINDS` entry alone
+        bad = read_record(rel, text, kind)[1]
     for ln in text.replace("\r\n", "\n").split("\n"):
         if m := FIELD.match(ln):
             print(f"build-records: {rel} · {m.group(1)}: {m.group(2).strip()}")
