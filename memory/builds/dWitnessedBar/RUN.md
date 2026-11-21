@@ -829,3 +829,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T15:21:37Z draw · re-dispatch · TOOL-dWitnessedBar-107 · 126/180 · 20261121T152137Z-3142b0
 
 2026-11-21T15:21:37Z dispatch · item 45fff6c2 TOOL-dWitnessedBar-107 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-11-21T15:29:49Z brief · item TOOL-dWitnessedBar-108 · reason d2a645718c2c memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md
