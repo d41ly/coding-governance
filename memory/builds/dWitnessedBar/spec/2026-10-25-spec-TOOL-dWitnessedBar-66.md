@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-66 — the CRLF record arm plants its CR on a key `read_green_file` reads, so removing the hook's CR strip turns the arm red
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 38 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 38 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-66-round6-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-66-round6-fix-return.md) | research | TOOL-dWitnessedBar-67 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-66-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-66-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-66-round6-fix-brief.md) | research | TOOL-dWitnessedBar-67 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-66-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-66-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-66-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-66-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-67 |
