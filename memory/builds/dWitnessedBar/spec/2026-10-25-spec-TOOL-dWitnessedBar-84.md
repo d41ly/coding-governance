@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-84 — the round-1 audit of units 74 to 78, 16 minors batched: single-copy checks reading what exists, a sed admitting the quoted arm, honest return codes, counted loops, one key derivation, the guide guarded, records on one line
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-5 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -19,6 +19,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-carry-h1-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-88 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-52-rename-brief.md) | journal | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-62 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-84-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-84-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-84-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-79-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 |
