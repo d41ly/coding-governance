@@ -5676,7 +5676,7 @@ def build_core_only_repo(t):
     return repo, kit
 
 
-def plant_absent_by_key(name, table, presets=None, here=KIT, top="."):
+def load_absent_by_key(name, table, presets=None, here=KIT, top="."):
     """`absent-by-key`: a loader refusing every key a `[[selects]]` row names, whatever its value."""
     keys = {k for k, _v in read_selects(policy.resolve_kit_dir("loop", "guard.py", here))}
     assignment = presets_module.derive_preset_assignment(name, presets, table)
@@ -5684,7 +5684,7 @@ def plant_absent_by_key(name, table, presets=None, here=KIT, top="."):
                                             for k, v in assignment.items() if policy.render_dotted(k) in keys], [])
 
 
-def plant_accept_all(name, table, presets=None, here=KIT, top="."):
+def load_accept_all(name, table, presets=None, here=KIT, top="."):
     """`accept-all`: a loader admitting every value."""
     return presets_module.Load(presets_module.derive_preset_assignment(name, presets, table), [], [])
 
@@ -5709,23 +5709,23 @@ def run_presets_core_only(name):
                           for k, v in presets.derive_preset_assignment(n, store, None).items()) for n in store["preset"]}
         want = {n: selects[n] for n in ("standard", "strict")}
 
-        def judge(refuses):
-            def ok(rc, o, e):
+        def derive_load_check(refuses):
+            def check_load(rc, o, e):
                 said = [ln for ln in o.splitlines() if " · refused · " in ln]
                 if not refuses:
                     return rc == 0 and not said and " · loaded · " in o
                 return rc == 2 and len(said) == 1 and all(n in said[0] for n in (
                     "build.closes", "after-release-verifies", CORE_FLOW_POINT))
-            return ok
+            return check_load
         argv = [sys.executable, str(kit / "presets.py"), "load"]
-        checks += [check_run(f"register without {CORE_FLOW_POINT}", f"presets.py load {n}", argv + [n], judge(r), repo)
+        checks += [check_run(f"register without {CORE_FLOW_POINT}", f"presets.py load {n}", argv + [n], derive_load_check(r), repo)
                    for n, r in want.items()]
         verdict, findings = run_arm(ARM["arm_presets"], repo, kit)
         graded = f"row-named half {sum(selects.values())} refused pair(s) graded"
         checks.append((f"register without {CORE_FLOW_POINT}", f"arm_presets unplanted, {graded}",
                        not findings and graded in verdict, "; ".join(f"{k}: {w}" for k, w in findings) or verdict))
-        for plant, loader, preset in (("absent-by-key", plant_absent_by_key, "standard"),
-                                      ("accept-all", plant_accept_all, "strict")):
+        for plant, loader, preset in (("absent-by-key", load_absent_by_key, "standard"),
+                                      ("accept-all", load_accept_all, "strict")):
             _v, findings = run_arm(Arm(plant, lambda r, k, loader=loader: arm_presets(r, k, loader), "finding"), repo, kit)
             checks.append((plant, f"arm_presets names preset.{preset} · build.closes",
                            any(k == f"preset.{preset} · build.closes" for k, _w in findings),
