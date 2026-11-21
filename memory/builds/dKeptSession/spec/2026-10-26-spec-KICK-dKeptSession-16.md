@@ -21,6 +21,9 @@
 | [2026-11-21-prompt-KICK-dKeptSession-16-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-build-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-16-orders-7-8-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-orders-7-8-reground-brief.md) | research | KICK-dKeptSession-12 |
 | [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 |
+| [2026-11-22-prompt-KICK-dKeptSession-16-1-builder.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-16-1-builder.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-16-2-builder.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-16-2-builder.md) | journal | — |
+| [2026-11-22-prompt-KICK-dKeptSession-16-mirror-brief.md](../prompts/2026-11-22-prompt-KICK-dKeptSession-16-mirror-brief.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
