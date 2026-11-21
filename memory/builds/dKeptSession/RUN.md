@@ -109,3 +109,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T21:09:55Z brief · item KICK-dKeptSession-20 · reason 1de718b05c8b memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-20-build-brief.md
 
 2026-11-21T21:11:20Z dispatch · item 04abaa3a KICK-dKeptSession-20 · reason tools/loop/scenario-schema.toml tools/loop/scenario.py tools/loop/README.md tools/policy/presets.py tools/policy/policy.py tools/policy/README.md tools/govkit/usage.toml help/policy.md help/loop.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-20-1-acceptance-ledger.md
+
+2026-11-21T21:54:44Z brief · item KICK-dKeptSession-32 · reason ff45f44eaa2d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-32-build-brief.md
+
+2026-11-21T21:56:09Z dispatch · item 38533a59 KICK-dKeptSession-32 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-32-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
