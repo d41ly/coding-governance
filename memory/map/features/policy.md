@@ -18,7 +18,7 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["check-grades-one-layer-of-a-layered-config.md", "off-switch-leaves-new-output-standing.md",
-  "budget-row-not-remeasured-after-added-arms.md"]
+  "budget-row-not-remeasured-after-added-arms.md", "kit-argument-dropped-at-an-inner-call.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

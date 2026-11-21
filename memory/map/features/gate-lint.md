@@ -17,6 +17,7 @@ gate-legs = [
   "shell hygiene (a location probe asked from a moved directory)",
   "shell hygiene (a fork spent on builtin work)",
   "shell hygiene (a fixed-name temp renamed into place)",
+  "shell hygiene (a stage committed with no staged-diff test)",
   "spawn budget (forks per hot entrypoint)",
 ]
 kits = ["gate-lint"]
@@ -210,6 +211,13 @@ that must land green over a non-compliant population without keying on a line nu
   admitted forms: a `$(mktemp` temp, or a binder that expands `SRANDOM` only behind `${SRANDOM:-`.
 - `memory/project/temp-name-sites.txt` — the carried fixed-temp sites, per path. Lower a count or
   delete a row in the commit that fixes a site.
+- `python tools/gate-lint/sh_hygiene.py --stage-commits [registry] [root] [pathspec ...]` — the
+  stage-commit lint: a commit after a `git add` in its scope with no `git diff --cached` test between
+  them. It prints the commit, unchecked, admitted, unpaired and empty-ok counts, each unpaired and
+  empty-ok site and every registered row's reason; a failing key is one finding listing each site's
+  path, line and code, and the remedy names the test: `git diff --cached --quiet` after the stage.
+- `memory/project/stage-commit-sites.txt` — the carried unchecked-stage sites, per path. Lower a count
+  or delete a row in the commit that fixes a site.
 - `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . [--only <id>]` — forks per
   hot entrypoint against its ceiling; `--selftest` proves the calibration holds and that a moved
   declaration refuses. A red prints the delta and the top ten `file:line` contributors.

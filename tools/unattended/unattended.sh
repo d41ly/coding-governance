@@ -92,7 +92,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.129 # gov:kit unattended@1.129 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.131 # gov:kit unattended@1.131 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -18827,12 +18827,14 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
 #
 # NOTHING HERE CHANGES AN EXIT (S6). Every miss is one line and a return 0: an absent kit (no record is
 # owed), a renderer or generator that refused, a dirty input, a refused stage or commit.
+# The commit is made only when the stage holds a diff (TOOL-dSkippedRecord-1): a record re-rendered
+# byte-identical stages nothing and skips with one line, and a staged-diff test git cannot answer refuses.
 #
 # THE INDEX follows `write_ask_views`'s two rules (S4): the record is staged FIRST, because the
 # generator lists its inputs with `git ls-files`; nothing renders over an unstaged input under the
 # memory root or `.memory-tree.conf`; and only paths the render newly dirtied are staged.
 write_run_record() { # slug -> 0 always; one line per miss
-  local slug=$1 py="" d="" gen="" rec="" p dirty="" rc
+  local slug=$1 py="" d="" gen="" rec="" p dirty="" rc dq
   local -a stage=()
   local -A pre=()
   if [ "${RUNLOG_SWITCH:-}" != 0 ]; then
@@ -18887,8 +18889,17 @@ write_run_record() { # slug -> 0 always; one line per miss
     echo "unattended: run record staged, but git could not stage what the index render moved: ${stage[*]}"
     return 0
   fi
-  # S5 - THE COMMIT, only where the close already commits: `in-place`, after `--close`.
+  # S5 - THE COMMIT, only where the close already commits: `in-place`, after `--close`, and only
+  # when the stage holds a diff: git's 1 is answer 0, its 0 is answer 1, anything above is answer 2.
   if [ "$VERB" = --close ] && [ "$LANDER_MODE" = in-place ]; then
+    GIT diff --cached --quiet 2>/dev/null; dq=$?
+    case "$dq" in
+      0) echo "unattended: run record unchanged — re-rendering it staged no change, so no commit was made; the record was last committed at $(GIT log -1 --format=%h -- "$rec" 2>/dev/null)"
+         return 0 ;;
+      1) ;;
+      *) echo "unattended: run record staged, but git could not test whether the stage holds a change (git diff --cached exited $dq), so no commit was attempted"
+         return 0 ;;
+    esac
     if run_bounded git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" commit -q -m "records($slug): the run record"; then
       echo "unattended: run record committed at $(GIT rev-parse --short HEAD 2>/dev/null) on top of the close record"
     else

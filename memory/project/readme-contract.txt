@@ -246,3 +246,9 @@ memory/builds/aTwinnedPass/README.md
 memory/builds/aPiecewiseGrade/README.md
 memory/builds/aHastenedSweep/README.md
 memory/builds/aTrimmedWait/README.md
+memory/builds/dTrackedAtlas/README.md
+memory/builds/dSweptScratch/README.md
+memory/builds/dSettledStage/README.md
+memory/builds/dLandedOwners/README.md
+memory/builds/dSkippedRecord/README.md
+memory/builds/dHomeGraded/README.md

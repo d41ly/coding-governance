@@ -287,6 +287,7 @@ def build_plant_repo(scratch, case):
 
 def run_plant(case):
     """-> 0 held, 1 missed, 2 the scratch could not be built; one closing line printed either way."""
+    from loop_witness import remove_tree   # the loop kit's remover: git's objects are read-only on Windows
     _text, owed, needle = PLANTS[case]
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="rb"))
     try:
@@ -306,7 +307,7 @@ def run_plant(case):
         print("%s: fixture · %s · MISSED exit %d, owed %d and a line naming %r" % (SAY, case, p.returncode, owed, needle))
         return 1
     finally:
-        shutil.rmtree(scratch, ignore_errors=True)
+        remove_tree(scratch)
 
 
 def main(argv):

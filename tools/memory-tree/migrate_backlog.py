@@ -3134,6 +3134,8 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
     import shutil
     import tempfile
 
+    from deviation_join import remove_tree   # the kit's remover: git's objects are read-only on Windows
+
     fails, count = [], [0]
 
     def arm(label: str, want, fn):
@@ -4162,7 +4164,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         if prior_default is not None:
             os.environ["GOV_DEFAULT_BRANCH"] = prior_default
     finally:
-        shutil.rmtree(base, ignore_errors=True)
+        remove_tree(base)
 
     if count[0] < FLOOR_ASSERTIONS:
         print(f"migrate-backlog selftest: {count[0]} assertions executed, below the declared floor "

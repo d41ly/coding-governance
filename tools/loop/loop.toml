@@ -1176,6 +1176,7 @@ cause = "reproduction"
 # The hooks' stage claims (TOOL-dDeclaredLoop-4): one row per git and harness hook the map inventories.
 # A git hook serves the step its act sits in; a harness hook on an event every session raises serves all
 # five, and the SubagentStart one the steps of the workflows that have roles.
+# The Atlas regeneration's row (TOOL-dTrackedAtlas-4) claims step.deploy alone: it acts after a landing.
 
 [[hook]]
 key = "commit-msg"
@@ -1192,6 +1193,10 @@ stage = ["step.test"]
 [[hook]]
 key = "pre-rebase"
 stage = ["step.build"]
+
+[[hook]]
+key = "PostToolUse memory/builds/dTrackedAtlas/build/2026-11-19-build-TOOL-dTrackedAtlas-4-regen.js"
+stage = ["step.deploy"]
 
 [[hook]]
 key = "PostToolUse {prefix}/memory-recall/recall-opened.js"

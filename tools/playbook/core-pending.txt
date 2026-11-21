@@ -83,6 +83,7 @@ leg	unattended skill size	dWitnessedBar
 leg	kickoff engine size <=18KiB	dWitnessedBar
 leg	shell hygiene (a loop fed by a command substitution)	dWitnessedBar
 leg	shell hygiene (a fork spent on builtin work)	dWitnessedBar
+leg	shell hygiene (a stage committed with no staged-diff test)	dWitnessedBar
 leg	spawn budget (forks per hot entrypoint)	dWitnessedBar
 leg	shell-hygiene selftest	dWitnessedBar
 leg	kit version markers	dWitnessedBar

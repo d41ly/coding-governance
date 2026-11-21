@@ -22459,6 +22459,7 @@ memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/run
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/extract.py:1204-1239
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/record.py:176
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-9.md	tools/runlog/runlog.py:217
+memory/builds/dLandedOwners/prompts/2026-11-19-prompt-TOOL-dLandedOwners-4-3-spec-writer.md	tools/policy/check_policy.py:20-21
 memory/builds/dLandedVerdict/README.md	drift_report.py:298-303
 memory/builds/dLandedVerdict/build/2026-08-19-build-TOOL-dLandedVerdict-1-design-pass.md	drift_report.py:298-303
 memory/builds/dLandedVerdict/spec/2026-08-19-spec-TOOL-dLandedVerdict-2.md	HYGIENE check 8
@@ -34284,6 +34285,8 @@ memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-6.md	tools
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:182-190
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/bench.py:308-330
 memory/builds/dTracedLattice/spec/2026-09-05-spec-TOOL-dTracedLattice-7.md	tools/memory-recall/check-recall.py:203
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-1-spec-writer.md	BUILD-METHOD M3
+memory/builds/dTrackedAtlas/prompts/2026-11-19-prompt-TOOL-dTrackedAtlas-1-2-spec-writer.md	BUILD-METHOD M3
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-10-deviation-9.md	BUILD-METHOD M4
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-11-deviation-10.md	BUILD-METHOD M4
 memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md	BUILD-METHOD M4

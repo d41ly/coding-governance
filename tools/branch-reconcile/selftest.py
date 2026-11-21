@@ -19,6 +19,7 @@ import io
 import os
 import pathlib
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -101,6 +102,31 @@ def build_dir():
     d = tempfile.mkdtemp(prefix="br-selftest-")
     SCRATCH.append(d)
     return pathlib.Path(d)
+
+
+def _set_writable(func, path, _exc):
+    """rmtree error hook: clear the read-only bit, then retry the operation that failed.
+
+    NOT `ignore_errors=True`: these fixtures are git repositories, and git writes its objects
+    READ-ONLY, so on Windows the unlink raises, `ignore_errors` swallows it and the whole scratch
+    tree survives every run (the `br-selftest-*` residue in %TEMP%). The memory-recall selftest's
+    hook of the same name, TOOL-aBranchedMandate-6.
+    """
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except OSError:
+        pass
+
+
+def remove_scratch(d):
+    # `onexc` replaced `onerror` in 3.12, where `onerror` is deprecated; feature-detected because
+    # this kit ships to adopters whose python this repo does not pick.
+    key = "onexc" if sys.version_info >= (3, 12) else "onerror"
+    try:
+        shutil.rmtree(d, **{key: _set_writable})
+    except OSError:
+        pass
 
 
 def seed_repo(base):
@@ -1116,7 +1142,7 @@ def main():
                 return 1 if FAIL else 0
     finally:
         for d in SCRATCH:
-            shutil.rmtree(d, ignore_errors=True)
+            remove_scratch(d)
     total = len(PASS) + len(FAIL)
     if SKIPPED:
         print(f"branch-reconcile: {len(SKIPPED)} skipped, not counted: {SKIPPED}")

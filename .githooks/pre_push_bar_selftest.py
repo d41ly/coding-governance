@@ -54,6 +54,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -301,6 +302,21 @@ def check_advice_admitted(fx: Fixture) -> None:
 
 
 def main() -> int:
+    def remove_scratch(d):
+        """Not `ignore_errors=True`: the fixture is git repositories, and git writes its objects
+        read-only, so on Windows the unlink raised, was swallowed and every scratch tree survived.
+        Clear the bit and retry; a refusal still never fails the run."""
+        def set_writable(func, path, _exc):
+            try:
+                os.chmod(path, stat.S_IWRITE)
+                func(path)
+            except OSError:
+                pass
+        try:
+            shutil.rmtree(d, **{"onexc" if sys.version_info >= (3, 12) else "onerror": set_writable})
+        except OSError:
+            pass
+
     if not os.path.isfile(HOOK):
         print(f"pre-push-bar selftest: {HOOK} is missing")
         return 2
@@ -369,7 +385,7 @@ def main() -> int:
         check_positional_and_declared(fx)
         check_advice_admitted(fx)   # last: it rewrites the fixture's declaration
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        remove_scratch(tmp)
 
     # --- THE MUTATION. Disable the three rev-3 arms and require the three hostile values to LAND.
     print("pre-push-bar selftest — the same hook with the rev-3 arms disabled (observed RED):")
@@ -408,7 +424,7 @@ def main() -> int:
             print_fail("M3 the rewritten working copy did not land under mutation, so case 7 is "
                        f"unproven: {out.strip()[:300]}")
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        remove_scratch(tmp)
 
     return print_report()
 

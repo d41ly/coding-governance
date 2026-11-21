@@ -40,8 +40,12 @@
 # commits it as `regen: generated outputs onto <remote>/<branch> at <sha8> for <unit>`, `Pass: none`.
 # In `--prepare`, gov first's walk is folded before the regeneration, so a generator reading HEAD sees
 # it committed (PLAY-dOrderedCharter-85), the order the attended landing's own commits keep.
-# A failed write refuses the landing as a refused mint does. No regen.py beside this lander says so
-# in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
+# Each lander commit, and each fold, is made only when the stage holds a diff (`write_staged_change`,
+# TOOL-dSettledStage-1): a regeneration staging no change makes no commit, and the landing goes on to
+# the bar. A stage which fails refuses the landing with no push, and refuses the fold, rather than
+# reading as nothing staged (TOOL-dSettledStage-3). A failed write refuses the landing as a refused
+# mint does. No regen.py beside this lander
+# says so in one line and lands as before. What it does NOT do: prove the result fresh -- the push bar's
 # preflight is that check, and a regeneration cannot fix a check red for another reason.
 # AFTER A LANDING (TOOL-aFrugalTurnstile-8). Both landing paths read `GATE_POST_MERGE` from the
 # gate-env file committed at the landed tip; `local` starts the run-gates kit's post-merge bar on that
@@ -1496,6 +1500,26 @@ remove_new_untracked() {  # snapshot file -> nothing on stdout
   rm -f "$now"
 }
 
+# `write_staged_change` stages the working tree and answers whether the stage now differs from HEAD,
+# the one place the lander stages before its four commits: the mint, gov first and regeneration
+# commits of the attended landing, and `write_merge_fold` (TOOL-dSettledStage-1). A dirty status does
+# not imply a staged diff. Landing 12764ec21 aborted before its bar because the regeneration rewrote
+# a tracked file checked out with CRLF bytes with its committed LF bytes under `core.autocrlf=true`:
+# status reported it modified on its cached size alone, staging normalized it back to the committed
+# blob, nothing was staged, and the commit failed. A stage equal to HEAD answers 1, as a clean tree
+# does, and its caller commits nothing, silently. An error from `git diff` answers 0, so the caller's
+# commit runs and refuses with its own line rather than landing a tree the lander never committed.
+# A failed status or stage answers 2, and every caller refuses on it rather than reading it as
+# nothing staged (the closing review's item 1, TOOL-dSettledStage-3).
+write_staged_change() {  # -> 0 the index differs from HEAD · 1 the tree was clean, or staging left nothing · 2 staging failed
+  local dirt
+  dirt=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) || return 2
+  [ -n "$dirt" ] || return 1
+  git add -A || return 2
+  git diff --cached --quiet && return 1
+  return 0
+}
+
 # ---- KIT VERSIONS, minted at the landing — TOOL-aMendedFleet-65 ----------------------------------
 # `run_minter <base> [<head>]` runs the deployer's `mint` verb, which writes the next version of every
 # kit whose shipped bytes moved in <base>..<head> with no bump dating the move, into the WORKING TREE;
@@ -1584,9 +1608,9 @@ read_mint_unit() {  # range -> the unit id on stdout, or nothing
 # caller's `t`. `commit-tree`, so no pre-commit hook fires (the MINT note in `cmd_prepare`). Its two
 # callers: after gov first's walk, so the regeneration meets the walk committed at HEAD, and after the
 # regeneration (PLAY-dOrderedCharter-85). Each caller refuses on its own 1 with its own stage's text.
-write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is the merge over the tree, or the tree was HEAD's · 1 the commit or the ref move failed
-  [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ] || return 0
-  git add -A
+write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is the merge over the tree, or the tree was HEAD's · 1 the stage, the commit or the ref move failed
+  write_staged_change
+  case $? in 1) return 0 ;; 2) return 1 ;; esac
   t=$(git commit-tree "$(git write-tree)" -p "$1" -p "$2" -m "$3") && git update-ref --no-deref HEAD "$t" || return 1
 }
 
@@ -1877,8 +1901,12 @@ while [ "$attempt" -le "$max" ]; do
     echo "push-main: the kit versions this landing owes could not be minted (named above). Aborted (no push)." >&2
     exit 1
   fi
-  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
-    git add -A
+  write_staged_change; staged=$?
+  if [ "$staged" = 2 ]; then
+    echo "push-main: could not stage the minted versions. Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ "$staged" = 0 ]; then
     mint_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}${mint_unit:+ for $mint_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
@@ -1902,8 +1930,12 @@ while [ "$attempt" -le "$max" ]; do
     exit 1
   fi
   rm -f "$gfsnap"
-  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
-    git add -A
+  write_staged_change; staged=$?
+  if [ "$staged" = 2 ]; then
+    echo "push-main: could not stage gov's receipt of the upgrade steps. Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ "$staged" = 0 ]; then
     gf_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "steps: gov first onto $remote/$def at ${mt:0:8}${gf_unit:+ for $gf_unit}" -m "Pass: none"; then
       echo "push-main: could not commit gov's receipt of the upgrade steps. Aborted (no push)." >&2
@@ -1926,8 +1958,12 @@ while [ "$attempt" -le "$max" ]; do
     exit 1
   fi
   rm -f "$rgsnap"
-  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
-    git add -A
+  write_staged_change; staged=$?
+  if [ "$staged" = 2 ]; then
+    echo "push-main: could not stage the regenerated outputs. Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ "$staged" = 0 ]; then
     regen_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "regen: generated outputs onto $remote/$def at ${mt:0:8}${regen_unit:+ for $regen_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the regenerated outputs. Aborted (no push)." >&2

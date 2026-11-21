@@ -242,6 +242,22 @@
     "stage": ["step.test"]
   },
   {
+    "name": "shell hygiene (a stage committed with no staged-diff test)",
+    "argv": [
+      "python3",
+      "{prefix}/gate-lint/sh_hygiene.py",
+      "--stage-commits",
+      "memory/project/stage-commit-sites.txt",
+      ".",
+      ":!*.test.sh",
+      ":!memory/"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300,
+    "stage": ["step.test"]
+  },
+  {
     "name": "spawn budget (forks per hot entrypoint)",
     "argv": [
       "bash",
@@ -2791,6 +2807,7 @@
       "{prefix}/memory-tree/asbuilt_view.py",
       "{prefix}/memory-tree/deviation_join.py",
       "{prefix}/memory-tree/routed_commits.py",
+      "{prefix}/memory-tree/commit_trailers.py",
       "{prefix}/memory-tree/row_grammar.py",
       "{prefix}/roles/roles_lib.py",
       "{prefix}/roles/render_agents.py",

@@ -425,7 +425,7 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
            "lang": "py" if lang == "module" else lang, "policy": f"{FIXTURE_PREFIX}/{FIXTURE_POLICY}"}
     kit = pathlib.Path(govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR))
     shutil.copytree(kit, t / FIXTURE_PREFIX / FIXTURE_POLICY,
-                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt"))
+                    ignore=shutil.ignore_patterns("__pycache__", "*.test.sh", *govkit.derive_withheld_names(kit)))
     files = [(row["to"], TARGETS[lang]), (row["from"], render_shim(row))]
     if lang in ("py", "module"):
         files.append((posixpath.join(posixpath.dirname(row["to"]), "sib.py"), SIBLING))
@@ -600,7 +600,11 @@ def run_fixture(plant: str, mode: str, window: int, releases: int, unlanded: boo
         print(f"shims fixture: cannot observe: {exc}")
         return 2
     finally:
-        shutil.rmtree(t, ignore_errors=True)
+        import step_gate  # noqa: E402, PLC0415  its scratch remover: git's objects are read-only on Windows
+        try:
+            step_gate.remove_scratch_tree(t)
+        except OSError:
+            pass
 
 
 def main(argv: list[str]) -> int:

@@ -5012,7 +5012,7 @@ same "the refused --landed wrote nothing" "$(sum)" "$before"
 # ---- for building one in a fixture is <prefix>/memory-recall/recall-opened.test.sh.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 git add -A && git commit -q -m runstate --no-verify
-OTHER=$(mktemp -d)/wt
+OP=$(mktemp -d); OTHER=$OP/wt   # the parent kept, so it is removed with the worktree below
 git worktree add -q -b other-tree "$OTHER" HEAD 2>/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' "$OTHER/memory/builds/tRun/RUN.md"
 out=$(run --landed tRun 2>&1)
@@ -5025,6 +5025,7 @@ out=$(run --landed tRun 2>&1)
 hit  "$out" "a run reaches LANDED only from LANDING"
 miss "$out" "an UNCOMMITTED LANDING is sitting in:"
 git worktree remove --force "$OTHER" 2>/dev/null; git branch -q -D other-tree 2>/dev/null
+rm -rf "$OP"
 reset_tree
 
 # ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
@@ -5489,6 +5490,7 @@ n=$((n+1)); [ -f "$arch" ]                     || { echo "FAIL rotation did not 
 n=$((n+1)); [ -f memory/builds/tRun/RUN.md ]   || { echo "FAIL rotation left no fresh run-state file"; st=1; }
 same "the fresh record starts at RUNNING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
 n=$((n+1)); cmp -s "$retired_copy" "$arch" || { echo "FAIL the archived bytes are not the retired record's"; st=1; }
+rm -f "$retired_copy"   # outside $TMP, which is the fixture repo, so its trap never takes it
 # BOTH SIDES IN THE INDEX. The leg's whole per-run population is `git ls-files`, so an unstaged
 # archive is invisible to every check the widened population gave it.
 n=$((n+1)); git ls-files --error-unmatch "$arch" >/dev/null 2>&1 || { echo "FAIL the archive is not staged, so the gate leg cannot see it"; st=1; }
@@ -17266,10 +17268,15 @@ fi
 # ---- stubs stand in for the resolvers and the bounded runner; the stub render appends to LIVE, so a
 # ---- helper that rendered anyway stages it. The blank-key controls render, which keeps the two
 # ---- refusals from passing vacuously. Staged red by restoring the memory-root-only inventory.
-run_render_helper() { # conf key value · helper -> the helper's output, then the staged paths, from a fresh tree
+run_render_helper() { # conf key value · helper [· mode] -> the helper's output, then the staged paths, from a fresh tree
+  # TOOL-dSkippedRecord-1: a MODE (same · moved · addfail · difffail) runs the helper as an `in-place`
+  # `--close`, so `write_run_record` reaches its commit, and prints whether HEAD moved and its subject.
+  local lu_mode=${3:-}
   reset_tree
   mkdir -p src memory/builds/tRun/build; printf '#!/bin/sh\n' > src/lu.sh; printf 'live\n' > memory/LIVE.md
   printf 'LIVE_LANDED_UNCLOSED="%s"\n' "$1" >> .memory-tree.conf
+  # `same`: the record the renderer writes is already committed, byte for byte
+  [ "$lu_mode" != same ] || printf 'rec\n' > memory/builds/tRun/build/lu-record.md
   fixture; printf '# cites ARCH-tRun-1\n' >> src/lu.sh
   (
     slice_fn "$2" >/dev/null && slice_fn scan_dirty_paths >/dev/null || exit 1
@@ -17278,16 +17285,42 @@ run_render_helper() { # conf key value · helper -> the helper's output, then th
     resolve_index_generator() { echo "$lu_g/lu-gen.py"; }
     resolve_kit_dir() { echo "$lu_g/lurl"; }
     run_bounded() {
+      local lu_rc
+      # the commit's own argv, run for real: the generator's argv starts with the python stub
+      if [ "$1" = git ]; then RB_OUT=$("$@" 2>&1); lu_rc=$?; RB_TOOK=0; return "$lu_rc"; fi
       case "$*" in
         *runlog.py*) printf 'rec\n' > memory/builds/tRun/build/lu-record.md
                      RB_STDOUT="runlog: record written memory/builds/tRun/build/lu-record.md (4 bytes)" ;;
-        *) printf 'stale\n' >> memory/LIVE.md; RB_STDOUT="" ;;
+        *) [ "$lu_mode" = same ] || printf 'stale\n' >> memory/LIVE.md; RB_STDOUT="" ;;
       esac
       RB_OUT=""; RB_TOOK=0; return 0
     }
     M=memory RUNLOG_SWITCH=0 VERB=--abort LANDER_MODE=primary KIT_DIR=.
+    if [ -n "$lu_mode" ]; then
+      VERB=--close LANDER_MODE=in-place
+      # the commit runs no hook the machine declares globally
+      mkdir -p "$lu_g/lu-hooks"
+      export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$lu_g/lu-hooks"
+      # A failed-stage mode fails the one call the driver's GIT wrapper makes for it, through a
+      # `git` shim on PATH that hands every other call to the real git, as the tw5 arm's shim does.
+      # A function override would add a shell definition, and the lexicon pins those.
+      case "$lu_mode" in
+        addfail|difffail)
+          mkdir -p "$lu_g/lu-shim"
+          printf '#!/usr/bin/env bash\ncase "%s $*" in\n  "addfail -c %s -c %s add -A "*) exit 1 ;;\n  "difffail -c %s -c %s diff --cached --quiet") exit 128 ;;\nesac\nexec "%s" "$@"\n' \
+            "$lu_mode" "$GIT_PIN_REPLACE" "$GIT_PIN_GRAFTADV" "$GIT_PIN_REPLACE" "$GIT_PIN_GRAFTADV" \
+            "$(command -v git)" > "$lu_g/lu-shim/git"
+          # the shell's own spelling of the directory: git's `C:/...` would split PATH at its colon
+          chmod +x "$lu_g/lu-shim/git"; PATH="$(cd "$lu_g/lu-shim" && pwd):$PATH" ;;
+      esac
+    fi
+    lu_head=$(git rev-parse HEAD)
     if [ "$2" = write_ask_views ]; then write_ask_views 1; else write_run_record tRun; fi
     echo "STAGED: $(git diff --cached --name-only | tr '\n' ' ')"
+    if [ -n "$lu_mode" ]; then
+      if [ "$(git rev-parse HEAD)" = "$lu_head" ]; then echo "HEAD: same"; else echo "HEAD: moved"; fi
+      echo "SUBJECT: $(git log -1 --format=%s)"
+    fi
   ) 2>&1
 }
 out=$(run_render_helper 1 write_ask_views)
@@ -17298,6 +17331,35 @@ hit  "$out" "the index was not re-rendered: its inputs carry changes the index d
 miss "$(printf '%s\n' "$out" | grep '^STAGED:')" "memory/LIVE.md"
 hit  "$(run_render_helper "" write_ask_views)" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged 1 path(s): memory/LIVE.md"
 hit  "$(run_render_helper "" write_run_record | grep '^STAGED:')" "memory/LIVE.md"
+# ---- TOOL-dSkippedRecord-1 AC1: an `in-place` close whose record re-renders byte-identical stages
+# ---- nothing, so the commit is skipped with one line and HEAD stays put. Staged red by restoring
+# ---- `write_run_record` from 81657e77, which commits the empty stage and prints its commit-failed line.
+# ---- TOOL-dSkippedRecord-2: the skip line is read whole, its hash the one `fixture` committed the
+# ---- record at, read after the helper returns from the repository it left. An empty read stands as
+# ---- `unread`, so a blank hash in the line cannot meet a blank read. Staged red by deleting the
+# ---- driver's `GIT log` substitution from the skip line, or by pointing it at another path.
+out=$(run_render_helper "" write_run_record same)
+lu_hash=$(git log -1 --format=%h -- memory/builds/tRun/build/lu-record.md)
+same "the skip line" "$(printf '%s\n' "$out" | grep '^unattended: run record unchanged')" \
+  "unattended: run record unchanged — re-rendering it staged no change, so no commit was made; the record was last committed at ${lu_hash:-unread}"
+hit  "$out" "HEAD: same"
+miss "$out" "its commit failed"
+# ---- AC2, the control: a real diff reaches the commit branch and commits, so `same` cannot pass on a
+# ---- driver that never reaches it, nor on an inverted answer.
+out=$(run_render_helper "" write_run_record moved)
+hit  "$out" "run record committed at"
+hit  "$out" "HEAD: moved"
+hit  "$out" "SUBJECT: records(tRun): the run record"
+# ---- AC3 and AC4: a failed stage and a staged-diff test git cannot answer each refuse with one line,
+# ---- and HEAD stays put. Staged red by deleting the return after the second stage's refusal line, and
+# ---- by letting the case's catch-all arm fall through to the commit.
+out=$(run_render_helper "" write_run_record addfail)
+hit  "$out" "git could not stage what the index render moved: memory/LIVE.md"
+hit  "$out" "HEAD: same"
+miss "$out" "run record committed at"
+out=$(run_render_helper "" write_run_record difffail)
+hit  "$out" "git could not test whether the stage holds a change (git diff --cached exited 128)"
+hit  "$out" "HEAD: same"
 reset_tree; unset -f run_render_helper
 
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================

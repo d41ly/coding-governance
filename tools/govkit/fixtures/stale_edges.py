@@ -41,7 +41,9 @@ PLAYBOOK_KIT = ('id = "playbook"\nhome = "playbook"\nversion_from = { none = "fi
 #: the fixture's regenerate: one composition line, in the delta report's shape, naming the unit the drift names
 COMPOSE_LINE = f"  {'stale':<18} [{'gov:alpha':<13}] {UNIT}"
 COMPOSE = f"print({COMPOSE_LINE!r})\n"
-IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt")
+# the policy kit's withheld names, read from its kit.toml, applied to every kit this fixture copies
+IGNORE = shutil.ignore_patterns("__pycache__", "*.test.sh", *govkit.derive_withheld_names(
+    govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR)))
 
 
 def build_stale_gov(tmp: pathlib.Path) -> pathlib.Path:
@@ -150,7 +152,11 @@ def run_fixture(plant: str, stub: str | None) -> int:
         print(f"stale-edges fixture: cannot observe: {exc}")
         return 2
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        import step_gate  # noqa: E402, PLC0415  its scratch remover: git's objects are read-only on Windows
+        try:
+            step_gate.remove_scratch_tree(tmp)
+        except OSError:
+            pass
     bad = 0
     for name, seen, want in obs:
         bad += seen != want

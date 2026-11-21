@@ -541,7 +541,8 @@ failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/${KIT}/merge-rows
   grep -qF "FAILED ($3" "$TMP/fcerr" \
     || bad "$1: the driver failed closed for a reason other than the staged one ($3): $(head -1 "$TMP/fcerr" | cut -c1-160)"
 }
-mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
+# Under the trapped $TMP: every caller is `S=$(mkscratch)`, a subshell, so a SCRATCH+= here was lost.
+mkscratch() { local d; d=$(mktemp -d "$TMP/s.XXXXXX")
   mkdir -p "$d/${PFX}${KIT}"
   seed_driver_kit "$d/${PFX}${KIT}"
   printf '%s' "$d"; }

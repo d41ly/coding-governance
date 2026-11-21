@@ -1454,7 +1454,8 @@ if [ "$MODE" = sweep ]; then
   fi
 
   SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
-  trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
+  # THE POPULATION SCRATCH TOO: this trap REPLACES the one that removed it at startup.
+  trap 'rm -rf "$SWEEP_ROOT" "$RS_SCRATCH" 2>/dev/null' EXIT
   # EACH ROW'S OUTPUT OUTLIVES THE TRAP. The render loop copies `$d/out` to
   # `<git-dir>/gate-logs/selftests/<row>.out` — the per-leg pattern `run-gates.sh` already keeps —
   # and prints that path on every row that is not `ok`, because a calibrate's READ row prints none

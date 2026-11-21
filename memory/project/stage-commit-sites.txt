@@ -1,0 +1,18 @@
+# stage-commit-sites.txt — the sites the `shell hygiene (a stage committed with no staged-diff test)` leg
+# carries. TOOL-dSettledStage-2.
+#
+# A row is `<path> TAB <class> TAB <count> TAB <reason>`. The key is the file and the one CLASS,
+# `unchecked-stage`, and NEVER a line number, because a line-keyed registry reds on an unrelated edit
+# above the site. The count is how many commits in that file follow a `git add` in their scope with no
+# `git diff --cached` or `diff-index --cached` test between them, so an empty stage fails the commit.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too: a measured path with no row fails, a row the
+# scan no longer finds fails, and a count that no longer matches fails, so fixing a site forces its
+# count down in the same commit. The leg grades the tracked product shell sources, less the suites and
+# the memory tree, so a suite's fixture commits are not rows here.
+#
+# Every row predates the lint. A merge conclusion and a fresh repository's first commit are the mode's
+# known false reds: each commits on what its stage holds, so neither fails empty. The leg prints every
+# row's reason on every run, green included. No total is written here: the scanner derives them.
+skills/session-kickoff/card-compaction.fixture.sh	unchecked-stage	1	a fixture's first commit in the repository it just created, after staging the two files it wrote, so the stage is never empty; predates the lint; drained by deleting this row in the commit that fixes it
+tools/unattended/pass-tree.sh	unchecked-stage	1	concludes a merge in progress, which commits on an empty stage; predates the lint; drained by deleting this row in the commit that fixes it

@@ -1201,6 +1201,69 @@ if [ -n "$_rg_k" ]; then
     *) bad "32 a failing regeneration did not refuse the attended landing, or something was pushed: $out32" ;;
   esac
 
+  # 42 (TOOL-dSettledStage-1 AC1) — the attended landing over a regeneration that leaves a tracked file
+  #      dirty by line endings only: a planted regen.py rewrites eol-only.txt, checked out with CRLF
+  #      bytes under core.autocrlf=true, with its committed LF bytes. Status names the file, staging
+  #      stages nothing, and the lander skips the empty regen commit and reaches the bar. The liveness
+  #      echoes first prove this git still produces the shape. Red at the base lander 12764ec2.
+  out42=$(
+    build_regen_fixture "$tmp/remote42.git" "$tmp/work42" || exit 1
+    R42=$(git rev-parse HEAD)
+    printf 'one\ntwo\n' > eol-only.txt
+    printf 'import pathlib\npathlib.Path("eol-only.txt").write_bytes(b"one\\ntwo\\n")\n' > "${KIT_REL}$_rg_k/regen.py"
+    git add eol-only.txt "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -m "TOOL-tFix-42: a regeneration rewriting a file with its committed bytes"
+    export GIT_CONFIG_VALUE_0=true
+    rm eol-only.txt; git checkout -q -- eol-only.txt
+    "$_py_arms" "${KIT_REL}$_rg_k/regen.py" --write >/dev/null 2>&1
+    [ -n "$(git status --porcelain -- eol-only.txt)" ] && echo eol-dirty=1
+    git add -A 2>/dev/null; git diff --cached --quiet && echo eol-empty=1
+    rm eol-only.txt; git checkout -q -- eol-only.txt
+    [ -z "$(git status --porcelain)" ] && echo clean=1
+    unset GATE_PUSH_BASE; bash "$lander" 2>&1; echo "rc=$?"
+    [ "$(git rev-parse origin/main)" = "$(git rev-parse HEAD)" ] && echo landed=1
+    echo "regen-commits=$(git log --format=%s "$R42..HEAD" | grep -c '^regen: generated outputs')"
+  )
+  _l42=0
+  for w42 in eol-dirty=1 eol-empty=1 clean=1 rc=0 landed=1 regen-commits=0; do
+    [[ $'\n'$out42$'\n' == *$'\n'"$w42"$'\n'* ]] || _l42=1
+  done
+  [[ $out42 == *"gating + pushing"* ]] || _l42=1
+  [ "$_l42" = 0 ] \
+    && ok "42 the attended landing skips a regen stage that line endings left empty and reaches the bar" \
+    || bad "42 the attended landing over a line-ending-only regeneration did not skip the empty stage and land: $out42"
+
+  # 44 (TOOL-dSettledStage-3 AC1) — the attended landing over a regeneration that writes a real change
+  #      and then holds the git dir's index.lock: the regen stage fails, so the lander refuses with its
+  #      own stage line and pushes nothing. The liveness echoes after the landing prove the
+  #      regeneration ran and held the lock at the stage, and left the change in the tree. Red at the
+  #      lander of 41e57fca5, which skipped the regen commit, pushed and exited 0.
+  out44=$(
+    build_regen_fixture "$tmp/remote44.git" "$tmp/work44" || exit 1
+    R44=$(git rev-parse HEAD)
+    printf 'one\n' > lock-real.txt
+    cat > "${KIT_REL}$_rg_k/regen.py" <<'PY'
+import pathlib, subprocess
+pathlib.Path("lock-real.txt").write_bytes(b"two\n")
+gd = subprocess.check_output(["git", "rev-parse", "--git-dir"], text=True).strip()
+pathlib.Path(gd, "index.lock").write_bytes(b"")
+PY
+    git add lock-real.txt "${KIT_REL}$_rg_k/regen.py"
+    git commit -q --no-verify -m "TOOL-tFix-44: a regeneration that holds the index lock over a real change"
+    unset GATE_PUSH_BASE; bash "$lander" 2>&1; echo "rc=$?"
+    gd44=$(git rev-parse --git-dir)
+    [ -f "$gd44/index.lock" ] && echo locked=1
+    [ -n "$(git status --porcelain -- lock-real.txt)" ] && echo dirty=1
+    [ "$(git ls-remote origin refs/heads/main | cut -f1)" = "$R44" ] && echo unpushed=1
+    rm -f "$gd44/index.lock"
+  )
+  case "$out44" in
+    *"gating + pushing"*) bad "44 the attended landing reached the push over a regen stage the index lock refused: $out44" ;;
+    *"push-main: could not stage the regenerated outputs. Aborted (no push)."*"rc=1"*"locked=1"*"dirty=1"*"unpushed=1"*)
+      ok "44 a regen stage the index lock refuses refuses the attended landing with its own line, and nothing is pushed" ;;
+    *) bad "44 a failed regen stage did not refuse the attended landing with its own line, or something was pushed: $out44" ;;
+  esac
+
   # 33 (TOOL-dGroundRules-25 S2-S4) — a policy-file change on `feat`, landed through the real
   #      --prepare, which stales the mirror (it records the policy file's blob): the prepared merge's
   #      own checks, the installed regen.py --check and the policy kit's mirror --check, must each
@@ -1238,7 +1301,7 @@ if [ -n "$_rg_k" ]; then
     fi
   fi
 else
-  skipped=1; echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+  skipped=1; echo "  skip — 28-32, 42 and 44 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi
 
 # 34 — TOOL-dSafePassage-8 AC5: --prepare walks every declared upgrade step on gov's own tree first,
@@ -1913,6 +1976,90 @@ exec bash \"$FX/real-driver\" \"\$@\""
 fi
 unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
 [ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"
+
+# 43 — TOOL-dSettledStage-1 AC2: the prepared merge's fold over a stage line endings left equal to
+#      HEAD leaves the merge where it is, and over a real change rewrites it with the same parents.
+#      `write_staged_change` and `write_merge_fold` are cut from the lander, as arm 38 cuts its
+#      stages, and run on a detached merge in a fresh repository. The dates are pinned years before
+#      the fixture, so a rewrite of the merge cannot reproduce its sha in the same second. The real
+#      change is the control: a helper that never stages fails it. Red at the base lander 12764ec2,
+#      whose fold commits a new merge over HEAD's own tree. The liveness echoes, arm 42's spelling,
+#      prove this git builds the shape (TOOL-dSettledStage-4): `eol-empty=1` when staging the
+#      line-ending rewrite leaves the stage empty, after which the shape is rebuilt, and `eol-dirty=1`
+#      when status names f.txt right before the fold. With no CRLF checkout the arm reds.
+out43=$(
+  for f in write_staged_change write_merge_fold; do
+    eval "$(sed -n "/^$f() {/,/^}/p" "$lander")"
+  done
+  git init -q "$tmp/fold43" && cd "$tmp/fold43" || exit 1
+  git symbolic-ref HEAD refs/heads/main
+  printf 'one\ntwo\n' > f.txt; git add f.txt; git commit -q --no-verify -m "f"
+  git checkout -q -b side
+  printf 'side\n' > g.txt; git add g.txt; git commit -q --no-verify -m "g"
+  git checkout -q --detach main
+  git merge -q --no-ff --no-verify side -m "merge" || exit 1
+  P1=$(git rev-parse HEAD^1) P2=$(git rev-parse HEAD^2) M=$(git rev-parse HEAD)
+  export GIT_CONFIG_VALUE_0=true
+  rm f.txt; git checkout -q -- f.txt
+  printf 'one\ntwo\n' > f.txt
+  git add -A 2>/dev/null; git diff --cached --quiet && echo eol-empty=1; git reset -q
+  rm f.txt; git checkout -q -- f.txt
+  printf 'one\ntwo\n' > f.txt
+  export GIT_COMMITTER_DATE='2001-01-01T00:00:00Z' GIT_AUTHOR_DATE='2001-01-01T00:00:00Z'
+  [ -n "$(git status --porcelain -- f.txt)" ] && echo eol-dirty=1
+  t=$M; write_merge_fold "$P1" "$P2" "msg" 2>/dev/null; echo "eol-rc=$?"
+  [ "$(git rev-parse HEAD)" = "$M" ] && echo eol-head=same
+  printf 'changed\n' > f.txt
+  write_merge_fold "$P1" "$P2" "msg" 2>/dev/null; echo "real-rc=$?"
+  [ "$(git rev-parse HEAD)" != "$M" ] && [ "$(git rev-parse HEAD^1)" = "$P1" ] \
+    && [ "$(git rev-parse HEAD^2)" = "$P2" ] && [ "$(git show HEAD:f.txt)" = changed ] && echo real-moved=1
+)
+_l43=0
+for w43 in eol-dirty=1 eol-empty=1 eol-rc=0 eol-head=same real-rc=0 real-moved=1; do
+  [[ $'\n'$out43$'\n' == *$'\n'"$w43"$'\n'* ]] || _l43=1
+done
+[ "$_l43" = 0 ] \
+  && ok "43 the fold leaves the prepared merge in place over a stage line endings left empty, and rewrites it over a real change" \
+  || bad "43 the fold rewrote the merge over an empty stage, or did not fold a real change onto the same parents: $out43"
+
+# 45 — TOOL-dSettledStage-3 AC2: a stage the index lock refuses answers 2, and the fold refuses on it
+#      with HEAD left on the merge. `write_staged_change` and `write_merge_fold` are cut from the
+#      lander as arm 43 cuts them, and run on arm 43's detached merge with a real change in f.txt and
+#      an empty index.lock in the git dir. The liveness echoes prove this git refuses a stage under
+#      the lock; the unlocked fold is the control, so a helper answering 2 on every call fails it.
+#      Red at the lander of 41e57fca5, whose helper answers 1 and whose fold answers 0 under the lock.
+out45=$(
+  for f in write_staged_change write_merge_fold; do
+    eval "$(sed -n "/^$f() {/,/^}/p" "$lander")"
+  done
+  git init -q "$tmp/fold45" && cd "$tmp/fold45" || exit 1
+  git symbolic-ref HEAD refs/heads/main
+  printf 'one\ntwo\n' > f.txt; git add f.txt; git commit -q --no-verify -m "f"
+  git checkout -q -b side
+  printf 'side\n' > g.txt; git add g.txt; git commit -q --no-verify -m "g"
+  git checkout -q --detach main
+  git merge -q --no-ff --no-verify side -m "merge" || exit 1
+  P1=$(git rev-parse HEAD^1) P2=$(git rev-parse HEAD^2) M=$(git rev-parse HEAD)
+  printf 'changed\n' > f.txt
+  gd45=$(git rev-parse --git-dir)
+  : > "$gd45/index.lock"
+  [ -n "$(git status --porcelain -- f.txt)" ] && echo lock-dirty=1
+  git add -A 2>/dev/null || echo lock-refuses=1
+  write_staged_change 2>/dev/null; echo "stage-rc=$?"
+  t=$M; write_merge_fold "$P1" "$P2" "msg" 2>/dev/null; echo "fold-rc=$?"
+  [ "$(git rev-parse HEAD)" = "$M" ] && echo head=same
+  rm -f "$gd45/index.lock"
+  write_merge_fold "$P1" "$P2" "msg" 2>/dev/null; echo "free-rc=$?"
+  [ "$(git rev-parse HEAD)" != "$M" ] && [ "$(git rev-parse HEAD^1)" = "$P1" ] \
+    && [ "$(git rev-parse HEAD^2)" = "$P2" ] && [ "$(git show HEAD:f.txt)" = changed ] && echo free-moved=1
+)
+_l45=0
+for w45 in lock-dirty=1 lock-refuses=1 stage-rc=2 fold-rc=1 head=same free-rc=0 free-moved=1; do
+  [[ $'\n'$out45$'\n' == *$'\n'"$w45"$'\n'* ]] || _l45=1
+done
+[ "$_l45" = 0 ] \
+  && ok "45 a stage the index lock refuses answers 2 and the fold refuses on it with HEAD unmoved, and the unlocked fold folds" \
+  || bad "45 a stage the index lock refused read as nothing staged, the fold reported success, or the unlocked control did not fold: $out45"
 
 # THE FLOOR (TOOL-dPlacedRequest-98), compared only where no dependency skip fired: an adopter whose
 # install lacks a sibling kit runs fewer rows on a healthy lander, and takes its verdict from `fail`.
