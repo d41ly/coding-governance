@@ -1,0 +1,39 @@
+# TOOL-dWitnessedBar-73 — acceptance ledger
+
+**Serves:** journal TOOL-dWitnessedBar-73
+
+No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node d,
+2026-11-21 (GNU bash 5.3.9 `x86_64-pc-cygwin`, git 2.54.0.windows.1), through probes of the code this
+pass changed: scratch fixtures under `%TEMP%/s73e` and `%TEMP%/s73f` built as section `2o` builds its
+own, with `GIT_CONFIG_NOSYSTEM=1` and an empty `GIT_CONFIG_GLOBAL`; the recorder's and the stand-ins'
+Python, cut from `tools/lib/resolve-python.test.sh` and run against `tools/lib/legacy_ledger.py`; the
+sweep's Python, cut from `tools/run-gates/run-gates.gov.test.sh`, run against
+`tools/run-gates/verdict_backends.py#remove_stale_signer_temps`; the every-key and listing lines, cut from
+the gov suite, run over HEAD's `.githooks/pre-push` and three scratch copies of it; and a scratch clone at
+`%TEMP%/s73c`. Both suites passed `bash -n`. The shell-role seed measures the resolver suite at 1420 past
+1381 and the gov suite at 773 past 738, widened under `2026-11-21-build-TOOL-dWitnessedBar-73-widen-17`
+and each row set to its measured count. The §7 legs, each `New arm:` line's RED-first observation, and
+the ledger lines this spec places in units 66's and 67's ledgers are the main loop's at the close.
+
+**Evidences:** TOOL-dWitnessedBar-73
+- AC1 — `refs/heads/master` — the loop and `child` now assert, where `ll_planted` is 1, that `git symbolic-ref HEAD` prints `refs/heads/master`, failing as `73 AC1: the <fixture> fixture's HEAD names '<ref>'`; three scratch fixtures built with `-c init.defaultBranch=master init -q --ref-format=files` printed it. The suite run under the plant and the staged deletion of the flag, which must name `refs/heads/main`, are OWED to the main loop at the close.
+- AC2 — `$ll_ref` — after its `case` write, every loop fixture but `detached` asserts a file at `.git/$ll_ref`, failing as `73 AC2: the <fixture> fixture wrote no branch file`. The staged literal `refs/heads/main` write is OWED at the close.
+- AC3 — `GIT_CONFIG_COUNT` — OWED to the main loop at the close: unit 67's ledger line beside AC5, naming `GIT_CONFIG_GLOBAL` as masked by the isolation and `GIT_CONFIG_COUNT` as reaching the fixture `git init` (§4 Rollout).
+- AC4 — `--show-toplevel` — the recorder over a missing-object scratch fixture printed `git calls 5 timeouts ['60']` and the lines `git call rev-parse --show-toplevel timeout 60` and `git call ls-files -z timeout 60`, the two lines the arm matches whole.
+- AC5 — `for-each-ref` — across the `--sha` seed in a one-commit fixture, the missing-object fixture and an unborn `ref: refs/heads/other` fixture, the recorded lines held `rev-parse --verify --quiet HEAD^{commit}`, `symbolic-ref -q HEAD`, `for-each-ref refs/heads/other` and `rev-parse --verify --quiet <sha>^{commit}`, the four prefixes the arm's membership loop reads. The staged `for-each-ref` spawned outside `subprocess.run` is OWED at the close; it must use a spawn that does not route through `subprocess.run`, such as `subprocess.Popen`, since `check_output` calls the patched `run`.
+- AC6 — `.githooks/pre-push` — the criterion's `python -c` printed `[['{prefix}/run-gates/', '{prefix}/gate-legs.json', '.githooks/pre-push']]`.
+- AC7 — `git diff --quiet` — in the scratch clone, after a commit appending one comment line to `.githooks/pre-push` alone, the command with the hook's pathspec exited 1 and without it exited 0.
+- AC8 — `<prefix>/memory-tree/gen_build_index.py` — `grep -n 'tools/memory-tree' tools/govkit/govkit.py` printed nothing; the second grep printed one line, the comment above `_check_exists_refused`, which names `1:x`. The `install-prefix (shipped surface)` leg is OWED at the close.
+- AC9 — `rec_st` — the derivation over HEAD's cut read seven pairs, `rec_blob rec_fp rec_man rec_reused rec_reused_cache rec_sha rec_st`; the written record held `<key>\told\n<key>\tnew\r\n` per key (read with `od -c`), and every variable read `new`, `fail` 0. Over a scratch hook whose `selftests` case reads `rec_st=${rec_st:-$_rg_v}`, the arm printed `these did not read exactly new: rec_st`. Its RED-first record is OWED at the close.
+- AC10 — `gov-signers-l` — the sweep's Python printed `case <c> held` for `unlink`, `stat`, `glob`, `is_file` and `stat-denied`; the last two each returned `['gov-signers-b']` with one stderr line naming `gov-signers-a`, and no case reached `gov-signers-d` or `gov-signers-l`. The staged existence test is OWED at the close.
+- AC11 — `unarmed p no HEAD: git not runnable: ` — in an unborn `chain` scratch fixture registering `p`, each of the four stand-ins, `TimeoutExpired` and `OSError` on `symbolic-ref` then on `for-each-ref`, printed that line, exited 1 and wrote no `Traceback`.
+- AC12 — `PM_SCRUB` — the predicate over `tools/run-gates/post-merge.sh`, comment lines dropped, printed 1; with `declare PM_SCRUB="x"`, `true; PM_SCRUB+=" y"`, `printf -v PM_SCRUB %s z` or `PM_SCRUB="${PM_SCRUB/GATE_SELECTION/}"` appended it printed 2; with `  # note PM_SCRUB="x"` it printed 1. The arm's failure line names `PM_SCRUB` and the count; its RED-first record is OWED at the close.
+- AC13 — `PYTHONDONTWRITEBYTECODE` — OWED to the main loop at the close: every staged break against a `.py` module runs with its `__pycache__` cleared and `PYTHONDONTWRITEBYTECODE=1` exported, and unit 67's ledger lines for AC3 and AC6 name it and the failing assertion each break names.
+- AC14 — `rec_verdict` — a fresh `bash -c` sourcing the cut over a `verdict<TAB>GREEN` record printed nothing over HEAD's hook; over a scratch hook with `verdict) rec_verdict=$_rg_v ;;` it printed `rec_verdict`, and with `verdict) rec_sha=$_rg_v ;;` it printed `rec_sha`. Their RED-first records are OWED at the close.
+- AC15 — `FLOOR_ASSERTIONS` — `grep -n '^FLOOR_ASSERTIONS='` prints `FLOOR_ASSERTIONS=72`, the comment beside it naming `TOOL-dWitnessedBar-73`: 68 counted from the source before this pass, each loop at its population (the plant loop 26, the sweep 3, the two `PM_SCRUB` copy loops 2 each, the shard arm 2), and 4 added. The `PASS (<n> assertions)` equality in a scratch clone at this pass commit, and unit 66's ledger line for AC1 stating its net delta 0, are OWED to the main loop at the close.
+- AC16 — `order 36` — the criterion's `grep -H` printed two lines, unit 64's at `order 36` and unit 65's at `order 37`. Unit 67's ledger line for AC14 recording it as a re-tie guard is OWED at the close.
+- AC17 — `453dfa886` — the `grep -c` printed 0, and `git log -S` over the file printed `453dfa886` and `df2344c3f`, the sentence's removal and its addition.
+- AC18 — `é:x` — `grep -rl 'é:x' tools/` printed nothing, and `grep -cE 'check-wiring[.]sh:[0-9]+'` over unit 67's spec printed 0.
+- AC19 — `SELFTESTS_OWED_PATHS` — the walk over unit 67's twenty-two §7 names printed sixteen held and the six that run, `govkit selfcheck`, `govkit refusal join`, `govkit acceptance matrix`, `recall floor`, `portability (shell lines only shrink)` and `memory hygiene`; over unit 66's three, two held. Units 66's and 67's ledger lines naming the held set are OWED at the close.
+- AC20 — `PM_SCRUB//` — the criterion's `grep -n` names two lines, the reader's header comment and the `bsp_bw` line, which now prints `${PM_SCRUB//$'\n'/ }`; its fold kept the newline inside `$(...)`, the evaluated words equalling the reader's, thirty from `GIT_DIR`.
+- AC21 — `seed: no HEAD: ` — in a scratch `git init` whose branch file holds `garbage`, one file staged and no `kit.toml`, `seed --all` through `tools/lib/legacy_ledger.py#main` exited 0 with stdout empty and `seed: no HEAD: fatal: No such ref: HEAD` on stderr, and `run_seed_cli(["--all"], ".")` printed that stderr line and exited 0 from each of the three copies. The populated `garbage` case's `rc=1` over `p` and `x1` is unit 67 AC7's arm, unchanged, and OWED with the suite at the close.

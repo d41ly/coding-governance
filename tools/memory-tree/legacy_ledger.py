@@ -788,7 +788,9 @@ def run_seed_cli(args, cwd):
     carries `legacy_ledger: <population>: <reason>; nothing written` (TOOL-dWitnessedBar-63 S6). Where
     no repository root resolves, that route is taken before any registration is read, from the toplevel
     call's reason: `--population` prints its one unarmed line, `--all` prints nothing on stdout and
-    `seed: no HEAD: <reason>` on stderr, each exit 1; `--home` exits 2 (TOOL-dWitnessedBar-65 S8). A
+    `seed: no HEAD: <reason>` on stderr, each exit 1; `--home` exits 2 (TOOL-dWitnessedBar-65 S8). Where a
+    root resolves and HEAD does not, `--all` over no registration prints nothing on stdout and that same
+    stderr line, and exits 0, nothing being left unarmed (TOOL-dWitnessedBar-73 S23). A
     given `--sha` is folded to lowercase and stamped as the full sha of the commit it names; one naming
     none, and the null SHA outside an unborn HEAD, exits 2 (TOOL-dWitnessedBar-65 S10), and so does one
     whose commit's full sha does not start with it, a branch or tag with an all-hex name having stood in
@@ -899,6 +901,9 @@ def run_seed_cli(args, cwd):
             print("legacy_ledger: retrofit.unseeded reads %r, outside unarmed | refuse" % value, file=sys.stderr)
             return 2
     if no_head:
+        # `--all` over no registration leaves nothing unarmed: the reason goes to stderr (TOOL-dWitnessedBar-73 S23).
+        if not picked:
+            print("seed: %s" % no_head, file=sys.stderr)
         for reg in picked:
             if reg.seed:
                 print("legacy_ledger: %s: %s; nothing written" % (reg.population, no_head), file=sys.stderr)

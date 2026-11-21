@@ -699,3 +699,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T04:07:54Z dispatch · item ba3a0a5e TOOL-dWitnessedBar-75 · reason memory/builds/dWitnessedBar/build memory/project/shell-role.txt tools/run-gates/run-gates.gov.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-75-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-75.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
 
 2026-11-21T04:19:45Z brief · item TOOL-dWitnessedBar-73 · reason 312886971b82 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-73-build-brief.md
+
+2026-11-21T04:21:55Z dispatch · item 06887064 TOOL-dWitnessedBar-73 · reason memory/project/shell-role.txt tools/gate-legs.json tools/gate-lint/legacy_ledger.py tools/govkit/govkit.py tools/lib/legacy_ledger.py tools/lib/resolve-python.test.sh tools/memory-tree/legacy_ledger.py tools/run-gates/run-gates.gov.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-73-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-73.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T04:35:23Z draw · re-dispatch · TOOL-dWitnessedBar-73 · 119/180 · 20261121T043523Z-4440d3
+
+2026-11-21T04:35:23Z dispatch · item 06887064 TOOL-dWitnessedBar-73 · reason memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-73-widen-17.md memory/guides/SESSION-KICKOFF.md
