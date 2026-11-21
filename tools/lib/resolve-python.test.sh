@@ -1517,17 +1517,18 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
   || bad "2o unborn AC2: --widen R1 did not stamp c at the new HEAD with a and b keeping the null SHA: ${out//$'\n'/ | }"; ok
 
 # ---- 2o, the corrupt HEAD (TOOL-dWitnessedBar-64 AC1) ------------------------------------------------
-# Four fresh `git init`s, each holding the unborn fixture's registration `p` staged and never committed,
-# each with HEAD broken one way: the branch file holding `garbage`; holding forty `1`s, an object that
+# Five fresh `git init`s, each holding the unborn fixture's registration `p` staged and never committed.
+# Four have HEAD broken one way: the branch file holding `garbage`; holding forty `1`s, an object that
 # does not exist; holding `ref: refs/heads/other` while `other` points back; `.git/HEAD` itself holding
-# forty `1`s. Through the CLI's `main`, each seed exits 1 with one stdout line `unarmed p no HEAD:
-# <reason>`, that reason and `; nothing written` on stderr, no home, and no file outside `.git` holding
+# forty `1`s; the fifth, `chain`, arms (below). Through the CLI's `main`, each of the four broken ones
+# exits 1 with one stdout line `unarmed p no HEAD: <reason>`, that reason and `; nothing written` on
+# stderr, no home, and no file outside `.git` holding
 # the null SHA or the dangling one; the detached fixture's reason is `git symbolic-ref exited 1`. RED
 # against a seed reading a silent rev-parse exit 1 as unborn, or stamping the SHA a bare HEAD read
 # prints. WHAT THIS DOES NOT CHECK: a reftable repository, where no branch file exists to break, and a
 # git release answering these states with other exit codes or words.
 # TOOL-dWitnessedBar-67 S6, AC5: no git config of the machine reshapes a fixture here or below. Each is
-# made by `git -c init.defaultBranch=master init -q --ref-format=files`, so it is files-backed by
+# made by `run_planted_git -c init.defaultBranch=master init -q --ref-format=files`, so it is files-backed by
 # construction and `git rev-parse --show-ref-format` must print `files`; each branch file is `.git/` plus
 # `git symbolic-ref HEAD`'s output, never a literal branch; and every git call to the block's end runs
 # with `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL` naming an empty scratch file, unset after it.
@@ -1535,13 +1536,29 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 # would create `other`, so the seed reads it as unborn and arms p at the null SHA (S13, AC11).
 LL_DANGLING=1111111111111111111111111111111111111111
 export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$LL/fixture-global"; : > "$GIT_CONFIG_GLOBAL"
+# TOOL-dWitnessedBar-71 S1, S2: the hostile git config AC5 names, planted at command scope, which S6's
+# isolation above does not mask. `run_planted_git` prefixes git's environment config pairs to its one
+# call, so the suite's environment after it, a caller's own count and pairs included, is untouched. The
+# in-effect proof: a plain `run_planted_git init -q` must read `reftable` and `refs/heads/main`, or the
+# arm fails naming the plant and grades no AC5 fixture, so a staged break of a fixture's
+# `--ref-format=files` cannot pass for want of a hostile default. WHAT THIS DOES NOT CHECK: a config
+# scope other than command scope, and a git without `--show-ref-format`, which fails the proof rather
+# than passing.
+run_planted_git() {
+  GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=init.defaultRefFormat GIT_CONFIG_VALUE_0=reftable GIT_CONFIG_KEY_1=init.defaultBranch GIT_CONFIG_VALUE_1=main git "$@"
+}
+ll_planted=0; LLP="$LL/planted"
+run_planted_git init -q "$LLP" >/dev/null 2>&1
+ll_pfmt=$(git -C "$LLP" rev-parse --show-ref-format 2>&1 | tr -d '\r'); ll_pref=$(git -C "$LLP" symbolic-ref HEAD 2>&1 | tr -d '\r')
+if [ "$ll_pfmt" = reftable ] && [ "$ll_pref" = refs/heads/main ]; then ll_planted=1
+else bad "resolve-python: the hostile git config is not in effect (71 S2: a planted git init read '$ll_pfmt' and '$ll_pref', not reftable and refs/heads/main)"; fi; ok
 for ll_fx in garbage missing loop detached chain; do
   LLC="$LL/corrupt-$ll_fx"; mkdir -p "$LLC/tools/fx" "$LLC/memory/project"
-  git -c init.defaultBranch=master init -q --ref-format=files "$LLC" && git -C "$LLC" config core.autocrlf false
+  run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLC" && git -C "$LLC" config core.autocrlf false
   cp "$LLR/fxseed.py" "$LLC/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLC/tools/fx/kit.toml"
   printf 'a\nb\n' > "$LLC/seed-keys.txt"; : > "$LLC/memory/project/.keep"; git -C "$LLC" add -A
   ll_fmt=$(git -C "$LLC" rev-parse --show-ref-format 2>&1 | tr -d '\r')
-  [ "$ll_fmt" = files ] || bad "67 AC5: the $ll_fx fixture read ref format '$ll_fmt', not files"; ok
+  [ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the $ll_fx fixture read ref format '$ll_fmt', not files"; ok
   ll_ref=$(git -C "$LLC" symbolic-ref HEAD | tr -d '\r')
   case $ll_fx in
     garbage) printf 'garbage\n' > "$LLC/.git/$ll_ref" ;;
@@ -1590,11 +1607,13 @@ ll_reasons=$(sed -n 's/^unarmed [^ ]* no HEAD: //p' "$LL/py.out" | sort -u)
 # reading `exited 0`, and a `--sha` stamped from a ref its hex only names. WHAT THIS DOES NOT CHECK: a
 # git that hangs past the bound, or an exact-match `for-each-ref`, which no seed call runs.
 LLK="$LL/child"; mkdir -p "$LLK/tools/fx" "$LLK/memory/project"
-{ git -c init.defaultBranch=master init -q --ref-format=files "$LLK" && git -C "$LLK" config core.autocrlf false \
+{ run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLK" && git -C "$LLK" config core.autocrlf false \
   && cp "$LLR/fxseed.py" "$LLK/" && build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLK/tools/fx/kit.toml" \
   && printf 'a\nb\n' > "$LLK/seed-keys.txt" && : > "$LLK/memory/project/.keep" && git -C "$LLK" add -A \
   && git -C "$LLK" -c user.email=t@e -c user.name=t commit -q --no-verify -m one; } \
   || bad "67: the one-commit child fixture could not be built"; ok
+ll_fmt=$(git -C "$LLK" rev-parse --show-ref-format 2>&1 | tr -d '\r')
+[ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the child fixture read ref format '$ll_fmt', not files"; ok
 ll_kref=$(git -C "$LLK" symbolic-ref HEAD | tr -d '\r'); ll_khead=$(git -C "$LLK" rev-parse HEAD | tr -d '\r')
 LL_RECORD='_run, _calls = L.subprocess.run, []
 def run(argv, **kw):

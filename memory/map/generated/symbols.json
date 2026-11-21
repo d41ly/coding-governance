@@ -33483,6 +33483,11 @@
       "file": "tools/unattended/gate-guard.test.sh"
     },
     {
+      "id": "run_planted_git",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "run_pm",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
