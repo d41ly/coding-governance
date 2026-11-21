@@ -53,4 +53,7 @@ Cite ids, never line numbers.
 | [PLAY-dConvergedCharter-36](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-22 | 2026-11-04 | THE RULING KIND STAYS UNARMED IN GOV. TOOL-dLinkedLibrary-8 gives the… |
 | [PLAY-dConvergedCharter-37](../builds/dConvergedCharter/BACKLOG.md) | DEFERRED | LOW | PLAY-dConvergedCharter-12 | 2026-11-04 | THE UNATTENDED SUITE ASKS OUTLIVE THE SUITES. PLAY-dClosedLoop-11 to… |
 | [PLAY-dConvergedCharter-42](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
+| [PLAY-dConvergedCharter-43](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE, FOR… |
+| [PLAY-dConvergedCharter-44](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE, FOR… |
+| [PLAY-dConvergedCharter-45](../builds/dConvergedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE, FOR… |
 | [PLAY-dOrderedCharter-66](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-11-04 | BUILD-METHOD HOLDS NO ENVELOPE. PLAY-dOrderedCharter-3's interim keeps… |
