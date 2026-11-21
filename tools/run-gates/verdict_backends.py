@@ -84,7 +84,11 @@ READER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*:[A-Za-z_][A-Za-z0-9_]*")
 SHA = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 SIGNERS_KEY = "verdict.peer.signers"
 GOOD_SIGNATURE = re.compile(r'Good "git" signature for (\S+) with ')
-PEER_SIGNERS_GRACE_S = 86400  # seconds a signer temp may stand before a peer read sweeps it as a killed read's
+# Seconds a signer temp may stand before a peer read sweeps it as a killed read's.
+# `TAIL_GRACE_S`, the run-gates kit's own constant for the runner's tail sweep (TOOL-dWitnessedBar-42),
+# is not reused: its span is seven days, far past a peer read's life, and it is a bash constant of the
+# runner, which this Python module cannot read (TOOL-dWitnessedBar-65 S21).
+PEER_SIGNERS_GRACE_S = 86400
 
 Verdict = collections.namedtuple("Verdict", "state witness why")
 
@@ -439,7 +443,9 @@ def remove_stale_signer_temps(common, now=None):
     """Unlink every `gov-signers-` file directly under the common git dir `common` whose mtime is older
     than `PEER_SIGNERS_GRACE_S`, the file a killed peer read left (TOOL-dWitnessedBar-63 S20, §8 F5). A
     younger one may be a concurrent read's live file and is kept; one that cannot be read or unlinked is
-    left for the next read. -> the names removed."""
+    left for the next read. Only a regular file is touched, never a link or a directory; an unlink that
+    finds the file gone is silent, and any other failure names the file on one stderr line, the read
+    going on either way (TOOL-dWitnessedBar-65 S11). -> the names removed."""
     now = time.time() if now is None else now
     gone = []
     try:
@@ -448,11 +454,19 @@ def remove_stale_signer_temps(common, now=None):
         return gone
     for p in found:
         try:
-            if p.is_file() and now - p.stat().st_mtime > PEER_SIGNERS_GRACE_S:
-                p.unlink()
-                gone.append(p.name)
+            if not (p.is_file(follow_symlinks=False) and now - p.stat().st_mtime > PEER_SIGNERS_GRACE_S):
+                continue
         except OSError:
             continue
+        try:
+            os.unlink(p)
+        except FileNotFoundError:
+            continue
+        except OSError as e:
+            print(f"verdict_backends: the aged signer temp {p} could not be removed, left for the next read: {e}",
+                  file=sys.stderr)
+            continue
+        gone.append(p.name)
     return gone
 
 
@@ -891,12 +905,14 @@ def run_local_plant(case, top, run_scenario):
         raise OSError(f"select --rev at the fixture's R derived {len(derived)} row(s), exit {rc}, not the one level "
                       f"row the plant needs: {said.strip()}")
 
-    def write_record(pair=("reused\t0\n", "reused_cache\t0\n"), selection=("none", [])):
+    def write_record(pair=("reused\t0\n", "reused_cache\t0\n"), selection=("none", []), head=None):
+        """`head` replaces the sha and verdict lines, written with its bytes as given."""
         hashed, rows = selection
-        text = f"tree\t{tree}\nsha\t{sha}\nverdict\tGREEN\nkind\tfull\nrun_id\tr1\n" + "".join(pair)
+        lead = f"sha\t{sha}\nverdict\tGREEN\n" if head is None else head
+        text = f"tree\t{tree}\n{lead}kind\tfull\nrun_id\tr1\n" + "".join(pair)
         if hashed is not None:
             text += f"selection\t{hashed}\n" + "".join(f"selection.{n}\t{r}\n" for n, r in enumerate(rows, 1))
-        (slot / tree).write_text(text, encoding="utf-8")
+        (slot / tree).write_text(text, encoding="utf-8", newline=None if head is None else "")
 
     def derive_rows_hash(rows):
         rc, h = run_git(work, "hash-object", "--stdin", data="".join(f"held\t{r}\n" for r in rows))
@@ -921,7 +937,10 @@ def run_local_plant(case, top, run_scenario):
     elif case == "key-no-tab":
         # TOOL-dWitnessedBar-63 AC11 (S19): `read_tag_lines` skips a line with no TAB, so a bare `reused`
         # reads as no key at all; a reader taking the key as its value reads `reused reused leg(s)`.
-        write_record(pair=("reused\n",))
+        # TOOL-dWitnessedBar-65 AC12 (S15): the record also holds `verdict<TAB>GREEN<CR>` and two `sha`
+        # lines, the second R's, so the pair line is reached only where the verdict reads GREEN with its
+        # CR stripped; the hook's `read_green_file` reads the same lines in the gov suite.
+        write_record(pair=("reused\n",), head=f"sha\t{'a' * 40}\nsha\t{sha}\nverdict\tGREEN\r\n")
         read_local("a bare reused line, no TAB", "NONE", ["neither reused nor reused_cache"])
     elif case == "no-selection":
         write_record(selection=(None, []))

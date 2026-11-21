@@ -1762,11 +1762,13 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     has three readers: run-gates' `regen.check_when` through `build_items`, the unattended kit's
     `resolve_generated_indexes`, and selfcheck 6c. Rows are planted in a COPY of gov's run-gates
     descriptor, one tree at a time. The ADMISSIBLE tree holds conf true, conf false, `exists:` present
-    and `exists:` absent, each carrying `write`, `check` and `stage`, and no refused form: regen reads
+    and `exists:` absent, and TOOL-dWitnessedBar-65 S1's controls `a/b`, `a..b/c` and `.x/y`, each
+    naming no file, each carrying `write`, `check` and `stage`, and no refused form: regen reads
     them TOGETHER, and its kept paths must equal the shell reader's kept pairs, with selfcheck refusing
     none. Each REFUSED form, an unknown token, an empty `exists:` path, a `when` of neither form, an
-    absolute `exists:` path, one holding a `..` segment, and the backslash, UNC and colon paths of
-    TOOL-dWitnessedBar-63 AC5, sits ALONE in its own tree beside one
+    absolute `exists:` path, one holding a `..` segment, the backslash, UNC and colon paths of
+    TOOL-dWitnessedBar-63 AC5, and TOOL-dWitnessedBar-65 S1's `a\\..\\b`, `a/..`, `x/..`, `1:x`, `C:x`,
+    `.` and `./.`, sits ALONE in its own tree beside one
     conf-true row, because one refused row refuses its whole descriptor in regen: regen raises naming
     the row, the shell reader names the descriptor and the `when` on stderr and keeps the conf-true
     row, and selfcheck refuses the row. A row lacking `write`, `check` and `stage` is skipped by regen
@@ -1782,8 +1784,11 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     here = f"{kit_rel}/kit.toml"
     conf = gcopy / "w54.conf"
     keep = desc.read_bytes()
+    # TOOL-dWitnessedBar-65 S1: three admitted controls, each naming no file, so a reader refusing one
+    # shows as a Refusal, a skip line or a selfcheck failure on the admissible tree.
     admissible = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
-                  "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt"}
+                  "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt",
+                  "ctl-plain": "exists:a/b", "ctl-dots-inside": "exists:a..b/c", "ctl-dot-lead": "exists:.x/y"}
     # The `..` form names a file that exists, so a reader without the containment test KEEPS it.
     # TOOL-dWitnessedBar-63 AC5 (S9 to S11): five Windows path forms, spelled as the TOML source text,
     # which the shell reader reads raw and tomllib unescapes, so the shell sees `\\` where regen and
@@ -1792,7 +1797,12 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
     refused = {"unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:", "no-colon": "W54=on",
                "absolute": f"exists:/{rk}/regen.py", "dotdot": f"exists:{{kit}}/../{rk}/regen.py",
                "bs-dotdot": r"exists:..\\x", "bs-inner": r"exists:a\\..\\..\\x", "bs-rooted": r"exists:\\x",
-               "unc": r"exists:\\\\server\\share", "colon": "exists:a:b"}
+               "unc": r"exists:\\\\server\\share", "colon": "exists:a:b",
+               # TOOL-dWitnessedBar-65 S1, S2: the one rule's remaining refused forms, a backslash `..`
+               # segment, a trailing `..`, a colon after a digit or a drive letter, and two paths that
+               # normalise to `.`, which the shell reader kept until S2 (§8 F5).
+               "bs-segment": r"exists:a\\..\\b", "trail-dotdot": "exists:a/..", "x-dotdot": "exists:x/..",
+               "digit-colon": "exists:1:x", "drive-rel": "exists:C:x", "dot": "exists:.", "dot-slash-dot": "exists:./."}
     conf.write_text("W54=on\n", encoding="utf-8", newline="\n")
 
     def render_w62_rows(forms: dict, bare: bool) -> str:
@@ -1850,6 +1860,7 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
         check("[dWB-62 AC1] the shell reader names no admissible row on stderr, and selfcheck refuses none",
               not any(f"{here} declares" in ln for ln in sh.stderr.splitlines())
               and not extract_refused(sc, admissible), sh.stderr[-800:] + sc.stdout[-800:])
+        seen = [(lbl, w, by_regen, sh, sc) for lbl, w in admissible.items()]
         # S3, S21, S22 — each refused form alone beside one conf-true row.
         graded = 0
         for lbl, w in refused.items():
@@ -1868,9 +1879,27 @@ def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
                       any(f"[[generated]] row {{kit}}/w54-{lbl}.out:" in ln
                           and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
                           for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+            if lbl == "dotdot":
+                # TOOL-dWitnessedBar-65 AC2 (S20): the `a/../b` row's failure line is selfcheck's own,
+                # naming the entry, the row and the `exists:` path; `demand_contained_dest`'s Refusal,
+                # whose hint names `deploy.toml`, never reaches it.
+                check("[dWB-65 AC2] selfcheck's line for the a/../b row names the entry, the row and the "
+                      "exists: path, and no deploy.toml",
+                      any("entry 'run-gates'" in ln and f"row {{kit}}/w54-{lbl}.out:" in ln and repr(w) in ln
+                          and "deploy.toml" not in ln for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+            seen.append((lbl, w, by_regen, sh, sc))
             graded += 1
-        check("[dWB-62 AC2] [dWB-63 AC5] every refused form was read in its own tree",
-              graded == len(refused) == 10, f"{graded} of {len(refused)}")
+        check("[dWB-62 AC2] [dWB-63 AC5] [dWB-65 AC1] every refused form was read in its own tree",
+              graded == len(refused) == 17, f"{graded} of {len(refused)}")
+        # TOOL-dWitnessedBar-65 S1: one line per form, its three readers' outcomes side by side.
+        for lbl, w, by_regen, sh, sc in seen:
+            o_regen = ("refused" if isinstance(by_regen, str) and f"w54-{lbl}.out" in by_regen
+                       else "kept" if isinstance(by_regen, set) and lbl in by_regen else "not kept")
+            o_shell = ("refused" if any(f"{here} declares" in ln and ln.endswith(f"skipped: {w}")
+                                        for ln in sh.stderr.splitlines())
+                       else "kept" if lbl in extract_labels(sh, {lbl: w}) else "not kept")
+            o_self = "refused" if extract_refused(sc, {lbl: w}) else "admitted"
+            print(f"      form {lbl} {w}: regen {o_regen} · shell {o_shell} · selfcheck {o_self}")
         # TOOL-dWitnessedBar-63 AC14 (S22): a row carrying a path and `when = "exists:"` and no generator,
         # beside one conf-true row. The shell reader reads each row whole and grades the `when` before the
         # generator, so it names the descriptor and the `when` and keeps the conf-true row only. RED

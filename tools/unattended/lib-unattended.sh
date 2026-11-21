@@ -924,6 +924,9 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
   # with a malformed `when` is named too. An `exists:` path has every `\` folded to `/` before the
   # containment test, and a colon anywhere refuses it (S9, §8 F6): `..\x`, `\\server\share` and `a:b`
   # are skipped with the line, as govkit's `derive_contained_rel` and regen's `check_when` refuse them.
+  # So is a path this kit's `normpath` reads as `.`, such as `.` or `./.` (TOOL-dWitnessedBar-65 S2,
+  # §8 F5): the Python readers refuse a normal form of `.`, and `[ -e "$root/." ]` would keep it. A
+  # pattern refusal sets `_np` to `.` so both reach the one skip line.
   local _rg_ln
   {
     while IFS= read -r _rg_ln; do
@@ -941,8 +944,10 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
           _rg_kv=${_rg_kv//\\//}
           case "$_rg_kv" in
             *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] when with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
-            /*|*:*|..|../*|*/..|*/../*) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+            /*|*:*|..|../*|*/..|*/../*) _np=. ;;
+            *) normpath "$_rg_kv" >/dev/null ;;
           esac
+          [ "$_np" != . ] || { printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue; }
           [ -e "$_rg_root/$_rg_kv" ] || continue ;;
         *:*=*)
           _rg_kv=${_rg_w#*:}

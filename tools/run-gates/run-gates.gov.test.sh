@@ -243,7 +243,10 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=41
+FLOOR_ASSERTIONS=47
+# RAISED 41 -> 47 by TOOL-dWitnessedBar-65 on 2026-11-21: the key-no-tab record read by the hook's
+# read_green_file and by read_tag_lines, and the PM_SCRUB reader's trailing-comment, one-line,
+# cut-under-a-comment and token-grammar copies, one assertion each. Counted by reading; no suite ran.
 # RAISED 38 -> 41 by TOOL-dWitnessedBar-63 on 2026-11-21: the scrub parity arm's first-and-last-name read
 # and its copy with the PM_SCRUB assignment taken out, and the key-no-tab plant in the verdict backends'
 # plant loop, one assertion each. Counted by reading; no suite ran.
@@ -811,13 +814,39 @@ for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache
   esac
 done
 
+# ---- THE KEY-NO-TAB RECORD'S CRLF AND REPEATED KEY, READ BY THE HOOK (TOOL-dWitnessedBar-65 AC12, S15) ----
+# The `key-no-tab` plant's record also holds `verdict<TAB>GREEN<CR>` and two `sha` lines, and the plant
+# above reads it on `local-hook`, which reaches the pair line only where the verdict reads GREEN. Here the
+# same lines are read by the hook's `read_green_file`, cut from the hook alone, and by `read_tag_lines`,
+# the reader `local-hook` goes through, over the file's bytes: both take the second `sha`, and
+# `read_tag_lines` reads `GREEN`. RED against a hook read printing every match. WHAT THIS DOES NOT
+# CHECK: a CR on a key `read_green_file` reads, which TOOL-dWitnessedBar-66 plants, or a `verdict` read
+# by the hook, which reads none.
+rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+printf 'verdict\tGREEN\r\nsha\t%s\nsha\t%s\n' "$rgf_a" "$rgf_b" > "$rgf_t/record"
+rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
+rgf_sha=$( eval "$rgf_fn"; read_green_file "$rgf_t/record"; printf '%s' "$rec_sha" )
+a=$((a+1))
+[ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
+  || { echo "gov-canary: the hook's read_green_file read sha as '${rgf_sha//$'\n'/|}' over two sha lines, not the second, or did not cut from the hook"; fail=1; }
+rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), r.get("sha"))' \
+  "$KITDIR" "$rgf_t/record" 2>&1 | tr -d '\r')
+a=$((a+1))
+[ "$rgf_py" = "'GREEN' $rgf_b" ] \
+  || { echo "gov-canary: read_tag_lines over the CRLF verdict and two sha lines read '$rgf_py', not 'GREEN' and the second sha"; fail=1; }
+rm -rf "$rgf_t"
+
 # ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
 # The pre-push hook scrubs `BAR_SCRUBBED_KNOBS` and clears `BAR_CLEARED_KNOBS` before its bar; post-merge's
 # `PM_SCRUB` and the unattended driver's `_gknobs` run bars whose green is trusted for the whole tree, so
 # each must carry every one of those names. The hook's two lists and `_gknobs` are read by the one-line
 # cuts the driver suite's parity arm uses, each list there being one line; `PM_SCRUB` spans lines and is
-# read as a range, from the line opening `PM_SCRUB="` to the line closing the quote, quotes stripped and
-# newlines folded to spaces: the reading post-merge itself applies, `${PM_SCRUB//$'\n'/ }`. The arm
+# read in awk from the line opening `PM_SCRUB="` to the first line, that one included, holding the
+# closing quote, whatever follows the quote discarded and newlines folded to spaces: the reading
+# post-merge itself applies, `${PM_SCRUB//$'\n'/ }`. Each name read must match `^[A-Z_][A-Z0-9_]*$`
+# (TOOL-dWitnessedBar-65 S17); a `sed` range never tested its opening line for the end and needed the
+# quote to end a line, so a trailing comment's words entered the list. The arm
 # prints the count of names it read from each of the four lists, and the first and last name of
 # `PM_SCRUB`, so a short read shows (TOOL-dWitnessedBar-63 S3); the range read must hold the names on the
 # assignment's first and last physical lines. A list that reads empty is named too, so a moved or
@@ -825,12 +854,14 @@ done
 # cut from `PM_SCRUB`, the `PM_SCRUB` assignment taken out, and the hook's `BAR_CLEARED_KNOBS` line taken
 # out. WHAT THIS DOES NOT CHECK: that either caller honours its list at run time (the evidence suite's
 # post-merge arm observes one), the hook's `ENV_DROPPED_KNOBS`, or the policy keys set from R's file.
-check_bar_scrub_parity() {   # hook · post-merge · driver -> one `read` line of the four counts, then one line per missing name or empty list
+bsp_pm_read='!on && /^PM_SCRUB="/ { on = 1; sub(/^PM_SCRUB="/, "") }
+  on { i = index($0, "\""); if (i) { print substr($0, 1, i - 1); exit } print }'
+check_bar_scrub_parity() {   # hook · post-merge · driver -> one `read` line of the four counts, then one line per missing name, empty list or ill-formed name
   local sk ck pm dr k out=""
   local -a ws wc wp wd
   sk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
   ck=$(sed -n 's/^BAR_CLEARED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
-  pm=$(sed -n '/^PM_SCRUB="/,/"$/p' "$2" 2>/dev/null | sed -e 's/^PM_SCRUB=//' -e 's/"//g' | tr '\n' ' ')
+  pm=$(awk "$bsp_pm_read" "$2" 2>/dev/null | tr '\n' ' ')
   dr=$(sed -n 's/^ *local _gk _gknobs="\([^"]*\)".*/\1/p' "$3" 2>/dev/null)
   ws=($sk); wc=($ck); wp=($pm); wd=($dr)
   printf 'read BAR_SCRUBBED_KNOBS %d · BAR_CLEARED_KNOBS %d · PM_SCRUB %d (%s … %s) · _gknobs %d\n' \
@@ -843,6 +874,9 @@ check_bar_scrub_parity() {   # hook · post-merge · driver -> one `read` line o
     case " $pm " in *" $k "*) ;; *) out+="PM_SCRUB in $2 lacks $k"$'\n' ;; esac
     case " $dr " in *" $k "*) ;; *) out+="_gknobs in $3 lacks $k"$'\n' ;; esac
   done
+  for k in "${wp[@]}"; do
+    case "$k" in [!A-Z_]*|*[!A-Z0-9_]*) out+="PM_SCRUB in $2 holds $k, outside ^[A-Z_][A-Z0-9_]*\$"$'\n' ;; esac
+  done
   printf '%s' "$out"
   [ -z "$out" ]
 }
@@ -853,7 +887,8 @@ bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_pm" "$bsp_drv") \
   || { echo "gov-canary: a bar caller does not scrub every knob the pre-push hook scrubs or clears:"; printf '%s\n' "$bsp_out" | sed 's/^/  /'; fail=1; }
 # The names on the assignment's first and last physical lines, read apart from the range cut.
 bsp_first=$(sed -n 's/^PM_SCRUB="\([^ "]*\).*/\1/p' "$bsp_pm")
-bsp_last=$(sed -n '/^PM_SCRUB="/,/"$/{/"$/s/.*[ "]\([^ "]*\)"$/\1/p}' "$bsp_pm")
+bsp_last=$(awk '!on && /^PM_SCRUB="/ { on = 1; sub(/^PM_SCRUB="/, "") }
+  on && (i = index($0, "\"")) { s = substr($0, 1, i - 1); sub(/[ \t]+$/, "", s); sub(/.*[ \t]/, "", s); print s; exit }' "$bsp_pm")
 a=$((a+1))
 case "${bsp_out%%$'\n'*}" in
   *"PM_SCRUB "*" ($bsp_first … $bsp_last) "*)
@@ -880,6 +915,34 @@ bsp_out=$(check_bar_scrub_parity "$bsp_t/pre-push" "$bsp_pm" "$bsp_drv") \
   && { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line passed the scrub parity arm"; fail=1; }
 printf '%s\n' "$bsp_out" | grep -q '^BAR_CLEARED_KNOBS reads empty' \
   || { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line was not named as an empty list: $bsp_out"; fail=1; }
+# TOOL-dWitnessedBar-65 AC14 (S17): a copy carrying `  # note GATE_SELECTION` after the closing quote, and
+# one holding the assignment on a single line, each read exactly the base list; with GATE_SELECTION cut
+# from the list while the comment still names it, the arm fails naming it; a planted `bad-name` fails the
+# token grammar. RED against the `sed` range, which reads the comment's words into the list.
+bsp_words=$(awk "$bsp_pm_read" "$bsp_pm" | tr -s ' \t' '\n\n' | grep .)
+bsp_line=$(printf '%s\n' "$bsp_words" | tr '\n' ' ')
+sed "s/ $bsp_last\"\$/ $bsp_last\"  # note GATE_SELECTION/" "$bsp_pm" > "$bsp_t/pm-comment.sh"
+printf '#!/usr/bin/env bash\nPM_SCRUB="%s"\n' "${bsp_line% }" > "$bsp_t/pm-one-line.sh"
+sed '/^PM_SCRUB="/,/# note GATE_SELECTION$/s/ GATE_SELECTION\([ "]\)/\1/' "$bsp_t/pm-comment.sh" > "$bsp_t/pm-comment-cut.sh"
+sed "s/ $bsp_last\"\$/ bad-name $bsp_last\"/" "$bsp_pm" > "$bsp_t/pm-bad.sh"
+for bsp_c in pm-comment pm-one-line; do
+  a=$((a+1))
+  bsp_cw=$(awk "$bsp_pm_read" "$bsp_t/$bsp_c.sh" | tr -s ' \t' '\n\n' | grep .)
+  { [ "$bsp_cw" = "$bsp_words" ] && [ "$(printf '%s\n' "$bsp_words" | grep -c .)" -gt 1 ] \
+    && { [ "$bsp_c" != pm-comment ] || [ "$(grep -c '"  # note GATE_SELECTION$' "$bsp_t/$bsp_c.sh")" = 1 ]; } \
+    && check_bar_scrub_parity "$bsp_hook" "$bsp_t/$bsp_c.sh" "$bsp_drv" >/dev/null; } \
+    || { echo "gov-canary: the PM_SCRUB reader over $bsp_c did not read exactly the base list: $(printf '%s' "$bsp_cw" | tr '\n' ' ')"; fail=1; }
+done
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/pm-comment-cut.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut and named by a trailing comment passed the scrub parity arm"; fail=1; }
+{ printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* lacks GATE_SELECTION$' && grep -q '# note GATE_SELECTION$' "$bsp_t/pm-comment-cut.sh"; } \
+  || { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut, named by a trailing comment, was not named for it: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/pm-bad.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy holding bad-name passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* holds bad-name, outside ' \
+  || { echo "gov-canary: a PM_SCRUB copy holding bad-name was not named for the token grammar: $bsp_out"; fail=1; }
 rm -rf "$bsp_t"
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }

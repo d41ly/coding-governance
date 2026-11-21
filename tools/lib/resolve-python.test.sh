@@ -1594,6 +1594,68 @@ if [ "$("$REALPY" -c 'import os; print(os.name)' | tr -d '\r')" = nt ]; then
     || bad "63 AC6: seed --home $ll_other:/x from a fixture on $ll_drive: did not read outside the tree: $out / $(tr '\n' '|' < "$LL/py.out") $(tr '\n' '|' < "$LL/py.err")"; ok
 fi
 
+# ---- 2o, no repository, no git and a given --sha (TOOL-dWitnessedBar-65 AC6 AC7 AC8) -----------------
+# A scratch directory under no repository, `GIT_CEILING_DIRECTORIES` its parent: `seed --population p`
+# exits 1 with one `unarmed p no HEAD: ` line, that reason and `nothing written` on stderr and nothing
+# written, and `--all` exits 1 with stdout empty and `seed: no HEAD: ` on stderr, before any registration
+# is read. With `PATH` naming only an empty directory and python run by absolute path, the reason is
+# `git not runnable: `. Over the committed fixture's two registrations, a stand-in for `subprocess.run`
+# on the `--verify` call alone, raising `TimeoutExpired` and then exiting 2 silently, gives each
+# population of `seed --all` its no-HEAD line. Then `--sha`: the null SHA in a repository with commits and
+# a sha naming no commit exit 2 naming --sha with no home; HEAD's first 8 hex characters in upper case,
+# or the shortest longer prefix holding a letter, arm p at HEAD's full lowercase sha; on a commitless
+# `git init` the null SHA arms. RED against the exit-2 work-tree refusal and against a `--sha` stamped
+# without resolving. WHAT THIS DOES NOT CHECK: a git that hangs for real, since no seed call passes git a
+# timeout; an abbreviation two commits share.
+LLN="$LL/norepo"; mkdir -p "$LLN" "$LL/nopath"
+out=$(LLU="$LLN" GIT_CEILING_DIRECTORIES="$LL" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
+{ [ "$out" = rc=1 ] && [ "$(wc -l < "$LL/py.out")" -eq 1 ] && grep -q '^unarmed p no HEAD: .' "$LL/py.out" \
+  && grep -q '^legacy_ledger: p: no HEAD: .*; nothing written$' "$LL/py.err" && ! grep -q Traceback "$LL/py.err" \
+  && [ -z "$(ls -A "$LLN")" ]; } \
+  || bad "65 AC6: seed --population p outside any repository did not exit 1 with one no-HEAD line and nothing written: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+out=$(LLU="$LLN" GIT_CEILING_DIRECTORIES="$LL" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--all"]))')
+{ [ "$out" = rc=1 ] && [ ! -s "$LL/py.out" ] && grep -q '^seed: no HEAD: .' "$LL/py.err" && ! grep -q Traceback "$LL/py.err" \
+  && [ -z "$(ls -A "$LLN")" ]; } \
+  || bad "65 AC6: seed --all outside any repository did not exit 1 with stdout empty and seed: no HEAD: on stderr: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+(cd "$LLN" && PATH="$LL/nopath" "$FLOORPY" -B "$HERE/legacy_ledger.py" seed --population p) >"$LL/py.raw" 2>"$LL/py.rawerr"; ll_rc=$?
+tr -d '\r' < "$LL/py.raw" > "$LL/py.out"; tr -d '\r' < "$LL/py.rawerr" > "$LL/py.err"
+{ [ "$ll_rc" = 1 ] && grep -q '^unarmed p no HEAD: git not runnable: .' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "65 AC7: seed with no git on PATH did not read no HEAD: git not runnable: rc=$ll_rc / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+for ll_fx in timeout:'git not runnable: ' silent:'git rev-parse exited 2'; do
+  out=$(run_ll_py '_run = L.subprocess.run
+def run(argv, **kw):
+    if "--verify" not in argv:
+        return _run(argv, **kw)
+    if sys.argv[2] == "timeout":
+        raise L.subprocess.TimeoutExpired(argv, 60)
+    return L.subprocess.CompletedProcess(argv, 2, "", "")
+L.subprocess.run = run
+sys.exit(L.run_seed_cli(["--all"], "."))' "${ll_fx%%:*}")
+  { [ "$out" = rc=1 ] && grep -qF "unarmed p no HEAD: ${ll_fx#*:}" "$LL/py.out" && grep -qF "unarmed x1 no HEAD: ${ll_fx#*:}" "$LL/py.out" \
+    && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "65 AC7: seed --all under a ${ll_fx%%:*} --verify call did not give p and x1 each a no-HEAD line reading ${ll_fx#*:}: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+rm -f "$LL_UHOME"
+for ll_sha in "$LL_NULL" deadbeef; do
+  out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_sha")
+  { [ "$out" = rc=2 ] && grep -q -- '--sha' "$LL/py.err" && [ ! -e "$LL_UHOME" ] \
+    && ! git -C "$LLU" rev-parse --verify --quiet "$ll_sha^{commit}" >/dev/null; } \
+    || bad "65 AC8: seed --sha $ll_sha in a repository with commits did not exit 2 naming --sha with no home: $out / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
+ll_n=8; while [ "$ll_n" -lt 40 ] && [ -z "$(printf '%s' "${ll_uhead:0:$ll_n}" | tr -d '0-9')" ]; do ll_n=$((ll_n+1)); done
+ll_up=$(printf '%s' "${ll_uhead:0:$ll_n}" | tr a-f A-F)
+out=$(run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$ll_up")
+{ [ "$out" = rc=0 ] && grep -q '^armed p ' "$LL/py.out" && grep -qxF "a${T}1${T}${ll_uhead}${T}seeded" "$LL_UHOME" \
+  && [ "$ll_up" != "${ll_uhead:0:$ll_n}" ]; } \
+  || bad "65 AC8: seed --sha $ll_up did not arm p at HEAD's full lowercase sha $ll_uhead: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+LLZ="$LL/unborn-sha"; mkdir -p "$LLZ/tools/fx" "$LLZ/memory/project"
+git init -q "$LLZ" && git -C "$LLZ" config core.autocrlf false
+cp "$LLR/fxseed.py" "$LLZ/"; build_ll_seeded p memory/project/p.txt "$LL_SEEDARGV" > "$LLZ/tools/fx/kit.toml"
+printf 'a\nb\n' > "$LLZ/seed-keys.txt"; : > "$LLZ/memory/project/.keep"; git -C "$LLZ" add -A
+out=$(LLU="$LLZ" run_ll_py 'sys.exit(L.run_seed_cli(["--population", "p", "--sha", sys.argv[2]], "."))' "$LL_NULL")
+{ [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && grep -qxF "a${T}1${T}${LL_NULL}${T}seeded" "$LLZ/memory/project/p.txt"; } \
+  || bad "65 AC8: seed --sha of the null SHA on a commitless git init did not arm p with null-SHA rows: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+
 # ---- 2o, the fresh adopt (TOOL-dWitnessedBar-47 AC1) ---------------------------------------------
 # A third fixture, a `git init` with nothing committed holding this repo's drift-audit kit, its seeded
 # drift_signals.py removed, and the memory-tree kit beside it, whose copy the adopter seeds through,
