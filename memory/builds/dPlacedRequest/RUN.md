@@ -22,7 +22,7 @@ hold-reason: the landing merge of origin/main changes the protected .claude/skil
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · handoff · 84 touching
+refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 8e8230d305b04f95b1e0a0a3c8026c564f5dd7c2
 phase: VERIFYING
@@ -595,3 +595,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T02:25:49Z hold · item owner-decision · reason until owner · reaped 65b12df9 · resume none(owner)
 
 2026-11-21T02:37:16Z resume · item dPlacedRequest · reason held · keepalive c039c97c · manual
+
+2026-11-21T09:11:56Z decision · item routed-commits-lane-limits · reason Six Red-fix commits on the run branch sit outside the inline lane's limits: eb1c1447, cf67c746, 09a53ab5, 2c6c2afe and 1983ee62 edit spec paths (L3) and 3b92d470 touches 5 paths and 90 lines (L1). routed_commits.py's RANGE half, which the pre-push hook runs over the landing range, reads no waiver, so push-main.sh --land would be refused. Options: (a) replay the run branch from the first violator's parent, each spec hunk in its own records commit and 3b92d470 in two, then force-push the run branch, as dSkippedRecord repaired the same red on 2026-11-20; (b) a unit that lets the RANGE half honour an owner-recorded waiver for limits findings; (c) the owner lands by hand. The run recommends (a), and refuses it unattended because it rewrites about 350 built commits, two merges among them.
