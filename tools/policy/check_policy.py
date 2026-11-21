@@ -68,9 +68,15 @@ read as a value.
 
 `resolution-order` is an outcome case (TOOL-dGroundRules-3), one repository per scenario read at
 `--rev HEAD`: it reds a default read over a key the file sets, an unset key or an absent file that
-refuses or reads anything but the catalogue default with its case's reason, a named preset missing
-from the reason, and a row with no default that prints a value; that row is planted in a copy of
-this kit, never in the tracked catalogue.
+refuses or reads anything but the catalogue default with its case's reason, and a row with no
+default that prints a value; that row is planted in a copy of this kit, never in the tracked
+catalogue. Its preset scenarios (KICK-dKeptSession-2) red a file naming `strict` whose
+`hooks.bypass` reads anything but `refused` from `preset` in `get` and in the mirror, a preset
+winning over the file's own `hooks.bypass`, a declared `[presets.ours]` whose own key or `strict`
+base is not read, and a kit copy carrying `presets.py` and no store that reads a value or escapes
+its refusal. `preset-every-key` reads every key each shipped preset assigns, which must answer its
+preset value from `preset`, and every `never` key but `preset`, which must answer as the absent
+file's does, in process, one line per preset.
 
 `on-invalid-classes` and `on-invalid-strict` are outcome cases (TOOL-dGroundRules-4). The first plants
 each failure class of the invalid-file branch in its own repository, and reds a default or the invalid
@@ -2111,18 +2117,22 @@ def run_reader_parsed(name):
 
 def run_resolution_order(name):
     """One repository per case, each read at `--rev HEAD`: a key the file sets and one it does not, an
-    absent file, a file naming `strict` without and with an override, and a copy of this kit whose
-    `budgets.enforce` row carries no default, read where the file does not set the key."""
+    absent file, a file naming `strict` without and with an override of `hooks.bypass`, its mirror, a
+    file declaring `[presets.ours]` over `strict` and naming it, and a copy of this kit carrying
+    `presets.py` and no store, whose `budgets.enforce` row carries no default, read where the file
+    does not set the key and where it names `strict` (KICK-dKeptSession-2)."""
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
         sets = build_reader_repo(t / "sets", '[budgets]\nenforce = "refuse"\n')
         absent = build_reader_repo(t / "absent", None)
         named = build_reader_repo(t / "named", 'preset = "strict"\n')
-        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[budgets]\nenforce = "refuse"\n')
+        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[hooks]\nbypass = "allowed"\n')
+        ours = build_reader_repo(t / "ours", 'preset = "ours"\n\n[presets.ours]\nextends = "strict"\n'
+                                             '"hooks.bypass" = "allowed"\n')
         other = build_reader_repo(t / "other", "[runtime]\nagents-in-flight = 3\n")
         kit = t / "kit"
         kit.mkdir()
-        for f in (*READER_FILES, policy.CATALOGUE):
+        for f in (*READER_FILES, "presets.py", policy.CATALOGUE):  # presets.py and no store, for `preset-store-absent`
             (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
         write_edit(kit / policy.CATALOGUE, lambda text: set_row_block(
             text, "budgets.enforce", lambda b: re.sub(r"^default = .*\n", "", b, flags=re.M)))
@@ -2134,15 +2144,69 @@ def run_resolution_order(name):
                       lambda rc, o, e: rc == 0 and o == "6\n" and " · default · not set in " in e),
             check_get("file-absent", absent, ["budgets.enforce", *get],
                       lambda rc, o, e: rc == 0 and o == "warn\n" and f" · default · {POLICY_REL} is absent at " in e),
-            check_get("preset-named", named, ["budgets.enforce", *get],
-                      lambda rc, o, e: rc == 0 and o == "warn\n" and " · default · " in e
-                      and "preset strict, not applied until dKeptSession" in e),
-            check_get("preset-overridden", over, ["budgets.enforce", *get],
-                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · file · " in e),
+            check_get("preset-named", named, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "refused\n" and " · preset · preset strict at " in e),
+            check_get("preset-named", named, ["--print"], lambda rc, o, e: rc == 0 and json.loads(o)["keys"].get(
+                      "hooks.bypass") == {"reason": "preset strict at {rev}", "source": "preset", "value": "refused"},
+                      verb="mirror"),
+            check_get("preset-overridden", over, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "allowed\n" and " · file · " in e),
+            check_get("preset-declared", ours, ["hooks.bypass", *get],
+                      lambda rc, o, e: rc == 0 and o == "allowed\n" and " · preset · preset ours at " in e),
+            check_get("preset-declared", ours, ["leases", *get],
+                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · preset · preset ours at " in e),
+            check_get("preset-store-absent", named, ["hooks.bypass", "--rev", "HEAD"],
+                      lambda rc, o, e: rc == 2 and not o and len(e.splitlines()) == 1
+                      and e.startswith("policy: refused · ") and presets.STORE in e, kit=kit),
             check_get("no-default", other, ["budgets.enforce", "--rev", "HEAD"],
                       lambda rc, o, e: rc == 2 and not o and "catalogue.toml" in e
                       and "the row budgets.enforce carries no default" in e, kit=kit),
         ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_preset_every_key(name):
+    """`preset-every-key` (KICK-dKeptSession-2 S3), DA-M10's resolution-order check per shipped preset:
+    one repository whose policy file sets only `preset = "<name>"` per preset of the shipped store,
+    beside one with no policy file, each read once through `policy.read_revision` at HEAD. Every key
+    the preset's assignment holds must read in process through `policy.resolve_read` at its preset
+    value with source `preset`; every `never` key but `preset`, which the file sets, must read what
+    the absent file reads, value and source, or the same refusal, a placeholder or `*` segment read
+    at the concrete segment `fixture`. One line per preset; an empty assignment, an empty `never`
+    list or a store holding no preset is a WRONG, never a pass. WHAT IT DOES NOT CHECK: a derived row
+    the preset leaves unassigned (KICK-dKeptSession-34's), a repository's declared preset, which
+    `resolution-order`'s `preset-declared` reads, and what `get` prints."""
+
+    def read_outcome(path, read):
+        try:
+            hit = policy.resolve_read(path, policy.read_catalogue_row(path, read["rows"]), read)
+        except policy.Refusal as exc:
+            return ("refused", exc.path, exc.line, exc.why)
+        return (hit.source, policy.render_json(hit.value))
+
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        store = presets.load_presets(KIT)
+        never = [n for n in presets.derive_never(store) if n != presets.PRESET_KEY[0]]
+        paths = [tuple("fixture" if policy.check_pattern_name(s) else s for s in n.split(".")) for n in never]
+        absent = policy.read_revision(build_reader_repo(t / "absent", None), "HEAD")
+        shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
+        for preset in shipped:
+            read = policy.read_revision(build_reader_repo(t / preset, f'preset = "{preset}"\n'), "HEAD")
+            assignment = presets.derive_preset_assignment(preset, store, None)
+            wrong = [f"{policy.render_dotted(p)} read {seen}" for p, want in assignment.items()
+                     if (seen := read_outcome(p, read)) != ("preset", policy.render_json(want))]
+            wrong += [f"{policy.render_dotted(p)} read {seen}, the absent file {base}" for p in paths
+                      if (seen := read_outcome(p, read)) != (base := read_outcome(p, absent))]
+            if not assignment or not paths:
+                wrong.append(f"a population of 0: {len(assignment)} assigned key(s), {len(paths)} never key(s)")
+            checks.append((preset, f"{len(assignment)} assigned key(s) from the preset, {len(paths)} never key(s) "
+                           "as the absent file", not wrong, "; ".join(wrong[:3]) or "every read as wanted"))
+        if not shipped:
+            checks.append(("store", "the shipped presets", False, f"{presets.STORE} holds no [preset.<name>] table"))
     finally:
         remove_repo(t)
     return print_checks(name, checks)
@@ -5915,6 +5979,7 @@ CASES = [
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
+    ("preset-every-key", None, run_preset_every_key),  # every assigned and `never` key per shipped preset (KICK-dKeptSession-2)
     ("on-invalid-classes", None, run_on_invalid_classes),
     ("on-invalid-strict", None, run_on_invalid_strict),
     *((c, None, run_reader_refusals) for c in READER_REFUSAL_CASES),  # the reader's refusals (TOOL-dGroundRules-21)

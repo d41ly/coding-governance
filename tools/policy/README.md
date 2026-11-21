@@ -33,7 +33,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `presets.toml` | the named presets (KICK-dKeptSession-1): one `[preset.<name>]` table per shipped preset, `velocity`, `standard`, `strict` and `guarded`, each assigning every presettable key by a quoted dotted key; the `never` list, the keys presets never touch; the `literal` list, `maintain.fixes` and `review.<stage>`, the derived-default rows the presets assign literal values while every other derived row reads unassigned (KICK-dKeptSession-33); and the `pairs` list of `[<higher>, <lower>]` keys. Its one writer is the preset kind's factory, `core.py new preset <name> --from <preset>` |
-| `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion` |
+| `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, `derive_declared_presets`, which the reader's preset step passes it, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 | `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 
@@ -245,10 +245,17 @@ symbol, never by line, so no later edit strands the citation (TOOL-dGroundRules-
   value. `resolve` runs `RESOLUTION_ORDER`, the one order, and the first step to answer wins; each
   step takes `(path, row, table, rev_phrase)`, `table` None for an absent file, and names the
   revision read only through `rev_phrase`, the read's `<sha8>, <how>`. `read_file_value`
-  answers `Resolution(value, "file", reason)` where the file sets the key; `read_default_value`
-  answers the row's `default` with source `default` and a reason naming the case, absent or not
-  set, and any `preset` the file names, which no step applies until dKeptSession adds its step
-  between the two. A row with no `default` refuses, naming it in the catalogue.
+  answers `Resolution(value, "file", reason)` where the file sets the key; `read_preset_value`
+  (KICK-dKeptSession-2), where the file names a `preset`, answers that preset's value with source
+  `preset` and the reason `preset <name> at <rev_phrase>`, looked up by exact path in
+  `read_preset_assignment`, `presets.derive_preset_assignment` over the store `read_kit_presets`
+  parses once per process and the file's `[presets]` table that `presets.derive_declared_presets`
+  rebuilds from the flattened leaves, each kept in a one-slot cache; it answers None for an absent
+  file, a file naming no preset, before importing `presets.py`, and a key the assignment lacks, a
+  `never` key among them. A `presets.py` that does not import, an absent or unparsable store and a
+  name no preset holds are each a Refusal `get` prints. `read_default_value` answers the row's
+  `default` with source `default` and a reason naming the case, absent or not set. A row with no
+  `default` refuses, naming it in the catalogue.
 - **An invalid file** (TOOL-dGroundRules-4). `validate(text)` is the file's one judge, and
   `arm_schema` grades through it: a list of `Problem(line, key, why)`, empty for a valid file. Text
   that is not TOML is one problem at the decoder's line, key `""`; text that parses has one per leaf
@@ -582,9 +589,17 @@ and a backticked `touch`, which must read its value; the marker must not exist a
 `resolution-order` reads one repository per scenario at `--rev HEAD`: a file setting
 `budgets.enforce = "refuse"` must read `refuse` from `file` and `runtime.agents-in-flight` its
 default `6` as `not set in`; a commit with no file must read `warn` as `is absent at`; a file setting
-only `preset = "strict"` must read `warn` with the unapplied preset in its reason, and `refuse` once
-it sets the key too; and a copy of this kit whose `budgets.enforce` row carries no `default` must
-refuse, naming `catalogue.toml` and the row. `on-invalid-classes` plants each failure class of the
+only `preset = "strict"` must read `hooks.bypass` as `refused` from `preset`, the reason naming
+`strict`, in `get` and as `preset strict at {rev}` in `mirror --print`, and `allowed` from `file`
+once it sets `[hooks]` `bypass = "allowed"` too; a file declaring `[presets.ours]` extending
+`strict` with `"hooks.bypass" = "allowed"` and naming `ours` must read that `allowed` and `strict`'s
+`leases` `refuse`, each from `preset` naming `ours`; and a copy of this kit carrying `presets.py` and
+no `presets.toml` must refuse the `strict` file's read with one line naming `presets.toml`, and,
+its `budgets.enforce` row carrying no `default`, refuse that key, naming `catalogue.toml` and the
+row. `preset-every-key` (KICK-dKeptSession-2) reads, per shipped preset, a repository whose file
+sets only `preset = "<name>"` and one with no file, in process: every key the preset assigns must
+read its value from `preset`, and every `never` key but `preset` as the absent file reads it, a
+placeholder segment read at `fixture`. `on-invalid-classes` plants each failure class of the
 invalid-file branch in its own repository, V a valid revision and C the one after it: an absent
 file reads defaults; a malformed C after V reads V with source `last-valid` and `check` names the
 fallback; a malformed revision with nothing before it refuses `get` and `check` naming its line,

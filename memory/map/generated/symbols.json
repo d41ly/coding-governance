@@ -11173,6 +11173,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_declared_presets",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -21978,6 +21983,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "read_kit_presets",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_kit_rel",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
@@ -23101,6 +23111,16 @@
       "id": "read_preflight_probes",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_preset_assignment",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_preset_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_printed",
@@ -32161,6 +32181,11 @@
       "id": "run_prefix_commit",
       "kind": "function",
       "file": ".githooks/pre-commit.test.sh"
+    },
+    {
+      "id": "run_preset_every_key",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_presets_complete",

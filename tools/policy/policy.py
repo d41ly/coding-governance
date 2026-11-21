@@ -33,7 +33,8 @@ working tree, and parses it with tomllib, never by sourcing it: `read_policy_key
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
 with no remote at all the local default branch, and every reason names its sha through the read's
 one `rev_phrase`, which the mirror's render spells `{rev}` (TOOL-dGroundRules-65). A key resolves in
-RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason. A
+RESOLUTION_ORDER, spelled once: the file's value, then the value of the preset the file names, from
+`presets.py`'s one assignment (KICK-dKeptSession-2), then the catalogue default with its reason. A
 file `validate` refuses never reads a default: the whole file falls back to its last valid revision
 on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
 
@@ -752,12 +753,71 @@ def read_file_value(path, row, table, rev_phrase):
     return Resolution(table[path], "file", f"set in {POLICY_REL} at {rev_phrase}")
 
 
+# The preset step's two one-slot caches (KICK-dKeptSession-2 S5, §8 F2): the store, parsed once per
+# process, and the last assignment derived, keyed by the preset's name and the declared table's JSON.
+PRESET_STORE_SLOT = []
+PRESET_ASSIGNMENT_SLOT = []
+
+
+def read_kit_presets():
+    """The preset store beside this kit, `presets.load_presets(KIT)`, parsed once per process. A
+    `presets.py` that does not import is a Refusal naming it, as `validate` names it; an absent or
+    unparsable store is the store's own Refusal, re-raised as this module's, since `presets.py`
+    imports this file as `policy`, a second module object when it runs as `__main__`."""
+    if not PRESET_STORE_SLOT:
+        try:
+            import presets  # the presets' module beside this file; it imports this one, so never at the top
+        except ImportError as exc:
+            raise Refusal((KIT / "presets.py").as_posix(), 0, f"presets.py, the named presets' module, does "
+                          f"not import beside {(KIT / 'policy.py').as_posix()}: {exc}") from None
+        try:
+            PRESET_STORE_SLOT.append(presets.load_presets(KIT))
+        except presets.policy.Refusal as exc:
+            raise Refusal(exc.path, exc.line, exc.why) from None
+    return PRESET_STORE_SLOT[0]
+
+
+def read_preset_assignment(name, declared):
+    """{key path: value} for the preset `name`, `presets.derive_preset_assignment` over the store
+    `read_kit_presets` reads and `declared`, the policy file's `[presets]` table nested, kept for the
+    last (name, declared) pair. A name neither the store nor `declared` holds is that function's
+    Refusal, re-raised as this module's."""
+    store = read_kit_presets()
+    import presets  # read_kit_presets imported it, or refused
+    key = (name, render_json(declared))
+    if not PRESET_ASSIGNMENT_SLOT or PRESET_ASSIGNMENT_SLOT[0][0] != key:
+        try:
+            assignment = presets.derive_preset_assignment(name, store, declared)
+        except presets.policy.Refusal as exc:
+            raise Refusal(exc.path, exc.line, exc.why) from None
+        PRESET_ASSIGNMENT_SLOT[:] = [(key, assignment)]
+    return PRESET_ASSIGNMENT_SLOT[0][1]
+
+
+def read_preset_value(path, row, table, rev_phrase):
+    """Resolution(value, "preset", reason) where the parsed `table` names a `preset` whose assignment
+    holds `path`, looked up by exact path alone, else None (KICK-dKeptSession-2 S1). An absent file
+    (`table` None) and a file naming no preset answer None before any import, so a kit copy without
+    `presets.py` reads such a file as before. The assignment is `read_preset_assignment` over the
+    file's declared presets, `presets.derive_declared_presets`; a `never` key is in none, so it
+    misses. `row` is unread; the reason names the revision only through `rev_phrase`."""
+    if table is None or ("preset",) not in table:
+        return None
+    name = table[("preset",)]
+    read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    assignment = read_preset_assignment(name, presets.derive_declared_presets(table))
+    if path not in assignment:
+        return None
+    return Resolution(assignment[path], "preset", f"preset {name} at {rev_phrase}")
+
+
 def read_default_value(path, row, table, rev_phrase):
     """Resolution(the row's default, "default", reason), the reason naming the revision by
-    `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`, then
-    any `preset` the file names, which is not applied. A row with no `default` is a Refusal naming
-    it, never an invented value, and so is a row whose default is `{ derived = "..." }`: its prose is
-    no value, and a table read as one would be (TOOL-dGroundRules-21 S12)."""
+    `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`. A
+    row with no `default` is a Refusal naming it, never an invented value, and so is a row whose
+    default is `{ derived = "..." }`: its prose is no value, and a table read as one would be
+    (TOOL-dGroundRules-21 S12)."""
     if "default" not in row:
         raise Refusal((KIT / CATALOGUE).as_posix(), 0,
                       f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
@@ -766,16 +826,13 @@ def read_default_value(path, row, table, rev_phrase):
                       f"so {render_dotted(path)} has no value to read until the file sets it")
     at = f"at {rev_phrase}; the catalogue default"
     reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
-    if table is not None and ("preset",) in table:
-        p = table[("preset",)]
-        reason += (f"; the file names preset {p if isinstance(p, str) else render_json(p)}, "
-                   "not applied until dKeptSession adds presets to this reader")
     return Resolution(row["default"], "default", reason)
 
 
 # The one order a key resolves in (TOOL-dGroundRules-3): `resolve` calls each step with (path, row,
-# table, rev_phrase) and the first Resolution answers. dKeptSession adds its preset step between the two.
-RESOLUTION_ORDER = (read_file_value, read_default_value)
+# table, rev_phrase) and the first Resolution answers: the file, the preset it names
+# (KICK-dKeptSession-2), the catalogue default.
+RESOLUTION_ORDER = (read_file_value, read_preset_value, read_default_value)
 
 
 def read_ordered_value(path, row, table, rev_phrase):
