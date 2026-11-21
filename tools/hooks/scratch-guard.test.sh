@@ -1765,9 +1765,9 @@ sg_got=$(env -u GOV_BASH PATH="$sg_sb:$PATH" "$sg_node" -e 'const c = require(pr
   || { echo "FAIL AC28 a bash first on PATH that cannot run the checker is passed over, and the card is read: $sg_got"; fail=$((fail+1)); }
 if [ -n "$sg_win" ]; then
   sg_cm=$(cygpath -m "$sg_cc/stub-card.md")
-  sg_cu="/$(printf '%s' "${sg_cm:0:1}" | tr 'A-Z' 'a-z')${sg_cm:2}"
+  sg_cd=${sg_cm:0:1}; sg_cu="/${sg_cd,,}${sg_cm:2}"
   printf '%s\n' '#!/usr/bin/env bash' "printf '%s\\n' '$sg_cu'" > "$sg_cc/answers-msys.sh"
-  sg_got=$(GOV_BASH="$(cygpath -m "$(command -v bash)")" PATH="$(dirname "$sg_node")" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim() + " · " + (/^[A-Za-z]:\//.test(c.path) ? "native" : "as printed " + c.path))' "$HOOK" "$SGFIX/.git" "$sg_cc/answers-msys.sh" 2>&1)
+  sg_got=$(GOV_BASH="$(cygpath -m "$(command -v bash)")" PATH="${sg_node%/*}" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim() + " · " + (/^[A-Za-z]:\//.test(c.path) ? "native" : "as printed " + c.path))' "$HOOK" "$SGFIX/.git" "$sg_cc/answers-msys.sh" 2>&1)
   [ "$sg_got" = "card — the stub card · native" ] && { echo "ok   AC28 a checker printing $sg_cu is read at its native path"; pass=$((pass+1)); } \
     || { echo "FAIL AC28 a checker printing an MSYS /c/ path is read at its native path $sg_cm: $sg_got"; fail=$((fail+1)); }
 else
