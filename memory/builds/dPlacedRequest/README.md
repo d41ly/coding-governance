@@ -170,7 +170,7 @@ ids TOOL-dPlacedRequest-110
 | [TOOL-dPlacedRequest-100 — the entry claim takes over a stale build lease instead of waiting on it](spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md) | 38 | 2 | CLOSED | rev-1 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 447 bound to this build, across 4 record folder(s).
+Records: 448 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
