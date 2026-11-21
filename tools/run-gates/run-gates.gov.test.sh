@@ -814,30 +814,59 @@ for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache
   esac
 done
 
-# ---- THE KEY-NO-TAB RECORD'S CRLF AND REPEATED KEY, READ BY THE HOOK (TOOL-dWitnessedBar-65 AC12, S15) ----
-# The `key-no-tab` plant's record holds `verdict<TAB>GREEN<CR>` and two `sha` lines, and the plant above
-# reads it on `local-hook`, which reaches the pair line only where the verdict reads GREEN. Here those
-# lines, the second `sha` CR-ended too (TOOL-dWitnessedBar-66 S1), are read by the hook's
-# `read_green_file`, cut from the hook alone, and by `read_tag_lines`, the reader `local-hook` goes
-# through, over the file's bytes: both take the second `sha`, CR stripped, and `read_tag_lines` reads
+# ---- THE CLEAN PLANT'S RECORD, ITS CRLF AND REPEATED KEYS, READ BY THE HOOK AND BY LOCAL-HOOK (TOOL-dWitnessedBar-65 AC12, S15) ----
+# The record is the `clean` plant's last write, built by `run_local_plant` under this arm's own
+# scratch with a runner that runs no scenario, at the fixture's `<common-dir>/gate-verdict/<tree>`
+# (TOOL-dWitnessedBar-68 S1). Its `verdict`, `sha` and `reused_cache` lines are replaced by
+# `verdict<TAB>GREEN<CR>`, two `sha` lines, the second CR-ended, and `reused_cache` 1 then 0<CR>. The
+# hook's `read_green_file`, cut from the hook alone, and `read_tag_lines`, the reader `local-hook` goes
+# through, read that file's bytes: both take the second `sha`, CR stripped, and `read_tag_lines` reads
 # `GREEN`. The hook half grades `rec_sha`, the variable each staged break reaches: RED against a `sha`
 # read of `$1=="sha"{print $2}`, printing every match, and against one lacking ` sub(/\r$/, "", v);`.
+# `read --backend local-hook` over the same fixture prints GREEN only where the verdict's CR is
+# stripped and the last `reused_cache` wins; a reader keeping the first reads NONE (S3).
 # WHAT THIS DOES NOT CHECK: on Git for Windows, gawk's text-mode read and bash `$(...)` lose the CR
 # before the strip sees it, so the second break reds only where both hand the CR on; nor a `verdict`
-# read by the hook, which reads none.
+# read by the hook, which reads none; nor a `sha` key read by the CLI half, whose line prints the
+# queried sha and never the record's.
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-printf 'verdict\tGREEN\r\nsha\t%s\nsha\t%s\r\n' "$rgf_a" "$rgf_b" > "$rgf_t/record"
+rgf_out=$("$PYBIN" -c 'import io, os, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+for s in (sys.stdout, sys.stderr):
+    s.reconfigure(encoding="utf-8", errors="replace", newline="\n")
+for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+          "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_PREFIX"):
+    os.environ.pop(k, None)
+top = V.pathlib.Path(sys.argv[2]).absolute()
+V.run_local_plant("clean", top, lambda *a, **k: None)
+work = top / "work"
+sha = V.run_fixture_git(work, "rev-parse", "HEAD")
+rec = V.read_common_dir(work) / "gate-verdict" / V.read_tree_of(work, sha)
+kept = [ln for ln in io.BytesIO(rec.read_bytes()).readlines()
+        if ln.split(b"\t", 1)[0] not in (b"verdict", b"sha", b"reused_cache")]
+rec.write_bytes(b"".join(kept) + b"verdict\tGREEN\r\nsha\t" + sys.argv[3].encode() + b"\nsha\t"
+                + sys.argv[4].encode() + b"\r\nreused_cache\t1\nreused_cache\t0\r\n")
+V.run_fixture_command(work, [sys.executable, str(V.HERE / "verdict_backends.py"), "read", "--backend",
+                             "local-hook", "--sha", sha])
+print(sha, rec.as_posix())' "$KITDIR" "$rgf_t" "$rgf_a" "$rgf_b" 2>&1); rgf_rc=$?
+rgf_last=${rgf_out##*$'\n'}; rgf_head=${rgf_last%% *}; rgf_rec=${rgf_last#* }
 rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
-rgf_sha=$( eval "$rgf_fn"; read_green_file "$rgf_t/record"; printf '%s' "$rec_sha" )
+rgf_sha=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s' "$rec_sha" )
 a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
 rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
 r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), repr(r.get("sha")))' \
-  "$KITDIR" "$rgf_t/record" 2>&1 | tr -d '\r')
+  "$KITDIR" "$rgf_rec" 2>&1 | tr -d '\r')
 a=$((a+1))
 [ "$rgf_py" = "'GREEN' '$rgf_b'" ] \
   || { echo "gov-canary: read_tag_lines over the CRLF verdict and two sha lines, the second CR-ended, read '$rgf_py', not 'GREEN' and the second sha"; fail=1; }
+rgf_cli=$(printf '%s\n' "$rgf_out" | grep '^verdict: local-hook · ')
+a=$((a+1))
+case "$rgf_rc:$rgf_cli" in
+  "0:verdict: local-hook · GREEN · ${rgf_head:0:8} "*) ;;
+  *) echo "gov-canary: read --backend local-hook over the clean plant's record, its verdict CR-ended and reused_cache 1 then 0, printed '$rgf_cli', not GREEN on ${rgf_head:0:8} (the record call exited $rgf_rc)"
+     [ "$rgf_rc" = 0 ] || printf '%s\n' "$rgf_out" | sed 's/^/  /'; fail=1 ;;
+esac
 rm -rf "$rgf_t"
 
 # ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
