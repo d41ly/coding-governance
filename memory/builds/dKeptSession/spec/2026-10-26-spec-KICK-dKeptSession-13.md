@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers
@@ -20,6 +20,8 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -81,8 +83,11 @@ defines the item boundary, I12, the one point every later session unit reads at.
   catalogue row already stands (`tools/policy/catalogue.toml`, `name = "card.pointers"`, owner
   dKeptSession); this unit gives it `summary` and `usage`, runs `python tools/policy/policy.py lists
   --write`, which takes it off `tools/policy/unsummarised-keys.txt`, and re-renders
-  `help/reference/policy.md` by `python tools/playbook/render_playbook.py --reference`. Observed by
-  AC3, AC9.
+  `help/reference/policy.md` by `python tools/playbook/render_playbook.py --reference`. That render
+  anchors `policy:card.pointers` on the page, so the same commit takes the key's row,
+  `policy:card.pointers`, off `memory/project/docs-undocumented.txt`: the `docs` leg reds a listed
+  member a page anchors, and a member anchored on two pages (`tools/govkit/docs_leg.py#read_docs_state`),
+  so S10's section names the key with no usage anchor. Observed by AC3, AC9, AC12.
 - **S6** — The boundary verb, the one item-boundary point. `manifest-check.sh --card --boundary
   --build <slug> --session <sid> [--transcript <path>] [--out <file>]` first moves the `at` of the
   session card's `item —` line to HEAD, writing `## pointers` with `item — none · at <sha8>` where the
@@ -240,6 +245,7 @@ Live at landing for a session whose card file routes a build. A session with no 
 - `tools/policy/catalogue.toml`: the `card.pointers` row's `summary` and `usage`
 - `tools/policy/unsummarised-keys.txt`: rewritten by `lists --write`
 - `help/reference/policy.md`: re-rendered by `render_playbook.py --reference`
+- `memory/project/docs-undocumented.txt`: S5, the `policy:card.pointers` row taken off
 - `help/orientation-card.md`: S10's section
 
 ### Alternatives rejected
@@ -326,10 +332,16 @@ Live at landing for a session whose card file routes a build. A session with no 
   card, `bash skills/session-kickoff/manifest-check.sh --card --check --session <sid>` exits 1 naming
   `forks —`, and exits 0 on the card as written.
   Red when: a section missing a line of `POINTER_LINES` passes the check.
+- **AC12** — When `grep -c 'usage: policy:card.pointers ' help/reference/policy.md` runs at the unit's
+  commit it prints `1`, `grep -cP '^policy:card\.pointers\t' memory/project/docs-undocumented.txt`
+  prints `0`, and the `policy:card.pointers` row of `python tools/govkit/docs_leg.py --fingerprints`
+  names `help/reference/policy.md` as its page.
+  Red when: the page carries no anchor for the key, or its row stays on the list the page drains.
+  figure: PINNED 2026-11-21 at `022a28ab`, the base reads `0`, `1` and the page `-`.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `policy check` · `help reference pages` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `policy check` · `help reference pages` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC6 AC11 · the pointers and boundary verbs over a stub loop kit, the failing case a crossing that leaves the ref's `item —` unchanged · none
 
@@ -411,6 +423,11 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
   item and the `forked —` line and keeps the pointer on a stale remote (F5); the instance key's
   example re-spelled to the engine's form; the kickoff manifest's re-stamp and the reference page's
   render added; every line citation re-cited by symbol or blob pin, and the guarded legs named.
+- rev-5 · 2026-11-21 · §2 S5 · §4 Files touched · §6 AC12 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief`: the probe found the
+  `policy:card.pointers` row standing on `memory/project/docs-undocumented.txt`, so S5's re-render
+  takes it off in the same commit, the list joins Files touched, AC12 observes the anchor present and
+  the row gone, and §7 names the `docs` leg.
 
 ## 10. Reuse audit
 
