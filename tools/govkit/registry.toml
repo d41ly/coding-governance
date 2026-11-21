@@ -225,6 +225,14 @@ id = "playbook/seeded-template"
 successor = "none"
 surfaces = ["file:coding-governance-agents.template.md", "installable:{playbook_path}"]
 
+# TOOL-dWitnessedBar-18: the playbook kit's `project-owned` seed of `instructions-legacy.txt`, which the
+# kit's directory held. The list moved to its ledger home under the memory root, registered in this
+# registry, gov-only; the kit seeds it no more, and an adopter's copy is released.
+[[retired]]
+id = "playbook/instructions-legacy-seed"
+successor = "none"
+surfaces = ["file:{prefix}/playbook/instructions-legacy.txt"]
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
