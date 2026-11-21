@@ -3040,8 +3040,9 @@ cd "$pfx_home" || exit 2
 
 # ---- TOOL-dWitnessedBar-106 AC1 to AC8: THE THREE POLICY READS AT R NEVER READ LOOSER THAN R'S FILE ----
 # The floor harness: the hook's R-scoped read, `_pp_read_fns` above, run in a subshell over a scratch
-# repo committing three revisions of the policy file at the path the policy kit's POLICY_REL names:
-# A names none of the three keys, R declares each at its strictest, R3 spells them as inline tables.
+# repo committing four revisions of the policy file at the path the policy kit's POLICY_REL names:
+# A names none of the three keys, R declares each at its strictest, R3 spells them as inline tables,
+# and R4 spells each at its strictest as a root dotted key, `verdict.blocks = ...` (TOOL-dWitnessedBar-110).
 # Three kit copies beside them: `kr` the real reader, `kb` a policy.py that exits 3, and `kt` the real
 # reader whose catalogue lists each key without its strictest value. `run_floor_read` stubs the
 # launcher and the kit per plant. The A column and the `real` plant are controls, green before the
@@ -3073,9 +3074,11 @@ print("tampered")' "$fl_d/kt/catalogue.toml" "verdict.blocks:${PP_BLOCKS_ORDER##
   && printf '[verdict]\nblocks = "every-red"\nheld = "push-selected"\n\n[hooks]\nbypass = "refused"\n' > "$fl_rel" \
   && git add "$fl_rel" && git commit -q -m R \
   && printf 'verdict = { blocks = "own-only", held = "on-demand" }\nhooks = { bypass = "allowed" }\n' > "$fl_rel" \
-  && git add "$fl_rel" && git commit -q -m R3 ) >/dev/null 2>&1 || bad "FL TOOL-dWitnessedBar-106 could not build the floor harness"
-fl_A=$(git -C "$fl_d" rev-parse HEAD~2 2>/dev/null); fl_R=$(git -C "$fl_d" rev-parse HEAD~1 2>/dev/null)
-fl_R3=$(git -C "$fl_d" rev-parse HEAD 2>/dev/null)
+  && git add "$fl_rel" && git commit -q -m R3 \
+  && printf 'verdict.blocks = "every-red"\nverdict.held = "push-selected"\nhooks.bypass = "refused"\n' > "$fl_rel" \
+  && git add "$fl_rel" && git commit -q -m R4 ) >/dev/null 2>&1 || bad "FL TOOL-dWitnessedBar-106 could not build the floor harness"
+fl_A=$(git -C "$fl_d" rev-parse HEAD~3 2>/dev/null); fl_R=$(git -C "$fl_d" rev-parse HEAD~2 2>/dev/null)
+fl_R3=$(git -C "$fl_d" rev-parse HEAD~1 2>/dev/null); fl_R4=$(git -C "$fl_d" rev-parse HEAD 2>/dev/null)
 run_floor_read() { # plant (nopy nokit broken tampered real) · sha -> `blocks=<v> held=<v> bypass=<v>`, then the PP_WHY and PP_BYPASS_WHY lines
   ( cd "$fl_d" || exit 1
     top=$PWD; main_local=""; PP_READ_AT=""; _gate_env_rel=.githooks/gate-env.sh; def=main
@@ -3098,9 +3101,9 @@ for fl_row in "AC1 nopy A own-only on-demand allowed" "AC1 nopy R every-red push
     "AC1 nopy R3 every-red push-selected refused" "AC2 nokit A own-only on-demand allowed" \
     "AC2 nokit R every-red push-selected refused" "AC3 broken A every-red on-demand allowed" \
     "AC3 broken R every-red push-selected refused" "AC4 tampered R every-red push-selected refused" \
-    "AC5 real R3 own-only on-demand allowed"; do
+    "AC5 real R3 own-only on-demand allowed" "AC1 nopy R4 every-red push-selected refused"; do
   read -r fl_ac fl_p fl_at fl_b fl_h fl_y <<< "$fl_row"
-  case "$fl_at" in A) fl_s=$fl_A ;; R) fl_s=$fl_R ;; *) fl_s=$fl_R3 ;; esac
+  case "$fl_at" in A) fl_s=$fl_A ;; R) fl_s=$fl_R ;; R3) fl_s=$fl_R3 ;; *) fl_s=$fl_R4 ;; esac
   _o=$(run_floor_read "$fl_p" "$fl_s")
   if [ "${_o%%$'\n'*}" = "blocks=$fl_b held=$fl_h bypass=$fl_y" ]; then
     ok "FL TOOL-dWitnessedBar-106 $fl_ac the $fl_p plant at $fl_at reads $fl_b $fl_h $fl_y"

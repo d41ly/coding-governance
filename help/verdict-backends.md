@@ -63,13 +63,13 @@ tag's message carries the bar's `verdict`, `tree` and `run_id`, and a `node` lin
 <name>` names the remote; the default is `origin`. Nothing schedules it: the peer's operator runs
 it, by hand or from its own cadence.
 
-A candidate is published only when this run of the bar wrote its verdict. `verify-peer` reads the
-slot's `run_id` before and after the bar, and a `run_id` that did not change is a record left by an
-earlier run. The bar's exit must agree with the verdict: exit 0 with GREEN, or a non-zero exit with
-RED. The slot must also read as `local-hook` reads it, a witnessed GREEN or a RED, so a GREEN that
-reused legs from the cache is not published. Any other candidate prints `not published` with its
-reason, and the verb exits 1. The bar runs with `GATE_RUN_ID` removed from its environment, because
-a pinned id repeats and would make every re-run look stale.
+A candidate is published only when this run of the bar wrote its verdict. `verify-peer` gives the bar
+a fresh `GATE_RUN_ID`, a `vp-` id no other run is handed, and reads the slot's `run_id` after the bar:
+any other id is a record the bar did not write. The bar's exit must agree with the verdict: exit 0
+with GREEN, or a non-zero exit with RED. The slot must also read as `local-hook` reads it, a witnessed
+GREEN or a RED, so a GREEN that reused legs from the cache is not published. Any other candidate
+prints `not published` with its reason, and the verb exits 1. A slot that another run on the same
+clone wrote, before or during this one, is not published.
 
 The tag is signed with the node's SSH key, `git -c gpg.format=ssh tag -s`, under the operator's
 own `user.signingkey`. With `user.signingkey` empty, `verify-peer` refuses, exit 2, before it reads

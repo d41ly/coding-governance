@@ -9821,6 +9821,7 @@ hit  "$out" "fixture · attribution · another value, a blank line and prose · 
 hit  "$out" "fixture · attribution · the charter's trailer, a blank line and prose · refused"
 hit  "$out" "fixture · attribution · another value spaced before its colon, then prose · refused"
 hit  "$out" "fixture · attribution · no agent trailer · none"
+hit  "$out" "fixture · attribution · the charter's trailer last, then a space and a tab · ok"
 # AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
 printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
@@ -9842,6 +9843,14 @@ printf 'records\n\nPass: none\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropi
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses the drifted agent value followed by a plain line, exit code" "$rc" "1"
 hit  "$out" "is not the charter's 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>'"
+# TOOL-dWitnessedBar-110 S5: a charter with no fact line is admitted, and the check says it did not run
+printf '# charter\n' > AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter names no trailer" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a message under a charter with no fact line, exit code" "$rc" "0"
+hit  "$out" "unattended: --check-commit did not check attribution: the charter"
+hit  "$out" "holds no line opening"
 rm -f "$CCM"
 
 # ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one

@@ -15562,10 +15562,12 @@ check_commit_message() { # commit message file
   # charter's address with another value, or a line after it, is refused with the line to write. Exit 2,
   # an unreadable message, says so and the path checks continue. WHAT IT DOES NOT CHECK: a commit no run
   # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
+  # Exit 0 is shared by `ok`, `none` and `unarmed`, and only `unarmed` is a check that did not run, so
+  # it alone is said (TOOL-dWitnessedBar-110 S4).
   _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
   _at=${_at//$'\r'/}
   case "$_arc" in
-    0) ;;
+    0) case "$_at" in "ATTRIBUTION unarmed"*) echo "unattended: --check-commit did not check attribution: ${_at#ATTRIBUTION unarmed · }" ;; esac ;;
     1) # the expected line, by the same reader's `read_charter_trailer`, so the repair names what it read
        _ae=$("$py" -c 'import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct; print(ct.read_charter_trailer(sys.argv[2])[0])' \
          "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""

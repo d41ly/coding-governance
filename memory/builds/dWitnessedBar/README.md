@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 93 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 93 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -201,10 +201,10 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dW
 | [TOOL-dWitnessedBar-107 — verify-peer publishes only a slot the current bar run witnessed](spec/2026-11-21-spec-TOOL-dWitnessedBar-107.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 | [TOOL-dWitnessedBar-108 — the closing review round 1's four minors batched: a staged removal trips the commit-time guard, scaffolded ledger homes open with their rendered header, an unread parameter reds, and the charter's trailer is checked at commit time](spec/2026-11-21-spec-TOOL-dWitnessedBar-108.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 | [TOOL-dWitnessedBar-109 — the attribution check reads every agent trailer line of the message, not only git's final trailer block](spec/2026-11-21-spec-TOOL-dWitnessedBar-109.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
-| [TOOL-dWitnessedBar-110 — the closing review round 2's five minors batched: verify-peer's bar carries a fresh run id, an unarmed attribution check says so, a trailer's trailing whitespace reads as git's cleanup reads it, and two accepted shapes gain the arms that fail when they break](spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md) | 51 | 2 | INPROGRESS | rev-1 | 2026-11-21 |
+| [TOOL-dWitnessedBar-110 — the closing review round 2's five minors batched: verify-peer's bar carries a fresh run id, an unarmed attribution check says so, a trailer's trailing whitespace reads as git's cleanup reads it, and two accepted shapes gain the arms that fail when they break](spec/2026-11-21-spec-TOOL-dWitnessedBar-110.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 967 bound to this build, across 4 record folder(s).
+Records: 969 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -46,8 +46,8 @@ the SHA's tree, its `node` line is not this node's `GOV_NODE`, and (TOOL-dWitnes
   the SHA, under `verdict.remote.trust`; the `workflow` scope, which pins only a workflow no peer runs,
   reads HELD naming the key outside `app-only`.
 `verify-peer` signs its tag with `git -c gpg.format=ssh tag -s` under the operator's `user.signingkey`,
-and refuses, exit 2, where that reads empty. It publishes a candidate's slot only where the bar, run with
-`GATE_RUN_ID` omitted from its environment, changed the slot's `run_id`, its exit agrees with the verdict,
+and refuses, exit 2, where that reads empty. It publishes a candidate's slot only where the bar, given a fresh
+`GATE_RUN_ID`, wrote that id as the slot's `run_id`, its exit agrees with the verdict,
 and `local-hook` reads the slot as a witnessed GREEN or a RED; anything else prints `not published` with its
 reason (TOOL-dWitnessedBar-107). `remote-ci`'s reader is `remote_verdict.py`'s.
 
@@ -60,6 +60,7 @@ import importlib
 import os
 import pathlib
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -628,8 +629,9 @@ def write_peer_tag(repo, sha, rec, node, remote):
 def run_verify_peer(remote, repo="."):
     """Each `refs/gov/candidate/<sha>` the remote lists with no `refs/gov/verdict/<sha>` beside it: fetched,
     barred under GATE_FULL=1 in a detached worktree of this clone, and its full slot published as a tag only
-    where this run wrote it and `read_local_verdict` reads it as a witnessed GREEN on exit 0 or a RED on a
-    non-zero exit (TOOL-dWitnessedBar-107 S1)."""
+    where its `run_id` is the fresh id this run handed its bar as GATE_RUN_ID (TOOL-dWitnessedBar-110 S1)
+    and `read_local_verdict` reads it as a witnessed GREEN on exit 0 or a RED on a non-zero exit
+    (TOOL-dWitnessedBar-107 S1)."""
     node = read_node_tag()
     if not node:
         print(f"{SAY}: verify-peer refused · GOV_NODE names no node tag here, so no verdict could name its node")
@@ -664,22 +666,17 @@ def run_verify_peer(remote, repo="."):
                 tree = read_tree_of(repo, sha)
                 slot = common / "gate-verdict" / tree if common and tree else None
                 t8 = tree[:8]
-                before = after = None
+                after = None
                 rc = 0
+                nonce = f"vp-{secrets.token_hex(8)}"
                 if slot is None:
                     why = "no full slot path resolves for this candidate's tree"
-                else:
-                    try:
-                        before = read_slot_run_id(slot)
-                    except OSError as e:
-                        why = f"gate-verdict/{t8} does not read before the bar: {e}"
                 if not why:
                     bash = resolve_bash(bar)
                     if bash is None:
                         raise OSError("no bash runs that can see " + bar.as_posix())
-                    # A pinned GATE_RUN_ID repeats, so a re-run would leave the run_id unchanged (TOOL-dWitnessedBar-107 F2).
-                    env = dict(os.environ, GATE_FULL="1")
-                    env.pop("GATE_RUN_ID", None)
+                    # The runner records GATE_RUN_ID as the slot's run_id and unsets it before any leg, so only this bar writes the nonce.
+                    env = dict(os.environ, GATE_FULL="1", GATE_RUN_ID=nonce)
                     rc = subprocess.run([bash, str(bar)], cwd=str(scratch), env=env).returncode
                     try:
                         after = read_slot_run_id(slot)
@@ -687,7 +684,7 @@ def run_verify_peer(remote, repo="."):
                         why = f"gate-verdict/{t8} does not read after the bar: {e}"
                 if not why and after is None:
                     why = f"the bar exited {rc} and wrote no full slot for tree {t8}"
-                elif not why and (not after or after == before):
+                elif not why and after != nonce:
                     why = f"the bar exited {rc} and left gate-verdict/{t8} at run {after or 'none'}, a record it did not write"
                 if not why:
                     # The slot read as local-hook reads it, so a peer tag never certifies a record that reader refuses.
@@ -699,7 +696,7 @@ def run_verify_peer(remote, repo="."):
                         again = read_slot_run_id(slot)
                     except OSError as e:
                         again = f"unreadable ({e})"
-                    if again != after:
+                    if again != nonce:
                         why = f"gate-verdict/{t8} was rewritten while it was read, run {after} then {again}"
                     else:
                         why = write_peer_tag(repo, sha, {"verdict": v.state, "tree": tree, "run_id": after}, node, remote)
@@ -736,7 +733,8 @@ PLANTS = {
     "peer-unsigned": "an unsigned tag from node b read on node a, then verify-peer with user.signingkey empty",
     "peer-self-tag": "a tag whose node line reads b, signed by node a's key, read on node a",
     "peer-stale-slot": "verify-peer over a stale reused_cache 1 slot and a stub bar writing nothing, then stubs writing "
-                       "a reused GREEN, a GREEN on exit 1, a RED and a clean GREEN",
+                       "a reused GREEN, a GREEN on exit 1, a RED on exit 0, a GREEN another run wrote, a RED and a "
+                       "clean GREEN",
     "peer-swapped-manifest": "a GREEN node b signed over a candidate emptying the leg manifest, under dispatch-closure, "
                              "then workflow pinning the workflow alone, then app-only",
     "lander-peer": "the lander under verdict = peer-node with no peer verdict: a candidate published, nothing landed",
@@ -1181,12 +1179,14 @@ mode=${VB_STUB_BAR:-}
 common=$(git rev-parse --path-format=absolute --git-common-dir) || exit 2
 tree=$(git rev-parse 'HEAD^{tree}') || exit 2
 sha=$(git rev-parse HEAD) || exit 2
-verdict=GREEN pair=0 rc=0 run=s-$mode
+verdict=GREEN pair=0 rc=0 run=${GATE_RUN_ID:-s-$mode}
 case $mode in
   reused) pair=1 ;;
   disagree) rc=1 ;;
   red) verdict=RED rc=1 ;;
-  clean) run=${GATE_RUN_ID:-s-clean} ;;
+  clean) ;;
+  redok) verdict=RED ;;
+  foreign) run=s-foreign ;;
   *) exit 2 ;;
 esac
 mkdir -p "$common/gate-verdict" || exit 2
@@ -1221,14 +1221,18 @@ exit "$rc"
                  ["not published", "reads NONE", "reused 1 leg(s) from the cache"], VB_STUB_BAR="reused", **peer)
     run_scenario("a fresh clean GREEN on a bar that exited 1", work, [*me, "verify-peer"], 1,
                  ["not published", "the bar exited 1", "reads GREEN"], VB_STUB_BAR="disagree", **peer)
-    run_scenario("no verdict published after three refusals", work, [sys.executable, "-c", count], 0,
+    run_scenario("a fresh RED on a bar that exited 0", work, [*me, "verify-peer"], 1,
+                 ["not published", "the bar exited 0", "reads RED"], VB_STUB_BAR="redok", **peer)
+    run_scenario("a clean GREEN another run wrote", work, [*me, "verify-peer"], 1,
+                 ["not published", "at run s-foreign, a record it did not write"], VB_STUB_BAR="foreign", **peer)
+    run_scenario("no verdict published after five refusals", work, [sys.executable, "-c", count], 0,
                  ["verdict refs: 0"])
     run_scenario("a fresh RED", work, [*me, "verify-peer"], 0, [published], VB_STUB_BAR="red", **peer)
-    run_scenario("the RED tag's lines", remote, tag, 0, ["verdict\tRED\n", "run_id\ts-red\n"])
+    run_scenario("the RED tag's lines", remote, tag, 0, ["verdict\tRED\n", "run_id\tvp-"])
     run_fixture_git(remote, "update-ref", "-d", VERDICT_REF + cand)
     run_scenario("a fresh clean GREEN, GATE_RUN_ID=s-red in verify-peer's environment", work, [*me, "verify-peer"], 0,
                  [published], VB_STUB_BAR="clean", GATE_RUN_ID="s-red", **peer)
-    run_scenario("the GREEN tag's lines", remote, tag, 0, ["verdict\tGREEN\n", "run_id\ts-clean\n"])
+    run_scenario("the GREEN tag's lines", remote, tag, 0, ["verdict\tGREEN\n", "run_id\tvp-"])
 
 
 def read_remote_module():

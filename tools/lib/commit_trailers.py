@@ -130,7 +130,9 @@ _ATTRIBUTION_FIXTURE = ("Co-Authored-By: Fx <fx@example.invalid>", (
      "s\n\nCo-Authored-By: Fx <fx@example.invalid>\n\nlater note\n", "refused"),
     ("another value spaced before its colon, then prose",
      "s\n\nCo-Authored-By : Fx 2 <fx@example.invalid>\nsee above\n", "refused"),
-    ("no agent trailer", "s\n\nPass: none\n", "none")))
+    ("no agent trailer", "s\n\nPass: none\n", "none"),
+    ("the charter's trailer last, then a space and a tab",
+     "s\n\nPass: none\nCo-Authored-By: Fx <fx@example.invalid> \t\n", "ok")))
 
 
 def run_git(repo, argv, stdin=None):
@@ -302,7 +304,8 @@ def extract_message_lines(raw) -> list:
     """The lines git keeps of the raw message `raw`, in order: decoded as UTF-8 with `replace`, split on
     `\\n`, every CR taken out of each line, nothing read from the first scissors line on, and lines
     opening `#` or holding only whitespace left out (TOOL-dWitnessedBar-109 S1). The one list both the
-    agent-line scan and the last-line check of `check_message_attribution` read."""
+    agent-line scan and the last-line check of `check_message_attribution` read. A kept line ends without
+    trailing whitespace, as git's cleanup leaves it (TOOL-dWitnessedBar-110 S6)."""
     kept = []
     for line in raw.decode("utf-8", "replace").split("\n"):
         line = line.replace("\r", "")
@@ -310,7 +313,7 @@ def extract_message_lines(raw) -> list:
             break
         if line.startswith("#") or not line.strip():
             continue
-        kept.append(line)
+        kept.append(line.rstrip())
     return kept
 
 
