@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-89 — the round-1 audit of units 85 to 88, 13 minors batched: a visited failure on its own code, a whole-token match, one owner line and pinned records
 
-**Status:** INPROGRESS · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 46 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 46 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,9 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-89-deviation-891.md](../build/2026-10-25-build-TOOL-dWitnessedBar-89-deviation-891.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-89-deviation-892.md](../build/2026-10-25-build-TOOL-dWitnessedBar-89-deviation-892.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-89-round11-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-89-round11-fix-return.md) | research | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-89-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-89-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-89-deviation-893.md](../build/2026-11-21-build-TOOL-dWitnessedBar-89-deviation-893.md) | deviation | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-89-widen-24.md](../build/2026-11-21-build-TOOL-dWitnessedBar-89-widen-24.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-89-round11-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-89-round11-fix-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-89-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-89-build-brief.md) | journal | — |

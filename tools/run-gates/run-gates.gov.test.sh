@@ -878,9 +878,11 @@ done
 # Its CR is spelled in this top-level body, never inside a `$(...)`, which reads it as empty here.
 # A READ FAILURE IS NOT A RED (TOOL-dWitnessedBar-84 S13): `check_cr_reached` returns 2 when `<file>`
 # cannot be sourced, defines no `read_green_file`, or `<record>` is not a regular file, and 1 only on a
-# value it measured. `check_canary_keys` prints a variable only on a 1, returning 1 (-88 S3), and 2 on any 2, and on
-# a visit count (S14) other than every word of `${CANARY_KEYS[*]}`, at least two, which it names on
-# stderr, since each call runs inside a `$(...)`. WHAT THIS DOES NOT CHECK: which of the two a 2 was.
+# value it measured. `check_canary_keys` prints a variable only on a 1, returning 1 (-88 S3), and 2 on any 2; it
+# returns 3, whatever else happened, on a visit count (S14) other than every word of `${CANARY_KEYS[*]}`,
+# at least two, which it names on stderr, since each call runs inside a `$(...)` (TOOL-dWitnessedBar-89
+# S4). A 3 is no read failure: no caller prints `unread` or `(rc 2)` for it, and each sets `fail`.
+# WHAT THIS DOES NOT CHECK: which of the two reads a 2 was.
 check_cr_reached() (   # file · record · var -> 0 when var, read by name, is forty-one bytes ending in CR; 1 when not; 2 unread
   LC_ALL=C
   unset -f read_green_file
@@ -893,7 +895,7 @@ check_cr_reached() (   # file · record · var -> 0 when var, read by name, is f
 )
 CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)   # <key>:<var>, each read by the cut, in the canary's order
 rgf_km=0; for rgf_w in ${CANARY_KEYS[*]}; do rgf_km=$((rgf_km+1)); done   # the pairs each loop owes a visit
-check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KEYS variable whose CR did not arrive; 0 none, 1 printed, 2 unread
+check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KEYS variable whose CR did not arrive; 0 none, 1 printed, 2 unread, 3 not every pair visited
   local _ck_p _ck_rc _ck_n=0 _ck_1=0 _ck_2=0
   for _ck_p in "${CANARY_KEYS[@]}"; do
     _ck_n=$((_ck_n+1))
@@ -901,17 +903,19 @@ check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KE
     case "$_ck_rc" in 0) ;; 1) printf '%s\n' "${_ck_p#*:}"; _ck_1=1 ;; *) _ck_2=1 ;; esac
   done
   if [ "$_ck_n" != "$rgf_km" ] || [ "$rgf_km" -lt 2 ]; then
-    echo "gov-canary: the canary visited $_ck_n of $rgf_km CANARY_KEYS pairs" >&2; return 2
+    echo "gov-canary: the canary visited $_ck_n of $rgf_km CANARY_KEYS pairs" >&2; return 3
   fi
   [ "$_ck_2" = 0 ] || return 2; return "$_ck_1"
 }
 # <key>:<var> · replacement · label · passed reason · other lead -> 0 silent when the variant, the cut
 # `rgf_fn` with its `<key>)` assignment set to the replacement, was seen red over `rgf_rec`; else
-# prints one reason and returns 1. Writes its variant and mutant under `rgf_t`.
+# prints one reason and returns 1; returns 3, printing nothing, when its mutant's `check_canary_keys`
+# returned 3 (TOOL-dWitnessedBar-89 S4). Writes its variant and mutant under `rgf_t`.
 check_key_variant() {
   local _kv_k=${1%%:*} _kv_v=${1#*:} _kv_n _kv_mn _kv_got _kv_rc _kv_g _kv_has=0 _kv_oth=
-  # The `<key>)` arm's assignment, bare, quoted, braced or aligned, takes the replacement unquoted (TOOL-dWitnessedBar-88 S10).
-  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k"')[[:space:]]*'"$_kv_v"'=\)"\{0,1\}\${\{0,1\}_rg_v}\{0,1\}"\{0,1\}/\1'"$2"'/' > "$rgf_t/cut-var.sh"
+  # The `<key>)` arm's assignment, bare, quoted, braced or aligned, takes the replacement unquoted (TOOL-dWitnessedBar-88 S10),
+  # its token whole and closed by a space, a `;` or the line's end, so an arm carrying a modifier changes no line (-89 S6).
+  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k"')[[:space:]]*'"$_kv_v"'=\)"\{0,1\}\(\$_rg_v\|\${_rg_v}\)"\{0,1\}\([[:space:];]\|$\)/\1'"$2"'\3/' > "$rgf_t/cut-var.sh"
   _kv_n=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
   sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
   _kv_mn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
@@ -921,6 +925,7 @@ check_key_variant() {
   done
   if [ "$_kv_n" != 1 ]; then printf '%s\n' "${3}variant changed $_kv_n lines"
   elif [ "$_kv_mn" != 1 ]; then printf '%s\n' "${3}mutant changed $_kv_mn lines"
+  elif [ "$_kv_rc" = 3 ]; then return 3
   elif [ "$_kv_rc" = 2 ]; then printf '%s\n' "${3}variant could not be sourced or read (rc 2)"
   elif [ "$_kv_rc" != 1 ] || [ "$_kv_has" != 1 ]; then printf '%s\n' "$4"
   elif [ -n "$_kv_oth" ]; then printf '%s\n' "$5 $_kv_oth whose CR arrived"
@@ -959,13 +964,15 @@ rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^
 # (TOOL-dWitnessedBar-77 S1): `count <n>` alone when the count failed, so no byte check runs past it,
 # else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`, or
 # `unread` alone when it returned 2 (TOOL-dWitnessedBar-84 S13, S14), its visit count one assertion.
-rgf_whats=()
+# A 3 takes no slot: its visited line is already on stderr, so it reds and the canary stays failed (-89 S4).
+rgf_whats=(); rgf_ck=0
 if [ "$rgf_n" != 1 ]; then rgf_whats=("count $rgf_n")
 else a=$((a+1)); rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec"); rgf_ck=$?
   if [ "$rgf_ck" = 2 ]; then rgf_whats=("unread")
+  elif [ "$rgf_ck" = 3 ]; then fail=1
   else for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi; fi
 rgf_ok=0
-[ "${#rgf_whats[@]}" = 0 ] && rgf_ok=1
+[ "${#rgf_whats[@]}" = 0 ] && [ "$rgf_ck" != 3 ] && rgf_ok=1
 for rgf_what in "${rgf_whats[@]}"; do
   [ "$rgf_ok" = 1 ] \
     || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
@@ -977,19 +984,20 @@ done
 # reason prints one line, and a key with any joins no `rgf_seen`. Each call seen red, its status 0
 # at the loop's top level and never inside its `$(...)`, adds one assertion (TOOL-dWitnessedBar-85 S1).
 # The loop counts the pairs it visits, checked after it against every word of `${CANARY_KEYS[*]}`,
-# at least two, one assertion (TOOL-dWitnessedBar-84 S14).
+# at least two, one assertion (TOOL-dWitnessedBar-84 S14). A call returning 3, its visited line on
+# stderr, reds alone: no reason, no count, and its key joins no `rgf_seen` (TOOL-dWitnessedBar-89 S4).
 rgf_seen=; rgf_lvn=0
 for rgf_kp in "${CANARY_KEYS[@]}"; do
   rgf_lvn=$((rgf_lvn+1))
-  rgf_kv=${rgf_kp#*:}; rgf_whys=()
-  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named') \
-    && a=$((a+1)) || rgf_whys+=("$rgf_why")
-  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'the length variant named') \
-    && a=$((a+1)) || rgf_whys+=("$rgf_why")
+  rgf_kv=${rgf_kp#*:}; rgf_whys=(); rgf_k3=0
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named'); rgf_kvr=$?
+  case "$rgf_kvr" in 0) a=$((a+1)) ;; 3) fail=1; rgf_k3=1 ;; *) rgf_whys+=("$rgf_why") ;; esac
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'the length variant named'); rgf_kvr=$?
+  case "$rgf_kvr" in 0) a=$((a+1)) ;; 3) fail=1; rgf_k3=1 ;; *) rgf_whys+=("$rgf_why") ;; esac
   for rgf_why in "${rgf_whys[@]}"; do
     echo "gov-canary: the $rgf_kv byte check was not seen red on its liveness variant ($rgf_why)"; fail=1
   done
-  [ "${#rgf_whys[@]}" = 0 ] && rgf_seen="$rgf_seen $rgf_kv"
+  [ "${#rgf_whys[@]}" = 0 ] && [ "$rgf_k3" = 0 ] && rgf_seen="$rgf_seen $rgf_kv"
 done
 a=$((a+1))
 [ "$rgf_lvn" = "$rgf_km" ] && [ "$rgf_km" -ge 2 ] \
