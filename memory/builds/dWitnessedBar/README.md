@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -179,7 +179,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-79 — the canary's liveness loop gains a length variant, so a vacuous or off-by-one byte count is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md) | 41 | 2 | CLOSED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md) | 41 | 2 | CLOSED | rev-4 | 2026-11-21 |
 | [TOOL-dWitnessedBar-81 — the byte check's staged reds are one break per condition, each recorded with the line it printed, so units 74 and 76 close on a red that happened](spec/2026-10-25-spec-TOOL-dWitnessedBar-81.md) | 41 | 2 | CLOSED | rev-4 | 2026-11-21 |
-| [TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed](spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md) | 42 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed](spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md) | 42 | 2 | INPROGRESS | rev-5 | 2026-11-21 |
 | [TOOL-dWitnessedBar-87 — unit 76 AC2's own break, a canary that skips `rec_fp`, is staged after unit 80 and recorded with the two lines it now prints](spec/2026-10-25-spec-TOOL-dWitnessedBar-87.md) | 42 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-82 — the gov canary's assertion floor is restated after unit 78, so the arms of units 74 to 81 cannot be deleted with the canary green](spec/2026-10-25-spec-TOOL-dWitnessedBar-82.md) | 43 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-83 — the gov canary's floor is owned by the last unit that adds an arm, derived from the specs, and its equality with the executed count is held at the close](spec/2026-10-25-spec-TOOL-dWitnessedBar-83.md) | 43 | 2 | DEFERRED | rev-2 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 844 bound to this build, across 4 record folder(s).
+Records: 845 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
