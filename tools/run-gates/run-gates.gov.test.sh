@@ -243,7 +243,11 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=47
+FLOOR_ASSERTIONS=54
+# RAISED 47 -> 54 by TOOL-dWitnessedBar-67 on 2026-11-21: the hook's rec_fp over a CR-ended fingerprint
+# line, the signer-temp sweep under its three stand-ins, the evaluated PM_SCRUB compare over the shipped
+# file and the pm-comment copy, and the single-assignment count, one assertion each. Counted by reading;
+# no suite ran.
 # RAISED 41 -> 47 by TOOL-dWitnessedBar-65 on 2026-11-21: the key-no-tab record read by the hook's
 # read_green_file and by read_tag_lines, and the PM_SCRUB reader's trailing-comment, one-line,
 # cut-under-a-comment and token-grammar copies, one assertion each. Counted by reading; no suite ran.
@@ -818,11 +822,14 @@ done
 # The record is the `clean` plant's last write, built by `run_local_plant` under this arm's own
 # scratch with a runner that runs no scenario, at the fixture's `<common-dir>/gate-verdict/<tree>`
 # (TOOL-dWitnessedBar-68 S1). Its `verdict`, `sha` and `reused_cache` lines are replaced by
-# `verdict<TAB>GREEN<CR>`, two `sha` lines, the second CR-ended, and `reused_cache` 1 then 0<CR>. The
-# hook's `read_green_file`, cut from the hook alone, and `read_tag_lines`, the reader `local-hook` goes
-# through, read that file's bytes: both take the second `sha`, CR stripped, and `read_tag_lines` reads
-# `GREEN`. The hook half grades `rec_sha`, the variable each staged break reaches: RED against a `sha`
-# read of `$1=="sha"{print $2}`, printing every match, and against one lacking ` sub(/\r$/, "", v);`.
+# `verdict<TAB>GREEN<CR>`, two `sha` lines, the second CR-ended, and `reused_cache` 1 then 0<CR>, then
+# `fingerprint<TAB>` and forty `c`, CR-ended. The hook's `read_green_file`, cut from the hook alone, and
+# `read_tag_lines`, the reader `local-hook` goes through, read that file's bytes: both take the second
+# `sha`, CR stripped, and `read_tag_lines` reads `GREEN`. The hook half grades `rec_sha`, the variable
+# each staged break reaches: RED against a `sha` read of `$1=="sha"{print $2}`, printing every match, and
+# against one lacking ` sub(/\r$/, "", v);`. In the same subshell it grades `rec_fp`, the CR strip on a
+# second key: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
+# (TOOL-dWitnessedBar-67 S2); the backends read no `fingerprint`, so that line moves no local-hook state.
 # `read --backend local-hook` over the same fixture prints GREEN only where the verdict's CR is
 # stripped and the last `reused_cache` wins; a reader keeping the first reads NONE (S3).
 # WHAT THIS DOES NOT CHECK: on Git for Windows, gawk's text-mode read and bash `$(...)` lose the CR
@@ -830,6 +837,7 @@ done
 # read by the hook, which reads none; nor a `sha` key read by the CLI half, whose line prints the
 # queried sha and never the record's.
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+rgf_c=cccccccccccccccccccccccccccccccccccccccc
 rgf_out=$("$PYBIN" -c 'import io, os, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
 for s in (sys.stdout, sys.stderr):
     s.reconfigure(encoding="utf-8", errors="replace", newline="\n")
@@ -842,18 +850,23 @@ work = top / "work"
 sha = V.run_fixture_git(work, "rev-parse", "HEAD")
 rec = V.read_common_dir(work) / "gate-verdict" / V.read_tree_of(work, sha)
 kept = [ln for ln in io.BytesIO(rec.read_bytes()).readlines()
-        if ln.split(b"\t", 1)[0] not in (b"verdict", b"sha", b"reused_cache")]
+        if ln.split(b"\t", 1)[0] not in (b"verdict", b"sha", b"reused_cache", b"fingerprint")]
 rec.write_bytes(b"".join(kept) + b"verdict\tGREEN\r\nsha\t" + sys.argv[3].encode() + b"\nsha\t"
-                + sys.argv[4].encode() + b"\r\nreused_cache\t1\nreused_cache\t0\r\n")
+                + sys.argv[4].encode() + b"\r\nreused_cache\t1\nreused_cache\t0\r\nfingerprint\t"
+                + sys.argv[5].encode() + b"\r\n")
 V.run_fixture_command(work, [sys.executable, str(V.HERE / "verdict_backends.py"), "read", "--backend",
                              "local-hook", "--sha", sha])
-print(sha, rec.as_posix())' "$KITDIR" "$rgf_t" "$rgf_a" "$rgf_b" 2>&1); rgf_rc=$?
+print(sha, rec.as_posix())' "$KITDIR" "$rgf_t" "$rgf_a" "$rgf_b" "$rgf_c" 2>&1); rgf_rc=$?
 rgf_last=${rgf_out##*$'\n'}; rgf_head=${rgf_last%% *}; rgf_rec=${rgf_last#* }
 rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
-rgf_sha=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s' "$rec_sha" )
+rgf_rd=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s\t%s' "$rec_sha" "$rec_fp" )
+rgf_sha=${rgf_rd%%$'\t'*}; rgf_fp=${rgf_rd#*$'\t'}
 a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
+a=$((a+1))
+[ -n "$rgf_fn" ] && [ "$rgf_fp" = "$rgf_c" ] \
+  || { rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_fp to '${rgf_fp//$'\r'/$rgf_cr}' over a CR-ended fingerprint line, not forty c with its CR stripped, or did not cut from the hook"; fail=1; }
 rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
 r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), repr(r.get("sha")))' \
   "$KITDIR" "$rgf_rec" 2>&1 | tr -d '\r')
@@ -868,6 +881,68 @@ case "$rgf_rc:$rgf_cli" in
      [ "$rgf_rc" = 0 ] || printf '%s\n' "$rgf_out" | sed 's/^/  /'; fail=1 ;;
 esac
 rm -rf "$rgf_t"
+
+# ---- THE SIGNER-TEMP SWEEP, EVERY FILESYSTEM CALL HELD (TOOL-dWitnessedBar-67 AC3, S3, S10) ----------
+# `remove_stale_signer_temps`, the sweep `read_signer_principal` runs first, over two aged `gov-signers-`
+# files and an aged `gov-signers-d` directory, under three stand-ins: `os.unlink` raising
+# FileNotFoundError for one file and PermissionError for the other, which names the second file once on
+# stderr; the age read raising FileNotFoundError for one entry, silent; the `pathlib.Path.glob` listing
+# raising PermissionError, one stderr line naming the directory. Each call returns, no unlink reaches
+# the directory and it stays. RED against a sweep with no `OSError` catch around the unlink (it raises
+# out of the sweep), and against one testing existence where it calls `is_file(follow_symlinks=False)`
+# (it reaches the directory). WHAT THIS DOES NOT CHECK: a real permission or race on the host, or a link.
+rss_t=$(mktemp -d)
+rss_out=$("$PYBIN" -c 'import contextlib, io, os, pathlib, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+top = pathlib.Path(sys.argv[2])
+real_unlink, real_stat, real_glob = os.unlink, pathlib.Path.stat, pathlib.Path.glob
+for case in ("unlink", "stat", "glob"):
+    d = top / case
+    d.mkdir()
+    (d / "gov-signers-a").write_text("x")
+    (d / "gov-signers-b").write_text("x")
+    (d / "gov-signers-d").mkdir()
+    aged = V.time.time() - V.PEER_SIGNERS_GRACE_S - 600
+    for n in ("a", "b", "d"):
+        os.utime(d / ("gov-signers-" + n), (aged, aged))
+    reached = []
+    def remove_planted(p, *a, **k):
+        reached.append(os.path.basename(str(p)))
+        if case == "unlink" and str(p).endswith("-a"):
+            raise FileNotFoundError(2, "gone", str(p))
+        if case == "unlink" and str(p).endswith("-b"):
+            raise PermissionError(13, "denied", str(p))
+        return real_unlink(p, *a, **k)
+    def read_planted_stat(self, *a, **k):
+        if case == "stat" and self.name == "gov-signers-a" and k.get("follow_symlinks", True) and not a:
+            raise FileNotFoundError(2, "gone", str(self))
+        return real_stat(self, *a, **k)
+    def scan_planted(self, *a, **k):
+        if case == "glob":
+            raise PermissionError(13, "denied", str(self))
+        return real_glob(self, *a, **k)
+    os.unlink, pathlib.Path.stat, pathlib.Path.glob = remove_planted, read_planted_stat, scan_planted
+    err = io.StringIO()
+    try:
+        with contextlib.redirect_stderr(err):
+            gone = V.remove_stale_signer_temps(str(d))
+    except BaseException as e:
+        gone = "raised %s: %s" % (type(e).__name__, e)
+    finally:
+        os.unlink, pathlib.Path.stat, pathlib.Path.glob = real_unlink, real_stat, real_glob
+    lines = err.getvalue().splitlines()
+    owed = {"unlink": ([], [ln for ln in lines if "gov-signers-b" in ln and "gov-signers-a" not in ln][:1]),
+            "stat": (["gov-signers-b"], []),
+            "glob": ([], [ln for ln in lines if str(d) in ln and "gov-signers-" not in ln][:1])}[case]
+    held = gone == owed[0] and lines == owed[1] and len(lines) == (0 if case == "stat" else 1) \
+        and "gov-signers-d" not in reached and (d / "gov-signers-d").is_dir()
+    print("case %s %s - returned %r - unlinked %s - stderr %s" % (case, "held" if held else "MISSED", gone,
+          reached, lines))' "$KITDIR" "$rss_t" 2>&1 | tr -d '\r')
+for rss_c in unlink stat glob; do
+  a=$((a+1))
+  printf '%s\n' "$rss_out" | grep -q "^case $rss_c held - " && ! printf '%s\n' "$rss_out" | grep -q Traceback \
+    || { echo "gov-canary: the signer-temp sweep under the $rss_c stand-in, over two aged gov-signers- files and an aged gov-signers-d directory, did not hold:"; printf '%s\n' "$rss_out" | sed 's/^/  /'; fail=1; }
+done
+rm -rf "$rss_t"
 
 # ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
 # The pre-push hook scrubs `BAR_SCRUBBED_KNOBS` and clears `BAR_CLEARED_KNOBS` before its bar; post-merge's
@@ -975,6 +1050,26 @@ bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/pm-bad.sh" "$bsp_drv") \
   && { echo "gov-canary: a PM_SCRUB copy holding bad-name passed the scrub parity arm"; fail=1; }
 printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* holds bad-name, outside ' \
   || { echo "gov-canary: a PM_SCRUB copy holding bad-name was not named for the token grammar: $bsp_out"; fail=1; }
+# TOOL-dWitnessedBar-67 AC4 (S4): the reader is graded on the tree, not on itself. Over the shipped file
+# and the `pm-comment` copy, bash evaluates, in a subshell, exactly the lines the reader spans, from the
+# `PM_SCRUB="` line to the line holding the closing quote, and its word list must equal the reader's,
+# first word `GIT_DIR`, last word bash's own. RED against the reader without its `exit`, which keeps the
+# text after the closing quote: the words it reads past bash's are named.
+for bsp_c in "$bsp_pm" "$bsp_t/pm-comment.sh"; do
+  a=$((a+1))
+  bsp_span=$(awk '!on && /^PM_SCRUB="/ { on = 1; s = NR; sub(/^PM_SCRUB="/, "") }
+    on && index($0, "\"") { print s "," NR; exit }' "$bsp_c")
+  bsp_bw=$( [ -n "$bsp_span" ] && eval "$(sed -n "${bsp_span}p" "$bsp_c")" && printf '%s\n' $PM_SCRUB )
+  bsp_rw=$(awk "$bsp_pm_read" "$bsp_c" | tr -s ' \t' '\n\n' | grep .)
+  [ -n "$bsp_bw" ] && [ "$bsp_rw" = "$bsp_bw" ] && [ "${bsp_bw%%$'\n'*}" = GIT_DIR ] \
+    || { echo "gov-canary: over ${bsp_c##*/} lines ${bsp_span:-none}, the PM_SCRUB reader's words are not the words bash evaluates (first '${bsp_bw%%$'\n'*}', last '${bsp_bw##*$'\n'}'); read past bash's: $(diff <(printf '%s\n' "$bsp_bw") <(printf '%s\n' "$bsp_rw") | sed -n 's/^> //p' | tr '\n' ' ' | cut -c1-400)"; fail=1; }
+done
+# TOOL-dWitnessedBar-67 AC15 (S17): that re-read holds only while `PM_SCRUB` has one statement, so a second
+# assignment, an append or a substitution after it reds here, naming the count. The arm re-reads the
+# assignment text with its awk range rather than reusing post-merge's fold, and this count guards that.
+a=$((a+1))
+bsp_n=$(grep -cE '^[[:space:]]*(export[[:space:]]+)?PM_SCRUB\+?=' "$bsp_pm")
+[ "$bsp_n" = 1 ] || { echo "gov-canary: PM_SCRUB has $bsp_n assignment statements in $bsp_pm, not 1, so the arm's re-read of one assignment's text no longer reads the list post-merge runs"; fail=1; }
 rm -rf "$bsp_t"
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }

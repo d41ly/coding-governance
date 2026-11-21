@@ -444,20 +444,30 @@ def remove_stale_signer_temps(common, now=None):
     """Unlink every `gov-signers-` file directly under the common git dir `common` whose mtime is older
     than `PEER_SIGNERS_GRACE_S`, the file a killed peer read left (TOOL-dWitnessedBar-63 S20, §8 F5). A
     younger one may be a concurrent read's live file and is kept; one that cannot be read or unlinked is
-    left for the next read. Only a regular file is touched, never a link or a directory; an unlink that
-    finds the file gone is silent, and any other failure names the file on one stderr line, the read
-    going on either way (TOOL-dWitnessedBar-65 S11). -> the names removed."""
+    left for the next read. Only a regular file is touched, never a link or a directory. Every filesystem
+    call of the sweep, the listing, the regular-file test, the age read and the unlink, is silent where
+    the entry is gone, and any other failure names the entry, or the directory for the listing, on one
+    stderr line, the read going on either way (TOOL-dWitnessedBar-65 S11, TOOL-dWitnessedBar-67 S10).
+    -> the names removed."""
     now = time.time() if now is None else now
     gone = []
     try:
         found = sorted(pathlib.Path(common).glob("gov-signers-*"))
-    except OSError:
+    except FileNotFoundError:
+        return gone
+    except OSError as e:
+        print(f"verdict_backends: the signer temps under {common} could not be listed, left for the next read: {e}",
+              file=sys.stderr)
         return gone
     for p in found:
         try:
             if not (p.is_file(follow_symlinks=False) and now - p.stat().st_mtime > PEER_SIGNERS_GRACE_S):
                 continue
-        except OSError:
+        except FileNotFoundError:
+            continue
+        except OSError as e:
+            print(f"verdict_backends: the signer temp {p} could not be read, left for the next read: {e}",
+                  file=sys.stderr)
             continue
         try:
             os.unlink(p)

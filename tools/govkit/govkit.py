@@ -2426,6 +2426,10 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     # every `\` to `/` and refuses a `.`, `..` or `../` climb, a rooted, UNC or drive-absolute path and a
     # colon anywhere, with unit 62 S22's `..`-segment refusal kept on the folded path
     # (TOOL-dWitnessedBar-63 S10): regen's `check_when` and the shell reader apply the same rule.
+    # The other Python spelling is gen_build_index.py's `--asks --path` check, which admits `1:x`:
+    # memory-tree's `read_asks_args`, whose `^[A-Za-z]:` tests the first character alone. It is not imported,
+    # because kits are copy-installed. This rule refuses a colon anywhere, as unit 65 S1's table and
+    # lib-unattended's `*:*` do, so it refuses `1:x` (TOOL-dWitnessedBar-67 S15).
     def _check_exists_refused(w):
         if _regen is None or not w:
             return True
