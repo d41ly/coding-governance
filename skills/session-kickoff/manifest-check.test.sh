@@ -1096,7 +1096,7 @@ check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node 
 # TOOL-dPlacedRequest-99 S2 — the resolver arm TOOL-dPlacedRequest-43 S20 owed: the user is case-folded,
 # so USERNAME spelled upper case still names row q's user and its tag, never UNKNOWN. Staged against the
 # case-sensitive compare, the cell reads UNKNOWN. GOV_NODE stays unset, as the block above leaves it.
-USERNAME="$(printf '%s' "$CUSER" | tr '[:lower:]' '[:upper:]')" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
+USERNAME="${CUSER^^}" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
 check_eq "TOOL-dPlacedRequest-99 S2 node — an upper-cased USERNAME resolves row q's tag, not UNKNOWN" "node — q · $CUSER" "$(read_cell node "$NONCE-t99a")"
 GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
 check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"
@@ -2155,8 +2155,8 @@ check_eq "AGH2 AC6 liveness: the read reached the remote, its seven claims are i
 seed_lease() { # slug · fleet tag
   local b c
   b=$(date -u -d "@$CLNOW" +%Y-%m-%dT%H:%M:%SZ)
-  c=$(printf 'gov-claim %s/build\n\nslug: %s\nnode: n2\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -\n' "$1" "$1" "$b" "$b" "$2" \
-    | GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test git -C "$CLB" commit-tree "$CLET") \
+  printf -v c 'gov-claim %s/build\n\nslug: %s\nnode: n2\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -\n' "$1" "$1" "$b" "$b" "$2"
+  c=$(printf '%s' "$c" | GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test git -C "$CLB" commit-tree "$CLET") \
     && git -C "$CLB" update-ref "refs/gov/leases/$1/build" "$c"
 }
 seed_lease tLease a
@@ -2166,7 +2166,7 @@ check_eq "DPR1 AC15 the lease row's field 2 is its fleet tag and the legacy row'
 cl_lk=$(cd "$CWT" && bash "$CLDRV" --claims --with-key 2>/dev/null | awk -F'\t' '$1 == "tLease" { print NF " " $6 }' | tr -d '\r')
 cl_sha=$(git -C "$CLB" rev-parse refs/gov/leases/tLease/build)
 cl_py=$(cd "$CWT" && resolve_python 2>/dev/null)
-cl_ck=$(ROOT="$CWT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file loop claims.py)
+cl_ck=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file loop claims.py)
 cl_want=$(cd "$CWT" && printf 'refs/gov/leases/tLease/build@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
 cl_runs=$(cd "$CWT" && printf 'refs/gov/runs/tLease@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
 check_eq "DPR1 AC18 the lease row is six fields keyed over refs/gov/leases/tLease/build, never the runs namespace" \
@@ -2188,9 +2188,14 @@ for cl_r in "sRel 7200" "rRelOld 259200"; do
 done
 run_card "DPR16 AC15 --card --write over nine claims, two released" "$CWT" 0 "claims — 9 on the remote · " --card --write --session "$NONCE-c16"
 cl_cell=$(read_claims_cell "$NONCE-c16")
+cl_nold=0; cl_nskip=0
+while IFS= read -r cl_l; do
+  if [[ $cl_l == *rRelOld* ]]; then cl_nold=$((cl_nold + 1)); fi
+  if [[ $cl_l == *skipped:* ]]; then cl_nskip=$((cl_nskip + 1)); fi
+done <<<"$cl_cell"
 check_eq "DPR16 AC15 sRel's row reads released, a terminal-rank row beside it, rRelOld hidden, no skipped line" \
   "  sRel · n1 · released · beat Ns · released · key K|terminal|0|0" \
-  "$(printf '%s\n' "$cl_cell" | grep -m1 '^  sRel · ')|$(printf '%s\n' "$cl_cell" | grep -A1 '^  sRel · ' | tail -1 | sed -E 's/.* · ([a-z]+) · key K$/\1/')|$(printf '%s\n' "$cl_cell" | grep -c 'rRelOld')|$(printf '%s\n' "$cl_cell" | grep -c 'skipped:')"
+  "$(printf '%s\n' "$cl_cell" | grep -m1 '^  sRel · ')|$(printf '%s\n' "$cl_cell" | grep -A1 '^  sRel · ' | tail -1 | sed -E 's/.* · ([a-z]+) · key K$/\1/')|$cl_nold|$cl_nskip"
 git -C "$CLB" update-ref -d refs/gov/runs/sRel; git -C "$CLB" update-ref -d refs/gov/runs/rRelOld
 git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/runs/sRel refs/gov/remote/runs/rRelOld | git -C "$CCLONE" update-ref --stdin
 
@@ -2405,7 +2410,9 @@ if [ -f "$cs_fx" ]; then
       echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1))
     fi
   done
-  check_eq "TOOL-dPlacedRequest-99 S1 the suite ran every plant --list names" "$(printf '%s' "$cs_list" | grep -c .)" "$cs_ran"
+  cs_n=0
+  while IFS= read -r cs_l; do if [ -n "$cs_l" ]; then cs_n=$((cs_n + 1)); fi; done <<<"$cs_list"
+  check_eq "TOOL-dPlacedRequest-99 S1 the suite ran every plant --list names" "$cs_n" "$cs_ran"
 fi
 
 # AC11 — this repository's REAL common dir holds no card the suite wrote.

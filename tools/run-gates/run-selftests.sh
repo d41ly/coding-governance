@@ -1202,7 +1202,7 @@ PY
     ev_note="$ev_note, ${pt_out##*$'\n'}"
   else
     echo "run-selftests: a loop-kit row's plants=<n> token does not match the plants its module runs — re-price the row over every plant, then set the token:" >&2
-    printf '%s\n' "$pt_out" | sed 's/^/  /' >&2
+    printf '  %s\n' "${pt_out//$'\n'/$'\n'  }" >&2
     fails=1
   fi
   [ "$NROWS" -gt 0 ] || { echo "run-selftests: the declaration is EMPTY, so both directions above passed by finding nothing" >&2; fails=1; }

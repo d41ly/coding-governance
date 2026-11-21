@@ -1917,16 +1917,16 @@ read_card_ref() { # slug -> 0 the remote answered, 1 not
 # The instant a card's `card —` header line was published, as epoch seconds: its `published <at>`
 # field, which `render_build_card` writes in local time with its offset, so two stamps from two
 # offsets compare as instants. Pure arithmetic, the days-from-civil count, so no `date -d` is needed.
-derive_card_epoch() { # header line -> epoch seconds on stdout; 1 when it carries no stamp that parses
+derive_card_epoch() { # var · header line -> the epoch seconds bound to var; 1 when the line carries no stamp that parses
   local rx='published ([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})([+-])([0-9]{2})([0-9]{2})( |$)'
   local y m d era yoe doy doe off
-  [[ ${1:-} =~ $rx ]] || return 1
+  [[ ${2:-} =~ $rx ]] || return 1
   y=$((10#${BASH_REMATCH[1]})); m=$((10#${BASH_REMATCH[2]})); d=$((10#${BASH_REMATCH[3]}))
   [ "$m" -le 2 ] && y=$((y - 1))
   era=$(( (y >= 0 ? y : y - 399) / 400 )); yoe=$((y - era * 400))
   doy=$(( (153 * (m > 2 ? m - 3 : m + 9) + 2) / 5 + d - 1 )); doe=$((yoe * 365 + yoe / 4 - yoe / 100 + doy))
   off=$(( 10#${BASH_REMATCH[8]} * 3600 + 10#${BASH_REMATCH[9]} * 60 )); [ "${BASH_REMATCH[7]}" = + ] || off=$((-off))
-  printf '%s\n' $(( (era * 146097 + doe - 719468) * 86400 + 10#${BASH_REMATCH[4]} * 3600 + 10#${BASH_REMATCH[5]} * 60 + 10#${BASH_REMATCH[6]} - off ))
+  printf -v "$1" '%s' $(( (era * 146097 + doe - 719468) * 86400 + 10#${BASH_REMATCH[4]} * 3600 + 10#${BASH_REMATCH[5]} * 60 + 10#${BASH_REMATCH[6]} - off ))
 }
 
 # A stored build card's text, from the stores `card.store` selects, chosen by FRESHNESS
@@ -1945,8 +1945,8 @@ read_card_stored() { # slug · outfile · the selected stores, space-padded -> 0
   [ -z "$cache" ] || cref=$(sed -n '1s/^# card-ref //p' "$cache" | tr -d '\r')
   case "$3" in *" remote-ref "*) refc=$(git rev-parse --verify -q "$ref^{commit}" 2>/dev/null | tr -d '\r') ;; esac
   if [ -n "$cache" ] && [ "$cref" = local ] && [ -n "$refc" ]; then
-    if ac=$(derive_card_epoch "$(sed -n '2p' "$cache" | tr -d '\r')"); then
-      ar=$(derive_card_epoch "$(git log -1 --format=%B "$refc" -- 2>/dev/null | sed -n '6p' | tr -d '\r')") \
+    if derive_card_epoch ac "$(sed -n '2p' "$cache" | tr -d '\r')"; then
+      derive_card_epoch ar "$(git log -1 --format=%B "$refc" -- 2>/dev/null | sed -n '6p' | tr -d '\r')" \
         && [ "$ac" -le "$ar" ] || refc=""
     fi
   fi
@@ -2124,7 +2124,8 @@ write_card_snapshot() { # slug · step · ref commit or none · card file · [su
   rel=$("$py" -c "$CARD_SNAPSHOT_PY" "${br%/*}" "${lt%/*}" "$CARD_TREE" "$1" "$2" "$3" "$4" 2>&1) \
     || { why=${rel//$'\r'/}; why=${why#$'\n'}; why=${why%%$'\n'*}; printf 'card — build-folder not written: %s\n' "${why:0:200}"; return 0; }
   rel=${rel//$'\r'/}; rel=${rel##*$'\n'}
-  if git -C "$CARD_TREE" add -- "$rel" 2>/dev/null && git -C "$CARD_TREE" commit -q -m "card snapshot($1): $2" >/dev/null 2>&1; then
+  if git -C "$CARD_TREE" add -- "$rel" 2>/dev/null && ! git -C "$CARD_TREE" diff --cached --quiet 2>/dev/null \
+    && git -C "$CARD_TREE" commit -q -m "card snapshot($1): $2" >/dev/null 2>&1; then
     printf 'card — %s · step %s · build-folder %s · commit %s%s\n' "$1" "$2" "$rel" "$(git -C "$CARD_TREE" rev-parse --short=8 HEAD 2>/dev/null | tr -d '\r')" "${5:-}"
   else
     git -C "$CARD_TREE" reset -q -- "$rel" 2>/dev/null; rm -f "$CARD_TREE/$rel"
