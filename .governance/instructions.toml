@@ -38,7 +38,7 @@ tag = "repo.rule-06-the-codebase-map-is-memory-map-dossiers"
 level = 0
 type = "adopter-rule"
 scope = ["reader.every"]
-text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise."
+text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.txt`, which shrinks unless a recorded decision says otherwise."
 
 [[unit]]
 tag = "repo.rule-07-work-state-is-read-from-the-generated-me"
@@ -60,3 +60,363 @@ level = 0
 type = "adopter-rule"
 scope = ["reader.every"]
 text = "`GATE_SELFTESTS=1` runs the held kit self-tests on demand only, and no boundary sets it."
+
+[[unit]]
+tag = "repo.kickoff.f01"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f02"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f03"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f04"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f05"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "The one exception is the red-fix lane: with `bar.inline-red-fixes` on and a leg recorded red at this branch's own head, the gate admits a product write with no route, and its commit carries a `Red-fix: <leg>` trailer and owes a `red-fix` record (`TOOL-aNimbleMend-8`, `-9`, `-10`, `-14`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f06"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A `Red-fix:` commit carries the fix alone: its record goes in the next commit, since the index regen writes it into a spec and limit L3 of `tools/memory-tree/routed_commits.py` refuses the push (`dDeclaredLoop`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f07"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f08"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in the order `tools/loop/loop.toml` gives them (`KICK-aOrientedCast-2`, `TOOL-dDeclaredLoop-1`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f09"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f10"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f11"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f12"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "An unattended run is bound by directives the unattended Skill `.claude/skills/unattended/SKILL.md` lists, waivable only by the owner at preflight; a discovery is adopted, not parked."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f13"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the routing table of `.claude/skills/unattended/SKILL.md` is the list."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f14"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f15"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "`GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f16"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "An adopter's bar holds a leg by `subject = \"kit\"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f17"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` \"Acceptance ledger\"."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f18"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A live spec retiring a named thing owes a `**Readers:**` clause (hygiene check 25), and a CLOSED unit whose spec grades THIN blocks `build-complete`."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f19"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f20"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A chain spec binds its design clause on a `**Carries:**` or `**Derived:**` line, graded by the carries join of `tools/check-spec-tokens.py` from `SPEC_CARRIES_CUTOFF`; each chain build's README renders it as `gen:build-coverage`, and hygiene check 29 refuses an INPROGRESS spec while it is red (`TOOL-dTrueNorth-2`, `-3`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f21"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "Render and check a chain build's packet through `python tools/chain-packet.py --write <slug>` and `--check <slug>`: the packet instrument's own `main` and bytes, without its one git process per spec revision; `--parity <slug>` proves it at the instrument's cost (`TOOL-aBatchedPacket-1`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f22"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A departure from the frozen design, or from a spec once its code has started, is a `deviation` record that `tools/memory-tree/deviation_join.py` joins at the commit and at the close; the grammar is `memory/HYGIENE.md` \"Deviation records\" (`TOOL-dTrueNorth-4`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f23"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A `spec-audit` record pins the spec revision it read as `@rev-N` on its Serves line, and check 21's audit-pin arm refuses one that does not from `SPEC_AUDIT_PIN_CUTOFF` (`TOOL-dTrueNorth-5`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f24"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "The as-built view at `DESIGN_VIEW` is generated by `tools/memory-tree/asbuilt_view.py`: `gen_build_index.py --write` re-renders it in the commit that changes its inputs, check 9 grades its bytes and check 30 its verdicts (`TOOL-dTrueNorth-6`, `-8`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f25"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A spec audit is owed only where the owner declares `spec-audit:` or `SPEC_AUDIT_DEFAULT`; a run never declares either, and kickoff asks."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f26"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "Before working inside a kit, `git log origin/main --oneline -20 -- tools/<kit>/` shows whether another node is rewriting it."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f27"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A landing that edits a grader owns every red that grader prints at the tip (KF3): reproduce at R in a detached worktree, then fix or ABSORB it (`memory/guides/UNATTENDED-STOPS.md` §13; `dHomedResolver`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f28"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "`tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f29"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f30"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "line"
+text = "A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f31"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; an agent writes it only through `tools/loop/policy_edit.py`, whose change record every commit and push of it owes, and the pre-commit guard admits an agent's change to it as one raised measured-file cap or on a live run's branch (`help/policy.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f32"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "`--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f33"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f34"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f35"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"
+
+[[unit]]
+tag = "repo.kickoff.f36"
+level = 2
+type = "constraint"
+scope = ["reader.card"]
+trigger = "always"
+budget = "block"
+text = "Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`)."
+enforced-by = "none — a fact the kickoff manifest front-loads"

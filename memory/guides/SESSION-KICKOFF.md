@@ -3,10 +3,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-11-20T01:11:09+02:00 @ a85f4a2e34dc9037c6af1d50a0c3239d45a2b3b0
+last-audit: 2026-11-21T20:44:30+02:00 @ f1af151e9e4fc22aadf943834a99367daa6a5c72
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6dee50847cec889610a5bbc370a1cf69cee02eb1
+last-body-change: a60437bb8fc90c0c883531697cf06f3dfe2de9fb
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -47,42 +47,7 @@ which restores it. The tier is §B's.
 One line per bullet (KICK-aDistilledCharter-1): a pointer or a trap, never a procedure. The detail
 lives where each bullet points.
 
-- A build of more than one pass runs on `memory/guides/BUILD-METHOD.md`; it is in `watch:`, so editing it re-audits this manifest.
-- A build may amend its own roster (BUILD-METHOD M2, M3) and must run delegated disjoint passes in parallel (M6); both invert a session's default.
-- Every session start writes an orientation card; a commit is refused until its READY line is appended, and only from a tree the card names (`tools/hooks/scratch-guard.js`).
-- A card's `## route` lands only when its build, unit specs and brief all resolve; a write under `ROUTED_PATHS` needs a route naming a buildable unit, and a pushed commit there names a specced one (`TOOL-aRoutedQuill-2`, `-3`).
-- The one exception is the red-fix lane: with `bar.inline-red-fixes` on and a leg recorded red at this branch's own head, the gate admits a product write with no route, and its commit carries a `Red-fix: <leg>` trailer and owes a `red-fix` record (`TOOL-aNimbleMend-8`, `-9`, `-10`, `-14`).
-- A `Red-fix:` commit carries the fix alone: its record goes in the next commit, since the index regen writes it into a spec and limit L3 of `tools/memory-tree/routed_commits.py` refuses the push (`dDeclaredLoop`).
-- The card's READY anchor accepts both the bare and the `- ` list-item spelling (`TOOL-cMendedVintage-16`).
-- An attended code build runs through `/build` after kickoff's go: the role catalogue's workflows in the order `tools/loop/loop.toml` gives them (`KICK-aOrientedCast-2`, `TOOL-dDeclaredLoop-1`).
-- Layout: `main` lives in `C:/projects/coding-governance`; every unit's branch rides its own worktree under `.claude/worktrees/<branch-slug>/`, and `git worktree list` is the inventory.
-- Remote `origin`, default branch `main`; a push needs an explicit ask or the authorization `memory/guides/UNATTENDED-PROTOCOL.md` section 1 defines.
-- Governing docs: `AGENTS.md`, the template it renders from, and `memory/DECISIONS.md`; binding guides are `memory/guides/REVIEW-PROTOCOL.md` and the unattended protocol and verbs.
-- An unattended run is bound by directives the unattended Skill lists, waivable only by the owner at preflight; a discovery is adopted, not parked.
-- An unattended run declares a mode, which decides its authorization, its anchor and the directives that bind; the Skill's routing table is the list.
-- The idle-wake at most wakes an idle session (nine never fired in 30 h of pending background work, 2026-10-10); resuming a stalled run is the stop-guard's, the stall-recorder's and the resume tick's, from the lease, and the tick kills only what it launched, so a live STALE session is a `stale-live-pid` health line (protocol §5, `aSparedHolder`).
-- `GATE_BOUND` bounds every declared command and kills it on breach; nothing bounds an agent-launched process except `tools/process-monitor/`.
-- An adopter's bar holds a leg by `subject = "kit"` alone: govkit never emits `chunk`, so a shipped self-test declares it in its descriptor (`aBenchedProbe`).
-- A CLOSED Tier-2 unit owes an acceptance ledger in a `journal` record; the grammar is `memory/HYGIENE.md` "Acceptance ledger".
-- A live spec retiring a named thing owes a `**Readers:**` clause (hygiene check 25), and a CLOSED unit whose spec grades THIN blocks `build-complete`.
-- A live spec's leg line names every leg its files-touched trips: `python tools/check-spec-tokens.py --list` prints them before the spec is dated.
-- A chain spec binds its design clause on a `**Carries:**` or `**Derived:**` line, graded by the carries join of `tools/check-spec-tokens.py` from `SPEC_CARRIES_CUTOFF`; each chain build's README renders it as `gen:build-coverage`, and hygiene check 29 refuses an INPROGRESS spec while it is red (`TOOL-dTrueNorth-2`, `-3`).
-- Render and check a chain build's packet through `python tools/chain-packet.py --write <slug>` and `--check <slug>`: the packet instrument's own `main` and bytes, without its one git process per spec revision; `--parity <slug>` proves it at the instrument's cost (`TOOL-aBatchedPacket-1`).
-- A departure from the frozen design, or from a spec once its code has started, is a `deviation` record that `tools/memory-tree/deviation_join.py` joins at the commit and at the close; the grammar is `memory/HYGIENE.md` "Deviation records" (`TOOL-dTrueNorth-4`).
-- A `spec-audit` record pins the spec revision it read as `@rev-N` on its Serves line, and check 21's audit-pin arm refuses one that does not from `SPEC_AUDIT_PIN_CUTOFF` (`TOOL-dTrueNorth-5`).
-- The as-built view at `DESIGN_VIEW` is generated by `tools/memory-tree/asbuilt_view.py`: `gen_build_index.py --write` re-renders it in the commit that changes its inputs, check 9 grades its bytes and check 30 its verdicts (`TOOL-dTrueNorth-6`, `-8`).
-- A spec audit is owed only where the owner declares `spec-audit:` or `SPEC_AUDIT_DEFAULT`; a run never declares either, and kickoff asks.
-- Before working inside a kit, `git log origin/main --oneline -20 -- tools/<kit>/` shows whether another node is rewriting it.
-- A landing that edits a grader owns every red that grader prints at the tip (KF3): reproduce at R in a detached worktree, then fix or ABSORB it (`memory/guides/UNATTENDED-STOPS.md` §13; `dHomedResolver`).
-- `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
-- The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
-- A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
-- This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; an agent writes it only through `tools/loop/policy_edit.py`, whose change record every commit and push of it owes, and the pre-commit guard admits an agent's change to it as one raised measured-file cap or on a live run's branch (`help/policy.md`).
-- `--dispatch` refuses one write set naming a generated index with its generator (check 49): a unit that edits a generator builds in two passes, the generator edit first and the re-rendered index second (`TOOL-dDeclaredLoop-12`).
-- The loop kit's definition `tools/loop/loop.toml` is checked one concern per module, each its own leg: `loop_lib.py --check`, and `check` on `loop_table.py`, `loop_checklist.py` and `loop_items.py` (`help/loop.md`).
-- A repository's own loop rows each have their own module and fixture leg: its stages `splice.py check`, an item's upstream rows `upstream.py`, the composition pinned per move `composition.py`, and the build's position from witnesses `position.py` (`help/loop.md`).
-- The review round bounds are policy keys read through `tools/loop/review_bounds.py`; the driver falls back to four defaults with a NOTE where the module or the policy kit does not resolve (`help/loop.md`).
-- Every composition is checked to terminate by `tools/loop/termination.py`, its own leg `loop termination`, and the owner gates and review breakpoints of a build are one list read by `tools/loop/breakpoints.py` (`help/loop.md`).
+- The orientation facts are level-2 units the card prints under ## pockets; change one with tools/playbook/instructions_edit.py.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -96,14 +61,14 @@ lives where each bullet points.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY at the gate-profiles.txt width or a lower `--calibrate-width` pick; the leg list is single-sourced from tools/gate-legs.json, which `tools/run-gates/leg_factory.py --write` renders from the kit descriptors and govkit's registry — read THAT for it, not this line
 # Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 bash tools/run-gates/run-gates.sh --regen   # regenerate every declared generated output; a bar refuses while one is stale. TOOL-aPrimedIndex-2, -3
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD and the docs mode (GATE_DOCS_BASE). .githooks/pre-push decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs. A leg the selection record GATE_SELECTION names (`verdict_flow.py select`, by `quarantine` or `level`) stays held under it; `verdict.held` says when held legs run. TOOL-dWitnessedBar-5
 # Per profile row: a whole-RUN wall (GATE_WALL; a breach kills the legs, TOOL-aQuenchedHarness-1), and mempause holding dispatch while used memory is above it (TOOL-aGraftedHelix-7)
-GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
+GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. The exit never moves; each red carries `blocks` under GATE_VERDICT_BLOCKS (verdict.blocks at R), and a red bar lands only when every red passes. TOOL-dDerivedDocket-23, TOOL-dWitnessedBar-3
 bash tools/run-gates/pass-legs.sh --base <rev>   # the declared FAST legs over one pass's diff, at the main loop after a unit pass's commit; `pass.fast-legs` off runs nothing; a role agent's hook refuses it. Its record is `gate-pass-legs.txt` in the git dir. TOOL-aNimbleMend-5, -7
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES an uncalibrated row until --pooled --calibrate; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1

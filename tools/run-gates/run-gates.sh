@@ -9,6 +9,7 @@
 # descriptor stages is proved fresh by `regen.py --check` and none is regenerated here. GATE_REGEN_CHECK=0
 # skips it; a guard-scoped leg may then let a stale output through, so the push bar scrubs that knob.
 #   bash <prefix>/run-gates/run-gates.sh --regen | --regen-check | --regen-list   # the verb, no bar
+#   bash <prefix>/run-gates/run-gates.sh --precommit [--list]   # every row's `precommit` argv, no bar
 #   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
 #                                                    # <prefix>/run-gates/gate-profiles.txt declares
 #                                                    # for the detected cores and RAM
@@ -18,7 +19,13 @@
 #                                                    # back to the built-in formula (the rollback)
 #   GATE_ATTRIBUTE=<rev> bash …                      # re-run each RED leg at <rev> and say whose red
 #                                                    # it is: OWN, INHERITED, MIXED, CONTENDED or
-#                                                    # DEAD PROBE. REPORT-ONLY: no exit code moves
+#                                                    # DEAD PROBE. No exit code moves: each row's
+#                                                    # `blocks`, by GATE_VERDICT_BLOCKS and
+#                                                    # lib-verdict.sh, is what a landing reads
+#   GATE_SELECTION=<path> bash …                     # hold each leg the selection record names by
+#                                                    # quarantine or level (verdict_flow.py select)
+#   GATE_RERUN=1 bash …                              # run each red leg once more on this tree, into
+#                                                    # <i>.rerun.leg; moves no verdict and no exit code
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
 #
@@ -26,14 +33,19 @@
 # verdict below is rendered by this file, so an edit here can move what any leg reads as and no leg
 # can see it. The attribution does not fix that and refuses to compound it (KF3): when the diff
 # between its base and the working tree touches this runner, `gate-fingerprint.sh`, the pre-push
-# hook or `lib-attribute.sh`, every red reads OWN and says why. Nobody grades their own grader.
+# hook, `lib-attribute.sh` or `lib-verdict.sh`, every red reads OWN and says why. Nobody grades their
+# own grader.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.51   # gov:kit run-gates@1.51
+KIT_RUN_GATES_VERSION=1.55   # gov:kit run-gates@1.55
+# 1.53 -> 1.54: the canary's one key set, `LEG_KEYS`, admits `level`, govkit's `LEG_KEY_FLOORS["level"]`, and `product_tests.py` grades it (TOOL-dWitnessedBar-9).
+# 1.52 -> 1.53: the canary's one key set, `LEG_KEYS`, admits `precommit`, govkit's `LEG_KEY_FLOORS["precommit"]`, and `--precommit` runs it (TOOL-dWitnessedBar-10).
+# 1.51 -> 1.52: the canary's one key set, `LEG_KEYS`, admits `purpose`, govkit's `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
+# 1.50 -> 1.51: the canary's one key set, `LEG_KEYS`, admits `tag`, govkit's `LEG_KEY_FLOORS["tag"]` (TOOL-dWitnessedBar-12).
 # 1.47 -> 1.49: the canary admits `stage` (TOOL-dDeclaredLoop-4), stepping over origin/main's 1.48, which ships without it (TOOL-dDeclaredLoop-46).
 # 1.40 -> 1.41: the kit ships `measure_legs.py`, a gate profiler that runs every manifest leg clean and
 # unbounded, each in its own Windows Job Object, with its fixtures and its `measure-legs selftest` leg
@@ -302,6 +314,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
@@ -362,8 +392,12 @@ case "${1:-}" in
   --regen)       exec "$PYBIN" "$KITDIR/regen.py" --write ;;
   --regen-check) exec "$PYBIN" "$KITDIR/regen.py" --check ;;
   --regen-list)  exec "$PYBIN" "$KITDIR/regen.py" --list ;;
+  # THE COMMIT-TIME LIST, derived (TOOL-dWitnessedBar-10 S3): `precommit.py` runs each manifest row's
+  # `precommit` argv its `guard` trips, under the interpreter just resolved; the pre-commit hook's call.
+  --precommit)   shift; exec "$PYBIN" "$KITDIR/precommit.py" "$@" ;;
 esac
-fails=0; n=0; skips=0; ondemands=0
+fails=0; n=0; skips=0; ondemands=0; HELD_KIT=0; HELD_QUARANTINE=0; HELD_LEVEL=0; HELD_KEYS=""
+HELD_N=0; HELD_RAN=0; HELD_RAN_FAIL=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
@@ -393,16 +427,24 @@ LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # that names a commit of THIS repository and attributes its fixture's reds against nothing.
 ATTR_REV=${GATE_ATTRIBUTE:-}
 unset GATE_ATTRIBUTE
-# THE INHERITED-RED POLICY THIS BAR WAS HANDED, and the age bound it ages an INHERITED leg under
-# (TOOL-dDerivedDocket-24). Read once and removed for the base's reason above: a leg that drives a
-# nested bar over a fixture must not inherit this repository's policy. The runner DECIDES nothing
-# with either. The bound sizes the age probe, and the policy only permits the `gate-inherited-green`
-# stamp to be WRITTEN; both readers that act on a red — the pre-push hook and the unattended driver —
-# read the policy at R themselves, so a caller exporting `land` buys a stamp nobody honours without a
-# read of its own. A bound that is not a positive integer, a leading zero included, asks for no age.
-ATTR_POLICY=${GATE_INHERITED_RED:-}
+# THE SELECTION RECORD THIS BAR HOLDS LEGS BY (TOOL-dWitnessedBar-5 S2), read once and removed for the
+# same reason: a nested bar over a fixture must not hold the fixture's legs by this repository's record.
+SEL_FILE=${GATE_SELECTION:-}
+unset GATE_SELECTION
+# THE `verdict.blocks` VALUE THIS BAR WAS HANDED, and the age bound it ages an INHERITED leg under
+# (TOOL-dWitnessedBar-3 S2, TOOL-dDerivedDocket-24). Read once and removed for the base's reason
+# above: a leg that drives a nested bar over a fixture must not inherit this repository's policy.
+# The value joins each red's class to `block` or `pass` through `lib-verdict.sh`, written into the
+# attribution record's ninth field, and permits the `gate-inherited-green` stamp to be WRITTEN when
+# every red reads `pass`; both readers that act on a red — the pre-push hook and the unattended driver
+# — read the value at R themselves and hand it here, so a caller exporting a looser value buys a stamp
+# nobody honours. An absent value is `every-red`, said on the summary, and an unknown one reads
+# `every-red` too. A bound that is not a positive integer, a leading zero included, asks for no age.
+ATTR_BLOCKS_HANDED=${GATE_VERDICT_BLOCKS:-}
+ATTR_BLOCKS=${GATE_VERDICT_BLOCKS:-every-red}
 ATTR_MAX_AGE=${GATE_INHERITED_RED_MAX_AGE:-}
-unset GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
+unset GATE_VERDICT_BLOCKS GATE_INHERITED_RED_MAX_AGE
+case "$ATTR_BLOCKS" in own-only|own-mixed-contended|every-red) ;; *) ATTR_BLOCKS=every-red ;; esac
 case "$ATTR_MAX_AGE" in ''|0*|*[!0-9]*) ATTR_MAX_AGE="" ;; esac
 # WHAT THE HELD TIER WAS ASKED FOR, as every record of this run states it (TOOL-aSparedSpawn-12 S7):
 # empty when held, `changed` when only the legs whose kit moved run, `1` for any other non-empty
@@ -2523,13 +2565,19 @@ RUNLOG_RC=""; RUNLOG_DONE=""
 # the caller names and for nothing else, so a line the runner did not expect cannot set a variable.
 # The caller declares the variables it names, as locals, before calling. Rc 1 when the file is absent.
 read_record_keys() { # file · variable prefix · key... -> sets <prefix><key> for each named key present
-  local _rk_f=$1 _rk_p=$2 _rk_k="" _rk_v="" _rk_want
+  # Each line is read WHOLE and its value is everything after the first TAB, so an empty last field
+  # keeps its TAB; a line with no TAB is no key at all (TOOL-dWitnessedBar-63 S17, S19), as
+  # verdict_backends.py's `read_tag_lines` reads it. A TAB IFS would strip the one and set the other.
+  local _rk_f=$1 _rk_p=$2 _rk_l="" _rk_k="" _rk_v="" _rk_want
   shift 2
   _rk_want=" $* "
   [ -f "$_rk_f" ] || return 1
-  while IFS=$'\t' read -r _rk_k _rk_v || [ -n "$_rk_k" ]; do
-    case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac
-    _rk_k=""; _rk_v=""
+  while IFS= read -r _rk_l || [ -n "$_rk_l" ]; do
+    case "$_rk_l" in
+      *$'\t'*) _rk_k=${_rk_l%%$'\t'*}; _rk_v=${_rk_l#*$'\t'}
+        case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac ;;
+    esac
+    _rk_l=""
   done 2>/dev/null < "$_rk_f"
   return 0
 }
@@ -2713,6 +2761,13 @@ GATE_RUN_KEEP=${GATE_RUN_KEEP:-5}
 # before they come back to look at it, and small enough that a header, one row per leg and a verdict
 # cannot grow the git dir without practical limit.
 RUNROOT=""; RUNDIR=""; RUNID=""
+# A tail no retained run names is kept this long after its last write (TOOL-dWitnessedBar-42 S2), seven
+# days, PINNED by that spec's F2: a fixed bound far past any bar's wall needs no other reading to be
+# true, where a profiled wall can be zero and a turnstile beacon is not held by every bar.
+TAIL_GRACE_S=604800
+# A per-tree verdict no retained run and no worktree head names is kept this long after its last write
+# (TOOL-dWitnessedBar-51 S28), 30 days, PINNED by that spec's F4: the bound that never removes a named one.
+VERDICT_GRACE_DAYS=30
 # THE COMPLETION FILE STAYS IN THE SCRATCH DIR, and the durable record does not hold one. This is
 # the one place this unit's spec asked for something its own reasoning argues against, and the
 # arm for it is what found the disagreement rather than a reading of the text.
@@ -2759,6 +2814,32 @@ fi
 # uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
 # leg starts.
 unset GATE_RUN_ID
+# WHERE THE SCOPED BASE CAME FROM, read once and removed for the same reason (TOOL-dWitnessedBar-40 S2):
+# `inherited` when the caller scoped this bar from an inherited green, which the pre-push hook and the
+# unattended close export beside `GATE_BASE`; anything else reads `full`. `GATE_BASE` alone cannot say
+# which, and a scoped run on an inherited base writes no per-tree verdict (see the writer below).
+BASE_FROM=full
+[ "${GATE_BASE_FROM:-}" = inherited ] && BASE_FROM=inherited
+unset GATE_BASE_FROM
+# THE CAUSE, read once and removed for the same reason (TOOL-dWitnessedBar-25 S2): the act that started
+# this bar, `<kind>:<id>` from the caller that exports it (the pre-push hook `push:<sha>`, post-merge
+# `post-merge:<sha>`, the unattended close `run:<slug>`, the pass-leg runner `pass:<sha>`), `attended`
+# when none did. A leg's nested runner inheriting it would name its caller's cause. The unset precedes
+# the environment digest, so the digest never lists it. A value outside `[A-Za-z0-9._:@-]+` reads
+# `attended` and is named on stderr, so an exported value cannot write a field separator into a record.
+RUN_CAUSE=attended
+if [ -n "${GATE_CAUSE:-}" ]; then
+  case "$GATE_CAUSE" in
+    *[!A-Za-z0-9._:@-]*) printf 'run-gates: GATE_CAUSE refused — %q is outside [A-Za-z0-9._:@-]+, so this run records cause attended\n' "$GATE_CAUSE" >&2 ;;
+    *) RUN_CAUSE=$GATE_CAUSE ;;
+  esac
+fi
+unset GATE_CAUSE
+# THE SAME-TREE RE-RUN (TOOL-dWitnessedBar-8 S1), read once and removed for the same reason: a nested
+# bar over a fixture re-runs its own reds only when its caller asks it to. `1` arms it; anything else
+# leaves the bar as it was.
+RERUN_RED=""; [ "${GATE_RERUN:-}" = 1 ] && RERUN_RED=1
+unset GATE_RERUN
 # THE REUSE KNOBS, read once and removed for the same reason (TOOL-aFrugalTurnstile-4 S4, composed by
 # TOOL-aSparedSpawn-32 S6): the pre-push hook exports `GATE_REUSE_LINEAGE` or `GATE_REUSE_PUSH` to THIS
 # bar, and a leg's nested runner inheriting either, or a hand-set `GATE_REUSE`, would reuse inside a
@@ -2832,6 +2913,10 @@ rm -f "$WORK/walk"
 # cannot reproduce at any sha. A walk that FAILED is not an empty listing, and is never clean.
 TREE_CLEAN=no
 [ "$WALK_OK" = yes ] && [ "${#DIRT_ROWS[@]}" = 0 ] && TREE_CLEAN=yes
+# THE TREE THIS RUN GRADES (TOOL-dWitnessedBar-4 S1): HEAD's tree hash when the run started clean, `-`
+# otherwise. The run record's verdict names it, and it keys the per-tree verdict written at the end.
+RUN_TREE=-
+[ "$TREE_CLEAN" = yes ] && RUN_TREE=$(git rev-parse -q --verify "HEAD^{tree}" 2>/dev/null) && [ -n "$RUN_TREE" ] || RUN_TREE=-
 
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
@@ -2848,6 +2933,15 @@ _pm_args=()
 [ "$PROCMON_CONF" = 1 ] && _pm_args=(process-monitor reap.py "$KITDIR")
 legs=$("$PYBIN" -c "$RKD_PROGRAM"'
 import hashlib, json, os, statistics, sys
+# THE DECLARATIVE KEYS the row hash leaves out (TOOL-dWitnessedBar-51 S48), imported from the sibling
+# held_halves.py in the kit dir argv[4] sits in, as measure_legs.py imports it: one tuple, one home.
+# Where no such sibling sits, a fixture holding the runner alone, the whole row is hashed: the stricter
+# reading, under which any change re-runs a leg and none reuses one.
+sys.path.insert(0, os.path.dirname(sys.argv[4]) if len(sys.argv) > 4 and os.path.dirname(sys.argv[4]) else ".")
+try:
+    from held_halves import DECLARATIVE_LEG_KEYS
+except ImportError:
+    DECLARATIVE_LEG_KEYS = ()
 # THE PROCESS-MONITOR KIT DIR (TOOL-aSparedSpawn-4 S10), asked by argv[5] to argv[7] and answered as the
 # runner wrapper of the resolver answered it: the dir relative to the nearest directory holding .git,
 # or the refusal text. A refusal never ends this program, because the manifest still has to be read.
@@ -2984,10 +3078,13 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          + "\x1e" + ("=" + ",".join(resolve_prefix_token(g, troot) for g in l["doc_reads"])
                             if isinstance(l.get("doc_reads"), list) else "")
          # THE TENTH AND ELEVENTH FIELDS, appended for the same reason, read only by the held-tier
-         # selection (TOOL-aSparedSpawn-12 S4): the row hash, the SHA-1 of this row as JSON with
-         # sorted keys, so a record earned under another row reads as stale; and the record name,
-         # the first 16 hex of the SHA-1 of the leg name, which stays put when the row changes.
-         + "\x1e" + hashlib.sha1(json.dumps(l, sort_keys=True).encode()).hexdigest()
+         # selection (TOOL-aSparedSpawn-12 S4): the row hash, the SHA-1 of this row LESS its
+         # DECLARATIVE_LEG_KEYS as JSON with sorted keys, so a record earned under another row reads as
+         # stale and a declarative key added or reworded neither releases a reuse quarantine nor re-earns
+         # a held record (TOOL-dWitnessedBar-51 S48); and the record name, the first 16 hex of the SHA-1
+         # of the leg name, which stays put when the row changes.
+         + "\x1e" + hashlib.sha1(json.dumps({k: v for k, v in l.items() if k not in DECLARATIVE_LEG_KEYS},
+                                             sort_keys=True).encode()).hexdigest()
          + "\x1e" + hashlib.sha1(str(l["name"]).encode()).hexdigest()[:16]
          for l in data]
 if pm is not None:
@@ -3017,6 +3114,85 @@ while IFS= read -r line; do
   rowhashes+=("${rwh_:-}"); heldkeys+=("${hky_:-}")
 done <<<"$legs"
 total=${#names[@]}
+
+# ---- THE HOLD, ONE PREDICATE (TOOL-dWitnessedBar-5 S1, S2) ----------------------------------------
+# A held leg is held by a SOURCE, a word of HOLD_SOURCES. `kit` the runner derives from the row itself,
+# subject `kit` or chunk `selftests`, and `GATE_SELFTESTS` asks for it; `quarantine` and `level` come
+# only from the selection record `GATE_SELECTION` named, a TAB file of `held · <leg> · <source> · <note>`
+# rows `verdict_flow.py select` writes at R, and such a leg is held whatever `GATE_SELFTESTS` says. A
+# row whose source is outside those two, or whose leg this manifest lacks, is printed and ignored, and
+# ignoring a hold RUNS the leg, the safe direction. The file is copied into the run record as
+# `selection`, which the pre-push hook re-derives at R before it admits this bar's verdict (S7).
+# THE SAME ROWS RIDE ON THE PER-TREE VERDICT (TOOL-dWitnessedBar-41 S1), because the run record is this
+# worktree's and is swept: the CANONICAL TEXT is the rows this loop ACCEPTED and only those
+# (TOOL-dWitnessedBar-56 S3), in file order, one trailing CR cut, each LF-terminated: four or five TAB
+# fields, the first `held`, a source of `quarantine` or `level`, a fifth if present `hold` or `run`, and
+# a leg the manifest carries, the field rule `verdict_flow.py`'s `read_selection` applies, so the hook
+# and `select --check --selection` read the rows the runner held. Every other row is counted in
+# SEL_IGNORED, the record's `selection_ignored`; a blank or `#` line is no row. SEL_HASH is the text's
+# `git hash-object --stdin`, `none` with no file; SEL_KEYS one `selection.<n>` per accepted row, the row
+# with its `held` field cut and its TABs KEPT (S1), so a ` · ` inside a note round-trips.
+# A ROW'S FIFTH FIELD IS ITS MODE (TOOL-dWitnessedBar-30 S1), `hold` or `run`, a four-field row `hold`.
+# A `run` leg EXECUTES in its ordinary slot, past its guard, the docs mode and the reuse cache, and
+# writes its `.leg` row, so the flake record holds its result; that result is its `held.<n>`, `ok` or
+# `fail`, counted in `held` and never in `failed` or the verdict. A mode outside the two is ignored as
+# the source is, and the leg runs.
+HOLD_SOURCES="kit quarantine level"
+SEL_HASH=none; SEL_KEYS=""; SEL_IGNORED=0
+declare -A SEL_SRC=() SEL_NOTE=() SEL_MODE=()
+derive_hold_source() { # leg index -> HOLD_SRC (a word of HOLD_SOURCES), HOLD_NOTE and HOLD_MODE, or all empty
+  HOLD_SRC=""; HOLD_NOTE=""; HOLD_MODE=""
+  if [ -n "${SEL_SRC[$1]:-}" ]; then HOLD_SRC=${SEL_SRC[$1]}; HOLD_NOTE=${SEL_NOTE[$1]}; HOLD_MODE=${SEL_MODE[$1]:-hold}; return 0; fi
+  { [ "${subjects[$1]}" = kit ] || [ "${chunks[$1]}" = selftests ]; } && HOLD_SRC=kit
+  return 0
+}
+if [ -n "$SEL_FILE" ]; then
+  if [ ! -f "$SEL_FILE" ]; then
+    echo "run-gates: selection — GATE_SELECTION names $SEL_FILE, which is no file, so no leg is held by it" >&2
+  else
+    declare -A _sel_at=()
+    for ((i=0; i<total; i++)); do [ -n "${names[$i]}" ] && _sel_at["${names[$i]}"]=$i; done
+    _sel_n=0; _sel_a=0; _sel_text=""
+    while IFS= read -r _sel_line || [ -n "$_sel_line" ]; do
+      _sel_n=$((_sel_n + 1))
+      _sel_line=${_sel_line%$'\r'}
+      case "$_sel_line" in '#'*) continue ;; esac
+      [ -z "${_sel_line//[[:space:]]/}" ] && continue
+      # The fields are cut at each TAB, never by `read`, which merges a run of TABs and so reads an empty
+      # note as no field: four or five fields, `read_selection`'s count, or no field at all.
+      _sel_t=${_sel_line//[!$'\t']/}; _sel_k=""; _sel_leg=""; _sel_src=""; _sel_note=""; _sel_mode=""
+      if [ "${#_sel_t}" = 3 ] || [ "${#_sel_t}" = 4 ]; then
+        _sel_v=$_sel_line
+        _sel_k=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_leg=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_src=${_sel_v%%$'\t'*}; _sel_v=${_sel_v#*$'\t'}
+        _sel_note=${_sel_v%%$'\t'*}
+        [ "${#_sel_t}" = 4 ] && _sel_mode=${_sel_v#*$'\t'}
+      fi
+      if [ "$_sel_k" != held ] || [ -z "$_sel_leg" ]; then
+        echo "run-gates: selection — row $_sel_n is not held · leg · source · note [· mode], ignored" >&2
+      elif [ "$_sel_src" = kit ] || [[ " $HOLD_SOURCES " != *" $_sel_src "* ]]; then
+        # `kit` is the row's own word and never a selection's: honoured here, a selection could hold any
+        # leg as a kit self-test.
+        echo "run-gates: selection — row $_sel_n holds $_sel_leg by '$_sel_src', outside quarantine level, ignored: it runs" >&2
+      elif [ "${#_sel_t}" = 4 ] && [ "$_sel_mode" != hold ] && [ "$_sel_mode" != run ]; then
+        echo "run-gates: selection — row $_sel_n holds $_sel_leg in mode '$_sel_mode', outside hold run, ignored: it runs" >&2
+      elif [ -z "${_sel_at["$_sel_leg"]+x}" ]; then
+        echo "run-gates: selection — row $_sel_n holds $_sel_leg, which the manifest lacks, ignored" >&2
+      else
+        SEL_SRC[${_sel_at["$_sel_leg"]}]=$_sel_src; SEL_NOTE[${_sel_at["$_sel_leg"]}]=$_sel_note
+        SEL_MODE[${_sel_at["$_sel_leg"]}]=${_sel_mode:-hold}
+        _sel_a=$((_sel_a + 1)); _sel_text+="$_sel_line"$'\n'
+        SEL_KEYS+="selection.$_sel_a"$'\t'"${_sel_line#held$'\t'}"$'\n'
+        continue
+      fi
+      SEL_IGNORED=$((SEL_IGNORED + 1))
+    done < "$SEL_FILE"
+    SEL_HASH=$(printf '%s' "$_sel_text" | git hash-object --stdin 2>/dev/null)
+    [ -n "${RUNDIR:-}" ] && { cp -f "$SEL_FILE" "$RUNDIR/selection" 2>/dev/null && chmod 600 "$RUNDIR/selection" 2>/dev/null; } || true
+    unset _sel_at _sel_n _sel_a _sel_t _sel_text _sel_line _sel_v _sel_k _sel_leg _sel_src _sel_note _sel_mode
+  fi
+fi
 
 # ---- PROCESS-MONITOR DELEGATION, RESOLVED (TOOL-aSparedSpawn-4 S10) ------------------------------
 # The detection the defaults above the turnstile describe, read from the leading line the legs parse
@@ -3117,7 +3293,7 @@ if [ "${GATE_SELFTESTS:-}" = changed ]; then
   _sel_in=""
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
-    { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } || continue
+    derive_hold_source "$i"; [ "$HOLD_SRC" = kit ] || continue
     _sel_in+="$i"$'\x1e'"${names[$i]}"$'\x1e'"${heldkeys[$i]}"$'\x1e'"${rowhashes[$i]}"$'\x1e'"${guards[$i]}"$'\x1e'"${argvs[$i]}"$'\n'
   done
   # Output rows, RS-separated: `F` and a note printed once; `R`, a leg index and why it runs; `H`, a
@@ -3274,8 +3450,15 @@ for ((i=0; i<total; i++)); do
   # the recorded run had them held.
   # Under `GATE_SELFTESTS=changed` a held leg the selection above found unchanged is held the same
   # way, and its `.unchanged` file is what `report_one` names the sha from (TOOL-aSparedSpawn-12).
-  if { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } \
-     && { [ -z "${GATE_SELFTESTS:-}" ] || [ -f "$WORK/$i.unchanged" ]; }; then
+  # A `quarantine` or `level` leg is held whatever `GATE_SELFTESTS` says: a request to run the kit
+  # class is not a request to run a flaky or deferred leg (TOOL-dWitnessedBar-5).
+  derive_hold_source "$i"
+  # A `run` ROW EXECUTES PAST EVERY RULE BELOW (TOOL-dWitnessedBar-30 S1): no guard, docs mode or reuse
+  # decides it, so its `.leg` row is written whatever moved. The marker is what `report_one` and both
+  # reuse passes read.
+  if [ "$HOLD_MODE" = run ]; then : > "$WORK/$i.heldrun"; continue; fi
+  if { [ "$HOLD_SRC" = kit ] && { [ -z "${GATE_SELFTESTS:-}" ] || [ -f "$WORK/$i.unchanged" ]; }; } \
+     || [ "$HOLD_SRC" = quarantine ] || [ "$HOLD_SRC" = level ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
   # THE DOCS MODE DECIDES A DECLARING LEG BY ITS DOC READS ALONE. Its guard is a statement about
@@ -3640,7 +3823,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'started\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'head\t%s\n' "$RG_HEAD"
     printf 'base\t%s\n' "$BASE"
-    printf 'base_from\t%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}"
+    # A third field `inherited` where the base is an inherited green (TOOL-dWitnessedBar-56 S10), so the
+    # record says why the per-tree verdict below was declined.
+    _bf=""; [ "$BASE_FROM" = inherited ] && _bf=$'\tinherited'
+    printf 'base_from\t%s%s\n' "${GATE_BASE:+GATE_BASE}${GATE_BASE:-$BASE_FROM_LADDER}" "$_bf"; unset _bf
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'tree_clean\t%s\n' "$TREE_CLEAN"
     printf 'manifest\t%s\n' "$LEGS_FILE"
@@ -3744,6 +3930,7 @@ if [ "$REUSE_MODE" = env ] || [ "$REUSE_MODE" = push ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
+    [ -f "$WORK/$i.heldrun" ] && continue            # a selection's `run` row executes (TOOL-dWitnessedBar-30)
     _cls=",${legreads[$i]},"
     # A LEGACY `impure` is never reused, on any tree, however identical: it says the verdict is a
     # function of something outside the tree and says nothing about what, so no key can carry it.
@@ -3829,6 +4016,7 @@ if [ "$REUSE_MODE" = lineage ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
+    [ -f "$WORK/$i.heldrun" ] && continue            # a selection's `run` row executes (TOOL-dWitnessedBar-30)
     # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
     # something outside the tree, so a byte-identical tree is not the same question twice. The
     # declaration is the manifest's legacy `impure`, which the cache block above refuses the same way,
@@ -3999,7 +4187,8 @@ unset _sf_bounded
 runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
   # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
   # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
-  # reads that first attempt exactly as it was written.
+  # reads that first attempt exactly as it was written. `.sample` is the reuse sample's second look and
+  # `.rerun` the same-tree re-run of a red leg (TOOL-dWitnessedBar-8 S1), beside them the same way.
   local i=$1 sfx=${2:-} s e out rc tpid="" FOREIGN=unknown _tp
   local -a chunks_out=()
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
@@ -4084,7 +4273,7 @@ runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMIC
   # NOT FOR THE SAMPLE'S SECOND LOOK (TOOL-aSparedSpawn-16 S16): the `log:` pointer `FAILED_LEGS` already
   # carries names this file, and it must keep naming the attempt that redded the run. The look's own
   # output stays in the run directory below.
-  if [ -n "$lf" ] && [ "$sfx" != .sample ]; then
+  if [ -n "$lf" ] && [ "$sfx" != .sample ] && [ "$sfx" != .rerun ]; then
     { write_redacted "$lf" "$logged"; } 2>/dev/null || true
   fi
   printf '%s\n' "$out" > "$WORK/$i$sfx.out"
@@ -4185,6 +4374,23 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   # leave to a stderr note. `-f` is a builtin test, so the read spawns nothing.
   if [ -f "$WORK/$i.sampled" ]; then rtail="  (sampled against a cached ok)"
   elif [ -f "$WORK/$i.aged" ]; then rtail="  (executed: reused on 10 runs in a row)"; fi
+  if [ -f "$WORK/$i.heldrun" ]; then
+    # A HELD LEG RUN OUTSIDE THE VERDICT (TOOL-dWitnessedBar-30 S1): its first attempt's result is its
+    # `held.<n>`, `ok` or `fail`, no result reading `fail`, counted in `held` and in its chunk's held
+    # tally, never in what ran, `failed`, the deferral or the red attribution. Its output is printed
+    # under a red result, as a failed leg's is.
+    local hres=fail
+    rc=""; { IFS= read -r rc < "$WORK/$i.rc"; } 2>/dev/null
+    derive_hold_source "$i"
+    c_ondemand=$((c_ondemand+1)); HELD_N=$((HELD_N+1)); HELD_RAN=$((HELD_RAN+1))
+    case "$HOLD_SRC" in level) HELD_LEVEL=$((HELD_LEVEL+1)) ;; *) HELD_QUARANTINE=$((HELD_QUARANTINE+1)) ;; esac
+    [ "$rc" = 0 ] && hres=ok
+    [ "$hres" = ok ] || HELD_RAN_FAIL=$((HELD_RAN_FAIL+1))
+    printf 'GATE held  %s  (%s, %s; run outside the verdict: %s)\n' "${names[$i]}" "$HOLD_SRC" "$HOLD_NOTE" "$hres"
+    [ "$hres" = ok ] || sed 's/^/    /' "$WORK/$i.out" 2>/dev/null
+    HELD_KEYS+="held.${HELD_N}"$'\t'"${names[$i]} · $HOLD_SRC · $hres"$'\n'
+    return
+  fi
   if [ ! -f "$WORK/$i.rc" ]; then
     RED_LEGS="$RED_LEGS $i"
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
@@ -4198,11 +4404,21 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
     # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
-    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
-    local since=""
+    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1)); HELD_N=$((HELD_N+1))
+    # ONE HELD LINE, `(<source>, <note>)` (TOOL-dWitnessedBar-5 S3), and one `held.<n>` key per held leg
+    # for the verdict record, numbered as `HELD_N` counts them, the held legs that ran outside the
+    # verdict among them (TOOL-dWitnessedBar-30), so the count and the keys agree (S4).
+    local since="" htail
+    derive_hold_source "$i"; [ -n "$HOLD_SRC" ] || HOLD_SRC=kit
     { IFS= read -r since < "$WORK/$i.unchanged"; } 2>/dev/null
-    if [ -n "$since" ]; then printf 'GATE held  %s  (self-test, unchanged since %s)\n' "${names[$i]}" "$since"
-    else printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"; fi
+    case "$HOLD_SRC" in
+      kit) if [ -n "$since" ]; then htail="kit, unchanged since $since"; else htail="kit, set GATE_SELFTESTS=1 to run"; fi
+           HELD_KIT=$((HELD_KIT+1)) ;;
+      level) htail="level $HOLD_NOTE"; HELD_LEVEL=$((HELD_LEVEL+1)) ;;
+      *) htail="$HOLD_SRC, $HOLD_NOTE"; HELD_QUARANTINE=$((HELD_QUARANTINE+1)) ;;
+    esac
+    printf 'GATE held  %s  (%s)\n' "${names[$i]}" "$htail"
+    HELD_KEYS+="held.${HELD_N}"$'\t'"${names[$i]} · $HOLD_SRC · unrun"$'\n'
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = docskip ]; then
@@ -4498,11 +4714,12 @@ derive_foreign() {
 # scratch worktree of R, under R's ceiling for that row — and prints one `GATE attr` line per red leg
 # in manifest order, then `attributed N of M red legs against <R8>`. The same rows land in the run
 # record as `attribution`, TAB-separated: leg · verdict · inherited · own · R sha · age · owner sha8 ·
-# owner id · reason, the reason LAST, and a unit that extends the row inserts its columns before it,
-# never after. The three age columns are TOOL-dDerivedDocket-24's, `-` wherever no age was asked for.
+# owner id · blocks · reason, the reason LAST, and a unit that extends the row inserts its columns before it,
+# never after. The three age columns are TOOL-dDerivedDocket-24's, `-` wherever no age was asked for;
+# `blocks` is TOOL-dWitnessedBar-3's, `block` or `pass` by `lib-verdict.sh` under GATE_VERDICT_BLOCKS.
 #
-# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the policy that acts on a
-# verdict is the inherited-red policy unit's, not this one's.
+# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the landing that reads the
+# `blocks` field is the pre-push hook's and the unattended driver's, not this one's.
 #
 # R IS THE LANDING BASE, never the branch point. `TOOL-aStagedLane-6` withdrew a "not mine" claim
 # measured against a base the default branch had already moved past, and left the rule this block
@@ -4512,7 +4729,7 @@ derive_foreign() {
 #
 # THE CLASSIFIER, first match wins:
 #   1  OWN, forced — the diff between R and the working tree touches this runner, the fingerprint
-#      helper, the pre-push hook or lib-attribute.sh (KF3). Every red, a timed-out one included.
+#      helper, the pre-push hook, lib-attribute.sh or lib-verdict.sh (KF3). Every red, a timed-out one included.
 #   2  CONTENDED   — the leg's own attempt ended with its ceiling FIRED (`check_ceiling_fired`, spelled
 #      identically on the retry side). Never re-run at R. A bound-0 rc 137 is a failure and goes on.
 #   3  OWN         — no row at R · its argv differs from R's · the diff touches its COMPARATOR (every
@@ -4960,7 +5177,7 @@ derive_attribution() {
 # Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg is run once more at R~n, R's n-th
 # first-parent ancestor: red there with every offender L carries is `aged`. The age decides the
 # ESCALATION only, never the landing (TOOL-dUnstuckLanding-22, superseding that part of
-# TOOL-dDerivedDocket-24): an aged INHERITED leg lands under `land` like any other, and the driver
+# TOOL-dDerivedDocket-24): an aged INHERITED leg lands like any other where its row reads `pass`, and the driver
 # files its ask at BLOCKER instead of HIGH. Otherwise the red arrived inside (R~n, R], and a bisection of that first-parent window finds
 # the first landing whose run carries L's offenders — its sha8, and the first id its subject carries,
 # name the OWNER. With n = 10 that is at most five more runs of one leg, on a red bar only.
@@ -4968,7 +5185,7 @@ derive_attribution() {
 # THE SAME COMPARISON RULE 5 MADE AT R, run from R's own row in the SAME scratch worktree checked out
 # at each probe, so the normaliser that strips that worktree's path still strips it. A probe that
 # cannot answer — the wall, a ceiling, a checkout that fails, an output that normalises to nothing —
-# leaves the age UNPROVEN (`-`). An unproven age still lands under `land` and is never escalated,
+# leaves the age UNPROVEN (`-`). An unproven age still lands where its row reads `pass` and is never escalated,
 # because nothing proves it aged.
 #
 # WITHOUT A SIGNATURE the probe reads red there only when every non-blank line of L's output is in
@@ -5080,7 +5297,7 @@ derive_age() {
 run_attribution() {
   [ -n "${ATTR_REV:-}" ] || return 0
   [ -n "$RED_LEGS" ] || return 0
-  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary land_n=0
+  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary land_n=0 blocking=0
   ATMP="$WORK/attr"; mkdir -p "$ATMP" 2>/dev/null
   ATTR_WHY_ALL=""; ATTR_KF3=""; ATTR_CHG=""; ATTR_ROWS="$ATMP/rows-at-R"; ATTR_ROWS_STATE=ok
   ATTR_NORM="$ATMP/normalise.sed"; ATTR_WT_FAILED=0; ATTR_WT_PATH=""
@@ -5097,6 +5314,10 @@ run_attribution() {
   if [ -z "$ATTR_WHY_ALL" ] && { [ ! -f "$KITDIR/lib-attribute.sh" ] || ! . "$KITDIR/lib-attribute.sh"; }; then
     ATTR_WHY_ALL="lib-attribute.sh is missing beside the runner, so there is no normaliser to compare with"
   fi
+  # THE BLOCK TABLE (TOOL-dWitnessedBar-3 S1), sourced beside the normaliser and by the same rule. A
+  # runner without it writes `block` on every row: deny by default, never a guessed table.
+  ATTR_VERDICT_LIB=0
+  [ -f "$KITDIR/lib-verdict.sh" ] && . "$KITDIR/lib-verdict.sh" && ATTR_VERDICT_LIB=1
   if [ -z "$ATTR_WHY_ALL" ] && ! ATTR_CHG=$(git diff --name-only "$ATTR_RSHA" -- 2>/dev/null); then
     ATTR_WHY_ALL="the diff between R and this tree could not be read"
   fi
@@ -5105,7 +5326,7 @@ run_attribution() {
     # no tracked hook gates this repository's pushes, so there is no tracked hook to have edited.
     hp=$(git config --get core.hooksPath 2>/dev/null) || hp=""
     case "$hp" in ''|/*|[A-Za-z]:*) hp="" ;; *) hp="${hp%/}/pre-push" ;; esac
-    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$hp"; do
+    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$KITREL/lib-verdict.sh" "$hp"; do
       [ -n "$k" ] || continue
       if printf '%s\n' "$ATTR_CHG" | grep -qxF -- "$k"; then ATTR_KF3=$k; break; fi
     done
@@ -5209,28 +5430,42 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
                    *)    tail="$tail · age $A_AGE · owner $A_OWN8"
                          [ "$A_OWNID" != - ] && tail="$tail $A_OWNID" ;;
                  esac
-                 # EVERY INHERITED LEG COUNTS, whatever its age reads — a number, `aged`, or `-` for
-                 # unproven or not asked (TOOL-dUnstuckLanding-16 S1). The age escalates the ask; it
-                 # no longer decides whether the leg lands.
-                 land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}" ;;
+                 # The age escalates the ask; it decides nothing about whether the leg lands
+                 # (TOOL-dUnstuckLanding-16 S1). The block table below does.
+                 ;;
       MIXED)     tail="MIXED · inherited $A_I · own $A_O · at $ATTR_R8" ;;
       *)         tail="$A_V · $A_WHY" ;;
     esac
     if [ "$A_V" = "DEAD PROBE" ]; then dead=$((dead + 1)); else nattr=$((nattr + 1)); fi
+    # BLOCK OR PASS, by the table under the handed value (TOOL-dWitnessedBar-3 S2). Every leg whose
+    # row reads `pass` counts toward the inherited-green stamp, whatever its class or its age.
+    A_BLOCKS=block
+    [ "$ATTR_VERDICT_LIB" = 1 ] && A_BLOCKS=$(derive_red_blocks "$ATTR_BLOCKS" "$A_V")
+    [ "$A_BLOCKS" = pass ] || A_BLOCKS=block
+    if [ "$A_BLOCKS" = pass ]; then
+      land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}"
+      tail="$tail · passes"
+    else
+      blocking=$((blocking + 1)); tail="$tail · blocks"
+    fi
     printf 'GATE attr  %s  %s\n' "${names[$i]}" "$tail"
-    # THE ROW: leg · verdict · inherited · own · R sha · age · owner sha8 · owner id · reason, the
-    # reason LAST as the red-attribution unit requires, the three age columns inserted before it.
+    # THE ROW: leg · verdict · inherited · own · R sha · age · owner sha8 · owner id · blocks · reason,
+    # the reason LAST as the red-attribution unit requires, the three age columns and `blocks`
+    # inserted before it.
     if [ -n "$rec" ]; then
-      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
-        "$A_AGE" "$A_OWN8" "$A_OWNID" \
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
+        "$A_AGE" "$A_OWN8" "$A_OWNID" "$A_BLOCKS" \
         "$(printf '%s%s' "$A_WHY" "${A_AGE_NOTE:+; $A_AGE_NOTE}" | tr '\t\n\r' '   ')" >> "$rec" 2>/dev/null || true
     fi
   done
-  # LANDABLE, for the inherited-green stamp alone: every red leg reads INHERITED, at any age. The
-  # stamp's other preconditions are the full green's, read where it is written.
+  # LANDABLE, for the inherited-green stamp alone: every red leg reads `pass`. The stamp's other
+  # preconditions are the full green's, read where it is written.
   [ "$m" -gt 0 ] && [ "$land_n" = "$m" ] && ATTR_LANDABLE=1
   summary="attributed $nattr of $m red legs against $ATTR_R8"
   [ "$dead" -gt 0 ] && summary="$summary · DEAD PROBE $dead"
+  if [ -n "$ATTR_BLOCKS_HANDED" ]; then summary="$summary · verdict.blocks $ATTR_BLOCKS"
+  else summary="$summary · verdict.blocks every-red, none handed"; fi
+  summary="$summary · $blocking blocking"
   printf '%s\n' "$summary"
   [ -n "$rec" ] && chmod 600 "$rec" 2>/dev/null
   if [ -n "$ATTR_WT" ]; then
@@ -5364,6 +5599,118 @@ if [ -n "$REUSE_CACHE" ]; then
   done
 fi
 unset _key _src _rc _rc2 _st
+# THE SAME-TREE RE-RUN (TOOL-dWitnessedBar-8 S1), under `GATE_RERUN=1`, after the serial retry and the
+# sample and inside the wall: each leg whose effective result is a numeric red runs once more, alone, on
+# this tree, into `<i>.rerun.*` beside its attempts, so `verdict_flow.py route` and `flakes` read a
+# red-then-green leg from its run record. IT MOVES NOTHING: every leg was reported above, the verdict
+# and the exit code are counted from those reports, and `runleg` writes no `gate-logs` file for the
+# attempt, so `log:` keeps naming the attempt that redded the run. A leg whose own ceiling fired, one
+# with a `.defer` marker or a serial retry, is left to the quiet-host re-run (TOOL-dWitnessedBar-30),
+# and a bar whose wall fired re-runs nothing. Green the second time prints the sample's
+# `nondeterministic` line, once: a sampled leg whose look already printed it does not print it again.
+if [ -n "$RERUN_RED" ] && [ ! -f "$WORK/wall.breach" ]; then
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    { [ -f "$WORK/$i.defer" ] || [ -f "$WORK/$i.retry.rc" ]; } && continue
+    _rc=""; { IFS= read -r _rc < "$WORK/$i.rc"; } 2>/dev/null
+    case "$_rc" in ''|0|*[!0-9]*) continue ;; esac
+    runleg "$i" .rerun &
+    wait "$!" 2>/dev/null
+    _rc2=""; { IFS= read -r _rc2 < "$WORK/$i.rerun.rc"; } 2>/dev/null
+    _rc=""; { IFS= read -r _rc < "$WORK/$i.sample.rc"; } 2>/dev/null
+    [ "$_rc2" = 0 ] && [ "$_rc" != 0 ] && printf 'nondeterministic · %s\n' "${names[$i]}"
+  done
+fi
+unset _rc _rc2
+
+# scan_leg_warnings — THE SIZE WARNINGS A PASSING LEG PRINTED (TOOL-dWitnessedBar-29 S3, S4, S6, S7). A
+# warning inside a green leg reached nobody: `report_one` prints `GATE ok` and the output stays in the
+# work dir. An emitter prints the marker `gate-warn<TAB><class><TAB><subject><TAB><detail>` on the line
+# after its human warning, and this reads it back with ONE `grep -F` over the copies of the legs that
+# passed: `<i>.out` where `<i>.rc` reads 0, and `<i>.retry.out` where `<i>.retry.rc` reads 0, the attempt
+# that passed. A held leg a selection's `run` row executed is read from its first attempt alone, the one
+# its `held.<n>` reads. A failed, skipped, unrun held or reused leg, a sample's second look and a red
+# leg's re-run are not read. One `GATE warn` line per warning, in manifest order, on stdout; `WARN_N`
+# and `WARN_KEYS`, the verdict record's `warn.<k>` rows. The unit is the newest specced one whose commits
+# touch the subject, the memory-tree kit's `routed_commits.py --newest-unit HEAD <subject>`, ONE spawn per
+# distinct subject; that kit is a sibling, reached through `resolve_kit_dir` from KITDIR, never by
+# literal. `-` names why where it is absent, the attribution fails or no commit names a specced unit.
+# WHAT IT DOES NOT CHECK: that the named unit GREW the file — the newest unit touching it may have
+# shrunk it — nor any warning printed without the marker. It moves no verdict and no exit code.
+# Self-contained, so a slice of it runs alone, as the suite slices `run_leg_reap`.
+scan_leg_warnings() {
+  local i rc line rest idx cls subj det got unit why tab=$'\t'
+  local -a files=()
+  local -A seen=()
+  WARN_N=0; WARN_KEYS=""
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    rc=""; { IFS= read -r rc < "$WORK/$i.rc"; } 2>/dev/null
+    [ "$rc" = 0 ] && files+=("$WORK/$i.out")
+    [ -f "$WORK/$i.heldrun" ] && continue
+    rc=""; { IFS= read -r rc < "$WORK/$i.retry.rc"; } 2>/dev/null
+    [ "$rc" = 0 ] && files+=("$WORK/$i.retry.out")
+  done
+  [ "${#files[@]}" -gt 0 ] || return 0
+  # Into a file the loop reads, never a substitution feeding it (TOOL-aSweptBar-4). `-H` names the
+  # file on a one-file search too, which is where the leg index is read from.
+  grep -F -H -e "gate-warn$tab" -- "${files[@]}" > "$WORK/warn.rows" 2>/dev/null
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    rest=${line#"$WORK/"}
+    idx=${rest%%.*}
+    case "$idx" in ''|*[!0-9]*) continue ;; esac
+    rest=${rest#*.out:}
+    case "$rest" in "gate-warn$tab"*) ;; *) continue ;; esac
+    rest=${rest#gate-warn$tab}
+    cls=${rest%%$tab*}; rest=${rest#*$tab}
+    subj=${rest%%$tab*}; det=""
+    [[ $rest == *$tab* ]] && det=${rest#*$tab}
+    if [ -z "$subj" ]; then got="-${tab}the marker names no subject"
+    elif [ -n "${seen[$subj]+x}" ]; then got=${seen[$subj]}
+    else
+      got=$(cd "$ROOT" 2>/dev/null && "$PYBIN" -B -c "$RKD_PROGRAM"'
+import contextlib, io, sys
+sys.dont_write_bytecode = True
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+here, subject = sys.argv[1], sys.argv[2]
+try:
+    kit = resolve_kit_dir("memory-tree", "routed_commits.py", here)
+except LookupError as exc:
+    print("-\tno memory-tree kit to attribute it: " + " ".join(str(exc).split()))
+    sys.exit(0)
+sys.path.insert(0, str(kit))
+said = io.StringIO()
+try:
+    import routed_commits
+    with contextlib.redirect_stdout(said):
+        rc = routed_commits.main(["routed_commits.py", "--newest-unit", "HEAD", subject])
+except Exception as exc:
+    print("-\tthe attribution failed: " + " ".join(str(exc).split()))
+    sys.exit(0)
+said = " ".join(said.getvalue().split())
+if rc == 0 and said:
+    print(said)
+elif rc == 0:
+    print("-\tno commit touching it names a specced unit")
+else:
+    print("-\tthe attribution failed: " + said)
+' "$KITDIR" "$subj" 2>/dev/null)
+      got=${got%$'\r'}
+      [ -n "$got" ] || got="-${tab}the attribution did not run"
+      seen[$subj]=$got
+    fi
+    unit=${got%%$tab*}; why=""
+    [[ $got == *$tab* ]] && why="; ${got#*$tab}"
+    WARN_N=$((WARN_N + 1))
+    printf 'GATE warn  %s  (%s: %s%s; grown by %s)\n' "${names[$idx]}" "$subj" "${det//$tab/ }" "$why" "$unit"
+    WARN_KEYS+="warn.$WARN_N$tab${names[$idx]}$tab$cls$tab$subj$tab$unit"$'\n'
+  done < "$WORK/warn.rows"
+  return 0
+}
+WARN_N=0; WARN_KEYS=""; WARN_LINES=""
+scan_leg_warnings > "$WORK/warn.lines"
+[ -s "$WORK/warn.lines" ] && { IFS= read -r -d '' WARN_LINES < "$WORK/warn.lines" || :; }
 # AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
 # the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
 run_attribution
@@ -5447,22 +5794,40 @@ if [ -n "$LEDGER" ]; then
   rm -f "$gd/gate-timings.tsv" ${TS_COMMON:+"$TS_COMMON/gate-timings.tsv"} 2>/dev/null || true
 fi
 
+# THE WARNINGS, after the last leg line and before the closing one (TOOL-dWitnessedBar-29 S6): the
+# `GATE warn` lines `scan_leg_warnings` wrote, which the summary file carries too.
+printf '%s' "$WARN_LINES"
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 [ "${reuses:-0}" -gt 0 ] && skipnote="$skipnote (${reuses} reused)"
 # THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
-[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)"
+# Counted BY SOURCE (TOOL-dWitnessedBar-5 S3): only the kit ones are what GATE_SELFTESTS=1 runs.
+# A held leg a selection's `run` row executed is held too, its result outside the verdict, and so is
+# out of `ran` below (TOOL-dWitnessedBar-30).
+if [ "${HELD_N:-0}" -gt 0 ]; then
+  _hby=""
+  for _hs in "kit:$HELD_KIT" "quarantine:$HELD_QUARANTINE" "level:$HELD_LEVEL"; do
+    [ "${_hs#*:}" -gt 0 ] && _hby="$_hby${_hby:+, }${_hs#*:} ${_hs%%:*}"
+  done
+  [ "$HELD_KIT" -gt 0 ] && _hby="$_hby; GATE_SELFTESTS=1 runs the kit ones"
+  [ "$HELD_RAN" -gt 0 ] && _hby="$_hby; $HELD_RAN run outside the verdict, $HELD_RAN_FAIL of them red"
+  skipnote="$skipnote (${HELD_N} held: $_hby)"
+  unset _hby _hs
+fi
 # A RETRIED LEG IS NAMED IN THE TOTAL TOO (TOOL-dDerivedDocket-26 S2): a green that needed a second
 # attempt is green, and a reader of the one summary line should still be able to see it was one.
 [ "${RETRIED:-0}" -gt 0 ] && skipnote="$skipnote (${RETRIED} retried after timeout)"
+# A WARNED LEG IS NAMED IN THE TOTAL as a retried one is (TOOL-dWitnessedBar-29 S6): it passed, and the
+# one summary line still says a size warning rode on the run.
+[ "${WARN_N:-0}" -gt 0 ] && skipnote="$skipnote (${WARN_N} warned)"
 
 # THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
 # the one a reader quotes. A leg that was held did not run, so counting it in the total is the
 # green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
-ran=$((n-skips-${ondemands:-0}))
+ran=$((n-skips-${ondemands:-0}-${HELD_RAN:-0}))
 
 # A BAR THAT RAN NOTHING BECAUSE EVERYTHING WAS HELD IS NOT A GREEN BAR. It is the loudest possible
 # green-by-absence: a repository whose whole manifest is kit-subject would print `gates GREEN` on
@@ -5525,7 +5890,8 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'ran\t%s\n' "$ran"
       printf 'failed\t%s\n' "$fails"
       printf 'skipped\t%s\n' "$skips"
-      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'held\t%s\n' "${HELD_N:-0}"
+      printf '%s' "$HELD_KEYS"
       printf 'reused\t%s\n' "$reuses"
       printf 'retried\t%s\n' "${RETRIED:-0}"
       printf 'paused\t%s\n' "$MEMPAUSE_N"
@@ -5554,7 +5920,8 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'ran\t0\n'
       printf 'failed\t0\n'
       printf 'skipped\t%s\n' "$skips"
-      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'held\t%s\n' "${HELD_N:-0}"
+      printf '%s' "$HELD_KEYS"
       printf 'reused\t0\n'
       printf 'retried\t0\n'
       printf 'paused\t%s\n' "$MEMPAUSE_N"
@@ -5589,7 +5956,7 @@ if [ -n "${GATE_SELFTESTS:-}" ] && [ -n "$HELD_DIR" ] && [ -n "$RG_HEAD" ]; then
   mkdir -p "$HELD_DIR" 2>/dev/null || true
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
-    { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } || continue
+    derive_hold_source "$i"; [ "$HOLD_SRC" = kit ] || continue
     [ -n "${heldkeys[$i]}" ] || continue
     _hrc=""; { IFS= read -r _hrc < "$WORK/$i.rc"; } 2>/dev/null
     case "$_hrc" in ondemand|skip|docskip|reuse) continue ;; esac
@@ -5705,6 +6072,45 @@ gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
 # that failed AND moved stays RED with exit 1 and its RED line names the move.
 [ "$gate_verdict" = GREEN ] && [ "$tree_moved" = yes ] && gate_verdict="TREE MOVED"
 
+# THE FAILING LEGS' TAILS, KEPT BY HASH (TOOL-dWitnessedBar-25 S3). For each failed leg, in manifest
+# order, the last 60 lines of its REDACTED output copy in the run record, at most their last 8192 bytes,
+# are hashed as git hashes a blob and written to `<common-dir>/gate-tails/<hash>` where no file holds
+# that hash, so every worktree of a clone writes one directory and the tail outlives the worktree and
+# its five-run sweep. `TAIL_ROWS` gathers `tail.<n>` lines, `<hash> <leg name>`, for the run record's
+# verdict and the per-tree verdict. A leg retried alone is cut from its retry's copy, a leg with no copy
+# from nothing, which is the empty tail's hash. The 60 lines and 8192 bytes are PINNED, the spec's
+# choice: a stack and its assertion, and a red bar of twenty legs commits under 200 KB. The cut lands
+# on the last whole UTF-8 character within them (TOOL-dWitnessedBar-51 S34): the continuation bytes a
+# byte cut leaves at the front, three at most, are dropped, so the tail is hashed as it decodes.
+# WHAT IT DOES NOT CHECK: that the tail decodes, a byte that is not UTF-8 being replaced at the keep;
+# the keep verb, `keep_tails.py`, is what commits a tail, and it masks runlog's secret shapes first.
+TAIL_ROWS=""
+if [ -n "$RUNDIR" ] && [ -n "$RED_LEGS" ] && [ -n "$RG_COMMON_RAW" ]; then
+  _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails || _td=""
+  if [ -n "$_td" ] && mkdir -p "$_td" 2>/dev/null; then
+    chmod 700 "$_td" 2>/dev/null || true
+    _tn=0
+    for i in $(printf '%s\n' $RED_LEGS | LC_ALL=C sort -n -u); do
+      _tsrc="$RUNDIR/$i.out"; [ -f "$RUNDIR/$i.retry.out" ] && _tsrc="$RUNDIR/$i.retry.out"
+      derive_temp_path _tp "$_td/tail" || continue
+      if [ -f "$_tsrc" ]; then tail -n 60 "$_tsrc" | tail -c 8192 > "$_tp" 2>/dev/null; else : > "$_tp"; fi
+      _tk=$(od -An -tx1 -N3 "$_tp" 2>/dev/null | awk '{ for (j = 1; j <= NF; j++) { if ($j ~ /^[89ab]/) k++; else exit } } END { print k + 0 }')
+      if [ "${_tk:-0}" -gt 0 ]; then tail -c "+$((_tk + 1))" "$_tp" > "$_tp.cut" 2>/dev/null && mv -f "$_tp.cut" "$_tp"; fi
+      _th=$(git hash-object --stdin < "$_tp" 2>/dev/null)
+      case "$_th" in
+        ''|*[!0-9a-f]*) rm -f "$_tp" 2>/dev/null; echo "run-gates: no tail kept for ${names[$i]} — git could not hash it" >&2; continue ;;
+      esac
+      # A hash already on disk is FRESHENED (TOOL-dWitnessedBar-42 S3), so the sweep's grace runs from
+      # the newest bar that produced it; `-c` so a file another sweep removed meanwhile is not made empty.
+      if [ -e "$_td/$_th" ]; then touch -c "$_td/$_th" 2>/dev/null; rm -f "$_tp" 2>/dev/null
+      else chmod 600 "$_tp" 2>/dev/null; mv -f "$_tp" "$_td/$_th" 2>/dev/null || { rm -f "$_tp" 2>/dev/null; continue; }; fi
+      _tn=$((_tn + 1))
+      printf -v _trow 'tail.%s\t%s %s\n' "$_tn" "$_th" "${names[$i]}"; TAIL_ROWS+=$_trow
+    done
+  fi
+  unset _td _tn _tsrc _th _trow
+fi
+
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
   # anywhere between the header and here leaves a directory with a header and no verdict, which
@@ -5720,7 +6126,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'ran\t%s\n' "$ran"
     printf 'failed\t%s\n' "$fails"
     printf 'skipped\t%s\n' "$skips"
-    printf 'held\t%s\n' "${ondemands:-0}"
+    printf 'held\t%s\n' "${HELD_N:-0}"
+    # One `held.<n>` per held leg, `<leg> · <source> · unrun` (TOOL-dWitnessedBar-5 S4), or `ok` or
+    # `fail` for one a selection's `run` row executed outside the verdict (TOOL-dWitnessedBar-30 S1).
+    printf '%s' "$HELD_KEYS"
     printf 'reused\t%s\n' "$reuses"
     printf 'fingerprint_end\t%s\n' "$FPRINT_END"
     printf 'tree_moved\t%s\n' "$tree_moved"
@@ -5730,6 +6139,17 @@ if [ -n "$RUNDIR" ]; then
     # The memory pause's episodes and the seconds they held, summed (TOOL-aGraftedHelix-7).
     printf 'paused\t%s\n' "$MEMPAUSE_N"
     printf 'paused_s\t%s\n' "$MEMPAUSE_HELD_S"
+    # The tree this run graded, `-` when it started dirty (TOOL-dWitnessedBar-4 S1).
+    printf 'tree\t%s\n' "$RUN_TREE"
+    # The run this verdict closes, the act that started it, and each failing leg's tail by its hash
+    # (TOOL-dWitnessedBar-25 S1-S3).
+    printf 'run_id\t%s\n' "$RUNID"
+    printf 'cause\t%s\n' "$RUN_CAUSE"
+    printf '%s' "$TAIL_ROWS"
+    # The size warnings the passing legs printed, and one `warn.<k>` per warning, `<leg name> <class>
+    # <subject> <unit>` TAB-separated (TOOL-dWitnessedBar-29 S7). Additive keys, so `schema` stays.
+    printf 'warned\t%s\n' "${WARN_N:-0}"
+    printf '%s' "$WARN_KEYS"
   } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi
@@ -5814,20 +6234,78 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = "$linea
   fi
 fi
 
+# THE VERDICT PER TREE (TOOL-dWitnessedBar-4 S2, `record-kind.verdict`). What the latest bar said about
+# one tree, GREEN or not, written by this runner alone for every run that started clean and did not
+# move, into the COMMON dir so every worktree of a clone reads one directory: `gate-verdict/<tree>` for
+# a run under GATE_FULL, `gate-verdict/<tree>.scoped` otherwise, so a scoped run never overwrites the
+# full record its base rests on. `<key>TAB<value>` lines read by key, so a key added later is additive.
+# The pre-push hook adopts one only when it reads `verdict GREEN` and passes the runner stamp's
+# predicates; the transition writer reads the full one at `item.test.exit`.
+# TWO DECLINES THE RETIRED HOOK WRITER MADE, carried here (TOOL-dWitnessedBar-40 S1, S2): a docs-mode
+# run ran fewer legs than a scoped bar from the same base, which the record cannot say, and a scoped run
+# on an inherited green rests on a base no full record names. `reused` and `reused_cache` are the
+# full-green stamp's two counts (S3), which the hook's predicate 9 reads; a record carrying neither is
+# refused there.
+# WHAT IT DOES NOT CHECK: which legs a scoped run skipped; `kind`, `base` and the run record under
+# `run_id` say what ran.
+if [ "$RUN_TREE" = - ]; then
+  echo "run-gates: no per-tree verdict written — the tree was not clean when the run started"
+elif [ "$tree_moved" != no ] || [ -z "$FPRINT_START" ]; then
+  echo "run-gates: no per-tree verdict written — the tree moved while the bar ran, or its fingerprint could not be read"
+elif [ -n "$DOCS_BASE" ]; then
+  echo "run-gates: no gate-verdict written — docs mode"
+elif [ -z "${GATE_FULL:-}" ] && [ "$BASE_FROM" = inherited ]; then
+  echo "run-gates: no gate-verdict written — scoped on an inherited green, as the run record header's base_from row reads"
+else
+  _vd=""; [ -n "$RG_COMMON_RAW" ] && _vd=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
+  _vkind=scoped; _vbase=$BASE; _vverdict=RED   # GREEN or RED: a HOST or REFUSED bar is no green
+  [ "$gate_verdict" = GREEN ] && _vverdict=GREEN
+  [ -n "${GATE_FULL:-}" ] && { _vkind=full; _vbase=""; }
+  _vf="$_vd/gate-verdict/$RUN_TREE"; [ "$_vkind" = scoped ] && _vf="$_vf.scoped"
+  if [ -n "$_vd" ] && mkdir -p "$_vd/gate-verdict" 2>/dev/null && derive_temp_path _tp "$_vf" && {
+       printf 'tree\t%s\n' "$RUN_TREE"
+       printf 'sha\t%s\n' "$RG_HEAD"
+       printf 'verdict\t%s\n' "$_vverdict"
+       printf 'kind\t%s\n' "$_vkind"
+       printf 'base\t%s\n' "$_vbase"
+       printf 'manifest\t%s\n' "$LEGS_REL"
+       printf 'manifest_blob\t%s\n' "$MANIFEST_BLOB"
+       printf 'fingerprint\t%s\n' "$FPRINT_START"
+       printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
+       printf 'reused\t%s\n' "$reuses"
+       printf 'reused_cache\t%s\n' "$cache_reuses"
+       printf 'run_id\t%s\n' "$RUNID"
+       printf 'selection\t%s\n' "$SEL_HASH"
+       printf '%s' "$SEL_KEYS"
+       printf 'selection_ignored\t%s\n' "$SEL_IGNORED"
+       printf 'cause\t%s\n' "$RUN_CAUSE"
+       printf '%s' "$TAIL_ROWS"
+       printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+       printf 'by\trunner\n'
+     } > "$_tp" 2>/dev/null && mv -f "$_tp" "$_vf" 2>/dev/null; then
+    echo "run-gates: per-tree verdict $_vverdict ($_vkind) written to $_vf"
+  else
+    [ -z "${_tp:-}" ] || rm -f "$_tp" 2>/dev/null
+    echo "run-gates: no per-tree verdict written — ${_vf} could not be written"
+  fi
+  unset _vd _vkind _vbase _vf _vverdict
+fi
+
 # THE INHERITED-GREEN STAMP (TOOL-dDerivedDocket-24, KF2). A DIFFERENT FILE from the full green, and
 # that is the whole of its safety: no reader of `gate-full-green` can ever take it for one, and this
 # block never touches that file. It is written under EVERY precondition of the full green except
 # "failed nothing" — skipped nothing, reused nothing, no wall, an unmoved tree that was clean when the
-# run started — plus three of its own: the caller exported `land`, at least one leg failed, and every
-# failed leg read INHERITED, at any age (TOOL-dUnstuckLanding-16 S1; it required a proven age inside
-# the bound until ruling TOOL-dUnstuckLanding-22). No age bound is required either. It records R and
-# the bound it was written under, empty when none was handed, because the pre-push hook trusts it only
-# where the remote sha it receives equals `base` and the bound it reads at that sha equals `max_age`.
+# run started — plus three of its own: the caller handed a `verdict.blocks` value, at least one leg
+# failed, and every failed leg's attribution row read `pass` under it, at any age (TOOL-dWitnessedBar-3
+# S4; TOOL-dUnstuckLanding-16 S1). No age bound is required either. It records R, the bound and the
+# value it was written under, the bound empty when none was handed, because the pre-push hook trusts it
+# only where the remote sha it receives equals `base`, the bound it reads at that sha equals `max_age`,
+# and the value it reads there equals `blocks`.
 #
-# WHAT IT DOES NOT CHECK: the policy itself. `land` here is whatever the caller exported; the hook
-# reads the policy at R before it reads this file, so a stamp written under a caller's own `land`
-# selects nothing at a boundary whose R says `park`.
-if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
+# WHAT IT DOES NOT CHECK: the policy itself. The value here is whatever the caller handed; the hook
+# reads `verdict.blocks` at R before it reads this file, so a stamp written under a caller's own
+# looser value selects nothing at a boundary whose R reads another.
+if [ -n "$gd" ] && [ -n "$ATTR_BLOCKS_HANDED" ] && [ "$ATTR_LANDABLE" = 1 ] \
    && [ "$fails" -gt 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] && [ -n "${ATTR_RSHA:-}" ]; then
   derive_temp_path _tp "$gd/gate-inherited-green"
@@ -5839,6 +6317,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'selftests\t%s\n' "$SELFTESTS_STAMP"
     printf 'base\t%s\n' "$ATTR_RSHA"
     printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
+    printf 'blocks\t%s\n' "$ATTR_BLOCKS"
     printf 'legs\t%s\n' "$ATTR_LAND_LEGS"
     printf 'reused\t%s\n' "$reuses"   # predicate 9's pair, as on the full green (TOOL-aSparedSpawn-13 S8, -32 S8)
     printf 'reused_cache\t%s\n' "$cache_reuses"
@@ -5846,7 +6325,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$_tp" 2>/dev/null \
     && mv -f "$_tp" "$gd/gate-inherited-green" 2>/dev/null || true
-  echo "run-gates: inherited-green stamp written — every red leg is INHERITED at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
+  echo "run-gates: inherited-green stamp written — every red leg passes under verdict.blocks $ATTR_BLOCKS at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
 fi
 
 # THE SWEEP runs AFTER the verdict is written and NEVER before the first leg dispatches. Both
@@ -5857,6 +6336,89 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
   ls -1t "$RUNROOT" 2>/dev/null | grep -v '^current$' | tail -n "+$((GATE_RUN_KEEP+1))" | while IFS= read -r old; do
     [ -n "$old" ] && [ "$old" != "$RUNID" ] && rm -rf "$RUNROOT/$old" 2>/dev/null || true
   done
+  # THE TAILS GO WITH THE RUNS THAT NAMED THEM (TOOL-dWitnessedBar-25 S4), IN EVERY WORKTREE
+  # (TOOL-dWitnessedBar-42 S1, S2): after the sweep, the tails directory keeps every hash a retained
+  # run record of ANY worktree of the clone names as `tail.<n>` — `<common>/gate-run/*/verdict`, the
+  # main worktree's, and `<common>/worktrees/*/gate-run/*/verdict`, each linked one's, read from git's
+  # own layout rather than `git worktree list`, so an unpruned removed worktree's runs still count —
+  # and every tail younger than TAIL_GRACE_S, so a tail a bar still running elsewhere wrote before its
+  # verdict names it survives. An age that cannot be read keeps every unnamed tail.
+  # A STAGING TEMP IS SWEPT TOO (TOOL-dWitnessedBar-56 S13): the writer above stages each tail as
+  # `derive_temp_path`'s sibling of `gate-tails/tail`, `tail.<n><n>.tmp` or `tail.XXXXXXXX`, either with
+  # `.cut` while it drops a split character. Every name opening `tail.` is read as such a temp, never kept
+  # as a tail, and unlinked once older than TAIL_GRACE_S, so the temp a crashed bar left goes; a fresh
+  # one, a tail in flight, is kept. This supersedes TOOL-dWitnessedBar-42's skip of every non-hex name.
+  # THE SEAM CONSIDERED AND REJECTED (TOOL-dWitnessedBar-56 S14): the reuse cache's prune above, its
+  # 30-day `cut`. It runs only when the cache block fires, keeps no set and swallows its errors, and a
+  # tail must be kept while any retained run names it. The grace is seven days against the cache's 30
+  # because it only covers a bar still running in another worktree, or a host asleep mid-bar, past its
+  # verdict: a tail a retained run names is kept by the set whatever its age, where a cache entry's 30
+  # days is its whole life, the bound on carrying a stale verdict forward.
+  # WHAT IT DOES NOT CHECK: a sweep here that reads a tail's time just before another worktree's bar
+  # freshens it can still remove it.
+  _td=""; [ -n "$RG_COMMON_RAW" ] && _td=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P) && [ -n "$_td" ] && _td=$_td/gate-tails
+  if [ -n "$_td" ] && [ -d "$_td" ]; then
+    _tc=${_td%/gate-tails}
+    _tkeep=" $(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ { split($2, h, " "); printf "%s ", h[1] }' \
+      "$_tc"/gate-run/*/verdict "$_tc"/worktrees/*/gate-run/*/verdict 2>/dev/null)"
+    _tfresh=""; _tok=1; _trm=0; _tkept=0
+    for _tf in "$_td"/*; do
+      _th=${_tf##*/}
+      case "$_th" in
+        tail.*) [ -f "$_tf" ] || continue ;;   # a staging temp: aged out below, never kept as a tail
+        ''|*[!0-9a-f]*) continue ;;
+        *) case "$_tkeep" in *" $_th "*) _tkept=$((_tkept + 1)); continue ;; esac ;;
+      esac
+      # ONE `find` per sweep, and only once an unnamed tail is met; it lists the tails modified inside
+      # the grace, and a find that fails keeps them all.
+      if [ "$_tok" = 1 ] && [ -z "$_tfresh" ]; then
+        _tfresh=$(find "$_td" -maxdepth 1 -type f -mmin "-$((TAIL_GRACE_S / 60))" 2>/dev/null) || _tok=0
+        _tfresh=$'\n'"$_tfresh"$'\n'
+      fi
+      case "$_tok$_tfresh" in 0*|*$'\n'"$_tf"$'\n'*) _tkept=$((_tkept + 1)); continue ;; esac
+      rm -f "$_tf" 2>/dev/null && _trm=$((_trm + 1))
+    done
+    [ $((_trm + _tkept)) -gt 0 ] && echo "run-gates: tails swept — $_trm removed, $_tkept kept (named by a retained run of any worktree, or younger than ${TAIL_GRACE_S}s)" >&2
+  fi
+  unset _td _tc _tkeep _tfresh _tok _trm _tkept _tf _th
+  # THE PER-TREE VERDICTS ARE PRUNED THE SAME WAY (TOOL-dWitnessedBar-51 S28, §8 F4): `gate-verdict/`
+  # keeps every tree a retained run record of ANY worktree names as its `tree`, read from the run
+  # records the tail sweep reads, and every worktree's `HEAD^{tree}`, so no worktree's sweep deletes
+  # another's live verdict; the rest are removed once older than VERDICT_GRACE_DAYS past their last
+  # write, so the directory shrinks. A staging name is never a tree, so a verdict in flight is kept,
+  # and a `find` or a worktree list that fails keeps every verdict.
+  # THE SEAM CONSIDERED AND REJECTED (TOOL-dWitnessedBar-56 S14): the reuse cache's prune, its 30-day
+  # `cut`. It runs only when the cache block fires, keeps no set and swallows its errors, and a verdict
+  # must be kept while a retained run or a worktree head names it. VERDICT_GRACE_DAYS matches that 30,
+  # where the tail sweep's TAIL_GRACE_S is seven days: a tail's grace only covers a bar still running
+  # elsewhere past its verdict, while a verdict nothing names is still read by a later push of its tree.
+  # WHAT IT DOES NOT CHECK: a worktree whose HEAD moved after the run record named its old tree keeps
+  # the old one until that record is swept.
+  _vc=""; [ -n "$RG_COMMON_RAW" ] && _vc=$(cd "$RG_COMMON_RAW" 2>/dev/null && pwd -P)
+  if [ -n "$_vc" ] && [ -d "$_vc/gate-verdict" ]; then
+    _vold=$(find "$_vc/gate-verdict" -maxdepth 1 -type f -mtime "+$VERDICT_GRACE_DAYS" 2>/dev/null) || _vold=""
+    _vheads=$(git worktree list --porcelain 2>/dev/null | awk '$1 == "HEAD" { print $2 "^{tree}" }') || _vheads=""
+    if [ -n "$_vold" ] && [ -n "$_vheads" ]; then
+      # through `cat`, which reads on past a glob that matched nothing, where awk stops at the first
+      _vkeep=" $(cat "$_vc"/gate-run/*/verdict "$_vc"/worktrees/*/gate-run/*/verdict 2>/dev/null \
+        | awk -F'\t' '$1 == "tree" { printf "%s ", $2 }')"
+      # shellcheck disable=SC2086  # one word per worktree head, each a sha with no space
+      _vkeep+="$(git rev-parse $_vheads 2>/dev/null | tr '\n' ' ') "
+      # A pipe, not a here-string from a substitution: the loop runs in the pipeline and hands its count back.
+      _vrm=$(printf '%s\n' "$_vold" | {
+        _vn=0
+        while IFS= read -r _vf; do
+          _vt=${_vf##*/}; _vt=${_vt%.scoped}
+          case "$_vt" in ''|*[!0-9a-f]*) continue ;; esac
+          case "$_vkeep" in *" $_vt "*) continue ;; esac
+          rm -f "$_vf" 2>/dev/null && _vn=$((_vn + 1))
+        done
+        printf '%s\n' "$_vn"
+      })
+      [ "$_vrm" -gt 0 ] && echo "run-gates: per-tree verdicts pruned — $_vrm older than ${VERDICT_GRACE_DAYS} days and named by no retained run or worktree head" >&2
+    fi
+  fi
+  unset _vc _vold _vheads _vkeep _vrm _vf _vt
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
@@ -5896,7 +6458,7 @@ elif [ "$fails" = 0 ]; then
   # measurement.
   # `QUEUE_SUMMARY` rides beside `PROF_LINE` on every path — green, red, and the durable RED copy —
   # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "$WARN_LINES"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
 elif [ "$gate_verdict" = HOST ]; then
   # EXIT 4, HOST (TOOL-dDerivedDocket-26 S5): every failed leg timed out on its first attempt beside
@@ -5915,7 +6477,7 @@ else
   # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
   # are read by the same person in the same terminal and a figure that changes meaning between them
   # is worse than either. TOOL-dUnstalledConvoy-31.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" "$hostnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf '%s' "$WARN_LINES" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" "$hostnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.

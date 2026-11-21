@@ -219,17 +219,31 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-# Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
-# reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=19
-# Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
-# Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
-# Raised 17 -> 18 by TOOL-aMeasuredDrag-4, which adds G8, the tags leg's unguarded pin.
-# Raised 18 -> 19 by TOOL-dDeclaredLoop-67, which adds G9, the `loop termination` leg's unguarded pin.
+# Raised to 80 by TOOL-dWitnessedBar-90, counting every arm built through order 47; stated ABSOLUTELY.
+FLOOR_ASSERTIONS=81
+# RAISED 80 -> 81 by TOOL-dWitnessedBar-107: the peer-stale-slot plant's loop case.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -583,6 +597,83 @@ if "guard" in rows[0]:
   fail=1
 fi
 
+# ---- G10. EVERY GOV LEG CARRIES ONE `leg` TAG, AND NO TWO SHARE ONE ------------------------------
+# TOOL-dWitnessedBar-12 S7: a row's `tag` is `leg.<owner>.<name>`, two segments after the namespace,
+# within 64 bytes. The one check that reds a duplicated leg tag (its section 8 F10): the resolver's
+# `check` keeps a tag's first definition, so two rows sharing one read green there.
+#
+# WHAT THIS DOES NOT CHECK: that a tag follows the rule from its row's owner and name, which only
+# `leg_factory.py new` applies, to a leg it writes, nor a duplicate in any manifest but gov's own.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, re, sys
+try:
+    legs = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+seg = "[a-z0-9][a-z0-9-]*"
+bad, seen = [], {}
+for l in legs:
+    nm, tag = l.get("name", "?"), l.get("tag")
+    if not isinstance(tag, str) or not re.fullmatch(r"leg\.%s\.%s" % (seg, seg), tag) or len(tag.encode()) > 64:
+        bad.append("leg %r carries tag %r, not leg.<owner>.<name> within 64 bytes" % (nm, tag))
+    elif tag in seen:
+        bad.append("legs %r and %r share the tag %s" % (seen[tag], nm, tag))
+    else:
+        seen[tag] = nm
+if not legs:
+    print("gov-canary: %s holds no leg, so no tag was graded" % sys.argv[1]); sys.exit(1)
+if bad:
+    print("gov-canary: " + "\ngov-canary: ".join(bad)); sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
+fi
+
+# ---- G11. A LEG'S `tests` AND THE DOSSIERS' CLAIMS AGREE, BOTH WAYS --------------------------------
+# TOOL-dWitnessedBar-22 S5: the feature a leg tests is declared once, on its row, as `tests`; each
+# dossier under the map's `features/` still claims its legs in `[claims] gate-legs` until dTotalRecall
+# derives that list from the edge. Until then the two spellings are compared in both directions: a leg
+# whose `tests` names `feature.<f>` is claimed by the dossier whose `feature` is <f>, and a leg a dossier
+# claims names that dossier's feature in `tests`. The dossiers are read through the map's own
+# `load_map_tree`, so the population is exactly the one the map gates parse, and never edited.
+#
+# WHAT THIS DOES NOT CHECK: a `tests` target outside `feature.*`, which no dossier claims; the claims of
+# `FOUNDATION.md`, which is no feature; or that a claim names the right feature.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, pathlib, sys
+root, legs_file = pathlib.Path(sys.argv[1]), sys.argv[2]
+sys.path.insert(0, str(root / sys.argv[3]))
+try:
+    import map_extractors as ext, map_lib as m
+    legs = json.load(open(legs_file, encoding="utf-8"))
+    tree = m.load_map_tree(ext.inventory_ids(), root=root,
+                           decision_id_re=getattr(ext, "DECISION_ID_RE", m.DEFAULT_DECISION_ID_RE))
+except Exception as e:
+    print("gov-canary: the tests compare cannot read the manifest or the dossiers: %s" % e); sys.exit(1)
+source = {d.feature: d.source for d in tree.dossiers}
+claims = {}
+for d in tree.dossiers:
+    for nm in d.claims.get("gate-legs", ()):
+        claims.setdefault(nm, set()).add(d.feature)
+# LIVENESS: a map whose dossiers claim no leg compares nothing, and would pass in silence.
+if not claims:
+    print("gov-canary: no dossier under the map claims a leg, so the tests compare graded nothing"); sys.exit(1)
+bad = []
+for l in legs:
+    nm = l.get("name", "?")
+    said = {t[len("feature."):] for t in l.get("tests") or () if isinstance(t, str) and t.startswith("feature.")}
+    for f in sorted(said - claims.get(nm, set())):
+        bad.append("leg %r carries tests feature.%s, " % (nm, f)
+                   + ("and %s does not claim it" % source[f] if f in source else "and no dossier declares that feature"))
+    for f in sorted(claims.get(nm, set()) - said):
+        bad.append("%s claims leg %r, whose tests does not name feature.%s" % (source[f], nm, f))
+if bad:
+    print("gov-canary: " + "\ngov-canary: ".join(bad)); sys.exit(1)
+' "$ROOT" "$LEGS_FILE" "${PFX}codebase-map"; then
+  fail=1
+fi
+
 # ---- verdict -------------------------------------------------------------------------------------
 # The executed assertion count, in the shape <prefix>/check-testsuite-counts.sh reads, against a floor
 # declared here. the run-gates promotion spec's S11: this file gets a counter and a floor at BIRTH, so it
@@ -671,6 +762,532 @@ if bad:
 # each beside its passing case, so the leg's own green is not the only witness that either arm reds.
 a=$((a+1))
 "$PYBIN" "$KITDIR/py_reads.py" --selftest || { echo "gov-canary: py_reads.py --selftest failed"; fail=1; }
+
+# ---- THE VERDICT BACKENDS' PLANTS (TOOL-dWitnessedBar-6 AC1 to AC6, AC7's held reader) ------------
+# Each plant of the unit's design runs in its own scratch directory through `verdict_backends.py
+# --fixture`, which drives `read`, the fixture lander and `remote_verdict.py --responses`, and owes
+# its last scenario's exit and its all-held line. Arms: a duplicate descriptor row, an unregistered and
+# an undeclared value, the full slot against the scoped one, a node's own or another tree's peer tag,
+# and the witness rule's writer, liveness, failed-read and source fields. The peer plants
+# (TOOL-dWitnessedBar-43 AC1, AC2, AC4) run over throwaway SSH keys: a signed GREEN standing, an unsigned
+# tag, a node line another node's key signed, and a candidate emptying the leg manifest read HELD under
+# dispatch-closure and workflow; each prints `not run` where no ssh-keygen runs. TOOL-dWitnessedBar-56
+# (AC6, AC13): the local-hook reader reads NONE over a full GREEN its two record predicates refuse, the
+# reuse pair (`reused-cache`, `reused-alone`, `no-pair`) and the selection (`no-selection`,
+# `edited-selection`, `underived-selection` at the landed revision), and GREEN over `clean`; a peer ref
+# the fetch cannot bring in and a verify with no ssh-keygen read DEAD PROBE, and a tag edited after it
+# was signed NONE naming the bad signature. TOOL-dWitnessedBar-63 (AC11, AC12): `key-no-tab`, a bare
+# `reused` line read as an absent key, and the no-ssh-keygen read sweeping an aged signer temp while it
+# keeps a young one. TOOL-dWitnessedBar-107: `peer-stale-slot`, verify-peer refusing a stale slot the
+# bar did not write, a reused GREEN and a GREEN on a failed bar, then publishing a fresh RED and a
+# witnessed GREEN under the run_id the bar wrote. WHAT THIS DOES NOT CHECK: a
+# real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
+for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache:1 reused-alone:1 no-pair:1 \
+               no-selection:1 edited-selection:1 underived-selection:1 clean:0 key-no-tab:1 peer:1 peer-signed:0 peer-unsigned:2 \
+               peer-self-tag:1 peer-swapped-manifest:0 peer-tip-missing:1 peer-no-ssh-keygen:0 \
+               peer-bad-signature:1 remote-green:0 peer-stale-slot:0 \
+               swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
+  a=$((a+1))
+  vb_plant=${vb_case%%:*}
+  vb_out=$("$PYBIN" "$KITDIR/verdict_backends.py" --fixture --plant "$vb_plant" 2>&1); vb_rc=$?
+  case "$vb_rc:$vb_out" in
+    "${vb_case#*:}:"*"plant $vb_plant · "*"all held"*) ;;
+    *) echo "gov-canary: verdict_backends.py --fixture --plant $vb_plant exited $vb_rc, owed ${vb_case#*:} with every scenario held:"
+       printf '%s\n' "$vb_out" | grep -E 'MISSED|not run|Traceback' | sed 's/^/  /'; fail=1 ;;
+  esac
+done
+
+# ---- THE CLEAN PLANT'S RECORD, ITS CRLF AND REPEATED KEYS, READ BY THE HOOK AND BY LOCAL-HOOK (TOOL-dWitnessedBar-65 AC12, S15) ----
+# The record is the `clean` plant's last write, built by `run_local_plant` under this arm's own
+# scratch with a runner that runs no scenario, at the fixture's `<common-dir>/gate-verdict/<tree>`
+# (TOOL-dWitnessedBar-68 S1). Its `verdict`, `sha` and `reused_cache` lines are replaced by
+# `verdict<TAB>GREEN<CR>`, two `sha` lines, the second CR-ended, and `reused_cache` 1 then 0<CR>, then
+# `fingerprint<TAB>` and forty `c`, CR-ended. The hook's `read_green_file`, cut from the hook alone, and
+# `read_tag_lines`, the reader `local-hook` goes through, read that file's bytes: both take the second
+# `sha`, CR stripped, and `read_tag_lines` reads `GREEN`. The hook half grades `rec_sha`, the variable
+# each staged break reaches, counted only behind the CR-REACH CANARY (TOOL-dWitnessedBar-70 S1, S2): a
+# mutant of the cut, its `%$'\r'}` strip deleted by `sed`, must differ from the cut in exactly one `diff`
+# line and, sourced in a subshell over this record, read `rec_sha` and `rec_fp` each as forty-one bytes
+# ending in CR (TOOL-dWitnessedBar-72 S1), so the planted CR is proved to reach `read_green_file` on both
+# keys before either strip is graded. A failed canary prints its line, reds, and leaves the `rec_sha`
+# and `rec_fp` compares uncounted, each of which still runs and prints its own line.
+# Both byte tests are one call, `check_canary_keys`, over the mutant written to a file under `$rgf_t`:
+# it runs `check_cr_reached` for each `<key>:<var>` pair of `CANARY_KEYS`, in order, and prints each
+# variable whose CR did not arrive; no line outside `check_cr_reached`'s body measures either
+# variable's bytes (TOOL-dWitnessedBar-74 S1, TOOL-dWitnessedBar-76 S1, S2). Each is seen red on every
+# run (TOOL-dWitnessedBar-76 S3): per pair, a variant of the cut whose `<key>)` case reads
+# `<var>=${_rg_v%?}x`, one `diff` line from the cut and one from its own mutant under the canary's `sed`,
+# must make `check_canary_keys` print exactly `<var>`, or the arm prints `the <var> byte check was not
+# seen red on its liveness variant (<reason>)`, reds, and leaves that key's compare uncounted. The
+# liveness loop gates those counts, and each variant seen red adds one (TOOL-dWitnessedBar-85 S1). Each variant runs through one function,
+# `check_key_variant`, called twice per pair (TOOL-dWitnessedBar-79 S1): the TAIL VARIANT above,
+# forty-one bytes ending in `x`, which fails the tail test alone and reds as `the tail variant passed
+# a value whose last byte is not CR` (TOOL-dWitnessedBar-80 S1, S3), then the LENGTH VARIANT, `<var>=` its value less the
+# first byte, forty bytes still ending in CR, which fails the count alone, so a count comparison made
+# vacuous reds as `the length variant passed a value one byte short`. A key joins `rgf_seen` only
+# when both its variants were seen red. NOT CHECKED: a count compared with `-ge 41`, which still
+# rejects forty bytes and admits more than forty-one; neither variant reaches it.
+# The breaks staged against it (S3): the loop without its `_rg_v=${_rg_v%$'\r'}` line, and a `sha` case
+# keeping every repeated key, `rec_sha=${rec_sha:+$rec_sha$'\n'}$_rg_v`. In the cut's own subshell
+# the hook half grades `rec_fp`, the CR strip on a second key, behind the same canary: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
+# (TOOL-dWitnessedBar-67 S2); the backends read no `fingerprint`, so that line moves no local-hook state.
+# `read --backend local-hook` over the same fixture prints GREEN only where the verdict's CR is
+# stripped and the last `reused_cache` wins; a reader keeping the first reads NONE (S3).
+# WHAT THIS DOES NOT CHECK: a strip spelled other than `%$'\r'}`, or spelled twice, which fails the
+# canary at its count rather than grading the CR; nor a `verdict` read by the hook, which reads none;
+# nor a `sha` key read by the CLI half, whose line prints the queried sha and never the record's.
+# Its CR is spelled in this top-level body, never inside a `$(...)`, which reads it as empty here.
+# A READ FAILURE IS NOT A RED (TOOL-dWitnessedBar-84 S13): `check_cr_reached` returns 2 when `<file>`
+# cannot be sourced, defines no `read_green_file`, or `<record>` is not a regular file, and 1 only on a
+# value it measured. `check_canary_keys` prints a variable only on a 1, returning 1 (-88 S3), and 2 on any 2; it
+# returns 3, whatever else happened, on a visit count (S14) other than every word of `${CANARY_KEYS[*]}`,
+# at least two, which it names on stderr, since each call runs inside a `$(...)` (TOOL-dWitnessedBar-89
+# S4). A 3 is no read failure: no caller prints `unread` or `(rc 2)` for it, and each sets `fail`.
+# WHAT THIS DOES NOT CHECK: which of the two reads a 2 was.
+check_cr_reached() (   # file · record · var -> 0 when var, read by name, is forty-one bytes ending in CR; 1 when not; 2 unread
+  LC_ALL=C
+  unset -f read_green_file
+  . "$1" || exit 2
+  declare -F read_green_file > /dev/null || exit 2
+  [ -f "$2" ] || exit 2
+  read_green_file "$2"
+  _cc_v=${!3}
+  [ "${#_cc_v}" -eq 41 ] && [ "${_cc_v: -1}" = $'\r' ] || exit 1
+)
+CANARY_KEYS=(sha:rec_sha fingerprint:rec_fp)   # <key>:<var>, each read by the cut, in the canary's order
+rgf_km=0; for rgf_w in ${CANARY_KEYS[*]}; do rgf_km=$((rgf_km+1)); done   # the pairs each loop owes a visit
+check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KEYS variable whose CR did not arrive; 0 none, 1 printed, 2 unread, 3 not every pair visited
+  local _ck_p _ck_rc _ck_n=0 _ck_1=0 _ck_2=0
+  for _ck_p in "${CANARY_KEYS[@]}"; do
+    _ck_n=$((_ck_n+1))
+    check_cr_reached "$1" "$2" "${_ck_p#*:}"; _ck_rc=$?
+    case "$_ck_rc" in 0) ;; 1) printf '%s\n' "${_ck_p#*:}"; _ck_1=1 ;; *) _ck_2=1 ;; esac
+  done
+  if [ "$_ck_n" != "$rgf_km" ] || [ "$rgf_km" -lt 2 ]; then
+    echo "gov-canary: the canary visited $_ck_n of $rgf_km CANARY_KEYS pairs" >&2; return 3
+  fi
+  [ "$_ck_2" = 0 ] || return 2; return "$_ck_1"
+}
+# <key>:<var> · replacement · label · passed reason · other lead -> 0 silent when the variant, the cut
+# `rgf_fn` with its `<key>)` assignment set to the replacement, was seen red over `rgf_rec`; else
+# prints one reason and returns 1; returns 3, printing nothing, when its mutant's `check_canary_keys`
+# returned 3 (TOOL-dWitnessedBar-89 S4). Writes its variant and mutant under `rgf_t`.
+check_key_variant() {
+  local _kv_k=${1%%:*} _kv_v=${1#*:} _kv_n _kv_mn _kv_got _kv_rc _kv_g _kv_has=0 _kv_oth=
+  # The `<key>)` arm's assignment, bare, quoted, braced or aligned, takes the replacement unquoted (TOOL-dWitnessedBar-88 S10),
+  # its token whole and closed by a space, a `;` or the line's end, so an arm carrying a modifier changes no line (-89 S6).
+  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k"')[[:space:]]*'"$_kv_v"'=\)"\{0,1\}\(\$_rg_v\|\${_rg_v}\)"\{0,1\}\([[:space:];]\|$\)/\1'"$2"'\3/' > "$rgf_t/cut-var.sh"
+  _kv_n=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
+  sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
+  _kv_mn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
+  _kv_got=$(check_canary_keys "$rgf_t/cut-var-mut.sh" "$rgf_rec"); _kv_rc=$?
+  for _kv_g in $_kv_got; do
+    if [ "$_kv_g" = "$_kv_v" ]; then _kv_has=1; else _kv_oth=${_kv_oth:+$_kv_oth }$_kv_g; fi
+  done
+  if [ "$_kv_n" != 1 ]; then printf '%s\n' "${3}variant changed $_kv_n lines"
+  elif [ "$_kv_mn" != 1 ]; then printf '%s\n' "${3}mutant changed $_kv_mn lines"
+  elif [ "$_kv_rc" = 3 ]; then return 3
+  elif [ "$_kv_rc" = 2 ]; then printf '%s\n' "${3}variant could not be sourced or read (rc 2)"
+  elif [ "$_kv_rc" != 1 ] || [ "$_kv_has" != 1 ]; then printf '%s\n' "$4"
+  elif [ -n "$_kv_oth" ]; then printf '%s\n' "$5 $_kv_oth whose CR arrived"
+  else return 0; fi
+  return 1
+}
+rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+rgf_c=cccccccccccccccccccccccccccccccccccccccc
+rgf_out=$("$PYBIN" -c 'import io, os, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+for s in (sys.stdout, sys.stderr):
+    s.reconfigure(encoding="utf-8", errors="replace", newline="\n")
+for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+          "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_PREFIX"):
+    os.environ.pop(k, None)
+top = V.pathlib.Path(sys.argv[2]).absolute()
+V.run_local_plant("clean", top, lambda *a, **k: None)
+work = top / "work"
+sha = V.run_fixture_git(work, "rev-parse", "HEAD")
+rec = V.read_common_dir(work) / "gate-verdict" / V.read_tree_of(work, sha)
+kept = [ln for ln in io.BytesIO(rec.read_bytes()).readlines()
+        if ln.split(b"\t", 1)[0] not in (b"verdict", b"sha", b"reused_cache", b"fingerprint")]
+rec.write_bytes(b"".join(kept) + b"verdict\tGREEN\r\nsha\t" + sys.argv[3].encode() + b"\nsha\t"
+                + sys.argv[4].encode() + b"\r\nreused_cache\t1\nreused_cache\t0\r\nfingerprint\t"
+                + sys.argv[5].encode() + b"\r\n")
+V.run_fixture_command(work, [sys.executable, str(V.HERE / "verdict_backends.py"), "read", "--backend",
+                             "local-hook", "--sha", sha])
+print(sha, rec.as_posix())' "$KITDIR" "$rgf_t" "$rgf_a" "$rgf_b" "$rgf_c" 2>&1); rgf_rc=$?
+rgf_last=${rgf_out##*$'\n'}; rgf_head=${rgf_last%% *}; rgf_rec=${rgf_last#* }
+rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
+rgf_rd=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s\t%s' "$rec_sha" "$rec_fp" )
+rgf_sha=${rgf_rd%%$'\t'*}; rgf_fp=${rgf_rd#*$'\t'}
+rgf_mut=$(printf '%s\n' "$rgf_fn" | sed 's/%[$].[\]r.}/}/')
+printf '%s\n' "$rgf_mut" > "$rgf_t/cut-mut.sh"
+rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^>')
+# The line's slot (TOOL-dWitnessedBar-75 S1, S2) takes each value of `rgf_whats`, one line apiece
+# (TOOL-dWitnessedBar-77 S1): `count <n>` alone when the count failed, so no byte check runs past it,
+# else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`, or
+# `unread` alone when it returned 2 (TOOL-dWitnessedBar-84 S13, S14), its visit count one assertion.
+# A 3 takes no slot: its visited line is already on stderr, so it reds and the canary stays failed (-89 S4).
+# Any code outside 0 to 3 takes none either: it prints its own line naming the code, reds, and the canary
+# stays failed (TOOL-dWitnessedBar-90 S1).
+rgf_whats=(); rgf_ck=0
+if [ "$rgf_n" != 1 ]; then rgf_whats=("count $rgf_n")
+else a=$((a+1)); rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec"); rgf_ck=$?
+  if [ "$rgf_ck" = 2 ]; then rgf_whats=("unread")
+  elif [ "$rgf_ck" = 3 ]; then fail=1
+  elif [ "$rgf_ck" != 0 ] && [ "$rgf_ck" != 1 ]; then echo "gov-canary: check_canary_keys returned $rgf_ck, a code it does not define"; fail=1
+  else for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi; fi
+rgf_ok=0
+[ "${#rgf_whats[@]}" = 0 ] && { [ "$rgf_ck" = 0 ] || [ "$rgf_ck" = 1 ]; } && rgf_ok=1
+for rgf_what in "${rgf_whats[@]}"; do
+  [ "$rgf_ok" = 1 ] \
+    || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
+done
+# The liveness variants (TOOL-dWitnessedBar-74 S2, TOOL-dWitnessedBar-76 S3): one per CANARY_KEYS
+# pair, its own key's value losing its CR after the read; `check_canary_keys` on its mutant must print
+# exactly that key's variable. `rgf_seen` lists the variables seen red, and only those compares count.
+# The tail variant's call, then the length variant's (TOOL-dWitnessedBar-79 S1): each failed call's
+# reason prints one line, and a key with any joins no `rgf_seen`. Each call seen red, its status 0
+# at the loop's top level and never inside its `$(...)`, adds one assertion (TOOL-dWitnessedBar-85 S1).
+# The loop counts the pairs it visits, checked after it against every word of `${CANARY_KEYS[*]}`,
+# at least two, one assertion (TOOL-dWitnessedBar-84 S14). A call returning 3, its visited line on
+# stderr, reds alone: no reason, no count, and its key joins no `rgf_seen` (TOOL-dWitnessedBar-89 S4).
+rgf_seen=; rgf_lvn=0
+for rgf_kp in "${CANARY_KEYS[@]}"; do
+  rgf_lvn=$((rgf_lvn+1))
+  rgf_kv=${rgf_kp#*:}; rgf_whys=(); rgf_k3=0
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named'); rgf_kvr=$?
+  case "$rgf_kvr" in 0) a=$((a+1)) ;; 3) fail=1; rgf_k3=1 ;; *) rgf_whys+=("$rgf_why") ;; esac
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'the length variant named'); rgf_kvr=$?
+  case "$rgf_kvr" in 0) a=$((a+1)) ;; 3) fail=1; rgf_k3=1 ;; *) rgf_whys+=("$rgf_why") ;; esac
+  for rgf_why in "${rgf_whys[@]}"; do
+    echo "gov-canary: the $rgf_kv byte check was not seen red on its liveness variant ($rgf_why)"; fail=1
+  done
+  [ "${#rgf_whys[@]}" = 0 ] && [ "$rgf_k3" = 0 ] && rgf_seen="$rgf_seen $rgf_kv"
+done
+a=$((a+1))
+[ "$rgf_lvn" = "$rgf_km" ] && [ "$rgf_km" -ge 2 ] \
+  || { echo "gov-canary: the liveness loop visited $rgf_lvn of $rgf_km CANARY_KEYS pairs"; fail=1; }
+[ "$rgf_ok" = 1 ] && case "$rgf_seen " in *" rec_sha "*) a=$((a+1)) ;; esac
+[ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
+  || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
+[ "$rgf_ok" = 1 ] && case "$rgf_seen " in *" rec_fp "*) a=$((a+1)) ;; esac
+[ -n "$rgf_fn" ] && [ "$rgf_fp" = "$rgf_c" ] \
+  || { rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_fp to '${rgf_fp//$'\r'/$rgf_cr}' over a CR-ended fingerprint line, not forty c with its CR stripped, or did not cut from the hook"; fail=1; }
+# EVERY KEY THE HOOK READS (TOOL-dWitnessedBar-73 S9, AC9). The keys and the variable each sets are
+# derived from the cut's `case` labels, each line reading `<label>) rec_<name>=`, never typed. A second
+# record holds, for each key, `<key><TAB>old<LF>` then `<key><TAB>new<CR><LF>`; the cut, sourced in a
+# subshell over it, must read every derived variable as exactly `new`, and the subshell prints only the
+# names that do not. An empty derivation reds. RED against a `selftests` case keeping the first of a
+# repeated key (it names `rec_st`). WHAT THIS DOES NOT CHECK: a key the hook reads through a line not of
+# that form, which the listing below names as a variable outside the derivation.
+# One derivation serves both readers (TOOL-dWitnessedBar-84 S10, S11): `_derive_case_keys` prints one
+# `<key> <var>` line per `<label>) <prefix><name>=` assignment in the cut, every one on a line, and
+# returns 1, naming the cut and both numbers on stderr, when that differs from `grep -o`'s count of
+# them. Each caller's assertion requires its 0.
+_derive_case_keys() {   # cut-file · prefix -> one `<key> <var>` line per case-arm assignment; 1 on a miscount
+  local _dk_out _dk_n _dk_m
+  _dk_out=$(awk -v p="$2" '{ s = $0
+    while (match(s, "[A-Za-z_]+\\) " p "[A-Za-z_]+=")) {
+      t = substr(s, RSTART, RLENGTH - 1); s = substr(s, RSTART + RLENGTH)
+      k = t; sub(/\).*/, "", k); v = t; sub(/^.*\) /, "", v); print k " " v } }' "$1")
+  _dk_n=$(printf '%s\n' "$_dk_out" | grep -c .)
+  _dk_m=$(grep -oE "[A-Za-z_]+\) $2[A-Za-z_]+=" "$1" | grep -c .)
+  [ -n "$_dk_out" ] && printf '%s\n' "$_dk_out"
+  [ "$_dk_n" = "$_dk_m" ] \
+    || { echo "gov-canary: the case keys derived from $1 number $_dk_n, and its $2 case-arm assignments $_dk_m" >&2; return 1; }
+}
+printf '%s\n' "$rgf_fn" > "$rgf_t/cut.sh"
+rgf_pairs=$(_derive_case_keys "$rgf_t/cut.sh" rec_); rgf_dk=$?
+rgf_vars=$(printf '%s\n' "$rgf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
+: > "$rgf_t/keys.rec"; printf '%s\n' "$rgf_pairs" > "$rgf_t/pairs.txt"  # a file, not a here-string from a substitution
+while read -r rgf_k rgf_kn; do
+  [ -n "$rgf_k" ] && printf '%s\told\n%s\tnew\r\n' "$rgf_k" "$rgf_k" >> "$rgf_t/keys.rec"
+done < "$rgf_t/pairs.txt"
+rgf_kf=$( eval "$rgf_fn"; read_green_file "$rgf_t/keys.rec"; for rgf_kv in $rgf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
+a=$((a+1))
+[ "$rgf_dk" = 0 ] && [ -n "${rgf_vars// /}" ] && [ -z "$rgf_kf" ] \
+  || { echo "gov-canary: over a record holding each key the cut's case labels name ($(printf '%s\n' "$rgf_pairs" | grep -c .) derived: ${rgf_vars:-none}), old then new CR-ended, these did not read exactly new: ${rgf_kf:-none}"; fail=1; }
+# EVERY KEY `read_bar_file` READS (TOOL-dWitnessedBar-78 S7, AC8): the same derived planting over the
+# hook's cut `read_bar_file`, its `<label>) bg_<name>=` lines, in a third record; every derived variable
+# must read exactly `new`, and the derivation must hold `base`, `max_age` and `blocks`, the inherited
+# green's keys (S8). RED against a `read_bar_file` keeping `IFS=$'\t' read -r k v` (it names a `bg_*`
+# variable). WHAT THIS DOES NOT CHECK: the `selection.[1-9]*` label, which fills `bg_sel_rows` and is
+# outside the derivation.
+rbf_fn=$(awk '/^read_bar_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
+printf '%s\n' "$rbf_fn" > "$rgf_t/bar-cut.sh"
+rbf_pairs=$(_derive_case_keys "$rgf_t/bar-cut.sh" bg_); rbf_dk=$?
+rbf_vars=$(printf '%s\n' "$rbf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
+: > "$rgf_t/bar-keys.rec"; printf '%s\n' "$rbf_pairs" > "$rgf_t/bar-pairs.txt"  # a file, not a here-string from a substitution
+rbf_miss=
+while read -r rgf_k rgf_kn; do
+  [ -n "$rgf_k" ] && printf '%s\told\n%s\tnew\r\n' "$rgf_k" "$rgf_k" >> "$rgf_t/bar-keys.rec"
+done < "$rgf_t/bar-pairs.txt"
+for rgf_k in base max_age blocks; do
+  grep -q "^$rgf_k " "$rgf_t/bar-pairs.txt" || rbf_miss="$rbf_miss $rgf_k"
+done
+rbf_kf=$( eval "$rbf_fn"; read_bar_file "$rgf_t/bar-keys.rec"; for rgf_kv in $rbf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
+a=$((a+1))
+[ "$rbf_dk" = 0 ] && [ -n "${rbf_vars// /}" ] && [ -z "$rbf_kf" ] && [ -z "$rbf_miss" ] \
+  || { echo "gov-canary: over a record holding each key read_bar_file's case labels name ($(printf '%s\n' "$rbf_pairs" | grep -c .) derived: ${rbf_vars:-none}; missing:${rbf_miss:- none}), old then new CR-ended, these did not read exactly new: ${rbf_kf:-none}"; fail=1; }
+# THE LINE RULES, OVER BOTH READERS (TOOL-dWitnessedBar-78 S13, AC14): a fourth record holds
+# `manifest<TAB>x<TAB>`, a bare `fingerprint` and a final `selftests<TAB>on` with no LF. Each cut reads
+# the manifest as `x<TAB>`, no fingerprint, and `on`; the subshell prints each variable that does not.
+# RED against a `read_green_file` splitting with `IFS=$'\t'` (it names `rec_man`) and against a loop
+# without `|| [ -n "$_rg_l" ]` (it names `rec_st`). Its TAB is spelled in this top-level body.
+rlr_x=x$'\t'
+printf 'manifest\tx\t\nfingerprint\nselftests\ton' > "$rgf_t/lines.rec"
+rlr_bad=$( eval "$rgf_fn"; eval "$rbf_fn"; read_green_file "$rgf_t/lines.rec"; read_bar_file "$rgf_t/lines.rec"
+  [ "$rec_man" = "$rlr_x" ] || printf 'rec_man '; [ -z "$rec_fp" ] || printf 'rec_fp '; [ "$rec_st" = on ] || printf 'rec_st '
+  [ "$bg_man" = "$rlr_x" ] || printf 'bg_man '; [ -z "$bg_fp" ] || printf 'bg_fp '; [ "$bg_st" = on ] || printf 'bg_st ' )
+a=$((a+1))
+[ -n "$rgf_fn" ] && [ -n "$rbf_fn" ] && [ -z "$rlr_bad" ] \
+  || { echo "gov-canary: over a record holding manifest x and a trailing TAB, a bare fingerprint and an unterminated selftests on, these did not read as the line rules give (x TAB, empty, on): ${rlr_bad:-a reader did not cut from the hook}"; fail=1; }
+# THE HOOK READS NO `verdict` KEY (TOOL-dWitnessedBar-73 S14, AC14). A fresh `bash -c` sources only the
+# cut and calls it on a record holding only `verdict<TAB>GREEN`: `compgen -v rec_` must list exactly the
+# variables the derivation above names, each empty, and the shell prints only the names that are not.
+# RED against a `verdict` case setting `rec_verdict` (it names `rec_verdict`) or setting `rec_sha` from
+# `verdict` (it names `rec_sha`). Unit 67 AC1's two greps stay beside it.
+printf '%s\n' "$rgf_fn" > "$rgf_t/cut.sh"
+printf 'verdict\tGREEN\n' > "$rgf_t/verdict.rec"
+rgf_lv=$("$BASH" -c '. "$1" || { printf "unsourced "; exit 1; }; read_green_file "$2"
+for v in $(compgen -v rec_); do case " $3 " in *" $v "*) [ -z "${!v}" ] || printf "%s " "$v" ;; *) printf "%s " "$v" ;; esac; done
+for v in $3; do declare -p "$v" >/dev/null 2>&1 || printf "%s " "$v"; done' _ "$rgf_t/cut.sh" "$rgf_t/verdict.rec" "$rgf_vars" 2>&1)
+a=$((a+1))
+[ -n "${rgf_vars// /}" ] && [ -z "$rgf_lv" ] \
+  || { echo "gov-canary: over a record holding only verdict GREEN, the cut's rec_ variables are not exactly the derived ${rgf_vars:-none}, each empty: ${rgf_lv:-no derivation}"; fail=1; }
+rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), repr(r.get("sha")))' \
+  "$KITDIR" "$rgf_rec" 2>&1 | tr -d '\r')
+a=$((a+1))
+[ "$rgf_py" = "'GREEN' '$rgf_b'" ] \
+  || { echo "gov-canary: read_tag_lines over the CRLF verdict and two sha lines, the second CR-ended, read '$rgf_py', not 'GREEN' and the second sha"; fail=1; }
+rgf_cli=$(printf '%s\n' "$rgf_out" | grep '^verdict: local-hook · ')
+a=$((a+1))
+case "$rgf_rc:$rgf_cli" in
+  "0:verdict: local-hook · GREEN · ${rgf_head:0:8} "*) ;;
+  *) echo "gov-canary: read --backend local-hook over the clean plant's record, its verdict CR-ended and reused_cache 1 then 0, printed '$rgf_cli', not GREEN on ${rgf_head:0:8} (the record call exited $rgf_rc)"
+     [ "$rgf_rc" = 0 ] || printf '%s\n' "$rgf_out" | sed 's/^/  /'; fail=1 ;;
+esac
+rm -rf "$rgf_t"
+
+# ---- THE SIGNER-TEMP SWEEP, EVERY FILESYSTEM CALL HELD (TOOL-dWitnessedBar-67 AC3, S3, S10) ----------
+# `remove_stale_signer_temps`, the sweep `read_signer_principal` runs first, over two aged `gov-signers-`
+# files, an aged `gov-signers-d` directory and an aged stand-in link `gov-signers-l`, under five
+# stand-ins: `os.unlink` raising
+# FileNotFoundError for one file and PermissionError for the other, which names the second file once on
+# stderr; the age read raising FileNotFoundError for one entry, silent; the `pathlib.Path.glob` listing
+# raising PermissionError, one stderr line naming the directory; and (TOOL-dWitnessedBar-73 S10, AC10)
+# `is_file(follow_symlinks=False)` raising PermissionError for one file, and the age read `Path.stat()`
+# raising PermissionError for one file, each naming that entry once on stderr while the other file is
+# removed. `gov-signers-l` is a regular file whose `is_file(follow_symlinks=False)` answers false and
+# whose following `is_file()` answers true, as a link to a file does, so no real symlink, which needs a
+# privilege the host may lack, is made. Each call returns, no unlink reaches the directory or the link
+# and both stay. RED against a sweep with no `OSError` catch around the unlink (it raises
+# out of the sweep), and against one testing existence where it calls `is_file(follow_symlinks=False)`
+# (it reaches `gov-signers-d` and `gov-signers-l`). WHAT THIS DOES NOT CHECK: a real permission or race
+# on the host, or a real link.
+rss_t=$(mktemp -d)
+rss_out=$("$PYBIN" -c 'import contextlib, io, os, pathlib, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
+top = pathlib.Path(sys.argv[2])
+real_unlink, real_stat, real_glob, real_is_file = os.unlink, pathlib.Path.stat, pathlib.Path.glob, pathlib.Path.is_file
+for case in ("unlink", "stat", "glob", "is_file", "stat-denied"):
+    d = top / case
+    d.mkdir()
+    (d / "gov-signers-a").write_text("x")
+    (d / "gov-signers-b").write_text("x")
+    (d / "gov-signers-d").mkdir()
+    (d / "gov-signers-l").write_text("x")
+    aged = V.time.time() - V.PEER_SIGNERS_GRACE_S - 600
+    for n in ("a", "b", "d", "l"):
+        os.utime(d / ("gov-signers-" + n), (aged, aged))
+    reached = []
+    def remove_planted(p, *a, **k):
+        reached.append(os.path.basename(str(p)))
+        if case == "unlink" and str(p).endswith("-a"):
+            raise FileNotFoundError(2, "gone", str(p))
+        if case == "unlink" and str(p).endswith("-b"):
+            raise PermissionError(13, "denied", str(p))
+        return real_unlink(p, *a, **k)
+    def read_planted_stat(self, *a, **k):
+        if case in ("stat", "stat-denied") and self.name == "gov-signers-a" and k.get("follow_symlinks", True) \
+                and not a:
+            if case == "stat":
+                raise FileNotFoundError(2, "gone", str(self))
+            raise PermissionError(13, "denied", str(self))
+        return real_stat(self, *a, **k)
+    def scan_planted(self, *a, **k):
+        if case == "glob":
+            raise PermissionError(13, "denied", str(self))
+        return real_glob(self, *a, **k)
+    def check_planted_file(self, *a, **k):
+        follow = k.get("follow_symlinks", True)
+        if self.name == "gov-signers-l":
+            return bool(follow)
+        if case == "is_file" and self.name == "gov-signers-a" and not follow:
+            raise PermissionError(13, "denied", str(self))
+        return real_is_file(self, *a, **k)
+    os.unlink, pathlib.Path.stat, pathlib.Path.glob = remove_planted, read_planted_stat, scan_planted
+    pathlib.Path.is_file = check_planted_file
+    err = io.StringIO()
+    try:
+        with contextlib.redirect_stderr(err):
+            gone = V.remove_stale_signer_temps(str(d))
+    except BaseException as e:
+        gone = "raised %s: %s" % (type(e).__name__, e)
+    finally:
+        os.unlink, pathlib.Path.stat, pathlib.Path.glob = real_unlink, real_stat, real_glob
+        pathlib.Path.is_file = real_is_file
+    lines = err.getvalue().splitlines()
+    named_a = ([ln for ln in lines if "gov-signers-a" in ln and "gov-signers-b" not in ln][:1])
+    owed = {"unlink": ([], [ln for ln in lines if "gov-signers-b" in ln and "gov-signers-a" not in ln][:1]),
+            "stat": (["gov-signers-b"], []),
+            "glob": ([], [ln for ln in lines if str(d) in ln and "gov-signers-" not in ln][:1]),
+            "is_file": (["gov-signers-b"], named_a),
+            "stat-denied": (["gov-signers-b"], named_a)}[case]
+    held = gone == owed[0] and lines == owed[1] and len(lines) == (0 if case == "stat" else 1) \
+        and "gov-signers-d" not in reached and (d / "gov-signers-d").is_dir() \
+        and "gov-signers-l" not in reached and (d / "gov-signers-l").is_file()
+    print("case %s %s - returned %r - unlinked %s - stderr %s" % (case, "held" if held else "MISSED", gone,
+          reached, lines))' "$KITDIR" "$rss_t" 2>&1 | tr -d '\r')
+for rss_c in unlink stat glob is_file stat-denied; do
+  a=$((a+1))
+  printf '%s\n' "$rss_out" | grep -q "^case $rss_c held - " && ! printf '%s\n' "$rss_out" | grep -q Traceback \
+    || { echo "gov-canary: the signer-temp sweep under the $rss_c stand-in, over two aged gov-signers- files, an aged gov-signers-d directory and an aged stand-in link gov-signers-l, did not hold:"; printf '%s\n' "$rss_out" | sed 's/^/  /'; fail=1; }
+done
+rm -rf "$rss_t"
+
+# ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
+# The pre-push hook scrubs `BAR_SCRUBBED_KNOBS` and clears `BAR_CLEARED_KNOBS` before its bar; post-merge's
+# `PM_SCRUB` and the unattended driver's `_gknobs` run bars whose green is trusted for the whole tree, so
+# each must carry every one of those names. The hook's two lists and `_gknobs` are read by the one-line
+# cuts the driver suite's parity arm uses, each list there being one line; `PM_SCRUB` spans lines and is
+# read in awk from the line opening `PM_SCRUB="` to the first line, that one included, holding the
+# closing quote, whatever follows the quote discarded and newlines folded to spaces: the reading
+# post-merge itself applies, `${PM_SCRUB//$'\n'/ }`. Each name read must match `^[A-Z_][A-Z0-9_]*$`
+# (TOOL-dWitnessedBar-65 S17); a `sed` range never tested its opening line for the end and needed the
+# quote to end a line, so a trailing comment's words entered the list. The arm
+# prints the count of names it read from each of the four lists, and the first and last name of
+# `PM_SCRUB`, so a short read shows (TOOL-dWitnessedBar-63 S3); the range read must hold the names on the
+# assignment's first and last physical lines. A list that reads empty is named too, so a moved or
+# reworded line cannot pass this over nothing. Three staged copies prove it can fail: `GATE_SELECTION`
+# cut from `PM_SCRUB`, the `PM_SCRUB` assignment taken out, and the hook's `BAR_CLEARED_KNOBS` line taken
+# out. WHAT THIS DOES NOT CHECK: that either caller honours its list at run time (the evidence suite's
+# post-merge arm observes one), the hook's `ENV_DROPPED_KNOBS`, or the policy keys set from R's file.
+bsp_pm_read='!on && /^PM_SCRUB="/ { on = 1; sub(/^PM_SCRUB="/, "") }
+  on { i = index($0, "\""); if (i) { print substr($0, 1, i - 1); exit } print }'
+check_bar_scrub_parity() {   # hook · post-merge · driver -> one `read` line of the four counts, then one line per missing name, empty list or ill-formed name
+  local sk ck pm dr k out=""
+  local -a ws wc wp wd
+  sk=$(sed -n 's/^BAR_SCRUBBED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
+  ck=$(sed -n 's/^BAR_CLEARED_KNOBS="\([^"]*\)"$/\1/p' "$1" 2>/dev/null)
+  pm=$(awk "$bsp_pm_read" "$2" 2>/dev/null | tr '\n' ' ')
+  dr=$(sed -n 's/^ *local _gk _gknobs="\([^"]*\)".*/\1/p' "$3" 2>/dev/null)
+  ws=($sk); wc=($ck); wp=($pm); wd=($dr)
+  printf 'read BAR_SCRUBBED_KNOBS %d · BAR_CLEARED_KNOBS %d · PM_SCRUB %d (%s … %s) · _gknobs %d\n' \
+    "${#ws[@]}" "${#wc[@]}" "${#wp[@]}" "${wp[0]:-none}" "${wp[*]: -1}" "${#wd[@]}"
+  [ -n "${sk// /}" ] || out+="BAR_SCRUBBED_KNOBS reads empty in $1"$'\n'
+  [ -n "${ck// /}" ] || out+="BAR_CLEARED_KNOBS reads empty in $1"$'\n'
+  [ -n "${pm// /}" ] || out+="PM_SCRUB reads empty in $2"$'\n'
+  [ -n "${dr// /}" ] || out+="_gknobs reads empty in $3"$'\n'
+  for k in $sk $ck; do
+    case " $pm " in *" $k "*) ;; *) out+="PM_SCRUB in $2 lacks $k"$'\n' ;; esac
+    case " $dr " in *" $k "*) ;; *) out+="_gknobs in $3 lacks $k"$'\n' ;; esac
+  done
+  for k in "${wp[@]}"; do
+    case "$k" in [!A-Z_]*|*[!A-Z0-9_]*) out+="PM_SCRUB in $2 holds $k, outside ^[A-Z_][A-Z0-9_]*\$"$'\n' ;; esac
+  done
+  printf '%s' "$out"
+  [ -z "$out" ]
+}
+bsp_hook="$ROOT/.githooks/pre-push"; bsp_pm="$KITDIR/post-merge.sh"; bsp_uk=unattended; bsp_drv="$ROOT/${PFX}$bsp_uk/$bsp_uk.sh"  # the driver kit, named once
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_pm" "$bsp_drv") \
+  && echo "gov-canary: bar-scrub parity ${bsp_out%%$'\n'*}" \
+  || { echo "gov-canary: a bar caller does not scrub every knob the pre-push hook scrubs or clears:"; printf '%s\n' "$bsp_out" | sed 's/^/  /'; fail=1; }
+# The names on the assignment's first and last physical lines, read apart from the range cut.
+bsp_first=$(sed -n 's/^PM_SCRUB="\([^ "]*\).*/\1/p' "$bsp_pm")
+bsp_last=$(awk '!on && /^PM_SCRUB="/ { on = 1; sub(/^PM_SCRUB="/, "") }
+  on && (i = index($0, "\"")) { s = substr($0, 1, i - 1); sub(/[ \t]+$/, "", s); sub(/.*[ \t]/, "", s); print s; exit }' "$bsp_pm")
+a=$((a+1))
+case "${bsp_out%%$'\n'*}" in
+  *"PM_SCRUB "*" ($bsp_first … $bsp_last) "*)
+    [ -n "$bsp_first" ] && [ -n "$bsp_last" ] \
+      || { echo "gov-canary: the first or last name of PM_SCRUB's assignment did not read: '$bsp_first' '$bsp_last'"; fail=1; } ;;
+  *) echo "gov-canary: the scrub parity arm's PM_SCRUB read does not run from $bsp_first to $bsp_last: ${bsp_out%%$'\n'*}"; fail=1 ;;
+esac
+bsp_t=$(mktemp -d)
+sed '/^PM_SCRUB="/,/"$/s/ GATE_SELECTION\([ "]\)/\1/' "$bsp_pm" > "$bsp_t/post-merge.sh"
+sed '/^PM_SCRUB="/,/"$/d' "$bsp_pm" > "$bsp_t/post-merge-none.sh"
+sed '/^BAR_CLEARED_KNOBS=/d' "$bsp_hook" > "$bsp_t/pre-push"
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/post-merge.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* lacks GATE_SELECTION$' \
+  || { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut was not named for it: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/post-merge-none.sh" "$bsp_drv") \
+  && { echo "gov-canary: a post-merge copy with no PM_SCRUB assignment passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB reads empty' \
+  || { echo "gov-canary: a post-merge copy with no PM_SCRUB assignment was not named as an empty list: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_t/pre-push" "$bsp_pm" "$bsp_drv") \
+  && { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^BAR_CLEARED_KNOBS reads empty' \
+  || { echo "gov-canary: a hook copy with no BAR_CLEARED_KNOBS line was not named as an empty list: $bsp_out"; fail=1; }
+# TOOL-dWitnessedBar-65 AC14 (S17): a copy carrying `  # note GATE_SELECTION` after the closing quote, and
+# one holding the assignment on a single line, each read exactly the base list; with GATE_SELECTION cut
+# from the list while the comment still names it, the arm fails naming it; a planted `bad-name` fails the
+# token grammar. RED against the `sed` range, which reads the comment's words into the list.
+bsp_words=$(awk "$bsp_pm_read" "$bsp_pm" | tr -s ' \t' '\n\n' | grep .)
+bsp_line=$(printf '%s\n' "$bsp_words" | tr '\n' ' ')
+sed "s/ $bsp_last\"\$/ $bsp_last\"  # note GATE_SELECTION/" "$bsp_pm" > "$bsp_t/pm-comment.sh"
+printf '#!/usr/bin/env bash\nPM_SCRUB="%s"\n' "${bsp_line% }" > "$bsp_t/pm-one-line.sh"
+sed '/^PM_SCRUB="/,/# note GATE_SELECTION$/s/ GATE_SELECTION\([ "]\)/\1/' "$bsp_t/pm-comment.sh" > "$bsp_t/pm-comment-cut.sh"
+sed "s/ $bsp_last\"\$/ bad-name $bsp_last\"/" "$bsp_pm" > "$bsp_t/pm-bad.sh"
+for bsp_c in pm-comment pm-one-line; do
+  a=$((a+1))
+  bsp_cw=$(awk "$bsp_pm_read" "$bsp_t/$bsp_c.sh" | tr -s ' \t' '\n\n' | grep .)
+  { [ "$bsp_cw" = "$bsp_words" ] && [ "$(printf '%s\n' "$bsp_words" | grep -c .)" -gt 1 ] \
+    && { [ "$bsp_c" != pm-comment ] || [ "$(grep -c '"  # note GATE_SELECTION$' "$bsp_t/$bsp_c.sh")" = 1 ]; } \
+    && check_bar_scrub_parity "$bsp_hook" "$bsp_t/$bsp_c.sh" "$bsp_drv" >/dev/null; } \
+    || { echo "gov-canary: the PM_SCRUB reader over $bsp_c did not read exactly the base list: $(printf '%s' "$bsp_cw" | tr '\n' ' ')"; fail=1; }
+done
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/pm-comment-cut.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut and named by a trailing comment passed the scrub parity arm"; fail=1; }
+{ printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* lacks GATE_SELECTION$' && grep -q '# note GATE_SELECTION$' "$bsp_t/pm-comment-cut.sh"; } \
+  || { echo "gov-canary: a PM_SCRUB copy with GATE_SELECTION cut, named by a trailing comment, was not named for it: $bsp_out"; fail=1; }
+a=$((a+1))
+bsp_out=$(check_bar_scrub_parity "$bsp_hook" "$bsp_t/pm-bad.sh" "$bsp_drv") \
+  && { echo "gov-canary: a PM_SCRUB copy holding bad-name passed the scrub parity arm"; fail=1; }
+printf '%s\n' "$bsp_out" | grep -q '^PM_SCRUB in .* holds bad-name, outside ' \
+  || { echo "gov-canary: a PM_SCRUB copy holding bad-name was not named for the token grammar: $bsp_out"; fail=1; }
+# TOOL-dWitnessedBar-67 AC4 (S4): the reader is graded on the tree, not on itself. Over the shipped file
+# and the `pm-comment` copy, bash evaluates, in a subshell, exactly the lines the reader spans, from the
+# `PM_SCRUB="` line to the line holding the closing quote, and its word list must equal the reader's,
+# first word `GIT_DIR`, last word bash's own. The evaluated list is folded with post-merge's own
+# newline-to-space fold before it prints, so the compare reuses the fold the reader's header names as
+# its seam (TOOL-dWitnessedBar-73 S22). RED against the reader without its `exit`, which keeps the
+# text after the closing quote: the words it reads past bash's are named.
+for bsp_c in "$bsp_pm" "$bsp_t/pm-comment.sh"; do
+  a=$((a+1))
+  bsp_span=$(awk '!on && /^PM_SCRUB="/ { on = 1; s = NR; sub(/^PM_SCRUB="/, "") }
+    on && index($0, "\"") { print s "," NR; exit }' "$bsp_c")
+  bsp_bw=$( [ -n "$bsp_span" ] && eval "$(sed -n "${bsp_span}p" "$bsp_c")" && printf '%s\n' ${PM_SCRUB//$'\n'/ } )
+  bsp_rw=$(awk "$bsp_pm_read" "$bsp_c" | tr -s ' \t' '\n\n' | grep .)
+  [ -n "$bsp_bw" ] && [ "$bsp_rw" = "$bsp_bw" ] && [ "${bsp_bw%%$'\n'*}" = GIT_DIR ] \
+    || { echo "gov-canary: over ${bsp_c##*/} lines ${bsp_span:-none}, the PM_SCRUB reader's words are not the words bash evaluates (first '${bsp_bw%%$'\n'*}', last '${bsp_bw##*$'\n'}'); read past bash's: $(diff <(printf '%s\n' "$bsp_bw") <(printf '%s\n' "$bsp_rw") | sed -n 's/^> //p' | tr '\n' ' ' | cut -c1-400)"; fail=1; }
+done
+# TOOL-dWitnessedBar-67 AC15 (S17): that re-read holds only while `PM_SCRUB` has one statement, so a second
+# assignment, an append or a substitution after it reds here, naming the count. The evaluated compare
+# reuses post-merge's fold, and the awk reader is the re-derivation this count guards. With comment
+# lines dropped first, the count reads every statement form (TOOL-dWitnessedBar-73 S12): a plain,
+# `export`, `declare`, `readonly`, `local` or `typeset` assignment or append, after a line start, a
+# space or a `;`, `&` or `|`, a `printf -v PM_SCRUB` and a `read` naming it. It counts LINES, so two
+# writes on one line count once.
+a=$((a+1))
+bsp_n=$(grep -v '^[[:space:]]*#' "$bsp_pm" | grep -cE '(^|[;&|[:space:]])((export|declare|readonly|local|typeset)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+)?PM_SCRUB\+?=|printf[[:space:]]+-v[[:space:]]+PM_SCRUB([[:space:]]|$)|(^|[;&|[:space:]])read([[:space:]]+-[a-zA-Z]+)*[^#;]*[[:space:]]PM_SCRUB([[:space:]]|$)')
+[ "$bsp_n" = 1 ] || { echo "gov-canary: PM_SCRUB has $bsp_n assignment statements in $bsp_pm, not 1, so the arm's re-read of one assignment's text no longer reads the list post-merge runs"; fail=1; }
+rm -rf "$bsp_t"
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then

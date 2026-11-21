@@ -70,6 +70,15 @@ How you work:
   you saw, and what would decide it. You cannot ask, and a question is a stall.
 - Cite, never ingest: the card carries `path:lo-hi — why` rows and record ids, not the bytes behind
   them.
+- Handed a request to place, return one disposition from the loop's closed set with the build it
+  names, a one-line reason, its evidence as `path:lo-hi` rows and record ids joined by `; `, and each
+  observation the request claims joined the same way, or `none`. Add `scenarios`, every scenario
+  whose admission predicate holds over the request, `+` joined in the composition's order, and
+  `facts`, the request facts you read as `<name>=<value>` pairs joined by `; `, each with its row in
+  `evidence`; the `entry` fact is derived from the disposition, so leave it out. Write them as `key:
+  value` lines, `disposition`, `build`, `playbook`, `reason`, `evidence`, `observations`, `scenarios`
+  and `facts`: the loop kit's `placement.py place` reads that block, and its `check` re-reads every
+  fact you cite from source and re-runs every scenario predicate.
 
 Done means every section of the card is filled from something you ran or read, and every open row
 names its options.

@@ -1694,11 +1694,12 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
 
 
 def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
-    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 and the 7h ceiling clause
-    were observed red only by hand-staged breaks that left nothing behind. Five breaks in a COPY of gov,
-    sharing runs where the lines they red are disjoint, each asserted on the ONE line that names it:
-    the subject-pin ratchet and the stale-exemption check red on several of the same breaks, so a
-    whole-output substring could pass on the wrong line."""
+    """DEPL-aBenchedProbe-4 (closing review H-M2 and H-L1) — selfcheck 7j4 was observed red only by
+    hand-staged breaks that left nothing behind. Breaks in a COPY of gov, sharing a run where the lines
+    they red are disjoint, each asserted on the ONE line that names it: the subject-pin ratchet reds on
+    the same breaks, so a whole-output substring could pass on the wrong line. The descriptor-against-
+    manifest plants this run once held moved with their arms to `<prefix>/run-gates/leg_factory.py
+    --selftest` (TOOL-dWitnessedBar-11 §4 "The plants")."""
     desc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "push-main.kit.toml"
     man = gcopy / PFX / "gate-legs.json"
     keep = {f: f.read_bytes() for f in (desc, man)}
@@ -1713,47 +1714,34 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
     def check_line(out: str, *parts: str) -> bool:
         return any(all(p in ln for p in parts) for ln in out.splitlines())
 
-    # Run 1: a1 (subject repo in descriptor AND manifest), a2 (a filename-shaped exempt row loses its
-    # chunk), and the 7h ceiling at 1781. Each reds a different line.
+    # Run 1: a1 (subject repo in descriptor AND manifest) and a2 (a filename-shaped exempt row loses
+    # its chunk), 7j4's two, each reds a different line.
     write_staged(desc, f'name = "{leg}"\nsubject = "kit"', f'name = "{leg}"\nsubject = "repo"', "a1 descriptor")
     write_staged(man, '"subject": "kit",\n    "ceiling": 1780', '"subject": "repo",\n    "ceiling": 1780',
           "a1 manifest")
     write_staged(man, '"chunk": "declarations",\n    "subject": "repo",\n    "ceiling": 1840',
           '"subject": "repo",\n    "ceiling": 1840', "a2 marker contracts chunk")
-    write_staged(desc, "ceiling = 1780", "ceiling = 1781", "b ceiling 1781")
     r1 = run_selfcheck(gcopy)
     o1 = r1.stdout + r1.stderr
     check("[aBP-4] a1: 7j4 reds a held self-test declared repo, naming entry and leg",
           r1.returncode != 0 and check_line(o1, "7j4:", f"entry 'push-main' gate leg '{leg}'"), o1[-1500:])
     check("[aBP-4] a2: 7j4 reds a chunkless filename-shaped leg, naming it and its argv element",
           check_line(o1, "7j4:", "'marker contracts'", "marker-contract.test.sh"), o1[-1500:])
-    check("[aBP-4] b: 7h reds a descriptor ceiling of 1781 against the manifest",
-          check_line(o1, "entry 'push-main'", f"gate leg '{leg}' with ceiling 1781"), o1[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
-    # Run 2: the 7h ceiling as a bool, which an int-only check must refuse.
-    write_staged(desc, "ceiling = 1780", "ceiling = true", "b ceiling true")
-    r2 = run_selfcheck(gcopy)
-    o2 = r2.stdout + r2.stderr
-    check("[aBP-4] b: 7h reds a descriptor ceiling of true",
-          r2.returncode != 0 and check_line(o2, "entry 'push-main'", f"gate leg '{leg}' with ceiling True"),
-          o2[-1500:])
+    # Run h (TOOL-dWitnessedBar-19 AC4): 7h's purpose presence arm, the one arm of its purpose block
+    # selfcheck keeps until TOOL-dWitnessedBar-51 S8 (TOOL-dWitnessedBar-11 §8 F8): an exempt leg with
+    # no purpose reds presence, naming it. Shape and uniqueness are the leg factory's `purpose` arm.
+    _pu = {x["name"]: x.get("purpose") for x in json.loads(man.read_text(encoding="utf-8"))}
+    _c = "build-method size"
+    write_staged(man, f'    "purpose": {json.dumps(_pu[_c])},\n', "", "h3 exempt none")
+    rh = run_selfcheck(gcopy)
+    out_h = rh.stdout + rh.stderr
+    check("[dWB-19] h3: 7h reds an exempt leg with no purpose, naming it and the presence arm",
+          rh.returncode != 0 and check_line(out_h, f"gate leg '{_c}' carries no `purpose`", "presence arm"),
+          out_h[-1500:])
     for f, b in keep.items():
         f.write_bytes(b)
-    # Runs d and e (TOOL-dDeclaredLoop-46 AC4): 7h compares `stage` presence included, so a
-    # descriptor value the manifest does not hold reds, and so does the key taken off the table.
-    _st = next(x for x in json.loads(man.read_text(encoding="utf-8")) if x.get("name") == leg)["stage"]
-    _anchor = f"ceiling = 1780\nstage = {json.dumps(_st)}"
-    for tag, new, shown in (("d", 'ceiling = 1780\nstage = ["step.disagree"]', "['step.disagree']"),
-                            ("e", "ceiling = 1780", "None")):
-        write_staged(desc, _anchor, new, f"{tag} stage")
-        rs = run_selfcheck(gcopy)
-        out_st = rs.stdout + rs.stderr
-        check(f"[dDL-46] {tag}: 7h reds a descriptor stage of {shown} against the manifest's, naming both",
-              rs.returncode != 0 and check_line(out_st, "entry 'push-main'", f"gate leg '{leg}' with stage {shown}",
-                                                f"says {_st!r}"), out_st[-1500:])
-        for f, b in keep.items():
-            f.write_bytes(b)
     # Run 3 (c, H-L1): no manifest. 7h's block is skipped, so 7j4 must still answer for itself, and
     # with the dead pre-initialisation gone a reader outside its own guard would raise here.
     man.unlink()
@@ -1767,6 +1755,166 @@ def check_benched_probe_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
     r4 = run_selfcheck(gcopy)
     check("[aBP-4] ...and the restored copy is green", r4.returncode == 0,
           (r4.stdout + r4.stderr)[-1500:])
+
+
+def check_when_forms_agree(gcopy: pathlib.Path, run_selfcheck) -> None:
+    """TOOL-dWitnessedBar-54 S3, TOOL-dWitnessedBar-62 S1 to S3 and S22 — a `[[generated]]` row's `when`
+    has three readers: run-gates' `regen.check_when` through `build_items`, the unattended kit's
+    `resolve_generated_indexes`, and selfcheck 6c. Rows are planted in a COPY of gov's run-gates
+    descriptor, one tree at a time. The ADMISSIBLE tree holds conf true, conf false, `exists:` present
+    and `exists:` absent, and TOOL-dWitnessedBar-65 S1's controls `a/b`, `a..b/c` and `.x/y`, each
+    naming no file, each carrying `write`, `check` and `stage`, and no refused form: regen reads
+    them TOGETHER, and its kept paths must equal the shell reader's kept pairs, with selfcheck refusing
+    none. Each REFUSED form, an unknown token, an empty `exists:` path, a `when` of neither form, an
+    absolute `exists:` path, one holding a `..` segment, the backslash, UNC and colon paths of
+    TOOL-dWitnessedBar-63 AC5, and TOOL-dWitnessedBar-65 S1's `a\\..\\b`, `a/..`, `x/..`, `1:x`, `C:x`,
+    `.` and `./.`, sits ALONE in its own tree beside one
+    conf-true row, because one refused row refuses its whole descriptor in regen: regen raises naming
+    the row, the shell reader names the descriptor and the `when` on stderr and keeps the conf-true
+    row, and selfcheck refuses the row. A row lacking `write`, `check` and `stage` is skipped by regen
+    before its `when` is read and kept by the shell reader, so the two cannot be compared on it: it is
+    printed `not compared <descriptor> <path>` and left out. WHAT IT DOES NOT CHECK: that disagreement
+    on such a row, which the memory-tree descriptor's own comment names (the shell readers match only
+    `path`, `generator` and `when`); and a fourth reader of the key, which this arm holds only once it
+    joins it."""
+    import tomllib  # noqa: PLC0415
+    rk = KIT_NAMES["run-gates"]
+    kit_rel = f"{PFX}{rk}"
+    desc = gcopy / kit_rel / "kit.toml"
+    here = f"{kit_rel}/kit.toml"
+    conf = gcopy / "w54.conf"
+    keep = desc.read_bytes()
+    # TOOL-dWitnessedBar-65 S1: three admitted controls, each naming no file, so a reader refusing one
+    # shows as a Refusal, a skip line or a selfcheck failure on the admissible tree.
+    admissible = {"conf-true": "w54.conf:W54=on", "conf-false": "w54.conf:W54=off",
+                  "present": f"exists:{{prefix}}/{rk}/regen.py", "absent": "exists:{kit}/w54-absent.txt",
+                  "ctl-plain": "exists:a/b", "ctl-dots-inside": "exists:a..b/c", "ctl-dot-lead": "exists:.x/y"}
+    # The `..` form names a file that exists, so a reader without the containment test KEEPS it.
+    # TOOL-dWitnessedBar-63 AC5 (S9 to S11): five Windows path forms, spelled as the TOML source text,
+    # which the shell reader reads raw and tomllib unescapes, so the shell sees `\\` where regen and
+    # selfcheck see `\`. RED against a shell reader without its backslash fold, which tests `..\\x` as a
+    # path that does not exist and skips it silently, naming nothing.
+    refused = {"unknown-token": "exists:{nope}/regen.py", "empty-path": "exists:", "no-colon": "W54=on",
+               "absolute": f"exists:/{rk}/regen.py", "dotdot": f"exists:{{kit}}/../{rk}/regen.py",
+               "bs-dotdot": r"exists:..\\x", "bs-inner": r"exists:a\\..\\..\\x", "bs-rooted": r"exists:\\x",
+               "unc": r"exists:\\\\server\\share", "colon": "exists:a:b",
+               # TOOL-dWitnessedBar-65 S1, S2: the one rule's remaining refused forms, a backslash `..`
+               # segment, a trailing `..`, a colon after a digit or a drive letter, and two paths that
+               # normalise to `.`, which the shell reader kept until S2 (§8 F5).
+               "bs-segment": r"exists:a\\..\\b", "trail-dotdot": "exists:a/..", "x-dotdot": "exists:x/..",
+               "digit-colon": "exists:1:x", "drive-rel": "exists:C:x", "dot": "exists:.", "dot-slash-dot": "exists:./."}
+    conf.write_text("W54=on\n", encoding="utf-8", newline="\n")
+
+    def render_w62_rows(forms: dict, bare: bool) -> str:
+        text = "".join(
+            f'\n[[generated]]\npath = "{{kit}}/w54-{lbl}.out"\ngenerator = "leg_factory.py"\n'
+            f'why = "the when-form parity fixture"\nwrite = ["python", "{{kit}}/leg_factory.py", "--write"]\n'
+            f'check = ["python", "{{kit}}/leg_factory.py", "--check"]\nstage = 1\nwhen = "{w}"\n'
+            for lbl, w in forms.items())
+        if bare:
+            text += ('\n[[generated]]\npath = "{kit}/w54-bare.out"\ngenerator = "leg_factory.py"\n'
+                     'why = "the when-form parity fixture, a row regen never reads"\nwhen = "w54.conf:W54=on"\n')
+        return text
+
+    def read_w62_tree(forms: dict, bare: bool = False, extra: str = ""):
+        """-> (regen's kept labels or its Refusal text, the shell run, the selfcheck run, not compared);
+        `extra` is descriptor text appended after the rows."""
+        desc.write_bytes(keep + (render_w62_rows(forms, bare) + extra).encode("utf-8"))
+        spec = importlib.util.spec_from_file_location("w54_regen", gcopy / kit_rel / "regen.py")
+        rg = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rg)
+        planted = [r for r in tomllib.loads(desc.read_text(encoding="utf-8")).get("generated", [])
+                   if "/w54-" in str(r.get("path"))]
+        uncompared = [r for r in planted if not any(k in r for k in ("write", "check", "stage"))]
+        for r in uncompared:
+            print(f"      not compared {here} {r['path']}")
+        try:
+            items = rg.build_items(gcopy, PFX.rstrip("/"), [(kit_rel, {"generated": planted})], [])
+            by_regen = {o.split("/w54-", 1)[1].removesuffix(".out")
+                        for i in items for o in i["outputs"] if "/w54-" in o}
+        except rg.Refusal as e:
+            by_regen = str(e)
+        argv = govkit_module().resolve_shell_argv(
+            ["bash", "-c", f'. ./{PFX}{KIT_NAMES["unattended"]}/lib-unattended.sh && '
+             'resolve_generated_indexes "$PWD" "" memory'])
+        sh = subprocess.run(argv, cwd=str(gcopy), capture_output=True, text=True, encoding="utf-8",
+                            errors="replace", timeout=120)
+        return by_regen, sh, run_selfcheck(gcopy), {r["path"].split("/w54-", 1)[1][:-4] for r in uncompared}
+
+    def extract_labels(sh, forms) -> set:
+        return {lbl for lbl in forms if f"{kit_rel}/w54-{lbl}.out:" in sh.stdout}
+
+    def extract_refused(sc, forms) -> set:
+        return {lbl for lbl in forms if f"[[generated]] row {{kit}}/w54-{lbl}.out:" in sc.stdout}
+    try:
+        # S2 — the admissible tree, read together, beside one row no regen reads.
+        by_regen, sh, sc, uncompared = read_w62_tree(admissible, bare=True)
+        check("[dWB-62 AC1] regen reads the admissible tree together and keeps the conf-true and "
+              "present-path rows only", by_regen == {"conf-true", "present"}, str(by_regen))
+        check("[dWB-62 AC1] the shell reader keeps the rows regen keeps",
+              extract_labels(sh, admissible) == by_regen, f"shell {extract_labels(sh, admissible)} vs "
+              f"regen {by_regen}\n{sh.stdout[-800:]}\n{sh.stderr[-800:]}")
+        check("[dWB-62 AC1] the row lacking write, check and stage is printed not compared and left out",
+              uncompared == {"bare"} and "bare" not in (by_regen if isinstance(by_regen, set) else set()),
+              str(uncompared))
+        check("[dWB-62 AC1] the shell reader names no admissible row on stderr, and selfcheck refuses none",
+              not any(f"{here} declares" in ln for ln in sh.stderr.splitlines())
+              and not extract_refused(sc, admissible), sh.stderr[-800:] + sc.stdout[-800:])
+        seen = [(lbl, w, by_regen, sh, sc) for lbl, w in admissible.items()]
+        # S3, S21, S22 — each refused form alone beside one conf-true row.
+        graded = 0
+        for lbl, w in refused.items():
+            forms = {"conf-true": admissible["conf-true"], lbl: w}
+            by_regen, sh, sc, _u = read_w62_tree(forms)
+            check(f"[dWB-62 AC2] regen raises Refusal naming the {lbl} row",
+                  isinstance(by_regen, str) and f"w54-{lbl}.out" in by_regen, str(by_regen))
+            check(f"[dWB-62 AC2] the shell reader names the descriptor and the {lbl} when on stderr and "
+                  f"keeps the conf-true row only",
+                  any(f"{here} declares" in ln and ln.endswith(f"skipped: {w}") for ln in sh.stderr.splitlines())
+                  and extract_labels(sh, forms) == {"conf-true"}, f"{sh.stdout[-600:]}\n{sh.stderr[-800:]}")
+            check(f"[dWB-62 AC2] selfcheck refuses the {lbl} row and no other planted row",
+                  sc.returncode != 0 and extract_refused(sc, forms) == {lbl}, sc.stdout[-1200:])
+            if lbl == "empty-path":
+                check("[dWB-54 AC2] selfcheck refuses the empty exists: when, naming both forms",
+                      any(f"[[generated]] row {{kit}}/w54-{lbl}.out:" in ln
+                          and "a when shaped <conf>:<KEY>=<value> or exists:<path>" in ln
+                          for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+            if lbl == "dotdot":
+                # TOOL-dWitnessedBar-65 AC2 (S20): the `a/../b` row's failure line is selfcheck's own,
+                # naming the entry, the row and the `exists:` path; `demand_contained_dest`'s Refusal,
+                # whose hint names `deploy.toml`, never reaches it.
+                check("[dWB-65 AC2] selfcheck's line for the a/../b row names the entry, the row and the "
+                      "exists: path, and no deploy.toml",
+                      any("entry 'run-gates'" in ln and f"row {{kit}}/w54-{lbl}.out:" in ln and repr(w) in ln
+                          and "deploy.toml" not in ln for ln in sc.stdout.splitlines()), sc.stdout[-1200:])
+            seen.append((lbl, w, by_regen, sh, sc))
+            graded += 1
+        check("[dWB-62 AC2] [dWB-63 AC5] [dWB-65 AC1] every refused form was read in its own tree",
+              graded == len(refused) == 17, f"{graded} of {len(refused)}")
+        # TOOL-dWitnessedBar-65 S1: one line per form, its three readers' outcomes side by side.
+        for lbl, w, by_regen, sh, sc in seen:
+            o_regen = ("refused" if isinstance(by_regen, str) and f"w54-{lbl}.out" in by_regen
+                       else "kept" if isinstance(by_regen, set) and lbl in by_regen else "not kept")
+            o_shell = ("refused" if any(f"{here} declares" in ln and ln.endswith(f"skipped: {w}")
+                                        for ln in sh.stderr.splitlines())
+                       else "kept" if lbl in extract_labels(sh, {lbl: w}) else "not kept")
+            o_self = "refused" if extract_refused(sc, {lbl: w}) else "admitted"
+            print(f"      form {lbl} {w}: regen {o_regen} · shell {o_shell} · selfcheck {o_self}")
+        # TOOL-dWitnessedBar-63 AC14 (S22): a row carrying a path and `when = "exists:"` and no generator,
+        # beside one conf-true row. The shell reader reads each row whole and grades the `when` before the
+        # generator, so it names the descriptor and the `when` and keeps the conf-true row only. RED
+        # against a TAB-IFS read, which folds the empty generator so the `when` lands in its place and
+        # the row is kept.
+        nogen = '\n[[generated]]\npath = "{kit}/w54-nogen.out"\nwhy = "a generator-less row"\nwhen = "exists:"\n'
+        forms = {"conf-true": admissible["conf-true"]}
+        _r, sh, _sc, _u = read_w62_tree(forms, extra=nogen)
+        check("[dWB-63 AC14] a generator-less row whose when is exists: alone: the shell reader names the "
+              "descriptor and the when on stderr and keeps the conf-true row only",
+              any(f"{here} declares" in ln and ln.endswith("skipped: exists:") for ln in sh.stderr.splitlines())
+              and extract_labels(sh, {**forms, "nogen": ""}) == {"conf-true"}, f"{sh.stdout[-600:]}\n{sh.stderr[-800:]}")
+    finally:
+        desc.write_bytes(keep)
+        conf.unlink(missing_ok=True)
 
 
 def check_update_safety(tmp: pathlib.Path) -> None:
@@ -2744,6 +2892,37 @@ def check_ceiling_emission(tmp: pathlib.Path) -> None:
                                             floor=gk.STAGE_FLOOR_RUN_GATES) is want, ver)
     check("ST1: the manifest writer routes the stage through its own floor",
           "floor=STAGE_FLOOR_RUN_GATES)" in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-12 AC6: the tag's row of LEG_KEY_FLOORS, one minor below it and at it, derived
+    # from the table so a later raise moves both sides; and the writer reads that row.
+    _fl = gk.LEG_KEY_FLOORS["tag"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"TG1: a target at run-gates {ver} {'gets' if want else 'does not get'} a tag",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["tag"]) is want, ver)
+    check("TG1: the manifest writer routes the tag through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["tag"])' in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-19 AC8: the purpose's row of LEG_KEY_FLOORS, the same pair, and the writer reads it.
+    _fl = gk.LEG_KEY_FLOORS["purpose"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"PU1: a target at run-gates {ver} {'gets' if want else 'does not get'} a purpose",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["purpose"]) is want, ver)
+    check("PU1: the manifest writer routes the purpose through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["purpose"])' in GOVKIT.read_text(encoding="utf-8"), "")
+    # TOOL-dWitnessedBar-10 AC6: the precommit's row of LEG_KEY_FLOORS, the same pair, and the writer reads it.
+    _fl = gk.LEG_KEY_FLOORS["precommit"]
+    for ver, want in ((".".join(map(str, _fl[:-1] + (_fl[-1] - 1,))), False), (".".join(map(str, _fl)), True)):
+        _rgs.write_text(f"#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION={ver}\n",
+                        encoding="utf-8", newline="\n")
+        check(f"PC1: a target at run-gates {ver} {'gets' if want else 'does not get'} a precommit",
+              gk.check_target_reads_subject(_rg, {"prefix": PFX[:-1]},
+                                            floor=gk.LEG_KEY_FLOORS["precommit"]) is want, ver)
+    check("PC1: the manifest writer routes the precommit through its row of LEG_KEY_FLOORS",
+          'floor=LEG_KEY_FLOORS["precommit"])' in GOVKIT.read_text(encoding="utf-8"), "")
 
     # AC1/AC3: an applied push-main carries 1780 on the declaring leg, row and receipt, and no other.
     t = tmp / "ceiling-install"
@@ -2981,9 +3160,10 @@ def check_roles_default() -> None:
 
 def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = False) -> None:
     """TOOL-aOrientedCast-8 S10, AC4 and AC6: a DEFAULT apply into a scratch target renders the roles
-    kit — the role index, nine agent types, ten seeded house overlays and the `/build` Skill — its
-    `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then `UNWIRED`
-    once the index is gone. The target holds a governing doc at the path the memory-tree seed writes
+    kit — the role index, one agent type per agent role, the seeded house overlays and the `/build`
+    Skill — its `--check` reads fresh, and the target's own wiring checker reads `ok` for roles, then
+    `UNWIRED` once the index is gone. Both roster counts are the source kit's, read rather than typed
+    (TOOL-dWitnessedBar-23 S6). The target holds a governing doc at the path the memory-tree seed writes
     as `CHARTER`, copied from gov's own `AGENTS.md`, because the shape lands the playbook elsewhere.
     With `charter=False` it holds none, and this asserts AC13 instead: the apply still exits 0 through
     the adopter's accepted exit 3, the Skill alone is rendered, and check-wiring names the doc.
@@ -3049,9 +3229,25 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
         return
     agents = sorted(p.name for p in (t / ".claude" / "agents").glob("gov-*.md"))
     check("OC8 AC4 ...renders the role index", (t / ".claude" / "roles.json").is_file(), str(agents))
-    check("OC8 AC4 ...renders nine agent types, one per agent role", len(agents) == 9, str(agents))
-    check("OC8 AC4 ...seeds ten house overlays", len(list((kit / "house").glob("*.md"))) == 10,
-          str(sorted(p.name for p in (kit / "house").glob("*.md"))))
+    # TOOL-dWitnessedBar-23 S6: the roster is DERIVED from the source kit, never typed beside it — the
+    # agent-true roles of its `agents/*.agent.md`, read by the kit's own loader, and the `house/*.md`
+    # entries of its descriptor's seed list. Both are read from the gov tree, not the target, so the
+    # install is graded against what it was handed.
+    import tomllib  # noqa: PLC0415
+    _rspec = importlib.util.spec_from_file_location("roles_lib_roster", KIT_DIRS["roles"] / "roles_lib.py")
+    _rlib = importlib.util.module_from_spec(_rspec)
+    _rspec.loader.exec_module(_rlib)
+    want_agents = sorted("%s.md" % s for s, r in _rlib.load_roles(KIT_DIRS["roles"]).items()
+                         if r["keys"].get("agent", "true") != "false")
+    _seeds = [x for f in tomllib.loads((KIT_DIRS["roles"] / "kit.toml").read_text(encoding="utf-8"))["files"]
+              if f.get("role") == "seed"
+              for x in (f["include"] if isinstance(f["include"], list) else [f["include"]])]
+    want_house = sorted(x[len("house/"):] for x in _seeds if x.startswith("house/") and x.endswith(".md"))
+    check("OC8 AC4 ...renders one agent type per agent role (%d)" % len(want_agents), agents == want_agents,
+          "rendered %s, agent roles %s" % (agents, want_agents))
+    house = sorted(p.name for p in (kit / "house").glob("*.md"))
+    check("OC8 AC4 ...seeds one house overlay per seed-list entry (%d)" % len(want_house),
+          bool(want_house) and house == want_house, "seeded %s, seed list %s" % (house, want_house))
     check("OC8 AC4 ...and renders the /build Skill", (t / ".claude" / "skills" / "build" / "SKILL.md").is_file(),
           "absent")
     ck = subprocess.run([govkit_module().resolve_bash(), str(kit / "adopt-roles.sh"), "--check"], cwd=str(t),
@@ -3919,6 +4115,26 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_kickoff_facts_step() -> None:
+    """TOOL-dPlacedRequest-9 AC1 AC3 AC4 AC5 AC6 AC7 AC9, and the step's and the verb's refusals — the step's `--fixture --plant <case>` for every
+    case it declares, each under `-I` as the runner runs a step, each in its own throwaway repository: an
+    exit 0 and no FAIL line is the case held. The cases are read from the step's own usage refusal, so a
+    joining plant arms its own case here."""
+    step_py = HERE / "steps" / "kickoff_facts_to_overlay.py"
+    probe = subprocess.run([sys.executable, "-I", str(step_py), "--fixture", "--plant", "?"], capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", timeout=120)
+    found = _re.search(r"the plants are (.+)$", probe.stderr, _re.M)
+    cases = found[1].split(", ") if found else []
+    check("[dPR-9] LIVENESS the step names its fixture's plants, sixteen of them", probe.returncode == 2
+          and len(cases) == 16, probe.stdout + probe.stderr)
+    for case in cases:
+        p = subprocess.run([sys.executable, "-I", str(step_py), "--fixture", "--plant", case], capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", timeout=900)
+        check(f"[dPR-9] the step's fixture case {case} holds: exit 0 and no FAIL line",
+              p.returncode == 0 and not _re.search(r"^FAIL ", p.stdout, _re.M) and " · 0 failed" in p.stdout,
+              p.stdout + p.stderr)
+
+
 def check_review_rounds_step(tmp: pathlib.Path) -> None:
     """TOOL-dDeclaredLoop-21 AC7 — S7's up, down and witness argvs over scratch targets, each run under
     `-I` as the runner runs it, with every `raise Refusal` site of `review_rounds.py` and of the shared
@@ -4022,6 +4238,226 @@ def check_review_rounds_step(tmp: pathlib.Path) -> None:
     got = steps.render_policy_text("[review]\nmax-rounds = 5\n", "review.design", "round-count", 5)
     check("[dDL-21 S8] render_policy_text sets a key under a dotted table and reads it back",
           got == "[review]\nmax-rounds = 5\n\n[review.design]\nround-count = 5\n", repr(got))
+
+
+def check_inherited_red_step(tmp: pathlib.Path) -> None:
+    """TOOL-dWitnessedBar-44 AC1 AC2 AC3 — `inherited_red.py` reads `INHERITED_RED` from both files
+    the kit before it read, the hook's `.githooks/gate-env.sh` and the driver's `GATE_POLICY_FILE`,
+    and maps every value the pre-step readers accepted: `land` alone to `own-mixed-contended`, any
+    other value and an off-tree `GATE_POLICY_FILE` to `every-red`, two files to the stricter. Each
+    verb runs under `-I` as the runner runs it. RED against the step that read the gate file alone:
+    AC1's custom file writes nothing, and an off-table value refuses. TOOL-dWitnessedBar-55 AC1 to
+    AC4 follow: the line rule of the hook's `read_policy_key`, held to a live cut of that function."""
+    import tomllib  # noqa: PLC0415
+    step_py = HERE / "steps" / "inherited_red.py"
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_blocks(t: pathlib.Path):
+        p = t / ".governance" / "policy.toml"
+        return tomllib.loads(p.read_text(encoding="utf-8")).get("verdict", {}).get("blocks") if p.is_file() else None
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {q.relative_to(t).as_posix(): q.read_bytes() for q in t.rglob("*")
+                if q.is_file() and ".git" not in q.relative_to(t).parts}
+
+    t = build_target(tmp, None, "ir-ac1", {".unattended.conf": 'GATE_POLICY_FILE="ops/gate-policy.sh"\n',
+                                          "ops/gate-policy.sh": "A=1\nINHERITED_RED=park  # was\n"})
+    w0, up = run_step("witness", t), run_step("up", t)
+    w1 = run_step("witness", t)
+    check("[dWB-44 AC1] a custom GATE_POLICY_FILE holding park, no gate-env.sh: the up writes "
+          "verdict.blocks every-red, takes the line out of the custom file, and its witness exits 1 "
+          "before and 0 after naming it",
+          up.returncode == 0 and read_blocks(t) == "every-red"
+          and (t / "ops" / "gate-policy.sh").read_bytes() == b"A=1\n"
+          and w0.returncode == 1 and w1.returncode == 0 and "ops/gate-policy.sh" in w1.stdout,
+          w0.stdout + up.stdout + up.stderr + w1.stdout)
+
+    for tag, value, want in (("park", "Park", "every-red"), ("land-uc", "LAND", "every-red"),
+                             ("bogus", "bogus", "every-red"), ("land", "land", "own-mixed-contended")):
+        t = build_target(tmp, None, f"ir-ac2-{tag}", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                                      "ops/p.sh": f"INHERITED_RED={value}\n"})
+        up = run_step("up", t)
+        check(f"[dWB-44 AC2] INHERITED_RED={value}: the up writes {want} and its witness holds after",
+              up.returncode == 0 and read_blocks(t) == want and run_step("witness", t).returncode == 0,
+              up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir-ac2-off", {".unattended.conf": "GATE_POLICY_FILE=/etc/x\n",
+                                               ".githooks/gate-env.sh": "INHERITED_RED=land\n"})
+    up = run_step("up", t)
+    check("[dWB-44 AC2] a GATE_POLICY_FILE of /etc/x beside gate-env.sh's land: the up writes every-red, "
+          "as the driver read the off-tree path",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
+
+    t = build_target(tmp, None, "ir-ac3", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                           ".githooks/gate-env.sh": "A=1\nINHERITED_RED=land\n",
+                                           "ops/p.sh": "INHERITED_RED=park\nB=2\n"})
+    pre = read_tree(t)
+    up, w1 = run_step("up", t), run_step("witness", t)
+    lines = [ln for ln in w1.stdout.splitlines() if ln.strip()]
+    check("[dWB-44 AC3] gate-env.sh land beside a GATE_POLICY_FILE holding park: the up writes the "
+          "stricter every-red and its witness prints two lines naming both files and values",
+          up.returncode == 0 and read_blocks(t) == "every-red" and w1.returncode == 0 and len(lines) == 2
+          and ".githooks/gate-env.sh" in lines[0] and "=land" in lines[0]
+          and "ops/p.sh" in lines[1] and "=park" in lines[1], up.stdout + up.stderr + w1.stdout)
+    down = run_step("down", t)
+    check("[dWB-44 AC3] the down restores both files byte for byte",
+          down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+    # TOOL-dWitnessedBar-55 AC1 to AC3: the step takes the line the pre-step readers took, the last
+    # one beginning exactly `INHERITED_RED=`. RED against the reader over `build_line_re`, which
+    # read the indented and spaced lines and named no line it skipped.
+    gate = ".githooks/gate-env.sh"
+    t = build_target(tmp, None, "ir55-ac1", {gate: "INHERITED_RED=land\nINHERITED_RED=park\n"})
+    up = run_step("up", t)
+    check("[dWB-55 AC1] land then park: the up writes every-red, the last assignment, and takes both out",
+          up.returncode == 0 and read_blocks(t) == "every-red" and b"INHERITED_RED" not in (t / gate).read_bytes(),
+          up.stdout + up.stderr)
+    for tag, body in (("export", "export INHERITED_RED=park\n"),
+                      ("empty-last", "INHERITED_RED=park\nINHERITED_RED=\n")):
+        t = build_target(tmp, None, f"ir55-ac2-{tag}", {gate: body})
+        up = run_step("up", t)
+        check(f"[dWB-55 AC2] {body!r}: the up writes no verdict.blocks",
+              up.returncode == 0 and read_blocks(t) is None, up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir55-ac3",
+                     {gate: "INHERITED_RED=land\nexport INHERITED_RED=park\nINHERITED_RED=park\n"})
+    up, w1 = run_step("up", t), run_step("witness", t)
+    check("[dWB-55 AC3] the up takes both assignments out and keeps the export line byte for byte; the "
+          "witness exits 0 naming that line as not an assignment",
+          up.returncode == 0 and (t / gate).read_bytes() == b"export INHERITED_RED=park\n"
+          and w1.returncode == 0 and f"not an assignment {gate}:1" in w1.stdout,
+          up.stdout + up.stderr + w1.stdout + w1.stderr)
+
+    # TOOL-dWitnessedBar-59 AC1 AC2: LF alone separates lines, as the hook's here-string read does, so
+    # a lone CR stays inside its line for every verb. RED against a step splitting its text with
+    # `str.splitlines()`: AC1's up takes the second half's land, and AC2's up keeps the indented half
+    # while its witness names that half as not an assignment. `run_step` reads stdout in text mode,
+    # which turns the CR into a line break, so the witness is graded by substring counts, not lines.
+    t = build_target(tmp, None, "ir59-ac1", {gate: b"A=1\nINHERITED_RED=park\rINHERITED_RED=land\nB=2\n"})
+    up = run_step("up", t)
+    check("[dWB-59 AC1] park<CR>INHERITED_RED=land on one LF line: the up reads the hook's one value "
+          "and writes every-red, never the land after the lone CR",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
+    t = build_target(tmp, None, "ir59-ac2", {gate: b"A=1\nINHERITED_RED=park\r INHERITED_RED=land\nB=2\n"})
+    w0, up = run_step("witness", t), run_step("up", t)
+    check("[dWB-59 AC2] park<CR> INHERITED_RED=land on one LF line: the witness exits 1 naming one "
+          "assignment and no stray line, and the up deletes the line whole, leaving A=1 and B=2",
+          w0.returncode == 1 and w0.stdout.count("assigns") == 1 and "not an assignment" not in w0.stdout
+          and up.returncode == 0 and (t / gate).read_bytes() == b"A=1\nB=2\n",
+          w0.stdout + up.stdout + up.stderr)
+
+    # TOOL-dWitnessedBar-57 AC12: the up reads and writes bytes, so over an LF file and a CRLF file every
+    # line it keeps is byte-identical to the before-image, line ends included, and a last line with no
+    # end stays without one. RED against a text-mode write, which turns the LF file CRLF on Windows.
+    for tag, eol in (("lf", b"\n"), ("crlf", b"\r\n")):
+        kept = [b"A=1", b"B=2  # kept", b"\tC='3'"]
+        t = build_target(tmp, None, f"ir57-ac12-{tag}",
+                         {gate: eol.join([kept[0], b"INHERITED_RED=park", kept[1], kept[2], b"D=4"])})
+        up = run_step("up", t)
+        got = (t / gate).read_bytes()
+        check(f"[dWB-57 AC12] a {tag.upper()} gate file: the up takes the assignment out and keeps every "
+              f"other line byte for byte, its {tag.upper()} line ends and its unended last line included",
+              up.returncode == 0 and got == eol.join([*kept, b"D=4"]), repr(got) + up.stdout + up.stderr)
+
+    # TOOL-dWitnessedBar-62 AC25 (S38): `witness` names a line `not an assignment` only where it opens
+    # `INHERITED_RED =`, `export` allowed, and is no assignment, so a `#`-led doc line spelling the key
+    # and an `INHERITED_RED_MAX_AGE` line are not named and an `export` line is. RED against a witness
+    # matching the key anywhere on a line, which names the doc line.
+    t = build_target(tmp, None, "ir62-ac25", {gate: "#   INHERITED_RED=park|land\nINHERITED_RED_MAX_AGE=10\n"
+                                                   "export INHERITED_RED=park\n"})
+    w62 = run_step("witness", t)
+    check("[dWB-62 AC25] the witness names the export line and neither the commented doc line nor the "
+          "INHERITED_RED_MAX_AGE line",
+          f"not an assignment {gate}:3" in w62.stdout and f"{gate}:1" not in w62.stdout
+          and f"{gate}:2" not in w62.stdout, w62.stdout + w62.stderr)
+
+    # TOOL-dWitnessedBar-55 AC4: the step's `read_value` and the hook's `read_policy_key` read one
+    # fixture set alike. The hook's function is cut by an awk range from its `read_policy_key()` line to
+    # the first column-0 `}`, UNDER the resolved bash, as the hook suite and the push-main suite's
+    # `read_parser_slice` cut it (TOOL-dWitnessedBar-62 S37): one slice rule, not a third in Python. A
+    # sentinel through the cut function proves bash ran it, and that the cut held it, before any row is
+    # graded. RED against the reader over `build_line_re` on the indented, spaced, leading-tab and BOM
+    # rows, and against a reader taking the first assignment on the first. TOOL-dWitnessedBar-59 AC3
+    # adds the `lone-cr` row, RED against a reader splitting on a lone CR. WHAT IT DOES NOT CHECK:
+    # spellings outside the set, the driver's copy of the parser (the push-main suite holds it to the
+    # hook's), and the value mapping the step applies after.
+    hook = (GOV_ROOT / ".githooks" / "pre-push").as_posix()
+    ir = importlib.util.spec_from_file_location("inherited_red_parity", step_py)
+    step = importlib.util.module_from_spec(ir)
+    ir.loader.exec_module(step)
+    d = tmp / "ir55-ac4"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "r.sh").write_bytes(rb"""eval "$(awk '/^read_policy_key\(\)/,/^}/' "$2")"
+read_policy_key "$(cat ./f)" "$1"
+""")
+
+    def read_hook_value(body: bytes, key: str) -> tuple[str | None, str]:
+        (d / "f").write_bytes(body)
+        argv = govkit_module().resolve_shell_argv(["bash", "r.sh", key, hook])
+        try:
+            p = subprocess.run(argv, cwd=str(d), capture_output=True, timeout=60)
+        except (OSError, subprocess.SubprocessError) as e:
+            return None, f"{argv!r} {e.__class__.__name__}: {e}"
+        out = p.stdout.decode("utf-8", "replace")
+        return (out if p.returncode == 0 else None), f"{argv!r} {p.stderr.decode('utf-8', 'replace')}"
+
+    got, err = read_hook_value(b"K=plain\n", "K")
+    if got != "plain":
+        check("[dWB-55 AC4] the hook's awk-cut read_policy_key reads the sentinel K=plain as plain", False,
+              f"read {got!r} {err}")
+        return
+    rows = (b"INHERITED_RED=land\nINHERITED_RED=park\n", b"export INHERITED_RED=park\n",
+            b"# INHERITED_RED=park\n", b"INHERITED_RED=park\n  INHERITED_RED=land\n",
+            b'INHERITED_RED="land"\n', b"INHERITED_RED=park  # was\n", b"INHERITED_RED=land\r\n",
+            b"INHERITED_RED=park\nINHERITED_RED=\n", b"INHERITED_RED=park\nINHERITED_RED = land\n",
+            b"INHERITED_RED=\tland\n", "﻿INHERITED_RED=land\n".encode())
+    lone_cr = b"INHERITED_RED=park\rINHERITED_RED=land\n"  # TOOL-dWitnessedBar-59 S3: one LF line
+    rows += (lone_cr,)
+    named = {lone_cr: ("lone-cr", "park\rINHERITED_RED=land")}  # row name, the hook's agreed value
+    graded = 0
+    for body in rows:
+        want, err = read_hook_value(body, "INHERITED_RED")
+        mine = step.read_value(body, gate, "INHERITED_RED") or ""
+        name, agreed = named.get(body, ("", None))
+        check(f"[dWB-55 AC4] the step's read_value and the hook's read_policy_key agree on "
+              f"{name + ' ' if name else ''}{body!r}",
+              want is not None and mine == want and (agreed is None or want == agreed),
+              f"hook {want!r} step {mine!r} {err}".strip())
+        graded += 1
+    check("[dWB-55 AC4] every row of the reader parity set was graded, lone-cr included",
+          graded == len(rows) == 12, f"{graded} of {len(rows)}")
+
+    # TOOL-dWitnessedBar-63 AC13 (S21): the step reads `.unattended.conf` as bytes, LF alone separating
+    # lines, so a conf holding `GATE_POLICY_FILE=pol-a<CR>GATE_POLICY_FILE=pol-b<LF>` resolves, byte for
+    # byte, the one path the hook's `read_policy_key` reads from it, and `pol-b`, holding land, is never
+    # read. The path is observed through `derive_reads` with the containment walk stubbed for the call,
+    # since a CR names no file on Windows and the walk refuses it there; the up then runs whole and
+    # writes no verdict.blocks. A conf naming a policy file whose INHERITED_RED holds a lone CR maps as
+    # unit 59's AC1 maps it. RED against a text-mode conf read, which splits at the CR and takes pol-b.
+    conf_cr = b"GATE_POLICY_FILE=pol-a\rGATE_POLICY_FILE=pol-b\n"
+    t = build_target(tmp, None, "ir63-ac13", {".unattended.conf": conf_cr, "pol-b": "INHERITED_RED=land\n"})
+    want, err = read_hook_value(conf_cr, "GATE_POLICY_FILE")
+    walk = step.C2P.STEPS.check_contained
+    step.C2P.STEPS.check_contained = lambda target, rel: None
+    try:
+        reads, _off = step.derive_reads(t)
+    except step.Refusal as e:
+        reads = [f"refused: {e}"]
+    finally:
+        step.C2P.STEPS.check_contained = walk
+    up = run_step("up", t)
+    check("[dWB-63 AC13] pol-a<CR>GATE_POLICY_FILE=pol-b: the step resolves the path the hook's "
+          "read_policy_key reads, byte for byte, and its up never reads pol-b",
+          want is not None and reads == [gate, want] and "pol-b" not in reads and read_blocks(t) is None
+          and (t / "pol-b").read_bytes() == b"INHERITED_RED=land\n",
+          f"hook {want!r} step {reads!r} {err} {up.stdout}{up.stderr}".strip())
+    t = build_target(tmp, None, "ir63-ac13-lone-cr", {".unattended.conf": "GATE_POLICY_FILE=ops/p.sh\n",
+                                                      "ops/p.sh": b"INHERITED_RED=park\rINHERITED_RED=land\n"})
+    up = run_step("up", t)
+    check("[dWB-63 AC13] a GATE_POLICY_FILE holding park<CR>INHERITED_RED=land: the up writes every-red, as "
+          "unit 59's AC1 maps the gate file",
+          up.returncode == 0 and read_blocks(t) == "every-red", up.stdout + up.stderr)
 
 
 def check_steps_recordable() -> None:
@@ -4874,17 +5310,21 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 def check_floor_bash(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
     every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
-    floor stub reaches its fallback to bare `bash`, its tail graded by `test_floor_fallback`, which
-    TOOL-dSafePassage-92 grades over every host shape the bar runs on. Called from `check_step_isolation`."""
+    floor stub either spawns the bash the block finds through Git's own `bin/bash.exe`, its tail graded
+    by `test_floor_fallback`, which TOOL-dSafePassage-92 grades over every host shape the bar runs on,
+    or refuses with exit 2 naming GOV_BASH. On `path94`, which drops git too, `resolve_shell_argv`
+    raises its Refusal (TOOL-dWitnessedBar-26 §4 "The govkit floor arms"). Called from
+    `check_step_isolation`."""
     us = govkit_module().upgrade_steps
     floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
     # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
     # holding a bash dropped but a System32 or WindowsApps launcher, which resolve_bash skips, and
     # GOV_BASH the parent's own bash: the floor stub resolves bash as the parent does, so it holds.
+    # The names planted and dropped are the block's own BASH_NAMES, the names its PATH step tries.
     bash87 = us.resolve_bash()
     fake87 = tmp / "dsp87-nobash"
     fake87.mkdir(exist_ok=True)
-    for nm in ("bash", "bash.exe"):
+    for nm in us.BASH_NAMES:
         (fake87 / nm).write_bytes(b"not a program\n")
         (fake87 / nm).chmod(0o755)
 
@@ -4892,8 +5332,13 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         return any(s in d.replace("\\", "/").lower() for s in ("/system32", "/windowsapps"))
 
     keep87 = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and (test_launcher87(d) or not any(
-        os.path.isfile(os.path.join(d, n)) for n in ("bash", "bash.exe")))]
+        os.path.isfile(os.path.join(d, n)) for n in us.BASH_NAMES))]
     path87 = os.pathsep.join([str(fake87)] + keep87)
+    # TOOL-dWitnessedBar-26: Git's `cmd` directory holds git and no bash, so it stays on path87 and
+    # the block's step 2 finds Git's own `bin/bash.exe` through it. path94 drops every directory
+    # holding git as well, so step 2 does not run and no bash resolves on any host.
+    path94 = os.pathsep.join([str(fake87)] + [d for d in keep87 if not any(
+        os.path.isfile(os.path.join(d, n)) for n in ("git", "git.exe"))])
     with set_environ({"PATH": path87, "GOV_BASH": bash87, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
     check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
@@ -4914,7 +5359,8 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     def read_fallback_argv(steps: types.ModuleType) -> object:
         # TOOL-dSafePassage-94: what `steps` hands the stub for a bare bash, read in this process with
         # its cached bash cleared, or the exception the call raised. A spawn crash's tail cannot show
-        # which spawn crashed, so this read is what proves the call reaches its fallback.
+        # which spawn crashed, so this read is what proves where the call ends: on path94, since
+        # TOOL-dWitnessedBar-26, in its Refusal.
         try:
             held = steps._BASH
         except AttributeError as e:  # TOOL-dSafePassage-95: a copy that did not load has no memo
@@ -4927,39 +5373,48 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         finally:
             steps._BASH = held
 
-    # TOOL-dSafePassage-94: the regression that read must see, check_runs no longer catching a spawn's
-    # OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
+    # TOOL-dSafePassage-94: the regression that read must see, the block's probe no longer catching a
+    # spawn's OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
     # TOOL-dSafePassage-95: staged by build_staged_copy, its anchor replaced once, and a copy that
-    # does not load is a labelled FAIL rather than a crash of the suite.
+    # does not load is a labelled FAIL rather than a crash of the suite. TOOL-dWitnessedBar-26: the
+    # anchor is the `resolve_bash_py` block's probe catch, once in the file, since step 2's own catch
+    # is followed by a different line.
     src94 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
-    anchor94 = "returncode == 0\n        except OSError:"
+    anchor94 = 'except (OSError, subprocess.SubprocessError):\n            return "did not run"'
     sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
     shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
     try:
         spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
-            tmp / "dsp94-narrowed", src94.replace(anchor94, "returncode == 0\n        except ValueError:", 1)))
+            tmp / "dsp94-narrowed", src94.replace(anchor94, 'except ValueError:\n            return "did not run"', 1)))
         steps94 = importlib.util.module_from_spec(spec94)
         spec94.loader.exec_module(steps94)
         steps94._BASH = sentinel94  # TOOL-dSafePassage-95: a memo only the raise path's restore gives back
     except Exception as e:  # noqa: BLE001 - a copy that does not load is what this records
         check("[dSP-95] the staged copy of upgrade_steps.py loads", False, repr(e))
 
-    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
-    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
-    # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
-    # so the rc, is the node's, so only the tail is graded, by `test_floor_fallback`.
+    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset. TOOL-dWitnessedBar-26: path87 keeps
+    # git, so where the block finds a bash through Git's own `bin/bash.exe` the stub spawns it and the
+    # tail is graded by `test_floor_fallback`; where it finds none the stub refuses with exit 2 and a
+    # tail naming GOV_BASH, never a traceback. The block is read in this process under that staging.
     with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+        found91 = us.scan_bash()[0]
+    check("[dSP-91 L2] the floor row's witness, PATH's bash unusable and GOV_BASH unset, spawns the bash "
+          "the block finds, else refuses naming GOV_BASH",
+          test_floor_fallback(got["tail"]) if found91 else
+          (got["rc"] == 2 and "GOV_BASH" in got["tail"] and "Traceback" not in got["tail"]),
+          f"block found {found91!r}; {got}")
+    # TOOL-dWitnessedBar-26: path94 drops git too, so no bash resolves on any host and the reads see
+    # resolve_shell_argv raise. They run in this process and need no git.
+    with set_environ({"PATH": path94, "GOV_BASH": None}):
         argv94, cut94 = read_fallback_argv(us), read_fallback_argv(steps94)
-    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
-          test_floor_fallback(got["tail"]), str(got))
-    check("[dSP-94] resolve_shell_argv on that PATH, GOV_BASH unset and no bash cached, hands back bare bash",
-          argv94 == ["bash", "x"], repr(argv94))
-    check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
+    check("[dSP-94] resolve_shell_argv on path94, GOV_BASH unset and no bash cached, raises its Refusal",
+          isinstance(argv94, us.Refusal), repr(argv94))
+    check("[dSP-94] the same read, the block's probe catch narrowed to ValueError, reads the spawn's OSError",
           src94.count(anchor94) == 1 and isinstance(cut94, OSError), f"anchor count {src94.count(anchor94)}; {cut94!r}")
     check("[dSP-95] the read gives the parent's bash cache back",
-          argv94 == ["bash", "x"] and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
+          isinstance(argv94, us.Refusal) and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
     check("[dSP-95] the read that raises gives the copy's bash cache back",
           isinstance(cut94, OSError) and getattr(steps94, "_BASH", None) == sentinel94,
           f"cut94 {cut94!r}; {getattr(steps94, '_BASH', None)!r}")
@@ -5907,7 +6362,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     seen = []
     for _ in ("with", "without"):
         seen.append([(r.returncode, r.stdout, r.stderr) for r in (
-            subprocess.run(["bash", str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
+            subprocess.run([govkit_module().resolve_bash(), str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
                            errors="replace", cwd=str(clone), timeout=900)
             for leg in ("check-wiring.sh", "check-install-prefix.sh"))])
         if rp.is_file():
@@ -6049,8 +6504,8 @@ def main() -> int:
         check("check calls that state NOT LANDED by name", "NOT LANDED" in p.stdout, p.stdout)
 
         # --- check RUNS a hole's discharge probe and reds on an undischarged one. The fixture is
-        # --- built so the probe genuinely CANNOT pass: memory-tree's measured pins are absent, which
-        # --- is the state a fresh install leaves. An arm whose fixture cannot trigger the rule
+        # --- built so the probe genuinely CANNOT pass: memory-tree's two waiver homes are absent, which
+        # --- is the state a fresh install leaves (TOOL-dWitnessedBar-17 S4). An arm whose fixture cannot trigger the rule
         # --- passes and proves nothing, so this one is asserted on the message, not the code.
         # The receipt carries a ROW, because a kit the receipt claims with NO rows is the separate
         # `not-landed` state and check reports that and stops — the hole loop is unreachable there.
@@ -6108,7 +6563,9 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_kickoff_facts_step()
         check_review_rounds_step(tmp / "drr")
+        check_inherited_red_step(tmp / "dir")
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
@@ -7085,18 +7542,12 @@ def main() -> int:
             return NL.join(lines) + NL
 
         r0 = scratch_gov(kit("demo leg"))
-        check("LIVENESS: a scratch gov whose leg names AGREE is silent",
+        check("LIVENESS: a scratch gov declaring one leg is silent",
               r0.returncode == 0, r0.stdout + r0.stderr)
 
-        r1 = scratch_gov(kit("typo leg"))
-        check("a descriptor leg absent from the manifest REDS",
-              "is in no leg of <prefix>/gate-legs.json" in r1.stdout, r1.stdout)
-        check("and the manifest leg it left unclaimed reds too — both directions, one fixture",
-              "claimed by no descriptor and carried by no [[exempt_leg]]" in r1.stdout, r1.stdout)
-
-        r2 = scratch_gov(kit("demo leg (3 checks)"))
-        check("a leg name carrying a digit-bearing parenthetical REDS",
-              "digit-bearing parenthetical" in r2.stdout, r2.stdout)
+        # The leg correspondence's typo and digit-bearing-name plants moved with their arms to
+        # `<prefix>/run-gates/leg_factory.py --selftest`, as its `fresh` and `name` arms
+        # (TOOL-dWitnessedBar-11 §4 "The plants").
 
         r3 = scratch_gov(kit("demo leg", include_all=False))
         check("a file under a non-flat home that no rule claims REDS",
@@ -7104,17 +7555,10 @@ def main() -> int:
         check("and it NAMES the file rather than reporting a count",
               "extra.sh" in r3.stdout, r3.stdout)
 
-        # Over gov itself both correspondences are COMPLETE, and every figure in the notes is
-        # derived. The positive halves matter as much as the negatives: without them these arms
-        # could be silent because the predicate is broken rather than because the tree is clean.
+        # Over gov itself the file correspondence is COMPLETE, and its note's figure is derived. The
+        # leg correspondence's positive halves and its `legs:` note are `leg_factory.py --conform`'s,
+        # whose selftest runs it over the live tree (TOOL-dWitnessedBar-11 §4 "The plants").
         ps = run("selfcheck")
-        check("over gov, every manifest leg is claimed or exempted",
-              "claimed by no descriptor" not in ps.stdout, ps.stdout)
-        check("over gov, no descriptor leg is missing from the manifest",
-              f"is in no leg of {PFX}gate-legs.json" not in ps.stdout, ps.stdout)
-        check("the leg note reports all three figures, derived",
-              "in the manifest" in ps.stdout and "claimed" in ps.stdout
-              and "exempt" in ps.stdout, ps.stdout)
         check("the per-file note reports its own derived figure",
               "unclaimed file(s) under a non-flat home" in ps.stdout, ps.stdout)
 
@@ -7425,16 +7869,17 @@ user_skills = "/tmp/gk-fake-skills"
         import tomllib  # noqa: PLC0415
         _an = tomllib.loads((gcopy / PFX / KIT_NAMES["govkit"] / "adopters.toml").read_text(
             encoding="utf-8"))["adopter"][0]["names"][0]
-        pf = gcopy / PFX / KIT_NAMES["playbook"] / "instructions-legacy.txt"  # PLAY-dOrderedCharter-72
+        # The include's one file since the legacy list moved under the memory root (TOOL-dWitnessedBar-18 S5).
+        pf = gcopy / PFX / KIT_NAMES["playbook"] / "core-pending.txt"
         pkt = gcopy / PFX / KIT_NAMES["playbook"] / "kit.toml"
         pfkeep, pktkeep = pf.read_bytes(), pkt.read_text(encoding="utf-8")
         pf.write_bytes(pfkeep + f"# {_an}\n".encode("utf-8"))
-        _named = f"'{PFX}{KIT_NAMES['playbook']}/instructions-legacy.txt' names the adopter"
+        _named = f"'{PFX}{KIT_NAMES['playbook']}/core-pending.txt' names the adopter"
         rpo = _run_selfcheck(gcopy)
         check("[dOC-71 S3] a project-owned source naming an adopter passes the ban",
               rpo.returncode == 0 and _named not in rpo.stdout and "adopter names:" in rpo.stdout,
               (rpo.stdout + rpo.stderr)[-1500:])
-        _pkt = pktkeep.replace(', "instructions-legacy.txt"', "", 1)
+        _pkt = pktkeep.replace('include = ["core-pending.txt"]', "include = []", 1)
         check("[dOC-71 S3] LIVENESS the staged descriptor really ships the planted list",
               _pkt != pktkeep, "the replace matched nothing in the playbook-render descriptor")
         pkt.write_text(_pkt, encoding="utf-8")
@@ -7479,7 +7924,7 @@ user_skills = "/tmp/gk-fake-skills"
                 ("indented key", 'generator = "gotchas.py"', '  generator = "gotchas.py"',
                  "rows read by the unattended kit's shell reader"),
                 ("when with no conf part", 'when = ".memory-tree.conf:BACKLOG_MODE=builds"',
-                 'when = "BACKLOG_MODE=builds"', "a when shaped <conf>:<KEY>=<value>")):
+                 'when = "BACKLOG_MODE=builds"', "a when shaped <conf>:<KEY>=<value> or exists:<path>")):
             _m6 = mkeep.replace(_old, _new)
             check(f"[aWP r2] LIVENESS the staged memory-tree descriptor really carries a {_lbl}",
                   _m6 != mkeep, "the replace matched nothing in the memory-tree descriptor")
@@ -7489,6 +7934,7 @@ user_skills = "/tmp/gk-fake-skills"
                   r6m.returncode != 0 and "entry 'memory-tree' [[generated]] row" in r6m.stdout
                   and _want in r6m.stdout, r6m.stdout[-1200:] + r6m.stderr[-300:])
             mk.write_text(mkeep, encoding="utf-8")
+        check_when_forms_agree(gcopy, _run_selfcheck)
 
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
         tc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-testsuite-counts.kit.toml"
@@ -9112,7 +9558,7 @@ user_skills = "/tmp/gk-fake-skills"
         _j4arows = json.loads(_j4al.read_text(encoding="utf-8"))
         _j4arows[0]["chunk"] = "selftests"
         _j4al.write_text(json.dumps(_j4arows, indent=2) + "\n", encoding="utf-8", newline="\n")
-        # The unclaimed manifest row reds 7h too, so exit 1 alone cannot tell a 7j4 red from a 7j4
+        # Exit 1 alone cannot tell 7j4's red from another class's red beside a 7j4
         # note. `emit` prints every note before every problem, and 7j4's own count note follows
         # its liveness call, so the line is a PROBLEM only when it prints after that count note.
         _r4a = run_in(_j4a)
@@ -9255,27 +9701,9 @@ user_skills = "/tmp/gk-fake-skills"
               "never falling back to demo's own argv",
               _rb17got.startswith("KeyError") and "'demo'" in _rb17got, _rb17got)
 
-        # ---- D3 (TOOL-dThriftyLanding-4): 7h holds a descriptor's doc_reads and the manifest's equal
-        _d3 = scratch_gov("true", f"{PFX}demo/", tag="d3")
-        _d3k = _d3 / PFX / "demo" / "kit.toml"
-        _d3l = _d3 / PFX / "gate-legs.json"
-        _d3rows = json.loads(_d3l.read_text(encoding="utf-8"))
-        _d3rows[0]["doc_reads"] = ["memory/builds/"]
-        _d3l.write_text(json.dumps(_d3rows, indent=2) + "\n", encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3: a manifest doc_reads the descriptor does not declare REDS",
-              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
-        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
-            'subject = "repo"\n', 'subject = "repo"\ndoc_reads = ["{memory_root}/builds/"]\n', 1),
-            encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3 control: the same paths, spelled through {memory_root}, agree",
-              "disagree about which doc paths" not in _r3.stdout, _r3.stdout)
-        _d3k.write_text(_d3k.read_text(encoding="utf-8").replace(
-            '{memory_root}/builds/', '{memory_root}/gotchas/'), encoding="utf-8", newline="\n")
-        _r3 = run_in(_d3)
-        check("D3: a descriptor naming OTHER doc paths REDS",
-              _r3.returncode == 1 and "disagree about which doc paths" in _r3.stdout, _r3.stdout)
+        # ---- D3 (TOOL-dThriftyLanding-4)'s doc_reads plants moved with their arm to
+        # `<prefix>/run-gates/leg_factory.py --selftest`, as its `fresh` arm on `doc_reads`
+        # (TOOL-dWitnessedBar-11 §4 "The plants").
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
@@ -9416,17 +9844,17 @@ user_skills = "/tmp/gk-fake-skills"
               in _pol.stdout, _pol.stdout + _pol.stderr)
         check("AC2: and the refusal names the file and the kit that would ship it",
               f"'{PFX}demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
-        # TOOL-dDerivedDocket-24 AC22: the inherited-red pair rides the same predicate. Gov's value is
-        # `land`, and a kit that copied the file carrying it would land every adopter over its reds.
+        # TOOL-dDerivedDocket-24 AC22: the inherited-red age bound rides the same predicate. Gov's value
+        # is 10, and a kit that copied the file carrying it would age every adopter's reds by gov's bound.
         # The trailing-comment spelling is the evasion the first predicate admitted for GATE_SELFTESTS.
-        for _line, _key in (("INHERITED_RED=land", "INHERITED_RED"),
+        for _line, _key in (("INHERITED_RED_MAX_AGE=10", "INHERITED_RED_MAX_AGE"),
                             ("export INHERITED_RED_MAX_AGE=10  # gov only", "INHERITED_RED_MAX_AGE")):
             (pg / PFX / "demo" / "policy.sh").write_text(
                 "#!/usr/bin/env sh\n" + _line + "\n", encoding="utf-8", newline="\n")
             git(pg, "add", "-A")
             git(pg, "commit", "-qm", f"{_key} in the payload")
             _irp = run_in(pg)
-            check(f"AC22: a bare {_key} assignment inside a kit's payload REDS, naming the file",
+            check(f"AC22: a bare {_key} assignment, {_line!r}, inside a kit's payload REDS, naming the file",
                   _irp.returncode == 1 and f"carries a bare {_key} assignment AND is shipped" in _irp.stdout
                   and f"'{PFX}demo/policy.sh'" in _irp.stdout, _irp.stdout + _irp.stderr)
 
@@ -9471,8 +9899,8 @@ user_skills = "/tmp/gk-fake-skills"
             if extra:
                 rows.append({"name": "demo two", "argv": ["true"], "guard": [], "subject": "repo"})
             legsf.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
-            # The DESCRIPTOR moves with it. Leaving it behind reds on the 7h agreement check, and
-            # the arm would then be green for a reason that has nothing to do with the ratchet.
+            # The DESCRIPTOR moves with it, so the fixture keeps its two spellings equal and the arm
+            # is green or red for the ratchet's reason alone.
             body = ('id = "demo"\nhome = "demo"\n'
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
@@ -9565,7 +9993,7 @@ user_skills = "/tmp/gk-fake-skills"
         _rowsc = [l for l in pinf.read_text(encoding="utf-8").split("\n")
                   if l.strip() and not l.startswith("#")]
         # DEPL-aBenchedProbe-3 S4: the leg stays subject `repo` in chunk `selftests`, which is 7j4's
-        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h, before it).
+        # red class, so `--write` writes the pin AND exits 1 on 7j4 (the write sits in 7h2, before it).
         check("AC5: and moving the pin in the same commit records the chunk, while 7j4 reds the "
               "repo-subject held leg",
               _wc.returncode == 1 and _rowsc == ["demo\trepo\tselftests"]
@@ -9608,26 +10036,10 @@ user_skills = "/tmp/gk-fake-skills"
 
         _write_legs("repo")
         run_in_gov(rg, "selfcheck", "--write")
-        _write_desc("")                       # the descriptor declares no subject at all
-        _r = run_in(rg)
-        check("L1: a descriptor gate leg with NO subject REDS",
-              _r.returncode == 1 and "with no `subject`" in _r.stdout, _r.stdout + _r.stderr)
-        check("L1: and the refusal points at where the criterion is stated",
-              "ask what a FAILURE of this leg MEANS" in _r.stdout, _r.stdout)
-
-        _write_desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
-        _r = run_in(rg)
-        check("L1: a descriptor subject outside the closed set kit|repo REDS",
-              _r.returncode == 1 and "outside the closed set kit|repo" in _r.stdout,
-              _r.stdout + _r.stderr)
-
-        _write_desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
-        _r = run_in(rg)
-        check("L1: a descriptor and manifest that DISAGREE about subject RED",
-              _r.returncode == 1 and "disagree about whether this leg runs by default" in _r.stdout,
-              _r.stdout + _r.stderr)
-
-        # ...back to agreement, then the PIN's own two refusals.
+        # L1's subject plants (none, `Kit`, and a descriptor disagreeing with its manifest) moved with
+        # their arms to `<prefix>/run-gates/leg_factory.py --selftest`, as its `subject` and `fresh`
+        # arms (TOOL-dWitnessedBar-11 §4 "The plants").
+        # The fixture as written, then the PIN's own two refusals.
         _write_desc('subject = "repo"\n')
         run_in_gov(rg, "selfcheck", "--write")
         check("L1 control: the fixture is GREEN again before the pin arms below",
@@ -9682,9 +10094,8 @@ user_skills = "/tmp/gk-fake-skills"
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("M5: the predicate this arm grades is the one check 7h3 actually calls",
               "policy_re = build_policy_re()" in _gk_src, "")
-        check("M5: POLICY_KEYS names the self-test switch, both inherited-red keys and the doc class",
-              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE",
-                                           "GATE_DOC_PATHS"},
+        check("M5: POLICY_KEYS names the self-test switch, the inherited-red age bound and the doc class",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS"},
               repr(_gk_mod.POLICY_KEYS))
         check("M5: a doc-class line is caught as policy — 'GATE_DOC_PATHS=\"memory/\"'",
               bool(_pol_re.match('GATE_DOC_PATHS="memory/"')), "")
@@ -9702,13 +10113,13 @@ user_skills = "/tmp/gk-fake-skills"
               not _pol_re.match('GATE_DOC_PATHS="a b" bash x'), "")
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
-                   "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
-                   ": ${INHERITED_RED:=land}"):
+                   "INHERITED_RED_MAX_AGE=10", "export INHERITED_RED_MAX_AGE=10  # gov only",
+                   ": ${INHERITED_RED_MAX_AGE:=10}"):
             check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
         for _s in (f"GATE_SELFTESTS=1 bash {PFX}{KIT_NAMES['run-gates']}/run-gates.sh",
                    'if [ -n "${GATE_SELFTESTS:-}" ]; then',
                    'echo "set GATE_SELFTESTS=1 to run"',
-                   "INHERITED_RED=land bash .githooks/pre-push"):
+                   "INHERITED_RED_MAX_AGE=10 bash .githooks/pre-push"):
             check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
                   not _pol_re.match(_s), _s)
 
@@ -10035,8 +10446,9 @@ user_skills = "/tmp/gk-fake-skills"
             # `windows-only-legs.txt` and agent-cap withholds `format-guard.test.sh` by the same
             # `project-owned` mechanism; both landed after this pin and moved no row out.
             # Measured by a default `plan` into a scratch target on 2026-10-13 (TOOL-aSweptBar-1 S10).
+            # seed 14 -> 15, TOOL-dWitnessedBar-23 S6: `roles` seeds `house/gov-tester.md`; the close observes it.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 14
+                  marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 15
                   and marks.get("ORDER|project-owned") == 34,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
@@ -19566,6 +19978,65 @@ user_skills = "/tmp/gk-fake-skills"
               and ("agent-instructions wiring", "demo") in read_owned13(_t13c)
               and "the gate-leg step refused" not in _u13c.stdout,
               _u13c.stdout[-1400:] + _u13c.stderr[-600:])
+
+        # ---- [dHG-1 S5]. A RETIRED KIT'S LEG LEAVES WITH THE KIT. The receipt records two legs of a
+        # ---- kit no descriptor declares, both in the runner: one at its recorded argv, one the
+        # ---- target edited. `update --write` removes the first from the runner and both from the
+        # ---- receipt; the edited one stays in the runner as the target's own.
+        _g5r = build_gov13("dhg5")
+        _t5r = build_target13("dhg5")
+        run_gov13(_g5r, "apply", "--target", str(_t5r))
+        settle(_t5r, "after apply")
+        _gone = [{"name": "retired wiring", "kit": "retired-kit", "argv": ["bash", "scripts/retired/check.sh"]},
+                 {"name": "retired edited", "kit": "retired-kit", "argv": ["bash", "scripts/retired/edit.sh"]}]
+        _rc5r = read_receipt13(_t5r)
+        _rc5r["gate_runner"]["emitted"] += [dict(e, guard=[], subject="repo") for e in _gone]
+        (_t5r / ".governance" / "install.json").write_text(
+            json.dumps(_rc5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        _lg5r = json.loads((_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+        _lg5r += [{"name": _gone[0]["name"], "argv": _gone[0]["argv"]},
+                  {"name": _gone[1]["name"], "argv": [*_gone[1]["argv"], "--theirs"]}]
+        (_t5r / "scripts" / "gate-legs.json").write_text(
+            json.dumps(_lg5r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t5r, "the receipt records a retired kit's legs")
+        write_vintage13(_g5r)
+        _u5r = run_gov13(_g5r, "update", "--target", str(_t5r), "--write")
+        _left5r = [e.get("name") for e in json.loads(
+            (_t5r / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))]
+        check("[dHG-1 AC5] update --write drops a retired kit's untouched leg from the runner and keeps "
+              "the one the target edited",
+              "retired wiring" not in _left5r and "retired edited" in _left5r
+              and "dropped   leg 'retired wiring'" in _u5r.stdout
+              and "released  leg 'retired edited'" in _u5r.stdout,
+              f"{_left5r} · " + _u5r.stdout[-1400:] + _u5r.stderr[-600:])
+        check("[dHG-1 AC5] ...and the restamped receipt claims neither, while the live kit's leg stays",
+              not any(n.startswith("retired ") for n, _k in read_owned13(_t5r))
+              and any(k == "demo" for _n, k in read_owned13(_t5r)),
+              str(read_owned13(_t5r)))
+
+        # ---- [dHG-2 S1]. A RETIRED ROW A LIVE ROW SUPERSEDES LEAVES. The receipt gains a
+        # ---- `retired-edited` row at the path an `engine` row already carries, the shape a seed rule's
+        # ---- row leaves when `apply` moves its file to an engine row; `update --write` reaps it, and
+        # ---- the sums sidecar lists the path once.
+        _g2r = build_gov13("dhg2")
+        _t2r = build_target13("dhg2")
+        run_gov13(_g2r, "apply", "--target", str(_t2r))
+        settle(_t2r, "after apply")
+        _rc2r = read_receipt13(_t2r)
+        _live2r = next(f for f in _rc2r["files"] if f.get("role") == "engine" and f.get("sha256"))
+        _rc2r["files"].append(dict(_live2r, role="retired-edited", kit="retired-seed", sha256="0" * 64))
+        (_t2r / ".governance" / "install.json").write_text(
+            json.dumps(_rc2r, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t2r, "the receipt carries a superseded retired row")
+        write_vintage13(_g2r)
+        _u2r = run_gov13(_g2r, "update", "--target", str(_t2r), "--write")
+        _rows2r = [f for f in read_receipt13(_t2r)["files"] if f.get("path") == _live2r["path"]]
+        _sums2r = (_t2r / ".governance" / "install.sums").read_text(encoding="utf-8")
+        check("[dHG-2 AC1] update --write reaps the retired row a live engine row supersedes",
+              [f.get("role") for f in _rows2r] == ["engine"]
+              and f"reaped    row '{_live2r['path']}'" in _u2r.stdout
+              and _sums2r.count(" " + _live2r["path"]) == 1,
+              f"{[f.get('role') for f in _rows2r]} · " + _u2r.stdout[-1200:] + _u2r.stderr[-400:])
 
         # ---- [dRB-16]. A NARROWER APPLY KEEPS THE CARRIED KIT'S LEG OWNERSHIP TOO.
         # ---- TOOL-dRedressedBar-12 keeps a kit the selection did not name in the receipt's `kits`,

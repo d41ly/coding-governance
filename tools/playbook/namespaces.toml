@@ -161,6 +161,36 @@ role = "describes"
 purpose-source = "{prefix}/govkit/registry.toml"
 join-armed-by = "dDeclaredLoop"
 
+[[namespace]]
+ns = "leg"
+owner = "dWitnessedBar"
+layer = "layer.flow"
+source = "each row's tag in {prefix}/gate-legs.json"
+extractor = "tag_index:extract_leg"
+role = "selects"
+purpose-source = "{prefix}/gate-legs.json"
+join-armed-by = "dWitnessedBar"
+
+[[namespace]]
+ns = "pack"
+owner = "dWitnessedBar"
+layer = "layer.flow"
+source = "each distinct pack value of the rows of {prefix}/gate-legs.json, pack.<word> each"
+extractor = "tag_index:extract_pack"
+role = "selects"
+purpose-source = "{prefix}/gate-legs.json"
+join-armed-by = "dWitnessedBar"
+
+[[namespace]]
+ns = "check"
+owner = "dWitnessedBar"
+layer = "layer.distribution"
+source = "each [[numbered_check]] row's id in a tracked kit.toml or *.kit.toml descriptor, check.<id>.<check id> each"
+extractor = "tag_index:extract_check"
+role = "describes"
+purpose-source = "{prefix}/govkit/registry.toml"
+join-armed-by = "dWitnessedBar"
+
 # The native-id classes (PLAY-dOrderedCharter-28 S2), read by edge_grammar.read_native_classes: one [[native]]
 # row per class, `class`, the word an edge row's `from` or `to` names it by; `owner`, the build that registered
 # it; `pattern`, the `<module>:<name>` that compiles its ids, never a second regex; `resolver`, what prints its

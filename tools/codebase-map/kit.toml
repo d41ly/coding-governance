@@ -72,7 +72,7 @@ file = ".codebase-map.conf"
 owner = "codebase-map"
 required_keys_gate = ["MAP_ROOT", "GATE_FILE"]
 required_keys_render = ["MAP_ROOT"]
-optional_keys = ["MAP_DIFF_CMD"]
+optional_keys = ["MAP_DIFF_CMD", "GEN_MAP_PYTHON"]
 # The defaults `map_lib.load_conf` and the adopter already apply, declared so govkit's required-key
 # reader agrees with them; selfcheck refuses an adopter default the descriptor omits
 # (DEPL-aHalvedInstall-1 rev-3).
@@ -100,12 +100,25 @@ probe = { must_exist = "{kit}/map_extractors.py", must_not_exist = "{map_root}/g
 means = "seeded-extractors-or-crashed"
 
 [[gate_leg]]
+tag = "leg.codebase-map.codebase-map-coverage-freshness"
+tests = ["feature.codebase-map"]
 name = "codebase-map coverage + freshness"
 subject = "repo"
+purpose = "grades the codebase map's coverage and freshness"
 argv = ["python", "{gate_file}"]
+precommit = ["python", "{gate_file}", "--precommit"]
 guard = []
 history_depth = "full"
 stage = ["step.build", "step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/codebase-map/test_codebase_map.py"]
+precommit = ["python3", "{prefix}/codebase-map/test_codebase_map.py", "--precommit"]
+reads = { base = "its baseline is the one carried at the merge-base with the remote default branch (TOOL-aSparedSpawn-13 S3).", history = "it reads that baseline out of history (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [[hole]]
 id = "map-extractors"
@@ -134,11 +147,21 @@ discharge = { command = ["python", "{kit}/check_gate_coverage.py"] }
 # descriptor declares as its `[config] file` as `root-conf`, and its selfcheck reds a guarded bar
 # leg whose argv names such a conf its guard lacks. TOOL-dDerivedDocket-21.
 [[gate_leg]]
+tag = "leg.codebase-map.codebase-map-gate-coverage"
+tests = ["feature.codebase-map"]
 name = "codebase-map gate coverage"
 subject = "repo"
+purpose = "checks the installed map gate compares every artifact"
 argv = ["python", "{kit}/check_gate_coverage.py"]
 guard = ["{kit}/", ".codebase-map.conf"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+argv = ["python3", "{prefix}/codebase-map/check_gate_coverage.py"]
+guard = ["{prefix}/codebase-map/", ".codebase-map.conf", "{prefix}/memory-tree/coverage_join.py"]
+chunk = "declarations"
+ceiling = 180
 
 [[lf_pin]]
 pattern = ".codebase-map.conf"
@@ -168,3 +191,68 @@ stage = "reuse"
 role = "gov-reuse-scout"
 command = 'python <prefix>/codebase-map/reuse_lookup.py "<behaviour>"'
 when = "a new behaviour about to be designed"
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "affordance-exempt"
+leg = "codebase-map coverage + freshness"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "affordance-exempt"]
+key = "key"
+fields = ["seam"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/map/affordance-exempt.txt"
+
+[[ledger]]
+population = "baseline"
+leg = "codebase-map coverage + freshness"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "baseline"]
+key = "key"
+fields = ["kind", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/map/baseline.txt"
+
+# THE EMPTY-DECISIONS PIN AS A KEYED POPULATION (TOOL-dWitnessedBar-17 S1): one row per dossier declaring no
+# decisions, so filling one and emptying another never nets to zero. The seed is `map_diff.py`'s, an engine
+# file every adopter holds that renders no generated index (its section 8 F12); the project-owned gate no
+# longer reads it, so `ratchet (both ways)` grades it as its own (section 8 F10).
+[[ledger]]
+population = "dossier-decisions-empty"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/codebase-map/map_diff.py", "--list-empty-decisions"]
+key = "key"
+fields = ["feature"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/dossier-decisions-empty.txt"
+
+# The two map lists this kit's adopter seeds take their `.txt` names at the adopter's next update.
+
+[[upgrade]]
+id = "codebase-map/affordance-exempt-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/map/affordance-exempt.txt"]
+surfaces = ["file:memory/map/affordance-exempt.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "codebase-map/baseline-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/map/baseline.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/map/baseline.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/map/baseline.txt"]
+surfaces = ["file:memory/map/baseline.txt"]
+needs-target = false
+
+# The conf pin this kit's gate read leaves the conf at the adopter's next update, its population seeded
+# first (TOOL-dWitnessedBar-17 S8).
+[[upgrade]]
+id = "codebase-map/dossier-decisions-empty-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "DOSSIER_DECISIONS_EMPTY_PIN"]
+surfaces = ["conf-key:.codebase-map.conf#DOSSIER_DECISIONS_EMPTY_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/dossier-decisions-empty.txt"]
+needs-target = false

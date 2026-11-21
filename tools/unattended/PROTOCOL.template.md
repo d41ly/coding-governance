@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.131 -->
+<!-- gov:kit unattended@1.134 -->
 [memory/guides/UNATTENDED-PROTOCOL.md · Level 3 · Binding for a run that merges and pushes with no owner turn; yields to levels 0 to 2]
 # Unattended runs — the protocol
 
@@ -123,7 +123,7 @@ The spec-audit opt-in is the OWNER's on the same reading (`TOOL-aWardedAudit-4`)
 line counts only from a `slug` README or a `prompt` one whose BASE prompt record asks for it, and
 preflight refuses it elsewhere (check 89);
 `SPEC_AUDIT_DEFAULT` is read at the default-branch side of BASE; the bar reds a run commit writing
-either. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
+either. The owner's placed `spec audit` at BASE, source `placement`, only adds an owed audit. The fan-out hook admits an audit in a live run only on the pinned `spec-audit` fact.
 
 **The build method is a RUN-TIME dependency of this kit.** Every directive (§10) points into a
 section of it, so `--preflight` refuses a tree where `<MEMORY_ROOT>/guides/BUILD-METHOD.md` is absent
@@ -517,11 +517,11 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
 | `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing on any red but another build's. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. |
-| `GATE_POLICY_FILE` | where `INHERITED_RED` and its age bound are read at R, unsourced; `GATE_POST_MERGE` only from `.githooks/gate-env.sh`. OPTIONAL: blank reads that, else `land`, announced. `UNATTENDED-STOPS.md` |
+| `GATE_POLICY_FILE` | where the inherited-red age bound is read at R, unsourced; `GATE_POST_MERGE` only from `.githooks/gate-env.sh`. OPTIONAL: blank reads that, else no bound, announced. `UNATTENDED-STOPS.md` |
 | `ASKS_CMD` | the ask generator the driver calls, in the shapes `UNATTENDED-ASKS.md` lists. OPTIONAL: blank or absent means not adopted, and the skip is announced |
 | `PROCMON_CMD` | the reaper, called `<cmd> --kill-msys <pid>` once per recorded orphan. OPTIONAL: blank turns reaping off, announced. `UNATTENDED-STOPS.md` |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
-| `RUN_CLAIMS` | `on` or `off`: whether every run claims its slug on the remote as `refs/gov/runs/<slug>`, so a second node is refused at `--preflight` rather than met at the merge. OPTIONAL: blank or absent is `off`, announced on stderr; any other value is refused. `UNATTENDED-STOPS.md` §7 |
+| `RUN_CLAIMS` | `on` or `off`: whether every run claims its slug on the remote as `refs/gov/leases/<slug>/build`, so a second node is refused at `--preflight`, not met at the merge. OPTIONAL: blank or absent is `off`, announced on stderr; any other is refused. `UNATTENDED-STOPS.md` §7 |
 | `HELD_CI_WORKFLOW` | the workflow file whose daily held job's red suites each file one HIGH ask. OPTIONAL: blank is DARK, announced. `UNATTENDED-STOPS.md` §13 |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |
 | `GENERATED_INDEXES` | `index:generator` pairs ADDED to the `[[generated]]` rows the kits declare. An index ALONE is fine; only the index TOGETHER WITH its generator is refused |

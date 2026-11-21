@@ -197,6 +197,53 @@ resolve_index_generator() {
   esac
 }
 
+# A LEDGER'S RECORD KEYS AT A REVISION, read through the memory-tree kit's ledger factory, this kit's
+# required sibling (TOOL-dWitnessedBar-16 S4): the waiver registries of the pass-order and brief-recorded
+# legs are ledger populations, keyed by unit, and no leg here parses their grammar itself.
+# `read_record_keys <rev> <repo-relative path>` prints each row's first key field, one per line; a row
+# the factory refuses is named on stderr and never waives. An absent blob prints nothing, the empty set.
+# -> 0, or 2 with a named refusal where no launcher or no factory resolves, since an empty answer would
+# read as nothing waived.
+read_record_keys() {
+  local py="" here d top
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] || { printf '%s\n' "lib-unattended: read_record_keys found no python launcher, so $2 was not read" >&2; return 2; }
+  here=$(dirname -- "${BASH_SOURCE[0]}")
+  d=$(resolve_kit_dir "$py" memory-tree legacy_ledger.py "$here") || { printf '%s\n' "lib-unattended: read_record_keys found no memory-tree ledger factory, so $2 was not read" >&2; return 2; }
+  top=$(git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
+  GIT show "$1:$2" 2>/dev/null | "$py" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+rows, bad = LL._parse_rows(sys.stdin.read().split("\n"), 1, ("sha", "disposition"), ())
+for entry in bad:
+    print("%s: %s" % (sys.argv[2], LL.render_malformed(entry)), file=sys.stderr)
+for key in rows:
+    print(key[0])' "$top/$d" "$2" | tr -d '\r'
+  return "${PIPESTATUS[1]}"
+}
+
+# THIS NODE'S FLEET TAG (TOOL-dPlacedRequest-1 S11), asked of the playbook kit's one fleet reader
+# through `render_playbook.py --fleet-tag`, found by the same `resolve_kit_dir` call as the generator
+# above, so no second parser of `fleet.toml` exists. The user is USERNAME, else USER; the row is
+# matched by the user alone, case-folded, never the host (TOOL-dPlacedRequest-34 S30), as every reader
+# of the registry matches it; a GOV_NODE naming a tag of the registry names this node outright. -> the
+# tag on stdout, or status 1 with the cause on stdout: no python, no playbook kit, no row naming this
+# user, or a GOV_NODE the registry does not hold.
+resolve_fleet_tag() {
+  local d="" py="" u="${USERNAME:-${USER:-}}" out
+  declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
+  [ -n "$py" ] || { printf '%s\n' "no python resolves, so fleet.toml cannot be read"; return 1; }
+  local here=${BASH_SOURCE[0]}; case $here in */*) here=${here%/*} ;; *) here=. ;; esac
+  d=$(resolve_kit_dir "$py" playbook render_playbook.py "$here" 2>/dev/null) || d=""
+  [ -n "$d" ] || { printf '%s\n' "no playbook kit resolves beside this one, so fleet.toml cannot be read"; return 1; }
+  # repo-relative to the kit's own checkout, so a driver run over another tree reads it under that one
+  [ -f "$d/render_playbook.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" "$d/render_playbook.py" --fleet-tag --user "$u" --node "${GOV_NODE:-}" 2>&1) || { printf '%s\n' "${out##*REFUSED — }"; return 1; }
+  out=${out%$'\r'}
+  case "$out" in [a-z]) printf '%s\n' "$out" ;; *) printf '%s\n' "fleet.toml answered no tag for user ${u:-<none>}: $out"; return 1 ;; esac
+}
+
 # The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
 # generator's `--write` mode. Both the driver and the gate leg print it, so it is spelled once, here.
 # -> the hint text; a miss says what was not found, never a guess.
@@ -839,6 +886,14 @@ derive_self_rel() {
 # that conf, at the repo root, assigns KEY exactly that value. memory-tree's backlog rows carry one,
 # because the backlog is GENERATED only under `BACKLOG_MODE=builds`; under the default it is authored,
 # is correctly a shared record, and an unconditional row refused every adopter's conf at load.
+# OR `when = "exists:<path>"` (TOOL-dWitnessedBar-54 S1): it applies only when that path exists under
+# the repo root, its `{prefix}`, `{kit}`, `{memory_root}` and `{map_root}` resolved as `regen.py`'s
+# `resolve_argv` resolves them, `{prefix}` being this reader's tool root or `.`. A `when` of neither
+# shape, an `exists:` with an empty path, one left holding a token, and one whose resolved path is
+# absolute (`/…`, `X:…`) or holds a `..` segment, by `read_gate_policy`'s containment pattern
+# (TOOL-dWitnessedBar-62 S22), is named on stderr with its descriptor and its `when` and skipped, as
+# `regen.py` and govkit selfcheck refuse it. A false conf `when`, and an `exists:` path absent from
+# the tree, is a silent skip: the row does not apply, which is no reader failure.
 #
 # WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
 # grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
@@ -884,14 +939,46 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
       t && /^when[ \t]*=/         { w = val($0) }
       END { flush() }' "${_rg_fs[@]}" >"$_rg_rf" 2>/dev/null
   [ "${#_rg_fs[@]}" -gt 0 ] || : >"$_rg_rf"
+  # Each row is read WHOLE and cut at its TABs by expansion (TOOL-dWitnessedBar-63 S22): a TAB IFS is
+  # whitespace to `read`, so it folds an empty generator and the `when` would land in its place. The
+  # `when` is graded on every row carrying a path, BEFORE the generator test, so a generator-less row
+  # with a malformed `when` is named too. An `exists:` path has every `\` folded to `/` before the
+  # containment test, and a colon anywhere refuses it (S9, §8 F6): `..\x`, `\\server\share` and `a:b`
+  # are skipped with the line, as govkit's `derive_contained_rel` and regen's `check_when` refuse them.
+  # So is a path this kit's `normpath` reads as `.`, such as `.` or `./.` (TOOL-dWitnessedBar-65 S2,
+  # §8 F5): the Python readers refuse a normal form of `.`, and `[ -e "$root/." ]` would keep it. A
+  # pattern refusal sets `_np` to `.` so both reach the one skip line.
+  local _rg_ln
   {
-    while IFS=$'\t' read -r _rg_d _rg_p _rg_g _rg_w; do
+    while IFS= read -r _rg_ln; do
+      _rg_d=${_rg_ln%%$'\t'*}; _rg_ln=${_rg_ln#*$'\t'}
+      _rg_p=${_rg_ln%%$'\t'*}; _rg_ln=${_rg_ln#*$'\t'}
+      _rg_g=${_rg_ln%%$'\t'*}; _rg_w=${_rg_ln#*$'\t'}
       _rg_d=${_rg_d#"$_rg_root/"}; _rg_krel=${_rg_d%/kit.toml}
-      [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
-      if [ -n "$_rg_w" ]; then
-        _rg_kv=${_rg_w#*:}
-        [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue
-      fi
+      [ -n "$_rg_p" ] || continue
+      case "$_rg_w" in
+        "") ;;
+        exists:?*)
+          _rg_kv=${_rg_w#exists:}
+          _rg_kv=${_rg_kv//\{prefix\}/${_rg_tool:-.}}; _rg_kv=${_rg_kv//\{kit\}/$_rg_krel}
+          _rg_kv=${_rg_kv//\{memory_root\}/$_rg_mem}; _rg_kv=${_rg_kv//\{map_root\}/$_rg_map}
+          _rg_kv=${_rg_kv//\\//}
+          case "$_rg_kv" in
+            *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] when with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+            /*|*:*|..|../*|*/..|*/../*) _np=. ;;
+            *) normpath "$_rg_kv" >/dev/null ;;
+          esac
+          [ "$_np" != . ] || { printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue; }
+          [ -e "$_rg_root/$_rg_kv" ] || continue ;;
+        *:*=*)
+          _rg_kv=${_rg_w#*:}
+          case "${_rg_w%%:*}:${_rg_kv%%=*}" in
+            :*|*:) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+          esac
+          [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue ;;
+        *) printf 'lib-unattended: %s declares a [[generated]] when this reader cannot evaluate, so it is skipped: %s\n' "$_rg_d" "$_rg_w" >&2; continue ;;
+      esac
+      [ -n "$_rg_g" ] || continue
       [ -n "$_rg_map" ] || _rg_p=${_rg_p//\{map_root\}\//}
       _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
       _rg_p=${_rg_p//\{kit\}/$_rg_krel}

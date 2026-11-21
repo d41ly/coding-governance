@@ -100,12 +100,13 @@ required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
 # declared one executes nothing.
 # BACKLOG_MODE's spelling is frozen — the transition audit classifies commits by it — so it is
 # declared here as well as in the conf example, and a sibling unit's `requires_if` names this entry.
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
 # TOOL-dTrueNorth-20 S1: the four DESIGN_* keys are gov's, the as-built view's and the deviation join's,
 # and blank or absent is off. Listed so govkit's check 7 resolves the unattended row's condition keys;
 # that check is the list's one reader and writes nothing. The example conf declares them blank, which
-# is off, as it declares the list's other three (TOOL-dTrueNorth-29 S5).
-conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "LIVE_LANDED_UNCLOSED", "DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"]
+# is off, as it declares the list's other key (TOOL-dTrueNorth-29 S5); DEAD_PATH_PIN and ORPHAN_ID_PIN
+# left the list with their keys (TOOL-dWitnessedBar-17 S4).
+conditional_keys = ["LIVE_LANDED_UNCLOSED", "DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -187,12 +188,22 @@ ok = true
 probe = { must_exist = ".memory-tree.conf" }
 
 [[gate_leg]]
+tag = "leg.memory-tree.memory-hygiene"
+tests = ["feature.memory-tree-hygiene"]
 name = "memory hygiene"
 subject = "repo"
+purpose = "runs the memory tree's mechanized hygiene checks"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
 guard = []
 history_depth = "full"
 stage = ["step.build", "step.test"]
+
+[gate_leg.gov]
+reads = { base = "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", clock = "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", history = "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)." }
+signature = ["bash", "{prefix}/memory-tree/check-memory-hygiene.sh", "--offenders"]
+guard = []
+chunk = "records"
+ceiling = 12720
 
 [[hole]]
 id = "memory-tree-taxonomy"
@@ -215,11 +226,11 @@ id = "measured-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
-why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
+why = "checks 13-15 arm on their two waiver homes, id-orphan-waiver.txt and corpus-path-unresolved.txt, each keyed by the offender it waives and measured against the target corpus; an inherited row is vacuous or permanently red. An absent home means its checks are simply OFF, so the hygiene leg exits 0 with that hole wide open (TOOL-dWitnessedBar-17 S4). Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the homes say."
 # DEPL-aRepatriatedFork-13 S5. The probe runs `{kit}/corpus_ids.py --check`; at a target that
 # owns that program, it would grade the adopter's own engine against gov's pins.
 stands_down = { when_owned = ["corpus_ids.py"], why = "the probe runs corpus_ids.py, and an adopter-owned corpus_ids.py is the target's program rather than gov's" }
-discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
+discharge = { command = ["bash", "-c", "for f in memory/project/id-orphan-waiver.txt memory/project/corpus-path-unresolved.txt; do [ -f \"$f\" ] || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 # THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
 # hygiene rules, the spec template, the build method and the annotation style — and until this block
@@ -240,6 +251,14 @@ argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
 argv = ["bash", "{kit}/adopt-memory-tree.sh", "--arm-routing"]
 writes = [".memory-tree.conf"]
 
+# TOOL-dWitnessedBar-46 S2. SEEDS THE ADOPTER'S SCALAR PINS at every update, since an update never
+# reaches `--scaffold`, whose end is the other caller of the same seed: `conf-scalar-pins`, through the
+# `[[ledger]]` registration below and this kit's copy of the ledger factory, written only where its home
+# is absent or unarmed. No `stage`, so regen.py lists it skipped and it never runs before a bar.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--seed-pins"]
+writes = ["memory/project/conf-scalar-pins.txt"]
+
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
@@ -248,18 +267,44 @@ the adopter's two modes are `--scaffold` and `--render`, measured, and neither i
 """
 
 [[gate_leg]]
+tag = "leg.memory-tree.verdict-epoch-kit-version-dates-the-engine"
+tests = ["feature.memory-tree-hygiene"]
 name = "verdict epoch (kit version dates the engine)"
 subject = "repo"
+purpose = "requires the version that dates the engine to move with it"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+reads = { base = "it grades from GATE_PUSH_BASE, else the mainline merge-base (TOOL-aSparedSpawn-13 S3).", history = "it walks `rev-list` and `git log` from that base to HEAD (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "declarations"
+ceiling = 300
+
 [[gate_leg]]
+tag = "leg.memory-tree.kit-dogfood-doc-parity"
+tests = ["feature.memory-tree-hygiene"]
 name = "kit/dogfood doc parity"
 subject = "repo"
+purpose = "holds the memory-tree kit's shipped docs equal to live ones"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
 guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/", ".memory-tree.conf"]
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = [
+  "memory/HYGIENE.md",
+  "memory/TEMPLATE-SPEC.md",
+  "memory/guides/BUILD-METHOD.md",
+  "memory/guides/ANNOTATION-STYLE.md",
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  ".memory-tree.conf",
+]
+chunk = "declarations"
+ceiling = 300
 # `.memory-tree.conf` joined the guard under TOOL-dDerivedDocket-21: the suite names it, govkit
 # classes a declared `[config] file` as `root-conf`, and its selfcheck reds a guarded bar leg whose
 # argv names such a conf its guard lacks. The reasoning below holds for it unchanged.
@@ -274,99 +319,212 @@ stage = ["step.test"]
 # than fixed.
 
 [[gate_leg]]
+tag = "leg.memory-tree.method-carriers-every-pointer-declared"
+tests = ["feature.build-method"]
 name = "method carriers (every pointer declared)"
 subject = "repo"
+purpose = "requires every pointer at the build method to be declared"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 1230
 
 [[gate_leg]]
+tag = "leg.memory-tree.build-readme-slot-contract"
+tests = ["feature.build-readme-surface"]
 name = "build README slot contract"
 subject = "repo"
+purpose = "grades each build README's slot contract and heading canon"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "records"
+ceiling = 300
+
 [[gate_leg]]
+tag = "leg.memory-tree.build-index-selftest"
 name = "build-index selftest"
 subject = "kit"
+purpose = "self-tests the generated build index"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.derive"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/check-spec-tokens.py",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+]
+chunk = "selftests"
+ceiling = 350
 
 [[gate_leg]]
+tag = "leg.memory-tree.corpus-ids-selftest"
 name = "corpus-ids selftest"
 subject = "kit"
+purpose = "self-tests the corpus's id and path classifier"
 argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 2690
+
 [[gate_leg]]
+tag = "leg.memory-tree.gotchas-selftest"
 name = "gotchas selftest"
 subject = "kit"
+purpose = "self-tests the bug-class index and its per-diff checklist"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+]
+chunk = "selftests"
+ceiling = 300
+
 [[gate_leg]]
+tag = "leg.memory-tree.row-grammar-selftest"
+tests = ["feature.row-grammar"]
 name = "row-grammar selftest"
 subject = "kit"
+purpose = "self-tests the row-document grammar and id-collision check"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
 
 # The migration planner's suite. DECLARED HERE rather than exempted in the govkit registry (unit 11
 # fork F8): `migrate_backlog.py` ships to every memory-tree adopter and each of them runs `--plan` in
 # their own deployer build, so withholding the leg would ship the suite and not the check that runs
 # it. Held like its four siblings, by `subject = kit`.
 [[gate_leg]]
+tag = "leg.memory-tree.backlog-migration-selftest"
+tests = ["feature.memory-tree-hygiene"]
 name = "backlog migration selftest"
 subject = "kit"
+purpose = "runs the backlog migration planner's suite"
 argv = ["python3", "{kit}/migrate_backlog.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
+
 [[gate_leg]]
+tag = "leg.memory-tree.marker-contracts"
+tests = ["feature.row-grammar"]
 name = "marker contracts"
 subject = "repo"
+purpose = "holds live readers to contracts shared code cannot express"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
 doc_reads = []
 stage = ["step.test"]
 
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 1840
+
 [[gate_leg]]
+tag = "leg.memory-tree.harness-arms-fail-branches-armed-or-pinned"
 name = "harness arms (fail branches armed or pinned)"
 subject = "repo"
+purpose = "requires each harness fail branch to be armed or pinned"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "declarations"
+ceiling = 300
 
 [[gate_leg]]
+tag = "leg.memory-tree.check-arms-selftest"
 name = "check-arms selftest"
 subject = "kit"
+purpose = "self-tests the harness arms meta-gate"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+ceiling = 300
 
 # TOOL-aRoutedQuill-3: every pushed commit touching ROUTED_PATHS names a unit specced before it. No
 # guard and no `doc_reads`: its subject is the commit history, which moves with nobody editing this
 # kit, and a doc-only push can still carry a product file the target's doc class names. Full history,
 # because a shallow clone refuses rather than grading the commits it lost.
 [[gate_leg]]
+tag = "leg.memory-tree.routed-commits-name-a-specced-unit"
+tests = ["feature.memory-tree-hygiene"]
 name = "routed commits name a specced unit"
 subject = "repo"
+purpose = "requires each routed commit to name a unit specced before it"
 argv = ["python3", "{kit}/routed_commits.py"]
 reads = { base = "it grades the commits past the GATE_PUSH_BASE the pre-push hook exports, so a verdict cached against one base says nothing about another (TOOL-aRoutedQuill-3).", history = "its verdict is a function of the commit GRAPH, not of the tree alone: two commits with one tree and different messages grade differently (TOOL-aRoutedQuill-3)." }
 guard = []
 history_depth = "full"
 stage = ["step.test"]
+enforces = ["practice.spec"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 3540
 
 [[gate_leg]]
+tag = "leg.memory-tree.routed-commits-selftest"
+tests = ["feature.memory-tree-hygiene"]
 name = "routed-commits selftest"
 subject = "kit"
+purpose = "self-tests the check that routed commits name a unit"
 argv = ["python3", "{kit}/routed_commits.py", "--selftest"]
 guard = ["{kit}/"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/",
+  "{prefix}/unattended/lib-unattended.sh",
+  "{prefix}/policy/",
+]
+chunk = "selftests"
+ceiling = 660
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
@@ -560,3 +718,341 @@ stage = "closing-review"
 role = "main"
 command = "python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>"
 when = "before any review, for the bug classes a diff can hit"
+
+# THE SCALAR PINS (TOOL-dWitnessedBar-14 S11): every `*_PIN` key a tracked root `.<name>.conf` assigns a
+# scalar count, held keyed by conf and key so a converter drains it and a tenth pin reds as a gain. The
+# seed is the leg's own measurement, run at the repository root by the ledger factory's seed run.
+[[ledger]]
+population = "conf-scalar-pins"
+leg = "ratchet (keys, not a scalar)"
+seed = ["python", "{prefix}/memory-tree/ratchet.py", "keys-not-scalar", "--measure"]
+key = "key"
+fields = ["conf", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/conf-scalar-pins.txt"
+
+# THE CONVERTED REGISTRIES (TOOL-dWitnessedBar-16): each list a check of this kit reads, converted in place
+# onto the ledger grammar, its direction the one its old header declared. Every seed is the conversion
+# program's `read-back`, which prints the home's own rows: no reader prints keyed rows of its own.
+[[ledger]]
+population = "curation-debt"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "curation-debt"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/curation-debt.txt"
+
+[[ledger]]
+population = "id-orphan-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "id-orphan-waiver"]
+key = "record"
+fields = ["id"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/id-orphan-waiver.txt"
+
+[[ledger]]
+population = "legacy-files"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "legacy-files"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/legacy-files.txt"
+
+[[ledger]]
+population = "method-carriers"
+leg = "method carriers (every pointer declared)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "method-carriers"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/method-carriers.txt"
+
+[[ledger]]
+population = "readme-contract"
+leg = "build README slot contract"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "readme-contract"]
+key = "site"
+fields = ["path", "binding"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/readme-contract.txt"
+
+[[ledger]]
+population = "refusal-retirements"
+leg = "harness arms (fail branches armed or pinned)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "refusal-retirements"]
+key = "record"
+fields = ["unit", "path", "check", "r1", "r2", "r3", "r4", "survivor", "signature", "replay"]
+verbatim = ["check", "r1", "r2", "r3", "r4", "signature", "replay"]
+drain = "none"
+direction = "append-only"
+home = "memory/project/refusal-retirements.txt"
+
+[[ledger]]
+population = "stale-header-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "stale-header-waiver"]
+key = "site"
+fields = ["path"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/stale-header-waiver.txt"
+
+[[ledger]]
+population = "trace-waiver"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "trace-waiver"]
+key = "site"
+fields = ["path", "subject"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/trace-waiver.txt"
+
+[[ledger]]
+population = "unarmed-branches"
+leg = "harness arms (fail branches armed or pinned)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "unarmed-branches"]
+key = "site"
+fields = ["path", "check", "signature"]
+verbatim = ["check", "signature"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/unarmed-branches.txt"
+
+# THE DEAD-PATH REGISTRY (TOOL-dWitnessedBar-17 §4): check 15's waiver, converted in place as unit 16's lists
+# were, `path` the citing file and `cited` the path it cites; its `absent|moved:DEST` column left as the
+# conversion's reason (§8 F9). Present, it arms check 15 and check 13; absent is off (§8 F2).
+[[ledger]]
+population = "corpus-path-unresolved"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "corpus-path-unresolved"]
+key = "site"
+fields = ["path", "cited"]
+drain = "hunk"
+direction = "shrink-only"
+home = "memory/project/corpus-path-unresolved.txt"
+
+# THE COUNTED PINS AS KEYED POPULATIONS (TOOL-dWitnessedBar-17 S1): each check's own measurement exposed as a
+# verb, so a fixed offender and a new one never net to zero. Check 20 grades `row-duplicates`, check 21
+# `unbound-records`, each an offender with no row red and a row no offender matches red as stale.
+[[ledger]]
+population = "row-duplicates"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/row_grammar.py", "--list-duplicates"]
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/row-duplicates.txt"
+
+[[ledger]]
+population = "unbound-records"
+leg = "memory hygiene"
+seed = ["python", "{prefix}/memory-tree/corpus_ids.py", "--list-unbound"]
+key = "record"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unbound-records.txt"
+
+# THE TWO UNSET SHARD PINS (TOOL-dWitnessedBar-17 S2), registered unseeded: `retrofit.unseeded`'s default
+# reads each `unarmed`, and its home is declared and never written while `seed` is empty. The unit that
+# gives either a seed adds its home to check 3's named list.
+[[ledger]]
+population = "severity-unlabelled"
+leg = "memory hygiene"
+seed = []
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/severity-unlabelled.txt"
+
+[[ledger]]
+population = "live-rows"
+leg = "memory hygiene"
+seed = []
+key = "record"
+fields = ["shard", "row-key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/live-rows.txt"
+
+# THE DATE CUTOFFS (TOOL-dWitnessedBar-17 S6): every `*_CUTOFF` key of a tracked root `.<name>.conf`, its count
+# the date as eight digits and a blank one `99991231`, under `ceiling`: a date moved later reds in both
+# ways as `count rose` and in never-gains as `above ceiling`, and one moved earlier is admitted. The dates
+# stay in their confs; `ratchet (both ways)` names this registration as its own (§8 F5).
+[[ledger]]
+population = "date-cutoffs"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/memory-tree/ratchet.py", "measure-cutoffs"]
+key = "cutoff"
+fields = ["conf", "key"]
+drain = "none"
+direction = "ceiling"
+home = "memory/project/date-cutoffs.txt"
+
+# Each list this kit's adopter seeds converts at the adopter's next update (TOOL-dWitnessedBar-16 S10).
+[[upgrade]]
+id = "memory-tree/curation-debt-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/curation-debt.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/curation-debt.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/curation-debt.txt"]
+surfaces = ["file:memory/project/curation-debt.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/id-orphan-waiver-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/id-orphan-waiver.txt"]
+surfaces = ["file:memory/project/id-orphan-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/legacy-files-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/legacy-files.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/legacy-files.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/legacy-files.txt"]
+surfaces = ["file:memory/project/legacy-files.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/method-carriers-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/method-carriers.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/method-carriers.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/method-carriers.txt"]
+surfaces = ["file:memory/project/method-carriers.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/readme-contract-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/readme-contract.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/readme-contract.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/readme-contract.txt"]
+surfaces = ["file:memory/project/readme-contract.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/stale-header-waiver-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/stale-header-waiver.txt"]
+surfaces = ["file:memory/project/stale-header-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/unarmed-branches-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/unarmed-branches.txt"]
+surfaces = ["file:memory/project/unarmed-branches.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/corpus-path-unresolved-to-ledger"
+up = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "up", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+down = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "down", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+witness = ["python", "{gov}/govkit/steps/registry_to_ledger.py", "witness", "{target}", "--home", "memory/project/corpus-path-unresolved.txt"]
+surfaces = ["file:memory/project/corpus-path-unresolved.txt"]
+needs-target = false
+
+# Each conf pin this kit's checks read leaves the conf at the adopter's next update (TOOL-dWitnessedBar-17 S8):
+# a counted pin's population seeded first, then the key and its `conf-scalar-pins` row drained; a folded
+# pin's home removed where the key was blank, so its checks stay off as the blank pin left them.
+[[upgrade]]
+id = "memory-tree/orphan-id-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "ORPHAN_ID_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "ORPHAN_ID_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "ORPHAN_ID_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#ORPHAN_ID_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/id-orphan-waiver.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/dead-path-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "DEAD_PATH_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "DEAD_PATH_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "DEAD_PATH_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#DEAD_PATH_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/corpus-path-unresolved.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/row-duplicate-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "ROW_DUPLICATE_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#ROW_DUPLICATE_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/row-duplicates.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/record-unbound-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "RECORD_UNBOUND_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#RECORD_UNBOUND_PIN", "file:memory/project/conf-scalar-pins.txt", "file:memory/project/unbound-records.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/severity-unlabelled-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "SEVERITY_UNLABELLED_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#SEVERITY_UNLABELLED_PIN", "file:memory/project/conf-scalar-pins.txt"]
+needs-target = false
+
+[[upgrade]]
+id = "memory-tree/live-row-pin-to-ledger"
+up = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "up", "{target}", "--key", "LIVE_ROW_PIN"]
+down = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "down", "{target}", "--key", "LIVE_ROW_PIN"]
+witness = ["python", "{gov}/govkit/steps/conf_pins_to_ledger.py", "witness", "{target}", "--key", "LIVE_ROW_PIN"]
+surfaces = ["conf-key:.memory-tree.conf#LIVE_ROW_PIN", "file:memory/project/conf-scalar-pins.txt"]
+needs-target = false
+
+# THE RATCHET PACK (TOOL-dWitnessedBar-14): one leg per row of retrofit's `[ratchet]` table, each a verb
+# of `ratchet.py`; `untouched quiet` and `merge` are plants of `ratchet selftest`, and the touch join is
+# `build.scope`'s, printed unarmed by `ratchet.py --list`. An adopter receives these two legs; the
+# other seven read gov's registered populations or the base remote, so they are `[[exempt_leg]]` rows
+# of govkit's registry (TOOL-dWitnessedBar-46 S5).
+
+[[gate_leg]]
+name = "ratchet (keys, not a scalar)"
+tag = "leg.memory-tree.ratchet-keys-not-a-scalar"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a scalar count pin in a root conf"
+argv = ["python3", "{kit}/ratchet.py", "keys-not-scalar"]
+subject = "repo"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "declarations"
+ceiling = 300
+
+[[gate_leg]]
+name = "ratchet selftest"
+tag = "leg.memory-tree.ratchet-selftest"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "self-tests the ratchet pack's plants red and green"
+argv = ["python3", "{kit}/ratchet.py", "--fixture"]
+unguarded_why = "a guard naming the memory-tree kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+subject = "kit"
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "selftests"
+ceiling = 300
+
+[[command]]
+verb = "seen-red"
+run = "seen_red.py"

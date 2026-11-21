@@ -110,7 +110,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.131 # gov:kit unattended@1.131 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.134 # gov:kit unattended@1.134 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -285,6 +285,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 case "${1:-}" in "") ;; *) echo "brief-recorded: unknown argument: $1" >&2; exit 2 ;; esac
 
@@ -498,7 +516,10 @@ read_history_range "$DRIVER"
 WAIVER_FILE="$MEMORY_ROOT/project/brief-recorded-waiver.txt"
 waived_ids=""; waived_n=0; waived_seen=""
 if GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
-  waived_ids=$(GIT show "HEAD:$WAIVER_FILE" 2>/dev/null | sed -e 's/#.*//' -e 's/[[:space:]].*$//' | grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' || true)
+  # Read through the ledger factory (TOOL-dWitnessedBar-16): one `<unit> TAB <count> TAB <sha> TAB <disposition>`
+  # row per waived unit, its reason in the conversion record and never on the row.
+  waived_ids=$(read_record_keys HEAD "$WAIVER_FILE") || exit 2
+  waived_ids=$(grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' <<<"$waived_ids" || true)
   waived_ids=$(echo $waived_ids)   # one space-separated line: the membership test needs a space on both sides
 fi
 # Every violation routes through here, so a waived unit is counted rather than silently dropped.

@@ -88,13 +88,50 @@ exactly where `Signals` stands. The door also refuses an `Answers` naming no rec
 build; every refusal exits 1, writing nothing. `--fixture --plant recommendation` stages a score record, the
 reason answering it, each refusal and their bindings.
 
+THE WIDEN KIND (TOOL-dWitnessedBar-14 S5): `<date>-build-<unit id>-widen-<n>.md`, a population's growth
+admitted with its reason: `Population`, `Keys` (each key backticked, its fields TAB-joined), `Reason` and
+`Caused-by`. It has no `new` door: the ratchet pack's `ratchet.py widen` calls `write_record` and writes the
+row `widened:<record stem>` beside it, and its `never gains` leg reads the record back through `read_record`.
+
+THE CARD KIND (TOOL-dPlacedRequest-2 S8): `<date>-build-<anchor id>-card-<n>.md`, a build's orientation card
+at one step, its snapshot, the anchor the transition kind's: `Build`, `Step` (one word), `Ref` (the card ref's
+commit, eight to forty hex digits, or `none`), then the card's text in one `~~~~` fenced block. `read_card`
+is its reader, which refuses each of those shapes and a record holding no fenced block. It has no `new`
+door: the kickoff engine's snapshot calls `write_record`.
+
+THE PROBE-TRIGGER AND PROBE KINDS (TOOL-dPlacedRequest-7 S6): `<date>-build-<unit id>-probe-trigger-<n>.md`, a
+probe opened at an item boundary: `Cause`, `Asker`, `Subject`, `At` and `Key`, `none` where the trigger names no
+position or content key. `<date>-build-<unit id>-probe-<n>.md`, the probe it opened: `Sha` (the pinned commit,
+eight to forty hex digits), `Kind` (`PROBE_KINDS`), `Question`, `Losing`, `Asker` and `Trigger`, written at the
+pin; `Verdict`, closed per `Kind` by `PROBE_VERDICTS`, beside `Judged` (`computed` or `claimed`, a claimed
+judgment carrying no `Verdict`) and `Writer` (`stand-in` until the executor lands), written later; then a
+`## Method` section of `METHOD_LINE` entries and the `RUN_LINE` lines. `read_probe_trigger` and `read_probe`
+are their readers. Neither kind has a `new` door: the loop kit's `probe.py` computes every field and calls
+`write_record`.
+
 ONE LINE PER VALUE, at the one writer (PLAY-dOrderedCharter-49 S53): `write_record` refuses a field value
 holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so no door's value forges a
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
 the same way, and so is a line that reads as a field.
 
+THE FLAKE KIND (TOOL-dWitnessedBar-8 S3): `<date>-build-<unit id>-flake-<n>.md`, one `test.flakes` run's
+verdicts: `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one fenced block of TAB rows, `<leg> · <first rc> ·
+<re-run rc or ->`, one per leg the run executed. It has no `new` door: the run-gates kit's `verdict_flow.py
+flakes` loads this factory as `keep_tails.py` does and calls `write_record`. The body's one reader is
+`read_flake_body`, its rows, and a row flaked where `derive_flaked` says so: its first rc a non-zero integer and
+its re-run rc 0. Both kits that read flake records, run-gates and drift, read them through these two
+(TOOL-dWitnessedBar-1 S7), so the grammar has this one home.
+
+THE GATE-HEALTH KIND (TOOL-dWitnessedBar-1 S4): `<date>-build-<unit id>-gate-health-<n>.md`, one gate-health
+measurement: `Measured` (the reliability bar, `<count>/10`), `Verdicts` (the `Run` of every flake record it
+read) and `Legs` (`<armed>/<bar legs>`). It has no `new` door: the drift kit's `drift_report.py --gate-health
+--write` loads this factory in-process and calls `write_record`, and the run-gates kit's `verdict_flow.py` reads
+the newest one's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
-2 an unreadable path or a pending kind.
+2 an unreadable path or a pending kind. A kind with a reader of its own is read by it; `exception` by
+`read_exception`; every other kind, `widen`, `leg-tail`, `flake` and `gate-health` among them, by
+`read_record` and its `KINDS` entry alone.
 
 ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
 bindings reader admits and joins to their file names, and an import whose table differs from that tuple
@@ -143,6 +180,17 @@ RECOMMEND_BINDS = ("yes", "no")
 #: one re-run command of an acceptance record: its exit (an integer, or `timeout`), the first twelve hex
 #: digits of the SHA-256 of its combined output, and the command as run
 RUN_LINE = re.compile(r"run · (?P<exit>-?\d+|timeout) · (?P<hash>[0-9a-f]{12}) · (?P<command>\S.*)")
+PROBE_KINDS = ("verification", "reproduction", "experiment")   # a probe's kind, closed (TOOL-dPlacedRequest-7)
+#: a probe's verdict, closed per its kind
+PROBE_VERDICTS = {"verification": ("confirmed", "refuted", "inconclusive", "unrunnable"),
+                  "reproduction": ("confirmed", "refuted", "inconclusive", "unrunnable"),
+                  "experiment": ("measured", "within-noise", "aborted", "unrunnable")}
+PROBE_JUDGED = ("computed", "claimed")   # how a probe's judgment was reached, a fact beside its verdict
+METHOD_MARKS = ("judge claimed", "visual")   # a method entry's optional trailing fields
+#: one entry of a probe's method: the predicted `<exit>:<hash12>`, the command, which never holds the field
+#: separator, then any of `METHOD_MARKS`, each after a ` · `
+METHOD_LINE = re.compile(r"- method · (?P<exit>-?\d+|timeout):(?P<hash>[0-9a-f]{12}) · (?P<command>(?:(?! · )\S)"
+                         r"(?:(?! · ).)*)(?P<marks>(?: · (?:judge claimed|visual))*)")
 
 # kind -> its required fields and its closed sets, `(field, allowed values)` in refusal order
 KINDS = {
@@ -185,6 +233,37 @@ KINDS = {
     "recommendation": {
         "required": ("Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"),
         "closed": (("Score", RECOMMEND_SCORES), ("Binds", RECOMMEND_BINDS)),
+    },
+    "widen": {   # TOOL-dWitnessedBar-14 S5: written by the ratchet pack's `ratchet.py widen`, no `new` door
+        "required": ("Population", "Keys", "Reason", "Caused-by"),
+        "closed": (),
+    },
+    "leg-tail": {   # TOOL-dWitnessedBar-25 S6: written by the run-gates kit's `keep_tails.py`, no `new` door;
+        # the tail itself is one fenced block after the fields
+        "required": ("Leg", "Hash", "Run", "Sha", "Cause"),
+        "closed": (),
+    },
+    "flake": {   # TOOL-dWitnessedBar-8 S3: written by the run-gates kit's `verdict_flow.py flakes`, no `new` door;
+        # one TAB row per executed leg in a fenced block after the fields
+        "required": ("Run", "Ended", "Sha", "Tree", "Legs"),
+        "closed": (),
+    },
+    "gate-health": {   # TOOL-dWitnessedBar-1 S4: written by the drift kit's `drift_report.py --gate-health --write`,
+        # no `new` door
+        "required": ("Measured", "Verdicts", "Legs"),
+        "closed": (),
+    },
+    "card": {
+        "required": ("Build", "Step", "Ref"),
+        "closed": (),
+    },
+    "probe-trigger": {
+        "required": ("Cause", "Asker", "Subject", "At", "Key"),
+        "closed": (),
+    },
+    "probe": {
+        "required": ("Sha", "Kind", "Question", "Losing", "Asker", "Trigger"),
+        "closed": (("Kind", PROBE_KINDS), ("Judged", PROBE_JUDGED), ("Writer", ACCEPTANCE_WRITERS)),
     },
 }
 if set(KINDS) != set(TYPED_RECORD_KINDS):
@@ -266,6 +345,17 @@ def read_records(root, conf, kind, reader):
             others = ", ".join(o["path"] for o in group if o is not r)
             r["malformed"].append(("file name", f"shares {kind}-{n} with {others}"))
     return records
+
+
+# -------------------------------------------------------------------------------- the flake kind's body
+def read_flake_body(text):
+    """[(leg, first rc, re-run rc or -)], the TAB rows of a flake record's body (TOOL-dWitnessedBar-1 S7)."""
+    return [tuple(ln.split("\t")) for ln in text.replace("\r\n", "\n").split("\n") if ln.count("\t") == 2]
+
+
+def derive_flaked(first, rerun):
+    """True where a flake row flaked: its first rc a non-zero integer and its re-run rc 0."""
+    return first not in ("0", "-") and first.lstrip("-").isdigit() and rerun == "0"
 
 
 # -------------------------------------------------------------------------------- the exception kind
@@ -642,6 +732,81 @@ def read_transition(path, text):
 
     fields, bad, name = read_record(path, text, "transition", check_fields=check_fields)
     return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+# -------------------------------------------------------------------------------- the card kind
+def read_card(path, text):
+    """One card record: its fields under their own names, `card` the text of its fenced block, and `id`,
+    `path`, `build`, `n` and `malformed`. Its own rules: `Build` a slug, `Step` one word, `Ref` `none` or eight
+    to forty hex digits, and one `~~~~` fenced block after the fields."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    fences = [i for i, ln in enumerate(lines) if ln == "~~~~"]
+    card = "\n".join(lines[fences[0] + 1:fences[1]]) if len(fences) >= 2 else None
+
+    def check_fields(fields):
+        bad = [] if card is not None else [("card", "is missing: the record holds the card's text in one ~~~~ fenced block")]
+        if "Build" in fields and not SLUG.fullmatch(fields["Build"]):
+            bad.append(("Build", f"{fields['Build']} is not a build slug"))
+        if "Step" in fields and not re.fullmatch(SEG, fields["Step"]):
+            bad.append(("Step", f"{fields['Step']} is not one word"))
+        if "Ref" in fields and not re.fullmatch(r"none|[0-9a-f]{8,40}", fields["Ref"]):
+            bad.append(("Ref", f"{fields['Ref']} is neither none nor eight to forty hex digits"))
+        return bad
+
+    fields, bad, name = read_record(path, text, "card", check_fields=check_fields)
+    return {**fields, "card": card, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+# -------------------------------------------------------------------------------- the probe kinds
+def read_probe_trigger(path, text):
+    """One probe-trigger record: its fields under their own names, and `id`, `path`, `build`, `n` and
+    `malformed`. Its own rules: `Asker` an item tag, and `At` an item tag or `none`."""
+    def check_fields(fields):
+        return [(k, f"{fields[k]} is not an item tag{' or none' if k == 'At' else ''}") for k in ("Asker", "At")
+                if k in fields and not (re.fullmatch(r"item\." + TAG, fields[k]) or (k == "At" and fields[k] == "none"))]
+
+    fields, bad, name = read_record(path, text, "probe-trigger", check_fields=check_fields)
+    return {**fields, "id": pathlib.PurePosixPath(path).stem, "path": path,
+            "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
+            "malformed": bad}
+
+
+def check_probe_fields(fields, lines):
+    """The probe kind's own rules over its `fields` and its `lines`: `Sha` eight to forty hex digits; a
+    `Verdict` inside its `Kind`'s `PROBE_VERDICTS` and standing exactly where `Judged` is `computed`; every
+    line opening `- method ·` a `METHOD_LINE` and every line opening `run ·` a `RUN_LINE`."""
+    bad = []
+    if "Sha" in fields and not re.fullmatch(r"[0-9a-f]{8,40}", fields["Sha"]):
+        bad.append(("Sha", f"{fields['Sha']} is not eight to forty hex digits"))
+    allowed = PROBE_VERDICTS.get(fields.get("Kind"))
+    if "Verdict" in fields and allowed and fields["Verdict"] not in allowed:
+        bad.append(("Verdict", f"{fields['Verdict']} is outside {' · '.join(allowed)}, a {fields['Kind']}'s verdicts"))
+    if ("Verdict" in fields) != (fields.get("Judged") == "computed") and "Judged" in fields:
+        bad.append(("Verdict", f"stands where Judged is {fields['Judged']}: a computed judgment carries a verdict and "
+                               f"a claimed one none"))
+    if "Verdict" in fields and "Judged" not in fields:
+        bad.append(("Judged", "is missing beside Verdict"))
+    bad += [("method", f"{ln!r} is not - method · <exit>:<hash12> · <command>[ · <mark>]")
+            for ln in lines if ln.startswith("- method ·") and not METHOD_LINE.fullmatch(ln)]
+    bad += [("run line", f"{ln!r} is not run · <exit> · <hash12> · <command>")
+            for ln in lines if ln.startswith("run ·") and not RUN_LINE.fullmatch(ln)]
+    return bad
+
+
+def read_probe(path, text):
+    """One probe record: its fields under their own names, `method` its entries as `(exit, hash, command,
+    marks)`, `runs` its run lines as `(command, exit, hash)`, and `id`, `path`, `build`, `n` and `malformed`."""
+    lines = [ln.strip() for ln in text.replace("\r\n", "\n").split("\n")]
+    method = [(m.group("exit"), m.group("hash"), m.group("command"), tuple(x for x in METHOD_MARKS
+                                                                          if f" · {x}" in m.group("marks")))
+              for ln in lines if (m := METHOD_LINE.fullmatch(ln))]
+    runs = [(m.group("command"), m.group("exit"), m.group("hash")) for ln in lines if (m := RUN_LINE.fullmatch(ln))]
+    fields, bad, name = read_record(path, text, "probe", check_fields=lambda f: check_probe_fields(f, lines))
+    return {**fields, "method": method, "runs": runs, "id": pathlib.PurePosixPath(path).stem, "path": path,
             "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
             "malformed": bad}
 
@@ -1198,8 +1363,16 @@ def main(argv):
         bad = read_transition(rel, text)["malformed"]
     elif kind == "recommendation":
         bad = read_recommendation(rel, text)["malformed"]
-    else:
+    elif kind == "card":
+        bad = read_card(rel, text)["malformed"]
+    elif kind == "probe-trigger":
+        bad = read_probe_trigger(rel, text)["malformed"]
+    elif kind == "probe":
+        bad = read_probe(rel, text)["malformed"]
+    elif kind == "exception":
         bad = read_exception(rel, text)["malformed"]
+    else:   # TOOL-dWitnessedBar-8 §8 F12: a kind with no rules of its own reads by its `KINDS` entry alone
+        bad = read_record(rel, text, kind)[1]
     for ln in text.replace("\r\n", "\n").split("\n"):
         if m := FIELD.match(ln):
             print(f"build-records: {rel} · {m.group(1)}: {m.group(2).strip()}")

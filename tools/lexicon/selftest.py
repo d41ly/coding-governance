@@ -47,46 +47,115 @@ os.environ.update(GIT_AUTHOR_NAME="lexicon selftest", GIT_AUTHOR_EMAIL="selftest
                   GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 def resolve_bash() -> str:
     """The bash that shares THIS filesystem, by absolute path — never the bare name `bash`.
 
     On a Windows host the loader resolves a bare `bash` from System32 BEFORE PATH, and what sits
     there is the WSL launcher: with no distribution behind it every arm reds on "no installed
     distributions", and with one it runs a bash that sees `/mnt/c/` rather than this tree. So the
-    override `GOV_BASH` is taken when set, else PATH is walked with System32 and WindowsApps
-    skipped, and a candidate is accepted only when it can `test -f` this file by its absolute
-    forward-slashed path — starting is not evidence, since a WSL bash starts fine. Nothing accepted,
-    or an override that cannot see the tree, is exit 2 naming the remedy, never a fall-through to
-    the bare name, which is the defect itself made silent.
+    one `resolve_bash_py` block above (TOOL-dWitnessedBar-26) runs each candidate against this file
+    by its absolute forward-slashed path — starting is not evidence, since a WSL bash starts fine.
+    Nothing accepted, or an override that cannot see the tree, is exit 2 naming the refusal, never a
+    fall-through to the bare name, which is the defect itself made silent.
     """
-    me = os.path.abspath(__file__).replace("\\", "/")
-    override = os.environ.get("GOV_BASH")
-    cands, tried = ([override] if override else []), []
-    for d in ([] if override else os.environ.get("PATH", "").split(os.pathsep)):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                tried.append(f"{cand} (a launcher, skipped)")
-            else:
-                cands.append(cand)
-    for cand in cands:
-        try:
-            sees = subprocess.run([cand, "-c", 'test -f "$1"', "_", me], capture_output=True).returncode == 0
-        except OSError:
-            sees = False
-        if sees:
-            return cand
-        tried.append(f"{cand} (cannot see {me})")
-    if override:
-        print(f"lexicon selftest: GOV_BASH is set to '{override}', an override that cannot see the tree "
-              f"(`test -f {me}` failed there); point GOV_BASH at a bash sharing this filesystem",
-              file=sys.stderr)
-    else:
-        print(f"lexicon selftest: no bash on PATH can see this tree, tried: {'; '.join(tried) or 'none found'}; "
-              "set GOV_BASH to a bash sharing this filesystem", file=sys.stderr)
+    found, _tried, refusal = scan_bash(os.path.abspath(__file__).replace("\\", "/"))
+    if found:
+        return found
+    print(f"lexicon selftest: {refusal}", file=sys.stderr)
     raise SystemExit(2)
 
 
@@ -388,6 +457,25 @@ check("P1 red: an undeclared leading token reds", code != 0 and "P1 verb" in out
 check("P1 red names the file", "core/a.py" in out, out)
 check("P1 red names the identifier", "frobnicate_index" in out, out)
 check("P1 red names the offending token", "'frobnicate'" in out, out)
+
+# ---- HOME-GRADED (TOOL-dHomeGraded-1 S2) --------------------------------------------------------
+# The same offender, claimed by a receipt `engine` row at gov's bytes, is gov's to grade and leaves
+# the corpus; the receipt itself sits in the deployer's state dir, whose `json` LANGS never declares.
+# Then the row records other bytes than the file holds, and the offender is graded again. One line,
+# no newline: the fixture writes text mode, and a line end would move the blob's bytes per platform.
+import hashlib  # noqa: E402 — the blob id a receipt row records
+import json  # noqa: E402
+
+_kit_src = "def frobnicate_index(): pass"
+_kit_oid = hashlib.sha1(f"blob {len(_kit_src)}\0{_kit_src}".encode()).hexdigest()
+for _label, _oid, _red in (("at gov's bytes leaves the corpus", _kit_oid, False),
+                           ("recording other bytes is graded", "0" * 40, True)):
+    code, out = run_case({"core/a.py": _kit_src, "core/b.py": "def build_index(): pass",
+                          ".governance/install.json": json.dumps({"files": [
+                              {"path": "core/a.py", "role": "engine", "oid": _oid, "gov_oid": _oid}]})},
+                         BASE_CONF)
+    check(f"home-graded: a receipt engine row {_label}",
+          (code != 0, "frobnicate_index" in out, "UNDECLARED EXTENSIONS" in out) == (_red, _red, False), out)
 
 # ---- P2: the banned-suffix predicate ------------------------------------------------------------
 code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass ThingManager:\n    pass\n"}, BASE_CONF)

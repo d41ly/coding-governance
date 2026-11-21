@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.131 -->
+<!-- gov:kit unattended@1.134 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -25,9 +25,16 @@ rendered ones do carry placeholders, and for them a render is the only correct i
 **A kit declares the outputs its generators write, and check 23 reads the declarations.** Each is a
 `[[generated]]` table in the kit's `kit.toml`, every key at column 0 as a double-quoted string:
 `path` (tokens `{memory_root}`, `{map_root}` and `{kit}` only), `generator` (a file beside the
-descriptor), `why`, and an optional `when = "<conf>:<KEY>=<value>"` that applies the row only when
-that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape for those
-four keys, because the shell reader would mangle or drop it. A row may also carry `write` and
+descriptor), `why`, and an optional `when` of one of two forms: `"<conf>:<KEY>=<value>"` applies the
+row only when that repo-root conf assigns exactly that value, and `"exists:<path>"` only when that
+path exists under the repo root, its `{prefix}`, `{kit}`, `{memory_root}` and `{map_root}` resolved
+as run-gates' `regen.py` resolves them (TOOL-dWitnessedBar-54). An `exists:` path that is empty,
+left holding another token, absolute (`/…`, `X:…`) or holding a `..` segment, and a `when` of
+neither form, is refused by govkit selfcheck and by `regen.py`, and the shell reader names it on
+stderr with its descriptor and its `when` and skips the row (TOOL-dWitnessedBar-62). An `exists:`
+path absent from the tree is a silent skip, as a false conf `when` is: the row does not apply.
+govkit selfcheck refuses any other shape for the four keys, because the shell reader would mangle
+or drop it. A row may also carry `write` and
 `check`, argv arrays, and `stage`, an integer, all three or none, at column 0: the shell reader
 ignores them, and the run-gates kit's `regen.py` reads them to regenerate the output or prove it
 fresh before a bar (that kit's README, "Generated outputs"; TOOL-aPrimedIndex-1).
@@ -279,10 +286,13 @@ A relaunch appends one `run-resumed` line, a launch that failed one `resume-fail
 live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
-`claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
-`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`), and
-`spec-tokens-lock-broken` or `spec-tokens-guard-cleared` for a dispatch's `spec-tokens.<slug>.lock` the same way
-(`TOOL-aPiecewiseGrade-6`). The line format is the
+`spec-tokens-lock-broken` when it breaks a stale `spec-tokens.<slug>.lock` a dispatch took, under that
+lock's guard, or `spec-tokens-guard-cleared` when it removes a guard a crashed writer left
+(`TOOL-aGraftedHelix-37`, `TOOL-aPiecewiseGrade-6`); the node locks, `gov-feed.lock`,
+`gov-queue.lock` and `--request`'s `requests.lock` in the common dir, append `node-lock-broken` and
+`node-guard-cleared` on the same terms (`TOOL-dPlacedRequest-24`, `TOOL-dPlacedRequest-43`); and a flush of
+the offline queue appends `lease-yielded` for each queued write it yields because the remote moved
+first (`TOOL-dPlacedRequest-41`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

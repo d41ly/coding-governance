@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.23 -->
+<!-- gov:kit roles@1.25 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -453,7 +453,7 @@ else; the check compares the two on every run.
 | spec-review | workflow | {prefix}/workflows/tier2-review.js | gov-spec-reviewer, gov-skeptic, gov-synthesizer | specFinder → gov-spec-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard, on the build harness's Workflow call whose roles carry the audit's review keys | after the spec set is written, where the build or its project declares a spec audit |
 | build | workflow | {prefix}/workflows/unattended-unit.js | gov-builder | builder → gov-builder | scratch-guard.js role arm, routed commits name a specced unit | once per unit, in stage order, after its spec is READY |
 | closing-review | workflow | {prefix}/workflows/tier2-review.js | gov-diff-reviewer, gov-skeptic, gov-synthesizer | diffFinder → gov-diff-reviewer, skeptic → gov-skeptic, synthesis → gov-synthesizer | agent-cap.js spawn guard | once per build, after the last unit is terminal, over the cumulative diff |
-| gate-bar | program | bash {prefix}/run-gates/run-gates.sh | — | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
+| gate-bar | program | bash {prefix}/run-gates/run-gates.sh | gov-tester | — | the pre-push hook | once, after the closing review, at the close or the push boundary |
 | research | agent | none | gov-researcher | — | agent-cap.js spawn guard | any time a design must choose between candidates that no existing seam decides |
 | handoff | program | python {prefix}/roles/handoff.py render | gov-session | — | none — a session-to-session message is no tool call the spawn guard sees | any time work passes to another session of this repository |
 | bookkeeping | main-loop | none | — | — | memory hygiene | any time a record, an index or the run state is updated |
@@ -464,7 +464,7 @@ else; the check compares the two on every run.
 |---|---|---|---|---|---|---|
 | `gov-builder` | build | product | input:spec, card:route?, brief:non-goals? | yagni, reuse, core, derive, verify, gate, docs, security, portable, tools | true | whether the unit was committed, the commit, why when it was not, and which check ran for which gate |
 | `gov-diff-reviewer` | closing-review | none | input:diff, input:spec? | verify, gate, class, docs, left-shift, security, risk, portable | true | concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix |
-| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows |
+| `gov-orienter` | orient | none | input:question, input:prompt? | small, ids, memory, tokens, tools | true | the orientation card body: the derived task, the manifest audit line, the rows read, the records found, the bug classes and the open rows; handed a request to place, its disposition · reason · evidence · observations · scenarios · facts |
 | `gov-researcher` | research | none | input:question, brief:goal?, brief:non-goals? | reuse, verify, class, memory | true | the candidates, each with its mechanism, the smallest test that would make it lose and that test's result, then the pick and its reason |
 | `gov-reuse-scout` | reuse | none | input:question, task:in?, card:reuse? | reuse | true | the seam to extend, cited by path, or "no existing seam fits" with the evidence |
 | `gov-session` | handoff | none | input:question, brief:goal?, task:todo?, card:route? | ids, memory | false | nothing to the sender; the receiving session acts on the task block and reports in its own session |
@@ -472,5 +472,6 @@ else; the check compares the two on every run.
 | `gov-spec-reviewer` | spec-review | none | input:spec, brief:goal?, brief:non-goals? | spec?, verify, gate, class, docs, security, risk | true | concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix |
 | `gov-spec-writer` | spec-write | spec | brief:prompt, brief:goal, brief:items, brief:acceptance, brief:gates, brief:non-goals, input:spec?, task:reuse?, card:route? | yagni, reuse, core, contract, derive, one-fact, spec?, verify, gate, class, small, docs, security | true | the units authored, already present and refused, each by its unit id, with the reason for every refusal |
 | `gov-synthesizer` | closing-review | review | input:diff?, input:spec? | left-shift, risk, signal | true | the report's path and the items it adjudicated, each with its severity and the ids of the findings it covers |
+| `gov-tester` | gate-bar | none | input:spec, input:diff?, input:question? | verify, spec, gate, class, risk | true | for each red handed, one judgment, code-miss or spec-wrong (the closed outcomes of the item.test.attribute row), with the evidence observed; for the Test step's question, its answer and the evidence |
 
 <!-- /gen:roles-catalogue -->

@@ -180,6 +180,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 PY_BIN=$(resolve_python "${PLAYBOOK_PY:-}") || exit 2
 
@@ -338,6 +356,10 @@ loop-rows $_tk|0|tags: plant loop-rows · where: rc=0 0, check: rc=0
 loop-bad-seg $_tk|1|· shape · step.Plan · segment 'Plan' is outside
 command-rows $_tk|1|\`command.corekit.old\` is cited and undeclared in command|\`command.corekit.new\`
 ns-word-leaf $_tk|0|tags: green · 0 red|namespace word
+leg-rows $_tk|0|tags: plant leg-rows · where: rc=0, check: rc=0
+pack-rows $_tk|0|tags: plant pack-rows · members pack.ratchet pack.tags, check: rc=0
+check-rows $_tk|0|members check.memory-tree.23 check.unattended.23, check: rc=0
+check-rows $_tk|0|tags: unarmed check (0 not graded)
 escaped-word $_tk|1|namespace row 'a.b' is outside seg, so no tag is graded against it
 escaped-word $_tk|1|· shape · a.b.c · namespace 'a' is not registered
 unregistered-cite $_tk|1|\`layer.nowhere\` is cited and undeclared in layer
@@ -420,7 +442,9 @@ fi
 # registry adds admitted with `edges.toml` unchanged. The rows from `promoted-elsewhere` on are
 # PLAY-dOrderedCharter-28's §4 plants: the one-writer type, the pin reds, and each address form resolved
 # over a scratch repository whose unit and clause texts moved under a second commit, beside the malformed
-# section, block and note refs segment.
+# section, block and note refs segment. The `leg-` rows are TOOL-dWitnessedBar-22's leg-row site, each its
+# site named `gate-legs.json`: a `tests` target in a namespace the shipped registry lacks marked `unarmed`
+# and counted, a row's two edges resolved, and a rule-member `enforces` target marked and never resolved.
 _uk=; check_sibling_kit roles roles_lib.py || _uk=roles
 if [ -n "$_uk" ]; then echo "UNARMED — the edge grammar's plants: no $_uk kit in this install"; else
 _tf=0
@@ -463,6 +487,15 @@ resolve-clause|0|edges: resolved · site.md:1 · carries-clause=cl-dAlpha-0001 �
 bad-section|1|site.md:5: `**Edges:** implements=doc.build-method#` holds the target 'doc.build-method#', a malformed section target
 bad-block|1|site.md:5: `**Edges:** tests=kit.y implements=kit.z` carries a second `type=` pair
 bad-note-refs|1|site.py:1: `# gov:note layer.memory — x → y refs=a b` refs segment holds the target 'a b'
+leg-unregistered|0|edges: leg rows · 1 tests target(s) unarmed until their namespace is registered|is not registered
+leg-unregistered|0|edges: green · 1 edge(s)
+leg-resolved|0|edges: resolved · gate-legs.json:
+leg-resolved|0|· tests=layer.memory · layer.memory
+leg-resolved|0|· enforces=practice.land · practice.land
+leg-resolved|0|edges: green · 2 edge(s)|leg rows
+leg-rule-member|0|edges: leg rows · 1 enforces target(s) unarmed, practice rules core meta-check grades|=practice.land.paths ·
+leg-rule-member|0|edges: resolved · gate-legs.json:
+leg-rule-member|0|· enforces=practice.land · practice.land
 PLANTS
 if [ "$_tf" != 0 ]; then echo "FAIL — $_tf edge-grammar arm(s) failed"; exit 1; fi
 echo "PASS — the edge grammar's plants"

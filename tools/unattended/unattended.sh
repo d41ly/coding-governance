@@ -20,7 +20,7 @@
 #   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
-#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...] [--fix-of <red>]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...   # fire a review: print its call's pin, trigger and review policy
@@ -40,11 +40,28 @@
 #   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --check-specs <slug> <unit> [<unit> ...]   # --dispatch's spec-file refusals, before the spec commit
-#   unattended.sh --claims [--with-key]                            # every run claim on the remote: slug, node, status, beat-age-s, verdict[, key]
+#   unattended.sh --claims [--with-key]                            # every run claim and lease on the remote: name, node or fleet tag, status, beat-age-s, verdict[, key]
+#   unattended.sh --lease acquire|renew|release|take-over|offer <kind> <name> [<sub>] [--witness <sha>] [--as <status>] [--for draw] [--to <fleet tag>[/<session>]]   # one lease of a build, unit, cadence run or request, by compare-and-swap; one line
+#   unattended.sh --lease flush                                    # push this node's queued offline lease writes, oldest first
+#   unattended.sh --lease status <kind> <name> [<sub>]             # one lease read, read-only: tail, fleet tag, session, status, verdict, epoch, TAB-separated; or `lease — none · <tail>`
+#   unattended.sh --lease prune [<kind> <name> [<sub>]]            # delete each run lease and legacy run claim terminal past leases.queued-claim-days; never a build or unit lease
+#   unattended.sh --lease fence build <slug> [--after <tip>]       # the fence an effect push carries: this session's lease, its tip and a beat on it; one line, pushes nothing; --after re-fences a same-holder, same-epoch move from <tip>
+#   unattended.sh --register decision <build> <item> <fork> <file> # one create-only decision on the remote, keyed by item and fork; 0 written, 1 exists, 2 not written
+#   unattended.sh --register problem <subject> <item> <file>       # one create-only problem on the remote, its id from the filing and its text; the same exits
+#   unattended.sh --card-ref write <slug> --message <file>         # the build card's ref on the remote, by compare-and-swap; `card-ref — off` while RUN_CLAIMS is not on; 0 written, 1 lost, 2 not written
+#   unattended.sh --card-ref lookup <slug>                         # that ref read into this node's cache, read-only: its commit and message, `card-ref — none` or `— off`; 0 read, 2 not read
+#   unattended.sh --request <file>                                 # an owner's request: its words kept on this node, refs/gov/requests/<content key> created on the remote
+#   unattended.sh --request-draw <content key> --cause <cause> --item <item>   # one row on the request's pre-claim budget, by compare-and-swap; 0 drawn, 3 exhausted, 2 nothing drawn
+#   unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]   # a placed new, patch or repeat request claimed as a build: refs/gov/claims/<slug>, its lease, plan record and first record; 0 claimed, 1 refused, 2 not written, 3 spent, 4 waiting, 5 a fresh slug owed
+#   unattended.sh --request-consent <content key>                  # the consent predicate, read-only: 0 this session typed the request here, 1 relayed
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
+#   unattended.sh --feed check [<file>]                            # the node's change feed held to the governance refs this clone holds; exit 1 naming each finding
+#   unattended.sh --feed rebuild                                   # write that feed from those refs where none is present; exit 2 naming one that is
+#   unattended.sh --feed print [--from <seq>]                      # replay every event at or after <seq>, in file order
 #   unattended.sh --version                                        # the kit version, then exit
 #   unattended.sh --help                                           # the verb list, the verb carrier's path and this text, then exit 0; -h is the same
 #   unattended.sh --overlaps                                       # the overlap probe against the LOCAL default-branch tracking ref, no network
+#   unattended.sh --path-tokens [--files-touched [--any-status] <rev> <spec> ...]  # the path tokens of stdin, or the specs' Files touched paths at <rev>, a terminal spec's under --any-status; writes nothing
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -75,7 +92,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.131 # gov:kit unattended@1.131 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.134 # gov:kit unattended@1.134 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -123,7 +140,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --wake --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --refused --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --trigger --recommend --fix-pass --exhausted --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --overlaps --version"
+VERBS_INLINE="--plan --check-specs --phase --check-commit --claims --lease --register --card-ref --request --request-draw --entry-claim --request-consent --feed --overlaps --path-tokens --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -566,6 +583,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 # The bound itself. DEFAULTED rather than required, and ANNOUNCED rather than silent.
 #
@@ -1022,7 +1057,9 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass"
+# `fix-of` joined in TOOL-dWitnessedBar-21: `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against, read back by `check_fix_keeps`; not owed. The two held copies move with it.
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass fix-of"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -2014,22 +2051,8 @@ read_landed_observation() { # slug · landing commit -> 0 with LO_SHA and LO_UTC
 # one slow census and still ends a hung one. A pinned literal, chosen rather than measured, on
 # REMOTE_BOUND's argument that a bound raisable from the environment leaves no diff behind.
 REAP_BOUND=120
-PT_TOKEN=""
-read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
-  local _l="" _r
-  local -a _f
-  PT_TOKEN=-
-  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
-  { IFS= read -r _l < "$PROCFS_ROOT/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
-  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
-  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
-  _r=${_l##*) }
-  read -r -a _f <<<"$_r"
-  [ "${#_f[@]}" -ge 20 ] || return 0
-  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
-  PT_TOKEN=${_f[19]}
-  return 0
-}
+# `read_proc_token` and `check_proc_gone`, the procfs readers this ledger and the directory lock share,
+# are defined in the `gov_feed_sh` block below (TOOL-dPlacedRequest-24).
 resolve_procs_path() { # slug -> the process ledger's path on this node, beside the landed log
   local _pp; _pp=$(resolve_landed_log "$1") || return 1
   printf '%s/%s.procs\n' "${_pp%/*}" "$1"
@@ -2087,14 +2110,6 @@ derive_proc_state() { # ledger line -> PS_STATE gone|reused|live|orphan|untokene
   if kill -0 "$PS_DPID" 2>/dev/null; then PS_STATE=live; return 0; fi
   if [ "$PS_TOK" = - ] || [ "$PT_TOKEN" = - ]; then PS_STATE=untokened; else PS_STATE=orphan; fi
   return 0
-}
-# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
-check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
-  kill -0 "$1" 2>/dev/null || return 0
-  [ "${2:--}" != - ] || return 1
-  read_proc_token "$1"
-  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
-  return 1
 }
 measure_orphans() { # slug -> how many recorded processes are alive with their driver gone, on stdout; reads only
   local _l _n=0
@@ -2272,7 +2287,8 @@ AUTH_SPEC_AUDIT=""
 AUTH_SPEC_AUDIT_DERIVED=""
 AUTH_SPEC_AUDIT_FROM=""
 # TOOL-dDeclaredLoop-19 S8 - a third source, `policy`: the `review.design` value read at `_cb`, and the
-# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read.
+# answer `breakpoints.py stage` gave for it, `opt-in` wherever nothing was read. TOOL-dPlacedRequest-5 S7 - a
+# fourth, `placement`: the owner's placed `spec audit` record at BASE, which only adds an owed audit.
 AUTH_DESIGN_REVIEW=""
 _dr_answer=opt-in
 # TOOL-aQuotedBrief-4 S2 - the DEFAULT-BRANCH SIDE of the pinned BASE, check_authorization's `_cb`,
@@ -2383,22 +2399,39 @@ observe_anchor() {
 # while the run lives, given a terminal status when it ends, and read before a run starts, is taken
 # over, dispatches a pass or closes. A live claim another session holds refuses a second driver.
 #
-# THE RECORD: `refs/gov/runs/<slug>` names a parentless commit over the empty tree whose message is
+# THE RECORD: `refs/gov/runs/<slug>` names a commit over the empty tree whose message is
 # `gov-claim <slug>`, a blank line, then eight `key: value` lines - slug, node, host, session,
-# keepalive, status, lease-utc, beat-utc. The verdicts, the table of who may write and the call
+# keepalive, status, lease-utc, beat-utc. Each commit's parent is the ref's previous tip, the sha the
+# write read, so `git log` of the ref lists every holder and beat in order; a create is the one
+# parentless commit (TOOL-dPlacedRequest-11). The verdicts, the table of who may write and the call
 # sites are the stops guide's section 7, rendered from STOPS.template.md; this file implements them.
 #
 # DARK BY DEFAULT: nothing below runs while RUN_CLAIMS is `off`; `--claims` then prints `claims: off`.
+#
+# ONE LEASE GRAMMAR (TOOL-dPlacedRequest-1). A claim is now a LEASE: `refs/gov/leases/<slug>/build`,
+# `refs/gov/leases/<slug>/unit/<id>` or `refs/gov/leases/run/<cadence>/<period>`, built only by
+# `derive_lease_ref`. Its message opens `gov-claim <tail>` (the ref after `refs/gov/leases/`) and
+# carries the eight keys above, then `epoch`, `kind`, `fleet-tag`, `renews`, `witness`, `offer`,
+# `offer-deadline` and `last-fetch`. A create writes epoch 1, a take of a foreign lease the read epoch
+# plus one, every other write keeps it. The driver's run claim IS the build lease. The legacy
+# `refs/gov/runs/<slug>` is still read, in the same fetch, its epoch 0 and its row losing to a lease
+# row of the same slug; the first write to a slug holding only a legacy claim creates the lease
+# parented on the legacy tip at epoch 1, and no legacy ref is ever moved or deleted.
 #
 # WHAT THIS DOES NOT CHECK. It is no lock against a run holding the push credential, which can force
 # or delete the ref: it stops an ACCIDENTAL second driver, as the lease does. `--liveness` and
 # `--status` stay offline and read no claim, and `--claims` decides nothing about who drives.
 CLAIM_NS="refs/gov/runs"
 CLAIM_CACHE="refs/gov/remote/runs"
+LEASE_NS="refs/gov/leases"
+LEASE_CACHE="refs/gov/remote/leases"
+LEASE_REF=""
 CR_NAME=""; CR_URL=""
-CLAIM_ROWS=""; CL_WHY=""
+CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""; CL_QUEUED=""; GQ_HOLD=""; GQ_DIR=""
 CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
-WC_WHY=""; WC_BEAT=""
+CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""; CW_MODE=""
+WC_WHY=""; WC_BEAT=""; WC_EPOCH=""
+WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_VERDICT=""; WL_WITNESS=""; WL_TAG=""; WL_QUEUE=""; WL_OFFER=""; WL_ODL=""
 
 # THE ONE REMOTE, counted once. SETS rather than prints, because check 24 is a `fail` and a `fail`
 # inside a command substitution is captured as the URL with its status lost. `observe_anchor` calls
@@ -2415,6 +2448,20 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
   return 0
 }
 
+# THE ONE CLAIM-LINE READER (TOOL-dPlacedRequest-59 S7): both `awk` programs of `read_claims` below
+# prepend this text, so a claim body's `key: value` line is split in one place. `read_kv` strips a
+# trailing CR, and keeps a key of `keys` not already in `v`, its tabs read as spaces. STRICT (`loose`
+# 0) splits at the first `": "` and trims nothing: the record read. LOOSE (1) ends the key at the
+# first colon and trims the value of blanks, so a bare `renews:`, two spaces or a tab read the empty
+# value: the walk. WHAT IT DOES NOT SERVE: the other hand reads of the claim grammar in this driver.
+CLAIM_KV_AWK='function read_kv(line, keys, v, loose,   s, p, k, x) {
+    sub(/\r$/, "", line); s = loose ? ":" : ": "
+    p = index(line, s); if (p < 2) return
+    k = substr(line, 1, p - 1); x = substr(line, p + length(s))
+    if (loose) { sub(/^[[:blank:]]+/, "", x); sub(/[[:blank:]]+$/, "", x) }
+    if ((k in keys) && !(k in v)) { gsub(/\t/, " ", x); v[k] = x } }
+'
+
 # EVERY CLAIM, IN ONE BOUNDED FETCH into this clone's private cache namespace - no FETCH_HEAD, no
 # branch, no remote-tracking ref - then ONE `for-each-ref`, ONE `date` for every age and two `awk`
 # passes, so no claim spawns a process of its own (memory/gotchas/process-creation-is-the-suite-cost.md).
@@ -2424,14 +2471,43 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # cannot parse and exits 1, so a count of answers that differs from the count asked is a DEAD PROBE
 # and every age reads `-`, with the verdict `unknown`, rather than shifting onto the next claim.
 # The policy says what a failed read prints: `strict` is check 109, `soft` a line, `quiet` nothing.
-read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
-  local pol="$1" d rc alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
-  CLAIM_ROWS=""; CL_WHY=""
+# TOOL-dPlacedRequest-1 S4: the one fetch carries both namespaces, `refs/gov/leases/*` and the legacy
+# `refs/gov/runs/*`, into their caches. EIGHTEEN fields per row: name (the slug for a build lease or a
+# legacy claim, the tail for a unit or cadence lease), node for a legacy claim or fleet-tag for a
+# lease, status, beat-age-s, verdict, sha, session, keepalive, host, lease-utc, beat-utc, epoch (0 for
+# a legacy claim), kind (`-` for a legacy claim), renews, witness, offer, offer-deadline, last-fetch.
+# A lease is `unknown` unless its first line is `gov-claim <tail>`, its `slug` and `kind` agree with
+# the ref and its `epoch` is positive. `cached` reads the caches with no fetch, for `leases.offline`;
+# a fetch that fails sets CL_OFFLINE.
+# THE OBSERVER CLOCK (TOOL-dPlacedRequest-17 S2, S3): no age reads the holder's `beat-utc`. ONE
+# `git log` over every cached tip, streamed and bounded (TOOL-dPlacedRequest-34 S43, at THE WALK below),
+# reads each first-parent commit's parent, `epoch` (absent 0) and
+# `renews`; per row a walk from its own tip, while the `epoch` is the tip's, finds the RENEWING BEAT,
+# the newest commit whose `renews` is `yes` or absent, else the tenure's opening commit (§8 F5), so a
+# migrated lease's legacy commits beneath its opener never renew it; a newer commit whose `renews` is
+# `-` stops that walk first and stands for the beat (TOOL-dPlacedRequest-46). `read_first_seen` gives the
+# first sighting of the tip and of that beat, and the one `date` ages both on this node's clock:
+# field 4 is now minus the tip's sighting, and a `live` row is `stale` once its beat's sighting is
+# older than `leases.expiry-hours` (`read_lease_bound expiry`), never where that beat carries
+# `renews: -`. A tip or beat the feed has not sighted reads `unknown`, age `-`; a refused bound reads
+# every row the bound would decide `unknown`. WHAT THIS DOES NOT CHECK: a clock stepped between a
+# sighting and its judgment, which moves this node's ages by the step.
+# TOOL-dPlacedRequest-16: `released` joins the status set with the verdict `released`, a hand-over
+# any mode takes; and the walk's renewing beat leaves as a NINETEENTH field, `beat-sha`, after the
+# eighteen above, so the draw's hold is aged over the same beat with no second walk.
+# TOOL-dPlacedRequest-41 S1: a `cached` read handed CL_QUEUED, `<ref> TAB <commit>`, the newest
+# queued commit of the one ref an offline write is about to build on, reads that commit's record in
+# place of the ref's cached tip, one `git cat-file`, and moves no ref: the commit stays a local object.
+# TOOL-dPlacedRequest-19 S4: a lease tail `request/<content key>` is kind `request`, slug `-`, named by
+# its tail as a cadence lease is; the fetch's refspecs are unchanged, so no request record is read here.
+read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WHY
+  local pol="$1" d rc lf qr alive=1 nask ngot thr now fd="" _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  CLAIM_ROWS=""; CL_WHY=""; CL_OFFLINE=""
   # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
   # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
   # SOFT TAKES THE SAME BRANCH (TOOL-aGraftedHelix-32): its callers promise a claim step announced
   # and never failing the verb, so check 24 reaches them only as the one `claims not read` line.
-  if [ "$pol" = quiet ] || [ "$pol" = soft ]; then
+  if [ "$pol" = quiet ] || [ "$pol" = soft ] || [ "$pol" = cached ]; then
     resolve_claim_remote >/dev/null; rc=$?
     status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
   else
@@ -2441,12 +2517,12 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
     CL_WHY="the clone does not declare exactly one remote, check 24"
   elif ! d=$(mktemp -d); then
     CL_WHY="cannot create a scratch directory to bound the claim read in"
-  else
-    observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+$CLAIM_NS/*:$CLAIM_CACHE/*" && rc=0 || rc=$?
+  elif [ "$pol" != cached ]; then
+    observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+$CLAIM_NS/*:$CLAIM_CACHE/*" "+$LEASE_NS/*:$LEASE_CACHE/*" && rc=0 || rc=$?
     case "$rc" in
       0) ;;
-      124) CL_WHY="the read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL" ;;
-      *) CL_WHY="the remote did not answer, git fetch exited $rc: $CR_URL" ;;
+      124) CL_WHY="the read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL"; CL_OFFLINE=1 ;;
+      *) CL_WHY="the remote did not answer, git fetch exited $rc: $CR_URL"; CL_OFFLINE=1 ;;
     esac
   fi
   if [ -n "$CL_WHY" ]; then
@@ -2457,42 +2533,162 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
     esac
     return 1
   fi
-  GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" >"$d/refs" 2>/dev/null
-  printf 'now\n' >"$d/stamps"
+  # THE SIGHTINGS (TOOL-dPlacedRequest-13 S4): every cached commit past the change feed's newest line
+  # for its ref, another node's beats included, joins it oldest first; a ref whose tip is that line's
+  # commit costs one awk pass (TOOL-dPlacedRequest-27).
+  add_feed_sightings refs/gov/remote/
+  # THE LAST FETCH (TOOL-dPlacedRequest-16 S6): a read that answered stamps `gov-last-fetch` in the
+  # common dir with this node's time, written to a file of this process's own and renamed over it, so
+  # a reader sees the old stamp or the new one and never a torn file. The offline queue copies it into
+  # a queued record's `last-fetch`, which `write_gov_queue` ages.
+  if [ "$pol" != cached ] && [ -n "${GOVFEED_DIR%$'\r'}" ]; then
+    TZ=UTC printf -v lf '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    CL_LFT=""
+    { derive_temp_path CL_LFT "${GOVFEED_DIR%$'\r'}/gov-last-fetch" && printf '%s\n' "$lf" >"$CL_LFT" \
+      && mv -f "$CL_LFT" "${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null \
+      || { [ -z "$CL_LFT" ] || rm -f "$CL_LFT"; }
+  fi
+  GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" "$LEASE_CACHE/" >"$d/refs" 2>/dev/null
+  if [ "$pol" = cached ] && [ -n "${CL_QUEUED#*$'\t'}" ]; then
+    qr=${CL_QUEUED%%$'\t'*}; qr="$LEASE_CACHE/${qr#"$LEASE_NS"/}"
+    derive_temp_path CL_RQ "$d/refs" && { CL_REF="$qr" awk '/^\001/ { split(substr($0, 2), a, "\t"); skip = (a[1] == ENVIRON["CL_REF"]) } !skip' "$d/refs"
+      printf '\001%s\t%s\n' "$qr" "${CL_QUEUED#*$'\t'}"
+      GIT cat-file commit "${CL_QUEUED#*$'\t'}" 2>/dev/null | awk 'b { print; next } /^\r?$/ { b = 1 }'
+    } >"$CL_RQ" && mv -f "$CL_RQ" "$d/refs"
+  fi
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
-  CL_STF="$d/stamps" awk -v ns="$CLAIM_CACHE/" '
+  CL_TIPS="$d/tips" awk -v rns="$CLAIM_CACHE/" -v lns="$LEASE_CACHE/" -v rfe="$CLAIM_NS/" -v lfe="$LEASE_NS/" "$CLAIM_KV_AWK"'
     function dash(x) { return x == "" ? "-" : x }
-    function flush(  k, ok, st, i) {
+    function flush(  k, ok, st, i, nm, kd, sl, f2, ep, ko) {
       if (ref == "") return
       ok = 1
       for (k in want) if (!(k in v)) ok = 0
       st = v["status"]
-      if (st != "live" && st != "held" && st != "landed" && st != "aborted") ok = 0
-      if (v["slug"] != slug) ok = 0
-      i = 0
-      if (v["beat-utc"] ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) { print v["beat-utc"] >> ENVIRON["CL_STF"]; i = ++n }
-      printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", slug, dash(v["node"]), dash(st), sha, dash(v["session"]), dash(v["keepalive"]), dash(v["host"]), dash(v["lease-utc"]), dash(v["beat-utc"]), ok, i
+      if (st != "live" && st != "held" && st != "released" && st != "landed" && st != "aborted" && st != "withdrawn") ok = 0
+      nm = tail
+      if (lease) {
+        kd = ""; sl = ""
+        if (tail ~ /^[^\/]+\/build$/) { kd = "build"; sl = tail; sub(/\/build$/, "", sl); nm = sl }
+        else if (tail ~ /^run\/[^\/]+\/[^\/]+$/) { kd = "run"; sl = "-" }
+        else if (tail ~ /^[^\/]+\/unit\/[^\/]+$/) { kd = "unit"; sl = tail; sub(/\/.*$/, "", sl) }
+        else if (tail ~ /^request\/[0123456789abcdef]+$/ && length(tail) == 20) { kd = "request"; sl = "-" }
+        if (kd == "" || hdr != "gov-claim " tail || v["kind"] != kd || v["slug"] != sl || v["epoch"] !~ /^[1-9][0-9]*$/) ok = 0
+        f2 = v["fleet-tag"]; ep = v["epoch"]; ko = (kd == "" ? "?" : kd)
+        if (kd == "build") lb[nm] = 1
+      } else {
+        if (v["slug"] != nm) ok = 0
+        f2 = v["node"]; ep = ("epoch" in v ? v["epoch"] : "0"); ko = "-"
+      }
+      row[++nr] = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", nm, dash(f2), dash(st), sha, dash(v["session"]), dash(v["keepalive"]), dash(v["host"]), dash(v["lease-utc"]), dash(v["beat-utc"]), ok, (lease ? lfe : rfe) tail, dash(ep), ko, dash(v["renews"]), dash(v["witness"]), dash(v["offer"]), dash(v["offer-deadline"]), dash(v["last-fetch"]))
+      old[nr] = !lease; who[nr] = nm; tip[nr] = sha
     }
-    BEGIN { split("slug node host session keepalive status lease-utc beat-utc", K, " "); for (j in K) want[K[j]] = 1 }
-    /^\001/ { flush(); split(substr($0, 2), a, "\t"); ref = a[1]; sha = a[2]; slug = substr(ref, length(ns) + 1); split("", v); next }
-    { sub(/\r$/, ""); p = index($0, ": ")
-      if (p > 1) { k = substr($0, 1, p - 1); if ((k in want) && !(k in v)) { x = substr($0, p + 2); gsub(/\t/, " ", x); v[k] = x } } }
-    END { flush() }' "$d/refs" >"$d/rows"
+    BEGIN { split("slug node host session keepalive status lease-utc beat-utc", K, " "); for (j in K) want[K[j]] = 1
+            split("epoch kind fleet-tag renews witness offer offer-deadline last-fetch", E, " "); for (j in E) more[E[j]] = 1
+            for (j in want) rk[j] = 1; for (j in more) rk[j] = 1 }
+    /^\001/ { flush(); split(substr($0, 2), a, "\t"); ref = a[1]; sha = a[2]
+              lease = (index(ref, lns) == 1); tail = substr(ref, length(lease ? lns : rns) + 1)
+              split("", v); hdr = ""; head = 1; next }
+    { sub(/\r$/, "")
+      if (head) { hdr = $0; head = 0; next }
+      read_kv($0, rk, v, 0) }
+    END { flush(); for (j = 1; j <= nr; j++) if (!(old[j] && (who[j] in lb))) { print row[j]; print tip[j] > ENVIRON["CL_TIPS"] } }' "$d/refs" >"$d/rows"
   if [ -s "$d/rows" ]; then
+    read_lease_bound expiry >/dev/null || LB_VALUE=""
+    thr=""
+    if [ -n "$LB_VALUE" ]; then printf -v now '%(%s)T' -1; TZ=UTC printf -v thr '%(%Y-%m-%dT%H:%M:%SZ)T' "$((now - LB_VALUE))"; fi
+    # THE WALK (S2), BOUNDED (TOOL-dPlacedRequest-34 S43): ONE streaming `git log --first-parent` over
+    # every row's tip, piped to an `awk` that walks each row from its tip, the tip included, and tests
+    # each commit in this order (TOOL-dPlacedRequest-35 S1): its TENURE'S END first (a commit whose epoch
+    # differs from the tip's is another holder's, read no further and never aged, the oldest commit read
+    # inside the tenure standing for the beat); then a `renews: -` commit (TOOL-dPlacedRequest-46 S1),
+    # which stops the row there and stands for the beat, so a lease whose holder's newer write declares
+    # it never expires is never aged by an older commit of the tenure; then its RENEWING BEAT (`renews`
+    # is `yes` or absent); then a commit the feed first sighted before `thr`, now less
+    # `leases.expiry-hours`, which makes the row `stale` whatever lies further back inside the tenure
+    # and stands for the beat. Any other `renews`, `no` or a value outside the four, reads on (S2). The
+    # `epoch` and `renews` keys are read by `CLAIM_KV_AWK`'s loose mode, the first line of each kept,
+    # its value trimmed, so a bare `renews:` or `renews: ` is
+    # the empty value, outside the four, and reads on, never a missing key (TOOL-dPlacedRequest-52 S26). A row whose chain
+    # ends first takes its oldest commit read (S2). The `awk` exits once every row is resolved, and
+    # `git log` stops on the closed pipe, so a read costs each lease's commits sighted inside the bound,
+    # not its history.
+    # In one first-parent chain `git log` names a child before its parent whatever the dates; a commit
+    # reached out of that order is held and read when its child is. The sighting is `read_first_seen`'s
+    # rule, the oldest well-formed feed line of the ref and commit, applied in place because its answer
+    # has to come back inside the stream; an unsighted commit never stops a row. A `\002` line carries
+    # git's exit, so a log that failed before every row resolved reads every age `-`, as before. It
+    # prints two `ref TAB commit` pairs per row, its tip then its beat, and one line per row saying
+    # whether that beat carries `renews: -`, the row's own tip standing for both where the log does not
+    # hold it. WHAT THIS DOES NOT CHECK: a sighting older than its parent's, which only a feed edited
+    # by hand holds, and which stops the row early at that commit.
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    [ -z "${GOVFEED_DIR%$'\r'}" ] || fd="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+    { GIT log --first-parent --format='%x01%H %P%n%B' --stdin <"$d/tips" 2>/dev/null; printf '\002%s\n' "$?"; } 2>/dev/null \
+      | CL_ROWS="$d/rows" CL_FEED="$fd" CL_NEVER="$d/never" CL_BEATS="$d/beats" CL_PAIRS="$d/pairs" CL_WALK="$d/walk" \
+        awk -v thr="$thr" "$CLAIM_KV_AWK"'
+      function stop(i, b) { if (i in bt) return; bt[i] = b; nd++ }
+      function step(i, c) {
+        while (1) {
+          if (!(c in kn)) { wt[c] = wt[c] " " i; return }
+          if (!(i in te)) te[i] = ep[c]
+          if (ep[c] != te[i]) { stop(i, od[i]); return }
+          if ((c in rn) && rn[c] == "-") { stop(i, c); return }
+          if (!(c in rn) || rn[c] == "yes") { stop(i, c); return }
+          if (thr != "" && ((rf[i], c) in seen) && seen[rf[i], c] < thr) { stop(i, c); return }
+          od[i] = c; c = par[c]
+          if (c == "") { stop(i, od[i]); return }
+        }
+      }
+      function read_commit(  n, w, j) {
+        if (cc == "") return
+        kn[cc] = 1; par[cc] = cp; ep[cc] = cv["epoch"] + 0; if ("renews" in cv) rn[cc] = cv["renews"]
+        w = wt[cc]; delete wt[cc]; n = split(w, ws, " ")
+        for (j = 1; j <= n; j++) step(ws[j] + 0, cc)
+        cc = ""
+      }
+      BEGIN { wk["epoch"] = 1; wk["renews"] = 1
+              while ((getline l < ENVIRON["CL_ROWS"]) > 0) {
+                sub(/\r$/, "", l); split(l, f, "\t"); nr++; tp[nr] = f[4]; rf[nr] = f[11]; od[nr] = f[4]; want[f[11]] = 1
+                if (f[10] != 1) stop(nr, f[4]); else wt[f[4]] = wt[f[4]] " " nr }
+              if (ENVIRON["CL_FEED"] != "") while ((getline l < ENVIRON["CL_FEED"]) > 0) {
+                sub(/\r$/, "", l)
+                if (split(l, x, "\t") != 6 || !(x[2] in want) || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+                if (!((x[2], x[5]) in seen)) seen[x[2], x[5]] = x[6] }
+              if (nd == nr) exit }
+      { sub(/\r$/, "") }
+      substr($0, 1, 1) == "\001" { read_commit(); if (nd == nr) exit
+                                   split(substr($0, 2), h, " "); cc = h[1]; cp = h[2]; split("", cv); next }
+      substr($0, 1, 1) == "\002" { read_commit(); rc = substr($0, 2); next }
+      cc == "" { next }
+      { read_kv($0, wk, cv, 1) }
+      END { read_commit()
+            print ((nd == nr || rc == "0") ? "ok" : "dead") > ENVIRON["CL_WALK"]
+            for (i = 1; i <= nr; i++) { b = (i in bt) ? bt[i] : od[i]
+              print rf[i] "\t" tp[i] > ENVIRON["CL_PAIRS"]; print rf[i] "\t" b > ENVIRON["CL_PAIRS"]
+              print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"]; print b > ENVIRON["CL_BEATS"] } }'
+    CL_WALK=""; [ ! -f "$d/walk" ] || CL_WALK=$(<"$d/walk"); [ "$CL_WALK" = ok ] || alive=0
+    read_first_seen <"$d/pairs" >"$d/seen"
+    awk 'BEGIN { print "now" } $0 != "-"' "$d/seen" >"$d/stamps"
     date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
     nask=$(grep -c '' "$d/stamps"); ngot=$(grep -c '' "$d/ages")
     [ "$nask" = "$ngot" ] || alive=0
-    CL_AGES="$d/ages" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$RESUME_STALE_BOUND" '
-      BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l }
-      { a = "-"
-        if (alive && $10 == 1 && $11 > 0) { a = age[1] - age[$11 + 1]; if (a < 0) a = 0 }
+    CL_AGES="$d/ages" CL_SEEN="$d/seen" CL_NEVER="$d/never" CL_BEATS="$d/beats" awk -F'\t' -v OFS='\t' -v alive="$alive" -v bound="$LB_VALUE" '
+      BEGIN { if (alive) while ((getline l < ENVIRON["CL_AGES"]) > 0) age[++na] = l
+              m = 1; while ((getline l < ENVIRON["CL_SEEN"]) > 0) { sub(/\r$/, "", l); at[++ns] = (l == "-" ? 0 : ++m) }
+              while ((getline l < ENVIRON["CL_NEVER"]) > 0) nv[++nn] = l + 0
+              while ((getline l < ENVIRON["CL_BEATS"]) > 0) { sub(/\r$/, "", l); bs[++nb] = l } }
+      { a = "-"; t = at[2 * NR - 1]; r = at[2 * NR]
+        if (alive && $10 == 1 && t > 0 && r > 0) { a = age[1] - age[t]; if (a < 0) a = 0; ra = age[1] - age[r]; if (ra < 0) ra = 0 }
         if ($10 != 1 || a == "-") { vd = "unknown"; a = "-" }
         else if ($3 == "held") vd = "held"
-        else if ($3 == "landed" || $3 == "aborted") vd = "terminal"
-        else if (a + 0 <= bound + 0) vd = "live"
+        else if ($3 == "released") vd = "released"
+        else if ($3 == "landed" || $3 == "aborted" || $3 == "withdrawn") vd = "terminal"
+        else if (nv[NR]) vd = "live"
+        else if (bound == "") vd = "unknown"
+        else if (ra + 0 <= bound + 0) vd = "live"
         else vd = "stale"
-        print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9 }' "$d/rows" >"$d/claims"
+        print $1, $2, $3, a, vd, $4, $5, $6, $7, $8, $9, $12, $13, $14, $15, $16, $17, $18, (bs[NR] == "" ? "-" : bs[NR]) }' "$d/rows" | LC_ALL=C sort -t $'\t' -k1,1 >"$d/claims"
     IFS= read -r -d '' CLAIM_ROWS <"$d/claims" || :
     CLAIM_ROWS=${CLAIM_ROWS%$'\n'}
   fi
@@ -2500,8 +2696,9 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   return 0
 }
 
-# --claims, interface I2: one TAB-separated row per claim on the remote - slug, node, status,
-# beat-age-s, verdict - sorted by slug, or the single line `claims: none`; exit 2 with check 109 when
+# --claims, interface I2: one TAB-separated row per claim or lease on the remote - name, node or fleet
+# tag (TOOL-dPlacedRequest-1 S11: a lease's `fleet-tag`, a legacy claim's `node`), status,
+# beat-age-s, verdict - sorted by name, or the single line `claims: none`; exit 2 with check 109 when
 # the remote does not answer, never an empty list. Where RUN_CLAIMS is not `on` it prints the single
 # line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
 # so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
@@ -2531,18 +2728,34 @@ print_claims() { # [--with-key] -> the rows on stdout; rc 2 when the remote does
 # spec's F4). ONE `cat-file --batch-check` for every blob and ONE key spawn for every row, so no claim
 # spawns a process of its own. Returns 1 printing nothing where python or the loop kit does not
 # resolve, and `print_claims` then prints `-`. WHAT THIS DOES NOT CHECK: that the tracking ref is fresh.
+# TOOL-dPlacedRequest-1 S11: a legacy row is keyed over `refs/gov/runs/<slug>@<sha>`, a lease row over
+# the ref `derive_lease_ref` builds from its kind and name, and `runstate=` is read from the row's slug,
+# the build a unit lease belongs to, and `?` for a cadence lease, which has no run record.
+# TOOL-dPlacedRequest-19 S4: a request lease row is keyed over `derive_lease_ref request <key>`'s ref,
+# `runstate=?` as a cadence row, since a request names no build.
 derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
-  local py d br blobs=""
+  local py d br blobs="" refs
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || return 1
   d=$(resolve_kit_dir "$py" loop claims.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] || return 1
+  [ -f "$d/claims.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  refs=$(printf '%s\n' "$CLAIM_ROWS" | while IFS=$'\t' read -r nm _ _ _ _ sha _ _ _ _ _ _ kd _; do
+      case "$kd" in
+        build) derive_lease_ref build "$nm" >/dev/null; sl=$nm ;;
+        unit) derive_lease_ref unit "${nm%%/*}" "${nm##*/}" >/dev/null; sl=${nm%%/*} ;;
+        run) sl=${nm#run/}; derive_lease_ref run "${sl%%/*}" "${nm##*/}" >/dev/null; sl=- ;;
+        request) derive_lease_ref request "${nm#request/}" >/dev/null; sl=- ;;
+        *) LEASE_REF="$CLAIM_NS/$nm"; sl=$nm ;;
+      esac
+      printf '%s\t%s\n' "${LEASE_REF:-$LEASE_NS/$nm}@$sha" "$sl"
+    done)
   br=$(default_branch 2>/dev/null) || br=""
   if [ -n "$br" ]; then
-    blobs=$(printf '%s\n' "$CLAIM_ROWS" | CK_PRE="refs/remotes/$CR_NAME/$br:$MEMORY_ROOT/builds/" \
-      awk -F'\t' '{ print ENVIRON["CK_PRE"] $1 "/RUN.md" }' | GIT cat-file --batch-check 2>/dev/null) || blobs=""
+    blobs=$(printf '%s\n' "$refs" | CK_PRE="refs/remotes/$CR_NAME/$br:$MEMORY_ROOT/builds/" \
+      awk -F'\t' '{ print ENVIRON["CK_PRE"] $2 "/RUN.md" }' | GIT cat-file --batch-check 2>/dev/null) || blobs=""
   fi
-  printf '%s\n' "$CLAIM_ROWS" | CK_BLOBS="$blobs" CK_NS="$CLAIM_NS" awk -F'\t' '
+  printf '%s\n' "$refs" | CK_BLOBS="$blobs" awk -F'\t' '
     BEGIN { split(ENVIRON["CK_BLOBS"], b, "\n") }
-    { split(b[NR], f, " "); print ENVIRON["CK_NS"] "/" $1 "@" $6 "\trunstate=" (f[2] == "blob" ? f[1] : "?") }' \
+    { split(b[NR], f, " "); print $1 "\trunstate=" (f[2] == "blob" && $2 != "-" ? f[1] : "?") }' \
     | "$py" "$d/claims.py" key --stdin
 }
 
@@ -2557,8 +2770,8 @@ derive_claim_keys() { # CLAIM_ROWS, CR_NAME -> one key per row on stdout
 # catch-alls, each of which refuses, announces or declines, and none of which writes a claim.
 # WHAT THIS DOES NOT CHECK: that a member here has a case branch below; the per-cell arm owns that.
 # The verdict half of a `foreign-` class is read off the remote's row, so the join cannot see it.
-CLAIM_READS="none mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
-CLAIM_MODES="preflight take-over holder status beat"
+CLAIM_READS="none offered foreign-released foreign-tombstone mine same foreign-live foreign-held foreign-stale foreign-terminal foreign-unknown"
+CLAIM_MODES="preflight take-over holder status beat lease"
 
 # WHO MAY WRITE THIS SLUG'S CLAIM, by the table in the stops guide's section 7. The identity rows are
 # tested FIRST - none, `mine` (keepalive AND session equal the lease handed in; `absent` compares
@@ -2581,10 +2794,45 @@ CLAIM_MODES="preflight take-over holder status beat"
 # record's keepalive. CW_SESS is the claim's own session when a claim was found, for that holder row.
 # CW_CLS is the claim-read class derived and CW_STATUS the claim's own status, empty with no claim, for
 # the settle's retry, which writes only a `mine` claim still `held` or `live` (TOOL-aGraftedHelix-36).
+# TOOL-dPlacedRequest-1 S6 - THE `lease` MODE, the `--lease` verbs' column, called as `<name> lease
+# <fleet tag> <session> <act>`: a lease is `mine` when its fleet tag and session are this node's and
+# this harness's, `same session` when only the session is, and `foreign` otherwise.
+# TOOL-dPlacedRequest-32 S3 - AN ABSENT SESSION IS NO IDENTITY: the session handed in is `mine` only
+# where it and the record's are both present, neither empty nor `absent`, and equal. With either absent
+# a lease is `mine` only through a keepalive present on both and equal, and the `--lease` verbs hand
+# none, a `--lease` write recording `keepalive: absent`, so two id-less sessions of one node read each
+# other's lease `foreign`. A run claim's keepalive identity is the run columns' rows below, unchanged.
+# TOOL-dPlacedRequest-97 - THE FENCE IS THE ONE `lease` CALLER HANDING A KEEPALIVE: `write_fence_beat`
+# hands the slug's run-state file as the sixth argument, and with either session absent a lease of this
+# node's fleet tag is `mine` where its `keepalive` is present, not `absent`, and equals that file's
+# `keepalive` fact, so an id-less run's `--preflight` lease fences; a missing file answers nothing. rc 0 writes with
+# CW_ACT; rc 1 is refused with CW_CAUSE (`live-holder` or `tombstone`, and `offered` or `terminal` for
+# TOOL-dPlacedRequest-20 below, CW_HINT `take-over` on a stale
+# acquire) and prints nothing, the verb printing its own line; rc 3 is `none` under renew or release.
+# Every row read also sets CW_EPOCH, CW_KIND (`-` for a legacy claim), CW_TAG, CW_WIT and CW_LEASE.
+# TOOL-dPlacedRequest-28 - CW_MODE is the column this call graded, set on every call, and the key on
+# which `write_claim` maps its return 3, a tombstone in this node's feed, as this table maps one here.
+# TOOL-dPlacedRequest-16 - `foreign-released` is free to every mode but the holder's, which refuses it
+# as a terminal claim, and `--beat`, which declines it; the lease act `draw` (`--for draw`) takes a
+# tombstone. `foreign-tombstone` refuses each run column by its own check carrying `tombstone`, and
+# the status column announces it, exit unchanged, so a run still closes over its own tombstone.
+# CW_DRAW is 1 where the row is a draw's hold, whoever reads it.
+# TOOL-dPlacedRequest-20 - AN OFFER, in the `lease` mode only and tested before every other row: a
+# record whose `offer` is neither `-` nor this node's fleet tag, nor that tag, `/` and this harness's
+# session (CLAUDE_CODE_SESSION_ID unset, empty or `absent` is no session and forms no such value), is
+# `offered` while `check_deadline_passed` over its tip and `offer-deadline` returns 1, not yet, or 2,
+# unsighted, the window opening at this node's first sighting; an `offer-deadline` that is not a whole
+# number reads as expired. `acquire`, `take-over` and a draw refuse it `offered`, CW_WHO naming the
+# offer for the refusal line; the named node, or any node once the window passed, reads the row below
+# it. The `offer` act writes over none (create) or a `released` record (write, its epoch kept) and
+# refuses a `live` or `held` one `live-holder` and a terminal one `terminal`.
 check_claim_writable() { # slug · mode · lease keepalive · lease session · the keepalive a write sets · [run-state file]
-  local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps=""
+  local slug="$1" mode="$2" ka="$3" sid="$4" wka="$5" rel="${6:-}" me="${CLAUDE_CODE_SESSION_ID:-}" row cls due ps="" la=""
   local c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_btxt=unknown r_host r_sess r_lease
+  local c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest c_tail dh c_open=""
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""; CW_FROM=""; CW_CLS=""; CW_STATUS=""
+  CW_EPOCH=0; CW_KIND=""; CW_TAG=""; CW_WIT=""; CW_LEASE=""; CW_CAUSE=""; CW_HINT=""; CW_DRAW=""; CW_MODE="$mode"
+  [ "$mode" != lease ] || la="$wka"
   row=""
   case $'\n'"$CLAIM_ROWS" in
     *$'\n'"$slug"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$slug"$'\t'}; row="$slug"$'\t'"${row%%$'\n'*}" ;;
@@ -2592,21 +2840,69 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   if [ -z "$row" ]; then
     cls=none
   else
-    IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat <<<"$row"
+    IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_kind c_renews c_wit c_offer c_odl c_lf c_bsha c_rest <<<"$row"
     CW_SHA="$c_sha"; CW_SESS="$c_sess"; CW_STATUS="$c_status"
+    CW_KIND="${c_kind:--}"; CW_WIT="${c_wit:--}"; CW_LEASE="$c_lease"
+    case "${c_epoch:-0}" in *[!0-9]*) CW_EPOCH=0 ;; *) CW_EPOCH=$((10#${c_epoch:-0})) ;; esac
+    [ "$CW_KIND" = - ] || CW_TAG="$c_node"
     c_btxt="${c_age}s"; [ "$c_age" != - ] || c_btxt=unknown
     CW_WHO="$slug · node $c_node · session $c_sess · beat $c_btxt · status $c_status · verdict $c_verdict"
     CW_FROM="$slug from node $c_node session $c_sess beat-age $c_btxt"
     if [ -n "$rel" ]; then fact "$rel" prior-session >/dev/null; ps=$_fact; fi
-    if [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
+    # THE CLASS ORDER (TOOL-dPlacedRequest-16, its section 4): a `released` record, then a build or unit
+    # tombstone, BEFORE the identity rows, so its releaser takes a hand-over at the epoch plus one and
+    # nobody, its writer included, revives a tombstone; a draw's hold after them, below. An open offer
+    # to another node or session (TOOL-dPlacedRequest-20) is tested before all of them.
+    # TOOL-dPlacedRequest-34 S49: the `offer` act reads an open offer to ANY target, this node's own
+    # included, as `offered`, so no node re-offers over an offer still running.
+    if [ "$mode" = lease ] && [ -n "$c_offer" ] && [ "$c_offer" != - ] \
+      && { [ "$la" = offer ] || { [ "$c_offer" != "$ka" ] && { [ -z "$me" ] || [ "$me" = absent ] || [ "$c_offer" != "$ka/$me" ]; }; }; }; then
+      c_tail=$c_slug; [ "$c_kind" != build ] || c_tail="$c_slug/build"
+      case "$c_odl" in
+        ""|*[!0-9]*) ;;
+        *) check_deadline_passed "$LEASE_NS/$c_tail" "$c_sha" "$c_odl" || c_open=1 ;;
+      esac
+    fi
+    if [ -n "$c_open" ]; then cls=offered; CW_WHO="$slug · $c_offer"
+    elif [ "$c_status" = released ]; then cls=foreign-released
+    elif { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; } && { [ "$c_status" = landed ] || [ "$c_status" = withdrawn ]; }; then cls=foreign-tombstone
+    elif [ "$mode" = lease ]; then
+      if [ "$c_node" = "$ka" ] && [ "$c_sess" = "$sid" ] && [ -n "$sid" ] && [ "$sid" != absent ]; then cls=mine
+      elif [ -n "$rel" ] && { [ "$sid" = absent ] || [ "$c_sess" = absent ]; } && [ "$c_node" = "$ka" ] \
+        && [ -n "$c_ka" ] && [ "$c_ka" != absent ] && fact "$rel" keepalive >/dev/null && [ "$c_ka" = "$_fact" ]; then cls=mine
+      elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
+      else cls="foreign-$c_verdict"; fi
+    elif [ "$c_ka" = "$ka" ] && [ "$c_sess" = "$sid" ]; then cls=mine
     elif [ -n "$ps" ] && [ "$mode" != take-over ] && [ "$c_ka" = "$ka" ] && [[ " $ps " == *" $c_sess "* ]]; then cls=mine
     elif [ -n "$me" ] && [ "$me" != absent ] && [ "$c_sess" = "$me" ]; then cls=same
     elif fact "$rel" keepalive >/dev/null; [ -n "$ps" ] && [ "$mode" = take-over ] && [[ " $ps " == *" $c_sess "* ]] && [ "$c_ka" = "$_fact" ]; then cls=same
     else cls="foreign-$c_verdict"; fi
+    # A DRAW'S HOLD (S3): a `held` build or unit lease whose first-parent chain reaches a tombstone
+    # through `held` records only, read by ONE `git log` stopping at the first record not `held`. It
+    # prints the `renews` of the row's renewing beat, `beat-sha`, or `?` where the held run does not
+    # hold it. Its holder reads it `mine` or `same`; everyone else reads a tombstone.
+    if [ "$c_status" = held ] && { [ "$c_kind" = build ] || [ "$c_kind" = unit ]; }; then
+      c_tail=$c_slug; [ "$c_kind" = unit ] || c_tail="$c_slug/build"
+      dh=$(GIT log --first-parent --format='%x01%H%n%B' "$c_sha" -- 2>/dev/null | CW_BEAT="$c_bsha" awk '
+        function check_draw_hold() { fin = 1
+          if (st == "held") { fin = 0; if (c == ENVIRON["CW_BEAT"]) rb = (rn == "" ? "absent" : rn); return 0 }
+          if (st == "landed" || st == "withdrawn") hit = 1
+          return 1 }
+        substr($0, 1, 1) == "\001" { if (c != "" && check_draw_hold()) exit; c = substr($0, 2); sub(/\r$/, "", c); st = ""; rn = ""; next }
+        { sub(/\r$/, "") }
+        /^status: / && st == "" { st = substr($0, 9) }
+        /^renews: / && rn == "" { rn = substr($0, 9) }
+        END { if (!fin && c != "") check_draw_hold(); if (hit) print (rb == "" ? "?" : rb) }')
+      dh=${dh%$'\r'}
+      if [ -n "$dh" ]; then
+        CW_DRAW=1
+        case "$cls" in mine|same) ;; *) cls=foreign-tombstone ;; esac
+      fi
+    fi
   fi
   CW_CLS="$cls"
   if [ "$cls" = mine ]; then
-    [ "$c_node" = - ] || CW_NODE="$c_node"
+    [ "$c_node" = - ] || [ "$CW_KIND" != - ] || CW_NODE="$c_node"
     # DUE at a quarter of the stale bound, or when a field the write would set differs - so a holder
     # still reads its claim on every call and finds a lost one, and pushes at most once per quarter.
     # The fields are the ones the write COPIES from the record, never this caller's environment, so
@@ -2622,7 +2918,50 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
       due=1
     fi
   fi
+  if [ "$la" = offer ]; then
+    # TOOL-dPlacedRequest-34 S49 and S54: an open offer is `offered`; a build or unit tombstone, a
+    # draw's hold included, is `tombstone`, and `terminal` stays a cadence or legacy claim's.
+    case "$cls:${c_status:-}" in
+      none:*) CW_ACT=create ;;
+      offered:*) CW_CAUSE=offered; return 1 ;;
+      foreign-tombstone:*) CW_CAUSE=tombstone; return 1 ;;
+      *:released) CW_ACT=write ;;
+      *:landed|*:aborted|*:withdrawn) CW_CAUSE=terminal; return 1 ;;
+      *) CW_CAUSE=live-holder; return 1 ;;
+    esac
+    return 0
+  fi
   case "$mode:$cls" in
+    lease:none) case "$la" in acquire|take-over|draw) CW_ACT=create ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:offered) case "$la" in acquire|take-over|draw) CW_CAUSE=offered; return 1 ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:mine) case "$la" in release) CW_ACT=write ;; *) CW_ACT=renew ;; esac ;;
+    lease:same) case "$la" in take-over) CW_ACT=take ;; release) CW_ACT=write ;; *) CW_ACT=rewrite ;; esac ;;
+    lease:foreign-released) case "$la" in acquire|take-over|draw) CW_ACT=take ;; *) CW_CAUSE=none; return 3 ;; esac ;;
+    lease:foreign-stale) case "$la" in take-over) CW_ACT=take-announced ;; acquire) CW_CAUSE=live-holder; CW_HINT=take-over; return 1 ;; *) CW_CAUSE=live-holder; return 1 ;; esac ;;
+    # THE DRAW (S4): `--for draw` takes a tombstone, and a draw's hold once its renewing beat is stale by
+    # `check_deadline_passed` over `leases.expiry-hours` (its F6); a beat writing `renews: -`, one the
+    # feed has not sighted or a refused bound keeps the hold `live-holder`. Every other act is refused.
+    lease:foreign-tombstone)
+      case "$la:$CW_DRAW" in
+        draw:) CW_ACT=take ;;
+        draw:1)
+          if [ "$dh" != - ] && [ "$dh" != "?" ] && read_lease_bound expiry >/dev/null \
+            && check_deadline_passed "$LEASE_NS/$c_tail" "$c_bsha" "$LB_VALUE"; then CW_ACT=take
+          else CW_CAUSE=live-holder; return 1; fi ;;
+        *) CW_CAUSE=tombstone; return 1 ;;
+      esac ;;
+    lease:foreign-terminal) CW_CAUSE=tombstone; return 1 ;;
+    lease:*) CW_CAUSE=live-holder; return 1 ;;
+    preflight:foreign-tombstone|take-over:foreign-tombstone)
+      fail 107 "this slug's lease on the remote is a tombstone, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written, and the lease names its last writer: $CW_WHO"
+      return 1 ;;
+    holder:foreign-tombstone)
+      fail 108 "this run's lease on the remote is a tombstone, its build landed or withdrawn, so the run must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $CW_WHO"
+      return 1 ;;
+    status:foreign-tombstone)
+      echo "unattended: claim not written — $slug is held $c_status by session $c_sess on $c_node, beat $c_btxt · tombstone"
+      return 3 ;;
+    preflight:foreign-released|take-over:foreign-released|status:foreign-released) CW_ACT=take ;;
     *:none) CW_ACT=create ;;
     preflight:mine|take-over:mine) CW_ACT=renew ;;
     holder:mine|beat:mine) [ -n "$due" ] || return 2; CW_ACT=renew ;;
@@ -2643,11 +2982,109 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   return 0
 }
 
-# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory at its second caller (TOOL-aPiecewiseGrade-6):
-# `write_claim` takes `claim-push.lock` for `REMOTE_BOUND` plus 10 s with the event stem `claim-push`,
-# and the spec-token start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the
-# stem `spec-tokens`. `write_dir_lock` takes the lock with
-# `mkdir` and writes its deadline into `until` and the caller's token into `owner`. A lock it cannot
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6): the spec-token
+# start half takes `spec-tokens.<slug>.lock` for `GATE_BOUND` plus 60 s with the stem `spec-tokens`,
+# and the node locks take theirs with the stem `node`. The factory and its rule are defined in the
+# `gov_feed_sh` block below (TOOL-dPlacedRequest-24), the one definition every carrier of it shares.
+
+# >>> gov_ref_sh — canonical copy: gov-ref.sh in gov's lib dir (byte-identical; gated)
+# I1 AND I2, ONE WRITER FOR EVERY GOVERNANCE REF (TOOL-dPlacedRequest-11): a run claim, the bar-red
+# ref and every later register, request and card ref are written here, never by a hand copy.
+# `build_gov_commit` builds the commit over the empty tree under the fixed `gov-claim` identity,
+# parented on the tip its caller read, so `git log <ref>` on the remote lists every write in order; a
+# create, whose tip read is empty, is the one parentless commit. It prints nothing and returns 1 when
+# git cannot build it. `write_gov_ref` pushes `--porcelain --force-with-lease=<ref>:<expected>`, the
+# expected sha EMPTY for a create, and the porcelain line whose second field ends in `:<ref>` decides,
+# never the exit alone: `!` with `(stale info)` or `(fetch first)` is 1, LOST; any other `!`, no status
+# line, or the bound firing (124) is 2, NOT COMPLETED; any other flag is 0. The cause is in
+# GOVREF_WHY. An EMPTY source returns 2 `no source` and pushes nothing, so a failed build captured as
+# `c=$(build_gov_commit …)` is never a deletion; `remove_gov_ref` is the one deletion form, its
+# expected sha non-empty, and it reaches the same push and porcelain read through `write_gov_ref`,
+# which admits an empty source only when `remove_gov_ref` is its caller.
+# THE CALLER SETS THREE NAMES: GOVREF_RUNNER, a function taking `<outfile> <git args…>` that runs git
+# bounded and writes its stdout to the file; GOVREF_REMOTE, the remote NAME the push names, so the
+# pre-push hook observes `<name>/HEAD`; GOVREF_GITDIR, the git dir whose `pre-push-refusal` a hook
+# writes, empty to read no token.
+# NO REFUSAL TOKEN IS THIS PUSH'S CAUSE. The refusal file is one per git dir and nothing here removes
+# it, so another push from the same git dir can write it while this call runs: a token newer than the
+# stamp this call created just before its push is appended on rc 2 as an ADVISORY only. The
+# `default-branch` hint comes from this call's own read: rc 2 and no `refs/remotes/<name>/HEAD`.
+# The stamp is a scratch file of its own, never the push's output file, which git writes after the
+# hook ran and so would read every token as stale.
+# THE ONE SUCCESS EXIT JOINS THE FEED (TOOL-dPlacedRequest-13 S3): it calls `write_feed_success` from
+# the `gov_feed_sh` block every carrier of this one carries beside it (TOOL-dPlacedRequest-34 S5), which
+# sets this node's cache ref `refs/gov/remote/<tail>` to what it wrote, or clears it on a deletion, and
+# appends the event. A lost or uncompleted write appends nothing.
+# WHAT THIS DOES NOT CHECK: a token written in the stamp's own filesystem tick reads as stale and is
+# omitted; a token another push wrote during this call reads as fresh and is printed beside this
+# push's own cause, never as it.
+build_gov_commit() { # tip read or empty · message -> prints the commit; rc 1 when git cannot build it
+  local t c
+  local -a p=()
+  [ -z "$1" ] || p=(-p "$1")
+  t=$(git mktree </dev/null 2>/dev/null) && [ -n "$t" ] || return 1
+  c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid \
+    git commit-tree "$t" "${p[@]}" -m "$2" 2>/dev/null) && [ -n "$c" ] || return 1
+  printf '%s\n' "$c"
+}
+write_gov_ref() {    # ref · expected sha or empty · src -> 0 written, 1 lost, 2 not completed; GOVREF_WHY
+  local ref="$1" exp="$2" src="$3" s f rc l line rf="" tok="" hd=""
+  GOVREF_WHY=""
+  if [ -z "$src" ] && [ "${FUNCNAME[1]:-}" != remove_gov_ref ]; then GOVREF_WHY="no source"; return 2; fi
+  s=$(mktemp) || { GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  f=$(mktemp) || { rm -f "$s"; GOVREF_WHY="cannot create a scratch file to bound the push"; return 2; }
+  "$GOVREF_RUNNER" "$f" push --porcelain "--force-with-lease=$ref:$exp" "$GOVREF_REMOTE" "$src:$ref" && rc=0 || rc=$?
+  line=""
+  while IFS= read -r l; do
+    case "$l" in ?$'\t'*":$ref"$'\t'*) line=${l%$'\r'} ;; esac
+  done <"$f"
+  if [ "$rc" = 124 ]; then GOVREF_WHY="the push was killed by this kit's own bound"; rc=2
+  elif [ -z "$line" ]; then GOVREF_WHY="git push exited $rc and printed no status line for $ref"; rc=2
+  elif [ "${line:0:1}" != '!' ]; then rc=0
+  else
+    case "$line" in
+      *"(stale info)"*|*"(fetch first)"*) GOVREF_WHY="lost the race on the lease: ${line##*$'\t'}"; rc=1 ;;
+      *) GOVREF_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
+    esac
+  fi
+  if [ "$rc" = 2 ]; then
+    [ -z "${GOVREF_GITDIR:-}" ] || rf="$GOVREF_GITDIR/pre-push-refusal"
+    if [ -n "$rf" ] && [ "$rf" -nt "$s" ]; then
+      { IFS=$'\t' read -r tok _ <"$rf"; } 2>/dev/null || :
+      GOVREF_WHY="$GOVREF_WHY · a pre-push refusal was recorded during this push: ${tok:-an empty refusal file}"
+    fi
+    hd=$(git symbolic-ref -q "refs/remotes/$GOVREF_REMOTE/HEAD" 2>/dev/null) || hd=""
+    [ -n "$hd" ] || GOVREF_WHY="$GOVREF_WHY · default-branch · fix once: git remote set-head $GOVREF_REMOTE -a"
+  fi
+  rm -f "$s" "$f"
+  [ "$rc" = 0 ] || return "$rc"
+  write_feed_success "$ref" "$src"
+  return 0
+}
+remove_gov_ref() {   # ref · expected sha -> as write_gov_ref, pushing the ref's deletion
+  GOVREF_WHY=""
+  [ -n "$2" ] || { GOVREF_WHY="no expected sha"; return 2; }
+  write_gov_ref "$1" "$2" ""
+}
+# <<< gov_ref_sh
+# >>> gov_feed_sh — canonical copy: gov-feed.sh in gov's lib dir (byte-identical; gated)
+# THE NODE LOCKS (TOOL-dPlacedRequest-24): a node-local file two sessions of this node write, the
+# feed's log and the offline queue's, is read and written only under a lock directory beside it in
+# the common dir, taken through `write_dir_lock_wait` with the stem `node`, so a stale break appends
+# `node-lock-broken` or `node-guard-cleared`. NODE_LOCK_BOUND is the seconds a node lock may hold,
+# a pinned literal over every section it covers (TOOL-dPlacedRequest-49 S33): the feed append,
+# `add_feed_event`; the queue's append, `add_gov_queue`, and its flush's two file passes,
+# `write_gov_queue`, which pushes with no lock held; the offline write's hold through
+# `write_gov_queue_hold`, from its read of the queue through its append, which builds the commit but
+# never pushes; and `write_request_record`'s compare, copy and `.typed` append. The longest is the
+# offline write's hold, measured once on node d on 2026-11-20 over the lease fixture:
+# 1.412 s, PINNED, under this bound.
+NODE_LOCK_BOUND=10
+# THE DIRECTORY LOCK (TOOL-aGraftedHelix-37), a factory (TOOL-aPiecewiseGrade-6), moved into this
+# block (TOOL-dPlacedRequest-24) so every carrier holds the one definition. `write_dir_lock` takes the
+# lock with `mkdir`, sets `_fl_mine=1` in the caller's shell, then writes the caller's token into
+# `owner` and only then its deadline into `until` (TOOL-dPlacedRequest-49 S5), so a taken lock always
+# carries the token `remove_dir_lock` matches, even where an abort stops the take. A lock it cannot
 # make is broken only when `check_dir_lock_stale` reads it stale - a deadline already passed,
 # or none and a directory older than two minutes - and only by the writer that takes the guard
 # `<lock>.break` with `mkdir`. Holding the guard it re-reads the rule, breaks a lock still stale,
@@ -2656,17 +3093,20 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # a lock another breaker made. A guard older than one minute was left by a crash: the writer finding
 # it removes it and reports busy, never taking it in the same call, and the next call breaks the
 # lock. Each self-heal appends a health event, named from the caller's stem, once the guard is
-# released. `remove_dir_lock`
+# released. `write_dir_lock_wait` is the one retrying take: it calls `write_dir_lock` every 50 ms
+# until it takes or its ceiling in seconds passes, read on the whole-second clock. `remove_dir_lock`
 # clears the lock only while its `owner` reads the caller's token, the turnstile's nonce pattern, so
-# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch, the
-# one field the lander's wait reads.
+# a release never removes the fresh lock of a writer that broke it. `until` stays a bare epoch.
 # WHAT THIS DOES NOT CHECK: removing an abandoned guard is itself unguarded, so two writers removing
 # one at once while a third takes a fresh guard between them can admit two breakers; that needs a
 # writer to die or stall for a minute inside the break, then four writers in one git dir in one
 # window. An owner that outlives its recorded deadline (no runnable `timeout -k`) is breakable while
 # it pushes, and its own release can land between a breaker's re-read and its removal. Both the
 # deadline and the age are wall-clock reads, so a clock stepped forward breaks a live lock.
-# A writer in another git dir takes another lock.
+# A writer in another git dir takes another lock. Each event goes through the `health_log_sh` block
+# every carrier holds beside this one (TOOL-dPlacedRequest-36), to `resolve_health_log` of `ROOT`
+# where the driver sets it, so its spec-tokens lock in the sidecar dir logs to the repository's log,
+# else of the lock's parent, which for a node lock is the common dir: no unset name under `set -u`.
 # THE OWNER'S PROCESSES, read as data in the lock (TOOL-aPiecewiseGrade-6 S9). A holder may write one
 # `pid.<role>` file per process with `write_dir_lock_pid`: the pid, its procfs start token or `-`, the
 # writer's runtime as `$HOSTNAME:$OSTYPE`, and an optional end file, last because a path may carry a
@@ -2674,10 +3114,35 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # one names a process gone: a digit pid, this runtime, `check_proc_gone` answering gone, and an end
 # file that exists or whose directory is gone, or none recorded. An empty file, the pending `-`, a
 # foreign runtime or a missing stamp reads live. A lock with no pid file keeps the deadline and age
-# rule alone, so the claim-push lock, which writes none, keeps its verdicts.
+# rule alone. The procfs read is `${PROCFS_ROOT:-/proc}`: the driver sets PROCFS_ROOT from its fixture
+# seam, and a carrier with no driver reads `/proc`.
 # WHAT THIS DOES NOT CHECK: two process tables printing one `$HOSTNAME:$OSTYPE`, such as two MSYS
 # installs on one host, read each other's pids gone and can break a live lock; and a reused pid with
 # no token reads live, so its lock waits for the deadline.
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "${PROCFS_ROOT:-/proc}/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
 check_dir_lock_stale() { # lock dir -> 0 when its deadline passed, or it has none and is older than two minutes, or every process it records is gone
   local lu="" f p t w e n=0; { read -r lu <"$1/until"; } 2>/dev/null || :
   case "$lu" in *[!0-9]*) lu="" ;; esac
@@ -2705,7 +3170,7 @@ write_dir_lock() { # lock dir · owner token · seconds it may hold · health-ev
     if ! mkdir "$g" 2>/dev/null; then
       if [ -n "$(find "$g" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
         rm -rf "$g"
-        add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-guard-cleared" "$g"
+        add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-guard-cleared" "$g"
       fi
       return 1
     fi
@@ -2714,12 +3179,21 @@ write_dir_lock() { # lock dir · owner token · seconds it may hold · health-ev
     mkdir "$lk" 2>/dev/null || { rmdir "$g" 2>/dev/null; return 1; }
     broke=1
   fi
-  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
+  _fl_mine=1
   printf '%s\n' "$2" >"$lk/owner" 2>/dev/null || :
+  printf '%s\n' "$(( $EPOCHSECONDS + $3 ))" >"$lk/until" 2>/dev/null || :
   if [ -n "$broke" ]; then
     rmdir "$g" 2>/dev/null
-    add_health_event "$(resolve_health_log "$ROOT")" unattended "$4-lock-broken" "$lk"
+    add_health_event "$(resolve_health_log "${ROOT:-${1%/*}}")" unattended "$4-lock-broken" "$lk"
   fi
+  return 0
+}
+write_dir_lock_wait() { # lock dir · owner token · seconds it may hold · health-event stem · seconds to wait -> 0 taken, 1 busy
+  local end=$(( EPOCHSECONDS + ${5:-0} ))
+  until write_dir_lock "$1" "$2" "$3" "$4"; do
+    [ "$EPOCHSECONDS" -lt "$end" ] || return 1
+    sleep 0.05
+  done
   return 0
 }
 remove_dir_lock() { # lock dir · owner token -> removes it only while its owner file reads that token
@@ -2727,92 +3201,374 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
   [ -n "$2" ] && [ "$o" = "$2" ] && rm -rf "$1"
   return 0
 }
+# I4, THE CHANGE FEED (TOOL-dPlacedRequest-13): `<git-common-dir>/gov-feed.log`, node-local and never
+# pushed, one LF-terminated line per governance ref write this node made or saw, six TAB fields:
+# seq (a positive integer rising across refs), ref (the remote ref name), kind (the segment after
+# `refs/gov/`), blob (the commit's tree, `-` on a deletion), commit (40 hex, 40 zeros on a deletion)
+# and seen-utc (`2026-10-25T14:03:07Z`, this node's clock at the append). The key is ref, blob and
+# commit. `write_gov_ref`'s success exit calls `write_feed_success`, which calls `add_feed_event`, so every
+# writer joins by construction.
+# APPENDING ONCE: under the feed's node lock (above, a 5 s wait) an event whose blob and commit
+# equal the newest line of its ref appends nothing (TOOL-dPlacedRequest-27), so a retry appends nothing and a repeat with another
+# event of the ref between, a second clear of `bar-red` say, appends again; `seq` is one more
+# than the larger of the counter `gov-feed.seq` and the last all-digit first field of the log, so a
+# lagging counter never repeats a `seq`; a last byte that is not LF is closed with one first, so a
+# torn line stays for `check_feed` to name. A failure prints ONE `feed: NOTE -` line on stderr and
+# returns 0, as the health log's appender does: the governance write already landed.
+# THE CONTAINED APPEND (TOOL-dPlacedRequest-39): the clock test, the common dir and the git reads run
+# in the caller's shell; the lock, the key check, the counter and the append run in a subshell whose
+# `EXIT` trap is armed BEFORE the take (TOOL-dPlacedRequest-49 S6) and acts only once `write_dir_lock`
+# has set `_fl_mine`, which the subshell empties first: it then releases the lock directory where its
+# `owner` reads this call's token, and clears one with no `owner` only while no `gov-feed.lock.break`
+# guard exists (TOOL-dPlacedRequest-52 S20); every other lock it leaves. A breaker in `write_dir_lock`
+# holds that guard from before its `rm -rf` until after it writes `owner`, so a breaker's window is
+# never cleared. So an abort anywhere after the `mkdir`, an unbound
+# name under a carrier's `set -u`, a function no carrier defines or a failed write, ends the subshell
+# alone: the append prints `feed: NOTE - <ref>: the append exited <rc>` and returns 0, and no lock is
+# left for the next writer to wait out; a busy take, exit 3, finds the flag empty and leaves the
+# holder's lock. The subshell sets no global a caller reads. WHAT THIS DOES NOT CHECK: the one window
+# left is a third writer's own `mkdir`-to-`owner` window, after a peer broke this writer's lock and
+# released it, which a holder that outlives NODE_LOCK_BOUND and a full peer cycle can find at its exit
+# and clear; an abort after the line is written reads as a NOTE all the same.
+# THE BASH FLOOR (TOOL-dPlacedRequest-37): a node lock's deadline reads `EPOCHSECONDS`, bash 5's,
+# and this is the one take a carrier with no driver reaches, so where it is unset the append prints
+# one `feed: NOTE -` line naming it and returns 0, before it touches the lock, the log or git.
+# THE CACHE `refs/gov/remote/<tail>` mirrors `refs/gov/<tail>` on the remote: what this node fetched
+# and, through `write_gov_ref`, what it wrote. `add_feed_sightings` appends, oldest first, the unseen
+# first-parent chain of every cached ref whose tip is not the commit of the feed's newest line for
+# that ref, stopping at that commit or at the first commit not authored `gov-claim`, appended as a
+# lone event, so a ref another node set back to a commit an older line holds is sighted again.
+# `derive_feed_events` is the same walk with no feed to stop at; `check_feed` holds a feed to it per
+# ref git still holds (`missing`, `duplicate` for two consecutive events of one ref with one blob and
+# commit, `extra` on a ref whose tip is a `gov-claim` commit, `order`, `torn`), and `write_feed`
+# writes it as a fresh feed where none is present.
+# GOVFEED_DIR names the common dir; unset, the first call resolves it once for the process.
+# WHAT THIS DOES NOT CHECK: two breakers the guard's own blind spots (above) admit can both append, which
+# gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
+# ref's events from before a deletion of it are outside every chain git holds and are not compared;
+# a retry made after another event of its ref landed appends again, an event that did happen.
+# A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
+# mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
+derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
+add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
+  local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
+  [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: NOTE - no git common dir resolves here, so this write of %s is not in the feed\n' "$ref" >&2; return 0; }
+  k=${ref#refs/gov/}; k=${k%%/*}
+  if [ -z "$c" ]; then
+    c=0000000000000000000000000000000000000000
+  else
+    r=$(git rev-parse "$c^{commit}" "$c^{tree}" 2>/dev/null) || r=""
+    r=${r//$'\r'/}; c=${r%%$'\n'*}; t=${r#*$'\n'}
+    [ "${#c}:${#t}" = 40:40 ] || c=""
+    case "$c$t" in *[!0-9a-f]*|"") printf 'feed: NOTE - %s names no commit this clone holds, so the write is not in the feed\n' "$ref" >&2; return 0 ;; esac
+  fi
+  tok="$BASHPID.$RANDOM"
+  ( _fl_mine=
+    trap '[ -z "$_fl_mine" ] || { [ -s "$d/gov-feed.lock/owner" ] || [ -e "$d/gov-feed.lock.break" ] || rm -rf "$d/gov-feed.lock"; remove_dir_lock "$d/gov-feed.lock" "$tok"; }' EXIT
+    write_dir_lock_wait "$d/gov-feed.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || exit 3
+    if [ -f "$d/gov-feed.log" ] && FEED_EV="$ref"$'\t'"$t"$'\t'"$c" awk -F'\t' '
+        BEGIN { split(ENVIRON["FEED_EV"], ev, "\t") }
+        $2 == ev[1] { p = $4 "\t" $5 }
+        END { exit !(p == ev[2] "\t" ev[3]) }' "$d/gov-feed.log" 2>/dev/null; then
+      exit 0
+    fi
+    if [ -f "$d/gov-feed.seq" ]; then { read -r s <"$d/gov-feed.seq"; } 2>/dev/null || :; fi
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s=0 ;; esac
+    l=0
+    if [ -s "$d/gov-feed.log" ]; then
+      l=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 0 }' "$d/gov-feed.log" 2>/dev/null) || l=0
+      case "$l" in ""|*[!0-9]*) l=0 ;; esac
+      [ -z "$(tail -c1 "$d/gov-feed.log" 2>/dev/null)" ] || printf '\n' >>"$d/gov-feed.log"
+    fi
+    n=$(( (10#$s > 10#$l ? 10#$s : 10#$l) + 1 ))
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
+      printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
+    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
+      [ -z "$st" ] || rm -f "$st" 2>/dev/null
+      printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
+    fi
+    exit 0 ) || rc=$?
+  case "$rc" in
+    0) ;;
+    3) printf 'feed: NOTE - the feed lock in %s was held for 5s, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2 ;;
+    *) printf 'feed: NOTE - %s: the append exited %s\n' "$ref" "$rc" >&2 ;;
+  esac
+  return 0
+}
+# THE ONE SUCCESS EXIT (TOOL-dPlacedRequest-34 S5): a governance write that landed sets this node's cache
+# ref `refs/gov/remote/<tail>` to the commit it wrote, or clears it on a deletion, then appends the event,
+# so the cache always names what this node last wrote or fetched. `write_gov_ref` calls it, and so does a
+# carrier whose push is no `write_gov_ref` call, the lander's fenced beat (S6). A cache ref git cannot
+# move prints ONE `feed: NOTE -` line and the event is appended all the same: the write already landed.
+write_feed_success() { # ref · commit, or empty for a deletion -> 0 always; the cache ref set or cleared, the event appended
+  if [ -n "${2:-}" ]; then git update-ref "refs/gov/remote/${1#refs/gov/}" "$2" 2>/dev/null
+  else git update-ref -d "refs/gov/remote/${1#refs/gov/}" 2>/dev/null; fi \
+    || printf 'feed: NOTE - the cache ref refs/gov/remote/%s was not set to this write\n' "${1#refs/gov/}" >&2
+  add_feed_event "$1" "${2:-}"
+  return 0
+}
+derive_feed_events() { # cache prefix · [feed file] -> `ref TAB kind TAB blob TAB commit` per event, per ref oldest first
+  local pre="${1%/}/" feed="${2:-}" rows r t g s
+  rows=$(git for-each-ref --format='%(refname) %(objectname)' "$pre" 2>/dev/null | FEED_FILE="$feed" FEED_PRE="$pre" awk '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") < 5) continue
+              newest[x[2]] = x[5] } }
+    { sub(/\r$/, ""); g = "refs/gov/" substr($1, length(ENVIRON["FEED_PRE"]) + 1)
+      if ((g in newest) && newest[g] == $2) next
+      print $2, g, (g in newest ? newest[g] : "-") }')
+  [ -n "$rows" ] || return 0
+  printf '%s\n' "$rows" | while read -r t g s; do
+    git log --first-parent --format='%H %T %an' "$t" 2>/dev/null | awk -v ref="$g" -v stop="$s" '
+      { sub(/\r$/, "") }
+      $1 == stop { exit }
+      { a = $0; sub(/^[^ ]+ [^ ]+ /, "", a); n++; h[n] = $1; tr[n] = $2; if (a != "gov-claim") exit }
+      END { k = ref; sub(/^refs\/gov\//, "", k); sub(/\/.*$/, "", k)
+            for (i = n; i >= 1; i--) printf "%s\t%s\t%s\t%s\n", ref, k, tr[i], h[i] }'
+  done
+  return 0
+}
+add_feed_sightings() { # cache prefix -> 0 always; every unseen commit of a cached ref appended oldest first
+  local pre="${1:-refs/gov/remote/}" r k t c
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -n "${GOVFEED_DIR%$'\r'}" ] || return 0
+  while IFS=$'\t' read -r r k t c; do
+    [ -z "$c" ] || add_feed_event "$r" "$c"
+  done < <(derive_feed_events "$pre" "${GOVFEED_DIR%$'\r'}/gov-feed.log")
+  return 0
+}
+check_feed() {       # cache prefix · [feed file, the node's by default] -> one line per finding and rc 1, or rc 0
+  local pre="${1%/}/" f="${2:-}" dv au
+  if [ -z "$f" ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  fi
+  dv=$(derive_feed_events "$pre")
+  au=$(git for-each-ref --format='%(refname) %(authorname)' "$pre" 2>/dev/null)
+  FEED_FILE="$f" FEED_PRE="$pre" FEED_DV="$dv" FEED_AU="$au" awk '
+    BEGIN {
+      np = length(ENVIRON["FEED_PRE"])
+      m = split(ENVIRON["FEED_AU"], a, "\n")
+      for (i = 1; i <= m; i++) { ln = a[i]; sub(/\r$/, "", ln); if (ln == "") continue
+        r = ln; sub(/ .*$/, "", r); au = ln; sub(/^[^ ]* /, "", au)
+        g = "refs/gov/" substr(r, np + 1); held[g] = 1; if (au == "gov-claim") chain[g] = 1 }
+      m = split(ENVIRON["FEED_DV"], a, "\n")
+      for (i = 1; i <= m; i++) { if (split(a[i], x, "\t") != 4) continue
+        dn[x[1]]++; ds[x[1], dn[x[1]]] = x[4]; inch[x[1] SUBSEP x[4]] = 1 }
+      f = ENVIRON["FEED_FILE"]; bad = 0
+      while ((getline ln < f) > 0) {
+        sub(/\r$/, "", ln)
+        if (split(ln, x, "\t") != 6) { print "torn " ln; bad = 1; continue }
+        k = x[4] SUBSEP x[5]
+        if ((x[2] in last) && last[x[2]] == k) { print "duplicate " x[2] " " x[5]; bad = 1; continue }
+        last[x[2]] = k
+        if (!(x[2] in held)) continue
+        if ((x[2] SUBSEP x[5]) in inch) { fn[x[2]]++; fs[x[2], fn[x[2]]] = x[5]; got[x[2] SUBSEP x[5]] = 1 }
+        else if (x[2] in chain) { print "extra " x[2] " " x[5]; bad = 1 }
+      }
+      for (g in dn) {
+        j = 0; off = ""
+        for (i = 1; i <= dn[g]; i++) {
+          c = ds[g, i]
+          if (!((g SUBSEP c) in got)) { print "missing " g " " c; bad = 1; continue }
+          j++; if (off == "" && fs[g, j] != c) off = fs[g, j]
+        }
+        if (off != "") { print "order " g " " off; bad = 1 }
+      }
+      exit bad }'
+}
+write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
+  local pre="${1%/}/" d now n=0 l lt="" st=""
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -n "$d" ] || { printf 'feed: no git common dir resolves here, so no feed was rebuilt\n'; return 2; }
+  if [ -e "$d/gov-feed.log" ]; then printf 'feed: a feed is present, so nothing was rebuilt over it: %s\n' "$d/gov-feed.log"; return 2; fi
+  TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+  derive_temp_path lt "$d/gov-feed.log" && derive_temp_path st "$d/gov-feed.seq" \
+    || { printf 'feed: no staging name resolves beside %s, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$lt" \
+    && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq" && mv -f "$lt" "$d/gov-feed.log" \
+    || { rm -f "$lt" "$st"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  printf 'feed: rebuilt %s event(s) from %s into %s\n' "$n" "$pre" "$d/gov-feed.log"
+  return 0
+}
+print_feed() {       # [seq] -> every event whose seq is at or after it, in file order
+  local from="${1:-0}" d
+  case "$from" in ""|*[!0-9]*) printf 'feed: a replay starts at a sequence number, not %s\n' "$from"; return 2 ;; esac
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  d=${GOVFEED_DIR%$'\r'}
+  [ -f "$d/gov-feed.log" ] || return 0
+  awk -F'\t' -v from="$from" 'NF == 6 && $1 ~ /^[0-9]+$/ && $1 + 0 >= from + 0' "$d/gov-feed.log"
+}
+# THE OBSERVER CLOCK, I8 (TOOL-dPlacedRequest-17): the one reader of a first sighting. Per
+# `ref TAB commit` pair on stdin, in order, the `seen-utc` of the oldest feed line of that ref and
+# commit, or `-` where the feed holds none, has none of that shape, or cannot be read. Every lease
+# deadline is now minus that stamp, both read on this node's clock, never the holder's `beat-utc`.
+read_first_seen() {  # `ref TAB commit` pairs on stdin -> one `seen-utc` or `-` per pair
+  local f=""
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ -z "${GOVFEED_DIR%$'\r'}" ] || f="${GOVFEED_DIR%$'\r'}/gov-feed.log"
+  FEED_FILE="$f" awk -F'\t' '
+    BEGIN { f = ENVIRON["FEED_FILE"]
+            if (f != "") while ((getline ln < f) > 0) {
+              sub(/\r$/, "", ln)
+              if (split(ln, x, "\t") != 6 || x[6] !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z$/) continue
+              if (!((x[2] SUBSEP x[5]) in seen)) seen[x[2], x[5]] = x[6] } }
+    { sub(/\r$/, ""); print (($1 SUBSEP $2) in seen ? seen[$1, $2] : "-") }'
+}
+# <<< gov_feed_sh
 
-# ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read: `git push --porcelain
-# --force-with-lease=<ref>:<that sha>`, EMPTY for a create. The porcelain status line decides the
-# outcome, never the exit alone: `!` with `(stale info)` or `(fetch first)` is LOST, the ref moved
-# between this call's read and its write; any other `!`, no status line, or the bound firing is NOT
-# COMPLETED and carries git's reason or the exit, so a pre-push refusal is never reported as a race.
-# Every write leaves the ref on the remote, a terminal one included. The commit has a FIXED identity,
-# so a clone with none configured still writes and the claim publishes no address the run's commits
-# do not already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder`
-# check 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
+# THE EPOCH FOR LIFE (TOOL-dPlacedRequest-16 S5), read once for every create (TOOL-dPlacedRequest-28
+# S1): the newest commit this node's feed holds for a lease ref the remote does not hold, one awk and
+# one cat-file. It prints nothing where the feed holds no commit for the ref; `unreadable <commit>`
+# where it names one this clone cannot read, `git prune` having taken it (TOOL-dPlacedRequest-34 S4);
+# `tombstone <commit>` where that commit is a build or unit tombstone; and otherwise
+# `<commit> <epoch>`, the epoch its record carries, 0 where that is no whole number. Its one caller is
+# `write_claim`, on a create whose tip read is empty.
+read_feed_lease_tip() { # lease ref -> nothing, `unreadable <commit>`, `tombstone <commit>` or `<commit> <epoch>`
+  local ref="$1" fc="" fm fe
+  [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+  [ ! -f "${GOVFEED_DIR%$'\r'}/gov-feed.log" ] || fc=$(LF_REF="$ref" awk -F'\t' '{ sub(/\r$/, "") } NF == 6 && $2 == ENVIRON["LF_REF"] && $5 ~ /^[0-9a-f]+$/ && $5 !~ /^0+$/ { c = $5 } END { print c }' "${GOVFEED_DIR%$'\r'}/gov-feed.log")
+  [ -n "$fc" ] || return 0
+  fm=$(GIT cat-file commit "$fc" 2>/dev/null) || { printf 'unreadable %s\n' "$fc"; return 0; }
+  fe=$(printf '%s\n' "$fm" | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^kind: / && k == "" { k = substr($0, 7) } /^status: / && s == "" { s = substr($0, 9) } END { print e " " k " " s }')
+  case "${fe#* }" in
+    "build landed"|"build withdrawn"|"unit landed"|"unit withdrawn") printf 'tombstone %s\n' "$fc"; return 0 ;;
+  esac
+  case "${fe%% *}" in ""|*[!0-9]*) printf '%s 0\n' "$fc" ;; *) printf '%s %s\n' "$fc" "$((10#${fe%% *}))" ;; esac
+}
+
+# ONE CLAIM WRITE, by compare-and-swap on the sha `check_claim_writable` read, through the one writer
+# above: `build_gov_commit` parents the commit on that sha, EMPTY for a create, and `write_gov_ref`
+# pushes it with `--force-with-lease=<ref>:<that sha>` and decides by the porcelain status line:
+# LOST when the ref moved between this call's read and its write, NOT COMPLETED with git's reason, the
+# bound or the missing line otherwise, so a pre-push refusal is never reported as a race. Every write
+# leaves the ref on the remote, a terminal one included. The commit has a FIXED identity, so a clone
+# with none configured still writes and the claim publishes no address the run's commits do not
+# already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder` check
+# 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
 # THE PUSH NAMES THE REMOTE, `CR_NAME`, never its URL (TOOL-aGraftedHelix-10). Given a name, the
 # tracked pre-push hook observes `<name>/HEAD` as the default branch, the pushed ref is not that
 # branch, and the hook exits `skip-nondefault`, or runs the branch bar a repository declares as
 # `GOV_BRANCH_GATE_CMD`. Given a URL it observes nothing and, with GOV_DEFAULT_BRANCH unset, refuses
-# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is a
-# `default-branch` refusal and NOT COMPLETED, its message carrying `git remote set-head <name> -a`,
-# which the hook prints only to the stderr this push discards. The hook's refusal file is removed
-# before the push, as push-main removes it, so a token read after it came from THIS push's hook -
-# which holds only because no claim push runs while push-main holds `push-main-active` in the same
-# git dir (TOOL-aGraftedHelix-32): that hook clears both verdict files the lander trusts on every
-# run, so a beat landing mid-bar would erase the landing's verdict. THE TWO WRITERS ARE SERIALISED
-# BY A LOCK AND THE MARKER (TOOL-aGraftedHelix-36 S10): this function takes the directory
-# `claim-push.lock` in the same git dir BEFORE it tests the marker, writes its deadline into the
-# lock's `until`, and releases it on every path out; push-main touches its marker, then waits for no
-# live lock, then clears and pushes. Whichever side moves second sees the other, so the marker test
-# can no longer pass a moment before the lander clears its verdict files. The take, the break of a
-# stale lock and the release are `write_dir_lock` and `remove_dir_lock`, whose header
-# states their limits (TOOL-aGraftedHelix-37).
-# WHAT THIS DOES NOT CHECK: on a host with no runnable `timeout -k` the push is unbounded, so a push
-# can outlive the deadline it recorded, and a lander past that deadline then pushes beside it.
+# every claim. The driver never supplies that variable, so a remote with no recorded HEAD is NOT
+# COMPLETED, its message carrying `git remote set-head <name> -a` from the writer's own read.
+# NO LOCK AND NO MARKER TEST (TOOL-dPlacedRequest-11 S6): the hook clears the verdict files the lander
+# trusts only on a push that carries the default branch, so a beat landing mid-bar leaves them as it
+# found them, and the claim write neither waits on push-main nor is refused by it. A refusal token
+# the hook recorded during this push is an advisory beside the cause, never the cause, because
+# another push from the same git dir may have written it.
 # THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
 # with no session, or a Workflow child under another one, never rewrites it. Handed the run-state
 # file, the write copies its `session`, `host` and `lease-utc` (the keepalive argument is the
 # record's too); handed none, it is `--preflight` or a take-over taking the claim, and writes this
 # harness's session and host with the one lease stamp the caller also hands `write_lease`. `node` is
 # the claim's own on the `mine` row, this user's elsewhere.
-write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed; WC_WHY
-  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" d t c rc l line flag node host sid msg rf="" tok="" lk="" own="" busy=""
-  WC_WHY=""; WC_BEAT=$(read_utc_now)
+# TOOL-dPlacedRequest-1 - THE WRITE IS A LEASE WRITE. The ref is the slug's build lease, or WL_REF where
+# `run_lease_verb` set the WL_ names; the commit is parented on CW_SHA, the tip read, which for a slug
+# holding only a legacy claim is the legacy tip, so the lease is created on it (expected sha empty) and
+# the legacy ref never moves. The epoch is 1 on a create, the read epoch plus one on a take, the read
+# epoch otherwise and never below 1.
+# TOOL-dPlacedRequest-28 - EVERY CREATE READS THE FEED, here and nowhere else: on CW_ACT `create` with
+# an empty tip read, `read_feed_lease_tip` over the ref this call derived, before the epoch. A commit
+# the feed names parents the create at its epoch plus one, the ref still expected absent; a build or
+# unit tombstone there builds, pushes and queues nothing and returns 3, WC_WHY naming the feed commit,
+# mapped once below by CW_MODE, the column `check_claim_writable` graded: check 107 for `preflight`
+# and `take-over`, check 108 for `holder`, the policy's line otherwise, which the lease verbs and the
+# beat print for themselves. So the `--lease` verbs, an offer, a draw, a queued create and the
+# driver's own claims read one rule, and a ref no feed line names is the one parentless create.
+# `witness` and the witness verdict are the WL_ values a verb
+# derived, else the driver's under `leases.renewal` (`read_lease_renewal`); `renews` is
+# `derive_lease_renews` over the epoch read (empty on a create), the epoch written, the policy and that
+# verdict, so a write that opens a tenure renews (TOOL-dPlacedRequest-25). WL_QUEUE builds the commit and queues it
+# through `add_gov_queue` instead of pushing it, the offline branch of `leases.offline`: rc 0 with
+# WC_WHY `already` where the queued commit it was built on holds its record less the stamp keys
+# (TOOL-dPlacedRequest-41 S2), rc 2 `gov-queue.lock busy` on its lock. WL_OFFER and WL_ODL fill
+# `offer` and `offer-deadline` for `write_lease_offer` (TOOL-dPlacedRequest-20) and are `-` on every
+# other write, so an acquisition of an offered lease carries no stale offer.
+write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [run-state file] · [lease stamp] -> 0 written, 1 lost, 2 not completed, 3 a feed tombstone; WC_WHY
+  local slug="$1" st="$2" ka="$3" pol="$4" rel="${5:-}" lease="${6:-}" c rc node host sid msg ref exp="" ep kd sl tag ren wit wv rv er lf pt pe ft="" wt
+  WC_WHY=""; WC_BEAT=$(read_utc_now); WC_EPOCH=""
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
-  [ -z "$RUNLOG_GITDIR" ] || rf="$RUNLOG_GITDIR/pre-push-refusal"
-  if [ -n "$RUNLOG_GITDIR" ]; then
-    lk="$RUNLOG_GITDIR/claim-push.lock"; own="$BASHPID.$RANDOM"
-    write_dir_lock "$lk" "$own" "$(( REMOTE_BOUND + 10 ))" claim-push || { lk=""; busy=1; }
-  fi
   if [ -n "$rel" ]; then
     fact "$rel" session >/dev/null; sid=$_fact; fact "$rel" host >/dev/null; host=$_fact; fact "$rel" lease-utc >/dev/null; lease=$_fact; lease="${lease:-absent}"
+  elif [ -n "$WL_REF" ]; then
+    sid="${CLAUDE_CODE_SESSION_ID:-}"; host=$(read_host_name) || host=""
+    case "$CW_ACT" in create|take|take-announced) lease=$WC_BEAT ;; *) lease=${CW_LEASE:--}; [ "$lease" != - ] || lease=$WC_BEAT ;; esac
   else
     sid="${CLAUDE_CODE_SESSION_ID:-}"; host=$(read_host_name) || host=""; lease="${lease:-$WC_BEAT}"
   fi
   sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
-  msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
-    "$slug" "$slug" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT")
-  if [ -n "$busy" ]; then
-    WC_WHY="a claim push from this git dir is in flight; retry once it ends: $RUNLOG_GITDIR/claim-push.lock"; rc=2
-  elif [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
-    WC_WHY="push-main is landing from this git dir, so a claim push now would clear its verdict files: $RUNLOG_GITDIR/push-main-active"; rc=2
-  elif ! d=$(mktemp); then
-    WC_WHY="cannot create a scratch file to bound the push"; rc=2
-  elif ! t=$(GIT mktree </dev/null) || ! c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid GIT commit-tree "$t" -m "$msg" 2>/dev/null); then
-    WC_WHY="the claim commit could not be built in this clone"; rc=2
+  case "$CW_KIND" in ""|-) exp="" ;; *) exp=$CW_SHA ;; esac
+  if [ -n "$WL_REF" ]; then
+    ref=$WL_REF; kd=$WL_KIND; sl=$WL_SLUG; tag=$WL_TAG; wv=$WL_VERDICT; wit=$WL_WITNESS
   else
-    [ -z "$rf" ] || rm -f "$rf"
-    observe_remote "$d" push --porcelain "--force-with-lease=$CLAIM_NS/$slug:$CW_SHA" "$CR_NAME" "$c:$CLAIM_NS/$slug" && rc=0 || rc=$?
-    line=""
-    while IFS= read -r l; do
-      case "$l" in ?$'\t'*":$CLAIM_NS/$slug"$'\t'*) line=${l%$'\r'} ;; esac
-    done <"$d"
-    flag=${line:0:1}
-    if [ "$rc" = 124 ]; then WC_WHY="the push was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; rc=2
-    elif [ -z "$line" ]; then WC_WHY="git push exited $rc and printed no status line for the claim: $CR_URL"; rc=2
-    elif [ "$flag" != '!' ]; then rc=0
-    else
-      case "$line" in
-        *"(stale info)"*|*"(fetch first)"*) WC_WHY="the push was rejected: ${line##*$'\t'}"; rc=1 ;;
-        *) WC_WHY="the push was refused: ${line##*$'\t'}"; rc=2 ;;
-      esac
+    derive_lease_ref build "$slug" >/dev/null; ref=$LEASE_REF; kd=build; sl=$slug
+    tag=$CW_TAG
+    if [ -z "$tag" ] || [ "$CW_CLS" != mine ]; then
+      [ -n "$FLEET_TAG" ] || FLEET_TAG=$(resolve_fleet_tag) || FLEET_TAG=-
+      tag=$FLEET_TAG
     fi
-    if [ "$rc" = 2 ] && [ -n "$rf" ] && [ -f "$rf" ]; then
-      IFS=$'\t' read -r tok _ <"$rf" || :
-      WC_WHY="$WC_WHY · the pre-push hook refused it: ${tok:-an empty refusal file}"
-      [ "$tok" != default-branch ] || WC_WHY="$WC_WHY · fix once: git remote set-head $CR_NAME -a"
+    read_lease_renewal "$slug"; wv=$LR_VERDICT; wit=$LR_WITNESS
+  fi
+  # A create is epoch 1, or the epoch plus one of the record the feed last held for a ref the remote
+  # no longer holds, parented on it (TOOL-dPlacedRequest-16 S5, read here for every create since
+  # TOOL-dPlacedRequest-28); a ref that does not derive reads nothing and refuses below.
+  pt=$CW_SHA; pe=$CW_EPOCH
+  [ -z "$ref" ] || [ "$CW_ACT" != create ] || [ -n "$pt" ] || ft=$(read_feed_lease_tip "$ref")
+  # AN UNREADABLE FEED COMMIT (TOOL-dPlacedRequest-34 S4): a build or unit lease cannot know the epoch
+  # it would continue, so its create is refused below, `epoch-fence` at the verb; a cadence `run` or a
+  # legacy claim takes the plain create at epoch 1.
+  case "$ft:$kd" in "unreadable "*:build|"unreadable "*:unit) ;; "unreadable "*) ft="" ;; esac
+  case "$ft" in ""|"tombstone "*|"unreadable "*) ;; *) pt=${ft%% *}; pe=${ft#* } ;; esac
+  case "$CW_ACT" in create|take|take-announced) ep=$((pe + 1)) ;; *) ep=$pe ;; esac
+  [ "$ep" -ge 1 ] 2>/dev/null || ep=1
+  rv=""; ! read_lease_policy leases.renewal >/dev/null || rv=$LP_VALUE
+  er=$CW_EPOCH; [ "$CW_ACT" != create ] || er=""
+  # A QUEUED write records this node's last fetch (S6): the stamp `read_claims` keeps, or `-` where it is
+  # absent or no ISO-8601 UTC second, which `write_gov_queue` refuses as `epoch-fence`.
+  lf=-
+  if [ -n "$WL_QUEUE" ]; then
+    [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
+    { IFS= read -r lf <"${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null || lf=""
+    lf=${lf%$'\r'}
+    [[ $lf =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] || lf=-
+  fi
+  derive_lease_renews "$er" "$ep" "$rv" "$wv" >/dev/null; ren=$LR_RENEWS
+  if [ -z "$ref" ]; then
+    WC_WHY="no lease ref derives for $slug: $LEASE_WHY"; rc=2
+  elif [ "${ft%% *}" = tombstone ]; then
+    WC_WHY="the remote no longer holds it, and this node's feed last saw its tombstone ${ft#tombstone }"; rc=3
+  elif [ "${ft%% *}" = unreadable ]; then
+    WC_WHY="the remote no longer holds it, and this node's feed names ${ft#unreadable }, which this clone cannot read, so the epoch a create would continue is unknown"; rc=1
+  else
+    printf -v msg 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: %s\noffer-deadline: %s\nlast-fetch: %s' \
+      "${ref#"$LEASE_NS"/}" "$sl" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT" \
+      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "${WL_OFFER:--}" "${WL_ODL:--}" "$lf"
+    msg=${msg%"${msg##*[!$'\n']}"}
+    if ! c=$(build_gov_commit "$pt" "$msg"); then
+      WC_WHY="the claim commit could not be built in this clone"; rc=2
+    elif [ -n "$WL_QUEUE" ]; then
+      add_gov_queue "$ref" "$exp" "$c" && rc=0 || rc=$?
+      case "$rc" in
+        0) WC_WHY=queued ;;
+        3) WC_WHY=already; rc=0 ;;
+        2) WC_WHY="gov-queue.lock busy" ;;
+        *) WC_WHY="the offline queue could not be written"; rc=2 ;;
+      esac
+    else
+      GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+      write_gov_ref "$ref" "$exp" "$c" && rc=0 || rc=$?
+      WC_WHY=$GOVREF_WHY
     fi
   fi
-  [ -z "$lk" ] || remove_dir_lock "$lk" "$own"
-  [ -z "${d:-}" ] || rm -f "$d"
+  [ "$rc" != 0 ] || WC_EPOCH=$ep
   if [ "$rc" = 0 ]; then
     # A TAKE-OVER OF A STALE CLAIM IS A SELF-HEAL, logged once per write that landed (I3,
     # TOOL-aGraftedHelix-8); the claim's own row, read before the write, is the detail.
@@ -2822,9 +3578,13 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
     fi
     return 0
   fi
-  case "$rc:$pol" in
-    1:strict|1:holder) fail 108 "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug · $WC_WHY" ;;
-    2:strict) fail 109 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
+  case "$rc:$CW_MODE:$pol" in
+    3:preflight:*|3:take-over:*) fail 107 "this slug's lease is a tombstone in this node's feed, its build landed or withdrawn, which only a patch build's draw takes, so a driver would revive a finished build; nothing was written: $slug · tombstone · $WC_WHY" ;;
+    3:holder:*|1:*:strict|1:*:holder)
+      msg="the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it" wt=""
+      [ "$rc" != 3 ] || { msg="this run's lease is a tombstone in this node's feed, its build landed or withdrawn, so the run must not drive the slug"; wt=" · tombstone"; }
+      fail 108 "$msg; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug$wt · $WC_WHY" ;;
+    2:*:strict) fail 109 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
     *:quiet) ;;
     *) echo "unattended: claim not written — $slug · $WC_WHY" ;;
   esac
@@ -2866,6 +3626,1415 @@ write_claim_beat() { # slug -> exactly one `beat —` line
     *) echo "unattended: beat — $slug · skipped: the write did not complete: $WC_WHY" ;;
   esac
   return 0
+}
+
+# ================================================ THE LEASE VERBS — TOOL-dPlacedRequest-1
+# `--lease acquire|renew|release|take-over <kind> <name> [<sub>]` and `--lease flush`. One lease grammar
+# for a build, a unit of a build and a cadence run (S1), written by compare-and-swap through the claim
+# writer above, its row read by `read_claims` and decided by the `lease` column of
+# `check_claim_writable` (S6). Each verb prints ONE line: `lease — <tail> · <act> · epoch <n>` exit 0,
+# `lease refused — <cause> · <tail> · <holder>` exit 1 (`live-holder`, `tombstone`, `epoch-fence`,
+# `overlap`, `offline`, and an offer's `offered`, naming its target, and `terminal`), or
+# `lease not written — <why>` exit 2. Dark behind RUN_CLAIMS, as every claim.
+# Expiry is judged by the observer clock in `read_claims` (TOOL-dPlacedRequest-17).
+# The hand-over, the tombstone, the draw and `--lease prune` are TOOL-dPlacedRequest-16's.
+# `--lease offer <kind> <name> [<sub>] --to <fleet tag>[/<session>]` is TOOL-dPlacedRequest-20's.
+# WHAT THIS DOES NOT CHECK: the queue is unlocked until TOOL-dPlacedRequest-24, so two writers
+# flushing one queue at once can push one line twice, the second losing its compare-and-swap.
+FLEET_TAG=""; LEASE_WHY=""; LP_VALUE=""; LP_SEEN=""; LP_NOTED=""; LB_VALUE=""
+LR_RENEWS=""; LR_WITNESS=""; LT_RECORD=""; LT_WHY=""; LT_SHA=""; LW_SHA=""; LW_VERDICT=""; GQ_PUSHED=""
+
+# A LEGAL ONE-SEGMENT REF NAME, as `git check-ref-format` reads one, held in bash so no segment costs a
+# process: non-empty, no `/`, no leading `.`, no trailing `.` or `.lock`, no `..`, no `@{`, not `@`, and
+# no control character, space, `~`, `^`, `:`, `?`, `*`, `\` or `[`.
+check_lease_segment() { # segment -> 0 when it is a legal one-segment ref name, 1 otherwise
+  case "$1" in ""|*/*|.*|*.|*.lock|*..*|*"@{"*|@) return 1 ;; esac
+  case "$1" in *[[:cntrl:]]*|*[[:space:]]*|*"~"*|*"^"*|*":"*|*"?"*|*"*"*|*"\\"*|*"["*) return 1 ;; esac
+  return 0
+}
+
+# A TAG THE FLEET REGISTRY HOLDS (TOOL-dPlacedRequest-20 S1), the target an offer names: asked of the
+# playbook kit's one registry reader, `read_fleet`, found by the `resolve_kit_dir` call
+# `read_lease_policy` makes for the policy kit, so no second parser of `fleet.toml` exists. The kit
+# imported writes no bytecode. -> 0 registered, 1 not, 2 the registry unread; the cause in LEASE_WHY.
+check_fleet_tag() { # tag -> 0 registered, 1 not, 2 the registry unread; LEASE_WHY
+  local tag="${1:-}" py d out
+  LEASE_WHY=""
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" playbook render_playbook.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    LEASE_WHY="no playbook kit resolves beside this kit, so fleet.toml cannot be read"; return 2
+  fi
+  [ -f "$d/render_playbook.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" -B -c 'import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import render_playbook as r
+try:
+    tags = {n["tag"] for n in r.read_fleet(Path(sys.argv[1]) / r.FLEET_NAME)}
+except r.Refusal as e:
+    print(e); sys.exit(2)
+print("held" if sys.argv[2] in tags else "absent")' "$d" "$tag" 2>&1)
+  out=${out//$'\r'/}
+  case "$out" in
+    held) return 0 ;;
+    absent) LEASE_WHY="'$tag' is no tag of fleet.toml"; return 1 ;;
+    *) LEASE_WHY="fleet.toml could not be read: ${out//$'\n'/ }"; return 2 ;;
+  esac
+}
+
+# A CADENCE SEGMENT (TOOL-dPlacedRequest-18 S1): the tag grammar's `seg` production of
+# PLAY-dOrderedCharter-19 S1, `[a-z0-9][a-z0-9-]*`, at most 64 bytes — `RULE_KEY_RE`'s shape in
+# the roles kit's `roles_lib.py` less its optional `?`, and never a list of cadence kinds, so a cadence an
+# expansion registers holds a lease the way `maintain` does. The suite compares its verdict with the
+# playbook kit's `parse_tag` over a fixed probe set, which keeps the two spellings one fact. `LC_ALL=C`
+# so `[a-z]` is the ASCII range under any collation and `${#1}` counts bytes. In bash, with no process
+# start, because a run-lease ref is built on the lease path. WHAT THIS DOES NOT CHECK: a name of 60
+# to 64 bytes is admitted here and is too long for the tag `unit.<name>`. Sets LEASE_WHY to the rule
+# broken and prints it on a refusal, so a caller in a loop spawns nothing.
+check_cadence_segment() { # name -> 0 inside seg and 64 bytes; 1 with the rule broken in LEASE_WHY and on stdout
+  local LC_ALL=C
+  LEASE_WHY=""
+  if ! [[ ${1:-} =~ ^[a-z0-9][a-z0-9-]*$ ]]; then LEASE_WHY="outside seg [a-z0-9][a-z0-9-]*"
+  elif [ "${#1}" -gt 64 ]; then LEASE_WHY="over 64 bytes (${#1})"
+  else return 0
+  fi
+  printf '%s\n' "$LEASE_WHY"; return 1
+}
+
+# THE ONE BUILDER OF A LEASE REF (S1, I5). `<cadence>` is held to the tag grammar by
+# `check_cadence_segment` (TOOL-dPlacedRequest-18). The slug `run` is reserved: a build or unit lease of
+# it is refused, because `refs/gov/leases/run/build` and a cadence named `build` cannot both be refs.
+# Sets LEASE_REF and prints it, so a caller in a loop spawns nothing.
+# TOOL-dPlacedRequest-19 S4: the kind `request` builds `refs/gov/leases/request/<content key>`, the key
+# twelve lower-case hex digits and no third segment, and the slug `request` is reserved as `run` is.
+derive_lease_ref() { # build <slug> | unit <slug> <id> | run <cadence> <period> | request <content key> -> LEASE_REF on stdout; rc 2 with LEASE_WHY
+  local k="${1:-}" n="${2:-}" s="${3:-}"
+  LEASE_REF=""; LEASE_WHY=""
+  case "$k" in
+    build|request) [ -z "$s" ] || { LEASE_WHY="a $k lease takes no third segment: $s"; return 2; } ;;
+    unit|run) [ -n "$s" ] || { LEASE_WHY="a $k lease takes a third segment"; return 2; } ;;
+    *) LEASE_WHY="the lease kind is build, unit, run or request, not '$k'"; return 2 ;;
+  esac
+  check_lease_segment "$n" || { LEASE_WHY="'$n' is not a legal one-segment ref name"; return 2; }
+  [ -z "$s" ] || check_lease_segment "$s" || { LEASE_WHY="'$s' is not a legal one-segment ref name"; return 2; }
+  [ "$k" != run ] || check_cadence_segment "$n" >/dev/null || { LEASE_WHY="the cadence '$n' is $LEASE_WHY"; return 2; }
+  [ "$k" != request ] || [[ $n =~ ^[0123456789abcdef]{12}$ ]] || { LEASE_WHY="'$n' is no content key, twelve lower-case hex digits"; return 2; }
+  case "$k:$n" in
+    build:run|unit:run) LEASE_WHY="the slug run is reserved: a $k lease of it would read as the cadence namespace $LEASE_NS/run/"; return 2 ;;
+    build:request|unit:request) LEASE_WHY="the slug request is reserved: a $k lease of it would read as the request namespace $LEASE_NS/request/"; return 2 ;;
+  esac
+  case "$k" in
+    build) LEASE_REF="$LEASE_NS/$n/build" ;;
+    unit) LEASE_REF="$LEASE_NS/$n/unit/$s" ;;
+    run) LEASE_REF="$LEASE_NS/run/$n/$s" ;;
+    request) LEASE_REF="$LEASE_NS/request/$n" ;;
+  esac
+  printf '%s\n' "$LEASE_REF"
+}
+
+# THE FIVE LEASE KEYS (S12), read once per process each, on `read_spec_audit_switch`'s pattern: the
+# policy kit found by `resolve_kit_dir`, a closed `case`, and one literal `get` line per key, which the
+# policy kit's reader coverage counts. Only an unresolved policy kit reads the catalogue default, with
+# ONE NOTE per process naming the keys; a refused `get`, an invalid file included, returns 1 and the
+# refusal in LP_VALUE, and the caller writes nothing. A value outside the closed set refuses too.
+# Sets LP_VALUE and prints it; called directly, never in a substitution, so the read is kept.
+# TOOL-dPlacedRequest-17 S5 adds the three bounds a lease deadline is judged by, `leases.expiry-hours`,
+# `leases.queued-claim-days` and `leases.offer-seconds`, each a non-negative number and read through
+# `read_lease_bound` in seconds.
+read_lease_policy() { # leases|leases.granularity|leases.renewal|leases.overlap|leases.offline|leases.expiry-hours|leases.queued-claim-days|leases.offer-seconds -> LP_VALUE on stdout; 1 with the refusal in LP_VALUE
+  local key="${1:-}" def py d out v
+  case "$key" in
+    leases) def=warn ;;
+    leases.granularity) def=build-and-unit ;;
+    leases.renewal) def=progress ;;
+    leases.overlap) def=kit-dirs ;;
+    leases.offline) def=warn ;;
+    leases.expiry-hours) def=24 ;;
+    leases.queued-claim-days) def=7 ;;
+    leases.offer-seconds) def=300 ;;
+    *) LP_VALUE="read_lease_policy reads leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days or leases.offer-seconds, and was asked for '$key'"
+       printf '%s\n' "$LP_VALUE"; return 1 ;;
+  esac
+  case $'\n'"$LP_SEEN" in
+    *$'\n'"$key="*) v=$'\n'"$LP_SEEN"; v=${v#*$'\n'"$key="}; LP_VALUE=${v%%$'\n'*}; printf '%s\n' "$LP_VALUE"; return 0 ;;
+  esac
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    [ -n "$LP_NOTED" ] || echo "unattended: NOTE - no policy kit resolves beside this kit, so leases, leases.granularity, leases.renewal, leases.overlap, leases.offline, leases.expiry-hours, leases.queued-claim-days and leases.offer-seconds take their catalogue defaults; $key reads '$def'." >&2
+    LP_NOTED=1; out=$def
+  else
+    # THE KIT'S PATH IS REPO-RELATIVE TO ITS OWN CHECKOUT: a driver run over another tree, a fixture's,
+    # reads it under that checkout's top level rather than under the tree it was called in.
+    [ -f "$d/policy.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+    case "$key" in
+      leases) out=$("$py" "$d/policy.py" get leases 2>&1) ;;
+      leases.granularity) out=$("$py" "$d/policy.py" get leases.granularity 2>&1) ;;
+      leases.renewal) out=$("$py" "$d/policy.py" get leases.renewal 2>&1) ;;
+      leases.overlap) out=$("$py" "$d/policy.py" get leases.overlap 2>&1) ;;
+      leases.offline) out=$("$py" "$d/policy.py" get leases.offline 2>&1) ;;
+      leases.expiry-hours) out=$("$py" "$d/policy.py" get leases.expiry-hours 2>&1) ;;
+      leases.queued-claim-days) out=$("$py" "$d/policy.py" get leases.queued-claim-days 2>&1) ;;
+      leases.offer-seconds) out=$("$py" "$d/policy.py" get leases.offer-seconds 2>&1) ;;
+    esac || { LP_VALUE=${out//$'\r'/}; LP_VALUE=${LP_VALUE//$'\n'/ }; printf '%s\n' "$LP_VALUE"; return 1; }
+    out=${out%$'\r'}
+  fi
+  case "$key:$out" in
+    leases:warn|leases:refuse|leases.granularity:build-and-unit|leases.granularity:build|leases.granularity:unit) ;;
+    leases.renewal:progress|leases.renewal:activity|leases.renewal:fixed|leases.renewal:none) ;;
+    leases.overlap:kit-dirs|leases.overlap:files|leases.overlap:builds) ;;
+    leases.offline:warn|leases.offline:refuse|leases.offline:follow-leases) ;;
+    leases.expiry-hours:*|leases.queued-claim-days:*|leases.offer-seconds:*)
+      [[ $out =~ ^[0-9]+(\.[0-9]+)?$ ]] || { LP_VALUE="$key answered '$out', which is not the non-negative number this driver ages a lease by"
+        printf '%s\n' "$LP_VALUE"; return 1; } ;;
+    *) LP_VALUE="$key answered '$out', which is outside the closed set this driver branches on"
+       printf '%s\n' "$LP_VALUE"; return 1 ;;
+  esac
+  LP_SEEN="$LP_SEEN$key=$out"$'\n'; LP_VALUE=$out
+  printf '%s\n' "$out"
+}
+
+# THE THREE BOUNDS A LEASE DEADLINE IS JUDGED BY (TOOL-dPlacedRequest-17 S5), in whole seconds, each
+# read through `read_lease_policy`: `expiry` is `leases.expiry-hours` (24), `offer` is
+# `leases.offer-seconds` (300) and `prune` is `leases.queued-claim-days` (7), a fraction kept to the
+# second and the rest dropped. Sets LB_VALUE and prints it; a refused read returns 1, LB_VALUE empty
+# and the refusal in LP_VALUE. Called directly, never in a substitution, so the read is kept.
+read_lease_bound() { # expiry|offer|prune -> LB_VALUE, seconds, on stdout; 1 with the refusal in LP_VALUE
+  local key m ip fp=""
+  LB_VALUE=""
+  case "${1:-}" in
+    expiry) key=leases.expiry-hours; m=3600 ;;
+    offer) key=leases.offer-seconds; m=1 ;;
+    prune) key=leases.queued-claim-days; m=86400 ;;
+    *) LP_VALUE="read_lease_bound reads expiry, offer or prune, and was asked for '${1:-}'"; printf '%s\n' "$LP_VALUE"; return 1 ;;
+  esac
+  read_lease_policy "$key" >/dev/null || { printf '%s\n' "$LP_VALUE"; return 1; }
+  ip=${LP_VALUE%%.*}; [ "$ip" = "$LP_VALUE" ] || fp=${LP_VALUE#*.}
+  fp=${fp:0:6}
+  LB_VALUE=$(( 10#$ip * m ))
+  [ -z "$fp" ] || LB_VALUE=$(( LB_VALUE + 10#$fp * m / 10**${#fp} ))
+  printf '%s\n' "$LB_VALUE"
+}
+
+# THE DEADLINE (TOOL-dPlacedRequest-17 S4, I8): whether this node first saw `<commit>` at `<ref>`, the
+# ref as the change feed spells it (`refs/gov/<tail>`), more than `<seconds>` ago, both stamps on this
+# node's clock through `read_first_seen` and one `date`. A stamp the record carries, its `beat-utc` or
+# `offer-deadline`, decides nothing. The one judgment an offer's deadline (TOOL-dPlacedRequest-20) and
+# a tombstone's prune age (TOOL-dPlacedRequest-16) call. A bound that is not whole seconds, or a
+# sighting `date` cannot read, is as unknown as an unsighted commit.
+check_deadline_passed() { # ref · commit · seconds -> rc 0 passed, 1 not yet, 2 the feed has not sighted it
+  local s t now
+  case "${3:-}" in ""|*[!0-9]*) return 2 ;; esac
+  s=$(printf '%s\t%s\n' "$1" "$2" | read_first_seen); s=${s%$'\r'}
+  case "$s" in ""|-) return 2 ;; esac
+  t=$(printf 'now\n%s\n' "$s" | date -u -f - +%s 2>/dev/null) || return 2
+  t=${t//$'\r'/}; now=${t%%$'\n'*}; s=${t#*$'\n'}
+  case "$now:$s" in *[!0-9:]*|:*|*:) return 2 ;; esac
+  [ $(( now - s )) -gt $(( 10#$3 )) ] && return 0
+  return 1
+}
+
+# `transitions.record`, the channels TOOL-dDeclaredLoop-3 S4 selects, read once per process through the
+# same `get` (S8, the design record's "The witness under `progress`"): LT_RECORD, its members space-
+# separated. An unresolved policy kit reads the catalogue default, all three; a refusal returns 1.
+read_transition_record() { # -> LT_RECORD; 1 with LT_WHY
+  local py d out
+  [ -z "$LT_RECORD" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    LT_RECORD="trailer log micro-format"; return 0
+  fi
+  [ -f "$d/policy.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" "$d/policy.py" get transitions.record 2>&1) || { LT_WHY=${out//$'\r'/}; LT_WHY=${LT_WHY//$'\n'/ }; return 1; }
+  out=${out//$'\r'/}; LT_RECORD=" ${out//$'\n'/ } "
+}
+
+# DOES <sha> RECORD A TRANSITION OF <slug>, on the channel `transitions.record` makes the source (§8 F8):
+# with `trailer` selected, its `Gov-Transition` trailer names `build=<slug>`; with `log` and no `trailer`,
+# it adds a `-transition-<n>.md` record under the build's `build/` folder whose `**Build:**` names it;
+# with `micro-format` alone nothing is stored, so nothing records one. <sha> is the resolved full sha.
+check_lease_transition() { # slug · full sha -> 0 a transition of the build, 1 not, 2 transitions.record refused (LT_WHY)
+  local slug="$1" c="$2" v p
+  read_transition_record || return 2
+  case " $LT_RECORD " in
+    *" trailer "*)
+      v=$(GIT log -1 --format='%(trailers:key=Gov-Transition,valueonly)' "$c" 2>/dev/null) || return 1
+      v=${v//$'\r'/}
+      case $'\n'"$v"$'\n' in *" build=$slug "*|*" build=$slug"$'\n'*) return 0 ;; esac
+      return 1 ;;
+    *" log "*)
+      for p in $(GIT diff-tree --root --no-commit-id --name-only -r --diff-filter=A "$c" -- "$M/builds/$slug/build/" 2>/dev/null); do
+        case "${p%$'\r'}" in *-transition-[0-9]*.md) ;; *) continue ;; esac
+        GIT show "$c:${p%$'\r'}" 2>/dev/null | LT_BUILD="$slug" awk '{ sub(/\r$/, "") } $0 == "**Build:** " ENVIRON["LT_BUILD"] || $0 == "- **Build:** " ENVIRON["LT_BUILD"] { f = 1 } END { exit !f }' && return 0
+      done
+      return 1 ;;
+  esac
+  return 1
+}
+
+# THE NEWEST COMMIT ON THIS BRANCH RECORDING A TRANSITION OF <slug>, the witness the driver's own claim
+# writes pass (the design record's "The witness under `progress`"): LT_SHA, empty when none does.
+read_transition_witness() { # slug -> LT_SHA; 0 when one was found
+  local slug="$1" c=""
+  LT_SHA=""
+  read_transition_record || return 1
+  case " $LT_RECORD " in
+    *" trailer "*) c=$(GIT log -1 --format=%H -E "--grep=^Gov-Transition: .* build=$slug( |$)" HEAD 2>/dev/null) ;;
+    *" log "*) c=$(GIT log -1 --format=%H --diff-filter=A HEAD -- "$M/builds/$slug/build/*-transition-*.md" 2>/dev/null) ;;
+  esac
+  c=${c%$'\r'}
+  [ -n "$c" ] && check_lease_transition "$slug" "$c" || return 1
+  LT_SHA=$c
+}
+
+# THE ONE WITNESS CHECK (S8, the design record's "The question witness"), run by `--lease renew` and the
+# no-write probe KICK-dKeptSession-25 calls. In one order: where `declare -F` finds both `read_mailbox`
+# and `check_mail_deadline` (dKeptSession's, inert until it lands), the mailbox is read, its fetch the
+# check's one remote read; then <sha> is resolved to the full sha `git rev-parse --verify --quiet
+# <sha>^{commit}` prints, an unresolvable one exiting 2 whatever the mailbox printed; then the commit is
+# classified: a transition of the build is `transition`, a mailbox row of kind `question` whose commit
+# is that full sha is `question` when `open` and `question-closed` (exit 1) in any other state. Anything
+# else exits 2. Prints the verdict, sets LW_VERDICT to it and LW_SHA to the full sha. A mailbox row is
+# read as KICK-dKeptSession-5 S6 prints it: id, kind, to, state, first-seen, from-build, subject,
+# answers, ref, commit, TAB-separated.
+check_lease_witness() { # slug · sha -> transition|question|question-closed|why; rc 0, 0, 1, 2
+  local slug="$1" arg="${2:-}" rows="" full st
+  LW_SHA=""; LW_VERDICT=""
+  if declare -F read_mailbox >/dev/null && declare -F check_mail_deadline >/dev/null; then
+    rows=$(read_mailbox "$slug" soft 2>/dev/null) || rows=""
+  fi
+  full=$(GIT rev-parse --verify --quiet "$arg^{commit}" 2>/dev/null) || full=""
+  full=${full%$'\r'}
+  if [ -z "$full" ]; then
+    LW_VERDICT="the witness '$arg' names no commit this clone holds"; printf '%s\n' "$LW_VERDICT"; return 2
+  fi
+  LW_SHA=$full
+  check_lease_transition "$slug" "$full"
+  case "$?" in
+    0) LW_VERDICT=transition; printf '%s\n' "$LW_VERDICT"; return 0 ;;
+    2) LW_VERDICT="transitions.record refused: $LT_WHY"; printf '%s\n' "$LW_VERDICT"; return 2 ;;
+  esac
+  if [ -n "$rows" ]; then
+    st=$(printf '%s\n' "$rows" | LW_FULL="$full" awk -F'\t' '{ sub(/\r$/, "") } $2 == "question" && $10 == ENVIRON["LW_FULL"] { print $4; exit }')
+    case "$st" in
+      "") ;;
+      open) LW_VERDICT=question; printf '%s\n' "$LW_VERDICT"; return 0 ;;
+      *) LW_VERDICT=question-closed; printf '%s\n' "$LW_VERDICT"; return 1 ;;
+    esac
+  fi
+  LW_VERDICT="the witness $full records no transition of $slug and is no open question to it"
+  printf '%s\n' "$LW_VERDICT"; return 2
+}
+
+# THE ONE DERIVATION OF `renews` (TOOL-dPlacedRequest-25), run by every lease write `write_claim`
+# builds. A write that opens a tenure, a create (the epoch read empty) or one whose written epoch
+# differs from the epoch it read, renews under `progress`, `activity` and `fixed`, witness or not; the
+# rule is keyed on the epoch the writer already computes and never on the act's name, so every act that
+# raises it inherits the rule. Within a tenure `progress` renews on a `new` or a `question` witness
+# verdict, `activity` always and `fixed` never; `none` prints `-` throughout. A policy outside the
+# four, a refused read, prints `no`, renewing nothing. Sets LR_RENEWS and prints it.
+derive_lease_renews() { # epoch read or empty · epoch written · policy · new|question|none -> yes|no|- on stdout; LR_RENEWS
+  local er="${1:-}" ew="${2:-}" pv="${3:-}" wv="${4:-none}"
+  case "$pv" in
+    none) LR_RENEWS=- ;;
+    progress|activity|fixed)
+      if [ -z "$er" ] || [ "$er" != "$ew" ]; then
+        LR_RENEWS=yes
+      else
+        case "$pv:$wv" in
+          progress:new|progress:question|activity:*) LR_RENEWS=yes ;;
+          *) LR_RENEWS=no ;;
+        esac
+      fi ;;
+    *) LR_RENEWS=no ;;
+  esac
+  printf '%s\n' "$LR_RENEWS"
+}
+
+# THE DRIVER'S OWN WITNESS VERDICT AND `witness` (S8): under `progress` the newest transition of the
+# build is a `new` verdict, and the witness stored, when it differs from the record's witness; every
+# other case, a refused read included, is `none` with the record's witness kept. `renews` is
+# `derive_lease_renews`'s, which `write_claim` calls with this verdict.
+read_lease_renewal() { # slug -> LR_VERDICT and LR_WITNESS
+  LR_VERDICT=none; LR_WITNESS=${CW_WIT:--}
+  read_lease_policy leases.renewal >/dev/null || return 0
+  [ "$LP_VALUE" = progress ] || return 0
+  if read_transition_witness "$1" && [ "$LT_SHA" != "$LR_WITNESS" ]; then LR_VERDICT=new; LR_WITNESS=$LT_SHA; fi
+  return 0
+}
+
+# THE OFFLINE QUEUE (S10): `<git-common-dir>/gov-queue.log`, node-local and never pushed, one TAB line
+# per write built while the remote did not answer: ref, the tip the commit was built on (`-` for a
+# create), commit, queued-utc. `add_gov_queue` appends one; `write_gov_queue` pushes each through
+# `write_gov_ref` on its recorded tip, oldest first: written and lost resolve the line, a lost one
+# printing `yield` with a `lease-yielded` health event, and a write that did not complete keeps it.
+# Every later compare-and-swap writer of this build applies `leases.offline` through these two.
+# UNDER THE NODE LOCK (TOOL-dPlacedRequest-24): both take `gov-queue.lock` in the common dir through
+# `write_dir_lock_wait`, waiting 5 s; a busy lock returns 2 with nothing queued. A flush reads the lines under the lock and releases it, pushes
+# with no lock held, then retakes it and rewrites the file now less exactly the lines it resolved, so
+# a line appended during the pushes stays; a busy lock skips the flush with one `queue: NOTE -` line.
+# Two flushes racing one line cannot both resolve it as lost: git reports a push whose remote ref is
+# already the queued commit as `[up to date]` before it tests the lease, so the loser's failed update
+# keeps the line (rc 2) and its next flush prints `flushed`.
+# WHAT THIS DOES NOT CHECK: a flush whose second take is refused leaves its resolved lines queued, so
+# the next flush pushes them again: a written one then prints `flushed` again, and a lost one yields
+# again.
+# THE CHAIN (TOOL-dPlacedRequest-41). An offline write to a ref the queue already holds is built on
+# that ref's newest queued commit, never on the cached tip: `write_gov_queue_hold` takes the lock for
+# the whole offline write, from its read of `read_gov_queue_head` through its append, and
+# `read_claims cached` reads that commit's record as an online write reads the remote tip's, so the
+# new commit's parent and its line's expected tip are that commit. `add_gov_queue`, under that hold,
+# appends nothing and returns 3 where the write was built on the ref's newest queued commit and its
+# record, less the stamp keys `beat-utc`, `last-fetch` and `renews`, equals that commit's: a re-run
+# offline acquire renews its own queued acquire, while a release, a renew with a new witness or a
+# take-over chains. Called without the hold, it takes the lock itself. The flush pushes a ref's lines
+# oldest first: a line after a kept line of its ref is kept unpushed, and a line after a yielded one
+# yields with it, its own `yield` and `lease-yielded` event, since its expected tip never reached the
+# remote. WHAT THIS DOES NOT CHECK: an offline write that outlives the lock's own `NODE_LOCK_BOUND`,
+# whose hold a waiter may then break as stale.
+# THE HEAD IS READ WHOLE (TOOL-dPlacedRequest-49 S26): the ref's NEWEST line, whatever its commit
+# field, is the head. It must hold the four fields, a tip of `-` or 40 hex, a commit of 40 hex that
+# `cat-file -e` finds as a commit and a `queued-utc` stamp; any other line returns 1 with nothing
+# printed, so an offline write refuses rather than chaining on garbage, an older line or the cached
+# tip. `add_gov_queue`'s dedupe read ignores the return, so a head it cannot read never dedupes.
+read_gov_queue_head() { # ref · queue file -> the ref's newest queued commit on stdout and 0; nothing and 0 where none; nothing and 1 where the newest line is unreadable
+  local l rx=$'^\\+[^\t]+\t(-|[0-9a-f]{40})\t([0-9a-f]{40})\t[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$'
+  [ -f "$2" ] || return 0
+  l=$(GQ_REF="$1" awk -F'\t' '{ sub(/\r$/, "") } $1 == ENVIRON["GQ_REF"] { l = $0; n = 1 } END { if (n) print "+" l }' "$2" 2>/dev/null) || return 1
+  [ -n "$l" ] || return 0
+  [[ $l =~ $rx ]] || return 1
+  l=${BASH_REMATCH[2]}
+  GIT cat-file -e "$l^{commit}" 2>/dev/null || return 1
+  printf '%s\n' "$l"
+  return 0
+}
+write_gov_queue_hold() { # -> 0 with GQ_HOLD and GQ_DIR, the queue's lock held; 1 the common dir does not resolve or the lock is busy
+  local d tok="$BASHPID.$RANDOM"
+  GQ_HOLD=""
+  d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  d=${d%$'\r'}; [ -n "$d" ] || return 1
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 1
+  GQ_DIR=$d; GQ_HOLD=$tok
+  return 0
+}
+remove_gov_queue_hold() { # -> WL_QUEUE cleared and the hold `write_gov_queue_hold` took released
+  WL_QUEUE=""
+  [ -z "$GQ_HOLD" ] || remove_dir_lock "$GQ_DIR/gov-queue.lock" "$GQ_HOLD"
+  GQ_HOLD=""
+  return 0
+}
+add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not, 2 gov-queue.lock busy, 3 already queued
+  local d now tok="" rc=0 hd
+  d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  d=${d%$'\r'}; [ -n "$d" ] || return 1
+  if [ -z "$GQ_HOLD" ] || [ "$GQ_DIR" != "$d" ]; then
+    tok="$BASHPID.$RANDOM"
+    write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 || return 2
+  fi
+  hd=$(read_gov_queue_head "$1" "$d/gov-queue.log")
+  if [ -n "$hd" ] && [ "$hd" = "${2:-}" ] && GIT log --no-walk=unsorted --format='%x01%B' "$hd" "$3" 2>/dev/null | awk '
+      { sub(/\r$/, "") }
+      /^\001/ { n++; sub(/^\001/, "") }
+      /^$/ || /^(beat-utc|last-fetch|renews): / { next }
+      { r[n] = r[n] "\n" $0 }
+      END { exit !(n == 2 && r[1] == r[2]) }'; then
+    rc=3
+  else
+    TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
+    printf '%s\t%s\t%s\t%s\n' "$1" "${2:--}" "$3" "$now" >>"$d/gov-queue.log" 2>/dev/null || rc=1
+  fi
+  [ -z "$tok" ] || remove_dir_lock "$d/gov-queue.lock" "$tok"
+  return "$rc"
+}
+write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept or the lock busy; GQ_PUSHED
+  local d f l ref tip c utc rc kept=0 ep tok n m lf s bd="" now qt=""
+  local -a q=()
+  local -A rs=() gk=()
+  GQ_PUSHED=""
+  d=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || d=""
+  d=${d%$'\r'}; f="$d/gov-queue.log"
+  [ -n "$d" ] && [ -s "$f" ] || return 0
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "queue: NOTE - gov-queue.lock is busy, so this flush is skipped and the next read that answers flushes"; return 2; }
+  while IFS= read -r l || [ -n "$l" ]; do q+=("${l%$'\r'}"); done <"$f"
+  remove_dir_lock "$d/gov-queue.lock" "$tok"
+  for l in "${q[@]}"; do
+    [ -n "$l" ] || continue
+    ref=""; tip=""; c=""; utc=""
+    IFS=$'\t' read -r ref tip c utc <<<"$l"
+    if [ -z "$ref" ] || [ -z "$c" ]; then n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue; fi
+    [ "$tip" != - ] || tip=""
+    m=$(GIT log -1 --format=%B "$c" 2>/dev/null | awk '{ sub(/\r$/, "") } /^epoch: / && e == "" { e = substr($0, 8) } /^last-fetch: / && f == "" { f = substr($0, 13) } END { print e "\t" f }')
+    ep=${m%%$'\t'*}; lf=${m#*$'\t'}; lf=${lf%$'\r'}
+    # THE CHAIN (TOOL-dPlacedRequest-41 S3): a line after a kept line of its ref stays unpushed, and a
+    # line after a yielded one yields, since the tip it was queued on never reached the remote.
+    case "${gk["$ref"]:-}" in
+      kept) kept=1; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: an earlier queued write of it stays queued"; continue ;;
+      yield) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · an earlier queued write of it yielded, so the tip it was queued on never reached the remote"
+             add_health_event "$(resolve_health_log "$ROOT")" unattended lease-yielded "$ref"
+             n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue ;;
+    esac
+    # THE QUEUED CLAIM'S AGE (TOOL-dPlacedRequest-16 S6): a write whose `last-fetch` is `-`, unparsable
+    # or older than `leases.queued-claim-days` is refused `epoch-fence` and leaves the queue, so no
+    # queued claim outlives a tombstone it would race; a refused bound keeps the line.
+    if [ -z "$bd" ]; then
+      read_lease_bound prune >/dev/null || { kept=1; gk["$ref"]=kept; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: leases.queued-claim-days refused: $LP_VALUE"; continue; }
+      bd=$LB_VALUE; TZ=UTC printf -v now '%(%s)T' -1
+    fi
+    s=""; [[ $lf =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] && s=$(date -u -d "$lf" +%s 2>/dev/null)
+    s=${s%$'\r'}
+    case "$s" in ""|*[!0-9]*) s="" ;; esac
+    if [ -z "$s" ] || [ $(( now - s )) -gt "$bd" ]; then
+      GQ_PUSHED=1; echo "lease refused — epoch-fence · ${ref#"$LEASE_NS"/} · queued with last fetch ${lf:--}, older than leases.queued-claim-days or none"
+      n=${rs["$l"]:-0}; rs["$l"]=$((n + 1)); continue
+    fi
+    GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+    write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
+    case "$rc" in
+      0) GQ_PUSHED=1; echo "lease — ${ref#"$LEASE_NS"/} · flushed · epoch ${ep:--}" ;;
+      1) GQ_PUSHED=1; gk["$ref"]=yield; echo "lease — ${ref#"$LEASE_NS"/} · yield · epoch ${ep:--} · $GOVREF_WHY"
+         add_health_event "$(resolve_health_log "$ROOT")" unattended lease-yielded "$ref" ;;
+      *) kept=1; gk["$ref"]=kept; echo "lease not written — ${ref#"$LEASE_NS"/} stays queued: $GOVREF_WHY"; continue ;;
+    esac
+    n=${rs["$l"]:-0}; rs["$l"]=$((n + 1))
+  done
+  write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "queue: NOTE - gov-queue.lock is busy, so the lines this flush resolved stay queued for the next flush"; return 2; }
+  derive_temp_path qt "$f" \
+    || { remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — no staging name resolves beside the queue: $f"; return 2; }
+  while IFS= read -r l || [ -n "$l" ]; do
+    l=${l%$'\r'}
+    [ -n "$l" ] || continue
+    n=${rs["$l"]:-0}
+    if [ "$n" -gt 0 ]; then rs["$l"]=$((n - 1)); continue; fi
+    printf '%s\n' "$l"
+  done <"$f" >"$qt" && mv -f "$qt" "$f" 2>/dev/null \
+    || { rm -f "$qt"; remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — the queue could not be rewritten: $f"; return 2; }
+  remove_dir_lock "$d/gov-queue.lock" "$tok"
+  [ "$kept" = 0 ] || return 2
+  return 0
+}
+
+# THE STALE HINT, SPELLED ONCE (TOOL-dPlacedRequest-100 S1): `run_lease_verb` appends it to an acquire's
+# `live-holder` refusal where the lease reads stale, and `run_entry_claim` reads the refusal line's
+# suffix against it to take the lease over, so a reworded hint cannot silently disable that branch.
+LEASE_STALE_HINT=' · stale, so --lease take-over takes it'
+
+# --lease, THE VERB'S BODY (S5). Order: the switch, the act and the ref, the five keys, the granularity
+# (S7), the node's fleet tag (S11), the read (with the queue flushed after a read that answered, S10, or
+# `leases.offline` where it did not), the overlap at an acquisition (S9), the `lease` column, the
+# witness at a renewal (S8), the write.
+# TOOL-dPlacedRequest-16: a release with no `--as` hands the lease over, `released`; a build or unit
+# lease takes `--as landed|withdrawn`, its tombstone, and a cadence `run` lease `--as landed|aborted`,
+# every other pair refused, writing nothing (its "The release outcomes"). `--for draw` acquires a
+# build's tombstone, writing `held` at the epoch plus one; the hold's own holder keeps it `held`, and
+# releases it only `--as landed`, at the same epoch. A create of a ref the remote no longer holds is
+# parented on the newest commit this node's feed holds for it, at its epoch plus one, and a build or
+# unit tombstone there is refused `tombstone` (S5): the read is `write_claim`'s, for every create
+# (TOOL-dPlacedRequest-28), and its return 3 is mapped here to that line, exit 1, queued or not.
+# TOOL-dPlacedRequest-20 S1: `offer` takes `--to <fleet tag>[/<session>]`, held before any read: the
+# tag `check_fleet_tag` finds in the registry, the session half a legal segment that is neither empty
+# nor `absent`, since either value names no session. It writes through `write_lease_offer`, on an
+# absent lease a create through the same feed read, and runs no overlap probe, because an offer
+# acquires nothing.
+# TOOL-dPlacedRequest-19 S4: the kind `request <content key>` writes `kind: request` and `slug: -`
+# through the default arm below; an acquire of it first reads its record's existence, refused
+# `no-record` (exit 1) where the remote holds none, and its overlap probe names no build, as a run's.
+# TOOL-dPlacedRequest-32 S4: with no session, CLAUDE_CODE_SESSION_ID unset, empty or `absent`, a holder
+# act prints `lease not written — no session: ...` and exits 2 before any read, because a `--lease`
+# write records `keepalive: absent` and so no keepalive identifies its holder either. The driver's run
+# claim, which carries the run's keepalive, is written by the run columns and keeps their rules.
+# TOOL-dPlacedRequest-40: the refusal gates the HOLDER ACTS by name, `acquire`, `take-over`, `renew`,
+# `release` and `offer`, each writing a record naming its holder, and an act on no list, so a new act
+# is gated until it is named exempt. `prune`, `flush`, `fence` and `status` name no holder and run with
+# no session as their own units state; `prune` and `fence` are dispatched to their own writers before
+# this verb, and no read here asks for an identity they do not need.
+run_lease_verb() { # act · kind · name · sub · witness · release status · purpose · offer target -> 0 written, 1 refused, 2 not written
+  local act="$1" kind="${2:-}" name="${3:-}" sub="${4:-}" warg="${5:-}" as="${6:-}" fp="${7:-}" to="${8:-}" ref tail lname sl tag sid st rc wv wit wk="" k hd ow la ot os odl=""
+  # OFF IS AN OUTCOME (TOOL-dPlacedRequest-34 S23): with RUN_CLAIMS not on, every act this verb runs
+  # prints `lease — off · <tail>`, the act's own word where it names no lease, reads and writes
+  # nothing and exits 0, so a caller never reads the switch as a refusal; `fence` keeps its line.
+  if [ "$RUN_CLAIMS" != on ]; then
+    tail=$act; ! derive_lease_ref "$kind" "$name" "$sub" >/dev/null 2>&1 || tail=${LEASE_REF#"$LEASE_NS"/}
+    echo "lease — off · $tail"; return 0
+  fi
+  case "$act" in
+    prune|flush|fence|status) ;;
+    acquire|take-over|renew|release|offer|*)
+      case "${CLAUDE_CODE_SESSION_ID:-absent}" in
+        absent) echo "lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder"; return 2 ;;
+      esac ;;
+  esac
+  if [ "$act" = flush ]; then
+    read_claims quiet || { echo "lease not written — the queue stays: $CL_WHY"; return 2; }
+    write_gov_queue; rc=$?
+    [ -n "$GQ_PUSHED" ] || [ "$rc" != 0 ] || echo "lease — flush · nothing queued"
+    return "$rc"
+  fi
+  case "$act" in acquire|renew|release|take-over|offer) ;; *) echo "lease not written — the act is acquire, renew, release, take-over, offer or flush, not '$act'"; return 2 ;; esac
+  derive_lease_ref "$kind" "$name" "$sub" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  case "$kind" in build) lname=$name; sl=$name ;; unit) lname=$tail; sl=$name ;; *) lname=$tail; sl=- ;; esac
+  if [ "$act" = offer ]; then
+    [ -n "$to" ] || { echo "lease not written — --lease offer names its target with --to <fleet tag>[/<session>]"; return 2; }
+    ot=${to%%/*}; os=""
+    if [ "$ot" != "$to" ]; then
+      os=${to#*/}
+      case "$os" in ""|absent) echo "lease not written — --to $to names no session, because an empty or absent session is none"; return 2 ;; esac
+      check_lease_segment "$os" || { echo "lease not written — --to $to: '$os' is not a legal one-segment session"; return 2; }
+    fi
+    check_fleet_tag "$ot" || { echo "lease not written — --to $to: $LEASE_WHY"; return 2; }
+  elif [ -n "$to" ]; then
+    echo "lease not written — --to names an offer's target, and $act takes none"; return 2
+  fi
+  [ -z "$warg" ] || [ "$act" = renew ] || { echo "lease not written — --witness names a renewal's witness, and $act takes none"; return 2; }
+  la=$act
+  case "$fp" in
+    "") ;;
+    draw) [ "$act:$kind" = acquire:build ] || { echo "lease not written — --for draw names a build lease's acquisition, and $act $kind takes none"; return 2; }
+          la=draw ;;
+    *) echo "lease not written — --for names draw, not '$fp'"; return 2 ;;
+  esac
+  if [ "$act" = release ]; then
+    case "$kind:$as" in
+      *:) st=released ;;
+      build:landed|build:withdrawn|unit:landed|unit:withdrawn|run:landed|run:aborted) st=$as ;;
+      *:landed|*:aborted|*:withdrawn) echo "lease not written — --as $as on a $kind lease"; return 2 ;;
+      *) echo "lease not written — a release names its status with --as landed, aborted or withdrawn, or none to hand the lease over"; return 2 ;;
+    esac
+  else
+    [ -z "$as" ] || { echo "lease not written — --as names a release's status, and $act takes none"; return 2; }
+    st=live; [ "$la" != draw ] || st=held; [ "$act" != offer ] || st=released
+  fi
+  for k in leases leases.granularity leases.renewal leases.overlap leases.offline; do
+    read_lease_policy "$k" >/dev/null || { echo "lease not written — $k refused: $LP_VALUE"; return 2; }
+  done
+  if [ "$act" = offer ]; then
+    read_lease_bound offer >/dev/null || { echo "lease not written — leases.offer-seconds refused: $LP_VALUE"; return 2; }
+    odl=$LB_VALUE
+  fi
+  read_lease_policy leases.granularity >/dev/null
+  case "$act:$kind:$LP_VALUE" in
+    acquire:unit:build) echo "lease not written — leases.granularity is build, so no unit lease is acquired"; return 2 ;;
+    acquire:build:unit) echo "lease not written — leases.granularity is unit, so no build lease is acquired"; return 2 ;;
+  esac
+  tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it writes no lease: $tag"; return 2; }
+  FLEET_TAG=$tag; sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  # NO OFFER TO ITSELF (TOOL-dPlacedRequest-34 S49): a `--to` naming this node's bare tag or this
+  # session on it hands nothing over; another session on this tag is a hand-over and lands.
+  if [ "$act" = offer ] && { [ "$to" = "$tag" ] || [ "$to" = "$tag/$sid" ]; }; then
+    echo "lease refused — offered · $tail · --to $to names this session, and an offer hands the lease to another"; return 1
+  fi
+  # A REQUEST IS CLAIMED ONLY OVER ITS RECORD (TOOL-dPlacedRequest-19 S4, F5): one bounded read of
+  # that one ref, before the claim read and apart from it, so the claim read fetches no request record.
+  if [ "$act:$kind" = acquire:request ]; then
+    check_request_recorded "$name"; rc=$?
+    case "$rc" in
+      0) ;;
+      1) echo "lease refused — no-record · $tail · $RQ_WHY"; return 1 ;;
+      *) echo "lease not written — $RQ_WHY"; return 2 ;;
+    esac
+  fi
+  WL_QUEUE=""
+  if read_claims quiet; then
+    write_gov_queue >&2 || :
+    if [ -n "$GQ_PUSHED" ]; then read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }; fi
+  elif [ -n "$CL_OFFLINE" ]; then
+    ow=$CL_WHY
+    read_lease_policy leases.offline >/dev/null
+    case "$LP_VALUE" in
+      refuse) echo "lease refused — offline · $tail · $ow"; return 1 ;;
+      follow-leases)
+        if [ "$act" = renew ] && read_claims cached && check_claim_writable "$lname" lease "$tag" "$sid" renew && [ "$CW_CLS" = mine ]; then
+          echo "lease — $tail · follow-leases · epoch $CW_EPOCH"; return 0
+        fi
+        echo "lease refused — offline · $tail · $ow"; return 1 ;;
+      # THE CHAIN (TOOL-dPlacedRequest-41 S1): the hold spans the read of the ref's newest queued
+      # commit, which stands for its cached tip, through the append.
+      *) write_gov_queue_hold || { echo "lease not written — gov-queue.lock busy"; return 2; }
+         # TOOL-dPlacedRequest-49 S26: a newest queued line it cannot read refuses, nothing appended.
+         hd=$(read_gov_queue_head "$ref" "$GQ_DIR/gov-queue.log") \
+           || { remove_gov_queue_hold; echo "lease not written — $tail · queued commit unreadable; nothing queued"; return 2; }
+         CL_QUEUED="$ref"$'\t'"$hd"
+         read_claims cached; rc=$?; CL_QUEUED=""
+         [ "$rc" = 0 ] || { remove_gov_queue_hold; echo "lease not written — $CL_WHY"; return 2; }
+         WL_QUEUE=1 ;;
+    esac
+  else
+    echo "lease not written — $CL_WHY"; return 2
+  fi
+  if [ "$act" = acquire ]; then
+    hd=$(GIT symbolic-ref -q "refs/remotes/$CR_NAME/HEAD" 2>/dev/null) || hd=""
+    ASHA=""; [ -z "$hd" ] || ASHA=$(GIT rev-parse --verify --quiet "$hd^{commit}" 2>/dev/null) || ASHA=""
+    case "$kind" in run|request) check_cross_run_overlap "" acquire ;; *) check_cross_run_overlap "$name" acquire ;; esac \
+      || { echo "lease refused — overlap · $tail · $OV_WHY"; remove_gov_queue_hold; return 1; }
+  fi
+  check_claim_writable "$lname" lease "$tag" "$sid" "$la"; rc=$?
+  case "$rc" in
+    0) ;;
+    1) echo "lease refused — $CW_CAUSE · $tail · ${CW_WHO#* · }${CW_HINT:+$LEASE_STALE_HINT}"; remove_gov_queue_hold; return 1 ;;
+    3) echo "lease not written — $tail holds no lease to $act"; remove_gov_queue_hold; return 2 ;;
+    *) echo "lease not written — the claim table declined $tail"; remove_gov_queue_hold; return 2 ;;
+  esac
+  # A DRAW'S HOLD, WRITTEN BY ITS OWN HOLDER, stays `held`, and its one release is `--as landed`.
+  if [ -n "$CW_DRAW" ] && { [ "$CW_CLS" = mine ] || [ "$CW_CLS" = same ]; }; then
+    if [ "$act" != release ]; then st=held
+    elif [ "$st" != landed ]; then echo "lease not written — a draw's hold is released --as landed"; remove_gov_queue_hold; return 2; fi
+  fi
+  # THE WITNESS VERDICT (TOOL-dPlacedRequest-25 S1): `question` for an open question, `new` for a
+  # transition differing from the record's witness, `none` otherwise, a closed question included; a
+  # witness the check answers is stored under every policy. `write_claim` derives `renews` from it.
+  wit=${CW_WIT:--}; wv=none
+  if [ -n "$warg" ]; then
+    check_lease_witness "$sl" "$warg" >/dev/null; rc=$?
+    case "$rc" in
+      0) wk=$LW_VERDICT ;;
+      1) wk="" ;;
+      *) echo "lease not written — $LW_VERDICT"; remove_gov_queue_hold; return 2 ;;
+    esac
+  fi
+  case "$wk" in
+    question) wv=question; wit=$LW_SHA ;;
+    transition) [ "$LW_SHA" = "$wit" ] || wv=new; wit=$LW_SHA ;;
+  esac
+  WL_REF=$ref; WL_KIND=$kind; WL_SLUG=$sl; WL_TAG=$tag; WL_VERDICT=$wv; WL_WITNESS=$wit
+  [ "$CW_CLS" != mine ] || [ -z "$CW_TAG" ] || WL_TAG=$CW_TAG
+  CW_NODE=""
+  if [ "$act" = offer ]; then write_lease_offer "$lname" "$to" "$odl"; rc=$?
+  else write_claim "$lname" "$st" absent quiet "" ""; rc=$?; fi
+  WL_REF=""; WL_KIND=""; WL_SLUG=""; WL_TAG=""; WL_VERDICT=""; WL_WITNESS=""
+  # A FEED TOMBSTONE (TOOL-dPlacedRequest-28): `write_claim` built nothing, queued or not.
+  [ "$rc" != 3 ] || { remove_gov_queue_hold; echo "lease refused — tombstone · $tail · $WC_WHY"; return 1; }
+  if [ -n "$WL_QUEUE" ]; then
+    remove_gov_queue_hold
+    [ "$rc:$WC_WHY" != 0:already ] || { echo "lease — queued — already · $tail"; return 0; }
+    [ "$rc" = 0 ] && { echo "lease — $tail · queued · epoch $WC_EPOCH"; return 0; }
+    echo "lease not written — $WC_WHY"; return 2
+  fi
+  case "$rc" in
+    0) case "$act:$CW_ACT:$st" in
+         offer:*) echo "lease — $tail · offer $to · epoch $WC_EPOCH" ;;
+         *:write:released) echo "lease — $tail · released · epoch $WC_EPOCH" ;;
+         *:write:*) echo "lease — $tail · released $st · epoch $WC_EPOCH" ;;
+         *) echo "lease — $tail · $CW_ACT · epoch $WC_EPOCH" ;;
+       esac
+       return 0 ;;
+    1) echo "lease refused — epoch-fence · $tail · $WC_WHY"; return 1 ;;
+    *) echo "lease not written — $WC_WHY"; return 2 ;;
+  esac
+}
+
+# --lease status, ONE LEASE READ (TOOL-dPlacedRequest-34 S22): read-only, so a reader that must tell two
+# sessions of one node apart, `placement.py check` among them, asks for the one lease it needs and never
+# parses `--claims`, which prints a fleet tag and no session. One read of the remote's leases, then ONE
+# TAB-separated line `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, exit 0; `lease — none ·
+# <tail>` where the remote holds none, exit 0; `lease — off · <tail>` with RUN_CLAIMS off, exit 0; or
+# `lease not written — <why>`, exit 2, for a shape that derives no ref or a read that did not answer.
+# A slug holding only a legacy claim prints that claim's row, its node in the fleet-tag field.
+print_lease_status() { # kind · name · [sub] -> 0 one line, 2 not read
+  local ref tail lname row c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_rest
+  derive_lease_ref "$1" "$2" "${3:-}" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  [ "$RUN_CLAIMS" = on ] || { echo "lease — off · $tail"; return 0; }
+  case "$1" in build) lname=$2 ;; *) lname=$tail ;; esac
+  read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }
+  row=""
+  case $'\n'"$CLAIM_ROWS" in
+    *$'\n'"$lname"$'\t'*) row=$'\n'"$CLAIM_ROWS"; row=${row#*$'\n'"$lname"$'\t'}; row="$lname"$'\t'"${row%%$'\n'*}" ;;
+  esac
+  [ -n "$row" ] || { echo "lease — none · $tail"; return 0; }
+  IFS=$'\t' read -r c_slug c_node c_status c_age c_verdict c_sha c_sess c_ka c_host c_lease c_beat c_epoch c_rest <<<"$row"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$tail" "${c_node:--}" "${c_sess:--}" "${c_status:--}" "${c_verdict:--}" "${c_epoch:-0}"
+  return 0
+}
+
+# THE OFFER WRITE (TOOL-dPlacedRequest-20 S1): the record `released`, `offer` the target and
+# `offer-deadline` the window `read_lease_bound offer` read at this write, a window in seconds and
+# never a timestamp, by `write_claim` through the one compare-and-swap writer on the tip
+# `check_claim_writable` read. Over a `released` record it keeps the epoch it read; over an absent
+# lease it is a create, which resets no tip and no epoch of its own, so `write_claim`'s feed read
+# makes it what every create is (TOOL-dPlacedRequest-28 S3): refused `tombstone` (return 3), parented
+# on the feed's commit at its epoch plus one, or at epoch 1 where the feed names the ref nowhere. The
+# run_lease_verb caller set the WL_ names the write reads.
+write_lease_offer() { # name · target · window seconds -> write_claim's rc, WC_WHY and WC_EPOCH
+  local rc
+  WL_OFFER=$2; WL_ODL=$3
+  write_claim "$1" released absent quiet "" ""; rc=$?
+  WL_OFFER=""; WL_ODL=""
+  return "$rc"
+}
+
+# --lease prune, ONLY A RUN'S TOMBSTONE (TOOL-dPlacedRequest-16 S7): each cadence `run` lease and each
+# legacy `refs/gov/runs/*` claim whose verdict is `terminal` and whose tip this node first saw longer
+# ago than `leases.queued-claim-days` (`check_deadline_passed`) is deleted by compare-and-swap on that
+# tip through `remove_gov_ref`, one line each. A build or unit lease is never pruned: naming one prints
+# `prune refused — tombstone` and exits 1, since a patch build's draw on a closed root must find it.
+# Named, a run lease is the only candidate. A queued claim older than the same bound is refused
+# `epoch-fence` (S6), so no queued claim outlives the tombstone it would race.
+# WHAT THIS DOES NOT CHECK: a legacy claim hidden behind a build lease of its slug, which `read_claims`
+# drops, and a run lease whose tip the feed has not sighted, which is left.
+write_lease_prune() { # [<kind> <name> [<sub>]] -> one line per prune; 0, 1 refused, 2 not written
+  local want="" rc=0 n=0 l ref sha bd
+  local -a cand=()
+  if [ "$RUN_CLAIMS" != on ]; then   # TOOL-dPlacedRequest-34 S23: off is `lease — off`, exit 0, as every act but fence
+    if [ $# -ge 2 ] && derive_lease_ref "$@" >/dev/null 2>&1; then echo "lease — off · ${LEASE_REF#"$LEASE_NS"/}"; else echo "lease — off · prune"; fi
+    return 0
+  fi
+  if [ $# -gt 0 ]; then
+    derive_lease_ref "$@" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+    case "$1" in build|unit) echo "prune refused — tombstone · ${LEASE_REF#"$LEASE_NS"/} · a $1 lease is never pruned"; return 1 ;; esac
+    want=$LEASE_REF
+  fi
+  read_lease_bound prune >/dev/null || { echo "lease not written — leases.queued-claim-days refused: $LP_VALUE"; return 2; }
+  bd=$LB_VALUE   # kept apart: the claim read below sets LB_VALUE to the expiry bound
+  read_claims quiet || { echo "lease not written — $CL_WHY"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  mapfile -t cand < <(printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v lns="$LEASE_NS/" -v rns="$CLAIM_NS/" -v want="$want" '
+    { sub(/\r$/, "") }
+    $5 == "terminal" && ($13 == "run" || $13 == "-") { r = ($13 == "run" ? lns : rns) $1; if (want == "" || r == want) print r "\t" $6 }')
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  for l in "${cand[@]}"; do
+    [ -n "$l" ] || continue
+    ref=${l%%$'\t'*}; sha=${l#*$'\t'}
+    check_deadline_passed "$ref" "$sha" "$bd" || continue
+    if remove_gov_ref "$ref" "$sha"; then n=$((n + 1)); echo "lease — ${ref#refs/gov/} · pruned"
+    else rc=2; echo "lease not written — ${ref#refs/gov/} · $GOVREF_WHY"; fi
+  done
+  [ "$n" != 0 ] || [ "$rc" != 0 ] || echo "lease — prune · nothing to prune"
+  return "$rc"
+}
+
+# --lease fence build <slug>, THE FENCE READ (TOOL-dPlacedRequest-15 S2): what an effect push of this
+# build carries so a holder replaced between its read and its push lands nothing. ONE bounded read of
+# the leases, the `lease` column deciding whether this session holds the build lease, and ONE line.
+# Held (`mine`): a beat built by `build_gov_commit` on the tip read, the record copied with a fresh
+# `beat-utc` and `renews: no`, its `witness` unchanged, so it renews nothing; it pushes nothing and
+# prints `fence — <lease ref> <tip> <beat>`, exit 0, the caller pushing the beat atomically beside its
+# effect under `--force-with-lease=<lease ref>:<tip>`. `RUN_CLAIMS` off, or no build lease on the
+# remote: `fence — none · <why>`, exit 0. A failed read is `offline`; any other row is the verb's
+# refusal line, its cause the column's, else `offered` for an open offer and `live-holder` for a
+# released lease or a same-session one under another fleet tag, exit 1. A shape or a fleet tag it
+# cannot derive is `lease not written`, exit 2, which the lander refuses as an unparsed read.
+# WHAT THIS DOES NOT CHECK: that the lease is still this session's at the push, which is the
+# compare-and-swap's, nor that the queue is flushed, since the fence writes nothing.
+# THE RE-FENCE, `--after <tip>` (TOOL-dPlacedRequest-29 S1): the lander's read after a fenced push
+# failed with the lease tip moved from <tip>, the full sha its fence read. The same one read, and the
+# fence line on the NEW tip only where this session holds the lease (`mine`), <tip> is on the new
+# tip's first-parent chain, and the new tip's `epoch` is <tip>'s: a move by this holder's own write.
+# A later epoch, a tip off that chain, leases off and no lease on the remote are each `lease refused
+# — epoch-fence`, exit 1; a foreign holder keeps its own cause word. The lander reads a fence line
+# as `refenced` and retries, anything else as `fenced`.
+write_fence_beat() { # slug · [--after tip] -> one line; 0 a fence or none, 1 refused, 2 not written
+  local slug="$1" after="${2:-}" ref tail tag sid rel rc cause body beat ae
+  if [ -n "$after" ] && ! [[ $after =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
+    echo "lease not written — --after takes the full sha of the lease tip a fence read: $after"; return 2
+  fi
+  [ "$RUN_CLAIMS" = on ] || [ -n "$after" ] || { echo "fence — none · leases are off"; return 0; }
+  derive_lease_ref build "$slug" >/dev/null || { echo "lease not written — $LEASE_WHY"; return 2; }
+  ref=$LEASE_REF; tail=${ref#"$LEASE_NS"/}
+  [ "$RUN_CLAIMS" = on ] || { echo "lease refused — epoch-fence · $tail · leases are off, so no lease re-fences"; return 1; }
+  tag=$(resolve_fleet_tag) || { echo "lease not written — this node has no row in fleet.toml, so it holds no lease: $tag"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  read_claims quiet || { echo "lease refused — offline · $tail · $CL_WHY"; return 1; }
+  check_claim_writable "$slug" lease "$tag" "$sid" fence "$rel"; rc=$?
+  case "$CW_CLS:$CW_KIND" in
+    none:*|*:-|*:)
+      [ -z "$after" ] || { echo "lease refused — epoch-fence · $tail · no lease on the remote"; return 1; }
+      echo "fence — none · no lease on the remote"; return 0 ;;
+  esac
+  if [ "$rc" != 0 ] || [ "$CW_CLS" != mine ]; then
+    cause=$CW_CAUSE
+    case "$rc:$CW_CLS" in 1:*) ;; *:offered) cause=offered ;; *) cause=live-holder ;; esac
+    echo "lease refused — $cause · $tail · ${CW_WHO#* · }"; return 1
+  fi
+  if [ -n "$after" ]; then
+    ae=$(GIT cat-file commit "$after" 2>/dev/null | awk '{ sub(/\r$/, "") } !b { if ($0 == "") b = 1; next } /^epoch: / { e = substr($0, 8); exit } END { print e }')
+    case "$ae" in ""|*[!0-9]*) ae=- ;; *) ae=$((10#$ae)) ;; esac
+    if [ "$ae" != "$CW_EPOCH" ] || ! GIT rev-list --first-parent "$CW_SHA" -- 2>/dev/null \
+      | AF_TIP="$after" awk '{ sub(/\r$/, "") } $0 == ENVIRON["AF_TIP"] { f = 1 } END { exit !f }'; then
+      echo "lease refused — epoch-fence · $tail · ${CW_WHO#* · }"; return 1
+    fi
+  fi
+  body=$(GIT cat-file commit "$CW_SHA" 2>/dev/null | FB_UTC=$(read_utc_now) awk '
+    { sub(/\r$/, "") }
+    !b { if ($0 == "") b = 1; next }
+    /^beat-utc: / && !u { print "beat-utc: " ENVIRON["FB_UTC"]; u = 1; next }
+    /^renews: / && !r { print "renews: no"; r = 1; next }
+    { print }
+    END { if (!u) print "beat-utc: " ENVIRON["FB_UTC"]; if (!r) print "renews: no" }')
+  [ -n "$body" ] && beat=$(build_gov_commit "$CW_SHA" "$body") \
+    || { echo "lease not written — the fence beat could not be built on $tail at $CW_SHA in this clone"; return 2; }
+  echo "fence — $ref $CW_SHA $beat"
+}
+
+# --register, TWO CREATE-ONLY REGISTERS ON THE REMOTE (TOOL-dPlacedRequest-12). A decision is
+# `refs/gov/decisions/<build>/<key>`, the key `derive_decision_key` over the item that raised the
+# question and its declared fork, never the decision's wording; a problem is
+# `refs/gov/problems/<encoded subject>/<id>`, the subject one encoded component and the id
+# `derive_problem_id` over the filer's session, the item it filed from (`none` outside one), the raw
+# subject and the body's bytes. Each entry is ONE parentless commit over the empty tree from
+# `build_gov_commit ""`, written by `write_gov_ref` with an EMPTY expected sha, so every write is a
+# create: a second decision on one slot, or a retried filing, loses the lease and is never written
+# beside the first, while new problem content on one subject derives a new id and lands beside it.
+# THE ENCODER writes every byte outside `[A-Za-z0-9_-]` as `%` and two upper-case hex digits under
+# LC_ALL=C, so `/`, every dot, `+`, a space, `:`, `~` and every other byte `git check-ref-format`
+# refuses are escaped and the result is always one legal component; an empty text is refused. `+`
+# being escaped inside either part, a decision key splits back into exactly one item and fork.
+# THE ORDER: the switch (`register — off`, exit 2, nothing read or written), the arity, each field
+# non-empty and free of control bytes, `<build>` through `check_slug`, the component bound, the body,
+# and only then the remote. REF_COMPONENT_CEILING bounds the whole component the ref carries, the
+# encoded subject or the JOINED key, never a segment alone, since an escaped byte costs three and a
+# loose ref's name is 255 bytes. The body is refused over 4096 bytes, or carrying a NUL or a control
+# byte other than tab and newline (a CR included), before any commit is built.
+# THE RECORD: `gov-decision <build>/<key>` or `gov-problem <encoded subject>/<id>`, a blank line, the
+# `key: value` lines (`build`, `item`, `fork`, `session`; or `subject`, the raw one, `item`,
+# `session`), a blank line and the body's text.
+# ONE LINE PER OUTCOME: `register — written <ref>` exit 0; `register — exists <ref>` exit 1, followed
+# by the first entry's record, read by ONE bounded fetch into this node's cache ref and sighted into
+# the feed as `read_claims` sights; `register — not written <ref> · <why>` exit 2.
+# WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44), and who files how many problems; an
+# entry is never pruned, so both namespaces only grow.
+REF_COMPONENT_CEILING=200
+derive_ref_segment() { # text -> the text with every byte outside [A-Za-z0-9_-] as %HH, printed and bound to _segment; rc 1 on an empty text
+  local LC_ALL=C s="$1" o="" c i
+  [ -n "$s" ] || return 1
+  for ((i = 0; i < ${#s}; i++)); do
+    c=${s:i:1}
+    case "$c" in
+      [A-Za-z0-9_-]) o+=$c ;;
+      *) printf -v c '%%%02X' "'$c"; o+=$c ;;
+    esac
+  done
+  _segment=$o; printf '%s\n' "$o"
+}
+derive_decision_key() { # item · fork -> `<item segment>+<fork segment>`; rc 1 when either is empty
+  local a b
+  derive_ref_segment "$1" >/dev/null && a=$_segment && derive_ref_segment "$2" >/dev/null && b=$_segment || return 1
+  printf '%s+%s\n' "$a" "$b"
+}
+derive_problem_id() { # session · item · subject · body file -> the first 12 hex digits; rc 1 when git cannot hash
+  local h
+  h=$({ printf '%s\0%s\0%s\0' "$1" "$2" "$3"; cat -- "$4" && printf '\0'; } | GIT hash-object --stdin 2>/dev/null) || return 1
+  [[ $h =~ ^[0-9a-f]{12} ]] || return 1
+  printf '%s\n' "${h:0:12}"
+}
+write_register() { # decision <build> <item> <fork> <file> | problem <subject> <item> <file> -> 0 written, 1 exists, 2 not written
+  local kind="${1:-}" b="" it="" fk="" sub="" f="" comp ref sid n bad msg c rc d LC_ALL=C
+  [ "$RUN_CLAIMS" = on ] || { echo "register — off"; return 2; }
+  case "$kind:$#" in
+    decision:5) b=$2; it=$3; fk=$4; f=$5 ;;
+    problem:4) sub=$2; it=$3; f=$4 ;;
+    *) echo "register — not written · the forms are --register decision <build> <item> <fork> <file> and --register problem <subject> <item> <file>"; return 2 ;;
+  esac
+  for n in build item fork subject; do
+    case "$kind:$n" in decision:subject|problem:build|problem:fork) continue ;; esac
+    case "$n" in build) bad=$b ;; item) bad=$it ;; fork) bad=$fk ;; *) bad=$sub ;; esac
+    [ -n "$bad" ] || { echo "register — not written · an empty $n"; return 2; }
+    case "$bad" in *[[:cntrl:]]*) echo "register — not written · the $n carries a control byte"; return 2 ;; esac
+  done
+  if [ "$kind" = decision ]; then
+    check_slug "$b" || { echo "register — not written · the build is no build-folder name: $b"; return 2; }
+    comp=$(derive_decision_key "$it" "$fk") || { echo "register — not written · the decision key did not derive"; return 2; }
+    n="decision key"
+  else
+    derive_ref_segment "$sub" >/dev/null && comp=$_segment || { echo "register — not written · the subject did not encode"; return 2; }
+    n=subject
+  fi
+  [ "${#comp}" -le "$REF_COMPONENT_CEILING" ] || { echo "register — refused $n over ${#comp} bytes encoded"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "register — not written · the body file is not readable: $f"; return 2; }
+  n=$(wc -c <"$f") && n=${n//[!0-9]/} || n=""
+  [ -n "$n" ] && [ "$n" -le 4096 ] || { echo "register — not written · the body is over 4096 bytes: ${n:-unread} · $f"; return 2; }
+  bad=$(LC_ALL=C tr -d '\011\012\040-\176\200-\377' <"$f" | wc -c) && bad=${bad//[!0-9]/} || bad=""
+  [ "$bad" = 0 ] || { echo "register — not written · the body carries a NUL or a control byte other than tab and newline: $f"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}; sid=${sid//[[:cntrl:]]/ }
+  if [ "$kind" = decision ]; then
+    ref="refs/gov/decisions/$b/$comp"
+    printf -v msg 'gov-decision %s/%s\n\nbuild: %s\nitem: %s\nfork: %s\nsession: %s\n\n' "$b" "$comp" "$b" "$it" "$fk" "$sid"
+    msg+=$(<"$f"); msg=${msg%"${msg##*[!$'\n']}"}
+  else
+    c=$(derive_problem_id "$sid" "$it" "$sub" "$f") || { echo "register — not written · the problem id did not derive"; return 2; }
+    ref="refs/gov/problems/$comp/$c"
+    printf -v msg 'gov-problem %s/%s\n\nsubject: %s\nitem: %s\nsession: %s\n\n' "$comp" "$c" "$sub" "$it" "$sid"
+    msg+=$(<"$f"); msg=${msg%"${msg##*[!$'\n']}"}
+  fi
+  resolve_claim_remote || { echo "register — not written $ref · the clone does not declare exactly one remote, check 24"; return 2; }
+  c=$(build_gov_commit "" "$msg") || { echo "register — not written $ref · the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "$ref" "" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) echo "register — written $ref"; return 0 ;;
+    1) echo "register — exists $ref"
+       d=$(mktemp) || { echo "register — exists $ref · its record was not read: no scratch file"; return 1; }
+       if observe_remote "$d" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+$ref:refs/gov/remote/${ref#refs/gov/}"; then
+         add_feed_sightings refs/gov/remote/
+         GIT log -1 --format=%B "refs/gov/remote/${ref#refs/gov/}" -- 2>/dev/null
+       else
+         echo "register — exists $ref · its record was not read: the bounded fetch failed"
+       fi
+       rm -f "$d"; return 1 ;;
+    *) echo "register — not written $ref · $GOVREF_WHY"; return 2 ;;
+  esac
+}
+
+# --card-ref write, THE BUILD CARD'S REMOTE REF (TOOL-dPlacedRequest-33). The kickoff engine's
+# `remote-ref` card store calls it, bounded, with the commit message it rendered in a file, so the
+# switch, the remote and the writer each live once: here. DARK BY DEFAULT: while RUN_CLAIMS is not
+# `on` it prints `card-ref — off` and exits 0, reading and writing nothing. With it on, the slug is
+# held to the build-folder grammar `check_slug` applies, the clone's one remote is resolved as every
+# claim resolves it (check 24), `refs/gov/builds/<slug>/*` is read by ONE bounded, pruned fetch into
+# this node's cache `refs/gov/remote/builds/<slug>/*` and sighted into the feed as `read_claims`
+# sights, and the commit is built by `build_gov_commit` on the card ref's tip read and written by
+# `write_gov_ref` with that tip expected, so the write joins the feed and sets the cache ref.
+# ONE LINE PER OUTCOME: `card-ref — builds/<slug>/card · <sha8>` exit 0; `card-ref lost — <sha8 of the
+# remote tip, re-read once, or `unread`>` exit 1; `card-ref not written — <why>` exit 2. Neither refusal is a
+# numbered one: the line and the return carry it, as `write_register`'s do.
+# WHAT THIS DOES NOT CHECK: that the message is a card, which the engine renders; who may publish a
+# build's card, which the lease and the claim decide.
+write_card_ref() { # slug · message file -> 0 written, 1 lost, 2 not written
+  local slug="$1" f="$2" ref tail d msg tip="" c rc
+  [ "$RUN_CLAIMS" = on ] || { echo "card-ref — off"; return 0; }
+  check_slug_shape "$slug" || { echo "card-ref not written — the build is no build-folder name: $slug"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "card-ref not written — the message file is not readable: $f"; return 2; }
+  msg=$(<"$f")
+  [ -n "$msg" ] || { echo "card-ref not written — the message file is empty: $f"; return 2; }
+  ref="refs/gov/builds/$slug/card"; tail=${ref#refs/gov/}
+  resolve_claim_remote || { echo "card-ref not written — the clone does not declare exactly one remote, check 24"; return 2; }
+  d=$(mktemp -d) || { echo "card-ref not written — no scratch directory to bound the read in"; return 2; }
+  observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*" && rc=0 || rc=$?
+  case "$rc" in
+    0) ;;
+    124) rm -rf "$d"; echo "card-ref not written — the read was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; return 2 ;;
+    *) rm -rf "$d"; echo "card-ref not written — the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
+  esac
+  add_feed_sightings refs/gov/remote/
+  tip=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
+  c=$(build_gov_commit "$tip" "$msg") || { rm -rf "$d"; echo "card-ref not written — the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) rm -rf "$d"; echo "card-ref — $tail · ${c:0:8}"; return 0 ;;
+    1) tip=""
+       if observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*"; then
+         add_feed_sightings refs/gov/remote/
+         tip=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || tip=""; tip=${tip%$'\r'}
+       fi
+       tip=${tip:0:8}; rm -rf "$d"; echo "card-ref lost — ${tip:-unread}"; return 1 ;;
+    *) rm -rf "$d"; echo "card-ref not written — $GOVREF_WHY"; return 2 ;;
+  esac
+}
+
+# --card-ref lookup, THE BUILD CARD'S ONE READ (TOOL-dPlacedRequest-34 S12, S5, S9): read-only, so the
+# kickoff engine holds no fetch, no feed block and no local card ref of its own. Dark as the write is:
+# `card-ref — off`, exit 0, reading nothing. With RUN_CLAIMS on, the slug is held to the build-folder
+# grammar, the remote is the one `resolve_claim_remote` resolves (check 24), never a literal `origin`,
+# and `refs/gov/builds/<slug>/*` is read by the write's ONE bounded, pruned fetch, `--no-write-fetch-head`
+# included, into this node's cache `refs/gov/remote/builds/<slug>/*`, then sighted into the feed. It
+# prints `card-ref — <commit>` and then the commit's message, exit 0; `card-ref — none`, exit 0, where
+# the remote holds no card, the pruned fetch having cleared the cache ref; or `card-ref not read —
+# <why>`, exit 2, writing nothing past the cache. WHAT THIS DOES NOT CHECK: that the message is a card.
+print_card_ref() { # slug -> 0 read or off, 2 not read
+  local slug="$1" tail d rc c
+  [ "$RUN_CLAIMS" = on ] || { echo "card-ref — off"; return 0; }
+  check_slug_shape "$slug" || { echo "card-ref not read — the build is no build-folder name: $slug"; return 2; }
+  tail="builds/$slug/card"
+  resolve_claim_remote >/dev/null || { echo "card-ref not read — the clone does not declare exactly one remote, check 24"; return 2; }
+  d=$(mktemp -d) || { echo "card-ref not read — no scratch directory to bound the read in"; return 2; }
+  observe_remote "$d/fetch" fetch --no-tags --no-write-fetch-head --no-auto-maintenance --prune "$CR_URL" "+refs/gov/builds/$slug/*:refs/gov/remote/builds/$slug/*" && rc=0 || rc=$?
+  rm -rf "$d"
+  case "$rc" in
+    0) ;;
+    124) echo "card-ref not read — the read was killed by this kit's own ${REMOTE_BOUND}s bound: $CR_URL"; return 2 ;;
+    *) echo "card-ref not read — the remote did not answer, git fetch exited $rc: $CR_URL"; return 2 ;;
+  esac
+  add_feed_sightings refs/gov/remote/
+  c=$(GIT rev-parse --verify -q "refs/gov/remote/$tail^{commit}" 2>/dev/null) || c=""; c=${c%$'\r'}
+  [ -n "$c" ] || { echo "card-ref — none"; return 0; }
+  echo "card-ref — $c"
+  GIT log -1 --format=%B "$c" -- 2>/dev/null | tr -d '\r'
+  return 0
+}
+
+# --request, THE PROJECT-LEVEL REQUEST RECORD (TOOL-dPlacedRequest-19). An owner's request that is not
+# yet a build is keyed by its text alone: `request_content_key`, the loop kit's `request.py key`, found
+# by `resolve_kit_dir` as `derive_claim_keys` finds `claims.py`, refusing a file that is empty once
+# normalised or not UTF-8. THE WORDS STAY ON THIS NODE: the file's bytes are copied unchanged to
+# `<git-common-dir>/requests/<key>.md`, the first copy kept for the same words again (TOOL-dPlacedRequest-30:
+# a stored copy whose `derive_request_fold` differs from the file's is a COLLISION, `request not
+# written — <key> · collision: ...` exit 2, before any write), and `<session><TAB><blob>` is appended once
+# to `<git-common-dir>/requests/<key>.typed`, the blob `git hash-object --no-filters` of the bytes THIS
+# session submitted (TOOL-dPlacedRequest-31, -43), a hash that does not answer refused as the append is, and no
+# line at all with no session (TOOL-dPlacedRequest-32); nothing under `requests/` is tracked or pushed. THE REMOTE
+# HOLDS THE RECORD ALONE: `refs/gov/requests/<key>`, ONE parentless commit from `build_gov_commit ""`
+# whose message is `gov-request <key>`, a blank line and exactly three lines, `content-key`,
+# `fleet-tag` (this node's, as `resolve_fleet_tag` reads it from `fleet.toml`) and `session` (letters,
+# digits and dashes), each held at the write, written by `write_gov_ref` with an EMPTY expected sha, so
+# every write is a create. ONE LINE PER OUTCOME: `request — <key> · recorded <ref>` exit 0; `request —
+# <key> · already recorded <ref>` exit 0, a lost create; `request — <key> · not written · <why>` exit 2,
+# the text kept, and re-running the verb retries; `request — <key> · not written · requests.lock busy`
+# exit 2, nothing written, the node lock busy past its wait (TOOL-dPlacedRequest-43 S30); or the key's own `request — refused:` line, exit 2,
+# before any write. Every refusal precedes the local copy, and the copy precedes the push.
+# WHAT THIS DOES NOT CHECK: that the file holds the owner's words, which the verb trusts its caller
+# for until the intake hook lands, a non-goal of this unit; the text is never scanned, because it never
+# leaves this node.
+RQ_WHY=""
+# THE FOLD the collision compare applies to both texts (TOOL-dPlacedRequest-30 §4): the key's own
+# whitespace fold and nothing more, so a CRLF, BOM, final-newline or re-wrapped copy of the same words
+# folds alike. A leading UTF-8 BOM dropped, every run of space, tab, CR, LF, form feed or vertical tab
+# one space, the ends trimmed; case, dates and links stay, so two texts the key alone equates differ.
+# WHAT THIS DOES NOT FOLD: a non-ASCII whitespace character or an ASCII separator byte, which
+# Python's `split` folds, so such a copy reads as a collision rather than the same words.
+derive_request_fold() { # file -> its folded text on stdout
+  local bom
+  printf -v bom '\357\273\277'
+  LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
+}
+write_request_record() { # file -> 0 recorded or already recorded, 2 not written
+  local f="${1:-}" py d out key tag sid cdir blob msg c rc tok rt=""
+  [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
+  [ -f "$f" ] && [ -r "$f" ] || { echo "request — not written · the request file is not readable: $f"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request — not written · no python resolves, so the content key cannot be derived"; return 2; }
+  d=$(resolve_kit_dir "$py" loop request.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "request — not written · no loop kit holding request.py resolves beside this kit, so the content key cannot be derived"; return 2; }
+  [ -f "$d/request.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  out=$("$py" "$d/request.py" key "$f" 2>&1) && rc=0 || rc=$?
+  out=${out//$'\r'/}
+  if [ "$rc" != 0 ] || ! [[ $out =~ ^[0123456789abcdef]{12}$ ]]; then
+    printf '%s\n' "${out:-request — refused: $f did not key, request.py exited $rc}"; return 2
+  fi
+  key=$out
+  tag=$(resolve_fleet_tag) || { echo "request — $key · not written · this node has no row in fleet.toml: $tag"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "request — $key · not written · the session id is not letters, digits and dashes"; return 2; }
+  cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} && [ -n "$cdir" ] \
+    || { echo "request — $key · not written · no git common dir resolves for the local store"; return 2; }
+  # THE REQUESTS LOCK (TOOL-dPlacedRequest-43 S30): the fold compare, the copy and the `.typed` append
+  # run under the node lock `<git-common-dir>/requests.lock`, stem `node`, waited on as the queue's is,
+  # so a racing second call re-runs the compare after the first's copy, and every way out of the
+  # block releases it before the push, which holds no lock. A lock still busy after the wait refuses.
+  tok="$BASHPID.$RANDOM"
+  write_dir_lock_wait "$cdir/requests.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
+    || { echo "request — $key · not written · requests.lock busy"; return 2; }
+  rc=0
+  if [ -e "$cdir/requests/$key.md" ] && ! cmp -s <(derive_request_fold "$cdir/requests/$key.md") <(derive_request_fold "$f"); then
+    echo "request not written — $key · collision: a different text keys alike, the stored copy is $cdir/requests/$key.md"; rc=2
+  elif ! mkdir -p "$cdir/requests" 2>/dev/null; then
+    echo "request — $key · not written · the local store cannot be made: $cdir/requests"; rc=2
+  elif [ ! -e "$cdir/requests/$key.md" ]; then
+    derive_temp_path rt "$cdir/requests/$key.md" && cp -- "$f" "$rt" 2>/dev/null \
+      && mv -n -- "$rt" "$cdir/requests/$key.md" 2>/dev/null
+    [ -z "$rt" ] || rm -f -- "$rt"
+    [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; rc=2; }
+  fi
+  # NO SESSION, NO CONSENT (TOOL-dPlacedRequest-32 S2): an id-less session's record keeps `session:
+  # absent` as provenance, and `.typed` gains no line, since `absent` would name every id-less session.
+  # THE BLOB IS OF THE SUBMITTED BYTES (TOOL-dPlacedRequest-43 S14): `--no-filters`, so no node's
+  # `core.autocrlf` or clean filter moves it, and `check_request_consent` hashes the stored copy alike.
+  if [ "$rc" = 0 ] && [ "$sid" != absent ]; then
+    blob=$(GIT hash-object --no-filters -- "$f" 2>/dev/null) && blob=${blob%$'\r'} && [[ $blob =~ ^[0123456789abcdef]{40}([0123456789abcdef]{24})?$ ]] \
+      && { grep -qxF -- "$sid"$'\t'"$blob" "$cdir/requests/$key.typed" 2>/dev/null || printf '%s\t%s\n' "$sid" "$blob" >>"$cdir/requests/$key.typed"; } \
+      || { echo "request — $key · not written · this session could not be added to $cdir/requests/$key.typed"; rc=2; }
+  fi
+  remove_dir_lock "$cdir/requests.lock" "$tok"
+  [ "$rc" = 0 ] || return 2
+  printf -v msg 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid"; msg=${msg%"${msg##*[!$'\n']}"}
+  resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
+  c=$(build_gov_commit "" "$msg") || { echo "request — $key · not written, the text kept · the commit could not be built in this clone"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  write_gov_ref "refs/gov/requests/$key" "" "$c" && rc=0 || rc=$?
+  case "$rc" in
+    0) echo "request — $key · recorded refs/gov/requests/$key"; return 0 ;;
+    1) echo "request — $key · already recorded refs/gov/requests/$key"; return 0 ;;
+    *) echo "request — $key · not written, the text kept and a re-run retries · $GOVREF_WHY"; return 2 ;;
+  esac
+}
+
+# THE RECORD'S EXISTENCE, before a request lease is acquired (TOOL-dPlacedRequest-19 S4, F5): ONE
+# bounded `ls-remote --exit-code` of `refs/gov/requests/<key>` alone against the claim remote, as
+# `branch_tip_quiet` asks for one branch. It fetches nothing and sights nothing into the feed, so the
+# claim read stays the size it is. Check 24's refusal of other than one remote is swallowed, as the
+# quiet claim read swallows it, and reaches RQ_WHY. -> 0 recorded; 1 the remote answered and holds no
+# such ref; 2 the read did not answer or the bound fired; the cause in RQ_WHY.
+check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read; RQ_WHY
+  local key="$1" f l rc hit="" _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  RQ_WHY=""
+  resolve_claim_remote >/dev/null; rc=$?
+  status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
+  [ "$rc" = 0 ] || { RQ_WHY="the clone does not declare exactly one remote, check 24"; return 2; }
+  f=$(mktemp) || { RQ_WHY="cannot create a scratch file to bound the record read"; return 2; }
+  observe_remote "$f" ls-remote --exit-code "$CR_URL" "refs/gov/requests/$key" && rc=0 || rc=$?
+  while IFS= read -r l; do case "${l%$'\r'}" in *$'\t'"refs/gov/requests/$key") hit=1 ;; esac; done <"$f"
+  rm -f "$f"
+  case "$rc:$hit" in
+    0:1) return 0 ;;
+    0:|2:*) RQ_WHY="the remote holds no refs/gov/requests/$key, so no request of that key is recorded"; return 1 ;;
+    124:*) RQ_WHY="the record read was killed by this kit's own ${REMOTE_BOUND}s bound, so nothing was learned: $CR_URL"; return 2 ;;
+    *) RQ_WHY="the remote did not answer the record read, git ls-remote exited $rc: $CR_URL"; return 2 ;;
+  esac
+}
+
+# --request-draw, THE PRE-CLAIM BUDGET (TOOL-dPlacedRequest-14). A request that loops at entry before any
+# build exists, placed, refused and placed again or retried under a fresh slug, draws on a budget keyed
+# to its content key. THE ROWS LIVE ON THE REQUEST RECORD, `refs/gov/requests/<key>`: one commit per row,
+# its message `gov-request <key>`, a blank line and the row, built by `build_gov_commit` on the tip read
+# and written by `write_gov_ref` with that tip expected, so every node counts one chain. The record's
+# existence is read by `check_request_recorded`; a key with no record is created first by
+# `write_request_record` from this clone's kept copy `<git-common-dir>/requests/<key>.md`, under no
+# session, so a draw never adds a session's consent line; with neither a record nor that copy the draw is
+# refused naming `--request <file>`, and a copy that `request.py key` keys to another key is refused
+# before any write, naming both. Then ONE bounded fetch of the ref into its cache ref, as `read_claims`
+# fetches, its first-parent messages each opened by a \001 byte handed to the loop kit's `budget.py draw
+# --request <key> --rows <file>`, which counts and writes nothing: `exhausted · <spent>/<total>` exits 3; a
+# `draw · <cause> · <item> · <spent>/<total>` row is pushed, and a lost race re-reads and draws again, at
+# most three times. CONTENTION DRAWS NOTHING: an unreachable remote, a bound that fired and a fourth lost
+# race exit 2 with no row. -> 0 the row printed; 3 exhausted; 2 nothing drawn, its cause printed.
+# WHAT THIS DOES NOT CHECK: that the lap its caller names is the one it made; the cause and the item are
+# the caller's word, the cause held to the closed set by `budget.py`.
+run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 not drawn
+  local key="$1" cause="$2" item="$3" py d cdir s out rc tip c row m n=0
+  [[ $key =~ ^[0123456789abcdef]{12}$ ]] || { echo "request-draw — not drawn · $key is no content key of 12 hex digits"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request-draw — $key · not drawn · no python resolves, so the budget cannot be counted"; return 2; }
+  d=$(resolve_kit_dir "$py" loop budget.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "request-draw — $key · not drawn · no loop kit holding budget.py resolves beside this kit"; return 2; }
+  [ -f "$d/budget.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  check_request_recorded "$key" && rc=0 || rc=$?
+  if [ "$rc" = 1 ]; then
+    cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && cdir=${cdir%$'\r'} || cdir=""
+    [ -n "$cdir" ] && [ -f "$cdir/requests/$key.md" ] \
+      || { echo "request-draw — $key · not drawn · no request record and no kept text: record it first with unattended.sh --request <file>"; return 2; }
+    out=$("$py" "$d/request.py" key "$cdir/requests/$key.md" 2>&1) || out=""
+    [ "${out//$'\r'/}" = "$key" ] \
+      || { echo "request-draw — $key · not drawn · the kept text $cdir/requests/$key.md keys to ${out:-nothing}, not $key, so no record is created"; return 2; }
+    ( CLAUDE_CODE_SESSION_ID=absent; write_request_record "$cdir/requests/$key.md" ) || { echo "request-draw — $key · not drawn · the request record could not be created"; return 2; }
+    check_request_recorded "$key" && rc=0 || rc=$?
+  fi
+  case "$rc" in
+    0) ;;
+    1) echo "request-draw — $key · not drawn · $RQ_WHY"; return 2 ;;
+    *) echo "request-draw — $key · not drawn, contention · $RQ_WHY"; return 2 ;;
+  esac
+  s=$(mktemp) || { echo "request-draw — $key · not drawn · cannot create a scratch file for the rows"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  while :; do
+    observe_remote "$s" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+refs/gov/requests/$key:refs/gov/remote/requests/$key" && rc=0 || rc=$?
+    [ "$rc" = 0 ] || { rm -f "$s"; echo "request-draw — $key · not drawn, contention · the record fetch exited $rc: $CR_URL"; return 2; }
+    add_feed_sightings refs/gov/remote/
+    tip=$(GIT rev-parse -q --verify "refs/gov/remote/requests/$key^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
+    [ -n "$tip" ] && GIT log --first-parent --format='%x01%B' "$tip" -- >"$s" 2>/dev/null \
+      || { rm -f "$s"; echo "request-draw — $key · not drawn · the fetched record does not read in this clone"; return 2; }
+    out=$("$py" "$d/budget.py" draw --request "$key" --cause "$cause" --item "$item" --rows "$s") && rc=0 || rc=$?
+    out=${out//$'\r'/}
+    case "$rc" in
+      0) row=${out%%$'\n'*} ;;
+      3) rm -f "$s"; printf '%s\n' "$out"; return 3 ;;
+      *) rm -f "$s"; printf '%s\n' "${out:-request-draw — $key · not drawn · budget.py exited $rc}"; return 2 ;;
+    esac
+    printf -v m '%s %s\n\n%s' gov-request "$key" "$row"; m=${m%"${m##*[!$'\n']}"}
+    c=$(build_gov_commit "$tip" "$m") \
+      || { rm -f "$s"; echo "request-draw — $key · not drawn · the row commit could not be built in this clone"; return 2; }
+    write_gov_ref "refs/gov/requests/$key" "$tip" "$c" && rc=0 || rc=$?
+    case "$rc" in
+      0) rm -f "$s"; printf '%s\n' "$row"; return 0 ;;
+      1) n=$((n + 1)); [ "$n" -le 3 ] || break
+         echo "request-draw — $key · lost the race, re-read $n of 3 · $GOVREF_WHY" ;;
+      *) rm -f "$s"; echo "request-draw — $key · not drawn · $GOVREF_WHY"; return 2 ;;
+    esac
+  done
+  rm -f "$s"; echo "request-draw — $key · not drawn, contention · the race was lost four times"; return 2
+}
+
+# --entry-claim, THE CLAIM (TOOL-dPlacedRequest-21): a placed `new`, `patch` or `repeat` request becomes a
+# build by one act. The loop kit's `claim.py`, found by `resolve_kit_dir` as `budget.py` is, holds the
+# logic; this function holds every remote read and write. In order: `claim.py body` reads the placement's
+# claim lines and refuses a disposition, a slug or, on a repeat, a `--pieces` count before anything is
+# read from the remote; ONE bounded `ls-remote --exit-code` of `refs/gov/claims/<slug>` through
+# `observe_remote`, as `check_request_recorded` reads a request; where the ref exists, ONE bounded fetch
+# into its cache ref, its body read by `claim.py read`: this claimant's key (`<fleet tag>:<session>`) is a
+# RESUME, which skips the local pre-check, another key draws `route-back` on `item.entry.claim` through
+# `run_request_draw` and exits 5, a fresh slug owed; with no ref, `claim.py precheck` runs the memory-tree
+# kit's `check_slug_claimed` and the claim is created by `write_gov_ref` with an EMPTY expected sha, a
+# lost create read as above. An unanswered read or create takes `leases.offline`: `refuse` exit 1, any
+# other value exit 4, no claim queued and no folder written. A patch or a repeat then takes its build
+# lease through `run_lease_verb acquire build`. A STALE LEASE IS TAKEN OVER (TOOL-dPlacedRequest-100): an
+# acquire refusal whose line ends with `LEASE_STALE_HINT` runs `run_lease_verb take-over build` once; a
+# take-over written is the claim's lease and the claim goes on, one refused has its own cause routed as
+# an acquire refusal is, and one not written exits 2. A refusal is routed by `claim.py route`: a terminal cause
+# prints one `ask:` line and exits 1, never retried; a wait adds `wait-since:` by a parented commit
+# (`add_claim_key`) and exits 4 until `flow.wait-ceiling` has passed, then prints an owner item and exits
+# 1; an overlap the probe notes under `leases: warn` adds `overlap:` and proceeds. Then `claim.py
+# scaffold` commits the derived plan record alone and `claim.py record` writes the first transition
+# record. -> 0 claimed or resumed, 1 refused, 2 not written, 3 the request's pre-claim budget spent, 4
+# waiting, 5 a fresh slug owed; 4 and 5 are printed by name beside the code.
+# WHAT THIS DOES NOT CHECK: that the other key's claim is live, since a claim never expires; a lease
+# `queued` offline, read as taken, its flush deciding it later.
+CLM_KEY=""; CLM_WHY=""
+read_claim_ref() { # claim ref · claim.py dir · python -> 0 with CLM_KEY its claimant-key; 2 not read, CLM_WHY
+  local ref="$1" s rc out
+  CLM_KEY=""; CLM_WHY=""
+  s=$(mktemp) || { CLM_WHY="cannot create a scratch file to bound the claim fetch"; return 2; }
+  observe_remote "$s" fetch --no-tags --no-write-fetch-head --no-auto-maintenance "$CR_URL" "+$ref:refs/gov/remote/${ref#refs/gov/}" && rc=0 || rc=$?
+  rm -f "$s"
+  [ "$rc" = 0 ] || { CLM_WHY="the claim fetch exited $rc: $CR_URL"; return 2; }
+  add_feed_sightings refs/gov/remote/
+  out=$("$3" "$2/claim.py" read --slug "${ref##*/}" 2>&1) || { CLM_WHY="the fetched claim does not read: ${out//$'\n'/ }"; return 2; }
+  CLM_KEY=$(printf '%s\n' "${out//$'\r'/}" | sed -n 's/^claimant-key: //p' | head -1)
+  return 0
+}
+add_claim_key() { # claim ref · the claim header `claim.py body` rendered · one `key: value` line -> 0 written on the cached tip, 2 not written, its line printed
+  local ref="$1" tip c rc m
+  tip=$(GIT rev-parse -q --verify "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
+  [ -n "$tip" ] || { echo "claim not written — no cached tip of $ref to add '$3' to"; return 2; }
+  printf -v m '%s\n\n%s' "$2" "$3"; m=${m%"${m##*[!$'\n']}"}
+  c=$(build_gov_commit "$tip" "$m") \
+    || { echo "claim not written — the commit adding '$3' could not be built in this clone"; return 2; }
+  write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
+  [ "$rc" = 0 ] || { echo "claim not written — '$3' was not added to $ref: $GOVREF_WHY"; return 2; }
+  return 0
+}
+run_entry_claim() { # slug · content key · pieces given (0|1) · pieces -> 0 claimed, 1 refused, 2 not written, 3 spent, 4 waiting, 5 a fresh slug owed
+  local slug="$1" key="$2" pf="$3" pieces="$4" py d tag sid msg disp f rc hit="" c out line cause own="" ref
+  local _st=$status _nc=${#RUNLOG_CHECKS[@]}
+  local -a pa=()
+  [ "$pf" = 0 ] || pa=(--pieces "$pieces")
+  ref="refs/gov/claims/$slug"
+  [ "$RUN_CLAIMS" = on ] || { echo "claim not written — RUN_CLAIMS is not on in $CONF, so no claim is read or written"; return 2; }
+  sid=${CLAUDE_CODE_SESSION_ID:-absent}
+  [ "$sid" != absent ] || { echo "claim not written — no session: CLAUDE_CODE_SESSION_ID is unset, so no claimant key names the claim"; return 2; }
+  [[ $sid =~ ^[A-Za-z0-9-]+$ ]] || { echo "claim not written — the session id is not letters, digits and dashes"; return 2; }
+  py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "claim not written — no python resolves, so the placement cannot be read"; return 2; }
+  d=$(resolve_kit_dir "$py" loop claim.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
+    || { echo "claim not written — no loop kit holding claim.py resolves beside this kit"; return 2; }
+  [ -f "$d/claim.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+  tag=$(resolve_fleet_tag) || { echo "claim not written — this node has no row in fleet.toml: $tag"; return 2; }
+  msg=$("$py" "$d/claim.py" body --request "$key" --slug "$slug" --claimant "$tag:$sid" "${pa[@]}" 2>&1) && rc=0 || rc=$?
+  msg=${msg//$'\r'/}
+  [ "$rc" = 0 ] || { printf '%s\n' "$msg"; return "$rc"; } # passes claim.py body's exit through: 1 refused, 2 not written
+  disp=$(printf '%s\n' "$msg" | sed -n 's/^disposition: //p' | head -1)
+  resolve_claim_remote >/dev/null; rc=$?
+  status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
+  [ "$rc" = 0 ] || { echo "claim not written — the clone does not declare exactly one remote, check 24"; return 2; }
+  [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
+  GOVREF_RUNNER=observe_remote; GOVREF_REMOTE=$CR_NAME; GOVREF_GITDIR=$RUNLOG_GITDIR
+  f=$(mktemp) || { echo "claim not written — cannot create a scratch file to bound the claim read"; return 2; }
+  observe_remote "$f" ls-remote --exit-code "$CR_URL" "$ref" && rc=0 || rc=$?
+  while IFS= read -r line; do case "${line%$'\r'}" in *$'\t'"$ref") hit=1 ;; esac; done <"$f"
+  rm -f "$f"
+  case "$rc:$hit" in
+    0:1) read_claim_ref "$ref" "$d" "$py" && rc=1 || rc=2 ;;
+    0:|2:*)
+      out=$("$py" "$d/claim.py" precheck --slug "$slug" 2>&1) || { rc=$?; printf '%s\n' "${out//$'\r'/}"; return "$rc"; } # passes claim.py precheck's exit through: 1 refused, 2 not written
+      c=$(build_gov_commit "" "$msg") || { echo "claim not written — the claim commit could not be built in this clone"; return 2; }
+      write_gov_ref "$ref" "" "$c" && rc=0 || rc=$?
+      case "$rc" in
+        0) echo "entry-claim — $slug · claimed $ref · $disp" ;;
+        1) read_claim_ref "$ref" "$d" "$py" || rc=2 ;;
+        *) CLM_WHY=$GOVREF_WHY ;;
+      esac ;;
+    *) CLM_WHY="the claim read did not answer, git ls-remote exited $rc: $CR_URL"; rc=2 ;;
+  esac
+  if [ "$rc" = 1 ]; then
+    if [ "$CLM_KEY" != "$tag:$sid" ]; then
+      run_request_draw "$key" route-back item.entry.claim; rc=$?
+      [ "$rc" != 3 ] || { echo "claim refused — $slug · claimed under another key, and the request's pre-claim budget is spent"; return 3; }
+      # A DRAW NOT RECORDED STOPS (TOOL-dPlacedRequest-34 S42): a route-back no row counts is no lap.
+      [ "$rc" = 0 ] || { echo "claim not written — $slug · claimed under another key, and the pre-claim draw was not recorded, so no fresh slug is owed yet"; return 2; }
+      echo "claim refused — $slug · claimed under another key, $CLM_KEY · a fresh slug owed · exit 5 (a fresh slug owed)"; return 5
+    fi
+    own=1; echo "entry-claim — $slug · claimed by this claimant · resuming at the first step not witnessed"
+  elif [ "$rc" = 2 ]; then
+    out=$("$py" "$d/claim.py" route --cause offline --slug "$slug" 2>&1); out=${out//$'\r'/}
+    case "$out" in
+      "route · refuse-offline"*) echo "lease refused — offline · claims/$slug · $CLM_WHY"; return 1 ;;
+      "route · wait-offline"*) echo "claim not written — offline · claims/$slug · $CLM_WHY · ${out#route · wait-offline · }: no claim is queued and no folder written, so a re-run claims it once the remote answers · exit 4 (waiting)"; return 4 ;;
+      *) printf '%s\n' "$out"; return 2 ;;
+    esac
+  fi
+  if [ "$disp" != new ]; then
+    out=$(run_lease_verb acquire build "$slug" "" "" "" "" "" 2>&1) && rc=0 || rc=$?
+    out=${out//$'\r'/}
+    printf '%s\n' "$out"
+    line=$(printf '%s\n' "$out" | grep -m1 '^lease ')
+    if [ "$rc" = 1 ] && [[ $line == *"$LEASE_STALE_HINT" ]]; then
+      out=$(run_lease_verb take-over build "$slug" "" "" "" "" "" 2>&1) && rc=0 || rc=$?
+      out=${out//$'\r'/}
+      printf '%s\n' "$out"
+      case "$rc" in
+        0) echo "entry-claim — $slug · the stale build lease taken over" ;;
+        1) line=$(printf '%s\n' "$out" | grep -m1 '^lease ') ;;
+        *) echo "claim not written — $slug · the stale build lease was not taken over"; return 2 ;;
+      esac
+    fi
+    if [ "$rc" = 0 ]; then
+      case "$out" in
+        *"sharing a path; this run is NOT blocked"*)
+          line=$(printf '%s\n' "$out" | sed -n 's/^  \(..*\)$/\1/p' | head -1)
+          add_claim_key "$ref" "${msg%%$'\n'*}" "overlap: ${line:-a path an unmerged branch shares}" || return 2
+          echo "entry-claim — $slug · overlap noted on the claim, the lease taken as held under leases warn" ;;
+      esac
+    elif [ "$rc" = 1 ]; then
+      cause=${line#lease refused — }; cause=${cause%% *}
+      out=$("$py" "$d/claim.py" route --cause "$cause" --slug "$slug" 2>&1); rc=$?; out=${out//$'\r'/}
+      [ "$rc" = 0 ] || { printf '%s\n' "$out"; return 2; }
+      case "$out" in
+        "route · refuse-offline"*) echo "claim refused — $slug · offline · leases.offline refuse"; return 1 ;;
+        "route · refuse "*)
+          echo "ask: $slug · $cause · request $key · the build lease refused $cause, which no retry lifts whatever leases says"
+          echo "claim refused — $slug · $cause · never retried"; return 1 ;;
+        "route · stamp"*)
+          line=$(read_utc_now)
+          add_claim_key "$ref" "${msg%%$'\n'*}" "wait-since: $line" || return 2
+          echo "claim waiting — $slug · $cause · wait-since $line · ${out#route · stamp · } · exit 4 (waiting)"; return 4 ;;
+        "route · wait "*) echo "claim waiting — $slug · $cause · ${out#route · wait · } · exit 4 (waiting)"; return 4 ;;
+        "route · expired"*) echo "owner item: $slug · $cause past flow.wait-ceiling · ${out#route · expired · } · request $key"; return 1 ;;
+        "route · wait-offline"*) echo "claim waiting — $slug · offline · ${out#route · wait-offline · } · exit 4 (waiting)"; return 4 ;;
+        *) echo "claim not written — $slug · claim.py route answered: $out"; return 2 ;;
+      esac
+    else
+      echo "claim not written — $slug · the build lease was not written, so no folder is written"; return 2
+    fi
+    out=$("$py" "$d/claim.py" scaffold --slug "$slug" --request "$key" "${pa[@]}" 2>&1) && rc=0 || rc=$?
+    printf '%s\n' "${out//$'\r'/}"
+    [ "$rc" = 0 ] || return "$rc" # passes claim.py scaffold's exit through: 1 refused, 2 not written
+  fi
+  out=$("$py" "$d/claim.py" record --slug "$slug" 2>&1) && rc=0 || rc=$?
+  printf '%s\n' "${out//$'\r'/}"
+  [ "$rc" = 0 ] || return "$rc" # passes claim.py record's exit through: 1 refused, 2 not written
+  echo "entry-claim — $slug · claimed · $disp${own:+ · resumed by this claimant}"
+  return 0
+}
+
+# THE CONSENT PREDICATE (TOOL-dPlacedRequest-19 S5): a request is the owner's consent only in a session
+# that recorded its words on THIS node, a line of `<git-common-dir>/requests/<key>.typed`. A key that
+# arrived from another node or session has no such line, so the predicate refuses it by default; the
+# breakpoint disposition calls it before it fires (TOOL-dPlacedRequest-5). CONSENT IS BOUND TO THE BYTES
+# (TOOL-dPlacedRequest-31): the line must be `<this session><TAB><blob>`, the blob the one `git
+# hash-object --no-filters` reads from `<git-common-dir>/requests/<key>.md` NOW, a CRLF rewrite included, so a stored copy replaced after the
+# fact, or a line written for other words, is no consent; a line of any other shape never matches.
+# -> 0 consent; 1 printing one `request — <key> · relayed` line otherwise, a malformed key, no common
+# dir and a missing stored copy included. NO SESSION IS NO CONSENT (TOOL-dPlacedRequest-32 S2):
+# CLAUDE_CODE_SESSION_ID unset, empty or `absent` returns 1 printing `request — <key> · no session:
+# ...` before any read, so a planted `absent` line consents for nobody.
+# WHAT THIS DOES NOT CHECK: that the session typed the words rather than relayed them into `--request`.
+check_request_consent() { # content key -> 0 this session typed it here, 1 relayed
+  local key="${1:-}" cdir now="" sid="${CLAUDE_CODE_SESSION_ID:-absent}"
+  if [ "$sid" = absent ]; then
+    echo "request — ${key:--} · no session: the harness exposed none, so nothing here is consent"
+    return 1
+  fi
+  cdir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || cdir=""
+  cdir=${cdir%$'\r'}
+  [[ $key =~ ^[0123456789abcdef]{12}$ ]] && [ -n "$cdir" ] && now=$(GIT hash-object --no-filters -- "$cdir/requests/$key.md" 2>/dev/null) || now=""
+  now=${now%$'\r'}
+  if [ -n "$now" ] && grep -qxF -- "$sid"$'\t'"$now" "$cdir/requests/$key.typed" 2>/dev/null; then
+    return 0
+  fi
+  echo "request — ${key:--} · relayed: data with provenance, never consent"
+  return 1
 }
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
@@ -3730,7 +5899,7 @@ check_single_live() {
   read_derived_phase --prime
   [ "$RUN_CLAIMS" = on ] && [ -n "$CLAIM_ROWS" ] || return 0
   printf '%s\n' "$CLAIM_ROWS" | awk -F'\t' -v me="${SLUG:-}" '
-    $1 != me && $5 != "terminal" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
+    $1 != me && $5 != "terminal" && $5 != "released" { r[++n] = sprintf("  %s · node %s · status %s · beat %s · verdict %s", $1, $2, $3, ($4 == "-" ? "unknown" : $4 "s"), $5) }
     END { if (n) { printf "unattended: %d claim(s) on the remote for other slugs — this run is NOT blocked by them:\n", n; for (i = 1; i <= n; i++) print r[i] } }'
   return 0
 }
@@ -3749,45 +5918,91 @@ check_single_live() {
 # path under a shared record or a generated index is never shared, because those reconcile
 # additively or re-render. A diff touching only kit version markers is not an overlap unless a spec
 # on the ref also declares the path. The age bound is a constant until an adopter asks for another.
+# TOOL-dPlacedRequest-1 S9 - THE CONSTANT 0 IS REPLACED. `leases.overlap` reduces each kept path before
+# the join: `kit-dirs` (the default) reduces a `<tools root>/<kit>/...` or `skills/<skill>/...` path to
+# that directory and joins every other path as `files` does, so two builds editing one kit overlap and
+# two touching only their own build folders do not; `files` is the join above; `builds` keeps it and
+# prints one finding per branch. Called with `acquire` (the `--lease acquire` caller) under `leases:
+# refuse`, a finding and each of the four UNAVAILABLE exits return 1 with OV_WHY its cause, so a probe
+# that cannot run admits nothing; every other caller, the driver's preflight included, reads `warn`.
 OVERLAP_AGE_DAYS=14
+OV_WHY=""
 # `read_files_touched <rev> <file>` - the backticked path tokens under `### Files touched` of every
 # spec the file lists, read at <rev> with ONE `git show`, terminal specs skipped. The blobs arrive
 # concatenated, so each spec's status header is what opens its record. A token is a path when it is
 # one word of path characters holding a `/` or ending in an extension: prose spans in the section
 # such as a function name or an id are not paths. Its status is git's, so an unreadable ref is
-# counted as unreadable rather than as clean.
-read_files_touched() { # rev · file of spec paths -> one declared path per line
-  local _rf_ps=() _rf_p
+# counted as unreadable rather than as clean. The token test is `read_path_tokens`, the one rule
+# (TOOL-dPlacedRequest-8 S5): this function hands it the section's lines and nothing else. A third
+# argument `any` reads a spec of any status, a CLOSED or WONTDO one included (TOOL-dPlacedRequest-34
+# S48), for a seed that asks what a finished unit wrote; every other caller skips terminal specs.
+read_files_touched() { # rev · file of spec paths · [any] -> one declared path per line
+  local _rf_ps=() _rf_p _rf_any="${3:-}"
   while IFS= read -r _rf_p; do
     _rf_p=${_rf_p%$'\r'}
     case "$_rf_p" in *.md) _rf_ps+=("$1:$_rf_p") ;; esac
   done < "$2"
   [ "${#_rf_ps[@]}" -gt 0 ] || return 0
-  GIT show "${_rf_ps[@]}" 2>/dev/null | awk '
+  GIT show "${_rf_ps[@]}" 2>/dev/null | awk -v any="$_rf_any" '
     { sub(/\r$/, "") }
-    /^\*\*Status:\*\* / { term = ($2 == "CLOSED" || $2 == "WONTDO"); ft = 0; next }
+    /^\*\*Status:\*\* / { term = (any != "any" && ($2 == "CLOSED" || $2 == "WONTDO")); ft = 0; next }
     /^#/ { ft = ($0 ~ /^### Files touched/); next }
-    ft && !term {
-      s = $0
+    ft && !term { print }' | read_path_tokens
+  return "${PIPESTATUS[0]}"
+}
+# `read_path_tokens` - THE ONE PATH-TOKEN RULE (TOOL-dPlacedRequest-8 S5): each backticked span of
+# the text on stdin, read line by line, that is one word of letters, digits, dot, underscore, slash
+# and dash holding a `/` or ending in an extension. A backslash, a space or a colon is no such word,
+# so a span holding one is prose and never a path. `read_files_touched` and `--path-tokens` call it.
+read_path_tokens() { # stdin text -> one path token per line, in text order
+  awk '
+    { sub(/\r$/, ""); s = $0
       while (match(s, /`[^`]+`/)) {
         t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
         if (t ~ /^[A-Za-z0-9._\/-]+$/ && (t ~ /\// || t ~ /\.[A-Za-z0-9]+$/)) print t
       }
     }'
-  return "${PIPESTATUS[0]}"
 }
-check_cross_run_overlap() { # slug - always returns 0
-  local slug="$1" anc="${ASHA:-}" rem d now ref sha ct age secs n=0 a=0 u=0 s=0 _co_q _co_g _co_ps=()
+# `print_path_tokens [--any-status] <rev> <spec>...` - `--path-tokens --files-touched`: the specs'
+# declared paths at <rev>, exactly as `read_files_touched` reads them, through a scratch file holding
+# the spec list, so a terminal spec and a path not ending `.md` print nothing; `--any-status` reads a
+# terminal spec too (TOOL-dPlacedRequest-34 S48). 2 with one `path-tokens not read` line where no
+# scratch file is made, or git cannot read <rev> or a spec at it.
+print_path_tokens() { # [--any-status] · rev · spec... -> one declared path per line
+  local _pt_rev _pt_list _pt_rc _pt_any=""
+  [ "${1:-}" != --any-status ] || { _pt_any=any; shift; }
+  _pt_rev="$1"
+  shift
+  _pt_list=$(mktemp) || { echo "path-tokens not read — cannot create a scratch file for the spec list"; return 2; }
+  printf '%s\n' "$@" > "$_pt_list"
+  read_files_touched "$_pt_rev" "$_pt_list" "$_pt_any"; _pt_rc=$?
+  rm -f "$_pt_list"
+  [ "$_pt_rc" = 0 ] || { echo "path-tokens not read — git cannot read $_pt_rev or a spec at it: exit $_pt_rc"; return 2; }
+  return 0
+}
+check_cross_run_overlap() { # slug · [acquire] -> 0; 1 with OV_WHY under `leases: refuse` at an acquisition
+  local slug="$1" acq="${2:-}" anc="${ASHA:-}" rem d now ref sha ct age secs n=0 a=0 u=0 s=0 _co_q _co_g _co_ps=() gran=files fin=0 tr=""
+  OV_WHY=""
+  if [ "$acq" = acquire ] && read_lease_policy leases >/dev/null && [ "$LP_VALUE" = refuse ]; then fin=1; fi
   if [ -z "$anc" ] || ! GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1; then
-    echo "unattended: overlap probe UNAVAILABLE — no observed default-branch tip names a commit in this clone, so no remote ref can be read as unmerged against it"
-    return 0
+    OV_WHY="overlap probe UNAVAILABLE — no observed default-branch tip names a commit in this clone, so no remote ref can be read as unmerged against it"
+    echo "unattended: $OV_WHY"
+    return "$fin"
   fi
-  d=$(mktemp -d) || { echo "unattended: overlap probe UNAVAILABLE — cannot create a scratch directory"; return 0; }
+  d=$(mktemp -d) || { OV_WHY="overlap probe UNAVAILABLE — cannot create a scratch directory"; echo "unattended: $OV_WHY"; return "$fin"; }
   rem=$(GIT remote | head -1)
+  if read_lease_policy leases.overlap >/dev/null; then gran=$LP_VALUE
+  else echo "unattended: overlap probe — leases.overlap was refused, so it joins as files: $LP_VALUE"; fi
+  if [ "$gran" = kit-dirs ]; then
+    tr=$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null) || tr=""
+    tr=${tr%$'\r'}; tr=${tr%/}
+    case "$tr" in */*) tr=${tr%/*} ;; *) tr="" ;; esac
+  fi
   # OUR PATHS: what this run changed since the anchor, and what its live specs declare.
   if ! GIT -c core.quotepath=off diff --no-renames --name-only "$anc...HEAD" > "$d/ours" 2>/dev/null; then
-    echo "unattended: overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
-    rm -rf "$d"; return 0
+    OV_WHY="overlap probe UNAVAILABLE — this run's own changes since the observed tip ${anc:0:8} cannot be listed"
+    echo "unattended: $OV_WHY"
+    rm -rf "$d"; return "$fin"
   fi
   # A SLUG names this run's build, whose live specs declare. NO SLUG is the attended `--overlaps`
   # caller (KICK-aMendedFleet-2 S2): its declared paths are those of the live specs its own
@@ -3807,8 +6022,9 @@ check_cross_run_overlap() { # slug - always returns 0
   # while it is behind HEAD and reappears when another session pushed past it.
   if ! GIT for-each-ref --no-merged="$anc" --no-merged=HEAD \
        --format='%(refname)%09%(objectname)%09%(committerdate:unix)' "refs/remotes/$rem/" > "$d/refs" 2>/dev/null; then
-    echo "unattended: overlap probe UNAVAILABLE — the remote-tracking refs of $rem cannot be listed"
-    rm -rf "$d"; return 0
+    OV_WHY="overlap probe UNAVAILABLE — the remote-tracking refs of $rem cannot be listed"
+    echo "unattended: $OV_WHY"
+    rm -rf "$d"; return "$fin"
   fi
   now=$EPOCHSECONDS; : > "$d/lines"
   while IFS=$'\t' read -r ref sha ct <&3; do
@@ -3828,7 +6044,12 @@ check_cross_run_overlap() { # slug - always returns 0
     if ! read_files_touched "$sha" "$d/tspecs" > "$d/tdecl"; then u=$((u + 1)); continue; fi
     # THE JOIN, one process: equal, or one a directory the other sits under, after the same
     # normalisation `normpath` applies. Prints `path<TAB>diff|declared|diff+declared`.
-    awk -F'\t' -v xf="$d/excl" -v of="$d/ours" -v tf="$d/tdiff" -v cf="$d/tdecl" '
+    awk -F'\t' -v xf="$d/excl" -v of="$d/ours" -v tf="$d/tdiff" -v cf="$d/tdecl" -v gran="$gran" -v tr="$tr" '
+      function derive_kit_dir(p,   q) {
+        if (gran != "kit-dirs") return p
+        if (tr != "" && index(p, tr "/") == 1) { q = substr(p, length(tr) + 2); if (q ~ /\//) { sub(/\/.*$/, "", q); return tr "/" q } }
+        if (index(p, "skills/") == 1) { q = substr(p, 8); if (q ~ /\//) { sub(/\/.*$/, "", q); return "skills/" q } }
+        return p }
       function norm(p) {
         sub(/\r$/, "", p); gsub(/\/\/+/, "/", p)
         while (p ~ /^\.\//) p = substr(p, 3)
@@ -3839,12 +6060,12 @@ check_cross_run_overlap() { # slug - always returns 0
       function under(a, b) { return a == b || index(b, a "/") == 1 }
       function kept(p,   i) { if (p == "") return 0; for (i = 1; i <= nx; i++) if (under(x[i], p)) return 0; return 1 }
       FILENAME == xf { p = norm($0); if (p != "") x[++nx] = p; next }
-      FILENAME == of { p = norm($0); if (kept(p) && !(p in ov)) { ov[p] = 1; o[++no] = p }; next }
+      FILENAME == of { p = norm($0); if (!kept(p)) next; p = derive_kit_dir(p); if (!(p in ov)) { ov[p] = 1; o[++no] = p }; next }
       { p = norm($0); if (!kept(p)) next
         if (!(p in tag)) { order[++nt] = p; tag[p] = "" }
         if (FILENAME == tf) td[p] = 1; else tc[p] = 1 }
       END { for (k = 1; k <= nt; k++) { p = order[k]
-              for (i = 1; i <= no; i++) if (under(p, o[i]) || under(o[i], p)) {
+              for (i = 1; i <= no; i++) if (under(derive_kit_dir(p), o[i]) || under(o[i], derive_kit_dir(p))) {
                 print p "\t" (td[p] ? (tc[p] ? "diff+declared" : "diff") : "declared"); break } } }
     ' "$d/excl" "$d/ours" "$d/tdiff" "$d/tdecl" > "$d/shared"
     [ -s "$d/shared" ] || continue
@@ -3860,7 +6081,7 @@ check_cross_run_overlap() { # slug - always returns 0
     if [ "${#_co_ps[@]}" -gt 0 ]; then
       GIT -c core.quotepath=off diff --no-renames -U0 "$anc...$sha" -- "${_co_ps[@]}" > "$d/u0" 2>/dev/null || : > "$d/u0"
     fi
-    awk -F'\t' -v uf="$d/u0" -v r="${ref#refs/remotes/}" -v t="${sha:0:8}" -v age="$age" '
+    awk -F'\t' -v uf="$d/u0" -v r="${ref#refs/remotes/}" -v t="${sha:0:8}" -v age="$age" -v gran="$gran" '
       FILENAME == uf {
         if ($0 ~ /^diff --git /) { h = 1; f = ""; next }
         if (h && $0 ~ /^\+\+\+ b\//) { f = substr($0, 7); next }
@@ -3873,6 +6094,7 @@ check_cross_run_overlap() { # slug - always returns 0
         if (g == "diff+declared") g = "diff"
         out[++k] = p " (" g ")" }
       END { if (k == 0) exit
+            if (gran == "builds") { print "  " r " · " t " · " age "d old · shares a path with this run"; exit }
             line = "  " r " · " t " · " age "d old · " k " shared: "
             for (i = 1; i <= k && i <= 5; i++) line = line (i > 1 ? ", " : "") out[i]
             if (k > 5) line = line " and " (k - 5) " more"
@@ -3881,8 +6103,12 @@ check_cross_run_overlap() { # slug - always returns 0
     rm -f "$d/lines.new"
   done 3< "$d/refs"
   printf "unattended: overlap probe — %d unmerged remote ref(s) read as of this clone's last fetch, %d aged out past %d days, %d unreadable, " "$n" "$a" "$OVERLAP_AGE_DAYS" "$u"
-  if [ "$s" -eq 0 ]; then echo "no shared path"; else echo "$s sharing a path; this run is NOT blocked"; cat "$d/lines"; fi
+  if [ "$s" -eq 0 ]; then echo "no shared path"
+  elif [ "$fin" = 1 ]; then echo "$s sharing a path; refused"; cat "$d/lines"
+    OV_WHY="$s unmerged branch(es) share a path under leases.overlap $gran:$(head -n 1 "$d/lines")"
+  else echo "$s sharing a path; this run is NOT blocked"; cat "$d/lines"; fi
   rm -rf "$d"
+  [ "$s" -eq 0 ] || return "$fin"
   return 0
 }
 # `--overlaps`: the probe above for a session that never preflights - the orientation card calls it
@@ -3966,6 +6192,13 @@ read_brief_items() {
 }
 # Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
 BI_NOTE=""
+# A BUILD README'S `opened:` date at a commit, its front matter alone read, a trailing CR dropped; empty
+# where the commit holds no README or the README no date. One reader for the three prompt-mode grades
+# that grandfather a README opened before PROMPT_BRIEF_CUTOFF (TOOL-dPlacedRequest-4 extracted it).
+read_readme_opened() { # commit · README path -> the date on stdout
+  GIT show "$1:$2" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }'
+}
+
 # TOOL-aQuotedBrief-3 S3 - `build-complete` TERM 7, read at close: every brief item of a prompt-mode
 # run past PROMPT_BRIEF_CUTOFF is built by CLOSED units or parked as `brief item <n>: ...`. The mode is
 # the run-state fact, the record and the README `opened:` are read at the pinned BASE - the same gate
@@ -3992,7 +6225,7 @@ check_brief_items() { # slug
     *) BI_NOTE="note — the project conf at the default-branch side of the pinned BASE declares no dated PROMPT_BRIEF_CUTOFF, so the brief-item term is OFF and a brief item is not graded here: ${cut:-blank}"
        return 0 ;;
   esac
-  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  opened=$(read_readme_opened "$base" "$rel")
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
   esac
@@ -4120,8 +6353,8 @@ check_prompt_brief() { # slug · base
     *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; it is read at the default-branch side of the pinned BASE, so declare one in $CONF there to turn it on: ${cut:-blank}" >&2
        return 0 ;;
   esac
-  readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
-  opened=$(GIT show "$base:$rel" 2>/dev/null | awk 'NR > 1 && /^---/ { exit } /^opened:/ { v = $2; sub(/\r$/, "", v); print v; exit }')
+  readme_of "$1" >/dev/null; rel=$_readme; dir=${rel%/*}
+  opened=$(read_readme_opened "$base" "$rel")
   # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
@@ -4211,6 +6444,52 @@ check_prompt_brief() { # slug · base
   return 1
 }
 
+# TOOL-dPlacedRequest-4 S9 - A PROMPT IS PLACED BEFORE IT OPENS A BUILD. The prompt path's step 3
+# records the prompt with `--request`, places it under the content key that prints with the loop
+# kit's placement.py, and writes the passed block under `## Placement` in the prompt record, its
+# `request: <content key>` line first. Graded at the FIRST preflight only, beside check_prompt_brief
+# and under its cutoff rule: a README `opened:` before PROMPT_BRIEF_CUTOFF, or a blank cutoff, is not
+# graded; an unknowable cutoff was check 116 there. Every record at BASE carrying `## The prompt` must
+# hold the section, its disposition one that opens a build (`new`, `patch` or `repeat`), and
+# `placement.py check --request <key>` must exit 0 over the node-local block, so a prompt that
+# continues or amends a live build is routed there, never opened as a new one. A placement.py that
+# does not resolve is a refusal, never a pass. WHAT THIS DOES NOT CHECK: that the section's block is
+# the store's newest, which `check` re-reads, nor that its build is the slug the README opens.
+check_prompt_placement() { # slug · base
+  local base="$2" rel dir cut opened rec txt sec key word build why="" py d out
+  [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
+  cut=$(read_brief_cutoff "$AUTH_CONF_AT") || return 1
+  case "$cut" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
+  readme_of "$1" >/dev/null; rel=$_readme; dir=${rel%/*}
+  opened=$(read_readme_opened "$base" "$rel")
+  case "$opened" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
+  esac
+  while IFS= read -r rec; do
+    txt=$(GIT show "$base:$rec" 2>/dev/null)
+    check_prompt_heading <<<"$txt" || continue
+    sec=$(printf '%s\n' "$txt" | awk '{ sub(/\r$/, "") } /^## / { on = ($0 == "## Placement"); next } on && /^[a-z-]+: / { print }')
+    key=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "request" { v = $2 } END { print v }')
+    word=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "disposition" { v = $2 } END { print v }')
+    build=$(printf '%s\n' "$sec" | awk -F': ' '$1 == "build" { v = $2 } END { print v }')
+    if [ -z "$sec" ]; then why="no ## Placement section, $rec"; break; fi
+    case "$word" in
+      new|patch|repeat) ;;
+      *) why="the disposition ${word:-none} opens no build, and it names the build ${build:-none}: $rec"; break ;;
+    esac
+    if [[ ! $key =~ ^[0123456789abcdef]{12}$ ]]; then why="the section names no request: content key, $rec"; break; fi
+    py=$(resolve_python 2>/dev/null) || py=""
+    d=""; [ -z "$py" ] || d=$(resolve_kit_dir "$py" loop placement.py "$KIT_DIR" 2>/dev/null) || d=""
+    [ -z "$d" ] || [ -f "$d/placement.py" ] || d="$(unset GIT_DIR GIT_WORK_TREE; GIT -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)/$d"
+    if [ -z "$d" ] || [ ! -f "$d/placement.py" ]; then why="the loop kit's placement.py does not resolve, so the block cannot be checked: $rec"; break; fi
+    out=$("$py" "$d/placement.py" check --request "$key" 2>&1) && continue
+    out=${out//$'\r'/}; why="placement.py check refused it, ${out##*$'\n'}: $rec"; break
+  done < <(GIT -c core.quotepath=off ls-tree --name-only --full-tree "$base" -- "$dir/prompts/" 2>/dev/null)
+  [ -z "$why" ] && return 0
+  fail 119 "a prompt record at the pinned BASE is not placed as a request that opens a build, so a prompt continuing or amending a live build would open a new one; place it with the loop kit's placement.py and write the passed block under ## Placement in the record - why, then the record: $why"
+  return 1
+}
+
 # TOOL-aQuotedBrief-2 S1 - A FIRST PREFLIGHT REFUSES A CARRIED BRANCH. Under `ANCHOR_SCOPE=published`
 # the commits a session's branch already carried sit below the pinned BASE, outside every population
 # the run's checks grade (`read_run_commits` reads `endpoint ^BASE`), so they would land with the run
@@ -4275,7 +6554,7 @@ check_branch_carried() { # slug
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb _pr _pd _pt
   AUTH_CONF_AT=""
   readme_of "$slug" >/dev/null; rel=$_readme
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
@@ -4394,6 +6673,26 @@ check_authorization() { # slug · base
     owed)     AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=policy ;;
     not-owed) AUTH_SPEC_AUDIT=""; AUTH_SPEC_AUDIT_FROM=policy ;;
   esac
+  # TOOL-dPlacedRequest-5 S7 - a FOURTH source, `placement`: the owner's placed `spec audit`, a disposition
+  # record in the build's `build/` folder whose Item is item.entry.place, Disposition breakpoint and Reason
+  # opens `spec audit · `, which `placement.py breakpoint` writes only once the request's consent held.
+  # Read at `_cb`, the default-branch side of the pinned BASE, as the project default is, so a record a
+  # run committed on its own pushed branch opts nothing in; on the first anchor `_cb` IS BASE. Read LAST
+  # and only where nothing above owes the audit, so it can ADD an owed audit and never cancel one, and
+  # check 89's rule that a run never opts itself out stands. Owed, it pins BASE's date, as `policy` does.
+  if [ -z "$AUTH_SPEC_AUDIT" ] && [ -n "$_cb" ]; then
+    for _pd in $(GIT ls-tree -r --name-only "$_cb" -- "$M/builds/$slug/build/" 2>/dev/null); do
+      case "$_pd" in *-disposition-[0-9]*.md) ;; *) continue ;; esac
+      _pt=$(GIT show "$_cb:$_pd" 2>/dev/null) || continue
+      _pt=${_pt//$'\r'/}
+      case "$_pt" in *$'\n- **Item:** item.entry.place\n'*) ;; *) continue ;; esac
+      case "$_pt" in *$'\n- **Disposition:** breakpoint\n'*) ;; *) continue ;; esac
+      # The name is the Reason's text before ` · request `, as `breakpoints.py`'s reader splits it.
+      case "$_pt" in *$'\n- **Reason:** spec audit · request '*|*$'\n- **Reason:** spec audit\n'*) ;; *) continue ;; esac
+      AUTH_SPEC_AUDIT=$(GIT show -s --format=%cs "$base" 2>/dev/null); AUTH_SPEC_AUDIT_FROM=placement
+      break
+    done
+  fi
   # Set AFTER BOTH halves (round 2, R2): a refusing return above - fail 52, 54 or 55 - leaves it
   # blank, so the specs-audited grader lands on its NOT GRADABLE branch instead of printing the
   # absence the refusal just declined to assert.
@@ -6343,10 +8642,12 @@ run_budget_verb() { # verb · flag=value... -> sets _bd_why to the script's firs
 check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming the live peer or the unread claims
   local slug="$1" mine row peer node rest verdict
   local -a _cp_rows
+  _bd_root=""
   run_loop_verb budget.py origin "--build=$slug" || return 0
   [ "$_bd_rc" = 0 ] || return 0
   mine=${_bd_why##* · }
   [ -n "$mine" ] && [ "$mine" != none ] || return 0
+  _bd_root=$mine
   if ! read_claims quiet; then
     _bd_rc=2
     _bd_why="budget: patch draw refused — claims unread: $CL_WHY"
@@ -6357,7 +8658,8 @@ check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming th
     # slug, node, status, beat-age-s, verdict: the claim row's first five fields
     peer=${row%%$'\t'*}; rest=${row#*$'\t'}; node=${rest%%$'\t'*}
     rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; rest=${rest#*$'\t'}; verdict=${rest%%$'\t'*}
-    [ "$verdict" = live ] && [ -n "$peer" ] && [ "$peer" != "$slug" ] || continue
+    # a unit or cadence lease's name carries a `/` and names no build of its own (TOOL-dPlacedRequest-1)
+    [ "$verdict" = live ] && [ -n "$peer" ] && [ "$peer" != "$slug" ] && [ "${peer#*/}" = "$peer" ] || continue
     run_loop_verb budget.py origin "--build=$peer" || continue
     [ "$_bd_rc" = 0 ] && [ "${_bd_why##* · }" = "$mine" ] || continue
     _bd_rc=2
@@ -6366,9 +8668,36 @@ check_patch_peers() { # slug -> 0 to draw; 1 with _bd_rc=2 and _bd_why naming th
   done
   return 0
 }
+# THE DRAW'S HOLD (TOOL-dPlacedRequest-16 S4 and F7): a patch build draws only while it holds its closed
+# root's lease, `--lease acquire build <root> --for draw` before the draw and `--lease release build
+# <root> --as landed` after every draw answer, both through `run_lease_verb` in a subshell, so two draws
+# on one closed root serialise. An acquire that does not exit 0, or queues offline, refuses the draw
+# with `_bd_rc=2` and its line; a release that does not exit 0 prints its line and leaves the hold,
+# which a later draw takes once stale. With RUN_CLAIMS off, or no readable origin, it draws as before.
 run_budget_draw() { # slug · cause · item -> as run_budget_verb; on `exhausted`, _bd_why names the remedy
-  check_patch_peers "$1" || return 0
-  run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  local _bd_held="" _bd_line _bd_lrc _bd_prc _bd_pwhy
+  # The peers' refusal is held while the hold is acquired: an acquire that does not take the hold names
+  # its own line first, a queued one included, and a peer refusal releases the hold it took.
+  check_patch_peers "$1"; _bd_prc=$?; _bd_pwhy=${_bd_why:-}
+  if [ -n "${_bd_root:-}" ] && [ "$RUN_CLAIMS" = on ]; then
+    _bd_line=$(run_lease_verb acquire build "$_bd_root" "" "" "" draw 2>/dev/null); _bd_lrc=$?
+    _bd_line=${_bd_line##*$'\n'}; _bd_line=${_bd_line%$'\r'}
+    case "$_bd_lrc:$_bd_line" in
+      0:*" · queued"*|0:*"queued — already"*|[!0]*)
+        _bd_rc=2; _bd_why="budget: patch draw refused — $_bd_line"; return 0 ;;
+    esac
+    _bd_held=$_bd_root
+  fi
+  if [ "$_bd_prc" = 0 ]; then
+    run_budget_verb draw "--build=$1" "--cause=$2" "--item=$3"
+  else
+    _bd_rc=2; _bd_why=$_bd_pwhy
+  fi
+  if [ -n "$_bd_held" ]; then
+    _bd_line=$(run_lease_verb release build "$_bd_held" "" "" landed 2>/dev/null) \
+      || printf '%s\n' "${_bd_line##*$'\n'}"
+  fi
+  [ "$_bd_prc" = 0 ] || return 0
   # THE LAP REFUSAL NAMES ITS REMEDY (TOOL-dDeclaredLoop-31 S5), after the module's line, which keeps naming
   # flow.on-exhausted: end the build while no exhaustion row stands, else the ending that row recorded.
   [ "$_bd_rc" = 3 ] || return 0
@@ -6915,11 +9244,10 @@ verb_landed() { # slug
     done <<WTS
 $(GIT worktree list --porcelain 2>/dev/null)
 WTS
-    if [ -n "$_elsewhere" ]; then
-      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
-    else
-      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
-    fi
+    # ONE SITE, its tail naming the other tree where there is one (TOOL-dPlacedRequest-4 merged the two
+    # sites, byte for byte, to pay for check 119 under the driver's refusal ceiling).
+    [ -z "$_elsewhere" ] || _elsewhere=" here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
+    fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur$_elsewhere"
     return 1
   fi
   # TOOL-dDerivedDocket-22 S7 - UNDER `in-place` THIS VERB IS AN OBSERVATION AND WRITES NOTHING TO
@@ -6946,12 +9274,12 @@ WTS
       # may never come, so the ledger goes HERE, beside the one write this verb makes.
       remove_procs_ledger "$slug"
       # TOOL-aGraftedHelix-1 S9 (spec rev-7) - THE IN-PLACE LANDING'S STATUS WRITE. This branch stages
-      # nothing, so the claim reads `landed` once the observation above is written, announced and never
+      # nothing, so the claim reads `released` (TOOL-dPlacedRequest-16 S2) once the observation above is written, announced and never
       # failing the verb like the staged writes; left `live` it would age to `stale` and be announced at
       # every later --preflight of another slug.
       if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
         fact "$rel" keepalive >/dev/null; _sk=$_fact
-        fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+        fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
       fi
       return 0
     fi
@@ -7197,12 +9525,12 @@ WTS
   set_fact "$rel" phase LANDED || return 1
   remove_procs_ledger "$slug"
   stage_or_fail "$rel" || return 1
-  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `landed`.
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `released`, the build lease handed over (TOOL-dPlacedRequest-16 S2).
   # Announced and never failing the verb when this call may not write it or the write does not
   # complete, because the local record is the truth and the claim then ages to `stale`.
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     fact "$rel" keepalive >/dev/null; _sk=$_fact
-    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" landed "$_sk" soft "$rel"
+    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
   fi
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
@@ -7338,12 +9666,12 @@ verb_abort() { # slug · reason · code
   set_fact "$rel" halt-code "$code" || return 1
   park "$rel" abort "$slug" "$reason" || return 1
   stage_or_fail "$rel" || return 1
-  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `aborted`.
+  # TOOL-aGraftedHelix-1 S9 - THE STATUS WRITE, after the record is staged: the claim reads `released`, the build lease handed over (TOOL-dPlacedRequest-16 S2).
   # Announced and never failing the verb when this call may not write it or the write does not
   # complete, because the local record is the truth and the claim then ages to `stale`.
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     fact "$rel" keepalive >/dev/null; _sk=$_fact
-    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" aborted "$_sk" soft "$rel"
+    fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" && write_claim "$slug" released "$_sk" soft "$rel"
   fi
   echo "unattended: phase ABORTED · witness $head · halt-code $code · reason recorded as a parked entry"
   return 0
@@ -7772,6 +10100,8 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 write_settle_claim() { # slug · run-state file · status to write · first|retry
   local slug="$1" rel="$2" st="$3" when="$4" _sk
   [ -n "$st" ] && [ "$RUN_CLAIMS" = on ] || return 0
+  # A run's end hands its build lease over (TOOL-dPlacedRequest-16 S2): `landed` and `aborted` write `released`.
+  case "$st" in landed|aborted) st=released ;; esac
   read_claims soft || return 0
   fact "$rel" keepalive >/dev/null; _sk=$_fact
   fact "$rel" session >/dev/null; check_claim_writable "$slug" status "$_sk" "$_fact" "$_sk" "$rel" || return 0
@@ -7779,9 +10109,10 @@ write_settle_claim() { # slug · run-state file · status to write · first|retr
     [ "$CW_CLS" = mine ] || return 0
     case "$CW_STATUS" in held|live) ;; *) return 0 ;; esac
   fi
+  # A tombstone in this node's feed (return 3, TOOL-dPlacedRequest-28) names no retry: one writes nothing either.
   if write_claim "$slug" "$st" "$_sk" soft "$rel"; then
     [ "$when" = first ] || echo "unattended: claim retried — $slug now reads $st on the remote"
-  else
+  elif [ "$?" != 3 ]; then
     echo "unattended: the settle's claim write did not complete; re-run --settle $slug to retry it"
   fi
   return 0
@@ -8136,6 +10467,7 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-aQuotedBrief-6 S1 - at a FIRST preflight only, check_branch_carried's gate: a re-preflight
   # derives a moved BASE, and a roster grown mid-run would fail rule 3 there (round 1 M3).
   [ -z "$_pf_first" ] || check_prompt_brief "$slug" "${base:-}" || true
+  [ -z "$_pf_first" ] || check_prompt_placement "$slug" "${base:-}" || true
   # TOOL-aQuotedBrief-2 S1 and S3 - a FIRST preflight refuses a branch carrying commits the default
   # branch lacks outside the build folder; before the write gate, so a refusal writes no RUN.md.
   [ -z "$_pf_first" ] || check_branch_carried "$slug" || true
@@ -8200,10 +10532,10 @@ verb_preflight() { # slug · keepalive-id
     case "$_pf_act" in
       create)
         if read_claims soft && check_claim_writable "$slug" status "$_pf_cka" "${CLAUDE_CODE_SESSION_ID:-absent}" "$_pf_cka" \
-          && write_claim "$slug" aborted "$_pf_cka" soft "" "$_pf_lu"; then
+          && write_claim "$slug" released "$_pf_cka" soft "" "$_pf_lu"; then
           echo "unattended: claim marked aborted — $slug, created by this refused call"
         else
-          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after ${RESUME_STALE_BOUND}s"
+          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after leases.expiry-hours with no renewal"
         fi ;;
       "") ;;
       *) echo "unattended: claim left — $slug · $_pf_act · this call refused after it" ;;
@@ -8514,6 +10846,8 @@ print_spec_audit_line() { # slug · run-state file
       echo "unattended: spec-audit — opted in by policy review.design: ${AUTH_DESIGN_REVIEW:-owed} · $sa"
     elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = project ]; then
       echo "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: $sa"
+    elif [ "${AUTH_SPEC_AUDIT_FROM:-}" = placement ]; then
+      echo "unattended: spec-audit — opted in by placement, the owner's placed spec audit at BASE, so it is owed: $sa"
     else
       echo "unattended: spec-audit — opted in by README spec-audit: $sa"
     fi
@@ -10066,7 +12400,7 @@ verb_resume() { # slug
     if ! check_lease_current "$ls_utc" "$ls_sid" "$ls_pid"; then
       os=$ls_sid; op=$ls_pid
       lu=$(read_utc_now) || lu=""
-      if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; [ "$cas" != 1 ] || return 1; fi
+      if [ -n "$cw" ]; then write_claim "$slug" live "$ka" holder "" "$lu"; cas=$?; case "$cas" in 1|3) return 1 ;; esac; fi
       if [ "$RUN_CLAIMS" = on ] && [ "$cas" != 0 ]; then
         fact "$rel" prior-session >/dev/null; ps=$_fact
         for pv in "$ls_sid" ${cw:+"$CW_SESS"}; do
@@ -10083,7 +12417,7 @@ verb_resume() { # slug
       fact "$rel" session >/dev/null; _fv20=$_fact; fact "$rel" pid >/dev/null; _fv21=$_fact; echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $_fv20 · pid ${op:-none} -> $_fv21 · this resume passes the keepalive the record names, so it is the holder"
     elif [ "$cw" = 0 ]; then
       write_claim "$slug" live "$ka" holder "$rel"; cas=$?
-      [ "$cas" != 1 ] || return 1
+      case "$cas" in 1|3) return 1 ;; esac
       fact "$rel" prior-session >/dev/null; if [ "$cas" = 0 ] && [ -n "$_fact" ]; then
         { set_fact "$rel" prior-session "" && stage_or_fail "$rel"; } || return 1
       fi
@@ -10208,29 +12542,26 @@ verb_resume() { # slug
   return 0
 }
 
-# ========================================================== THE INHERITED-RED POLICY — TOOL-dDerivedDocket-24
+# ========================================================== WHICH RED BLOCKS — TOOL-dWitnessedBar-3, -dDerivedDocket-24
 # A red the landing base already carries used to leave a run two answers, both bad: override
 # `gates-green`, which spends the one check between an unattended run and its landing, or abort. This
 # section is the third, and it is a POLICY rather than a judgment the run makes about itself.
 #
 # THE POLICY IS READ AT R AND NEVER FROM THE TREE. R is the tip `observe_anchor` saw the remote
-# advertise — never local main and never any other local ref, both of which the run can write. The
-# conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED AT R, and the two keys
-# `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R.
-# Both reads PARSE and never execute: one anchored match per key, the value's trailing comment and one
-# pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
-# a run that re-points the conf key moves nothing until a gated push has landed it.
+# advertise — never local main and never any other local ref, both of which the run can write. Which
+# red blocks is the policy key `verdict.blocks`, read by the policy kit's `policy.py get --rev R`
+# (TOOL-dWitnessedBar-3 S5): no policy kit reads the catalogue default `own-only`, and a reader that
+# fails or answers outside the three values reads `every-red`, because a typo must never land a red,
+# and so does a missing R. The conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED
+# AT R, and the age bound `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R; that
+# read PARSES and never executes: one anchored match, the value's trailing comment and one pair of
+# quotes stripped. A run that loosens its own copy of either therefore enables nothing until a gated
+# push has landed it. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY:
+# a red that passes lands at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
 #
-# BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
-# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named and
-# no hook file at R, a named one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
-# bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
-# never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
-# INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
-# INHERITED red lands under `land` at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
-#
-# WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
-# from the run record of a bar whose id this driver pinned, and never re-derived.
+# WHAT THIS DOES NOT DECIDE: whether a red is inherited, or whether it blocks. Both are the runner's
+# attribution record, the class and its ninth field `blocks`, read here from the run record of a bar
+# whose id this driver pinned, and never re-derived.
 #
 # TWO COPIES OF THIS PARSER, BYTE-IDENTICAL, and the second is the pre-push hook's. The hook ships
 # verbatim through another kit and cannot source this one, so the parse is spelled twice; the two
@@ -10253,22 +12584,21 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
-# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
-# hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
-# conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
-# before it defaults to land. Defaulting first made the two readers disagree in the direction that
-# strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
-# The path is spelled as the hook derives it; a named file is still the conf's, read as before.
+GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN AGE BOUND (closing review round 1, M7 and
+# M12). The hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says,
+# so when the conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at
+# the same R. The path is spelled as the hook derives it; a named file is still the conf's.
 # GP_POST_MERGE IS READ FROM THE HOOK'S OWN FILE AT R, whatever GATE_POLICY_FILE names
 # (TOOL-aFrugalTurnstile-9 S1, spec F3): the hook binds a post-merge red and the lander starts the
 # post-merge bar only where that file declares one, so a declaration read anywhere else could buy a
-# scoped close that no post-merge bar follows.
-read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
-  local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
-  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# scoped close that no post-merge bar follows. Which red blocks is `verdict.blocks`, read by
+# `read_gate_blocks` below at the same R (TOOL-dWitnessedBar-3 S5).
+read_gate_policy() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
+  local r=$1 conf path blob="" age bnd via="" hook=".githooks/gate-env.sh"
+  GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
   if [ -z "$r" ]; then
-    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
+    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at, which reads every-red"; return 0
   fi
   GP_POST_MERGE=$(read_policy_key "$(GIT show "$r:$hook" 2>/dev/null)" GATE_POST_MERGE)
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
@@ -10278,42 +12608,91 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
     path=$(read_policy_key "$conf" GATE_POLICY_FILE)
     [ -n "$path" ] || via="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}"
   fi
-  if [ -n "$via" ]; then
-    path=$hook
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="$via, and the pre-push hook's own $path is absent there too, so the kit default land applies, with no age bound"; return 0
-    fi
-  else
-    case "$path" in
-      /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-        GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
-    esac
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
-    fi
+  [ -z "$via" ] || path=$hook
+  case "$path" in
+    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+      read_gate_blocks "$r"
+      GP_WHY="$GP_WHY, with no age bound: GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+  esac
+  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+    read_gate_blocks "$r"
+    GP_WHY="$GP_WHY, with no age bound: $path is absent at ${r:0:8}${via:+; $via}"; return 0
   fi
-  pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
-  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings"; else bnd="no age bound"; fi
-  # THE BOUND TRAVELS UNDER EITHER POLICY when one is declared: the runner ages and owns each
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings, read from $path at ${r:0:8}"
+  else bnd="no positive INHERITED_RED_MAX_AGE in $path at ${r:0:8}, so no leg is aged and nothing is escalated"; fi
+  [ -z "$via" ] || bnd="$bnd; $via, so the file the pre-push hook reads decides"
+  # THE BOUND TRAVELS UNDER EVERY VALUE when one is declared: the runner ages and owns each
   # INHERITED leg with it, and the auto-filed ask names that owner and is escalated BLOCKER when the
   # leg reads aged. Nothing lands or holds on it.
-  case "$pol" in
-    land) GP_POLICY=land; GP_MAX_AGE=$age
-          if [ -n "$age" ]; then
-            GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
-          else
-            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, so no leg is aged and nothing is escalated"
-          fi ;;
-    park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
-    '')   GP_POLICY=land; GP_MAX_AGE=$age
-          GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
-    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
+  GP_MAX_AGE=$age
+  read_gate_blocks "$r"
+  GP_WHY="$GP_WHY, with $bnd"
+}
+
+# THE `verdict.blocks` VALUE AT R (TOOL-dWitnessedBar-3 S5), read through the policy kit's own reader
+# as `read_spec_audit_switch` finds it, `--rev` the advertised tip, so a run that loosens its own
+# policy file enables nothing. No policy kit reads the catalogue default `own-only`, announced; a
+# reader that exits non-zero or answers outside the three values reads `every-red`, because a typo must
+# never land a red. The pre-push hook reads the same key the same way at the same R.
+read_gate_blocks() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red) and GP_WHY
+  local r=$1 py d out rc=0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    GP_POLICY=own-only; GP_WHY="no policy kit resolves beside this kit, so the catalogue default own-only applies"
+    return 0
+  fi
+  out=$("$py" "$d/policy.py" get verdict.blocks --rev "$r" 2>/dev/null) || rc=$?
+  out=${out%$'\r'}
+  case "$rc:$out" in
+    0:own-only|0:own-mixed-contended|0:every-red)
+      GP_POLICY=$out; GP_WHY="read by policy.py get at ${r:0:8}" ;;
+    *) GP_POLICY=every-red
+       GP_WHY="policy.py get verdict.blocks at ${r:0:8} exited $rc answering '$out', outside 'own-only own-mixed-contended every-red', which reads every-red" ;;
   esac
-  [ -z "$via" ] || GP_WHY="$GP_WHY; $via, so the file the pre-push hook reads decides"
+}
+
+# THE ROUTES OF A RED BAR (TOOL-dWitnessedBar-3 S6): the run-gates kit's `verdict_flow.py route` writes
+# the routing record beside the bar's attribution and prints one `route` line per red, relayed here.
+# It decides nothing this driver reads: the decision table reads the attribution's `blocks` field. A
+# kit or a python that does not resolve, or a route that refuses, is announced and changes nothing.
+# TOOL-dWitnessedBar-30 S4, S5 - THEN THE QUIET RE-RUN, after a route that wrote: `verdict_flow.py
+# quiet-rerun` runs each blocking CONTENDED red once alone on a quiet host, or waits, its lines relayed,
+# and each `owner  <leg>  ...` line it prints is filed as the owner item, a HIGH ask through
+# `write_leg_ask`, reused while one is OPEN for that leg, with the bar's capture put back after it.
+run_verdict_route() { # run dir · slug
+  local d=$1 slug=$2 py k out rc=0 line leg rb qf
+  [ -n "$d" ] && [ -f "$d/verdict" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "unattended: gates-green — no run-gates kit holding verdict_flow.py resolves beside this kit, so the reds are not routed"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_flow.py" route --run "$d" 2>&1) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
+  if [ "$rc" != 0 ]; then
+    echo "unattended: gates-green — verdict_flow.py route exited $rc, so the reds are not routed"
+    return 0
+  fi
+  rc=0
+  qf=$(mktemp) || { echo "unattended: gates-green — no scratch file for quiet-rerun, so no contended red was re-run"; return 0; }
+  "$py" "$k/verdict_flow.py" quiet-rerun --run "$d" >"$qf" 2>&1 || rc=$?
+  sed 's/^/unattended: gates-green — /' "$qf"
+  [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py quiet-rerun exited $rc, so no contended red was re-run"
+  rb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "owner  "*) ;; *) continue ;; esac
+    leg=${line#owner  }; leg=${leg%%  *}
+    write_leg_ask "$slug" "$leg" "contended red, no quiet host: leg" \
+      "waited past flow.wait-ceiling · ${line#owner  "$leg"  } · accept the leg is re-run alone on a quiet host, or its contention is fixed" \
+      HIGH "a blocking CONTENDED red found no quiet host to re-run on within flow.wait-ceiling" \
+      "filed by an unattended run as the owner item a contended red's wait raises; outside this build's goal" || :
+  done <"$qf"
+  rm -f -- "$qf"
+  RB_OUT=${rb[0]}; RB_STDOUT=${rb[1]}; RB_TOOK=${rb[2]}; RB_ERR=${rb[3]}
+  return 0
 }
 
 # THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
@@ -10321,19 +12700,20 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
 #
 #   the verdict reads tree_moved yes                  moved   UNMET, naming the move
 #   no usable record (see below)                      none    UNMET exactly as before this unit
-#   every red INHERITED, at any age, policy land       land    MET, a gates-inherited fact
-#   every red INHERITED, policy park                   hold    UNMET, the hold line
-#   any OWN, MIXED, DEAD PROBE or CONTENDED            other   UNMET, the attribution lines
+#   every row's `blocks` reads pass, at any age        land    MET, a gates-inherited fact
+#   every red INHERITED, one reading block             hold    UNMET, the hold line
+#   anything else                                      other   UNMET, the attribution lines
 #
 # A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
 # with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
-# partial record is not an all-INHERITED one. THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an
-# aged leg, and one whose age is unproven, land under `land` like any other. GR_AGED names the legs
-# whose age reads `aged` — never an unproven one, since nothing proves it aged — for the BLOCKER
-# escalation and the MET line.
+# partial record is not an all-passing one. `blocks` is the row's ninth field, the runner's under the
+# `verdict.blocks` value this driver handed it (TOOL-dWitnessedBar-3 S5); anything but `pass` blocks.
+# THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an aged leg, and one whose age is unproven,
+# land like any other. GR_AGED names the legs whose age reads `aged` — never an unproven one, since
+# nothing proves it aged — for the BLOCKER escalation and the MET line.
 GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
 read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comma-joined) and GR_WHY
-  local d=$1 pol=$2 v tm fl wb n=0 inh=0 leg ver age
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 pass=0 leg ver age blk
   GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
   if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
     GR_WHY="the bar left no run record under the id this driver pinned"; return 0
@@ -10350,21 +12730,20 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comm
   if [ "$v" != RED ] || [ "$tm" != no ] || [ -n "$wb" ] || [ ! -f "$d/attribution" ]; then
     GR_WHY="the bar's record is not a RED verdict on an unmoved tree beside an attribution record"; return 0
   fi
-  while IFS=$'\t' read -r leg ver _ _ _ age _; do
+  while IFS=$'\t' read -r leg ver _ _ _ age _ _ blk _; do
     [ -n "$leg" ] || continue
     n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
-    [ "$ver" = INHERITED ] || continue
-    inh=$((inh + 1))
+    [ "$blk" = pass ] && pass=$((pass + 1))
     [ "$age" = aged ] && GR_AGED="$GR_AGED${GR_AGED:+,}$leg"
+    [ "$ver" = INHERITED ] && inh=$((inh + 1))
   done < "$d/attribution"
   if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
     GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
   fi
-  if [ "$inh" != "$n" ]; then
-    GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
-  fi
-  if [ "$pol" = land ]; then GR_STATE=land; return 0; fi
-  GR_STATE=hold
+  if [ "$pass" = "$n" ]; then GR_STATE=land; return 0; fi
+  if [ "$inh" = "$n" ]; then GR_STATE=hold; return 0; fi
+  GR_STATE=other
+  GR_WHY="a red leg blocks under verdict.blocks ${pol:-every-red} and not every red is INHERITED, so this red is the run's to fix"
   return 0
 }
 
@@ -10506,6 +12885,8 @@ derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> 
   printf '%s' "$((hi + 1))"
 }
 
+# An EMPTY ask or KEEP row is not written, so an existing file takes one disposition row alone, under its
+# `## Dispositions`, as `write_ask_closing`'s `CLOSED` row (TOOL-dWitnessedBar-30 S6).
 write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP row
   local f=$1 tmp
   tmp=$(mktemp) || return 1
@@ -10524,13 +12905,14 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
                   for (i = ai + 1; i < stop; i++) if (line[i] ~ /[^ \t]/) at = i }
         if (di) { dl = di; for (i = di + 1; i <= n; i++) if (line[i] ~ /[^ \t]/) dl = i }
         for (i = 1; i <= n; i++) {
-          if (!ai && di && i == di) { print "## Asks"; print a; print "" }
+          if (!ai && di && i == di && a != "") { print "## Asks"; print a; print "" }
           print line[i]
-          if (ai && i == at) print a
-          if (di && i == dl) { print s; print k }
+          if (ai && i == at && a != "") print a
+          if (di && i == dl) { print s; if (k != "") print k }
         }
-        if (!ai && !di) { print ""; print "## Asks"; print a; print ""; print "## Dispositions"; print s; print k }
-        else if (!di)   { print ""; print "## Dispositions"; print s; print k }
+        if (!ai && !di) { if (a != "") { print ""; print "## Asks"; print a }
+                          print ""; print "## Dispositions"; print s; if (k != "") print k }
+        else if (!di)   { print ""; print "## Dispositions"; print s; if (k != "") print k }
       }' "$f" > "$tmp"
   fi
   mv "$tmp" "$f"
@@ -10699,7 +13081,7 @@ read_roster_family() { # slug -> the first family of the build README's front-ma
 # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
 # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
 # file is not a backup.
-write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
+write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 or empty · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
   local bl=$1 slug=$2 id=$3 what=$4 at8=$5 sev=${9:-HIGH} prior="" had=0 restored rc=0
   if [ -f "$bl" ]; then
     had=1
@@ -10711,7 +13093,7 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
   fi
   mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$6" "$7" "$8" && GIT add -- "$bl" 2>/dev/null
   if read_ask_back "$id" "$slug" "$sev"; then
-    echo "gates-green: filed ask $id for $what red at $at8, $sev, staged in $bl"
+    echo "gates-green: filed ask $id for $what${at8:+ red at $at8}, $sev, staged in $bl"
     case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
   else
     rc=1
@@ -10736,13 +13118,16 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
 }
 
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid blk cand reused fam seq id argv file tok a s k cls
   local r8=${2:0:8} today sev filed=0
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
-  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
-    [ "$ver" = INHERITED ] || continue
+  # ONE ASK PER ROW READING `pass` (TOOL-dWitnessedBar-3 S5), the `ask` route: a red that lands still
+  # has an owner on the record. Its text names the class, `inherited red` for an INHERITED one.
+  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid blk _; do
+    [ "$blk" = pass ] || continue
+    cls=${ver,,}
     # THE SEV OWED: BLOCKER for an aged leg, HIGH for every other one, an unproven age included.
     sev=HIGH; [ "$age" = aged ] && sev=BLOCKER
     # REUSE FIRST, over this build's own filings for the same leg AND the same R, at the SEV owed.
@@ -10753,7 +13138,7 @@ write_inherited_asks() { # slug · R · run dir
         if read_ask_back "$cand" "$slug" "$sev"; then
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
-      done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
+      done < <(grep -F -- "$cls red: leg $leg red at $r8," "$bl" 2>/dev/null \
                  | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
     fi
     [ -z "$reused" ] || continue
@@ -10776,11 +13161,11 @@ write_inherited_asks() { # slug · R · run dir
     seq=$(derive_ask_seq "$fam" "$slug")
     id="$fam-$slug-$seq"
     if [ "$sev" = BLOCKER ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     elif [ "$own8" != - ] && [ -n "$own8" ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
     else
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     fi
     if [ "$sev" = BLOCKER ]; then
       s="- SEV · $id · BLOCKER · a merge-bar leg is red on the default branch, older than the age bound"
@@ -10815,97 +13200,137 @@ write_inherited_asks() { # slug · R · run dir
 # is. Blank or absent is DARK and makes no request; a value outside `[A-Za-z0-9._-]+` ending `.yml`
 # or `.yaml` is refused by name before any URL is built from it.
 #
-# THE READ: one anonymous HTTPS GET of the runs listing and one per page of that run's jobs, at the
-# literal host `api.github.com`, for the owner and repository parsed out of the anchor URL only when
-# its host is `github.com`. No redirect is followed, no credential is sent or read, every request is
-# bounded at 30 seconds and every response at 4 MiB. Every way the read can fail to see the job is a
-# DEAD PROBE line that files nothing: a non-GitHub anchor, a non-200 answer, no completed scheduled
-# run, no job named `held <suite>`, or fewer jobs read than the API declares. A green day prints a
-# zero red count beside a non-zero job count, so a broken probe cannot read as a clean one.
+# THE READ is the run-gates kit's `remote_verdict.py held <anchor URL> <workflow file>`
+# (TOOL-dWitnessedBar-6 S7), moved there whole beside the `remote-ci` slot's reader and sharing its one
+# bounded GET: anonymous HTTPS to the literal host `api.github.com`, no redirect, no credential, 30
+# seconds and 4 MiB. It prints one TAB row per `held <suite>` job and ONE liveness line, or ONE DEAD
+# PROBE line that files nothing; a green day prints a zero red count beside a non-zero job count, so a
+# broken probe cannot read as a clean one. The kit is found as `write_flake_releases` finds its own,
+# and a python or a kit that does not resolve prints one `held reader: DEAD PROBE` line.
 #
 # REUSED BEFORE IT IS FILED, over EVERY build's `BACKLOG.md`, not only this one's: a red the daily
 # job carries for a week would otherwise collect one HIGH ask per closing build. A job name is
 # untrusted text bound for a tracked file, so one carrying a backtick, a control character, the
 # ` · ` separator or the ` → ` arrow is refused and named, and so is a head sha R does not descend
 # from. Nothing here changes the caller's verdict.
-read_held_reds() { # anchor URL · workflow file name -> one TAB row per held job and ONE liveness line, or ONE DEAD PROBE line
-  local py
-  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
-    echo "held reader: DEAD PROBE — no python launcher resolves, so nothing was read"; return 0
+
+# TOOL-dWitnessedBar-8 S8 - THE LEG ASK, extracted from `write_held_asks` at its second instance, the
+# held flaky leg `gates-green` files on a red bar's `hold` line. The summary is `<form> <leg> <ask text>`.
+# REUSE FIRST, across every tracked BACKLOG.md: an OPEN ask of that SEV whose summary opens `<form> <leg> `
+# and the ask text's first word, so a leg whose name another extends (`recall floor arms`, `recall
+# floor`) is never taken for it. Else the id is minted in the build's roster family and the ask, SEV
+# and KEEP rows are written and read back through `write_ask_rows`, the two reasons their text, and the
+# views rendered. With ASKS_CMD blank nothing is written and the rows it would have filed are printed.
+# WHAT IT DOES NOT CHECK: that the leg is a leg of the bar, or that the text is true: the caller's.
+write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP reason -> 0 filed or reused, 1 not; one line each
+  local slug=$1 leg=$2 form=$3 text=$4 sev=$5 bl f home cand fam id a s k at8=""
+  bl="$M/builds/$slug/BACKLOG.md"
+  if [ -n "${ASKS_CMD:-}" ]; then
+    for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
+      [ -f "$f" ] || continue
+      home=${f%/BACKLOG.md}; home=${home##*/}
+      while IFS= read -r cand; do
+        [ -n "$cand" ] || continue
+        if read_ask_back "$cand" "$home" "$sev"; then
+          echo "gates-green: ask $cand already OPEN $sev for ${form#*: } $leg in $f · reused"; return 0
+        fi
+      done < <(WLA_KEY="$form $leg ${text%% *} " awk '
+                 /^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed [^ ]+ · / {
+                   r = $0; sub(/^- [^ ]+ · filed [^ ]+ · /, "", r)
+                   if (substr(r, 1, length(ENVIRON["WLA_KEY"])) == ENVIRON["WLA_KEY"]) print $2
+                 }' "$f" 2>/dev/null)
+    done
   fi
-  RHR_URL="$1" RHR_WF="$2" "$py" -c '
-import json, os, re, sys, urllib.error, urllib.request
-try:
-    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
-except Exception:
-    pass
-def dead(why):
-    print("held reader: DEAD PROBE — " + why)
-    sys.exit(0)
-url, wf = os.environ["RHR_URL"].strip(), os.environ["RHR_WF"]
-if not re.fullmatch(r"[A-Za-z0-9._-]+\.ya?ml", wf):
-    dead("the workflow file name is outside [A-Za-z0-9._-]+ ending .yml or .yaml: " + repr(wf))
-m = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?", url)
-if not m:
-    dead("the anchor URL is not a github.com repository, so there is no public job listing to read: " + (url or "(none)"))
-class Refuse(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, *args, **kwargs):
-        return None
-opener, cap = urllib.request.build_opener(Refuse), 4 << 20
-def get(path):
-    req = urllib.request.Request("https://api.github.com" + path, headers={
-        "Accept": "application/vnd.github+json", "User-Agent": "unattended-held-reader"})
-    try:
-        with opener.open(req, timeout=30) as r:
-            status, body = r.status, r.read(cap + 1)
-    except urllib.error.HTTPError as e:
-        dead("GET " + path + " answered HTTP " + str(e.code))
-    except Exception as e:
-        dead("GET " + path + " did not answer: " + type(e).__name__)
-    if status != 200:
-        dead("GET " + path + " answered HTTP " + str(status))
-    if len(body) > cap:
-        dead("GET " + path + " answered more than the 4 MiB cap")
-    try:
-        return json.loads(body)
-    except ValueError:
-        dead("GET " + path + " answered something that is not JSON")
-base = "/repos/%s/%s/actions" % (m.group(1), m.group(2))
-runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&per_page=1").get("workflow_runs") or []
-if not runs:
-    dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
-rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
-# EVERY FIELD BEFORE THE LAST IS NON-EMPTY: the writer splits on TAB, which bash collapses, so an
-# empty sha would shift the conclusion out of its field and a red would read as no verdict at all.
-if not re.fullmatch(r"[0-9a-f]{40}", sha) or not isinstance(rid, int):
-    dead("the latest completed scheduled run carries no 40-hex head sha or integer id: %r %r" % (sha, rid))
-jobs, total, page = [], None, 1
-while True:
-    got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
-    total, batch = got.get("total_count"), got.get("jobs") or []
-    jobs += batch
-    if not batch or not isinstance(total, int) or len(jobs) >= total or page >= 50:
-        break
-    page += 1
-if not isinstance(total, int) or len(jobs) != total:
-    dead("run %s declares %s job(s) and %d were read" % (rid, total, len(jobs)))
-held = [j for j in jobs if str(j.get("name") or "").startswith("held ") and str(j.get("name"))[5:].strip()]
-if not held:
-    dead("run %s at %s carries %d job(s) and none is named held <suite>" % (rid, sha[:8], len(jobs)))
-red = 0
-for j in held:
-    c = str(j.get("conclusion") or "")
-    red += c in ("failure", "timed_out")
-    # A TAB, a newline, a CR or a NUL in a name would split the row; each becomes U+001F, a control
-    # character the writer refuses by name, so the row grammar holds and the refusal stays visible.
-    print("held\t%s\t%s\t%s\t%s" % (str(j["name"])[5:].translate({0: 31, 9: 31, 10: 31, 13: 31}), sha, rid, c))
-print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:8], len(held), red))
-' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
+  fam=$(read_roster_family "$slug")
+  if [ -z "$fam" ]; then
+    echo "gates-green: no ask filed for ${form#*: } $leg — the build README names no roster family, so there is no family to mint the id in"
+    return 1
+  fi
+  id="$fam-$slug-$(derive_ask_seq "$fam" "$slug")"
+  a="- $id · filed $(date -u +%Y-%m-%d) · $form $leg $text"
+  s="- SEV · $id · $sev · $6"
+  k="- KEEP · $id · $7"
+  if [ -z "${ASKS_CMD:-}" ]; then
+    echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
+    printf '    %s\n' "$a" "$s" "$k"
+    return 1
+  fi
+  # The read-back line names where the red was seen, which a held suite's text opens with.
+  case "$text" in "red at "*) at8=${text#red at }; at8=${at8%% *} ;; esac
+  write_ask_rows "$bl" "$slug" "$id" "${form#*: } $leg" "$at8" "$a" "$s" "$k" "$sev" || return 1
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S6 - THE CLOSING ROW, beside `write_leg_ask`: `- CLOSED · <id> · by <by> · <why>`
+# appended under the home's `## Dispositions` by `write_backlog_rows`, the grammar `backlog.py`'s
+# `_extract_status` reads, and the prefix `verdict_flow.py#read_flake_releases` dates a release by. Staged,
+# and the views rendered and staged through `write_ask_views`. An ask its home's BACKLOG.md does not file,
+# or one a CLOSED row already closes, is named and left as it is.
+# WHAT IT DOES NOT CHECK: that the ask is OPEN anywhere else, or that `why` is true: the caller's.
+write_ask_closing() { # ask id · home build slug · by (sha or id) · why -> 0 written or already closed, 1 not; one line each
+  local id=$1 home=$2 by=$3 why=$4 bl
+  bl="$M/builds/$home/BACKLOG.md"
+  if [ ! -f "$bl" ] || ! grep -qF -- "- $id · filed " "$bl"; then
+    echo "gates-green: ask $id not closed — $bl files no such ask"
+    return 1
+  fi
+  if grep -qF -- "- CLOSED · $id · " "$bl"; then
+    echo "gates-green: ask $id is already CLOSED in $bl · unchanged"
+    return 0
+  fi
+  if ! write_backlog_rows "$bl" "$home" "" "- CLOSED · $id · by $by · $why" "" || ! GIT add -- "$bl" 2>/dev/null; then
+    echo "gates-green: ask $id not closed — its CLOSED row could not be written and staged in $bl"
+    return 1
+  fi
+  echo "gates-green: closed ask $id, by $by, staged in $bl"
+  case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S3, §8 F5 - THE RELEASES, after the bar on every return code beside
+# `write_held_asks`: the run-gates kit's `verdict_flow.py select` at R into a scratch file removed after,
+# each `release  <leg>  <ask id>  <reason>` line it prints turned into that ask's closing row by
+# `write_ask_closing`, by this tree's HEAD, its home the build the id names. A kit or a python that does
+# not resolve, or a select that refuses, is announced and closes nothing; never a verdict.
+write_flake_releases() { # R -> one line per release: closed or refused
+  local r=$1 py k out rc=0 tmp line rest leg id why home head
+  [ -n "$r" ] || { echo "gates-green: releases — no advertised tip was observed, so there is no R to select at"; return 0; }
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: releases — no run-gates kit holding verdict_flow.py resolves beside this kit, so no quarantined leg is released"
+    return 0
+  fi
+  tmp=$(mktemp) || { echo "gates-green: releases — no scratch file for the selection, so no quarantined leg is released"; return 0; }
+  "$py" "$k/verdict_flow.py" select --rev "$r" --out "$tmp" >"$tmp.lines" 2>&1 || rc=$?
+  rm -f -- "$tmp" "$tmp.tmp"
+  if [ "$rc" != 0 ]; then
+    echo "gates-green: releases — verdict_flow.py select at ${r:0:8} exited $rc, so no quarantined leg is released"
+    sed 's/^/    /' "$tmp.lines"; rm -f -- "$tmp.lines"
+    return 0
+  fi
+  head=$(GIT rev-parse HEAD 2>/dev/null) || head=""
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "release  "*) ;; *) continue ;; esac
+    rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
+    home=${id#*-}; home=${home%-*}
+    if [[ ! $id =~ ^[A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
+      echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
+      continue
+    fi
+    write_ask_closing "$id" "$home" "$head" "released: leg $leg, $why" || :
+  done <"$tmp.lines"
+  rm -f -- "$tmp.lines"
+  return 0
 }
 
 write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
-  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8 bl f home cand reused fam seq id
-  local argv file tok seen a s k today filed=0
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8
+  local argv file tok seen py k
   local -a rows=()
   if [ -z "$r" ]; then
     echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
@@ -10921,14 +13346,19 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
     return 0
   fi
+  # TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's, found as write_flake_releases finds it.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates remote_verdict.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: held reader: DEAD PROBE — no python launcher, or no run-gates kit holding remote_verdict.py beside this kit, so nothing was read"
+    return 0
+  fi
   while IFS= read -r line; do
+    line=${line%$'\r'}
     case "$line" in
       held$'\t'*) rows+=("$line") ;;
       ?*) echo "gates-green: $line" ;;
     esac
-  done < <(read_held_reds "${AURL:-}" "$wf")
-  bl="$M/builds/$slug/BACKLOG.md"
-  today=$(date -u +%Y-%m-%d)
+  done < <("$py" "$k/remote_verdict.py" held "${AURL:-}" "$wf" 2>&1 || echo "held reader: DEAD PROBE — the reader exited $? without a verdict")
   for line in "${rows[@]}"; do
     IFS=$'\t' read -r _ suite sha run concl <<< "$line"
     case "$concl" in failure|timed_out) ;; *) continue ;; esac
@@ -10946,27 +13376,6 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
       echo "gates-green: no ask filed for held suite $suite — its head sha $sha is not an ancestor of R $r8 here, so the red is not proven on the default branch"
       continue
     fi
-    reused=""
-    if [ -n "${ASKS_CMD:-}" ]; then
-      for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
-        [ -f "$f" ] || continue
-        home=${f%/BACKLOG.md}; home=${home##*/}
-        while IFS= read -r cand; do
-          [ -n "$cand" ] || continue
-          if read_ask_back "$cand" "$home" HIGH; then
-            echo "gates-green: ask $cand already OPEN HIGH for held suite $suite in $f · reused"; reused=1; break
-          fi
-        done < <(grep -F -- "held red: suite $suite red at " "$f" 2>/dev/null \
-                   | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
-        [ -z "$reused" ] || break
-      done
-    fi
-    [ -z "$reused" ] || continue
-    fam=$(read_roster_family "$slug")
-    if [ -z "$fam" ]; then
-      echo "gates-green: no ask filed for held suite $suite — the build README names no roster family, so there is no family to mint the id in"
-      continue
-    fi
     # THE LOCATOR: the suite's own script at that sha when the leg manifest the bar's header names
     # resolves it there, else the workflow file at that sha, which is where the suite's job is defined.
     if argv=$(read_leg_argv "$d" "$sha" "$suite") && [ -n "$argv" ]; then
@@ -10977,21 +13386,42 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     else
       seen="seen \`.github/workflows/$wf\`@$sha8"
     fi
-    seq=$(derive_ask_seq "$fam" "$slug")
-    id="$fam-$slug-$seq"
-    a="- $id · filed $today · held red: suite $suite red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip"
-    s="- SEV · $id · HIGH · a held self-test is red on the default branch's daily job"
-    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
-    if [ -z "${ASKS_CMD:-}" ]; then
-      echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
-      printf '    %s\n' "$a" "$s" "$k"
-      continue
-    fi
-    write_ask_rows "$bl" "$slug" "$id" "held suite $suite" "$sha8" "$a" "$s" "$k" && filed=$((filed + 1))
+    # THE ONE LEG ASK (TOOL-dWitnessedBar-8 S8): reuse, mint, rows, read-back and views are its.
+    write_leg_ask "$slug" "$suite" "held red: suite" \
+      "red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip" \
+      HIGH "a held self-test is red on the default branch's daily job" \
+      "filed by an unattended run for the owning build; outside this build's goal" || :
   done
-  [ "$filed" -gt 0 ] || return 0
-  write_ask_views "$filed" || :
-  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-6 S8 - THE PIN'S OWNER ITEM, after the held reader and the releases on the same
+# every-return-code site: under `verdict = remote-ci` the run-gates kit's `verdict_backends.py read` at R,
+# and a HELD slot, an unset pin or a workflow differing from it, filed through `write_leg_ask` as one
+# `pin held: backend remote-ci` ask, reused while open. Any other value reads and prints nothing; a kit
+# or a python that does not resolve, or a read that refuses, is announced and files nothing. Never a
+# verdict: the lander is what refuses a landing on the slot.
+write_pin_ask() { # slug · R -> at most one line: the slot's state, or the ask filed, reused or refused
+  local slug=$1 r=$2 py k out rc=0 why
+  [ -n "$r" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_backends.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: verdict slot — no run-gates kit holding verdict_backends.py resolves beside this kit, so no pin is read"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_backends.py" read --sha "$r" 2>&1) || rc=$?
+  out=${out//$'\r'/}
+  case "$out" in
+    *"verdict: remote-ci · HELD · "*) ;;
+    *"verdict: remote-ci · "*) printf '%s\n' "$out" | sed -n 's/^verdict: /gates-green: verdict slot: /p'; return 0 ;;
+    *"verdict: "*) return 0 ;;
+    *) echo "gates-green: verdict slot — verdict_backends.py read at ${r:0:8} exited $rc, so no pin is read: ${out//$'\n'/ · }"; return 0 ;;
+  esac
+  why=$(printf '%s\n' "$out" | sed -n 's/^verdict: remote-ci · HELD · [0-9a-f]* · //p' | head -1)
+  write_leg_ask "$slug" remote-ci "pin held: backend" \
+    "held at ${r:0:8}: $why · accept the owner re-pins verdict.remote.pin or refuses the workflow change" \
+    HIGH "the remote-ci verdict slot reads HELD, so no remote verdict stands" \
+    "filed by an unattended run for the owner; a pin is the owner's to move" || :
   return 0
 }
 
@@ -11055,7 +13485,7 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
 #
 # TOOL-dUnstuckLanding-27 S3 - THE RECORD IS NOT ALL THE CLOSE STAGES. Over an inherited-only red
-# under `land`, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
+# that passes, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
 # views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
 # The set is read from THE BAR'S OWN RUN RECORD, `staged` beside its attribution, never from the
 # run-state file (implementation review round 2, M2 and L1): a fact there was one line a run could
@@ -11113,10 +13543,57 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 }
 
 # TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
-# reads its bar MET over an inherited-only red under `land`, or prints the hold line over one under
-# `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
+# reads its bar MET over a red every row of which passes, or prints the hold line over an inherited-only
+# one that blocks (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
+# TOOL-dWitnessedBar-25 S5 - A RED BAR'S FAILING-LEG TAILS, COMMITTED AS `leg-tail` RECORDS. The run-gates
+# kit's keep verb reads `trace.leg-output` itself and, under `tail-by-hash`, writes one record per tail of
+# the run that no tracked record holds, under the build's record anchor `derive_review_signals` derives;
+# each record it wrote is staged, so it commits with the close's records. Every line it prints is echoed.
+# WHAT IT DOES NOT CHECK: the records' content, which is the keep verb's; a miss here never moves the
+# item, it is named and the close goes on.
+write_leg_tails() { # slug · the bar's pinned run id
+  run_leg_records "$1" keep_tails.py leg-tail --run "$2"
+  return 0
+}
+
+# TOOL-dWitnessedBar-8 S6 - ONE RUN-AND-STAGE for a run-gates verb that writes build records, extracted
+# from `write_leg_tails` at its second instance, `verdict_flow.py flakes`. The verb runs bounded under the
+# build's record anchor, `--build <slug> --unit <anchor>` appended to its arguments; every line it prints
+# is echoed, and each `<say>: wrote <path>` line's path is staged so it commits with the close's records.
+# RB_OUT holds what it printed for a caller that reads more of it. A miss is named and returns 1; it
+# never moves the item.
+run_leg_records() { # slug · the run-gates script · the record kind it writes · its arguments… -> 0 ran, 1 not run
+  local slug=$1 script=$2 kind=$3 py="" d="" kr _lt_line _lt_rel
+  shift 3
+  derive_review_signals "$slug" build
+  if [ -z "$_rs_anchor" ]; then
+    echo "unattended: gates-green — no $kind record written: the build's generated units region names no unit to anchor it"
+    return 1
+  fi
+  kr=$KIT_DIR
+  while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" run-gates "$script" "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: gates-green — no $kind record written: no python launcher, or the run-gates kit's $script does not resolve beside this kit"
+    return 1
+  fi
+  RB_BOUND=120 run_bounded "$py" -B "${kr:-.}/$d/$script" "$@" --build "$slug" --unit "$_rs_anchor"
+  while IFS= read -r _lt_line; do
+    _lt_line=${_lt_line%$'\r'}
+    [ -n "$_lt_line" ] || continue
+    echo "unattended: gates-green — $_lt_line"
+    case "$_lt_line" in
+      [a-z]*": wrote "*)
+        case "${_lt_line%%: wrote *}" in *[!a-z-]*) continue ;; esac
+        _lt_rel=${_lt_line#*: wrote }; _lt_rel=${_lt_rel%% *}
+        stage_runmd "$_lt_rel" || echo "unattended: gates-green — the $kind record git could not stage: $_lt_rel" ;;
+    esac
+  done <<<"$RB_OUT"
+  return 0
+}
+
 write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
   local p b
   local -a ps=()
@@ -11850,50 +14327,6 @@ check_phase_gates() { # slug · from · to -> 0 where the move crosses no held e
   return 1
 }
 
-# write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
-# green, by tree (TOOL-aFrugalTurnstile-3 S1, design D3). The grammar is the pre-push hook's function
-# of the same name (TOOL-aFrugalTurnstile-2): the same preconditions, the same ten keys in the same
-# order, the same `.tmp` rename and the same `.shared` copy into the common dir from a linked worktree;
-# only `by` differs. The hook ships verbatim and sources no kit, so the grammar is spelled twice and
-# held together by a parity arm in this kit's suite, as `read_policy_key` is. SILENT on a red rc, whose
-# output is already the item's; otherwise ONE line, recorded or declined with why. A `kind scoped`
-# record goes to `gate-bar-green.scoped` (and `.scoped.shared`), the hook's slot rule
-# (TOOL-aFrugalTurnstile-11 S1), so it never replaces the full record its base names.
-write_bar_green() {
-  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs f=gate-bar-green
-  local -a words=()
-  local no="unattended: gates-green — no gate-bar-green written:"
-  [ "$rc" = 0 ] || return 0
-  case "$kind" in
-    full) ;;
-    scoped) f=gate-bar-green.scoped ;;
-    "") echo "$no the bar did not run full"; return 0 ;;
-    *) echo "$no the kind '$kind' is neither full nor scoped"; return 0 ;;
-  esac
-  case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
-  if [ "$(GIT rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
-  if ! dirty=$(GIT status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
-    echo "$no the tree is not clean"; return 0
-  fi
-  tree=$(GIT rev-parse -q --verify "$h^{tree}" 2>/dev/null)
-  if [ -z "$tree" ]; then echo "$no the tree of ${h:0:8} could not be read"; return 0; fi
-  read -ra words <<<"$bar"
-  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
-  if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tunattended\nstamped\t%s\n' \
-           "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-           > "$g/$f.tmp" && mv -f "$g/$f.tmp" "$g/$f"; } 2>/dev/null; then
-    echo "$no $g/$f could not be written"; return 0
-  fi
-  cdir=$(GIT rev-parse --git-common-dir 2>/dev/null) || cdir=""
-  cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
-  g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
-  if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
-    cp "$g/$f" "$cdir_abs/$f.shared.tmp" 2>/dev/null \
-      && mv -f "$cdir_abs/$f.shared.tmp" "$cdir_abs/$f.shared" 2>/dev/null
-  fi
-  echo "unattended: gates-green — recorded $f for ${h:0:8} (kind $kind)"
-}
-
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
@@ -11926,18 +14359,18 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
-      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
-      local -a _genv _grb
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
+      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok _gfl _gfr _gfleg _gff
+      local -a _genv _grb _gfrom
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
-      # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
-      # INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
+      # ref: a run's own commit on local main loosening `verdict.blocks` with its own red would sit at
+      # R, read INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
       # id is PINNED, unpredictable and cleared first, because this arm reads THAT bar's record after
       # it and a record the runner never wrote must not be mistaken for one it did.
       _gr=${ASHA:-}
       read_gate_policy "$_gr"
-      echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
+      echo "unattended: gates-green — verdict.blocks reads $GP_POLICY: $GP_WHY"
       # TOOL-dDerivedDocket-27 S4 - THE BAR'S BOUND IS THE BACKSTOP `--preflight` PINNED, because
       # GATE_WALL is a working-tree declaration the run can edit and a bound that moves between the
       # two reads is two bounds. A record that predates the fact is recomputed HERE, announced; no
@@ -11956,12 +14389,13 @@ dod_met() { # slug · run-state file · item · checker
       fi
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
       # TOOL-aFrugalTurnstile-12 S1 - THE BAR'S KNOBS ARE SCRUBBED FROM EVERY CALL BELOW. Its rc-0
-      # result is recorded as a trusted gate-bar-green that stores neither the manifest nor the reuse
-      # mode, so a GATE_LEGS subset or a GATE_REUSE run inherited from the driver would certify the
-      # whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
-      # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
+      # result is a gates-green the close trusts, so a GATE_LEGS subset or a GATE_REUSE run inherited
+      # from the driver would certify the whole bar for this tree. The list carries every name in the hook's
+      # BAR_SCRUBBED_KNOBS and BAR_CLEARED_KNOBS, plus its docs knob; unit 60's `check_bar_scrub_parity` arm in
+      # run-gates.gov.test.sh reds when the hook names one this list lacks (TOOL-dWitnessedBar-63 S29), since
+      # the parity arm in unattended.test.sh reads BAR_SCRUBBED_KNOBS alone. `GATE_REUSE_LINEAGE` too, which
       # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
-      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
+      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY" _gset=""
       local -a _gscrub=(-u GATE_WALL)
       for _gk in $_gknobs; do
         _gscrub+=(-u "$_gk")
@@ -11978,7 +14412,10 @@ dod_met() { # slug · run-state file · item · checker
         else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$DRIVER_PID"; fi
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
-        _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+        # TOOL-dWitnessedBar-25 S2 - the bar's cause, this run, in the runner's verdict.
+        # TOOL-dWitnessedBar-8 S1 - and each red leg re-run once on the same tree, which moves no verdict
+        # and lets `verdict_flow.py route` and `flakes` read a red-then-green leg from the run record.
+        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_VERDICT_BLOCKS="$GP_POLICY" GATE_RERUN=1)
         [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
         [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
         # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
@@ -12062,10 +14499,12 @@ dod_met() { # slug · run-state file · item · checker
             esac
           fi
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
+          # TOOL-dWitnessedBar-40 S2 - a `-` full base is an inherited green, which the runner cannot
+          # tell from GATE_BASE: it is told on the argv, so it writes no per-tree verdict of this bar.
+          _gfrom=(); [ "$_gfull" = - ] && _gfrom=(GATE_BASE_FROM=inherited)
           case "$_gdec" in
-            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" ${_gfrom[@]+"${_gfrom[@]}"} "${_genv[@]}" $GATE_CMD; _grc=$? ;;
             covered) _grc=0 ;;
             *)       run_bounded env "${_gscrub[@]}" GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
           esac
@@ -12075,7 +14514,6 @@ dod_met() { # slug · run-state file · item · checker
           # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
           # was: the project declares a command line, not a path.
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           run_bounded env "${_gscrub[@]}" "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
@@ -12090,6 +14528,11 @@ dod_met() { # slug · run-state file · item · checker
       # the writer's outcome reaches neither DOD_OUT nor this item's return.
       _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR"); WI_STAGED=""
       write_held_asks "$slug" "$_gr" "$_gdir"
+      # TOOL-dWitnessedBar-30 S3 - AND THE RELEASES, on the same every-return-code site: each quarantined
+      # leg `select` at R releases has its held-flaky-leg ask closed.
+      write_flake_releases "$_gr"
+      # TOOL-dWitnessedBar-6 S8 - AND THE PIN'S OWNER ITEM, under verdict = remote-ci, on the same site.
+      write_pin_ask "$slug" "$_gr"
       RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
@@ -12098,37 +14541,36 @@ dod_met() { # slug · run-state file · item · checker
       # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
       # writes nothing new and an older record can never answer for a newer bar.
       _gh=$(GIT rev-parse HEAD 2>/dev/null)
-      # TOOL-aFrugalTurnstile-3 S2 - THE BAR'S GREEN IS RECORDED BY TREE, in the grammar the push
-      # boundary writes, so a wrapper bar that never earns a usable runner stamp still leaves a green
-      # the boundary can read. `full` under `in-place`, whose bar always runs with GATE_FULL=1; under
-      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty
-      # except on the scoped arm below.
-      # WHAT THIS RECORD DOES NOT CHECK: it says this bar exited 0 on this tree, never that the push
-      # boundary will run the same bar; that equality is the reader's, which compares the bar string
-      # byte for byte.
-      # TOOL-aFrugalTurnstile-9 S5 - the kind and base are the bar that RAN: `scoped` with the base the
-      # boundary picked, and a `covered` close ran none, so it writes no record and no `gates-run` fact.
+      # THE BAR'S VERDICT PER TREE IS THE RUNNER'S OWN RECORD (TOOL-dWitnessedBar-4 S4): the runner
+      # this bar runs writes `<common-dir>/gate-verdict/<tree hash>`, so the close writes none.
+      # TOOL-aFrugalTurnstile-9 S5 - a `covered` close ran no bar, so it writes no `gates-run` fact.
       if [ "$_gdec" = covered ]; then
         echo "unattended: gates-green — met without a bar: the boundary reads this tree as covered by $_grec"
         GG_RUN_FACT=""; DOD_OUT=""; return 0
       fi
-      _gkind=""
-      if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
-      if [ "$_gdec" = scoped ]; then _gkind=scoped; fi
-      # TOOL-aFrugalTurnstile-16 S1/S3: a scoped record names the FULL base the hook's writer would,
-      # and none is written over an inherited green, which no later push can adopt as a base.
-      if [ "$_gdec" = scoped ] && [ "$_gfull" = - ]; then
-        echo "unattended: gates-green — no gate-bar-green written: the boundary scoped from an inherited green, which no later push can adopt as a base"
-      else
-        [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gfull" "$GATE_CMD" "$_gid"
-      fi
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+        # TOOL-dWitnessedBar-51 S15 - A GREEN BAR'S FLAKE RECORD, so gate health arms and a quarantine can
+        # release: `flakes --record-only` reads `verdict.flakes` itself, writes nothing under `retry-only`,
+        # and prints no re-entry. A BARE STATEMENT with the bar's capture put back after it; a miss rides
+        # `run_leg_records`' own lines and never moves the item.
+        if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+          _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+          run_leg_records "$slug" verdict_flow.py flake flakes --record-only --run "$_gdir" || :
+          RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+        fi
         DOD_OUT=""; return 0
       fi
       fact "$rel" gates-run >/dev/null; if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$_fact" ]; then
         set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+      fi
+      # TOOL-dWitnessedBar-25 S5 - THE RED BAR'S TAILS COMMIT WITH THE CLOSE'S RECORDS, staged here beside
+      # the `gates-run` fact. A BARE STATEMENT with the bar's capture put back after it, as the held asks'.
+      if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+        _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+        write_leg_tails "$slug" "$_gid"
+        RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       fi
       GG_RUN_FACT=""
       DOD_OUT=$RB_OUT
@@ -12172,16 +14614,44 @@ dod_met() { # slug · run-state file · item · checker
           fi ;;
         1)
           # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
-          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED, at any
-          # age, under `land` is MET (TOOL-dUnstuckLanding-16); the same under `park` is UNMET and
-          # prints the hold line the Skill acts on; anything else is UNMET with the attribution lines
-          # exactly as before that unit. The MET line names the aged legs, whose asks are BLOCKER.
+          # `read_gates_record` states it, first matching row wins. Every red row reading `pass`, at
+          # any age, is MET (TOOL-dWitnessedBar-3 S5, TOOL-dUnstuckLanding-16); every red INHERITED
+          # and one blocking is UNMET and prints the hold line the Skill acts on; anything else is
+          # UNMET with the attribution lines. The MET line names the aged legs, whose asks are BLOCKER.
+          # TOOL-dWitnessedBar-3 S6 - every red bar read here is ROUTED first, its routing record
+          # written beside the attribution, each route printed.
+          run_verdict_route "$_gdir" "$slug"
+          # TOOL-dWitnessedBar-8 S6 - AND ITS FLAKES, beside the route: `verdict_flow.py flakes` reads
+          # `verdict.flakes` itself, writes the run's flake record, staged by `run_leg_records`, and under
+          # `quarantine` prints one `hold  <leg>  <flakes>/<window>  <record ids>` line per leg to hold,
+          # each filed as the held-flaky-leg ask through `write_leg_ask`, reused while one is OPEN for
+          # that leg. The OPEN ask is the hold: the selection's `quarantine` row reads it at R. A BARE
+          # STATEMENT with the bar's capture put back after it, as the held asks'; a miss never moves it.
+          if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+            _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+            if run_leg_records "$slug" verdict_flow.py flake flakes --run "$_gdir"; then
+              while IFS= read -r _gfl; do
+                _gfl=${_gfl%$'\r'}
+                case "$_gfl" in "hold  "*) ;; *) continue ;; esac
+                _gfr=${_gfl#hold  }; _gfleg=${_gfr%%  *}; _gfr=${_gfr#*  }; _gff=${_gfr%%  *}; _gfr=${_gfr#*  }
+                case "$_gff" in
+                  [0-9]*/[0-9]*) ;;
+                  *) echo "unattended: gates-green — no held-flaky-leg ask filed: the line is not hold  <leg>  <flakes>/<window>  <record ids>: $_gfl"; continue ;;
+                esac
+                write_leg_ask "$slug" "$_gfleg" "held flaky leg: leg" \
+                  "flaked ${_gff%/*} in its last ${_gff#*/} verdicts · seen $_gfr · accept the leg is released after its streak, or its flake is fixed" \
+                  MED "a merge-bar leg flaked at the entry threshold and is held from the bar until its ask closes" \
+                  "filed under verdict.flakes, which holds a leg while its held-flaky-leg ask is OPEN; closing it releases the leg" || :
+              done <<<"$RB_OUT"
+            fi
+            RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+          fi
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)
               DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
             land|hold|other)
-              # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+              # S10 - an owner on the record for every red that passes, on every path whose record is usable.
               write_inherited_asks "$slug" "$_gr" "$_gdir"
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
@@ -12194,13 +14664,13 @@ dod_met() { # slug · run-state file · item · checker
                 else
                   _gesc="none aged past the ${GP_MAX_AGE}-landing age bound"
                 fi
-                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED; $_gesc"
+                DOD_OUT="gates-green MET over a red every row of which passes under verdict.blocks $GP_POLICY: $GR_LEGS red at ${_gr:0:8}; $_gesc"
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
                 # TOOL-dDeclaredLoop-17 S6: the hold's join reads this set, as the hand-off's does.
                 write_gates_staged "$_gdir" "$WI_STAGED"
-                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; verdict.blocks=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
                 DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
@@ -15368,7 +17838,8 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py _fk_re _fk_a _at _arc _ae
+  local -a _fk_st=()
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -15398,6 +17869,29 @@ check_commit_message() { # commit message file
     PASSTRAILER) trl=none ;;
     "PASSTRAILER "*) trl=${trl#PASSTRAILER } ;;
     *) subj=$trl; trl="" ;;
+  esac
+  # THE CHARTER'S TRAILER, LAST (TOOL-dWitnessedBar-108 S9), asked of EVERY message a bound run's commit
+  # carries, `Pass: none` included, so before the `none` return below. The value is read from the
+  # charter, `AGENTS.md`, by the kit's one trailer reader, never typed here: an agent trailer naming the
+  # charter's address with another value, or a line after it, is refused with the line to write. Exit 2,
+  # an unreadable message, says so and the path checks continue. WHAT IT DOES NOT CHECK: a commit no run
+  # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
+  # Exit 0 is shared by `ok`, `none` and `unarmed`, and only `unarmed` is a check that did not run, so
+  # it alone is said (TOOL-dWitnessedBar-110 S4).
+  _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
+  _at=${_at//$'\r'/}
+  case "$_arc" in
+    0) case "$_at" in "ATTRIBUTION unarmed"*) echo "unattended: --check-commit did not check attribution: ${_at#ATTRIBUTION unarmed · }" ;; esac ;;
+    1) # the expected line, by the same reader's `read_charter_trailer`, so the repair names what it read
+       _ae=$("$py" -c 'import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct; print(ct.read_charter_trailer(sys.argv[2])[0])' \
+         "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
+       _ae=${_ae//$'\r'/}
+       _at=${_at#ATTRIBUTION refused · }
+       # The repair leads, so the site's signature is the literal its arm asserts (check-arms takes the
+       # longest literal run, and a leading interpolation would join its stripped prefix to it).
+       fail 49 "end the message with '$_ae' and nothing after it: $_at"
+       return 1 ;;
+    *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
@@ -15463,6 +17957,19 @@ check_commit_message() { # commit message file
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
     fi
+    # TOOL-dWitnessedBar-21 S4 - A FIX PASS'S KEEPS, before the walk's undeclared-path refusal, so a
+    # staged kept file meets the route and never a widening command the keeps would refuse. Only a
+    # key holding a `fix-of` row loads the spec facts and spawns the module; any other commit asks git
+    # nothing more than this one grep.
+    _fk_re=$'\n''o '"$u"' ([0-9a-f]+) '
+    if [[ $'\n'"$rows" =~ $_fk_re ]]; then
+      _fk_a=${BASH_REMATCH[1]}
+      if grep -qF -- " fix-of · item $_fk_a $u · reason " "$rel" 2>/dev/null; then
+        load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+        _fk_st=(); [ -z "$st" ] || mapfile -t _fk_st <<<"$st"
+        check_fix_keeps --check-commit "$rel" "$_fk_a $u" "" "" "${SPEC_PATH[$u]:-}" "${_fk_st[@]}" || return 1
+      fi
+    fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
     uncov=""; uncovl=""
     printf '%s\n' "$st" > "$CC_TMP"
@@ -15497,6 +18004,15 @@ check_commit_message() { # commit message file
       return 1
     fi
   done
+  # THE COMMIT CHECK'S WITNESS (TOOL-dWitnessedBar-2 S4), on its one admitting path for a commit whose
+  # Pass: trailer names an open dispatched pass: the message gains `Commit-Checked:
+  # unattended@<kit version>`, so a pass commit this hook never saw is told by the trailer's absence,
+  # which the pre-push hook and the pass-order leg read under `hooks.bypass`. A failed append prints one
+  # line and still admits: the trailer is evidence, and this check gains no refusal. Written at the
+  # START of the trailer block (TOOL-dWitnessedBar-108 S9, §8 F5), so the charter's trailer stays the
+  # message's last line, as the charter's "ends with" states and the attribution check above holds.
+  git interpret-trailers --in-place --where start --if-exists replace --trailer "Commit-Checked: unattended@$KIT_UNATTENDED_VERSION" "$msg" 2>/dev/null \
+    || echo "unattended: --check-commit admitted this pass commit and could not append its Commit-Checked: trailer to $msg, so the pre-push hook will read it as made past the commit check"
   return 0
 }
 
@@ -15838,6 +18354,86 @@ check_dispatch_specs() { # slug · unit... -> 0 clean, 1 after the refusals it p
   echo "unattended: --check-specs $slug — $*: none carries a refusal --dispatch makes from its spec files"
 }
 
+# ------------------------------------------------- TOOL-dWitnessedBar-21, A FIX PASS KEEPS ITS CHECK
+# A fix pass declared with `--dispatch --fix-of <red>`, `<red>` one of `leg:<leg name>` or
+# `acceptance`, may not write the red check's own files: the leg's argv words that name tracked files,
+# its gate script first, or the check files the unit's acceptance commands name. `fix_keeps.py` beside
+# this script derives them, run under the launcher `resolve_python` answers; its stdout is the kept
+# paths and its stderr `fix-of:` notes, `fix-of: tests <tags>|none` naming the leg's `tests` targets.
+# ONE HELPER HOLDS EVERY REFUSAL SITE this unit adds, three, so the driver's census stays under its
+# refusal ceiling: the red's shape, the module's refusal relayed (no launcher included), and a kept
+# path. It is asked for the red given now AND every red a `fix-of` row recorded at this key, so a
+# later `--dispatch` of the key without `--fix-of`, and `--check-commit` on it, are held to the same
+# keeps. The route both path refusals print is FIX_ROUTE. WHAT IT DOES NOT CHECK: a write that is
+# never declared or staged, and a key the unit takes after a commit moves HEAD, which is a new pass
+# with no keeps unless it is declared against a red again.
+FIX_ROUTE="a red check's own files change only through the tester, gov-tester, judging the red spec-wrong, which routes to Design as a new unit, whose own --dispatch is no fix pass and holds no keeps"
+check_fix_keeps() { # verb · run-state file · key · given (1 or empty) · red · spec · paths... -> 0, or 1 after check 49
+  local _fk_verb="$1" _fk_rel="$2" _fk_key="$3" _fk_given="$4" _fk_red="$5" _fk_spec="$6"
+  local _fk_shown _fk_l _fk_r _fk_py="" _fk_out _fk_why _fk_tests _fk_route _fk_p _fk_k
+  local -a _fk_reds=() _fk_lines=() _fk_kept=() _fk_args=()
+  shift 6
+  if [ -n "$_fk_given" ]; then
+    _fk_shown=${_fk_red:-(empty)}; _fk_shown=${_fk_shown//[$'\r\n']/ }
+    if case "$_fk_red" in acceptance|leg:?*) false ;; *) true ;; esac \
+       || case "$_fk_red" in *$'\n'*|*$'\r'*) true ;; *) false ;; esac \
+       || { [ -n "$BYPASS_BAN" ] && case "$_fk_red" in *"$BYPASS_BAN"*) true ;; *) false ;; esac; }; then
+      fail 49 "--fix-of names a red that is neither leg:<leg name> nor acceptance, or one carrying a line end or the declared bypass flag, so no kept file can be derived from it and nothing is recorded: $_fk_shown"
+      return 1
+    fi
+    _fk_reds+=("$_fk_red")
+  fi
+  _fk_l=$(grep -F -- " fix-of · item $_fk_key · reason " "$_fk_rel" 2>/dev/null)
+  [ -z "$_fk_l" ] || mapfile -t _fk_lines <<<"$_fk_l"
+  for _fk_l in "${_fk_lines[@]}"; do
+    _fk_r=${_fk_l#* · reason }; _fk_r=${_fk_r%$'\r'}
+    [ -n "$_fk_given" ] && [ "$_fk_r" = "$_fk_red" ] && continue
+    _fk_reds+=("$_fk_r")
+  done
+  [ "${#_fk_reds[@]}" -gt 0 ] || return 0
+  _fk_py=$(resolve_python 2>/dev/null) || _fk_py=""
+  for _fk_r in "${_fk_reds[@]}"; do
+    _fk_args=(--keeps "$_fk_r")
+    [ "$_fk_r" != acceptance ] || _fk_args+=(--spec "$_fk_spec")
+    _fk_why=""
+    if [ -z "$_fk_py" ]; then
+      _fk_why="no python launcher resolved, so fix_keeps.py did not run"
+    elif ! _fk_out=$("$_fk_py" "$KIT_DIR/fix_keeps.py" "${_fk_args[@]}" 2>&1); then
+      _fk_why=${_fk_out//[$'\r\n']/ }
+    fi
+    if [ -n "$_fk_why" ]; then
+      fail 49 "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: $_fk_r · $_fk_why"
+      return 1
+    fi
+    _fk_kept=(); _fk_lines=(); _fk_tests=""
+    [ -z "$_fk_out" ] || mapfile -t _fk_lines <<<"$_fk_out"
+    for _fk_l in "${_fk_lines[@]}"; do
+      _fk_l=${_fk_l%$'\r'}
+      case "$_fk_l" in
+        "") ;;
+        "fix-of: tests "*) _fk_tests=${_fk_l#fix-of: tests } ;;
+        "fix-of: "*) echo "unattended: $_fk_verb — $_fk_r · $_fk_l" >&2 ;;
+        *) _fk_kept+=("$_fk_l") ;;
+      esac
+    done
+    _fk_route=""
+    case "$_fk_tests" in
+      "") ;;
+      none) _fk_route="; the leg ${_fk_r#leg:} declares no tests edge" ;;
+      *) _fk_route="; the leg's tests edge names $_fk_tests, each the feature whose dossier names the code a code-miss fix belongs in" ;;
+    esac
+    for _fk_p in "$@"; do
+      [ -n "$_fk_p" ] || continue
+      for _fk_k in "${_fk_kept[@]}"; do
+        overlaps "$_fk_p" "$_fk_k" || continue
+        fail 49 "a fix pass keeps the red check's own files out of its write set, so $_fk_verb refuses $_fk_p, which covers or sits under $_fk_k, kept by the red $_fk_r: $FIX_ROUTE$_fk_route"
+        return 1
+      done
+    done
+  done
+  return 0
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk _c1_own _c1_gen
@@ -16077,6 +18673,10 @@ verb_dispatch() { # slug · unit · writes...
   # when both appear, in this declaration or in a sibling's within the same group.
   grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
   [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
+  # TOOL-dWitnessedBar-21 S3 - THE KEEPS, after the per-path shape loop and above the spec-token window,
+  # the claim, the rework budget's draw and the row, so a refused fix pass draws and records nothing.
+  # A key already holding a `fix-of` row is held to its keeps whether or not this call names a red.
+  check_fix_keeps --dispatch "$rel" "$grp $unit" "${DP_FIX_OF_SET:-}" "${DP_FIX_OF:-}" "$_d_spec" "$@" || return 1
   # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
   # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
   # empties the sibling set at the moment the second pass declares, and condition 1 then passes by
@@ -16255,6 +18855,10 @@ SIBS
     fi
   fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
+  # The red this fix pass is declared against, at its key, read back by `check_fix_keeps` (S3).
+  if [ -n "${DP_FIX_OF_SET:-}" ]; then
+    park "$rel" fix-of "$grp $unit" "$DP_FIX_OF" || return 1
+  fi
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
   # THE SET NOW IN FORCE, which is the key's union and not the row just parked: a declaration naming
@@ -16648,7 +19252,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""; RS_FLOW=""; RS_ROW=""
-DP_WRITES=()
+DP_WRITES=(); DP_FIX_OF=""; DP_FIX_OF_SET=""
 RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=(); RR_OWNER_STOP=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
@@ -16695,6 +19299,8 @@ while [ $# -gt 0 ]; do
                       _dw_n=$((_dw_n+1)); shift
                     done
                     [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
+    # SET is recorded apart from the value, so `--fix-of` with an empty value meets the shape refusal.
+    --fix-of)       DP_FIX_OF="${2:-}"; DP_FIX_OF_SET=1; shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --flow)         RS_FLOW="${2:-}"; shift 2 || shift ;;
@@ -16819,10 +19425,109 @@ while [ $# -gt 0 ]; do
     # TOOL-aGraftedHelix-1 - the remote's claims, read and printed; no slug, because it lists them all.
     --claims)       refuse_waive_unless_preflight --claims
                     print_claims "${2:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-1 S5 - one lease of a build, unit or cadence run; no slug, because a unit or
+    # cadence lease is named by its kind and segments, and `flush` names none.
+    --lease)        refuse_waive_unless_preflight --lease
+                    shift; LV_ACT=${1:-}; [ $# -eq 0 ] || shift
+                    LV_POS=(); LV_WIT=""; LV_AS=""; LV_FOR=""; LV_TO=""; LV_AFTER=""; _rl_rc=""
+                    while [ $# -gt 0 ]; do
+                      case "$1" in
+                        --witness|--as|--for|--to|--after)
+                          if [ $# -lt 2 ] || [ -z "$2" ]; then echo "lease not written — $1 takes a value"; _rl_rc=2; break; fi
+                          case "$1" in --witness) LV_WIT=$2 ;; --as) LV_AS=$2 ;; --to) LV_TO=$2 ;; --after) LV_AFTER=$2 ;; *) LV_FOR=$2 ;; esac
+                          shift 2 ;;
+                        --*) echo "lease not written — --lease takes --witness <sha>, --as <status>, --for draw, --to <fleet tag>[/<session>] or a fence's --after <tip>, not $1"; _rl_rc=2; break ;;
+                        *) LV_POS+=("$1"); shift ;;
+                      esac
+                    done
+                    if [ -n "$_rl_rc" ]; then :
+                    elif [ -n "$LV_AFTER" ] && [ "$LV_ACT" != fence ]; then
+                      echo "lease not written — --after belongs to --lease fence alone"; _rl_rc=2
+                    elif [ "$LV_ACT" = flush ]; then
+                      if [ "${#LV_POS[@]}" -gt 0 ] || [ -n "$LV_TO" ]; then echo "lease not written — --lease flush takes no argument"; _rl_rc=2
+                      else run_lease_verb flush; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = prune ]; then
+                      # TOOL-dPlacedRequest-16 S7 - every prunable run tombstone, or the one lease named.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" = 1 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                        echo "lease not written — --lease prune takes <kind> <name> [<sub>] or nothing"; _rl_rc=2
+                      else write_lease_prune ${LV_POS[@]+"${LV_POS[@]}"}; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = status ]; then
+                      # TOOL-dPlacedRequest-34 S22 - one lease read, read-only, its holder's session named.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                        echo "lease not written — --lease status takes <kind> <name> [<sub>] and nothing else"; _rl_rc=2
+                      else print_lease_status "${LV_POS[@]}"; _rl_rc=$?; fi
+                    elif [ "$LV_ACT" = fence ]; then
+                      # TOOL-dPlacedRequest-15 S2 - the fence read of a build lease, one line; TOOL-dPlacedRequest-29
+                      # S1 - `--after <tip>`, the re-fence after a fenced push failed on a moved tip.
+                      if [ -n "$LV_WIT$LV_AS$LV_FOR$LV_TO" ] || [ "${#LV_POS[@]}" != 2 ] || [ "${LV_POS[0]}" != build ]; then
+                        echo "lease not written — --lease fence takes build <slug> [--after <tip>] and nothing else"; _rl_rc=2
+                      else write_fence_beat "${LV_POS[1]}" "$LV_AFTER"; _rl_rc=$?; fi
+                    elif [ "${#LV_POS[@]}" -lt 2 ] || [ "${#LV_POS[@]}" -gt 3 ]; then
+                      echo "lease not written — --lease <act> <kind> <name> [<sub>]: build <slug>, unit <slug> <id>, run <cadence> <period> or request <content key>"; _rl_rc=2
+                    else
+                      run_lease_verb "$LV_ACT" "${LV_POS[0]}" "${LV_POS[1]}" "${LV_POS[2]:-}" "$LV_WIT" "$LV_AS" "$LV_FOR" "$LV_TO"; _rl_rc=$?
+                    fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-12 - one create-only decision or problem on the remote; no slug, because a
+    # problem names a subject and a decision names its build among its own positional words.
+    --register)     refuse_waive_unless_preflight --register
+                    shift; write_register "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-33 - the build card's remote ref, written for the kickoff engine; no slug
+    # verb, because `write` comes first and the slug second.
+    --card-ref)     refuse_waive_unless_preflight --card-ref
+                    if [ $# = 5 ] && [ "${2:-}" = write ] && [ "${4:-}" = --message ]; then write_card_ref "$3" "$5"; _rl_rc=$?
+                    elif [ $# = 3 ] && [ "${2:-}" = lookup ]; then print_card_ref "$3"; _rl_rc=$?
+                    else echo "card-ref not written — the form is --card-ref write <slug> --message <file>, or --card-ref lookup <slug>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-19 - an owner's request recorded by its content key; no slug, because a
+    # request is not yet a build.
+    --request)      refuse_waive_unless_preflight --request
+                    shift; write_request_record "$@"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-14 - one row on a request's pre-claim budget; no slug, because no build exists yet.
+    --request-draw) refuse_waive_unless_preflight --request-draw
+                    if [ $# = 6 ] && [ "${3:-}" = --cause ] && [ "${5:-}" = --item ]; then run_request_draw "$2" "$4" "$6"; _rl_rc=$?
+                    else echo "request-draw — not drawn · the form is --request-draw <content key> --cause <cause> --item <item>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-21 - entry.claim: a placed request claimed as a build, no run-state file needed.
+    --entry-claim)  refuse_waive_unless_preflight --entry-claim
+                    if [ "${3:-}" = --request ] && [ $# = 4 ]; then run_entry_claim "$2" "$4" 0 ""; _rl_rc=$?
+                    elif [ "${3:-}" = --request ] && [ $# = 6 ] && [ "${5:-}" = --pieces ]; then run_entry_claim "$2" "$4" 1 "$6"; _rl_rc=$?
+                    else echo "claim not written — the form is --entry-claim <slug> --request <content key> [--pieces <n>]"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-5 S3 - the consent predicate as a verb, read-only, for the placement check of a
+    # `breakpoint`: a relayed request is data with provenance and never consent. No slug, as for --request.
+    --request-consent) refuse_waive_unless_preflight --request-consent
+                    if [ $# = 2 ]; then
+                      check_request_consent "$2" && echo "request — $2 · typed here: this session's own words"; _rl_rc=$?
+                    else echo "request — not read · the form is --request-consent <content key>"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    # TOOL-dPlacedRequest-13 - this node's change feed, held to, rebuilt from or replayed over the cache
+    # of governance refs this clone holds; no slug, because the feed is the node's.
+    --feed)         refuse_waive_unless_preflight --feed
+                    case "${2:-}" in
+                      check)   check_feed refs/gov/remote/ "${3:-}"; _rl_rc=$? ;;
+                      rebuild) write_feed refs/gov/remote/; _rl_rc=$? ;;
+                      print)   case "${3:-}" in
+                                 "")     print_feed; _rl_rc=$? ;;
+                                 --from) print_feed "${4:-none}"; _rl_rc=$? ;;
+                                 *)      echo "unattended: --feed print takes --from <seq> or nothing: ${3:-}"; _rl_rc=2 ;;
+                               esac ;;
+                      *)       echo "unattended: --feed takes check [<file>], rebuild or print [--from <seq>]: ${2:-}"; _rl_rc=2 ;;
+                    esac
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     --help|-h)      echo "unattended: the verbs are $(verb_list); each verb's contract is $MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
                     usage; RUNLOG_CLEAN=1; exit 0 ;;
     --overlaps)     print_overlaps; RUNLOG_CLEAN=1; exit 0 ;;
+    # TOOL-dPlacedRequest-8 S5 - the one path-token rule as a read-only verb; no slug, because it reads
+    # text or the specs it is handed and no build. The loop kit's seed resolver calls it.
+    --path-tokens)  refuse_waive_unless_preflight --path-tokens
+                    if [ "${2:-}" = --files-touched ]; then
+                      if [ $# -lt 4 ] || { [ "${3:-}" = --any-status ] && [ $# -lt 5 ]; }; then echo "path-tokens not read — the form is --path-tokens --files-touched [--any-status] <rev> <spec> [<spec> ...]"; _rl_rc=2
+                      else shift 2; print_path_tokens "$@"; _rl_rc=$?; fi
+                    elif [ $# = 1 ]; then read_path_tokens; _rl_rc=0
+                    else echo "path-tokens not read — --path-tokens takes --files-touched <rev> <spec> [<spec> ...] or nothing: ${2:-}"; _rl_rc=2; fi
+                    RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
     # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above

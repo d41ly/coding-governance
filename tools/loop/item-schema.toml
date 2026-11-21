@@ -100,6 +100,30 @@ name = "routes"
 shape = "set"
 widens = "add"
 
+# The code seed and its two neighbours, landed in one edit (TOOL-dPlacedRequest-8). A scalar's `widens`
+# lists its values narrowest first, so the order IS the value set and no `values` key is written. An
+# absent `seed` or `map` reads `none` and an absent `unfolds` reads empty.
+[[field]]
+# seed: what the item's `code` slot is computed from, each value a broader neighbourhood: none, the
+# unit's declared write set, the question's paths, the design's scope paths. Only a role item declares
+# one other than none; loop_lib.py's `check_item_seeds` reads this order as the value set and
+# `resolve_item_seed` turns a value into paths.
+name = "seed"
+shape = "scalar"
+widens = ["none", "write-set", "question-paths", "scope-paths"]
+
+[[field]]
+# map, the seed's neighbour: whether the item's work order fills its `map` slot (TOOL-dPlacedRequest-6)
+name = "map"
+shape = "scalar"
+widens = ["none", "base"]
+
+[[field]]
+# unfolds: the registry words whose namespaces the map slot spells out node by node (TOOL-dPlacedRequest-6)
+name = "unfolds"
+shape = "set"
+widens = "add"
+
 [[fixed-row]]
 tag = "item.plan.exit"
 fixed-by = ["principle=principle.p20"]

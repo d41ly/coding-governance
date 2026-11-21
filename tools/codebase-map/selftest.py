@@ -474,6 +474,7 @@ def test_remedy_paths_are_real(tmp: Path):
     got = run(f"{PFX}{KIT_NAME}/gen_map.py", "--scaffold")
     assert got.returncode == 0, got.stdout + got.stderr
 
+
     # S4 of TOOL-aRepatriatedFork-25: the legacy constant a pre-1.1 GATE_FILE reads names THIS
     # install's generator, so an old gate at a prefix prints a command that exists.
     got = run("-c", f"import sys; sys.path.insert(0, {str(kit)!r}); import map_lib as m; print(m.REGEN_CMD)")
@@ -519,6 +520,39 @@ def test_remedy_paths_are_real(tmp: Path):
     # the generated artifacts carry the same real prefix (they are the remedy's other home)
     inv = (repo / "memory" / "map" / "generated" / "inventories.json").read_text(encoding="utf-8")
     assert f"{PFX}{KIT_NAME}/gen_map.py" in inv, inv[:400]
+
+
+def test_gen_map_declared_python(tmp: Path):
+    """TOOL-dHomeGraded-3 AC1: `GEN_MAP_PYTHON` hands the run to the command it names, with the run's
+    own arguments; a run that already carries GEN_MAP_REEXEC, or a conf with no key, maps in place."""
+    import gen_map as gm
+    root = tmp / "declared"
+    root.mkdir()
+    exe = sys.executable.replace(chr(92), "/")
+    # exits 7 only when the handed argument list ends in `--check`, whose last letter is k (chr 107)
+    (root / m.CONF_NAME).write_text(
+        f"GEN_MAP_PYTHON=\"{exe} -c 'import sys; sys.exit(7 if sys.argv[-1].endswith(chr(107)) else 3)'\"\n",
+        encoding="utf-8")
+    saved_env = {k: os.environ.get(k) for k in ("CODEBASE_MAP_ROOT", gm.REEXEC_MARK)}
+    saved_argv = sys.argv
+    try:
+        os.environ["CODEBASE_MAP_ROOT"] = str(root)
+        os.environ.pop(gm.REEXEC_MARK, None)
+        sys.argv = ["gen_map.py", "--check"]
+        got = gm.run_declared_python()
+        assert got == 7, f"GEN_MAP_PYTHON was not handed the run with its arguments: {got!r}"
+        os.environ[gm.REEXEC_MARK] = "1"
+        assert gm.run_declared_python() is None, "a handed-off run handed off again"
+        os.environ.pop(gm.REEXEC_MARK, None)
+        (root / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
+        assert gm.run_declared_python() is None, "a conf with no GEN_MAP_PYTHON handed the run off"
+    finally:
+        sys.argv = saved_argv
+        for k, v in saved_env.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 def test_coverage_directions():
@@ -587,7 +621,7 @@ def test_attribution():
 
 
 def test_renders_round_trip_and_determinism():
-    text = m.render_baseline({"flags": ["b", "a"]}, IDS)
+    text = m.render_baseline({"flags": ["b", "a"]}, IDS, "abcdef12")
     parsed = m.parse_baseline(text, IDS)
     assert parsed["flags"] == ("a", "b") and parsed["routes"] == ()
     owners = {"x": claims(flags=("a_flag",)), "y": claims(flags=("b_flag",))}
@@ -931,18 +965,22 @@ def test_affordance_graced_presence(tmp: Path):
     map_dir = tmp / "memory" / "map"
     map_dir.mkdir(parents=True)
     assert m.load_affordance_exempt(tmp) == frozenset()  # absent file = no grace (fresh-repo default)
-    rendered = m.render_affordance_exempt(["b", "a", "a"])  # unsorted + dup
-    (map_dir / "affordance-exempt.toml").write_text(rendered, encoding="utf-8")
+    rendered = m.render_affordance_exempt(["b", "a", "a"], "abcdef12")  # unsorted + dup
+    (map_dir / m.AFFORDANCE_FILE).write_text(rendered, encoding="utf-8")
     assert m.load_affordance_exempt(tmp) == frozenset({"a", "b"})
-    assert rendered.endswith("\n") and rendered.index('"a"') < rendered.index('"b"')  # sorted, deduped
+    assert rendered.endswith("\n") and rendered.index("\na\t") < rendered.index("\nb\t")  # sorted, deduped
+    # TOOL-dWitnessedBar-16: a list graced to nothing is its header and the factory's unarmed line,
+    # which reads as no grace, never as an armed empty home.
+    (map_dir / m.AFFORDANCE_FILE).write_text(m.render_affordance_exempt([], "abcdef12"), encoding="utf-8")
+    assert m.load_affordance_exempt(tmp) == frozenset()
+    assert "# unarmed · dead probe · abcdef12" in m.render_affordance_exempt([], "abcdef12")
     for bad, needle in [
-        ("exempt = \"x\"\n", "exempt"),        # not a list
-        ("exempt = [1]\n", "exempt"),          # non-string element
-        ("exempt = [\"\"]\n", "exempt"),       # empty string
-        ("other = []\n", "exempt"),            # unknown key / no exempt
-        ("exempt = [\n", "toml parse error"),  # malformed toml
+        ("a\n", "not the key's fields"),                                          # no count, sha or disposition
+        ("a\tx\tabcdef12\tseeded\n", "the count is not a positive integer"),      # a count that is no count
+        ("a\t1\tabcdef12\tseeded\na\t1\tabcdef12\tseeded\n", "declared twice"),  # one dossier twice
+        ("exempt = [\"a\"]\n", "not the key's fields"),                          # the old TOML grammar
     ]:
-        (map_dir / "affordance-exempt.toml").write_text(bad, encoding="utf-8")
+        (map_dir / m.AFFORDANCE_FILE).write_text(bad, encoding="utf-8")
         try:
             m.load_affordance_exempt(tmp)
             raise AssertionError(f"load accepted a malformed exempt file (expected {needle!r})")
@@ -1587,20 +1625,22 @@ def test_baseline_additions_from_git(tmp: Path):
     run_git("add", "-A")
     run_git("commit", "-qm", "no map yet")
     bare = run_git("rev-parse", "HEAD")
-    baseline = tmp / "memory" / "map" / "baseline.toml"
+    # TOOL-dWitnessedBar-16 §8 F8: the baseline is a ledger population, its never-gains compare the
+    # factory's `compare_to_base` at the ladder's compare base, so the fixture registers it.
+    (tmp / "kit").mkdir()
+    (tmp / "kit" / "kit.toml").write_text(
+        'id = "fix"\n\n[[ledger]]\npopulation = "baseline"\nleg = "l"\nseed = []\nkey = "key"\n'
+        'fields = ["kind", "key"]\ndrain = "key"\ndirection = "shrink-only"\nhome = "memory/map/baseline.txt"\n',
+        encoding="utf-8")
+    baseline = tmp / "memory" / "map" / m.BASELINE_FILE
     baseline.parent.mkdir(parents=True)
-    baseline.write_text(m.render_baseline({"flags": ["a"]}, IDS), encoding="utf-8")
+    baseline.write_text(m.render_baseline({"flags": ["a"]}, IDS, "abcdef12"), encoding="utf-8")
     run_git("add", "-A")
     run_git("commit", "-qm", "seed the baseline")
     seeded = run_git("rev-parse", "HEAD")
-
-    same, note = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.toml")
-    assert same == {} and "base carried 1 key(s), working carries 1" in note, (same, note)
-    baseline.write_text(m.render_baseline({"flags": ["a", "b"], "routes": ["r"]}, IDS), encoding="utf-8")
-    added, _ = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.toml")
-    assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
-    none, why = cj.derive_baseline_additions(tmp, bare, "memory/map/baseline.toml")
-    assert none is None and "no memory/map/baseline.toml" in why, (none, why)
+    # A name no registration homes answers None and says so: the fixture registers baseline.txt alone.
+    nowhere, why = cj.derive_baseline_additions(tmp, seeded, "memory/map/unregistered.txt")
+    assert nowhere is None and "no [[ledger]] registration homes" in why, (nowhere, why)
     # TOOL-dLadderedRemote-2: the remote is the LADDER'S, not one called `origin`. The ambient
     # GOV_REMOTE and GOV_DEFAULT_BRANCH are cleared for these arms, so a node exporting either
     # cannot make one pass, and restored after.
@@ -1625,6 +1665,16 @@ def test_baseline_additions_from_git(tmp: Path):
         os.environ["GOV_REMOTE"] = "upstream"
         chosen, why = cj.resolve_compare_base(tmp)
         assert chosen == bare and "upstream/main" in why, (chosen, why)
+        # A compare base holding no baseline is NO comparison, never an empty one.
+        none, why = cj.derive_baseline_additions(tmp, bare, "memory/map/baseline.txt")
+        assert none is None and "no memory/map/baseline.txt" in why, (none, why)
+        run_git("update-ref", "refs/remotes/upstream/main", seeded)
+        same, note = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.txt")
+        assert same == {} and seeded[:12] in note, (same, note)
+        baseline.write_text(m.render_baseline({"flags": ["a", "b"], "routes": ["r"]}, IDS, "abcdef12"),
+                            encoding="utf-8")
+        added, _ = cj.derive_baseline_additions(tmp, seeded, "memory/map/baseline.txt")
+        assert added == {"flags": ["b"], "routes": ["r"]}, f"an added key must be named: {added}"
     finally:
         os.environ.pop("GOV_REMOTE", None)
         os.environ.pop("GOV_DEFAULT_BRANCH", None)
@@ -1859,6 +1909,9 @@ def main() -> int:
         )
     failures += check_guarded("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
                       test_js_probe_against_the_lexicon)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gen_map hands its run to GEN_MAP_PYTHON (TOOL-dHomeGraded-3)",
+                          lambda: test_gen_map_declared_python(Path(td)))
     failures += check("coverage both directions + ratchet guards", test_coverage_directions)
     failures += check("dossier contract fails loud", test_parse_contract)
     failures += check("the optional stage key: a list carried, a string refused (TOOL-dDeclaredLoop-4)", test_stage_key)

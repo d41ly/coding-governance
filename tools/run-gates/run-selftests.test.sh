@@ -204,6 +204,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -695,6 +713,34 @@ arm "a row naming a path git does not track reds" 1 "which git does not track" \
 
 arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg of that name" \
     "printf 'orphan\t60\t\tworst of 3 readings 5s, x1.5\n' >> $B" \
+    "$R --check"
+
+# ---------------------------------------------------------------- the plant-count token, TOOL-dPlacedRequest-99 S5
+# A row running `<tool root>/loop/<module>.py` carries `plants=<n>` equal to the module's PLANTS
+# once IMPORTED. The scratch module declares two plants and grows a third by `PLANTS.update`, the
+# shape the loop kit's budget module has, so a static count of its literal reads 2. The control
+# carries 3 and passes, counting the one row it graded; the token of 2 and a token of 4 each red,
+# naming the row and the runtime count. Staged against a runner with no such check, both pass.
+# The module sits where the runner's check looks, `<tool root>/loop/`, held in a variable as a fixture
+# names a kit directory it lays out.
+PT_LOOP="${PFX}loop"
+PT_MOD="mkdir -p $PT_LOOP && printf 'PLANTS = {\"a\": 1, \"b\": 2}\nPLANTS.update({\"c\": 3})\n' > $PT_LOOP/zq_plants.py"
+arm "TOOL-dPlacedRequest-99 S5 control · a loop-kit row whose plants= token equals its module's runtime PLANTS passes --check" 0 \
+    "plant tokens graded 1 row(s), 0 finding(s)" \
+    "$PT_MOD && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=3 a fixture row\n' >> $B && git add -A" \
+    "$R --check"
+arm "TOOL-dPlacedRequest-99 S5 a module that grows PLANTS by update after declaring two reds a row whose token reads 2" 1 \
+    "row 'zq fixtures' carries plants=2, and $PT_LOOP/zq_plants.py's PLANTS holds 3 plant(s) once imported" \
+    "$PT_MOD && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=2 a fixture row\n' >> $B && git add -A" \
+    "$R --check"
+arm "TOOL-dPlacedRequest-99 S5 a mismatched plants= token reds, naming the row and the runtime count" 1 \
+    "row 'zq fixtures' carries plants=4, and $PT_LOOP/zq_plants.py's PLANTS holds 3 plant(s) once imported" \
+    "$PT_MOD && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=4 a fixture row\n' >> $B && git add -A" \
+    "$R --check"
+# A module that fails to import is a finding naming it, never a row passed over as running no plants.
+arm "TOOL-dPlacedRequest-99 S5 a loop-kit module that fails to import reds, naming the row and the module" 1 \
+    "row 'zq fixtures' runs $PT_LOOP/zq_plants.py, which did not import" \
+    "$PT_MOD && printf 'raise RuntimeError(\"zq import refused\")\n' >> $PT_LOOP/zq_plants.py && printf 'zq fixtures\t60\tbash ${PFX}suite-ok.sh $PT_LOOP/zq_plants.py\tplants=3 a fixture row\n' >> $B && git add -A" \
     "$R --check"
 
 # ---------------------------------------------------------------- the shard token, TOOL-aBatchedArm-4 S1
@@ -1568,6 +1614,16 @@ arm "GOV_NODE spelling two adjacent registered tags with a space between is REFU
     "GOV_NODE is 't u', which is no tag the charter's" \
     "printf '| \`u\` | someone-else | fixture |\n' >> AGENTS.md" \
     "( GOV_NODE='t u' $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
+
+# THE USER IS MATCHED BY EQUALITY, never as a substring (TOOL-dPlacedRequest-99 S2, the resolver arm
+# TOOL-dPlacedRequest-43 S20 owed): a row whose user token is the user's first character, tag `s`, is
+# written ABOVE the exact row `t`, and the pooled run still keys its evidence on `t`. Staged against
+# the pre-S20 substring `case`, the run resolves `s` and refuses with no reading on node s.
+_s2_u=${USERNAME:-$USER}
+arm "TOOL-dPlacedRequest-99 S2 a registry row whose user token is a strict substring of the user, tag s, above the exact row t, leaves the pooled evidence keyed on t" 0 \
+    "under pooled@2x1 on node t" \
+    "printf '# fixture charter\n\n| Tag | Machine/user | Primary tree |\n|-----|---|---|\n| \`s\` | \`%s\` | fixture |\n| \`t\` | \`%s\` | fixture |\n' '${_s2_u:0:1}' '$_s2_u' > AGENTS.md" \
+    "$R --pooled"
 
 arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \
     "will not parse" \

@@ -22,6 +22,8 @@ reader and its active set (PLAY-dOrderedCharter-1).
     python instruction_units.py drive --list [--root <dir>]       # the selected kits' drive rows, each with its kit
     python instruction_units.py drive --check [--root <dir>] [--charter <path>]  # the rows and the charter, both ways
     python instruction_units.py map [--root <dir>]               # the map in the charter's envelope, for the replay
+    python instruction_units.py legacy --list            # the legacy list's seed: each file no lock row renders from units
+    python instruction_units.py pockets [--root <dir>] (--room <bytes> | --all)  # the card's level-2 units
 
 `LEVELS` is the one place an envelope, a unit row, a card or a map reads a level from: a tuple whose index is
 the level, so `len(LEVELS)` is the ladder's height and `LEVELS[n]` a level's name. `PLATFORM` names the
@@ -64,7 +66,8 @@ and source, and two active definitions of one term. A row carries no status: `de
 the records naming the tag, and `read_change_records` is every tree read's one source of them.
 
 THE POPULATION. `INSTRUCTION_PATHSPECS` is the instruction files, closed. `check_renderers` holds them against
-`renderers.toml` both ways and `check_legacy` against `instructions-legacy.txt`; the render gate calls both.
+`renderers.toml` both ways and `check_legacy` against `instructions-legacy.txt`, a ledger population under the
+memory root's `project/` folder (TOOL-dWitnessedBar-18); the render gate calls both.
 
 THE PRACTICES. `read_practice_catalogue` reads `practices.toml`: its `foundation` tags and its `[[practice]]`
 rows, each a tag, a line and a reach table, a row it refuses naming the row. `resolve_active_practices` turns
@@ -88,6 +91,15 @@ a row carries `hold`, one `held —` line saying the held document reads at its 
 `preset —` line, `PRESET_LINE_PENDING` until presets exist. MAP (PLAY-dOrderedCharter-4) prints it inside
 the charter row's envelope for the session replay, each level line cut at `MAP_LINE_BYTES`; a map past
 `MAP_CAP_BYTES` exits 2 with one `instruction-map:` line, as does a registry it cannot read, never 1.
+
+THE POCKETS (TOOL-dPlacedRequest-9 S3). POCKETS prints the orientation card's `## pockets` section: the
+level-2 units the card's slot composes, gov's units and the overlay's at HEAD through `overlay.py`'s
+`derive_slot_units` with the selector `reader.card`, each one whole `- <text>` line from `render_unit`, in
+the composition's order. `--room <n>` prints at most `<n>` bytes: the heading, the longest run of lines from
+the first that fits beside the closing `- … (+<k>) — instruction_units.py pockets --all` line, `<k>` the
+units left out, and no closing line when every line fits; a room too small for the heading and the closing
+line for every unit prints nothing, exit 0. `--all` prints every line. No unit prints `- none declared`. A
+refused read, composition or render exits 1 with one line, a malformed argv 2.
 
 THE DRIVE TABLE (PLAY-dOrderedCharter-6). Each kit's descriptor may carry `[[drive]]` rows, `stage`, `role`,
 `command` and `when`, which the renderer composes into the charter's drive section for the kits the target's
@@ -1081,13 +1093,25 @@ def check_renderers(root) -> list[str]:
     return reds
 
 
+def derive_legacy_path(root) -> pathlib.Path:
+    """The legacy list's home, `instructions-legacy.txt` under the tree's `<MEMORY_ROOT>/project/`, outside
+    this kit (TOOL-dWitnessedBar-18 §8 F7)."""
+    return pathlib.Path(root) / derive_instruction_tokens(root)["memory_root"].strip("/") / "project" / LEGACY_LIST
+
+
 def read_legacy(root) -> list:
-    """`instructions-legacy.txt`'s paths; absent, none."""
-    path = derive_kit_file(root, LEGACY_LIST)
-    if not path.is_file():
-        return []
-    lines = path.read_text(encoding="utf-8").splitlines()
-    return [ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")]
+    """`instructions-legacy.txt`'s paths, the `instructions-legacy` population's keys, read through
+    `positional.read_list` and its `[[ledger]]` registration (TOOL-dWitnessedBar-18 S5); absent, none. A list
+    the factory refuses raises the tag index's TagError, naming the population."""
+    import positional
+    return positional.read_list(root, derive_legacy_path(root)) or []
+
+
+def run_legacy_list(root) -> tuple[list, int]:
+    """`legacy --list`, the population's seed: each instruction file whose lock row lists no units, the
+    population `check_legacy` grades, as its path then the count (TOOL-dWitnessedBar-18 S4)."""
+    rendered = {r.get("path") for r in read_lock(root) if r.get("units")}
+    return [f"{f}\t1" for f in sorted(set(derive_instruction_files(root)) - rendered)], 0
 
 
 def check_legacy(root, value) -> list[str]:
@@ -1474,6 +1498,47 @@ def run_map(root=None) -> tuple[list, int]:
     if size > MAP_CAP_BYTES:
         return [f"instruction-map: {size} over MAP_CAP_BYTES"], 2
     return text.splitlines(), 0
+
+
+#: TOOL-dPlacedRequest-9 S3: the card's reader, the level its units sit at, and the section's two fixed lines
+POCKETS_SELECTOR = "reader.card"
+POCKETS_LEVEL = 2
+POCKETS_HEADING = "## pockets"
+POCKETS_NONE = "- none declared"
+
+
+def run_pockets(root=None, room=None) -> tuple[list, int]:
+    """S3: the card's `## pockets` section, every line with `room` None, else at most `room` bytes of whole
+    lines. Exit 0 with the lines, none where the room cannot hold the heading and the closing line; 1 with
+    one line on a refused read, composition or render."""
+    if str(KIT_DIR) not in sys.path:
+        sys.path.insert(0, str(KIT_DIR))
+    import overlay as ov  # inside the body: overlay imports this module
+    try:
+        root = pathlib.Path(root or run_git(".", "rev-parse", "--show-toplevel").strip())
+        units = read_units(root)
+        repo = ov.read_overlay(root)
+        exclude = ov.read_excluded_tags(root) if units else set()
+        policy_reader = ov.derive_policy_reader(root)
+        chosen = ov.derive_slot_units(units, repo.units, POCKETS_SELECTOR, exclude,
+                                      ov.derive_fixed_units(units, root), policy_reader)[0]
+        lines = [f"- {render_unit(u, policy_reader, root)}" for u in chosen if u.level == POCKETS_LEVEL]
+    except (ValueError, OSError, RuntimeError) as exc:  # OverlayRefused, UnitRowError, LevelError, TagError
+        return [f"pockets: refused · {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}"], 1
+    body = lines or [POCKETS_NONE]
+
+    def derive_size(rows) -> int:
+        return sum(len(r.encode("utf-8")) + 1 for r in rows)
+
+    if room is None or derive_size([POCKETS_HEADING, *body]) <= room:
+        return [POCKETS_HEADING, *body], 0
+    if not lines:
+        return [], 0
+    for keep in range(len(lines) - 1, -1, -1):
+        out = [POCKETS_HEADING, *lines[:keep], f"- … (+{len(lines) - keep}) — instruction_units.py pockets --all"]
+        if derive_size(out) <= room:
+            return out, 0
+    return [], 0
 
 
 def read_drive(root, engine_dir=KIT_DIR) -> tuple[list, list]:
@@ -2068,11 +2133,24 @@ def derive_template_rel() -> str:
     return derive_kit_rel(TEMPLATE_NAME)
 
 
+def derive_gate_legacy(legacy) -> str:
+    """The fixture's legacy list in the ledger grammar gov's registration renders, one row per path of
+    `legacy` (TOOL-dWitnessedBar-18 S5)."""
+    import positional
+    return positional.derive_fixture_list("instructions-legacy", [p for p in legacy.split("\n") if p])
+
+
+GATE_LEGACY_REL = f"memory/project/{LEGACY_LIST}"  # the fixture's MEMORY_ROOT is `memory`
+
+
 def write_gate_tree(c, legacy=GATE_LEGACY, **files):
-    """The tree the render gate grades green, `GATE_FILES` with `files` over them, one commit on main."""
+    """The tree the render gate grades green, `GATE_FILES` with `files` over them, one commit on main; the
+    legacy list's `[[ledger]]` table read from gov's registry into the fixture's own."""
+    import positional
     run_git(c.top, "checkout", "-q", "-b", "main")
     c.write_file(derive_kit_rel(RENDERERS_TABLE), GATE_TABLE)
-    c.write_file(derive_kit_rel(LEGACY_LIST), legacy)
+    c.write_file(derive_tool_rel("govkit", "registry.toml"), positional.derive_fixture_ledger(["instructions-legacy"]))
+    c.write_file(GATE_LEGACY_REL, derive_gate_legacy(legacy))
     c.write_file(derive_tool_rel("check-playbook-parity.sh"), "exit 0\n")
     for rel, text in {**GATE_FILES, **{k.replace("__", "/"): v for k, v in files.items()}}.items():
         c.write_file(rel, text)
@@ -2208,10 +2286,10 @@ def arm_legacy(c):
             rc == 1 and ".claude/agents/b.md is neither rendered from units nor on" in said, said)
     c.check("shrink-only reds a listed file whose lock row lists units as stale",
             rc == 1 and ".claude/agents/a.md is stale" in said, said)
-    c.write_file(derive_kit_rel(LEGACY_LIST), GATE_LEGACY + "memory/guides/GONE.md\n.claude/agents/b.md\n")
+    c.write_file(GATE_LEGACY_REL, derive_gate_legacy(GATE_LEGACY + "memory/guides/GONE.md\n.claude/agents/b.md\n"))
     rc, said = run_render(c.top, "--check-render")
     c.check("a listed path no instruction file holds is stale", rc == 1 and "memory/guides/GONE.md is stale" in said, said)
-    c.write_file(derive_kit_rel(LEGACY_LIST), GATE_LEGACY)
+    c.write_file(GATE_LEGACY_REL, derive_gate_legacy(GATE_LEGACY))
     c.write_file(".governance/policy.toml", 'instructions.legacy = "refuse"\n')
     run_commit(c.top, "refuse the list")
     rc, said = run_render(c.top, "--check-render")
@@ -2794,8 +2872,20 @@ def main(argv) -> int:
             opts = dict(zip(argv[2::2], argv[3::2]))
             top = pathlib.Path(opts.get("--root") or run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip())
             lines, rc = run_drive(top, argv[1], charter=opts.get("--charter"))
+        elif argv == ["legacy", "--list"]:
+            lines, rc = run_legacy_list(pathlib.Path(run_git(KIT_DIR, "rev-parse", "--show-toplevel").strip()))
         elif argv[:1] == ["map"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--root")):
             lines, rc = run_map(argv[2] if len(argv) == 3 else None)
+        elif argv[:1] == ["pockets"]:
+            rest = argv[1:]
+            top = rest[1] if rest[:1] == ["--root"] and len(rest) > 1 else None
+            mode = rest[2:] if top is not None else rest
+            if mode == ["--all"]:
+                lines, rc = run_pockets(top)
+            elif len(mode) == 2 and mode[0] == "--room" and mode[1].isascii() and mode[1].isdigit():
+                lines, rc = run_pockets(top, int(mode[1]))
+            else:
+                lines, rc = [__doc__.split("\n\n")[1]], 2
         elif argv[:1] == ["fixture"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--plant")):
             plant = argv[2] if len(argv) == 3 else None
             if plant is not None and plant not in PLANTS:

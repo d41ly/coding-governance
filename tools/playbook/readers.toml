@@ -14,3 +14,7 @@ why = "the driving session, which loads the charter"
 [[reader]]
 tag = "reader.subagent"
 why = "a spawned subagent, which loads no charter (gap-found-03)"
+
+[[reader]]
+tag = "reader.card"
+why = "the orientation card, which prints its level-2 units under ## pockets (TOOL-dPlacedRequest-9)"

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-4 — the runner-written verdict per tree, the pre-push hook reading it, and the tree Test verifies
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 17 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-5 · 2026-11-20 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 17 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0342@a3fc832c whole
 **Carries:** node:item.test.merge
@@ -13,24 +13,37 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-a.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-a.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-4-deviation-41.md](../build/2026-10-25-build-TOOL-dWitnessedBar-4-deviation-41.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-4-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-4-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-4-1-builder-return.md) | journal | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-4-deviation-42.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-deviation-42.md) | deviation | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-73.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-73.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-74.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-74.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-75.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-75.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-76.md](../build/2026-11-20-build-TOOL-dWitnessedBar-4-red-fix-76.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-55 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-4-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-4-build-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The per-tree green the push boundary adopts is written by whoever ran a bar: the pre-push hook
-(`write_bar_green`, `.githooks/pre-push:2288`), the unattended driver's close
-(`tools/unattended/unattended.sh:11057`) and the post-merge verifier
-(`tools/run-gates/post-merge.sh:337`), three copies of one grammar, none of them the runner that
+(`write_bar_green`, `.githooks/pre-push@176f5913:2488`), the unattended driver's close
+(`tools/unattended/unattended.sh#write_bar_green`) and the post-merge verifier
+(`tools/run-gates/post-merge.sh#write_bar_green`), three copies of one grammar, none of them the runner that
 judged the legs. The runner writes only a per-run record and a per-sha stamp (gap-test-02, gap-test-05;
 flow-steps' `hook-actor-kind` amend: `test.verdict` is the runner, whose record the hook reads). This
 unit makes the runner write one verdict per tree hash, has the hook read it in place of the three
@@ -40,7 +53,7 @@ writers, gives the Test step's merge its policy `verdict.tree`, and records the 
 ## 2. Scope (IN)
 
 - **S1** — The run record names its tree. The runner's `$RUNDIR/verdict` block
-  (`tools/run-gates/run-gates.sh:5545-5570`) gains `tree`, the tree hash of `HEAD` when the run started
+  (`tools/run-gates/run-gates.sh@4e410b10:5733-5758`) gains `tree`, the tree hash of `HEAD` when the run started
   clean, `-` otherwise (I8). Observed by AC1.
 - **S2** — The per-tree verdict. At the end of every run whose tree was clean at its start and did not
   move, the runner writes `<common-dir>/gate-verdict/<tree hash>` for a full run and
@@ -48,34 +61,50 @@ writers, gives the Test step's merge its policy `verdict.tree`, and records the 
   `derive_temp_path` and a rename, in the grammar of §4 "The record" (I8, `record-kind.verdict`).
   Observed by AC1, AC2 and AC3.
 - **S3** — The hook reads it. `.githooks/pre-push`'s bar-record candidates
-  (`.githooks/pre-push:1398-1417`), `check_bar_record` and `check_bar_base` read the pushed tree's
-  `gate-verdict/<tree hash>` and `.scoped` file through `read_bar_file`, adopting one only when it reads
-  `verdict GREEN` and passes the predicates the runner's own stamp passes in `check_green_record`
-  (`.githooks/pre-push:1453`). Observed by AC4 and AC5.
+  (`.githooks/pre-push@176f5913:1598-1617`), `check_bar_record`, `check_bar_base` and the bar branch
+  of the cover pass's `check_cover_record` (`.githooks/pre-push@176f5913:2190-2235`) read the pushed
+  tree's `gate-verdict/<tree hash>` and `.scoped` file through `read_bar_file`, adopting one only when
+  it reads `verdict GREEN` and passes the predicates the runner's own stamp passes in
+  `check_green_record` (`.githooks/pre-push@176f5913:1653`) and, for its reuse pair,
+  `check_green_reuse` (`.githooks/pre-push@176f5913:1749`). Observed by AC4 and AC5.
 - **S4** — The three hand-written per-tree records leave. The hook's `write_bar_green` and its call
-  (`.githooks/pre-push:2390-2408`), the driver's copy and the post-merge verifier's copy are deleted;
-  each of those bars runs the runner, which now writes the record. Observed by AC6.
+  (`.githooks/pre-push@176f5913:2611-2629`), the driver's copy and the post-merge verifier's copy are
+  deleted; each of those bars runs the runner, which now writes the record. The call's declines go
+  with it: the floor's advisory red (TOOL-dDeclaredLoop-2 S14, landed since the base) is a bar whose
+  runner record reads RED, which the hook never adopts; the declared STUB runs no runner; the
+  doc-only and inherited-base declines are unit 40's, on the runner's write rule. Observed by AC6.
   **Readers:** by name: `.githooks/pre-push`, `.githooks/pre-push.test.sh`,
   `.githooks/pre-push.runlog.test.sh`, `tools/unattended/unattended.sh`,
   `tools/unattended/unattended.test.sh`, `tools/run-gates/post-merge.sh`,
   `tools/run-gates/run-gates.evidence.test.sh` and `tools/run-gates/README.md`, every tracked file
-  outside the memory tree that spells `write_bar_green` or `gate-bar-green`, by a git grep at the base
-  · by value: `check_bar_record` and `check_bar_base` in `.githooks/pre-push`, which compare a record's
-  `sha`, `tree`, `kind` and `base`, re-pointed by S3; `tools/unattended/unattended.sh`'s gates-green
+  outside the memory tree that spells `write_bar_green` or `gate-bar-green`, by a git grep at the base,
+  re-derived at HEAD 666874a8 on 2026-11-20 as the same files, by the same git grep
+  · by value: `check_bar_record`, `check_bar_base` and `check_cover_record` in `.githooks/pre-push`,
+  which compare a record's `sha`, `tree`, `kind`, `base` and `bar`, re-pointed by S3; `tools/unattended/unattended.sh`'s gates-green
   check, which reads the record it wrote.
 - **S5** — `verdict.tree`. `tools/push-main.sh --prepare`, the actor of `test.merge`, reads
-  `verdict.tree` through `policy.py get` (TOOL-dGroundRules-2), the catalogue default `prepared-merge`
-  where the reader cannot run (TOOL-dGroundRules-3): under `prepared-merge` it merges the run's branch
-  onto the advertised tip as today (`cmd_prepare`, `tools/push-main.sh:844`); under `build-tip` it makes
-  no merge and pins the branch tip. Either way it prints one witness line naming the value, the SHA and
-  its tree hash. Observed by AC7.
+  `verdict.tree` through `policy.py get` (TOOL-dGroundRules-2), its kit found by
+  `resolve_lander_kit policy policy.py` (`tools/push-main.sh#resolve_lander_kit`, every lander stage's
+  one kit resolution), the catalogue default `prepared-merge` where either cannot run
+  (TOOL-dGroundRules-3): under `prepared-merge` it merges the run's branch onto the advertised tip as
+  today (`tools/push-main.sh#cmd_prepare`); under `build-tip` it makes no merge and pins the branch tip.
+  Either way it prints one witness line naming the value, the SHA and its tree hash. `--land`
+  (`tools/push-main.sh#cmd_land`) pushes only a prepared merge (`check_prepared_merge`) and re-prepares
+  through `cmd_prepare` on a race, so under `build-tip` it makes the landing merge itself, through the
+  merge path `--prepare` takes under `prepared-merge`, when HEAD carries none, and its race path takes
+  that merge path too (F4). Observed by AC7.
 - **S6** — `test.exit`'s verified tree. `TRANSITION_FIELDS` (TOOL-dDeclaredLoop-3,
-  `tools/loop/loop_transition.py`) gains `tree`, and the transition written at `item.test.exit` refuses
-  unless its `tree` names a full `gate-verdict/<tree hash>` reading `verdict GREEN` for the tree
-  `verdict.tree` selects. Observed by AC8.
+  `tools/loop/loop_transition.py#TRANSITION_FIELDS`) gains `tree`, a field `record` takes as
+  `--field tree=<hash>`, and the move `write_transition` records at `item.test.exit` (outcome
+  `recorded`, `testing -> deploying` in `tools/loop/loop.toml`) refuses unless its `tree` names a full
+  `gate-verdict/<tree hash>` reading `verdict GREEN` for the tree `verdict.tree` selects. Observed by
+  AC8.
 - **S7** — The key's catalogue row. `verdict.tree`'s row of `tools/policy/catalogue.toml`
   (TOOL-dGroundRules-1 S3) gets its `summary` and `usage`, drained from
-  `tools/policy/unsummarised-keys.txt` by `policy.py lists --write`; no row is added. Observed by AC9.
+  `tools/policy/unsummarised-keys.txt` by `policy.py lists --write`; no row is added. The rendered
+  `help/reference/policy.md`, which lists a row lacking either field under its unsummarised heading,
+  is re-rendered by `python tools/playbook/render_playbook.py --reference`, giving the key a section of
+  its own. Observed by AC9.
 - **S8** — The kit page. `tools/run-gates/README.md` states the verdict record kind, its two files, the
   keys this unit writes and the rule that keys are additive. NOT OBSERVED — prose, read by the closing
   review.
@@ -91,7 +120,9 @@ writers, gives the Test step's merge its policy `verdict.tree`, and records the 
 - The lease record `test.exit` writes onto once dPlacedRequest lands the lease kind; until then the
   transition record carries the tree, as flow-steps.md:365 says.
 - The `[[item]]` rows for `item.test.merge`, `item.test.verdict` and `item.test.exit`: TOOL-dDeclaredLoop-12
-  transcribes them, their actors naming the commands this unit makes real.
+  transcribed them into `tools/loop/loop.toml` since this spec's base, their actors
+  `command:test.merge`, `command:test.verdict` and `command:test.exit` naming the commands this unit
+  makes real; this unit edits none of them.
 - The unattended kit's own self-test suites: waived for this build's landing (README rule), so their
   arms over the deleted writer are amended citing that rule, not observed here.
 
@@ -121,8 +152,10 @@ by key, so a key added later is additive and changes no reader:
 | `<common-dir>/gate-verdict/<tree hash>` and `.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` or `scoped`), `base`, `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `run_id`, `stamped`, `by` (`runner`) |
 
 `kind` is `full` when `GATE_FULL=1` ignored every guard and `scoped` otherwise, `base` the resolved
-`BASE` a scoped run diffed against (`run-gates.sh:395-398`). The common dir is resolved once, as the
-`.shared` stamp resolves it (`RG_COMMON_RAW`, `run-gates.sh:5636-5651`), so every worktree of a clone
+`BASE` a scoped run diffed against (`tools/run-gates/run-gates.sh@4e410b10:557-569`). The common dir is
+resolved once, as the `.shared` stamp resolves it (`RG_COMMON_RAW`, asked at
+`tools/run-gates/run-gates.sh@4e410b10:118-122` and read at
+`tools/run-gates/run-gates.sh@4e410b10:5824-5839`), so every worktree of a clone
 reads one directory, and a full record never overwrites a scoped one or the reverse: two slots per
 tree, the two-slot rule the hook adopted (TOOL-aFrugalTurnstile-11 S1). The last run of a tree in a
 slot wins, GREEN or RED, because the record is what the latest bar said about that tree.
@@ -144,9 +177,9 @@ which is the rule the deleted writers stated for every decline.
 | `item.test.verdict` | `run-gates.sh`, on that tree | writes `gate-verdict/<tree>` for the merge's tree | for the tip's tree |
 | `item.test.exit` | the transition writer at `testing -> deploying` | `tree` = the merge's tree, refused without its GREEN | `tree` = the tip's tree |
 
-The witness line is `push-main: test.merge <value> <sha8> tree <tree hash>`. Under `build-tip` the
-landing still merges at `--land` and the hook still gates the pushed tree; the value decides which tree
-Test verifies, never whether the boundary runs.
+The witness line is `push-main: test.merge <value> <sha8> tree <tree hash>`. Under `build-tip`,
+`--land` makes the landing merge when HEAD carries none (F4) and the hook still gates the pushed tree;
+the value decides which tree Test verifies, never whether the boundary runs.
 
 ### Inventory
 
@@ -176,9 +209,11 @@ Live at landing; the hook, the driver and the post-merge verifier change in one 
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `tools/unattended/unattended.sh`
+- `tools/unattended/unattended.test.sh`
 - `tools/loop/loop_transition.py`
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
+- `help/reference/policy.md`
 
 ### Alternatives rejected
 
@@ -199,12 +234,15 @@ Live at landing; the hook, the driver and the post-merge verifier change in one 
 - testing — fixtures on scratch clones; the suite arms in §7 are observed RED then GREEN by the main
   loop at the close.
 - migration — none to run; stale files are ignored.
-- user docs — `tools/run-gates/README.md` (S8); no page under `help/` covers the boundary.
+- user docs — `tools/run-gates/README.md` (S8) and `help/reference/policy.md`, re-rendered with
+  `verdict.tree`'s section (S7). `help/policy.md`'s floor row says a red read as advisory writes no
+  green record, which stays true: the runner's record of that bar reads RED.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When the runner makes a full run, every guard ignored, over a fixture manifest
-  (`--legs <fixture>`) holding one passing leg in a clean scratch clone,
+  (`GATE_LEGS=<fixture>`, the runner's manifest knob at `tools/run-gates/run-gates.sh@4e410b10:415`)
+  holding one passing leg in a clean scratch clone,
   `<common-dir>/gate-verdict/<tree>` exists for `git rev-parse HEAD^{tree}` and reads `verdict GREEN`,
   `kind full`, `by runner`, and the run's `verdict` file holds the same `tree`.
   Red when: the record is written under the git dir of a linked worktree, or keyed by the SHA.
@@ -226,28 +264,35 @@ Live at landing; the hook, the driver and the post-merge verifier change in one 
   Red when: a writer of the hand-written record survives beside the runner's.
 - **AC7** — When `bash push-main.sh --prepare --slug x` runs on a scratch run branch under
   `verdict.tree = "build-tip"`, `HEAD` is unchanged and the witness line names `build-tip`, the tip and
-  its tree; under `prepared-merge` it names the merge it made.
-  Red when: `build-tip` still merges, so Test verifies a tree the value excluded.
-- **AC8** — When the transition writer is asked for `testing -> deploying` at `item.test.exit` with a
-  `tree` whose full per-tree record is missing or RED, it exits 1 naming the tree; with a GREEN record
-  it writes the transition carrying `tree=<hash>`.
+  its tree; under `prepared-merge` it names the merge it made. When `--land` then runs on that pinned
+  branch under `build-tip` over the suite's fixture remote, the remote's default branch holds a merge
+  whose first parent is the advertised tip and whose second is the pinned tip.
+  Red when: `build-tip` still merges at `--prepare`, so Test verifies a tree the value excluded, or
+  `--land` refuses the pinned tip for want of a prepared merge.
+- **AC8** — When the transition writer is asked for `testing -> deploying` at `item.test.exit`
+  (`loop_transition.py record --from testing --item item.test.exit --outcome recorded`) with a
+  `--field tree=<hash>` whose full per-tree record is missing or RED, it exits 1 naming the tree; with
+  a GREEN record it writes the transition carrying `tree=<hash>`.
   Red when: the exit records a tree no GREEN verdict covers.
 - **AC9** — When `python policy.py get verdict.tree` runs on the built tree, it prints `prepared-merge`,
-  and `grep -cx 'verdict.tree' unsummarised-keys.txt` under `tools/policy/` prints 0.
-  Red when: the row keeps an empty `summary` or `usage`.
+  and `grep -cx 'verdict.tree' unsummarised-keys.txt` under `tools/policy/` prints 0, and
+  `grep -c '^## .verdict\.tree.$' help/reference/policy.md` prints 1.
+  Red when: the row keeps an empty `summary` or `usage`, or the reference page still lists the key as
+  unsummarised.
 
 ## 7. Gates
 
-`measure-legs selftest` · `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates evidence` · `memory hygiene`
+`measure-legs selftest` · `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates evidence` · `memory hygiene` · `scratch-guard self-test` · `routed-commits selftest` · `tier2-review self-test` · `policy fixtures` · `policy check` · `loop transition record` · `help reference pages`
 
 The guards join's broad `.githooks/`, `tools/` and `tools/run-gates/` guards are excluded by the
 checker's floor; the bar at the close runs them all. The unattended kit's suites are waived for this
-build's landing (README rule), and dGroundRules' `policy check` leg is not in the manifest at this
-spec's base.
+build's landing (README rule). `policy check`, `loop transition record` and `help reference pages`,
+none in the manifest at this spec's base, carry no guard and run on every bar: they read S7's row,
+S6's field and S7's render.
 
 New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC1 AC2 AC3 · a dirty start and a scoped-after-full pair staged on a scratch clone · none
 New arm: .githooks/pre-push.test.sh · covers AC4 AC5 · a per-tree record planted RED, then from another manifest, then GREEN · none
-New arm: tools/push-main.test.sh · covers AC7 · `verdict.tree` planted as `build-tip` on a scratch run branch · none
+New arm: tools/push-main.test.sh · covers AC7 · `verdict.tree` planted as `build-tip` on a scratch run branch, then `--land` over the suite's fixture remote · none
 
 ## 8. Open questions
 
@@ -266,6 +311,17 @@ New arm: tools/push-main.test.sh · covers AC7 · `verdict.tree` planted as `bui
   records. (b) runs Test's bar on a tree the value excludes. RESOLVED (agent, 2026-10-25, delegated):
   (a), rung 1, flow-steps.md:356, "Under `build-tip`, it pins the build's tip". widens: none ·
   relaxes: none
+- **F4 — Under `build-tip`, what makes the landing merge?** `--land` pushes only a merge
+  `check_prepared_merge` finds on HEAD's first-parent line and re-prepares through `cmd_prepare` on a
+  race (`tools/push-main.sh#cmd_land`), so a tip F3 pinned is refused, and §4's rule that the landing
+  still merges had no actor. flow-steps.md:437 has `deploy.land` push "HEAD of the prepared merge" and
+  names no actor under `build-tip`. Options: (a) `--land`, under `build-tip` and with no prepared
+  merge on HEAD, takes `--prepare`'s merge path before its push, and its race path takes that path
+  too; (b) a new `--prepare` flag making the landing merge after Test, a public surface (M3 veto 2);
+  (c) `--prepare` under `build-tip` also writes the merge to a side ref `--land` pushes, a new write
+  surface (M3 veto 3). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3, the one survivor of the
+  vetoes, and it keeps AC7 and §4's rule. widens: none, since `--land` already merges on its race
+  path · relaxes: none
 
 ## 9. Revision log
 
@@ -276,13 +332,27 @@ New arm: tools/push-main.test.sh · covers AC7 · `verdict.tree` planted as `bui
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-56, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
+- rev-4 · 2026-11-19 · §7 · the leg line gains `scratch-guard self-test`, `routed-commits selftest`,
+  `tier2-review self-test` and `policy fixtures`, whose manifest guards hold the §4 paths
+  `tools/unattended/unattended.sh` and `tools/policy/catalogue.toml`, per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-17-spec-tokens-brief; nothing else moved.
+- rev-5 · 2026-11-20 · §1 · S3 S4 S5 S6 S7 · §3 · §4 · §5 · AC1 AC7 AC8 AC9 · §7 · §8 F4 · §10 ·
+  re-grounded at `666874a8` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-4-reground-brief: moved
+  hook and runner lines blob-pinned, the rest cited as `path#symbol`; S3 names the cover pass and
+  `check_green_reuse`; S4 names the floor's advisory-red decline the call gained; S5 reads through
+  `resolve_lander_kit` and F4 gives `--land` the landing merge under `build-tip`; S7 re-renders
+  `help/reference/policy.md`; AC1's manifest is `GATE_LEGS`; Files touched gains that page and
+  `tools/unattended/unattended.test.sh`; the leg line gains `policy check`, `loop transition record`
+  and `help reference pages`, landed since the base.
 
 ## 10. Reuse audit
 
 The seams extended are the runner's `$RUNDIR/verdict` block and its `.shared` common-dir placement
-(`tools/run-gates/run-gates.sh:5545-5651`), the hook's `read_bar_file` and runner-stamp predicates
-(`.githooks/pre-push:1418-1453`), `cmd_prepare` (`tools/push-main.sh:844`), and dDeclaredLoop's
-`TRANSITION_FIELDS`. `python tools/codebase-map/reuse_lookup.py "record the bar's verdict for a tree
+(`tools/run-gates/run-gates.sh@4e410b10:5733-5839`), the hook's `read_bar_file` and runner-stamp
+predicates (`.githooks/pre-push@176f5913:1618-1653`), `tools/push-main.sh#cmd_prepare` with its kit
+resolution `tools/push-main.sh#resolve_lander_kit`, and dDeclaredLoop's
+`tools/loop/loop_transition.py#TRANSITION_FIELDS`. The lookup below, re-run at `666874a8`, ranks the
+same generic stems. `python tools/codebase-map/reuse_lookup.py "record the bar's verdict for a tree
 hash so the push boundary can adopt it"` ranked generic stems (`tree` in a selftest, `records` in
 `tools/memory-tree/gotchas.py`, runlog's `write_record`) and named none of the three writers, which
 `git grep -c 'write_bar_green'` found. The recall probe returned TOOL-aFrugalTurnstile-2's brief, the

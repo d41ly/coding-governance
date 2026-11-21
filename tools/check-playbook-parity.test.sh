@@ -204,6 +204,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -287,7 +305,7 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
+  mkdir -p "$d/memory/project" "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}${WF}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
@@ -330,7 +348,11 @@ fixture() {
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
   # The bare `§2` is S4's NEAR-MISS: a section sign with no charter word, counted and never failed.
   printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\nthe runbook §2 lists the steps\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks   not adopter-facing as a kit.\n%s   planted as the lens-array bound owner, not a kit under test.\n' "$WF" > "$d/${FX}playbook-kit-waivers.txt"
+  printf '# waivers\nhooks\t1\tabcdef12\tseeded\n%s\t1\tabcdef12\tseeded\n' "$WF" > "$d/memory/project/playbook-kit-waivers.txt"
+  # The gate reads that registry through the memory-tree kit's ledger factory (TOOL-dWitnessedBar-16),
+  # so the factory and the two modules it imports sit in the fixture's memory-tree kit, as installed.
+  cp "$ROOT/${PFX}${MT_KIT}/legacy_ledger.py" "$ROOT/${PFX}${MT_KIT}/backlog.py" \
+    "$ROOT/${PFX}${MT_KIT}/coverage_join.py" "$d/${FX}${MT_KIT}/"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
   # redded on a missing owning source from the day that row landed, because this fixture built no
@@ -475,15 +497,15 @@ arm "AC5 a derivation missing its sentinel reds" red \
 # --- AC6 · both waiver-drain arms ----------------------------------------------------------------------
 arm "AC6a a waiver for a kit that is gone reds as stale" red \
   "a waiver row names a kit that no longer exists, so the row excuses nothing and is stale" \
-  sh -c 'printf "ghostkit  gone\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "ghostkit\t1\tabcdef12\tseeded\n" >> memory/project/playbook-kit-waivers.txt'
 arm "AC6b a waiver for a kit the playbook DOES name reds" red \
   "a waiver row names a kit the playbook DOES document, so the row excuses nothing" \
-  sh -c 'printf "memory-tree  redundant\n" >> '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'printf "memory-tree\t1\tabcdef12\tseeded\n" >> memory/project/playbook-kit-waivers.txt'
 
 # --- AC9 · the registry absent: red and STOP, never create one -------------------------------------------
 arm "AC9 an absent waiver registry reds and stops" red \
   "the kit waiver registry is absent and this gate never creates it: expected " \
-  sh -c 'git rm -q --cached '"${PFX}playbook-kit-waivers.txt"' >/dev/null 2>&1; rm -f '"${PFX}playbook-kit-waivers.txt"''
+  sh -c 'git rm -q --cached memory/project/playbook-kit-waivers.txt >/dev/null 2>&1; rm -f memory/project/playbook-kit-waivers.txt'
 
 # --- the two S2-stage integrity guards ----------------------------------------------------------
 # Both mutate the fixture's OWN copy of the gate, which is what a red proof of THIS kind of guard

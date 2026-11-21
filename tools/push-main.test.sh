@@ -187,6 +187,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
@@ -196,7 +214,19 @@ trap 'rm -rf "$tmp"' EXIT
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@e GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@e
 export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
 fail=0
-ok()  { echo "  ok   — $1"; }
+# THE COUNT AND ITS FLOOR (TOOL-dPlacedRequest-98). `ok` counts the rows it prints and every
+# dependency skip sets `skipped`; the closing lines compare the count with the pin only where no
+# dependency skip fired, the install where every block runs, so a block whose arms stop running
+# there reds rather than ending `all cases ok`. A skip is admissible only for a dependency genuinely
+# absent, never for a fixture step that failed. PINNED on node d, 2026-11-21: the ok rows the suite
+# runs with every block running, DERIVED from its 97 `ok` call sites plus the 14 loop's second file
+# and the 37 loop's three further plantable rows, owed the main loop's first reading of the leg;
+# every later unit adding an `ok` row that runs there raises it.
+# 103 = 101 + TOOL-dPlacedRequest-99 S3's two fenced-landing rows, 55 and 56, one `ok` call site run
+# twice by its loop, counted off the block; no suite ran in the pass.
+FLOOR_ASSERTIONS=103
+n=0; skipped=0
+ok()  { echo "  ok   — $1"; n=$((n + 1)); }
 bad() { echo "  FAIL — $1"; fail=1; }
 
 # stub gate: RED iff $tmp/gate-fail; on $tmp/race-once, advance origin behind our back, then remove it.
@@ -253,36 +283,6 @@ if bash "$lander" >/dev/null 2>&1; then ok "2 push-main lands (marker + green ga
 # 2c — case 1's token does not survive a later SUCCESSFUL push, or the lander would one day report a
 #      refusal that never happened.
 [ -f "$gitdir/pre-push-refusal" ] && bad "2c a stale refusal token survived a successful push" || ok "2c a successful push leaves no refusal token"
-
-# 2d — a claim push in flight in this git dir holds the lander until its recorded deadline, then it
-#      lands (TOOL-aGraftedHelix-36 S10). RED with the wait cut: it pushes at once beside the lock.
-#      LOAD-INDEPENDENT (TOOL-aClassedKnob-2): a deadline 3s out expired before a loaded host's lander
-#      reached it. The deadline is now far, under the 120s ceiling, and a releaser removes the lock 3s
-#      after the lander's marker appears — the lander touches it immediately before it waits, so the
-#      lock is still held when it first looks. The verdict reads the lander's own announcements.
-git commit -q --allow-empty -m c2d
-mkdir "$gitdir/claim-push.lock"; echo "$(( $(date +%s) + 100 ))" > "$gitdir/claim-push.lock/until"
-( for _i in $(seq 1 1000); do [ -e "$gitdir/push-main-active" ] && break; sleep 0.1; done
-  sleep 3; rm -rf "$gitdir/claim-push.lock" ) & rel2d=$!
-out2d=$(bash "$lander" 2>&1); rc2d=$?
-wait "$rel2d"
-case "$out2d" in
-  *"proceeding past a claim-push lock"*) bad "2d the lander passed the lock instead of waiting for its release: $out2d" ;;
-  *"waited "*"s for a claim push in flight in this git dir"*) [ "$rc2d" = 0 ] \
-    && ok "2d a live claim-push lock holds the lander until it is released, then it lands" || bad "2d rc=$rc2d: $out2d" ;;
-  *) bad "2d the lander did not wait for a live claim-push lock: $out2d" ;;
-esac
-# 2e — an expired lock is announced and passed at once.
-git commit -q --allow-empty -m c2e
-mkdir -p "$gitdir/claim-push.lock"; echo "$(( $(date +%s) - 5 ))" > "$gitdir/claim-push.lock/until"
-out2e=$(bash "$lander" 2>&1); rc2e=$?
-case "$out2e" in
-  *"waited "*) bad "2e the lander waited on an expired claim-push lock: $out2e" ;;
-  *"proceeding past a claim-push lock whose deadline passed"*) [ "$rc2e" = 0 ] \
-    && ok "2e an expired claim-push lock is announced and passed, and the push lands" || bad "2e rc=$rc2e $out2e" ;;
-  *) bad "2e an expired claim-push lock was not announced: $out2e" ;;
-esac
-rm -rf "$gitdir/claim-push.lock"
 
 # 3 — reconcile-before-gate
 git -C "$tmp/racer" pull -q; git -C "$tmp/racer" commit -q --allow-empty -m ahead; git -C "$tmp/racer" push -q origin main
@@ -376,6 +376,7 @@ chmod +x "$tmp/killed-hook/pre-push"
 git commit -q --allow-empty -m sg-ac3
 rm -f "$gcd/unattended-landed"
 git config core.hooksPath "$tmp/killed-hook"
+_bl0=$(grep -c 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null); _bl0=${_bl0:-0}
 outsg=$( ( unset GOV_GATE_CMD_TEST; bash "$lander" 2>&1 ) ); rcsg=$?
 git config core.hooksPath .githooks
 case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git -C "$tmp/remote.git" rev-parse main)" in
@@ -386,6 +387,16 @@ case "$rcsg|$([ -f "$gcd/unattended-landed" ] && echo marker || echo none)|$(git
     esac ;;
   0*) bad "SG AC3 the lander called a push with no hook verdict landed (rc 0): $outsg" ;;
   *) bad "SG AC3 expected rc 4, no marker and the remote at HEAD, got rc $rcsg marker $([ -f "$gcd/unattended-landed" ] && echo yes || echo no): $outsg" ;;
+esac
+# BYP AC2 (TOOL-dWitnessedBar-2) — AND THE UNGATED LANDING IS RECORDED: the journal under the common dir
+#      gains ONE `decision=bypass` line, `bypass=ungated-landing`, naming the pushed sha, the policy and
+#      a `tree_verdict` field (`none` here, where no run-gates kit sits beside the fixture lander), and
+#      stderr carries its `bypass:` line. Red when the UNGATED path prints its line and records nothing.
+_bl=$(grep 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null | tail -1)
+case "$rcsg|$(grep -c 'decision=bypass' "$gcd/runlog/pushes.log" 2>/dev/null)|$_bl|$outsg" in
+  "4|$((_bl0 + 1))|"*$'\tev=once\tdecision=bypass\tbypass=ungated-landing\tsha='"$(git rev-parse HEAD)"$'\tpolicy=allowed\ttree_verdict=none'*"bypass: ungated-landing · "*)
+    ok "BYP AC2 the UNGATED landing writes one bypass line naming the pushed sha, its policy and its tree verdict, and says so on stderr" ;;
+  *) bad "BYP AC2 expected rc 4 and one ungated-landing line naming $(git rev-parse --short HEAD), got rc $rcsg: $_bl | $outsg" ;;
 esac
 # SG re-run (closing review round 1) — NOTHING PUSHED IS NOT UNGATED. The remote now holds HEAD, so git
 #      runs the real hook with no ref lines, it exits as skip-nondefault and writes no allow record, and
@@ -602,7 +613,7 @@ if [ -n "$lib" ] && [ -f "$SRC/$lib" ]; then
     bad "11 before=$(cat "$tmp/bc-before" 2>/dev/null) after=$(cat "$tmp/bc-after" 2>/dev/null)"
   fi
 else
-  echo "  skip — 11 build_commit: this tree carries no unattended-kit library, so the join this case grades does not exist here"
+  skipped=1; echo "  skip — 11 build_commit: this tree carries no unattended-kit library, so the join this case grades does not exist here"
 fi
 
 # 12 — the hook refuses an unmarked worktree push; --land is accepted; and the foreign commit
@@ -896,7 +907,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ]; then
   ) && ok "24 --prepare mints runlog's next version into the prepared merge and says so once" \
     || bad "24 the prepared merge does not carry the minted runlog version (or the tree was left dirty)"
 else
-  echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
+  skipped=1; echo "  skip — 24 no govkit deployer or runlog kit beside this lander, so the mint arm did not run"
 fi
 
 # 25 — TOOL-aMendedFleet-111 AC2: THIS lander run in a tree that lacks the lexicon and govkit files
@@ -935,7 +946,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
     && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
     || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
 else
-  echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
+  skipped=1; echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
 
 # ---- THE POST-MERGE BAR AFTER A LANDING — TOOL-aFrugalTurnstile-8 ---------------------------------
@@ -1025,6 +1036,14 @@ d9=$(diff <(read_parser_slice "$HERE/push-main.sh") <(read_parser_slice "$SRC/.g
 [ -z "$d9" ] && [ -n "$(read_parser_slice "$HERE/push-main.sh")" ] && [ -n "$d9b" ] \
   && ok "pm9 read_policy_key is byte-identical to the pre-push hook's, and a staged break shows" \
   || bad "pm9 parity diff: $d9 | break diff empty: $([ -z "$d9b" ] && echo yes || echo no)"
+# BYP S2 (TOOL-dWitnessedBar-2) — the bypass record's writer is byte-identical to the hook's, held as
+#      pm9 holds the parser; a one-byte break in a scratch copy shows.
+read_bypass_slice() { awk '/^write_bypass_line\(\)/,/^}/' "$1"; }
+sed 's/decision=bypass/decision=bypasz/' "$HERE/push-main.sh" > "$tmp/pm-copy.sh"
+d9c=$(diff <(read_bypass_slice "$HERE/push-main.sh") <(read_bypass_slice "$SRC/.githooks/pre-push")); d9d=$(diff <(read_bypass_slice "$tmp/pm-copy.sh") <(read_bypass_slice "$SRC/.githooks/pre-push"))
+[ -z "$d9c" ] && [ -n "$(read_bypass_slice "$HERE/push-main.sh")" ] && [ -n "$d9d" ] \
+  && ok "BYP S2 write_bypass_line is byte-identical to the pre-push hook's, and a staged break shows" \
+  || bad "BYP S2 parity diff: $d9c | break diff empty: $([ -z "$d9d" ] && echo yes || echo no)"
 # 26 — TOOL-aRoutedQuill-3 AC11: the ATTENDED landing's mint commit names the newest unit the pushed
 #      range attributes, `mint: kit versions onto origin/main at <sha8> for <unit>`, and carries a
 #      `Pass: none` trailer, because it touches version carriers under ROUTED_PATHS and the pre-push
@@ -1077,7 +1096,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_mt_rl" ] && [ -n "$_mt_rc" ]; then
     && ok "26 the attended mint commit names the range's newest unit and carries Pass: none, and it lands" \
     || bad "26 the attended mint subject or trailer is wrong, or the landing failed: $out26"
 else
-  echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
+  skipped=1; echo "  skip — 26 no govkit deployer, runlog kit or memory-tree kit beside this lander, so the mint-subject arm did not run"
 fi
 
 # 27 — TOOL-aRoutedQuill-12 AC16: a `--newest-unit` that REFUSES names no unit. Its refusal prints on
@@ -1291,7 +1310,7 @@ PY
   #      install without one says so, as 28-32 do without regen.py.
   _pk_k=$(cd "$HERE" && for d in */; do [ -f "$d/policy.py" ] && [ -f "$d/catalogue.toml" ] && { printf '%s' "${d%/}"; break; }; done)
   if [ -z "$_pk_k" ]; then
-    echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
+    skipped=1; echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
   elif [ -z "$_py_arms" ]; then
     bad "33 no python launcher runs, so the prepared merge's checks cannot be read"
   else
@@ -1319,7 +1338,7 @@ PY
     fi
   fi
 else
-  echo "  skip — 28-32, 42 and 44 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+  skipped=1; echo "  skip — 28-32, 42 and 44 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi
 
 # 34 — TOOL-dSafePassage-8 AC5: --prepare walks every declared upgrade step on gov's own tree first,
@@ -1394,7 +1413,7 @@ PY
       *) bad "36 a refused regeneration after a passing walk left the walk's files untracked, or the retry folded or refused on them: $out36" ;;
     esac
   else
-    echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
+    skipped=1; echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
   fi
   # 39 — TOOL-dSafePassage-35 AC10: a snapshot that cannot be written refuses before the walk. With
   #      TMPDIR naming a file, `mktemp` fails, so --prepare exits 1 with the gov-first stage's own
@@ -1431,7 +1450,7 @@ PY
     *) bad "39 the attended landing's unwritable snapshot fell through to the walk, or its refusal is not the full message: $out39" ;;
   esac
 else
-  echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
+  skipped=1; echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
 fi
 
 # 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
@@ -1462,8 +1481,8 @@ case "$out35" in
   *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
 esac
 
-# 37 — TOOL-dSafePassage-28: EVERY refusal of cmd_prepare after the gov-first walk leaves a clean
-#      tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of cmd_prepare from
+# 37 — TOOL-dSafePassage-28: EVERY refusal of --prepare's merge path after the gov-first walk leaves a
+#      clean tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of write_prepared_merge from
 #      its `run_gov_first` call to its end, in source order: stage | plant | expect. The arm derives
 #      that count from the lander beside this suite and reds when the table's row count differs, so a
 #      refusal added later joins the table or reds here. A refusal spelled other than `return 1` is
@@ -1484,7 +1503,8 @@ PREPARE_REFUSALS=(
 )
 # TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
 # a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
-# mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
+# mention of the name, to the closing brace of write_prepared_merge, cmd_prepare's merge path since
+# TOOL-dWitnessedBar-4 S5, here-document and continued lines aside.
 measure37() {  # lander path -> the count on stdout
   "$_py_arms" -c '
 import importlib.util, re, sys
@@ -1492,7 +1512,7 @@ spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
 arms = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(arms)
 rows = [r for r in arms.scan_shell_lines(open(sys.argv[2], encoding="utf-8").read()) if r]
-start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
+start = next(i for i, r in enumerate(rows) if r[0].startswith("write_prepared_merge()"))
 end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
 at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
 print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
@@ -1515,15 +1535,15 @@ if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" 
        /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
     "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
   b37=$(measure37 "$tmp/lander37-blanked.sh")
-  # the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
-  measure_raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+  # the anchors occur twice in the lander, so the plant's liveness is read inside write_prepared_merge: three more lines
+  measure_raw37() { awk '/^write_prepared_merge\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
   if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(measure_raw37 "$tmp/lander37-blanked.sh")" = "$(( $(measure_raw37 "$HERE/push-main.sh") + 3 ))" ]; then
     ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
   else
     bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
   fi
 else
-  echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
+  skipped=1; echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
 fi
 n37=0
 for _row37 in "${PREPARE_REFUSALS[@]}"; do
@@ -1531,7 +1551,7 @@ for _row37 in "${PREPARE_REFUSALS[@]}"; do
   IFS='|' read -r st37 pl37 ex37 <<< "$_row37"
   case "$pl37" in unplantable:*) echo "  skip — 37 $st37: ${pl37#unplantable: }, so this refusal is NOT covered"; continue ;; esac
   if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py_arms" ]; then
-    echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
+    skipped=1; echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
     continue
   fi
   out37=$(
@@ -1683,7 +1703,7 @@ if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
     *) bad "40 the attended landing with a failing witness did not refuse at gov first on a clean tree, or the retry did not land: $out40" ;;
   esac
 else
-  echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
+  skipped=1; echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
 fi
 
 # 41 — PLAY-dOrderedCharter-85 AC1: --prepare folds gov first's walk into the merge BEFORE it
@@ -1711,8 +1731,362 @@ if [ -n "$_mt_gk" ] && [ -n "$_rg_k" ] && [ -n "$_py_arms" ]; then
     *) bad "41 --prepare regenerated over gov first's uncommitted walk, or left no single clean merge holding the planted step's receipt: $out41" ;;
   esac
 else
-  echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
+  skipped=1; echo "  skip — 41 no govkit deployer or no run-gates kit holding regen.py beside this lander, or no python launcher, so the fold-before-regeneration arm did not run"
 fi
+
+# 42 — TOOL-dWitnessedBar-4 AC7: `verdict.tree` planted as `build-tip`, through a policy reader
+#      committed beside the lander that prints FIX_VERDICT_TREE. --prepare leaves HEAD where it was and
+#      its witness line names build-tip, the tip and its tree; under `prepared-merge` it names the merge
+#      it made. --land on the pinned branch under build-tip then makes the landing merge itself, so the
+#      fixture remote's main is a merge whose first parent is the advertised tip and second the pinned
+#      tip. Its own remote, so the planted reader never reaches another case's branch. Red at the base
+#      lander, which merges at --prepare whatever the value says.
+out42=$(
+  git init -q --template= --bare "$tmp/remote42.git"
+  setup_repo "$tmp/work42" origin "$tmp/remote42.git" >/dev/null
+  git push -q --no-verify origin main && git -C "$tmp/remote42.git" symbolic-ref HEAD refs/heads/main
+  R42=$(git rev-parse HEAD)
+  git checkout -q -b feat
+  pk=policy  # the planted reader's kit directory and file stem, named once
+  mkdir -p "./${KIT_REL}$pk"
+  printf 'import os, sys\nif sys.argv[1:] != ["get", "verdict.tree"]:\n    sys.exit(2)\nprint(os.environ.get("FIX_VERDICT_TREE", "prepared-merge"))\n' > "./${KIT_REL}$pk/$pk.py"
+  echo "u42" > src-u42.txt
+  git add -A && git commit -q -m "TOOL-tFix-42: a unit and the planted verdict.tree reader"
+  T42=$(git rev-parse HEAD)
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --prepare --slug tFix 2>&1); echo "pin-rc=$?"
+  [ "$(git rev-parse HEAD)" = "$T42" ] && echo head-kept=1
+  case "$o" in *"push-main: test.merge build-tip ${T42:0:8} tree $(git rev-parse "$T42^{tree}")"*) echo pin-witness=1 ;; esac
+  git checkout -q -b feat-merge "$T42"
+  o=$(FIX_VERDICT_TREE=prepared-merge bash "$lander" --prepare --slug tFix 2>&1); echo "merge-rc=$?"
+  M42=$(git rev-parse HEAD)
+  [ "$(git rev-parse HEAD^1)" = "$R42" ] && case "$o" in *"push-main: test.merge prepared-merge ${M42:0:8} tree $(git rev-parse "$M42^{tree}")"*) echo merge-witness=1 ;; esac
+  git checkout -q feat
+  o=$(FIX_VERDICT_TREE=build-tip bash "$lander" --land --slug tFix 2>&1); echo "land-rc=$?"
+  L42=$(git -C "$tmp/remote42.git" rev-parse refs/heads/main)
+  [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^1")" = "$R42" ] && [ "$(git -C "$tmp/remote42.git" rev-parse "$L42^2")" = "$T42" ] && echo landed-merge=1
+  printf '%s\n' "$o" | tail -5
+)
+case "$out42" in
+  *"pin-rc=0"*"head-kept=1"*"pin-witness=1"*"merge-rc=0"*"merge-witness=1"*"land-rc=0"*"landed-merge=1"*)
+    ok "42 build-tip pins the tip at --prepare with its witness line, prepared-merge names its merge, and --land makes the landing merge onto the advertised tip" ;;
+  *) bad "42 expected the pinned tip, both witness lines and a landing merge of the pinned tip onto the advertised tip: $out42" ;;
+esac
+
+# 43 — TOOL-dWitnessedBar-6 AC9: under `verdict = "peer-node"` with no peer verdict, the fixture lander
+#      of `verdict_backends.py --fixture --plant lander-peer` publishes refs/gov/candidate/<sha> and
+#      exits 1 naming NONE, its remote's main unmoved. The plant builds the fixture repository and its
+#      bare remote in the system temp dir, beside a copy of THIS lander, and owes its all-held line.
+#      Red at a lander that skips the verdict read before its push and lands on its own hook.
+_vb_k=$(cd "$HERE" && for d in */; do [ -f "$d/verdict_backends.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_vb_k" ] && [ -n "$_py_arms" ]; then
+  out43=$("$_py_arms" "$HERE/$_vb_k/verdict_backends.py" --fixture --plant lander-peer 2>&1); rc43=$?
+  case "$rc43:$out43" in
+    "0:"*"plant lander-peer · "*"all held"*)
+      ok "43 under peer-node with no peer verdict the lander publishes its candidate, exits 1 naming NONE and lands nothing" ;;
+    *) bad "43 the lander-peer plant exited $rc43 or missed a scenario: $(printf '%s\n' "$out43" | grep -E 'MISSED|not run' | tr '\n' ' ')" ;;
+  esac
+else
+  echo "  skip — 43 no run-gates kit holding verdict_backends.py beside this lander, or no python launcher, so the peer-node landing arm did not run"
+fi
+
+# 44 — TOOL-dWitnessedBar-2 AC5: `off-node --backend local-hook` exits 1 naming peer-node and remote-ci,
+#      and the fixture lander of `verdict_backends.py --fixture --plant lander-refused`, under
+#      `hooks.bypass = "refused"` and `verdict = "local-hook"`, exits 1 before any push naming verdict and
+#      those two off-node names, its remote's refs unchanged. Red at a lander that honours `refused` on
+#      the node it claims to guard, which its own bypass skips.
+if [ -n "$_vb_k" ] && [ -n "$_py_arms" ]; then
+  out44=$("$_py_arms" "$HERE/$_vb_k/verdict_backends.py" --fixture --plant lander-refused 2>&1); rc44=$?
+  case "$rc44:$out44" in
+    "0:"*"plant lander-refused · "*"all held"*)
+      ok "44 under hooks.bypass refused and verdict local-hook the lander refuses before any push, naming the off-node backends" ;;
+    *) bad "44 the lander-refused plant exited $rc44 or missed a scenario: $(printf '%s\n' "$out44" | grep -E 'MISSED|not run' | tr '\n' ' ')" ;;
+  esac
+else
+  echo "  skip — 44 no run-gates kit holding verdict_backends.py beside this lander, or no python launcher, so the refused-bypass landing arm did not run"
+fi
+
+
+# 42-51 — TOOL-dPlacedRequest-15: THE FENCED PUSH. A bare remote and clone A, each push's hook a stub
+#      that writes the allow record `check_push_allow` reads and exits 0, the unattended kit beside
+#      this lander standing at the fixture's own `<prefix>unattended/` as a one-line launcher of a
+#      copy of it in the fixture's own kit tree (below),
+#      leases on, and clone A's session `sA` holding the build lease `fx` under fleet tag `a`. Clone B
+#      takes the lease over as fleet tag `b`, same session, which the `lease` column reads `same`.
+#      A planted fence read stands in a stub driver committed at the same place. Staged against the
+#      base lander, which pushes one ref and reads no fence: 42 moves no lease, 43 lands, 44 to 47
+#      land, and 48 lands the attended `--slug`, which the base refuses outright. The hook also runs,
+#      once, a planted script from clone B: 52 and 53 (TOOL-dPlacedRequest-29) plant a lease commit
+#      there, over a fixture made again after 51 took the driver away. Staged against
+#      TOOL-dPlacedRequest-15's lander, which classifies both `fenced`: 52 exits 1 and lands nothing.
+#      WHAT THIS DOES NOT CHECK: a real remote's `--atomic` (the spec's AC1, at the build run), and
+#      the change-feed census over this lander, which the lib dir's own suite reads.
+#      THE FIXTURE'S OWN REGISTRY (TOOL-dPlacedRequest-98): the launcher execs a COPY of the driver's
+#      kit in a scratch kit tree under FX, beside a copy of the playbook kit whose `fleet.toml` holds
+#      the fixture's two rows, so `resolve_fleet_tag` finds that registry by its kit probe and never
+#      the live one; the tree is a git root of its own because the probe's answer is repo-relative.
+#      The launcher runs the copy with GOV_NODE unset, so every driver call made through it, the
+#      fixture's acquire, the lander's fence reads and the hook's take-over, ignores the ambient node.
+_fn_k=$(cd "$HERE" && for d in */; do [ -f "$d/unattended.sh" ] && [ -f "$d/lib-unattended.sh" ] && { printf '%s' "${d%/}"; break; }; done)
+_fn_pb=$(cd "$HERE" && for d in */; do [ -f "$d/render_playbook.py" ] && { printf '%s' "${d%/}"; break; }; done)
+FX="$tmp/fx"
+write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 with the failed step's own line in fx_line
+  rm -rf "$FX"; mkdir -p "$FX"
+  fx_line="no playbook kit holding render_playbook.py beside this lander, so the fixture's registry has no reader to copy"
+  [ -n "$_fn_pb" ] || return 1
+  fx_line="the fixture's kit tree could not be made under $FX/kit"
+  git init -q --template= "$FX/kit" && cp -R "$HERE/$_fn_k" "$FX/kit/$_fn_k" && cp -R "$HERE/$_fn_pb" "$FX/kit/$_fn_pb" \
+    && printf '[[node]]\ntag = "%s"\nuser = "%s"\nhost = ""\nprojects_root = "%s"\nvariances = ""\n\n' a daily-agent "$FX" b agent5 "$FX" \
+      > "$FX/kit/$_fn_pb/fleet.toml" || return 1
+  for _fn_s in policy loop; do # the driver's optional siblings its lease verbs resolve, where this install has them
+    [ ! -d "$HERE/$_fn_s" ] || cp -R "$HERE/$_fn_s" "$FX/kit/$_fn_s" || return 1
+  done
+  fx_line="the fixture's remote and clones could not be made under $FX"
+  git init -q --template= --bare -b main "$FX/o.git"
+  git init -q --template= -b main "$FX/a"
+  ( cd "$FX/a" || exit 1
+    mkdir -p "./${KIT_REL}$_fn_k" .githooks memory/builds/fx
+    cp "$HERE/push-main.sh" "$lander"
+    printf '#!/usr/bin/env bash\nexec env -u GOV_NODE bash "%s" "$@"\n' "$FX/kit/$_fn_k/unattended.sh" > "${KIT_REL}$_fn_k/unattended.sh"
+    printf '#!/usr/bin/env bash\ngd=$(git rev-parse --git-dir)\nwhile read -r _l s r _o; do [ "$r" = refs/heads/main ] && printf "%%s\\tstub\\n" "$s" > "$gd/pre-push-allow"; done\nif [ -f "%s/take-once" ]; then rm -f "%s/take-once"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && USERNAME=agent5 bash "%s" --lease take-over build fx >&2 ); fi\nif [ -f "%s/plant-once" ]; then mv -f "%s/plant-once" "%s/plant-ran"; ( unset GIT_DIR GIT_WORK_TREE; cd "%s/b" && bash "%s/plant-ran" >&2 ); fi\nexit 0\n' \
+      "$FX" "$FX" "$FX" "${KIT_REL}$_fn_k/unattended.sh" "$FX" "$FX" "$FX" "$FX" "$FX" > .githooks/pre-push
+    printf '%s\n' 'MEMORY_ROOT=memory' 'RUN_CLAIMS="on"' 'LANDER="echo land"' 'LANDER_MODE="primary"' 'BYPASS_BAN="--no-verify"' \
+      'GATE_CMD="true"' 'GATE_WALL="21600"' 'RESUME_SCHEDULE="off"' 'RESUME_SCHEDULE_DELAY=1800' 'RESUME_SCHEDULE_LIMIT=6' \
+      'GATE_BOUND=3600' 'UNIT_STALL_BOUND=1800' 'RESUME_STALE_BOUND=5400' > .unattended.conf
+    echo x > memory/builds/fx/README.md
+    git config core.hooksPath .githooks
+    git add -A && git commit -q -m base && git remote add origin "$FX/o.git" \
+      && git push -q --no-verify origin main && git remote set-head origin -a >/dev/null ) || return 1
+  git clone -q "$FX/o.git" "$FX/b" && git -C "$FX/b" config core.hooksPath .githooks || return 1
+  fx_line=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx 2>&1)
+  [[ $'\n'$fx_line == *$'\n''lease — fx/build · create'* ]]
+}
+read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fx/build)"; }
+run_fence_land() { ( cd "$FX/a" && bash "$lander" "$@" 2>&1 ); }
+write_fence_stub() { # stub driver body -> committed in clone A, the branch prepared again
+  printf '#!/usr/bin/env bash\n%s\n' "$1" > "$FX/a/${KIT_REL}$_fn_k/unattended.sh"
+  git -C "$FX/a" commit -qam "TOOL-fx-9: a planted fence read"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+}
+_fn_u=${USERNAME-}; _fn_sid=${CLAUDE_CODE_SESSION_ID-}; _fn_gct=${GOV_GATE_CMD_TEST-}
+export GOV_RUNLOG=0 USERNAME=daily-agent CLAUDE_CODE_SESSION_ID=sA; unset GOV_GATE_CMD_TEST GATE_PUSH_BASE
+if [ -z "$_fn_k" ] || [ -z "$_py_arms" ]; then
+  skipped=1; echo "  skip — 42-54 no unattended kit beside this lander, or no python launcher, so the fenced-push arms did not run"
+elif ! write_fence_fixture; then
+  bad "42-54 the fenced-push fixture could not be made, so the fenced-push arms did not run: ${fx_line//$'\n'/ · }"
+else
+  # 42 — AC4: a fenced landing moves the branch and the lease together, the beat on the tip read,
+  #      `renews: no`, and clone A's feed holds one event for the lease at the beat.
+  tip42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  out42=$(run_fence_land --land --slug fx); rc42=$?
+  b42=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  g42="$rc42 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && echo main) $([ "$b42" != "$tip42" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$b42^")" = "$tip42" ] && echo beat) $(git --git-dir="$FX/o.git" log -1 --format=%B "$b42" | sed -n 's/^renews: //p') $(grep -c "refs/gov/leases/fx/build.*$b42" "$FX/a/.git/gov-feed.log" 2>/dev/null)"
+  [ "$g42" = "0 main beat no 1" ] && ok "42 a fenced landing pushes the branch and a beat parented on the tip read, renews: no, one feed event" \
+    || bad "42 the fenced landing did not move the branch and the lease together, or the feed missed the beat: [$g42] $out42"
+  # 42b — TOOL-dPlacedRequest-34 AC6 (S6): the landing's beat is clone A's cache ref, so its feed checks
+  #       clean. Staged against `add_feed_event` alone in the lander's fenced push: the cache stays on
+  #       the tip the fence read, and `--feed check` exits 1 printing `extra` for the beat.
+  c42=$(git -C "$FX/a" rev-parse -q --verify refs/gov/remote/leases/fx/build)
+  f42=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --feed check 2>&1); fr42=$?
+  [ -n "$b42" ] && [ "$c42 $fr42" = "$b42 0" ] && ok "42b the fenced landing sets the cache ref to its beat and the feed checks clean" \
+    || bad "42b the cache ref does not name the landed beat, or the feed check refused: [$c42 $fr42, beat $b42] $f42"
+  # 43 — AC2: clone B takes the lease over inside A's hook, after the fence read; A's atomic push lands
+  #      nothing and the lander exits 1 naming `fenced`, the branch unchanged and the lease B's.
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  m43=$(git --git-dir="$FX/o.git" rev-parse main); : > "$FX/take-once"
+  out43=$(run_fence_land --land --slug fx); rc43=$?
+  g43="$rc43 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m43" ] && echo unchanged) $(git --git-dir="$FX/o.git" log -1 --format=%B refs/gov/leases/fx/build | sed -n 's/^fleet-tag: //p')"
+  case "$g43|$out43" in
+    "1 unchanged b|"*"push-main: fenced — the lease"*) ok "43 a lease taken over after the fence read lands nothing: exit 1, fenced, the branch unchanged, the lease B's" ;;
+    *) bad "43 a lease taken over mid-push did not refuse as fenced with the branch unchanged: [$g43] $out43" ;;
+  esac
+  # 44 — AC5: against the lease B now holds, the fence read refuses `live-holder` and nothing moves.
+  t44=$(read_fence_tips); out44=$(run_fence_land --land --slug fx); rc44=$?
+  case "$rc44 $([ "$(read_fence_tips)" = "$t44" ] && echo unchanged)|$out44" in
+    "1 unchanged|"*"lease refused — live-holder · fx/build"*) ok "44 a lease another holds refuses the landing live-holder and pushes nothing" ;;
+    *) bad "44 a lease clone B holds did not refuse the landing: $out44" ;;
+  esac
+  # 45 — AC6: a remote that advertises no `--atomic` refuses the fenced push, `unfenced`, never a fallback.
+  ( cd "$FX/b" && USERNAME=agent5 bash "${KIT_REL}$_fn_k/unattended.sh" --lease release build fx >/dev/null 2>&1 )
+  ( cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx >/dev/null 2>&1 )
+  git --git-dir="$FX/o.git" config receive.advertiseAtomic false
+  t45=$(read_fence_tips); out45=$(run_fence_land --land --slug fx); rc45=$?
+  git --git-dir="$FX/o.git" config --unset receive.advertiseAtomic
+  case "$rc45 $([ "$(read_fence_tips)" = "$t45" ] && echo unchanged)|$out45" in
+    "1 unchanged|"*"push-main: unfenced — the remote refused the atomic push"*) ok "45 a remote without atomic pushes refuses the fenced landing as unfenced, the branch and the lease unchanged" ;;
+    *) bad "45 a remote without atomic pushes did not refuse as unfenced with nothing moved: $out45" ;;
+  esac
+  # 46 — AC9: a driver exiting 2 with nothing, and one exiting 0 with two fence lines, refuse unparsed.
+  cp "$FX/a/${KIT_REL}$_fn_k/unattended.sh" "$FX/real-driver"
+  t46=$(read_fence_tips)
+  write_fence_stub 'exit 2'; out46=$(run_fence_land --land --slug fx); rc46=$?
+  write_fence_stub 'echo "fence — none · leases are off"; echo "fence — none · leases are off"'
+  out46b=$(run_fence_land --land --slug fx); rc46b=$?
+  case "$rc46 $rc46b $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out46|$out46b" in
+    "1 1 unchanged|"*"push-main: fence read unparsed — exit 2 · (empty)"*"|"*"push-main: fence read unparsed — exit 0 · fence — none"*)
+      ok "46 an empty odd-exit fence read and a two-line one each refuse unparsed, nothing pushed" ;;
+    *) bad "46 an unparsed fence read landed or was not named: $out46 | $out46b" ;;
+  esac
+  # 47 — AC3: a fence line whose beat IS its tip, the unchanged re-push no remote checks, refuses first.
+  lt47=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt47 $lt47\""
+  out47=$(run_fence_land --land --slug fx); rc47=$?
+  case "$rc47 $([ "$(read_fence_tips)" = "$t46" ] && echo unchanged)|$out47" in
+    "1 unchanged|"*"IS the lease tip, an unchanged lease ref the remote never checks"*) ok "47 check_fence_beat refuses a beat equal to the tip before any push" ;;
+    *) bad "47 a fence beat equal to its tip was not refused before the push: $out47" ;;
+  esac
+  # 48 — AC5 and AC7: leases off, the driver prints one `fence — none` line and the landing is a
+  #      single-ref push; the attended `--slug` fences as --land does, and no argument reads no fence.
+  cp "$FX/real-driver" "$FX/a/${KIT_REL}$_fn_k/unattended.sh"
+  sed -i 's/^RUN_CLAIMS="on"/RUN_CLAIMS="off"/' "$FX/a/.unattended.conf"
+  git -C "$FX/a" commit -qam "TOOL-fx-9: leases off"
+  ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out48=$(run_fence_land --land --slug fx); rc48=$?
+  case "$rc48 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb48" ] && echo unmoved)|$out48" in
+    "0 unmoved|"*"push-main: fence — none · leases are off"*"landed main"*) ok "48 with leases off the landing reads fence — none and pushes the branch alone" ;;
+    *) bad "48 a landing with leases off was refused or moved the lease: $out48" ;;
+  esac
+  ( cd "$FX/a" && git checkout -q main && git fetch -q origin && git reset -q --hard origin/main \
+      && sed -i 's/^RUN_CLAIMS="off"/RUN_CLAIMS="on"/' .unattended.conf && git commit -qam "TOOL-fx-9: leases on" \
+      && git commit -q --allow-empty -m "TOOL-fx-3: attended" )
+  lb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out48b=$(run_fence_land --slug fx); rc48b=$?
+  nb48=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-4: attended plain"
+  out48c=$(run_fence_land); rc48c=$?
+  case "$rc48b $rc48c $([ "$(git --git-dir="$FX/o.git" rev-parse "$nb48^")" = "$lb48" ] && echo fenced) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$nb48" ] && echo unmoved) $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse main)" ] && echo main)|$out48b|$out48c" in
+    "0 0 fenced unmoved main|"*"push-main: fence — refs/gov/leases/fx/build"*"|"*)
+      case "$out48c" in *"fence"*) bad "48 the attended landing with no argument read a fence: $out48c" ;;
+        *) ok "48 the attended --slug fences on the build's lease, and no argument lands with no fence read" ;; esac ;;
+    *) bad "48 the attended --slug was refused or did not fence, or no argument moved the lease: $out48b | $out48c" ;;
+  esac
+  # 49 — S6: an attended `--slug` outside the build-folder grammar refuses at exit 2 before any read.
+  out49=$(run_fence_land --slug 'a b'); rc49=$?
+  case "$rc49|$out49" in
+    "2|push-main: --slug <slug>, a build-folder name"*) ok "49 an attended --slug outside the build-folder grammar exits 2" ;;
+    *) bad "49 a malformed attended --slug was not refused at exit 2: $out49" ;;
+  esac
+  # 50 — S3: a fence line naming another lease ref refuses unparsed, and a beat not parented on the
+  #      tip refuses at check_fence_beat; the attended `--slug` pushes nothing either time.
+  t50=$(read_fence_tips); lt50=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  m50=$(git --git-dir="$FX/o.git" rev-parse main)
+  write_fence_stub "echo \"fence — refs/gov/leases/other/build $lt50 $m50\""
+  out50=$(run_fence_land --slug fx); rc50=$?
+  write_fence_stub "echo \"fence — refs/gov/leases/fx/build $lt50 $m50\""
+  out50b=$(run_fence_land --slug fx); rc50b=$?
+  case "$rc50 $rc50b $([ "$(read_fence_tips)" = "$t50" ] && echo unchanged)|$out50|$out50b" in
+    "1 1 unchanged|"*"push-main: fence read unparsed — exit 0 · fence — refs/gov/leases/other/build"*"|"*"so it does not stand on the tip the fence read"*)
+      ok "50 a fence line naming another lease, and a beat not parented on the tip, each refuse with nothing pushed" ;;
+    *) bad "50 a foreign lease ref or an unparented beat was not refused before the push: $out50 | $out50b" ;;
+  esac
+  # 51 — S3: no unattended driver beside the lander is no fence, and the attended `--slug` lands alone.
+  git -C "$FX/a" rm -rq "${KIT_REL}$_fn_k" && git -C "$FX/a" commit -qm "TOOL-fx-9: no driver"
+  lb51=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+  out51=$(run_fence_land --slug fx); rc51=$?
+  case "$rc51 $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$lb51" ] && echo unmoved)|$out51" in
+    "0 unmoved|"*"push-main: fence — none · no unattended driver beside this lander"*"landed main"*) ok "51 with no driver beside the lander the --slug landing reads no fence and lands the branch alone" ;;
+    *) bad "51 a lander with no driver beside it refused or moved the lease: $out51" ;;
+  esac
+  if write_fence_fixture; then
+    # 52 — TOOL-dPlacedRequest-29 AC1: inside the first push's hook, clone B pushes the lease one
+    #      commit on, parented on the tip and carrying its record: this holder's own beat at the same
+    #      epoch. The atomic push fails its compare-and-swap, the re-fence reads `refenced`, and the
+    #      retry lands without re-preparing: the branch at the prepared merge, the lease the landing's
+    #      beat parented on the planted commit.
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    m52=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out52=$(run_fence_land --land --slug fx); rc52=$?
+    p52=""; [ ! -f "$FX/planted" ] || p52=$(<"$FX/planted"); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+    g52="$rc52 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && [ "$(git -C "$FX/a" rev-parse HEAD^1)" = "$m52" ] && echo main) $([ -n "$p52" ] && [ "$l52" != "$p52" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$l52^")" = "$p52" ] && echo beat)"
+    case "$g52|$out52" in
+      *"re-preparing"*) bad "52 a same-holder lease move re-prepared the landing: [$g52] $out52" ;;
+      "0 main beat|"*"push-main: the lease moved under this holder's own write; re-fencing on ${p52:0:8} (attempt 2/"*"landed main"*)
+        ok "52 a lease moved by its own holder's beat inside the hook is refenced and the retry lands, the lease the landing's beat on the planted commit" ;;
+      *) bad "52 a same-holder lease move was not refenced and landed: [$g52] $out52" ;;
+    esac
+    # 53 — TOOL-dPlacedRequest-29 AC2: the planted commit raises the epoch under another session, a
+    #      take-over; the re-fence is refused, the landing exits 1 `fenced` and the branch is unmoved.
+    git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-2: more"
+    ( cd "$FX/a" && bash "$lander" --prepare --slug fx >/dev/null 2>&1 )
+    m53=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'e=$(git log -1 --format=%B refs/plant/tip | sed -n "s/^epoch: //p")' \
+      'git log -1 --format=%B refs/plant/tip | sed -e "s/^epoch: .*/epoch: $((e + 1))/" -e "s/^session: .*/session: sB/" | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out53=$(run_fence_land --land --slug fx); rc53=$?
+    p53=""; [ ! -f "$FX/planted" ] || p53=$(<"$FX/planted")
+    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$p53" ] && echo planted)"
+    case "$g53|$out53" in
+      *"re-fencing on"*) bad "53 a take-over at the epoch plus one was retried as the holder's own write: [$g53] $out53" ;;
+      "1 unchanged planted|"*"push-main: fenced — the lease"*) ok "53 a take-over at the epoch plus one under another session refuses the landing fenced, the branch unmoved" ;;
+      *) bad "53 a take-over at the epoch plus one did not refuse as fenced with the branch unmoved: [$g53] $out53" ;;
+    esac
+  else
+    bad "52-53 the fenced-push fixture, made once above, could not be made again: ${fx_line//$'\n'/ · }"
+  fi
+  if write_fence_fixture; then
+    # 54 — TOOL-dPlacedRequest-43 AC28: the lease moves inside the first push's hook as 52's does, and
+    #      a stub driver answers the `--after` re-fence read `lease refused — offline`, the driver's
+    #      line for a read that did not answer, passing every other call to the fixture's launcher. The
+    #      landing exits 1 `unreachable`, no abort remedy and never `fenced`, the branch unmoved.
+    #      Staged against TOOL-dPlacedRequest-29's lander, which reads every refusal there `fenced`.
+    git -C "$FX/a" checkout -q -b feat && git -C "$FX/a" commit -q --allow-empty -m "TOOL-fx-1: work"
+    cp "$FX/a/${KIT_REL}$_fn_k/unattended.sh" "$FX/real-driver"
+    write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease refused — offline · fx/build · the remote did not answer the claim read'; exit 1 ;; esac
+exec bash \"$FX/real-driver\" \"\$@\""
+    m54=$(git --git-dir="$FX/o.git" rev-parse main)
+    printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+      'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+    out54=$(run_fence_land --land --slug fx); rc54=$?
+    g54="$rc54 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m54" ] && echo unchanged)"
+    case "$g54|$out54" in
+      *"push-main: fenced —"*|*"claim-lost"*) bad "54 a re-fence read that did not answer told the holder to abort: [$g54] $out54" ;;
+      "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+        ok "54 a killed --after read refuses the landing unreachable, no abort remedy, the branch unmoved" ;;
+      *) bad "54 a killed --after read did not refuse as unreachable with the branch unmoved: [$g54] $out54" ;;
+    esac
+    # 55, 56 — TOOL-dPlacedRequest-99 S3: over 54's fixture, the lease moves inside the push's hook
+    #      again, and the stub driver answers the `--after` re-fence read with what is no refusal by
+    #      the lease: 55 an exit-2 `lease not written — x` line, 56 a fence line whose beat is the
+    #      branch tip, not parented on the lease tip. Each landing exits 1 `unreachable`, never
+    #      `fenced` and never the `claim-lost` remedy, the branch unmoved. Staged against the lander
+    #      of 95c3103ad, which returns 1 for both reads and classifies both `fenced` with claim-lost.
+    for a55 in 55 56; do
+      if [ "$a55" = 55 ]; then
+        write_fence_stub "case \" \$* \" in *' --after '*) echo 'lease not written — x'; exit 2 ;; esac
+exec bash \"$FX/real-driver\" \"\$@\""
+      else
+        m56=$(git --git-dir="$FX/o.git" rev-parse main)
+        write_fence_stub "case \" \$* \" in *' --after '*) a=\"\$*\"; a=\${a##*--after }; echo \"fence — refs/gov/leases/fx/build \${a%% *} $m56\"; exit 0 ;; esac
+exec bash \"$FX/real-driver\" \"\$@\""
+      fi
+      m55=$(git --git-dir="$FX/o.git" rev-parse main)
+      printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
+        'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
+        'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+      out55=$(run_fence_land --land --slug fx); rc55=$?
+      g55="$rc55 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m55" ] && echo unchanged)"
+      case "$g55|$out55" in
+        *"push-main: fenced —"*|*"claim-lost"*) bad "$a55 TOOL-dPlacedRequest-99 S3 a re-fence read that is no refusal by the lease told the holder to abort: [$g55] $out55" ;;
+        "1 unchanged|"*"push-main: unreachable — the lease refs/gov/leases/fx/build moved"*)
+          ok "$a55 TOOL-dPlacedRequest-99 S3 an --after read answering $([ "$a55" = 55 ] && echo 'lease not written' || echo 'a bad beat') refuses the landing unreachable, never claim-lost, the branch unmoved" ;;
+        *) bad "$a55 TOOL-dPlacedRequest-99 S3 an --after read that is no refusal did not refuse as unreachable with the branch unmoved: [$g55] $out55" ;;
+      esac
+    done
+  else
+    bad "54 the fenced-push fixture could not be made a third time: ${fx_line//$'\n'/ · }"
+  fi
+fi
+unset GOV_RUNLOG; export USERNAME="$_fn_u" CLAUDE_CODE_SESSION_ID="$_fn_sid"
+[ -z "$_fn_gct" ] || export GOV_GATE_CMD_TEST="$_fn_gct"
 
 # 43 — TOOL-dSettledStage-1 AC2: the prepared merge's fold over a stage line endings left equal to
 #      HEAD leaves the merge where it is, and over a real change rewrites it with the same parents.
@@ -1798,4 +2172,12 @@ done
   && ok "45 a stage the index lock refuses answers 2 and the fold refuses on it with HEAD unmoved, and the unlocked fold folds" \
   || bad "45 a stage the index lock refused read as nothing staged, the fold reported success, or the unlocked control did not fold: $out45"
 
+# THE FLOOR (TOOL-dPlacedRequest-98), compared only where no dependency skip fired: an adopter whose
+# install lacks a sibling kit runs fewer rows on a healthy lander, and takes its verdict from `fail`.
+if [ "$skipped" = 0 ]; then
+  [ "$n" -ge "$FLOOR_ASSERTIONS" ] || bad "the suite ran $n assertions, below its floor of $FLOOR_ASSERTIONS with every block running, so a block's arms stopped running"
+else
+  echo "push-main.test: floor not compared — a dependency skip fired"
+fi
+[ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

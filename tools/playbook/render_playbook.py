@@ -136,27 +136,103 @@ import tomllib
 from pathlib import Path
 
 # >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
-def resolve_bash(script):
-    r"""The bash that can SEE `script`, by RUNNING each candidate, or None. GOV_BASH first, then the
-    bash PATH names, then Git for Windows' two paths, each kept only when `test -f` on the script
-    exits 0 under it. On Windows PATH order commonly puts the System32 WSL launcher first, which
-    cannot open a `C:/` path, and a stub that exits 127 can sit there too (gotcha
-    subprocess-resolves-a-different-shell); being on PATH is not evidence."""
-    cands = [os.environ.get("GOV_BASH", ""), shutil.which("bash") or "",
-             "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"]
-    tried = []
-    for c in cands:
-        if not c or c in tried:
-            continue
-        tried.append(c)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
         try:
-            r = subprocess.run([c, "-c", 'test -f "$1"', "_", str(script)], capture_output=True, timeout=20)
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
         except (OSError, subprocess.SubprocessError):
-            continue
-        if r.returncode == 0:
-            return c
-    return None
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
 # <<< resolve_bash_py
+
+
+def resolve_bash(script):
+    """The bash that can SEE `script`, or None: the one `resolve_bash_py` block above, run with it,
+    its refusal read as None (TOOL-dWitnessedBar-26)."""
+    return scan_bash(script)[0] or None
 
 
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -592,6 +668,27 @@ def check_user_clash(user: str, held: list[tuple[str, str]]) -> str:
     return ''
 
 
+def read_fleet_tag(path: Path, user: str, node: str = '') -> str:
+    """The tag of the fleet row naming `user`, matched as every reader matches it: the user alone,
+    case-folded (`check_user_clash`), never the host, so a row whose `host` is empty or another
+    machine's still resolves (TOOL-dPlacedRequest-34 S30). `node`, the driver's GOV_NODE, names the tag
+    outright and must be a tag of the registry. TOOL-dPlacedRequest-1 S11: the unattended driver's
+    `resolve_fleet_tag` asks this, so a lease names a fleet tag and `read_fleet` stays the registry's
+    one reader. Refuses naming the registry when no row matches, or a `node` no row carries."""
+    rows = read_fleet(path)
+    if node.strip():
+        if any(row['tag'] == node.strip() for row in rows):
+            return node.strip()
+        raise Refusal(f'GOV_NODE {node!r} is no tag of {FLEET_NAME} at {path.as_posix()}, so this node '
+                      f'carries no fleet tag')
+    u = user.strip().lower()
+    for row in rows:
+        if u and row['user'].strip().lower() == u:
+            return row['tag']
+    raise Refusal(f'no row of {FLEET_NAME} at {path.as_posix()} names user {user!r}, so this node carries '
+                  f'no fleet tag')
+
+
 def resolve_node_overrides(target: Path, tags: set[str]) -> dict[str, dict]:
     """The target's `[nodes.<tag>]` tables, graded against the fleet's tags and NODE_KEYS."""
     try:
@@ -927,8 +1024,14 @@ def check_one_line_regions(text: str, cap: tuple | None = None) -> list:
                           f'so a rule spans two lines or is not a rule: {quoted!r}')
         if limit and len(line.rstrip()) > limit:
             if mode == 'warn':
+                # The runner's `gate-warn` marker on the warning's next line, inside its own item, so it prints
+                # wherever the notes print (TOOL-dWitnessedBar-29 S2); the policy kit's module is the
+                # one `read_one_line_cap` loaded to answer `warn`.
+                budgets = sys.modules.get('budgets')
+                said = f'one-line-rule · {len(line.rstrip())} chars over {limit}'
                 warned.append(f'BUDGET WARN — one-line-rule · line {n} {quoted!r} · '
-                              f'{len(line.rstrip())} chars over {limit} · {rule}')
+                              f'{len(line.rstrip())} chars over {limit} · {rule}'
+                              + ('\n' + budgets.render_warn_marker(f'line {n} {quoted!r}', said) if budgets else ''))
                 continue
             raise Refusal(f'line {n}: a rule in a one-line region is {len(line.rstrip())} '
                           f'characters, past the {limit} a one-line rule may take: {quoted!r}'
@@ -992,10 +1095,17 @@ def write_charter_lock(gov_root: Path, target: Path, charter_path: Path, units=(
 
 
 def write_empty_lists(target: Path) -> list[str]:
-    """PLAY-dOrderedCharter-70 S10: the two lists this kit's checks red when absent, written empty where
+    """PLAY-dOrderedCharter-70 S10: the two lists this kit's checks red when absent, written with no row where
     the check looks and the folder exists and the list does not: the positional list under
     `<target>/<MEMORY_ROOT>/project/` (PLAY-dOrderedCharter-72), the pending list under
-    `<target>/<prefix>/<kit dir>`. A present file is left alone. -> the paths written, target-relative."""
+    `<target>/<prefix>/<kit dir>`. A present file is left alone. -> the paths written, target-relative.
+
+    The positional list is the `positional-refs` ledger population (TOOL-dWitnessedBar-18 S5, §8 F9): it is
+    written as the bytes `convert_registry.derive_converted_text` returns for its registration with no row,
+    its header and `# unarmed · dead probe · <sha>`, the registration found as `derive_registration` finds
+    it and the sha the target's `read_head_sha`, so a fresh target's list reads `unarmed` as a converted one
+    does; with no sha read it is refused as the converter refuses. `core-pending.txt`, no population, is
+    empty bytes."""
     iu = load_units_module()
     homes = (('positional-refs.txt', target / derive_memory_root(target, {}).strip('/') / 'project'),
              ('core-pending.txt', target / iu.derive_kit_prefix() / iu.KIT_DIR.name))
@@ -1003,9 +1113,27 @@ def write_empty_lists(target: Path) -> list[str]:
     for name, home in homes:
         path = home / name
         if home.is_dir() and not path.exists():
-            path.write_bytes(b'')
+            data = derive_unarmed_list(target, path) if name == 'positional-refs.txt' else b''
+            path.write_bytes(data)
             written.append(path.relative_to(target).as_posix())
     return written
+
+
+def derive_unarmed_list(target: Path, path: Path) -> bytes:
+    """The `positional-refs` home's bytes with no row at `target`, through memory-tree's converter: its
+    header and the factory's unarmed line at the target's HEAD (TOOL-dWitnessedBar-18 §8 F9)."""
+    load_units_module()
+    import positional
+    cr = positional.load_converter()
+    home = path.relative_to(target).as_posix()
+    try:
+        reg, _entry = cr.derive_registration('positional-refs', home)
+    except cr.Refusal as e:
+        raise Refusal(f'{home}: {e}') from None
+    sha, why = cr.LL.read_head_sha(target)
+    if not sha:
+        raise Refusal(f'{home}: {why}, so no sha can be stamped')
+    return cr.derive_converted_text(reg, {}, sha)
 
 
 def build_region(charter: str | None, body: str) -> str:
@@ -1821,8 +1949,10 @@ def check_charter_budget(target: Path, charter_path: Path, body: str, parts: dic
     rel = Path(os.path.relpath(charter_path, target)).as_posix()
     refused, lines = load_sets.run_budget_check(target, [(rel, size)])
     largest = ' · '.join(f'{o} {n}' for o, n in measure_contributors(size, parts or {}))
-    lines = [ln + (f' · key budgets."{rel}"' if f' over {rel} ' in ln else '') + f' · largest: {largest}'
-             if ' BUDGET ' in ln else ln for ln in lines]
+    # A warned line carries its runner marker after a newline (TOOL-dWitnessedBar-29 S2): the tail goes
+    # on the warning, before it.
+    lines = [h + (f' · key budgets."{rel}"' if f' over {rel} ' in h else '') + f' · largest: {largest}' + s + m
+             if ' BUDGET ' in h else h + s + m for h, s, m in (ln.partition('\n') for ln in lines)]
     if refused:
         raise Refusal('\n'.join(sorted(lines, key=lambda ln: 'BUDGET REFUSE' not in ln)))
     return [f'budget    {ln}' for ln in lines]
@@ -2699,6 +2829,28 @@ def run_selftest() -> int:
           and 'INSTALLED' in installed,
           'a claim takes the lowest free letter, once per identity, never in an installed copy',
           f'got {got!r} rows {rows_after} again {again!r} installed {installed!r}')
+    # TOOL-dPlacedRequest-1 AC8: `--fleet-tag` names the row of the user, case-folded, and a user no row
+    # names is a refusal naming the registry, never a guessed tag.
+    with tempfile.TemporaryDirectory() as td:
+        (Path(td) / FLEET_NAME).write_text(build_fleet_text(fleet_rows), encoding='utf-8')
+        tag_got = read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1].upper())
+        try:
+            read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here')
+            tag_miss = 'no refusal'
+        except Refusal as e:
+            tag_miss = str(e)
+        # TOOL-dPlacedRequest-34 AC30: GOV_NODE names a registered tag outright; an unregistered one refuses.
+        node_got = read_fleet_tag(Path(td) / FLEET_NAME, 'nobody-here', fleet_rows[0][0])
+        try:
+            read_fleet_tag(Path(td) / FLEET_NAME, fleet_rows[1][1], 'zz')
+            node_miss = 'no refusal'
+        except Refusal as e:
+            node_miss = str(e)
+    check_arm(tag_got == fleet_rows[1][0] and FLEET_NAME in tag_miss and 'nobody-here' in tag_miss
+              and node_got == fleet_rows[0][0] and 'GOV_NODE' in node_miss,
+              '--fleet-tag names the user\'s row, or GOV_NODE\'s registered tag, and refuses a user no row '
+              'names or an unregistered GOV_NODE, naming the registry',
+              f'got {tag_got!r} miss {tag_miss!r} node {node_got!r} node miss {node_miss!r}')
     arm_fixture('a legacy drop_blocks member with no fence is noted with the descriptor\'s why',
                 trailer_desc + '\n[[block]]\nname = "node-table"\nlegacy = "v3"\nwhy = "WHY-X"\n',
                 'plain\n', 'drop_blocks = ["node-table"]\n' + ans, in_body='plain',
@@ -3478,6 +3630,9 @@ def run_check_render(engine_dir: Path, gov_root: Path, target: Path, charter_pat
     except PolicyRefused as e:
         reds.append(f'render-playbook: red · instructions.legacy · {e.line} · remedy: repair the committed '
                     f'policy file; a refused read grades under no default')
+    except RuntimeError as e:  # the tag index's TagError: a legacy list the ledger factory refuses (TOOL-dWitnessedBar-18 S5)
+        print(f'render-playbook: REFUSED — the legacy list · {e}', file=sys.stderr)
+        return 2
     for red in reds:
         print(red)
     print(f'render-playbook: gate · {len(reds)} red in the table, the status arm and the legacy list')
@@ -3744,6 +3899,10 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--answers', nargs='+', metavar='KEY')
     # TOOL-aDistilledCharter-2: a new node claims its tag once, in gov's own checkout.
     ap.add_argument('--claim-node', action='store_true')
+    ap.add_argument('--fleet-tag', action='store_true')
+    # TOOL-dPlacedRequest-34 S29, S30: the registry a fixture plants, and the GOV_NODE the driver hands on.
+    ap.add_argument('--fleet', type=Path)
+    ap.add_argument('--node', default='')
     ap.add_argument('--user', default='')
     ap.add_argument('--host', default='')
     ap.add_argument('--projects-root', default='')
@@ -3790,6 +3949,13 @@ def main(argv: list[str]) -> int:
         except Refusal as e:
             print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
             return 1
+    if a.fleet_tag:
+        try:
+            print(read_fleet_tag(a.fleet or Path(__file__).resolve().parent / FLEET_NAME, a.user, a.node))
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        return 0
     if a.claim_node:
         try:
             tag = write_fleet_claim(Path(__file__).resolve().parent, a.user, a.host,
@@ -3913,7 +4079,7 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
                   for rel in write_alias_copies(target, before)]
     try:
         write_charter_lock(gov_root, target, charter_path, slots)
-        notes += [f"wrote {p} empty: this kit's checks read an absent list as a refusal"
+        notes += [f"wrote {p} with no row: this kit's checks read an absent list as a refusal"
                   for p in write_empty_lists(target)]
     except (Refusal, ValueError) as e:   # ValueError: the lock module's LevelError and LockError
         print(f'render-playbook: REFUSED — the charter is written but its lock row is not: {e}',
@@ -3932,4 +4098,4 @@ def run_charter_scope(engine_dir: Path, gov_root: Path, target: Path, charter_pa
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.43"  # gov:kit playbook-render@1.43
+KIT_PLAYBOOK_RENDER_VERSION = "1.45"  # gov:kit playbook-render@1.45

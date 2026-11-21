@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.sh — wire the process-monitor kit into a project.
 #
-# gov:kit process-monitor@0.24
+# gov:kit process-monitor@0.25
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/process-monitor/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
@@ -24,7 +24,7 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.24"   # gov:kit process-monitor@0.24 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.25"   # gov:kit process-monitor@0.25 — the deployer's read (kit.toml version_from)
 
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
@@ -191,6 +191,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 MODE=""
 for _a in "${@:-}"; do

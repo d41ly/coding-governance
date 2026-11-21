@@ -82,7 +82,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.169   # gov:kit memory-tree@2.169 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.173   # gov:kit memory-tree@2.173 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -405,15 +405,11 @@ case "${1:-}" in
     [ -n "${2:-}" ] || { echo "HYGIENE — cannot run: --print-live-index-home takes a stem"; exit 2; }
     resolve_live_index_home "$2"; exit 0 ;;
 esac
-LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
-DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
 # Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
 # call, and these run once per scanned file (minutes on a large adopter tree; a fork is ~50-100ms
 # under MSYS/Windows). Exact-key lookup is semantically identical (fixed string, whole line) and
 # costs zero processes. (Upstream: adopter ic ARCH-aFencedNamespace-3.)
 declare -A LEGACY_SET DEBT_SET
-while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
-while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "HYGIENE check $1 FAILED — $2"; fi; status=1; }
@@ -639,7 +635,107 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
+# THE TWO GRANDFATHER LISTS, read through the ledger factory this kit carries (TOOL-dWitnessedBar-16 S4):
+# `legacy-files.txt` and `curation-debt.txt` are ledger populations keyed by `path`, one row per listed
+# file, so no line of either is parsed here. ONE python spawn reads both, and an absent list is an empty
+# one. A row the factory refuses is listed as its whole text, a path no tree tracks, so the stale-line
+# guard of check 5 or 6 names it rather than reading it as unlisted.
+_LD=$("$_PY" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+for tag, path in (("L", sys.argv[2]), ("D", sys.argv[3])):
+    try:
+        rows, bad = LL.read_rows(path, 1)
+    except FileNotFoundError:
+        continue
+    for entry in bad:
+        print("%s\t%s" % (tag, LL.render_malformed(entry).replace("\t", " ")))
+    for key in rows:
+        print("%s\t%s" % (tag, key[0]))' "$HERE" "$M/project/legacy-files.txt" "$M/project/curation-debt.txt" | tr -d '\r'; exit "${PIPESTATUS[0]}") \
+  || { echo "HYGIENE — cannot run: the ledger factory did not read legacy-files.txt and curation-debt.txt"; exit 2; }
+LEGACY=""; DEBT=""
+while IFS=$'\t' read -r _t _l; do
+  case "$_t" in
+    L) LEGACY="$LEGACY$_l"$'\n'; LEGACY_SET["$_l"]=1 ;;
+    D) DEBT="$DEBT$_l"$'\n'; DEBT_SET["$_l"]=1 ;;
+  esac
+done <<<"$_LD"
+LEGACY=${LEGACY%$'\n'}; DEBT=${DEBT%$'\n'}
+# CHECK 21'S ONE POPULATION FILTER (TOOL-aRepatriatedFork-32). A record the grandfather registry lists,
+# or one dated before RECORD_SERVES_CUTOFF, is exempt from every branch of check 21, not only the
+# missing-Serves one: an adopter declaring the cutoff still redded 55 legacy names in branch 4 and two
+# reviews in the id branch. Rows are `  <path> — <detail>`. Defined HERE, above the `--list-unbound`
+# print mode, which reads the unbound branch through it (TOOL-dWitnessedBar-17 §8 F6).
+#
+# The legacy half: the registry reaches this population as it reaches check 5, and costs no
+# process per row -- `in_legacy` is an array lookup. TOOL-aRepatriatedFork-10 S2.
+#
+# The cutoff half, S3 of that unit. A project adopting this kit mid-life has landed records that
+# predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
+# grandfather list would be 549 rows. THIS NARROWS A POPULATION, which is why the preset block
+# refuses a cutoff dated after today: a future date exempts every record and the check reports
+# clean over nothing. Blank grades everything, which is what gov does.
+extract_graded_rows() {
+  local _r21 _p21
+  while IFS= read -r _r21; do
+    [ -n "$_r21" ] || continue
+    _p21=${_r21#"  "}; _p21=${_p21%% *}
+    in_legacy "$_p21" || printf '%s\n' "$_r21"
+  done | if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+    awk -v cut="$RECORD_SERVES_CUTOFF" '
+    # the record date is the basename prefix the naming grammar already pins. A row whose
+    # name carries no date is KEPT: unparseable is not the same answer as old, and only one
+    # of them is an exemption.
+    {
+      # LEADING SPACES COME OFF FIRST. The row is `  <path> — <detail>`, so cutting at the
+      # first space before trimming the indent leaves an EMPTY path and the filter matches
+      # nothing -- the cutoff then silently exempts no record while appearing to work.
+      p = $0; sub(/^ +/, "", p); sub(/ .*$/, "", p)
+      b = p; sub(/^.*\//, "", b)
+      if (b ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
+        d = substr(b, 1, 10)
+        if (d < cut) next
+      }
+      print
+    }'
+  else
+    cat
+  fi
+}
+# --list-unbound — the `unbound-records` seed's measurement (TOOL-dWitnessedBar-17 §8 F6): one
+# `<record> TAB 1` row per unbound record check 21 grades, the bindings parse's U rows through the one
+# population filter above. It exits before check 1, as every print mode does, and `corpus_ids.py
+# --list-unbound` asks for it, so no seed carries a `bash` head. A parse that did not complete prints
+# no row and exits 2, so the seed reads unarmed rather than an empty population.
+case "${1:-}" in --list-unbound)
+  _lu=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>&1); _lurc=$?
+  if [ "$_lurc" -ne 0 ] || ! printf '%s\n' "$_lu" | grep -q $'^N\t'; then
+    echo "memory-hygiene: --list-unbound: gen_build_index.py --print-bindings exited $_lurc without its N row" >&2; exit 2
+  fi
+  printf '%s\n' "$_lu" | tr -d '\r' | sed -n 's/^U\t\(.*\)$/  \1 — unbound/p' | extract_graded_rows \
+    | sed 's/^  \(.*\) — unbound$/\1\t1/'
+  exit 0 ;;
+esac
 # TOOL-aWitnessedCrash-1: the crash witness. Bash 5.3 runs on past some runtime errors under
 # `set -u` (an unset map's `${#X[@]}` fails its command and the script continues), so the exit
 # status cannot see a check that stopped part-way. This engine's stderr is kept and replayed at
@@ -717,6 +813,8 @@ check_cap_findings() {
     _r=${CAP_RULE[$_cap]-}
     if [ "$_mode" = warn ]; then
       printf 'BUDGET WARN — %s · %s · %s %s over %s · %s · check %s\n' "$_cap" "${_t%%[ :]*}" "$_n" "$_u" "$_v" "$_r" "$1"
+      # The runner's marker on the next line (TOOL-dWitnessedBar-29 S2), so a passing bar shows it.
+      _t=${_t%%[ :]*}; printf 'gate-warn\tsize\t%s\t%s · %s %s over %s\n' "${_t//[$'\t\r\n']/ }" "$_cap" "$_n" "$_u" "$_v"
     else
       _CAP_REFUSED="$_CAP_REFUSED$_t${_r:+ · $_r}"$'\n'
     fi
@@ -1004,6 +1102,22 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # The same class again: the roles kit's catalogue checker reads the owner's stand-in waivers at
   # this DEFAULT path under <M>/project/ (TOOL-aOrientedCast-19 S5).
   F:role-stand-in-waiver.txt) ;;
+  # The same class: the drift-audit kit's populations, its pins and its baselines, which its
+  # `[[upgrade]]` steps write at this DEFAULT path at every adopter (TOOL-dWitnessedBar-16 S14).
+  F:drift-pins.txt|F:drift-baselines.txt) ;;
+  # The same class: this kit's `conf-scalar-pins` ledger, which its adopter seeds at this path at
+  # `--scaffold` and at every update's `--seed-pins` (TOOL-dWitnessedBar-46 S4).
+  F:conf-scalar-pins.txt) ;;
+  # The same class: the memory-tree and codebase-map kits' keyed pin populations and the date
+  # cutoffs, which their adopter seeds at these paths (TOOL-dWitnessedBar-17 S7). The two unseeded
+  # homes, `live-rows.txt` and `severity-unlabelled.txt`, are never written while their seed is
+  # empty, so the unit giving either a seed adds its name here.
+  F:row-duplicates.txt|F:unbound-records.txt|F:dossier-decisions-empty.txt|F:date-cutoffs.txt) ;;
+  # The same class: the gate-lint kit's portability ledgers, which its `[[ledger]]` tables register and its
+  # seed writes at these paths at every adopter (TOOL-dWitnessedBar-24 S13), named here and not in a
+  # project's PROJECT_REGISTRY_EXTRA, the rule TOOL-dWitnessedBar-17 S7 follows (TOOL-dWitnessedBar-51 S13).
+  F:encoding-stdout-sites.txt|F:encoding-js-sites.txt|F:path-literal-sites.txt|F:quoting-sites.txt) ;;
+  F:shell-role.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what adopter nc carved this file out to do.
   #
@@ -1030,7 +1144,7 @@ bm=""
 if [ -n "$MAP_SUB" ]; then
   m1=$(printf '%s\n' "$FILES" | grep "^$M/$MAP_SUB/" | awk -F/ '{ if (NF==3) print "F:"$3; else print "D:"$3 }' | LC_ALL=C sort -u)
   bm=$(printf '%s\n' "$m1" | grep . | while IFS= read -r e; do case "$e" in
-    F:README.md|F:FOUNDATION.md|F:baseline.toml|F:affordance-exempt.toml|D:features|D:generated) ;;
+    F:README.md|F:FOUNDATION.md|F:baseline.txt|F:affordance-exempt.txt|D:features|D:generated) ;;
     *) echo "$M/$MAP_SUB/${e#*:}";; esac; done)
 fi
 bad3=$(printf '%s\n%s\n%s\n' "$bad3" "$bp" "$bm" | grep . || true)
@@ -1656,46 +1770,8 @@ if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
 $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
     b21=""
   fi
-  # ONE POPULATION FILTER FOR EVERY BRANCH (TOOL-aRepatriatedFork-32). A record the grandfather
-  # registry lists, or one dated before RECORD_SERVES_CUTOFF, is exempt from all four branches of
-  # this check, not only the missing-Serves one: an adopter declaring the cutoff still redded 55
-  # legacy names in branch 4 and two reviews in the id branch. Rows are `  <path> — <detail>`.
-  #
-  # The legacy half: the registry reaches this population as it reaches check 5, and costs no
-  # process per row -- `in_legacy` is an array lookup. TOOL-aRepatriatedFork-10 S2.
-  #
-  # The cutoff half, S3 of that unit. A project adopting this kit mid-life has landed records that
-  # predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
-  # grandfather list would be 549 rows. THIS NARROWS A POPULATION, which is why the preset block
-  # refuses a cutoff dated after today: a future date exempts every record and the check reports
-  # clean over nothing. Blank grades everything, which is what gov does.
-  extract_graded_rows() {
-    local _r21 _p21
-    while IFS= read -r _r21; do
-      [ -n "$_r21" ] || continue
-      _p21=${_r21#"  "}; _p21=${_p21%% *}
-      in_legacy "$_p21" || printf '%s\n' "$_r21"
-    done | if [ -n "$RECORD_SERVES_CUTOFF" ]; then
-      awk -v cut="$RECORD_SERVES_CUTOFF" '
-      # the record date is the basename prefix the naming grammar already pins. A row whose
-      # name carries no date is KEPT: unparseable is not the same answer as old, and only one
-      # of them is an exemption.
-      {
-        # LEADING SPACES COME OFF FIRST. The row is `  <path> — <detail>`, so cutting at the
-        # first space before trimming the indent leaves an EMPTY path and the filter matches
-        # nothing -- the cutoff then silently exempts no record while appearing to work.
-        p = $0; sub(/^ +/, "", p); sub(/ .*$/, "", p)
-        b = p; sub(/^.*\//, "", b)
-        if (b ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
-          d = substr(b, 1, 10)
-          if (d < cut) next
-        }
-        print
-      }'
-    else
-      cat
-    fi
-  }
+  # ONE POPULATION FILTER FOR EVERY BRANCH: `extract_graded_rows`, defined above the print modes
+  # because `--list-unbound` reads the unbound branch through it (TOOL-dWitnessedBar-17 §8 F6).
   miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   # RECORD_UNDATED_ARTIFACTS=exempt — a JSON result or an HTML report cannot carry a Serves line at
   # any date, so a DATE is not what decides it (the owner ruled this independent of the cutoff). The
@@ -1746,33 +1822,50 @@ $bad21"
   apin21=$(printf '%s\n' "$b21" | sed -n 's/^P\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   [ -n "$apin21" ] && fail 21 "spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision:
 $apin21"
-  # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
-  # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
-  # read above, where its absence is the parse's liveness test.
-  # The pin counts the U rows the population filter keeps, so an exempt record no longer spends it;
-  # `n21` stays the liveness total. TOOL-aRepatriatedFork-32.
-  pin21=${RECORD_UNBOUND_PIN-}
+  # The unbound escape, a KEYED population (TOOL-dWitnessedBar-17 S1). `none` is a deliberate
+  # declaration and WHICH records carry it is the thing a reader is entitled to see bounded, so each
+  # graded U row is a key of `unbound-records.txt`: a record with no row reds, and a row no graded
+  # record matches reds as stale, so a bound record and a new unbound one never net to zero. An absent
+  # home is the empty population, the strictest one. `n21` was read above, where its absence is the
+  # parse's liveness test; the population filter's exempt records are no keys (TOOL-aRepatriatedFork-32).
   u21=$(printf '%s\n' "$b21" | sed -n 's/^U\t\(.*\)$/  \1 — unbound/p')
-  g21=$(printf '%s\n' "$u21" | extract_graded_rows | grep -c . || true)
-  # A generator predating the U row prints N and no U, which would make the pin unreachable.
+  g21=$(printf '%s\n' "$u21" | extract_graded_rows | tr -d '\r' | sed -n 's/^  \(.*\) — unbound$/\1/p')
+  # A generator predating the U row prints N and no U, which would make the population unreachable.
   if [ -n "$b21" ] && [ "$(printf '%s\n' "$u21" | grep -c . || true)" != "${n21:-0}" ]; then
-    fail 21 "the bindings parse printed N ${n21:-0} but $(printf '%s\n' "$u21" | grep -c . || true) U row(s) — a generator without the U row leaves RECORD_UNBOUND_PIN ungraded"
+    fail 21 "the bindings parse printed N ${n21:-0} but $(printf '%s\n' "$u21" | grep -c . || true) U row(s) — a generator without the U row leaves the unbound-records population ungraded"
   fi
-  # THE MEASUREMENT PRINTS ON EVERY RUN, and SLACK REDS (TOOL-aRepatriatedFork-32 rev-3, the closing
-  # review's C1). Since the pin began counting the graded rows, an adopter who set it to `N` as the
-  # runbook said held slack equal to its exempt records, and that many new unbound records then
-  # landed green: a shrink-only pin satisfied vacuously. The line names all three numbers, because
-  # the one to set the pin to is the graded count, and a reader shown only `N` sets the wrong one.
-  [ -n "$b21" ] && echo "memory-hygiene: check 21: the unbound pin grades ${g21:-0} of N ${n21:-0} unbound record(s), $(( ${n21:-0} - ${g21:-0} )) exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=${pin21:-<undeclared>}" >&2
-  if [ -z "$pin21" ]; then
-    fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
-  elif [ "${g21:-0}" -gt "$pin21" ]; then
-    over21="  measured ${g21:-0} against the pin $pin21"
-    fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
-$over21"
-  elif [ -n "$b21" ] && [ "$pin21" -gt "${g21:-0}" ]; then
-    fail 21 "RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green:
-  the pin $pin21 against a graded count of ${g21:-0} — lower it to ${g21:-0} in .memory-tree.conf"
+  # THE MEASUREMENT PRINTS ON EVERY RUN, naming graded, total and exempt, because the population holds
+  # the graded records and a reader shown only `N` would key the exempt ones too.
+  _gn21=$(printf '%s\n' "$g21" | grep -c . || true)
+  [ -n "$b21" ] && echo "memory-hygiene: check 21: the unbound population grades ${_gn21:-0} of N ${n21:-0} unbound record(s), $(( ${n21:-0} - ${_gn21:-0} )) exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against $M/project/unbound-records.txt" >&2
+  if [ -n "$b21" ]; then
+    # The compare is the ledger factory's, read through this kit's copy: one `<finding> TAB <path>`
+    # line per key `compare_counts` names, or `malformed TAB <text>` for a row the factory refuses.
+    _uc21=$(printf '%s\n' "$g21" | "$_PY" -I -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger as LL
+try:
+    rows, bad = LL.read_rows(sys.argv[2], 1)
+except FileNotFoundError:
+    rows, bad = {}, []
+for entry in bad:
+    print("malformed\t%s" % LL.render_malformed(entry).replace("\t", " "))
+measured = {(p,): 1 for p in sys.stdin.read().split("\n") if p.strip()}
+for name, key, _have, _want in LL.compare_counts(measured, {k: r[0] for k, r in rows.items()}, "shrink-only"):
+    print("%s\t%s" % (name, key[0]))' "$HERE" "$M/project/unbound-records.txt" 2>&1) \
+      || fail 21 "the ledger factory did not read $M/project/unbound-records.txt, so no unbound record was graded:
+$(printf '%s\n' "$_uc21" | tail -n 3 | sed 's/^/  /')"
+    _uc21=${_uc21//$'\r'/}
+    new21=$(printf '%s\n' "$_uc21" | sed -n 's/^undeclared site\t\(.*\)$/  \1/p')
+    [ -n "$new21" ] && fail 21 "records carrying the unbound Serves form with no row in $M/project/unbound-records.txt — bind them, or widen the population through a widen record:
+$new21"
+    stale21=$(printf '%s\n' "$_uc21" | sed -n 's/^unmeasured row\t\(.*\)$/  \1/p')
+    [ -n "$stale21" ] && fail 21 "rows of $M/project/unbound-records.txt that no graded unbound record matches — stale rows; the population is shrink-only, so delete each to lock the binding in:
+$stale21"
+    bad21u=$(printf '%s\n' "$_uc21" | sed -n 's/^\(malformed\|count rose\|count fell\)\t\(.*\)$/  \1: \2/p')
+    [ -n "$bad21u" ] && fail 21 "rows of $M/project/unbound-records.txt the ledger factory refuses or whose count is not 1:
+$bad21u"
   fi
   # Branch 4 — the filename PROJECTS the header. Its input is the S row, because a conformant record
   # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
@@ -3264,10 +3357,10 @@ fi
 
 _onepy=""   # 1 once the 13-16 block ran 17-19 in the same interpreter (TOOL-aHastenedSweep-4)
 if check_selected 13 14 15 16; then
-# 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
+# 13-15 (waived) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
-# owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
-# classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
+# owns the id grammar it imports from the recall kit. Neither transcribes the other. Every waiver the
+# classifier reads is keyed per corpus, and checks 13-15 are armed by the presence of id-orphan-waiver.txt / corpus-path-unresolved.txt; check 16 is STRUCTURAL and behind none.
 # When this script's own checks 1 to 5 ran clean it hands --print-index-set's answer down on stdin
 # under GOV_INDEX_SET_STDIN=1 instead (TOOL-aHastenedSweep-3).
 if [ "$STAGED" = 0 ]; then
@@ -3540,6 +3633,10 @@ if [ -n "$alcut" ]; then
           u = (j ? $2 : ""); continue }
         if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           u = ""; continue }
+        # TOOL-dWitnessedBar-7 S8: a seen-red line is no answer, so it CLOSES the open one and its
+        # tokens join no criterion; the block stays open for the answers after it.
+        if ($0 ~ /^- seen-red/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          continue }
         if (u != "" && $0 ~ /^- *(\*\*)?AC[0-9]+/) {
           if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)

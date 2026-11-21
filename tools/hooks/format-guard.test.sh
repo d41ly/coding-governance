@@ -188,6 +188,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -254,6 +272,15 @@ ROLES_HOME=$(resolve_kit_dir "$TESTPY" roles handoff.py "$HERE") || exit 2
 mkdir -p "$TMP/kit/$HOOKS_HOME" "$TMP/kit/$ROLES_HOME"
 cp "$HERE/format-guard.js" "$HERE/scratch-guard.js" "$HERE/agent-cap.js" "$TMP/kit/$HOOKS_HOME/"
 HOOK="$TMP/kit/$HOOKS_HOME/format-guard.js"
+# The hook's card reader asks the kickoff checker where a session's card lives, resolved from the hook's
+# OWN install (TOOL-dPlacedRequest-2 S10), so the copy carries a stub checker where that probe looks: it
+# answers --card --path alone, with the orientation folder of the fixture's git common dir, and no arm
+# reads the real kickoff kit.
+case $HOOKS_HOME in */*) KICKOFF_HOME=${HOOKS_HOME%/*}/session-kickoff ;; *) KICKOFF_HOME=session-kickoff ;; esac
+mkdir -p "$TMP/kit/$KICKOFF_HOME"
+printf '%s\n' '[ "${1:-} ${2:-} ${3:-}" = "--card --path --session" ] || exit 2' \
+  'd=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1' \
+  'echo "$d/orientation/$4.md"' > "$TMP/kit/$KICKOFF_HOME/manifest-check.sh"
 export GOV_PYTHON="$TESTPY"
 
 # The native spelling of a directory: node reads the payload's cwd as a Windows path on Windows, and

@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.34` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.35` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -80,6 +80,11 @@ Requires `.memory-tree.conf` (owned by the memory-tree kit). This kit reads `MEM
 **declares no conf of its own** — there is deliberately no `--memory-root` flag. A second way to state
 the same value is the hand-kept-second-copy defect the kit exists to detect.
 
+The adopter seeds `drift_signals.py` from its template through the memory-tree kit's
+`legacy_ledger.py seed --home <prefix>/drift-audit/drift_signals.py --copy <template>`
+(TOOL-dWitnessedBar-15): the copy is made only while the file is absent, atomically, and every later
+adopt prints `present` and leaves your tuned pins alone.
+
 Then, in order:
 
 1. Fill `<prefix>/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
@@ -89,18 +94,21 @@ Then, in order:
    your pins sit close together, so a justification for a DIFFERENT pin cannot be read as this
    one's; widen it if your repo writes long justifications above a pin. This tree has two pins
    three lines apart at the same value, which is the case that makes the first half real.
-4. **Seed `PINS` at the values you just measured, not at zero.** A pin above the measured value hides
-   a live regression on day one; a pin below it reds the bar on work nobody did. Where a gateable
-   signal's rows each carry an `id`, seed `BASELINES` with the measured ids instead of a pin for it.
+4. **Seed the `drift-pins` rows at the values you just measured, not at zero.** A pin above the
+   measured value hides a live regression on day one; a pin below it reds the bar on work nobody did.
+   Where a gateable signal's rows each carry an `id`, seed `drift-baselines` rows with the measured
+   ids instead of a pin for it. Both are ledger populations (TOOL-dWitnessedBar-16), registered in
+   this kit's descriptor and homed at `memory/project/drift-pins.txt` and
+   `memory/project/drift-baselines.txt`, beside every other population.
 4. Wire `--check` into your gate manifest.
 
 ## Layout
 
 | File | Owner | What |
 |---|---|---|
-| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
+| `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio`, `--gate-health` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `BASELINES`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR`, `DEAD_READINGS_LIMIT`, `DEAD_FILED` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `HANDKEPT`, `RATCHETS`, `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR`, `DEAD_READINGS_LIMIT`, `DEAD_FILED` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -113,10 +121,13 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 A report-only signal with no pin by design prints `report only, no pin` in the status column, never
 `over pin 0`: it has nothing to be over, so the column states that rather than raising a red-looking
 word nobody acts on. Its `--json` record carries `null` for both `tolerance` and `pin`. A project
-that wants a threshold for one declares it in its `PINS`, and the column then compares against it.
+that wants a threshold for one declares it as a `drift-pins` row, and the column then compares against it.
 Which signals are pinless is the status column's to say, not this paragraph's; a gateable signal
 never is. A gateable signal whose rows each name their offender by `id` may take an id set in
-`BASELINES` instead of a `PINS` count; its status then reads `ok (baseline <n>)` or `OVER BASELINE`.
+`drift-baselines` instead of a `drift-pins` count; its status then reads `ok (baseline <n>)` or `OVER BASELINE`.
+The lists the shrink signal watches are not typed anywhere: they are every `shrink-only` `[[ledger]]`
+registration the tree carries, read through the memory-tree kit's ledger factory, and the signal is
+empty by declaration wherever there is none.
 
 | Signal | Asks | Gateable |
 |---|---|---|
@@ -147,6 +158,7 @@ never is. A gateable signal whose rows each name their offender by `id` may take
 | `source_cited_ids_resolving_to_no_record` | does every id cited in tracked source resolve to a record, an anchor line under the memory root or a spec's own H1? | no |
 | `dossiers_older_than_their_paths` | how many codebase-map feature dossiers are older than their paths — a commit touching a path the dossier claims is not an ancestor of the dossier's own last commit? Read from the map kit's own `map_diff.py --stale-dossiers --json`, so the attribution is spelled once; map-root paths are never a claim, and a merge commit carries no paths, so a change made only in a conflict resolution is not seen. The detail is the refresh worklist, most-behind first. Not asked where the map kit is absent or unadopted; DEAD PROBE on a shallow clone or when nothing touched a claimed path. | no |
 | `live_builds_without_activity` | how many live builds are dormant? Counts the `dormant` cells of the `Activity` column the memory-tree generator renders into `LIVE.md` against its `LIVE_DORMANT_DAYS`, found by header name, and defines no dormancy rule of its own; `of` counts the `active` and `dormant` rows, any other cell is unjudgeable, and the detail names each dormant build with its `Last record`. Not asked where `LIVE.md` or its `Activity` column is absent. | no |
+| `gate_health` | what reliability bar do the flake records measure? Once every leg of the bar (each leg of the gate-leg manifest beside this kit's tool root that the kit hold, `subject` `kit` or `chunk` `selftests`, does not hold) has thirty verdicts in the flake records, one more than the nearest-rank 90th percentile, across those legs, of each leg's flakes in its newest ten by `Ended`, as `value`; `n/a` while unarmed, its first detail row naming each leg short of thirty with its count. Read through the memory-tree record factory; DEAD PROBE only where no factory resolves or no manifest reads. | no |
 
 ### Armed cutoff keys are a budget
 
@@ -155,7 +167,7 @@ Every armed `_CUTOFF` key makes a record's required shape depend on a filename d
 counting in the same change. A key stops counting in one of three ways. Its rule becomes
 unconditional, and the key goes with its readers' date guards. Two keys merge into one. Or the key
 is blanked or unassigned, which disarms its rule. The signal cannot tell the third from the first
-two; the diff shows which one happened. With no `PINS` entry the signal reports and never gates,
+two; the diff shows which one happened. With no `drift-pins` row the signal reports and never gates,
 because the shipped example confs arm a key. When no tracked root conf assigns any `_CUTOFF` key
 the signal reads DEAD PROBE, never 0.
 
@@ -263,6 +275,26 @@ known: a fix not called `fix` is missed, and blame credits moved code to its mov
 always prints is the rule: a difference between two months of one repository is not evidence of an
 effect, so it prints no comparison.
 
+## Gate health — `--gate-health`, the reliability bar
+
+`drift_report.py --gate-health` prints the `gate_health` measurement in one line: `drift-report:
+gate-health measured <count>/10 · legs <armed>/<bar legs> · verdicts <run id> …`, or `drift-report:
+gate-health unarmed · <leg> <rows>/30 …`. It is a mode of its own, as `--escape-ratio` is: it reads
+`.memory-tree.conf`, the gate-leg manifest and the flake records through the memory-tree factory alone,
+no project layer and no base ref, and refuses `--check`, `--offenders`, `--delta` and `--escape-ratio`.
+`--with <path>` counts one flake record not yet staged beside the tracked ones, and is refused unless the
+path is a flake record inside this repository. `--write --build <slug> --unit <id>` writes the armed
+measurement as a `gate-health` record of that build, `Measured`, `Verdicts` (the `Run` of every flake
+record it read) and `Legs`, through the factory's `write_record`, and prints `drift-report: wrote <path>`;
+an unarmed one writes nothing. Exit 0 measured or unarmed, 2 refused with nothing written. The run-gates
+kit's `verdict_flow.py flakes` runs it with `--write` and `--with` after each flake record it writes, and
+reads the newest gate-health record's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
+`--gate-health` requires `--selection <path>`, the selection record whose `quarantine` and `level`
+rows the runner held, read through the runner's own row reader carried inline as the `selection_row`
+block (TOOL-dWitnessedBar-62), an empty file holding nothing.
+`--gate-health --fixture differs|lower|short|write --selection <an empty file>` runs one planted case
+over a scratch repository.
+
 ## What "landed" is measured against — the base ladder
 
 Every ancestry answer, every `git show <base>:<path>` a ratchet reads and the trace walk are
@@ -303,13 +335,14 @@ population drops; raising one needs the same justification as any other ratchet 
 
 **A pin bounds a count, not the offenders it counts.** When one pinned offender drains and a new one
 arrives in the same change, the value does not move and `--check` stays green over a regression. So
-a gateable signal whose detail rows each carry an `id` takes an id set in `BASELINES` instead: a row
+a gateable signal whose detail rows each carry an `id` takes an id set in `drift-baselines` instead: a row
 whose `id` the set does not list reds as `new`, a listed id no row carries reds as `stale` until its
 line is deleted, and the set may never gain an id against the base, nor be first seeded above the
 pin the base held. There is no escape for an addition: each such signal has a remedy that is not
-one. Nor is moving a signal out of the set an escape: a signal leaving `BASELINES` for `PINS` is
-pinned no higher than the size of the set the base held, or `--check` reds it as a weakened ratchet.
-A signal named in both `PINS` and `BASELINES`, or a `BASELINES` key naming no gateable signal,
+one. Nor is moving a signal out of the set an escape: a signal leaving `drift-baselines` for
+`drift-pins` is pinned no higher than the size of the set the base held, or `--check` reds it as a
+weakened ratchet. A signal with both a `drift-pins` and a `drift-baselines` row, or a baselines row
+naming no gateable signal,
 is refused with exit 2. Signals that never gate keep their pins, because a set would change nothing
 `--check` does. The project layer is never evidence for signal 2, so listing an id does not cite it.
 

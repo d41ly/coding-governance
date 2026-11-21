@@ -57,18 +57,18 @@ by name, the stop-guard allows, and the matrix's HELD and working rows refuse a 
 graded where it is read, and the tick acts on none of its copies.
 
 **Two nodes meet at the remote, not at the merge.** The lease lives on the run's own branch, so with
-`RUN_CLAIMS` on every run also claims `refs/gov/runs/<slug>` on the landing remote by
-compare-and-swap: `--preflight` and a take-over refuse another session's live claim (check 107), the
+`RUN_CLAIMS` on every run also claims `refs/gov/leases/<slug>/build` on the landing remote by
+compare-and-swap (the legacy `refs/gov/runs/<slug>` read only by `read_claims`' legacy read): `--preflight` and a take-over refuse another session's live claim (check 107), the
 holder's verbs refuse one at check 108 and end with halt code `claim-lost`, a claim read or write that
 does not complete is check 109, and `--claims` lists them all. The beat is a remote fact, so the
 record is never restaged for it (`TOOL-aGraftedHelix-1`). Where `RUN_CLAIMS` is off, `--claims` prints
-`claims: off` and reads nothing. A claim push waits while push-main holds `push-main-active` in the
-same git dir, and a `--preflight` refused after its claim write restores the record and writes a claim
-it created `aborted` (`TOOL-aGraftedHelix-32`). The claim push takes `claim-push.lock` in that git dir
-before it tests the marker, and push-main touches its marker before it waits on the lock, so the two
-pushes serialise. A stale lock is broken only under its guard directory `claim-push.lock.break`, by
-the one writer that takes it and re-reads the deadline there, and released only by its `owner`
-(`TOOL-aGraftedHelix-37`); a `--settle` re-run over a settled record retries the claim's status write through
+`claims: off` and reads nothing. Each claim write is a commit parented on the tip it read, so the
+remote's first-parent chain lists every write, and a `--preflight` refused after its claim write
+restores the record and writes a claim it created `aborted` (`TOOL-aGraftedHelix-32`). The tracked
+pre-push hook clears the verdict files the lander trusts only on a push that carries the default
+branch (`TOOL-dPlacedRequest-11`), so a claim push needs no lock and no marker test beside a landing,
+and the hook's fast path skips the straggler layer for a claim beat, parentless or parented
+(`TOOL-dPlacedRequest-34`); a `--settle` re-run over a settled record retries the claim's status write through
 `write_settle_claim`, over a `held` or `live` claim of the record's own lease alone
 (`TOOL-aGraftedHelix-36`). The class `orchestrator-hand-off-owed-a-disposition.md`
 is claimed here because its remedy is a stop: a discovery handed to the orchestrator resolves to a

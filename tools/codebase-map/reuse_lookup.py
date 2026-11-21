@@ -114,8 +114,8 @@ def _parse_dossier_decisions(text: str) -> tuple:
 
     A front-matter read rather than a parse, so this module keeps needing no project layer.
     An absent or empty list yields an empty tuple, which prints no clause at all -- an empty
-    clause would be noise on the dossiers that declare none, which `DOSSIER_DECISIONS_EMPTY_PIN`
-    in `.codebase-map.conf` counts. No figure here: it is a live count and it has already moved.
+    clause would be noise on the dossiers that declare none, which the `dossier-decisions-empty`
+    population keys, one row per feature. No figure here: it is a live count and it has already moved.
     """
     m_ = _DECISIONS_RE.search(text)
     if not m_:

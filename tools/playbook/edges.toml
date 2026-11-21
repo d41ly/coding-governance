@@ -304,3 +304,6 @@ key = "Gov-Policy"         # value: the policy change's record, written by TOOL-
 
 [[trailer]]
 key = "Red-fix"            # value: one gate leg's name, read by the routed-commit gate
+
+[[trailer]]
+key = "Commit-Checked"     # value: unattended@<kit version>, written by the commit check, TOOL-dWitnessedBar-2

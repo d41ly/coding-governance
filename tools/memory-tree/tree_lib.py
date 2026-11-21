@@ -49,6 +49,102 @@ FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 RED_FIX_TRAILER = "Red-fix"
 
 
+# The one bash rule, carried inline once for the kit (TOOL-dWitnessedBar-57 S7): `row_grammar.py`'s
+# `resolve_shell_ere` and `corpus_ids.py`'s `resolve_bash` import its `scan_bash` from here, and
+# `resolve-python.test.sh` in the gov lib dir reds this copy once it drifts.
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
 def parse_leg_names(text: str) -> set:
     """The leg names a leg manifest's text declares: the `name` of each `{name: ...}` row of its
     top-level list. ValueError when the text is not JSON or its top level is not a list. The kit's
@@ -505,9 +601,21 @@ BIND_HEAD_LINES = 12
 # commands re-run at a commit, written by a stand-in or an executor and never by a door. `transition`
 # (TOOL-dDeclaredLoop-3 S2) is a build's stage move, written by the loop kit's transition writer alone.
 # `recommendation` (TOOL-dDeclaredLoop-22 S1) is a stage exit's review recommendation, a command's score or a
-# role's reason, written through the factory's door by the unattended driver's `--recommend`.
+# role's reason, written through the factory's door by the unattended driver's `--recommend`. `widen`
+# (TOOL-dWitnessedBar-14 S5) is a population's growth admitted with its reason, written through
+# `write_record` by the ratchet pack's `ratchet.py widen` alone. `leg-tail` (TOOL-dWitnessedBar-25 S6) is a
+# failing leg's output tail kept by its hash, written through `write_record` by the run-gates kit's
+# `keep_tails.py` alone. `flake` (TOOL-dWitnessedBar-8 S3) is one `test.flakes` run's per-leg verdicts,
+# written through `write_record` by the run-gates kit's `verdict_flow.py flakes` alone. `gate-health`
+# (TOOL-dWitnessedBar-1 S4) is one gate-health measurement, the reliability bar derived from the flake records,
+# written through `write_record` by the drift kit's `drift_report.py --gate-health --write` alone. `card`
+# (TOOL-dPlacedRequest-2 S8) is a build's orientation card at one step, its snapshot, written by the
+# kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
+# (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
+# method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
-                      "transition", "recommendation")
+                      "transition", "recommendation", "widen", "leg-tail", "flake", "gate-health", "card",
+                      "probe-trigger", "probe")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
@@ -516,6 +624,24 @@ BIND_RE = re.compile(
     r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
 )
 UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
+EVIDENCES_RE = re.compile(r"^\*\*Evidences:\*\* `?([^`\s]+)`?")
+
+
+def read_evidence_lines(text: str) -> list:
+    """`(line number, unit, line)` for every line of `text` under an `**Evidences:** <unit>` block: a
+    block opens at its `**Evidences:**` line and ends at the next one or at a line opening `#`, a
+    heading. The walk `deviation_join.read_population`'s ledger arm did inline, extracted at its second
+    Python instance, `seen_red.read_seen_red_records` (TOOL-dWitnessedBar-7 S2). It reads no binding:
+    whether the text is a `journal` record is each caller's test, through `read_bindings`."""
+    out, unit = [], None
+    for n, line in enumerate(text.split("\n"), 1):
+        ev = EVIDENCES_RE.match(line)
+        if ev or line.startswith("#"):
+            unit = ev.group(1) if ev else None
+            continue
+        if unit:
+            out.append((n, unit, line))
+    return out
 
 
 def _id_alternation(conf: dict) -> str:

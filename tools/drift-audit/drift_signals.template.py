@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.34
+gov:kit drift-audit@1.35
 
 Copied from <prefix>/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python <prefix>/drift-audit/drift_report.py`.
@@ -41,15 +41,10 @@ PRODUCT_GLOBS: list[str] = [
 ]
 
 # --------------------------------------------------------------------------------------------
-# SHRINK_ONLY — repo-relative path -> what the list is. Any exemption/waiver/baseline file whose own
-# header promises it only shrinks. The signal reports each one's seed count vs its count today.
-# A shrink-only list with no scheduled shrinker is a permanent exemption with optimistic framing.
+# THE LISTS THAT PROMISE TO SHRINK are no longer typed here (TOOL-dWitnessedBar-16 S8): they are the
+# `shrink-only` `[[ledger]]` registrations, read through the memory-tree kit's ledger factory, each
+# glossed by its population name, so a converted list joins the signal by being registered.
 # --------------------------------------------------------------------------------------------
-
-SHRINK_ONLY: dict[str, str] = {
-    # "memory/map/baseline.toml": "map coverage backfill grace",
-    # "memory/project/curation-debt.txt": "index-budget waiver",
-}
 
 # --------------------------------------------------------------------------------------------
 # HANDKEPT — hand-maintained inventories that mirror a generated/authoritative source.
@@ -116,41 +111,21 @@ TRACE_WAIVER: str = ""
 EVIDENCE_GLOBS: list[str] = []
 
 # --------------------------------------------------------------------------------------------
-# PINS — shrink-only ceilings per GATEABLE signal, seeded at the values the report actually measured.
-# `--check` reds when a value exceeds its pin. Lower a pin whenever its population drops; raising one
-# needs the same justification any other ratchet raise does.
-#
-# Signals with no pin entry default to tolerance 0.
+# THE PINS are the rows of the `ceiling` population `drift-pins` (TOOL-dWitnessedBar-16 S8), its home
+# `memory/project/drift-pins.txt`: one row per signal, its count the pin, seeded at MEASURED
+# values and never guessed. A pin of 0 is no row, so the signal keeps its own tolerance of 0. A
+# raise is the `ratchet` pack's widen, which costs a widen record and its reason; each pin's
+# history, written here until this unit, is the conversion record's.
 # --------------------------------------------------------------------------------------------
 
-PINS: dict[str, int] = {
-    # "ledger_rows_contradicting_git": 0,
-    # "non_terminal_specs_cited_by_product_source": 0,
-    # "handkept_inventories_disagreeing_with_source": 0,
-    # "readme_mechanism_drift": 0,   # REPORT-ONLY: seed it at what your first report MEASURES.
-    #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
-    #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
-    #   guessed pin is the one thing this block forbids.
-    # "cutoff_keys_armed": 0,   # armed `_CUTOFF` keys in your tracked root confs. Seed it from your
-    #   first report's value; with no entry it reports and never gates, because the shipped example
-    #   confs arm a key and a default of 0 would red your first `--check`.
-    # "aborted_work_landed": 0,     # REPORT-ONLY: seed it at what your first report MEASURES; it
-    #   drains as `--settle` writes `work-landed-at` onto each listed record.
-    # "discarded_work_landed": 0,   # REPORT-ONLY: seed it at what your first report MEASURES; no
-    #   verb clears it, so a pin there records the value rather than a drain target.
-}
-
 # --------------------------------------------------------------------------------------------
-# BASELINES — optional. For a GATEABLE signal whose detail rows each name their offender by `id`
-# (`non_terminal_specs_cited_by_product_source`, `closed_specs_with_no_product_commit`), list the
-# offender ids instead of pinning a count: a pin cannot tell a drained offender from a new one at an
-# equal count, and a set can. `--check` reds on an id the list does not carry, on a listed id that
-# no longer offends (delete its line), and on a list that gains an id against the base, or is first
-# seeded above the base's pin. Seed it with the ids your first report measured, and drop that
-# signal's PINS entry in the same change: a signal takes one bound, and declaring both is refused.
+# THE BASELINES are the rows of the `shrink-only` population `drift-baselines` (TOOL-dWitnessedBar-16
+# S8), its home `memory/project/drift-baselines.txt`: one row per (signal, offender id), the
+# gateable signals bounded by WHICH offenders they hold rather than how many (TOOL-aMendedFleet-56).
+# A new id reds, a listed id that no longer offends reds until its row is deleted, and the set may
+# never gain an id against the base; a signal moved to `drift-pins` is pinned no higher than the
+# set the base held (TOOL-aMendedFleet-110).
 # --------------------------------------------------------------------------------------------
-
-BASELINES: dict[str, list[str]] = {}
 
 # --------------------------------------------------------------------------------------------
 # CHARTER — optional. The governing doc a HANDKEPT probe reads as `ctx.charter`, as the example
@@ -196,13 +171,11 @@ DEAD_FILED: dict[str, str] = {}
 # that has gone DEAD, because a blind instrument reporting 0 is the failure this kit exists to
 # refuse; a signal you have deliberately not populated yet is not blind, and belongs here.
 #
-# `shrink_only_lists_not_shrinking` starts here because SHRINK_ONLY above ships empty. Remove it the
-# moment you declare your first list — leaving it here after that is how the exemption becomes the
-# hole.
+# `shrink_only_lists_not_shrinking` is not listed: the engine declares it empty wherever no
+# `shrink-only` registration exists, and lifts that the moment one does (TOOL-dWitnessedBar-16 S8).
 # --------------------------------------------------------------------------------------------
 
 DECLARED_EMPTY: set[str] = {
-    "shrink_only_lists_not_shrinking",   # SHRINK_ONLY above ships empty
     "handkept_inventories_disagreeing_with_source",   # HANDKEPT above ships empty
 }
 
@@ -231,6 +204,5 @@ DECLARED_EMPTY: set[str] = {
 # RATCHET_LOOKBACK = 14
 
 RATCHETS: list[dict] = [
-    # {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
-    # {"file": "<path of this file>", "key": "cutoff_keys_armed", "weakens": "up"},
+    # {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
 ]

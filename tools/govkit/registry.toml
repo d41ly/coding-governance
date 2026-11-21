@@ -225,6 +225,22 @@ id = "playbook/seeded-template"
 successor = "none"
 surfaces = ["file:coding-governance-agents.template.md", "installable:{playbook_path}"]
 
+# TOOL-dWitnessedBar-18: the playbook kit's `project-owned` seed of `instructions-legacy.txt`, which the
+# kit's directory held. The list moved to its ledger home under the memory root, registered in this
+# registry, gov-only; the kit seeds it no more, and an adopter's copy is released.
+[[retired]]
+id = "playbook/instructions-legacy-seed"
+successor = "none"
+surfaces = ["file:{prefix}/playbook/instructions-legacy.txt"]
+
+# TOOL-dWitnessedBar-111, on the owner's ruling: the adopter-rules step's landed witness held each
+# converted rule to its text, so an instruction edit of a rule read as the step un-applied. Its
+# successor keeps the frozen up and down and reads a rule by its derived tag as well.
+[[retired]]
+id = "playbook/adopter-rules-to-overlay"
+successor = "playbook/adopter-rules-to-overlay-2"
+surfaces = []
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
@@ -313,20 +329,12 @@ path = "{prefix}/check-remote-literals.test.sh"
 why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
-path = "{prefix}/dead-path-waivers.txt"
-why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and the TEXT of gov carrier lines, keyed by occurrence rather than by line number since TOOL-dHonouredPark-3; seeded from this repo's measured population, meaningless in any other tree."
-
-[[exempt]]
 path = "{prefix}/check-playbook-parity.sh"
 why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's <prefix>/ and compares values against the sources in this repo that own them. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
 
 [[exempt]]
 path = "{prefix}/check-playbook-parity.test.sh"
 why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
-
-[[exempt]]
-path = "{prefix}/playbook-kit-waivers.txt"
-why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the shipped charter template. Gov-specific by construction — it enumerates gov's own <prefix>/ population — and prescribed for copy nowhere in the runbook."
 
 [[exempt]]
 path = "{prefix}/check-template-size.test.sh"
@@ -377,6 +385,10 @@ path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
 
 [[exempt]]
+path = "skills/session-kickoff/card-store.fixture.sh"
+why = "gov's own fixture for the build card, deliberately not shipped. Each case copies the memory-tree, loop and unattended kits out of the tree it sits in into a scratch repository and drives the engine beside it against a bare remote; the kickoff self-test's arm runs it where it sits beside the checker and says so where it does not. TOOL-dPlacedRequest-2 S12."
+
+[[exempt]]
 path = "skills/session-kickoff/card-compaction.fixture.sh"
 why = "gov's own live fixture for the orientation card file, deliberately not shipped. It drives two headless `claude` sessions and a compaction, minutes of model time and API tokens, so the main loop runs it live and no target receives it: a target has no build whose card it would prove. PLAY-dOrderedCharter-8 S1; exempted by PLAY-dOrderedCharter-77 S7."
 
@@ -395,58 +407,198 @@ why = "gov's own source-mode deploy receipt, deliberately not shipped: the deplo
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
 why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
+tag = "leg.gov.hook-destinations-every-declared-hook-path-ships"
+tests = ["feature.agent-cap"]
+purpose = "requires every declared hook path to ship"
+argv = ["bash", "{prefix}/check-hook-destinations.sh"]
+chunk = "product"
+subject = "repo"
+ceiling = 2940
+doc_reads = []
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "spawn budget (forks per hot entrypoint)"
 why = "its ceilings file declares THIS repository's hot entrypoints and the fixture each is counted in, by path, so the leg is gov-side only: an adopter has other entrypoints and no row for them. The counter itself, `fork-count.sh`, ships with the gate-lint kit and takes the ceilings file as an argument, so an adopter that wants a fork budget declares its own rows and wires its own leg. TOOL-aSparedSpawn-8."
+tag = "leg.gov.spawn-budget-forks-per-hot-entrypoint"
+tests = ["feature.gate-lint"]
+purpose = "caps the forks per hot entrypoint at a shrink-only ceiling"
+argv = ["bash", "{prefix}/gate-lint/fork-count.sh", "memory/project/fork-ceilings.txt", "."]
+chunk = "product"
+subject = "repo"
+ceiling = 2400
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "hook destinations self-test"
 why = "the arms for that gate; no descriptor can claim a leg whose script no adopter receives."
+tag = "leg.gov.hook-destinations-self-test"
+tests = ["feature.agent-cap"]
+purpose = "arms the hook-destinations gate"
+argv = ["bash", "{prefix}/check-hook-destinations.test.sh"]
+guard = [
+  "{prefix}/check-hook-destinations.sh",
+  "{prefix}/hooks/",
+  "{prefix}/memory-recall/",
+  "{prefix}/workflows/kit.toml",
+  "{prefix}/workflows/spec-audit-optin.fragment.json",
+  "{prefix}/workflows/spec-audit-optin.js",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1620
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "kickoff engine size <=18KiB"
 why = "it measures THIS repo's own kickoff engine against a row in <prefix>/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The kickoff-manifest descriptor used to declare this as a gate_leg, so `apply` would have emitted an adopter a row running an engine gov never ships and recorded it in the receipt as coverage. DEPL-dCarriedReceipt-6 withdrew the leg and this row is where it went."
+tag = "leg.gov.kickoff-engine-size-18kib"
+tests = ["feature.session-kickoff"]
+purpose = "caps the kickoff engine's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh", "skills/session-kickoff/SKILL.md"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "build-method size"
 why = "it measures THIS repo's own rendered build method against a row in <prefix>/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The ASYMMETRY is the whole reason this is not a gate_leg in the memory-tree kit.toml: that kit ships BUILD-METHOD.template.md and ships no size gate, so declaring it there would make `apply` emit an adopter a row running an engine gov never ships — verbatim the defect DEPL-dCarriedReceipt-6 withdrew the kickoff row for."
+tag = "leg.gov.build-method-size"
+tests = ["feature.build-method"]
+purpose = "caps the build method's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh", "memory/guides/BUILD-METHOD.md"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "unattended protocol size"
 why = "it measures THIS repo's own rendered unattended protocol against its row in the template-size limits file, through check-template-size.sh, for `build-method size`'s reason one row up: the unattended kit ships PROTOCOL.template.md and ships no size gate, so a gate_leg in its kit.toml would make `apply` emit an adopter a row running an engine gov never ships. An adopter's own cap on that file is its GUIDE_CAP_BYTES, which the kit's adopter announces against instead (TOOL-aRepatriatedFork-11 S6, S7)."
+tag = "leg.gov.unattended-protocol-size"
+tests = ["feature.unattended"]
+purpose = "caps the unattended protocol's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh", "memory/guides/UNATTENDED-PROTOCOL.md"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "unattended skill size"
 why = "it measures THIS repo's own rendered unattended Skill against its row in the template-size limits file, through check-template-size.sh, for `unattended protocol size`'s reason one row up: the kit ships SKILL.template.md and no size gate, so a gate_leg in its kit.toml would make `apply` emit an adopter a row running an engine gov never ships. TOOL-aMendedFleet-68 S5."
+tag = "leg.gov.unattended-skill-size"
+tests = ["feature.unattended"]
+purpose = "caps the unattended skill's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh", ".claude/skills/unattended/SKILL.md"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "charter size"
 why = "it measures THIS repo's own rendered charter against a row in <prefix>/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
+tag = "leg.gov.charter-size"
+tests = ["feature.playbook"]
+purpose = "caps the charter's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh", "AGENTS.md"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "branch-guard self-test"
 why = """
 gov's own red/green proof of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file, and the path it drives is already a registry exemption for that reason.
 """
+tag = "leg.gov.branch-guard-self-test"
+purpose = "tests the pre-commit branch guard in a throwaway repo"
+argv = ["bash", ".githooks/pre-commit.test.sh"]
+guard = [".githooks/", "{prefix}/memory-tree/check-memory-hygiene.sh", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "straggler-guard arms"
 why = """
 gov's own red/green proof of the shards-to-builds straggler layer. The script it drives is a registry exemption, and so are both of its subjects: the library and `pre-rebase` are gov-only, because a pre-flip branch carries the old kit and the rule has to sit beside the hook files. An adopter receives neither, so there is no descriptor for this leg to be claimed by. TOOL-dDerivedDocket-13.
 """
+tag = "leg.gov.straggler-guard-arms"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "arms the shards-to-builds straggler layer"
+argv = ["bash", ".githooks/straggler-guard.test.sh"]
+guard = [
+  ".githooks/",
+  "{prefix}/check-wiring.sh",
+  "{prefix}/lib/",
+  "{prefix}/memory-recall/",
+  "{prefix}/memory-tree/",
+  ".memory-tree.conf",
+  ".lexicon.conf",
+]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+doc_reads = []
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "recall floor"
 why = """
 gov's own recall-quality floor. The question set it grades is keyed on gov record ids and the value it compares against was MEASURED on this corpus, so both are meaningless in an adopter's tree — a pin copied from another corpus is the class `memory/gotchas/pin-copied-from-another-corpus.md` names. `<prefix>/memory-recall/kit.toml` withholds `check-recall.py` and `recall-fixture.json` from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs. An adopter who wants a floor authors their own fixture and measures their own value; that adoption path is the parked half of `TOOL-aWalkedCorpus-3` section 8.
 """
+tag = "leg.gov.recall-floor"
+tests = ["feature.memory-recall"]
+purpose = "grades the committed question set against the recall floor"
+argv = ["python3", "{prefix}/memory-recall/check-recall.py"]
+guard = [
+  "{prefix}/memory-recall/",
+  "memory/",
+  ".memory-tree.conf",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+  "{prefix}/memory-tree/backlog.py",
+]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "recall floor arms"
 why = """
 the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
 """
+tag = "leg.gov.recall-floor-arms"
+tests = ["feature.memory-recall"]
+purpose = "arms the recall floor check per degradation row"
+argv = ["python3", "{prefix}/memory-recall/test_recall_floor.py"]
+guard = [
+  "{prefix}/memory-recall/",
+  "memory/",
+  "{prefix}/govkit/",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+  "{prefix}/memory-tree/backlog.py",
+]
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "spec tokens (a spec's own names resolve)"
@@ -454,6 +606,15 @@ why = """
 grades gov's OWN specs against gov's OWN leg manifest, through a script that is itself a registry
 exemption for that reason. An adopter receives neither.
 """
+tag = "leg.gov.spec-tokens-a-spec-s-own-names-resolve"
+tests = ["feature.spec-tokens"]
+purpose = "requires a spec's own names to resolve in the tree"
+argv = ["python", "{prefix}/check-spec-tokens.py"]
+reads = { history = "it dates a token by `git log -1 --pickaxe-regex` (TOOL-aSparedSpawn-13 S3)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 940
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "spec tokens (the pass's own spec)"
@@ -461,6 +622,16 @@ why = """
 the pass form of the leg above: the same gov-only script under `--pass-spec`, grading the one spec
 the pass's commits name. An adopter receives neither the script nor the leg. TOOL-aNimbleMend-4.
 """
+tag = "leg.gov.spec-tokens-the-pass-s-own-spec"
+tests = ["feature.spec-tokens"]
+purpose = "resolves the tokens of the pass's own spec"
+argv = ["python", "{prefix}/check-spec-tokens.py", "--pass-spec"]
+scope_of = "spec tokens (a spec's own names resolve)"
+reads = { history = "it names the pass's unit from the `git log` of `$GATE_BASE..HEAD`, else of the last commit (TOOL-aNimbleMend-4 S2)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "memory hygiene (the pass checks)"
@@ -470,6 +641,16 @@ selection is sized against gov's corpus, where those three checks fit a pass and
 do not, so a `[[gate_leg]]` row would hand an adopter a pin measured in another tree. An adopter
 runs the whole leg. TOOL-aNimbleMend-4.
 """
+tag = "leg.gov.memory-hygiene-the-pass-checks"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "runs the memory hygiene checks a pass owes"
+argv = ["bash", "{prefix}/memory-tree/check-memory-hygiene.sh", "--only", "9,21,23"]
+scope_of = "memory hygiene"
+reads = { base = "its later checks diff what was added since the mainline merge-base (TOOL-aSparedSpawn-13 S3).", clock = "it compares the date against RECORD_SERVES_CUTOFF (TOOL-aSparedSpawn-13 S3).", history = "it reads commits since that merge-base (TOOL-aSparedSpawn-13 S3)." }
+chunk = "records"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "positional (the citation check alone)"
@@ -479,10 +660,30 @@ check`, over gov's own records. Gov-only for the parent leg's reason, and no `[[
 same one: a descriptor row naming a leg the target cannot carry is what reds the deployer.
 TOOL-aNimbleMend-4.
 """
+tag = "leg.gov.positional-the-citation-check-alone"
+tests = ["feature.playbook"]
+purpose = "runs the positional file:line citation check alone"
+argv = ["python", "{prefix}/playbook/positional.py", "check"]
+scope_of = "tags (the resolver's checks)"
+reads = { history = "it reads when each line holding a citation was written, by `git blame -M` (TOOL-aNimbleMend-4 S1)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "spec-tokens self-test"
 why = "gov's own red/green proof of the leg above; it travels with a gate that does not travel."
+tag = "leg.gov.spec-tokens-self-test"
+tests = ["feature.spec-tokens"]
+purpose = "arms the spec-tokens check red and green"
+argv = ["bash", "{prefix}/check-spec-tokens.test.sh"]
+guard = ["{prefix}/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 330
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "chain-packet self-test"
@@ -490,84 +691,218 @@ why = """
 gov's own red/green proof of the chain packet's front door, a registry exemption; it travels with a script that does not travel. TOOL-aBatchedPacket-1.
 Its guard is the tool root and the instrument folder, so the leg is not selected under changed mode by a change that moves only records. The records its fixture T reads are the tracked specs of dGroundRules and dTrueNorth, the first line and front matter of every packet-holding build's README, the tracked packets under `memory/builds/*/prompts/`, the v2 design file the instruments name, and `memory/DECISIONS.md`. After a change to any of them the route is the bar with `GATE_FULL=1`. TOOL-aBatchedPacket-2.
 """
+tag = "leg.gov.chain-packet-self-test"
+tests = ["feature.spec-tokens"]
+purpose = "arms the chain-packet door red and green"
+argv = ["bash", "{prefix}/chain-packet.test.sh"]
+guard = ["{prefix}/", "memory/builds/dClosedLoop/build/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 900
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "dead-path carriers (deleted files still named)"
 why = """
 gov's own dead-path scan. Its needle set is derived from this repo's deletion history and it is anchored on a frozen sentinel basename only this repo ever had, so the script is a registry exemption rather than an entry file and there is no descriptor for the leg to be claimed by.
 """
+tag = "leg.gov.dead-path-carriers-deleted-files-still-named"
+tests = ["feature.install-prefix"]
+purpose = "catches a deleted file still named outside the memory tree"
+argv = ["bash", "{prefix}/check-dead-paths.sh"]
+reads = { history = "it reads every deletion and rename `git log` reaches (TOOL-aSparedSpawn-13 S3)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 430
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "dead-path carriers self-test"
 why = """
 the arms for the leg above, gov-only for the same reason. Its fixtures construct real deletion histories containing gov's sentinel basename, which is a fact about this repo rather than about the predicate.
 """
+tag = "leg.gov.dead-path-carriers-self-test"
+tests = ["feature.install-prefix"]
+purpose = "self-tests the dead-path carriers gate"
+argv = ["bash", "{prefix}/check-dead-paths.test.sh"]
+guard = ["{prefix}/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2070
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "remote literals (kit code names no remote)"
 why = """
 gov's own ban over its kit source, the remote-literal half of what the install-prefix gate does for kit paths. The script is a registry exemption rather than an entry file, so there is no descriptor for the leg to be claimed by (TOOL-dLadderedRemote-3).
 """
+tag = "leg.gov.remote-literals-kit-code-names-no-remote"
+tests = ["feature.install-prefix"]
+purpose = "bans kit code naming a remote by literal"
+argv = ["bash", "{prefix}/check-remote-literals.sh"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "remote literals self-test"
 why = """
 the arms for the leg above, gov-only for the same reason: it grades a gate that does not travel.
 """
+tag = "leg.gov.remote-literals-self-test"
+tests = ["feature.install-prefix"]
+purpose = "self-tests the remote-literals ban"
+argv = ["bash", "{prefix}/check-remote-literals.test.sh"]
+guard = ["{prefix}/check-remote-literals.sh", "{prefix}/check-remote-literals.test.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 600
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "govkit selfcheck"
 why = """
 the deployer grading its own declarations. It runs on the deployer machine and is never installed into a target, so there is nothing in an adopter for it to check.
 """
+tag = "leg.gov.govkit-selfcheck"
+tests = ["feature.govkit"]
+purpose = "self-checks the deployer's own declarations"
+argv = ["python", "{prefix}/govkit/govkit.py", "selfcheck"]
+reads = { history = "its arm 11 finds the commit that landed each closed shim row with `git log --first-parent -S` and counts the releases descending from it (TOOL-dSafePassage-6)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 310
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "kit epoch (shipped bytes move, the version moves)"
 why = """
 the deployer grading gov's own history: it reads this registry, the descriptors' shipped rows and gov's commits, none of which travels into a target. An adopter's copy of a kit is never where a forgotten bump is made, so the check has to live where the kit is authored. TOOL-aRepatriatedFork-15.
 """
+tag = "leg.gov.kit-epoch-shipped-bytes-move-the-version-moves"
+tests = ["feature.govkit"]
+purpose = "requires a kit's version to move when its shipped bytes do"
+argv = ["python", "{prefix}/govkit/govkit.py", "epoch"]
+reads = { base = "it grades from GATE_PUSH_BASE, else the merge-base with the default branch (TOOL-aSparedSpawn-13 S3).", history = "it asks `merge-base --is-ancestor` of the commits HEAD carries (TOOL-aSparedSpawn-13 S3)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "govkit selftest"
 why = """
 the deployer's own arms. Same reason as its selfcheck: the deployer does not travel.
 """
+tag = "leg.gov.govkit-selftest"
+tests = ["feature.govkit"]
+purpose = "exercises every deployer refusal in throwaway repos"
+argv = ["python", "{prefix}/govkit/selftest.py"]
+guard = [
+  "{prefix}/govkit/",
+  "{prefix}/hooks/kit.toml",
+  "{prefix}/settings-merge.py",
+  "{prefix}/codebase-map/kit.toml",
+  "{prefix}/process-monitor/census.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 11750
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "manifest-check self-test"
 why = """
 gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is claimed by the kickoff-manifest entry; this self-test is not prescribed for copy anywhere in the runbook, and that asymmetry is deliberate. Since TOOL-aRepatriatedFork-18 the FILE ships beside the engine, because every adopter's check-arms reads it for the ratchet's arms; the LEG stays gov's, which is this row.
 """
+tag = "leg.gov.manifest-check-self-test"
+purpose = "runs the kickoff manifest check's scenario suite"
+argv = ["bash", "skills/session-kickoff/manifest-check.test.sh"]
+guard = ["skills/session-kickoff/", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 6480
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "python resolver (behaviour + inline parity + idiom ban)"
 why = """
 grades <prefix>/lib/, the permanently exempt gov-internal directory, plus the inline copies every kit already carries. Nothing here travels, and the parity it asserts is asserted before the kits ship rather than after.
 """
+tag = "leg.gov.python-resolver-behaviour-inline-parity-idiom-ban"
+purpose = "tests the python resolver's behaviour, inline parity and ban"
+argv = ["bash", "{prefix}/lib/resolve-python.test.sh"]
+guard = ["{prefix}/", "{prefix}/lib/", ".githooks/"]
+chunk = "wiring"
+subject = "kit"
+ceiling = 350
+enforces = ["practice.portable.launch", "practice.portable.interpreter-floor"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates gov canary"
 why = """
 the GOV-ONLY arms of the run-gates canary, gov-only for the reason the recall-floor pair above is: each arm is keyed on THIS repo's corpus — gov's declared chunk names, gov's network-calling leg names, a named gov leg's guard — so in any other tree they would red on absence rather than on behaviour. `<prefix>/run-gates/kit.toml` withholds the file from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs, and the harness REFUSES (exit 2) rather than passing when the manifest it is pointed at is not gov's. The SHIPPED canary keeps every assertion true in any tree and is claimed, as a [[gate_leg]] of the run-gates entry.
 """
+tag = "leg.gov.run-gates-gov-canary"
+tests = ["feature.run-gates"]
+purpose = "runs the run-gates canary arms keyed on this repository"
+argv = ["bash", "{prefix}/run-gates/run-gates.gov.test.sh"]
+guard = ["{prefix}/", "{prefix}/run-gates/", "{prefix}/gate-legs.json", ".githooks/pre-push", "memory/guides/MERGE-BAR.md", ".githooks/"]
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "template size <=48KiB"
 why = """
 gates gov's OWN product template at the repo root. An adopter's instantiated playbook carries no size ceiling, and the runbook prescribes this script for copy nowhere.
 """
+tag = "leg.gov.template-size-48kib"
+purpose = "caps the charter template's bytes at its declared ceiling"
+argv = ["bash", "{prefix}/check-template-size.sh"]
+precommit = ["bash", "{prefix}/check-template-size.sh"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+stage = ["step.build", "step.test"]
 
 [[exempt_leg]]
 name = "govkit runbook parity"
 why = """
 the deployer grading THIS repo's runbook against THIS repo's own registry. Both sides of the comparison are gov-side: the registry is the deployer's declaration and never travels, and the runbook is gov's instructions for wiring the chain INTO a target rather than anything a target keeps. An adopter receives neither file, so there is nothing in their tree for the leg to compare.
 """
+tag = "leg.gov.govkit-runbook-parity"
+tests = ["feature.govkit"]
+purpose = "holds the prose runbook and the registry to one population"
+argv = ["python", "{prefix}/govkit/check_runbook_parity.py"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.one-fact"]
 
 [[exempt_leg]]
 name = "govkit refusal join"
 why = """
 a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.
 """
+tag = "leg.gov.govkit-refusal-join"
+tests = ["feature.govkit"]
+purpose = "requires every deployer refusal to be reached by an arm"
+argv = ["python", "{prefix}/govkit/refusal_join.py"]
+guard = ["{prefix}/govkit/"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 # ------------------------------------------------------------------- gov-only pins
 # eol pins that belong to NO deployable. Forcing them into an entry would attribute a
@@ -590,395 +925,1826 @@ name = "govkit acceptance matrix"
 why = """
 a gov-internal harness over gov's OWN deployer, which never travels into a target. It drives the deployer against four repo SHAPES; an adopter has one repo and receives no deployer, so there is nothing there for it to exercise.
 """
+tag = "leg.gov.govkit-acceptance-matrix"
+tests = ["feature.govkit"]
+purpose = "drives the deployer against repository shapes"
+argv = ["python", "{prefix}/govkit/matrix.py"]
+guard = [
+  "{prefix}/govkit/",
+  "{prefix}/playbook/",
+  "{prefix}/check-microformats.sh",
+  "{prefix}/check-line-length.sh",
+  ".lexicon.conf",
+]
+chunk = "declarations"
+subject = "repo"
+ceiling = 7030
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "template size gate selftest"
 why = """
 gov's own red/green proof of the size gate above; it travels with a gate that does not travel.
 """
+tag = "leg.gov.template-size-gate-selftest"
+tests = ["feature.playbook"]
+purpose = "self-tests the template size gate"
+argv = ["bash", "{prefix}/check-template-size.test.sh"]
+unguarded_why = "a guard naming the template size gate would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 710
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "playbook parity"
 why = """
 grades gov's OWN playbook against this repo's state. An adopter's playbook is an instantiated copy with their own answers in it, so there is nothing here for them to grade.
 """
+tag = "leg.gov.playbook-parity"
+tests = ["feature.playbook"]
+purpose = "runs the charter's parity gate over its stated values"
+argv = ["python", "{prefix}/playbook/render_playbook.py", "--check-render", "--scope", "claims"]
+chunk = "product"
+subject = "repo"
+ceiling = 560
+stage = ["step.test"]
+enforces = ["practice.one-fact"]
 
 [[exempt_leg]]
 name = "playbook parity selftest"
 why = """
 gov's own red/green proof of the parity gate above; same reason.
 """
+tag = "leg.gov.playbook-parity-selftest"
+tests = ["feature.playbook"]
+guard = [
+  "{prefix}/check-playbook-parity.sh",
+  "{prefix}/check-playbook-parity.test.sh",
+  "memory/project/playbook-kit-waivers.txt",
+  "{prefix}/workflows/check-verifier-fanout.js",
+]
+purpose = "self-tests the playbook parity check"
+argv = ["bash", "{prefix}/check-playbook-parity.test.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1380
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "kit placeholders (a declared token its adopter substitutes)"
 why = """
 grades a kit-AUTHORING invariant over gov's own <prefix>/*/kit.toml and the adopter script each one names. An adopter RECEIVES descriptors copy-installed and does not author them, so the defect this catches — a declared placeholder its own adopter never substitutes, which ships an unresolved brace — is one gov emits and gov must catch. Catching it downstream is one release too late, and the adopter could only fix it by forking the descriptor, which is the fork class this build exists to stop manufacturing. The gate script is itself a registry exemption for the same reason.
 """
+tag = "leg.gov.kit-placeholders-a-declared-token-its-adopter"
+tests = ["feature.kit-placeholders"]
+purpose = "requires a kit's adopter to substitute each declared token"
+argv = ["python", "{prefix}/check-kit-placeholders.py"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 180
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "kit-placeholders self-test"
 why = "the red/green arms for the leg above, gov-only for the same reason. Its fixtures build their own scratch trees and assert against gov's own predicate, so in an adopter tree they would grade a program that is not there."
+tag = "leg.gov.kit-placeholders-self-test"
+tests = ["feature.kit-placeholders"]
+purpose = "arms the kit-placeholders check red and green"
+argv = ["bash", "{prefix}/check-kit-placeholders.test.sh"]
+guard = ["{prefix}/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 180
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "foreign-prefix parity (every self-test at three prefixes)"
 why = "it runs `foreign-prefix.gov.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"` beside `run-gates.gov.test.sh`: it moves GOV's whole tool root in a scratch clone and grades gov's own declared self-test population there, so in any other tree it has no population to move. A held leg with a budget row, run once per build (TOOL-aRepatriatedFork-18 section 8 F3, TOOL-aRepatriatedFork-30 S1). NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`."
+tag = "leg.gov.foreign-prefix-parity-every-self-test-at-three-prefixes"
+tests = ["feature.install-prefix"]
+purpose = "runs every declared self-test at three tool-root prefixes"
+argv = ["bash", "{prefix}/run-gates/foreign-prefix.gov.test.sh"]
+guard = ["{prefix}/"]
+chunk = "selftests"
+subject = "repo"
+ceiling = 7500
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "agent-instructions wiring"
 why = "it runs `<prefix>/playbook/render_playbook.py --check-render --scope entry-files --aliases claude`, the renderer's `entry-files` check over gov's own entry files, which the retired agent-instructions kit's `--check` reached. NOT a [[gate_leg]] on the `playbook-render` descriptor: that row would hand it to every target selecting that entry, where it reds while the target's aliases are unwired, and no path of `apply` wires them (section 8, F3). PLAY-dOrderedCharter-39."
+tag = "leg.gov.agent-instructions-wiring"
+tests = ["feature.playbook"]
+purpose = "compares the rendered CLAUDE.md entry file with its render"
+argv = [
+  "python",
+  "{prefix}/playbook/render_playbook.py",
+  "--check-render",
+  "--scope",
+  "entry-files",
+  "--aliases",
+  "claude",
+]
+chunk = "wiring"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.derive"]
 
 [[exempt_leg]]
 name = "codebase-map kit selftest"
 why = "it runs `selftest.py`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.codebase-map-kit-selftest"
+tests = ["feature.codebase-map"]
+purpose = "exercises the codebase-map engine with fixtures"
+argv = ["python3", "{prefix}/codebase-map/selftest.py"]
+guard = [
+  "{prefix}/codebase-map/",
+  "{prefix}/lib/",
+  "{prefix}/lexicon/",
+  "{prefix}/memory-tree/coverage_join.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "codebase-map adopter e2e"
 why = "it runs `adopt-codebase-map.test.sh`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.codebase-map-adopter-e2e"
+tests = ["feature.codebase-map"]
+purpose = "tests the codebase-map adopter end to end"
+argv = ["bash", "{prefix}/codebase-map/adopt-codebase-map.test.sh"]
+guard = ["{prefix}/codebase-map/", "{prefix}/lib/"]
+chunk = "e2e"
+subject = "kit"
+ceiling = 540
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "process-monitor census selftest"
 why = "it runs `selftest.py`, which the process-monitor descriptor withholds with `role = \"project-owned\"`: the suite's subject is the census checker in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor: there it printed a `SILENT` row in every adopter's `plan`, and selfcheck arm 7j3 now refuses that. DEPL-aRepatriatedFork-14."
+tag = "leg.gov.process-monitor-census-selftest"
+tests = ["feature.process-monitor"]
+purpose = "arms the process-monitor engine's parsing and liveness"
+argv = ["python", "{prefix}/process-monitor/selftest.py"]
+guard = [
+  "{prefix}/process-monitor/census.py",
+  "{prefix}/process-monitor/selftest.py",
+  "{prefix}/process-monitor/classify.py",
+  "{prefix}/process-monitor/reap.py",
+  "{prefix}/process-monitor/scope.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 180
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "process-monitor adopter selftest"
 why = "it runs `adopt-process-monitor.test.sh`, which the process-monitor descriptor withholds with `role = \"project-owned\"`: the suite's subject is the adopter in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor: there it printed a `SILENT` row in every adopter's `plan`, and selfcheck arm 7j3 now refuses that. DEPL-aRepatriatedFork-14."
+tag = "leg.gov.process-monitor-adopter-selftest"
+tests = ["feature.process-monitor"]
+purpose = "observes each process-monitor adopter refusal red"
+argv = ["bash", "{prefix}/process-monitor/adopt-process-monitor.test.sh"]
+guard = [
+  "{prefix}/process-monitor/adopt-process-monitor.sh",
+  "{prefix}/process-monitor/adopt-process-monitor.test.sh",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 420
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "drift-audit selftest"
 why = "it runs `selftest.py`, which `<prefix>/drift-audit/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.drift-audit-selftest"
+purpose = "tests that the drift-audit kit can fail"
+argv = ["python", "{prefix}/drift-audit/selftest.py"]
+guard = [
+  "{prefix}/drift-audit/",
+  "{prefix}/lib/",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/lexicon/canon.py",
+  "{prefix}/lexicon/lexicon.py",
+  "{prefix}/lexicon/lexicon_conf.py",
+  "{prefix}/lexicon/scaffold_lexicon.py",
+  "{prefix}/lexicon/subtokens.py",
+  "{prefix}/memory-tree/backlog.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "line-length gate selftest"
 why = "it runs `check-line-length.test.sh`, which `<prefix>/govkit/entries/check-line-length.kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's. Two reasons, and the second is the harder one: the suite stages a break into a copy of a checker beside it, so its subject is the checker (owner ruling 2026-08-23, applied to what SHIPS); AND since TOOL-aQuenchedHarness-6 ported it onto `<prefix>/lib/lib-selftest.sh`, which is gov-internal and travels to nobody, a shipped copy would red on arrival with `build_fixture: command not found`. It stays a leg on GOV's bar. TOOL-aQuenchedHarness-6."
+tag = "leg.gov.line-length-gate-selftest"
+tests = ["feature.playbook"]
+purpose = "observes the line-length gate's failing case per branch"
+argv = ["bash", "{prefix}/check-line-length.test.sh"]
+guard = ["{prefix}/check-line-length.sh", "{prefix}/check-line-length.test.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 930
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "run-selftests self-test"
 why = "it runs `run-selftests.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-6."
+tag = "leg.gov.run-selftests-self-test"
+tests = ["feature.run-gates"]
+purpose = "observes every refusal of the on-demand self-test runner"
+argv = ["bash", "{prefix}/run-gates/run-selftests.test.sh"]
+guard = ["{prefix}/run-gates/run-selftests.sh", "{prefix}/run-gates/run-selftests.test.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2040
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "scratch-guard self-test"
 why = "it runs `scratch-guard.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.scratch-guard-self-test"
+tests = ["feature.agent-cap"]
+purpose = "tests the guard that keeps agent scratch out of home"
+argv = ["bash", "{prefix}/hooks/scratch-guard.test.sh"]
+guard = [
+  "{prefix}/hooks/",
+  "{prefix}/lib/",
+  "{prefix}/unattended/unattended.sh",
+  "skills/session-kickoff/",
+  "{prefix}/policy/",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 490
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "format-guard self-test"
 why = "it runs `format-guard.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite's subject is the hook beside it, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aHeardState-1."
+tag = "leg.gov.format-guard-self-test"
+tests = ["feature.agent-cap"]
+purpose = "tests the hook refusing a final message without its format"
+argv = ["bash", "{prefix}/hooks/format-guard.test.sh"]
+guard = [
+  "{prefix}/hooks/format-guard.js",
+  "{prefix}/hooks/format-guard.test.sh",
+  "{prefix}/hooks/scratch-guard.js",
+  "{prefix}/hooks/agent-cap.js",
+  "{prefix}/runlog/prose.py",
+  "{prefix}/runlog/extract.py",
+  "{prefix}/lib/",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "agent-cap self-test"
 why = "it runs `agent-cap.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.agent-cap-self-test"
+tests = ["feature.agent-cap"]
+purpose = "tests the agent-cap guard on Workflow and Agent tool calls"
+argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
+guard = ["{prefix}/hooks/", "{prefix}/lib/", "{prefix}/workflows/spec-audit-optin.js"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1800
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "lexicon selftest"
 why = "it runs `selftest.py`, which `<prefix>/lexicon/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.lexicon-selftest"
+tests = ["feature.lexicon"]
+purpose = "runs red and green fixtures for every lexicon predicate"
+argv = ["python", "{prefix}/lexicon/selftest.py"]
+guard = ["{prefix}/lexicon/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 880
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "branch-reconcile selftest"
 why = "it runs `selftest.py`, which `<prefix>/branch-reconcile/kit.toml` withholds with `role = \"project-owned\"`: the suite builds its fixture repositories from scratch and drives the CLI in that directory, so its subject is the CLI and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dSweptBranches-1."
+tag = "leg.gov.branch-reconcile-selftest"
+tests = ["feature.branch-reconcile"]
+purpose = "tests the branch-reconcile kit in fixture repositories"
+argv = ["python", "{prefix}/branch-reconcile/selftest.py"]
+guard = ["{prefix}/branch-reconcile/", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 600
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "runlog selftest"
 why = "it runs `selftest.py`, which `<prefix>/runlog/kit.toml` withholds with `role = \"project-owned\"` together with the `fixtures/` it reads: the suite's subject is the reader in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.runlog-selftest"
+tests = ["feature.runlog"]
+purpose = "arms the runlog kit over fixtures and scratch trees"
+argv = ["python", "{prefix}/runlog/selftest.py"]
+guard = ["{prefix}/runlog/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 720
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "memory-recall kit selftest"
 why = "it runs `selftest.py`, which `<prefix>/memory-recall/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.memory-recall-kit-selftest"
+tests = ["feature.memory-recall"]
+purpose = "tests the memory-recall kit's own contract"
+argv = ["python3", "{prefix}/memory-recall/selftest.py"]
+guard = [
+  "{prefix}/lib/",
+  "{prefix}/memory-recall/",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/policy/budgets.py",
+  "{prefix}/policy/policy.py",
+  "{prefix}/memory-tree/backlog.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2730
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "verdict-epoch self-test"
 why = "it runs `check-verdict-epoch.test.sh`, which `<prefix>/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.verdict-epoch-self-test"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "self-tests the verdict-epoch check in throwaway repos"
+argv = ["bash", "{prefix}/memory-tree/check-verdict-epoch.test.sh"]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1130
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "memory-hygiene self-test"
 why = "it runs `check-memory-hygiene.test.sh`, which `<prefix>/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.memory-hygiene-self-test"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "fixture-tests the memory hygiene checks and empty guard"
+argv = ["bash", "{prefix}/memory-tree/check-memory-hygiene.test.sh"]
+guard = ["{prefix}/lib/", "{prefix}/memory-tree/", "{prefix}/check-spec-tokens.py"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 4800
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "transition-audit arms"
 why = "it runs `transition-audit.test.sh`, which the memory-tree kit's own `kit.toml` withholds with `role = \"project-owned\"`: the suite stages breaks into copies of this kit's checkers and asserts they still catch them, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. It also grades GOV's OWN hooks: one arm compares the tracked hook-named files under `.githooks/` with `GOV_WIRING_HOOKS` both ways, and an adopter's hook population is theirs, so the arm would red in their tree on arrival. Owner ruling 2026-08-23, applied to what SHIPS, as `memory-hygiene self-test` and `row-keyed merge driver replay` are declared beside it. Adopters keep check 26 itself, inside their `memory hygiene` leg. TOOL-dDerivedDocket-9."
+tag = "leg.gov.transition-audit-arms"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "arms hygiene check 26 and its commit-time carrier"
+argv = ["bash", "{prefix}/memory-tree/transition-audit.test.sh"]
+guard = [
+  ".githooks/",
+  "{prefix}/check-wiring.sh",
+  "{prefix}/lib/",
+  "{prefix}/memory-recall/",
+  "{prefix}/memory-tree/",
+  ".memory-tree.conf",
+]
+chunk = "declarations"
+subject = "repo"
+ceiling = 900
+doc_reads = []
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "row-driver view refusal"
 why = "it runs `merge-rows.py --check`, which asserts THIS repo's `.gitattributes` and THIS repo's own rendered view header. Both halves are gov facts: the attribute set it derives comes from gov's `.memory-tree.conf` and its index, and the probe renders through gov's install prefix. An adopter's tree carries neither until it switches to the per-build backlog, and a `[[gate_leg]]` in the memory-tree kit's own `kit.toml` would therefore assert the backlog attribute in every adopter's tree on upgrade -- including adopters whose attribute emission is the concurrent adopter-wiring work and adopters whose driver is inert, a shipped surface this unit does not scope. An adopter takes this leg in its own deployer build, at the commit where it switches. TOOL-dDerivedDocket-10 section 8 F4."
+tag = "leg.gov.row-driver-view-refusal"
+tests = ["feature.memory-tree-merge-driver"]
+purpose = "asserts governed paths resolve merge=rows and views refuse"
+argv = ["python3", "{prefix}/memory-tree/merge-rows.py", "--check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.reconcile"]
 
 [[exempt_leg]]
 name = "row-keyed merge driver replay"
 why = "it runs `merge-rows.test.sh`, which `<prefix>/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.row-keyed-merge-driver-replay"
+tests = ["feature.memory-tree-merge-driver"]
+purpose = "replays fixtures through the row-keyed merge driver"
+argv = ["bash", "{prefix}/memory-tree/merge-rows.test.sh"]
+guard = ["{prefix}/lib/", "{prefix}/memory-recall/", "{prefix}/memory-tree/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2750
+stage = ["step.test"]
+enforces = ["practice.reconcile"]
 
 [[exempt_leg]]
 name = "method-carriers self-test"
 why = "it runs `check-method-carriers.test.sh`, which `<prefix>/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.method-carriers-self-test"
+tests = ["feature.build-method"]
+purpose = "self-tests the method-carrier gate in a scratch repo"
+argv = ["bash", "{prefix}/memory-tree/check-method-carriers.test.sh"]
+unguarded_why = "a guard naming the memory-tree kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 460
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "pytest-guardrails self-test"
 why = "it runs `pytest-parallel-guardrails.test.sh`, which `<prefix>/pytest-parallel-guardrails/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.pytest-guardrails-self-test"
+purpose = "statically checks the pytest parallel guardrails kit"
+argv = ["bash", "{prefix}/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"]
+guard = ["{prefix}/lib/", "{prefix}/pytest-parallel-guardrails/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "profile-bar selftest"
 why = "it runs `profile_bar.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.profile-bar-selftest"
+tests = ["feature.run-gates"]
+purpose = "self-tests the bar profiler"
+argv = ["bash", "{prefix}/run-gates/profile_bar.test.sh"]
+guard = ["{prefix}/run-gates/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1910
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "measure-legs selftest"
 why = "it runs `measure_legs.py --selftest`, whose arms profile the fixture legs under `<prefix>/run-gates/fixtures/measure-legs/`, and `<prefix>/run-gates/kit.toml` withholds every one of those fixtures with `role = \"project-owned\"`, naming each literally. The tool itself ships, but its self-test also needs the process-monitor kit installed beside run-gates, which the descriptor's `requires = []` does not declare, and a Windows host, since every reading comes from a Windows Job Object and the tool refuses anywhere else. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dRedressedBar-19 S29."
+tag = "leg.gov.measure-legs-selftest"
+tests = ["feature.run-gates"]
+purpose = "self-tests the profiler that runs each leg clean"
+argv = ["python3", "{prefix}/run-gates/measure_legs.py", "--selftest"]
+guard = [
+  "{prefix}/run-gates/",
+  "{prefix}/gate-legs.json",
+  ".githooks/pre-push",
+  "{prefix}/process-monitor/census.py",
+  "{prefix}/process-monitor/reap.py",
+  "{prefix}/process-monitor/scope.py",
+  "{prefix}/process-monitor/classify.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 500
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates turnstile"
 why = "it runs `run-gates.turnstile.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.run-gates-turnstile"
+tests = ["feature.run-gates-turnstile"]
+purpose = "arms the turnstile that serialises bars on one repository"
+argv = ["bash", "{prefix}/run-gates/run-gates.turnstile.test.sh"]
+guard = ["{prefix}/run-gates/", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 8210
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates canary"
 why = "it runs `run-gates.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.run-gates-canary"
+purpose = "checks the manifest is well-formed and sources every leg"
+argv = ["bash", "{prefix}/run-gates/run-gates.test.sh"]
+guard = ["{prefix}/", "{prefix}/gate-legs.json", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "repo"
+ceiling = 13200
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates evidence"
 why = "it runs `run-gates.evidence.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.run-gates-evidence"
+purpose = "checks a red leg's own output survives on disk"
+argv = ["bash", "{prefix}/run-gates/run-gates.evidence.test.sh"]
+guard = ["{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 7040
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates adopter e2e"
 why = "it runs `adopt-run-gates.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.run-gates-adopter-e2e"
+tests = ["feature.run-gates"]
+purpose = "grades the run-gates adopter on its effects"
+argv = ["bash", "{prefix}/run-gates/adopt-run-gates.test.sh"]
+guard = ["{prefix}/run-gates/"]
+chunk = "e2e"
+subject = "kit"
+ceiling = 460
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "run-gates run-log line"
 why = "it runs `run-gates.runlog.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the runner in that directory inside a scratch clone and reads the run-log line it writes, so its subject is the runner and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-3."
+tag = "leg.gov.run-gates-run-log-line"
+tests = ["feature.run-gates"]
+purpose = "observes the gate runner's run-log line from outside"
+argv = ["bash", "{prefix}/run-gates/run-gates.runlog.test.sh"]
+guard = ["{prefix}/run-gates/", "{prefix}/runlog/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1200
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "pre-push run-log line"
 why = "it runs `.githooks/pre-push.runlog.test.sh`, which `<prefix>/govkit/entries/push-main.kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the hook in a scratch clone and reads the run-log lines it writes, so its subject is the hook's writer and it has a job only when that source changes -- and none at all in a tree that receives the hook verbatim and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. The sibling `pre-push self-test` still ships, and changing that is not this row's. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-4."
+tag = "leg.gov.pre-push-run-log-line"
+tests = ["feature.runlog"]
+purpose = "observes the pre-push hook's run-log lines from outside"
+argv = ["bash", ".githooks/pre-push.runlog.test.sh"]
+guard = [".githooks/", "{prefix}/runlog/", "{prefix}/run-gates/"]
+chunk = "selftests"
+subject = "repo"
+ceiling = 600
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "verifier fan-out self-test"
 why = "it runs `check-verifier-fanout.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.verifier-fan-out-self-test"
+tests = ["feature.agent-cap"]
+purpose = "self-tests the verifier fan-out gate and its rule"
+argv = ["bash", "{prefix}/workflows/check-verifier-fanout.test.sh"]
+guard = ["{prefix}/hooks/", "{prefix}/lib/", "{prefix}/workflows/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "spec-audit opt-in pack self-test"
 why = "it runs `spec-audit-optin.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-dFairHearing-16 added the leg; TOOL-dFairHearing-23 S26."
+tag = "leg.gov.spec-audit-opt-in-pack-self-test"
+tests = ["feature.review-harnesses"]
+purpose = "tests the review kit's spec-audit opt-in pack"
+argv = ["bash", "{prefix}/workflows/spec-audit-optin.test.sh"]
+unguarded_why = "a guard naming the workflows kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "tier2-review self-test"
 why = "it runs `tier2-review.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.tier2-review-self-test"
+tests = ["feature.review-harnesses"]
+purpose = "tests the review harness's argument and durability contracts"
+argv = ["bash", "{prefix}/workflows/tier2-review.test.sh"]
+guard = [
+  "{prefix}/workflows/",
+  "{prefix}/memory-tree/gen_build_index.py",
+  "{prefix}/unattended/unattended.sh",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 1800
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "unattended-build self-test"
 why = "it runs `unattended-build.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.unattended-build-self-test"
+tests = ["feature.review-harnesses"]
+purpose = "arms the unattended build harness"
+argv = ["bash", "{prefix}/workflows/unattended-build.test.sh"]
+guard = ["{prefix}/workflows/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 700
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "review-join self-test"
 why = "it runs `check-review-join.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+tag = "leg.gov.review-join-self-test"
+tests = ["feature.review-harnesses"]
+purpose = "self-tests the review-join ban and workflow syntax gates"
+argv = ["bash", "{prefix}/workflows/check-review-join.test.sh"]
+guard = ["{prefix}/hooks/", "{prefix}/lib/", "{prefix}/workflows/"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "leg ceilings clear their evidenced maximum"
 why = "it grades GOV's ceilings against GOV's own recorded seconds, from `<prefix>/run-gates/ceiling-evidence.txt` and `<prefix>/run-gates/ceiling-margin.txt` -- both withheld with `role = \"project-owned\"` for the reason `<prefix>/codebase-map/kit.toml` withholds `scen-adversarial.json`: a pin measured against one corpus and shipped into a tree that never measured it is either vacuous or permanently red. The TOOL ships and an adopter who wants the check runs `--write` on their own bar and declares their own headroom; what does not ship is this repo's numbers wearing their name. TOOL-aQuenchedHarness-2."
+tag = "leg.gov.leg-ceilings-clear-their-evidenced-maximum"
+tests = ["feature.run-gates"]
+purpose = "checks each leg's ceiling against its recorded evidence"
+argv = ["python", "{prefix}/run-gates/derive-ceilings.py", "--check"]
+reads = { history = "it reads the last commit's date through `git log -1` (TOOL-aSparedSpawn-13 S3)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.cost"]
 
 [[exempt_leg]]
 name = "every held leg is budgeted, every budget row resolves"
 why = "it asserts `<prefix>/run-gates/selftest-budgets.txt` against GOV's own held legs, and that declaration is withheld with `role = \"project-owned\"` because its 55 rows name THIS repo's suites and carry readings taken on THIS node. An adopter receives the runner and seeds their own declaration; what they must not receive is a gate asserting a population they do not have, which would red on arrival and could only ever be silenced. Same disposition and same reason as `leg ceilings clear their evidenced maximum`. TOOL-aQuenchedHarness-4."
+tag = "leg.gov.every-held-leg-is-budgeted-every-budget-row-resolves"
+tests = ["feature.run-gates"]
+purpose = "checks each held self-test's on-demand cost declaration"
+argv = ["bash", "{prefix}/run-gates/run-selftests.sh", "--check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+doc_reads = ["AGENTS.md", "CLAUDE.md"]
+stage = ["step.test"]
+enforces = ["practice.cost"]
 
 [[exempt_leg]]
 name = "extract-arms self-test"
 why = "its subject is `<prefix>/lib/extract-arms.sh`, and `<prefix>/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `<prefix>/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-6."
+tag = "leg.gov.extract-arms-self-test"
+tests = ["feature.run-gates"]
+purpose = "arms the four states the arm extractor can report"
+argv = ["bash", "{prefix}/lib/extract-arms.test.sh"]
+guard = [
+  "{prefix}/lib/extract-arms.sh",
+  "{prefix}/lib/extract-arms.test.sh",
+  "{prefix}/lib/lib-selftest.sh",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "selftest harness self-test"
 why = "its subject is `<prefix>/lib/lib-selftest.sh`, and `<prefix>/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `<prefix>/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-5."
+tag = "leg.gov.selftest-harness-self-test"
+tests = ["feature.run-gates"]
+purpose = "arms the shared self-test harness from outside it"
+argv = ["bash", "{prefix}/lib/lib-selftest.test.sh"]
+guard = ["{prefix}/lib/lib-selftest.sh", "{prefix}/lib/lib-selftest.test.sh"]
+chunk = "selftests"
+subject = "kit"
+ceiling = 370
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "roles adopter self-test"
 why = "it runs `adopt-roles.test.sh`, which `<prefix>/roles/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of the adopter in that directory, so its subject is the adopter and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aOrientedCast-8 S6."
+tag = "leg.gov.roles-adopter-self-test"
+tests = ["feature.roles"]
+purpose = "tests the roles adopter in fresh fixture repositories"
+argv = ["bash", "{prefix}/roles/adopt-roles.test.sh"]
+unguarded_why = "a guard naming the roles kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+stage = ["step.test"]
 
 [[exempt_leg]]
-name = "encoding posture (text IO names its encoding)"
-why = "it grades GOV's own tools and skills Python against `memory/project/encoding-posture-sites.txt`, a registry of THIS repo's gov-internal sites. The scanner ships with the gate-lint kit's `**` include, but the leg does not: a declared adopter leg would red at every adopter's next pull until they seeded a registry, and whether gov's scanner replaces an adopter's own is theirs to decide. Owner ruling, TOOL-aRepatriatedFork-3 section 8 F2."
+name = "portability (the interpreter floor, run for real)"
+why = "it runs the floor module's `census` verb, and the floor module lives in gov's `<prefix>/lib/`, which ships nothing: the floor declaration it reads is gov's alone, and an adopter's own interpreter floor is theirs to declare. It compiles every tracked *.py under a real interpreter at the declared floor and counts the version-bound features, red with the install command where no such interpreter runs, never a skip. TOOL-dWitnessedBar-24 S10, section 8 F5 and F8."
+tag = "leg.gov.portability-the-interpreter-floor-run-for-real"
+purpose = "compiles the tree at the declared interpreter floor"
+argv = ["python3", "{prefix}/lib/python_floor.py", "census"]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+pack = "portability"
+enforces = ["practice.portable.interpreter-floor"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "portability (a bare shell name launched)"
+why = "it runs the run-gates kit's `--bare-bash` query, which grades every launch against the `resolve_bash_py` and `resolve_bash_js` resolver blocks gov's kits carry; an adopter's own code need not use those blocks, so a shipped leg would red every adopter that launches `bash` by name with no population to carry its sites. TOOL-dWitnessedBar-24 S9, section 8 F9."
+tag = "leg.gov.portability-a-bare-shell-name-launched"
+tests = ["feature.run-gates"]
+purpose = "catches a launch of the bare name bash in Python or JS"
+argv = ["python3", "{prefix}/run-gates/measure_legs.py", "--bare-bash", "."]
+chunk = "product"
+subject = "repo"
+ceiling = 300
+pack = "portability"
+enforces = ["practice.portable.launch"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "policy fixtures"
 why = "it runs `check_policy.py --fixture`, which plants each red case of the policy kit's arms into a scratch repository and asserts it red as planted and green without, so its subject is the arms and the catalogue in `<prefix>/policy/` and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. The file ships, because the same script is the `policy check` leg every adopter runs; the LEG is gov's, held on GOV's bar like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dGroundRules-1."
+tag = "leg.gov.policy-fixtures"
+tests = ["feature.policy"]
+purpose = "proves on a fixture that each policy arm can red"
+argv = [
+  "python",
+  "{prefix}/policy/check_policy.py",
+  "--fixture",
+  "--strict-from",
+  "memory/builds/dClosedLoop/build/",
+]
+guard = [
+  "{prefix}/policy/",
+  "{prefix}/govkit/govkit.py",
+  "{prefix}/govkit/registry.toml",
+  "{prefix}/govkit/selftest.py",
+  "{prefix}/workflows/unattended-build.template.js",
+  "{prefix}/workflows/check-review-join.js",
+  "{prefix}/workflows/check-verifier-fanout.js",
+  "{prefix}/lib/",
+  "{prefix}/hooks/agent-cap.js",
+  "{prefix}/memory-tree/tree_lib.py",
+  "{prefix}/check-template-size.sh",
+  "{prefix}/check-spec-tokens.py",
+  "{prefix}/check-line-length.sh",
+  "{prefix}/memory-tree/check-memory-hygiene.sh",
+  "{prefix}/memory-tree/gen_build_index.py",
+  "{prefix}/roles/check_roles.py",
+  "{prefix}/playbook/render_playbook.py",
+  "{prefix}/playbook/instruction_units.py",
+  "{prefix}/playbook/load_sets.py",
+  "{prefix}/playbook/policy_value.py",
+  "{prefix}/roles/handoff.py",
+  "skills/session-kickoff/manifest-check.sh",
+  "{prefix}/memory-tree/gotchas.py",
+  "{prefix}/memory-recall/query.py",
+  "{prefix}/memory-tree/corpus_ids.py",
+  "{prefix}/runlog/record.py",
+  "{prefix}/codebase-map/map_lib.py",
+  "{prefix}/hooks/scratch-guard.js",
+  "{prefix}/govkit/entries/",
+  "{prefix}/memory-tree/kit.toml",
+  "{prefix}/memory-tree/adopt-memory-tree.sh",
+  "{prefix}/run-gates/",
+  "{prefix}/roles/kit.toml",
+  "{prefix}/playbook/kit.toml",
+  "{prefix}/memory-recall/kit.toml",
+  "{prefix}/runlog/kit.toml",
+  "{prefix}/codebase-map/kit.toml",
+  "{prefix}/hooks/kit.toml",
+  "{prefix}/gate-legs.json",
+  "{prefix}/memory-tree/backlog.py",
+  "{prefix}/memory-tree/legacy_ledger.py",
+  "{prefix}/memory-tree/coverage_join.py",
+  "memory/project/legacy-homes.txt",
+  "{prefix}/memory-tree/design_lib.py",
+  "{prefix}/memory-tree/asbuilt_view.py",
+  "{prefix}/memory-tree/deviation_join.py",
+  "{prefix}/memory-tree/routed_commits.py",
+  "{prefix}/memory-tree/commit_trailers.py",
+  "{prefix}/memory-tree/row_grammar.py",
+  "{prefix}/roles/roles_lib.py",
+  "{prefix}/roles/render_agents.py",
+  "{prefix}/memory-recall/bench.py",
+  "{prefix}/memory-recall/extract.py",
+  "{prefix}/memory-recall/recall_conf.py",
+  "{prefix}/runlog/extract.py",
+  "{prefix}/runlog/model.py",
+  "{prefix}/runlog/runlog_lib.py",
+  "{prefix}/branch-reconcile/kit.toml",
+  "{prefix}/drift-audit/kit.toml",
+  "{prefix}/gate-lint/kit.toml",
+  "{prefix}/lexicon/kit.toml",
+  "{prefix}/memory-tree/build-readme-slot-limits.txt",
+  "{prefix}/process-monitor/kit.toml",
+  "{prefix}/pytest-parallel-guardrails/kit.toml",
+  "{prefix}/roles/agents/gov-builder.agent.md",
+  "{prefix}/template-size-limits.txt",
+  "{prefix}/unattended/kit.toml",
+  "{prefix}/workflows/kit.toml",
+  "AGENTS.md",
+  "memory/builds/dClosedLoop/build/",
+  "help/policy.md",
+  ".governance/install.json",
+  "{prefix}/memory-tree/build_records.py",
+  "{prefix}/memory-tree/id_grammar.py",
+  "{prefix}/govkit/upgrade_steps.py",
+  "{prefix}/playbook/check_layers.py",
+  "{prefix}/playbook/core.py",
+  "{prefix}/playbook/edge_grammar.py",
+  "{prefix}/playbook/gov_tag.py",
+  "{prefix}/playbook/instructions_edit.py",
+  "{prefix}/playbook/memory_index.py",
+  "{prefix}/playbook/overlay.py",
+  "{prefix}/playbook/overlay_rows.py",
+  "{prefix}/playbook/pins.py",
+  "{prefix}/playbook/positional.py",
+  "{prefix}/playbook/row_checks.py",
+  "{prefix}/playbook/tag_bundle.py",
+  "{prefix}/playbook/tag_index.py",
+]
+chunk = "selftests"
+subject = "kit"
+ceiling = 2420
+stage = ["step.test"]
+enforces = ["principle.p10", "principle.p42", "practice.gate"]
 
 [[exempt_leg]]
 name = "layer dependencies (the core never depends on an expansion)"
 why = "it runs `<prefix>/playbook/check_layers.py`, which grades gov's own kit sources against gov's own layer register, `<prefix>/playbook/layers.toml`: every descriptor's `layer` row and every edge from a file a core kit ships to a non-core kit. The script and the register ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the kits it grades are authored here, and an adopter that copy-installs them has no edge of its own to grade. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-16."
+tag = "leg.gov.layer-dependencies-the-core-never-depends-on-an"
+tests = ["feature.playbook"]
+purpose = "refuses a core dependency on an expansion"
+argv = ["python", "{prefix}/playbook/check_layers.py"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 124
+enforces = ["principle.p28", "principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "tags (the resolver's checks)"
 why = "it runs `<prefix>/playbook/gov_tag.py check`, the tag resolver's checks over gov's own tree: the citations of gov's guides, help pages and kit READMEs against the namespaces `<prefix>/playbook/namespaces.toml` registers, read from gov's own index. The resolver and its registry ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the documents it grades and the namespaces it grades them against are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-19."
+tag = "leg.gov.tags-the-resolver-s-checks"
+tests = ["feature.playbook"]
+purpose = "runs the tag resolver's checks"
+argv = ["python", "{prefix}/playbook/gov_tag.py", "check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 420
+pack = "tags"
+enforces = ["practice.writing.address", "practice.writing.retirement"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction ladder (level is the one term)"
 why = "it runs `<prefix>/playbook/instruction_units.py ladder-terms`, which reds a ladder place spelled as a priority or a rank in gov's own instruction sources, the closed pathspec list `LADDER_SOURCES`: gov's charter template, kit templates, role agents, Skills and workflow templates. The module ships with the playbook-render kit's `**` include, so an adopter receives it, but the LEG is gov's: the sources it grades are authored here, and an adopter's tree holds none of those paths. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-13."
+tag = "leg.gov.instruction-ladder-level-is-the-one-term"
+tests = ["feature.playbook"]
+purpose = "requires level to be the one term for a ladder place"
+argv = ["python", "{prefix}/playbook/instruction_units.py", "ladder-terms"]
+chunk = "product"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p13", "principle.p11"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction grammar (statement types, provenance lock)"
 why = "it runs `<prefix>/playbook/instruction_units.py grammar`, which grades gov's own unit rows against the closed statement types through the unit reader, every document gov renders from units against the four unloaded shapes, and gov's own `.governance/instructions.lock` against the tree. The module ships with the playbook-render kit's `**` include, and the renderer writes an adopter its own lock, but the LEG is gov's: the unit rows and their reader are authored here, so an adopter carrying the leg holds an empty population for its unit half. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-12."
+tag = "leg.gov.instruction-grammar-statement-types-provenance-lock"
+tests = ["feature.playbook"]
+purpose = "checks instruction statement types and the provenance lock"
+argv = ["python", "{prefix}/playbook/instruction_units.py", "grammar"]
+chunk = "product"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p11"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction envelopes"
 why = "it runs `<prefix>/playbook/instruction_units.py envelopes --check`, which holds every document of `<prefix>/playbook/documents.toml` to its envelope and every load-bearing document gov tracks to a row of it. The module and the registry ship with the playbook-render kit's `**` include, but the LEG is gov's: the registry's seeded rows name gov's own documents, the merge-bar guide, the kickoff manifest and the role agent files among them, and each row must match a file, so an adopter carrying the leg reds on a document it never received. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-3."
+tag = "leg.gov.instruction-envelopes"
+tests = ["feature.playbook"]
+purpose = "checks every instruction document against its envelope"
+argv = ["python", "{prefix}/playbook/instruction_units.py", "envelopes", "--check"]
+chunk = "product"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p13"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "edges (every declared edge parses, is registered and resolves)"
 why = "it runs `<prefix>/playbook/edge_grammar.py --check`, the edge check over gov's own tree: every record header, record section, spec `**Carries:**` line, `gov:handoff` marker and commit trailer read as a typed edge, graded against `<prefix>/playbook/edges.toml` and resolved against gov's own index, defined ids and design view. The checker and its registries ship with the playbook-render kit's `**` include, so an adopter receives them, but the LEG is gov's: the records, specs and trailers it grades are authored here, beside the `tags` leg it joins in the `tags` pack. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-28."
+tag = "leg.gov.edges-every-declared-edge-parses-is-registered-and"
+tests = ["feature.playbook"]
+purpose = "requires every declared edge to parse, register and resolve"
+argv = ["python", "{prefix}/playbook/edge_grammar.py", "--check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 180
+pack = "tags"
+enforces = ["practice.writing.typed-relations"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "writing practice (records and units)"
 why = "it runs `<prefix>/playbook/writing_practice.py check`, the writing practice's one-subject, pinned-facts, one-door and rationale-apart arms over gov's own records, unit rows and registered documents, against `<prefix>/playbook/doors.toml` and gov's keyed list `unpinned-facts.txt` under the memory root's `project/` folder, which no descriptor ships and no target is written. The module and the door list ship with the playbook-render kit's `**` include, but the LEG is gov's: an adopter carrying it refuses on the absent list until it seeds its own. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-29."
+tag = "leg.gov.writing-practice-records-and-units"
+tests = ["feature.playbook"]
+purpose = "runs the writing practice's checks on records and units"
+argv = ["python", "{prefix}/playbook/writing_practice.py", "check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 180
+pack = "tags"
+enforces = [
+  "practice.writing.one-subject",
+  "practice.writing.pinned-facts",
+  "practice.writing.one-door",
+  "practice.writing.rationale-apart",
+]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "one-owner"
 why = "it runs `<prefix>/playbook/writing_practice.py check one-owner`, which holds every namespace, kind and kit unit row gov authors to exactly one owner, a build gov's `memory/builds/` holds or a layer of `<prefix>/playbook/layers.toml`. The module ships with the playbook-render kit's `**` include, but the LEG is gov's: the owners it grades name gov's own chain builds, which an adopter's tree does not hold. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-29."
+tag = "leg.gov.one-owner"
+tests = ["feature.playbook"]
+purpose = "requires each namespace, kind and kit unit to name one owner"
+argv = ["python", "{prefix}/playbook/writing_practice.py", "check", "one-owner"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 180
+pack = "tags"
+enforces = ["practice.writing.one-owner"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction edits (manifest checks)"
 why = "it runs `<prefix>/playbook/instructions_edit.py check`, the write command's checks over gov's own manifests and change records, resolving the tags they name through gov's own index. The tree's tag checks are the `tags (the resolver's checks)` leg's, which the `check` verb leaves to it (TOOL-aMeasuredDrag-4). The command ships with the playbook-render kit's `**` include, but the LEG is gov's: the rows and records it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
+tag = "leg.gov.instruction-edits-manifest-checks"
+tests = ["feature.playbook"]
+purpose = "runs the instruction edit path's manifest checks"
+argv = ["python", "{prefix}/playbook/instructions_edit.py", "check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 420
+enforces = ["principle.p11", "principle.p13"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction edits selftest"
 why = "it runs `<prefix>/playbook/instructions_edit.py fixture`, every plant of the module's table. Its cases reach the `policy` and `memory-tree` kits, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-15."
+tag = "leg.gov.instruction-edits-selftest"
+tests = ["feature.playbook"]
+purpose = "self-tests the one write path for instruction units"
+argv = ["python", "{prefix}/playbook/instructions_edit.py", "fixture"]
+unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction units (schema, one fact)"
 why = "it runs `<prefix>/playbook/instruction_units.py schema one-fact`, which grades each row of the kit manifests gov authors: an adopter copy-installs those manifests and never edits them, the reason `layer dependencies` gives, so an adopter carrying the leg grades nothing of its own. The module ships with the playbook-render kit's `**` include, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+tag = "leg.gov.instruction-units-schema-one-fact"
+tests = ["feature.playbook"]
+purpose = "checks the instruction unit schema and one fact per unit"
+argv = ["python", "{prefix}/playbook/instruction_units.py", "schema", "one-fact"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p11", "principle.p13", "principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction render (one renderer of record)"
-why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and `<prefix>/playbook/instructions-legacy.txt`, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+why = "it runs `<prefix>/playbook/render_playbook.py --check-render`, the render gate over gov's own files against gov's own `<prefix>/playbook/renderers.toml` and the keyed list `instructions-legacy.txt` under the memory root's `project/` folder, whose rows name gov's instruction files. The engine ships with the playbook-render kit's `**` include and an adopter keeps its renders through the absorbed wiring legs, but the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+tag = "leg.gov.instruction-render-one-renderer-of-record"
+tests = ["feature.playbook"]
+purpose = "requires one renderer of record per instruction file"
+argv = ["python", "{prefix}/playbook/render_playbook.py", "--check-render"]
+chunk = "wiring"
+subject = "repo"
+ceiling = 560
+enforces = ["principle.p11", "principle.p13"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "instruction units selftest"
 why = "it runs `<prefix>/playbook/instruction_units.py fixture`, every plant of the module's table. `work-order` and `legacy` reach the `roles` and `policy` kits, which a `playbook-render` target may not hold, so the LEG is gov's: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-20."
+tag = "leg.gov.instruction-units-selftest"
+tests = ["feature.playbook"]
+purpose = "plants each instruction-unit break in a throwaway tree"
+argv = ["python", "{prefix}/playbook/instruction_units.py", "fixture"]
+unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "core selftest"
 why = "it runs `<prefix>/playbook/core.py fixture`, every plant of the core's table, each writing its registries, legs, records and committed policy into a scratch repository. Its plants read their policy through the `policy` kit, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's, as the core's four gates over gov's own registries are: on gov's bar each kit is present, and a kit not found reds the case, never a skip. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-7, moved here by PLAY-dOrderedCharter-77 S8."
+tag = "leg.gov.core-selftest"
+tests = ["feature.playbook"]
+purpose = "plants each core check's break in a throwaway repository"
+argv = ["python", "{prefix}/playbook/core.py", "fixture"]
+unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop computed witness"
 why = "it runs `<prefix>/loop/loop_witness.py --selftest`, every plant of the re-run stand-in, each in a scratch repository. Its `hold-inherited` plant preflights and holds a run through the `unattended` driver, which requires the `loop` kit, so an adopter's copy would reach a kit the loop kit declares no edge to; on gov's bar each kit is present, and a kit not found exits 2, never a pass. The module ships with the loop kit's `**` include, but the LEG is gov's, as `core selftest` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-17."
+tag = "leg.gov.loop-computed-witness"
+tests = ["feature.loop"]
+purpose = "self-tests witnesses computed rather than typed"
+argv = ["python", "{prefix}/loop/loop_witness.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p2"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop item kind"
 why = "it runs `<prefix>/loop/loop_items.py check --selftest`, the item kind's checks over the composition of gov's items with the repository's, then every plant in a scratch repository. The composition is the `playbook` kit's `overlay_rows.py compose`, run as a subprocess, and the loop kit takes no edge to that kit, so an adopter's copy would reach a kit its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2, never a pass. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop computed witness` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-24."
+tag = "leg.gov.loop-item-kind"
+tests = ["feature.loop"]
+purpose = "checks the item kind's factory and the composed items"
+argv = ["python", "{prefix}/loop/loop_items.py", "check", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop splice check"
 why = "it runs `<prefix>/loop/splice.py check --selftest`, the stage kind's frame check over the composition of the repository's stages and items, then every plant, all in memory over the definition but the factory's, which runs in a scratch repository. The compositions are the `playbook` kit's `overlay_rows.py compose`, run as a subprocess, `instructions.exclude` is read through the `policy` kit and the change records through the `memory-tree` kit, and the loop kit takes no edge to the playbook or policy kit, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2, never a pass. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop item kind` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-25."
+tag = "leg.gov.loop-splice-check"
+tests = ["feature.loop"]
+purpose = "checks a repository's own stages spliced into the loop"
+argv = ["python", "{prefix}/loop/splice.py", "check", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+enforces = ["principle.p16", "principle.p20"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop command conformance"
 why = "it runs `<prefix>/loop/factories.py check-commands`, the command kind's gate over every `[[command]]` row of gov's own kit descriptors, which are gov's authored rows, and an adopter declares no command kind of its own today. The module reaches the roles, policy and hooks kits for its other factories, and the loop kit takes no edge to any of them, so an adopter's copy of the leg would sit beside a module reaching kits its descriptor does not require; on gov's bar each kit is present. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop item kind` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-6."
+tag = "leg.gov.loop-command-conformance"
+tests = ["feature.loop"]
+purpose = "gates the command kind's rows"
+argv = ["python", "{prefix}/loop/factories.py", "check-commands"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop factories fixtures"
 why = "it runs `<prefix>/loop/factories.py --selftest`, `check-commands` over the tree, then every plant of the six kind factories in one scratch clone of the working tree that the `policy` kit's `build_source_snapshot` builds. The plants run the roles kit's checker, the policy kit's arms and the hook-destination gate, and the loop kit takes no edge to those kits, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2, never a pass. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop item kind` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-6."
+tag = "leg.gov.loop-factories-fixtures"
+tests = ["feature.loop"]
+purpose = "self-tests the factories of six registered kinds"
+argv = ["python", "{prefix}/loop/factories.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop definition fixtures"
 why = "it runs `<prefix>/loop/loop_lib.py --selftest`, every plant of the definition's reader in process, each break made in memory over the shipped definition and actor list and held to the exit and line `PLANT_OWED` declares: the steps, workflows, dispositions, witness classes, the actor list against its base, the item programs, actors, allowances and computed witnesses, and the two scope plants over a scratch directory. Its plants read the `playbook` kit's layer register and load sets and the `roles` kit's role defaults, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present. The shipped `loop definition` leg runs `--check` alone. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop factories fixtures` is, and it declares no guard, so the plant arms of units 41 and 50 run on every bar. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-67."
+tag = "leg.gov.loop-definition-fixtures"
+tests = ["feature.loop"]
+purpose = "plants each break in the loop definition's reader"
+argv = ["python", "{prefix}/loop/loop_lib.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p1"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop checklist tags"
 why = "it runs `<prefix>/loop/loop_checklist.py check --selftest`, the map of each core handle of the `unattended` driver's two registries onto a declared loop item, checked both ways, then its plants in memory. It reads the driver's registry lines, and the `unattended` kit requires the `loop` kit, so an adopter holding the loop kit without that driver would carry a leg that exits 2; on gov's bar each kit is present. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop computed witness` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-11."
+tag = "leg.gov.loop-checklist-tags"
+tests = ["feature.loop"]
+purpose = "maps each core checklist handle onto its declared item"
+argv = ["python", "{prefix}/loop/loop_checklist.py", "check", "--selftest"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p11"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop parent routes"
 why = "it runs `<prefix>/loop/loop_parents.py --selftest`, a dependent build's route on its parent's withdrawal over every plant, each in a scratch repository. The route reads `deps.on-parent-withdrawn` and each parent's run facts through the `policy` kit, found by `resolve_kit_dir`, and the loop kit takes no edge to that kit, so an adopter's copy would reach a kit its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop item kind` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-15."
+tag = "leg.gov.loop-parent-routes"
+tests = ["feature.loop"]
+purpose = "tests a dependent build's route when its parent withdraws"
+argv = ["python", "{prefix}/loop/loop_parents.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p21"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop transition record"
 why = "it runs `<prefix>/loop/loop_transition.py check --selftest`, the stage transition recorded three ways, the trailer, the log record and the micro-format line, each plant in a scratch repository, after holding the tree's own `AGENTS.md` definition. The writer and the check read `transitions.record` through the `policy` kit, found by `resolve_kit_dir`, and the loop kit takes no edge to that kit, so an adopter's copy would reach a kit its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop parent routes` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-3."
+tag = "leg.gov.loop-transition-record"
+tests = ["feature.loop"]
+purpose = "checks a build's stage transition recorded three ways"
+argv = ["python", "{prefix}/loop/loop_transition.py", "check", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p20"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop guard fixtures"
 why = "it runs `<prefix>/loop/guard.py --selftest`, the policy file's guard over every plant, each in a scratch repository: the commit verdict, the push arm, the policy command and the floor's readers. The verdict wraps the `policy` kit's minimal guard and reads `policy-file.guard` and the floor through that kit, found by `resolve_kit_dir`, and its plants write change records through the `memory-tree` kit and read the `playbook` kit's layer register; the loop kit takes no edge to the policy kit, so an adopter's copy would reach a kit its descriptor does not require. On gov's bar each kit is present, and a kit not found exits 2, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop parent routes` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-2."
+tag = "leg.gov.loop-guard-fixtures"
+tests = ["feature.loop"]
+purpose = "plants breaks in the policy guard's commit and push arms"
+argv = ["python", "{prefix}/loop/guard.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p10"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop claims fixtures"
 why = "it runs `<prefix>/loop/claims.py --selftest`, every case of the claim key: the key's stability and movement, an unread source, the typed and aged-remote verdicts, and the card's keys read in a scratch worktree beside its primary. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop guard fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-8."
+tag = "leg.gov.loop-claims-fixtures"
+tests = ["feature.loop"]
+purpose = "tests stored claims keyed and trusted over their sources"
+argv = ["python", "{prefix}/loop/claims.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p23"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop request fixtures"
+why = "it runs `<prefix>/loop/request.py --selftest`, every plant of a request's content key through the module's own `key` verb, each file in a scratch directory: two texts differing only in case, whitespace and an ISO date keyed alike, a text empty once normalised refused, a text saved with and without a byte-order mark keyed alike, and a byte that is not UTF-8 refused by name. The key reads the `memory-tree` kit's normaliser under the loop kit's edge to it. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop claims fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-19."
+tag = "leg.gov.loop-request-fixtures"
+tests = ["feature.loop"]
+purpose = "plants a request's content key through its key verb"
+argv = ["python", "{prefix}/loop/request.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p40"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop probe fixtures"
+why = "it runs `<prefix>/loop/probe.py --selftest`, every plant of the probe program, each in a throwaway repository with a stub policy file and a pinned commit: the trigger's causes and each policy key's refused and admitted cases, the pin committed alone before any run, the entry-time records beside a request, the method's appends and refusals, the re-run through `loop_witness.py rerun` judged confirmed and refuted, the visual, claimed and experiment stand-ins, each verb's retried and out-of-order calls refused, a cross-kind verdict and five other malformed records refused, and both record kinds bound. It reads the `memory-tree` kit's record factory under the loop kit's edge to it, and the `policy` kit's reader by `read_policy_kit`, found by `resolve_kit_dir` with no edge, as `loop guard fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-7."
+tag = "leg.gov.loop-probe-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every break of the probe program"
+argv = ["python", "{prefix}/loop/probe.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p31"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop placement fixtures"
+why = "it runs `<prefix>/loop/placement.py --fixture`, every plant of the placement predicate, each in a throwaway repository with a stub policy file: one request per member of the disposition set, an unknown word refused and an alias resolved, the three `placement` values, a planted token redacted and a long reason capped, a closed build and a foreign build lease refused under `refuse` and recorded under `record`, an observation held unverified until its probe record carries a verdict, the claim lines, the owner hold and its release, a re-entering late answer, and the unattended driver's prompt-mode refusal. It reads the `memory-tree` kit under the loop kit's edge to it, and the `policy` and `runlog` kits and the unattended driver by `resolve_kit_dir` with no edge, as `loop probe fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-4."
+tag = "leg.gov.loop-placement-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every case of the placement predicate"
+argv = ["python", "{prefix}/loop/placement.py", "--fixture"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 200
+enforces = ["principle.p22"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "loop claim fixtures"
+why = "it runs `<prefix>/loop/claim.py --fixture`, every plant of `entry.claim`, each in a throwaway repository with a bare remote and the unattended driver's `--entry-claim`: a patch held under `patch.ratify` = `owner`, released by its owner's ratification and held for good by a rejection, a continue placement, `--pieces` on a patch, a stray staged path and an unreachable remote under `leases.offline: refuse` each refused, a tombstoned build lease refused under `leases: warn` with one ask and no second take, one claimant's claim resumed past the local pre-check, a slug local history minted refused by it, a slug claimed under another key drawing route-back and an unreachable remote writing no folder, a repeat with no count refused, a live holder waited for past `flow.wait-ceiling`, an overlap noted under `warn`, and the scaffold commit and first transition record of a repeat and of a patch. It reads the `memory-tree` kit under the loop kit's edge to it, and the `policy` kit, the `playbook` kit's fleet registry and the unattended driver by `resolve_kit_dir` with no edge, as `loop placement fixtures` does. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop request fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dPlacedRequest-21."
+tag = "leg.gov.loop-claim-fixtures"
+tests = ["feature.loop"]
+purpose = "plants every case of the entry claim against a bare remote"
+argv = ["python", "{prefix}/loop/claim.py", "--fixture"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p39"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop position fixtures"
 why = "it runs `<prefix>/loop/position.py --selftest`, the position engine over every plant, each in a scratch repository with a bare remote: each unit's step from its witnesses, the next item and its key, the interrupts and every answer, and the `--plan` and `--status` lines over the unattended driver. Its plants run that driver, found by `resolve_kit_dir`, and read run facts through the `policy` kit; the loop kit takes no edge to either, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop guard fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-7."
+tag = "leg.gov.loop-position-fixtures"
+tests = ["feature.loop"]
+purpose = "tests deriving a build's position from witnesses alone"
+argv = ["python", "{prefix}/loop/position.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p22", "principle.p24"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop upstream fixtures"
 why = "it runs `<prefix>/loop/upstream.py --selftest`, every plant of an item's upstream field over one scratch repository: the measured edge's proof read at HEAD, the hand-on of an upstream return's establishes rows, the join of the handed rows with a return's answers on each gate, and the journal record. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, and its check runs inside the item kind's own `check`, but the LEG is gov's, as `loop claims fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-29."
+tag = "leg.gov.loop-upstream-fixtures"
+tests = ["feature.loop"]
+purpose = "tests an item's upstream commitments and their returns"
+argv = ["python", "{prefix}/loop/upstream.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p26"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop review bounds fixtures"
 why = "it runs `<prefix>/loop/review_bounds.py --fixture`, every plant of the review bounds, each in a scratch repository of its own: the four keys' defaults, a fixed count equal to the ceiling admitted and one above it refused naming both keys, a count or ceiling below 1 refused, an `until-*` value bounded by the ceiling, the closing bound under each `review.follow-up`, the refusal read by a copy with no unattended kit beside it, and the unarmed line with no policy kit. Its subject is the module itself, so the leg has a job only where that source changes, and none in a tree that copy-installs the loop kit and never edits it, the owner's 2026-08-23 ruling for a kit's self-test. The module ships with the loop kit's `**` include, and its refusal runs inside `loop_lib.py --check`, the shipped `loop definition` leg, but the LEG is gov's, as `loop upstream fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-21."
+tag = "leg.gov.loop-review-bounds-fixtures"
+tests = ["feature.loop"]
+purpose = "tests each review loop's round bound from the policy file"
+argv = ["python", "{prefix}/loop/review_bounds.py", "--fixture"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 120
+enforces = ["principle.p38"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop composition fixtures"
 why = "it runs `<prefix>/loop/composition.py --selftest`, every plant of a build's composition pin over one scratch repository built from this tree's kits: the pin a move records, the composition read at it in a scratch worktree, the witness carried to a renamed item's successor, the item-ended order of an ended or split item, the policy value redirected with its policy-renamed order, and a move with no pin read at the tip. Its plants run the playbook kit's compose verb and tag resolver and read the policy kit, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop position fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-26."
+tag = "leg.gov.loop-composition-fixtures"
+tests = ["feature.loop"]
+purpose = "tests a build's composition pinned and moved per step"
+argv = ["python", "{prefix}/loop/composition.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p8"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop adapt fixtures"
 why = "it runs `<prefix>/loop/adapt.py --selftest`, every plant of a build's own flow changes over one scratch repository built from this tree's kits, reset per plant: an additive change applied at the next step boundary and never inside the step, the same held under `owner-approves` and released by a `continue` disposition record, refused under `off`, an exclusion held as loosening and then applied through the compose verb's `exclude` element, an unrecorded skip filed as a `flow-deviation` order, a proposal whose act its row disagrees with refused writing nothing, the unit form's `rescope · item` row read unchanged beside a flow row, and the position unchanged by a pending proposal. Its plants run the playbook kit's compose verb and read the policy kit, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop composition fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-28."
+tag = "leg.gov.loop-adapt-fixtures"
+tests = ["feature.loop"]
+purpose = "tests a build's own flow changes proposed and applied"
+argv = ["python", "{prefix}/loop/adapt.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p8"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop budget fixtures"
 why = "it runs `<prefix>/loop/budget.py --selftest`, every plant of a build's rework budget, each in a scratch repository of its own: a loop that mints a unit on each lap against a total frozen at Design's exit, route backs before the freeze drawn across records until the fifth is refused, a stale verdict read as contention, a patch build's draw on its landed origin, one item's returns past `flow.route-backs`, the value's two forms and a third refused, an unknown cause refused, one freeze across a re-entry into building, draws before the first spec copied into the first record, a set without the log refused, an unrecorded build frozen at its first draw across a rotated run-state file, and this tree's unattended driver drawing on its review rounds and dispatches. Its plants read the `policy` kit and run that driver, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop adapt fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-30."
+tag = "leg.gov.loop-budget-fixtures"
+tests = ["feature.loop"]
+purpose = "tests a build's rework budget and what draws on it"
+argv = ["python", "{prefix}/loop/budget.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p39"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop termination"
 why = "it runs `<prefix>/loop/termination.py check --selftest`: the static termination check over gov's composition and every live build's at its pin, every state reaching a terminal, every item reachable, every cycle of the build table and the item routes passing a counted edge, every wait declaring its deadline, and each applied loosening naming the owner's release and each held one recommending the decline, then every plant, each in memory but the deadline patch and the step boundary, which build a scratch repository. Its populations are gov's definition, its pending list and gov's live builds, its compositions are the `playbook` kit's compose verb run as a subprocess, and it reads the `policy` kit's catalogue, landed builds and `flow.wait-ceiling`, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop budget fixtures` is, and it declares no guard, since `{prefix}/loop/` misses the overlay, the scenarios and a build's changes. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-33."
+tag = "leg.gov.loop-termination"
+tests = ["feature.loop"]
+purpose = "checks every composition a build can run terminates"
+argv = ["python", "{prefix}/loop/termination.py", "check", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+enforces = ["principle.p39"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop breakpoint fixtures"
 why = "it runs `<prefix>/loop/breakpoints.py --selftest`, every plant of a build's breakpoints, each in a scratch repository of its own: the reviews `review.<stage>` and the owner gates `autonomy` place listed by one rule, a `review.breakpoints` member placed and an undeclared one refused, the owner item under `decisions.major = \"author-owner-ratifies\"` held and released by the owner's disposition record, a stage's reading under `owed-above-tier`, and this tree's unattended driver holding `--close` at the owner item, deriving the spec-audit opt-in from `review.design` and printing the list under `--plan`. Its plants read the `policy` kit, run the `playbook` kit's compose verb and tag resolver and run that driver, which the loop kit reaches with no edge, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop budget fixtures` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-19."
+tag = "leg.gov.loop-breakpoint-fixtures"
+tests = ["feature.loop"]
+purpose = "tests a build's breakpoints at its item boundaries"
+argv = ["python", "{prefix}/loop/breakpoints.py", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+enforces = ["principle.p7"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop scenario fixtures"
 why = "it runs `<prefix>/loop/scenario.py check --selftest`, the scenario kind's rules over gov's pack and the repository's composed scenarios, `select` over the tree, then every plant over one scratch repository built from this tree's kits: two builds placed under different scenarios positioned at once, a scenario's activated rows meeting the item and stage compositions' refusals, a conflict refused and settled in declared order, a refused default, the switch at a step boundary and the derived pin. The compositions are the `playbook` kit's `overlay_rows.py compose`, run as a subprocess, `flow.scenario-default` and `flow.scenario-conflict` are read through the `policy` kit, and the loop kit takes no edge to the playbook or policy kit, so an adopter's copy would reach kits its descriptor does not require; on gov's bar each kit is present, and a kit not found exits 2 `unarmed`, never a default. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop item kind` is. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-27."
+tag = "leg.gov.loop-scenario-fixtures"
+tests = ["feature.loop"]
+purpose = "checks the scenario kind's rows and their conflicts"
+argv = ["python", "{prefix}/loop/scenario.py", "check", "--selftest"]
+unguarded_why = "a guard naming the loop kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "repo"
+ceiling = 300
+enforces = ["principle.p16", "principle.p8"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "loop stage coverage"
 why = "it runs `<prefix>/loop/stage_coverage.py --selftest`: every dossier, gate leg, workflow, role and hook of THIS tree joined both ways to its stage claim, each step's exit-item witness read through the definition's own readers, then every plant made in memory. Its populations are gov's tree: the map's dossiers and hook inventories, gov's manifest rows and the `[[hook]]` rows naming gov's hooks, so an adopter's copy would read hooks its tree does not hold as stale and manifest rows that carry no `stage`. It reaches the codebase-map and roles kits by `resolve_kit_dir` with no edge, and exits 2 `unarmed` where either does not resolve. The module ships with the loop kit's `**` include, but the LEG is gov's, as `loop guard fixtures` is; whether a later unit ships it is TOOL-dDeclaredLoop-46's question. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dDeclaredLoop-4."
+tag = "leg.gov.loop-stage-coverage"
+tests = ["feature.loop"]
+purpose = "joins every product part both ways to its stage"
+argv = ["python", "{prefix}/loop/stage_coverage.py", "--selftest"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p1"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "tags positional selftest"
 why = "it runs `<prefix>/playbook/positional.py --selftest`, every positional plant, each through `gov_tag.py --fixture` in a scratch repository. Its plants read the `tags.*` keys through the `policy` kit and their blobs through the `memory-tree` kit, which a `playbook-render` target may not hold, the reason `instruction units selftest` gives, so the LEG is gov's, beside the `tags` row above. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-26, moved here by PLAY-dOrderedCharter-77 S8."
+tag = "leg.gov.tags-positional-selftest"
+tests = ["feature.playbook"]
+purpose = "self-tests the positional citation population"
+argv = ["python", "{prefix}/playbook/positional.py", "--selftest"]
+unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+pack = "tags"
+stage = ["step.test"]
+enforces = ["practice.gate"]
 
 [[exempt_leg]]
 name = "tags bundle selftest"
 why = "it runs `<prefix>/playbook/tag_bundle.py --selftest`, every `bundle-*` plant, each through `gov_tag.py --fixture` in a scratch repository, so it reaches the `policy` and `memory-tree` kits for the reason `tags positional selftest` gives, and the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-25, moved here by PLAY-dOrderedCharter-77 S8."
+tag = "leg.gov.tags-bundle-selftest"
+tests = ["feature.playbook"]
+purpose = "self-tests bundling a tag's node and its inbound edges"
+argv = ["python", "{prefix}/playbook/tag_bundle.py", "--selftest"]
+unguarded_why = "a guard naming the playbook kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+subject = "kit"
+ceiling = 300
+pack = "tags"
+stage = ["step.test"]
+enforces = ["principle.p33"]
 
 [[exempt_leg]]
 name = "core meta-check"
 why = "it runs `<prefix>/playbook/core.py meta-check`, which joins gov's own principle registry, `<prefix>/playbook/principles.toml`, both ways to the `enforces` of gov's own legs and the `binds` of gov's own kinds register, against gov's own pending list and design record. The script and its registries ship with the playbook-render kit's `**` include, but the LEG is gov's: the principles, legs and pending rows it grades are authored here. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-7."
+tag = "leg.gov.core-meta-check"
+tests = ["feature.playbook"]
+purpose = "joins every principle both ways to what enforces it"
+argv = ["python", "{prefix}/playbook/core.py", "meta-check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "core kinds"
 why = "it runs `<prefix>/playbook/core.py kinds`, the conformance-gate contract over gov's own kinds register, `<prefix>/playbook/kinds.toml`: each landed kind's factory and the gate leg of gov's own `gate-legs.json` that enforces its binds. The LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+tag = "leg.gov.core-kinds"
+tests = ["feature.playbook"]
+purpose = "checks the core kinds' conformance-gate contract"
+argv = ["python", "{prefix}/playbook/core.py", "kinds"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "core skills conformance"
 why = "it runs `<prefix>/playbook/core.py kinds skill`, the Skill kind's gate over gov's own `skills/*/SKILL.md`: every Skill directory holds a SKILL.md whose name is its directory and whose description is non-empty and at most 1024 characters. The Skills it grades are gov's own, so the LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+tag = "leg.gov.core-skills-conformance"
+tests = ["feature.playbook"]
+purpose = "gates the skill kind's population"
+argv = ["python", "{prefix}/playbook/core.py", "kinds", "skill"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "core practices conformance"
 why = "it runs `<prefix>/playbook/core.py kinds practice`, the practice kind's gate over gov's own practice catalogue, `<prefix>/playbook/practices.toml`, `unarmed` until PLAY-dOrderedCharter-1 writes it. The catalogue it grades is gov's own, so the LEG is gov's, as `core meta-check`'s is, for that row's reason. PLAY-dOrderedCharter-7."
+tag = "leg.gov.core-practices-conformance"
+tests = ["feature.playbook"]
+purpose = "gates the practice kind's population"
+argv = ["python", "{prefix}/playbook/core.py", "kinds", "practice"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p14", "principle.p16"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "step-rows-frozen"
 why = "it runs `<prefix>/govkit/upgrade_steps.py frozen`, the deployer's own step reader grading gov's landed `[[upgrade]]` and `[[retired]]` rows against the push base. The deployer is a registry exemption that never travels into a target, and a step row is authored in gov's descriptors, so the rows are frozen where they land; an adopter has no deployer and no row to freeze. TOOL-dSafePassage-1."
+tag = "leg.gov.step-rows-frozen"
+tests = ["feature.govkit"]
+purpose = "refuses an edit to a frozen upgrade step row"
+argv = ["python", "{prefix}/govkit/upgrade_steps.py", "frozen"]
+reads = { base = "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through the step module's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-1, -26).", history = "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+stage = ["step.test"]
+enforces = ["principle.p38"]
 
 [[exempt_leg]]
 name = "step-gate"
 why = "it runs `<prefix>/govkit/step_gate.py`, which diffs gov's adopter-visible surface population between a landing's base and its tip through the deployer's own readers, and reds a member that vanishes with no `[[upgrade]]` or `[[retired]]` row naming it. The deployer is a registry exemption that never travels into a target, and the rows it asks for are authored in gov, so the gate grades gov's landings; an adopter has no deployer and no population to step. TOOL-dSafePassage-10."
+tag = "leg.gov.step-gate"
+tests = ["feature.govkit"]
+purpose = "diffs the adopter-visible surface between base and tip"
+argv = ["python", "{prefix}/govkit/step_gate.py"]
+reads = { base = "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-10).", history = "it checks the base out in a detached sparse worktree and reads the adopter-visible population there with the tip's readers (TOOL-dSafePassage-10)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 130
+stage = ["step.test"]
+enforces = ["principle.p38"]
 
 [[exempt_leg]]
 name = "docs"
 why = "it runs `<prefix>/govkit/docs_leg.py`, which grades gov's own pages under `help/` against gov's own user-facing population through the step gate's class readers and the rows of `usage.toml`, and reads `help.enforce` through the deployer's policy reader. The deployer is a registry exemption that never travels into a target, and the pages, the rows and the shrink-only list are gov's, so the leg grades gov's landings; an adopter has no deployer and no help tree it grades. TOOL-dSafePassage-13."
+tag = "leg.gov.docs"
+tests = ["feature.govkit"]
+purpose = "fingerprints each member's usage against its help page"
+argv = ["python", "{prefix}/govkit/docs_leg.py"]
+reads = { history = "it reads help.enforce at the landed revision through govkit's read_policy_value, and walks the first-parent history of memory/project/docs-undocumented.txt through drift-audit's derive_low_waters for the list's low-water (TOOL-dSafePassage-13)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 130
+doc_reads = ["help/", "memory/project/docs-undocumented.txt"]
+stage = ["step.test"]
+enforces = ["principle.p42", "practice.docs"]
 
 [[exempt_leg]]
 name = "help reference pages"
 why = "it runs `<prefix>/playbook/render_playbook.py --reference --check`, which compares gov's own pages under `help/reference/` with a render of the registries `<prefix>/playbook/references.toml` declares, taking each anchor's fingerprint from the docs leg's `--fingerprints`. The renderer ships with the playbook-render kit, but the docs leg it reads is the deployer's, a registry exemption that never travels into a target, and the pages are gov's, so the LEG is gov's. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. PLAY-dOrderedCharter-37."
+tag = "leg.gov.help-reference-pages"
+tests = ["feature.playbook"]
+purpose = "compares each help reference page with its render"
+argv = ["python", "{prefix}/playbook/render_playbook.py", "--reference", "--check"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 130
+enforces = ["principle.p42"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "help page commands"
 why = "it runs `<prefix>/govkit/docs_leg.py --run`, which runs every command gov's own pages under `help/` show, each page in a scratch adopter it installs gov's checkout into. The leg is the deployer's, a registry exemption that never travels into a target, and the pages are gov's, so the leg grades gov's landings; an adopter has no deployer and no help tree it runs. PLAY-dOrderedCharter-37."
+tag = "leg.gov.help-page-commands"
+tests = ["feature.govkit"]
+purpose = "runs every command a help page shows in a scratch adopter"
+argv = ["python", "{prefix}/govkit/docs_leg.py", "--run"]
+reads = { history = "it reads help.enforce at the landed revision through govkit's read_policy_value, and installs gov at this checkout's HEAD into one scratch adopter per page holding a runnable block (PLAY-dOrderedCharter-37)." }
+chunk = "declarations"
+subject = "repo"
+ceiling = 600
+enforces = ["principle.p42"]
+stage = ["step.test"]
 
 [[exempt_leg]]
 name = "upgrade-walk"
 why = "it runs `<prefix>/govkit/upgrade_walk.py`, which builds release-0 with the `apply` of a scratch clone of gov at the commit `<prefix>/govkit/fixtures/release-0/pin.txt` pins, then walks every declared `[[upgrade]]` step over it up, down, up again, skipped, killed and failed through the deployer's own `update`. The deployer is a registry exemption that never travels into a target, and the steps, the pin and the fixture are gov's, so the leg grades gov's kit source; an adopter has no deployer and no step to prove. TOOL-dSafePassage-5."
+tag = "leg.gov.upgrade-walk"
+tests = ["feature.govkit"]
+purpose = "walks every declared upgrade step over release-0"
+argv = ["python", "{prefix}/govkit/upgrade_walk.py"]
+unguarded_why = "a guard naming the deployer kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+reads = { history = "it clones gov with no tags, checks out the pinned commit in <prefix>/govkit/fixtures/release-0/pin.txt to apply release-0, and reads each step's introducing commit along the landed ref gov's own resolve_landed_ref names (TOOL-dSafePassage-5)." }
+chunk = "e2e"
+subject = "kit"
+ceiling = 14360
+doc_reads = []
+stage = ["step.test"]
+enforces = ["principle.p38"]
 
 [[exempt_leg]]
 name = "python reads (a name never bound, an import outside its guard)"
 why = "it runs `<prefix>/run-gates/py_reads.py`, which reads gov's own manifest and gov's own tracked Python through the memory-tree kit's import walk. The file is withheld by its `project-owned` row in the run-gates descriptor, so no target's manifest can carry the leg. PLAY-dOrderedCharter-67."
+tag = "leg.gov.python-reads-a-name-never-bound-an-import-outside-its"
+tests = ["feature.run-gates"]
+purpose = "catches a Python name never bound or an unguarded import"
+argv = ["python", "{prefix}/run-gates/py_reads.py"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 120
+enforces = ["principle.p16"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "gate-leg conformance"
+tag = "leg.gov.gate-leg-conformance"
+why = "it grades gov's own declarations, the descriptors and this registry, through the deployer's readers, which an adopter does not receive; TOOL-dWitnessedBar-45 makes the factory runnable where govkit is absent. TOOL-dWitnessedBar-11."
+tests = ["feature.run-gates"]
+purpose = "grades every leg's one declaration both ways"
+argv = ["python", "{prefix}/run-gates/leg_factory.py", "--conform"]
+chunk = "declarations"
+ceiling = 120
+subject = "repo"
+enforces = ["principle.p16"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "leg-factory selftest"
+tag = "leg.gov.leg-factory-selftest"
+why = "the arms of the leg above, keyed on gov's own tree for its live-tree case, and gov-only for the reason that leg's row states. TOOL-dWitnessedBar-11."
+tests = ["feature.run-gates"]
+purpose = "arms each leg-factory conformance arm red and green"
+argv = ["python", "{prefix}/run-gates/leg_factory.py", "--selftest"]
+unguarded_why = "a guard naming the run-gates kit would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
+chunk = "selftests"
+ceiling = 300
+subject = "kit"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+# THE RATCHET PACK'S GOV-ONLY LEGS (TOOL-dWitnessedBar-46 S5): seven of the pack's nine legs read gov's
+# registered populations or the base remote, so an adopter receives the other two from the memory-tree
+# descriptor and these stay gov's, each its whole row, its argv respelled from `{kit}/`.
+
+[[exempt_leg]]
+name = "ratchet (never gains)"
+why = "it grades every registered population against the compare base, so it reads gov's registered populations and the base remote, and `retrofit.widen` through `tree_lib.py#read_policy_value`; no adopter install carries a seed per registration or a base every adopter holds. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-never-gains"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a population's growth past its base"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "never-gains"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (both ways)"
+why = "it runs every registration's seed at HEAD and grades gov's registered populations both ways; an adopter's registrations are seeded by no install at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-both-ways"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "grades its own populations both ways at HEAD"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "both-ways"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (unarmed)"
+why = "it reads every registered home, which are gov's populations; no adopter install seeds a home per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-unarmed"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an unarmed population that reads armed"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "unarmed"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (populated)"
+why = "it reads every registered population and the seen-red records, both gov's; no adopter install seeds a population per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-populated"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses an armed population holding no row"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "populated"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (seed laundering)"
+why = "it reads every registered population at the compare base, so it reads gov's populations and the base remote, which no adopter install holds for each registration. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-seed-laundering"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a baseline row re-dated or re-seeded"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "seed-laundering"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (rename)"
+why = "it reads the base range for renamed files holding `site` rows of gov's populations, and an adopter holds no base every adopter shares. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-rename"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a renamed file's rows left uncarried"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "rename"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+[[exempt_leg]]
+name = "ratchet (key shape)"
+why = "it reads every registered population, which are gov's; no adopter install seeds a population per registration at this build. TOOL-dWitnessedBar-46 S5."
+tag = "leg.gov.ratchet-key-shape"
+tests = ["feature.memory-tree-hygiene"]
+purpose = "refuses a number where a ledger key holds a label"
+argv = ["python3", "{prefix}/memory-tree/ratchet.py", "key-shape"]
+chunk = "declarations"
+subject = "repo"
+ceiling = 300
+pack = "ratchet"
+enforces = ["practice.gate"]
+stage = ["step.test"]
+
+# The kit-less gov tools' lists (TOOL-dWitnessedBar-16 §8 F3), registered beside the `[[exempt_leg]]` rows
+# that declare their legs; gov's own, so they owe no upgrade step.
+
+[[ledger]]
+population = "docs-undocumented"
+leg = "docs"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "docs-undocumented"]
+key = "key"
+fields = ["id"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/docs-undocumented.txt"
+
+[[ledger]]
+population = "spec-token-waivers"
+leg = "spec tokens (a spec's own names resolve)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "spec-token-waivers"]
+key = "key"
+fields = ["token"]
+verbatim = ["token"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/spec-token-waivers.txt"
+
+[[ledger]]
+population = "dead-path-waivers"
+leg = "dead-path carriers (deleted files still named)"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "dead-path-waivers"]
+key = "site"
+fields = ["path", "text"]
+verbatim = ["text"]
+drain = "hunk"
+direction = "declared-set"
+home = "memory/project/dead-path-waivers.txt"
+
+[[ledger]]
+population = "playbook-kit-waivers"
+leg = "playbook parity selftest"
+seed = ["python", "{prefix}/memory-tree/convert_registry.py", "read-back", "playbook-kit-waivers"]
+key = "key"
+fields = ["kit"]
+drain = "key"
+direction = "declared-set"
+home = "memory/project/playbook-kit-waivers.txt"
+
+# The gov legs' keyed lists dOrderedCharter landed and the landed step rows dSafePassage hands this
+# factory (TOOL-dWitnessedBar-18 S1, §8 F4): gov's own, which no target is written, so they owe no step.
+# Each seed is its check's own measurement; `landed-steps` has no check of its own, so it names the
+# both-ways leg, and its seed prints every step id the graded tree declares (§8 F6).
+[[ledger]]
+population = "positional-producers"
+leg = "tags (the resolver's checks)"
+seed = ["python", "{prefix}/playbook/positional.py", "producers", "--list"]
+key = "site"
+fields = ["path", "text"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/positional-producers.txt"
+
+[[ledger]]
+population = "unpinned-facts"
+leg = "writing practice (records and units)"
+seed = ["python", "{prefix}/playbook/writing_practice.py", "check", "pinned-facts", "--list"]
+key = "site"
+fields = ["path", "fact"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unpinned-facts.txt"
+
+# TOOL-dWitnessedBar-108 S7: the `python reads` leg's params arm keeps the parameters it tolerates here,
+# shrink-only, each row drained by renaming the parameter to open `_` or by reading it.
+[[ledger]]
+population = "unread-params"
+leg = "python reads (a name never bound, an import outside its guard)"
+seed = ["python", "{prefix}/run-gates/py_reads.py", "--list-params"]
+key = "site"
+fields = ["path", "function", "param"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unread-params.txt"
+
+[[ledger]]
+population = "instructions-legacy"
+leg = "instruction render (one renderer of record)"
+seed = ["python", "{prefix}/playbook/instruction_units.py", "legacy", "--list"]
+key = "site"
+fields = ["path"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/instructions-legacy.txt"
+
+[[ledger]]
+population = "landed-steps"
+leg = "ratchet (both ways)"
+seed = ["python", "{prefix}/govkit/upgrade_steps.py", "list", "--ids"]
+key = "key"
+fields = ["id"]
+drain = "none"
+direction = "append-only"
+home = "memory/project/landed-steps.txt"
+
+# The legacy policy homes' list (TOOL-dWitnessedBar-20 S1, §8 F4, F7): gov's own, which no target is
+# written, so it owes no step. Its seed is the policy kit's derivation, one `<conf> <key> 1` row per
+# key a legacy home holds, and its mark is read from that derivation, never stored here.
+[[ledger]]
+population = "legacy-homes"
+leg = "policy check"
+seed = ["python", "{prefix}/policy/policy.py", "lists", "--derive", "legacy-homes"]
+key = "key"
+fields = ["conf", "key"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/legacy-homes.txt"

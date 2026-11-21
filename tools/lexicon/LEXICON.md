@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.28 -->
+<!-- gov:kit lexicon@1.30 -->
 # LEXICON.md — how to write the table this gate reads
 
 The engine grades against `.lexicon.conf`. This file is how a human decides what goes in it. It is
@@ -180,7 +180,8 @@ both: the reader refuses an unknown block key by name rather than ignoring it.
 The two offender pins are MEASURED at scaffold and are a TWO-SIDED EQUALITY. A count that rises reds
 and a count that FALLS reds too, printing the replacement row, because a drain nobody records leaves a
 pin no tree can meet again. A non-zero day-one pin is
-honest; `ORPHAN_ID_PIN` is the precedent for a pin that is legitimately non-zero on arrival. What the
+honest; memory-tree's `ORPHAN_ID_PIN`, measured 4 at the flatten and keyed since TOOL-dWitnessedBar-17
+as its waiver's rows, was the precedent for a pin legitimately non-zero on arrival. What the
 kit does NOT have is a guard against lowering a pin for the wrong reason — a `probe`-mode extractor
 that matches less than it should produces a smaller offender set that looks like repair. The mode is
 declared and reported on every run so a reader can see which languages are incomplete, and nothing

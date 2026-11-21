@@ -22,13 +22,17 @@ the live decision index. NAMED GAP: the live index and its rotated archive are t
 so a row that rotates out and is re-minted is not caught here; the all-time collision grep the
 decision index's own header prescribes is what covers that.
 
-THE PIN IS A COUNT, NOT A REGISTRY. A membership list would put the offending ids in a second place
-and let a deletion there pass unnoticed; a shrink-only count keeps the names single-sourced in the
-document and still reds when the number grows. An UNDECLARED pin means ZERO — the strictest value,
-never a refusal and never off: a default that can only tighten needs no ceremony, and refusing one
-cost every hygiene fixture and every freshly scaffolded adopter a red bar.
+THE TOLERATED DUPLICATES ARE A KEYED POPULATION, NOT A COUNT (TOOL-dWitnessedBar-17 S1). A scalar pin
+over the duplicates netted a repaired one against a new one to zero and read green while the set it
+bounded changed. `<memory>/project/row-duplicates.txt` is the `row-duplicates` ledger, one row per
+`(shard, row key)` and its count the rows of that shard carrying the key, read through the ledger
+factory: a duplicate with no row reds, a row no duplicate matches reds as stale, and a count that moved
+reds. An ABSENT home is the empty population, the strictest value, never a refusal and never off: a
+default that can only tighten needs no ceremony. The live-row and unranked-row ceilings per shard were
+pins too; their populations, `live-rows` and `severity-unlabelled`, are registered unseeded, so this
+check counts both and announces them NOT MEASURED until a unit gives either a seed.
 
-CLI: --check (gate), --report (human), --emit-pin (the current counts, for re-pinning), --ages (row
+CLI: --check (gate), --report (human), --list-duplicates (the `row-duplicates` seed), --ages (row
 age DERIVED from git rather than stored), --check-rotation (check 24), --check-relations [<base>]
 (check 27), --measure-relations [<floor> [<base>]] (check 27's replay instrument), --check-content
 [<base>] (check 28), --selftest.
@@ -65,8 +69,8 @@ reds when at least one holder was ADDED since the mainline merge-base. What chec
 
 PROVENANCE. The backlog-row grammar, the two shard pins and `--ages` were written in adopter nc's
 fork of this file and taken upstream by TOOL-aRepatriatedFork-9, with two grammar corrections that
-corpus could not surface (a frozen legacy id, a parenthesised `CLOSED by` clause) and the third pin
-added to `--emit-pin`. Measurements quoted below against `memory/backlog/PKG.md` are that repo's.
+corpus could not surface (a frozen legacy id, a parenthesised `CLOSED by` clause); its two shard pins
+are registered unseeded populations now (TOOL-dWitnessedBar-17 S2). Measurements quoted below against `memory/backlog/PKG.md` are that repo's.
 """
 import os
 import re
@@ -83,18 +87,18 @@ from tree_lib import (  # noqa: E402  the kit's shared helpers
     unfenced_lines,
 )
 
+# TOOL-dWitnessedBar-48: the one bash rule; `cmd_selftest`'s `resolve_shell_ere` is its adapter. The
+# `resolve_bash_py` block is carried once in `tree_lib.py` (TOOL-dWitnessedBar-57 S7).
+from tree_lib import scan_bash  # noqa: E402  the kit's one resolve_bash_py block
+
+
 CHECK = 20
 # Check 24 rides this module for the same reason 13-20 do: it walks ROW DOCUMENTS, and the row
 # grammar lives here. TOOL-cSpliceWarden-6.
 ROTATION_CHECK = 24
-PIN_KEY = "ROW_DUPLICATE_PIN"
-# PKG-dCandidLodestar-61 S5. Spelled as that unit's spec spells it; see `parse_unranked_pins`.
-UNRANKED_PIN_KEY = "SEVERITY_UNLABELLED_PIN"
-# PKG-dCandidLodestar-61 found this key DECLARED and unread: `.memory-tree.conf` carried it from
-# `-59` S5 while no file in the repo compared anything to it. A pin whose value can never be wrong
-# is not a pin. It is read here now, through the same `<shard>:<count>` reader, so the live-row
-# floor the drain established actually holds.
-LIVE_ROW_PIN_KEY = "LIVE_ROW_PIN"
+DUPLICATES = "project/row-duplicates.txt"  # the `row-duplicates` home under the memory root
+# The two shard populations registered unseeded (TOOL-dWitnessedBar-17 S2), named in the announcement.
+UNSEEDED_SHARD_POPULATIONS = ("live-rows", "severity-unlabelled")
 
 
 class Problem(Exception):
@@ -387,68 +391,23 @@ def scan(root, conf):
     return rows, unkeyed, dupes, loose, open_fences
 
 
-def pin_of(conf):
-    """Undeclared means ZERO — the STRICTEST value, never a refusal and never off.
-
-    The first cut refused an undeclared pin, reasoning that omitting a key is the quietest way to
-    disarm a gate. That reasoning is sound for a pin whose absence RELAXES the check and wrong for
-    this one, because 0 is the strict end: a tree that never declares the key can never tolerate a
-    duplicate. The refusal bought nothing and cost two real trees — every fixture in the hygiene
-    self-test, and every repo scaffolded from the shipped conf example, which is the adopter breakage
-    the closing review caught as a blocker. A default that can only tighten needs no ceremony.
-    """
-    raw = conf.get(PIN_KEY, "").strip()
-    if raw == "":
-        return 0
-    if not raw.isdigit():
-        raise Problem(f"row-grammar: {PIN_KEY} must be a non-negative integer, got '{raw}'")
-    return int(raw)
-
-
-def parse_unranked_pins(conf):
-    """-> {shard-path: ceiling} from `SEVERITY_UNLABELLED_PIN`, or {} when it is undeclared.
-
-    POLARITY, and why the default here is the OPPOSITE of `pin_of`'s. That pin's strictest value is
-    0 and a young tree can honestly carry it, so an undeclared key can safely mean "tolerate
-    nothing". This one is a ceiling over a population of 200 inherited rows: the strict value is
-    unreachable, and any default this function could invent would either red the tree on adoption
-    or invent a number nobody measured. So undeclared means UNARMED — and `cmd_check` says so out
-    loud on every run rather than passing quietly, because a ratchet nobody armed and nobody
-    mentions is indistinguishable from one that is holding.
-
-    That is not a hypothetical. `LIVE_ROW_PIN` was declared in `.memory-tree.conf` by
-    `PKG-dCandidLodestar-59` S5 and, measured at 32bf8c15, is read by no file in this repo — a pin
-    whose value can never be wrong because nothing compares anything to it. The announcement below
-    is what stops this key becoming the second one.
-
-    Format is `LIVE_ROW_PIN`'s, deliberately: space-separated `<shard-path>:<count>` tokens, so the
-    two pins over the same shards are read the same way and an operator learns one spelling.
-    """
-    return _parse_shard_pins(conf, UNRANKED_PIN_KEY)
-
-
-def parse_live_row_pins(conf):
-    """-> {shard-path: ceiling} from `LIVE_ROW_PIN`, or {} when it is undeclared.
-
-    Same polarity and same announcement as `parse_unranked_pins`: undeclared means UNARMED and says so in
-    the green output. This key spent one wave declared and unread, which is the state that arm
-    exists to make impossible.
-    """
-    return _parse_shard_pins(conf, LIVE_ROW_PIN_KEY)
-
-
-def _parse_shard_pins(conf, key):
-    """The one `<shard-path>:<count>` parse, shared so the two pins cannot drift in spelling."""
-    raw = conf.get(key, "").strip()
-    if raw == "":
+def read_duplicate_rows(root, conf):
+    """-> {(shard, row key): count} of the `row-duplicates` home, read through the ledger factory this
+    kit carries; an absent home is the empty population, the strictest one. A refused row is a Problem
+    naming it, never a skipped line."""
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as corpus_ids imports it)
+    path = os.path.join(root, conf["MEMORY_ROOT"], DUPLICATES)
+    if not os.path.isfile(path):
         return {}
-    pins = {}
-    for tok in raw.split():
-        shard, sep, count = tok.rpartition(":")
-        if not sep or not shard or not count.isdigit():
-            raise Problem(f"row-grammar: {key} takes `<shard-path>:<count>` tokens, got '{tok}'")
-        pins[shard] = int(count)
-    return pins
+    rows, bad = LL.read_rows(path, 2)
+    if bad:
+        raise Problem(f"row-grammar: {conf['MEMORY_ROOT']}/{DUPLICATES}: {LL.render_malformed(bad[0])}")
+    return {key: row[0] for key, row in rows.items()}
+
+
+def measure_duplicates(dupes):
+    """-> {(shard, row key): count} of `scan`'s duplicates, each count the rows of its shard carrying it."""
+    return {(p, i): len(lines) for p, i, lines in dupes}
 
 
 # =========================================================================== THE EXPORTED GRAMMAR
@@ -716,7 +675,6 @@ census_problems = check_census_floor
 
 def cmd_check(root, conf):
     rows, unkeyed, dupes, loose, open_fences = scan(root, conf)
-    pin = pin_of(conf)
     bad = []
     if rows == 0 and loose:
         bad.append(f"check {CHECK}: {loose} line(s) under the row documents carry id-shaped text but "
@@ -731,9 +689,8 @@ def cmd_check(root, conf):
                    f"it is invisible:")
         for p, n in open_fences:
             bad.append(f"    {p}: fence opened at line {n} and never closed")
-        # TERMINAL. The counts below are derived from a read that stopped early, so comparing
-        # them against the pin would turn a partial scan into a pin instruction — "lower it to
-        # N" where N omits everything the fence hid. Refuse first, count later.
+        # TERMINAL. The duplicates below are derived from a read that stopped early, so comparing
+        # them against the population would call every row the fence hid stale. Refuse first.
         print(chr(10).join(bad))
         return 1
     if unkeyed:
@@ -741,75 +698,48 @@ def cmd_check(root, conf):
                    f"cannot key, so a key-merge would drop or duplicate them:")
         for p, n in unkeyed:
             bad.append(f"    {p}:{n}")
-    if len(dupes) > pin:
-        bad.append(f"check {CHECK}: {len(dupes)} id(s) appear more than once within one row document "
-                   f"(pin {pin}, shrink-only) — an index that answers to one id twice has two "
+    # The duplicates against their population (TOOL-dWitnessedBar-17 S1), both ways through the ledger
+    # factory's `compare_counts`: a new duplicate is a key with no row, a repaired one a row no
+    # duplicate matches, so a repair and a new duplicate can never net to zero.
+    import legacy_ledger as LL  # noqa: E402  (deliberately late, as `read_duplicate_rows`)
+    home = f"{conf['MEMORY_ROOT']}/{DUPLICATES}"
+    lines_of = {(p, i): lines for p, i, lines in dupes}
+    found = LL.compare_counts(measure_duplicates(dupes), read_duplicate_rows(root, conf), "shrink-only")
+    new = [(key, have) for name, key, have, _want in found if name == "undeclared site"]
+    if new:
+        bad.append(f"check {CHECK}: {len(new)} id(s) appear more than once within one row document "
+                   f"with no row in {home} — an index that answers to one id twice has two "
                    f"answers to one question:")
-        for p, i, lines in dupes:
-            bad.append(f"    {p}: {i} at lines {', '.join(str(x) for x in lines)}")
-    elif len(dupes) < pin:
-        bad.append(f"check {CHECK}: {PIN_KEY} is {pin} but only {len(dupes)} duplicate(s) remain — "
-                   f"the pin is shrink-only, so lower it to {len(dupes)} to lock the repair in")
-    # The census floor (S3). This arm asserts nothing about HOW MANY live rows there should be —
-    # that pin is `PKG-dCandidLodestar-59` S5's and lives in `.memory-tree.conf` — only that the
-    # grammar still resolves the population at all. Without it, `--report`'s numbers and every
-    # consumer built on `parse_row` degrade to zero silently.
+        for (p, i), _have in new:
+            bad.append(f"    {p}: {i} at lines {', '.join(str(x) for x in lines_of[(p, i)])}")
+    for name, (p, i), have, want in found:
+        if name == "unmeasured row":
+            bad.append(f"check {CHECK}: {home} holds the row {p} {i}, which no duplicate matches — a "
+                       f"stale row; the population is shrink-only, so delete it to lock the repair in")
+        elif name in ("count rose", "count fell"):
+            bad.append(f"check {CHECK}: {p}: {i} appears {have} time(s) against its row's {want} in "
+                       f"{home} — {'a duplicate grew' if name == 'count rose' else 'lower the row'}")
+    # The census floor (S3). This arm asserts nothing about HOW MANY live rows there should be — that
+    # population, `live-rows`, is registered unseeded — only that the grammar still resolves the
+    # population at all. Without it, `--report`'s numbers and every consumer built on `parse_row`
+    # degrade to zero silently.
     shards = measure_census(root, conf)
     floor = check_census_floor(shards)
     bad.extend(f"check {CHECK}: {msg}" for msg in floor)
-    # The severity ratchet (PKG-dCandidLodestar-61 S5). Shrink-only per shard, over LIVE rows whose
-    # `rank` is None.
-    #
-    # SUPPRESSED ENTIRELY WHEN THE FLOOR FIRES, for the open-fence branch's reason one level down: a
-    # shard whose rows have stopped parsing reports 0 unranked, and this arm would then print "lower
-    # it to 0" — a pin instruction, in a gate's own voice, derived from a read that matched nothing.
-    # Ordering the messages would not have been enough; the arm has to not run.
-    pins = {} if floor else parse_unranked_pins(conf)
-    for s in shards:
-        if s["note"] or s["shard"] not in pins:
-            continue
-        pin, now = pins[s["shard"]], s["unranked"]
-        if now > pin:
-            bad.append(f"check {CHECK}: {s['shard']} carries {now} live row(s) with no declared "
-                       f"severity against a pin of {pin} — the pin is shrink-only, so a row added "
-                       f"without one of {'/'.join(SEVERITY_VOCAB)} is what moved it")
-        elif now < pin:
-            bad.append(f"check {CHECK}: {UNRANKED_PIN_KEY} for {s['shard']} is {pin} but only "
-                       f"{now} live row(s) are unranked — lower it to {now} to lock the drain in")
-    # THE LIVE-ROW FLOOR, armed for the first time. Same shrink-only polarity as the rank pin
-    # above, and suppressed by the same grammar floor for the same reason: a shard whose rows
-    # stopped parsing reports 0 live, and an unsuppressed arm would print "lower it to 0" in a
-    # gate's own voice, derived from a read that matched nothing.
-    lpins = {} if floor else parse_live_row_pins(conf)
-    for s in shards:
-        if s["note"] or s["shard"] not in lpins:
-            continue
-        pin, now = lpins[s["shard"]], s["live"]
-        if now > pin:
-            bad.append(f"check {CHECK}: {s['shard']} carries {now} live row(s) against a pin of "
-                       f"{pin} — the shard has stopped draining, and rotation cannot help because "
-                       f"rotation carries every non-terminal row forward")
-        elif now < pin:
-            bad.append(f"check {CHECK}: {LIVE_ROW_PIN_KEY} for {s['shard']} is {pin} but only "
-                       f"{now} live row(s) remain — lower it to {now} to lock the drain in")
     if bad:
-        print("\n".join(bad))
+        print(chr(10).join(bad))
         return 1
     live = sum(s["live"] for s in shards)
-    print(f"row-grammar: clean ({rows} row(s) across the row documents, {len(dupes)} pinned "
+    print(f"row-grammar: clean ({rows} row(s) across the row documents, {len(dupes)} keyed "
           f"duplicate(s), {live} live backlog row(s) across {len(shards)} shard(s))")
     # A skip announces itself, INSIDE the green output, because that is the only place the operator
-    # who could arm it is looking. Silence here is how `LIVE_ROW_PIN` became a declared pin nothing
-    # reads: nothing in a green run ever said it was not being compared to anything.
+    # who could arm it is looking. The live-row and unranked-row populations are registered with
+    # `seed = []` (TOOL-dWitnessedBar-17 S2), so each shard's two counts are measured and not gated.
     for s in shards:
-        if s["note"] is None and s["shard"] not in pins:
-            print(f"row-grammar: NOT MEASURED — {s['shard']} has no {UNRANKED_PIN_KEY} entry, so "
-                  f"its {s['unranked']} unranked live row(s) are counted and NOT gated; "
-                  f"`--emit-pin` prints the token to declare")
-        if s["note"] is None and s["shard"] not in lpins:
-            print(f"row-grammar: NOT MEASURED — {s['shard']} has no {LIVE_ROW_PIN_KEY} entry, so "
-                  f"its {s['live']} live row(s) are counted and NOT gated; "
-                  f"`--emit-pin` prints the token to declare")
+        if s["note"] is None:
+            print(f"row-grammar: NOT MEASURED — {s['shard']}: {s['live']} live row(s), "
+                  f"{s['unranked']} of them unranked, counted and NOT gated; "
+                  f"{' and '.join(UNSEEDED_SHARD_POPULATIONS)} are registered unseeded")
     return 0
 
 
@@ -1541,25 +1471,19 @@ def cmd_report(root, conf):
     return 0
 
 
-def cmd_emit_pin(root, conf):
+def cmd_list_duplicates(root, conf):
+    """`--list-duplicates`: the `row-duplicates` seed, one `<shard> TAB <row key> TAB <count>` row per
+    duplicated key (TOOL-dWitnessedBar-17 S1), check 20's own measurement. A partial read prints no row:
+    a population seeded from a corpus the scanner could not finish reading would hide what the fence
+    hid, so it exits 1 and the seed reads unarmed."""
     _rows, _unkeyed, dupes, _loose, open_fences = scan(root, conf)
-    # A pin emitted from a partial read is worse than no pin: it is a NUMBER an operator will
-    # paste into the conf, derived from a corpus the scanner could not finish reading.
     if open_fences:
         for p, n in open_fences:
-            print(f"row-grammar: {p} ends inside a fence opened at line {n}; no pin is emitted "
+            print(f"row-grammar: {p} ends inside a fence opened at line {n}; no row is listed "
                   f"from a partial read")
         return 1
-    print(f'{PIN_KEY}="{len(dupes)}"')
-    # All three pins, so re-pinning is one paste. Emitted even when a key is already declared: an
-    # operator lowering a ratchet needs the measurement, not a reminder of the value they are
-    # replacing. The fork this came from printed two and its own NOT MEASURED line told the operator
-    # `--emit-pin` prints the `LIVE_ROW_PIN` token — an instruction naming output that never arrived.
-    shards = measure_census(root, conf)
-    toks = " ".join(f"{s['shard']}:{s['unranked']}" for s in shards if s["note"] is None)
-    print(f'{UNRANKED_PIN_KEY}="{toks}"')
-    toks = " ".join(f"{s['shard']}:{s['live']}" for s in shards if s["note"] is None)
-    print(f'{LIVE_ROW_PIN_KEY}="{toks}"')
+    for (p, i), n in sorted(measure_duplicates(dupes).items()):
+        print(f"{p}\t{i}\t{n}")
     return 0
 
 
@@ -1741,13 +1665,20 @@ def scan_engine_imports(kit_dir):
 
 
 # ----------------------------------------------------------------------------------------- selftest
-def _tree(tmp, decisions, *, families="arch:ARCH", pin="0", archives=None, shards=None):
+def _tree(tmp, decisions, *, families="arch:ARCH", dupes=None, archives=None, shards=None):
     """`shards` is {basename: text} written under <memory>/backlog/ and TRACKED, so the census arms
-    below exercise `scan_backlog_shards`'s `git ls-files` walk rather than a directory listing."""
+    below exercise `scan_backlog_shards`'s `git ls-files` walk rather than a directory listing.
+    `dupes` is {(shard, row key): count}, written as the `row-duplicates` home's rows; None writes no
+    home, the empty population (TOOL-dWitnessedBar-17 S1)."""
     run("git", "init", "-q", "--template=", ".", cwd=tmp)
     with open(os.path.join(tmp, ".memory-tree.conf"), "w", encoding="utf-8") as fh:
-        fh.write(f'MEMORY_ROOT=memory\nFAMILIES="{families}"\n{PIN_KEY}="{pin}"\n')
+        fh.write(f'MEMORY_ROOT=memory\nFAMILIES="{families}"\n')
     os.makedirs(os.path.join(tmp, "memory", "backlog"), exist_ok=True)
+    if dupes is not None:
+        os.makedirs(os.path.join(tmp, "memory", "project"), exist_ok=True)
+        with open(os.path.join(tmp, "memory", DUPLICATES), "w", encoding="utf-8", newline="") as fh:
+            fh.write("# ledger · row-duplicates · key record shard,row-key · direction shrink-only · drain key\n")
+            fh.writelines(f"{s}\t{i}\t{n}\tabcdef12\tseeded\n" for (s, i), n in dupes.items())
     with open(os.path.join(tmp, "memory", "DECISIONS.md"), "w", encoding="utf-8") as fh:
         fh.write(decisions)
     # A live shard, so an archive has an index to be resolved against and to be DISJOINT from.
@@ -1814,21 +1745,34 @@ def cmd_selftest():
             "two answers to one question", lambda: cap(t2, c2))
         arm("the duplicate's id and lines are printed", "ARCH-tOne-1 at lines 1, 2",
             lambda: cap(t2, c2))
-        # The pin admits a known duplicate, and shrink-only bites in the other direction too.
+        # The population admits a keyed duplicate, and a row no duplicate matches reds as stale
+        # (TOOL-dWitnessedBar-17 S1): the keyed compare bites in both directions.
+        _dk = ("memory/DECISIONS.md", "ARCH-tOne-1")
         t3 = os.path.join(base, "pinned"); os.makedirs(t3)
-        c3 = _tree(t3, "- ARCH-tOne-1 · one\n- ARCH-tOne-1 · again\n", pin="1")
-        arm("a pinned duplicate passes", "row-grammar: clean", lambda: cap(t3, c3))
+        c3 = _tree(t3, "- ARCH-tOne-1 · one\n- ARCH-tOne-1 · again\n", dupes={_dk: 2})
+        arm("a duplicate keyed in row-duplicates.txt passes", "row-grammar: clean", lambda: cap(t3, c3))
         t4 = os.path.join(base, "stale"); os.makedirs(t4)
-        c4 = _tree(t4, "- ARCH-tOne-1 · one\n", pin="1")
-        arm("a pin above the real count reds, so a repair must lower it",
-            "the pin is shrink-only", lambda: cap(t4, c4))
+        c4 = _tree(t4, "- ARCH-tOne-1 · one\n", dupes={_dk: 2})
+        arm("a row no duplicate matches reds as stale, so a repair must drain it",
+            "which no duplicate matches — a stale row", lambda: cap(t4, c4))
+        # THE NET-TO-ZERO CASE a scalar pin passed: one keyed duplicate repaired, one new one landed.
+        t4b = os.path.join(base, "netzero"); os.makedirs(t4b)
+        c4b = _tree(t4b, "- ARCH-tOne-2 · two\n- ARCH-tOne-2 · again\n", dupes={_dk: 2})
+        arm("a new duplicate beside a repaired one reds on the new key",
+            "ARCH-tOne-2 at lines 1, 2", lambda: cap(t4b, c4b))
+        arm("...and on the repaired key's row as stale", "holds the row memory/DECISIONS.md ARCH-tOne-1",
+            lambda: cap(t4b, c4b))
+        t4c = os.path.join(base, "grown"); os.makedirs(t4c)
+        c4c = _tree(t4c, "- ARCH-tOne-1 · one\n- ARCH-tOne-1 · again\n- ARCH-tOne-1 · thrice\n",
+                    dupes={_dk: 2})
+        arm("a keyed duplicate that gained a row reds on its count", "appears 3 time(s) against its row's 2",
+            lambda: cap(t4c, c4c))
         t5 = os.path.join(base, "nopin"); os.makedirs(t5)
         c5 = _tree(t5, "\n".join(["- ARCH-tOne-1 · one",
                                   "- ARCH-tOne-1 · the same id twice", ""]))
-        del c5[PIN_KEY]
-        # An undeclared pin is the STRICTEST value, not a refusal and not off: this fixture holds one
-        # duplicate and no pin, so it must RED on the duplicate rather than on the missing key.
-        arm("an undeclared pin reds on a duplicate rather than on the missing key",
+        # An absent home is the STRICTEST population, not a refusal and not off: this fixture holds
+        # one duplicate and no home, so it must RED on the duplicate rather than on the missing file.
+        arm("an absent row-duplicates.txt reds on a duplicate rather than on the missing home",
             "two answers to one question", lambda: cap(t5, c5))
         # VACUITY: the wrong-grammar case must red, not pass by finding nothing.
         t6 = os.path.join(base, "wrongfam"); os.makedirs(t6)
@@ -1864,12 +1808,12 @@ def cmd_selftest():
         # read that stopped at an unclosed fence is a number an operator would act on.
         t7e = os.path.join(base, "openfencepin"); os.makedirs(t7e)
         c7e = _tree(t7e, chr(10).join(["- ARCH-tOne-1 . one", "", "```",
-                                       "- ARCH-tOne-1 . the duplicate the pin exists for", ""]),
-                    pin="1")
-        arm("an open fence stops --check before any pin comparison", "TERMINAL",
-            lambda: "LEAKED" if "lower it to" in cap(t7e, c7e) else "TERMINAL")
-        arm("--emit-pin refuses on a partial read instead of printing a number",
-            "no pin is emitted", lambda: cap(t7d, c7d, cmd_emit_pin))
+                                       "- ARCH-tOne-1 . the duplicate the row exists for", ""]),
+                    dupes={("memory/DECISIONS.md", "ARCH-tOne-1"): 2})
+        arm("an open fence stops --check before any population comparison", "TERMINAL",
+            lambda: "LEAKED" if "stale row" in cap(t7e, c7e) else "TERMINAL")
+        arm("--list-duplicates refuses on a partial read instead of listing a row",
+            "no row is listed", lambda: cap(t7d, c7d, cmd_list_duplicates))
         # A dash-led line holding an id the grammar cannot KEY is counted, not ignored.
         t8 = os.path.join(base, "unkeyed"); os.makedirs(t8)
         c8 = _tree(t8, "- ARCH-tOne-1 · one\n- see ARCH-tOne-9 for the rationale\n")
@@ -1877,11 +1821,13 @@ def cmd_selftest():
             "the row grammar cannot key", lambda: cap(t8, c8))
         arm("an unkeyed line is reported with its path and line, not a bare count",
             "memory/DECISIONS.md:2", lambda: cap(t8, c8))
-        # AC5: --report and --emit-pin unpack scan() too; rev-1 named neither as a consumer.
+        # AC5: --report and --list-duplicates unpack scan() too; rev-1 named neither as a consumer.
         arm("--report survives the return-shape change", "open fences  : 0",
             lambda: cap(t, c, cmd_report))
-        arm("--emit-pin survives the return-shape change", f'{PIN_KEY}="0"',
-            lambda: cap(t, c, cmd_emit_pin))
+        arm("--list-duplicates survives the return-shape change", "rc=0",
+            lambda: cap(t, c, cmd_list_duplicates))
+        arm("--list-duplicates prints each duplicate as the seed's row, its count the rows carrying it",
+            "memory/DECISIONS.md\tARCH-tOne-1\t2", lambda: cap(t2, c2, cmd_list_duplicates))
 
         # THE WIDENING (TOOL-cSpliceWarden-3). The archive branch admitted a file only when its
         # basename began `DECISIONS.`, so every rotated BACKLOG shard went unscanned — three of them
@@ -1931,34 +1877,32 @@ def cmd_selftest():
         # two copies free to drift — and the drift is silent in the worst direction, since a narrower
         # Python side simply scans less and still prints a clean count. The shell PRINTS its ERE and
         # this arm asserts the two agree over a tree holding one of every shape.
-        shell_used = []
+        shell_used, shell_refused = [], []
 
         def resolve_shell_ere(sh, cwd):
-            """The shell's own ERE, or None. Every candidate is RUN — being on PATH is not evidence.
-            The candidate that answered is kept in `shell_used`, so the home comparison below asks
-            the SAME shell rather than probing again.
-
-            On Windows `bash` resolves to the WSL launcher, which tries to boot a VM and returns
-            UTF-16 "the timeout period expired" at rc=1. That is the MS-Store-python3 shape one
-            interpreter over, and it is why this probes rather than assuming.
+            """The shell's own ERE, or None. An adapter over the `resolve_bash_py` block in
+            `tree_lib.py` (TOOL-dWitnessedBar-48, -57 S7): it runs the block's `found` bash and no candidate of its own, so
+            WSL's launcher, which a bare `bash` reaches on Windows, is refused by the block's rule. The
+            bash that answered is kept in `shell_used`, so the home comparison below asks the SAME
+            shell rather than probing again; on the block's refusal its text is kept in
+            `shell_refused` and this returns None, the "no ERE" contract.
             """
-            cands = [os.environ.get("GOV_BASH", ""), "bash",
-                     "C:/Program Files/Git/bin/bash.exe", "/bin/bash", "sh"]
-            for c in cands:
-                if not c:
-                    continue
-                try:
-                    r = subprocess.run([c, sh, "--print-rotated-archive-ere"], cwd=cwd,
-                                       capture_output=True, text=True, encoding="utf-8", timeout=60)
-                except (OSError, subprocess.TimeoutExpired):
-                    continue
-                if r.returncode != 0:
-                    continue
-                out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
-                # The print modes sit below an observability echo, so the ERE is the LAST line.
-                if out and out[-1].startswith("^"):
-                    shell_used.append(c)
-                    return out[-1]
+            found, _tried, refusal = scan_bash(sh)
+            if not found:
+                shell_refused.append(refusal)
+                return None
+            try:
+                r = subprocess.run([found, sh, "--print-rotated-archive-ere"], cwd=cwd,
+                                   capture_output=True, text=True, encoding="utf-8", timeout=60)
+            except (OSError, subprocess.TimeoutExpired):
+                return None
+            if r.returncode != 0:
+                return None
+            out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
+            # The print modes sit below an observability echo, so the ERE is the LAST line.
+            if out and out[-1].startswith("^"):
+                shell_used.append(found)
+                return out[-1]
             return None
 
         def check_readers_agree():
@@ -1972,9 +1916,10 @@ def cmd_selftest():
                 # PRINTED, not merely returned. `arm()` prints the label alone on success, so a skip
                 # returned as a passing value is indistinguishable from a verified one — which is the
                 # whole objection to a silent skip.
-                print("arm SKIP  the cross-reader join did NOT run: no candidate shell executed "
+                print("arm SKIP  the cross-reader join did NOT run: no resolved bash executed "
                       "`--print-rotated-archive-ere` on this node. The two readers were NOT compared. "
-                      "Set GOV_BASH to a usable bash to exercise it.")
+                      "Set GOV_BASH to a usable bash to exercise it."
+                      + (" " + shell_refused[-1] if shell_refused else ""))
                 return ("JOIN-OK SKIPPED — announced above; this arm verified nothing")
             rx = re.compile(ere.replace("$M", "memory"))
             tracked = [x for x in run("git", "ls-files", "--", "memory/", cwd=t11).split("\n") if x]
@@ -2016,7 +1961,7 @@ def cmd_selftest():
         # CHECK 24 — the declared ROTATION_MODE, every branch. TOOL-cSpliceWarden-6.
         # The clean case first, so the reds below are known to be reds and not a broken fixture.
         t24 = os.path.join(base, "rotcut"); os.makedirs(t24)
-        c24 = _tree(t24, "- ARCH-tOne-1 · one\n", pin="0",
+        c24 = _tree(t24, "- ARCH-tOne-1 · one\n",
                     shards={"ARCH.md": "- ARCH-tLive-1 · OPEN · the live row\n"},
                     archives={"ARCH.2026-01-01.md": "- ARCH-tGone-1 · CLOSED · a terminal row, cut-legal\n"})
         _conf24 = dict(c24); _conf24["ROTATION_MODE"] = "cut"
@@ -2026,7 +1971,7 @@ def cmd_selftest():
 
         # (a) a non-terminal row in a cut archive.
         t24b = os.path.join(base, "rotnonterm"); os.makedirs(t24b)
-        c24b = _tree(t24b, "- ARCH-tOne-1 · one\n", pin="0",
+        c24b = _tree(t24b, "- ARCH-tOne-1 · one\n",
                      shards={"ARCH.md": "- ARCH-tLive-1 · OPEN · the live row\n"},
                      archives={"ARCH.2026-01-01.md": "- ARCH-tGone-1 · CLOSED · terminal\n"
                                                      "- ARCH-tStay-1 · OPEN · under cut this never rotates\n"})
@@ -2038,7 +1983,7 @@ def cmd_selftest():
         # shell and a bold-wrapped id passed it silently — and `memory/DECISIONS.md` carries fifteen
         # such rows. Delegating to this module's grammar is what closes it, so the arm pins it.
         t24c = os.path.join(base, "rotbold"); os.makedirs(t24c)
-        c24c = _tree(t24c, "- ARCH-tOne-1 · one\n", pin="0",
+        c24c = _tree(t24c, "- ARCH-tOne-1 · one\n",
                      shards={"ARCH.md": "- ARCH-tLive-1 · OPEN · the live row\n"},
                      archives={"ARCH.2026-01-01.md": "- **ARCH-tBold-1** · SPECCED · bold-wrapped\n"})
         _c24c = dict(c24c); _c24c["ROTATION_MODE"] = "cut"
@@ -2047,7 +1992,7 @@ def cmd_selftest():
 
         # (b) exclusivity: one id, two files.
         t24d = os.path.join(base, "rotboth"); os.makedirs(t24d)
-        c24d = _tree(t24d, "- ARCH-tOne-1 · one\n", pin="0",
+        c24d = _tree(t24d, "- ARCH-tOne-1 · one\n",
                      shards={"ARCH.md": "- ARCH-tBoth-1 · OPEN · the id the archive also carries\n"},
                      archives={"ARCH.2026-01-01.md": "- ARCH-tBoth-1 · CLOSED · also live in the shard\n"})
         _c24d = dict(c24d); _c24d["ROTATION_MODE"] = "cut"
@@ -2061,7 +2006,7 @@ def cmd_selftest():
         # exclusivity half went UNGRADED — so this arm asks for the partition finding itself, which
         # only a graded half can print (TOOL-dHomedResolver-1).
         t24n = os.path.join(base, "rotnamesake"); os.makedirs(t24n)
-        c24n = _tree(t24n, "- ARCH-tOne-1 · one\n", pin="0",
+        c24n = _tree(t24n, "- ARCH-tOne-1 · one\n",
                      shards={"ARCH.md": "- ARCH-tBoth-2 · OPEN · the id the archive also carries\n"},
                      archives={"ARCH.2026-01-01.md": "- ARCH-tBoth-2 · CLOSED · also live in the shard\n"})
         os.makedirs(os.path.join(t24n, "memory", "backlog", "sub"))
@@ -2080,7 +2025,7 @@ def cmd_selftest():
         # TOOL-dHomedResolver-1 either; the closing review found the gap and refuted it as older than
         # the build, and TOOL-dHomedResolver-5 adopts it.
         t24m = os.path.join(base, "rotnohome"); os.makedirs(t24m)
-        c24m = _tree(t24m, "- ARCH-tOne-1 · one\n", pin="0",
+        c24m = _tree(t24m, "- ARCH-tOne-1 · one\n",
                      archives={"ARCH.2026-01-01.md": "- ARCH-tGone-3 · CLOSED · its shard is gone\n"})
         _c24m = dict(c24m); _c24m["ROTATION_MODE"] = "cut"
         arm("a cut archive whose declared home is not tracked is named, and its half is ungraded",
@@ -2091,7 +2036,7 @@ def cmd_selftest():
         # error there and is deliberately not asserted. Without this arm, scoping it out is
         # indistinguishable from forgetting it.
         t24e = os.path.join(base, "rotdecisions"); os.makedirs(t24e)
-        c24e = _tree(t24e, "- ARCH-tOne-1 · one\n", pin="0",
+        c24e = _tree(t24e, "- ARCH-tOne-1 · one\n",
                      archives={"DECISIONS.2026-01-01.md": "- ARCH-tDec-1 · CORRECTS an earlier row, and this is prose\n"})
         _c24e = dict(c24e); _c24e["ROTATION_MODE"] = "cut"
         arm("a DECISIONS archive is not graded terminal-only — a decision row carries no status",
@@ -2107,7 +2052,7 @@ def cmd_selftest():
 
         # ANTI-VACUITY: `cut` over a tree with no rotated archive must SAY it graded nothing.
         t24f = os.path.join(base, "rotempty"); os.makedirs(t24f)
-        c24f = _tree(t24f, "- ARCH-tOne-1 · one\n", pin="0")
+        c24f = _tree(t24f, "- ARCH-tOne-1 · one\n")
         _c24f = dict(c24f); _c24f["ROTATION_MODE"] = "cut"
         arm("`cut` with NO rotated archive says it graded nothing rather than reporting clean",
             "graded NOTHING", lambda: cap(t24f, _c24f, cmd_check_rotation))
@@ -2119,7 +2064,7 @@ def cmd_selftest():
         # ---- GENERATED view whose rows are renderings of asks filed elsewhere, so reading one as a
         # ---- row document would report a mis-segmented grammar against text no author wrote.
         tBM = os.path.join(base, "backlogmode"); os.makedirs(tBM)
-        cBM = _tree(tBM, "- ARCH-tDec-1 · one\n- ARCH-tDec-1 · the same id twice\n", pin="0",
+        cBM = _tree(tBM, "- ARCH-tDec-1 · one\n- ARCH-tDec-1 · the same id twice\n",
                     shards={"ARCH.md": "- ARCH-tView-1 · OPEN · a live row\n"
                                        "- ARCH-tView-1 · OPEN · the same id twice\n"},
                     archives={"DECISIONS.2026-01-01.md": "- ARCH-tDrot-1 · a rotated decision\n",
@@ -2163,7 +2108,7 @@ def cmd_selftest():
         # the resolver cannot see that, so this one SHELLS OUT with a foreign cwd.
         t9 = os.path.join(base, "foreign"); os.makedirs(t9)
         _tree(t9, "\n".join(["- ARCH-tOne-1 · one",
-                             "- ARCH-tOne-1 · the same id twice", ""]), pin="0")
+                             "- ARCH-tOne-1 · the same id twice", ""]))
         def _foreign():
             r = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"],
                                cwd=t9, capture_output=True, text=True, encoding="utf-8")
@@ -2303,39 +2248,20 @@ def cmd_selftest():
                           "- ARCH-tOne-4 · CLOSED · terminal and unranked, must NOT count", ""])
         t14 = os.path.join(base, "sevpin"); os.makedirs(t14)
         c14 = _tree(t14, "- ARCH-tOne-1 · one\n", shards={"ARCH.md": _sev})
-        c14[UNRANKED_PIN_KEY] = "memory/backlog/ARCH.md:2"
-        arm("a shard at its unranked pin passes, and TERMINAL unranked rows do not count",
-            "row-grammar: clean", lambda: cap(t14, c14))
-        # OBSERVED RED [61-1]: a new unranked row lands and the ceiling bites.
-        c14b = dict(c14); c14b[UNRANKED_PIN_KEY] = "memory/backlog/ARCH.md:1"
-        arm("an unranked live row above the pin REDS and names the vocabulary it wanted",
-            "against a pin of 1", lambda: cap(t14, c14b))
-        arm("the red names BLOCKER/HIGH/MED/LOW rather than a bare count", "BLOCKER/HIGH/MED/LOW",
-            lambda: cap(t14, c14b))
-        # OBSERVED RED [61-2]: shrink-only bites in the other direction, so a drain must be locked in.
-        c14c = dict(c14); c14c[UNRANKED_PIN_KEY] = "memory/backlog/ARCH.md:3"
-        arm("a stale-high unranked pin REDS, so a drain has to lower it",
-            "lower it to 2 to lock the drain in", lambda: cap(t14, c14c))
-        # An UNDECLARED pin must ANNOUNCE. This is the arm that stops this key becoming LIVE_ROW_PIN,
-        # which is declared in .memory-tree.conf and read by nothing.
-        c14d = dict(c14); c14d.pop(UNRANKED_PIN_KEY, None)
-        arm("an undeclared unranked pin announces the skip inside the GREEN output",
-            "NOT MEASURED", lambda: cap(t14, c14d))
-        arm("the announcement names the shard and its unmeasured count",
-            "memory/backlog/ARCH.md has no SEVERITY_UNLABELLED_PIN", lambda: cap(t14, c14d))
-        arm("a malformed pin token fails NAMED rather than silently pinning nothing",
-            "takes `<shard-path>:<count>` tokens", lambda: cap(t14, dict(c14, **{UNRANKED_PIN_KEY: "ARCH.md"})))
-        # The ordering hazard: a shard whose grammar broke reports 0 unranked, and an unsuppressed
-        # ratchet would answer with "lower it to 0" — a pin instruction from a read that matched
-        # nothing. The floor must fire and the ratchet must NOT speak.
-        c11b = dict(c11); c11b[UNRANKED_PIN_KEY] = "memory/backlog/ARCH.md:5"
-        arm("a broken-grammar shard reds on the FLOOR, not on a bogus pin instruction",
+        # The two shard populations are registered unseeded (TOOL-dWitnessedBar-17 S2): each shard's
+        # live and unranked counts are measured, TERMINAL unranked rows uncounted, and nothing gated.
+        arm("a shard's live and unranked rows are counted and not gated, TERMINAL rows uncounted",
+            "row-grammar: NOT MEASURED — memory/backlog/ARCH.md: 3 live row(s), 2 of them unranked",
+            lambda: cap(t14, c14))
+        arm("...inside the GREEN output", "rc=0 row-grammar: clean", lambda: cap(t14, c14))
+        arm("the announcement names both unseeded populations",
+            "live-rows and severity-unlabelled are registered unseeded", lambda: cap(t14, c14))
+        # The ordering hazard: a shard whose grammar broke reports 0 live, and an announcement over it
+        # would state a count from a read that matched nothing. The floor must fire and nothing else.
+        arm("a broken-grammar shard reds on the FLOOR and announces no count",
             "FLOOR-ONLY",
-            lambda: "LEAKED" if "lower it to 0" in cap(t11, c11b) else
-                    ("FLOOR-ONLY" if "stopped matching" in cap(t11, c11b) else "NEITHER"))
-        arm("--emit-pin emits the unranked pin beside the duplicate pin",
-            'SEVERITY_UNLABELLED_PIN="memory/backlog/ARCH.md:2"',
-            lambda: cap(t14, c14, cmd_emit_pin))
+            lambda: "LEAKED" if "NOT MEASURED" in cap(t11, c11) else
+                    ("FLOOR-ONLY" if "stopped matching" in cap(t11, c11) else "NEITHER"))
         arm("--report prints the declared rank census, not just a raw prefix list",
             "declared rank (live): BLOCKER=0 HIGH=1 MED=0 LOW=0",
             lambda: cap(t14, c14, cmd_report))
@@ -2451,15 +2377,6 @@ def cmd_selftest():
             lambda: read_field("- ARCH-tOne-1 · CLOSED by deletion (ARCH-tTwo-1) · a body", "live"))
         arm("...and its `by` token is returned without the parenthetical", "'deletion'",
             lambda: read_field("- ARCH-tOne-1 · CLOSED by deletion (ARCH-tTwo-1) · a body", "closed_by"))
-        # AC4. The live-row pin: undeclared announces inside the GREEN output, and --emit-pin prints
-        # its token beside the other two, measured.
-        arm("an undeclared live-row pin announces the skip inside the GREEN output",
-            "memory/backlog/ARCH.md has no LIVE_ROW_PIN entry", lambda: cap(t14, c14d))
-        arm("--emit-pin prints the live-row pin as the third declaration",
-            'LIVE_ROW_PIN="memory/backlog/ARCH.md:3"', lambda: cap(t14, c14, cmd_emit_pin))
-        c14e = dict(c14); c14e[LIVE_ROW_PIN_KEY] = "memory/backlog/ARCH.md:2"
-        arm("a live row above the live-row pin REDS", "3 live row(s) against a pin of 2",
-            lambda: cap(t14, c14e))
         # The age walk dates what the census keys. A frozen legacy id under a DECLARED family is live
         # and keyed, so a walk still spelled in family-slug-seq would report it undated at exit 1.
         t19 = os.path.join(base, "ageslegacy"); os.makedirs(t19)
@@ -2862,8 +2779,8 @@ def main(argv):
         return cmd_check(root, conf)
     if mode == "--report":
         return cmd_report(root, conf)
-    if mode == "--emit-pin":
-        return cmd_emit_pin(root, conf)
+    if mode == "--list-duplicates":
+        return cmd_list_duplicates(root, conf)
     if mode == "--ages":
         return cmd_ages(root, conf)
     if mode == "--check-rotation":
@@ -2876,7 +2793,7 @@ def main(argv):
     if mode == "--check-content":
         return cmd_check_content(root, conf, argv[2] if len(argv) > 2 else None)
     print(f"row-grammar: unknown argument '{mode}'; the modes are --check, --check-rotation, "
-          f"--check-relations, --measure-relations, --check-content, --report, --emit-pin, --ages "
+          f"--check-relations, --measure-relations, --check-content, --report, --list-duplicates, --ages "
           f"and --selftest")
     return 2
 

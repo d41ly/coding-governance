@@ -166,6 +166,9 @@ SLOT_CANON = (
 # population is legal and is ANNOUNCED on every run, because a rule binding nothing that reports
 # `clean` is the vacuous-selector class this repo names.
 CONTRACT_REGISTRY = "project/readme-contract.txt"
+# Its ledger key since TOOL-dWitnessedBar-16 S7: a row is `<path> TAB <binding>`, the binding one of these.
+CONTRACT_FIELDS = ("path", "binding")
+CONTRACT_BINDINGS = ("bound", "exempt")
 
 # TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
 # spec's status header and its first numbered section, which is the one place in a spec that hygiene
@@ -318,6 +321,9 @@ def write_text(path: str, text: str) -> None:
 import backlog  # noqa: E402  a sibling of this file, reached by the path insert above
 # A spec's declared write set and consumed siblings, read by the build-order render (TOOL-dGroundRules-25).
 import design_lib  # noqa: E402  a sibling of this file, reached by the path insert above
+# The ledger factory this kit carries (TOOL-dWitnessedBar-13): the contract registry and the stale-header
+# waiver are its populations, read through `read_rows` and graded against the base by `compare_to_base`.
+import legacy_ledger as LL  # noqa: E402  a sibling of this file, reached by the path insert above
 
 
 def load_conf(root: str) -> dict:
@@ -1291,13 +1297,12 @@ def read_stale_header_waiver(root: str, m: str, tracked: list) -> dict:
             f"nobody created is a decision nobody made, and defaulting it to empty would silently "
             f"disarm the distinction it exists to keep."
         )
-    rows = {}
-    for line in read_text(full).split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        path, _, why = line.partition(" ")
-        rows[path.strip()] = why.strip()
+    # A LEDGER POPULATION keyed by `path` (TOOL-dWitnessedBar-16 S4), read through the factory; a row's
+    # reason is the conversion record's, never the row's. A row the factory refuses tolerates nothing.
+    keyed, bad = LL.read_rows(full, 1)
+    if bad:
+        raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
+    rows = {key[0]: "" for key in keyed}
     stale = sorted(p for p in rows if p not in tracked)
     if stale:
         raise Problem(
@@ -2567,7 +2572,9 @@ def read_slot_mode(root: str) -> tuple:
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does. A slot over
     its declared ceiling is hard under the `readme-slot` cap's `refuse` and a `BUDGET WARN` advisory
-    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding."""
+    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding. Each advisory is `(line, marker)`,
+    the marker the runner's `gate-warn` line its printer prints after it (TOOL-dWitnessedBar-29 S2),
+    built by the policy kit's `render_warn_marker`, and empty where no policy kit loads."""
     here = resolve_slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
@@ -2582,12 +2589,17 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
         if cap is not None and size > cap:
             mode, rule = read_slot_mode(root)
             if mode == "warn":
-                adv.append(f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}")
+                adv.append((f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}",
+                            f"readme-slot · `{head}` {size} bytes over {cap}"))
             else:
                 hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B · {rule}")
         elif hw is not None and size > hw:
-            adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
-                       f"{hw} B and under its {cap} B ceiling")
+            read_slot_mode(root)  # loads the policy kit's module once, the marker's factory
+            adv.append((f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
+                        f"{hw} B and under its {cap} B ceiling",
+                        f"slot `{head}` {size} B over high-water {hw} B"))
+    budgets = sys.modules.get("budgets")
+    adv = [(line, budgets.render_warn_marker(rel, detail) if budgets else "") for line, detail in adv]
     return hard, adv
 
 
@@ -2609,50 +2621,54 @@ def read_contract_registry(root: str, conf: dict) -> set:
     not depend on a file unit 3 had not written; this is the handover, and it is stated in both specs
     rather than left as two specs disagreeing.
     """
-    bound, _exempt, _pin = read_contract_rows(root, conf)
+    bound, _exempt = read_contract_rows(root, conf)
     return bound
 
 
 def read_contract_rows(root: str, conf: dict) -> tuple:
-    """`(bound, exempt, declared_pin)` from the declared registry. An absent file REFUSES."""
+    """`(bound, exempt)`, the paths of each binding, from the declared registry. An absent file REFUSES.
+
+    A LEDGER POPULATION since TOOL-dWitnessedBar-16 S7, keyed by `path` and `binding`, read through
+    the factory's `read_rows`; its `exempt-pin:` line retired, the shrink of the exempt rows graded
+    against the base instead (`check_contract_registry`). A home whose first line is no ledger header
+    REFUSES: the old grammar has no reader here (S12), and the adopter's step converts it.
+    """
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
     full = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
     if not os.path.exists(full):
         raise Problem(f"{rel} is absent; the heading canon and the slot budgets would then bind "
                       f"nothing and report clean, which is coverage of nothing")
-    bound, exempt, pin = set(), {}, None
-    for n, raw in enumerate(read_text(full).split("\n"), 1):
-        s = raw.strip()
-        if not s or s.startswith("#"):
-            continue
-        if s.startswith("exempt-pin:"):
-            v = s.split(":", 1)[1].strip()
-            if not v.isdigit():
-                raise Problem(f"{rel}:{n}: exempt-pin is `{v}`, which is not a count")
-            pin = int(v)
-            continue
-        if s.startswith("!"):
-            path, _sep, why = s[1:].partition(" - ")
-            path = path.strip()
-            if not why.strip():
-                raise Problem(f"{rel}:{n}: exempt row `{path}` carries no reason; an exemption whose "
-                              f"reason lives elsewhere is one nobody can drain")
-            exempt[path] = why.strip()
-            continue
-        if " " in s:
-            raise Problem(f"{rel}:{n}: `{s}` is neither a bare bound path, an `!`-prefixed exempt "
-                          f"row with a reason, nor an `exempt-pin:` line")
-        bound.add(s)
-    if pin is None:
-        raise Problem(f"{rel}: no `exempt-pin:` line; the exempt list is shrink-only and a list with "
-                      f"no pin cannot report that it stopped shrinking")
-    return bound, exempt, pin
+    try:
+        LL.parse_header(read_text(full).split("\n", 1)[0])
+    except ValueError:
+        raise Problem(f"{rel}: its first line is no ledger header, so it is not in the ledger grammar "
+                      f"this reader reads; run its kit's `[[upgrade]]` step to convert it") from None
+    keyed, bad = LL.read_rows(full, len(CONTRACT_FIELDS))
+    if bad:
+        raise Problem(f"{rel}: {LL.render_malformed(bad[0])}")
+    bound, exempt = set(), set()
+    for path, binding in keyed:
+        if binding not in CONTRACT_BINDINGS:
+            raise Problem(f"{rel}: the row for `{path}` binds `{binding}`, which is neither "
+                          f"{' nor '.join(CONTRACT_BINDINGS)}")
+        (bound if binding == "bound" else exempt).add(path)
+    return bound, exempt
+
+
+def _render_contract_fixture(rows: list, lead: str = "") -> str:
+    """A contract registry in the ledger grammar for the self-test: the header the memory-tree
+    descriptor's `[[ledger]]` table renders, `lead`'s comment lines, then one row per `(path, binding)`."""
+    reg = LL.Registration("readme-contract", (), "site", CONTRACT_FIELDS, "hunk", "declared-set", CONTRACT_REGISTRY, "")
+    return (LL.render_header(reg) + "\n" + lead
+            + "".join("\t".join([p, b, "1", "abcdef12", "seeded"]) + "\n" for p, b in rows))
 
 
 def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
-    """Both directions, plus the equality pin. Every failure names the row or the path."""
+    """Both directions, plus the exempt rows' shrink against the base. Every failure names the row or the path."""
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
-    bound, exempt, pin = read_contract_rows(root, conf)
+    bound, exempt = read_contract_rows(root, conf)
+    for both in sorted(bound & exempt):
+        raise Problem(f"{rel} declares `{both}` both bound and exempt, so neither row says which it is")
     named, have = bound | set(exempt), set(tracked)
     # FORWARD — a tracked build README nothing names cannot silently escape the contract.
     for miss in sorted(have - named):
@@ -2662,11 +2678,22 @@ def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
     for dead in sorted(named - have):
         raise Problem(f"{rel} carries a row for `{dead}`, which is not a tracked build README; a "
                       f"stale row silently widens the surface it was written to narrow")
-    # The pin is an EQUALITY in both directions: above the count is permanent slack after a drain.
-    if pin != len(exempt):
-        raise Problem(f"{rel}: exempt-pin is {pin} and the measured exempt count is {len(exempt)}; "
-                      f"the pin is an equality, because a pin left above the count after a drain is "
-                      f"slack nothing reports")
+    # THE EXEMPT ROWS ONLY SHRINK (TOOL-dWitnessedBar-16 S7, §8 F4), the retired `exempt-pin:` line's
+    # job: an `exempt` row the base's rows did not hold is a new exemption, read through the factory's
+    # `compare_to_base` as a shrink-only population's gain. A bound row may be added freely, so a gained
+    # `bound` key is no finding. Where the compare answers None (no base, no home at the base, or a
+    # legacy base home) the shrink is UNGRADED and says why. WHAT IT DOES NOT CHECK: a path whose row
+    # moved from bound to exempt in a commit the base already holds.
+    reg = LL.Registration("readme-contract", (), "site", CONTRACT_FIELDS, "hunk", "shrink-only", rel,
+                          "build README slot contract")
+    findings, why = LL.compare_to_base(root, reg)
+    if findings is None:
+        print(f"build-index: UNGRADED the exempt rows' shrink against the base — {why}", file=sys.stderr)
+        return
+    for name, key in findings:
+        if name == "gained" and key[1] == "exempt":
+            raise Problem(f"{rel}: `{key[0]}` is a new exemption — the base's rows did not hold it "
+                          f"exempt, and the exempt rows only shrink; bind it, or conform the README")
 
 
 def scan_canon(lines: list, first_open: int) -> list:
@@ -3343,10 +3370,12 @@ def cmd_check_format(root: str, conf: dict) -> int:
             adv += a
     # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
     # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
-    for line in adv:
+    for line, marker in adv:
         if not line.startswith("BUDGET WARN"):  # a warned breach prints alone (TOOL-dGroundRules-9)
             print("build-index ADVISORY — a slot passed its recorded high-water:")
         print(line)
+        if marker:
+            print(marker)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
         for line in bad:
@@ -4453,16 +4482,19 @@ def render_new_build_readme(slug: str, conf: dict, ids: list, opened: str, at: s
 
 
 def add_contract_row(root: str, conf: dict, rel: str) -> None:
-    """Append `rel` to the registry as a BOUND row. The exempt list and its pin are NOT touched.
+    """Append `rel` to the registry as a BOUND ledger row, at HEAD's sha. The exempt rows are NOT touched.
 
     Bound and not exempt, because an exemption is not coverage and a brand-new README has no
     history to be grandfathered for — it is written by this very function, to the canon's shape.
     """
     path = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
     text = read_text(path)
-    if any(line.strip() == rel for line in text.split("\n")):
+    if any(line.split("\t")[:2] == [rel, "bound"] for line in text.split("\n")):
         return
-    write_text(path, text.rstrip("\n") + "\n" + rel + "\n")
+    sha, why = LL.read_head_sha(root)
+    if not sha:
+        raise Problem(f"{CONTRACT_REGISTRY}: {why}, so the bound row for {rel} has no sha to carry")
+    write_text(path, text.rstrip("\n") + "\n" + "\t".join([rel, "bound", "1", sha, "seeded"]) + "\n")
 
 
 def cmd_new_build(root: str, conf: dict, args: dict) -> int:
@@ -4522,6 +4554,134 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     print(f"build-index: wrote {rel} and its BOUND row in {registry}, and staged both so the "
           f"render below can see them")
     return cmd_write(root, conf)
+
+
+# ------------------------------------------------------------------- the placed build's scaffold
+# TOOL-dPlacedRequest-21 S4. A placed `patch` or `repeat` request is claimed before any plan record
+# kind exists, so its derived plan record is this README scaffold: the six required keys and
+# `status: OPEN`, then on a patch `parents: <origin>`, the key `collect` parses as the originating
+# build, and on a repeat `authorized-by: recipe`, `playbook:` and `pieces:`, the keys the unattended
+# driver's `check_authorization` reads in recipe mode. Its slots cite the request by its content key
+# and the origin or the playbook by path, and quote no request text, which never leaves its node.
+# It runs no slug probe of its own: `--entry-claim` runs `check_slug_claimed` before a fresh claim,
+# and a resumed claim is its claimant's. It stages the README and its contract row as `--new-build`
+# does and renders nothing, the claim verb committing the two alone before the build's first
+# transition record. WHAT THIS DOES NOT CHECK: that the origin is terminal or the playbook a
+# playbook, which the placement check read before the claim; the roster of a repeat, which is the
+# conf's first declared family, no playbook declaring one.
+PLACED_BUILD_USAGE = ("usage: gen_build_index.py --placed-build <slug> --request <content key> "
+                      "(--origin <slug> | --playbook <path> --pieces <n>)")
+#: A request's content key, as the loop kit's `request.py` derives it.
+PLACED_REQUEST_KEY = re.compile(r"[0-9a-f]{12}")
+#: The front-matter value a repeat's README carries on `authorized-by:`, the driver's recipe mode.
+AUTHORIZED_BY_RECIPE = "recipe"
+
+
+def read_placed_build_args(argv: list) -> dict:
+    """`--placed-build`'s own parse: one positional slug, `--request`, and `--origin` or `--playbook` with
+    `--pieces`, each value held to its shape here, the write boundary."""
+    out = {"slug": "", "request": "", "origin": "", "playbook": "", "pieces": ""}
+    rest = list(argv)
+    if rest and not rest[0].startswith("--"):
+        out["slug"] = rest.pop(0)
+    while rest:
+        token = rest.pop(0)
+        name = token[2:]
+        if name not in ("request", "origin", "playbook", "pieces") or not rest or out[name]:
+            raise Problem(f"--placed-build: {token} is unknown, repeated or has no value. {PLACED_BUILD_USAGE}")
+        out[name] = rest.pop(0)
+    if not out["slug"] or not PLACED_REQUEST_KEY.fullmatch(out["request"]):
+        raise Problem(f"--placed-build takes a slug and a content key of 12 hex digits. {PLACED_BUILD_USAGE}")
+    if bool(out["origin"]) == bool(out["playbook"]):
+        raise Problem(f"--placed-build takes --origin for a patch or --playbook for a repeat, one of the two. "
+                      f"{PLACED_BUILD_USAGE}")
+    if out["origin"] and out["pieces"]:
+        raise Problem(f"--placed-build: --pieces names a repeat's count, and a patch takes none. {PLACED_BUILD_USAGE}")
+    if out["playbook"] and not (out["pieces"].isdigit() and int(out["pieces"]) > 0):
+        raise Problem(f"--placed-build: a repeat takes --pieces <n>, a positive whole number, not "
+                      f"'{out['pieces'] or 'nothing'}'. {PLACED_BUILD_USAGE}")
+    return out
+
+
+def render_placed_build_readme(slug: str, args: dict, roster: str, streams: str, opened: str) -> str:
+    """The placed build's README: the front matter of a patch or a repeat, five filled slots and the
+    pairs `--write` renders into. `args` is `read_placed_build_args`'s; no request text is read."""
+    key = args["request"]
+    head = ["---", f"slug: {slug}", f"node: {slug[0]}", f"opened: {opened}", f"streams: {streams}",
+            f"roster: {roster}", "ids:", "status: OPEN"]
+    if args["origin"]:
+        head.append(f"parents: {args['origin']}")
+        what = f"a patch of `{args['origin']}`"
+        source = f"- Placed as a patch of the build `{args['origin']}`, whose folder is its origin."
+    else:
+        head += [f"authorized-by: {AUTHORIZED_BY_RECIPE}", f"playbook: {args['playbook']}",
+                 f"pieces: {args['pieces']}"]
+        what = f"a repeat of the playbook `{args['playbook']}`"
+        source = f"- Placed as a repeat of `{args['playbook']}`, {args['pieces']} piece(s) as its claimant stated."
+    return "\n".join(head + [
+        "---", "", f"# {slug} — {what}", "",
+        SLOT_CANON[0][0],
+        f"The request keyed `{key}` was placed as {what} and claimed as this build; its words stay on the "
+        f"node that recorded them, and this README cites them by that key alone.",
+        "",
+        SLOT_CANON[1][0],
+        "- The placed request is answered by the one build its claim names.",
+        "",
+        SLOT_CANON[2][0],
+        "- The placed request stays claimed with no build carrying it to done.",
+        "",
+        SLOT_CANON[3][0],
+        source,
+        f"- Claimed through `entry.claim` on `refs/gov/claims/{slug}`, the request's content key `{key}`.",
+        "",
+        SLOT_CANON[4][0],
+        "",
+        PLAN_OPEN,
+        PLAN_CLOSE,
+        "",
+        MARK_OPEN,
+        MARK_CLOSE,
+    ]) + "\n"
+
+
+def cmd_placed_build(root: str, conf: dict, args: dict) -> int:
+    """`--placed-build`: write a placed patch's or repeat's README and its BOUND contract row, and stage
+    both, as `cmd_new_build` stages them; the render and the commit are the caller's."""
+    m = conf["MEMORY_ROOT"]
+    slug = args["slug"]
+    check_archives_tracked(root, conf)
+    if not backlog.SLUG_RE.match(slug) or not (slug[0].isalpha() and slug[0].islower()):
+        raise Problem(f"`{slug}` is not a build slug: a slug is the node's own lower-case tag "
+                      f"followed by a CamelCase adjective-noun, letters and digits only")
+    rel = f"{m}/builds/{slug}/README.md"
+    if os.path.exists(os.path.join(root, rel)):
+        raise Problem(f"--placed-build {slug}: {rel} already exists, so nothing was written")
+    disciplines = read_discipline_map(conf)
+    if args["origin"]:
+        origin = args["origin"]
+        if not backlog.SLUG_RE.match(origin):
+            raise Problem(f"--placed-build: --origin `{origin}` is not a build slug")
+        source = os.path.join(root, m, "builds", origin, "README.md")
+        if not os.path.isfile(source):
+            raise Problem(f"--placed-build: the origin {m}/builds/{origin}/README.md is not in this tree")
+        fm = parse_front_matter(source, origin)
+        roster, streams = fm["roster"], fm["streams"]
+    else:
+        playbook = args["playbook"].replace("\\", "/")
+        if playbook.startswith("/") or ".." in playbook.split("/") or not os.path.isfile(os.path.join(root, playbook)):
+            raise Problem(f"--placed-build: --playbook {playbook} is no file under this tree")
+        args = dict(args, playbook=playbook)
+        if not disciplines:
+            raise Problem("--placed-build: the conf declares no FAMILIES pair, so a repeat has no roster")
+        family = next(iter(disciplines))
+        roster, streams = family, disciplines[family]
+    opened = datetime.date.today().isoformat()
+    write_text(os.path.join(root, rel), render_placed_build_readme(slug, args, roster, streams, opened))
+    registry = os.path.join(m, CONTRACT_REGISTRY).replace(os.sep, "/")
+    add_contract_row(root, conf, rel)
+    run("git", "add", "--", rel, registry, cwd=root)
+    print(f"build-index: wrote {rel} and its BOUND row in {registry}, and staged both")
+    return 0
 
 
 # ------------------------------------------------------------- the backlog-modes docs drift arm
@@ -6423,7 +6583,7 @@ def cmd_selftest() -> int:
         _bconf = _fixture(_bt, spec_status="OPEN")
         _brd = "memory/builds/tOne/README.md"
         write_text(os.path.join(_bt, "memory", CONTRACT_REGISTRY),
-                   "exempt-pin: 0\n" + _brd + "\n")
+                   _render_contract_fixture([(_brd, "bound")]))
         _bdir = os.path.join(base, "bumpdata"); os.makedirs(_bdir)
         write_text(os.path.join(_bdir, SLOT_LIMITS),
                    "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
@@ -6517,7 +6677,7 @@ def cmd_selftest() -> int:
             lambda: read_contract_registry(t16, conf16))
         os.makedirs(os.path.join(t16, "memory", "project"), exist_ok=True)
         write_text(os.path.join(t16, "memory", CONTRACT_REGISTRY),
-                   "# a comment\nexempt-pin: 0\nmemory/builds/tOne/README.md\n")
+                   _render_contract_fixture([("memory/builds/tOne/README.md", "bound")], "# a comment\n"))
         arm("a registry row binds its path and comments are skipped",
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
@@ -6563,18 +6723,22 @@ def cmd_selftest() -> int:
         os.path.exists(reg18) and os.remove(reg18)
         arm("an absent registry refuses, replacing unit 1's empty set", "is absent",
             lambda: check_contract_registry(t18, conf18, trk18))
-        arm("a registry with no pin refuses", "no `exempt-pin:` line",
-            build_reg_check("memory/builds/tOne/README.md\n"))
+        # The registry is a ledger population (TOOL-dWitnessedBar-16 S7): its `exempt-pin:` line and the
+        # reason refusal retired with the old grammar, and the exempt rows' shrink is the base compare's.
         arm("a tracked README named by no row refuses", "names neither a bound nor an exempt row",
-            build_reg_check("exempt-pin: 0\n"))
+            build_reg_check(_render_contract_fixture([])))
         arm("a row naming a path that is not a tracked README refuses", "stale row silently widens",
-            build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
-        arm("an exempt row with no reason refuses", "carries no reason",
-            build_reg_check("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
-        arm("the pin ABOVE the measured count refuses, not only below", "the pin is an equality",
-            build_reg_check("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
-        arm("a bound row and a matching pin pass", "None",
-            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound"),
+                                                      ("memory/builds/ghost/README.md", "bound")])))
+        arm("a row binding neither bound nor exempt refuses", "which is neither bound nor exempt",
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "pinned")])))
+        arm("a path declared both bound and exempt refuses", "both bound and exempt",
+            build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound"),
+                                                      ("memory/builds/tOne/README.md", "exempt")])))
+        arm("a row the factory refuses refuses", "the count is not a positive integer",
+            build_reg_check(_render_contract_fixture([]) + "memory/builds/tOne/README.md\tbound\tx\tabcdef12\tseeded\n"))
+        arm("a bound row passes", "None",
+            lambda: str(build_reg_check(_render_contract_fixture([("memory/builds/tOne/README.md", "bound")]))()))
         # TOOL-aRepatriatedFork-21: the population is builds/<slug>/README.md and nothing deeper.
         _pop = ["memory/builds/tOne/README.md", "memory/builds/tOne/build/legacy/README.md",
                 "memory/builds/tOne/spec/x.md", "memory/archive/README.md", ""]
@@ -7610,7 +7774,9 @@ def cmd_selftest() -> int:
             lambda: _read_waiver("# only comments\n\n"))
         arm("a MISSING waiver registry REFUSES", "absent", lambda: _read_waiver(None))
         arm("a waiver row naming an untracked path REFUSES", "outlived",
-            lambda: _read_waiver("memory/builds/ghost/README.md   gone\n"))
+            lambda: _read_waiver("memory/builds/ghost/README.md\t1\tabcdef12\tseeded\n"))
+        arm("a waiver row the ledger factory refuses REFUSES", "not the key's fields",
+            lambda: _read_waiver("memory/builds/x/README.md   a reason in the old grammar\n"))
 
         # TOOL-dDerivedDocket-6 — the two BACKLOG verbs, read through `backlog.py` and expanded by
         # this module's own `_expand_ids`. THE DARK ARM IS FIRST and is the one that matters here: a
@@ -8017,7 +8183,7 @@ def cmd_selftest() -> int:
         _f17 = dict(CORE)
         _f17[foo_rel] = _render_backlog_file("aFoo", [ask2, "- matches no declared row shape"])
         _f17["memory/" + STALE_HEADER_WAIVER] = \
-            "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n"
+            "memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n"
         _f17["memory/builds/aBar/README.md"] = ("---\nslug: aBar\nthis line has no colon\n---\n"
                                                 "\n# aBar\n\n" + MARK_OPEN + "\n"
                                                 + MARK_CLOSE + "\n")
@@ -8396,7 +8562,7 @@ def cmd_selftest() -> int:
             # has somewhere to land — and the arm can say it landed on stderr and not in the rows.
             "memory/builds/aBar/README.md": "---\nslug: aBar\nthis line has no colon\n---\n",
             "memory/" + STALE_HEADER_WAIVER:
-                "memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n",
+                "memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n",
         }
         _c7 = _build_backlog_fixture(et, _ac7, cutoff=_cut)
         _rc7, _so7, _se7 = _read_asks_run(et, _c7, ["--all", "--tsv"])
@@ -8618,8 +8784,7 @@ def cmd_selftest() -> int:
                     _render_backlog_spec("EXMP-aFoo-90"),
                 "memory/builds/aFoo/BACKLOG.md": _render_backlog_file("aFoo", asks),
                 "memory/" + CONTRACT_REGISTRY:
-                    "# the fixture registry\nexempt-pin: 1\n"
-                    "!" + _SC_HOME + " - a fixture home build with no authored half\n",
+                    _render_contract_fixture([(_SC_HOME, "exempt")], "# the fixture registry\n"),
             }
 
         def _build_sc_ask(seq, text, clauses=(_SEEN_HERE, _ACCEPT), pointer=""):
@@ -8650,10 +8815,10 @@ def cmd_selftest() -> int:
         arm("the `ids:` line is the RENDER's, which owns it — empty on a build no id names yet",
             "[ids:]", lambda: "[" + [x for x in _sc_fm if x.startswith("ids:")][0] + "]")
         arm("the README is BOUND by the contract registry, never exempted into it",
-            f"{_sc_rel}\n",
-            lambda: "\n".join(x for x in read_text(
+            f"{_sc_rel}\tbound\n",
+            lambda: "\n".join("\t".join(x.split("\t")[:2]) for x in read_text(
                 os.path.join(sc, "memory", CONTRACT_REGISTRY)).split("\n")
-                if x.strip() == _sc_rel) + "\n")
+                if x.split("\t")[0] == _sc_rel) + "\n")
         arm("the scaffold writes no grant key, so the build it opens can grant nothing", "False",
             lambda: str(any(x.startswith("may:") for x in _sc_text.split("\n"))))
         _rc10c, _out10c = _read_mode(cmd_check, sc, load_conf(sc))
@@ -8778,6 +8943,36 @@ def cmd_selftest() -> int:
                 x.startswith("may:") for x in read_text(os.path.join(
                     sc, "memory/builds/zGrantedDocket/README.md")).split("\n")))
             if _rc11 == 0 else f"rc={_rc11} :: {_out11}")
+
+        # TOOL-dPlacedRequest-21 AC5 — the placed build's scaffold, a patch of aFoo and a repeat of a
+        # playbook, over the same home tree. RED, observed at the close, is a patch scaffold written with
+        # no `parents:` key, which the first arm reads as its origin unrecorded.
+        _pb_files = dict(_build_sc_tree([_build_sc_ask(3, "the placed ask")]))
+        _pb_files["playbooks/zq-run.md"] = "# a playbook\n"
+        _pb_conf = _build_backlog_fixture(sc, _pb_files)
+        run("git", "commit", "-q", "-m", "placed", "--no-verify", cwd=sc)
+
+        def _read_placed_fm(slug, argv):
+            rc, out = _read_mode(cmd_placed_build, sc, _pb_conf, read_placed_build_args([slug] + argv))
+            path = os.path.join(sc, "memory", "builds", slug, "README.md")
+            text = read_text(path) if os.path.isfile(path) else ""
+            fm = [x for x in text.split("\n---")[0].split("\n")[1:] if ":" in x and not x.startswith("opened:")]
+            return f"rc={rc} {fm} quoted={'zq-placed-words' in text} :: {out if rc else ''}"
+
+        arm("a placed patch's README carries parents: <origin> and its staged registry row", "rc=0 ['slug: zFixPatch', "
+            "'node: z', 'streams: tool', 'roster: EXMP', 'ids:', 'status: OPEN', 'parents: aFoo'] quoted=False",
+            lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
+        arm("a placed repeat's README carries authorized-by: recipe, its playbook and its pieces",
+            "'status: OPEN', 'authorized-by: recipe', 'playbook: playbooks/zq-run.md', 'pieces: 3'] quoted=False",
+            lambda: _read_placed_fm("zRunAgain", ["--request", "3f9c2a7d01be", "--playbook", "playbooks/zq-run.md",
+                                                  "--pieces", "3"]))
+        arm("both placed READMEs and the registry are staged, nothing else", "memory/builds/zFixPatch/README.md "
+            "memory/builds/zRunAgain/README.md memory/project/readme-contract.txt",
+            lambda: " ".join(sorted(run("git", "diff", "--cached", "--name-only", cwd=sc).split())))
+        arm("a placed repeat with no --pieces is refused before any write", "a repeat takes --pieces <n>",
+            lambda: read_placed_build_args(["zNoCount", "--request", "3f9c2a7d01be", "--playbook", "p.md"]))
+        arm("a placed patch whose README exists is refused", "already exists, so nothing was written",
+            lambda: _read_placed_fm("zFixPatch", ["--request", "3f9c2a7d01be", "--origin", "aFoo"]))
 
 
     # ---------------------------------------------------- the example family (TOOL-dDerivedDocket-51)
@@ -9375,7 +9570,7 @@ def check_folder_slots(root: str, conf: dict, slug: str) -> dict:
     tracked = extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m)
     bound = set()
     try:
-        bound, exempt, _pin = read_contract_rows(root, conf)
+        bound, exempt = read_contract_rows(root, conf)
         if rel not in bound and rel not in exempt:
             out["mine"].append(("registry", f"{m}/{CONTRACT_REGISTRY} names neither a bound nor an "
                                             f"exempt row for `{rel}`"))
@@ -9620,13 +9815,13 @@ def main(argv: list) -> int:
         return cmd_selftest()
     if mode not in ("--check", "--write", "--write-staged", "--check-format", "--print-bindings", "--survey",
                     "--check-asbuilt",
-                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
+                    "--report", "--bump", "--asks", "--new-build", "--placed-build", "--new-spec", "--doctor",
                     "--check-coverage"):
         print("usage: gen_build_index.py "
               "[--check [--staged|--with-verdicts]|--write|--write-staged|--check-coverage [--staged]|"
               "--check-asbuilt [--staged]|"
               "--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
+              "--print-bindings|--asks|--new-build|--placed-build|--new-spec|--doctor|--selftest]")
         return 2
     # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
     # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
@@ -9688,6 +9883,8 @@ def main(argv: list) -> int:
     try:
         if mode == "--new-build":
             return cmd_new_build(root, conf, read_new_build_args(argv[2:]))
+        if mode == "--placed-build":
+            return cmd_placed_build(root, conf, read_placed_build_args(argv[2:]))
         if mode == "--new-spec":
             return cmd_new_spec(root, conf, read_new_spec_args(argv[2:]))
         if mode == "--check-format":

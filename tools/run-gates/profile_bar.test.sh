@@ -19,7 +19,9 @@
 set -u
 
 # 40: the interim-verdict arm added one executed assertion (TOOL-dDerivedDocket-26 and -23's verbs).
-FLOOR_ASSERTIONS=40
+# 40 -> 43, TOOL-dWitnessedBar-30: arm 9p's three, the POSIX arm of check_quiet. Not gated. Counted by
+# reading; this pass runs no suite.
+FLOOR_ASSERTIONS=43
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
@@ -306,6 +308,45 @@ print(p.check_quiet()[0])
 PYEOF
 )
 chk $(case "$QS" in true|false|unverified) echo 0 ;; *) echo 1 ;; esac)     "quiet arm: live state '$QS' outside the closed set"
+
+# ------------- arm 9p: the POSIX arm keeps the liveness assertion. TOOL-dWitnessedBar-30 AC6.
+# PATH emptied inside the child, so no PowerShell resolves on any host and the `ps` arm is the one
+# taken; a stub `ps` answers through the injected runner. Rows that omit this process's own pid read
+# `unverified`, and the runner's argv proves it was `ps` that was asked. The two controls are what make
+# that a refusal rather than an arm that answers `unverified` to everything: its own row beside a
+# foreign bar reads `false`, and its own row alone reads `true`.
+QP=$("$PY" - <<'PYEOF'
+import os, sys
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+os.environ["PATH"] = ""
+me, asked = os.getpid(), []
+
+
+class Ps:
+    returncode = 0
+
+    def __init__(self, stdout):
+        self.stdout = stdout
+
+
+def stub(rows):
+    def run(argv, **_kw):
+        asked.append(argv[0])
+        return Ps(rows)
+    return run
+
+
+rg_kit = "run-gates"  # the runner kit, named once
+omit = p.check_quiet(_runner=stub("4242 bash tools/%s/run-gates.sh\n4243 sleep 1\n" % rg_kit))[0]
+print("omit=%s:%s" % (omit, asked[-1]))
+print("foreign=%s" % p.check_quiet(_runner=stub("%d python x\n4242 bash run-gates.sh\n" % me))[0])
+print("alone=%s" % p.check_quiet(_runner=stub("%d python x\n4243 sleep 1\n" % me))[0])
+PYEOF
+)
+chk $(printf '%s\n' "$QP" | grep -qx 'omit=unverified:ps' && echo 0 || echo 1)     "quiet posix arm: rows omitting its own pid read '$QP', expected unverified from ps"
+chk $(printf '%s\n' "$QP" | grep -qx 'foreign=false' && echo 0 || echo 1)     "quiet posix arm: its own row beside a foreign bar read '$QP', expected false"
+chk $(printf '%s\n' "$QP" | grep -qx 'alone=true' && echo 0 || echo 1)     "quiet posix arm: its own row alone read '$QP', expected true"
 
 # ---------------------------- arm 10: the packing invariant refuses an impossible wall clock
 # Wall cannot be below the ideal its own durations imply. Reached directly rather than through a run,

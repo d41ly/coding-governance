@@ -596,7 +596,7 @@ def derive_legs_path(root):
     return cands[0], ("" if rel == "." else rel)
 
 SEC = r"^## %s\.[^\n]*\n(.*?)(?=\n## |\Z)"
-TICK = re.compile(r"`([^`\n]+)`")
+# `TICK`, a backticked token, sits in the `acceptance_reader` block beside `extract_acceptance`.
 CITE = re.compile(r"`([^`\s]+\.[A-Za-z0-9]+):(\d+)(?:-\d+)?`")
 CITE_TAIL = re.compile(r":\d+(-\d+)?$")
 # A shell source command, `.` or `source` at a command position — a line or code-span start, after a
@@ -625,7 +625,7 @@ LEG_LINE = re.compile(r"^[\s]*(`[^`\n]+`[\s]*[·,]?[\s]*)+\.?[\s]*$")
 # EVERY READ BELOW FOLDS CRLF TO LF (TOOL-aMeteredSweep-1). The heading patterns anchor at `$`, so a
 # spec checked out with CRLF, which core.autocrlf=true does on a Windows node, matched no section
 # heading and every join over it read as an empty spec rather than failing.
-GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
+# `GATES_HEAD` sits in the `arm_walk` block beside `extract_gates`, which reads it.
 # The dated demand, the owner's ruling on this unit's fork. From this date a LIVE spec that CARRIES a
 # Gates heading must contribute at least one graded leg name from it. The heading precondition is the
 # whole of the Tier-1 accommodation: under the light profile a spec may legally omit the section, and
@@ -646,8 +646,8 @@ GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
 # the floor excludes TODAY is derived and printed on every run, never typed.
 BROAD_LEG_FLOOR = 5
 # The acceptance section by HEADING TEXT, the shape GATES_HEAD already has and for the same reason:
-# a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
-AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
+# a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth. `AC_HEAD` sits in the
+# `acceptance_reader` block beside `extract_acceptance`.
 # A criterion LABEL in any of the three forms the spec template admits (`- **AC1** — `, `- AC1. `,
 # `**AC1** `): the label regex of the hygiene gate's acceptance-witness check, ported, so the covers
 # join and that check agree on which criteria a spec defines (TOOL-aMendedFleet-75).
@@ -930,6 +930,12 @@ def extract_section(text, num):
     return m.group(1) if m else ""
 
 
+# >>> arm_walk -- canonical copy: check-spec-tokens.py in the gov tools dir (byte-identical; gated)
+# The Gates section by its heading text and its `New arm:` lines: `seen_red.py` in the memory-tree kit
+# carries this block inline, and `resolve-python.test.sh`'s parity table reds a copy that drifts.
+GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
+
+
 def extract_gates(text):
     """Section 7 by its HEADING TEXT, never by its ordinal.
 
@@ -950,6 +956,30 @@ def extract_gates(text):
     return rest[:nxt.start()] if nxt else rest
 
 
+def scan_arm_lines(gates):
+    """`gates`' `New arm:` lines, `gates` a Gates section `extract_gates` returned, each joined with its
+    indented continuation lines into one string: a line opening `New arm:` starts an arm, an indented
+    non-blank line continues the open one, and any other line closes it (TOOL-dWitnessedBar-51 S20)."""
+    arms, cur = [], None
+    for line in gates.splitlines():
+        if line.startswith("New arm:"):
+            cur = [line.strip()]
+            arms.append(cur)
+        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
+            cur.append(line.strip())
+        else:
+            cur = None
+    return [" ".join(arm) for arm in arms]
+# <<< arm_walk
+
+
+# >>> acceptance_reader -- canonical copy: check-spec-tokens.py in the gov tools dir (byte-identical; gated)
+# The acceptance section by its heading text and its backticked tokens: `fix_keeps.py` in the
+# unattended kit carries this block inline, and the parity table reds a copy that drifts.
+TICK = re.compile(r"`([^`\n]+)`")
+AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
+
+
 def extract_acceptance(text):
     """The acceptance section by its HEADING TEXT — `extract_gates` with `AC_HEAD` in its place.
 
@@ -963,6 +993,7 @@ def extract_acceptance(text):
     rest = text[m.end():]
     nxt = re.search(r"^## ", rest, re.M)
     return rest[:nxt.start()] if nxt else rest
+# <<< acceptance_reader
 
 
 def scan_bare_sources(text):
@@ -1701,17 +1732,23 @@ def check_claim_canary():
 
 
 def read_waivers(root):
+    """-> (the waived tokens, each refused row's malformed line), or None for an absent registry. A
+    LEDGER POPULATION keyed by `token` (TOOL-dWitnessedBar-16 S4), read through the memory-tree kit's
+    ledger factory, its token verbatim; a row's reason is the conversion record's or its widen
+    record's, never the row's. A row the factory refuses waives nothing and reds as a stale waiver."""
     p = root / WAIVERS
     if not p.exists():
         return None
-    rows = {}
-    for line in p.read_bytes().decode("utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        tok, _, why = line.partition("\t")
-        rows[tok.strip()] = why.strip()
-    return rows
+    try:
+        kit = str(resolve_kit_dir("memory-tree", "legacy_ledger.py", HERE))
+    except LookupError as exc:
+        print(f"spec-tokens: REFUSING — {WAIVERS} is read through the ledger factory and {exc}")
+        raise SystemExit(2) from None
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import legacy_ledger as LL  # noqa: PLC0415  the factory, found where this install put it
+    rows, bad = LL.read_rows(p, 1, verbatim=(0,))
+    return {key[0] for key in rows}, [LL.render_malformed(entry) for entry in bad]
 
 
 def read_size_ceilings(tooldir, root):
@@ -1770,6 +1807,9 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
     and it reads no line count: the template gate prices bytes only, and so does this."""
     ceiling = answer.value
     hits, stale, held, largest, size, warned = [], [], 0, None, {}, 0
+    # The policy kit's module, on the path since `read_size_ceilings` found it: a warned verdict carries
+    # its `gate-warn` marker line after it (TOOL-dWitnessedBar-29 S2), built by the kit's one factory.
+    import budgets
     for f in specs:
         n = len((root / f).read_bytes().replace(b"\r", b""))
         size[f] = n
@@ -1786,6 +1826,7 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
             else:
                 warned += 1
                 print(f"{verdict.line} · held at its recorded high-water {rec} in {hw_rel}, grown +{n - rec}")
+                print(budgets.render_warn_marker(f, f"{answer.cap} · {n} {answer.unit} over {answer.value}"))
             continue
         if largest is None or n > largest[0]:
             largest = (n, f)
@@ -1798,6 +1839,7 @@ def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
             else:
                 warned += 1
                 print(verdict.line)
+                print(budgets.render_warn_marker(f, f"{answer.cap} · {n} {answer.unit} over {answer.value}"))
     for key in sorted(highwater):
         if not key.startswith("memory/builds/"):
             continue
@@ -1818,18 +1860,9 @@ def read_arm_lines(text):
     gates = extract_gates(text)
     if gates is None:
         return []
-    arms, cur = [], None
-    for line in gates.splitlines():
-        if line.startswith("New arm:"):
-            cur = [line.strip()]
-            arms.append(cur)
-        elif cur is not None and line[:1] in (" ", "\t") and line.strip():
-            cur.append(line.strip())
-        else:
-            cur = None
     read = []
-    for arm in arms:
-        parts = " ".join(arm).split(" · ")
+    for arm in scan_arm_lines(gates):
+        parts = arm.split(" · ")
         read.append((parts[0].removeprefix("New arm:").strip().strip("`"),
                      [fl.strip().split()[1:] for fl in parts if fl.strip().startswith("covers ")]))
     return read
@@ -2378,6 +2411,8 @@ def main(argv):
     hw_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_HIGHWATER_NAME
 
     waivers = read_waivers(root)
+    if waivers is not None:
+        waivers, waiver_bad = waivers
     if waivers is None:
         print(f"spec-tokens: REFUSING — {WAIVERS} is absent; a registry nobody created is a "
               "decision nobody made")
@@ -2541,10 +2576,9 @@ def main(argv):
 
     stale = []
     # Under --spec a row no NAMED spec produces is not stale: some other spec may produce it.
-    for tok, why in (waivers.items() if named_specs is None else ()):
-        if not why:
-            stale.append(("WAIVER", tok, "carries no reason"))
-        elif tok not in seen_waived:
+    stale += [("WAIVER", line, "is not a ledger row, so it waives nothing") for line in waiver_bad]
+    for tok in (sorted(waivers) if named_specs is None else ()):
+        if tok not in seen_waived:
             stale.append(("WAIVER", tok, "no spec produces this hit any more"))
     stale += sz_stale
 

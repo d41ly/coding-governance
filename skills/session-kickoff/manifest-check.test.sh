@@ -5,6 +5,9 @@ set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null   # a runner's core.hooksPath/init.templateDir must not reach the throwaway repos
 CHECK="$(cd "$(dirname "$0")" && pwd)/manifest-check.sh"
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcheck.XXXXXX")
+# FORWARD SLASHES (TOOL-dPlacedRequest-99 S1): MSYS `mktemp` keeps an inherited backslashed TMPDIR, and
+# every card-store plant reds on a backslashed path, an awk escape warning on each read.
+if command -v cygpath >/dev/null 2>&1; then TMP=$(cygpath -m "$TMP"); fi
 trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 # NO SESSION VERSION LEAKS INTO A CARD WRITE (TOOL-aSparedSpawn-11 S6). Every `--card --write` derives
@@ -559,6 +562,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 PYBIN=$(resolve_python) || { echo "manifest-check.test: no usable python"; exit 2; }
 "$PYBIN" - "$R/memory/guides/SESSION-KICKOFF.md" <<'PY'
 import sys
@@ -914,6 +935,9 @@ git clone -q --local "$GOVROOT" "$CCLONE" \
   || { echo "FAIL card fixture: cannot clone $GOVROOT, commit the fixture and add two worktrees under $TMP"; fail=$((fail+1)); }
 CARD_HOME="$CCLONE/.git/orientation"
 CUSER="${USERNAME:-${USER:-}}"
+# The node cell answers GOV_NODE first (TOOL-dPlacedRequest-49 S23), so an ambient one would move every
+# user-matched node row below; the GOV_NODE arm sets it per call.
+unset GOV_NODE
 
 # run_card <name> <repo> <want_exit> <want_grep|-> [args...] — stdout+stderr to $CARD_OUT, stdin
 # from /dev/null so the hook channel is provably empty; `run` cannot serve here because it strips
@@ -950,6 +974,17 @@ MEMORY_ROOT=memory'; do
 done
 rm -f "$TMP/mr/.memory-tree.conf"
 (ROOT="$TMP/mr" read_memory_root >/dev/null); check_eq "AC1 ...and returns 1 for a tree with no conf" "1" "$?"
+# TOOL-dPlacedRequest-56 AC7 AC8 — the `claims —` cell's skip line, staged by a FILE where the parent of
+# CARD_DIR should be, so `mkdir -p` refuses on every node; a mode-bit stage leaves the directory
+# creatable under Git Bash on NTFS. The stage is asserted to take before any cell is judged (S8), and
+# the skip returns before `run_driver_bounded`, so no driver stub is needed. CARD_DIR is derived from
+# the git common dir in the checker, so the case sets it in this shell after the eval.
+eval "$(awk '/^derive_claims_line\(\) \{/,/^}$/' "$CHECK")"
+s=$(mktemp -d "$TMP/dcl.XXXXXX"); : > "$s/f"; CARD_DIR="$s/f/sub"
+if mkdir -p "$CARD_DIR" 2>/dev/null; then echo "FAIL DPR56 AC8 the scratch-directory stage did not take"; fail=$((fail+1))
+else check_eq "DPR56 AC7 derive_claims_line skips the cell when no scratch directory can be made under CARD_DIR" \
+  "claims — skipped: no scratch directory under $CARD_DIR to capture the read in" "$(derive_claims_line write 2>/dev/null)"; fi
+unset CARD_DIR
 
 # Two fixture registries. REG1: the Remote column repeats the user on EVERY row (a row-wide match
 # hits all three), the matching Machine/user cell is BACKTICKED (equality after stripping), one
@@ -1071,6 +1106,23 @@ check_eq "AC4 node — a registry path that is not a file is UNKNOWN, and the ca
 write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md"
 run_card "AC4 --card --write with no registry key" "$CWT" 0 - --card --write --session "$NONCE-t4d"
 check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node — UNKNOWN: no registry" "$(read_cell node "$NONCE-t4d")"
+# TOOL-dPlacedRequest-49 AC23 — GOV_NODE first: naming row `q` under row `p`'s user, the cell names `q`,
+# where a cell reading the user alone names `p`; naming no row, the cell is UNKNOWN and says so.
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG1.md"
+GOV_NODE=q USERNAME=someone-else run_card "DPR49 AC23 --card --write with GOV_NODE=q under row p's user" "$CWT" 0 - --card --write --session "$NONCE-t23a"
+check_eq "DPR49 AC23 node — GOV_NODE names row q, not the user's row p" "node — q · $CUSER" "$(read_cell node "$NONCE-t23a")"
+# TOOL-dPlacedRequest-99 S2 — the resolver arm TOOL-dPlacedRequest-43 S20 owed: the user is case-folded,
+# so USERNAME spelled upper case still names row q's user and its tag, never UNKNOWN. Staged against the
+# case-sensitive compare, the cell reads UNKNOWN. GOV_NODE stays unset, as the block above leaves it.
+USERNAME="${CUSER^^}" run_card "TOOL-dPlacedRequest-99 S2 --card --write with USERNAME upper-cased" "$CWT" 0 - --card --write --session "$NONCE-t99a"
+check_eq "TOOL-dPlacedRequest-99 S2 node — an upper-cased USERNAME resolves row q's tag, not UNKNOWN" "node — q · $CUSER" "$(read_cell node "$NONCE-t99a")"
+GOV_NODE=w USERNAME=someone-else run_card "DPR49 AC23 --card --write with a GOV_NODE no row carries" "$CWT" 0 - --card --write --session "$NONCE-t23b"
+check_eq "DPR49 AC23 node — a GOV_NODE naming no row is UNKNOWN with the reason" "node — UNKNOWN: GOV_NODE w names no Tag cell in REG1.md" "$(read_cell node "$NONCE-t23b")"
+printf '## Node registry\n\n| Tag | Machine/user |\n|-----|--------------|\n| `q` | one |\n| `q` | two |\n' > "$CWT/REG3.md"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG3.md"
+GOV_NODE=q run_card "DPR49 AC23 --card --write with GOV_NODE=q over two rows tagged q" "$CWT" 0 - --card --write --session "$NONCE-t23c"
+check_eq "DPR49 AC23 node — a GOV_NODE two Tag cells carry is UNKNOWN, never the first" "node — UNKNOWN: 2 Tag cells in REG3.md read GOV_NODE q" "$(read_cell node "$NONCE-t23c")"
+rm -f "$CWT/REG3.md"
 
 # AC5 — replay: the playbook kit's instruction map (PLAY-dOrderedCharter-4), the stored bytes, one
 # `now —` line, the file untouched; a missing card is written fresh under the replay's own name, node
@@ -1343,7 +1395,9 @@ run_card "map block: no module replays at exit 0" "$R" 0 - --card --replay --ses
 check_replay "map block: no module" t79a "map — skipped: no playbook instruction map resolves in this tree"
 mkrepo mapcell; mp_kit=playbook; mp_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
 mp_two=$'[AGENTS.md · Level 0 · a stub map]\n[/AGENTS.md]'
-printf 'print("[AGENTS.md · Level 0 · a stub map]")\nprint("[/AGENTS.md]")\n' > "$mp_mod"
+# The stub prints for the `map` verb alone: a card write calls the `pockets` verb of the same module
+# (TOOL-dPlacedRequest-9 S4), and a stub printing for any argv would land its lines in that section.
+printf 'import sys\nif sys.argv[1:2] == ["map"]:\n    print("[AGENTS.md · Level 0 · a stub map]")\n    print("[/AGENTS.md]")\n' > "$mp_mod"
 commit_all "$R" "the stub instruction map"
 run_card "map block: the startup writer over a stub map" "$R" 0 - --card --write --session "$NONCE-t79b"
 check_eq "map block: the startup writer prints no map — line and no envelope line" "0" "$(grep -cE '^(map — |\[)' "$CARD_OUT")"
@@ -1360,6 +1414,33 @@ export CARD_MAP_BOUND=1
 run_card "map block: a map past the bound replays at exit 0" "$R" 0 - --card --replay --session "$NONCE-t79b"
 check_replay "map block: a map past the bound" t79b "map — skipped: the map did not answer within 1s"
 unset CARD_MAP_BOUND
+
+# TOOL-dPlacedRequest-9 AC5 — the card's `## pockets` section over a stub `pockets` verb the resolver finds
+# as the repo's one tracked `instruction_units.py`: the section sits immediately above `recent —` and the
+# room the verb is handed is the cap less the card's other parts, which the stub prints back; a stub that
+# exits 2 is one `pockets — skipped:` line in the section's place, and the card still writes. Staged red
+# by a stub that exits 2 under the first arm. WHAT THIS DOES NOT CHECK: the real verb's fit, which the
+# step's own `card` and `card-cap` fixture cases observe.
+mkrepo pockcell; pk_mod="$R/$mp_kit/instruction_units.py"; mkdir -p "$R/$mp_kit"
+printf 'import sys\nif sys.argv[1:2] == ["pockets"]:\n    print("## pockets")\n    print("- room " + sys.argv[sys.argv.index("--room") + 1])\n' > "$pk_mod"
+commit_all "$R" "the stub pockets verb"
+run_card "pockets: a card over a stub pockets verb" "$R" 0 - --card --write --session "$NONCE-t81a"
+pk_card="$R/.git/orientation/$NONCE-t81a.md"
+check_eq "pockets: the section sits immediately above recent —, handed the room the cap leaves" \
+  "## pockets|- room $(( 8192 - $(grep -v -e '^## pockets$' -e '^- room [0-9]*$' "$pk_card" | wc -c | tr -d '[:space:]') ))|recent —" \
+  "$(awk '/^## pockets$/{f=1} f{print} /^recent —/{exit}' "$pk_card" | tr '\n' '|' | sed 's/|$//')"
+printf 'import sys\nprint("pockets: refused · a stub refusal")\nsys.exit(2)\n' > "$pk_mod"
+run_card "pockets: a refusing verb still writes the card" "$R" 0 - --card --write --session "$NONCE-t81b"
+check_eq "pockets: the refusal is one skipped: line, immediately above recent —" \
+  "pockets — skipped: pockets: refused · a stub refusal|recent —" \
+  "$(awk '/^recent —/{print prev "|" $0; exit} {prev=$0}' "$R/.git/orientation/$NONCE-t81b.md")"
+printf 'import time\ntime.sleep(5)\n' > "$pk_mod"
+export CARD_POCKETS_BOUND=1
+run_card "pockets: a verb past the bound still writes the card" "$R" 0 - --card --write --session "$NONCE-t81c"
+check_eq "pockets: a verb past the bound is one skipped: line naming the bound" \
+  "pockets — skipped: the pockets verb did not answer within 1s" \
+  "$(grep -m1 '^pockets — ' "$R/.git/orientation/$NONCE-t81c.md")"
+unset CARD_POCKETS_BOUND
 
 # PLAY-dOrderedCharter-11 S5 — the injected load points measured at a card write: the playbook kit's
 # load_sets.py, found in gov as the checker finds every sibling and copied beside the fixture's root, over
@@ -1543,10 +1624,13 @@ printf 'nothing here\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && ba
 [ "$got" = 1 ] && grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 AC3 a token-free body is DEAD PROBE, exit 1"; pass=$((pass+1)); } \
   || { echo "FAIL K2 AC3 a token-free body is DEAD PROBE, exit 1 (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_card_unchanged "K2 AC3 the card is byte-identical after DEAD PROBE"
-# AC4 — the cap, forced to the card's own size plus a few bytes so any body that grows the card
-# overflows it; a no-READY body, because a real one replaces the tail and can shrink the card.
+# AC4 — the cap, forced to the card's own size plus a few bytes; a no-READY body, because a real one
+# replaces the tail and can shrink the card. Since TOOL-dPlacedRequest-9 an append refits the card's
+# `## pockets` section to the room the body leaves, so a short body now lands; this body is padded
+# past the card's own size, so the card's other parts pass the cap with no section at all.
 k2cap=$(( $(wc -c < "$K2CARD" | tr -d '[:space:]') + 8 ))
-printf '## open\n- `AGENTS.md:1`\n' | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+k2pad=$(printf '%*s' "$k2cap" '' | tr ' ' x)
+printf '## open\n- `AGENTS.md:1`\n%s\n' "$k2pad" | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 2 ] && grep -qE "the card would be [0-9]+ bytes, [0-9]+ over the $k2cap-byte cap" "$CARD_OUT" \
   && { echo "ok   K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage"; pass=$((pass+1)); } \
   || { echo "FAIL K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -2080,6 +2164,60 @@ check_eq "AGH2 AC6 HEAD, every branch and every remote-tracking ref are unchange
 check_eq "AGH2 AC6 liveness: the read reached the remote, its seven claims are in the driver's private cache and nowhere else" \
   "7" "$(git -C "$CCLONE" for-each-ref refs/gov/ | grep -c .)"
 
+# TOOL-dPlacedRequest-1 AC15 AC18 — a LEASE row beside seed_claim's legacy rows: a build lease of tLease
+# whose fleet-tag is `a` and whose node is n2, and the legacy zLive whose node is n1. The driver prints
+# field 2 as the lease's fleet tag and the legacy claim's node, five fields each, and `--with-key` keys
+# the lease over refs/gov/leases/tLease/build, never over the runs namespace. RED against a reader
+# printing the node of a lease, or a key derived over refs/gov/runs/tLease. The lease is removed after,
+# so every count below is the seven legacy claims'.
+seed_lease() { # slug · fleet tag
+  local b c
+  b=$(date -u -d "@$CLNOW" +%Y-%m-%dT%H:%M:%SZ)
+  printf -v c 'gov-claim %s/build\n\nslug: %s\nnode: n2\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: live\nlease-utc: %s\nbeat-utc: %s\nepoch: 1\nkind: build\nfleet-tag: %s\nrenews: no\nwitness: -\noffer: -\noffer-deadline: -\nlast-fetch: -\n' "$1" "$1" "$b" "$b" "$2"
+  c=$(printf '%s' "$c" | GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test git -C "$CLB" commit-tree "$CLET") \
+    && git -C "$CLB" update-ref "refs/gov/leases/$1/build" "$c"
+}
+seed_lease tLease a
+cl_two=$(cd "$CWT" && bash "$CLDRV" --claims 2>/dev/null | awk -F'\t' '$1 == "tLease" || $1 == "zLive" { print $1 " " NF " " $2 }' | tr -d '\r' | sort | tr '\n' ' ')
+check_eq "DPR1 AC15 the lease row's field 2 is its fleet tag and the legacy row's its node, five fields each" \
+  "tLease 5 a zLive 5 n1 " "$cl_two"
+cl_lk=$(cd "$CWT" && bash "$CLDRV" --claims --with-key 2>/dev/null | awk -F'\t' '$1 == "tLease" { print NF " " $6 }' | tr -d '\r')
+cl_sha=$(git -C "$CLB" rev-parse refs/gov/leases/tLease/build)
+cl_py=$(cd "$CWT" && resolve_python 2>/dev/null)
+cl_ck=$(ROOT="$CWT" MC_DIR="${CHECK%/*}" resolve_kit_file loop claims.py)
+cl_want=$(cd "$CWT" && printf 'refs/gov/leases/tLease/build@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
+cl_runs=$(cd "$CWT" && printf 'refs/gov/runs/tLease@%s\trunstate=?\n' "$cl_sha" | "$cl_py" "$cl_ck" key --stdin 2>/dev/null | tr -d '\r')
+check_eq "DPR1 AC18 the lease row is six fields keyed over refs/gov/leases/tLease/build, never the runs namespace" \
+  "6 $cl_want differs" "$cl_lk $([ "$cl_want" != "$cl_runs" ] && echo differs)"
+git -C "$CLB" update-ref -d refs/gov/leases/tLease/build
+git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/leases/ | git -C "$CCLONE" update-ref --stdin
+
+# TOOL-dPlacedRequest-16 AC15 — two `released` claims beside the seven, a build lease handed over at a
+# run's end: sRel first seen two hours ago and rRelOld three days ago, each sighting planted in the
+# clone's change feed, the driver's observer clock. The cell counts nine, ranks sRel among the
+# `terminal` rows and hides rRelOld past CARD_CLAIMS_HIDE_S, and never reads `skipped:`. RED against a
+# card whose verdict set omits `released`: the whole cell reads skipped. Both are removed after, so
+# every count below is the seven legacy claims'.
+seed_claim sRel released 7200; seed_claim rRelOld released 259200
+for cl_r in "sRel 7200" "rRelOld 259200"; do
+  cl_s=$(awk -F'\t' '$1 ~ /^[0-9]+$/ { s = $1 } END { print s + 1 }' "$CCLONE/.git/gov-feed.log" 2>/dev/null)
+  printf '%s\trefs/gov/runs/%s\truns\t%s\t%s\t%s\n' "${cl_s:-1}" "${cl_r%% *}" "$CLET" "$(git -C "$CLB" rev-parse "refs/gov/runs/${cl_r%% *}")" \
+    "$(date -u -d "@$((CLNOW - ${cl_r#* }))" +%Y-%m-%dT%H:%M:%SZ)" >>"$CCLONE/.git/gov-feed.log"
+done
+run_card "DPR16 AC15 --card --write over nine claims, two released" "$CWT" 0 "claims — 9 on the remote · " --card --write --session "$NONCE-c16"
+cl_cell=$(read_claims_cell "$NONCE-c16")
+cl_nold=0; cl_nskip=0
+mapfile -t cl_lines <<<"$cl_cell"
+for cl_l in "${cl_lines[@]}"; do
+  if [[ $cl_l == *rRelOld* ]]; then cl_nold=$((cl_nold + 1)); fi
+  if [[ $cl_l == *skipped:* ]]; then cl_nskip=$((cl_nskip + 1)); fi
+done
+check_eq "DPR16 AC15 sRel's row reads released, a terminal-rank row beside it, rRelOld hidden, no skipped line" \
+  "  sRel · n1 · released · beat Ns · released · key K|terminal|0|0" \
+  "$(printf '%s\n' "$cl_cell" | grep -m1 '^  sRel · ')|$(printf '%s\n' "$cl_cell" | grep -A1 '^  sRel · ' | tail -1 | sed -E 's/.* · ([a-z]+) · key K$/\1/')|$cl_nold|$cl_nskip"
+git -C "$CLB" update-ref -d refs/gov/runs/sRel; git -C "$CLB" update-ref -d refs/gov/runs/rRelOld
+git -C "$CCLONE" for-each-ref --format='delete %(refname)' refs/gov/remote/runs/sRel refs/gov/remote/runs/rRelOld | git -C "$CCLONE" update-ref --stdin
+
 # AC10 and S7 — the replay reads no remote: with the remote broken, the stored head prints
 # unchanged, and a replay that finds no card writes one whose cell made no read.
 git -C "$CCLONE" remote set-url origin "$TMP/nope.git"
@@ -2137,6 +2275,16 @@ run_card "DL56 AC5 --card --write over a driver printing five fields" "$CWT" 0 \
   "claims — 1 on the remote · 1 shown · 0 hidden" --card --write --session "$NONCE-c56"
 check_eq "DL56 AC5 the five-field row is placed and its key prints -" \
   "  zFive · n1 · live · beat 60s · live · key -" "$(grep -m1 '^  zFive · ' "$CARD_HOME/$NONCE-c56.md" 2>/dev/null)"
+git -C "$CWT" checkout -q -- "$CLDRV_REL"
+
+# TOOL-dPlacedRequest-52 AC19 — the skip signal: a driver whose own `--claims` prints `FAILED: boom` and
+# exits 125 reaches the failure branch and its first line, never a skip with an empty or stale reason;
+# AGH2 AC3 below holds the true skip, no .unattended.conf, to its reason. RED against callers that
+# read rc 125 alone: the cell prints `claims — skipped: ` and whatever CARD_REF_WHY last held.
+printf '%s\n' '#!/bin/sh' '[ "$1" = --claims ] || exit 0' 'echo "FAILED: boom"' 'exit 125' > "$CLDRV"
+run_card "DPR52 AC19 --card --write over a driver whose --claims exits 125" "$CWT" 0 - --card --write --session "$NONCE-c52"
+check_eq "DPR52 AC19 the driver's own 125 prints its first line, not a skip reason" \
+  "claims — skipped: FAILED: boom" "$(grep -m1 '^claims — ' "$CARD_HOME/$NONCE-c52.md" 2>/dev/null)"
 git -C "$CWT" checkout -q -- "$CLDRV_REL"
 
 # AC11 — ten kept claims, nine terminal ones and a live one whose slug sorts last: exactly
@@ -2204,7 +2352,8 @@ rm -f "$CWT/.unattended.conf"; unset CARD_OVERLAP_BOUND CARD_CLAIMS_BOUND
 # The log is the card clone's own `<common-dir>/health.log`, seeded here and removed after; nothing
 # else in this suite writes one. Stamps count back from one clock read: two events an hour old, one
 # thirty hours old (outside the 24-hour window), and one line of three fields. The cell is read as
-# the line DIRECTLY ABOVE `recent —`, the position the startup split needs. WHAT THIS DOES NOT CHECK:
+# the line DIRECTLY ABOVE the `## pockets` section, or above `recent —` where the card carries none
+# (TOOL-dPlacedRequest-9 S4 puts the section between them), the position the startup split needs. WHAT THIS DOES NOT CHECK:
 # any writer, whose own suite owns its call site, or the BSD `date -r` fallback no node here takes.
 HLOG="$CCLONE/.git/health.log"; HLNOW=$(date -u +%s)
 hl_h1=$(date -u -d "@$((HLNOW - 3600))" +%Y-%m-%dT%H:%M:%S+00:00)
@@ -2212,14 +2361,14 @@ hl_h30=$(date -u -d "@$((HLNOW - 108000))" +%Y-%m-%dT%H:%M:%S+00:00)
 printf '%s\tcheck-wiring\thookspath-set\tcore.hooksPath -> .githooks · mode session\n%s\trun-gates\tretry-passed\tx after a 3s timeout\n%s\treap\ttree-killed\ttarget 1 killed 1 survivors 0 unsignalable 0\n%s\tthree\tfields\n' \
   "$hl_h1" "$hl_h1" "$hl_h30" "$hl_h1" > "$HLOG"
 run_card "AGH8 AC7 --card --write over a seeded health log" "$CWT" 0 - --card --write --session "$NONCE-h7"
-check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above recent —" \
+check_eq "AGH8 AC7 the health — line counts the window, names its kinds and the unreadable line, directly above the pockets section" \
   "health — 2 in the last 24h of 3 logged · check-wiring hookspath-set ×1 · run-gates retry-passed ×1 · 1 unreadable" \
-  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
+  "$(awk '/^(## pockets$|pockets — skipped: |recent —)/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h7.md")"
 rm -f "$HLOG"
 run_card "AGH8 AC8 --card --write with no health log" "$CWT" 0 - --card --write --session "$NONCE-h8"
 check_eq "AGH8 AC8 an absent log reads none recorded on the same line position, never a zero it did not read" \
   "health — none recorded: no health.log in the git common dir" \
-  "$(awk '/^recent —/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h8.md")"
+  "$(awk '/^(## pockets$|pockets — skipped: |recent —)/{print prev; exit} {prev=$0}' "$CARD_HOME/$NONCE-h8.md")"
 
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
@@ -2234,6 +2383,57 @@ printf 'a lone CR (0x0D) here:%bX
 ' "$(printf '\r')" >> "$R/memory/guides/SESSION-KICKOFF.md"
 commit_all "$R" "embed a CR"
 run "C12 a CR byte in the manifest is named" "$R" 1 "the manifest carries a CR byte (0x0D), and a text-mode rewrite silently converts it --"
+
+# ---- TOOL-dPlacedRequest-2: the build card ----------------------------------------------------------
+# First its flag refusals, each exit 2 naming its cause, and the cache path read with no session, in
+# the card clone's worktree. Then card-store.fixture.sh beside this checker, whose plants each build
+# their own scratch repository and bare remote and remove them, so they share nothing with the card
+# clone: the publish and its parented second write (AC2), the follow at a move and at a terminal one
+# (AC4), the lookup on a second clone whose stale cache is not trusted — the failing case — (AC6),
+# R7's refusal of a route to an ended build (AC9) and a terminal follow run twice leaving one record
+# (AC13); and TOOL-dPlacedRequest-33's three, the publish under RUN_CLAIMS off writing no ref and under
+# it on writing one the feed names (its AC1, AC2), no conf, no driver and a driver refusal each named
+# unwritten (its S2), and a driver that never answers bounded (its AC3).
+# A plant counts only when it exits 0 and printed a held line. The fixture is gov's and ships
+# to no adopter (the deployer registry exempts it), so a copy of this suite with no fixture beside
+# its checker says so and runs no fixture arm.
+run_card "TOOL-dPlacedRequest-2 --card --publish with no --build is refused" "$CWT" 2 "--card --publish needs --build <slug>" --card --publish --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --card --follow with no --to is refused" "$CWT" 2 "--card --follow needs --to <state>" --card --follow --build tFix
+run_card "TOOL-dPlacedRequest-2 a --build that is no slug is never joined into a ref" "$CWT" 2 "is not a build slug" --card --lookup --build 'a/b' --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --build on a session verb is refused" "$CWT" 2 "--build is the build card's flag" --card --write --build tFix --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --to off the follow is refused" "$CWT" 2 "--to and --terminal are --card --follow's flags" --card --write --to designing --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 a publish with no session card is refused" "$CWT" 2 "so there is no card to publish" --card --publish --build tFix --session "$NONCE-b1"
+run_card "TOOL-dPlacedRequest-2 --card --path --build prints the build card's cache path" "$CWT" 0 "/orientation/tFix.md" --card --path --build tFix
+cs_fx="${CHECK%/*}/card-store.fixture.sh"
+if [ -f "$cs_fx" ]; then
+  bash "$cs_fx" --plant nosuch > "$TMP/cs.out" 2>&1; cs_rc=$?
+  [ "$cs_rc" = 2 ] && grep -q "^card-store: no case 'nosuch'" "$TMP/cs.out" \
+    && { echo "ok   TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit 2)"; pass=$((pass+1)); } \
+    || { echo "FAIL TOOL-dPlacedRequest-2 card-store.fixture.sh refuses a case it does not hold (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1)); }
+fi
+[ -f "$cs_fx" ] || echo "skip TOOL-dPlacedRequest-2 the card-store plants: no card-store.fixture.sh beside $CHECK, gov's fixture, which ships to no adopter"
+# EVERY PLANT THE FIXTURE HOLDS (TOOL-dPlacedRequest-99 S1), read from its own `--list` rather than a
+# hand list, which gated 8 of its 30 and left the rest to run nowhere; a `--list` exiting non-zero is a
+# named failure, never an empty list, and a liveness row holds the plants run to the count `--list`
+# printed, `grep -c .` over the capture, which counts an empty capture as 0 where `wc -l` reads 1.
+if [ -f "$cs_fx" ]; then
+  cs_ran=0
+  cs_list=$(bash "$cs_fx" --list 2>&1) \
+    || { echo "FAIL TOOL-dPlacedRequest-99 S1 card-store.fixture.sh --list exited non-zero: $cs_list"; fail=$((fail+1)); cs_list=""; }
+  cs_list=${cs_list//$'\r'/}
+  for cs_plant in $cs_list; do
+    TMPDIR="$TMP" timeout 300 bash "$cs_fx" --plant "$cs_plant" > "$TMP/cs.out" 2>&1; cs_rc=$?; cs_ran=$((cs_ran+1))
+    if [ "$cs_rc" = 0 ] && grep -q ' · held$' "$TMP/cs.out" && ! grep -q ' · MISSED$' "$TMP/cs.out"; then
+      echo "ok   TOOL-dPlacedRequest-2 the card-store plant $cs_plant holds"; pass=$((pass+1))
+    else
+      echo "FAIL TOOL-dPlacedRequest-2 the card-store plant $cs_plant (exit $cs_rc)"; sed 's/^/    /' "$TMP/cs.out"; fail=$((fail+1))
+    fi
+  done
+  cs_n=0
+  mapfile -t cs_lines <<<"$cs_list"
+  for cs_l in "${cs_lines[@]}"; do if [ -n "$cs_l" ]; then cs_n=$((cs_n + 1)); fi; done
+  check_eq "TOOL-dPlacedRequest-99 S1 the suite ran every plant --list names" "$cs_n" "$cs_ran"
+fi
 
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
@@ -2283,7 +2483,28 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # the AC8 six-field row (one), counted off the diff; no suite ran in the pass, each probed over a scratch clone.
 # +2: TOOL-dDeclaredLoop-56 AC5's five-field stand-in driver, one run_card and one check_eq, counted off
 # the block; no suite ran in the pass, the card's awk was probed alone over the stand-in's row.
-FLOOR_ASSERTIONS=350
+# +2: TOOL-dPlacedRequest-16 AC15's two `released` seeds, one run_card and one check_eq, counted off the
+# block; no suite ran in the pass, the card's awk was probed alone over nine rows.
+# +6: TOOL-dPlacedRequest-9 AC5's `## pockets` block, three run_card and three check_eq calls, counted off
+# the block; no suite ran in the pass, each card write was probed alone over a scratch fixture.
+# +12: TOOL-dPlacedRequest-2's build card block, its seven run_card calls (six flag refusals and the
+# cache path) and one check per card-store plant (five as counted, though its hand list ran eight, so
+# three rows ran uncounted, left as slack by TOOL-dPlacedRequest-99), counted off the block; the fixture's
+# unknown-case refusal is left uncounted. No suite ran in the pass: each command was run alone, each
+# plant over its own scratch remote.
+# +6: TOOL-dPlacedRequest-49 AC23's GOV_NODE block, three run_card and three check_eq calls, counted off
+# the block; no suite ran in the pass, the three node resolvers were probed alone over the real
+# registry and the cell's three GOV_NODE outcomes over scratch registries.
+# +2: RAISED by TOOL-dPlacedRequest-52 AC19's skip-signal arm, one run_card and one check_eq, counted
+# off the block; no suite ran in the pass, the four callers were probed alone over a stub driver.
+# +1: RAISED by TOOL-dPlacedRequest-56's scratch-directory case (AC7), one check_eq on its green branch
+# (its stage-failed branch counts a failure, never a pass), counted off the block; no suite ran in
+# the pass, the case was probed alone over a scratch slice with its stage taken and with it left.
+# +29: RAISED by TOOL-dPlacedRequest-99 — S1's loop over every plant `--list` prints, 34 where the hand
+# list ran 8, so 26 more ok rows, and its liveness check_eq; S2's upper-cased USERNAME arm, one
+# run_card and one check_eq. Counted off the block; no suite ran in the pass, each plant was run
+# alone by direct CLI.
+FLOOR_ASSERTIONS=408
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

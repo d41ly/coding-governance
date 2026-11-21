@@ -52,9 +52,8 @@ not a meeting.
 One shell call in `<repo>`: `git branch --show-current` · `status --short` · fetch +
 `merge --ff-only <remote>/<default>` (only on the default branch with a clean tree; report if
 it moved) · `rev-parse HEAD` → report as **BASE** (the immutable SHA for diff-scoping, never a
-moving ref). A card opening `orientation —` in context already carries the node tag, tree
-kind, worktree count and recent subjects: consume those, never its branch or BASE (HEAD may
-have moved since). No card → add `git worktree list` when multi-tree.
+moving ref) · `worktree list` when multi-tree. **With a card in context**, `RESUME.md` beside this file
+is the call, the already-oriented path, Step 2b's `## pockets` repair and Step 5's resume act.
 
 If the ff moved the default branch AND the project has a codebase map (manifest-declared, or
 `.codebase-map.conf` at the repo root): run the manifest's map-diff command over
@@ -115,8 +114,8 @@ proceed unaudited and say so in one clause. Relay a version WARN without blockin
 On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a
 flagged §A task instead) and STAGE it; Step 5 commits it after the append: for each file the
 drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
-map ← moved dirs · traps/corrections ← toolchain files), fix or DELETE stale rows, and delete
-dated entries whose prune-when condition now holds.
+map ← moved dirs · traps/corrections ← toolchain files): a `## pockets` fact as `RESUME.md` says; else fix or
+DELETE stale rows, and delete dated entries whose prune-when condition now holds.
 Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the

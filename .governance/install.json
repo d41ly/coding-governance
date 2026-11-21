@@ -71,10 +71,22 @@
       "source": "tools/gate-lint/README.md"
     },
     {
+      "path": "tools/gate-lint/coverage_join.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/coverage_join.py"
+    },
+    {
       "path": "tools/gate-lint/encoding_posture.py",
       "kit": "gate-lint",
       "role": "engine",
       "source": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "path": "tools/gate-lint/eol_class.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/eol_class.py"
     },
     {
       "path": "tools/gate-lint/fork-count.sh",
@@ -87,6 +99,12 @@
       "kit": "gate-lint",
       "role": "engine",
       "source": "tools/gate-lint/kit.toml"
+    },
+    {
+      "path": "tools/gate-lint/legacy_ledger.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/legacy_ledger.py"
     },
     {
       "path": "tools/gate-lint/ps-hygiene.py",
@@ -317,6 +335,12 @@
       "source": "tools/memory-tree/commit_trailers.py"
     },
     {
+      "path": "tools/memory-tree/convert_registry.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/convert_registry.py"
+    },
+    {
       "path": "tools/memory-tree/corpus_ids.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -377,6 +401,12 @@
       "source": "tools/memory-tree/kit.toml"
     },
     {
+      "path": "tools/memory-tree/legacy_ledger.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/legacy_ledger.py"
+    },
+    {
       "path": "tools/memory-tree/marker-contract.test.sh",
       "kit": "memory-tree",
       "role": "engine",
@@ -401,6 +431,12 @@
       "source": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "path": "tools/memory-tree/ratchet.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/ratchet.py"
+    },
+    {
       "path": "tools/memory-tree/routed_commits.py",
       "kit": "memory-tree",
       "role": "engine",
@@ -411,6 +447,12 @@
       "kit": "memory-tree",
       "role": "engine",
       "source": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "path": "tools/memory-tree/seen_red.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/seen_red.py"
     },
     {
       "path": "tools/memory-tree/transition_audit.py",
@@ -561,6 +603,12 @@
       "kit": "pytest-parallel-guardrails",
       "role": "engine",
       "source": "tools/pytest-parallel-guardrails/pyproject-snippet.toml"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/run_level.py",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/run_level.py"
     },
     {
       "path": "tools/runlog/README.md",
@@ -965,12 +1013,6 @@
       "source": "tools/playbook/instruction_units.py"
     },
     {
-      "path": "tools/playbook/instructions-legacy.txt",
-      "kit": "playbook-render",
-      "role": "engine",
-      "source": "tools/playbook/instructions-legacy.txt"
-    },
-    {
       "path": "tools/playbook/instructions.toml",
       "kit": "playbook-render",
       "role": "engine",
@@ -1289,6 +1331,12 @@
       "source": "tools/roles/agents/gov-synthesizer.agent.md"
     },
     {
+      "path": "tools/roles/agents/gov-tester.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-tester.agent.md"
+    },
+    {
       "path": "tools/roles/check_roles.py",
       "kit": "roles",
       "role": "engine",
@@ -1389,6 +1437,12 @@
       "kit": "roles",
       "role": "seed",
       "source": "tools/roles/house/gov-synthesizer.md"
+    },
+    {
+      "path": "tools/roles/house/gov-tester.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-tester.md"
     },
     {
       "path": "tools/roles/house/policy.toml",
@@ -1655,6 +1709,12 @@
       "source": "tools/unattended/commit_trailers.py"
     },
     {
+      "path": "tools/unattended/fix_keeps.py",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fix_keeps.py"
+    },
+    {
       "path": "tools/unattended/fixture-pieces/one/piece.md",
       "kit": "unattended",
       "role": "engine",
@@ -1813,6 +1873,143 @@
     },
     {
       "id": "unattended/review-rounds-to-policy",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "kickoff-manifest/facts-to-overlay",
+      "introduced": null,
+      "state": "applied"
+    },
+    {
+      "id": "govkit/inherited-red-to-verdict-blocks",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "playbook-render/positional-refs-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/curation-debt-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/id-orphan-waiver-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/legacy-files-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/method-carriers-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/readme-contract-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/stale-header-waiver-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/unarmed-branches-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/corpus-path-unresolved-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/orphan-id-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/dead-path-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/row-duplicate-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/record-unbound-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/severity-unlabelled-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "memory-tree/live-row-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "codebase-map/affordance-exempt-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "codebase-map/baseline-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "codebase-map/dossier-decisions-empty-pin-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "drift-audit/drift-pins-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "drift-audit/drift-baselines-to-ledger",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "playbook/adopter-rules-to-overlay-2",
       "introduced": null,
       "state": "applied",
       "via": "witness"

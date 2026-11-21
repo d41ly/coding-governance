@@ -39,7 +39,8 @@ project specifics live in exactly two files the adopting repo owns.
   every time. This reports the SET difference, not a byte diff, because a project is entitled to
   customise its gate — and it states that it cannot tell a deliberate omission from a stale one.
 - `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
-  · --seed-affordances --top N`.
+  [--out <path>] · --seed-affordances --top N`. `--out` writes the grace list to the path the
+  ledger factory's `seed --home` hands it, in place of the map root's.
 
   It writes `generated/inventories.json`, `generated/MAP.md`, `generated/CARDS.md` and, where the
   SYMBOL tier is declared, `generated/symbols.json`. `CARDS.md` holds one card of at most
@@ -85,7 +86,7 @@ project specifics live in exactly two files the adopting repo owns.
   out. A symbol is a SEAM when fan-in plus installs reaches `SEAM_FANIN_THRESHOLD`, here and in
   `gen_map.py --seed-affordances` alike; installs never move the ranking order.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
-- `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
+- `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD · GEN_MAP_PYTHON, the interpreter command `gen_map.py` hands itself to when the extractors need the application's own environment).
 - `selftest.py` — the kit's own contract check (`python <kit>/selftest.py`).
 
 ## Adopt (per project)
@@ -122,7 +123,16 @@ gated, content not); generated artifacts are byte-deterministic (POSIX keys, LF 
 timestamps) so the freshness gate cannot flap across platforms; convergence rides the
 design pass — substantial work touching an undossiered feature creates its dossier then.
 
-The affordance check is graced by a shrink-only `affordance-exempt.toml` (feature names),
+The baseline and the grace list are ledger populations (TOOL-dWitnessedBar-16): `baseline.txt`,
+one row per `<inventory> TAB <key>`, and `affordance-exempt.txt`, one row per graced dossier, each
+under the header its `[[ledger]]` table in this kit's descriptor renders and read through the
+memory-tree kit's ledger factory. A grace list holding no row is its header and the factory's
+`# unarmed · dead probe · <sha>` line, which a fresh scaffold with no section-less dossier is given.
+The affordance check is graced by the shrink-only `affordance-exempt.txt` (feature names),
 seeded from existing dossiers at adoption (`gen_map.py --seed-affordance-baseline`, wired into
 the adopter) so it never retro-reds the fleet; a NEW dossier is never exempt, so new work is
-always forced to record its reuse decision.
+always forced to record its reuse decision. The adopter seeds it through the memory-tree kit's
+`legacy_ledger.py seed --home <list> -- <gen_map.py --seed-affordance-baseline --out {out}>`
+(TOOL-dWitnessedBar-15), which writes it only while it is absent or unarmed, atomically, and prints
+`present` on every later adopt, so a re-adopt never graces a dossier added since. A seed that fails
+leaves one `# unarmed · <reason> · <sha>` line there, and the next adopt seeds it again.

@@ -48,7 +48,7 @@ to = "{prefix}/{relpath}"
 # Machine-scoped: the engine installs ONCE PER MACHINE as a junction outside the target repo, so
 # `apply` writes nothing for it and emits an order instead.
 [[files]]
-include = ["SKILL.md"]
+include = ["SKILL.md", "RESUME.md"]
 role = "engine"
 scope = "machine"
 link = true
@@ -59,7 +59,20 @@ argv = []
 mutates_index = false
 why_no_adopter = "installation is a copy plus a per-machine link; the manifest's own section B is the hole"
 
+# The step that moves the manifest's §B orientation facts into the overlay as level-2 `repo.kickoff.`
+# units the card prints under `## pockets` (TOOL-dPlacedRequest-9 S5). Its argv carries no manifest
+# path: the step reads the `manifest_path` answer itself. `surfaces` is the declared absence: no
+# step-gate class reads a manifest bullet, and the witness is what proves the move. Frozen once landed.
+[[upgrade]]
+id = "kickoff-manifest/facts-to-overlay"
+up = ["python", "{gov}/govkit/steps/kickoff_facts_to_overlay.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/kickoff_facts_to_overlay.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/kickoff_facts_to_overlay.py", "witness", "{target}"]
+surfaces = []
+needs-target = false
+
 [[gate_leg]]
+tag = "leg.kickoff-manifest.kickoff-manifest-ratchet"
 # TOOL-aScouredKit-12. The PATH IS PASSED, because the engine cannot derive it. `manifest-check.sh`
 # resolves the manifest from a hardcoded two-element list and reads MEMORY_ROOT zero times, while
 # the seed above lands at the target-supplied `{manifest_path}` that nothing validates and intake
@@ -68,11 +81,21 @@ why_no_adopter = "installation is a copy plus a per-machine link; the manifest's
 # entry is in the registry's DEFAULT selection. The script already accepts and grades a path as $1.
 name = "kickoff-manifest ratchet"
 subject = "repo"
+purpose = "verifies the kickoff manifest against mechanical signals"
 argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
+precommit = ["bash", "{prefix}/manifest-check.sh", "--staged", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true
 stage = ["step.build", "step.test"]
+
+[gate_leg.gov]
+argv = ["bash", "skills/session-kickoff/manifest-check.sh"]
+precommit = ["bash", "skills/session-kickoff/manifest-check.sh", "--staged"]
+reads = { history = "it asks `rev-list` and `git log` whether a watched file moved since the last audit (TOOL-aSparedSpawn-13 S3)." }
+guard = []
+chunk = "records"
+ceiling = 640
 
 [[hole]]
 id = "manifest-section-b"

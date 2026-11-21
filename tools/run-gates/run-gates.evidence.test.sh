@@ -216,6 +216,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 DC_PY="${PYBIN:-}"
 [ -n "$DC_PY" ] || DC_PY=$(resolve_python 2>/dev/null)
 # NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
@@ -298,7 +316,35 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=272
+FLOOR_ASSERTIONS=317
+# RAISED 316 -> 317 by TOOL-dWitnessedBar-67 on 2026-11-21: the runner's record reader over an unterminated
+# last line, one assertion. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 314 -> 316 by TOOL-dWitnessedBar-65 on 2026-11-21: the runner's record reader over a CRLF verdict
+# line and a repeated key, one assertion each. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 312 -> 314 by TOOL-dWitnessedBar-63 on 2026-11-21: the runner's record reader cut alone, an empty
+# last field kept and a no-TAB line unset. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 311 -> 312 by TOOL-dWitnessedBar-62 on 2026-11-20: the runner's record of an empty-note selection
+# row. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 310 -> 311 by TOOL-dWitnessedBar-60 on 2026-11-20: the post-merge run under an inherited
+# GATE_SELECTION and GATE_BASE_FROM. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 309 -> 310 by TOOL-dWitnessedBar-58 on 2026-11-20: the leg-output and no-.scoped assertion after
+# unit 56's AC8 run. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 304 -> 309 by TOOL-dWitnessedBar-56 on 2026-11-20: the selection's CRLF, ` · ` and ignored-row
+# arm's three, base_from's inherited field's one and the aged staging temps' one. Counted one per
+# `ok … || nope` pair; this pass runs no suite.
+# RAISED 302 -> 304 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-41, whose pass left the
+# floor where it was: its AC1 arm's two. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 297 -> 302 by TOOL-dWitnessedBar-51: the declarative-key quarantine's precondition and two arms,
+# the two-worktree verdict prune's one and keep_tails' fence and cut's one. Counted one per `ok … || nope`
+# pair; this pass runs no suite.
+# RAISED 292 -> 297 by TOOL-dWitnessedBar-42: the every-worktree tail sweep, AC1's one, AC2's two, AC3's
+# one and the two-worktree control's one. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 287 -> 292 by TOOL-dWitnessedBar-40: the per-tree verdict's declines and reuse pair, AC1's two,
+# AC2's two and AC3's one. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 278 -> 287 by TOOL-dWitnessedBar-25: the verdict's run, cause and tail arms, AC1's one, AC2's
+# four, AC3's one, AC4's one and AC5's two. Counted one per `ok … || nope` pair; this pass runs no suite.
+# RAISED 272 -> 278 by TOOL-dWitnessedBar-10: the node-keyed evidence arms, AC8's one, AC7's two,
+# AC9's one, and AC10's two. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 253 -> 270 by TOOL-aNimbleMend-15: the pass-leg rule arms over fixtures F and B, S8's thirteen,
 # S2's one and S3's three. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 270 -> 272 by a further pass of the same unit: the two absent-manifest arms of --check.
@@ -655,6 +701,258 @@ else
   nope "the control failed: the linked worktree's run stamped nothing, so the sharing arms prove nothing"
 fi
 rm -rf "$REC_T.wt"; rec_done
+
+# --- TOOL-dWitnessedBar-4 AC1-AC3: the runner's verdict per tree ------------------------------------
+# A full green writes `<common-dir>/gate-verdict/<tree>` reading GREEN, kind full, by runner, and the run
+# record's verdict names the same tree; a red leg rewrites it RED; a dirty start writes none and says
+# why; a scoped run after the full green of the same tree writes the `.scoped` slot and leaves the full
+# one; and a linked worktree's run writes into the COMMON dir, keyed by the tree, never by the sha.
+rec_repo
+rv_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); rv_f="$REC_GD/gate-verdict/$rv_tree"
+rec_run GATE_FULL=1 >/dev/null
+rv_rec=$(rec_dir)/verdict
+[ "$(awk -F'\t' '$1=="verdict"||$1=="kind"||$1=="by"{print $2}' "$rv_f" 2>/dev/null | tr '\n' ' ')" = "GREEN full runner " ] \
+  && [ "$(awk -F'\t' '$1=="tree"{print $2}' "$rv_rec" 2>/dev/null)" = "$rv_tree" ] \
+  && ok "AC1 a full green writes gate-verdict/<tree> reading GREEN, kind full, by runner, and the run record names the tree" \
+  || { nope "AC1 no full per-tree verdict, or the run record names another tree"; sed 's/^/      /' "$rv_f" "$REC_OUT" 2>/dev/null; }
+rec_run GATE_FULL= >/dev/null
+[ "$(awk -F'\t' '$1=="kind"{print $2}' "$rv_f.scoped" 2>/dev/null)|$(awk -F'\t' '$1=="kind"{print $2}' "$rv_f" 2>/dev/null)" = "scoped|full" ] \
+  && ok "AC3 a scoped run after the full green writes the .scoped slot and the full record still reads kind full" \
+  || { nope "AC3 the scoped run overwrote the full record or wrote no .scoped slot"; sed 's/^/      /' "$rv_f" "$rv_f.scoped" 2>/dev/null; }
+rec_legs '[ {"name": "red", "argv": ["bash", "fx/red.sh"]} ]'
+rv_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); rv_f="$REC_GD/gate-verdict/$rv_tree"
+rec_run GATE_FULL=1 >/dev/null
+[ "$(awk -F'\t' '$1=="verdict"{print $2}' "$rv_f" 2>/dev/null)" = RED ] \
+  && ok "AC2 a red leg's full run writes the per-tree verdict reading RED" \
+  || { nope "AC2 a red run wrote no RED per-tree verdict"; sed 's/^/      /' "$rv_f" 2>/dev/null; }
+rm -f "$rv_f"; touch "$REC_T/scratch.tmp"
+rec_run GATE_FULL=1 >/dev/null
+[ ! -e "$rv_f" ] && grep -q 'no per-tree verdict written — the tree was not clean when the run started' "$REC_OUT" \
+  && [ "$(awk -F'\t' '$1=="tree"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)" = - ] \
+  && ok "AC2 a dirty start writes no per-tree verdict, says why, and the run record's tree reads -" \
+  || nope "AC2 a dirty start wrote a per-tree verdict for a tree nobody tested, or said nothing"
+rm -f "$REC_T/scratch.tmp"
+( cd "$REC_T" && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+( cd "$REC_T.wt" && printf 'wt\n' > fx/wt.txt && git add fx/wt.txt && git commit -qm wt ) >/dev/null 2>&1
+rv_wtree=$(git -C "$REC_T.wt" rev-parse 'HEAD^{tree}'); rv_wsha=$(git -C "$REC_T.wt" rev-parse HEAD)
+( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 \
+    bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+rv_wgd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
+[ -f "$REC_GD/gate-verdict/$rv_wtree" ] && [ ! -e "$rv_wgd/gate-verdict" ] && [ ! -e "$REC_GD/gate-verdict/$rv_wsha" ] \
+  && ok "AC1 a linked worktree's run writes gate-verdict/<tree> in the common dir, not its own git dir, and keys it by the tree" \
+  || nope "AC1 the linked worktree's per-tree verdict is missing from the common dir, written under its own git dir, or keyed by the sha"
+rm -rf "$REC_T.wt"; rec_done
+
+# --- TOOL-dWitnessedBar-41 AC1: the per-tree verdict carries the selection its run held legs by ------
+# A full run under a GATE_SELECTION holding one `quarantine` row for `guarded`, beside `one` which runs,
+# writes `selection.1` naming the held leg and a `selection` equal to `git hash-object` of the canonical
+# text, its `held` rows alone; with no GATE_SELECTION the record reads `selection none`. The file sits
+# OUTSIDE the clone, since an untracked file inside it starts the run dirty and no per-tree verdict is
+# written. Red against a writer that drops the `selection` keys.
+rec_repo
+sl_f="$REC_GD/gate-verdict/$(git -C "$REC_T" rev-parse 'HEAD^{tree}')"; sl_sel="$REC_T.sel"
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ "$(awk -F'\t' '$1=="selection.1"{sub(/^[^\t]*\t/, ""); print}' "$sl_f" 2>/dev/null)" = $'guarded\tquarantine\tTOOL-x-7' ] \
+  && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-41 AC1 a run under a one-row selection writes selection.1 naming the held leg and selection as the hash of its canonical text" \
+  || { nope "TOOL-dWitnessedBar-41 AC1 the per-tree verdict omits the selection, or its hash is not the canonical text's"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+rec_run GATE_FULL=1 >/dev/null
+[ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = none ] \
+  && [ -z "$(awk -F'\t' '$1=="selection.1"' "$sl_f" 2>/dev/null)" ] \
+  && ok "TOOL-dWitnessedBar-41 AC1 with no GATE_SELECTION the per-tree verdict reads selection none and no selection.1" \
+  || { nope "TOOL-dWitnessedBar-41 AC1 a run with no GATE_SELECTION did not write selection none"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+# TOOL-dWitnessedBar-56 AC1 AC2: a CRLF selection whose one accepted row's note holds ` · `, beside a
+# three-field row and a row whose source is `bogus`. The accepted row is written as four TAB fields, the
+# hash is the LF canonical text of that row alone, the two others are counted as `selection_ignored`, and
+# the LF twin holding the accepted row alone yields the same `selection`. Red against a writer joining
+# `selection.<n>` with ` · `, or one hashing an ignored row.
+printf '# planted\r\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\r\nheld\tone\tquarantine\r\nheld\tone\tbogus\tnote\r\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+sl_got=$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)
+[ "$(awk -F'\t' '$1=="selection.1"{print NF}' "$sl_f" 2>/dev/null)" = 4 ] && [ "$sl_got" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-56 AC1 a CRLF row whose note holds ' · ' is written as four TAB fields and hashed as its LF canonical text" \
+  || { nope "TOOL-dWitnessedBar-56 AC1 selection.1 is not four TAB fields, or selection is not the LF canonical text's hash"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+[ "$(grep -c '^selection\.[0-9]' "$sl_f" 2>/dev/null)|$(awk -F'\t' '$1=="selection_ignored"{print $2}' "$sl_f" 2>/dev/null)" = "1|2" ] \
+  && ok "TOOL-dWitnessedBar-56 AC2 the three-field row and the bogus-source row are left out of the keys and counted as selection_ignored 2" \
+  || { nope "TOOL-dWitnessedBar-56 AC2 an ignored row entered the keys, or selection_ignored does not read 2"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+printf '# planted\nheld\tguarded\tquarantine\tTOOL-x-7 · 3/10\n' > "$sl_sel"
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ -n "$sl_got" ] && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_got" ] \
+  && ok "TOOL-dWitnessedBar-56 AC1 the LF twin of the selection yields the same selection hash" \
+  || nope "TOOL-dWitnessedBar-56 AC1 the LF twin hashed differently from the CRLF file"
+# TOOL-dWitnessedBar-62 AC8 (S13): a `quarantine` row whose note is EMPTY, its last field. The record's
+# `selection.1` keeps the empty field, four TAB fields the last one empty, and its `selection` is the
+# hash of the row's own text. Red against a runner cutting the row with a TAB-IFS `read`, which merges
+# the trailing TAB away and refuses or rewrites the row.
+printf '# planted\nheld\tguarded\tquarantine\t\n' > "$sl_sel"
+sl_want=$(printf 'held\tguarded\tquarantine\t\n' | git hash-object --stdin)
+rec_run GATE_FULL=1 GATE_SELECTION="$sl_sel" >/dev/null
+[ "$(awk -F'\t' '$1=="selection.1"{print NF "|" $2 "|" $3 "|" $4}' "$sl_f" 2>/dev/null)" = "4|guarded|quarantine|" ] \
+  && [ "$(awk -F'\t' '$1=="selection"{print $2}' "$sl_f" 2>/dev/null)" = "$sl_want" ] \
+  && ok "TOOL-dWitnessedBar-62 AC8 an empty-note quarantine row keeps its empty last field in selection.1 and hashes as its own text" \
+  || { nope "TOOL-dWitnessedBar-62 AC8 selection.1 lost the empty note, or selection is not the row's hash"; sed 's/^/      /' "$sl_f" 2>/dev/null; }
+rm -f "$sl_sel"; rec_done
+
+# --- TOOL-dWitnessedBar-25 AC1-AC5: the verdict names its run and cause, and a failing leg's tail is kept by hash
+# One red leg printing 100 numbered lines and a credential-shaped URL, beside a leg printing whether it
+# sees GATE_CAUSE. The verdict carries `run_id` (the header's), `cause` (the export, `attended` unset or
+# refused) and `tail.1`; the tail file is the redacted copy's last 60 lines, named by its blob hash; and
+# the sweep past GATE_RUN_KEEP removes a tail only a swept run named.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'for i in $(seq 1 100); do echo "line $i"; done' \
+  'echo "see https://user:secret@example.com/x"' 'exit 1' > "$REC_T/fx/hundred.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'env | grep -c "^GATE_CAUSE=" || true' 'exit 0' > "$REC_T/fx/cause.sh"
+printf '%s\n' '#!/usr/bin/env bash' 'echo "varied ${FX_N:-0}"' 'exit 1' > "$REC_T/fx/varied.sh"
+rec_legs '[ {"name": "hundred", "argv": ["bash", "fx/hundred.sh"]}, {"name": "cause", "argv": ["bash", "fx/cause.sh"]} ]'
+tl_sha=$(git -C "$REC_T" rev-parse HEAD); tl_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}')
+rec_run GATE_FULL=1 GATE_CAUSE="push:$tl_sha" >/dev/null
+tl_d=$(rec_dir); tl_v="$tl_d/verdict"
+tl_id=$(awk -F'\t' '$1=="run_id"{print $2}' "$tl_d/header" 2>/dev/null)
+[ -n "$tl_id" ] && [ "$(awk -F'\t' '$1=="run_id"{print $2}' "$tl_v" 2>/dev/null)" = "$tl_id" ] \
+  && ok "AC1 the run record's verdict names run_id, the id its header names" \
+  || { nope "AC1 the verdict names no run_id, or another run's"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+[ "$(awk -F'\t' '$1=="cause"{print $2}' "$tl_v" 2>/dev/null)|$(awk -F'\t' '$1=="cause"{print $2}' "$REC_GD/gate-verdict/$tl_tree" 2>/dev/null)" = "push:$tl_sha|push:$tl_sha" ] \
+  && ok "AC2 the verdict and the per-tree verdict both read cause push:<sha>" \
+  || { nope "AC2 the verdict or the per-tree verdict does not read the exported cause"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+[ "$(tr -d '\r\n ' < "$tl_d/1.out" 2>/dev/null)" = 0 ] \
+  && ok "AC2 a leg's own environment holds no GATE_CAUSE" \
+  || nope "AC2 a leg inherited GATE_CAUSE, or the cause leg wrote no output: $(cat "$tl_d/1.out" 2>/dev/null)"
+tl_h=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$tl_v" 2>/dev/null)
+tl_f="$REC_GD/gate-tails/$tl_h"
+[ -n "$tl_h" ] && [ "$(awk -F'\t' '$1=="tail.1"{print $2}' "$tl_v")" = "$tl_h hundred" ] && [ -f "$tl_f" ] \
+  && [ "$(wc -l < "$tl_f")" -eq 60 ] && [ "$(head -n 1 "$tl_f")" = "line 42" ] \
+  && [ "$(git -C "$REC_T" hash-object --stdin < "$tl_f")" = "$tl_h" ] \
+  && ok "AC3 tail.1 names the red leg, and gate-tails/<hash> holds its last 60 lines under its own blob hash" \
+  || { nope "AC3 no tail.1 for the red leg, or its file is not the last 60 lines named by their hash"; sed 's/^/      /' "$tl_v" 2>/dev/null; }
+grep -q '://\*\*\*:\*\*\*@' "$tl_f" 2>/dev/null && ! grep -q 'secret' "$tl_f" 2>/dev/null \
+  && ok "AC4 the tail holds the masked credential and not the secret, so it was cut from the redacted copy" \
+  || nope "AC4 the tail carries the secret, or holds no masked form to prove it was read"
+rec_run GATE_FULL=1 >/dev/null
+tl_unset="$(awk -F'\t' '$1=="cause"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)|$(awk -F'\t' '$1=="cause"{print $2}' "$REC_GD/gate-verdict/$tl_tree" 2>/dev/null)"
+[ "$tl_unset" = "attended|attended" ] \
+  && ok "AC2 with GATE_CAUSE unset the verdict and the per-tree verdict read cause attended" \
+  || nope "AC2 an unset GATE_CAUSE did not read attended: $tl_unset"
+rec_run GATE_FULL=1 GATE_CAUSE=$'push:a\tb' >/dev/null
+[ "$(awk -F'\t' '$1=="cause"{print $2}' "$(rec_dir)/verdict" 2>/dev/null)" = attended ] && grep -q 'GATE_CAUSE refused' "$REC_OUT" \
+  && ok "AC2 a tabbed GATE_CAUSE reads attended and stderr names the refusal" \
+  || { nope "AC2 a malformed GATE_CAUSE reached the record, or nothing named the refusal"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+# AC5: the first run's tail is named by no other run, and two runs are kept: three more red runs, each
+# naming a tail of its own, sweep the first run and its tail with it, and keep every tail a kept run names.
+rec_legs '[ {"name": "varied", "argv": ["bash", "fx/varied.sh"]} ]'
+[ -f "$tl_f" ] && ok "AC5 control: the first run's tail is on disk before the sweep, so its removal is the sweep's" \
+               || nope "AC5 control: the first run's tail was gone before the sweep, so the arm below proves nothing"
+# Every tail is aged past TAIL_GRACE_S before each run (TOOL-dWitnessedBar-42 S4), so the grace keeps
+# none of them and the exact named-equals-on-disk check below still reads the sweep's naming rule.
+for tl_k in 1 2 3; do
+  touch -d '8 days ago' "$REC_GD"/gate-tails/* 2>/dev/null
+  rec_run GATE_FULL=1 GATE_RUN_KEEP=2 FX_N=$tl_k >/dev/null; sleep 1
+done
+tl_named=$(awk -F'\t' '$1 ~ /^tail\.[0-9]+$/ {split($2, a, " "); print a[1]}' "$REC_GD"/gate-run/*/verdict 2>/dev/null | sort -u)
+tl_files=$(ls -1 "$REC_GD/gate-tails" 2>/dev/null | sort -u)
+[ ! -e "$tl_f" ] && [ -n "$tl_named" ] && [ "$tl_named" = "$tl_files" ] \
+  && ok "AC5 the sweep past GATE_RUN_KEEP removed the swept run's tail and kept exactly the tails the kept runs name" \
+  || nope "AC5 a tail outlived every run that named it, or a named tail was removed: named [$tl_named] on disk [$tl_files]"
+rec_done
+
+# --- TOOL-dWitnessedBar-42 AC1-AC3: the tail sweep keeps every worktree's named tails and every fresh one
+# A linked worktree B's red run names a tail, aged past the grace; beside it an aged tail nobody names
+# and a one-minute-old one nobody names. Worktree A then runs past GATE_RUN_KEEP: B's tail and the fresh
+# one survive, the aged unnamed one goes. A red run whose tail is on disk, aged, freshens it and leaves
+# no `tail.*` temp. Red when the sweep reads only RUNROOT, drops the grace, or drops the `touch -c`.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'echo "varied ${FX_N:-0}"' 'exit 1' > "$REC_T/fx/varied.sh"
+rec_legs '[ {"name": "varied", "argv": ["bash", "fx/varied.sh"]} ]'
+( cd "$REC_T" && git worktree add -q "$REC_T.wt" -b side ) >/dev/null 2>&1
+( cd "$REC_T.wt" && env -u GATE_BASE -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES -u GATE_DOCS_BASE GATE_FULL=1 FX_N=b \
+    bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1 )
+wt_gd=$( cd "$REC_T.wt" && git rev-parse --absolute-git-dir 2>/dev/null )
+wt_h=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$wt_gd"/gate-run/*/verdict 2>/dev/null)
+wt_d="$REC_GD/gate-tails"
+printf 'aged\n' > "$wt_d/deadbeef" 2>/dev/null; printf 'fresh\n' > "$wt_d/cafe01" 2>/dev/null
+touch -d '8 days ago' "$wt_d/$wt_h" "$wt_d/deadbeef" 2>/dev/null; touch -d '1 minute ago' "$wt_d/cafe01" 2>/dev/null
+if [ -n "$wt_h" ] && [ -f "$wt_d/$wt_h" ] && [ -f "$wt_d/deadbeef" ]; then
+  ok "AC1 control: B's run names a tail and both aged tails are on disk before A's sweep"
+  for wt_k in 1 2 3; do rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a$wt_k >/dev/null; sleep 1; done
+  [ -f "$wt_d/$wt_h" ] && [ ! -e "$wt_d/deadbeef" ] \
+    && ok "AC1 past GATE_RUN_KEEP in A, the aged tail only B's retained run names survives and the aged unnamed one is removed" \
+    || nope "AC1 B's named tail was swept from A, or an aged unnamed tail outlived the sweep: on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+  [ -f "$wt_d/cafe01" ] \
+    && ok "AC2 a one-minute-old tail no run names survives the sweep" \
+    || nope "AC2 a fresh unnamed tail was swept, so a bar still running elsewhere loses its tail"
+else
+  nope "AC1 control: B's run kept no tail, or the planted tails are missing, so the sweep arms prove nothing"
+fi
+[ "$(grep -c 'TAIL_GRACE_S' "$ROOT/${PFX}${KIT}/run-gates.sh")" -ge 2 ] \
+  && ok "AC2 run-gates.sh spells TAIL_GRACE_S at least twice" \
+  || nope "AC2 run-gates.sh does not declare and read TAIL_GRACE_S"
+wt_a=$(awk -F'\t' '$1=="tail.1"{split($2, a, " "); print a[1]; exit}' "$(rec_dir)/verdict" 2>/dev/null)
+touch -d '8 days ago' "$wt_d/$wt_a" 2>/dev/null
+rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a3 >/dev/null
+[ -n "$wt_a" ] && [ -n "$(find "$wt_d" -maxdepth 1 -name "$wt_a" -mmin -10080 2>/dev/null)" ] \
+  && ! ls -1 "$wt_d" 2>/dev/null | grep -q '^tail\.' \
+  && ok "AC3 a red run re-hashing an aged tail freshens it inside the grace and leaves no tail.* temp" \
+  || nope "AC3 the re-hashed tail kept its old time, or a tail.* temp was left: [$wt_a] on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+# TOOL-dWitnessedBar-56 AC11 (S13): a crashed bar's staging temps, both of `derive_temp_path`'s spellings,
+# aged past the grace, are removed by the next sweep, and a fresh one, a tail in flight, is kept. Red
+# against a sweep that skips every name that is not a hash.
+: > "$wt_d/tail.123456789.tmp"; : > "$wt_d/tail.AbCd1234"; : > "$wt_d/tail.987654321.tmp"
+touch -d '8 days ago' "$wt_d/tail.123456789.tmp" "$wt_d/tail.AbCd1234" 2>/dev/null
+rec_run GATE_FULL=1 GATE_RUN_KEEP=1 FX_N=a4 >/dev/null
+[ ! -e "$wt_d/tail.123456789.tmp" ] && [ ! -e "$wt_d/tail.AbCd1234" ] && [ -f "$wt_d/tail.987654321.tmp" ] \
+  && ok "TOOL-dWitnessedBar-56 AC11 the sweep removes both aged staging temps and keeps the fresh one" \
+  || nope "TOOL-dWitnessedBar-56 AC11 an aged temp outlived the sweep or the fresh one was removed: on disk [$(ls -1 "$wt_d" 2>/dev/null | tr '\n' ' ')]"
+rm -rf "$REC_T.wt"; rec_done
+
+# --- TOOL-dWitnessedBar-40 AC1-AC3: the per-tree verdict's two declines and its reuse pair ----------
+# Over a fixture manifest named by GATE_LEGS: a scoped run in docs mode writes no `.scoped` record and
+# says why, and the same run with the docs base unset writes one; a scoped run told GATE_BASE_FROM=
+# inherited writes none, names the inherited green, and its leg's environment holds no GATE_BASE_FROM;
+# a full green's record carries `reused` and `reused_cache` with the run's counts. Red when the
+# DOCS_BASE guard is removed, a leg inherits the knob, or the record omits either key.
+rec_repo
+printf '%s\n' '#!/usr/bin/env bash' 'echo "base_from_seen $(env | grep -c "^GATE_BASE_FROM=")"' 'exit 0' > "$REC_T/fx/basefrom.sh"
+printf '%s\n' '[ {"name": "basefrom", "argv": ["bash", "fx/basefrom.sh"]} ]' > "$REC_T/fx/legs.json"
+( cd "$REC_T" && git add -A && git commit -qm basefrom ) >/dev/null 2>&1
+dw_tree=$(git -C "$REC_T" rev-parse 'HEAD^{tree}'); dw_f="$REC_GD/gate-verdict/$dw_tree"
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_DOCS_BASE=HEAD >/dev/null
+[ ! -e "$dw_f.scoped" ] && grep -q 'no gate-verdict written — docs mode' "$REC_OUT" \
+  && ok "AC1 a docs-mode scoped run writes no .scoped per-tree verdict and says docs mode" \
+  || { nope "AC1 a docs-mode scoped run wrote a per-tree verdict, or did not say why"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json >/dev/null
+[ "$(awk -F'\t' '$1=="kind"{print $2}' "$dw_f.scoped" 2>/dev/null)" = scoped ] \
+  && ok "AC1 control: the same scoped run with GATE_DOCS_BASE unset writes the .scoped record" \
+  || { nope "AC1 control: the scoped run wrote no .scoped record, so the decline above proves nothing"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+rm -f "$dw_f.scoped"
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_BASE_FROM=inherited >/dev/null
+[ ! -e "$dw_f.scoped" ] && grep -q 'no gate-verdict written — scoped on an inherited green' "$REC_OUT" \
+  && ok "AC2 a scoped run told GATE_BASE_FROM=inherited writes no .scoped record and names the inherited green" \
+  || { nope "AC2 a scoped run on an inherited base wrote a record, or did not say why"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -5; }
+grep -q '^base_from_seen 0' "$(rec_dir)/0.out" 2>/dev/null \
+  && ok "AC2 a leg's own environment holds no GATE_BASE_FROM" \
+  || nope "AC2 a leg inherited GATE_BASE_FROM, or the leg wrote no output: $(cat "$(rec_dir)/0.out" 2>/dev/null)"
+# TOOL-dWitnessedBar-56 AC8 (S10): the same decline under GATE_BASE puts `inherited` on the header's
+# `base_from` row as a third field, and the decline line names that row. Red when the record cannot show
+# why no verdict was written.
+rec_run GATE_FULL= GATE_LEGS=fx/legs.json GATE_BASE="$(git -C "$REC_T" rev-parse HEAD)" GATE_BASE_FROM=inherited >/dev/null
+dw_bf=$(awk -F'\t' '$1=="base_from"{print NF "|" substr($2, 1, 9) "|" $3}' "$(rec_dir)/header" 2>/dev/null)
+[ "$dw_bf" = "3|GATE_BASE|inherited" ] && grep -q "scoped on an inherited green, as the run record header's base_from row reads" "$REC_OUT" \
+  && ok "TOOL-dWitnessedBar-56 AC8 an inherited base reads GATE_BASE and inherited on the header's base_from row, and the decline line names the row" \
+  || { nope "TOOL-dWitnessedBar-56 AC8 the base_from row reads '$dw_bf', or the decline line does not name it"; sed 's/^/      /' "$REC_OUT" 2>/dev/null | tail -3; }
+# TOOL-dWitnessedBar-58 AC2 (S2): that run carries the hook's real export pair, GATE_BASE and
+# GATE_BASE_FROM=inherited, and its leg still reads no GATE_BASE_FROM, since the runner read the knob and
+# unset it before any leg started, and the decline wrote no .scoped record for the tree. Red when the
+# runner's unset is dropped, so the leg reads base_from_seen 1, or the decline writes a .scoped record.
+[ ! -e "$dw_f.scoped" ] && grep -q '^base_from_seen 0' "$(rec_dir)/0.out" 2>/dev/null \
+  && ok "TOOL-dWitnessedBar-58 AC2 under the hook's GATE_BASE and GATE_BASE_FROM=inherited pair no .scoped record is written and the leg reads base_from_seen 0" \
+  || nope "TOOL-dWitnessedBar-58 AC2 a .scoped record was written ($([ -e "$dw_f.scoped" ] && echo yes || echo no)), or the leg read: $(cat "$(rec_dir)/0.out" 2>/dev/null || echo 'no output')"
+rec_run GATE_FULL=1 GATE_LEGS=fx/legs.json >/dev/null
+[ "$(awk -F'\t' '$1=="reused"||$1=="reused_cache"{printf "%s:%s ", $1, $2}' "$dw_f" 2>/dev/null)" = "reused:0 reused_cache:0 " ] \
+  && ok "AC3 a full green's per-tree verdict carries reused and reused_cache with the run's counts" \
+  || { nope "AC3 the per-tree verdict omits reused or reused_cache, or misreads the counts"; sed 's/^/      /' "$dw_f" 2>/dev/null; }
+rec_done
 
 rec_repo
 rc=$(rec_run GATE_FULL=)     # guards live: the guarded leg is unchanged vs origin/main
@@ -1790,6 +2088,10 @@ cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.tx
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
 DC_SCRIPT="$DC_T/${PFX}${KIT}/derive-ceilings.py"
 DC_EV="$DC_T/${PFX}${KIT}/ceiling-evidence.txt"
+# EVERY WRITE HERE IS NODE z (TOOL-dWitnessedBar-10 S7): `--write` refuses an unset GOV_NODE, and the
+# out-of-band arms below write as z, so the runner rows they are graded beside must be z's own for the
+# monotone hold to compare one node's rows. Unset again when this fixture is removed.
+export GOV_NODE=z
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row
@@ -2170,7 +2472,7 @@ dc_reach=$(printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep 'REACHED')
 printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep -q 'does not clear its evidenced maximum' \
   && ok "it gets the headroom sentence instead, which states the floor such a ceiling has to clear" \
   || { nope "an out-of-band reading above its ceiling produced neither sentence — the row fails with no target to raise the ceiling to"; printf '%s\n' "$dc_chk" | sed 's/^/      /'; }
-rm -rf "$DC_T"
+rm -rf "$DC_T"; unset GOV_NODE
 
 # --- ONLY A CENSUSED-CLEAN READING ARGUES A CEILING (TOOL-aGraftedHelix-5) -------------------------
 # A fixture of its own, for the reason the one above gives: `--write` writes beside the script. One
@@ -2182,6 +2484,9 @@ cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.tx
   || { echo "evidence-test: cannot copy the ceiling kit for the census arms"; exit 2; }
 ( cd "$CN_T" && git init -q --template= -b main . ) >/dev/null 2>&1
 CN_SCRIPT="$CN_T/${PFX}${KIT}/derive-ceilings.py"; CN_EV="$CN_T/${PFX}${KIT}/ceiling-evidence.txt"
+# The planted rows below are node a's, and the runner writes here are node a's too, so the hold this
+# fixture grades compares one node's rows (TOOL-dWitnessedBar-10 S7). Unset when the fixture goes.
+export GOV_NODE=a
 printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 100},' '  {"name": "M", "argv": ["true"], "ceiling": 100}' ']' \
   > "$CN_T/${PFX}gate-legs.json"
 { printf 'L\tok\t0\t10.0\t0\t0\t-\t0\n'
@@ -2236,7 +2541,56 @@ cn_w=$( cd "$CN_T" && "$DC_PY" "$CN_SCRIPT" --write 2>&1 ); cn_rc=$?
 [ "$cn_rc" = 2 ] && printf '%s' "$cn_w" | grep -q 'DEAD PROBE' \
   && ok "AC8 control: a record holding no reading still exits 2 with DEAD PROBE" \
   || nope "AC8 control: an empty record no longer reports DEAD PROBE (rc=$cn_rc)"
-rm -rf "$CN_T"
+rm -rf "$CN_T"; unset GOV_NODE
+
+# --- EVIDENCE KEYED BY LEG AND NODE, AND THE WALL RECORD (TOOL-dWitnessedBar-10 AC7, AC8, AC10) -----
+# A fixture of its own: the ceiling script and the profiler beside a planted margin of floor 1 s and
+# fraction 0.5, so a ceiling of 16 s clears L's node-a 10.0 (needs 15) and does NOT clear a 12.0 (needs
+# 18). Node b's run record holds 12.0. A `--write` that overwrote node a's row, or a `--check` reading
+# one row per leg, reds an arm below; so does a write under a defaulted node. The profiler records the
+# last record of a planted log as node b's wall row, and refuses a `--scoped` last record.
+NK_T=$(mktemp -d)
+mkdir -p "$NK_T/${PFX}${KIT}" "$NK_T/.git/gate-run/r1"
+cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/profile_bar.py" "$NK_T/${PFX}${KIT}/" \
+  || { echo "evidence-test: cannot copy the ceiling kit for the node arms"; exit 2; }
+( cd "$NK_T" && git init -q --template= -b main . ) >/dev/null 2>&1
+printf '1\t0.5\n' > "$NK_T/${PFX}${KIT}/ceiling-margin.txt"
+printf '%s\n' '[' '  {"name": "L", "argv": ["true"], "ceiling": 16}' ']' > "$NK_T/${PFX}gate-legs.json"
+NK_EV="$NK_T/${PFX}${KIT}/ceiling-evidence.txt"
+printf '# hdr\nL\t10.0\t1\ta\t2026-09-10\trunner\n' > "$NK_EV"
+printf 'L\tok\t0\t12.0\t0\t0\t-\t0\n' > "$NK_T/.git/gate-run/r1/1.leg"
+nk_a=$(awk -F'\t' '$1=="L" && $4=="a"' "$NK_EV")
+nk_before=$(<"$NK_EV")
+# AC8 first, so the file it must leave untouched is the planted one.
+nk_w=$( cd "$NK_T" && unset GOV_NODE && "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --write 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [[ $nk_w == *GOV_NODE* ]] && [ "$(<"$NK_EV")" = "$nk_before" ] \
+  && ok "AC8 --write with GOV_NODE unset exits 1 naming GOV_NODE, and the evidence bytes are unchanged" \
+  || { nope "AC8 --write with GOV_NODE unset wrote, or did not refuse naming GOV_NODE (rc=$nk_rc)"; printf '%s\n' "$nk_w" | sed 's/^/      /'; }
+nk_w=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --write 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 0 ] && [ "$(awk -F'\t' '$1=="L" && $4=="a"' "$NK_EV")" = "$nk_a" ] \
+  && awk -F'\t' '$1=="L" && $2=="12.0" && $4=="b" {f=1} END{exit !f}' "$NK_EV" \
+  && ok "AC7 GOV_NODE=b --write adds L's node-b row at 12.0 and carries node a's 10.0 row byte-identical" \
+  || { nope "AC7 node b's write overwrote node a's row, or wrote no node-b row (rc=$nk_rc)"; sed 's/^/      /' "$NK_EV"; }
+nk_c=$( cd "$NK_T" && "$DC_PY" "$NK_T/${PFX}${KIT}/derive-ceilings.py" --check 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [[ $'\n'$nk_c == *$'\n''CEILING-EVIDENCE FAILED — L: ceiling 16s does not clear its evidenced maximum 12.0s'* ]] \
+  && ok "AC7 --check grades L's ceiling against 12.0, the largest reading across nodes, and reds it" \
+  || { nope "AC7 --check did not grade L against the node-b maximum (rc=$nk_rc)"; printf '%s\n' "$nk_c" | sed 's/^/      /'; }
+[[ $'\n'$nk_c$'\n' == *$'\n''ceiling-evidence: 0 of 1 legs evidenced on one node only'$'\n'* ]] \
+  && ok "AC9 --check prints the one-node line, 0 of 1 once L carries rows for a and b" \
+  || { nope "AC9 --check printed no one-node line, or a wrong count"; printf '%s\n' "$nk_c" | sed 's/^/      /'; }
+NK_WALL="$NK_T/${PFX}${KIT}/bar-wall-evidence.txt"; NK_LOG="$NK_T/profile.jsonl"
+printf '%s\n' '{"at": "2026-11-20T10:00:00+02:00", "sha": "1234abcd", "full": true, "wall": 812.34, "width": 6, "legs": [{"verdict": "ok"}, {"verdict": "skip"}]}' > "$NK_LOG"
+nk_p=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/profile_bar.py" --record --out "$NK_LOG" 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 0 ] && [ "$(grep -v '^#' "$NK_WALL" 2>/dev/null)" = $'b\t2026-11-20\t1234abcd\t812.3\t1\t6' ] \
+  && ok "AC10 --record writes one node-b row carrying the full record's wall seconds" \
+  || { nope "AC10 --record wrote no node-b row, or not the record's wall (rc=$nk_rc)"; printf '%s\n' "$nk_p" | sed 's/^/      /'; }
+nk_before=$(<"$NK_WALL")
+printf '%s\n' '{"at": "2026-11-21T10:00:00+02:00", "sha": "99999999", "full": false, "wall": 5.0, "width": 6, "legs": []}' >> "$NK_LOG"
+nk_p=$( cd "$NK_T" && GOV_NODE=b "$DC_PY" "$NK_T/${PFX}${KIT}/profile_bar.py" --record --out "$NK_LOG" 2>&1 ); nk_rc=$?
+[ "$nk_rc" = 1 ] && [ "$(<"$NK_WALL")" = "$nk_before" ] \
+  && ok "AC10 a --scoped last record is refused with exit 1 and nothing written" \
+  || { nope "AC10 a guarded run was recorded as a whole-bar wall (rc=$nk_rc)"; printf '%s\n' "$nk_p" | sed 's/^/      /'; }
+rm -rf "$NK_T"
 
 # --- A READING TAKEN DURING A MEMORY PAUSE ARGUES NO CEILING (TOOL-aGraftedHelix-7 AC10) -----------
 # One run, one `pauses` episode from epoch 1000 to 1010, and three `ok` readings of L at foreign 0:
@@ -2569,6 +2923,15 @@ PW_OUT=$( cd "$PW_T" && unset GATE_LEGS; "$DC_PY" "$PW_K/pass_legs.py" --check 2
 [ "$PW_RC" = 0 ] && [ ! -e "$PW_K/../gate-legs.json" ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: not derived, no leg manifest at ' \
   && ok "--check with no manifest beside the kit and GATE_LEGS unset exits 0 on a not-derived line" \
   || { nope "--check refused a fresh install that holds no manifest beside the kit (rc=$PW_RC)"; print_pw_out; }
+# A MANIFEST THE DEPLOY FILE NAMES (TOOL-dHomeGraded-1 S6): an adopter whose bar is its own keeps gov's
+# legs in the file `[gate_runner].file` names, and with GATE_LEGS unset that file is read, not the sibling.
+mkdir -p "$PW_T/.governance"
+printf '[gate_runner]\nkind = "manifest"\nfile = "legs.json"\n' > "$PW_T/.governance/deploy.toml"
+PW_OUT=$( cd "$PW_T" && unset GATE_LEGS; GOV_NODE=f "$DC_PY" "$PW_K/pass_legs.py" --check 2>&1 | tr -d '\r'; exit "${PIPESTATUS[0]}" ); PW_RC=$?
+[ "$PW_RC" = 0 ] && [ "$PW_OUT" = "pass-legs: 6 declared, 600.0s of 600s" ] \
+  && ok "--check with GATE_LEGS unset reads the manifest [gate_runner].file names" \
+  || { nope "--check did not read the manifest the deploy file names (rc=$PW_RC)"; print_pw_out; }
+rm -rf "$PW_T/.governance"
 rm -f "$PW_M"
 run_pw f --check
 [ "$PW_RC" = 2 ] && printf '%s\n' "$PW_OUT" | grep -q '^pass-legs: REFUSED — the leg manifest .* does not read as JSON' \
@@ -2776,17 +3139,16 @@ pm_rc=$(run_pm "$pm_c2"); pm_id=$(read_pm_key "$PM_REC" run_id)
   && ok "AC1 gate-run/<run_id>/ in the common dir holds the failing leg's output after the scratch worktree is gone" \
   || { nope "AC1 the run record went with the worktree, or the worktree survived (id=$pm_id)"; git -C "$PM_C" worktree list | sed 's/^/      /'; }
 
-# AC2 — a green descendant clears it and writes D3's record, by post-merge.
+# AC2 — a green descendant clears it, and the runner's per-tree verdict of c3's tree is the record:
+# post-merge writes none of its own (TOOL-dWitnessedBar-4 S4).
 pm_rc=$(run_pm "$pm_c3"); git ls-remote --exit-code "$PM_B" "$PM_REF" >/dev/null 2>&1; pm_lr=$?
 [ "$pm_rc" = 0 ] && [ "$pm_lr" = 2 ] \
   && ok "AC2 a green descendant exits 0 and git ls-remote --exit-code of refs/gov/bar-red exits 2" \
   || { nope "AC2 the green did not clear the ref (rc=$pm_rc, ls-remote rc=$pm_lr)"; print_pm_out; }
-PM_BG="$PM_GD/gate-bar-green.shared"
-[ "$(cut -f1 "$PM_BG" 2>/dev/null | tr '\n' ' ')" = "sha tree bar bar_paths kind base selftests run_id by stamped " ] \
-  && [ "$(read_pm_key "$PM_BG" kind)" = full ] && [ "$(read_pm_key "$PM_BG" by)" = post-merge ] && [ "$(read_pm_key "$PM_BG" sha)" = "$pm_c3" ] \
-  && [ "$(read_pm_key "$PM_BG" bar)" = "bash $PM_K/run-gates.sh" ] \
-  && ok "AC2 gate-bar-green.shared carries exactly D3's keys, kind full, by post-merge, and the default bar string" \
-  || { nope "AC2 gate-bar-green.shared differs from D3's grammar"; sed 's/^/      /' "$PM_BG" 2>/dev/null; }
+PM_BG="$PM_GD/gate-bar-green.shared"; PM_TV="$PM_GD/gate-verdict/$(git -C "$PM_C" rev-parse "$pm_c3^{tree}")"
+[ ! -e "$PM_BG" ] && [ "$(read_pm_key "$PM_TV" verdict)|$(read_pm_key "$PM_TV" kind)|$(read_pm_key "$PM_TV" by)|$(read_pm_key "$PM_TV" sha)" = "GREEN|full|runner|$pm_c3" ] \
+  && ok "AC2 the common dir's gate-verdict/<c3 tree> reads GREEN, kind full, by runner, sha c3, and no gate-bar-green.shared is written" \
+  || { nope "AC2 the runner's per-tree verdict of c3 is missing or wrong, or a hand-written record appeared"; sed 's/^/      /' "$PM_TV" "$PM_BG" 2>/dev/null; }
 [ -f "$PM_GD/gate-full-green.shared" ] && ! git -C "$PM_C" worktree list | grep -q 'gate-pm\.' \
   && ok "AC2 the runner's gate-full-green.shared is present and no gate-pm. worktree is left" \
   || nope "AC2 gate-full-green.shared is absent, or a gate-pm. worktree survived"
@@ -2813,8 +3175,14 @@ pm_rc=$(PM_X="GATE_REUSE=lineage" run_pm "$pm_c4")
   && ! grep -q '^GATE_REUSE=' "$PM_PROBE" && grep -qx "$pm_c4" "$PM_PROBE" && grep -q 'gate-pm\.[0-9]*$' "$PM_PROBE" \
   && ok "AC5 the declared bar saw GATE_FULL=1, a holder, no GATE_REUSE, HEAD at the sha and a gate-pm. cwd" \
   || { nope "AC5 the declared bar ran outside the hold verb, unfull, with reuse, or elsewhere (rc=$pm_rc)"; print_pm_out; }
-[ "$(read_pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
-  && ok "AC5 the green record's bar reads bash bar.sh" || nope "AC5 the green record's bar reads '$(read_pm_key "$PM_BG" bar)'"
+# TOOL-dWitnessedBar-60 AC3 — a caller's GATE_SELECTION and GATE_BASE_FROM never reach the bar post-merge
+# records as green: the first would hold legs by the caller's file, the second skip a scoped verdict.
+rm -f "$PM_PROBE"
+pm_rc=$(PM_X="GATE_SELECTION=$PM_T/planted-selection GATE_BASE_FROM=inherited" run_pm "$pm_c4")
+[ "$pm_rc" = 0 ] && [ -f "$PM_PROBE" ] && [ "$(grep -c '^GATE_SELECTION=\|^GATE_BASE_FROM=' "$PM_PROBE")" = 0 ] \
+  && grep -q 'not honoured from the environment:.* GATE_BASE_FROM' "$PM_OUT" \
+  && ok "TOOL-dWitnessedBar-60 AC3 an inherited GATE_SELECTION and GATE_BASE_FROM are named as not honoured and the declared bar sees neither" \
+  || { nope "TOOL-dWitnessedBar-60 AC3 post-merge's bar inherited GATE_SELECTION or GATE_BASE_FROM, or ran no bar (rc=$pm_rc)"; print_pm_out; }
 
 # AC6 — a remote that rejects the ref fails the publication, loudly, and the record still lands.
 printf '#!/bin/sh\nwhile read o n r; do case "$r" in refs/gov/*) echo "no gov refs here"; exit 1 ;; esac; done\nexit 0\n' \
@@ -2836,7 +3204,8 @@ pm_rc=$(run_pm "$pm_c5")
   && ok "AC7 an unlanded commit exits 2 with REFUSING, no bar ran and no ref was pushed" \
   || { nope "AC7 an unlanded commit was not refused before the bar (rc=$pm_rc)"; print_pm_out; }
 
-# AC8 — the export form is refused; the hook's accepted forms all read bash bar.sh.
+# AC8 — the export form is refused; the hook's accepted forms all run bash bar.sh, whose probe file and
+# the bar line are the witness now that post-merge writes no record naming the bar (TOOL-dWitnessedBar-4 S4).
 pm_c6=$(build_pm_commit green 'export GOV_GATE_CMD="bash bar.sh"\n'); rm -f "$PM_PROBE"
 pm_rc=$(run_pm "$pm_c6")
 [ "$pm_rc" = 2 ] && grep -q 'export GOV_GATE_CMD' "$PM_OUT" && [ ! -f "$PM_PROBE" ] \
@@ -2844,22 +3213,17 @@ pm_rc=$(run_pm "$pm_c6")
   || { nope "AC8 the export form was not refused (rc=$pm_rc)"; print_pm_out; }
 for pm_form in "GOV_GATE_CMD='bash bar.sh'\\n" 'GOV_GATE_CMD="bash bar.sh" # the bar\n' 'GOV_GATE_CMD="bash bar.sh"\r\n' \
                'GOV_GATE_CMD=bash nothing.sh\nGOV_GATE_CMD="bash bar.sh"\n'; do
-  pm_c=$(build_pm_commit green "$pm_form"); rm -f "$PM_BG"
+  pm_c=$(build_pm_commit green "$pm_form"); rm -f "$PM_PROBE"
   pm_rc=$(run_pm "$pm_c")
-  [ "$pm_rc" = 0 ] && [ "$(read_pm_key "$PM_BG" bar)" = "bash bar.sh" ] \
+  [ "$pm_rc" = 0 ] && [ -f "$PM_PROBE" ] && grep -q 'bar: bash bar.sh' "$PM_OUT" \
     && ok "AC8 the accepted form $(printf '%q' "$pm_form") resolves to bash bar.sh" \
-    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") resolved to '$(read_pm_key "$PM_BG" bar)' (rc=$pm_rc)"; print_pm_out; }
+    || { nope "AC8 the accepted form $(printf '%q' "$pm_form") did not run bash bar.sh (rc=$pm_rc)"; print_pm_out; }
 done
 
-# TOOL-aFrugalTurnstile-17 AC1-AC3 — a wrapper bar that dirties the tree earns no green record, a
-# runner's exit 0 without verdict GREEN is RED, and a bar that moves the worktree's HEAD is refused.
+# TOOL-aFrugalTurnstile-17 AC2-AC3 — a runner's exit 0 without verdict GREEN is RED, and a bar that
+# moves the worktree's HEAD is refused. AC1, a dirtied tree's declined record, left with post-merge's
+# own writer (TOOL-dWitnessedBar-4 S4).
 git -C "$PM_B" update-ref -d "$PM_REF" 2>/dev/null
-printf '#!/usr/bin/env bash\necho dirtied >> verdict.txt\n' > "$PM_C/dirty.sh"
-pm_c=$(build_pm_commit green 'GOV_GATE_CMD="bash dirty.sh"\n'); rm -f "$PM_BG"
-pm_rc=$(run_pm "$pm_c")
-[ "$pm_rc" = 0 ] && [ ! -f "$PM_BG" ] && grep -q 'no gate-bar-green.shared written .* not clean' "$PM_OUT" \
-  && ok "TOOL-17 AC1 a wrapper bar that edits a tracked file and exits 0 writes no gate-bar-green.shared and names the dirty tree" \
-  || { nope "TOOL-17 AC1 a dirty tree's green was recorded, or the decline is silent (rc=$pm_rc)"; print_pm_out; }
 git -C "$PM_C" push -q -f "$PM_R" "$pm_c1:$PM_REF" 2>/dev/null
 cp "$PM_C/$PM_K/run-gates.sh" "$PM_T/run-gates.real"
 printf '#!/usr/bin/env bash\nd=$(git rev-parse --absolute-git-dir)/gate-run/$GATE_RUN_ID; mkdir -p "$d"; printf "verdict\\tRED\\n" > "$d/verdict"\nexit 0\n' \
@@ -2900,6 +3264,106 @@ pm_rc=$(run_pm 0123456789abcdef0123456789abcdef01234567)
   && ok "AC10 a sha naming no commit exits 2 with a usage line and no bar" || { nope "AC10 an unknown sha did not refuse (rc=$pm_rc)"; print_pm_out; }
 rm -rf "$PM_T"
 # <<< post-merge arms
+
+# --- TOOL-dWitnessedBar-51 AC32: A DECLARATIVE KEY RELEASES NO QUARANTINE (S36, S48) ---------------------
+# The runner hashes a row less its DECLARATIVE_LEG_KEYS, read from its sibling held_halves.py, so a reuse
+# quarantine planted at `pa`'s row hash holds across a `purpose` reworded and is released by an `argv`
+# changed. The fixture's kit dir carries the sibling, as an install does. RED when the whole row is hashed:
+# the reworded purpose moves the hash and the quarantine line never prints.
+ru_repo
+cp "$ROOT/${PFX}${KIT}/held_halves.py" "$ROOT/${PFX}${KIT}/profile_bar.py" "$RU_T/${PFX}${KIT}/"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "purpose": "one"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run >/dev/null
+dk_q=$("$DC_PY" -c 'import hashlib, json, sys
+sys.path.insert(0, sys.argv[1])
+from held_halves import DECLARATIVE_LEG_KEYS as K
+r = next(l for l in json.load(open(sys.argv[2], encoding="utf-8")) if l["name"] == "pa")
+print(hashlib.sha1(json.dumps({k: v for k, v in r.items() if k not in K}, sort_keys=True).encode()).hexdigest(),
+      hashlib.sha1(b"pa").hexdigest()[:16])' "$RU_T/${PFX}${KIT}" "$RU_T/${PFX}gate-legs.json" | tr -d '\r')
+mkdir -p "$RU_GD/gate-cache" && printf '%s' "${dk_q% *}" > "$RU_GD/gate-cache/quarantine.${dk_q#* }"
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" \
+  && ok "51-AC32 precondition: the quarantine planted at pa's row hash holds" \
+  || nope "51-AC32 the planted quarantine did not hold, so the arms below prove nothing"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "purpose": "two"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" && ! grep -q '^GATE reuse pa' "$REC_OUT" \
+  && ok "51-AC32 a reworded purpose leaves pa quarantined" || nope "51-AC32 a declarative key released the quarantine"
+write_ru_legs '{"name": "pa", "argv": ["bash", "fx/a.sh", "moved"], "guard": ["ga/"], "purpose": "two"}' \
+        '{"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}'
+ru_run GATE_REUSE=1 >/dev/null
+grep -q 'pa is quarantined until its manifest row changes' "$REC_OUT" \
+  && nope "51-AC32 an argv changed did not release the quarantine" || ok "51-AC32 an argv changed releases it"
+ru_done
+
+# --- TOOL-dWitnessedBar-51 AC24: THE VERDICT PRUNE KEEPS ANOTHER WORKTREE'S LIVE VERDICT (S28) -----------
+# Worktree B's retained run record names tree T1; T1's verdict and an unnamed T2's are 31 days old. A run in
+# worktree A keeps T1 and removes T2. RED when the prune reads only its own worktree's runs (T1 goes) or
+# never prunes (T2 stays).
+ru_repo
+vp_b="$RU_T.wb"; git -C "$RU_T" worktree add -q "$vp_b" -b vp-b >/dev/null 2>&1
+vp_t1=1111111111111111111111111111111111111111; vp_t2=2222222222222222222222222222222222222222
+mkdir -p "$RU_GD/gate-verdict" "$RU_GD/worktrees/${vp_b##*/}/gate-run/vp-1"
+printf 'tree\t%s\n' "$vp_t1" > "$RU_GD/worktrees/${vp_b##*/}/gate-run/vp-1/verdict"
+printf 'verdict\tGREEN\n' > "$RU_GD/gate-verdict/$vp_t1"; printf 'verdict\tGREEN\n' > "$RU_GD/gate-verdict/$vp_t2"
+"$DC_PY" -c 'import os, sys, time
+t = time.time() - 31 * 86400
+for p in sys.argv[1:]:
+    os.utime(p, (t, t))' "$RU_GD/gate-verdict/$vp_t1" "$RU_GD/gate-verdict/$vp_t2"
+ru_run >/dev/null
+[ -f "$RU_GD/gate-verdict/$vp_t1" ] && [ ! -e "$RU_GD/gate-verdict/$vp_t2" ] \
+  && ok "51-AC24 a run in worktree A keeps the verdict B's run names and prunes the unnamed 31-day one" \
+  || { nope "51-AC24 the prune removed B's live verdict or kept the unnamed old one"; ls "$RU_GD/gate-verdict" | sed 's/^/      /'; }
+git -C "$RU_T" worktree remove --force "$vp_b" >/dev/null 2>&1; rm -rf "$vp_b"
+ru_done
+
+# --- TOOL-dWitnessedBar-51 AC30 (§8 F9): keep_tails.py --selftest, its fence and its character cut ------
+# The keep verb's self-test holds a tail opening three backticks, carrying a `**Hash:**` line and cut at the
+# last whole character within 8192 bytes: a longer fence, the fields read once, the hash the stored bytes'.
+# RED with a fixed three-backtick fence: the tail's own line closes it.
+kt_out=$("$DC_PY" "$ROOT/${PFX}${KIT}/keep_tails.py" --selftest 2>&1); kt_rc=$?
+[ "$kt_rc" = 0 ] && grep -q 'case fenced: ok' <<<"$kt_out" \
+  && ok "51-AC30 keep_tails.py --selftest holds the fence, the fields and the cut" \
+  || { nope "51-AC30 keep_tails.py --selftest exited $kt_rc"; printf '%s\n' "$kt_out" | sed 's/^/      /'; }
+
+# --- TOOL-dWitnessedBar-63 AC16 (S17, S19, S24): the runner's record reader, cut from the runner ---------
+# `read_record_keys`, cut by its awk range and sourced alone, reads `note<TAB>a<TAB>` with the empty last
+# field kept, and leaves a bare `reused` line unset, as `read_tag_lines` reads one. RED against the
+# `IFS=$'\t'` split, which strips the trailing TAB and sets `reused` empty. WHAT THIS DOES NOT CHECK: the
+# awk readers of run records, whose keys the runner writes as one scalar after the key.
+rk_fn=$(awk '/^read_record_keys\(\)/,/^}/' "$RUNNER")
+printf 'note\ta\t\nreused\n' > "$tmp/rk-record"
+rk_out=$( eval "$rk_fn"; unset rk_note rk_reused; read_record_keys "$tmp/rk-record" rk_ note reused
+  printf 'note=[%s] reused=%s' "${rk_note-unset}" "${rk_reused+set}" )
+[ -n "$rk_fn" ] && [ "${rk_out% reused=*}" = "note=[a"$'\t'"]" ] \
+  && ok "63-AC16 read_record_keys keeps an empty last field's TAB in note" \
+  || nope "63-AC16 read_record_keys read note<TAB>a<TAB> as '${rk_out% reused=*}', or did not cut from the runner"
+[ -n "$rk_fn" ] && [ "${rk_out##* reused=}" = "" ] \
+  && ok "63-AC16 read_record_keys leaves a no-TAB reused line unset" \
+  || nope "63-AC16 read_record_keys set reused from a line with no TAB: $rk_out"
+# TOOL-dWitnessedBar-65 AC11 (S14): the same cut over `verdict<TAB>GREEN<CR>`, `note<TAB>a<TAB>`, then
+# `head<TAB>x` and `head<TAB>y` reads `verdict` as GREEN with its CR stripped, `note` as `a<TAB>`, and
+# `head` as y, the last of a repeated key. RED against a reader dropping the CR strip, or keeping the
+# first of a repeated key.
+printf 'verdict\tGREEN\r\nnote\ta\t\nhead\tx\nhead\ty\n' > "$tmp/rk-record-65"
+rk_out=$( eval "$rk_fn"; unset rk_verdict rk_note rk_head; read_record_keys "$tmp/rk-record-65" rk_ verdict note head
+  printf 'verdict=[%s] note=[%s] head=[%s]' "${rk_verdict-unset}" "${rk_note-unset}" "${rk_head-unset}" )
+[ -n "$rk_fn" ] && [ "$rk_out" = "verdict=[GREEN] note=[a"$'\t'"] head=[y]" ] \
+  && ok "65-AC11 read_record_keys strips one CR from verdict and keeps note's last TAB" \
+  || nope "65-AC11 read_record_keys read verdict<TAB>GREEN<CR> and note<TAB>a<TAB> as: ${rk_out//$'\r'/<CR>}"
+[ -n "$rk_fn" ] && [ "${rk_out##* head=}" = "[y]" ] \
+  && ok "65-AC11 read_record_keys keeps the last of a repeated head key" \
+  || nope "65-AC11 read_record_keys read head<TAB>x then head<TAB>y as ${rk_out##* head=}"
+# TOOL-dWitnessedBar-67 AC9 (S11): the same cut over a record whose last line, `head<TAB>z`, carries no
+# trailing LF reads `head` as z. RED against the loop without its `|| [ -n "$_rk_l" ]` guard, which drops
+# the unterminated line and leaves `head` unset.
+printf 'verdict\tGREEN\nhead\tz' > "$tmp/rk-record-67"
+rk_out=$( eval "$rk_fn"; unset rk_head; read_record_keys "$tmp/rk-record-67" rk_ head; printf 'head=[%s]' "${rk_head-unset}" )
+[ -n "$rk_fn" ] && [ "$rk_out" = "head=[z]" ] \
+  && ok "67-AC9 read_record_keys reads an unterminated last line head<TAB>z as z" \
+  || nope "67-AC9 read_record_keys read an unterminated last line head<TAB>z as ${rk_out#head=}, or did not cut from the runner"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
