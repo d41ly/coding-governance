@@ -14,8 +14,8 @@ unmoved. No function was added, so the symbol map was not regenerated (DERIVED f
 
 **Evidences:** TOOL-dWitnessedBar-80
 - AC1 — `${_rg_v%?}x` — S1's `sha` edit over the cut, then the canary's `sed`, each counted one `diff` line;
-  the sourced mutant over the record read `rec_sha` as 41 bytes, `od -c` of its last byte `x`, and `rec_fp`
-  as 41 ending `\r`. The `fingerprint` edit counted one and one, and read `rec_fp` as 41 bytes ending `x` and
+  the sourced mutant over the record read `rec_sha` as 41 bytes, `od -c` of its last byte `x`, and `rec_fp` (DERIVED from the builder's probe)
+  as 41 ending `\r`. The `fingerprint` edit counted one and one, and read `rec_fp` as 41 bytes ending `x` and (DERIVED from the builder's probe)
   `rec_sha` as 41 ending `\r` (DERIVED from the builder's probe).
 - AC2 — `tail variant` — over the suite as built the loop printed no line, `fail` 0, `rgf_seen`
   ` rec_sha rec_fp`. Over a scratch copy of the suite's functions whose `check_cr_reached` tests the count
