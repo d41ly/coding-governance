@@ -28,7 +28,7 @@ answer who a commit is attributed to, and each consumer names its own:
     python commit_trailers.py message <file>                        # a message not yet committed
     python commit_trailers.py attribution <file> <charter file>    # the message's agent trailer, last
     python commit_trailers.py --print-commits                       # the commit class's members
-    python commit_trailers.py --fixture                             # three planted commits, both views
+    python commit_trailers.py --fixture                             # three planted commits, both views, and the attribution cases
 """
 from __future__ import annotations
 
@@ -118,6 +118,17 @@ _FIXTURE = (("TOOL-tFix-1: a subject id, no trailer", ""),
             ("TOOL-tFix-1: a subject id, trailer none", "Pass: none"),
             ("chore: no subject id, a trailer id", "Pass: TOOL-tFix-2"))
 _FIXTURE_ID = re.compile(r"TOOL-tFix-[0-9]+")
+#: The charter line, then the `(name, message, state)` attribution cases `--fixture` checks (TOOL-dWitnessedBar-109 S3).
+_ATTRIBUTION_FIXTURE = ("Co-Authored-By: Fx <fx@example.invalid>", (
+    ("the charter's trailer last", "s\n\nPass: none\nCo-Authored-By: Fx <fx@example.invalid>\n", "ok"),
+    ("another value, then a plain line", "s\n\nCo-Authored-By: Fx 2 <fx@example.invalid>\nsee above\n", "refused"),
+    ("another value, a blank line and prose",
+     "s\n\nPass: none\nCo-Authored-By: Fx 2 <fx@example.invalid>\n\nlater note\n", "refused"),
+    ("the charter's trailer, a blank line and prose",
+     "s\n\nCo-Authored-By: Fx <fx@example.invalid>\n\nlater note\n", "refused"),
+    ("another value spaced before its colon, then prose",
+     "s\n\nCo-Authored-By : Fx 2 <fx@example.invalid>\nsee above\n", "refused"),
+    ("no agent trailer", "s\n\nPass: none\n", "none")))
 
 
 def run_git(repo, argv, stdin=None):
@@ -285,14 +296,36 @@ def read_charter_trailer(path) -> tuple:
     return "", f"the charter {path} holds no line opening '{CHARTER_TRAILER_LEAD}'"
 
 
+def extract_message_lines(raw) -> list:
+    """The lines git keeps of the raw message `raw`, in order: decoded as UTF-8 with `replace`, split on
+    `\\n`, every CR taken out of each line, nothing read from the first scissors line on, and lines
+    opening `#` or holding only whitespace left out (TOOL-dWitnessedBar-109 S1). The one list both the
+    agent-line scan and the last-line check of `check_message_attribution` read."""
+    kept = []
+    for line in raw.decode("utf-8", "replace").split("\n"):
+        line = line.replace("\r", "")
+        if _SCISSORS.fullmatch(line.rstrip()):
+            break
+        if line.startswith("#") or not line.strip():
+            continue
+        kept.append(line)
+    return kept
+
+
 def check_message_attribution(text, expected) -> tuple:
     """`(state, detail)` of a commit message against the charter's trailer line `expected`
-    (TOOL-dWitnessedBar-108 S8). The agent trailers are the `Co-Authored-By` trailers, key in any case,
-    of git's own trailer parse, whose `<...>` address equals the expected value's. `unarmed` where
-    `expected` is empty; `none` where no agent trailer is carried; `refused` naming both values where
-    one is not the expected value, or naming the last line where the message's last line, CRs stripped,
-    `#` and blank lines dropped and nothing read past a scissors line, is not `expected`; else `ok`.
-    WHAT IT DOES NOT CHECK: a `core.commentChar` other than `#`."""
+    (TOOL-dWitnessedBar-108 S8, TOOL-dWitnessedBar-109 S2). The message is read only as
+    `extract_message_lines` keeps it, never through git's trailer parse, which sees only the final
+    trailer block and so reads an agent trailer followed by any plain line as absent. The agent lines
+    are every kept line whose key is the expected key, in any case, with blanks or tabs allowed before
+    its `:` as git allows them, and which contains the expected value's `<...>` address; each one's value
+    is the text after its first `:`, stripped. `unarmed` where `expected` is empty; `none` where no line
+    is an agent line; `refused` naming both values where an agent value is not the expected value, or
+    naming the last line where the last kept line, `''` when none is kept, is not `expected`; else `ok`.
+    WHAT IT DOES NOT CHECK: a value folded onto an indented continuation line, whose address sits on the
+    second line, so its first line is no agent line (where the message ends there, the last-line check
+    still refuses it); a separator other than `:` that `trailer.separators` adds; a `core.commentChar`
+    other than `#`."""
     if not expected:
         return "unarmed", "the charter names no commit trailer, so no attribution was checked"
     raw = text if isinstance(text, bytes) else text.encode("utf-8", "surrogateescape")
@@ -300,23 +333,15 @@ def check_message_attribution(text, expected) -> tuple:
     value = value.strip()
     address = re.search(r"<[^<>]*>", value)
     address = address.group(0) if address else value
-    proc = subprocess.run(["git", "interpret-trailers", "--parse"], input=raw, capture_output=True)
-    found = [m.group(1).strip() for m in re.finditer(r"(?im)^" + re.escape(key.strip()) + r": *(.*)$",
-                                                      proc.stdout.decode("utf-8", "replace"))]
-    agent = [v for v in found if (m := re.search(r"<[^<>]*>", v)) and m.group(0) == address]
+    lines = extract_message_lines(raw)
+    agent_re = re.compile(r"(?i)^" + re.escape(key.strip()) + r"[ \t]*:")
+    agent = [line.partition(":")[2].strip() for line in lines if agent_re.match(line) and address in line]
     if not agent:
         return "none", f"no {key.strip()}: trailer naming {address}"
     wrong = [v for v in agent if v != value]
     if wrong:
         return "refused", f"the trailer '{key.strip()}: {wrong[0]}' is not the charter's '{expected}'"
-    last = ""
-    for line in raw.decode("utf-8", "replace").split("\n"):
-        line = line.replace("\r", "")
-        if _SCISSORS.fullmatch(line.rstrip()):
-            break
-        if line.startswith("#") or not line.strip():
-            continue
-        last = line
+    last = lines[-1] if lines else ""
     if last != expected:
         return "refused", f"the message's last line is '{last}', not the charter's '{expected}'"
     return "ok", f"the message ends with the charter's '{expected}'"
@@ -337,6 +362,23 @@ def build_fixture(top) -> pathlib.Path:
         if proc.returncode:
             raise OSError(f"the fixture's `git {step[0]}` failed: " + proc.stderr.decode("utf-8", "replace").strip())
     return repo
+
+
+def check_attribution_fixture() -> tuple:
+    """`(lines, failed)`: `check_message_attribution` run over each `_ATTRIBUTION_FIXTURE` case against
+    its charter line, one `fixture · attribution · <name> · <state>` line per case, a case whose state
+    is not its planted one ending `· FAIL, the case plants <state>`, and `failed` their count
+    (TOOL-dWitnessedBar-109 S3)."""
+    expected, cases = _ATTRIBUTION_FIXTURE
+    lines, failed = [], 0
+    for name, message, planted in cases:
+        state, _detail = check_message_attribution(message, expected)
+        line = f"{SAY}: fixture · attribution · {name} · {state}"
+        if state != planted:
+            failed += 1
+            line += f" · FAIL, the case plants {planted}"
+        lines.append(line)
+    return lines, failed
 
 
 def main(argv=None) -> int:
@@ -398,7 +440,10 @@ def main(argv=None) -> int:
                     os.chmod(path, stat.S_IWRITE)
                     fn(path)
                 shutil.rmtree(top, onexc=remove_readonly)
-            return 0
+            lines, failed = check_attribution_fixture()
+            for line in lines:
+                print(line)
+            return 1 if failed else 0
     except (LookupError, ValueError, OSError) as exc:
         print(f"{SAY}: refused · {exc}", file=sys.stderr)
         return 2

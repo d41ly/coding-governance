@@ -9772,7 +9772,9 @@ rm -f "$CCM"
 # ---- TOOL-dWitnessedBar-108 S10: THE CHARTER'S TRAILER, LAST. --check-commit asks it of every message a
 # ---- bound run's commit carries, `Pass: none` included, reading the value from the fixture's own
 # ---- AGENTS.md, which the last arm moves to show it is read and never typed. Against the parent the
-# ---- two refusals exit 0 and the admitted pass message ends with `Commit-Checked:`.
+# ---- two refusals exit 0 and the admitted pass message ends with `Commit-Checked:`. Against the
+# ---- parent of TOOL-dWitnessedBar-109 each message whose agent line is followed by a plain line exits
+# ---- 0, and `--fixture` prints no attribution line.
 CCM=$(mktemp)
 build_check_commit_fixture
 _fx_at='Co-Authored-By: Fx <fx@example.invalid>'
@@ -9794,6 +9796,31 @@ hit  "$out" "the message's last line is 'Commit-Checked: unattended@0'"
 printf 'records\n\nPass: none\n' > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit admits a message carrying no agent trailer, exit code" "$rc" "0"
+# TOOL-dWitnessedBar-109: an agent line is read wherever git keeps it, a plain line after it included
+printf 'records\n\nCo-Authored-By: Fx 2 <fx@example.invalid>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value followed by a plain line, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+printf 'records\n\nPass: none\nCo-Authored-By: Fx 2 <fx@example.invalid>\n\nlater note\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value followed by a blank line and prose, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+printf 'records\n\nPass: none\n%s\n\nlater note\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses the charter's trailer followed by a blank line and prose, exit code" "$rc" "1"
+hit  "$out" "the message's last line is 'later note'"
+printf 'records\n\nCo-Authored-By : Fx 2 <fx@example.invalid>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value spaced before its colon then prose, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+out=$("$_rkd_py" "$HERE/commit_trailers.py" --fixture 2>&1); rc=$?
+same "the trailer reader's --fixture passes its attribution cases, exit code" "$rc" "0"
+hit  "$out" "fixture · attribution · the charter's trailer last · ok"
+hit  "$out" "fixture · attribution · another value, then a plain line · refused"
+hit  "$out" "fixture · attribution · another value, a blank line and prose · refused"
+hit  "$out" "fixture · attribution · the charter's trailer, a blank line and prose · refused"
+hit  "$out" "fixture · attribution · another value spaced before its colon, then prose · refused"
+hit  "$out" "fixture · attribution · no agent trailer · none"
 # AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
 printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
@@ -9808,6 +9835,13 @@ git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter
 printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit reads the charter's trailer, so a moved value refuses the old one, exit code" "$rc" "1"
+# TOOL-dWitnessedBar-109 A4: the record's drifted value, followed by a plain line, under the address it names
+sed -i 's/`Co-Authored-By: Fx 3 <fx@example.invalid>`/`Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`/' AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter names the agent's address" --no-verify
+printf 'records\n\nPass: none\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses the drifted agent value followed by a plain line, exit code" "$rc" "1"
+hit  "$out" "is not the charter's 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>'"
 rm -f "$CCM"
 
 # ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one
