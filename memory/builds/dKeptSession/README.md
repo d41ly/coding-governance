@@ -106,7 +106,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale](spec/2026-10-26-spec-KICK-dKeptSession-40.md) | 4 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file](spec/2026-10-26-spec-KICK-dKeptSession-4.md) | 5 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | CLOSED | rev-6 | 2026-11-21 |
-| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | INPROGRESS | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-21 |
 | [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
@@ -128,9 +128,9 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable](spec/2026-10-26-spec-KICK-dKeptSession-48.md) | 14 | 2 | DEFERRED | rev-5 | 2026-11-21 |
-| [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | DEFERRED | rev-7 | 2026-11-21 |
-| [KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id](spec/2026-10-26-spec-KICK-dKeptSession-31.md) | 16 | 2 | DEFERRED | rev-4 | 2026-11-21 |
-| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | DEFERRED | rev-10 | 2026-11-21 |
+| [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | DEFERRED | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id](spec/2026-10-26-spec-KICK-dKeptSession-31.md) | 16 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | DEFERRED | rev-9 | 2026-11-21 |
 | [KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census](spec/2026-10-26-spec-KICK-dKeptSession-23.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses](spec/2026-10-26-spec-KICK-dKeptSession-36.md) | 17 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | DEFERRED | rev-3 | 2026-11-21 |
@@ -163,7 +163,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 238 bound to this build, across 4 record folder(s).
+Records: 239 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

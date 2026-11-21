@@ -345,7 +345,10 @@ render byte-identical mirrors, so the mirror the lander renders into a merge sta
 and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
 lander makes, and the bar's preflight runs the check. A branch carrying a policy change carries a
 stale mirror until it lands or until a commit of its own carries the regenerated one, which the
-guard admits (below).
+guard admits (below). A mirror rendered before `presets.toml` became an input is re-rendered at the
+next landing by the `[[generated]]` row here, and in an adopter by the `[[regenerate]]` row on every
+update unless `GOVKIT_RERENDER=0` is exported; with it exported the mirror stays as it was,
+`adopt-policy.sh --check` refuses it, and the hooks read it stale (KICK-dKeptSession-49).
 
 **Read from the landed blob only.** `policy-mirror.js`'s `readPolicy(key, { repo })` finds the
 landed revision L through `policy-shim.sh landed`, reads the mirror's blob at L and the two blob ids

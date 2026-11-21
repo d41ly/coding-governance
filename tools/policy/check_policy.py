@@ -3004,6 +3004,53 @@ def run_mirror_landed_parity(name):
     return print_checks(name, checks)
 
 
+def run_mirror_upgrade(name):
+    """`mirror-upgrade` (KICK-dKeptSession-50 S1, S2): a pre-unit mirror, the render at HEAD with the
+    store's key taken out of `legacy_blobs`, committed in `build_landed_repo`'s repository, read by
+    this kit's own adopter with `--target`, each path forward-slashed. First the skipped upgrade, as an
+    update with `GOVKIT_RERENDER=0` exported leaves the mirror unrendered: `adopt-policy.sh --check`
+    must print `arm_mirror_parity` with 1 finding naming `legacy_blobs`. Its exit is 1 whatever the
+    mirror holds, since `arm_legacy_homes` finds gov's list against the scratch tree, so the line is
+    what is read. Then the `[[regenerate]]` row's argv, `adopt-policy.sh --scaffold`, must exit 0
+    printing `kept` and `policy: mirror written`, the written mirror's `legacy_blobs` naming the
+    store, and `policy.py mirror --check` there must print `policy: mirror fresh`."""
+    repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
+    adopter = (KIT / "adopt-policy.sh").as_posix()
+    checks = []
+    try:
+        bash = resolve_bash(adopter)
+        if bash is None:
+            return print_checks(name, [(name, "a bash that can see the adopter", False, "none: set GOV_BASH")])
+        store = policy.derive_kit_rel(presets.STORE)
+        doc = json.loads(policy.render_mirror(repo, "HEAD"))
+        del doc["legacy_blobs"][store]
+        Path(repo, *MIRROR_FILE).write_bytes(
+            (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+        run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+        run_fixture_git(repo, "commit", "-q", "-m", "a pre-unit mirror, the store's key omitted")
+        # The arm's own line and its first finding line, never the other arms' findings over the scratch tree.
+        wants, said = ("policy-check: arm_mirror_parity · 1 finding(s) · ", "  legacy_blobs: differs from the render at HEAD"), []
+        scenario, what, ok, seen = check_run(
+            "the pre-unit mirror kept", "adopt-policy.sh --check", [bash, adopter, "--check", "--target", repo.as_posix()],
+            lambda rc, o, e: not said.extend(next((ln for ln in o.split("\n") if ln.startswith(w)), "(no line)")
+                                             for w in wants) and rc == 1 and "(no line)" not in said)
+        checks.append((scenario, what, ok, seen.split(" · stdout ")[0] + " · " + " · ".join(s.strip() for s in said)))
+        checks.append(check_run("the pre-unit mirror", "adopt-policy.sh --scaffold", [bash, adopter, "--scaffold",
+                                "--target", repo.as_posix()], lambda rc, o, e: rc == 0 and o.startswith("kept ")
+                                and any(ln.startswith("policy: mirror written") for ln in o.split("\n"))))
+        recorded = sorted(json.loads(Path(repo, *MIRROR_FILE).read_bytes()).get("legacy_blobs") or {})
+        checks.append(("the written mirror", f"legacy_blobs names {store}", store in recorded,
+                       "legacy_blobs " + (", ".join(recorded) or "(none)")))
+        checks.append(check_get("the written mirror", repo, ["--check"], lambda rc, o, e: rc == 0
+                                and o == "policy: mirror fresh\n", kit=KIT, verb="mirror"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(repo)
+        remove_repo(bare)
+    return print_checks(name, checks)
+
+
 # ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
 
 GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: the mirror shape's `mirror --print`
@@ -6258,6 +6305,7 @@ CASES = [
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
+    ("mirror-upgrade", None, run_mirror_upgrade),  # a pre-unit mirror through the adopter's check and scaffold (KICK-dKeptSession-50)
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS, *GUARD_RUN]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
