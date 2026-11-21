@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: c2a407b0390f3d57a118b58e376c326aeb207c13
-phase: RUNNING
+witness: a4dd146d6773f436a4527d2a9740a7beec69e405
+phase: BUILDING
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dkeptsession-a0567a
@@ -29,3 +29,7 @@ anchor-ref: refs/heads/main
 base: c2a407b0390f3d57a118b58e376c326aeb207c13
 
 ## Parked
+
+2026-11-21T13:26:22Z brief · item KICK-dKeptSession-1 · reason b9a738e8e603 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md
+
+2026-11-21T13:27:22Z dispatch · item a4dd146d KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt help/reference/kinds.md help/policy.md

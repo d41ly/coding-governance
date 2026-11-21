@@ -1,6 +1,6 @@
 # KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 1 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 1 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0139@065e06ab whole
 **Carries:** node:policy-key.preset
