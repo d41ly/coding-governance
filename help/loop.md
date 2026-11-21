@@ -749,8 +749,9 @@ None of gov's five activates a row or hands over to another, so a gov build's fl
 gov's five before yours. Where none holds, it is placed under the default, `scenario.<value>` for the
 value of `flow.scenario-default` in `.governance/policy.toml`, `feature` when unset. A default naming no
 scenario the composition holds, one your `instructions.exclude` leaves out for instance, and a value the
-policy kit refuses are each refused, naming the key and the value. Until placement supplies a request's
-facts, they are the `--fact <name>=<value>` flags of `select` and of the transition writer.
+policy kit refuses are each refused, naming the key and the value. A request's facts come from its
+placement, where the scout names them and the check re-runs this selection (see "Placing a request"
+below); `select` and the transition writer take them as `--fact <name>=<value>` flags.
 
 **Your own scenario.** Add a `[[scenario]]` row to your overlay, `.governance/instructions.toml`, tagged
 with `adopter` at its second segment. `extends` names the scenario whose facts, entry step, activated
@@ -844,7 +845,26 @@ and `health —` cells read inputs no key covers, so a fresh view key says nothi
 The unattended driver's `--claims` rows carry five fields, and `bash tools/unattended/unattended.sh --claims --with-key` adds the claim's key as a sixth, over the claim's ref <!-- usage: verb:unattended.sh:--claims 946a3549 -->
 and its run record at the default branch's tracking ref. The card asks for the key, and its
 `claims —` rows end ` · key ` and the key's first eight characters after `k1:`, or ` · key -` where
-the driver is older than the flag and prints five fields.
+the driver is older than the flag and prints five fields. A row is a run's claim or any lease: its name is
+the slug of a build lease, or the tail of a unit or cadence lease, and its second field the lease's fleet
+tag, or a legacy `refs/gov/runs/<slug>` claim's node. A `released` row, a build handed over at its run's
+end, shows on the card as a `terminal` one does: sorted with them, and hidden once a day old.
+
+The build card's ref on the remote, `refs/gov/builds/<slug>/card`, is written by the driver, never by the kickoff engine itself: at a READY append or a stage follow the engine's `remote-ref` card store runs `bash tools/unattended/unattended.sh --card-ref write <slug> --message <file>`, bounded by its card publish bound, `CARD_PUBLISH_BOUND`, above the write's own worst case, with the card's commit message in the file. It is dark behind `RUN_CLAIMS`: while that is not `on` the verb prints `card-ref — off` and reads and writes nothing, and the append says `card — remote-ref not written: RUN_CLAIMS is off` while the clone cache and the build folder are still written, so a project that leaves the switch off never publishes a governance ref. With it on it prints `card-ref — builds/<slug>/card · <sha8>` (exit 0), `card-ref lost — <sha8>` when another write moved the ref first (exit 1; the engine re-renders once and tries again) or `card-ref not written — <why>` (exit 2); a write that does not answer within that bound leaves `card — remote-ref unknown: no answer within <n>s` and the rest of the append standing, since the write may have landed before it was stopped, and a landed one reaches the change feed at the next read of the remote; a lookup that does not answer wrote nothing and leaves `card — remote-ref not written: no answer within <n>s`. The engine reads the card through the driver too, never by a fetch of its own: `bash tools/unattended/unattended.sh --card-ref lookup <slug>` fetches the ref from the clone's one remote, whatever its name, into this node's cache `refs/gov/remote/builds/<slug>/card`, writing no `FETCH_HEAD`, and prints `card-ref — <commit>` and the commit's message, `card-ref — none` where the remote holds no card, `card-ref — off`, or `card-ref not read — <why>` (exit 2). That cache ref is the one name the engine reads, so a route to a build whose card a terminal follow marked is refused at once, and a lookup that does not answer leaves the card read from the clone cache as `evidence`. <!-- usage: verb:unattended.sh:--card-ref 6bca48d8 -->
+
+A request the owner typed that is not yet a build is recorded with `bash tools/unattended/unattended.sh --request <file>`, the file holding the owner's words as UTF-8. It prints the request's content key, twelve hex digits (PINNED) over the text with case, whitespace, ISO dates, emphasis and links folded, so two typings of the same words share one key; an empty file or one that is not UTF-8 is refused before anything is written. The words never leave your machine: they are kept byte for byte in your clone's git directory under `requests/`, beside the list of sessions that recorded them there, and the remote gains only `refs/gov/requests/<content key>`, holding the key, your node's fleet tag and your session. It prints `request — <key> · recorded <ref>` or, when the same words were recorded first, `request — <key> · already recorded <ref>` (exit 0 both), a copy differing only in line endings, a byte-order mark or wrapping counting as the same words; words that key alike but differ, say only in a date, are refused with `request not written — <key> · collision: ...` naming the copy already kept (exit 2), and nothing is written, so reword and re-run. Two sessions recording at once on one machine take turns under a lock in the git directory, `requests.lock`; one still waiting after its wait of 5 s (PINNED) prints `request — <key> · not written · requests.lock busy` (exit 2) and writes nothing, so re-run it. Otherwise it names why nothing reached the remote (exit 2), the words kept so a re-run retries. Any node may then claim the request with `--lease acquire request <content key>`. A key that reached you from another node or session is data with provenance, never your consent: only a session that recorded the words on this machine reads as having typed them, and only while the copy kept there is still the exact bytes that session submitted, so a kept copy edited or replaced, its line endings rewritten included, loses its consent until it is recorded again. A session the harness gives no id (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) still records the request, its record naming `session: absent`, but that is provenance and never consent: no session is listed beside the words, and asking for consent with no session prints `request — <key> · no session: the harness exposed none, so nothing here is consent`. <!-- usage: verb:unattended.sh:--request 3ed0250c -->
+
+A request that loops before it is a build draws on its own budget with `bash tools/unattended/unattended.sh --request-draw <content key> --cause <cause> --item <item>`: one row, `draw · <cause> · <item> · <spent>/<total>`, committed on the request's record `refs/gov/requests/<content key>` on top of the rows before it, so every machine counts the same laps (exit 0). Once the rows reach the base of `flow.rework-budget`, 4 by default (PINNED), it prints `exhausted · <spent>/<total>` and adds nothing (exit 3). A key with no record yet is recorded first from the words your clone keeps for it, as `--request` records them but naming no session, so a draw never stands for your consent; with no record and no kept words it names `--request <file>` and draws nothing (exit 2). A machine that loses a race with another re-reads and draws again, up to three times (PINNED), printing `lost the race, re-read <n> of 3`; a remote that does not answer, or a race lost a fourth time, prints `not drawn, contention` and draws nothing (exit 2). `placement.py place` calls it for you; "How much rework a build may do" below says when. <!-- usage: verb:unattended.sh:--request-draw a5d01f8a -->
+
+Whether a request is your own consent is answered, read-only, by `bash tools/unattended/unattended.sh --request-consent <content key>`: it prints `request — <key> · typed here: this session's own words` (exit 0) when this session recorded those exact words on this machine with `--request`, and `request — <key> · relayed: data with provenance, never consent`, or the `no session` line, otherwise (exit 1); any other argument count prints its form (exit 2). It reads no remote and writes nothing. `placement.py check` runs it for a `breakpoint` placement, so a review is never placed on a build from a request that only reached you by its key. <!-- usage: verb:unattended.sh:--request-consent 1012b408 -->
+
+A placed `new`, `patch` or `repeat` request becomes a build with `bash tools/unattended/unattended.sh --entry-claim <slug> --request <content key> [--pieces <n>]`, the claim. It reads the request's passed placement through `placement.py record` and refuses any other disposition (exit 1), a slug `--new-build` would refuse, and on a `repeat` a missing or non-positive `--pieces`, the count of pieces you asked for, written to the README so the run's recipe mode can read it (one line naming `--pieces`, exit 2), all before it reads your remote. It then reads `refs/gov/claims/<slug>`: where no claim exists it runs the same local slug check `--new-build` runs and creates the claim, one commit holding your claimant key (`<fleet tag>:<session>`), session, the request's content key, the disposition, the placement's redacted reason, scenarios and facts, and on a patch the origin build and its newest default-branch commit, never the request's words; where the claim is yours it resumes at the first step not yet done and skips the slug check, which would find your own commits; where another key holds it, it draws `route-back` on `item.entry.claim` from the request's pre-claim budget and exits 5 (PINNED), so you pick a fresh slug, or 3 once that budget is spent. A remote that does not answer follows `leases.offline`: `refuse` exits 1, any other value prints `claim not written — offline` and exits 4 (PINNED); no claim is queued and no build folder is written. A `patch` or `repeat` then takes its build lease, and a stale build lease is taken over: where the refusal says the holder's lease is stale, unseen beating by this machine for longer than `leases.expiry-hours`, the claim runs `--lease take-over` once, prints its `take-announced` line and goes on as though it had acquired the lease, a take-over refused being routed by its own cause as below, so a holder that came back is waited on, and one not written exits 2. Otherwise the lease's refusal is routed by its cause: `tombstone`, `terminal` and `epoch-fence` print one `ask:` line for you to file and exit 1, never retried however lenient `leases` is; `live-holder`, `offered`, and `overlap` under `leases: refuse`, add `wait-since:` to the claim and exit 4 while you wait, then once `flow.wait-ceiling`, 72 hours by default (PINNED), has passed by this machine's clock, print an owner item and exit 1; an overlap under `leases: warn` adds `overlap:` to the claim and goes on. It commits the derived plan record in a commit of its own, `records(<slug>): entry.claim's derived plan record`, holding the README `gen_build_index.py --placed-build` writes (`parents: <origin>` on a patch; `authorized-by: recipe`, `playbook:` and `pieces:` on a repeat) and its contract row, and refuses when anything else is staged; then it writes the build's first transition record: a `new` into planning and a `repeat` into designing as `item.entry.claim` `claimed`, a `patch` into designing as `item.plan.dedupe` `patch`. Under `patch.ratify: owner` (the default is `auto`) a patch prints `owner item: ratify <slug>` and its record into designing is refused, naming `patch.ratify`, until your disposition record of `item.entry.claim` `ratified` sits in the build's `build/` folder under the unit id `<FAMILY>-<slug>-1`, and `rejected` holds it for good. It does nothing while `RUN_CLAIMS` is off. <!-- usage: verb:unattended.sh:--entry-claim 2cb559fb -->
+
+A decision or a problem is filed once on the remote with `bash tools/unattended/unattended.sh --register decision <build> <item> <fork> <file>` or `--register problem <subject> <item> <file>`. A decision is keyed by the item that raised the question and its fork, never by its wording, so a second session deciding the same slot is refused with exit 1 and shown the first one's record; a problem's id comes from your session, the item, the subject and the text, so two different problems on one path both land and a retried filing is refused. The text file is capped at 4096 bytes (PINNED) of plain text. It prints `register — written <ref>` (exit 0), `register — exists <ref>` (exit 1) or names why nothing was written (exit 2), and does nothing while `RUN_CLAIMS` is off. <!-- usage: verb:unattended.sh:--register 371297d7 -->
+
+A build, a unit of a build, a cadence run or a recorded request is leased on the remote with `bash tools/unattended/unattended.sh --lease acquire build <slug>` (or `unit <slug> <id>`, `run <cadence> <period>`, `request <content key>`, the last refused `no-record` where the remote holds no `refs/gov/requests/<content key>`, and the slug `request` reserved for it as `run` is); `renew` takes `--witness <sha>`, `release` with no `--as` hands the lease over as `released`, which anyone takes at the next epoch, while `--as landed|withdrawn` leaves a build or unit lease a tombstone (a cadence run lease takes `--as landed|aborted`), `take-over` takes a stale foreign lease and raises its epoch, `offer <kind> <name> [<sub>] --to <tag>` (or `--to <tag>/<session>`) offers an absent or released lease to one node, or one session of it, without assigning it, every other caller refused `offered` until `leases.offer-seconds` after its first sighting of the offer, `acquire build <slug> --for draw` holds a closed build's tombstone for a patch build's draw, `--lease flush` pushes the writes this node queued while the remote did not answer, refusing one whose last fetch is older than `leases.queued-claim-days`, and `--lease prune` deletes the run leases and legacy run claims terminal that long, never a build's; `fence build <slug> [--after <tip>]` prints the fence the lander's push carries and writes nothing, `--after` re-fencing a move of the lease by its own holder at the same epoch. Each prints one line, `lease — <tail> · <act> · epoch <n>`, or names the refusal: `live-holder`, `tombstone`, `epoch-fence`, `overlap`, `offline`, `offered`, `terminal` or `no-record`. With no session id from the harness (`CLAUDE_CODE_SESSION_ID` unset, empty or `absent`) the acts that write a holder, `acquire`, `take-over`, `renew`, `release` and `offer`, print `lease not written — no session: CLAUDE_CODE_SESSION_ID is unset and no keepalive identifies this holder` and exit 2 before reading anything, because an absent session would name every id-less session on your node; `flush`, `prune` and `fence` name no holder and run as they do with a session, so a headless supervisor still prunes and a fence from a terminal or CI still answers. A run's own claim, identified by its keepalive, is unaffected. `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line, its tail, fleet tag, session, status, verdict and epoch, or `lease — none · <tail>`; it is how a reader tells two sessions of one node apart, which `--claims` cannot. With `RUN_CLAIMS` off every act but `fence` prints `lease — off · <tail>` and exits 0 having written nothing, and `fence` prints `fence — none · leases are off`. An offer is refused `offered` over an offer still open, whoever it names, and when `--to` names your own tag or your own session on it; another session on your tag is a hand-over and lands. An offer over a build or unit tombstone is refused `tombstone`, and `terminal` stays a cadence or legacy claim's. A create whose last commit this node's feed holds but git can no longer read, after a `git prune` say, is refused `epoch-fence` for a build or unit lease, whose epoch it cannot continue, and is a plain create at epoch 1 for a cadence run. An offline write whose ref's newest queued line is not a readable queued commit, a commit this clone does not hold or a line of another shape, prints `lease not written — <tail> · queued commit unreadable; nothing queued` and exits 2, queueing nothing, rather than building on that line, an older one or the cached tip. The `leases.*` policy keys shape it: `memory/guides/UNATTENDED-STOPS.md` section 7. <!-- usage: verb:unattended.sh:--lease f067f09f -->
+
+Each node also keeps a change feed of every governance ref write it made or saw, in `gov-feed.log` under its git common dir. `bash tools/unattended/unattended.sh --feed check` holds that feed to the governance refs the clone holds and names each `missing`, `duplicate`, `extra`, `order` or `torn` line with exit 1; `--feed rebuild` writes the feed from those refs on a node that has none, and `--feed print --from <seq>` replays it from a sequence number. <!-- usage: verb:unattended.sh:--feed 4f313579 -->
 
 - **Key some sources:** `python tools/loop/claims.py key commit=<sha> base=<sha>` prints one key; <!-- usage: script:tools/loop/claims.py#key d36ca5b8 -->
   `key --stdin` prints one key per input line, the line's sources separated by TABs.
@@ -999,6 +1019,9 @@ routes = { done = "item.test.exit" }
   `supersedes`.
 - `inputs` and `routes` are open, and adding widens them. An `amends` writes `routes` whole, so every
   changed route reads as a widening, with gov's old table as a narrowing beside it.
+- `seed` and `map` are open along their order of values, a later value widening: `seed` runs `none`,
+  `write-set`, `question-paths`, `scope-paths`, and `map` runs `none`, `base`. `unfolds` is open, and
+  adding widens it. An absent `seed` or `map` reads `none`, an absent `unfolds` reads empty.
 - `step`, `witness` and `outcomes` are fixed by a principle, and `actor`, `allowance`, `returns` and
   `owner` are fixed because they declare no direction. Patching one is refused, naming the field and
   what fixes it.
@@ -1059,6 +1082,60 @@ version, so after a bump an input still pinned at the old version is refused unt
 compares each row with the record table and reads no earlier revision, so that edit is the review's to
 see. A role item's record kind comes from its role and is not joined. The step gate's `item` class
 grades a gov item that disappears between a landing's base and its tip, as it does any member.
+
+## The code an item is handed: its seed
+
+A role's work order will carry a `code` slot, the code its item touches. Which code is computed from
+the item's `seed`, one of four values, from the narrowest neighbourhood to the broadest:
+
+- `none`, the default and every non-role item's: no code is handed.
+- `write-set`: the paths the unit's spec declares under `### Files touched`, read from the spec at your
+  last commit. The builder, tester and spec-writer items take it.
+- `question-paths`: the backticked paths in the question a researcher was asked.
+- `scope-paths`: the paths of the design's scope. No plan record carries a scope yet, so this one prints
+  `unarmed — scope-paths: no plan record carries a scope; dRankedPlan's plan.record arms it`, never an
+  empty list. The architect's items and the design's reasoning item take it.
+
+`python tools/loop/loop_lib.py --check` prints one `loop: seed <tag> · <value>` line per item and a
+`loop: seeds` count, and refuses a value outside those four and a seed other than `none` on an item
+whose actor is not a role, naming the item and the value.
+
+**Resolve an item's seed:** the definition's reader takes a `seed` command,
+`loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]`, run from inside your
+repository. It prints one path per line, relative to the repository, with forward slashes, a leading
+`./` and a trailing `/` dropped and each path once, in the order first seen; or the one `unarmed`
+line naming the source and why. `write-set` takes `--build` and `--unit` and finds the spec whose
+heading names that unit; `question-paths` takes `--question`. A missing one exits 2 naming it, as do an
+item no row declares and a unit with no spec, or two. Where the unattended kit is not installed,
+`write-set` and `question-paths` print `unarmed — <source>: no unattended driver resolves`. A spec at
+CLOSED or WONTDO still declares its paths to `write-set`, which reads a spec of any status, and a spec
+listing none prints `unarmed — write-set: <spec> lists no path`; a path spelled with backslashes is prose, not a path. The paths
+are what was declared, not what was written. `--fixture --plant seed-bad`, `seed-write`, `seed-question`
+and `seed-scope` show a refusal and each source.
+
+**The one path-token rule.** Both sources read paths through the unattended driver, so one rule decides <!-- usage: verb:unattended.sh:--path-tokens ee31c658 -->
+what a path is: `bash tools/unattended/unattended.sh --path-tokens` prints each backticked span of the
+text on its standard input that is one word of letters, digits, dots, underscores, slashes and dashes
+holding a `/` or ending in an extension, one per line. With `--files-touched <rev> <spec> ...` it prints
+instead the paths each spec declares under `### Files touched` at that revision, exactly what the
+driver's own overlap and dispatch reads take, skipping a CLOSED or WONTDO spec unless `--any-status`
+comes first, as `write-set` asks. It writes nothing and
+exits 0, or 2 with one `path-tokens not read` line on a malformed call or a revision or spec git cannot
+read.
+
+**The map slot and its unfolds.** An item's `map` says whether its work order's `map` slot is filled:
+`none`, the default, or `base`, the project map. The items where the project map is delivered to the
+planner, the architect, the reuse scout, the spec writer and the researcher declare `base`, as
+`--check` lists them; the unit workers, the builder and the tester among them, get no map. An item's
+`unfolds` lists the namespace words, each the `ns` of a row of the playbook kit's `namespaces.toml`,
+whose nodes its map slot spells out one by one; `item.design.inventory` unfolds `kit`
+and `policy`. `loop_lib.py --check` prints one `loop: map <tag> · map <value>` line per item, ending
+`· unfolds <words>` where it unfolds, and refuses a `map` outside `none` and `base`, an `unfolds` beside
+`map = "none"`, and an unfold word no namespace row registers, naming the item and the value or word.
+Where the playbook kit is not installed it prints `loop: unfolds · unarmed — no namespace registry
+resolves`, checks no unfold word, and the rest of the check runs; a registry that resolves and does not
+read is refused. `--fixture --plant map-bad`, `unfold-unregistered`, `unfold-no-map`, `unfold-not-list`,
+`no-registry` and `registry-bad` show each.
 
 ## Handing an item what its upstream items established
 
@@ -1575,6 +1652,187 @@ The list does not fire a review: you, or the run, fire each review line through 
 `--trigger` with its cause. A run may still move past an owner gate before its close, and anyone who
 can write a disposition record releases a gate.
 
+## Placing a request: a disposition, its reason and its check
+
+Every request a session or an unattended run receives gets one disposition from the loop's closed set,
+`continue`, `amend`, `new`, `patch`, `repeat`, `unit`, `breakpoint`, `ask` or `none`, recorded with its
+reason. The tool is `placement.py` in the loop kit, run in your repository, keyed by the request's
+content key, the one `--request <file>` of the unattended driver prints. Each placement is a block
+appended to `<key>.placement` in your git directory's `requests/` store, which is never pushed: the
+newest block is the placement and the earlier ones are its history. Its `reason` and `evidence` are
+redacted of secrets and cut to the module's `VALUE_CAP`, since those lines reach the claim commit.
+
+Who places is the key `placement` in `.governance/policy.toml`:
+
+- `agent-places`, the default: the orientation scout's return is the placement, given as
+  `placement.py place --request <key> --return <file>`, a file of `disposition`, `build`, `playbook`,
+  `reason`, `evidence`, `observations`, `scenarios` and `facts` lines, the scout's `returns:` shape, and
+  `breakpoint` for a `breakpoint` disposition.
+- `declared-checked`: the request's own declaration is, `placement.py place --request <key> --declared
+  <word> [<build>]`, and the scout's return is evidence only.
+- `owner-places`: `place` writes no disposition and prints the scout's return as evidence and
+  `placement: owner item — <key>`; your disposition record naming `item.entry.place-owner` is the
+  placement, read by `placement.py place --request <key> --owner <record>`.
+
+An alias is written as the member it means, `attach` as `amend`, and any other word is refused with no
+block written. Where the return names an observation and `probe.observations` reads
+`verify-before-place`, `place` opens a probe for it first, and the check below waits for its verdict.
+
+**The check**, `placement.py check --request <key>`, re-reads every fact the disposition rests on from
+its source, never from the scout's text: the build exists and is live, and its build lease is free or
+yours, for `continue` and `amend`; the request's words are held for `new`; the build is terminal for
+`patch`; the playbook is in the tree for `repeat`; the ask is filed for `ask`; your session card routes
+no unit for `none`; and for `breakpoint`, the block's `breakpoint:` line names one review, `spec audit`,
+`gate review`, `closing review` or `landing review`, or `item <tag>` for a tag the build's composed rows
+declare, the build is live, and the request is your own words, typed in this session on this machine:
+the unattended driver's `--request-consent` answers for it, and a request that reached you by its
+record's id alone is refused `relayed`. `unit` is refused until units can be held apart from their
+build's driver. The key `placement.check` says what a failed fact does:
+`refuse`, the default, prints `placement: refused — <disposition> · <fact>` and exits 1, back to placing;
+`record` writes the failure into the block and exits 0. A passed `new`, `amend`, `patch` or `repeat` is
+then held for you, `placement: held-owner`, while the Plan or Design item it enters is unbuilt, and once
+its claim exists the owner item names `refs/gov/claims/<slug>`; your disposition record of that build
+naming `item.entry.place` with the placement's own word releases it, and any other word refuses it,
+back to placing.
+
+**The scenarios**, chosen once here. The scout's return names `scenarios`, each scenario it finds
+admitted joined by `+` (`scenario.feature+scenario.design-only`), and `facts`, the request facts it read
+as `<name>=<value>` pairs joined by `; ` (`design-only=true`), each name and value one lower-case word;
+any other shape is refused at `place` with no block written. The `entry` fact is never taken from the
+scout: `new` is `entry=feature`, `amend` `entry=amendment`, `patch` `entry=patch` and `repeat`
+`entry=playbook-run`, and a typed `entry` that disagrees fails as `entry-mismatch <typed> <derived>`.
+The check then re-runs the selection of "Choosing a build's scenario" above over those facts and your
+composition at HEAD: a named scenario whose predicate fails is `scenario-predicate <tag>`, an admitted
+one the scout left out `scenario-missing <tag>`, and the same scenarios in another order
+`scenario-order`. Each failed fact prints its own line, so one round trip names them all, and
+`placement.check` treats them as it treats the others; under `record` the block's `scenarios` is
+rewritten to the selection. Where no scenario admits the request, the default is the selection,
+written `scenarios: scenario.feature (default)`, and a return naming none passes. The other
+dispositions open no build and select no scenario, so a return naming one for them fails as
+`scenario-not-placed`. The check prints `placement: facts — <facts>`, the facts it evaluated, and where
+your tree has no scenario composition it prints `placement: scenario · unread · <why>` and checks none;
+a default naming no composed scenario refuses the check, exit 1.
+
+**The record**, `placement.py record --request <key>`, prints the passed block's `disposition`,
+`build`, `playbook`, `reason`, `scenarios` and `facts` lines, with `reenters` after `disposition` for an
+owner's late answer, the lines the claim commit carries; a block whose check did not pass prints nothing
+and exits 1.
+
+**Asking for a review on a live build.** When you ask mid-build for a review, "audit the specs" say, the
+request is placed as `breakpoint` with `build: <slug>` and `breakpoint: spec audit` in the scout's
+return, and once its check passes, `placement.py breakpoint --request <key>` declares it on the build:
+it writes your disposition record into the build's `build/` folder, `Item` `item.entry.place`,
+`Disposition` `breakpoint`, `Channel` `prompt` and `Reason` `<name> · request <key>`, naming the request
+by its key and none of its words, for you to commit, and prints `placement: declared — breakpoint <name>
+· <slug> · <record>`. A build whose lease another machine holds is refused `live-holder` and nothing is
+written. Once committed, `breakpoints.py list` and the driver's `--plan` list it beside the build's other
+breakpoints: a placed `spec audit` after `item.design.reason` with cause `owed`, since it makes the
+pre-code audit owed, the driver's preflight reading it at BASE as the source `placement`; the other
+three reviews at their own positions and `item <tag>` before that tag, cause `placement`. The run fires
+each at its position through `--trigger`. Where the build is already in a step past the position,
+`breakpoint` fires it at once, `--trigger <slug> --subject <s> --cause placement`, the subject
+`<slug>-specs` for `spec audit`, `<slug>` for `closing review` and the position's item tag otherwise.
+
+**An unattended prompt is placed the same way.** Before its build folder is written, the prompt is
+recorded, placed and checked, and the passed block is written under `## Placement` in the prompt record,
+its `request: <key>` line first. A prompt-mode run's first preflight refuses at check 119 a record with
+no such section, a disposition that opens no build, or a block the check refuses, so a prompt that
+continues or amends a live build is sent there rather than opened as a new one. A README opened before
+`PROMPT_BRIEF_CUTOFF` is not graded.
+
+## The entry items: orienting, placing and claiming a request
+
+Before any step, a request passes through the entry program: five items tagged `item.entry.<name>`, which
+sit in no step, as the review and probe programs' items do, and which `--check` prints as
+`loop: program entry`.
+
+| Item | Actor | Needs | Its work today |
+|---|---|---|---|
+| `item.entry.orient` | `role:gov-orienter` | none | the `/session-kickoff` orientation and its card; where the card routes a build, that build's card |
+| `item.entry.place` | `role:gov-orienter` | `item.entry.orient` | the scout's return, placed by `placement.py place --request <key> --return <file>` and checked by `placement.py check` |
+| `item.entry.place-check` | `command:entry.place-check` | `item.entry.orient` | the request's own declaration, `placement.py place --request <key> --declared <word> [<build>]`, then `placement.py check` |
+| `item.entry.place-owner` | `owner` | `item.entry.orient` | your disposition record naming `item.entry.place-owner`, read by `placement.py place --request <key> --owner <record>` |
+| `item.entry.claim` | `command:entry.claim` | any one of the three placing items | the unattended driver's `--entry-claim`, which claims the build on `refs/gov/claims/<slug>` |
+
+`item.entry.orient` answers the value of the policy key `placement`, `agent-places`, `declared-checked`
+or `owner-places`, and each value routes to the placing item it names; its `probe` goes to the probe
+tool's stand-in, as every role item's does. It reads the whole map (`map = "base"`).
+
+The three placing items answer a disposition and share one route table. `new`, `patch` and `repeat` go
+to `item.entry.claim`; `breakpoint` to `item.review.trigger`; `unit` back to `item.entry.place`,
+drawing `route-back` on the rework budget; and the dispositions whose owners have not landed go to
+today's tools: `amend` to `placement.py`, which holds it for you, `continue` to the unattended driver,
+`ask` to `backlog.py` and `none` to the orientation scout. A failed `placement.py check` is the
+item's refusal and goes back to it. Your placement waits on you until `run.owner-deadline` passes, and
+then becomes an `ask`.
+
+`item.entry.claim` answers one word per exit of `--entry-claim`: `claimed` moves the build, a `new` into
+planning and a `repeat` into designing, while a `patch` moves through `item.plan.dedupe`'s `patch`;
+`slug-taken` comes back to the claim for a fresh slug, drawing `route-back` on the request's pre-claim
+budget; `awaiting` comes back to the claim while another party holds the build, drawing nothing, until
+`flow.wait-ceiling` passes and it answers `refused`; and `refused` goes to `backlog.py`, the `ask:`
+line or owner item the driver prints.
+
+## Testing outside Test: the probe program
+
+A probe is a test any item can ask for, outside the Test step: an owner's observation checked before it
+is placed, a reported bug made red before its fix, or an experiment that sets a measured reference. Its
+eight items, `item.probe.trigger`, `.pin`, `.design`, `.experiment`, `.run`, `.judge`, `.judge-claimed`
+and `.return`, sit in no step, as the review program's do, and `--check` prints them as
+`loop: program probe`.
+
+A probe has two ways in. It is **placed** at an item boundary, by a point `probe.points` names or by
+you; or it is **raised** by a role whose item answers `probe`, an outcome every role item outside the
+probe program carries, routed to the probe tool. No role returns `probe` until the role templates
+carry it, so today probes are placed, never raised. Four keys in `.governance/policy.toml` decide what
+opens:
+
+- `probe.points`, default empty: the item tags where a probe opens with the cause `point`. A tag the
+  build's items do not declare is refused by `probe.py points --build <slug>`, naming the key.
+- `probe.raise`, default `roles-and-owner`: `owner-only` refuses a raised probe, and `off` refuses
+  yours as well.
+- `probe.observations`, default `verify-before-place`: where an owner's observation is probed,
+  at `item.entry.place` under `verify-before-place`, at `item.plan.input` under `verify-at-plan`, and
+  nowhere under `on-request`, where you open the probe yourself with the cause `owner`.
+- `probe.experiment.authority`, default `within-cap`: named, with its value, on the owner item an
+  experiment routes to while the experiment shape is unbuilt; `within-cap` is the agent cap the hooks
+  kit enforces.
+
+A cause outside `point`, `owner`, `observation`, `raised` and `reproduction`, the rows of the
+definition's `[[trigger-cause]]` table, is refused. A patch build's `reproduction` always opens.
+
+The tool is `probe.py` in the loop kit, run in your repository, one verb per item it serves:
+
+- **`trigger`**, `probe.py trigger --cause <cause> --asker <item tag> --subject <text>` with `--build <slug>
+  --unit <id>` or `--request <content key>`, and `--at <item tag>` for a point or an observation, opens
+  the probe and writes a `probe-trigger` record in the build's `build/` folder, or,
+  given a request's content key before any build folder exists, `<key>.probe-trigger.md` beside the
+  request's text in your git directory's `requests/` store, which is never pushed. A second
+  observation of the same request joins its open probe and prints `probe — joined`; once that probe
+  has returned, a later trigger opens the next one, `<key>.probe-trigger-2.md` with its probe
+  `<key>.probe-2.md`, and the returned verdict is never written over. A refused cause writes
+  nothing and prints `probe — not opened · <key>: <why> · to <asker>`.
+- **`pin`**, `probe.py pin --trigger <record> --sha <commit> --kind verification|reproduction|experiment
+  --question <text> --losing <text>`, writes the `probe` record's head, the commit, the kind, the question and the losing
+  outcome, before anything runs, and commits it alone as `probe pin(<asker>): <kind>`; a request's
+  head stays in the store, uncommitted, so its git blob is written to the trigger record as `Head`,
+  and `run` refuses, exit 2, a head edited since. A commit that does not resolve exits 2. An experiment routes to the owner
+  item naming dBoundRoles, which builds its shape.
+- **`design`**, `probe.py design --probe <record> --cmd <command> --expect <exit>:<hash>`, with `--mark
+  visual` or `--mark "judge claimed"`, appends one `- method · <exit>:<hash> · <command>` entry to the record's `## Method`
+  section, the prediction made before anything runs. Once `run` has written a run line the method is
+  frozen and `design` exits 2, leaving the record as it was.
+- **`run`**, `probe.py run --probe <record>`, re-runs every entry at the pinned commit through `loop_witness.py rerun` and writes one
+  `run · <exit> · <hash> · <command>` line each. An entry marked `visual` needs a capture adapter not
+  yet built, so nothing runs and the record reads `Verdict: unrunnable`.
+- **`judge`**, `probe.py judge --probe <record>`, computes the verdict from the run lines against the predictions: `confirmed`, `refuted`
+  or `inconclusive`, with `Judged: computed`. An entry marked `judge claimed` is written
+  `Judged: claimed` with no verdict, and goes to you rather than to a gate.
+- **`return`**, `probe.py return --probe <record>`, writes `Writer: stand-in` and prints `probe — <verdict> · <record> · to <asker>`, the line
+  the asking item is re-entered with; a claimed or unrunnable probe goes to you instead.
+
+No probe verdict gates a landing: only Test's verdict does.
+
 ## How much rework a build may do
 
 Every build has one rework budget, the policy key `flow.rework-budget`, and every repetition draws on
@@ -1628,6 +1886,20 @@ build's landing, a wait on a lease another build holds and an unreachable remote
 turn and spend none of this build's budget. `flow.route-backs`, default 3, counts one item's draws:
 past it, that item's loop is non-converging, though a spec subject's review rounds never end its loop.
 
+**Before a build exists, a request has a budget of its own**, keyed to its content key, so a request
+that loops at entry stops too. Its total is the base of `flow.rework-budget`, 4 by default (PINNED): a
+request has no units and nothing freezes, and the build it becomes later starts a budget of its own.
+Its rows live on the request's record `refs/gov/requests/<content key>` on your remote, one commit each,
+so a request another machine takes over keeps its count. `placement.py place` draws one lap before it
+writes a block that repeats an earlier placement: `route-back` once any of the request's blocks was
+refused by its check, and `research` when the request's probe record has come back since its last
+block; the claiming step draws `route-back` on `item.entry.claim` before each fresh slug. The draw
+prints its row, and once the budget is spent `place` prints `placement: pre-claim budget exhausted —
+<content key> · <spent>/<total>`, exits 3 and writes no block. Only you can place it then: a placement
+under `--owner <record>` draws nothing and is written past a spent budget. A remote that does not
+answer, or a race lost to another machine four times (PINNED), draws nothing, and `place` exits 2 with
+no block, so you place again once it answers.
+
 - **Draw on a budget:** `python tools/loop/budget.py draw --build <slug> --cause <cause> --item <item>` <!-- usage: script:tools/loop/budget.py#draw 7c651ac5 -->
   runs at your repository's top level. It prints `loop: budget · drawn · <row>` and exits 0,
   `loop: budget · exhausted · <slug> · <spent>/<total> · flow.on-exhausted` and exits 3, or
@@ -1641,6 +1913,12 @@ past it, that item's loop is non-converging, though a spec subject's review roun
   <MEMORY_ROOT>/builds/*/build/*-transition-*.md merge=union to .gitattributes`. Add that line to your
   `.gitattributes`: two worktrees drawing on one build each append a row, and only a union merge keeps
   both. The draw stands either way.
+  For a request, `--request <content key>` or `--request-text <file>` takes the place of `--build`,
+  with `--rows <file>` holding the request record's messages as the driver's `--request-draw` hands
+  them over; the text form computes the key from the request's words, so it needs no record of them.
+  It writes nothing, prints `draw · <cause> · <item> · <spent>/<total>` (exit 0) or `exhausted ·
+  <spent>/<total>` (exit 3), names on stderr any row it cannot read and does not count it, and refuses
+  a cause as above.
 
 - **See a patch build's origin:** `python tools/loop/budget.py origin --build <slug>` runs at your <!-- usage: script:tools/loop/budget.py#origin 2f439620 -->
   repository's top level and prints `loop: budget · origin · <slug|none>`, the build whose budget a
@@ -1764,7 +2042,7 @@ the definition's check refuses is refused the same way.
   `boundary` each in a scratch repository.
 
 The check trusts `draws` and `waits` as written, so a wrong mark hides a loop. It does not see a wait
-outside the flow, such as the lander's wait on a claim lock, which the loop kit's README lists.
+outside the flow, one that lives in code with a deadline of its own.
 
 ## How to use it
 
@@ -1772,7 +2050,8 @@ outside the flow, such as the lander's wait on a claim lock, which the loop kit'
   workflow with its order, step and reach word, then the dispositions and one line per alias. It
   prints one `loop: program` line per step, with its items in an order where each comes after the
   items it needs, then a `loop: program review` line for the review program, whose items are tagged
-  `item.review.<name>`, carry the step `none` and sit in no step. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
+  `item.review.<name>`, carry the step `none` and sit in no step, and the same for the probe program
+  and the entry program, `loop: program probe` and `loop: program entry`. Where the playbook kit is not installed, a `loop: inputs unarmed` line comes first
   and the inputs go unchecked. Then it prints one `loop: item` line per item, saying where each of
   its fields comes from, or `pending` or `unarmed`, and a `loop: items` count line. Then it
   prints the witness classes, one line per witness alias and per step's and item's witness, one line per

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-71
 
 **Carries:** cl-dClosedLoop-0138@b6141505 whole
 **Carries:** node:policy-key.leases.offer-seconds
@@ -13,9 +13,16 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-a.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-a.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-build-TOOL-dPlacedRequest-20-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dPlacedRequest-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-13 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -36,16 +43,24 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
   `write_gov_ref <lease ref> <tip read> <commit>`, keeping the epoch it read; an absent lease is a
   create at epoch 1. It is legal on an absent lease and on a `released` one; a `live` or `held` lease
   refuses `live-holder`, a terminal one `terminal`, each on TOOL-dPlacedRequest-1's refusal line, and a
-  tag `resolve_fleet_tag`'s registry does not hold is refused before any read. Observed by AC1, AC2.
+  tag `resolve_fleet_tag`'s registry does not hold is refused before any read.
+  `--to <fleet tag>/<session>` offers to one session: it writes `offer: <fleet tag>/<session>`, its
+  session half held by TOOL-dPlacedRequest-1's `check_lease_segment` before any read, and S2 classes
+  the lease `offered` for every other session, the named node's included, until the deadline. A
+  session half that is empty or the literal `absent` exits 2 naming `--to` before any read, because
+  the identity rule TOOL-dPlacedRequest-32 S1 states makes either value no session, so it names no
+  one; this unit applies that rule itself, since it builds before unit 32. Observed by AC1, AC2,
+  AC9.
 - **S2** — The `offered` class: `CLAIM_READS` (`tools/unattended/unattended.sh:2219`) gains `offered`,
-  derived for the `lease` mode TOOL-dPlacedRequest-1 adds when the record's `offer` names another fleet
-  tag and `check_deadline_passed <lease ref> <tip> <offer-deadline>` returns 1, not yet. `acquire` and
+  derived for the `lease` mode TOOL-dPlacedRequest-1 adds when the record's `offer` names neither this
+  node's fleet tag nor that tag, `/` and this harness's session, and
+  `check_deadline_passed <lease ref> <tip> <offer-deadline>` returns 1, not yet. `acquire` and
   `take-over` reading `offered` print `lease refused — offered · <tail> · <target tag>` and write
   nothing; the `status` mode announces it, and `beat` declines it as it declines every foreign class.
-  Observed by AC3.
-- **S3** — The named node and the expired offer: for the node the offer names, and for every node once
-  `check_deadline_passed` returns 0, the offer is ignored and the lease classes as the `released` lease
-  it is. An acquisition writes `offer: -` and `offer-deadline: -`, so an acquired lease carries no
+  Observed by AC3 and AC9.
+- **S3** — The named node and the expired offer: for the node, or the node's session, the offer
+  names, and for every node once `check_deadline_passed` returns 0, the offer is ignored and the
+  lease classes as the `released` lease it is. An acquisition writes `offer: -` and `offer-deadline: -`, so an acquired lease carries no
   stale offer. A record whose `offer` reads `-` carries no offer. Observed by AC4, AC5.
 - **S4** — The unsighted offer: when `check_deadline_passed` returns 2, the feed has not seen the tip,
   and the offer holds, its window opening at this node's first sighting. A window that is not a whole
@@ -79,11 +94,13 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-1` — the lease grammar `refs/gov/leases/<slug>/build` and its unit and run forms, the `--lease` verb and its `lease` mode, the record's `offer`, `offer-deadline` and `epoch` keys, `resolve_fleet_tag` and the refusal line; without it there is no lease to offer
+- **consumes-from** `TOOL-dPlacedRequest-1` — the lease grammar `refs/gov/leases/<slug>/build` and its unit and run forms, the `--lease` verb and its `lease` mode, the record's `offer`, `offer-deadline` and `epoch` keys, `resolve_fleet_tag`, `check_lease_segment` and the refusal line; without it there is no lease to offer
 - **consumes-from** `TOOL-dPlacedRequest-17` — `read_first_seen` behind `check_deadline_passed`, and `read_lease_bound offer`, the observer clock an offer's window is judged on and the window itself; without it the deadline would be judged on the reader's raw clock, which clause 0135 forbids
 - **consumes-from** external — dGroundRules' catalogue row for `leases.offer-seconds` and its reader `python tools/policy/policy.py get <key>`, which the chain builds before this build's build run
 - **hands-off** `TOOL-dPlacedRequest-28` — `write_lease_offer`'s absent-lease branch, which that unit routes through `read_feed_lease_tip`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-34` — S1's `--to <fleet tag>/<session>` form, which that unit's S49 own-tag refusal admits when the session half names another session on the caller's own node
+- **hands-off** `TOOL-dPlacedRequest-32` — `me`'s session half and the `--to` refusal, which apply that unit's S1 identity rule, unset, empty and `absent` one value meaning no session, here first because this unit builds at order 6, so that unit's rule covers the offer read when it lands
 
 ## 4. Design
 
@@ -108,7 +125,7 @@ old read, and so an old epoch, is refused as `epoch-fence` (gap-conc-19; P40, th
 | Key | Value | Written by |
 |---|---|---|
 | `status` | `released` | `--lease offer` |
-| `offer` | the target node's fleet tag, one registered tag | `--lease offer` |
+| `offer` | the target node's fleet tag, one registered tag, or that tag, `/` and one session | `--lease offer` |
 | `offer-deadline` | an integer number of seconds, `read_lease_bound offer` at the write | `--lease offer` |
 | `epoch` | the epoch read, unchanged; 1 on a create | `--lease offer` |
 
@@ -124,8 +141,15 @@ The offer test sits before the identity rows of the class derivation, in the `le
 offer   = record's `offer`; `-` or empty is no offer
 window  = record's `offer-deadline`; not a whole number reads as expired
 open    = check_deadline_passed <lease ref> <tip> <window> returns 1 or 2
-offered = offer present, offer != resolve_fleet_tag's tag, and open
+me      = resolve_fleet_tag's tag, and me/<session> only when the rule TOOL-dPlacedRequest-32 S1
+          states finds a session, applied here first: CLAUDE_CODE_SESSION_ID unset, empty or `absent` is none, and forms no
+          <tag>/<session>
+offered = offer present, offer equal to neither form of me, and open
 ```
+
+The session is the one the driver's claim test reads (`tools/unattended/unattended.sh@875eaadf:2585`),
+so an offer to `b/s1` holds the lease from session `s2` on node `b` as from node `a`, and a caller
+with no session matches only a whole-node offer.
 
 `offered` routes `acquire` and `take-over` to the refusal line, `status` to its announce line and
 `beat` to its silent decline. A malformed window frees the lease rather than holding it for ever,
@@ -149,7 +173,7 @@ check reads that as red.
 
 | Identifier | Kind | Where |
 |---|---|---|
-| `offer` | an act of the `--lease` verb, with `--to <fleet tag>` | `tools/unattended/unattended.sh` |
+| `offer` | an act of the `--lease` verb, with `--to <fleet tag>[/<session>]` | `tools/unattended/unattended.sh` |
 | `write_lease_offer` | function | `tools/unattended/unattended.sh` |
 | `offered` | claim-read class and refusal cause | `CLAIM_READS`, the refusal line |
 | `offer`, `offer-deadline` | record keys, given behaviour here (I6 declares them) | the lease record |
@@ -160,6 +184,12 @@ check reads that as red.
 - `tools/unattended/STOPS.template.md`, rendered to `memory/guides/UNATTENDED-STOPS.md`
 - `tools/unattended/VERBS.template.md`, rendered to `memory/guides/UNATTENDED-VERBS.md`
 - `tools/unattended/unattended.test.sh`
+- `help/loop.md`: the `verb:unattended.sh:--lease` usage anchor's fingerprint, refreshed to the one
+  the govkit kit's `docs_leg.py --fingerprints` prints once this unit moves the usage line
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
+  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
+  only
 
 ### Alternatives rejected
 
@@ -225,15 +255,24 @@ is the observation.
 - **AC7** — When `python policy.py get leases.offer-seconds` runs in the built tree it prints `300`,
   and `--lease offer` writes `offer-deadline: 300`.
   Red when: the window is typed in the driver rather than read through `read_lease_bound offer`.
-- **AC8** — When `grep -n "offered" tools/unattended/STOPS.template.md` and
-  `grep -n "lease offer" tools/unattended/VERBS.template.md` run, each finds its row.
-  Red when: either guide omits the class or the act.
+- **AC8** — When `grep -n "offered" tools/unattended/STOPS.template.md`,
+  `grep -n "lease offer" tools/unattended/VERBS.template.md` and
+  `grep -nF -- "--to <fleet tag>/<session>" tools/unattended/VERBS.template.md` run, each finds its row.
+  Red when: either guide omits the class or the act, or the verbs guide omits the session form.
+- **AC9** — When clone A runs `unattended.sh --lease offer unit fx u1 --to b/s1`, the remote record
+  reads `offer: b/s1`; clone B then running `--lease acquire unit fx u1` under
+  `CLAUDE_CODE_SESSION_ID=s2` within the window prints `lease refused — offered` and leaves the tip
+  unmoved, and under `s1` it lands with `offer: -`; `--to 'b/s 1'`, `--to b/absent` and `--to b/`
+  each exit 2 before any remote read. Over the offer to `b/s1`, clone B under
+  `CLAUDE_CODE_SESSION_ID=absent`, and again with it unset, prints `lease refused — offered`.
+  Red when: another session on the named node takes the unit before the window passes, the record
+  names the node alone, or a caller with no session matches an offer to a session.
 
 ## 7. Gates
 
-`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates`
+`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `scratch-guard self-test` · `tier2-review self-test` · `docs` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 · the offered class and its per-cell row, an expired and an unsighted offer and a replayed stale take, staged against the base driver, which has no offer act · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 AC9 · the offered class and its per-cell row, an expired and an unsighted offer and a replayed stale take, staged against the base driver, which has no offer act · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -266,6 +305,21 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC6 · th
   `recall floor arms`, the legs `memory/guides/UNATTENDED-STOPS.md` in Files touched trips.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-28,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-11-19 · §2 S1, S2, S3 · §3 Edges · §4 The offer record, The class derivation · §6 AC9
+  · §7 · adopts ask TOOL-dPlacedRequest-71 per the brief
+  `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: `--to <fleet tag>/<session>` offers to one
+  session, every other session on the named node included reading `offered` until the deadline; §7
+  gains the two legs the spec-token guard join names.
+- rev-5 · 2026-11-19 · §2 S1 · §3 Edges · §4 The class derivation, Inventory · §6 AC8, AC9 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`: finding 22
+  (H5), a hands-off to TOOL-dPlacedRequest-34 S49 names the own-node session offer its own-tag refusal
+  must admit; findings 3, 18 and 29 (M2), the caller's session half follows TOOL-dPlacedRequest-32 S1's
+  rule, a `--to` whose session half is empty or `absent` exits 2, the hands-off edge to
+  TOOL-dPlacedRequest-32 is added in build order, the Inventory row spells the session form, and AC8 and AC9 observe
+  both.
+- rev-6 · 2026-11-19 · §4 Files touched · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), `help/loop.md` refreshes
+  the `--lease` anchor and §7 names `docs`; finding 17 (M8), this unit's own pass regenerates
+  `memory/map/generated/`, named in Files touched, and §7 names its leg.
 
 ## 10. Reuse audit
 

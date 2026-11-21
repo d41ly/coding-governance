@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-6 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,14 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-30-deviation-301.md](../build/2026-10-25-build-TOOL-dPlacedRequest-30-deviation-301.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-build-TOOL-dPlacedRequest-30-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dPlacedRequest-30-1-acceptance-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -34,12 +40,15 @@ with exit 2 and a collision line, and nothing of it is written.
 ## 2. Scope (IN)
 
 - **S1** — The collision refusal. `unattended.sh --request <file>`, after computing the key and before
-  any write, compares the file's bytes with `<git-common-dir>/requests/<key>.md` when that copy
-  exists; on any difference it prints `request not written — <key> · collision: a different text keys
-  alike, the stored copy is <path>` and exits 2. It copies nothing, appends no `.typed` line, builds no
-  commit and pushes nothing. Observed by AC1.
-- **S2** — The same words again. Bytes equal to the stored copy keep `TOOL-dPlacedRequest-19` S2 and
-  S3 unchanged: the `.typed` line, and the "already recorded" exit 0 on a lost create. Observed by AC2.
+  any write, compares the file's words with `<git-common-dir>/requests/<key>.md` when that copy
+  exists, both folded as the key folds whitespace (§4 "The fold"); on a difference that survives the
+  fold it prints `request not written — <key> · collision: a different text keys alike, the stored
+  copy is <path>` and exits 2. It copies nothing, appends no `.typed` line, builds no commit and pushes
+  nothing. Observed by AC1.
+- **S2** — The same words again. Words equal to the stored copy once folded, a CRLF, BOM, final-newline
+  or re-wrapped copy included, keep `TOOL-dPlacedRequest-19` S2 and S3 unchanged: the stored copy stays
+  as first written, the `.typed` line is appended, and a lost create is the "already recorded" exit 0.
+  Observed by AC2.
 - **S3** — The verbs guide's `--request` row (`tools/unattended/VERBS.template.md`, rendered to
   `memory/guides/UNATTENDED-VERBS.md`) names the collision outcome and its exit code. Observed by AC3.
 
@@ -56,7 +65,7 @@ with exit 2 and a collision line, and nothing of it is written.
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-19` — `--request`, its key and its store `<git-common-dir>/requests/`, whose first-copy rule this unit replaces with a refusal; without them there is no request to refuse
-- **hands-off** `TOOL-dPlacedRequest-43` — the collision compare, which that unit's item for finding 39 holds under `write_node_lock` on `requests.lock`
+- **hands-off** `TOOL-dPlacedRequest-43` — the collision compare, which that unit's item for finding 39 holds under `write_dir_lock` on `requests.lock`
 
 ## 4. Design
 
@@ -64,13 +73,26 @@ with exit 2 and a collision line, and nothing of it is written.
 
 ```
 key = request.py key <file>
-requests/<key>.md exists and cmp -s fails  -> collision line, exit 2, nothing written
-requests/<key>.md absent                   -> copy, .typed, record   (TOOL-dPlacedRequest-19 S2, S3)
-requests/<key>.md byte-equal               -> .typed, record         (TOOL-dPlacedRequest-19 S2, S3)
+requests/<key>.md exists, folds differ      -> collision line, exit 2, nothing written
+requests/<key>.md absent                    -> copy, .typed, record   (TOOL-dPlacedRequest-19 S2, S3)
+requests/<key>.md exists, folds equal       -> .typed, record         (TOOL-dPlacedRequest-19 S2, S3)
 ```
 
-The compare is `cmp -s`, before the copy, the `.typed` append and `build_gov_commit`, so a refused
-request touches no file and no ref.
+The compare runs before the copy, the `.typed` append and `build_gov_commit`, so a refused request
+touches no file and no ref.
+
+### The fold
+
+`derive_content_key` joins the words of a text split on whitespace runs
+(`tools/memory-tree/row_grammar.py@2b622305:1430-1434`), and `TOOL-dPlacedRequest-19`'s reader drops a
+leading UTF-8 BOM, so a CRLF copy, a BOM copy, a copy without its final newline and a re-wrapped copy
+all key alike with different bytes; with `core.autocrlf=true` on this fleet the first is routine. The
+compare applies that same fold to both texts and nothing more: a leading BOM dropped, every run of
+space, tab, CR, LF, form feed or vertical tab replaced by one space, and the ends trimmed, one `sed`
+and `tr` pipeline per text, then `cmp -s` over the two results. Case, dates and links, which the key
+also drops, are not folded, so two texts the key alone equates stay a collision. What it does not
+fold: a non-ASCII whitespace character, which Python's `split` folds, reads as a difference, so such a
+copy is refused as a collision rather than taken as the same words.
 
 ### Files touched (estimate)
 
@@ -78,6 +100,10 @@ request touches no file and no ref.
 - `tools/unattended/unattended.test.sh`: the collision arm
 - `tools/unattended/VERBS.template.md`: the `--request` row
 - `memory/guides/UNATTENDED-VERBS.md`: its render
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
+  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
+  only
 
 ### Alternatives rejected
 
@@ -97,7 +123,7 @@ request touches no file and no ref.
   record names the first; this unit cannot see that case (§3).
 - testing — the probes of §6 and the arm in §7.
 - migration — none.
-- user docs — `memory/guides/UNATTENDED-VERBS.md`; no `help/` page describes the driver's verbs.
+- user docs — `memory/guides/UNATTENDED-VERBS.md`; `help/loop.md` anchors the driver's verbs beside its `--claims` paragraph, and this unit adds no verb.
 
 ## 6. Acceptance criteria
 
@@ -111,17 +137,20 @@ the lease switch on, a fixture `fleet.toml`.
   Red when: the second request exits 0 or writes anything, the planted case being
   `TOOL-dPlacedRequest-19`'s first-copy rule.
 - **AC2** — When clone A runs `--request a.md` twice, the second prints that the request is already
-  recorded and exits 0.
-  Red when: an identical request is refused as a collision.
+  recorded and exits 0; the same holds for a copy of `a.md` with CRLF line endings, a copy with a
+  UTF-8 BOM and CRLF, and a copy re-wrapped at another width, and after each
+  `<git-common-dir>/requests/<key>.md` is still byte-identical to `a.md`.
+  Red when: an identical request is refused as a collision, a copy differing only in line endings, a
+  BOM or wrapping is refused, or the stored copy is replaced.
 - **AC3** — When `grep -n 'collision' tools/unattended/VERBS.template.md` runs, the `--request` row
   names the outcome and exit 2.
   Red when: the guide omits it.
 
 ## 7. Gates
 
-`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `tier2-review self-test` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a date-differing pair and an identical pair, staged against the first-copy rule · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a date-differing pair, an identical pair and its CRLF, BOM and re-wrapped copies, staged against the first-copy rule and a raw `cmp -s` · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -138,6 +167,15 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a date-differi
   `<git-common-dir>/` prefix, so they do not read as repository paths.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-4 · 2026-11-19 · §3 Edges · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` finding 15 (H3): the node lock is the shared `write_dir_lock` family, which `TOOL-dPlacedRequest-24` rev-5 S1 moves into `gov_feed_sh`, so every name of the lock factory this spec spells is that family's. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-5 · 2026-11-19 · §2 S1, S2 · §4 The order of `--request`, The fold · §6 AC2 · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit` findings 15 and 31 (item L9): the collision test
+  compares both texts under the key's own whitespace fold, a leading BOM dropped, so a CRLF, BOM,
+  final-newline or re-wrapped copy is the same words again, and AC2 plants each.
+- rev-6 · 2026-11-19 · §4 Files touched · §5 · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), the user-docs line names
+  `help/loop.md`, which anchors the driver's verbs; finding 17 (M8), this unit's own pass
+  regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
 
 ## 10. Reuse audit
 

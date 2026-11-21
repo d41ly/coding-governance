@@ -411,9 +411,12 @@ SWEEP_NOBASELINE_RX='expected set not yet observed'
 # THE NODE IS THE CHARTER'S NODE-REGISTRY TAG, never a hostname, which the registry does not know:
 # GOV_NODE when set, else USERNAME/USER matched against the registry table of the charter at the
 # repo root — `AGENTS.md`, then `CLAUDE.md`, the precedent `run-gates.gov.test.sh` spells — with the
-# row regex the drift audit's `_resolve_node_tag` uses (the registry's machine/user token is a
-# SUBSTRING of the lowercased user). Prints the tag; returns 1 when no row
-# matches, and the caller refuses BY NAME rather than falling back to a hostname.
+# row regex the drift audit's `_resolve_node_tag` uses. ONE REGISTRY, ONE RULE (TOOL-dPlacedRequest-43
+# S20): that table is the one the playbook kit's `derive_node_table` renders from `fleet.toml`, and the
+# row's user token, case-folded, must EQUAL the case-folded user, `read_fleet_tag`'s rule, which the
+# unattended driver's `resolve_fleet_tag` asks; a substring match named `a` for a user `daily-agent2`.
+# It stays a read of the rendered table because this kit carries no playbook kit. Prints the tag;
+# returns 1 when no row matches, and the caller refuses BY NAME rather than falling back to a hostname.
 _rs_reg_rx='^\|[[:space:]]*`([a-z])`[[:space:]]*\|[[:space:]]*`?([A-Za-z0-9_@.-]+)`?'
 read_registry_tags() {  # every tag the registry table carries, one per line
   local f line
@@ -444,7 +447,7 @@ resolve_node_tag() {
     while IFS= read -r line; do
       if [[ "$line" =~ $_rs_reg_rx ]]; then
         tok=${BASH_REMATCH[2],,}
-        case "$user" in *"$tok"*) printf '%s' "${BASH_REMATCH[1]}"; return 0 ;; esac
+        [ "$user" != "$tok" ] || { printf '%s' "${BASH_REMATCH[1]}"; return 0; }
       fi
     done < "$f"
   done
@@ -727,6 +730,72 @@ for line in open(budgets, encoding="utf-8"):
     if filt and filt not in argv:
         continue
     print("\t".join(["ok", name, budget, argv]))
+PY
+}
+
+# THE PLANT-COUNT TOKEN (TOOL-dPlacedRequest-99 S5). A loop-kit row's budget is a proxy read plant by
+# plant, so a reading over fewer plants than the leg now runs under-prices it silently: the placement
+# row priced fifteen plants against twenty-nine. Every `ok` row of the population `read_population`
+# computed, its own argv or its held leg's with `{prefix}` resolved, whose argv names
+# `<tool root>/loop/<module>.py` for a module holding a module-level `PLANTS` carries `plants=<n>` in
+# its note, equal to `len(PLANTS)` once the module is IMPORTED, the collection its self-test iterates:
+# a static count of the dict literal misses `PLANTS.update(...)` at import. A module that fails to
+# import is a finding naming it, never a skip. -> findings, then one summary line, on stdout; 0 when
+# none, 1 otherwise. WHAT THIS DOES NOT CHECK: that the row's reading covered the plants its token
+# names, which only re-reading the leg shows; or any row whose argv runs no such module.
+check_plant_tokens() { # population file · budgets -> its lines on stdout; 0 clean, 1 a finding
+  "$PYBIN" -I - "$1" "$2" "$TROOT" <<'PY'
+import contextlib, importlib.util, io, os, re, sys
+sys.stdout.reconfigure(newline="")
+pop, budgets, troot = sys.argv[1], sys.argv[2], sys.argv[3]
+mod_rx = re.compile(re.escape(troot + "/" if troot not in ("", ".") else "") + r"loop/([A-Za-z_][A-Za-z0-9_]*)\.py")
+notes = {}
+for line in open(budgets, encoding="utf-8"):
+    f = line.rstrip("\r\n").split("\t")
+    if line.strip() and not line.lstrip().startswith("#") and len(f) == 4:
+        notes[f[0]] = f[3]
+counts, findings, graded = {}, [], 0
+for line in open(pop, encoding="utf-8"):
+    f = line.rstrip("\r\n").split("\t")
+    if len(f) != 4 or f[0] != "ok":
+        continue
+    name, argv = f[1], f[3]
+    for tok in argv.split():
+        m = mod_rx.fullmatch(tok)
+        if not m:
+            continue
+        if tok not in counts:
+            stem, d = m.group(1), os.path.dirname(os.path.abspath(tok))
+            try:
+                mod = sys.modules.get(stem)
+                if mod is None or os.path.dirname(os.path.abspath(getattr(mod, "__file__", "") or "")) != d:
+                    if d not in sys.path:
+                        sys.path.insert(0, d)
+                    spec = importlib.util.spec_from_file_location(stem, tok)
+                    mod = importlib.util.module_from_spec(spec)
+                    sys.modules[stem] = mod
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        spec.loader.exec_module(mod)
+                plants = getattr(mod, "PLANTS", None)
+                counts[tok] = len(plants) if isinstance(plants, (dict, list, tuple, set)) else None
+            except BaseException as e:
+                counts[tok] = "import failed: %s: %s" % (type(e).__name__, str(e).splitlines()[0][:160] if str(e) else "")
+        n = counts[tok]
+        if n is None:
+            continue
+        graded += 1
+        if isinstance(n, str):
+            findings.append("row '%s' runs %s, which did not import, so its plants cannot be counted (%s)" % (name, tok, n))
+            continue
+        got = re.findall(r"(?<![A-Za-z0-9_])plants=(\d+)(?![0-9])", notes.get(name, ""))
+        if not got:
+            findings.append("row '%s' runs %s, whose PLANTS holds %d plant(s) once imported, and its note carries no plants=<n> token" % (name, tok, n))
+        elif len(got) > 1 or int(got[0]) != n:
+            findings.append("row '%s' carries plants=%s, and %s's PLANTS holds %d plant(s) once imported, the count its self-test runs" % (name, ",".join(got), tok, n))
+for x in findings:
+    print(x)
+print("plant tokens graded %d row(s), %d finding(s)" % (graded, len(findings)))
+sys.exit(1 if findings else 0)
 PY
 }
 
@@ -1127,6 +1196,14 @@ PY
   else
     echo "run-selftests: no pooled evidence at $EVIDENCE, so the evidence-shape arm graded NOTHING — --pooled refuses every row until --pooled --calibrate writes one"
     ev_note=", no pooled evidence file"
+  fi
+  # THE PLANT-COUNT TOKEN of every loop-kit row (TOOL-dPlacedRequest-99 S5), over the same population.
+  if pt_out=$(check_plant_tokens "$POP_FILE" "$BUDGETS"); then
+    ev_note="$ev_note, ${pt_out##*$'\n'}"
+  else
+    echo "run-selftests: a loop-kit row's plants=<n> token does not match the plants its module runs — re-price the row over every plant, then set the token:" >&2
+    printf '%s\n' "$pt_out" | sed 's/^/  /' >&2
+    fails=1
   fi
   [ "$NROWS" -gt 0 ] || { echo "run-selftests: the declaration is EMPTY, so both directions above passed by finding nothing" >&2; fails=1; }
   [ "$fails" = 0 ] && echo "run-selftests: declaration clean — $NROWS row(s), every held leg budgeted, every row resolvable$ev_note"

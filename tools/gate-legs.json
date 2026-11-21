@@ -370,7 +370,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 4370,
+    "ceiling": 6480,
     "stage": ["step.test"]
   },
   {
@@ -2242,6 +2242,58 @@
     "subject": "kit",
     "ceiling": 120,
     "enforces": ["principle.p23"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop request fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/request.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 120,
+    "enforces": ["principle.p40"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop probe fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/probe.py",
+      "--selftest"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p31"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop placement fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/placement.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 200,
+    "enforces": ["principle.p22"],
+    "stage": ["step.test"]
+  },
+  {
+    "name": "loop claim fixtures",
+    "argv": [
+      "python",
+      "{prefix}/loop/claim.py",
+      "--fixture"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300,
+    "enforces": ["principle.p39"],
     "stage": ["step.test"]
   },
   {

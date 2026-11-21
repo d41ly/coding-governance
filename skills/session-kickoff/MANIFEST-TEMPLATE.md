@@ -22,7 +22,8 @@ multi-node ruleset (if adopted) lives in the governance doc, referenced — not 
 - Every work-unit that changed what this file front-loads writes the delta back before wrap-up — a
   gate command, entrypoint, governing doc, layout/branch convention, a trap hit, a doc/memory claim
   found stale, or **a fact the session had to re-derive that this file should have front-loaded**
-  (the accretion trigger); no delta → no touch.
+  (the accretion trigger); no delta → no touch. Once §B's facts are level-2 units, a new fact is
+  proposed with `instructions_edit.py propose add --manifest overlay` rather than written into §B.
 - `last-audit` is an assertion of verification, re-stamped ONLY after actually re-verifying §B, with
   a delta line (`manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp:
   <n>`, n counted from the OLD stamp before re-stamping) in the commit message; the gate goes red

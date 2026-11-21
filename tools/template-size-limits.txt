@@ -179,7 +179,11 @@ memory/guides/BUILD-METHOD.md	30720
 # beside PHASES_EXTRA, which TOOL-dDeclaredLoop-63 wrote for the protocol to state. The render measures
 # 68288 CR-stripped, and the row is that figure because this block's rule is no headroom. A run's
 # raise, on the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-75).
-memory/guides/UNATTENDED-PROTOCOL.md	68288
+# RAISED 68288 -> 68374, 2026-11-20, by TOOL-dPlacedRequest-5: section 1's spec-audit opt-in sentence
+# names the owner's placed spec audit, source `placement`, which that unit's spec has the protocol state.
+# The render measures 68374 CR-stripped (DERIVED), and the row is that figure because this block's rule
+# is no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-5).
+memory/guides/UNATTENDED-PROTOCOL.md	68374
 
 # --- the unattended Skill, as rendered ----------------------------------------------------------
 # 10240 bytes = 10 KiB, CR-stripped (TOOL-aMendedFleet-68 S5). The Skill is the first file every
@@ -239,7 +243,50 @@ memory/guides/UNATTENDED-PROTOCOL.md	68288
 # MERGED at dDeclaredLoop's reconcile of origin/main 4e6ac5f7c, 2026-11-18: the render measures 11015
 # CR-stripped, every raise above kept, and the row is that figure, with no headroom. A run's raise, on
 # the four terms above (memory/DECISIONS.md, TOOL-dDeclaredLoop-20).
-.claude/skills/unattended/SKILL.md	11015
+# RAISED 11015 -> 11051, 2026-11-19, by TOOL-dPlacedRequest-13: the `--feed check` line the fenced verb
+# list gains, which the kit gate's check 26 requires of every declared verb, so it is a block the gate
+# reads and no prose coming back. The render measures 11051 CR-stripped, and the row is that figure,
+# with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-13).
+# RAISED 11051 -> 11094, 2026-11-19, by TOOL-dPlacedRequest-1: the `--lease acquire build <slug>` line the
+# fenced verb list gains, which the kit gate's check 26 requires of the declared `--lease` verb, so it is a
+# block the gate reads and no prose coming back. The render measures 11094 CR-stripped, and the row is
+# that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-1).
+# RAISED 11094 -> 11151, 2026-11-19, by TOOL-dPlacedRequest-12: the `--register problem <subject> <item>
+# <file>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--register` verb, so it is a block the gate reads and no prose coming back. The render measures 11151
+# CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms above
+# (memory/DECISIONS.md, TOOL-dPlacedRequest-12).
+# RAISED 11151 -> 11182, 2026-11-19, by TOOL-dPlacedRequest-19: the `--request <file>` line the fenced
+# verb list gains, which the kit gate's check 26 requires of the declared `--request` verb, so it is a
+# block the gate reads and no prose coming back. The render measures 11182 CR-stripped (DERIVED), and the
+# row is that figure, with no headroom. A run's raise, on the four terms above (memory/DECISIONS.md,
+# TOOL-dPlacedRequest-19).
+# RAISED 11182 -> 11237, 2026-11-20, by TOOL-dPlacedRequest-33: the `--card-ref write <slug> --message
+# <file>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--card-ref` verb, so it is a block the gate reads and no prose coming back. The render measures 11237
+# CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms
+# above (memory/DECISIONS.md, TOOL-dPlacedRequest-33).
+# RAISED 11237 -> 11293, 2026-11-20, by TOOL-dPlacedRequest-8: the `--path-tokens --files-touched HEAD
+# <spec>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--path-tokens` verb, so it is a block the gate reads and no prose coming back. The render measures
+# 11293 CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four
+# terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-8).
+# RAISED 11293 -> 11351, 2026-11-20, by TOOL-dPlacedRequest-14: the `--request-draw <key> --cause <c> --item
+# <i>` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--request-draw` verb, so it is a block the gate reads and no prose coming back. The render measures
+# 11351 CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four
+# terms above (memory/DECISIONS.md, TOOL-dPlacedRequest-14).
+# RAISED 11351 -> 11389, 2026-11-20, by TOOL-dPlacedRequest-5: the `--request-consent <key>` line the
+# fenced verb list gains, which the kit gate's check 26 requires of the declared `--request-consent`
+# verb, so it is a block the gate reads and no prose coming back. The render measures 11389 CR-stripped
+# (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms above
+# (memory/DECISIONS.md, TOOL-dPlacedRequest-5).
+# RAISED 11389 -> 11455, 2026-11-20, by TOOL-dPlacedRequest-21: the `--entry-claim <slug> --request <key>
+# [--pieces <n>]` line the fenced verb list gains, which the kit gate's check 26 requires of the declared
+# `--entry-claim` verb, so it is a block the gate reads and no prose coming back. The render measures 11455
+# CR-stripped (DERIVED), and the row is that figure, with no headroom. A run's raise, on the four terms
+# above (memory/DECISIONS.md, TOOL-dPlacedRequest-21).
+.claude/skills/unattended/SKILL.md	11455
 
 # --- every LIVE spec, a CLASS row (TOOL-aMendedFleet-25) --------------------------------------
 # 49152 bytes = 48 KiB, CR-stripped, the charter template's own ceiling, so no spec costs more to

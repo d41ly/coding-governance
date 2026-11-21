@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-25 — a write that opens a holder's tenure renews the lease
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-3 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,14 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-25-deviation-251.md](../build/2026-10-25-build-TOOL-dPlacedRequest-25-deviation-251.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-build-TOOL-dPlacedRequest-25-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dPlacedRequest-25-1-acceptance-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -34,16 +40,20 @@ unit of H1.
 
 - **S1** — One derivation of `renews`, `derive_lease_renews <epoch read> <epoch written> <policy>
   <witness verdict>`, in `tools/unattended/unattended.sh`, prints `yes`, `no` or `-`. `<epoch read>` is
-  empty on a create; `<witness verdict>` is `new` when the write carries a witness that passes
-  `TOOL-dPlacedRequest-1` S8's test and differs from the record's, else `none`. Every lease write
-  `TOOL-dPlacedRequest-1` builds sets `renews` from it and from nothing else. Observed by AC3.
+  empty on a create. `<witness verdict>` takes three values. It is `new` when the write carries a
+  witness that `check_lease_witness` answers `transition` and that differs from the record's. It is
+  `question` when `check_lease_witness` answers `question` (`TOOL-dPlacedRequest-1` rev-7 S8 and §4 "The
+  question witness"), whatever the record's `witness` holds. It is `none` otherwise, a
+  `question-closed` answer included. Every lease write `TOOL-dPlacedRequest-1` builds sets `renews` from
+  it and from nothing else. Observed by AC3 and AC5.
 - **S2** — The tenure rule. Under `none` it prints `-`. Under `progress`, `activity` and `fixed`, a
   create or a write whose epoch differs from the epoch read prints `yes`, witness or not. Otherwise
   `progress` prints `yes` for a `new` witness and `no` for none, `activity` prints `yes`, and `fixed`
   prints `no`. The rule is keyed on the epoch change and not on the act's name, so every act that
   opens a tenure takes it: the create, the take, the announced take, `take-over`, the first lease
   write over a legacy claim, and `TOOL-dPlacedRequest-16`'s take of a `released` lease and its draw.
-  Observed by AC1, AC2 and AC3.
+  A `question` verdict prints as a `new` one does under every value. Observed by AC1, AC2, AC3 and
+  AC5.
 - **S3** — The stops guide's section 7 (`tools/unattended/STOPS.template.md`, rendered to
   `memory/guides/UNATTENDED-STOPS.md`) states, beside `leases.renewal`'s row, that a write opening a
   tenure renews under every value but `none`. Observed by AC4.
@@ -52,24 +62,29 @@ unit of H1.
 
 - No change to how a lease is aged: the walk that stops at the tenure's start, and the verdict of a
   tenure with no renewing commit, are `TOOL-dPlacedRequest-26`'s.
-- No change to what a witness is: `TOOL-dPlacedRequest-1` S8's trailer test stands.
+- No change to what a witness is: `TOOL-dPlacedRequest-1` rev-7 S8 and its `check_lease_witness`
+  decide it, the transition test and the question witness both; this unit only maps the check's
+  answer to a verdict.
 - No new record key: `renews` and `epoch` are `TOOL-dPlacedRequest-1`'s I6 keys.
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-1` — the lease writer, the `renews`, `witness` and `epoch` keys and `read_lease_policy`'s `leases.renewal`, whose per-write value this unit derives; without them there is no write to set `renews` on
+- **consumes-from** `TOOL-dPlacedRequest-1` — the lease writer, the `renews`, `witness` and `epoch` keys, `read_lease_policy`'s `leases.renewal`, whose per-write value this unit derives, and S8's question-witness branch, whose `check_lease_witness` answer `question` is this unit's third verdict; without them there is no write to set `renews` on, and a held question would read `none`
 - **hands-off** `TOOL-dPlacedRequest-16` — `derive_lease_renews`, through which the take of a `released` lease and the draw set `renews`, so each opens its tenure renewed
 
 ## 4. Design
 
 ### The table
 
-| `leases.renewal` | create, or epoch changed | same epoch, new witness | same epoch, no new witness |
-|---|---|---|---|
-| `progress` | `yes` | `yes` | `no` |
-| `activity` | `yes` | `yes` | `yes` |
-| `fixed` | `yes` | `no` | `no` |
-| `none` | `-` | `-` | `-` |
+| `leases.renewal` | create, or epoch changed | same epoch, `new` | same epoch, `question` | same epoch, `none` |
+|---|---|---|---|---|
+| `progress` | `yes` | `yes` | `yes` | `no` |
+| `activity` | `yes` | `yes` | `yes` | `yes` |
+| `fixed` | `yes` | `no` | `no` | `no` |
+| `none` | `-` | `-` | `-` | `-` |
+
+The `question` column renews under `progress` even on a second beat whose witness equals the record's,
+which is how a declared wait outlives `leases.expiry-hours` (ask TOOL-dPlacedRequest-67).
 
 `fixed` reads as `TOOL-dPlacedRequest-1` §8 F6 resolved it, "renews only at acquisition"; this table
 says what acquisition means to a writer: the write that opens a tenure. The `witness` key is written
@@ -94,6 +109,10 @@ a rule keyed on the epoch the writer already computes is inherited by constructi
 - `tools/unattended/unattended.test.sh`: the renewal arms
 - `tools/unattended/STOPS.template.md`: section 7's renewal row
 - `memory/guides/UNATTENDED-STOPS.md`: its render
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
+  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
+  only
 
 ### Alternatives rejected
 
@@ -113,7 +132,7 @@ a rule keyed on the epoch the writer already computes is inherited by constructi
   same act as a new acquisition.
 - testing — the probes of §6 and the arm in §7.
 - migration — none: no lease exists before this build lands.
-- user docs — `memory/guides/UNATTENDED-STOPS.md` section 7; no `help/` page covers the kit.
+- user docs — `memory/guides/UNATTENDED-STOPS.md` section 7; `help/loop.md` anchors the driver's verbs beside its `--claims` paragraph, and this unit adds no verb.
 
 ## 6. Acceptance criteria
 
@@ -127,19 +146,24 @@ The fixture is `TOOL-dPlacedRequest-1` AC1's scratch clone and bare origin, `RUN
   `epoch: 1` and `renews: yes`; with `leases.renewal` planted `none` it reads `renews: -`, and planted
   `fixed` a later renew reads `renews: no`.
   Red when: a create carries no renewing beat, or `none` renews.
-- **AC3** — When a probe sources `unattended.sh` and calls `derive_lease_renews` over the twelve
+- **AC3** — When a probe sources `unattended.sh` and calls `derive_lease_renews` over the sixteen
   cells of §4's table, it prints each cell's value.
   Red when: a cell differs, the planted case being a scratch copy keyed on the act name that misses
-  the announced take.
+  the announced take, or one whose `question` column reads `no` under `progress`.
 - **AC4** — When `grep -n 'tenure' tools/unattended/STOPS.template.md` runs, a section 7 line names
   `leases.renewal` and says a write opening a tenure renews.
   Red when: the guide omits the rule.
+- **AC5** — When `TOOL-dPlacedRequest-1` AC11's fixture runs its double renew, the planted commit `$Q`
+  given twice as `--witness` under the stubs, both records read `renews: yes`, and a probe that sources
+  `unattended.sh` and calls `derive_lease_renews 3 3 progress question` prints `yes`.
+  Red when: the second renew reads `renews: no`, the planted case being a scratch copy whose verdict
+  has only `new` and `none`.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the renewal arms over a planted stale lease and each planted policy value, staged by a scratch copy whose rule is keyed on the act name · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC5 · the renewal arms over a planted stale lease and each planted policy value, staged by a scratch copy whose rule is keyed on the act name · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -153,6 +177,14 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the renewa
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 20 (HIGH, item H1,
   shared with finding 1).
+- rev-2 · 2026-11-19 · §2 S1, S2 · §3 Non-goals, Edges · §4 The table · §6 AC3, AC5 · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit` findings 1 and 23 (item H1): the witness verdict gains `question`, which renews under
+  `progress` even when it equals the record's witness, as `TOOL-dPlacedRequest-1` rev-7 S8 states; AC3
+  counts sixteen cells and AC5 runs that unit's AC11 double renew through `derive_lease_renews`. §7 also names `scratch-guard self-test`, `tier2-review self-test`, the leg(s) the spec-token guard join names for this spec's Files touched.
+- rev-3 · 2026-11-19 · §4 Files touched · §5 · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 16 (M7), the user-docs line names
+  `help/loop.md`, which anchors the driver's verbs; finding 17 (M8), this unit's own pass
+  regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
 
 ## 10. Reuse audit
 

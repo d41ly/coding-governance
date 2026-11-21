@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.131 -->
+<!-- gov:kit unattended@1.132 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -279,10 +279,13 @@ A relaunch appends one `run-resumed` line, a launch that failed one `resume-fail
 live pid the tick spared one `stale-live-pid` line per tick, to the
 health log under the git common dir that the orientation card counts; the driver appends
 `claim-taken-over` when it takes over a stale claim (`TOOL-aGraftedHelix-8`), and
-`claim-push-lock-broken` when it breaks a stale `claim-push.lock` under that lock's guard, or
-`claim-push-guard-cleared` when it removes a guard a crashed writer left (`TOOL-aGraftedHelix-37`), and
-`spec-tokens-lock-broken` or `spec-tokens-guard-cleared` for a dispatch's `spec-tokens.<slug>.lock` the same way
-(`TOOL-aPiecewiseGrade-6`). The line format is the
+`spec-tokens-lock-broken` when it breaks a stale `spec-tokens.<slug>.lock` a dispatch took, under that
+lock's guard, or `spec-tokens-guard-cleared` when it removes a guard a crashed writer left
+(`TOOL-aGraftedHelix-37`, `TOOL-aPiecewiseGrade-6`); the node locks, `gov-feed.lock`,
+`gov-queue.lock` and `--request`'s `requests.lock` in the common dir, append `node-lock-broken` and
+`node-guard-cleared` on the same terms (`TOOL-dPlacedRequest-24`, `TOOL-dPlacedRequest-43`); and a flush of
+the offline queue appends `lease-yielded` for each queued write it yields because the remote moved
+first (`TOOL-dPlacedRequest-41`). The line format is the
 header of the `health_log_sh` block in `lib-unattended.sh`.
 
 ## The sidecar

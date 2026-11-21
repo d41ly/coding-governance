@@ -1,4 +1,4 @@
-<!-- gov:kit loop@1.4 -->
+<!-- gov:kit loop@1.5 -->
 # loop — the loop's definition: the gov steps, and where each workflow sits in them
 
 A governed build runs one loop: Plan, Design, Build, Test, Deploy. This kit is where that loop is
@@ -107,17 +107,19 @@ a later build names today's stand-in under `{prefix}`, which keeps the row clear
 ban. `routes` is inline, never an `[item.routes]` table, so the tag index reads one span per row.
 
 `check_program(data, where, layers)` grades the rows as one needs graph, an any-of entry an edge to
-each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50): its
-`step` is `NO_STEP`, `none`, and any other step on it is refused, while `none` on a gov step's row
-stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
+each of its tags. A tag `item.review.<name>` is the breakpoint program's (TOOL-dDeclaredLoop-50), a
+tag `item.probe.<name>` the probe program's (TOOL-dPlacedRequest-7), and a tag `item.entry.<name>` the
+entry program's, the flow's router before any step (TOOL-dPlacedRequest-3), each segment one of
+`PROGRAM_SEGMENTS`: its `step` is `NO_STEP`, `none`, and any other step on it is refused, while `none`
+on a gov step's row stays refused. It refuses a tag opening no `item.<step>.` of a gov step or a `step` other than
 that one, a tag declared twice, a need naming no declared item, and a needs cycle, each cycle named
 once and a self-need a cycle of one. Per item it refuses an outcome set `derive_outcome_set` refuses,
 empty or with a word twice; routes that are not exactly the outcomes; a target that is no declared
 item, `transition` or a stand-in; and, where `layers` is not `None`, an input whose text before its
 first `:` is no layer tag. Each `[[step]]` row's `exit` must be a declared item of that step. It
-returns `{step tag: [item tags in needs order]}`, one order filtered per step, and the review
-program's tags under the key `review`, `REVIEW_PROGRAM`, which `--check` prints as `loop: program
-review`. A review row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
+returns `{step tag: [item tags in needs order]}`, one order filtered per step, and each program of
+`PROGRAM_SEGMENTS` under its segment, which `--check` prints as `loop: program review`,
+`loop: program probe` and `loop: program entry`. A review, probe or entry row is graded for its needs, outcomes, routes and inputs, and is no step's exit. The order and the
 cycles come from the needs-graph helper, `derive_needs_order` and `scan_cycles`, the `needs_graph_py`
 block this module carries inline beside govkit's and the memory-tree kit's backlog copies.
 
@@ -508,6 +510,43 @@ python <prefix>/loop/claims.py card-keys
 python <prefix>/loop/claims.py --selftest
 ```
 
+## The request key
+
+`request.py` (TOOL-dPlacedRequest-19) keys an owner's request by its text alone, the key I11 names
+`request_content_key`. `derive_request_content_key` is the first twelve hex digits of the SHA-256 over
+the UTF-8 bytes of the memory-tree kit's `derive_content_key` of the text, so case, whitespace, ISO
+dates, emphasis and links fold away and two typings of one request key alike; a text that normalises
+to nothing is refused. `key <file>` reads the file as bytes and decodes them strictly as `utf-8-sig`,
+so a byte-order mark never reaches the key, and refuses an undecodable byte by its offset with exit 2.
+The unattended driver's `--request` finds the module by `resolve_kit_dir` and records the request under
+that key. `--fixture --plant <case>` runs one of `PLANTS`, and `--selftest` runs every case through
+`run_selftest_cases`; it is gov's `loop request fixtures` leg.
+
+```bash
+python <prefix>/loop/request.py key <file>
+python <prefix>/loop/request.py --selftest
+```
+
+## The probe program
+
+`probe.py` (TOOL-dPlacedRequest-7) is the tool of the probe program, the eight `item.probe.*` rows at step
+`none`. `trigger` opens a probe for a cause the `[[trigger-cause]]` rows of the program `probe` hold,
+read by `read_trigger_causes`, where the policy keys `probe.points`, `probe.raise` and
+`probe.observations` admit it, and writes a `probe-trigger` record through the memory-tree kit's
+`write_record`, or, for a request before placement, `<key>.probe-trigger.md` beside the request's text in
+the git common dir's `requests/` store. `pin` writes the `probe` record's head and commits it alone before
+any command runs; `design` appends one method entry until a run line freezes the record; `run` calls
+`loop_witness.py rerun` once at the pinned commit; `judge` computes the verdict from the run lines against
+the predictions; `return` prints the line the asking item is re-entered with. A role item's `probe`
+outcome routes to `PROBE_STAND_IN`, and `check_probe_outcomes` refuses a role item without it and a probe
+item with it. `--fixture --plant <case>` runs one of `PLANTS` in a throwaway repository and `--selftest`
+runs every case through `run_selftest_cases`; it is gov's `loop probe fixtures` leg.
+
+```bash
+python <prefix>/loop/probe.py trigger --cause owner --asker <item tag> --subject <text> --build <slug> --unit <id>
+python <prefix>/loop/probe.py --selftest
+```
+
 ## The position engine
 
 `position.py` (TOOL-dDeclaredLoop-7) answers where a build is and what runs next from witnesses alone.
@@ -747,12 +786,9 @@ python <prefix>/loop/termination.py --fixture --plant stage-self-loop
 
 ### The waits outside the composition
 
-The check grades the waits a composition declares. These waits live in code, each with a deadline of
-its own, and the check does not grade them:
-
-| Wait | Its deadline |
-|---|---|
-| the lander's wait on another session's claim lock | the lander's `CLAIM_WAIT_CEILING`, 120 seconds PINNED |
+The check grades the waits a composition declares. A wait that lives in code, with a deadline of its
+own, is not graded. None is listed: the lander's wait on a claim push went with
+`TOOL-dPlacedRequest-11`, which left the lander nothing to wait on.
 
 ## The factories, `factories.py`
 

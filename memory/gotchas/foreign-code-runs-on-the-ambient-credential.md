@@ -49,6 +49,26 @@ an adopter's tree with no execution contract: a step's `git mv` fires the adopte
 code, in the workspace that pushes through the adopter's grant. The step kind now runs every step scrubbed, isolated and
 hookless, with no ambient credential.
 
+## It bit again in the PreToolUse hook
+
+The closing diff review of dPlacedRequest
+(`memory/builds/dPlacedRequest/reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md`,
+H1) found the class inside a hook. The orientation gate of `tools/hooks/scratch-guard.js` resolves the
+kickoff checker `manifest-check.sh` to ask where a session's card lives, and its resolver,
+`resolveKickoffChecker`, walked a third rung: the toplevel of the
+commit or edit target's repository. Where the hook's own install answered nothing, as in an adopter
+with no kickoff kit beside it, a `git -C <clone> commit` or an Edit under another repository's routed
+tree ran the one `manifest-check.sh` that clone tracks. It ran inside PreToolUse, before any allow or
+deny, with the agent's environment and the node's credential, so whoever commits to the clone chose
+code this node ran.
+
+TOOL-dPlacedRequest-95 cut the rung. The rule: a hook runs only files of its own install, resolved
+from its own directory, and never a file its target's tree supplies; where its install answers
+nothing, it reads the card as absent and says no kickoff checker resolves. This site is gated by
+`tools/hooks/scratch-guard.test.sh`, whose TOOL-dPlacedRequest-95 arm plants a tracked checker that
+writes a marker in a scratch target and drives the hook at it through a copy outside any repository,
+a copy whose own repository tracks two checkers, and a commit payload, asserting no marker each time.
+
 ## The fix
 
 - An unattended item that touches another repository names its sandbox: a throwaway workspace, an

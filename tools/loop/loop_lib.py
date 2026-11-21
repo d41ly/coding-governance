@@ -6,6 +6,7 @@
     python loop_lib.py --fixture --plant <case>   # read it with one break planted in memory
     python loop_lib.py --selftest                 # every plant, each held to the exit and line it owes
     python loop_lib.py --grade-site <site> <entry>...   # grade one declaration site's witness entries
+    python loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]   # its seed's paths
 
 The definition holds the gov steps as `[[step]]` rows and one `[[workflow]]` row per workflow of the roles
 kit: its build order, the step its work sits in and, where it differs from that step's own word, the reach
@@ -41,8 +42,10 @@ The definition also holds each gov step's program (TOOL-dDeclaredLoop-12): one `
 its `tag` `item.<step>.<name>`, its `step`, `actor`, `needs`, `inputs`, `allowance`, `returns`, closed
 `outcomes`, `witness`, `owner` and `routes`, an inline table naming one target per outcome: a declared
 item, `transition`, or `stand-in:{prefix}/<home>/<file>`. A `needs` entry is a tag, or a list of tags any
-one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, carry the step
-`none` and sit in no step (TOOL-dDeclaredLoop-50). `check_program` grades the rows as one needs graph,
+one of which meets it. The breakpoint program's rows, tagged `item.review.<name>`, the probe
+program's, tagged `item.probe.<name>`, and the entry program's, tagged `item.entry.<name>`, carry the step
+`none` and sit in no step, each segment one of `PROGRAM_SEGMENTS` (TOOL-dDeclaredLoop-50,
+TOOL-dPlacedRequest-7, TOOL-dPlacedRequest-3). `check_program` grades the rows as one needs graph,
 ordered by the needs-graph helper below: every need declared, no cycle, each outcome set closed
 through `derive_outcome_set`, the rule `read_outcome_set` applies, each outcome routed once to a
 target that resolves, each input's text before its first `:` a layer tag `read_layer_tags` reads from
@@ -62,6 +65,31 @@ item's explicit field equal to its role's (a copy), and a role item's explicit `
 `none`. A slot the catalogue lacks prints `pending`, and every role item `unarmed` where the roles
 kit does not resolve; neither is a refusal, and the loop kit declares no edge to that kit. Every
 item's `witness` is graded by `check_witness_classes` beside the steps', and joins the actor list.
+
+A role item also declares its code seed (TOOL-dPlacedRequest-8): `seed`, what its work order's `code`
+slot is computed from, one of the `widens` order of the item kind's schema row `seed` in
+`item-schema.toml` beside this file, which `read_seed_values` reads: `none`, absent reading the same,
+`write-set`, `question-paths` or `scope-paths`. `check_item_seeds` refuses a value outside that set and
+a value other than `none` on an item whose actor is no role. `resolve_item_seed` turns a declared seed
+into repository-relative paths, normalised by `resolve_seed_path` and deduplicated in first-seen order,
+or one `unarmed — <source>: <why>` line: `write-set` the unit spec's Files touched and `question-paths`
+the question's backticked paths, each through the unattended driver's `--path-tokens`, the one path-token
+rule, run as a subprocess where that driver resolves; `scope-paths` reads unarmed until a plan record
+carries a scope. `seed <item tag>` prints it.
+
+Every role item outside the probe program asks for a test through the outcome `probe`, routed to
+`PROBE_STAND_IN`, the probe tool, never into the probe program, whose items sit in no step; the probe
+program's own items carry no `probe` outcome, so a probe never asks for a probe of itself
+(TOOL-dPlacedRequest-7 S8). `check_probe_outcomes` refuses either break, naming the item. The probe
+program's trigger causes are `[[trigger-cause]]` rows, `program` and `cause`, which `read_trigger_causes`
+returns for one program in file order.
+
+A role item also declares its map slot (TOOL-dPlacedRequest-6): `map`, whether its work order's `map`
+slot is filled, `none`, absent reading the same, or `base`, the `widens` order of the schema's `map` row
+read by `read_seed_values`; and `unfolds`, the namespace words whose nodes that slot spells out one by
+one. `check_item_maps` refuses a `map` outside that order, an `unfolds` beside `map = "none"`, and an
+unfold word that is no `ns` of the playbook kit's `namespaces.toml`, found by `resolve_kit_dir` as the
+layer tags are; where that kit does not resolve the namespace arm prints `unarmed` and checks no word.
 
 The definition also declares the computed witness kinds (TOOL-dDeclaredLoop-17): one
 `[[computed-witness]]` row per witness a tool computes rather than the acting agent typing it, its
@@ -101,9 +129,14 @@ it; `read_dispositions` and `--check` refuse a definition that declares no set.
 
 `--check` prints one line per step and per workflow, the set and one line per alias, then a count, and exits 0; a refused definition is one
 line and exit 1. It prints each step's program, `loop: program <step> · <n> item(s) · <tags>` in needs
-order, then the breakpoint program's as `loop: program review`, or `loop: inputs unarmed` and why
+order, then the breakpoint program's, the probe program's and the entry program's as `loop: program review`,
+`loop: program probe` and `loop: program entry`, or `loop: inputs unarmed` and why
 before them where no layer tags resolve, then one `loop: item` line per item in file order, each field's source or `pending` or `unarmed`, and `loop: items · <n>
-read · <p> pending · <u> unarmed`. It then prints the witness classes, one line per witness alias and per witness, one
+read · <p> pending · <u> unarmed`, then one `loop: seed <tag> · <value>` line per item and `loop: seeds · <n>
+declared · <m> none`, then one `loop: map <tag> · map <value>` line per item, ending `· unfolds <words>`
+where it unfolds, `loop: maps · <n> declared · <m> none`, and `loop: unfolds · <n> word(s) checked against
+<m> namespace(s)` or `loop: unfolds · unarmed — no namespace registry resolves`, then `loop: probe outcomes ·
+<n> role item(s) route probe to <target> · <m> probe item(s) carry none`. It then prints the witness classes, one line per witness alias and per witness, one
 line per list row with its build and the list's base line, the base or `no comparison` and why, the
 builds line, the folder or `foreign` and why, one `loop: computed-witness <name> · serves <tag> · class
 <class> · writer <writer> · armed by <build>` line per computed witness, then `review_bounds.py`'s
@@ -117,8 +150,15 @@ exit and line `PLANT_OWED` declares beside it, one PASS or FAIL line per plant a
 when every one holds (TOOL-dDeclaredLoop-67 S30); the `loop definition fixtures` leg runs it. `--grade-site <site> <entry>...` prints `loop: site <site> · <item> · <word> ·
 <class>` per entry, `· until <build>` on a `DOD_CORE` actor entry, `· adopter-declared, not on the
 shipped list` on a `DOD_EXTRA` one, then each refusal, and exits 0, or 1 on a refusal. `--scopes` prints `loop: scope <tag> · <derive's item line> · <the tags it lists, or none>` per
-item and exits 0, or 1 on a refused definition or a derive that exits non-zero. Exit 2 is a usage
-error, a site outside `DECLARATION_SITES` included.
+item and exits 0, or 1 on a refused definition or a derive that exits non-zero. `seed <item tag>`
+prints the item's seed as `resolve_item_seed` answers it, one path per line or its `unarmed` line, and
+exits 0, 1 on a refused definition, or 2 naming an item no row declares or the resolver's refusal. Its
+plants, `SEED_PLANTS` and `seed-bad`, run `seed` as a process in a scratch repository and break the
+definition's seeds. The map's plants, `map-bad`, `unfold-unregistered`, `unfold-no-map` and
+`unfold-not-list`, break the declarations, `no-registry` resolves the registry from an empty scratch
+directory and `registry-bad` from one whose registry is no TOML. `probe-step` adds a row of a gov
+step's tag at step `none`, `role-no-probe` takes the `probe` outcome off a role item, `probe-route`
+routes it into the probe program, and `probe-self` gives one to the probe program's design item. Exit 2 is a usage error, a site outside `DECLARATION_SITES` included.
 
 WHAT THIS DOES NOT CHECK: that a workflow row names a workflow the roles kit holds, which is that kit's
 catalogue check, both ways; that a step tag or an item tag is registered in its namespace, which is the
@@ -128,12 +168,18 @@ being non-empty; a need on an item outside the five programs; that
 a `stand-in:` path exists; that a `transition` route reaches a row of the build's transition table,
 which `loop_table.py` beside this file checks, both ways (TOOL-dDeclaredLoop-13); that a disposition record's
 `Item` names a declared item, which reads None; or that a writer resolved an alias before it wrote. An
-unknown key on a row is not read and not refused. That a witness's `by` is true. Stdlib only, but for
+unknown key on a row is not read and not refused. That a witness's `by` is true. That a seed path exists,
+stays inside the repository, or is the write set a builder really wrote: the seed is what was declared,
+read from a spec at HEAD, and a CLOSED or WONTDO spec declares none, as the driver's reader skips it.
+That a `map` sits on a role item, or that an unfolded namespace has a node: a map is what was declared,
+and the slot that renders it is dFurnishedOrders'.
+Stdlib only, but for
 `read_actor_base` and `read_builds_dir`, which import the memory-tree kit's compare base and its conf
 reader inside the function, `read_role_defaults`, which imports the roles kit's library there, and
 `read_driver_conf`, which sources the unattended driver's `.unattended.conf` in the bash `loop_witness.py`'s
-`resolve_bash` finds, imported inside the function (TOOL-dDeclaredLoop-70), so a reader calling
-`load_loop` never reaches them.
+`resolve_bash` finds, imported inside the function (TOOL-dDeclaredLoop-70), and `resolve_item_seed`,
+which imports the memory-tree kit's `parse_spec_h1` and runs the unattended driver there, so a reader
+calling `load_loop` never reaches them.
 """
 import contextlib
 import io
@@ -143,7 +189,7 @@ import sys
 import tempfile
 import tomllib
 
-KIT_LOOP_VERSION = "1.4"
+KIT_LOOP_VERSION = "1.5"
 
 DEFINITION = "loop.toml"
 #: The shrink-only list of actor witnesses beside the definition, `<site>\t<witness>\t<build>` per row.
@@ -152,9 +198,13 @@ ACTOR_LIST = "actor-witnesses.txt"
 STEP_TAGS = ("step.plan", "step.design", "step.build", "step.test", "step.deploy")
 #: A workflow's `step` when its work sits in no gov step.
 NO_STEP = "none"
-#: The breakpoint program: its rows' tag segment, `item.review.<name>`, each at step `NO_STEP`, and its
-#: key in `check_program`'s return (TOOL-dDeclaredLoop-50).
-REVIEW_PROGRAM = "review"
+#: The programs that sit in no step: each its rows' tag segment, `item.<segment>.<name>`, each row at step
+#: `NO_STEP`, and its key in `check_program`'s return: the breakpoint program (TOOL-dDeclaredLoop-50),
+#: the probe program (TOOL-dPlacedRequest-7) and the entry program, the flow's router before any step
+#: (TOOL-dPlacedRequest-3).
+PROGRAM_SEGMENTS = ("review", "probe", "entry")
+#: The route of a role item's `probe` outcome: the probe tool, whose line names the asker (TOOL-dPlacedRequest-7 S8).
+PROBE_STAND_IN = "stand-in:{prefix}/loop/probe.py"
 #: The reach words that are no gov step: the entry step and the review breakpoint.
 REACH_WORDS = ("entry", "review")
 #: One word of a disposition set or an outcome set: the segment a tag is composed of.
@@ -213,7 +263,28 @@ PLANTS = {"missing-step": "the step.deploy row taken out",
           "conf-route-opens-none": "a scratch copy of this module whose resolve_memory_root_source returns None",
           "conf-openers-none": "a scratch copy of this module whose read_driver_conf and resolve_memory_root_source "
                                "each return None",
-          "conf-module-unparsable": "a scratch copy of this module given a definition that does not parse"}
+          "conf-module-unparsable": "a scratch copy of this module given a definition that does not parse",
+          "seed-bad": "item.build.unit-pass's seed set to diff, and item.plan.place, a command item, given seed "
+                      "write-set",
+          "seed-write": "seed item.build.unit-pass run in a scratch repository whose unit spec declares one path "
+                        "twice, plain and with a leading ./, then with each argument the write set owes missing "
+                        "or wrong",
+          "seed-question": "seed item.plan.research run with a question naming two backticked paths, then with no "
+                           "question",
+          "seed-scope": "seed item.design.inventory run in a scratch repository, its scope-paths source armed by "
+                        "no plan record, then an undeclared item and an unknown flag",
+          "map-bad": "item.build.unit-pass, a unit worker, given map full",
+          "unfold-unregistered": "item.design.inventory's unfolds set to legs, a word no namespace row registers",
+          "unfold-no-map": "item.build.unit-pass given unfolds kit beside map none",
+          "no-registry": "item.design.inventory's unfolds set to legs, the namespace registry resolved from an "
+                         "empty scratch directory",
+          "unfold-not-list": "item.design.inventory's unfolds set to the string kit, no list",
+          "registry-bad": "the namespace registry resolved from a scratch directory whose namespaces.toml is no "
+                          "TOML",
+          "probe-step": "a copy of item.probe.trigger tagged item.plan.x, at step none",
+          "role-no-probe": "item.plan.research's probe outcome and its route taken out",
+          "probe-self": "item.probe.design given the probe outcome, routed to the probe tool",
+          "probe-route": "item.plan.research's probe outcome routed to item.probe.trigger"}
 #: `--selftest`'s owed answer of each plant (TOOL-dDeclaredLoop-67 S30): its exit, the opening of a line
 #: it prints and a needle that line holds, each pair found by running the plant alone at the pass's base.
 #: A definition the reader refuses prints `loop: <path>: <why>`, a graded refusal `loop: refused · <why>`.
@@ -261,7 +332,27 @@ PLANT_OWED = {"missing-step": (1, "loop: ", "the step step.deploy is missing"),
               "conf-route-opens-none": (1, "loop: refused · ", "resolve_memory_root_source is in CONF_ROUTES and "
                                                                "opens no conf"),
               "conf-openers-none": (1, "loop: refused · ", "no conf opener found in loop_lib.py"),
-              "conf-module-unparsable": (1, "loop: refused · ", "cannot be read as the conf constants' module")}
+              "conf-module-unparsable": (1, "loop: refused · ", "cannot be read as the conf constants' module"),
+              "seed-bad": (1, "loop: refused · ", "the item item.plan.place seed 'write-set' sits on the actor"),
+              "seed-write": (0, "loop: fixture · seed-write held · ", "fx/seed-plant.txt"),
+              "seed-question": (0, "loop: fixture · seed-question held · ", "fx/y.sh fx/z.sh"),
+              "seed-scope": (0, "loop: fixture · seed-scope held · ", "unarmed — scope-paths:"),
+              "map-bad": (1, "loop: refused · ", "the item item.build.unit-pass map 'full' is not one of"),
+              "unfold-unregistered": (1, "loop: refused · ", "the item item.design.inventory unfolds 'legs', which "
+                                                              "is no ns"),
+              "unfold-no-map": (1, "loop: refused · ", "the item item.build.unit-pass unfolds kit with map none"),
+              "no-registry": (0, "loop: unfolds · ", "unarmed — no namespace registry resolves"),
+              "unfold-not-list": (1, "loop: refused · ", "the item item.design.inventory unfolds 'kit', which is no "
+                                                          "list of namespace words"),
+              "registry-bad": (1, "loop: refused · ", "namespaces.toml does not read: "),
+              "probe-step": (1, "loop: ", "the item item.plan.x step 'none' is not step.plan"),
+              "role-no-probe": (1, "loop: refused · ", "the item item.plan.research, a role item, carries no probe "
+                                                       "outcome"),
+              "probe-self": (1, "loop: refused · ", "the item item.probe.design carries the probe outcome"),
+              "probe-route": (1, "loop: refused · ", "the item item.plan.research routes probe to "
+                                                     "'item.probe.trigger', not ")}
+#: The kit home whose `namespaces.toml` registers the namespace words an item unfolds (TOOL-dPlacedRequest-6 S3).
+NS_KIT_HOME = "playbook"
 #: The plants whose break is in what the scope verb reads rather than in the definition, so `--check`
 #: runs whole and the scope verb runs after it.
 SCOPE_PLANTS = ("scope-selected", "scope-no-kit")
@@ -272,6 +363,27 @@ CONF_PLANTS = ("conf-readers-declared", "conf-opener-literal", "conf-opener-cons
                "conf-route-opens-none", "conf-openers-none", "conf-module-unparsable")
 #: The `scope-selected` plant's unit: one scratch manifest row scoped to one item.
 PLANT_SCOPE_UNIT = ("unit.loop-fixture", "item.plan.record")
+#: The item kind's row schema beside the definition, whose `seed` row's `widens` order is the value set of
+#: an item's declared code seed (TOOL-dPlacedRequest-8).
+ITEM_SCHEMA = "item-schema.toml"
+#: An item's `seed` where it declares none: the value that hands no path; and its `map` where it declares
+#: none, the value that fills no map slot (TOOL-dPlacedRequest-6).
+SEED_NONE = "none"
+#: The line a `scope-paths` seed resolves to until a plan record carries a scope.
+SEED_SCOPE_UNARMED = "unarmed — scope-paths: no plan record carries a scope; dRankedPlan's plan.record arms it"
+#: A `--build` value the seed resolver takes: one path segment, so it never walks out of the builds folder.
+SEED_BUILD = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
+#: The bound on the driver's `--path-tokens` call, in seconds (PINNED 2026-11-20: a bound chosen, not measured).
+SEED_DRIVER_BOUND = 120
+#: The resolver's plants: each runs the `seed` command in a scratch repository, never a break in the definition.
+SEED_PLANTS = ("seed-write", "seed-question", "seed-scope")
+#: The one path the `seed-write` plant's spec declares twice, plain and with a leading `./`: the plant's own,
+#: under its scratch repository.
+PLANT_SEED_PATH = "fx/seed-plant.txt"
+#: The `seed-write` plant's second unit, whose spec is written and never committed.
+PLANT_SEED_UNCOMMITTED = "TOOL-tFix-3"
+#: The `seed-question` plant's question and the two paths it names backticked.
+PLANT_SEED_QUESTION = ("is `fx/y.sh` racing with `fx/z.sh`?", ["fx/y.sh", "fx/z.sh"])
 #: The declaration sites outside the definition whose entries `--grade-site` grades: the unattended
 #: driver's core Definition of Done and the conf's extra one, each a set of `<item>:<word>` entries.
 DECLARATION_SITES = ("DOD_CORE", "DOD_EXTRA")
@@ -685,12 +797,9 @@ def read_actor_base(kit_dir):
     if top is None or prefix is None:
         return None, "the loop kit sits in no git work tree"
     try:
-        mt_dir = resolve_kit_dir("memory-tree", "coverage_join.py", kit_dir)
-    except LookupError as e:
+        resolve_compare_base = load_tree_lib("coverage_join", ("resolve_compare_base",)).resolve_compare_base
+    except LoopError as e:
         return None, str(e)
-    if str(mt_dir) not in sys.path:
-        sys.path.insert(0, str(mt_dir))
-    from coverage_join import resolve_compare_base
     base, why = resolve_compare_base(top.strip())
     if not base:
         return None, why
@@ -708,12 +817,9 @@ def read_builds_dir(kit_dir, root):
     root:` reason as the why (TOOL-dDeclaredLoop-116). The memory-tree kit's `read_design_conf` is
     imported inside the function, as `read_actor_base` imports its compare base."""
     try:
-        mt_dir = resolve_kit_dir("memory-tree", "design_lib.py", kit_dir)
-    except LookupError as e:
+        read_design_conf = load_tree_lib("design_lib", ("read_design_conf",)).read_design_conf
+    except LoopError as e:
         return None, str(e)
-    if str(mt_dir) not in sys.path:
-        sys.path.insert(0, str(mt_dir))
-    from design_lib import read_design_conf
     conf = read_design_conf(root)
     if not str(conf.get("DESIGN_RECORD") or "").strip():
         return None, "%s sets no DESIGN_RECORD, or is absent, so the chain's builds are not this tree's" % (
@@ -930,30 +1036,33 @@ def derive_conf_rebinds(tree, docs):
 TREE_LIB_SYMBOLS = ("derive_docstring_ids", "derive_constant_charges")
 
 
-def load_tree_lib():
-    """The memory-tree kit's `tree_lib`, found through `read_memory_tree` and imported inside the call,
-    never at this module's import: the one route by which this module reaches it, which
-    `derive_conf_reads` and `derive_conf_constants` call. One LoopError naming the loaded file, every
-    name of `TREE_LIB_SYMBOLS` the module lacks, in tuple order joined by `, `, and
+def load_tree_lib(module="tree_lib", need=TREE_LIB_SYMBOLS):
+    """The memory-tree kit's module `module`, `tree_lib` by default, found through `read_memory_tree` and
+    imported inside the call, never at this module's import: the one route by which the loop kit reaches a
+    memory-tree module (TOOL-dPlacedRequest-34 S34), which `derive_conf_reads`, `derive_conf_constants`,
+    `read_actor_base`, `read_builds_dir`, `request.py` and `budget.py` call. One LoopError naming the loaded
+    file, every name of `need`, `TREE_LIB_SYMBOLS` by default, the module lacks, in tuple order joined by
+    `, `, and
     `govkit update --kits memory-tree` (TOOL-dDeclaredLoop-86 S21, TOOL-dDeclaredLoop-89 S6,
     TOOL-dDeclaredLoop-90 S4, TOOL-dDeclaredLoop-94 S21), so a memory-tree kit older than the charge
     walk refuses by name, never by an AttributeError; LoopError naming the same command where
     `read_memory_tree` cannot locate the kit, keeping its message and the places it looked, or where
     the import raises any other exception, naming its class (TOOL-dDeclaredLoop-88 S33,
     TOOL-dDeclaredLoop-94 S21)."""
+    import importlib
     try:
-        read_memory_tree("tree_lib.py")
-        import tree_lib
+        read_memory_tree("%s.py" % module)
+        mod = importlib.import_module(module)
     except LookupError as e:
         raise LoopError("memory-tree kit", "%s — govkit update --kits memory-tree" % e) from None
-    except Exception as e:   # noqa: BLE001  a damaged tree_lib.py raises anything at import; named, never a traceback
+    except Exception as e:   # noqa: BLE001  a damaged module raises anything at import; named, never a traceback
         raise LoopError("memory-tree kit", "%s: %s — govkit update --kits memory-tree" % (
             type(e).__name__, e)) from None
-    missing = [name for name in TREE_LIB_SYMBOLS if not hasattr(tree_lib, name)]
+    missing = [name for name in need if not hasattr(mod, name)]
     if missing:
-        raise LoopError(pathlib.Path(tree_lib.__file__).as_posix(),
+        raise LoopError(pathlib.Path(mod.__file__).as_posix(),
                         "has no %s — govkit update --kits memory-tree" % ", ".join(missing))
-    return tree_lib
+    return mod
 
 
 def derive_conf_constants(loop_lib_path):
@@ -1281,10 +1390,12 @@ def check_program(data, where, layers, stages=()):
     which leaves the inputs unchecked. `stages` are the composed repository stage tags,
     `step.adopter.<name>` (TOOL-dDeclaredLoop-25): an item tagged `item.adopter.<name>.<item>` whose
     `step.adopter.<name>` is one of them is that stage's, and the stage's program is returned beside the
-    five. An item tagged `item.review.<name>` is the breakpoint program's, its `step` `none`, and that
-    program is returned under the key `review` (TOOL-dDeclaredLoop-50). LoopError naming `where`, the item
-    and the field that does not hold: a tag opening no `item.<step>.` of a gov step, no
-    `item.adopter.<stage>.` of a composed stage and no `item.review.`, a `step` other than that one, or a
+    five. An item tagged `item.<segment>.<name>`, the segment one of `PROGRAM_SEGMENTS`, is that program's,
+    its `step` `none`, and the program is returned under the key `<segment>`: the breakpoint program's
+    `review` (TOOL-dDeclaredLoop-50), the probe program's `probe` (TOOL-dPlacedRequest-7) and the entry
+    program's `entry` (TOOL-dPlacedRequest-3). LoopError
+    naming `where`, the item and the field that does not hold: a tag opening no `item.<step>.` of a gov
+    step, no `item.adopter.<stage>.` of a composed stage and no `item.<segment>.`, a `step` other than that one, or a
     tag given
     twice; a need naming no declared item, or a needs cycle, each cycle named once; an outcome set that
     does not hold; routes that are not exactly the outcomes, or a target that is no declared item,
@@ -1305,10 +1416,10 @@ def check_program(data, where, layers, stages=()):
             if row.get("step") != stage:
                 raise LoopError(where, "the item %s step %r is not %s, the stage its tag opens" % (
                     tag, row.get("step"), stage))
-        elif len(parts) == 3 and parts[:2] == ["item", REVIEW_PROGRAM] and parts[2]:
+        elif len(parts) == 3 and parts[0] == "item" and parts[1] in PROGRAM_SEGMENTS and parts[2]:
             if row.get("step") != NO_STEP:
-                raise LoopError(where, "the item %s step %r is not %s, the breakpoint program's step" % (
-                    tag, row.get("step"), NO_STEP))
+                raise LoopError(where, "the item %s step %r is not %s, the %s program's step" % (
+                    tag, row.get("step"), NO_STEP, parts[1]))
         elif len(parts) != 3 or parts[0] != "item" or parts[1] not in steps or not parts[2]:
             raise LoopError(where, "item row %d tag %r opens no item.<step>. of a gov step: %s" % (
                 n, tag, " ".join(steps)))
@@ -1366,7 +1477,8 @@ def check_program(data, where, layers, stages=()):
         if exit_tag not in declared or declared[exit_tag]["step"] != row.get("tag"):
             raise LoopError(where, "the step %s exit %r is no declared item of that step" % (row.get("tag"), exit_tag))
     program = {s: [t for t in order if declared[t]["step"] == s] for s in (*STEP_TAGS, *stages)}
-    program[REVIEW_PROGRAM] = [t for t in order if declared[t]["step"] == NO_STEP]
+    for segment in PROGRAM_SEGMENTS:
+        program[segment] = [t for t in order if t.split(".")[1] == segment]
     return program
 
 
@@ -1469,6 +1581,291 @@ def check_item_declarations(items, roles, why):
             tag, actor, src["inputs"], got["allowance"], src["allowance"], src["returns"]))
     lines.append("loop: items · %d read · %d pending · %d unarmed" % (len(items), pending, unarmed))
     return lines, refusals
+
+
+def read_seed_values(kit_dir, field="seed"):
+    """The value set of an item's `seed`, narrowest first: the `widens` order of the `seed` `[[field]]` row
+    of the item kind's schema in `kit_dir` (TOOL-dPlacedRequest-8 S1), or of the scalar row `field` names,
+    `map` for `check_item_maps` (TOOL-dPlacedRequest-6). LoopError naming the schema where it does not
+    read, is no TOML, or holds no such row whose `widens` is an order of words."""
+    path = pathlib.Path(kit_dir) / ITEM_SCHEMA
+    try:
+        with open(path, "rb") as fh:
+            data = tomllib.load(fh)
+    except OSError as e:
+        raise LoopError(path.as_posix(), "cannot be read: %s" % e.strerror)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise LoopError(path.as_posix(), "not valid TOML: %s" % e)
+    row = next((f for f in data.get("field", []) if isinstance(f, dict) and f.get("name") == field), {})
+    widens = row.get("widens")
+    if not isinstance(widens, list) or not widens or not all(isinstance(v, str) and SEG.fullmatch(v) for v in widens):
+        raise LoopError(path.as_posix(), "holds no [[field]] row %s whose widens is an order of words" % field)
+    return list(widens)
+
+
+def check_item_seeds(items):
+    """`(lines, refusals)` of the `[[item]]` rows `items` (TOOL-dPlacedRequest-8 S3): one `loop: seed <tag>
+    · <value>` line per item in file order, an absent `seed` read `none`, then `loop: seeds · <n> declared
+    · <m> none`. A value outside `read_seed_values` over the schema beside this file is refused naming the
+    item and the value, and so is a value other than `none` on an item whose actor is no `role:`, since
+    only a role's work order carries a `code` slot. LoopError where the schema does not read."""
+    values = read_seed_values(pathlib.Path(__file__).absolute().parent)
+    lines, refusals, declared, none = [], [], 0, 0
+    for row in items:
+        tag, actor, seed = row.get("tag"), row.get("actor"), row.get("seed", SEED_NONE)
+        lines.append("loop: seed %s · %s" % (tag, seed))
+        if seed not in values:
+            refusals.append("the item %s seed %r is not one of %s" % (tag, seed, " ".join(values)))
+        elif seed == SEED_NONE:
+            none += 1
+        elif not (isinstance(actor, str) and actor.startswith("role:")):
+            refusals.append("the item %s seed %r sits on the actor %r, which is no role: only a role's work order "
+                            "carries a code slot" % (tag, seed, actor))
+        else:
+            declared += 1
+    lines.append("loop: seeds · %d declared · %d none" % (declared, none))
+    return lines, refusals
+
+
+def check_item_maps(items, namespaces):
+    """`(lines, refusals)` of the `[[item]]` rows `items` (TOOL-dPlacedRequest-6 S3): one `loop: map <tag> ·
+    map <value>` line per item in file order, an absent `map` read `none`, ending `· unfolds <words>` where
+    the item declares unfolds, then `loop: maps · <n> declared · <m> none` and the namespace arm's line. A
+    `map` outside the `widens` order of the schema's `map` row is refused naming the item and the value; an
+    `unfolds` that is no list of words, or that stands on an item whose `map` is `none`, since nothing
+    renders the nodes it would list, is refused naming the item; and an unfold word that is no word of
+    `namespaces`, the `ns` of each row of the playbook kit's namespace registry, is refused naming the item
+    and the word. `namespaces` None is a registry that does not resolve: the arm prints `unarmed — no
+    namespace registry resolves`, checks no unfold word and refuses nothing. LoopError where the schema
+    does not read."""
+    values = read_seed_values(pathlib.Path(__file__).absolute().parent, "map")
+    lines, refusals, declared, none, words = [], [], 0, 0, 0
+    for row in items:
+        tag, value, unfolds = row.get("tag"), row.get("map", SEED_NONE), row.get("unfolds", [])
+        listed = isinstance(unfolds, list) and all(isinstance(w, str) for w in unfolds)
+        lines.append("loop: map %s · map %s%s" % (tag, value, " · unfolds %s" % ", ".join(unfolds)
+                                                   if listed and unfolds else ""))
+        if value not in values:
+            refusals.append("the item %s map %r is not one of %s" % (tag, value, " ".join(values)))
+        elif value == SEED_NONE:
+            none += 1
+        else:
+            declared += 1
+        if not listed:
+            refusals.append("the item %s unfolds %r, which is no list of namespace words" % (tag, unfolds))
+            continue
+        if unfolds and value == SEED_NONE:
+            refusals.append("the item %s unfolds %s with map none: nothing renders the nodes it would list" % (
+                tag, ", ".join(unfolds)))
+        if namespaces is None:
+            continue
+        for word in unfolds:
+            words += 1
+            if word not in namespaces:
+                refusals.append("the item %s unfolds %r, which is no ns of the namespace registry" % (tag, word))
+    lines.append("loop: maps · %d declared · %d none" % (declared, none))
+    if namespaces is None:
+        lines.append("loop: unfolds · unarmed — no namespace registry resolves")
+    else:
+        lines.append("loop: unfolds · %d word(s) checked against %d namespace(s)" % (words, len(namespaces)))
+    return lines, refusals
+
+
+def check_probe_outcomes(items):
+    """`(lines, refusals)` of the `[[item]]` rows `items` (TOOL-dPlacedRequest-7 S8): each role item whose
+    `outcomes` is a list and whose tag opens no `item.probe.` carries the outcome `probe` routed to
+    `PROBE_STAND_IN`, and no `item.probe.` row carries it, so a probe never asks for a probe of itself. One
+    refusal per item that does not hold, naming it; the line `loop: probe outcomes · <n> role item(s) route
+    probe to <target> · <m> probe item(s) carry none`."""
+    refusals, asking, probes = [], 0, 0
+    for row in items:
+        tag, actor, outcomes = row.get("tag"), row.get("actor"), row.get("outcomes")
+        routes = row.get("routes") if isinstance(row.get("routes"), dict) else {}
+        listed = isinstance(outcomes, list)
+        if isinstance(tag, str) and tag.startswith("item.probe."):
+            probes += 1
+            if (listed and "probe" in outcomes) or "probe" in routes:
+                refusals.append("the item %s carries the probe outcome: a probe never asks for a probe of itself" % tag)
+            continue
+        if not (isinstance(actor, str) and actor.startswith("role:") and listed):
+            continue
+        if "probe" not in outcomes:
+            refusals.append("the item %s, a role item, carries no probe outcome: it could not ask for a test" % tag)
+        elif routes.get("probe") != PROBE_STAND_IN:
+            refusals.append("the item %s routes probe to %r, not %s" % (tag, routes.get("probe"), PROBE_STAND_IN))
+        else:
+            asking += 1
+    lines = ["loop: probe outcomes · %d role item(s) route probe to %s · %d probe item(s) carry none" % (
+        asking, PROBE_STAND_IN, probes)]
+    return lines, refusals
+
+
+def read_trigger_causes(program):
+    """The causes the `[[trigger-cause]]` rows of the definition beside this file admit for `program`, in file
+    order (TOOL-dPlacedRequest-7 S3). LoopError where the definition does not read, a row's `program` or
+    `cause` is not one word of `SEG`, or a cause is given twice for one program."""
+    data, where = read_definition(pathlib.Path(__file__).absolute().parent)
+    rows = data.get("trigger-cause", [])
+    if not isinstance(rows, list) or not all(isinstance(r, dict) for r in rows):
+        raise LoopError(where, "'trigger-cause' is not an array of tables")
+    causes = []
+    for n, row in enumerate(rows, 1):
+        prog, cause = row.get("program"), row.get("cause")
+        if not all(isinstance(v, str) and SEG.fullmatch(v) for v in (prog, cause)):
+            raise LoopError(where, "trigger-cause row %d carries no program and cause, each one word" % n)
+        if prog != program:
+            continue
+        if cause in causes:
+            raise LoopError(where, "trigger-cause row %d gives the %s cause %s twice" % (n, program, cause))
+        causes.append(cause)
+    return causes
+
+
+def resolve_seed_path(value):
+    """One seed path in the form the asks join compares paths in, the memory-tree kit's `resolve_ask_path`
+    restated so this kit imports no sibling for it: a backslash folded to a slash, a trailing `:<line>`, a
+    leading `./` and a trailing `/` dropped."""
+    out = re.sub(r":\d+$", "", value.strip().replace("\\", "/"))
+    while out.startswith("./"):
+        out = out[2:]
+    return out.rstrip("/")
+
+
+def resolve_item_seed(item, *, build=None, unit=None, question=None):
+    """The paths an `[[item]]` row's declared `seed` hands its `code` slot (TOOL-dPlacedRequest-8 S4), in the
+    repository the working directory sits in: a list of repository-relative paths, deduplicated in
+    first-seen order after `resolve_seed_path`, or one str, the line `unarmed — <source>: <why>`.
+
+    `none`, or no `seed`, is the empty list. `scope-paths` is `SEED_SCOPE_UNARMED` until a plan record
+    carries a scope. `write-set` finds the unit's spec as the file under `<records root>/builds/<build>/spec/`
+    whose H1's first token is `unit`, the memory-tree kit's `parse_spec_h1` deciding, and hands its path to
+    the unattended driver's `--path-tokens --files-touched --any-status HEAD <spec>`, a spec of any status
+    (TOOL-dPlacedRequest-34 S48), and a spec listing no path is `unarmed — write-set: <spec> lists no path`;
+    `question-paths` hands `question`
+    to that verb's stdin form. The driver is an optional sibling found by `resolve_kit_dir` and run by the
+    bash `loop_witness.py`'s `resolve_bash` finds, both imported inside the function: where neither
+    resolves, the source is `unarmed`. ValueError naming why on a missing `unit` or `build` for `write-set`,
+    a `build` that is no one path segment, a missing or empty `question` for `question-paths`, an unknown
+    value, a working directory in no git work tree, no spec or two specs defining `unit`, and a driver
+    call that does not start, exits non-zero, or does not answer within `SEED_DRIVER_BOUND` seconds, a
+    driver past it killed with its children through `loop_witness.py`'s `run_tree_kill`."""
+    import os
+    import subprocess
+    tag, seed = item.get("tag"), item.get("seed", SEED_NONE)
+    if seed == SEED_NONE:
+        return []
+    if seed == "scope-paths":
+        return SEED_SCOPE_UNARMED
+    if seed == "write-set":
+        if not unit:
+            raise ValueError("the item %s seeds write-set, which takes --unit <id>" % tag)
+        if not build:
+            raise ValueError("the item %s seeds write-set, which takes --build <slug>" % tag)
+        if not SEED_BUILD.fullmatch(build):
+            raise ValueError("--build %r is no build slug, one path segment of letters, digits, _ and -" % build)
+    elif seed == "question-paths":
+        if not question:
+            raise ValueError("the item %s seeds question-paths, which takes --question <text>" % tag)
+    else:
+        raise ValueError("the item %s seed %r is no seed value" % (tag, seed))
+    from loop_witness import read_clean_env, resolve_bash, run_tree_kill
+    env = read_clean_env()
+    try:
+        p = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env=env)
+    except OSError as e:
+        raise ValueError("git does not run: %s" % e) from None
+    if p.returncode != 0 or not p.stdout.strip():
+        raise ValueError("the working directory sits in no git work tree")
+    top = pathlib.Path(p.stdout.strip())
+    argv = ["--path-tokens"]
+    if seed == "write-set":
+        try:
+            read_memory_tree("tree_lib.py")
+            from tree_lib import parse_spec_h1
+            memory_root = resolve_memory_root(top)
+        except LookupError as e:
+            raise ValueError(str(e)) from None
+        folder = top / memory_root / "builds" / build / "spec"
+        hits = []
+        for path in sorted(folder.rglob("*.md")) if folder.is_dir() else []:
+            rel = path.relative_to(top).as_posix()
+            try:
+                text = path.read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            got = parse_spec_h1(rel, text, memory_root, [unit.split("-", 1)[0]])
+            if got and got[1] == unit:
+                hits.append(rel)
+        if len(hits) != 1:
+            raise ValueError("%d spec(s) under %s/builds/%s/spec/ define %s, where one owes it%s" % (
+                len(hits), memory_root, build, unit, (": " + " ".join(hits)) if hits else ""))
+        argv += ["--files-touched", "--any-status", "HEAD", hits[0]]
+    try:
+        driver = resolve_kit_dir("unattended", "unattended.sh", pathlib.Path(__file__).absolute().parent)
+    except LookupError:
+        return "unarmed — %s: no unattended driver resolves" % seed
+    driver = driver / "unattended.sh"
+    bash = resolve_bash(driver)
+    if bash is None:
+        return "unarmed — %s: no bash that can see %s" % (seed, driver.as_posix())
+    try:   # its own process group on POSIX, so a timed-out driver is killed with every child it started
+        proc = subprocess.Popen([bash, str(driver), *argv], cwd=str(top), env=env, stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
+                                errors="replace", **({} if os.name == "nt" else {"start_new_session": True}))
+    except OSError as e:
+        raise ValueError("the unattended driver did not start: %s" % e) from None
+    try:
+        out, err = proc.communicate(question if seed == "question-paths" else "", timeout=SEED_DRIVER_BOUND)
+    except subprocess.TimeoutExpired:
+        run_tree_kill(proc)   # never a second communicate: a surviving grandchild would hold the pipe open
+        raise ValueError("the unattended driver's --path-tokens did not answer within %d seconds" % (
+            SEED_DRIVER_BOUND)) from None
+    if proc.returncode != 0:
+        said = (out.strip().splitlines() or err.strip().splitlines() or ["no output"])[0]
+        raise ValueError("the unattended driver's --path-tokens exited %d: %s" % (proc.returncode, said))
+    paths = []
+    for line in out.splitlines():
+        path = resolve_seed_path(line)
+        if path and path not in paths:
+            paths.append(path)
+    if seed == "write-set" and not paths:   # TOOL-dPlacedRequest-34 S48: an empty write set is no seed
+        return "unarmed — write-set: %s lists no path" % hits[0]
+    return paths
+
+
+def run_seed_command(kit_dir, args):
+    """`seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]`: the item's declared seed through
+    `resolve_item_seed`, one path per line or its one `unarmed` line, exit 0. Exit 1 on a definition that
+    does not hold; 2 on a usage error, an item no row declares, or the resolver's ValueError, each named."""
+    opts, tag = {"--build": None, "--unit": None, "--question": None}, None
+    if args and not args[0].startswith("--"):
+        tag, rest = args[0], args[1:]
+        while rest:
+            if rest[0] not in opts or len(rest) < 2 or opts[rest[0]] is not None:
+                tag = None
+                break
+            opts[rest[0]], rest = rest[1], rest[2:]
+    if tag is None:
+        print("usage: python loop_lib.py seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]",
+              file=sys.stderr)
+        return 2
+    try:
+        rows = {r.get("tag"): r for r in read_items(kit_dir)}
+    except LoopError as e:
+        print("loop: %s" % e)
+        return 1
+    if tag not in rows:
+        print("loop: seed · no [[item]] row declares %s" % tag)
+        return 2
+    try:
+        got = resolve_item_seed(rows[tag], build=opts["--build"], unit=opts["--unit"], question=opts["--question"])
+    except ValueError as e:
+        print("loop: seed · %s" % e)
+        return 2
+    for line in [got] if isinstance(got, str) else got:
+        print(line)
+    return 0
 
 
 def read_layer_tags(kit_dir):
@@ -1620,6 +2017,30 @@ def write_loop_plant(data, case, rows, base_rows):
             items["item.build.unit-pass"]["actor"] = "role:gov-no-such-role"
         elif case == "roles-no-kit":
             pass  # its break is the roles kit's directory, which `main` resolves from a scratch directory
+        elif case == "seed-bad":
+            items["item.build.unit-pass"]["seed"] = "diff"
+            items["item.plan.place"]["seed"] = "write-set"
+        elif case == "map-bad":
+            items["item.build.unit-pass"]["map"] = "full"
+        elif case in ("unfold-unregistered", "no-registry"):   # no-registry's other break is in `main`
+            items["item.design.inventory"]["unfolds"] = ["legs"]
+        elif case == "unfold-not-list":
+            items["item.design.inventory"]["unfolds"] = "kit"
+        elif case == "registry-bad":
+            pass  # its break is the registry, which `main` writes in a scratch directory
+        elif case == "unfold-no-map":
+            items["item.build.unit-pass"]["map"] = SEED_NONE
+            items["item.build.unit-pass"]["unfolds"] = ["kit"]
+        elif case == "probe-step":
+            data["item"].append(dict(items["item.probe.trigger"], tag="item.plan.x", step=NO_STEP))
+        elif case == "role-no-probe":
+            items["item.plan.research"]["outcomes"].remove("probe")
+            items["item.plan.research"]["routes"].pop("probe")
+        elif case == "probe-self":
+            items["item.probe.design"]["outcomes"].append("probe")
+            items["item.probe.design"]["routes"]["probe"] = PROBE_STAND_IN
+        elif case == "probe-route":
+            items["item.plan.research"]["routes"]["probe"] = "item.probe.trigger"
         else:
             plan["exit"] = "item.design.exit"
 
@@ -1666,11 +2087,19 @@ def main(argv):
         for r in refusals:
             print("loop: refused · %s" % r)
         return 1 if refusals else 0
+    if argv[:1] == ["seed"]:   # TOOL-dPlacedRequest-8 S4: an item's declared seed, resolved to paths
+        return run_seed_command(kit_dir, argv[1:])
     if argv not in (["--check"], ["--scopes"]) and plant not in PLANTS:
         print("usage: python loop_lib.py --check | --scopes | --selftest | --fixture --plant <%s> | --grade-site <%s> "
-              "<entry>..." % (
+              "<entry>... | seed <item tag> [--build <slug>] [--unit <id>] [--question <text>]" % (
             "|".join(PLANTS), "|".join(DECLARATION_SITES)), file=sys.stderr)
         return 2
+    if plant in SEED_PLANTS:   # TOOL-dPlacedRequest-8 AC4 to AC6: the resolver in a scratch repository
+        print("loop: fixture · plant %s · %s" % (plant, PLANTS[plant]))
+        refusals = check_seed_plant(plant)
+        for r in refusals:
+            print("loop: refused · %s" % r)
+        return 1 if refusals else 0
     if plant in CONF_PLANTS:   # TOOL-dDeclaredLoop-99 S3, TOOL-dDeclaredLoop-117 S2: conf openers, no definition read
         print("loop: fixture · plant %s · %s" % (plant, PLANTS[plant]))
         if plant == "conf-readers-declared":
@@ -1691,9 +2120,10 @@ def main(argv):
         for line in lines:
             print(line)
         return 0
-    # A scope plant's or roles-no-kit's scratch directory sits under the host temp directory and is
-    # removed after.
-    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit",) else None
+    # A scope plant's, roles-no-kit's, no-registry's or registry-bad's scratch directory sits under the host
+    # temp directory and is removed after.
+    scratch = tempfile.TemporaryDirectory() if plant in SCOPE_PLANTS + ("roles-no-kit", "no-registry",
+                                                                        "registry-bad") else None
     layer_dir = scratch.name if plant == "scope-no-kit" else kit_dir
     try:
         data, where = read_definition(kit_dir)
@@ -1735,6 +2165,39 @@ def main(argv):
     item_lines, item_refusals = check_item_declarations(read_item_rows(data, where), roles, roles_why)
     for line in item_lines:
         print(line)
+    try:   # TOOL-dPlacedRequest-8 S3: each item's declared seed
+        seed_lines, seed_refusals = check_item_seeds(read_item_rows(data, where))
+    except LoopError as e:
+        seed_lines, seed_refusals = [], [str(e)]
+    for line in seed_lines:
+        print(line)
+    # TOOL-dPlacedRequest-6 S3: each item's map and unfolds, each unfold word joined to the playbook kit's
+    # namespace registry, read as the lexicon's read_tag_words reads it; no playbook kit leaves the arm unarmed.
+    ns_dir = scratch.name if plant in ("scope-no-kit", "no-registry", "registry-bad") else kit_dir
+    if plant == "registry-bad":   # a registry that resolves and is no TOML
+        ns_home = pathlib.Path(ns_dir) / NS_KIT_HOME
+        ns_home.mkdir()
+        (ns_home / "namespaces.toml").write_text("[[namespace]\n", encoding="utf-8")
+    try:
+        try:
+            registry = resolve_kit_dir(NS_KIT_HOME, "namespaces.toml", ns_dir) / "namespaces.toml"
+        except LookupError:
+            namespaces = None
+        else:
+            with open(registry, "rb") as fh:
+                namespaces = {r["ns"] for r in tomllib.load(fh).get("namespace", [])
+                              if isinstance(r, dict) and isinstance(r.get("ns"), str)}
+        map_lines, map_refusals = check_item_maps(read_item_rows(data, where), namespaces)
+    except LoopError as e:
+        map_lines, map_refusals = [], [str(e)]
+    except (OSError, tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        map_lines, map_refusals = [], ["the namespace registry %s does not read: %s" % (registry.as_posix(), e)]
+    for line in map_lines:
+        print(line)
+    probe_lines, probe_refusals = check_probe_outcomes(read_item_rows(data, where))   # TOOL-dPlacedRequest-7 S8
+    for line in probe_lines:
+        print(line)
+    item_refusals = item_refusals + seed_refusals + map_refusals + probe_refusals
     print("loop: witness classes %s · refused %s" % (" ".join(data["witnesses"]["classes"]),
                                                       " ".join(data["witnesses"]["refused"])))
     for a in data.get("witness-alias", []):
@@ -1824,6 +2287,86 @@ def check_scope_plant(plant, layers, scratch, kit_dir, root, tags):
     armed = [ln for ln in lines if " · unarmed · " not in ln]
     return ([] if layers is None else ["the inputs read layer tags with no playbook kit"]) + [
         "a scope line with no playbook kit is armed: %s" % ln for ln in armed]
+
+
+def write_seed_plant(scratch):
+    """The scratch repository the resolver plants run `seed` in, `scratch` itself (TOOL-dPlacedRequest-8): a
+    `.unattended.conf` the unattended driver loads, and the build `tFix`'s unit spec, `loop_witness.py`'s
+    `FX_UNIT`, whose Files touched declares `PLANT_SEED_PATH` twice, plain and with a leading `./`, committed.
+    No path is spelled with backslashes, since the one token rule reads none (its spec's F3). A second
+    unit's spec, `PLANT_SEED_UNCOMMITTED`'s, is written after the commit and never committed, so the
+    driver cannot read it at HEAD."""
+    from loop_witness import FX_UNIT, run_fixture_git, write_fixture_files
+    spec = "# %s — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-01-01 · node a · Tier-2 · base 0123abcd\n\n" \
+           "### Files touched (estimate)\n\n- `%s`\n- `./%s`, the same path again\n"
+    run_fixture_git(scratch, "init", "-q", "--template=")
+    write_fixture_files(scratch, {
+        ".unattended.conf": "MEMORY_ROOT=memory\n",
+        "memory/builds/tFix/spec/2026-01-01-spec-%s.md" % FX_UNIT: spec % (FX_UNIT, PLANT_SEED_PATH, PLANT_SEED_PATH)})
+    run_fixture_git(scratch, "add", "-A")
+    run_fixture_git(scratch, "commit", "-q", "-m", "the seed plant's unit")
+    write_fixture_files(scratch, {"memory/builds/tFix/spec/2026-01-02-spec-%s.md" % PLANT_SEED_UNCOMMITTED:
+                                  spec % (PLANT_SEED_UNCOMMITTED, PLANT_SEED_PATH, PLANT_SEED_PATH)})
+    return FX_UNIT
+
+
+def check_seed_plant(plant):
+    """The refusals of one resolver plant (TOOL-dPlacedRequest-8 AC4, AC5, AC6), each `seed` call it makes
+    printed with its exit and output lines: this file run as a process in the scratch repository
+    `write_seed_plant` writes under the host temp directory, removed after. `seed-write` owes
+    `PLANT_SEED_PATH` once, without its `./`, then exit 2 and the one line naming why for a missing
+    `--unit`, a missing `--build`, a `--build` that walks out of the builds folder, a unit no spec
+    defines and a spec the driver cannot read at HEAD; `seed-question` owes the question's two paths,
+    then exit 2 naming `--question` with none; `seed-scope` owes the one `unarmed — scope-paths:` line
+    naming dRankedPlan, then exit 2 for an item no row declares and for a flag the command does not take.
+    Each holding plant prints `loop: fixture · <plant> held · <what it printed>`."""
+    import subprocess
+    from loop_witness import read_clean_env, remove_tree
+    scratch = tempfile.mkdtemp(prefix="seed-")
+    refusals, held = [], ""
+    pass_item, said = "item.build.unit-pass", "loop: seed · "
+    try:
+        unit = write_seed_plant(scratch)
+        question, asked = PLANT_SEED_QUESTION
+        runs = {"seed-write": [
+                    ([pass_item, "--build", "tFix", "--unit", unit], 0, [PLANT_SEED_PATH]),
+                    ([pass_item, "--build", "tFix"], 2, [said + "the item %s seeds write-set, which takes --unit "
+                                                         "<id>" % pass_item]),
+                    ([pass_item, "--unit", unit], 2, [said + "the item %s seeds write-set, which takes --build "
+                                                      "<slug>" % pass_item]),
+                    ([pass_item, "--build", "../tFix", "--unit", unit], 2, [
+                        said + "--build '../tFix' is no build slug, one path segment of letters, digits, _ and -"]),
+                    ([pass_item, "--build", "tFix", "--unit", "TOOL-tFix-2"], 2, [
+                        said + "0 spec(s) under memory/builds/tFix/spec/ define TOOL-tFix-2, where one owes it"]),
+                    ([pass_item, "--build", "tFix", "--unit", PLANT_SEED_UNCOMMITTED], 2, [
+                        said + "the unattended driver's --path-tokens exited 2: path-tokens not read — git cannot "
+                               "read HEAD or a spec at it: exit 128"])],
+                "seed-question": [(["item.plan.research", "--question", question], 0, asked),
+                                  (["item.plan.research"], 2, [said + "the item item.plan.research seeds "
+                                                               "question-paths, which takes --question <text>"])],
+                "seed-scope": [(["item.design.inventory", "--build", "tFix"], 0, [SEED_SCOPE_UNARMED]),
+                               (["item.no-such"], 2, [said + "no [[item]] row declares item.no-such"]),
+                               (["item.design.inventory", "--frob", "x"], 2, [])]}[plant]
+        for args, owed, want in runs:
+            p = subprocess.run([sys.executable, str(pathlib.Path(__file__).absolute()), "seed", *args], cwd=scratch,
+                               capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env=read_clean_env(PYTHONIOENCODING="utf-8"), timeout=SEED_DRIVER_BOUND * 2)
+            out = p.stdout.splitlines()
+            print("loop: fixture · seed %s · exit %d" % (" ".join(args), p.returncode))
+            for line in out:
+                print("loop: fixture ·   %s" % line)
+            if p.returncode != owed or out != want:
+                refusals.append("seed %s exited %d printing %r, owed exit %d printing %r" % (
+                    " ".join(args), p.returncode, out, owed, want))
+            elif owed == 0:
+                held = " ".join(out)
+    except (OSError, subprocess.SubprocessError) as e:
+        refusals.append("the plant %s did not run: %s" % (plant, e))
+    finally:
+        remove_tree(scratch)
+    if not refusals:
+        print("loop: fixture · %s held · %s" % (plant, held))
+    return refusals
 
 
 def write_conf_plant(plant, scratch):

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 199 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 174 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 203 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · workflow-scripts: 14 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 176 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -88,6 +88,7 @@ Inventories: gate-legs: 199 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `loop breakpoint fixtures` | loop |
 | `loop budget fixtures` | loop |
 | `loop checklist tags` | loop |
+| `loop claim fixtures` | loop |
 | `loop claims fixtures` | loop |
 | `loop command conformance` | loop |
 | `loop composition fixtures` | loop |
@@ -98,7 +99,10 @@ Inventories: gate-legs: 199 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `loop guard fixtures` | loop |
 | `loop item kind` | loop |
 | `loop parent routes` | loop |
+| `loop placement fixtures` | loop |
 | `loop position fixtures` | loop |
+| `loop probe fixtures` | loop |
+| `loop request fixtures` | loop |
 | `loop review bounds fixtures` | loop |
 | `loop scenario fixtures` | loop |
 | `loop splice check` | loop |
@@ -375,6 +379,7 @@ Inventories: gate-legs: 199 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `forwarded-arg-opens-an-unhandled-return-shape.md` | memory-tree-hygiene |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
+| `global-set-and-never-read.md` | session-kickoff |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `guard-above-a-fold-makes-its-fallback-dead.md` | govkit |
 | `guard-fed-the-value-it-supersedes.md` | unattended |
@@ -472,6 +477,7 @@ Inventories: gate-legs: 199 · kits: 20 · git-hooks: 4 · harness-hooks: 14 · 
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `unvalidated-arg-reaches-an-agent-shell-line.md` | memory-tree-hygiene |
+| `usage-exit-list-lags-its-function.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
 | `verdict-printed-before-the-step-that-reverts-it.md` | govkit |
 | `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |

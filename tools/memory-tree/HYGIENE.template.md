@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.171 -->
+<!-- gov:kit memory-tree@2.172 -->
 [{{MEMORY_ROOT}}/HYGIENE.md · Level 3 · Read before writing any record, index or id under the memory root; yields to levels 0 to 2]
 # {{MEMORY_ROOT}}/ retention & hygiene
 
@@ -659,8 +659,12 @@ carry it too:
   `acceptance` (a unit's acceptance commands re-run at a commit, in the grammar under "Acceptance
   records") · `transition` (one build stage move, in the grammar under "Transition records") ·
   `recommendation` (a stage exit's review recommendation, in the grammar under "Recommendation
-  records"). The nine after `research` are the typed kinds: each record is named
-  `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
+  records") · `card` (a build's orientation card at one step, its snapshot, fields `Build`, `Step` and
+  `Ref` and the card's text in one `~~~~` fenced block) · `probe-trigger` (a probe opened at an item
+  boundary, fields `Cause`, `Asker`, `Subject`, `At` and `Key`) · `probe` (the probe it opened: its pinned
+  head, its `## Method` entries, its run lines and its `Verdict` beside `Judged`, written by the loop kit's
+  `probe.py`). The twelve after `research` are the typed
+  kinds: each record is named `<date>-build-<unit id>-<kind>-<n>.md` in a build's `build/` folder, and the kind and that name are
   joined both ways. An open kind field stops being groupable the first time two authors spell one
   relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
