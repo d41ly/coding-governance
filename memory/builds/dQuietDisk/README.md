@@ -105,7 +105,7 @@ ids TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-20 
 | [TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper](spec/2026-11-20-spec-TOOL-dQuietDisk-9.md) | 6 | 2 | SPECCED | rev-1 | 2026-11-20 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
