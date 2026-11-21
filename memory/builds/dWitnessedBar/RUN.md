@@ -800,3 +800,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T13:22:48Z brief · item TOOL-dWitnessedBar-96 · reason 24f049362df2 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-96-build-brief.md
 
 2026-11-21T13:25:09Z dispatch · item ae4ca8cb TOOL-dWitnessedBar-96 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-96.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-96-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-96.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-21T13:46:21Z brief · item TOOL-dWitnessedBar-97 · reason 3b27b8c682b8 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-97-build-brief.md
