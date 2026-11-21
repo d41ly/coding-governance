@@ -37,7 +37,10 @@ the landed revision sets that the helper `policy-mirror.js` and the reader answe
 `help/` and the self-tests that READS `policy.json`, by `arm_single_reader`. `arm_legacy_homes` reds
 each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7); where
 this kit holds no list, as in every install, it prints `policy-check: arm_legacy_homes · not graded
-· <why>` (TOOL-dGroundRules-17).
+· <why>` (TOOL-dGroundRules-17). `arm_reader_join` grades the shrink-only `unnamed-keys.txt`, the
+catalogue keys no clause on their owner build's row of the design view names, as `policy.py lists
+--check` does (KICK-dKeptSession-19); where every `DESIGN_*` key is blank, as in every adopter, or
+the list is withheld, it prints `policy-check: arm_reader_join · not graded · <why>`.
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -846,6 +849,36 @@ def arm_reader_coverage(repo, kit):
             [tuple(f.split(": ", 1)) for f in findings])
 
 
+def arm_reader_join(repo, kit):
+    """The catalogue's reader join (KICK-dKeptSession-19 S5): `policy.check_unnamed_list` over the
+    design `policy.load_design` reads from `repo`, the one grade `policy.py lists --check` makes of
+    `unnamed-keys.txt`. Where this kit holds no list, the list being gov's own and withheld from
+    installs, or the repository's conf leaves every DESIGN_* key blank, as in every adopter, it grades
+    nothing and says so. A memory-tree kit that does not resolve, or any other DesignRefusal, is the
+    one finding, as `arm_reader_coverage` reds a memory-tree miss."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    path = Path(kit) / policy.UNNAMED_LIST
+    if not path.is_file():
+        return None, f"{policy.UNNAMED_LIST} is absent · {policy.LEGACY_WITHHELD}", []
+    try:
+        design = policy.load_design(kit, repo)
+    except LookupError as exc:
+        return len(rows), "the design was not read", [("kit.toml", f"requires memory-tree, which does not resolve: {exc}")]
+    except ValueError as exc:
+        if policy.check_design_blank(exc):
+            return None, str(exc), []
+        return len(rows), "the design was not read", [(".memory-tree.conf", str(exc))]
+    with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
+        compare = policy.resolve_compare_base(kit)
+    findings, note = policy.check_unnamed_list(kit, design, compare)
+    m = sum(1 for r in rows if r.get("name"))
+    n = m - len(policy.derive_unnamed_keys(rows, design))
+    k = len(policy.parse_list(path.read_text(encoding="utf-8")))
+    return m, f"{n} of {m} catalogue key(s) named on their owner's row · {k} listed · {note}", findings
+
+
 # ---- the size caps (TOOL-dGroundRules-9) --------------------------------------------------------
 
 # A request of the size switch as an enforcer spells it: a verb of budgets.py's CLI, a
@@ -1137,6 +1170,8 @@ ARMS = [
         why="gov's own list derives rows; with no list, or in an adopter's tree, it is announced"),
     Arm("arm_reader_coverage", arm_reader_coverage, empty="announce",
         why="no owner build landed, or no landed revision, is legal"),
+    Arm("arm_reader_join", arm_reader_join, empty="announce",
+        why="every DESIGN_* key blank, as in every adopter, or the list withheld from installs, is legal"),
     Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"),
         empty="announce", why="a tree with no tracked code is legal"),
     Arm("arm_cap_census", arm_cap_census, empty="finding", why="the census ships in the kit, so it always has rows"),
@@ -3443,6 +3478,95 @@ def run_reader_declared(name):
             checks.append((f"case {case}: refused", "check_reader_coverage", False, str(exc)))
         finally:
             remove_repo(t)
+    return print_checks(name, checks)
+
+
+# ---- the catalogue's reader join (KICK-dKeptSession-19) -----------------------------------------
+
+RJ_OWNER = "dKeptSession"
+RJ_ROW = f'\n[[key]]\nname = "{PLANTED}"\nallowed = ["a"]\ndefault = "a"\nowner = "{RJ_OWNER}"\n'
+RJ_BLANK_CONF = 'DESIGN_RECORD=""\nDESIGN_BASELINE=""\nDESIGN_VIEW=""\nDESIGN_NODES=""\n'
+RJ_ARM_LINE = "policy-check: arm_reader_join · not graded · "
+
+
+def render_join_design(named):
+    """A design of `read_design`'s shape, `{"builds": ...}`, holding one clause per (owner, key) pair
+    of `named`, the clause naming that key in backticks, and a clause on RJ_OWNER's row naming no
+    catalogue key, so the planted row's owner is a build of the view."""
+    builds = {RJ_OWNER: {"cl-dFixture-0000": ("the fixture's clause names `zz.nothing`", "", "baseline")}}
+    for n, (owner, key) in enumerate(named, 1):
+        builds.setdefault(owner, {})[f"cl-dFixture-{n:04d}"] = (f"the fixture's clause names `{key}`", "", "baseline")
+    return {"builds": builds}
+
+
+def run_reader_join(name):
+    """`reader-join` (KICK-dKeptSession-19 AC2, AC3): `build_repo`'s copy, a design the case builds
+    naming the catalogue's first row on its owner's row, the copy's `unnamed-keys.txt` seeded by
+    `write_shrink_list` over that design and committed as its base. `check_unnamed_list` must be green
+    unplanted; red naming a planted RJ_OWNER row no clause names `unnamed and not listed`; red naming a
+    listed key `stale` once a clause on its owner's row names it; and red naming the planted row `added
+    to a shrink-only list above the base` once its name is added to the list copy. `reader-join-blank`
+    (AC6): `check_policy.py --repo` over a scratch repository whose `.memory-tree.conf` leaves every
+    DESIGN_* key blank prints `arm_reader_join · not graded` naming the blank keys, no finding under it."""
+    if name == "reader-join-blank":
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            Path(t, ".memory-tree.conf").write_text(RJ_BLANK_CONF, encoding="utf-8", newline="\n")
+            run_fixture_git(t, "init", "-q")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", "a conf leaving every DESIGN_* key blank")
+            rc, out = run_case_argv(t, [sys.executable, KIT / "check_policy.py", "--repo", t])
+            lines = out.split("\n")
+            at = next((i for i, ln in enumerate(lines) if ln.startswith(RJ_ARM_LINE)), None)
+            told = at is not None and "DESIGN_" in lines[at]
+            under = at is not None and at + 1 < len(lines) and lines[at + 1].startswith("  ")
+            seen = lines[at] if at is not None else f"no {RJ_ARM_LINE.strip()} line (exit {rc})"
+            checks = [("blank DESIGN_* keys", "check_policy.py --repo", told and not under,
+                       seen + (" · a finding under it" if under else ""))]
+        except subprocess.CalledProcessError as exc:
+            checks = [(name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}")]
+        finally:
+            remove_repo(t)
+        return print_checks(name, checks)
+    rows = policy.load_catalogue(KIT)
+    repo, kit = build_repo(rows)
+    checks = []
+    try:
+        first = next(r for r in rows if r.get("name") and r.get("owner"))
+        design = render_join_design([(first["owner"], first["name"])])
+        policy.write_shrink_list(kit, policy.UNNAMED_LIST, policy.UNNAMED_HEADER,
+                                 policy.derive_unnamed_keys(policy.load_catalogue(kit), design))
+        run_fixture_git(repo, "add", "-A")
+        run_fixture_git(repo, "commit", "-q", "-m", "the unnamed-keys list, seeded over the case's design")
+        run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/main", "HEAD")
+        with policy.run_without_git_env():
+            compare = policy.resolve_compare_base(kit)
+        cat, listed = kit / policy.CATALOGUE, kit / policy.UNNAMED_LIST
+        saved = {p: p.read_bytes() for p in (cat, listed)}
+        names = policy.parse_list(listed.read_text(encoding="utf-8"))
+        stale = next(r for r in rows if r.get("name") in names and r.get("owner"))
+
+        def judge(scenario, key, needle, plant_design=design):
+            findings, note = policy.check_unnamed_list(kit, plant_design, compare)
+            ok = (not findings) if key is None else any(k == key and needle in why for k, why in findings)
+            seen = "; ".join(f"{k}: {why}" for k, why in findings) or f"no finding · {note}"
+            checks.append((scenario, "check_unnamed_list", ok, seen))
+            for p, b in saved.items():
+                p.write_bytes(b)
+
+        judge("unplanted: green", None, "")
+        write_edit(cat, lambda s: s + RJ_ROW)
+        judge(f"a {RJ_OWNER} row no clause names", PLANTED, policy.UNNAMED_WHY)
+        judge("a clause naming a listed key", stale["name"], "stale",
+              render_join_design([(first["owner"], first["name"]), (stale["owner"], stale["name"])]))
+        write_edit(cat, lambda s: s + RJ_ROW)
+        write_edit(listed, lambda s: s + PLANTED + "\n")
+        judge("the list grown above its base", PLANTED, "added to a shrink-only list above the base")
+        judge("put back: green", None, "")
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(repo)
     return print_checks(name, checks)
 
 
@@ -5782,6 +5906,8 @@ CASES = [
     ("reader-coverage-declared", None, run_reader_declared),  # a key read only outside the scan, declared in the list
     ("reader-quoted-pattern", None, run_reader_quoted),  # a pattern key read through a quoted segment
     ("reader-coverage-carried", None, run_reader_carried),  # a build run landed with a unit carried forward
+    ("reader-join", None, run_reader_join),  # an outcome case: the unnamed-keys list over the case's own design
+    ("reader-join-blank", None, run_reader_join),  # arm_reader_join over a conf leaving every DESIGN_* key blank
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
     *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch

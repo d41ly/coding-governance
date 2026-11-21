@@ -108,6 +108,14 @@ allowed values and every check.
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the <!-- usage: script:tools/policy/policy.py#lists 54ff8bae -->
   list. `python tools/policy/policy.py lists --check` reds a list that grew past the one the default
   branch carries.
+- **See which keys no build has picked up:** a catalogue key that no clause on its owner build's row
+  of the design view names is listed in `tools/policy/unnamed-keys.txt`. The list is generated,
+  coding-governance's own, and never installed into another repository; it may only shrink. A key
+  leaves unnamed-keys.txt one way: its owner build records a deviation that moves a clause naming the
+  key, in backticks, onto that build's row; then `python tools/policy/policy.py lists --write` drains it.
+  `lists --check` reds a listed key a clause now names (`stale`), a new key no clause names, and a key
+  the default branch's list did not carry. Where the design is not declared, as in every other
+  repository, the check prints `policy lists: unnamed-keys.txt · not graded`.
 - **Know which keys are loop bounds or deadlines:** raising one loosens the policy, so its catalogue
   row says so with `direction = "raise-loosens"`. A row is one when its allowed values are a retry,
   round or route-back count, or a number of hours, days or seconds. The check reds such a row that

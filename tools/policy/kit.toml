@@ -18,7 +18,7 @@ optional = [
 ]
 
 # Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
-# beside it, the module, the checker and the adopter; the legacy-home and unscanned-readers lists alone are withheld, below. A repository's own policy is the file the
+# beside it, the module, the checker and the adopter; the legacy-home, unscanned-readers and unnamed-keys lists alone are withheld, below. A repository's own policy is the file the
 # adopter scaffolds OUTSIDE this directory, `.governance/policy.toml`, which no update rewrites.
 [[files]]
 include = "**"
@@ -31,8 +31,10 @@ role = "engine"
 # `arm_legacy_homes` arm announces itself not graded, and `lists --write` never creates it.
 # THE UNSCANNED-READERS LIST IS WITHHELD the same way (TOOL-dLandedOwners-3): its rows name gov's own
 # paths, which an adopter's tree does not hold, and an absent list is no rows.
+# THE UNNAMED-KEYS LIST IS WITHHELD the same way (KICK-dKeptSession-19): its rows are graded against
+# gov's own design view, which no adopter declares, so `arm_reader_join` announces itself not graded.
 [[files]]
-include = ["legacy-homes.txt", "unscanned-readers.txt"]
+include = ["legacy-homes.txt", "unscanned-readers.txt", "unnamed-keys.txt"]
 role = "project-owned"
 
 # `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise, then

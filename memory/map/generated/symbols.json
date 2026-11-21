@@ -1798,6 +1798,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "arm_reader_join",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_record",
       "kind": "function",
       "file": "tools/playbook/instructions_edit.py"
@@ -6018,6 +6023,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_design_blank",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_deviation_fields",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -8558,6 +8568,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_shrink_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_shrink_row",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -9111,6 +9126,11 @@
       "id": "check_unmerged_live",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_unnamed_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_untouched_r3",
@@ -13818,6 +13838,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_unnamed_keys",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -15748,9 +15773,19 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "load_design",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "load_design_lib",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "load_design_lib",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "load_document_registry",
@@ -23878,6 +23913,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "read_shrink_base",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_side",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -26511,6 +26551,11 @@
       "id": "render_item_row",
       "kind": "function",
       "file": "tools/loop/loop_items.py"
+    },
+    {
+      "id": "render_join_design",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "render_journal_bytes",
@@ -32259,6 +32304,11 @@
     },
     {
       "id": "run_reader_declared",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_join",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -39611,6 +39661,16 @@
       "id": "write_shims",
       "kind": "function",
       "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "write_shrink_file",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "write_shrink_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "write_skill",
