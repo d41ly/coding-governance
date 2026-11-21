@@ -215,7 +215,6 @@ leg	selftest harness self-test	dWitnessedBar
 leg	extract-arms self-test	dWitnessedBar
 leg	run-selftests self-test	dWitnessedBar
 kind	kind.tool-kit	dShippedRelease
-kind	kind.preset	dKeptSession
 kind	kind.gate-leg	dWitnessedBar
 kind	kind.record-kind	dConvergedCharter
 kind	kind.lens	dCalibratedLens

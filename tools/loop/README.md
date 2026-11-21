@@ -468,7 +468,12 @@ its directory put first on `sys.path` so its `guard` is never this kit's file of
   kit's minimal guard wherever this kit resolves; the push arm, `--push-range <base>..<tip>`, which
   the pre-push hook runs over a default-branch update; and the expansion rule,
   `check_expansion_value(key, value, points)`, over this definition's `[[selects]]` rows, each a key,
-  a value and the layer point that value needs. The verdict reads its rule from the landed revision:
+  a value and the layer point that value needs, printed by the verb `--expansion`, which judges each
+  `<key>=<toml value>` line on stdin by that rule, prints one `loop-guard: refused · stdin:<n> · <why>`
+  line per refused pair or unreadable line, and exits 2 on any, else 0, so the policy kit's
+  `presets.py load` reaches the rule by subprocess and copies none of it (KICK-dKeptSession-1 S8). One
+  row, `build.closes` = `after-release-verifies` at `point.flow.release`, the release slot the core
+  Flow row declares, is the presets' own. The verdict reads its rule from the landed revision:
   guard-self before the value's rule, the live run's admission before guard-self, a change record for
   every change, then `policy-file.guard`, the minimal guard run as a subprocess for every shape it
   admits. The help page's section "Who may change the policy file" is the user's statement.
@@ -483,6 +488,7 @@ temp directory, this tree's kits found beside this one, and prints each scenario
 ```bash
 python <prefix>/loop/guard.py --staged
 python <prefix>/loop/guard.py --push-range <base>..<tip>
+printf '%s\n' 'build.closes="after-release-verifies"' | python <prefix>/loop/guard.py --expansion
 python <prefix>/loop/guard.py --fixture --plant raise-admitted
 python <prefix>/loop/guard.py --selftest
 python <prefix>/loop/floor.py get guard-self
@@ -792,11 +798,15 @@ own, is not graded. None is listed: the lander's wait on a claim push went with
 
 ## The factories, `factories.py`
 
-Six more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
-rows `kind.command`, `kind.policy-key`, `kind.hook`, `kind.role`, `kind.workflow` and `kind.scenario`
-each name one of its subcommands, so `core.py new <kind> <name> ...` runs it; the scenario factory
-appends a gov row to `scenarios.toml` and refuses the name `adopter`, its gate `scenario.py check`
-(TOOL-dDeclaredLoop-27). Each validates its arguments first and exits
+Seven more kinds of the register take their factory from `factories.py` (TOOL-dDeclaredLoop-6): the
+rows `kind.command`, `kind.policy-key`, `kind.preset`, `kind.hook`, `kind.role`, `kind.workflow` and
+`kind.scenario` each name one of its subcommands, so `core.py new <kind> <name> ...` runs it; the
+scenario factory appends a gov row to `scenarios.toml` and refuses the name `adopter`, its gate
+`scenario.py check` (TOOL-dDeclaredLoop-27); the seventh, `preset <name> --from <preset>`, appends a
+`[preset.<name>]` table copying the shipped preset `--from` names to the policy kit's `presets.toml`
+and adds the name to the catalogue's `preset` row's `of`, its gate `PRESET_ARMS`, the policy kit's
+`arm_presets` run in process as the policy key's arms are, and a `--from` naming no preset of the
+store refused before any write (KICK-dKeptSession-1 S6). Each validates its arguments first and exits
 2 on a bad one, before any write; holds every path it writes, and the path a renderer it runs writes,
 through `write_guarded` from `policy_edit.py`, one call per path, nested; and runs the kind's gate as the
 innermost record step, so a red gate puts every byte back and removes every created path, prints the
@@ -808,9 +818,8 @@ for a policy key, a `[[key]]` row of its catalogue, the mirror left to the calle
 caller's index holding the written files, since it grades tracked fragments only; and the roles kit's
 `check_roles.py`, through its `--write` render, for a role and a workflow, the workflow's loop row also
 graded by `loop_lib.py --check`. A role and a workflow join the two sets the roles kit closes in code,
-`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The preset kind is pending for
-dKeptSession, and the stage kind for TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant
-<case>` runs one of thirteen plants, each factory's instance green and a hand-made one red under the same
+`BODY_CEILINGS` and `WORKFLOW_NAMES`, by one anchored insertion each. The stage kind is pending for
+TOOL-dDeclaredLoop-25's repository stage. `--fixture --plant <case>` runs one of seventeen plants, each factory's instance green and a hand-made one red under the same
 gate plus the restore, in a scratch clone of the working tree the policy kit's `build_source_snapshot`
 builds, and `--selftest` runs `check-commands` and every plant over one such clone through
 `run_selftest_cases`.

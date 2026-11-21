@@ -673,6 +673,13 @@ verb = "policy-key"
 flags = ["--allowed=", "--default=", "--summary=", "--usage=", "--owner="]
 
 [[usage]]
+id = "script:{prefix}/loop/factories.py#preset"
+shape = "verb"
+entry = "{prefix}/loop/factories.py"
+verb = "preset"
+flags = ["--from="]
+
+[[usage]]
 id = "script:{prefix}/loop/factories.py#hook"
 shape = "verb"
 entry = "{prefix}/loop/factories.py"
@@ -713,6 +720,20 @@ shape = "verb"
 entry = "{prefix}/policy/budgets.py"
 verb = "resolve"
 flags = ["--explain"]
+
+[[usage]]
+id = "script:{prefix}/policy/presets.py#check"
+shape = "verb"
+entry = "{prefix}/policy/presets.py"
+verb = "check"
+flags = []
+
+[[usage]]
+id = "script:{prefix}/policy/presets.py#load"
+shape = "verb"
+entry = "{prefix}/policy/presets.py"
+verb = "load"
+flags = ["--repo="]
 
 [[usage]]
 id = "script:{prefix}/lib/python_floor.py#check"

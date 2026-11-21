@@ -6,7 +6,9 @@ branch (TOOL-dGroundRules-4), the JSON mirror the hooks read (TOOL-dGroundRules-
 shrink-only list of the legacy policy homes, derived from the files they guard (TOOL-dGroundRules-7),
 gov's own and withheld from installs, so `lists --write` never creates it (TOOL-dGroundRules-17).
 The size caps' half, the census, the switch and the `[budgets]` table's schema rule `validate`
-calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
+calls, is `budgets.py` beside this file (TOOL-dGroundRules-9). The named presets' store, its check and
+the repository-preset rule `validate` calls for a file holding a `presets` table, `check_repo_presets`,
+are `presets.py` (KICK-dKeptSession-1).
 
     python <this kit>/policy.py lists --check   # both lists against their derivations and baselines
     python <this kit>/policy.py lists --write   # drain both lists; neither ever gains a row
@@ -64,6 +66,7 @@ KIT_POLICY_VERSION = "1.13"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
+PRESETS_TABLE = "presets"                       # a policy file's table of repository presets (KICK-dKeptSession-1)
 OVERLAY_REL = ".governance/instructions.toml"   # the instruction overlay, whose `[[policy]]` rows join the catalogue's
 ADOPTER = "adopter"                             # the one top segment a repository's own key sits under
 REPOSITORY_OWNER = "repository"
@@ -250,8 +253,11 @@ def read_catalogue_row(path, catalogue):
 
 def scan_keys(doc, rows, prefix=()):
     """Yield (segments, row or None, value) for each key of a parsed policy document. A table is
-    descended into unless a map-valued row names it, so a table's leaves are the keys graded."""
+    descended into unless a map-valued row names it, so a table's leaves are the keys graded. The
+    top-level `presets` table, a repository's declared presets, is `presets.check_repo_presets`'s."""
     for k, v in doc.items():
+        if not prefix and k == PRESETS_TABLE:
+            continue
         segs = prefix + (k,)
         try:
             row = read_catalogue_row(segs, rows)
@@ -589,21 +595,37 @@ def validate(text, rows=None, census=None):
     the decoder's line, key "". Text that parses yields one per leaf its catalogue row refuses, by
     `check_value`, and one per leaf no row matches, each at the line `derive_key_line` finds, then the
     `[budgets]` table's own rule, `budgets.check_budgets` over the cap census `census`, the working
-    directory's by default (TOOL-dGroundRules-9). `rows` is `load_catalogue`'s, this kit's by default.
-    The module's one judge of a policy file."""
+    directory's by default (TOOL-dGroundRules-9). Only for a file holding a top-level `presets` table,
+    a repository's declared presets, the presets' rule follows, `presets.check_repo_presets`, which
+    then judges the `preset` leaf too, admitting a declared name; a file without the table is judged as
+    before it, and one holding it where `presets.py` does not import is one problem naming that module
+    (KICK-dKeptSession-1 S3, §8 F9). No pair rule runs here (§8 F10). `rows` is `load_catalogue`'s,
+    this kit's by default. The module's one judge of a policy file."""
     text = derive_bomless_text(text)
     try:
         doc = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
         at = re.search(r"at line (\d+)", str(exc))  # Python 3.14 carries `lineno`; 3.11 to 3.13 the message
         return [Problem(getattr(exc, "lineno", None) or (int(at[1]) if at else 0), "", str(exc))]
-    out = []
-    for segs, row, value in scan_keys(doc, load_catalogue(KIT) if rows is None else rows):
+    out, rows, declares = [], load_catalogue(KIT) if rows is None else rows, PRESETS_TABLE in doc
+    for segs, row, value in scan_keys(doc, rows):
+        if declares and segs == ("preset",):
+            continue  # a file declaring presets may name one, so its `preset` is the presets' rule's to admit
         why = "no catalogue row matches this key" if row is None else check_value(row, value)
         if why:
             out.append(Problem(derive_key_line(text, segs), render_dotted(segs), why))
     import budgets  # the caps module beside this file; it imports this one, so never at the top
-    return out + budgets.check_budgets(doc, text, census)
+    out += budgets.check_budgets(doc, text, census)
+    if not declares:
+        return out
+    try:
+        import presets  # the presets' module beside this file, imported alike, and only for a file declaring one
+    except ImportError as exc:
+        first = next(iter(doc[PRESETS_TABLE]), None) if isinstance(doc[PRESETS_TABLE], dict) else None
+        at = derive_key_line(text, (PRESETS_TABLE,) + ((first,) if first is not None else ()))
+        return out + [Problem(at, PRESETS_TABLE, f"the file declares presets and presets.py, their rule, does not "
+                                                 f"import beside {(KIT / 'policy.py').as_posix()}: {exc}")]
+    return out + presets.check_repo_presets(doc, text, rows)
 
 
 def parse_overlay_policies(text):

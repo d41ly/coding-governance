@@ -2847,7 +2847,9 @@
       "{prefix}/playbook/positional.py",
       "{prefix}/playbook/row_checks.py",
       "{prefix}/playbook/tag_bundle.py",
-      "{prefix}/playbook/tag_index.py"
+      "{prefix}/playbook/tag_index.py",
+      "{prefix}/loop/",
+      "{prefix}/playbook/layers.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",
