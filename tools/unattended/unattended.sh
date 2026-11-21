@@ -2523,17 +2523,18 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
   # a queued record's `last-fetch`, which `write_gov_queue` ages.
   if [ "$pol" != cached ] && [ -n "${GOVFEED_DIR%$'\r'}" ]; then
     TZ=UTC printf -v lf '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-    { printf '%s\n' "$lf" >"${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID" \
-      && mv -f "${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID" "${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null \
-      || rm -f "${GOVFEED_DIR%$'\r'}/gov-last-fetch.$BASHPID"
+    CL_LFT=""
+    { derive_temp_path CL_LFT "${GOVFEED_DIR%$'\r'}/gov-last-fetch" && printf '%s\n' "$lf" >"$CL_LFT" \
+      && mv -f "$CL_LFT" "${GOVFEED_DIR%$'\r'}/gov-last-fetch"; } 2>/dev/null \
+      || { [ -z "$CL_LFT" ] || rm -f "$CL_LFT"; }
   fi
   GIT for-each-ref --format='%01%(refname)%09%(objectname)%0a%(contents)' "$CLAIM_CACHE/" "$LEASE_CACHE/" >"$d/refs" 2>/dev/null
   if [ "$pol" = cached ] && [ -n "${CL_QUEUED#*$'\t'}" ]; then
     qr=${CL_QUEUED%%$'\t'*}; qr="$LEASE_CACHE/${qr#"$LEASE_NS"/}"
-    { CL_REF="$qr" awk '/^\001/ { split(substr($0, 2), a, "\t"); skip = (a[1] == ENVIRON["CL_REF"]) } !skip' "$d/refs"
+    derive_temp_path CL_RQ "$d/refs" && { CL_REF="$qr" awk '/^\001/ { split(substr($0, 2), a, "\t"); skip = (a[1] == ENVIRON["CL_REF"]) } !skip' "$d/refs"
       printf '\001%s\t%s\n' "$qr" "${CL_QUEUED#*$'\t'}"
       GIT cat-file commit "${CL_QUEUED#*$'\t'}" 2>/dev/null | awk 'b { print; next } /^\r?$/ { b = 1 }'
-    } >"$d/refs.q" && mv -f "$d/refs.q" "$d/refs"
+    } >"$CL_RQ" && mv -f "$CL_RQ" "$d/refs"
   fi
   # PATHS REACH awk THROUGH THE ENVIRONMENT: `-v` processes escapes, and a Windows TMPDIR's
   # backslashes turned `\Users` into `Users` and the stamps into a file nobody read.
@@ -3226,6 +3227,9 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
+# A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
+# mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
+derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
   local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
   [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
@@ -3264,8 +3268,8 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
     if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
       printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
-    elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
-      rm -f "$d/gov-feed.seq.$$" 2>/dev/null
+    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
+      [ -z "$st" ] || rm -f "$st" 2>/dev/null
       printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
     fi
     exit 0 ) || rc=$?
@@ -3360,15 +3364,17 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       exit bad }'
 }
 write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
-  local pre="${1%/}/" d now n=0 l
+  local pre="${1%/}/" d now n=0 l lt="" st=""
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
   [ -n "$d" ] || { printf 'feed: no git common dir resolves here, so no feed was rebuilt\n'; return 2; }
   if [ -e "$d/gov-feed.log" ]; then printf 'feed: a feed is present, so nothing was rebuilt over it: %s\n' "$d/gov-feed.log"; return 2; fi
   TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$d/gov-feed.log.$$" \
-    && printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq" && mv -f "$d/gov-feed.log.$$" "$d/gov-feed.log" \
-    || { rm -f "$d/gov-feed.log.$$" "$d/gov-feed.seq.$$"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  derive_temp_path lt "$d/gov-feed.log" && derive_temp_path st "$d/gov-feed.seq" \
+    || { printf 'feed: no staging name resolves beside %s, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$lt" \
+    && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq" && mv -f "$lt" "$d/gov-feed.log" \
+    || { rm -f "$lt" "$st"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
   printf 'feed: rebuilt %s event(s) from %s into %s\n' "$n" "$pre" "$d/gov-feed.log"
   return 0
 }
@@ -4019,7 +4025,7 @@ add_gov_queue() { # ref · expected sha or empty · commit -> 0 appended, 1 not,
   return "$rc"
 }
 write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 2 a line was kept or the lock busy; GQ_PUSHED
-  local d f l ref tip c utc rc kept=0 ep tok n m lf s bd="" now
+  local d f l ref tip c utc rc kept=0 ep tok n m lf s bd="" now qt=""
   local -a q=()
   local -A rs=() gk=()
   GQ_PUSHED=""
@@ -4074,14 +4080,16 @@ write_gov_queue() { # -> one line per queued write; 0 the queue is empty after, 
   done
   write_dir_lock_wait "$d/gov-queue.lock" "$tok" "$NODE_LOCK_BOUND" node 5 \
     || { echo "queue: NOTE - gov-queue.lock is busy, so the lines this flush resolved stay queued for the next flush"; return 2; }
+  derive_temp_path qt "$f" \
+    || { remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — no staging name resolves beside the queue: $f"; return 2; }
   while IFS= read -r l || [ -n "$l" ]; do
     l=${l%$'\r'}
     [ -n "$l" ] || continue
     n=${rs["$l"]:-0}
     if [ "$n" -gt 0 ]; then rs["$l"]=$((n - 1)); continue; fi
     printf '%s\n' "$l"
-  done <"$f" >"$f.$$" && mv -f "$f.$$" "$f" 2>/dev/null \
-    || { rm -f "$f.$$"; remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — the queue could not be rewritten: $f"; return 2; }
+  done <"$f" >"$qt" && mv -f "$qt" "$f" 2>/dev/null \
+    || { rm -f "$qt"; remove_dir_lock "$d/gov-queue.lock" "$tok"; echo "lease not written — the queue could not be rewritten: $f"; return 2; }
   remove_dir_lock "$d/gov-queue.lock" "$tok"
   [ "$kept" = 0 ] || return 2
   return 0
@@ -4662,7 +4670,7 @@ derive_request_fold() { # file -> its folded text on stdout
   LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
 }
 write_request_record() { # file -> 0 recorded or already recorded, 2 not written
-  local f="${1:-}" py d out key tag sid cdir blob msg c rc tok
+  local f="${1:-}" py d out key tag sid cdir blob msg c rc tok rt=""
   [ $# = 1 ] && [ -n "$f" ] || { echo "request — not written · the form is --request <file>"; return 2; }
   [ -f "$f" ] && [ -r "$f" ] || { echo "request — not written · the request file is not readable: $f"; return 2; }
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request — not written · no python resolves, so the content key cannot be derived"; return 2; }
@@ -4693,8 +4701,9 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
   elif ! mkdir -p "$cdir/requests" 2>/dev/null; then
     echo "request — $key · not written · the local store cannot be made: $cdir/requests"; rc=2
   elif [ ! -e "$cdir/requests/$key.md" ]; then
-    cp -- "$f" "$cdir/requests/$key.md.$$" 2>/dev/null && mv -n -- "$cdir/requests/$key.md.$$" "$cdir/requests/$key.md" 2>/dev/null
-    rm -f -- "$cdir/requests/$key.md.$$"
+    derive_temp_path rt "$cdir/requests/$key.md" && cp -- "$f" "$rt" 2>/dev/null \
+      && mv -n -- "$rt" "$cdir/requests/$key.md" 2>/dev/null
+    [ -z "$rt" ] || rm -f -- "$rt"
     [ -e "$cdir/requests/$key.md" ] || { echo "request — $key · not written · the text could not be copied to $cdir/requests/$key.md"; rc=2; }
   fi
   # NO SESSION, NO CONSENT (TOOL-dPlacedRequest-32 S2): an id-less session's record keeps `session:
