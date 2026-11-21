@@ -220,7 +220,9 @@ assigns: the by-key half reds a refusal whose key and value no `[[selects]]` row
 a row-named pair the rule refuses and the load admits; a pair the rule admits is named `presets-core-only ·
 not graded` until TOOL-dDeclaredLoop-101's judgement refuses it, and a loop kit that does not resolve
 announces both halves. Its cases are outcome cases: `presets-complete` plants a cut key, a refused value,
-the default preset off a default and a fifth table on a copy of the store; `presets-pairs` a broken pair in
+the default preset off a default and a fifth table on a copy of the store; `presets-derived`
+(KICK-dKeptSession-33) a key on a derived row the store leaves unassigned, a derived default's text as a
+value, a stage key one preset lacks and a literal-default row in the `literal` list; `presets-pairs` a broken pair in
 a preset, which the arm and `presets.py check` both red, then `policy.py check` admitting a file whose one
 revision sets a round count past its preset's ceiling, since the pair rules judge the store alone (§8
 F10); `presets-repo` a repository preset admitted and refused; and `presets-core-only` copies this kit,
@@ -1142,7 +1144,7 @@ def arm_presets(repo, kit, loader=presets.load_preset):
     findings = presets.check_presets(rows, store)
     shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
     note, more = check_preset_loads(store, kit, repo, loader) if shipped else ("no load ran", [])
-    n = len(presets.derive_presettable(rows, presets.derive_never(store)))
+    n = len(presets.derive_presettable(rows, presets.derive_never(store), presets.derive_literal(store)))
     return len(shipped), f"{len(shipped)} preset(s), {n} presettable key(s) each · {note}", findings + more
 
 
@@ -5688,17 +5690,19 @@ PAIR_PLANT = (lambda t: set_preset_block(t, "velocity", lambda b: re.sub(
 
 def check_store_plant(scenario, repo, kit, plant):
     """`plant` written over the kit copy's store, `arm_presets` run, then the store put back and run
-    again -> the two checks: red naming the plant's preset and key, then green."""
+    again -> the two checks: red naming the plant's preset and key, then green. A plant whose preset is
+    None names a place of the store's own lists, its key spelled whole."""
     edit, name, key, needle = plant
+    at = key if name is None else f"preset.{name} · {key}"
     store = kit / presets.STORE
     shipped = store.read_bytes()
     write_edit(store, edit)
     _v, findings = run_arm(ARM["arm_presets"], repo, kit)
-    hit = any(k == f"preset.{name} · {key}" and needle in why for k, why in findings)
+    hit = any(k == at and needle in why for k, why in findings)
     store.write_bytes(shipped)
     verdict, clean = run_arm(ARM["arm_presets"], repo, kit)
     seen = "; ".join(f"{k}: {w}" for k, w in findings) or "no finding"
-    return [(scenario, f"arm_presets names preset.{name} · {key}", hit, seen),
+    return [(scenario, f"arm_presets names {at}", hit, seen),
             (scenario + ", unplanted", "arm_presets", not clean, "; ".join(f"{k}: {w}" for k, w in clean) or verdict)]
 
 
@@ -5718,6 +5722,36 @@ def run_presets_complete(name):
     repo, kit = build_presets_repo(policy.load_catalogue(KIT))
     try:
         checks = [c for plant, p in PRESET_PLANTS.items() for c in check_store_plant(plant, repo, kit, p)]
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
+def run_presets_derived(name):
+    """`presets-derived` (KICK-dKeptSession-33 AC2): four plants on a copy of the shipped store, each
+    red in `arm_presets` naming its place, the copy put back green: `5` on the census's first cap in
+    `strict`, a row the store leaves unassigned; `velocity`'s `maintain.fixes` set to the one member
+    equal to its row's derived text; `review.test` cut from `guarded`, a stage key the other presets
+    assign; and `hooks.bypass`, a row whose default is literal, added to `literal`. The repository
+    holds no loop kit, so the load halves announce."""
+    rows = policy.load_catalogue(KIT)
+    cap = next(iter(budgets.read_cap_census(KIT)))
+    text = policy.read_catalogue_row(("maintain", "fixes"), rows)["default"]["derived"]
+    plants = {
+        "budget-cap": (lambda t: set_preset_block(t, "strict", lambda b: policy.render_toml_value(
+            policy.render_dotted(("budgets", cap))) + " = 5\n" + b), "strict", policy.render_dotted(("budgets", cap)),
+            "not a presettable key"),
+        "derived-text": (lambda t: set_preset_block(t, "velocity", lambda b: re.sub(
+            r'(?m)^"maintain\.fixes" = .*$', lambda _m: '"maintain.fixes" = ' + policy.render_toml_value([text]), b)),
+            "velocity", "maintain.fixes", "derived default text"),
+        "stage-cut": (lambda t: set_preset_block(t, "guarded", lambda b: re.sub(r'(?m)^"review\.test" = .*\n', "", b)),
+                      "guarded", "review.test", "lacks this key"),
+        "literal-widened": (lambda t: re.sub(r'(?m)^literal = \[', 'literal = ["hooks.bypass", ', t),
+                            None, "literal · hooks.bypass", "names no catalogue row"),
+    }
+    repo, kit = build_presets_repo(rows)
+    try:
+        checks = [c for plant, p in plants.items() for c in check_store_plant(plant, repo, kit, p)]
     finally:
         remove_repo(repo)
     return print_checks(name, checks)
@@ -5922,6 +5956,7 @@ CASES = [
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
     *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
     ("presets-complete", None, run_presets_complete),  # the named presets (KICK-dKeptSession-1): the store's plants
+    ("presets-derived", None, run_presets_derived),  # the derived-default rows (KICK-dKeptSession-33): four store plants
     ("presets-pairs", None, run_presets_pairs),  # a pair broken in a preset and over a repository's override
     ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
     ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders

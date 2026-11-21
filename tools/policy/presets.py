@@ -6,17 +6,25 @@ this file, its completeness check, the repository side `validate` calls, and the
 
 THE STORE. One `[preset.<name>]` table per shipped preset, each assigning every presettable key by a
 quoted dotted key, `"hooks.bypass" = "refused"`; a top-level `never` list, the keys presets never
-touch; and a top-level `pairs` list of `[<higher>, <lower>]` pairs. A presettable key is a catalogue
-row `never` does not name whose default `policy.check_derived` does not flag. The store's one writer
-is the preset kind's factory, `core.py new preset <name> --from <preset>`, in the loop kit's
-`factories.py`; every reader takes a preset's values through `derive_preset_assignment`.
+touch; a top-level `literal` list, the derived-default rows the presets assign literal values
+(KICK-dKeptSession-33); and a top-level `pairs` list of `[<higher>, <lower>]` pairs. A presettable key
+is a catalogue row `never` does not name whose default `policy.check_derived` does not flag or which
+`literal` names. The derived rows, `derive_derived_rows`, less `literal` are the unassigned rows: no
+preset carries a key on one. The store's one writer is the preset kind's factory, `core.py new preset
+<name> --from <preset>`, in the loop kit's `factories.py`; every reader takes a preset's values
+through `derive_preset_assignment`.
 
 THE CHECK, `check_presets(rows, presets)`: every presettable row matched by a key of each shipped
 preset and every preset key matching a presettable row, both through `policy.read_catalogue_row`;
-each value admitted by `policy.check_value`; the default preset, the `preset` row's default, equal to
-each presettable row's default; the `preset` row's `of` and the table names one set; each `never`
-entry a row; each pair held in each preset. Each finding names the preset and the key. `check`
-prints it, and the policy kit's `arm_presets` grades it.
+each value admitted by `policy.check_value`, and none equal to, or holding as a member, its row's
+derived default text; the default preset, the `preset` row's default, equal to each presettable row's
+default, a derived one on a set-typed row read as its text split on `, ` and compared as a set, on any
+other derived row judged by `check_value` alone (§8 F3); under a presettable placeholder row such as
+`review.<stage>`, each key one preset assigns held by every other; the `preset` row's `of` and the
+table names one set; each `never` entry a row; `literal` an array of strings, each naming a derived
+row `never` lacks; each pair held in each preset. Each finding names the preset and the key. `check`
+prints it after one line per preset and one `unassigned` line naming the unassigned rows, and the
+policy kit's `arm_presets` grades it.
 
 THE REPOSITORY SIDE, `check_repo_presets(doc, text, rows)`, which `validate` imports and calls after
 `budgets.check_budgets` only for a policy file holding a top-level `presets` table: each
@@ -119,9 +127,23 @@ def derive_pairs(presets):
     return [tuple(p) for p in pairs if ok and isinstance(p, list) and len(p) == 2 and all(isinstance(k, str) for k in p)] if ok else []
 
 
-def derive_presettable(rows, never):
-    """The catalogue rows a preset assigns: each row `never` does not name whose default is literal."""
-    return [r for r in rows if r.get("name") not in never and not policy.check_derived(r.get("default"))]
+def derive_literal(presets):
+    """The store's `literal` list: the derived-default rows the presets assign literal values."""
+    literal = presets.get("literal")
+    return [n for n in literal if isinstance(n, str)] if isinstance(literal, list) else []
+
+
+def derive_derived_rows(rows, never):
+    """The catalogue rows, in catalogue order, whose default `policy.check_derived` flags, less those
+    `never` names: the class `literal` splits into the assigned rows and the unassigned ones."""
+    return [r for r in rows if r.get("name") not in never and policy.check_derived(r.get("default"))]
+
+
+def derive_presettable(rows, never, literal):
+    """The catalogue rows a preset assigns: each row `never` does not name whose default is literal or
+    which the store's `literal` list names."""
+    return [r for r in rows if r.get("name") not in never
+            and (not policy.check_derived(r.get("default")) or r.get("name") in literal)]
 
 
 def derive_default_preset(rows):
@@ -183,6 +205,11 @@ def check_preset_key(row, value, never, presettable):
         return "a key presets never touch"
     if row.get("name") not in presettable:
         return "not a presettable key: its row's default is derived"
+    default = row.get("default")
+    if policy.check_derived(default):
+        text = default["derived"]
+        if value == text or (isinstance(value, list) and text in value):
+            return f"{policy.render_json(text)} is the row's derived default text, not a value"
     return policy.check_value(row, value)
 
 
@@ -200,7 +227,14 @@ def check_presets(rows, presets):
     pairs = derive_pairs(presets)
     if not isinstance(presets.get("pairs"), list) or len(pairs) != len(presets["pairs"]):
         out.append(("pairs", "is not an array of [<higher>, <lower>] key pairs"))
-    presettable = {r["name"]: r for r in derive_presettable(rows, never)}
+    literal = derive_literal(presets)
+    if not (isinstance(presets.get("literal"), list) and len(literal) == len(presets["literal"])):
+        out.append(("literal", "is not an array of strings"))
+    derived = {r.get("name") for r in derive_derived_rows(rows, never)}
+    for n in literal:
+        if n not in derived:
+            out.append((f"literal · {n}", "names no catalogue row whose default is derived and `never` lacks"))
+    presettable = {r["name"]: r for r in derive_presettable(rows, never, literal)}
     for pair in pairs:
         for k in pair:
             if k not in presettable:
@@ -215,25 +249,42 @@ def check_presets(rows, presets):
     for name in of:
         if name not in shipped:
             out.append((f"preset.{name} · preset", "a name the preset row's `of` holds and no table of the store"))
+    placed = {}   # {preset: the keys it assigns under a presettable placeholder row}
     for name, table in shipped.items():
         if name not in of:
             out.append((f"preset.{name} · preset", "a table the preset row's `of` lacks"))
         if not isinstance(table, dict):
             out.append((f"preset.{name}", "is not a table"))
             continue
-        seen, assignment = set(), {}
+        seen, assignment, placed[name] = set(), {}, []
         for _raw, segs, row, value in scan_preset_keys(table, rows):
             at = f"preset.{name} · {policy.render_dotted(segs)}"
             why = check_preset_key(row, value, never, presettable)
-            if why is None and name == default and not check_same_value(value, row.get("default")):
-                why = f"{policy.render_json(value)} is not the row's default {policy.render_json(row.get('default'))}"
+            if why is None and name == default:
+                # A derived default is judged on a set-typed row by its text split on `, `, as a set,
+                # and on any other row by `check_value` alone (§8 F3).
+                want = row.get("default")
+                if policy.check_derived(want):
+                    allowed = row.get("allowed") if isinstance(row.get("allowed"), dict) else {}
+                    want = str(want["derived"]).split(", ") if allowed.get("type") == "set" else None
+                if want is not None and not check_same_value(value, want):
+                    why = f"{policy.render_json(value)} is not the row's default {policy.render_json(want)}"
             if why:
                 out.append((at, why))
             if row is not None:
                 seen.add(row.get("name"))
+                if row.get("name") in presettable and policy.check_pattern_name(row.get("name")):
+                    placed[name].append(policy.render_dotted(segs))
             assignment[segs] = value
         out += [(f"preset.{name} · {key}", "lacks this presettable key") for key in presettable if key not in seen]
         out += [(f"preset.{name} · {lo}", why) for _hi, lo, why in check_pairs(pairs, assignment, name)]
+    for other, keys in placed.items():
+        named = set(keys)   # each key another preset assigns is named once, by the first that does
+        for name, theirs in placed.items():
+            for key in theirs:
+                if key not in named:
+                    named.add(key)
+                    out.append((f"preset.{other} · {key}", f"lacks this key, which preset {name} assigns"))
     return out
 
 
@@ -249,7 +300,7 @@ def check_repo_presets(doc, text, rows):
         return [policy.Problem(0, REPO_TABLE, f"{exc.path}:{exc.line} · {exc.why}")]
     out, line = [], (lambda path: policy.derive_key_line(text, path))
     never = derive_never(store)
-    presettable = {r["name"] for r in derive_presettable(rows, never)}
+    presettable = {r["name"] for r in derive_presettable(rows, never, derive_literal(store))}
     shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
     declared = doc.get(REPO_TABLE)
     if not isinstance(declared, dict):
@@ -333,11 +384,14 @@ def run_check():
         print(f"{SAY}: refused · {exc.path}:{exc.line} · {exc.why}")
         return 2
     findings = check_presets(rows, store)
-    presettable = derive_presettable(rows, derive_never(store))
+    never, literal = derive_never(store), derive_literal(store)
+    presettable = derive_presettable(rows, never, literal)
     for name, table in (store.get("preset") or {}).items():
         have = {row.get("name") for _r, _s, row, _v in scan_preset_keys(table, rows) if row is not None} if isinstance(table, dict) else set()
         print(f"{SAY}: check · {name} · {sum(r['name'] in have for r in presettable)} of {len(presettable)} "
               "presettable key(s)")
+    unassigned = [r["name"] for r in derive_derived_rows(rows, never) if r["name"] not in literal]
+    print(f"{SAY}: check · unassigned · {len(unassigned)} derived row(s) · {', '.join(unassigned)}")
     for where, why in findings:
         print(f"{SAY}: refused · {where} · {why}")
     print(f"{SAY}: check · {'red' if findings else 'green'} · {len(findings)} finding(s)")

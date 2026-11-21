@@ -11203,6 +11203,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_derived_rows",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "derive_digest_diff",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -12201,6 +12206,11 @@
       "id": "derive_list_rel",
       "kind": "function",
       "file": "tools/loop/guard.py"
+    },
+    {
+      "id": "derive_literal",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
     },
     {
       "id": "derive_live_rows",
@@ -32159,6 +32169,11 @@
     },
     {
       "id": "run_presets_core_only",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_presets_derived",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
