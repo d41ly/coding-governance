@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-92 — the round-1 audit of unit 90, 13 minors batched: a call site isolated from the floor, ledger notes labelled and placed under their answer, criteria that can red, a narrower write grant and a derivation that names every exit
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 48 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 48 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-91-round13-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-91-round13-fix-return.md) | research | TOOL-dWitnessedBar-91 |
 | [2026-10-25-build-TOOL-dWitnessedBar-92-deviation-921.md](../build/2026-10-25-build-TOOL-dWitnessedBar-92-deviation-921.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-91-round13-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-91-round13-fix-brief.md) | research | TOOL-dWitnessedBar-91 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-91-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-91-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-91 |
 
 <!-- /gen:spec-records -->
@@ -51,29 +53,32 @@ half only id 6's fix names.
 
 - **S1** — id 6. The anchored count's baseline. On the built tree,
   `grep -c 'sha)[[:space:]]*rec_sha="' .githooks/pre-push` prints 0, because unit 69's built arm is
-  `sha) rec_sha=$_rg_v`, unquoted. Beside unit 91 S1's 1 in each quoted clone of 90 AC2, that 0 shows
-  the count tells a quoted arm from the built one, so the 1 is the clone's edit. Unit 90's ledger
-  records the 0 in the note row `92|S1` of §4's note table. Observed by AC1.
-- **S2** — id 2. 90 AC1's clones isolated from the floor. Each of 90 AC1's two scratch clones also
-  carries one line directly after the canary's top-level call site of `check_canary_keys`, in the
-  parent shell. The line adds to `a` the increments the call site's `0)` arm adds, read from the
-  built call site. A skipped visited increment then leaves `a` at the floor, so only the call site's
-  verdict can fail the arm. 90 AC1's exit clause is superseded: each clone exits non-zero and prints
-  no line holding `PASS (` and none holding `below the pinned floor`, beside 90 AC1's other clauses.
-  90 §7's staged red is corrected: a third clone with the same added line and a call site handling
-  0, 1 and 2 alone ends `PASS (<n> assertions)`, and the main loop records that last line before
-  it pins anything. The added line never sits inside `check_canary_keys`, which runs in a
-  command-substitution subshell, and S2 adds no line to the built suite and no marker to
-  `check_canary_keys`. Unit 90's ledger records the third clone's last line in note row `92|S2`.
-  Observed by AC2.
+  `sha) rec_sha=$_rg_v ;;`, unquoted (`.githooks/pre-push#read_green_file`). Beside unit 91 S1's 1
+  in each quoted clone of 90 AC2, that 0 shows the count tells a quoted arm from the built one, so
+  the 1 is the clone's edit. Unit 90's ledger records the 0 in the note row `92|S1` of §4's note
+  table. Observed by AC1.
+- **S2** — id 2. 90 AC1's clones isolated from the floor. On any code but 0 or 1 the built call site
+  leaves `rgf_ok` at 0, which skips the increments the suite gates on `rgf_ok`: one per line opening
+  `[ "$rgf_ok" = 1 ] && case`, the `rec_sha` and `rec_fp` compares (§4 Evidence). Each of 90 AC1's
+  two scratch clones also carries one line directly after the line that sets `rgf_ok`, in the parent
+  shell, adding that many to `a`. A canary its call site fails then leaves `a` at the floor, so only
+  the call site's verdict can fail the arm. 90 AC1's exit clause is superseded: each clone exits
+  non-zero and prints no line holding `PASS (` and none holding `below the pinned floor`, beside 90
+  AC1's other clauses. 90 §7's staged red is corrected: a third clone with the same added line and a
+  call site handling 0, 1 and 2 alone, with no `= 3` branch and no undefined-code `elif`, ends
+  `PASS (<n> assertions)`, and the main loop records that last line before it pins anything. The
+  added line never sits inside `check_canary_keys`, which runs in a command-substitution subshell,
+  and S2 adds no line to the built suite and no marker to `check_canary_keys`. Unit 90's ledger
+  records the third clone's last line in note row `92|S2`. Observed by AC2.
 - **S3** — id 3. Each note keyed on the item that writes it. Every note unit 90 writes in another
   unit's ledger opens with the label `TOOL-dWitnessedBar-90 S<k>`, where `<k>` is the item writing it.
   Each of 90's ledger clauses is read through §4's note check over that item's rows of §4's note
   table, in place of a `grep -n 'AC<n>'` that only has to find a line naming `TOOL-dWitnessedBar-90`.
   One item writes each label, so no item's clause can pass on another item's line. Observed by AC3.
 - **S4** — id 4. Two criteria that can red. First, 90 AC3's `grep -c 'sha)'` over the probe's own
-  scratch files is struck. The probe's diff counts read 89 S6's fixed text, which no build act
-  changes, so they stand PINNED by 90 §4 Evidence (2026-10-25) and are not run by the build. 90 S2's
+  scratch files is struck. The probe's diff counts read the built match, which no act of this build
+  changes, so they stand PINNED by 90 §4 Evidence (2026-11-21) and by 90's pass (`da3fbc953`) under
+  its `- AC3` answer, and the close does not run them again. 90 S2's
   clones, 89 AC6's clone and 88 AC10's clones grade the built loop. Second, 90 AC15's
   `sed ... | grep -cE 'python3? -c'` clause over 90's own text is struck. In its place, each
   close-time run of the owner derivation that 88 AC6 and AC18 and 89 AC9 and AC12 make is recorded in
@@ -88,10 +93,12 @@ half only id 6's fix names.
   through `check_gen_region_only`. 90 S12's statement names all three `[[generated]]` rows
   `gen_build_index.py` owns: `{memory_root}/LIVE.md`, `{memory_root}/ledger` and
   `{memory_root}/backlog`. With the declaration withdrawn, S12's "this build adds no rule beside it"
-  holds. `spec/` stays in 90's Files touched and in 90 AC13's porcelain read, which observe a commit
-  and grant nothing. Units 89 and 90 dispatch before this unit, so a declaration either made is
-  answered after the fact: each of their pass commits changed no other unit's spec outside its gen
-  regions. Note rows `90|S13` and `92|S5` record it. Observed by AC5.
+  holds. This pass declares its own spec file, never the directory, as unit 91's dispatch row did.
+  `spec/` stays in 90's Files touched and in 90 AC13's porcelain read, which observe a commit and
+  grant nothing. Units 89 and 90 dispatched before this unit, and 90's row declared
+  `memory/builds/dWitnessedBar/spec` (§4 Evidence), so that grant is answered after the fact: each of
+  their pass commits changed no other unit's spec outside its gen regions. Note rows `90|S13` and
+  `92|S5` record it. Observed by AC5.
 - **S6** — id 11. Notes under the answer, never beside it. Every note units 90 and 92 write in an
   acceptance ledger is a continuation line under the `- AC<n>` answer its note-table row names: two
   spaces in, never a line opening `- `. It is written once that answer exists. 90 AC10's
@@ -106,39 +113,46 @@ half only id 6's fix names.
   `python` with no exit read. Unit 90's ledger records the exit in note row `92|S7`.
   Observed by AC7.
 - **S8** — id 7. The floor-comment inventory, stated as the command prints it. Over base `cdfbd1cf`,
-  `grep -n -i floor tools/run-gates/run-gates.gov.test.sh` prints lines 20, 91, 92, 94, 262, 377, 378,
-  396, 408 and 459. It does not print `:93` or `:95`, which are a continuation line and the
-  `TOOL-dDerivedDocket-23` line. This corrects 90 §4 Evidence's first bullet, and this spec's §4
-  Evidence carries it. NOT OBSERVED by the build: the inventory reads a base blob that no build act
-  changes, and S9 observes on the built tree the keep list it decides.
+  `grep -n -i floor tools/run-gates/run-gates.gov.test.sh` prints lines 20, 91, 92, 94, 262, 377,
+  378, 396, 408 and 459. It does not print `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf:93` or
+  `:95`, which are a continuation line and the `TOOL-dDerivedDocket-23` line. This spec's §4 Evidence
+  carries it. 90 §4 Evidence, re-grounded at rev-3 over `9b0ad9c97`, no longer states a
+  `grep -i floor` inventory, so S8 stands as the record of the base inventory S9's keep list is
+  drawn from. NOT OBSERVED by the build: the inventory reads a base blob that no build act changes,
+  and S9 observes on the built tree the keep list it decides.
 - **S9** — id 12. 90 S11's keep list, made whole. Beside the comments 90 S11 keeps, the floor comments
-  outside the assertion floor stay untouched: `:20` (`test_recall_floor.py from the payload`) and
-  `:262` (`1565 s floor`). So does `:396`, the section header
+  outside the assertion floor stay untouched: `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf:20`
+  (`test_recall_floor.py from the payload`) and `:262` (`1565 s floor`). So does `@cdfbd1cf:396`, the
+  section header
   `# ---- THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2) ----`, though it carries the unit
-  id 90 S11 drops from the owner line. This unit's pass reads all three on the built tree. Where unit
-  90's pass removed one, this pass restores it, byte for byte, from base `cdfbd1cf`. Unit 90's ledger
-  records the reading in note row `92|S9`. Observed by AC8.
-- **S10** — id 5. Each act at its phase. 90 §4 Rollout is superseded. S11, S14 and S15's probes run at
-  the pass, and S3's probe is PINNED (S4). S1, S2 and S9's clones run at the close. AC13's
-  regeneration runs after the pass commit, and every ledger note is written at the close. 90 S10's
+  id 90 S11 keeps off the owner line. On the tree 90's pass built (`da3fbc953`) each of the three
+  counts 1 (§4 Evidence), so this pass restores none and writes no suite line; any other count is a
+  divergence the builder returns. This unit's pass reads all three on the built tree, and unit 90's
+  ledger records the reading in note row `92|S9`. Observed by AC8.
+- **S10** — id 5. Each act at its phase. 90 §4 Rollout is superseded. S1, S11, S14 and S15's probes
+  ran at 90's pass (`da3fbc953`), and S3's probe stands PINNED (S4). S1, S2 and S9's clones run at the
+  close. AC13's regeneration runs after the pass commit, and every ledger note is written at the
+  close. 90 S10's
   reading of unit 89's schedule is superseded too. 89 AC4, AC6, AC7, AC10 and AC12 have a half at the
   pass, and 89 AC1 is wholly at the close. 89 AC2, AC3, AC5, AC8, AC9 and AC11 are graded at the
   close, and 89 AC13's porcelain read runs after its pass commit. 90 S10's note, row `90|S10`, quotes
   `AC4 AC6 AC7 AC10 AC12` as the criteria with a pass half. Unit 90's ledger records the Rollout in
   note row `92|S10`. Observed by AC9.
 - **S11** — id 8. The pre-commit trigger, stated by its filter. 90 S12's sentence is restated as
-  follows. `.githooks/pre-commit` runs hygiene with `--staged`, and so check 9, on a commit that
-  adds, copies, modifies or renames a path under `memory/` (`--diff-filter=ACMR`). A deletion-only
-  commit under `memory/` runs no staged hygiene, and `regen.py --check` before the bar's first leg is
-  its backstop. 90 S12's note, rows `90|S12`, carries `--diff-filter=ACMR` beside
-  `regen.py --check` and `check 9`. Observed by AC10.
+  follows. `.githooks/pre-commit` reads its staged list once with
+  `git diff --cached --name-status --no-renames` and runs hygiene with `--staged`, and so check 9,
+  on a commit holding an added or modified entry under `memory/` (`[AM]:memory/*`), a rename or copy
+  counting by its added half. A deletion-only commit under `memory/` runs no staged hygiene, and
+  `regen.py --check` before the bar's first leg is its backstop. 90 S12's note, rows `90|S12`,
+  carries `[AM]:memory/*` beside `regen.py --check` and `check 9`. Observed by AC10.
 - **S12** — id 14. The owner derivation names every exit. §4's owner derivation takes the place of 90
   §4's, which took the place of 89 §4's. It keeps exits 3 to 6. It adds `TOKEN READER NOT FOUND`
   (exit 7) for a `tools/check-spec-tokens.py` that is missing or fails to load, `SPEC UNREADABLE <path>`
   (exit 8) for an index row naming a spec it cannot read, and `TOKEN READER FAILED <path>` (exit 9)
   for an `extract_gates` that raises. Every close-time run of the owner derivation runs this script:
-  88 S6, AC6 and AC18, 89 S9, AC9 and AC12, and 90 AC15. Unit 90's ledger records the staged exits in
-  note row `92|S12`. Observed by AC11.
+  88 S6, AC6 and AC18, 89 S9, AC9 and AC12, and 90 AC15's, which ran 90's script at its pass
+  (`da3fbc953`) and which AC11 runs again with every staging. Unit 90's ledger records the staged
+  exits in note row `92|S12`. Observed by AC11.
 - **S13** — id 16. A note's grepped tokens on one physical line. Every note units 90 and 92 write
   carries its label and every token its note-table row names on one physical line, and wraps only
   prose after it, as `memory/gotchas/ledger-token-wrapped-across-a-line-joins-nothing.md` rules. §4's
@@ -157,8 +171,11 @@ half only id 6's fix names.
   clone's Red-when, a shared ledger selector, a criterion fed only its own text, a `--writes`
   directory, a bare launcher, a Rollout phase, a quoted command's output and a script's exit codes,
   and the hygiene check 23 tightenings. No clause of this build names them.
-- New assertions in the suite, and a `New arm:` line. S9 only restores comments unit 90's pass may
-  have removed. So `TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+- New assertions in the suite, and a `New arm:` line. S9 reads three comments and writes none. So
+  `TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+- Unit 28, deferred unbuilt at order 30 on asks TOOL-dWitnessedBar-101 to -103. No item here waits
+  on it: its `New arm:` line is one of the 28 the owner derivation counts, and its index row sits
+  above unit 90's, so the owner stays unit 90 while it waits.
 
 ### Edges
 
@@ -178,59 +195,72 @@ half only id 6's fix names.
 
 ### Why one unit
 
-M4 admits a second unit only so that the two halves build concurrently. The one item that may write
-code is S9, which can restore a comment in `tools/run-gates/run-gates.gov.test.sh`. S2's clones run
-that suite, so the rest of the batch reads S9's output as an acceptance input, which M6 clause 2
-forbids. Every other item writes notes into the ledgers of units 87, 88, 89 and 90, and S6 counts
-the answers those notes sit under, so a split would share those records. Dispatch is strictly
-sequential, a shared order included (`tools/workflows/unattended-build.js:76`), so a split would buy
-no concurrency.
+M4 admits a second unit only so that the two halves build concurrently. No item writes code: S9
+reads the suite's comments and restores none (§4 Evidence). Every item writes notes into the
+ledgers of units 87, 88, 89 and 90, and S6 counts the answers those notes sit under, so a split
+would share those records. Dispatch is strictly sequential, a shared order included
+(`tools/workflows/unattended-build.js@f50a17e83:78`), so a split would buy no concurrency.
 
 ### Evidence
 
-- `tools/run-gates/run-gates.gov.test.sh`, unchanged from base `cdfbd1cf` to `d42cdf8b`:
-  `grep -n -i floor` prints 20, 91, 92, 94, 262, 377, 378, 396, 408 and 459. `:93` and `:95` hold no
-  `floor`. Each of `THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2)`,
-  `test_recall_floor.py from the payload` and `1565 s floor` is counted once by `grep -c`. `:459`
-  prints `below the pinned floor`, and `:460-465` print `PASS ($a assertions)` only when `fail` is 0.
-- `.githooks/pre-push:1350` and `:1352` hold the two `rec_sha=""` resets, and
-  `grep -c 'sha)[[:space:]]*rec_sha="'` prints 0 on today's hook. Spec-69 line 74 spells the built
-  arm `sha) rec_sha=$_rg_v`.
-- `TOOL-dWitnessedBar-89` S7 (spec-89 lines 92-96) puts the canary's visited increment at its single
-  top-level call site and none in the body of `check_canary_keys`. 89 S4 (lines 69-77) returns 3 on a
-  visited failure. Neither is built yet.
-- `tools/unattended/unattended.sh:13552-13559` is `--check-commit`'s admission loop. It admits a
-  path a declaration covers, then one `GENERATED_INDEXES` covers, then one where
-  `check_gen_region_only "HEAD:$p" ":$p"` holds, and refuses the rest with fail 49 at `:13565` and
-  `:13577`, `stages paths outside the set it declared`. `GENERATED_INDEXES` is resolved at `:750`
-  through `resolve_generated_indexes` (`tools/unattended/lib-unattended.sh:838`).
-  `check_gen_region_only` (`tools/unattended/lib-unattended.sh:1137`) compares two blobs through
-  `GEN_REGION_AWK` (`:1136`). `covers` (`:745-749`) admits every path under a declared directory.
-- `tools/memory-tree/kit.toml:473-478`, `:481-486` and `:489-495` are the three `[[generated]]` rows
-  whose generator is `gen_build_index.py`: `{memory_root}/LIVE.md`, `{memory_root}/ledger` and
-  `{memory_root}/backlog`. `.unattended.conf:418` names none of them.
-- `.githooks/pre-commit:180` gates the staged hygiene leg on
-  `git diff --cached --name-only --diff-filter=ACMR -- 'memory/**'`. `tools/run-gates/run-gates.sh:1449`
-  runs `regen.py --check`.
-- `tools/memory-tree/check-memory-hygiene.sh:3146` opens a ledger answer on `^- *(\*\*)?AC[0-9]+`, and
-  `:3158` adds the backticked tokens of every later non-blank line to that answer, so a continuation
-  note joins the answer it sits under. `memory/HYGIENE.md` "Acceptance ledger" (`:686`) gives one
-  answer line per criterion, inside an `**Evidences:**` block.
-- `tools/check-spec-tokens.py:495` defines `extract_gates`. §4's owner derivation was probed on
-  2026-10-25 against a scratch copy of the five paths it reads. Over the live README it printed 28 and
+Read on 2026-11-21 at `f50a17e83`. Units 69 and 87 to 91 are CLOSED; unit 28 is deferred unbuilt.
+
+- `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf`: `grep -n -i floor` prints 20, 91, 92, 94, 262,
+  377, 378, 396, 408 and 459, and `:93` and `:95` hold no `floor`. On the built suite
+  (`@f50a17e83`), each of `THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2)`,
+  `test_recall_floor.py from the payload` and `1565 s floor` is counted once by `grep -c`, at `:696`,
+  `:20` and `:412` (PINNED 2026-11-21). `@f50a17e83:1289` prints `below the pinned floor`, and
+  `:1290-1295` print `PASS ($a assertions)` only when `fail` is 0.
+- The canary's call site (`tools/run-gates/run-gates.gov.test.sh@f50a17e83:928-936`) adds its
+  visited increment before the call of `check_canary_keys`, sets `fail=1` on a 3 (unit 89,
+  `0c2f7e195`) and on a code outside 0 to 3 (unit 90, `da3fbc953`), and sets `rgf_ok` only on 0 or 1
+  with `rgf_whats` empty. The `rec_sha` and `rec_fp` compares add to `a` only under `rgf_ok`
+  (`:966`, `:969`):
+  `grep -c '^\[ "\$rgf_ok" = 1 \] && case' tools/run-gates/run-gates.gov.test.sh` prints 2 (PINNED
+  2026-11-21). `check_canary_keys` runs inside `rgf_miss=$(...)`.
+- `.githooks/pre-push@f50a17e83:1600` and `:1603` hold the two `rec_sha=""` resets, and
+  `grep -c 'sha)[[:space:]]*rec_sha="'` prints 0 on the built hook (PINNED 2026-11-21). Its two
+  `sha)` arms are `sha) rec_sha=$_rg_v ;;` in `.githooks/pre-push#read_green_file` and
+  `sha) bg_sha=$_rb_v ;;` in `#read_bar_file`.
+- `tools/unattended/unattended.sh#check_commit_message` holds `--check-commit`'s admission loop. It
+  admits a path a declaration covers, then one `GENERATED_INDEXES` covers, then one where
+  `check_gen_region_only "HEAD:$p" ":$p"` holds, and refuses the rest with fail 49,
+  `stages paths outside the set it declared`. `GENERATED_INDEXES` is resolved at
+  `@f50a17e83:928` through `tools/unattended/lib-unattended.sh#resolve_generated_indexes`.
+  `#check_gen_region_only` compares two blobs through `GEN_REGION_AWK`, and `#covers` admits every
+  path under a declared directory.
+- `tools/memory-tree/kit.toml@f50a17e83:666-672`, `:674-680` and `:682-689` are the three
+  `[[generated]]` rows whose generator is `gen_build_index.py`: `{memory_root}/LIVE.md`,
+  `{memory_root}/ledger` and `{memory_root}/backlog`. `.unattended.conf#GENERATED_INDEXES` names
+  none of them.
+- `memory/builds/dWitnessedBar/RUN.md` records a dispatch as
+  `dispatch · item <sha8> <unit> · reason <declared paths>`. Unit 89's row declares its own spec
+  alone under `spec/`, unit 90's (`item 197df554`) declares `memory/builds/dWitnessedBar/spec`, and
+  unit 91's declares its own spec file twice and the directory never. Pass commits `0c2f7e195` and
+  `da3fbc953` each change their own spec alone under `spec/`, so the after-the-fact read covers 0
+  paths (PINNED 2026-11-21 by `git diff --name-only <c>~1 <c>`).
+- `.githooks/pre-commit@f50a17e83:216-223` reads `git diff --cached --name-status --no-renames` once
+  and sets the memory flag on `[AM]:memory/*`; `:283-291` runs hygiene with `--staged` under that
+  flag. `tools/run-gates/run-gates.sh@f50a17e83:1629` runs `regen.py --check` before the queue.
+- `tools/memory-tree/check-memory-hygiene.sh@f50a17e83:3640` opens a ledger answer on
+  `^- *(\*\*)?AC[0-9]+`, and `:3652` adds the backticked tokens of every later non-blank line to that
+  answer, so a continuation note joins the answer it sits under. `memory/HYGIENE.md` "Acceptance
+  ledger — how a built unit evidences its criteria" gives one answer line per criterion, inside an
+  `**Evidences:**` block. Each of the ledgers of units 87 to 90 is the one file its glob matches, and
+  `grep -cE "^- AC${n} "` prints 1 for every criterion of 89 and 90, for 87 AC2 and for 88 AC6 and
+  AC18 (PINNED 2026-11-21).
+- `tools/check-spec-tokens.py#extract_gates` is the token reader. §4's owner derivation was probed on
+  2026-11-21 against a scratch copy of the paths it reads. Over the live README it printed 28 and
   `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md`, exit 0. It printed `SPEC UNREADABLE <path>`, exit
   8, with a README row repointed to a spec that does not exist. It printed `TOKEN READER NOT FOUND`,
   exit 7, with `check-spec-tokens.py` removed, and again with no `extract_gates` in it. It printed
   `TOKEN READER FAILED <path>`, exit 9, with an `extract_gates` that raises. It printed
   `MALFORMED REGION` exit 3, `REGION READER NOT FOUND` exit 4 and `REGION READ FAILED (rc 2)` exit 6
-  on 90 AC15's three stagings. PINNED on 2026-10-25. Units 91 and 92 declare no `New arm:`, so a
-  re-render that lists them leaves the length at 28 and the owner at unit 90.
-- §4's note check was probed on 2026-10-25 over a fixture ledger. It printed `NOTES OK 4` for four
+  on 90 AC15's three stagings. PINNED on 2026-11-21. Units 91 and 92 declare no `New arm:`, so the
+  length stays 28 and the owner unit 90.
+- §4's note check was probed on 2026-11-21 over a fixture ledger. It printed `NOTES OK 4` for four
   placed rows. It printed `MISPLACED` for a row naming the wrong answer, and `NO NOTE` for a label no
   line carries and for a token not on the label's line. `S1([^0-9]|$)` did not match an `S11` note.
-- `memory/builds/dWitnessedBar/RUN.md` records a dispatch as
-  `dispatch · item <sha8> <unit> · reason <declared paths>`, as `memory/builds/aBatchedArm/RUN.md:59`
-  shows.
 
 ### The note table
 
@@ -250,7 +280,7 @@ alone.
 90|S9|89|AC4|for unread
 90|S10|89|AC12|AC4 AC6 AC7 AC10 AC12
 90|S11|89|AC10|build_commit
-90|S12|89|AC13|--diff-filter=ACMR
+90|S12|89|AC13|[AM]:memory/*
 90|S12|89|AC13|regen.py --check
 90|S12|89|AC13|check 9
 90|S12|89|AC13|{memory_root}/ledger
@@ -353,19 +383,28 @@ None: no stored data changes.
 
 ### Rollout
 
-Live at landing, at order 48, one above unit 90's 47 and beside `TOOL-dWitnessedBar-91`. S9's
-reading and any restore run at the pass. S5's dispatch reading and pass-commit reading, and S7's
+Live at landing, at order 48, one above unit 90's 47, building alone after `TOOL-dWitnessedBar-91`
+and closing order 48; order 49's units 93 to 96 consume it. The pass writes this unit's acceptance
+ledger, and S9's reading runs at it. S5's dispatch reading and pass-commit reading, and S7's
 regeneration, run after the pass commit. S1, S2, S5's scratch-clone probe and S12's stagings run at
 the close, with every note.
 
 ### Files touched (estimate)
 
-- `tools/run-gates/run-gates.gov.test.sh`
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/build/`, this unit's acceptance ledger at the pass, and the close's
+  notes in `2026-11-19-build-TOOL-dWitnessedBar-87-1-acceptance-ledger.md`,
+  `2026-11-19-build-TOOL-dWitnessedBar-88-1-acceptance-ledger.md`,
+  `2026-11-19-build-TOOL-dWitnessedBar-89-1-acceptance-ledger.md` and
+  `2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md`
+- `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-92.md`, its status header
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered
+  by `gen_build_index.py --write`, with any `gen:spec-records` region the `--write` moves, committed
+  under `check_gen_region_only` (S5)
 
 ### Alternatives rejected
 
-- **Two batches, the suite half and the ledger half.** §4 "Why one unit".
+- **Two batches.** §4 "Why one unit".
 - **Key each selector on a token only its item writes, the report's first way for id 3.** The
   tokens are chosen one by one, and the next item that quotes another's token reopens the defect. A
   label written by one item is unique by construction.
@@ -376,13 +415,14 @@ the close, with every note.
   canary calls it in a command substitution, so an increment there never reaches the parent shell.
 - **A marker line S1 of unit 90 prints on 3, the finder's second way for id 2.** It contradicts 90
   S1's "prints nothing beyond the visited line" and mints a probe-only marker, which 90 §8 F3 refuses.
-- **Narrow 90 §4 Evidence's command to `grep -n FLOOR`, a way id 12's fix offered.** It prints only
-  `:94` and `:459`, so the bullet would still not list what the command prints.
+- **Narrow 90 §4 Evidence's command to `grep -n FLOOR`, a way id 12's fix offered.** Over base it
+  prints only `tools/run-gates/run-gates.gov.test.sh@cdfbd1cf:94` and `:459`, so the bullet would
+  still not list what the command prints.
 
 ## 5. Production-readiness checklist
 
-- security — the write grant narrows: no pass of this build declares the spec directory. The scratch
-  clones sit under `%TEMP%`.
+- security — the write grant narrows: no later pass of this build declares the spec directory. The
+  scratch clones sit under `%TEMP%`.
 - perf / scale — one note-check run over 29 rows, the derivation's stagings and four clones, once.
 - error / empty / loading states — the note check names a missing ledger, a missing note and a
   misplaced one apart. The derivation names seven failures, each with its own exit.
@@ -409,14 +449,15 @@ the close, with every note.
   `92|S2|`, it prints `NOTES OK 1`.
   Red when: a call site that handles 0, 1 and 2 alone fails the isolated clone through the floor.
   fixture: scratch clones under `%TEMP%/<short-name>`.
-  figure: the increment count is DERIVED at observation time from the built call site's `0)` arm.
+  figure: the increment count is DERIVED at observation time by S2's `grep -c` over the built suite;
+  it read 2 on 2026-11-21 at `f50a17e83` (§4 Evidence).
   permission: the arm's run is the main loop's, at the close.
 - **AC3** — When §4's note check is fed every note-table row opening `90|`, it prints
   `NOTES OK 17` and exits 0. In a scratch copy of the ledgers where the note holding `for unread` is
   relabelled `TOOL-dWitnessedBar-90 S1`, it prints `NO NOTE 90 S9 for unread` and exits 1.
   Red when: an item's ledger clause passes on another item's line.
   fixture: a scratch copy of the build's ledgers under the run's scratch directory.
-  figure: 17 is PINNED, the rows of §4's note table opening `90|` at rev-1.
+  figure: 17 is PINNED 2026-11-21, the rows of §4's note table opening `90|` at rev-3.
   permission: the ledgers are written at the close.
 - **AC4** — When §4's note check is fed the rows opening `92|S4|`, it prints `NOTES OK 5`. In a scratch
   copy of 88's ledger whose note under `- AC6` has lost its `resolve_python:` path, it prints
@@ -442,6 +483,8 @@ the close, with every note.
   Red when: a pass declares the spec directory, or a pass of unit 89 or 90 edits another unit's spec
   outside its gen regions.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
+  figure: the paths read are DERIVED at observation time; 0 on 2026-11-21, each pass commit naming
+  its own spec alone under `spec/` (§4 Evidence).
   cost: a clone and three staged commits, at the close.
   permission: the ledger is written at the close.
 - **AC6** — At the close, for each `n` from 1 to 13,
@@ -467,7 +510,7 @@ the close, with every note.
   `grep -c '1565 s floor' tools/run-gates/run-gates.gov.test.sh`. When §4's note check is fed the rows
   opening `92|S9|`, it prints `NOTES OK 1`.
   Red when: a sweep by `grep -i floor` deletes a comment outside the assertion floor.
-  figure: each count is PINNED at 1 over base `cdfbd1cf`.
+  figure: each count is PINNED at 1 over base `cdfbd1cf` and over `f50a17e83` (2026-11-21).
 - **AC9** — When §4's note check is fed the rows opening `92|S10|` and `90|S10|`, it prints
   `NOTES OK 2`, so 90 S10's note quotes `AC4 AC6 AC7 AC10 AC12` as the criteria with a pass half.
   Red when: 90 S10's note records 90 S10's own list, which gives 89 AC1 a pass half and 89 AC7 none.
@@ -492,18 +535,18 @@ the close, with every note.
   Red when: a note wrapped at the house width splits a token from its label and the record still
   reads as present.
   fixture: a scratch copy of the build's ledgers under the run's scratch directory.
-  figure: 29 is PINNED, the rows of §4's note table at rev-1.
+  figure: 29 is PINNED 2026-11-21, the rows of §4's note table at rev-3.
   permission: the ledgers are written at the close.
 
 ## 7. Gates
 
-`run-gates gov canary` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `memory hygiene`
+`memory hygiene` · `recall floor` · `recall floor arms`
 
-`run-gates gov canary` and `testsuite counts (every bar self-test prints one)` are owed for the suite
-S9 may restore a comment in; `run-gates gov canary` is held unless the main loop sets GATE_SELFTESTS
-at the close, which `SELFTESTS_OWED_PATHS="tools/"` does (`.unattended.conf:40`). `recall floor` and
-`recall floor arms` are owed for the ledgers under `memory/`. This unit adds no arm and moves none,
-so it declares no new-arm line.
+`recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. This unit writes no
+suite line (S9), so it owes no suite leg; AC2's clones run the gov canary arm at the close, as the
+main loop's observation. It adds no arm and moves none, so it declares no new-arm line, and §4's
+owner derivation still names unit 90 the floor's owner: run on 2026-11-21 it printed 28 and
+`spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md` (PINNED, §4 Evidence).
 
 ## 8. Open questions
 
@@ -533,19 +576,25 @@ so it declares no new-arm line.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-93 to TOOL-dWitnessedBar-97, promoted by the round-1 spec audit of
   units 91 and 92; nothing else moved.
+- rev-3 · 2026-11-21 · §2 to §7 · §10 · re-grounded at `f50a17e83` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-92-reground-brief. S2's added line counts the built
+  `rgf_ok`-gated increments; S9 restores nothing, so the suite leaves Files touched and its legs the
+  gates; S11 and its note token follow the hook's `[AM]:memory/*` trigger; Evidence re-cited and
+  re-pinned; Files touched listed exactly; criteria unchanged but their figures.
 
 ## 10. Reuse audit
 
 Each item extends the seam its finding names. S2 reuses 90 AC1's clones and 89 S7's placement. S3,
 S6 and S13 use the acceptance ledger of `memory/HYGIENE.md` "Acceptance ledger", whose continuation
-lines `tools/memory-tree/check-memory-hygiene.sh:3158` already joins to the answer above. S5 names
-the admission seam `--check-commit` already has, `check_gen_region_only`
-(`tools/unattended/lib-unattended.sh:1137`) and `resolve_generated_indexes` (`:838`), and grants
-nothing beside it. S7 and S12 adopt `resolve_python` (`tools/lib/resolve-python.sh`), the one
-interpreter resolver, and S12 keeps `region` (`tools/unattended/unattended.sh:1310`).
+lines `tools/memory-tree/check-memory-hygiene.sh@f50a17e83:3652` already joins to the answer
+above. S5 names the admission seam `--check-commit` already has,
+`tools/unattended/lib-unattended.sh#check_gen_region_only` and `#resolve_generated_indexes`, and
+grants nothing beside it. S7 and S12 adopt `resolve_python` (`tools/lib/resolve-python.sh`), the
+one interpreter resolver, and S12 keeps `region` (`tools/unattended/unattended.sh#region`).
 `python tools/codebase-map/reuse_lookup.py "join a ledger note to the acceptance answer it sits under"`
-ranked `note`, `join_aliases`, `read_join_state` and `resolve_answers`, none a reader that places a
-line under the answer above it, so no existing seam fits beyond the ledger grammar and the seams
-named above.
+ranked `note`, `read_ledger`, `derive_fixture_ledger` and `write_acceptance` first on 2026-11-21.
+`write_acceptance` and `read_acceptance` (`tools/memory-tree/build_records.py`) write and read an
+acceptance record's run lines, and none is a reader that places a line under the answer above it,
+so no existing seam fits beyond the ledger grammar and the seams named above.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a later unit record a note beside another unit's acceptance answer without opening a second answer line" --terms "acceptance ledger continuation line answer label selector note superseded criterion check 23 wrapped token"`
