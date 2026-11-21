@@ -33,3 +33,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T13:26:22Z brief · item KICK-dKeptSession-1 · reason b9a738e8e603 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md
 
 2026-11-21T13:27:22Z dispatch · item a4dd146d KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt help/reference/kinds.md help/policy.md
+2026-11-21T14:01:58Z budget · frozen · 64 unit(s) · 132
+2026-11-21T14:01:58Z draw · re-dispatch · KICK-dKeptSession-1 · 1/132 · 20261121T140158Z-b911aa
+
+2026-11-21T14:01:58Z dispatch · item a186ba16 KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/gate-legs.json help/reference/kinds.md help/policy.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md
