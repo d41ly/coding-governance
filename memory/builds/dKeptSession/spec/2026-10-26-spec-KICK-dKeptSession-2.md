@@ -1,6 +1,6 @@
 # KICK-dKeptSession-2 — the preset step in dGroundRules' reader
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 2bf35aa1 · streams kickoff · order 3 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base 2bf35aa1 · streams kickoff · order 3 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0140@6531184d whole
 
@@ -82,7 +82,7 @@ and rewrites the clause, the texts that state it and the fixture case asserting 
   the file's `[presets]` table rebuilt from the leaves `parse_policy` flattened
   (`tools/policy/policy.py#parse_policy`), each path under `("presets",)` re-nested, since
   `derive_preset_assignment` takes that table nested (`tools/policy/presets.py#derive_preset_assignment`);
-  KICK-dKeptSession-3 calls the same function. In `policy.py`, `read_kit_presets()` is a one-slot
+  KICK-dKeptSession-3's verb takes the same assignment. In `policy.py`, `read_kit_presets()` is a one-slot
   cache of KICK-dKeptSession-1's `presets.load_presets(KIT)`, the store parsed once per process, and
   `read_preset_assignment(name, declared)` a one-slot cache, keyed by `name` and
   `render_json(declared)`, of `presets.derive_preset_assignment(name, read_kit_presets(), declared)`.
@@ -122,7 +122,7 @@ and rewrites the clause, the texts that state it and the fixture case asserting 
 ### Edges
 
 - **consumes-from** `KICK-dKeptSession-1` — `presets.toml` and `derive_preset_assignment`, the one store and the one assignment this step answers from
-- **hands-off** `KICK-dKeptSession-3` — `RESOLUTION_ORDER` with its `preset` source, whose answers the charter's section compares to the named preset, and `derive_declared_presets` and `read_kit_presets`, which that section calls
+- **hands-off** `KICK-dKeptSession-3` — `RESOLUTION_ORDER` with its `preset` source, whose answers the charter's section compares to the named preset, and `read_preset_assignment` over `derive_declared_presets`, the assignment its verb takes as this step takes it
 - **hands-off** `KICK-dKeptSession-20` — `RESOLUTION_ORDER`, into which the scenario's step is inserted ahead of `read_preset_value`
 - **consumes-from** external — dGroundRules' `RESOLUTION_ORDER`, `read_ordered_value`, `resolve_read`, `Resolution` and its `preset` source (`tools/policy/policy.py#Resolution`; TOOL-dGroundRules-3 S1, S3) and the `resolution-order` fixture case (TOOL-dGroundRules-3 S6)
 - **hands-off** `KICK-dKeptSession-32` — `read_preset_value`, through which a row the scaffold leaves out reads its preset value
@@ -319,11 +319,14 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 AC8 AC9 · `
   for behaviour against the landed KICK-dKeptSession-1 under the brief
   `2026-11-21-prompt-KICK-dKeptSession-33-precheck-brief`. Moved: S1 looks up by path alone, since
   `parse_key` refuses a placeholder row's name; S5 added: `derive_declared_presets` in `presets.py`,
-  the one rebuild of the `[presets]` table from the flattened leaves, which KICK-dKeptSession-3
-  calls too, an assignment cache beside the store's (F2 re-ruled on the pinned cost), and the
+  the one rebuild of the `[presets]` table from the flattened leaves, an assignment cache beside the store's (F2 re-ruled on the pinned cost), and the
   store's refusals re-raised as this module's, which `__main__` would not catch; S2 widened to the module docstrings and `preset-overridden`; S3 drops `preset` from
   the `never` comparison, reads placeholder rows at `fixture` and loses `READER_FILES`, no copy
   reading a preset; AC9 added; Files touched gains the symbol map.
+- rev-5 · 2026-11-21 · §3 · S5 · the hands-off bullet to `KICK-dKeptSession-3` names what spec 3
+  rev-4 takes, `read_preset_assignment` over `derive_declared_presets`, and no longer
+  `read_kit_presets`, which the spec-token checker's hands-off join redded; under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-33-precheck-brief`.
 
 ## 10. Reuse audit
 
