@@ -97,7 +97,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | INPROGRESS | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | INPROGRESS | rev-8 | 2026-11-21 |
 | [KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts](spec/2026-10-26-spec-KICK-dKeptSession-19.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 | [KICK-dKeptSession-33 — the preset store's rule for the derived-default rows: unassigned where v2 restates the default, literal where a preset differs](spec/2026-10-26-spec-KICK-dKeptSession-33.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-2 — the preset step in dGroundRules' reader](spec/2026-10-26-spec-KICK-dKeptSession-2.md) | 3 | 2 | DEFERRED | rev-3 | 2026-11-21 |
@@ -137,19 +137,19 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it](spec/2026-10-26-spec-KICK-dKeptSession-51.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 | [KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key](spec/2026-10-26-spec-KICK-dKeptSession-27.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it](spec/2026-10-26-spec-KICK-dKeptSession-24.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind](spec/2026-10-26-spec-KICK-dKeptSession-10.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed](spec/2026-10-26-spec-KICK-dKeptSession-25.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-21 |
-| [KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload](spec/2026-10-26-spec-KICK-dKeptSession-21.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id](spec/2026-10-26-spec-KICK-dKeptSession-6.md) | 23 | 2 | DEFERRED | rev-2 | 2026-11-21 |
-| [KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices](spec/2026-10-26-spec-KICK-dKeptSession-7.md) | 24 | 2 | DEFERRED | rev-5 | 2026-11-21 |
-| [KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message](spec/2026-10-26-spec-KICK-dKeptSession-35.md) | 25 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-42 — a dependent's transition acknowledges the notices it has consumed, so a parent's notice never holds the dependent until the wait ceiling](spec/2026-10-26-spec-KICK-dKeptSession-42.md) | 25 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight](spec/2026-10-26-spec-KICK-dKeptSession-8.md) | 25 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects](spec/2026-10-26-spec-KICK-dKeptSession-11.md) | 26 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-43 — the `actions.free` arm reads every form of the item pointer, a skipped pointer leaving it unarmed and saying so](spec/2026-10-26-spec-KICK-dKeptSession-43.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate](spec/2026-10-26-spec-KICK-dKeptSession-52.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival](spec/2026-10-26-spec-KICK-dKeptSession-53.md) | 26 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-55 — the transition writer acknowledges notices only when the guard would then pass, and prints each one it consumed](spec/2026-10-26-spec-KICK-dKeptSession-55.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind](spec/2026-10-26-spec-KICK-dKeptSession-10.md) | 20 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed](spec/2026-10-26-spec-KICK-dKeptSession-25.md) | 21 | 2 | DEFERRED | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload](spec/2026-10-26-spec-KICK-dKeptSession-21.md) | 22 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id](spec/2026-10-26-spec-KICK-dKeptSession-6.md) | 23 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices](spec/2026-10-26-spec-KICK-dKeptSession-7.md) | 24 | 2 | DEFERRED | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message](spec/2026-10-26-spec-KICK-dKeptSession-35.md) | 25 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-42 — a dependent's transition acknowledges the notices it has consumed, so a parent's notice never holds the dependent until the wait ceiling](spec/2026-10-26-spec-KICK-dKeptSession-42.md) | 25 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight](spec/2026-10-26-spec-KICK-dKeptSession-8.md) | 25 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects](spec/2026-10-26-spec-KICK-dKeptSession-11.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-43 — the `actions.free` arm reads every form of the item pointer, a skipped pointer leaving it unarmed and saying so](spec/2026-10-26-spec-KICK-dKeptSession-43.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate](spec/2026-10-26-spec-KICK-dKeptSession-52.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival](spec/2026-10-26-spec-KICK-dKeptSession-53.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-55 — the transition writer acknowledges notices only when the guard would then pass, and prints each one it consumed](spec/2026-10-26-spec-KICK-dKeptSession-55.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor](spec/2026-10-26-spec-KICK-dKeptSession-17.md) | 27 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed](spec/2026-10-26-spec-KICK-dKeptSession-61.md) | 27 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits](spec/2026-10-26-spec-KICK-dKeptSession-18.md) | 28 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -163,7 +163,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 176 bound to this build, across 4 record folder(s).
+Records: 187 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

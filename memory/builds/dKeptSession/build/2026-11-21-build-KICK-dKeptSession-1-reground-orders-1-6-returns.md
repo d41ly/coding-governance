@@ -35,7 +35,7 @@ ran, and resumed a returned writer where a later return moved its spec.
 - 32: spec 3's verb opens "- preset — <name>", new --section form; "- no key differs" unchanged, 32 AC2 holds.
 - 58 rev-4: S1,S2 now observations of unit 34's preset-derived-cap; S3 supersedes 54's 'same row' text (answered in unit 54's ledger); Files touched none.
 - 44 S1/AC1: unit 1 now prints the not-graded line itself (`presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits after-release-verifies`); S1 shrinks to observation.
-- 56 S41: met by 33 S1 (its policy.py:132 cite stale). 56 S25: met by 33's Gates line.
+- 56 S41: met by 33 S1 (its line citation into the policy kit is stale). 56 S25: met by 33's Gates line.
 - unit 1 factory: `python {prefix}/loop/factories.py preset`, plants preset-new, preset-from-unknown (replace presets.py new / presets-factory case).
 - 12: ask KICK-dKeptSession-66 — S3 observes the always-resume switch TOOL-dPlacedRequest-2 S7 built, by its line; builds no second. Fold at 12's re-ground (rev bump + §9 line); closes 66.
 - F5 of spec 1 accepted (unit 1 builds guard.py --expansion in tools/loop/guard.py): Decided trailer on the spec commit.
