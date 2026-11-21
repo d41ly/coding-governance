@@ -34,7 +34,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `presets.toml` | the named presets (KICK-dKeptSession-1): one `[preset.<name>]` table per shipped preset, `velocity`, `standard`, `strict` and `guarded`, each assigning every presettable key by a quoted dotted key; the `never` list, the keys presets never touch; the `literal` list, `maintain.fixes` and `review.<stage>`, the derived-default rows the presets assign literal values while every other derived row reads unassigned (KICK-dKeptSession-33); and the `pairs` list of `[<higher>, <lower>]` keys. Its one writer is the preset kind's factory, `core.py new preset <name> --from <preset>` |
 | `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, `derive_declared_presets`, which the reader's preset step passes it, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion` |
-| `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
+| `adopt-policy.sh` | the adopter: `--scaffold --preset <name>` and `--check` |
 | `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 
 ## A catalogue row
@@ -194,9 +194,15 @@ predicate, `check_legacy_graded`: the list is present and `derive_census_tree` a
 writes the summary list alone, printing `legacy-homes.txt · not written`: it updates the legacy list
 where the predicate holds and never creates it. On gov's tree the case `legacy-homes-present` reds a
 deleted list.
-- `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
-  build owns that has a literal default, one table per first segment, written as UTF-8 bytes with LF
-  line ends on every platform, so it equals the blob git stores (TOOL-dGroundRules-21 S1).
+- `python <prefix>/policy/policy.py scaffold --preset <name> [--kept <file>]` — print the starter policy
+  file: `preset = "<name>"` as its first key, then each row this kit's build owns that has a literal
+  default, one table per first segment, written as UTF-8 bytes with LF line ends on every platform, so
+  it equals the blob git stores (TOOL-dGroundRules-21 S1, KICK-dKeptSession-4 S2). A call naming no
+  preset is the usage line, and a name the catalogue's `preset` row refuses is that row's reason on
+  stderr, exit 2, nothing on stdout. `--kept <file>` writes nothing: where the file's preset, the
+  default `standard` where it names none, is not `<name>`, it prints the kept-file line
+  `policy: <file> keeps its preset "<its>", not the answer "<name>": …`, exit 0; a file that does not
+  decode or parse prints nothing (S3).
 - `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
   read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
   list one member per line, LF-ended. `--json` prints one JSON object of `reason`, `source` and
@@ -875,9 +881,15 @@ and the case reds a row whose opening word differs from it (TOOL-dGroundRules-25
 
 ## The adopter
 
-`bash <prefix>/policy/adopt-policy.sh --scaffold [--target <repo>]` writes `.governance/policy.toml`
-from the scaffold only where no file exists, and says "kept" otherwise: the file is the
-repository's own from its first write. Kept or written, it then renders the harness's settings,
+`bash <prefix>/policy/adopt-policy.sh --scaffold --preset <name> [--target <repo>]` writes
+`.governance/policy.toml` from `policy.py scaffold --preset <name>` only where no file exists, and
+says "kept" otherwise: the file is the repository's own from its first write. `kit.toml`'s `[adopt]`
+argv passes `--preset {preset}`, so `govkit intake` asks for the preset and records it under the
+target's `[answers]` (KICK-dKeptSession-4 S1). With no file and no `--preset` it refuses, exit 2,
+before any write. Over a kept file, `--preset` runs `policy.py scaffold --preset <name> --kept
+<file>`, which prints the kept-file line where the file's preset is not the answer and rewrites
+nothing; its exit 2, an unknown or unresolved name, ends the adopter before any render (S3). Kept or
+written, it then renders the harness's settings,
 `policy.py settings --write`, and then the JSON mirror, `policy.py mirror --write`
 (TOOL-dGroundRules-25 S7), wherever HEAD resolves, so an adopter's first spawn passes rule 7 without a
 render by hand and its bar's preflight finds the mirror; with no commit yet it prints one line naming

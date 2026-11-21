@@ -14,7 +14,8 @@ written through, are KICK-dKeptSession-19's.
 
     python <this kit>/policy.py lists --check   # the three lists against their derivations and baselines
     python <this kit>/policy.py lists --write   # drain the three lists; none ever gains a row
-    python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
+    python <this kit>/policy.py scaffold --preset <name>   # print the starter .governance/policy.toml
+    python <this kit>/policy.py scaffold --preset <name> --kept <file>   # one line where <file>'s preset differs
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
     python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
@@ -1567,15 +1568,17 @@ def render_toml_value(v):
     raise ValueError(f"no TOML spelling for {v!r}")
 
 
-def render_scaffold(rows):
+def render_scaffold(rows, preset=None):
     """The starter policy file: each literal-defaulted row this kit's build owns, one table per first
-    segment, tables sorted, keys in catalogue order."""
+    segment, tables sorted, keys in catalogue order. A `preset` name is written as the file's first
+    key, `preset = "<name>"`, the line after SCAFFOLD_HEADER and above the tables; None writes no
+    such key, the bytes the callers that name no preset read (KICK-dKeptSession-4 S2)."""
     tables = {}
     for r in rows:
         if r.get("owner") == SCAFFOLD_OWNER and "default" in r and not check_derived(r["default"]):
             segs = str(r["name"]).split(".")
             tables.setdefault(segs[0], []).append((".".join(segs[1:]), r["default"]))
-    out = SCAFFOLD_HEADER
+    out = SCAFFOLD_HEADER + ("" if preset is None else f"preset = {render_toml_value(preset)}\n")
     for t in sorted(tables):
         out += f"\n[{t}]\n" + "".join(f"{k} = {render_toml_value(v)}\n" for k, v in tables[t])
     return out
@@ -1666,7 +1669,52 @@ def cmd_preset(argv):
     return 0
 
 
-USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
+def cmd_scaffold(argv):
+    """`scaffold --preset <name> [--kept <file>]` (KICK-dKeptSession-4 S2, S3). The name is checked
+    by `check_value` on the catalogue's `preset` row, the reason on stderr and nothing on stdout, exit
+    2, as is a call naming no preset. With no `--kept`, `render_scaffold` with that preset on stdout,
+    LF bytes. With `--kept <file>`, nothing is written: the file's top-level `preset`, through
+    `parse_policy`, the row's default where it names none, and where that is not the name one stdout
+    line naming the file, its preset and the name; a file that does not read, decode or parse prints
+    nothing, its invalidity the mirror step's to report. Exit 0."""
+    flags = {}
+    while argv[:1] in (["--preset"], ["--kept"]) and len(argv) >= 2 and argv[0] not in flags:
+        flags[argv[0]] = argv[1]
+        argv = argv[2:]
+    if argv or "--preset" not in flags:
+        print(USAGE, file=sys.stderr)
+        return 2
+    name, kept = flags["--preset"], flags.get("--kept")
+    rows = load_catalogue(KIT)
+    try:
+        row = read_catalogue_row(("preset",), rows)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    why = check_value(row, name)
+    if why is not None:
+        print(f"policy: scaffold refused · preset · {why}", file=sys.stderr)
+        return 2
+    if kept is None:
+        # The bytes, LF, never the text layer's newline translation: one output on every platform,
+        # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
+        sys.stdout.buffer.write(render_scaffold(rows, preset=name).encode("utf-8"))
+        return 0
+    try:
+        named = parse_policy(Path(kept).read_bytes().decode("utf-8")).get(("preset",))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+        return 0
+    have = row.get("default") if named is None else named
+    if have != name:
+        sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+        print(f"policy: {kept} keeps its preset {render_json(have)}{' (the default)' if named is None else ''}, "
+              f"not the answer {render_json(name)}: the file is the repository's own, so its preset "
+              f"changes by a policy change")
+    return 0
+
+
+USAGE = ("usage: python policy.py lists --check | lists --write | scaffold --preset <name> [--kept <file>]"
+         " | get <key> [--rev <rev>] [--explain] [--json]"
          " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
          " | settings [--write|--check] [<settings-file>] | preset --diff [--section | --line] [--rev <rev>]")
 
@@ -1860,11 +1908,8 @@ def main(argv):
         return cmd_settings(argv[1:])
     if argv[:1] == ["preset"]:
         return cmd_preset(argv[1:])
-    if argv == ["scaffold"]:
-        # The bytes, LF, never the text layer's newline translation: one output on every platform,
-        # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
-        sys.stdout.buffer.write(render_scaffold(load_catalogue(KIT)).encode("utf-8"))
-        return 0
+    if argv[:1] == ["scaffold"]:
+        return cmd_scaffold(argv[1:])
     if argv[:1] == ["lists"] and argv[1:] in (["--check"], ["--write"]):
         return cmd_lists(argv[1:])
     print(USAGE, file=sys.stderr)

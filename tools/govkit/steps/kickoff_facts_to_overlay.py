@@ -378,7 +378,8 @@ def build_fact_fixture(base: pathlib.Path, bullets=FX_BULLETS, *, manifest=None,
                             + (f"manifest_path = \"{FX_MANIFEST}\"\n" if answer else ""), encoding="utf-8",
                             newline="\n")
     policy = STEPS.resolve_kit_dir("policy", "policy.py", GOV) / "policy.py"
-    scaffold = subprocess.run([sys.executable, str(policy), "scaffold"], capture_output=True).stdout
+    scaffold = subprocess.run([sys.executable, str(policy), "scaffold", "--preset", "standard"],
+                              capture_output=True).stdout
     (t / ".governance" / "policy.toml").write_bytes(scaffold.replace(b"\r\n", b"\n"))
     if units:
         kit = t / WRITE_HOME

@@ -1552,12 +1552,13 @@ def remove_gate_runner(desc):
     desc.write_text(text, encoding="utf-8", newline="")
 
 
-def build_install_target(name, ids):
+def build_install_target(name, ids, answers=None):
     """A fresh target ready for the deployer (TOOL-dGroundRules-24, -26): `build_source_snapshot`'s
     clone of the tree under test, and beside it `git init` with a pinned autocrlf and a one-line README,
     over which the snapshot's deployer runs `intake` (TOOL-dGroundRules-34 S22): `ids` as `--kits`,
-    this kit's tool root's name as the `prefix` answer, and one `--answer` per key of
-    `read_deploy_answers`, so `intake` writes `.governance/deploy.toml`, the answers the closure needs
+    this kit's tool root's name as the `prefix` answer, and one `--answer` per key of `answers`,
+    `read_deploy_answers`'s where None, the one override the `intake-preset` case passes
+    (KICK-dKeptSession-4 S4), so `intake` writes `.governance/deploy.toml`, the answers the closure needs
     and its `[gate_runner]` seed, and this builder types no descriptor and no answer list; the seed is
     then stripped (`remove_gate_runner`), and the target committed once, through `run_fixture_git`.
     Prints the snapshot line, with the snapshot's file count and the seconds it took (S27). -> (target, snapshot), which `run_govkit` installs from; the caller removes
@@ -1575,7 +1576,7 @@ def build_install_target(name, ids):
     took = time.monotonic() - began
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
-        answers = read_deploy_answers(top)
+        answers = read_deploy_answers(top) if answers is None else answers
         snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
         files = len((policy.run_git(s, "ls-tree", "-r", "HEAD") or "").splitlines())
         print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]} · "
@@ -1670,7 +1671,14 @@ def run_fresh_target(name):
         asserted += 1
         if not verdict.startswith(want):
             wrong.append(f"an Arm planted with population 0 under `{empty}` printed {verdict!r}, not {want!r}")
-    keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT))), []))
+    # KICK-dKeptSession-4 S4: the installed file carries the `preset` key the install answered, so the
+    # count is the scaffold's under that answer; a failed read is the install's own WRONG below.
+    try:
+        preset = read_deploy_answers(derive_source_top()).get("preset")
+    except RuntimeError:
+        preset = None
+    keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT),
+                                                                                 preset=preset)), []))
     lines = {"arm_schema": re.compile(rf"0 finding\(s\) · {keys} key\(s\) of "),
              "arm_mirror_readers": re.compile(r"0 finding\(s\) · [1-9][0-9]* tracked code file\(s\)"),
              "arm_reader_coverage": re.compile(r"not graded · "),
@@ -1866,6 +1874,67 @@ def run_legacy_withheld_install(name):
             held = sorted(f.relative_to(t).as_posix() for f in t.rglob(withheld_name))
             checks.append(("apply", f"the target holds no {withheld_name}", not held, f"{held or 'none held'}"))
         checks.append(("apply", "exit 0 with DEPLOY_FULL's answers", rc == 0, f"exit {rc} · {out.strip().replace(chr(10), ' · ') if rc else 'ok'}"))
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
+    finally:
+        for d in (t, s):
+            if d is not None:
+                remove_repo(d)
+    return print_checks(name, checks)
+
+
+def run_intake_preset(name):
+    """`intake-preset` (KICK-dKeptSession-4 AC1, AC2, AC3): this kit and its `requires` closure, with
+    every `read_deploy_answers` answer but `preset`, must make `build_install_target` raise intake's
+    exit 2 naming the missing `preset` and `Refusing to invent one`. With `preset = "strict"` added, the
+    target's `.governance/deploy.toml` must carry it under `[answers]`, its `[policy]` table only the
+    deployer's two switches; then `apply` through `run_govkit`, the install committed, the line after
+    the policy file's header must be `preset = "strict"`, and the installed `policy.py get hooks.bypass
+    --rev HEAD --explain` must print `refused` on stdout and the strict preset as its source on stderr."""
+    ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
+    checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
+    t = s = None
+    try:
+        answers = {k: v for k, v in read_deploy_answers(derive_source_top()).items() if k != "preset"}
+        try:
+            made = build_install_target(name, ids, answers=answers)
+            for d in made:
+                remove_repo(d)
+            checks.append(("no preset answer", "intake refuses, exit 2", False, "intake exited 0 and the target was built"))
+        except RuntimeError as exc:
+            said = str(exc)
+            checks.append(("no preset answer", "intake refuses, exit 2, naming the missing preset",
+                           "exited 2" in said and "the selected kits need answer(s) preset" in said
+                           and "Refusing to invent one" in said, said.replace("\n", " · ")))
+        t, s = build_install_target(name, ids, answers=dict(answers, preset="strict"))
+        deploy = tomllib.loads(Path(t, ".governance", "deploy.toml").read_text(encoding="utf-8"))
+        switches = sorted((deploy.get("policy") or {}).keys())
+        checks.append(("preset strict", "deploy.toml's [answers] carries preset = \"strict\", its [policy] only the two switches",
+                       (deploy.get("answers") or {}).get("preset") == "strict"
+                       and switches == ["on_baseline_red", "on_hook_block"],
+                       f"answers.preset {(deploy.get('answers') or {}).get('preset')!r} · [policy] {switches}"))
+        rc, out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
+        checks.append(("preset strict", f"apply --kits {','.join(ids)} exits 0", rc == 0,
+                       f"exit {rc}" + (f" · {out.strip()}" if rc else "")))
+        if rc == 0:
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+            lines = Path(t, *POLICY_FILE).read_text(encoding="utf-8").split("\n")
+            first = lines[policy.SCAFFOLD_HEADER.count("\n")] if len(lines) > policy.SCAFFOLD_HEADER.count("\n") else None
+            checks.append(("preset strict", "the line after the policy file's header is preset = \"strict\"",
+                           first == 'preset = "strict"', repr(first)))
+            installed = next((r["path"] for r in read_receipt_rows(t) if r.get("kit") == ids[0]
+                              and str(r.get("path")).endswith("/policy.py")), None)
+            if installed is None:
+                checks.append(("preset strict", "the receipt has the installed policy.py", False, "no such row"))
+            else:
+                env = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
+                p = subprocess.run([sys.executable, (t / installed).as_posix(), "get", "hooks.bypass", "--rev", "HEAD",
+                                    "--explain"], cwd=t, capture_output=True, text=True, encoding="utf-8",
+                                   errors="replace", env=env)
+                checks.append(("preset strict", "get hooks.bypass --rev HEAD --explain reads refused from the preset",
+                               p.stdout.strip() == "refused" and "policy: hooks.bypass · preset · preset strict at " in p.stderr,
+                               f"exit {p.returncode} · stdout {p.stdout.strip()!r} · stderr {p.stderr.strip()!r}"))
     except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
         checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
     finally:
@@ -4121,7 +4190,8 @@ def run_limit_case(name):
             # spawns on install day without running the render by hand.
             repo, kit, hook = build_limit_repo(t / "r", None, mirror=False)
             (kit / "adopt-policy.sh").write_bytes((KIT / "adopt-policy.sh").read_bytes().replace(b"\r\n", b"\n"))
-            rc, out = run_case_argv(repo, ["bash", (kit / "adopt-policy.sh").as_posix(), "--scaffold", "--target", repo.as_posix()])
+            rc, out = run_case_argv(repo, ["bash", (kit / "adopt-policy.sh").as_posix(), "--scaffold", "--preset", "standard",
+                                           "--target", repo.as_posix()])
             checks.append(("--scaffold over a committed target", "exit 0, the settings written", rc == 0
                            and Path(repo, *SETTINGS_FILE).is_file(), f"exit {rc} · {render_said(out, 'settings')}"))
             checks.append(check_hook_call(name, "the first Agent call", hook, render_spawn(repo, "u-first"), admits))
@@ -6130,6 +6200,7 @@ CASES = [
     ("adopter-suite", None, run_adopter_suite),  # the adopter's sibling suite, which arms its refusals
     ("legacy-homes-withheld-install", None, run_legacy_withheld_install),  # the plan's row and the applied target (TOOL-dGroundRules-25)
     ("census-default-adopter", None, run_census_default_adopter),  # the census over a real install without check-line-length
+    ("intake-preset", None, run_intake_preset),  # intake asks for the preset and the scaffold writes it (KICK-dKeptSession-4)
     ("govkit-source-root-refused", None, run_govkit_source_root_refused),  # run_govkit refuses the tree under test's own root
     ("arms-empty-declared", None, run_arms_empty_declared),  # every ARMS row declares its empty and why
     ("arms-empty-target", None, run_arms_empty_target),  # the announcing arms over an empty target, arm_schema over its scaffold
