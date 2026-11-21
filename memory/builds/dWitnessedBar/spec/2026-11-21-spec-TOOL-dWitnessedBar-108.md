@@ -12,6 +12,7 @@
 | [2026-11-19-build-TOOL-dWitnessedBar-108-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-108-1-acceptance-ledger.md) | journal | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-108-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-108-1-builder-return.md) | journal | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md) | widen | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md) | widen | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md) | journal | — |
