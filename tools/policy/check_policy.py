@@ -3546,7 +3546,7 @@ def run_reader_join(name):
         names = policy.parse_list(listed.read_text(encoding="utf-8"))
         stale = next(r for r in rows if r.get("name") in names and r.get("owner"))
 
-        def judge(scenario, key, needle, plant_design=design):
+        def check_join_case(scenario, key, needle, plant_design=design):
             findings, note = policy.check_unnamed_list(kit, plant_design, compare)
             ok = (not findings) if key is None else any(k == key and needle in why for k, why in findings)
             seen = "; ".join(f"{k}: {why}" for k, why in findings) or f"no finding · {note}"
@@ -3554,15 +3554,15 @@ def run_reader_join(name):
             for p, b in saved.items():
                 p.write_bytes(b)
 
-        judge("unplanted: green", None, "")
+        check_join_case("unplanted: green", None, "")
         write_edit(cat, lambda s: s + RJ_ROW)
-        judge(f"a {RJ_OWNER} row no clause names", PLANTED, policy.UNNAMED_WHY)
-        judge("a clause naming a listed key", stale["name"], "stale",
+        check_join_case(f"a {RJ_OWNER} row no clause names", PLANTED, policy.UNNAMED_WHY)
+        check_join_case("a clause naming a listed key", stale["name"], "stale",
               render_join_design([(first["owner"], first["name"]), (stale["owner"], stale["name"])]))
         write_edit(cat, lambda s: s + RJ_ROW)
         write_edit(listed, lambda s: s + PLANTED + "\n")
-        judge("the list grown above its base", PLANTED, "added to a shrink-only list above the base")
-        judge("put back: green", None, "")
+        check_join_case("the list grown above its base", PLANTED, "added to a shrink-only list above the base")
+        check_join_case("put back: green", None, "")
     except subprocess.CalledProcessError as exc:
         checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
     finally:
