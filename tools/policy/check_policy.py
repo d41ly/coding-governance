@@ -75,8 +75,12 @@ catalogue. Its preset scenarios (KICK-dKeptSession-2) red a file naming `strict`
 winning over the file's own `hooks.bypass`, a declared `[presets.ours]` whose own key or `strict`
 base is not read, and a kit copy carrying `presets.py` and no store that reads a value or escapes
 its refusal. `preset-every-key` reads every key each shipped preset assigns, which must answer its
-preset value from `preset`, and every `never` key but `preset`, which must answer as the absent
-file's does, in process, one line per preset.
+preset value from `preset`, every `never` key but `preset`, which must answer as the absent
+file's does, and every derived row the preset leaves unassigned, which must raise the absent file's
+`DerivedDefault` refusal (KICK-dKeptSession-34), in process, one line per preset; any other key the
+preset leaves unassigned reds naming it. `preset-derived-cap` runs `budgets.py resolve --explain`
+for one derived switch cap over an empty file and under `strict`, and reds a value or source the
+two rows do not share, or a mode that is not `warn` and strict's `refuse`.
 
 `on-invalid-classes` and `on-invalid-strict` are outcome cases (TOOL-dGroundRules-4). The first plants
 each failure class of the invalid-file branch in its own repository, and reds a default or the invalid
@@ -2174,24 +2178,38 @@ def run_preset_every_key(name):
     the preset's assignment holds must read in process through `policy.resolve_read` at its preset
     value with source `preset`; every `never` key but `preset`, which the file sets, must read what
     the absent file reads, value and source, or the same refusal, a placeholder or `*` segment read
-    at the concrete segment `fixture`. One line per preset; an empty assignment, an empty `never`
-    list or a store holding no preset is a WRONG, never a pass. WHAT IT DOES NOT CHECK: a derived row
-    the preset leaves unassigned (KICK-dKeptSession-34's), a repository's declared preset, which
-    `resolution-order`'s `preset-declared` reads, and what `get` prints."""
+    at the concrete segment `fixture`. Its third class (KICK-dKeptSession-34 S2): each row
+    `presets.derive_derived_rows` returns whose concrete key the assignment does not hold, `budgets.*`
+    read at the census's first cap as one quoted segment as `budgets.resolve_caps` spells it, must
+    raise the absent file's `DerivedDefault` refusal, type and reason, never a value or a `preset`
+    source; whether the preset assigns such a row is decided at that concrete key, never by its
+    name. Any other catalogue row whose concrete key the assignment does not hold is a WRONG naming
+    the preset and the key. One line per preset; an empty assignment, an empty `never` list, no
+    unassigned derived row or a store holding no preset is a WRONG, never a pass. WHAT IT DOES NOT
+    CHECK: a placeholder row at any concrete segment but `fixture`, a cap but the census's first, a
+    repository's declared preset, which `resolution-order`'s `preset-declared` reads, and what `get`
+    prints; `preset-derived-cap` reads a derived cap through `budgets.py`."""
 
     def read_outcome(path, read):
         try:
             hit = policy.resolve_read(path, policy.read_catalogue_row(path, read["rows"]), read)
         except policy.Refusal as exc:
-            return ("refused", exc.path, exc.line, exc.why)
+            return ("refused", type(exc).__name__, exc.path, exc.line, exc.why)
         return (hit.source, policy.render_json(hit.value))
 
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     checks = []
     try:
         store = presets.load_presets(KIT)
-        never = [n for n in presets.derive_never(store) if n != presets.PRESET_KEY[0]]
+        rows = policy.load_catalogue(KIT)
+        held = presets.derive_never(store)
+        never = [n for n in held if n != presets.PRESET_KEY[0]]
         paths = [tuple("fixture" if policy.check_pattern_name(s) else s for s in n.split(".")) for n in never]
+        derived = {r["name"] for r in presets.derive_derived_rows(rows, held)}
+        cap = policy.render_json(next(iter(budgets.read_cap_census(t)), "fixture"))  # one quoted segment, as resolve_caps reads it
+        concrete = {r["name"]: policy.parse_key(f"budgets.{cap}") if r["name"] == "budgets.*" else
+                    tuple("fixture" if policy.check_pattern_name(s) else s for s in r["name"].split(".")) for r in rows
+                    if r["name"] not in held}
         absent = policy.read_revision(build_reader_repo(t / "absent", None), "HEAD")
         shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
         for preset in shipped:
@@ -2201,12 +2219,57 @@ def run_preset_every_key(name):
                      if (seen := read_outcome(p, read)) != ("preset", policy.render_json(want))]
             wrong += [f"{policy.render_dotted(p)} read {seen}, the absent file {base}" for p in paths
                       if (seen := read_outcome(p, read)) != (base := read_outcome(p, absent))]
-            if not assignment or not paths:
-                wrong.append(f"a population of 0: {len(assignment)} assigned key(s), {len(paths)} never key(s)")
+            unheld = {n: p for n, p in concrete.items() if p not in assignment}
+            unassigned = [p for n, p in unheld.items() if n in derived]
+            wrong += [f"{policy.render_dotted(p)} read {seen}, the absent file {base}" for p in unassigned
+                      if (seen := read_outcome(p, read)) != (base := read_outcome(p, absent))
+                      or seen[:2] != ("refused", policy.DerivedDefault.__name__)]
+            wrong += [f"preset {preset} leaves {n} unassigned, and it is neither a never key nor a derived row"
+                      for n in unheld if n not in derived]
+            if not assignment or not paths or not unassigned:
+                wrong.append(f"a population of 0: {len(assignment)} assigned key(s), {len(paths)} never key(s), "
+                             f"{len(unassigned)} unassigned derived row(s)")
             checks.append((preset, f"{len(assignment)} assigned key(s) from the preset, {len(paths)} never key(s) "
-                           "as the absent file", not wrong, "; ".join(wrong[:3]) or "every read as wanted"))
+                           f"as the absent file, {len(unassigned)} unassigned derived row(s) refused as the absent file",
+                           not wrong, "; ".join(wrong[:3]) or "every read as wanted"))
         if not shipped:
             checks.append(("store", "the shipped presets", False, f"{presets.STORE} holds no [preset.<name>] table"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_preset_derived_cap(name):
+    """`preset-derived-cap` (KICK-dKeptSession-34 S3): a derived cap read through the caps module, its
+    one reader, under a preset. Two repositories on `main`, one whose policy file is empty and one
+    whose file is `preset = "strict"`, each running this kit's own `budgets.py resolve --explain
+    <cap>` for the census's first `switch` row that is no family and whose home is not `limits:`. Each
+    must exit 0 with one `<cap>\\t<value>\\t<mode>\\t<source>` row and one `budgets: <cap> ·
+    budgets.enforce is <mode> · <reason>` line, the mode `warn` with no preset and `refuse` under
+    strict, whose `budgets.enforce` is `refuse`; the two rows must carry one value and one source, so
+    the preset writes no value over the cap's derived default. A census holding no such row is a
+    WRONG, never a pass. WHAT IT DOES NOT CHECK: any other cap, preset or pinned cap, and a cap's
+    value where the file or a home sets one."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks, seen = [], {}
+    try:
+        cap = next((c.name for c in budgets.read_cap_census(t).values() if c.cls == "switch" and not c.family
+                    and c.home.partition(":")[0] != "limits"), None)
+        if cap is None:
+            checks.append(("census", "a switch cap that is no family and has no limits: home", False,
+                           f"{budgets.CENSUS} holds none"))
+        for scenario, text, mode in ([] if cap is None else [("empty", "", "warn"), ("strict", 'preset = "strict"\n', "refuse")]):
+            repo = build_reader_repo(t / scenario, text)
+            checks.append(check_run(
+                scenario, f"budgets.py resolve --explain {cap}", [sys.executable, str(KIT / "budgets.py"), "resolve", "--explain", cap],
+                lambda rc, o, e, scenario=scenario, mode=mode: seen.setdefault(scenario, o.rstrip("\n").split("\t")) is not None
+                and rc == 0 and len(o.splitlines()) == 1 and len(seen[scenario]) == 4 and seen[scenario][0] == cap
+                and seen[scenario][2] == mode and len(e.splitlines()) == 1
+                and e.startswith(f"budgets: {cap} · budgets.enforce is {mode} · "), repo))
+        if cap is not None:
+            pair = [seen.get(s, [])[1::2] for s in ("empty", "strict")]
+            checks.append(("strict", "the empty file's value and source", pair[0] == pair[1] and len(pair[0]) == 2,
+                           f"value and source {pair[1]}, the empty file's {pair[0]}"))
     finally:
         remove_repo(t)
     return print_checks(name, checks)
@@ -6038,7 +6101,8 @@ CASES = [
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
-    ("preset-every-key", None, run_preset_every_key),  # every assigned and `never` key per shipped preset (KICK-dKeptSession-2)
+    ("preset-every-key", None, run_preset_every_key),  # every assigned, `never` and unassigned derived key per shipped preset (KICK-dKeptSession-2, -34)
+    ("preset-derived-cap", None, run_preset_derived_cap),  # a derived cap through budgets.py, empty file and strict (KICK-dKeptSession-34)
     ("on-invalid-classes", None, run_on_invalid_classes),
     ("on-invalid-strict", None, run_on_invalid_strict),
     *((c, None, run_reader_refusals) for c in READER_REFUSAL_CASES),  # the reader's refusals (TOOL-dGroundRules-21)
