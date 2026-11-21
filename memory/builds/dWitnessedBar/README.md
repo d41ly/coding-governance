@@ -202,7 +202,7 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dW
 | [TOOL-dWitnessedBar-108 — the closing review round 1's four minors batched: a staged removal trips the commit-time guard, scaffolded ledger homes open with their rendered header, an unread parameter reds, and the charter's trailer is checked at commit time](spec/2026-11-21-spec-TOOL-dWitnessedBar-108.md) | 51 | 2 | CLOSED | rev-1 | 2026-11-21 |
 <!-- /gen:build-units -->
 
-Records: 957 bound to this build, across 4 record folder(s).
+Records: 958 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

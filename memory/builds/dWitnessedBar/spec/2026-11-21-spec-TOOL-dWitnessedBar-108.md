@@ -19,6 +19,7 @@
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md) | journal | — |
+| [2026-11-21-review-TOOL-dWitnessedBar-106-closing-diff-review-round2.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-106-closing-diff-review-round2.md) | diff-review | TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 |
 
 <!-- /gen:spec-records -->
 
