@@ -25473,6 +25473,7 @@ memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-63-devia
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-64-deviation-641.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-1-departures-build.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/unattended.sh:852
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md	BUILD-METHOD M3
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	HYGIENE check 12
