@@ -8,10 +8,12 @@ gov's own and withheld from installs, so `lists --write` never creates it (TOOL-
 The size caps' half, the census, the switch and the `[budgets]` table's schema rule `validate`
 calls, is `budgets.py` beside this file (TOOL-dGroundRules-9). The named presets' store, its check and
 the repository-preset rule `validate` calls for a file holding a `presets` table, `check_repo_presets`,
-are `presets.py` (KICK-dKeptSession-1).
+are `presets.py` (KICK-dKeptSession-1). The third shrink-only list, the catalogue keys no clause on
+their owner build's row of the design view names, and the factory all three lists are read and
+written through, are KICK-dKeptSession-19's.
 
-    python <this kit>/policy.py lists --check   # both lists against their derivations and baselines
-    python <this kit>/policy.py lists --write   # drain both lists; neither ever gains a row
+    python <this kit>/policy.py lists --check   # the three lists against their derivations and baselines
+    python <this kit>/policy.py lists --write   # drain the three lists; none ever gains a row
     python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
@@ -1056,14 +1058,39 @@ def parse_list(text):
     return [ln.strip() for ln in text.replace("\r", "").split("\n") if ln.strip() and not ln.startswith("#")]
 
 
-def check_list(kit, compare):
-    """-> ((name, why) findings, note) for the shrink-only list against the catalogue and its base,
-    `compare` the (sha or None, why) `resolve_compare_base` answered for `kit`."""
+# ---- the shrink-only list factory (KICK-dKeptSession-19 S1) -------------------------------------
+# Every list file of this kit is read at the compare base and written through the two lower helpers;
+# a list of plain names is graded and drained by the upper two. The legacy-home list, whose rows
+# carry a pair and a mark, keeps its own compare and write policy and calls the lower two alone.
+
+def read_shrink_base(kit, name, base):
+    """-> the names of the list file `name` under `kit` in the commit `base` names, read by
+    `parse_list`, or None where that commit holds no such file. A Refusal where the kit is in no git
+    repository: there is no compare base to read."""
+    prefix = run_git(kit, "rev-parse", "--show-prefix")
+    if prefix is None:
+        raise Refusal((Path(kit) / name).as_posix(), 0, "the policy kit is in no git repository, so its list has no compare base")
+    # git's own spelling of the kit dir, so no two path forms are compared
+    text = run_git(kit, "show", f"{base}:{prefix.strip()}{name}")
+    return None if text is None else parse_list(text)
+
+
+def write_shrink_file(kit, name, header, names):
+    """Write the list file `name` under `kit`: `header`, then one line per name, UTF-8 with LF endings."""
+    with open(Path(kit) / name, "w", encoding="utf-8", newline="\n") as f:
+        f.write(header + "".join(n + "\n" for n in names))
+
+
+def check_shrink_list(kit, name, derived, compare, unlisted):
+    """-> ((name, why) findings, note) for the shrink-only list file `name` under `kit` against the
+    `derived` names and its base, `compare` the (sha or None, why) `resolve_compare_base` answered for
+    `kit`: a derived name the list lacks, its why `unlisted`; a listed name no longer derived, stale;
+    a listed name the list at the base lacks, grown. A list absent at the base compares nothing."""
     kit = Path(kit)
-    d = set(derive_unsummarised(load_catalogue(kit)))
-    path = kit / LIST
+    d = set(derived)
+    path = kit / name
     listed = parse_list(path.read_text(encoding="utf-8")) if path.is_file() else []
-    out = [(n, "lacks a summary or a usage and is not listed") for n in sorted(d - set(listed))]
+    out = [(n, unlisted) for n in sorted(d - set(listed))]
     out += [(n, "stale: drain it with `lists --write`") for n in sorted(set(listed) - d)]
     prefix = run_git(kit, "rev-parse", "--show-prefix")
     if prefix is None:
@@ -1071,29 +1098,104 @@ def check_list(kit, compare):
     base, why = compare
     if base is None:
         return out, f"no base: {why}; only the catalogue is compared"
-    rel = prefix.strip() + LIST  # git's own spelling of the kit dir, so no two path forms are compared
-    text = run_git(kit, "show", f"{base}:{rel}")
-    if text is None:
+    at_base = read_shrink_base(kit, name, base)
+    if at_base is None:
+        rel = prefix.strip() + name
         return out, f"no comparison: {rel} is absent at {base[:12]} ({why}), and absent is never an empty list"
-    at_base = set(parse_list(text))
+    at_base = set(at_base)
     out += [(n, f"added to a shrink-only list above the base {base[:12]}") for n in listed if n not in at_base]
     return out, f"base {base[:12]} ({why}) carried {len(at_base)}, the list carries {len(listed)}"
 
 
-def write_list(kit):
-    """Write L intersect D, sorted, under the header; an absent list is seeded with D. -> the names removed."""
-    kit = Path(kit)
-    d = derive_unsummarised(load_catalogue(kit))
-    path = kit / LIST
+def write_shrink_list(kit, name, header, derived):
+    """Write the list file `name` under `kit` as its names intersected with `derived`, sorted, under
+    `header`; an absent list is seeded with the whole derived set. -> the names drained."""
+    path = Path(kit) / name
     if path.is_file():
         listed = parse_list(path.read_text(encoding="utf-8"))
-        keep = sorted(set(listed) & set(d))
+        keep = sorted(set(listed) & set(derived))
         removed = sorted(set(listed) - set(keep))
     else:
-        keep, removed = d, []
-    with open(path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(LIST_HEADER + "".join(n + "\n" for n in keep))
+        keep, removed = sorted(derived), []
+    write_shrink_file(kit, name, header, keep)
     return removed
+
+
+def check_list(kit, compare):
+    """-> ((name, why) findings, note) for the summary list against the catalogue and its base,
+    `compare` the (sha or None, why) `resolve_compare_base` answered for `kit`."""
+    return check_shrink_list(kit, LIST, derive_unsummarised(load_catalogue(Path(kit))), compare,
+                             "lacks a summary or a usage and is not listed")
+
+
+def write_list(kit):
+    """Drain the summary list onto the catalogue's unsummarised rows; an absent list is seeded with
+    them. -> the names removed."""
+    return write_shrink_list(kit, LIST, LIST_HEADER, derive_unsummarised(load_catalogue(Path(kit))))
+
+
+# ---- the catalogue's reader join (KICK-dKeptSession-19 S3, S4) ----------------------------------
+
+UNNAMED_LIST = "unnamed-keys.txt"
+UNNAMED_HEADER = (
+    "# unnamed-keys.txt - GENERATED by `python <this kit>/policy.py lists --write`, never edited.\n"
+    "# The catalogue keys no clause on their owner build's row names (gap-spine-10), sorted.\n"
+    "# SHRINK-ONLY: `lists --check` reds a key named now, a new unnamed key, and a key the list at\n"
+    "# the compare base did not carry. A key leaves when its owner's row names it.\n"
+)
+UNNAMED_WHY = "unnamed and not listed"
+
+
+def load_design_lib(kit):
+    """The memory-tree kit's `design_lib`, its directory found by `resolve_kit_dir` from `kit`, as
+    `check_policy.load_tree_lib` finds `tree_lib` -> the module; LookupError where no memory-tree kit
+    is found or its module does not import."""
+    lib = str(resolve_kit_dir("memory-tree", "design_lib.py", kit))
+    if lib not in sys.path:
+        sys.path.insert(0, lib)
+    try:
+        import design_lib
+    except ImportError as exc:
+        raise LookupError(f"the memory-tree kit at {Path(lib).as_posix()} does not import: {exc}") from None
+    return design_lib
+
+
+def load_design(kit, root):
+    """The design view of the repository at `root`, read once by memory-tree's `read_design` over that
+    repository's conf as `read_design_conf` reads it. LookupError where no memory-tree kit is found
+    from `kit`; `read_design`'s DesignRefusal goes through, its `blank` holding every DESIGN_* key
+    where none is set."""
+    lib = load_design_lib(kit)
+    return lib.read_design(root, lib.read_design_conf(root))
+
+
+def check_design_blank(exc):
+    """True where `exc` is the DesignRefusal of a conf leaving every DESIGN_* key blank, the off
+    state; False for any other DesignRefusal. Anything else is raised again."""
+    blank = getattr(exc, "blank", None)
+    if blank is None:
+        raise exc
+    return set(blank) == set(load_design_lib(KIT).DESIGN_KEYS)
+
+
+def derive_unnamed_keys(rows, design):
+    """The sorted names of the catalogue `rows` whose `name` is among no clause's backticked names,
+    memory-tree's `extract_clause_tokens`, on the row's `owner` build in `design`, the shape
+    `read_design` returns. A placeholder name is matched as spelled, and a row whose owner is no
+    build of the view is unnamed."""
+    tokens = load_design_lib(KIT).extract_clause_tokens
+    named = {b: {t for text, *_rest in clauses.values() for t in tokens(text)}
+             for b, clauses in design["builds"].items()}
+    return sorted(str(r["name"]) for r in rows
+                  if r.get("name") and str(r["name"]) not in named.get(r.get("owner"), ()))
+
+
+def check_unnamed_list(kit, design, compare):
+    """-> ((name, why) findings, note) for the unnamed-keys list against the catalogue joined to
+    `design` and the list at the compare base `compare` names: the one grade `lists --check` and the
+    gate arm both call."""
+    return check_shrink_list(kit, UNNAMED_LIST, derive_unnamed_keys(load_catalogue(Path(kit)), design), compare,
+                             UNNAMED_WHY)
 
 
 # ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
@@ -1318,16 +1420,14 @@ def derive_legacy_homes(repo, notes):
     return sorted(set(rows))
 
 
-def read_base_pairs(repo, kit, base):
+def read_base_pairs(kit, base):
     """-> the (home, key) pairs of this kit's legacy list in the commit `base` names, or None where
-    that commit holds no list. `base` is the compare base `cmd_lists` resolved, the one comparison
-    the summary list reads too, never the working tree, HEAD or the landed tip (TOOL-dGroundRules-21
-    S23)."""
-    prefix = run_git(kit, "rev-parse", "--show-prefix")
-    if prefix is None:
-        raise Refusal((Path(kit) / LEGACY_LIST).as_posix(), 0, "the policy kit is in no git repository, so its list has no compare base")
-    text = run_git(repo, "show", f"{base}:{prefix.strip()}{LEGACY_LIST}")
-    return None if text is None else {tuple(ln.split(" ")[:2]) for ln in parse_list(text)}
+    that commit holds no list, read through the list factory's base read from the kit's own
+    repository (KICK-dKeptSession-19 S2). `base` is the compare base `cmd_lists` resolved, the one
+    comparison the other lists read too, never the working tree, HEAD or the landed tip
+    (TOOL-dGroundRules-21 S23)."""
+    names = read_shrink_base(kit, LEGACY_LIST, base)
+    return None if names is None else {tuple(ln.split(" ")[:2]) for ln in names}
 
 
 def check_legacy_homes(repo, kit, compare):
@@ -1345,7 +1445,7 @@ def check_legacy_homes(repo, kit, compare):
     path = Path(kit) / LEGACY_LIST
     committed = parse_list(path.read_text(encoding="utf-8")) if path.is_file() else []
     sha, why = compare
-    at_base = None if sha is None else read_base_pairs(repo, kit, sha)
+    at_base = None if sha is None else read_base_pairs(kit, sha)
     reports = []
     for ln in committed:
         f = ln.split(" ")
@@ -1375,8 +1475,7 @@ def write_legacy_homes(repo, kit, compare):
     compare base: then write nothing. The list shrinks by this verb and grows by none. -> (new, notes, rows)."""
     _reports, notes, rows, new = check_legacy_homes(repo, kit, compare)
     if not new:
-        with open(Path(kit) / LEGACY_LIST, "w", encoding="utf-8", newline="\n") as f:
-            f.write(LEGACY_HEADER + "".join(" ".join(r) + "\n" for r in rows))
+        write_shrink_file(kit, LEGACY_LIST, LEGACY_HEADER, [" ".join(r) for r in rows])
     return new, notes, rows
 
 
@@ -1509,9 +1608,13 @@ def cmd_mirror(argv):
 
 
 def cmd_lists(argv):
-    """`lists --check | --write`: both shrink-only lists, the summary list and the legacy-home list,
-    against ONE compare base, `resolve_compare_base` read once here for both (TOOL-dGroundRules-21
-    S23), so a branch opened before the default branch dropped a key is never read as adding it."""
+    """`lists --check | --write`: the three shrink-only lists, the summary list, the unnamed-keys list
+    and the legacy-home list, against ONE compare base, `resolve_compare_base` read once here for all
+    three (TOOL-dGroundRules-21 S23), so a branch opened before the default branch dropped a key is
+    never read as adding it. The unnamed-keys list is graded over the design `load_design` reads once
+    (KICK-dKeptSession-19 S4): where no memory-tree kit is found, every DESIGN_* key is blank, or under
+    `--check` the list is absent, both verbs say it is not graded and touch nothing; any other
+    DesignRefusal is printed, exit 2."""
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")
     top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
@@ -1529,11 +1632,31 @@ def cmd_lists(argv):
     except Refusal as exc:
         print(exc, file=sys.stderr)
         return 2
+    design, unnamed_why = None, ""
+    try:
+        design = load_design(KIT, top)
+    except LookupError as exc:  # a kit copy with no memory-tree kit beside it keeps its other two lists
+        unnamed_why = str(exc)
+    except ValueError as exc:
+        if not check_design_blank(exc):
+            print(exc, file=sys.stderr)
+            return 2
+        unnamed_why = str(exc)
+    if argv == ["--check"] and design is not None and not (KIT / UNNAMED_LIST).is_file():
+        design, unnamed_why = None, f"{UNNAMED_LIST} is absent · {LEGACY_WITHHELD}"
     if argv == ["--check"]:
         findings, note = check_list(KIT, compare)
         print(f"policy lists: {LIST} · {note}")
         for n, why in findings:
             print(f"  {n}: {why}")
+        if design is None:
+            print(f"policy lists: {UNNAMED_LIST} · not graded · {unnamed_why}")
+        else:
+            more, note = check_unnamed_list(KIT, design, compare)
+            print(f"policy lists: {UNNAMED_LIST} · {note}")
+            for n, why in more:
+                print(f"  {n}: {why}")
+            findings = findings + more
         print(f"policy lists: {LEGACY_LIST} · " + (f"{len(rows)} row(s) derived from the legacy homes"
                                                    if held else f"not graded · {LEGACY_WITHHELD}"))
         for ln in notes:
@@ -1552,6 +1675,11 @@ def cmd_lists(argv):
         return 1
     removed = write_list(KIT)
     print(f"policy lists: wrote {LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
+    if design is None:
+        print(f"policy lists: {UNNAMED_LIST} · not graded · {unnamed_why}")
+    else:
+        removed = write_shrink_list(KIT, UNNAMED_LIST, UNNAMED_HEADER, derive_unnamed_keys(load_catalogue(KIT), design))
+        print(f"policy lists: wrote {UNNAMED_LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
     if held:
         write_legacy_homes(top, KIT, compare)
         print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
