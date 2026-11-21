@@ -1601,21 +1601,23 @@ rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_re
 read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st rec_reused rec_reused_cache, each empty when absent
   rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_reused_cache=""
   [ -f "$1" ] || return 0
-  rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$1" 2>/dev/null)
-  rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$1" 2>/dev/null)
-  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$1" 2>/dev/null)
+  # Each key as the runner's `read_record_keys` and `read_tag_lines` read it: the last line of a repeated
+  # key wins, and one trailing CR is stripped (TOOL-dWitnessedBar-65 S15).
+  rec_sha=$(awk -F'\t' '$1=="sha"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
+  rec_fp=$(awk -F'\t' '$1=="fingerprint"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
+  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
   # WHICH MANIFEST THE BLOB BELONGS TO (TOOL-aFrugalTurnstile-1 S4). Absent reads as the kit sibling,
   # in check_green_record, because that is what every stamp written before the key existed ran.
-  rec_man=$(awk -F'\t' '$1=="manifest"{print $2}' "$1" 2>/dev/null)
+  rec_man=$(awk -F'\t' '$1=="manifest"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
   # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
   # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
   # "covered everything" would make each of them certify legs it never ran.
-  rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$1" 2>/dev/null)
+  rec_st=$(awk -F'\t' '$1=="selftests"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
   # HOW MANY LEGS THE RUN REUSED, and how many of them from the cache (TOOL-aSparedSpawn-13 S8, -32
   # S8), the pair predicate 9 reads. Each is empty when absent; what an absent one means is
   # predicate 9's to say.
-  rec_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$1" 2>/dev/null)
-  rec_reused_cache=$(awk -F'\t' '$1=="reused_cache"{print $2}' "$1" 2>/dev/null)
+  rec_reused=$(awk -F'\t' '$1=="reused"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
+  rec_reused_cache=$(awk -F'\t' '$1=="reused_cache"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
 }
 
 # THE CANDIDATE STAMPS (TOOL-dThriftyLanding-2). `--git-dir` is per WORKTREE, so a full green earned in

@@ -316,7 +316,9 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=314
+FLOOR_ASSERTIONS=316
+# RAISED 314 -> 316 by TOOL-dWitnessedBar-65 on 2026-11-21: the runner's record reader over a CRLF verdict
+# line and a repeated key, one assertion each. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 312 -> 314 by TOOL-dWitnessedBar-63 on 2026-11-21: the runner's record reader cut alone, an empty
 # last field kept and a no-TAB line unset. Counted one per `ok … || nope` pair; this pass runs no suite.
 # RAISED 311 -> 312 by TOOL-dWitnessedBar-62 on 2026-11-20: the runner's record of an empty-note selection
@@ -3330,6 +3332,19 @@ rk_out=$( eval "$rk_fn"; unset rk_note rk_reused; read_record_keys "$tmp/rk-reco
 [ -n "$rk_fn" ] && [ "${rk_out##* reused=}" = "" ] \
   && ok "63-AC16 read_record_keys leaves a no-TAB reused line unset" \
   || nope "63-AC16 read_record_keys set reused from a line with no TAB: $rk_out"
+# TOOL-dWitnessedBar-65 AC11 (S14): the same cut over `verdict<TAB>GREEN<CR>`, `note<TAB>a<TAB>`, then
+# `head<TAB>x` and `head<TAB>y` reads `verdict` as GREEN with its CR stripped, `note` as `a<TAB>`, and
+# `head` as y, the last of a repeated key. RED against a reader dropping the CR strip, or keeping the
+# first of a repeated key.
+printf 'verdict\tGREEN\r\nnote\ta\t\nhead\tx\nhead\ty\n' > "$tmp/rk-record-65"
+rk_out=$( eval "$rk_fn"; unset rk_verdict rk_note rk_head; read_record_keys "$tmp/rk-record-65" rk_ verdict note head
+  printf 'verdict=[%s] note=[%s] head=[%s]' "${rk_verdict-unset}" "${rk_note-unset}" "${rk_head-unset}" )
+[ -n "$rk_fn" ] && [ "$rk_out" = "verdict=[GREEN] note=[a"$'\t'"] head=[y]" ] \
+  && ok "65-AC11 read_record_keys strips one CR from verdict and keeps note's last TAB" \
+  || nope "65-AC11 read_record_keys read verdict<TAB>GREEN<CR> and note<TAB>a<TAB> as: ${rk_out//$'\r'/<CR>}"
+[ -n "$rk_fn" ] && [ "${rk_out##* head=}" = "[y]" ] \
+  && ok "65-AC11 read_record_keys keeps the last of a repeated head key" \
+  || nope "65-AC11 read_record_keys read head<TAB>x then head<TAB>y as ${rk_out##* head=}"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

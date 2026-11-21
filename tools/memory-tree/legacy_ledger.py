@@ -166,13 +166,15 @@ class Registration:
 
 def _run_git(root, *args, with_stderr=False):
     """-> (returncode, stdout) of one `git -C root` call, the inherited-directory variables dropped;
-    `with_stderr` adds its stderr as a third item."""
+    `with_stderr` adds its stderr as a third item. A git that cannot be spawned or that times out is exit
+    127 with the text `git not runnable: <exception>` (TOOL-dWitnessedBar-65 S9)."""
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     try:
         p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
                            encoding="utf-8", errors="surrogateescape", env=env)
-    except OSError as exc:
-        return (127, "", str(exc)) if with_stderr else (127, str(exc))
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        text = "git not runnable: %s" % exc
+        return (127, "", text) if with_stderr else (127, text)
     return (p.returncode, p.stdout, p.stderr) if with_stderr else (p.returncode, p.stdout)
 
 
@@ -773,7 +775,12 @@ def run_seed_cli(args, cwd):
     `read_head_sha` names the sha: on an unborn HEAD the null SHA, `UNBORN_LINE` printed once on stderr,
     so stdout keeps one line per population (TOOL-dWitnessedBar-63 S32); on any other failure each
     population is `unarmed` with that reason and nothing is written, the refused-home branch whole: stderr
-    carries `legacy_ledger: <population>: <reason>; nothing written` (TOOL-dWitnessedBar-63 S6)."""
+    carries `legacy_ledger: <population>: <reason>; nothing written` (TOOL-dWitnessedBar-63 S6). Where
+    no repository root resolves, that route is taken before any registration is read, from the toplevel
+    call's reason: `--population` prints its one unarmed line, `--all` prints nothing on stdout and
+    `seed: no HEAD: <reason>` on stderr, each exit 1; `--home` exits 2 (TOOL-dWitnessedBar-65 S8). A
+    given `--sha` is folded to lowercase and stamped as the full sha of the commit it names; one naming
+    none, and the null SHA outside an unborn HEAD, exits 2 (TOOL-dWitnessedBar-65 S10)."""
     usage = ("usage: legacy_ledger.py seed (--all | --population <name>) [--widen <record>] [--sha <sha>]\n"
              "       legacy_ledger.py seed --home <path> [--sha <sha>] (--copy <template> | -- <argv>...)")
     argv = None
@@ -800,17 +807,40 @@ def run_seed_cli(args, cwd):
         print("legacy_ledger: --widen takes a record with no whitespace, as widened:<record> is written",
               file=sys.stderr)
         return 2
-    rc, top = _run_git(cwd, "rev-parse", "--show-toplevel")
+    rc, top, err = _run_git(cwd, "rev-parse", "--show-toplevel", with_stderr=True)
     if rc != 0 or not top.strip():
-        print("legacy_ledger: not inside a git work tree", file=sys.stderr)
-        return 2
+        if homed:
+            print("legacy_ledger: not inside a git work tree", file=sys.stderr)
+            return 2
+        # No root is no HEAD, read before any registration or home (TOOL-dWitnessedBar-65 S8, §8 F6).
+        no_head = "no HEAD: %s" % (err.strip().splitlines() or ["git rev-parse exited %d" % rc])[0].strip()
+        if every:
+            print("seed: %s" % no_head, file=sys.stderr)
+        else:
+            print("legacy_ledger: %s: %s; nothing written" % (opts["--population"], no_head), file=sys.stderr)
+            print("unarmed %s %s" % (opts["--population"], no_head))
+        return 1
     root = top.strip()
     sha, no_head = opts.get("--sha"), ""
     if sha is None:
         sha, no_head = read_head_sha(root)
-    if sha is not None and not SHA_RE.fullmatch(sha):
-        print("legacy_ledger: --sha %r is not 8 to 40 lowercase hex digits" % sha, file=sys.stderr)
-        return 2
+    else:
+        # A given sha is folded to lowercase, held to the grammar, then must name a commit, whose full sha
+        # is stamped; the null SHA only where HEAD is unborn (TOOL-dWitnessedBar-65 S10, §8 F4, F7).
+        sha = sha.lower()
+        if not SHA_RE.fullmatch(sha):
+            print("legacy_ledger: --sha %r is not 8 to 40 hex digits" % opts["--sha"], file=sys.stderr)
+            return 2
+        if sha == NULL_SHA:
+            named = read_head_sha(root)[0] == NULL_SHA
+        else:
+            rc, out = _run_git(root, "rev-parse", "--verify", "--quiet", "%s^{commit}" % sha)
+            named = rc == 0 and SHA_RE.fullmatch(out.strip()) is not None
+            sha = out.strip()
+        if not named:
+            print("legacy_ledger: --sha %r names no commit in this repository%s, so no home is written"
+                  % (opts["--sha"], ", whose HEAD is not unborn" if sha == NULL_SHA else ""), file=sys.stderr)
+            return 2
     unborn = "--sha" not in opts and sha == NULL_SHA
     try:
         if homed:
