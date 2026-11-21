@@ -1,6 +1,6 @@
 # TOOL-aMendedLedger-2 — U1: the journal relocation pass, plus the three .md stub deletions
 
-**Status:** SPECCED · rev-2 · 2026-08-09 · node a · Tier-2 · base 663ca427 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-11-22 · node a · Tier-2 · base 663ca427 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -51,7 +51,7 @@ hygiene check 2 is full-tree at the push boundary.
   prose, marked RETIRED, so nothing is lost between this unit and U2.
   - **Readers:** by name: `tools/check-dead-paths.sh` derives the pointer stub's name from git's
     deletion history and reds any tracked file outside the memory tree that spells it,
-    `tools/dead-path-waivers.txt` waives the runbook's two spellings, and
+    `memory/project/dead-path-waivers.txt` waives the runbook's two spellings, and
     `tools/memory-tree/check-memory-hygiene.sh` lists the stub among check 3's retired members.
     by value: the protocol's self-prune rule is read by `signal_ledger` in
     `tools/drift-audit/drift_report.py`, which matches a merged row and tests its sha's ancestry.
@@ -469,6 +469,7 @@ builder working in this unit could mistake for U1's business.
   numbers are spelled out in words throughout this section, deliberately: check 12 takes the largest
   `rev-N` token anywhere in §9 as the high-water the header must not exceed, so another spec's higher
   revision token written here would pre-satisfy the assertion for revisions this file has not had.)
+- rev-3 · 2026-11-22 · S6 · the **Readers:** by name: half re-pointed from `tools/dead-path-waivers.txt` to `memory/project/dead-path-waivers.txt`, where TOOL-dWitnessedBar-16 S14 moved it; nothing else moves. From the brief `2026-11-22-prompt-TOOL-dWitnessedBar-1-check25-brief`.
 
 ## 10. Reuse audit
 
