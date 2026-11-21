@@ -1,6 +1,6 @@
 # KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-KICK-dKeptSession-51-deviation-511.md](../build/2026-10-26-build-KICK-dKeptSession-51-deviation-511.md) | deviation | — |
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-27 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 |
 | [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-61 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
@@ -42,7 +43,8 @@ after it (order 17).
   `tools/unattended/unattended.sh` (`KICK-dKeptSession-22` S2, eight fields from
   `KICK-dKeptSession-31` S1) lists the eight fields in order and states that a later act is appended
   as the ninth, after `<content-key>`, so a reader of the function reads the position where the
-  derivation lives. Observed by AC1.
+  derivation lives. Where unit 31's comment already states the ninth position, S1 is that
+  observation and the comment is left as it landed. Observed by AC1.
 - **S2** — id 39. The order in the guide. The id paragraph of the verbs guide's `--mail` entry,
   which `KICK-dKeptSession-5` S14 writes with the eight fields in `tools/unattended/VERBS.template.md`
   and its render `memory/guides/UNATTENDED-VERBS.md`, names the act as the ninth field after the
@@ -54,16 +56,18 @@ after it (order 17).
   `<content-key>` (`KICK-dKeptSession-31` S1); `KICK-dKeptSession-22` S4's seventh is superseded". Its
   accept line: the child's Runtime spec states the ninth position. Observed by AC3.
 - **S4** — id 39. The sibling text superseded by name. `KICK-dKeptSession-22` S4 and its `hands-off
-  external` edge to dWellOiledMachine join `KICK-dKeptSession-31` S4's superseded list, with the act
-  at position 9. Each is answered in this unit's own acceptance ledger,
+  external` edge to dWellOiledMachine are superseded beside the two passages `KICK-dKeptSession-31`
+  S4 answers in that unit's own ledger, with the act at position 9. Each is answered in this unit's
+  own acceptance ledger,
   `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md`,
   which quotes both passages of unit 22's spec, states the ninth position supersedes them, and cites
-  S3's ask. Unit 22 builds at order 15 and is CLOSED when this unit builds, so neither its spec nor
-  its ledger is written (F1). Observed by AC3 and AC4.
+  S3's ask. Units 22 and 31 build at orders 15 and 16 and are CLOSED when this unit builds, so no
+  spec or ledger of either is written (F1). Observed by AC3 and AC4.
 
 ## 3. Non-goals (OUT)
 
 - Minting the act: dWellOiledMachine's Runtime.
+- No kit version: the lander mints the unattended kit's (`tools/push-main.sh@78f40c3c2475:27`).
 - The eight fields themselves: `KICK-dKeptSession-31`; the guide's eight-field text:
   `KICK-dKeptSession-5` S14.
 - The report's left-shift checklist entry, that a spec changing a field order lists every sibling
@@ -82,7 +86,7 @@ after it (order 17).
 
 - `memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-22.md#S4`: "the act is a seventh
   field of S2, appended after `answers`"; the same spec's Edges bullet to dWellOiledMachine: "whose act
-  joins S2 as a seventh field". Both stand at that spec's rev-6.
+  joins S2 as a seventh field". Both stand at that spec's rev-7.
 - `memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-31.md#S1`: eight fields ending
   `<to> <content-key>`, and "`KICK-dKeptSession-22` S4's act joins as the ninth field"; its S4
   supersedes unit 22 S2 and AC2 only, and leaves unit 5 S5's call to that unit's own spec.
@@ -101,8 +105,8 @@ after it (order 17).
 ### Inventory
 
 No identifier is minted; S3's ask takes an id of dWellOiledMachine's `TOOL` family that no roster
-unit or ask holds, read from that build's README `ids:` line and its `BACKLOG.md` when the main loop
-files it.
+unit or ask holds, read from that build's README `ids:` line and its `BACKLOG.md` when this unit's
+pass files it.
 
 ### Migration
 
@@ -112,8 +116,12 @@ None: no act exists, and no message exists before this build.
 
 - `tools/unattended/unattended.sh`: S1, the comment on `derive_message_id`
 - `tools/unattended/VERBS.template.md`: S2
-- `memory/guides/UNATTENDED-VERBS.md`: S2's render
+- `memory/guides/UNATTENDED-VERBS.md`: S2's installed copy, byte-equal to the template under the
+  unattended kit gate's check 10
 - `memory/builds/dWellOiledMachine/BACKLOG.md`: S3's ask row and its `SEV` row
+- `memory/builds/dWellOiledMachine/README.md` and `memory/backlog/TOOL.md`: the renders S3's ask
+  moves, the README's `ids:` line and the family's ask index, which `gen_build_index.py --write`
+  derives and the commit hook stages through `--write-staged` when hygiene check 9 reds
 - `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md`:
   S4's answer beside the criteria observed
 
@@ -150,9 +158,10 @@ None: no act exists, and no message exists before this build.
   Red when: the child build's only statement of the position is unit 22's superseded edge.
 - **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "a seventh
   field of S2"` prints `1`, and into `grep -c "joins S2 as a seventh field"` prints `1`; and `git
-  diff --name-only <pass base> HEAD --` over unit 22's spec and its acceptance ledger prints
-  nothing.
-  Red when: S4's answer lands in a record of unit 22, or this unit's ledger quotes neither passage.
+  diff --name-only <pass base> HEAD --` over the specs and acceptance ledgers of units 22 and 31
+  prints nothing.
+  Red when: S4's answer lands in a record of unit 22 or 31, or this unit's ledger quotes neither
+  passage.
 
 ## 7. Gates
 
@@ -184,6 +193,13 @@ None: no act exists, and no message exists before this build.
   acceptance ledger, which joins Files touched, F1 resolved (b) and AC4 observing the quoted
   passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`; the class of
   `KICK-dKeptSession-50`'s divergence, which unit 49's rev-6 first resolved.
+- rev-4 · 2026-11-21 · S1 · S4 · §3 · §4 · AC4 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief`: S4 no longer reads as a write to unit 31's
+  superseded list, which lives in unit 31's own ledger, and AC4's diff covers units 22 and 31; Files
+  touched names the dWellOiledMachine README and `memory/backlog/TOOL.md`, which an ask filing moves
+  through the index render; the verbs guide's installed copy is a byte copy, not a render; unit 22 is
+  cited at its rev-7; S1 is an observation where unit 31's comment already states the ninth; the
+  Inventory's filer is this unit's pass. Nothing narrowed: no landed unit states the position.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 18 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 18 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0164@148f5fda whole
 
@@ -18,6 +18,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 |
 | [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-24 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -50,20 +51,33 @@ the notice whose key equals the key it recomputes from the interface's text, nev
   `derive_gov_id --file <interface file>` (KICK-dKeptSession-22), passed as the post's new
   `--interface <file>` option and computed before the id, so it also fills the `<content-key>` field of
   `derive_message_id` (KICK-dKeptSession-31 S1); `none` on every other kind, in the record and in the
-  id. A `confirmed` or `changed` post without `--interface` is refused with exit 2 before any commit.
+  id. It is computed in unit 5 S5's body-and-values step, before the fetch. A `confirmed` or `changed`
+  post without `--interface`, a post of any other kind naming it, and an interface file
+  `derive_gov_id` cannot read, its rc 1, are each refused with exit 2 before any fetch or commit.
   Observed by AC3.
 - **S4** — The reader: `read_mailbox`'s row (KICK-dKeptSession-5 S6) gains the columns `seq`, `after`
   and `content-key`, after `reply`, the last of unit 5's columns, read from the record; a record
   without one reads `-`. Unit 5's columns keep their places, whose first ten the landed witness check
-  reads by position (`tools/unattended/unattended.sh#check_lease_witness`). Observed by AC1, AC2.
+  reads by position (`tools/unattended/unattended.sh#check_lease_witness`), and the guard's
+  `read_mail_rows` in `tools/loop/loop_transition.py` reads unit 5's eleven by position too: where
+  unit 5 landed a row split that requires exactly eleven fields, this unit widens it to take the
+  first eleven, and a unit 5 arm in `tools/unattended/unattended.test.sh` comparing a whole row gains
+  the three columns. Observed by AC1, AC2, AC7.
 - **S5** — The dependent's check, `check_interface_notice <slug> <subject> <interface file>` in
   `tools/unattended/unattended.sh`: over the `confirmed` and `changed` rows `read_mailbox <slug> soft`
   prints with that subject, it recomputes `derive_gov_id --file <interface file>` and prints
   `interface — current <id> · <kind> · key <k>`, exit 0, for the row whose `content-key` equals it, and
-  `interface — unconfirmed · key <k>`, exit 1, when none does. It never chooses a row by `first-seen`,
-  `seq` or fetch order. Observed by AC4, AC5.
+  `interface — unconfirmed · key <k>`, exit 1, when none does. Where two rows carry that key, both
+  announcing the same text, it names the lesser id, a choice no arrival can move. It never chooses a
+  row by `first-seen`, `seq` or fetch order. A read that exits non-zero, or an interface file
+  `derive_gov_id` cannot read, exits 2 with one line naming why, never `unconfirmed`, so a refusal is
+  not read as a stale interface. Observed by AC4, AC5.
 - **S6** — The documentation: the verbs guide's mailbox section names the three keys, the
-  `--interface` option and the rule a dependent acts by. Observed by AC6.
+  `--interface` option and the rule a dependent acts by. `help/loop.md`'s `--mail` paragraph,
+  `KICK-dKeptSession-5` S14's, names `--interface`, and its `verb:unattended.sh:--mail` usage anchor
+  takes the fingerprint `python tools/govkit/docs_leg.py --fingerprints` prints once the usage line
+  carries the option, since `read_verb_usage` (`tools/govkit/docs_leg.py#read_verb_usage`) derives the
+  row from the usage line's flags. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -74,6 +88,7 @@ the notice whose key equals the key it recomputes from the interface's text, nev
 - No total order across builds: `seq` orders one session's messages and `after` links one build's
   sessions; nothing orders two builds' messages, and nothing needs to.
 - No rewrite of a delivered message: a later notice supersedes by key, never by editing.
+- No kit version: the lander mints the unattended kit's (`tools/push-main.sh@78f40c3c2475:27`).
 
 ### Edges
 
@@ -121,10 +136,17 @@ the notice whose key equals the key it recomputes from the interface's text, nev
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.sh`: the three keys, `--interface`, the row's columns,
-  `check_interface_notice`, and `KIT_UNATTENDED_VERSION` moved
-- `tools/unattended/unattended.test.sh`
-- `tools/unattended/VERBS.template.md`, rendered to `memory/guides/UNATTENDED-VERBS.md`
+- `tools/unattended/unattended.sh`: the three keys, `--interface`, the row's columns and
+  `check_interface_notice`
+- `memory/map/generated/symbols.json`: `check_interface_notice`, a new shell function the map indexes
+- `tools/unattended/unattended.test.sh`: the arm in §7, a unit 5 arm comparing a whole row (S4), and
+  the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` raised by the arm's counted
+  assertions
+- `tools/loop/loop_transition.py`: `read_mail_rows`' row split, only where unit 5 landed one that
+  requires exactly eleven fields (S4)
+- `tools/unattended/VERBS.template.md`, and its installed copy `memory/guides/UNATTENDED-VERBS.md`,
+  byte-equal under the unattended kit gate's check 10
+- `help/loop.md`: S6's option and the re-stamped `verb:unattended.sh:--mail` anchor
 
 ### Alternatives rejected
 
@@ -147,7 +169,7 @@ the notice whose key equals the key it recomputes from the interface's text, nev
   message; `after` is a link, and the content key, not `after`, decides what a dependent acts on.
 - testing — the fixture cases under AC1 to AC5 and the suite arm in §7.
 - migration — none: no message exists yet.
-- user docs — the verbs guide; no `help/` page covers the unattended kit.
+- user docs — the verbs guide, and `help/loop.md`'s `--mail` paragraph and its usage anchor (S6).
 
 ## 6. Acceptance criteria
 
@@ -156,31 +178,44 @@ The fixture is KICK-dKeptSession-5's: a bare remote and two clones under `%TEMP%
 - **AC1** — When session `s1` of `fx` posts two messages to `build:fy`, `unattended.sh --mail read fy`
   shows them with `seq` 1 and 2.
   Red when: a second post reads `seq` 1, as a planted writer counting from zero shows.
-- **AC2** — When session `s2` of `fx` then posts its first message, its `after` is `s1`'s second id; its
-  second message's `after` is `none`; and a build's very first message has `after` `none`.
+- **AC2** — When session `s0` of `fx` posts one message before AC1's posts, the clone's feed line for
+  `s0`'s tip is set one minute before `s1`'s first so the order holds without a sleep, and session
+  `s2` then posts its first message, its `after` is `s1`'s second id; its second message's `after` is
+  `none`; and `s0`'s message, the build's very first, has `after` `none`.
   Red when: a take-over's first message names no predecessor, or names one that is not the last, as a
-  planted pair spelled with the cache prefix shows.
+  planted pair spelled with the cache prefix shows: every tip then reads `-`, and the tie goes to
+  `s0`, the lesser ref name.
 - **AC3** — When a `confirmed` post names `--interface i.txt`, its record's `content-key` equals
-  `derive_gov_id --file i.txt`; a `changed` post with no `--interface` exits 2 and the remote is
+  `derive_gov_id --file i.txt`; a `changed` post with no `--interface`, a `question` post naming
+  `--interface i.txt`, and a `confirmed` post naming an absent file each exit 2 and the remote is
   unchanged.
-  Red when: an interface notice lands without its key.
+  Red when: an interface notice lands without its key, or an option no kind reads is ignored.
 - **AC4** — When clone B holds `s1`'s `confirmed` (key of `i1.txt`) and `s2`'s `changed` (key of
-  `i2.txt`), the `changed` planted as sighted first, and `check_interface_notice fy I16 i2.txt` runs,
+  `i2.txt`), the `changed`'s feed line on B set one minute before the `confirmed`'s, and
+  `check_interface_notice fy I16 i2.txt` runs,
   it prints `interface — current <the changed's id> · changed`.
   Red when: the dependent acts on the `confirmed`, as a planted check choosing the newest `first-seen`
   shows.
 - **AC5** — When the same check runs with an interface file matching neither key, it prints
-  `interface — unconfirmed` and exits 1.
-  Red when: an unmatched interface reads as confirmed.
+  `interface — unconfirmed` and exits 1; with an interface file that does not exist, it exits 2 and
+  prints no `unconfirmed` line.
+  Red when: an unmatched interface reads as confirmed, or an unreadable file reads as unconfirmed.
 - **AC6** — When `grep -n "content-key" tools/unattended/VERBS.template.md` runs, the guide names
-  `seq`, `after`, `content-key` and `--interface`.
-  Red when: the guide omits a key or the option.
+  `seq`, `after`, `content-key` and `--interface`; `grep -n -- "--interface" help/loop.md` finds the
+  `--mail` paragraph; and `python tools/govkit/docs_leg.py --fingerprints` prints
+  `verb:unattended.sh:--mail` with the fingerprint that paragraph's anchor carries.
+  Red when: the guide omits a key or the option, or the anchor keeps the fingerprint from before
+  `--interface`.
+- **AC7** — When `python tools/loop/loop_transition.py --fixture --plant mail-open` runs over rows
+  carrying the three columns, it exits 1 printing `mail open <id>`, as `KICK-dKeptSession-5` AC6
+  states.
+  Red when: the guard's row split refuses or misreads a fourteen-column row.
 
 ## 7. Gates
 
-`unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene`
+`unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `docs` · `loop transition record` · `policy fixtures` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · two posts on one session, a take-over's first post, an interface notice without a file, and a `changed` sighted before the `confirmed` it supersedes, staged by a planted check choosing by arrival · none
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · two posts on one session, a take-over's first post, an interface notice without a file, and a `changed` sighted before the `confirmed` it supersedes, staged by a planted check choosing by arrival · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` rise by its counted assertions
 
 ## 8. Open questions
 
@@ -211,6 +246,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · tw
   `KICK-dKeptSession-5` rev-9 added, and keeps the ten the landed witness check reads by position; the version move and the guarded legs `kit epoch`, `scratch-guard self-test`
   and `tier2-review self-test` added; line-number citations replaced by `path#symbol` and blob pins.
   Nothing narrowed: no landed unit carries a key, the option or the check.
+- rev-6 · 2026-11-21 · S3 · S4 · S5 · S6 · §3 · §4 · §5 · AC2 to AC7 · §7 · checked for behaviour
+  under `2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief`: AC2's red is staged over two other
+  refs, since one alone is chosen whatever its spelling; the sightings AC2 and AC4 order are planted
+  a minute apart, since `seen-utc` counts whole seconds; S3 refuses `--interface` on another kind and
+  an unreadable file; S5 names the lesser id where two rows share the key, and exits 2, never
+  `unconfirmed`, on a read or file it cannot use; S4 holds unit 5's `read_mail_rows` and whole-row
+  arms to the widened row, AC7 observing the guard; S6 re-stamps `help/loop.md`'s
+  `verb:unattended.sh:--mail` anchor, whose fingerprint the option moves, and the `docs`,
+  `loop transition record` and `policy fixtures` legs join; `symbols.json` joins Files touched for
+  `check_interface_notice`; the version move is dropped, the lander minting it.
 
 ## 10. Reuse audit
 

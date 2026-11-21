@@ -1,6 +1,6 @@
 # KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0161@10c6cad1 whole
 
@@ -15,6 +15,8 @@
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-23-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-39 KICK-dKeptSession-51 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -36,7 +38,9 @@ that true over every tracked shell file, so this unit observes the join on the m
   (`tools/lib/gov-feed.sh#add_feed_event`). A landed post therefore appends one line whose `ref` is the
   remote mail ref, `kind` `mail`, `blob` the empty tree and `commit` the post's commit; a lost,
   uncompleted, refused or duplicate post appends nothing. This unit adds no second call, and its
-  fixture cases in `tools/unattended/unattended.test.sh` observe the join. Observed by AC1, AC2.
+  fixture cases in `tools/unattended/unattended.test.sh` observe the join. Each case posts kind
+  `question`, never `confirmed` or `changed`, which KICK-dKeptSession-27 S3 refuses without
+  `--interface` at order 18, so these cases keep passing after that unit. Observed by AC1, AC2.
 - **S2** — The census, landed and observed. `scan_feed_writers` (`tools/lib/gov-feed.sh#scan_feed_writers`)
   already reads every tracked `*.sh` and hook less the suites, flags a scope holding a lease-carrying
   push that calls no name on `FEED_WRITER_HELPER_FNS` (limb 1) and any plain push of a `refs/gov/` ref
@@ -97,7 +101,10 @@ Nothing is minted: the unit adds fixture cases, and no function, flag, field or 
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.test.sh`: the post, refusal and sighting cases
+- `tools/unattended/unattended.test.sh`: the post, refusal and sighting cases, inline arms that
+  define no shell function, so the codebase map's symbol index does not move; and the effective
+  `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` raised by the cases' counted assertions, as
+  the suite's floor paragraph has each unit do
 
 ### Alternatives rejected
 
@@ -128,25 +135,30 @@ The fixture is KICK-dKeptSession-5's: a bare remote and two clones under `%TEMP%
   post's remote mail ref, `kind` `mail` and `commit` the remote ref's tip.
   Red when: a landed post leaves the feed unchanged, as a planted `write_mail_ref` pushing around
   `write_gov_ref` shows.
-- **AC2** — When the same post is retried and refused as a duplicate, and when a post loses its
-  compare-and-swap against a planted remote tip, A's `gov-feed.log` gains no line in either case.
+- **AC2** — When the same post is retried and refused as a duplicate, exit 1, and when a post loses
+  its compare-and-swap, exit 1, A's `gov-feed.log` gains no line in either case. The lost race is
+  staged as the suite stages one, by a git shim on PATH that writes a tip into the bare remote between
+  the post's fetch and its push, so the fetch never reads it: a planted tip the fetch does read is a
+  sighting, and appends its own line by S3.
   Red when: a write that did not land is appended.
 - **AC3** — When `bash -c '. tools/lib/gov-feed.sh && scan_feed_writers "$1"' _ <copy>` runs over a
   scratch copy of `tools/unattended/unattended.sh` holding a planted function that pushes
-  `refs/gov/mail/fx/a/s1` with `--force-with-lease` and calls no helper, it prints that copy's line.
+  `refs/gov/mail/fx/a/s1` with `--force-with-lease` and calls no helper, it prints that copy's
+  `<file>:<line>` and exits 1.
   Red when: the planted mail writer passes the census.
 - **AC4** — When the same probe runs over the shipped `tools/unattended/unattended.sh` after
   KICK-dKeptSession-5 lands, it prints nothing, and `write_mail_ref` carries no push of its own.
   Red when: the shipped mail writer is flagged, or pushes around `write_gov_ref`.
-- **AC5** — When clone B posts a message and clone A then runs `unattended.sh --mail read fy`, A's feed
-  gains one line for B's commit, `kind` `mail`.
+- **AC5** — When clone B's `fy` posts a `question` to `build:fx` and clone A then runs
+  `unattended.sh --mail read fx`, A's feed gains one line for B's commit, its `ref` under
+  `refs/gov/mail/fy/` and `kind` `mail`.
   Red when: a fetched mail write is not sighted.
 
 ## 7. Gates
 
 `unattended kit gate` · `python resolver (behaviour + inline parity + idiom ban)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC5 · a landed post, a duplicate and a lost post, and a sighted foreign post, staged against a planted writer pushing around `write_gov_ref` · none
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC5 · a landed post, a duplicate and a lost post, and a sighted foreign post, staged against a planted writer pushing around `write_gov_ref` · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` rise by its counted assertions
 
 ## 8. Open questions
 
@@ -173,6 +185,14 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC5 · a landed p
   corrected to `refs/gov/remote/`, under which the walk names the mail ref. Narrowed: S2's census case
   and the `tools/lib/resolve-python.test.sh` arm are dropped, AC3 and AC4 reduced to direct probes of
   `scan_feed_writers`, and S4's blind spot restated from the census's own list.
+- rev-4 · 2026-11-21 · S1 · §4 · AC2 · AC3 · AC5 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief`: AC2's lost post is staged by a git shim
+  between the fetch and the push, since a planted tip the post's fetch reads is sighted and appends a
+  line; AC3 names the census's `<file>:<line>` and exit 1, as a scratch copy shows; AC5 posts from `fy`
+  to `build:fx` and reads `fx`, unit 5 AC4's shape; S1's cases post `question`, which unit 27's
+  `--interface` refusal never reaches; Files touched names the floor the cases raise and states
+  `symbols.json` does not move. Nothing narrowed: no landed unit since rev-3 touches the feed or the
+  driver.
 
 ## 10. Reuse audit
 

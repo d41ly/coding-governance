@@ -1,6 +1,6 @@
 # KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-51 KICK-dKeptSession-27 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-51 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
@@ -44,7 +45,8 @@ kind binds as itself. It builds one step after `KICK-dKeptSession-5` (order 17).
   record's file name to its Serves kind both ways (`tools/memory-tree/tree_lib.py#read_bindings`), so
   a `-mailbox-message-<n>.md` file serving another kind, and a `mailbox-message` record named
   otherwise, are each malformed with no code added. Satisfied by landed code and reduced to its
-  observation. Observed by AC2 and AC3.
+  observation; the Serves line `write_record` writes for the kind is `KICK-dKeptSession-5` AC11's
+  `typed-kinds` plant's to observe, so this unit's probes hand-write theirs. Observed by AC2 and AC3.
 - **S3** — id 32. The closed list. The `<kind>` bullet of `tools/memory-tree/HYGIENE.template.md`'s
   "Record bindings — how a record names its spec" section, and its dogfood copy `memory/HYGIENE.md`,
   name `mailbox-message` as a backticked kind with a half-line naming its fields, as each typed kind's
@@ -57,6 +59,7 @@ kind binds as itself. It builds one step after `KICK-dKeptSession-5` (order 17).
 - The tuple member and the factory row: `KICK-dKeptSession-5` S12 (F1).
 - The tuple, the factory, the Serves line and the file-name join themselves: PLAY-dOrderedCharter-42
   and -7, landed.
+- No kit version: the lander mints the memory-tree kit's (`tools/push-main.sh@78f40c3c2475:27`).
 - A bindings fixture case of its own: the factory's `typed-kinds` plant already writes and binds one
   record of every kind of the tuple, and `gen_build_index.py`'s selftest holds the mis-served typed
   record case, so a mailbox case would gate an instance of a class those arms hold.
@@ -130,11 +133,18 @@ None: no mailbox-message record exists before `KICK-dKeptSession-5`.
   == set(tree_lib.TYPED_RECORD_KINDS))"` runs after `KICK-dKeptSession-5` lands, it prints `True True`,
   the import of `build_records` itself exiting 0 being the factory's own refusal not firing.
   Red when: the factory row exists and the tuple lacks the kind, so the import refuses.
-- **AC2** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over a scratch
-  build holding `KICK-dKeptSession-5` AC6's record, it binds that record with kind `mailbox-message`.
-  Red when: the record serves `journal` and reads malformed.
-- **AC3** — When the same scratch build holds a `-mailbox-message-2.md` record serving `journal`, the
-  probe names it malformed with the file-name reason.
+The probe for AC2 and AC3 is a scratch git repository under `%TEMP%` holding a copy of this tree's
+`.memory-tree.conf` and the records below under `memory/builds/fx/build/`, staged with `git add -A`,
+and `python <this checkout>/tools/memory-tree/gen_build_index.py --print-bindings` run in it, which
+reads the staged files and this checkout's `TYPED_RECORD_KINDS`; exit 0.
+
+- **AC2** — When the scratch repository holds `2026-11-21-build-KICK-fx-1-mailbox-message-1.md`
+  carrying `**Serves:** mailbox-message KICK-fx-1`, the probe prints an `S` row for it whose kind
+  field is `mailbox-message`.
+  Red when: the record reads as an `A` row, as it does before `KICK-dKeptSession-5` adds the member.
+- **AC3** — When it also holds `2026-11-21-build-KICK-fx-1-mailbox-message-2.md` carrying
+  `**Serves:** journal KICK-fx-1`, the probe prints an `A` row for that record naming it as a
+  `mailbox-message` record whose Serves kind is `journal`.
   Red when: a mis-served mailbox record binds.
 - **AC4** — When `grep -c 'mailbox-message' tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md`
   runs, each file prints at least `1`, the closed list's bullet naming it backticked, and
@@ -169,6 +179,13 @@ None: no mailbox-message record exists before `KICK-dKeptSession-5`.
   both reduced to observations; the old S4, unit 5's `journal` Serves line, dropped as already
   superseded by that unit's rev-8; the `gen_build_index.py` arm dropped for the landed class arms; S3
   replaces the list's count with a pointer to the tuple.
+- rev-4 · 2026-11-21 · S2 · §3 · AC2 · AC3 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-23-precheck-brief`: `--print-bindings` reads the repository
+  it runs in, its tracked and staged files, so AC2 and AC3 name the scratch repository, its conf and
+  hand-written records, and the `S` and `A` rows a probe over a planted `deviation` pair shows today;
+  unit 5 AC6's record is written inside a fixture that removes itself, so AC2 no longer names it; §3
+  states the lander mints the kit version. Nothing narrowed: no landed unit since rev-3 touches the
+  tuple, the factory or the guide.
 
 ## 10. Reuse audit
 
