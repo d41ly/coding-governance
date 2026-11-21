@@ -845,7 +845,13 @@ done
 # `<var>=${_rg_v%?}`, one `diff` line from the cut and one from its own mutant under the canary's `sed`,
 # must make `check_canary_keys` print exactly `<var>`, or the arm prints `the <var> byte check was not
 # seen red on its liveness variant (<reason>)`, reds, and leaves that key's compare uncounted. The
-# liveness loop gates those counts and adds none.
+# liveness loop gates those counts and adds none. Each variant runs through one function,
+# `check_key_variant`, called twice per pair (TOOL-dWitnessedBar-79 S1): the tail variant above, which
+# fails the count and the tail test at once, then the LENGTH VARIANT, `<var>=` its value less the
+# first byte, forty bytes still ending in CR, which fails the count alone, so a count comparison made
+# vacuous reds as `the length variant passed a value one byte short`. A key joins `rgf_seen` only
+# when both its variants were seen red. NOT CHECKED: a count compared with `-ge 41`, which still
+# rejects forty bytes and admits more than forty-one; neither variant reaches it.
 # The breaks staged against it (S3): the loop without its `_rg_v=${_rg_v%$'\r'}` line, and a `sha` case
 # keeping every repeated key, `rec_sha=${rec_sha:+$rec_sha$'\n'}$_rg_v`. In the cut's own subshell
 # the hook half grades `rec_fp`, the CR strip on a second key, behind the same canary: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
@@ -869,6 +875,26 @@ check_canary_keys() {   # file · record -> prints, one per line, each CANARY_KE
   for _ck_p in "${CANARY_KEYS[@]}"; do
     check_cr_reached "$1" "$2" "${_ck_p#*:}" || printf '%s\n' "${_ck_p#*:}"
   done
+}
+# <key>:<var> · replacement · label · passed reason · other lead -> 0 silent when the variant, the cut
+# `rgf_fn` with its `<key>)` assignment set to the replacement, was seen red over `rgf_rec`; else
+# prints one reason and returns 1. Writes its variant and mutant under `rgf_t`.
+check_key_variant() {
+  local _kv_k=${1%%:*} _kv_v=${1#*:} _kv_n _kv_mn _kv_got _kv_g _kv_has=0 _kv_oth=
+  printf '%s\n' "$rgf_fn" | sed 's/\('"$_kv_k) $_kv_v"'=\)\$_rg_v/\1'"$2"'/' > "$rgf_t/cut-var.sh"
+  _kv_n=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
+  sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
+  _kv_mn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
+  _kv_got=$(check_canary_keys "$rgf_t/cut-var-mut.sh" "$rgf_rec")
+  for _kv_g in $_kv_got; do
+    if [ "$_kv_g" = "$_kv_v" ]; then _kv_has=1; else _kv_oth=${_kv_oth:+$_kv_oth }$_kv_g; fi
+  done
+  if [ "$_kv_n" != 1 ]; then printf '%s\n' "${3}variant changed $_kv_n lines"
+  elif [ "$_kv_mn" != 1 ]; then printf '%s\n' "${3}mutant changed $_kv_mn lines"
+  elif [ "$_kv_has" != 1 ]; then printf '%s\n' "$4"
+  elif [ -n "$_kv_oth" ]; then printf '%s\n' "$5 $_kv_oth whose CR arrived"
+  else return 0; fi
+  return 1
 }
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 rgf_c=cccccccccccccccccccccccccccccccccccccccc
@@ -914,24 +940,19 @@ done
 # The liveness variants (TOOL-dWitnessedBar-74 S2, TOOL-dWitnessedBar-76 S3): one per CANARY_KEYS
 # pair, its own key's value losing its CR after the read; `check_canary_keys` on its mutant must print
 # exactly that key's variable. `rgf_seen` lists the variables seen red, and only those compares count.
+# The tail variant's call, then the length variant's (TOOL-dWitnessedBar-79 S1): each failed call's
+# reason prints one line, and a key with any joins no `rgf_seen`.
 rgf_seen=
 for rgf_kp in "${CANARY_KEYS[@]}"; do
-  rgf_k=${rgf_kp%%:*}; rgf_kv=${rgf_kp#*:}; rgf_why=; rgf_has=0; rgf_oth=
-  printf '%s\n' "$rgf_fn" | sed 's/\('"$rgf_k) $rgf_kv"'=\)\$_rg_v/\1${_rg_v%?}/' > "$rgf_t/cut-var.sh"
-  rgf_vn=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
-  sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
-  rgf_vmn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
-  rgf_got=$(check_canary_keys "$rgf_t/cut-var-mut.sh" "$rgf_rec")
-  for rgf_g in $rgf_got; do
-    if [ "$rgf_g" = "$rgf_kv" ]; then rgf_has=1; else rgf_oth=${rgf_oth:+$rgf_oth }$rgf_g; fi
+  rgf_kv=${rgf_kp#*:}; rgf_whys=()
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}' '' 'it passed a value that lost its CR' 'it named') \
+    || rgf_whys+=("$rgf_why")
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'it named') \
+    || rgf_whys+=("$rgf_why")
+  for rgf_why in "${rgf_whys[@]}"; do
+    echo "gov-canary: the $rgf_kv byte check was not seen red on its liveness variant ($rgf_why)"; fail=1
   done
-  if [ "$rgf_vn" != 1 ]; then rgf_why="variant changed $rgf_vn lines"
-  elif [ "$rgf_vmn" != 1 ]; then rgf_why="mutant changed $rgf_vmn lines"
-  elif [ "$rgf_has" != 1 ]; then rgf_why="it passed a value that lost its CR"
-  elif [ -n "$rgf_oth" ]; then rgf_why="it named $rgf_oth whose CR arrived"
-  else rgf_seen="$rgf_seen $rgf_kv"; fi
-  [ -z "$rgf_why" ] \
-    || { echo "gov-canary: the $rgf_kv byte check was not seen red on its liveness variant ($rgf_why)"; fail=1; }
+  [ "${#rgf_whys[@]}" = 0 ] && rgf_seen="$rgf_seen $rgf_kv"
 done
 [ "$rgf_ok" = 1 ] && case "$rgf_seen " in *" rec_sha "*) a=$((a+1)) ;; esac
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
