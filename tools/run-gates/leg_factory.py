@@ -67,6 +67,9 @@ SAY = "leg-factory"
 # `purpose := at most 60 characters` (TOOL-dWitnessedBar-19 S2, §8 F3), CHARACTERS and never bytes.
 # Moved whole from govkit (TOOL-dWitnessedBar-11 §8 F8): read by the `purpose` arm and by `new`.
 PURPOSE_MAX_CHARS = 60
+# A count inside a leg name's parentheses, read by the `name` arm and by `new`: a run of digits standing
+# alone, so `(3 arms)` is one and the `8` of `UTF-8` or of `py3` is no count (merge red-fix).
+COUNT_IN_PARENS = re.compile(r"\([^)]*(?<![\w-])\d+(?![\w-])[^)]*\)")
 # Sibling kits' directory names, spelled once so no literal kit path ships (the install-prefix ban).
 GOVKIT_HOME = "govkit"  # the deployer kit's directory name, as the policy kit's DEPLOYER_HOME spells it
 PLAYBOOK_HOME = "playbook"
@@ -436,7 +439,7 @@ def check_declarations(decls, rows):
         if dc["kind"] == "exempt" and not str(dc["why"] or "").strip():
             found.append(("exempt reason", nm, f"[[exempt_leg]] {nm!r} carries an empty why: an exemption "
                                                f"without a reason is an omission wearing a label"))
-        if re.search(r"\([^)]*\d[^)]*\)", nm):
+        if COUNT_IN_PARENS.search(nm):
             found.append(("name", nm, f"leg {nm!r} carries a digit-bearing parenthetical: a count in a "
                                       f"leg name goes stale where nobody is reading"))
         for side, src in (("its row", dc["base"]), ("[gate_leg.gov]", dc["gov"])):
@@ -653,7 +656,7 @@ def run_new(root, a):
     tool_rel, _mem = read_layout(root, G)
     bad = []
     nm = a.name
-    if not nm or re.search(r"\([^)]*\d[^)]*\)", nm):
+    if not nm or COUNT_IN_PARENS.search(nm):
         bad.append(f"name {nm!r} is empty or carries a digit-bearing parenthetical")
     if any(d["name"] == nm for d in decls):
         bad.append(f"leg {nm!r} is declared already")
@@ -891,8 +894,10 @@ def run_selftest():
         ("held guard: a guard and a reason", lambda t: write_planted(
             t, be, 'argv = ["bash", "{kit}/beta.test.sh"]\n', 'argv = ["bash", "{kit}/beta.test.sh"]\nguard = ["{kit}/"]\n'),
          run_conform, 1, ("held guard ·", "'beta selftest'", "a guard in every form and an unguarded_why"), ()),
-        ("held guard, control: a guard alone is silent", lambda t: write_planted(
+        # The plant re-renders after its edit, so the freshness half of --conform reads the planted row.
+        ("held guard, control: a guard alone is silent", lambda t: (write_planted(
             t, be, 'unguarded_why = "a fixture suite with no path to guard"\n', 'guard = ["{kit}/"]\n'),
+            run_write(t)),
          run_conform, 0, ("1 held · 0 unguarded",), ("held guard ·",)),
         ("control: --check is green on the fresh render", None, run_check, 0, ("fresh · 4 legs",), ()),
         ("AC1 fresh: a manifest row hand-edited", lambda t: write_manifest_edit(
@@ -911,8 +916,10 @@ def run_selftest():
          run_check, 1, ("'alpha check' changed: stage",), ()),
         ("fresh, run f: a tag", lambda t: write_planted(t, al, '"leg.alpha.alpha-check"', '"leg.alpha.drifted"'),
          run_check, 1, ("'alpha check' changed: tag",), ()),
-        ("fresh, run g: tests and enforces", lambda t: write_planted(
-            t, al, 'tests = ["feature.alpha"]\n', 'tests = ["feature.drifted"]\nenforces = ["principle.p1"]\n'),
+        # alpha declares `enforces` already, so the plant moves that line rather than adding a second.
+        ("fresh, run g: tests and enforces", lambda t: (write_planted(
+            t, al, 'tests = ["feature.alpha"]\n', 'tests = ["feature.drifted"]\n'), write_planted(
+            t, al, 'enforces = ["practice.verify"]\n', 'enforces = ["principle.p1"]\n')),
          run_check, 1, ("'alpha check' changed: enforces, tests",), ()),
         ("fresh, run i2: a drifted purpose", lambda t: write_planted(t, al, pu_a, 'purpose = "drifted"'),
          run_check, 1, ("'alpha check' changed: purpose",), ()),
@@ -947,6 +954,10 @@ def run_selftest():
         ("name: a digit-bearing parenthetical", lambda t: write_planted(
             t, be, 'name = "beta selftest"', 'name = "beta selftest (3 arms)"'), run_conform, 1,
          ("name ·", "'beta selftest (3 arms)'", "digit-bearing"), ()),
+        ("name, near miss: a digit inside a word is no count", lambda t: (write_planted(
+            t, be, 'name = "beta selftest"', 'name = "beta selftest (as UTF-8)"'), run_write(t)),
+         run_conform, 0, ("conform · green",),
+         ("digit-bearing",)),
         ("purpose, run h1: 61 characters", lambda t: write_planted(t, al, pu_a, f'purpose = "{"x" * 61}"'),
          run_conform, 1, ("purpose ·", "'alpha check'", "61 characters"), ()),
         ("purpose, run h2: two legs sharing one", lambda t: write_planted(
@@ -954,8 +965,8 @@ def run_selftest():
          ("purpose ·", "'alpha check'", "'beta selftest'", "share the purpose"), ()),
         ("purpose presence: a declaration with no purpose", lambda t: write_planted(t, al, pu_a + "\n", ""),
          run_conform, 1, ("purpose presence ·", "'alpha check'", "carries no purpose"), ()),
-        ("purpose, run i1: 60 characters, one multibyte, is silent", lambda t: write_planted(
-            t, al, pu_a, f'purpose = "{"é" + "x" * 59}"'), run_conform, 0, ("conform · green",),
+        ("purpose, run i1: 60 characters, one multibyte, is silent", lambda t: (write_planted(
+            t, al, pu_a, f'purpose = "{"é" + "x" * 59}"'), run_write(t)), run_conform, 0, ("conform · green",),
          ("purpose ·",)),
         ("token: a {gate_file} with no gov override", lambda t: write_planted(
             t, be, '"{kit}/beta.test.sh"]', '"{kit}/beta.test.sh", "{gate_file}"]'), run_conform, 1,
