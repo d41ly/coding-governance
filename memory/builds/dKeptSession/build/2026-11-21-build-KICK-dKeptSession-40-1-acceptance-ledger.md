@@ -19,27 +19,19 @@ omits the store, and green once restored; and AC4, whose render this pass does n
 beside its generator `policy.py`, so the landing's `regen.py --write` or the main loop renders it.
 
 **Evidences:** KICK-dKeptSession-40
-- AC1 — `grep -n "def derive_kit_rel\|def derive_catalogue_rel" policy.py` in `tools/policy/`
-  printed both definitions, and `derive_catalogue_rel`'s body is the one line `return
-  derive_kit_rel(CATALOGUE)`; `git rev-parse --show-prefix` is read in `policy.py` by
-  `derive_kit_rel` for a kit file, the two list readers taking a `kit` argument apart.
-- AC2 — the probe printed the helper's call `policy-mirror.js get hooks.bypass --explain` at L
-  exiting 0 with stdout `allowed` and the stderr line `policy: hooks.bypass · preset · mirror stale
-  at <L8>; preset strict at <L8>, upstream/main, the landed revision`, and `arm_mirror_landed`
-  reading 0 finding(s) over the 3 key(s) the policy file sets (DERIVED, that probe: `preset`,
-  `policy-file.on-invalid` and `runtime.agents-in-flight`); 3 assertions, 0 wrong (DERIVED, that
-  probe).
-- AC2, red side — the same probe with `policy.derive_mirror_inputs` replaced in process by one
-  answering `LEGACY_INPUTS` alone: the mirror read FRESH and the helper answered `refused`, strict's
-  value at L, with no `mirror stale at`; 3 assertions, 1 wrong (DERIVED, that probe). The copy's own
-  `policy.py` is gov's file, so AC3's red needs the arm's staged break and is owed.
-- AC3 — in that case's repository the copy's `policy.py mirror --print` exited 0, its
-  `legacy_blobs` naming `.agent-cap.conf`, `.governance/instructions.toml` and
-  `tools/policy/presets.toml` (DERIVED, that probe).
-- AC4, owed — `python tools/policy/policy.py mirror --print` in gov's checkout records
-  `tools/policy/presets.toml` under `legacy_blobs` beside the two legacy inputs, and `mirror
-  --check` exits 1 naming `legacy_blobs` (DERIVED, that probe at 40c5217f): gov's committed mirror
-  predates the input until it is rendered, which this pass does not write.
-- AC5 — `grep -n "legacy_blobs" policy.md` in `help/` printed the guard section's one line, which
-  names the policy kit's `presets.toml` and opens the list of its three inputs, the fanout conf and
-  the instruction overlay following.
+- AC1 — `grep -n "def derive_kit_rel\|def derive_catalogue_rel" policy.py` in `tools/policy/` printed both definitions, and `derive_catalogue_rel`'s body is the one line `return derive_kit_rel(CATALOGUE)`.
+  `git rev-parse --show-prefix` is read in `policy.py` by `derive_kit_rel` for a kit file, the two
+  list readers that take a `kit` argument apart.
+- AC2 — `policy-mirror.js get hooks.bypass --explain` at L exited 0 printing `allowed`, its stderr line `policy: hooks.bypass · preset · mirror stale at <L8>; preset strict at <L8>, upstream/main, the landed revision`, and `arm_mirror_landed` found nothing.
+  That closing arm read 0 finding(s) over the 3 key(s) the policy file sets (DERIVED, that probe:
+  `preset`, `policy-file.on-invalid` and `runtime.agents-in-flight`); the case returned 3
+  assertions, 0 wrong (DERIVED, that probe).
+- AC2, red side — with `policy.derive_mirror_inputs` replaced in process by one answering `LEGACY_INPUTS` alone, the mirror read FRESH and the helper answered `refused`.
+  That is strict's value at L, with no `mirror stale at`; 3 assertions, 1 wrong (DERIVED, that
+  probe). The copy's own `policy.py` is gov's file, so AC3's red needs the arm's staged break and is
+  owed.
+- AC3 — in that case's repository the copy's `policy.py mirror --print` exited 0, its `legacy_blobs` naming `.agent-cap.conf`, `.governance/instructions.toml` and `tools/policy/presets.toml` (DERIVED, that probe).
+- AC4, owed — `python tools/policy/policy.py mirror --print` in gov's checkout records `tools/policy/presets.toml` under `legacy_blobs`, and `python tools/policy/policy.py mirror --check` exits 1 naming `legacy_blobs` (DERIVED, that probe at 40c5217f).
+  gov's committed mirror predates the input until it is rendered, which this pass does not write.
+- AC5 — `grep -n "legacy_blobs" policy.md` in `help/` printed the guard section's one line, which names the policy kit's `presets.toml` and opens the list of its three inputs.
+  The fanout conf and the instruction overlay follow it in that list.
