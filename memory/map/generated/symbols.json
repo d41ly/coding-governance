@@ -32713,6 +32713,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "run_scaffold_preset",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_scenario_plant",
       "kind": "function",
       "file": "tools/loop/scenario.py"
