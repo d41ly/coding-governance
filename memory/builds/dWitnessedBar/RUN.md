@@ -684,3 +684,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T02:46:57Z dispatch · item 7378b97c TOOL-dWitnessedBar-71 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-21T03:07:32Z brief · item TOOL-dWitnessedBar-72 · reason 1d93c709f34c memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-72-build-brief.md
+
+2026-11-21T03:09:39Z dispatch · item 001ee47f TOOL-dWitnessedBar-72 · reason memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-67-1-acceptance-ledger.md memory/project/shell-role.txt tools/run-gates/run-gates.gov.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-72-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-72.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T03:13:41Z draw · re-dispatch · TOOL-dWitnessedBar-72 · 118/180 · 20261121T031341Z-30d379
+
+2026-11-21T03:13:41Z dispatch · item 001ee47f TOOL-dWitnessedBar-72 · reason memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-72-widen-14.md

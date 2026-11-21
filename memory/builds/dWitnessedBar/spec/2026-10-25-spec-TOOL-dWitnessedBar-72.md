@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-72 — the `fingerprint` CRLF line's strip is proven reachable by the same canary, so unit 67's `rec_fp` break can turn red on Windows
 
-**Status:** INPROGRESS · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-4 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-68-round7-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-68-round7-fix-return.md) | research | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-73 |
 | [2026-10-25-build-TOOL-dWitnessedBar-72-deviation-721.md](../build/2026-10-25-build-TOOL-dWitnessedBar-72-deviation-721.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-72-deviation-722.md](../build/2026-10-25-build-TOOL-dWitnessedBar-72-deviation-722.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-72-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-72-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-72-widen-14.md](../build/2026-11-21-build-TOOL-dWitnessedBar-72-widen-14.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-68-round7-fix-brief.md) | research | TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-73 |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-72-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-72-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-72-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-72-reground-brief.md) | journal | — |

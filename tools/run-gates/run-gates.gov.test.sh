@@ -828,12 +828,13 @@ done
 # `sha`, CR stripped, and `read_tag_lines` reads `GREEN`. The hook half grades `rec_sha`, the variable
 # each staged break reaches, counted only behind the CR-REACH CANARY (TOOL-dWitnessedBar-70 S1, S2): a
 # mutant of the cut, its `%$'\r'}` strip deleted by `sed`, must differ from the cut in exactly one `diff`
-# line and, sourced in a subshell over this record, read `rec_sha` as forty-one bytes ending in CR, so
-# the planted CR is proved to reach `read_green_file` before the strip is graded. A failed canary prints
-# its line, reds, and leaves the `rec_sha` compare uncounted, which still runs and prints its own line.
+# line and, sourced in a subshell over this record, read `rec_sha` and `rec_fp` each as forty-one bytes
+# ending in CR (TOOL-dWitnessedBar-72 S1), so the planted CR is proved to reach `read_green_file` on both
+# keys before either strip is graded. A failed canary prints its line, reds, and leaves the `rec_sha`
+# and `rec_fp` compares uncounted, each of which still runs and prints its own line.
 # The breaks staged against it (S3): the loop without its `_rg_v=${_rg_v%$'\r'}` line, and a `sha` case
 # keeping every repeated key, `rec_sha=${rec_sha:+$rec_sha$'\n'}$_rg_v`. In the cut's own subshell
-# the hook half grades `rec_fp`, the CR strip on a second key, uncanaried: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
+# the hook half grades `rec_fp`, the CR strip on a second key, behind the same canary: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
 # (TOOL-dWitnessedBar-67 S2); the backends read no `fingerprint`, so that line moves no local-hook state.
 # `read --backend local-hook` over the same fixture prints GREEN only where the verdict's CR is
 # stripped and the last `reused_cache` wins; a reader keeping the first reads NONE (S3).
@@ -871,15 +872,16 @@ rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^
 # empty string, so `*$'\r'` there matched every value.
 rgf_crb=$'\r'
 rgf_mr=$( LC_ALL=C; eval "$rgf_mut"; read_green_file "$rgf_rec"
-  case "$rec_sha" in *"$rgf_crb") printf '%s cr' "${#rec_sha}" ;; *) printf '%s' "${#rec_sha}" ;; esac )
+  case "$rec_sha" in *"$rgf_crb") printf '%s cr' "${#rec_sha}" ;; *) printf '%s' "${#rec_sha}" ;; esac
+  case "$rec_fp" in *"$rgf_crb") printf ' %s cr' "${#rec_fp}" ;; *) printf ' %s' "${#rec_fp}" ;; esac )
 rgf_ok=0
-[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && [ "$rgf_mr" = "41 cr" ] && rgf_ok=1
+[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && [ "$rgf_mr" = "41 cr 41 cr" ] && rgf_ok=1
 [ "$rgf_ok" = 1 ] \
   || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s); the CR-strip assertion is not counted"; fail=1; }
 [ "$rgf_ok" = 1 ] && a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
-a=$((a+1))
+[ "$rgf_ok" = 1 ] && a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_fp" = "$rgf_c" ] \
   || { rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_fp to '${rgf_fp//$'\r'/$rgf_cr}' over a CR-ended fingerprint line, not forty c with its CR stripped, or did not cut from the hook"; fail=1; }
 rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
