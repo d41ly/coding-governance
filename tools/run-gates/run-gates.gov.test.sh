@@ -842,12 +842,13 @@ done
 # variable whose CR did not arrive; no line outside `check_cr_reached`'s body measures either
 # variable's bytes (TOOL-dWitnessedBar-74 S1, TOOL-dWitnessedBar-76 S1, S2). Each is seen red on every
 # run (TOOL-dWitnessedBar-76 S3): per pair, a variant of the cut whose `<key>)` case reads
-# `<var>=${_rg_v%?}`, one `diff` line from the cut and one from its own mutant under the canary's `sed`,
+# `<var>=${_rg_v%?}x`, one `diff` line from the cut and one from its own mutant under the canary's `sed`,
 # must make `check_canary_keys` print exactly `<var>`, or the arm prints `the <var> byte check was not
 # seen red on its liveness variant (<reason>)`, reds, and leaves that key's compare uncounted. The
 # liveness loop gates those counts and adds none. Each variant runs through one function,
-# `check_key_variant`, called twice per pair (TOOL-dWitnessedBar-79 S1): the tail variant above, which
-# fails the count and the tail test at once, then the LENGTH VARIANT, `<var>=` its value less the
+# `check_key_variant`, called twice per pair (TOOL-dWitnessedBar-79 S1): the TAIL VARIANT above,
+# forty-one bytes ending in `x`, which fails the tail test alone and reds as `the tail variant passed
+# a value whose last byte is not CR` (TOOL-dWitnessedBar-80 S1, S3), then the LENGTH VARIANT, `<var>=` its value less the
 # first byte, forty bytes still ending in CR, which fails the count alone, so a count comparison made
 # vacuous reds as `the length variant passed a value one byte short`. A key joins `rgf_seen` only
 # when both its variants were seen red. NOT CHECKED: a count compared with `-ge 41`, which still
@@ -945,7 +946,7 @@ done
 rgf_seen=
 for rgf_kp in "${CANARY_KEYS[@]}"; do
   rgf_kv=${rgf_kp#*:}; rgf_whys=()
-  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}' '' 'it passed a value that lost its CR' 'it named') \
+  rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v%?}x' 'tail ' 'the tail variant passed a value whose last byte is not CR' 'it named') \
     || rgf_whys+=("$rgf_why")
   rgf_why=$(check_key_variant "$rgf_kp" '${_rg_v:1}' 'length ' 'the length variant passed a value one byte short' 'it named') \
     || rgf_whys+=("$rgf_why")
