@@ -175,9 +175,9 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-75 — the CR-reach canary's failure line names the check that failed, so a red at its line count cannot pass for a red at its byte check](spec/2026-10-25-spec-TOOL-dWitnessedBar-75.md) | 40 | 2 | CLOSED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-73 — the round-1 audit of units 66 and 67, its 23 minors batched: fixtures, populations, the hook guard, every key and filesystem call exercised, predicates and records](spec/2026-10-25-spec-TOOL-dWitnessedBar-73.md) | 41 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [TOOL-dWitnessedBar-76 — the canary's `rec_fp` byte check is seen red on every run, against a variant whose `fingerprint` value alone loses its CR](spec/2026-10-25-spec-TOOL-dWitnessedBar-76.md) | 41 | 2 | CLOSED | rev-4 | 2026-11-21 |
-| [TOOL-dWitnessedBar-77 — the canary's failure line names `rec_fp` when the `fingerprint` CR did not arrive, and unit 72's red is recorded with that line](spec/2026-10-25-spec-TOOL-dWitnessedBar-77.md) | 41 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-79 — the canary's liveness loop gains a length variant, so a vacuous or off-by-one byte count is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md) | 41 | 2 | DEFERRED | rev-2 | 2026-10-25 |
-| [TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md) | 41 | 2 | DEFERRED | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-77 — the canary prints its failure line once per variable whose CR did not arrive, and unit 72's red is recorded with the `for rec_fp` line](spec/2026-10-25-spec-TOOL-dWitnessedBar-77.md) | 41 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [TOOL-dWitnessedBar-79 — the canary's liveness loop gains a length variant, so a vacuous or off-by-one byte count is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md) | 41 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-81 — the byte check's staged reds are one break per condition, each recorded with the line it printed, so units 74 and 76 close on a red that happened](spec/2026-10-25-spec-TOOL-dWitnessedBar-81.md) | 41 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed](spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md) | 42 | 2 | DEFERRED | rev-4 | 2026-10-25 |
 | [TOOL-dWitnessedBar-87 — unit 76 AC2's own break, a canary that skips `rec_fp`, is staged after unit 80 and recorded with the two lines it now prints](spec/2026-10-25-spec-TOOL-dWitnessedBar-87.md) | 42 | 2 | DEFERRED | rev-4 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 818 bound to this build, across 4 record folder(s).
+Records: 824 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
