@@ -97,22 +97,22 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | DEFERRED | rev-4 | 2026-11-05 |
-| [KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts](spec/2026-10-26-spec-KICK-dKeptSession-19.md) | 2 | 2 | DEFERRED | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-33 — the preset store's rule for the derived-default rows: unassigned where v2 restates the default, literal where a preset differs](spec/2026-10-26-spec-KICK-dKeptSession-33.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-2 — the preset step in dGroundRules' reader](spec/2026-10-26-spec-KICK-dKeptSession-2.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-3 — the charter's preset section: the posture and only the keys that differ](spec/2026-10-26-spec-KICK-dKeptSession-3.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-34 — the reader's preset step answers None for a row the preset leaves unassigned, so a derived default reads with source default under every preset](spec/2026-10-26-spec-KICK-dKeptSession-34.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale](spec/2026-10-26-spec-KICK-dKeptSession-40.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file](spec/2026-10-26-spec-KICK-dKeptSession-4.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-05 |
-| [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts](spec/2026-10-26-spec-KICK-dKeptSession-19.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-21 |
+| [KICK-dKeptSession-33 — the preset store's rule for the derived-default rows: unassigned where v2 restates the default, literal where a preset differs](spec/2026-10-26-spec-KICK-dKeptSession-33.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-2 — the preset step in dGroundRules' reader](spec/2026-10-26-spec-KICK-dKeptSession-2.md) | 3 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-3 — the charter's preset section: the posture and only the keys that differ](spec/2026-10-26-spec-KICK-dKeptSession-3.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-34 — the reader's preset step answers None for a row the preset leaves unassigned, so a derived default reads with source default under every preset](spec/2026-10-26-spec-KICK-dKeptSession-34.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale](spec/2026-10-26-spec-KICK-dKeptSession-40.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file](spec/2026-10-26-spec-KICK-dKeptSession-4.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -163,18 +163,18 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 146 bound to this build, across 4 record folder(s).
+Records: 156 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-dKeptSession-65.
 
 Ids whose spec moved past its audited revision: KICK-dKeptSession-1@rev-1 KICK-dKeptSession-10@rev-1 KICK-dKeptSession-11@rev-1 KICK-dKeptSession-12@rev-1 KICK-dKeptSession-13@rev-1 KICK-dKeptSession-14@rev-1 KICK-dKeptSession-16@rev-1 KICK-dKeptSession-17@rev-1 KICK-dKeptSession-18@rev-1
-KICK-dKeptSession-2@rev-1 KICK-dKeptSession-20@rev-1 KICK-dKeptSession-21@rev-1 KICK-dKeptSession-22@rev-1 KICK-dKeptSession-23@rev-1 KICK-dKeptSession-25@rev-1 KICK-dKeptSession-27@rev-1 KICK-dKeptSession-28@rev-1 KICK-dKeptSession-3@rev-1 KICK-dKeptSession-30@rev-1 KICK-dKeptSession-31@rev-1
-KICK-dKeptSession-32@rev-1 KICK-dKeptSession-33@rev-1 KICK-dKeptSession-34@rev-1 KICK-dKeptSession-35@rev-1 KICK-dKeptSession-36@rev-1 KICK-dKeptSession-37@rev-1 KICK-dKeptSession-38@rev-1 KICK-dKeptSession-39@rev-1 KICK-dKeptSession-4@rev-1 KICK-dKeptSession-40@rev-1 KICK-dKeptSession-41@rev-1
-KICK-dKeptSession-42@rev-1 KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-45@rev-1 KICK-dKeptSession-46@rev-1 KICK-dKeptSession-47@rev-1 KICK-dKeptSession-48@rev-1 KICK-dKeptSession-49@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-50@rev-1 KICK-dKeptSession-52@rev-1
-KICK-dKeptSession-53@rev-1 KICK-dKeptSession-54@rev-1 KICK-dKeptSession-55@rev-1 KICK-dKeptSession-56@rev-1 KICK-dKeptSession-57@rev-1 KICK-dKeptSession-58@rev-1 KICK-dKeptSession-59@rev-1 KICK-dKeptSession-60@rev-1 KICK-dKeptSession-61@rev-1 KICK-dKeptSession-62@rev-1 KICK-dKeptSession-63@rev-1
-KICK-dKeptSession-64@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
+KICK-dKeptSession-19@rev-1 KICK-dKeptSession-2@rev-1 KICK-dKeptSession-20@rev-1 KICK-dKeptSession-21@rev-1 KICK-dKeptSession-22@rev-1 KICK-dKeptSession-23@rev-1 KICK-dKeptSession-25@rev-1 KICK-dKeptSession-27@rev-1 KICK-dKeptSession-28@rev-1 KICK-dKeptSession-3@rev-1 KICK-dKeptSession-30@rev-1
+KICK-dKeptSession-31@rev-1 KICK-dKeptSession-32@rev-1 KICK-dKeptSession-33@rev-1 KICK-dKeptSession-34@rev-1 KICK-dKeptSession-35@rev-1 KICK-dKeptSession-36@rev-1 KICK-dKeptSession-37@rev-1 KICK-dKeptSession-38@rev-1 KICK-dKeptSession-39@rev-1 KICK-dKeptSession-4@rev-1 KICK-dKeptSession-40@rev-1
+KICK-dKeptSession-41@rev-1 KICK-dKeptSession-42@rev-1 KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-45@rev-1 KICK-dKeptSession-46@rev-1 KICK-dKeptSession-47@rev-1 KICK-dKeptSession-48@rev-1 KICK-dKeptSession-49@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-50@rev-1
+KICK-dKeptSession-52@rev-1 KICK-dKeptSession-53@rev-1 KICK-dKeptSession-54@rev-1 KICK-dKeptSession-55@rev-1 KICK-dKeptSession-56@rev-1 KICK-dKeptSession-57@rev-1 KICK-dKeptSession-58@rev-1 KICK-dKeptSession-59@rev-1 KICK-dKeptSession-60@rev-1 KICK-dKeptSession-61@rev-1 KICK-dKeptSession-62@rev-1
+KICK-dKeptSession-63@rev-1 KICK-dKeptSession-64@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-32-deviation-321.md](../build/2026-10-26-build-KICK-dKeptSession-32-deviation-321.md) | deviation | — |
+| [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
+| [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -35,20 +38,29 @@ builds one step after it (order 6).
   no value, by `KICK-dKeptSession-33`'s rule: the store's `never` keys and the rows it leaves
   unassigned. A row the preset assigns is written as one comment line instead, `# <key> = <value>
   (preset <name>)`, so the file still shows the posture it starts from. Observed by AC1 and AC2.
-- **S2** — id 1. The one caller. `cmd_scaffold` passes the `--preset` value `KICK-dKeptSession-4`
-  S2 adds; `render_scaffold` takes no default for `preset`, so a call naming none is a `TypeError`
-  at the fixture rather than a silent standard scaffold. Observed by AC3.
-- **S3** — id 1. The fixture case `scaffold-preset` in `tools/policy/check_policy.py`: per shipped
-  preset, one scratch repository scaffolded with `--preset <name>`, then `policy.py get` over every
-  key the preset assigns and `policy.py preset --diff` (`KICK-dKeptSession-3` S1). Observed by AC1,
-  AC2.
+- **S2** — id 1. The verb. `main`'s `scaffold` branch in `tools/policy/policy.py`, which
+  `KICK-dKeptSession-4` S2 extends to `scaffold --preset <name>`, passes that name;
+  `render_scaffold` takes no default for `preset`, so a call naming none raises `TypeError` rather
+  than rendering a silent standard scaffold. Observed by AC3.
+- **S3** — id 1. The fixture case `scaffold-preset` in `tools/policy/check_policy.py`, one row of
+  `CASES`: per shipped preset, one scratch repository scaffolded with `--preset <name>`, then
+  `policy.py get` over every key the preset assigns and `policy.py preset --diff`
+  (`KICK-dKeptSession-3` S1). Observed by AC1 and AC2.
 - **S4** — id 1. `KICK-dKeptSession-4` S2's "above dGroundRules' tables" is superseded by name here:
   the tables hold only the rows S1 writes. Its AC3 is answered in that unit's acceptance ledger with
   AC1's output. Observed by AC1.
+- **S5** — id 1. The kit's own calls. Each call of `render_scaffold` in
+  `tools/policy/check_policy.py`, in `run_fresh_target`, `run_arms_empty_target`,
+  `run_mirror_absent_adopter` and `build_repo`, passes `"standard"`, so the fixture keeps rendering a
+  scaffold once S2 takes the default away; each key count a case takes is re-derived from the render
+  it reads, as `run_fresh_target` and `run_arms_empty_target` already derive theirs. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
 - The intake answer, the token and the kept-file line: `KICK-dKeptSession-4`'s, unchanged.
+- A `scaffold` run naming no `--preset`, which `tools/govkit/selftest.py#check_fanout_step` and
+  `tools/govkit/steps/kickoff_facts_to_overlay.py#build_fact_fixture` make today:
+  `KICK-dKeptSession-4`'s verb answers it before `render_scaffold` is called.
 - The wrapper's error path: the refusal `adopt-policy.sh` swallows is id 20, item M11, batched into
   `KICK-dKeptSession-44`.
 - Which rows a preset leaves unassigned: `KICK-dKeptSession-33`'s rule, read here.
@@ -57,7 +69,7 @@ builds one step after it (order 6).
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-4` — `render_scaffold`'s preset argument and `cmd_scaffold`'s `--preset`, whose written rows this unit narrows (id 1)
+- **consumes-from** `KICK-dKeptSession-4` — `render_scaffold`'s preset argument and the `scaffold --preset` verb, whose written rows this unit narrows (id 1)
 - **consumes-from** `KICK-dKeptSession-33` — the store's rule for which rows a preset assigns, which decides the rows S1 leaves out
 - **consumes-from** `KICK-dKeptSession-2` — `read_preset_value`, without which a left-out row reads its default and not the preset
 - **consumes-from** `KICK-dKeptSession-3` — `policy.py preset --diff`, whose `- no key differs` line AC2 observes
@@ -67,12 +79,23 @@ builds one step after it (order 6).
 
 ### Evidence
 
-- `render_scaffold(rows)` writes each row whose `owner` is `SCAFFOLD_OWNER` and whose default is not
-  derived (`git show 3c8c4718a:tools/policy/policy.py`, lines 1313-1324; `SCAFFOLD_OWNER` at :98).
-- At `3c8c4718a` those rows include `budgets.enforce` with default `warn` (catalogue row read with
-  `tomllib`, 2026-10-26), and v2's table sets it `refuse` under strict (v2:1669).
-- v2's never list holds `policy-file.on-invalid`, `runtime.agents-in-flight` and `budgets.pinned`,
-  and not `budgets.enforce` (v2:1430-1437).
+- `render_scaffold(rows)` writes each row whose `owner` is `SCAFFOLD_OWNER`, `dGroundRules`, and
+  whose default is not derived (`tools/policy/policy.py#render_scaffold`, `#SCAFFOLD_OWNER`); the
+  `scaffold` branch of `main` calls it with the catalogue alone (`tools/policy/policy.py#main`).
+- `python tools/policy/policy.py scaffold` at c2a407b0 prints the tables `[budgets]`, with
+  `enforce = "warn"` and `pinned = []`, `[policy-file]` and `[runtime]` (run 2026-11-21).
+- The catalogue's `budgets.enforce` row has default `warn` and owner `dGroundRules`
+  (`tools/policy/catalogue.toml`, read with `tomllib`, 2026-11-21), and v2's table sets it `refuse`
+  under strict
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952d54f01be759082f7ae3e52cde160:1669`).
+- v2's never list holds `policy-file.on-invalid`
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952d54f01be759082f7ae3e52cde160:1430`),
+  `runtime.agents-in-flight` and `budgets.pinned`
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952d54f01be759082f7ae3e52cde160:1435`),
+  and not `budgets.enforce`.
+- `render_scaffold` is called in `run_fresh_target`, `run_arms_empty_target`, twice,
+  `run_mirror_absent_adopter` and `build_repo` of `tools/policy/check_policy.py`, each with the
+  catalogue alone (`git grep -n "render_scaffold(" tools/policy/check_policy.py`, 2026-11-21).
 - `KICK-dKeptSession-2` S1's order is `(read_file_value, read_preset_value, read_default_value)`.
 
 ### The file, scaffolded under strict
@@ -105,8 +128,8 @@ None. A policy file already scaffolded is the repository's own and is never rewr
 
 ### Files touched (estimate)
 
-- `tools/policy/policy.py`: `render_scaffold` and `cmd_scaffold`
-- `tools/policy/check_policy.py`: the `scaffold-preset` case
+- `tools/policy/policy.py`: `render_scaffold` and `main`'s `scaffold` branch
+- `tools/policy/check_policy.py`: the `scaffold-preset` case and the kit's own calls, S5
 
 ### Alternatives rejected
 
@@ -114,6 +137,8 @@ None. A policy file already scaffolded is the repository's own and is never rewr
   where the file is the repository's explicit choice.
 - **Writing only `never` keys.** The rows a preset leaves unassigned would vanish from the starter
   file, and an adopter could not see where their values come from.
+- **A default of `"standard"` for `preset`.** A call naming no preset would render the standard
+  scaffold silently, the defect AC3 exists to catch.
 
 ## 5. Production-readiness checklist
 
@@ -124,7 +149,7 @@ None. A policy file already scaffolded is the repository's own and is never rewr
 - observability — each left-out row is a comment naming its preset value.
 - risks — a preset assigning a row dGroundRules adds later writes it as a comment, which is the
   intended posture.
-- testing — the case of §6 and the arm in §7.
+- testing — the criteria of §6 and the arm in §7.
 - migration — §4.
 - user docs — `help/policy.md`'s intake paragraph (`KICK-dKeptSession-4` S5) needs no change: it
   already says the preset decides the starting posture.
@@ -142,13 +167,15 @@ The fixture is dGroundRules' `check_policy.py --fixture`, one scratch repository
   Red when: any preset's scaffold carries a literal that differs from it.
 - **AC3** — When a probe calls `render_scaffold(rows)` with no preset, it raises `TypeError`.
   Red when: a call naming no preset renders the standard file silently.
+- **AC4** — When `python check_policy.py --fixture arms-empty-target` and `python check_policy.py
+  --fixture adopter-fresh-target` run in the policy kit, each passes, and `git grep -n
+  "render_scaffold(rows)\|render_scaffold(policy.load_catalogue(KIT))" tools/policy/check_policy.py`
+  prints nothing.
+  Red when: a kit call names no preset and the case raises `TypeError`.
 
 ## 7. Gates
 
-`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
-
-The policy kit's `policy fixtures` leg runs the case once dGroundRules has landed it; the arm line
-below declares it.
+`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `build-index selftest` · `gotchas selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms`
 
 New arm: tools/policy/check_policy.py · covers AC1 AC2 · the `scaffold-preset` case, staged red by a copy of `render_scaffold` writing every literal row · none
 
@@ -167,16 +194,24 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 · the `scaffold-preset`
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's H1 (id 1).
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-56` mirrored, the other ends of
   the edges the round-1 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · S2 · S3 · S5 · AC4 · §3 · §4 · §7 · §10 · re-grounded on the landed tree at
+  c2a407b0 under the brief `2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief`: every
+  line citation became a `path#symbol` or a blob pin, and the leg line names each guarded leg.
+  Moved: no `cmd_scaffold` exists, so S2 names `main`'s `scaffold` branch; S5 and AC4 take the
+  kit's own five calls, which S2's missing default would break at this unit's build, ahead of
+  `KICK-dKeptSession-56` S28; a `scaffold` naming no preset is left to `KICK-dKeptSession-4`.
+  Narrowed: nothing; the evidence now reads the landed kit rather than a branch.
 
 ## 10. Reuse audit
 
-The seam extended is dGroundRules' `render_scaffold` (`tools/policy/policy.py` at `3c8c4718a`, lines
-1313-1324), with `KICK-dKeptSession-1`'s `derive_preset_assignment` as the one assignment and
-`KICK-dKeptSession-33`'s rule for what it assigns. `python tools/codebase-map/reuse_lookup.py
+The seam extended is dGroundRules' landed `render_scaffold` (`tools/policy/policy.py#render_scaffold`)
+and the `scaffold` branch of `main`, with `KICK-dKeptSession-1`'s `derive_preset_assignment` as the
+one assignment, `KICK-dKeptSession-33`'s rule for what it assigns, and the kit's `CASES` table
+(`tools/policy/check_policy.py#CASES`) for the case. `python tools/codebase-map/reuse_lookup.py
 "scaffold a starter policy file leaving out keys a preset assigns"` ranked `key`, `keys`,
-`read_conf_key` and `load_policy` (`tools/roles/roles_lib.py`) by name stem only: the policy kit is
-on `branch/unattended-dgroundrules-e47ae1`, not at this base, so no existing seam in the tree fits
-and the branch's function is the one extended.
+`write_fixture_files` and `read_policy_value` by name stem, then `parse_key`
+(`tools/policy/policy.py`), none a scaffold; the landed `render_scaffold`, read in the code, is the
+seam.
 
 Recall terms used: `python tools/memory-recall/query.py "how does the scaffold write a policy file
 under a named preset" --terms "render_scaffold scaffold preset strict budgets.enforce refuse warn
