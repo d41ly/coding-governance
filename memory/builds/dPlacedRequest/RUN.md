@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17952593412338706263-496420 bfa5f311
+gates-run: unattended-179526050037528812083-565919 c822ae39
 parked-surfaced: yes
 keepalive-reaped: yes
 asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO TOOL-dPlacedRequest-109=OPEN TOOL-dPlacedRequest-110=OPEN
@@ -25,7 +25,7 @@ held-from: VERIFYING
 refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 6b3ebc8308414624d538f94e36d218eb9771af48
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -603,3 +603,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T09:12:29Z hold · item owner-decision · reason until owner · reaped c039c97c · resume none(owner)
 
 2026-11-21T11:07:12Z resume · item dPlacedRequest · reason held · keepalive 2439436f · manual
+
+2026-11-21T11:44:44Z override · item specs-audited · reason TOOL-dPlacedRequest-100 was promoted from the closing review after the spec audit chain ran, so no spec-audit record names it; the owner answered 'Build 95-100, override 100'. An audit round over spec 100 would meet it.
