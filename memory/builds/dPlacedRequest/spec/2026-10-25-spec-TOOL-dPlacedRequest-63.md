@@ -290,8 +290,8 @@ rows.
   driver's two calls take `-v BINMODE="${CLAIM_BINMODE:-0}"` and the arm sets the variable. (b) adds
   an environment surface to a shipped kit, which
   `doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`'s veto 2 discards.
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, on the `slice_fn` seam. widens: none ·
-  relaxes: none. Made in 59's S7 at its rev-7 (F5).
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, on the `slice_fn` seam. widens: none · relaxes: none · Made
+  in 59's S7 at its rev-7 (F5).
 - **F3 — How is finding 3 closed (S13)?** (a) 61 AC14 reads 57's AC2 bullet; (b) 61 S14 and AC14
   taken out, citing 60 AC1 and AC2. (b) leaves a gap in 61's items and no criterion of 61's own for
   finding 6. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's second fix judged
@@ -331,6 +331,10 @@ rows.
   specs' items resolved in §4 (F5); unit 64's citations by anchor and its readers made here and in
   59; Files touched now none, and §7 loses the legs its code owed; line citations swapped for symbol
   citations, and the build method's sections for their alias tags.
+- editorial · 2026-11-21 · §8 F2 · no rev bump, the status stays CLOSED: the mark re-wrapped so its
+  widens and relaxes values share its first line, the period after its relaxes value a middle-dot
+  separator, and the departures report reads each as none, per
+  `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief`.
 
 ## 10. Reuse audit
 

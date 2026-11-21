@@ -19,6 +19,7 @@
 | [2026-11-20-prompt-TOOL-dPlacedRequest-46-2-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-2-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-46-divergence-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-divergence-brief.md) | research | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief.md) | research | — |
+| [2026-11-21-prompt-TOOL-dPlacedRequest-46-1-spec-writer.md](../prompts/2026-11-21-prompt-TOOL-dPlacedRequest-46-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief.md](../prompts/2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief.md) | research | TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 |
 | [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
@@ -203,8 +204,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · mixed 
   before the threshold, resolving never-stale; (b) folded into the renewing beat; (c) no stop, as
   `TOOL-dPlacedRequest-35` reads. (c) is the defect. (b) reads the same verdicts on the tree, since
   the flag follows whichever commit stops the row (rev-6), and blurs the renewing beat's definition.
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's fix judged sound. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's fix judged sound. widens: none · relaxes: none
 - **F2 — What does the `renews: -` stop repair, when the verdict pass already reads a `-` beat
   live?** (a) The mixed chain: a `-` commit above an older sighted `renews: no` commit of the same
   tenure, which reads stale today; (b) keep the old criteria and name a red copy that also drops the
@@ -234,6 +234,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · mixed 
   each line carrying the probe's ages of 60, 120 and 3600000 seconds marks every figure PINNED on
   that line, an inline red fix of the pinned-facts leg, per
   `2026-11-20-prompt-TOOL-dPlacedRequest-46-pass-red-fix-brief`.
+- editorial · 2026-11-21 · §8 F1 · no rev bump, the status stays CLOSED: the mark re-wrapped so its
+  widens and relaxes values share its first line and the departures report reads each as none, per
+  `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief`.
 
 ## 10. Reuse audit
 

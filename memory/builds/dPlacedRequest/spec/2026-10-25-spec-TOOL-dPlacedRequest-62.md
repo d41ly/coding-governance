@@ -177,7 +177,7 @@ No new arm: every criterion is a read of spec text, observed by this unit's prob
 - **F1 — Where does the read of a `###` section close (S1)?** (a) At the next `##` or `###` heading,
   the skeptic's corrected fix; (b) at the next heading of any level; (c) a `sed` range to the next
   `### ` heading. (b) stops on the `# ` comment line in 54's rev-3 sketch, and (c) runs past a `## `
-  heading. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none. Made
+  heading. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none · Made
   in 59 §4's `sec` at its rev-7 (F2).
 - **F2 — Are this unit's amendments to specs 59 and 61 made at its pass or now?** (a) Now, once, in
   59's rev-7 and 61's rev-6, this unit reduced to observing that text; (b) at this unit's pass, by a
@@ -203,6 +203,9 @@ No new arm: every criterion is a read of spec text, observed by this unit's prob
   made here, the Evidence's line number out, its heading counts kept, §6 pointing at 59 §4, §10
   naming `extract_run_facts` as the seam, and AC4 reading by `entries`; Files touched now none; the
   build method's section for its alias tag.
+- editorial · 2026-11-21 · §8 F1 · no rev bump, the status stays CLOSED: the period after the mark's
+  relaxes value becomes a middle-dot separator, so the departures report reads it as none, per
+  `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief`.
 
 ## 10. Reuse audit
 

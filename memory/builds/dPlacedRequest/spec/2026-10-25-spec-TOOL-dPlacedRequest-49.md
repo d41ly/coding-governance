@@ -421,8 +421,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC23 · a `GOV_
 - **F3 — What closes finding 27 at order 26 (S24)?** (a) Each spec records its sequence; (b) the
   orders renumbered; (c) a render that marks meeting write sets. (b) moves nothing after those units
   are built; (c) is a third parser of Files touched beside the spec-token checker's and the driver's.
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the finding's second fix. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the finding's second fix. widens: none · relaxes: none
 - **F4 — Does the card's node cell answer `GOV_NODE` (S23)?** (a) Yes: `derive_node_tag` reads a
   `GOV_NODE` naming a registry row first, as `resolve_node_tag` and `resolve_fleet_tag` do; (b) no:
   the cell names the user's row, and the probe's `GOV_NODE` case is left out; (c) the cell prints both.
@@ -469,6 +468,9 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC23 · a `GOV_
   lines and their Files touched rows; the kickoff manifest and the card's help page added to Files
   touched; every line citation to `path#symbol` or a blob pin, the build method's sections to their
   alias tags, and F1 and F3 pinned.
+- editorial · 2026-11-21 · §8 F3 · no rev bump, the status stays CLOSED: the mark re-wrapped so its
+  widens and relaxes values share its first line and the departures report reads each as none, per
+  `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief`.
 
 ## 10. Reuse audit
 
