@@ -832,6 +832,12 @@ done
 # ending in CR (TOOL-dWitnessedBar-72 S1), so the planted CR is proved to reach `read_green_file` on both
 # keys before either strip is graded. A failed canary prints its line, reds, and leaves the `rec_sha`
 # and `rec_fp` compares uncounted, each of which still runs and prints its own line.
+# The `rec_sha` byte test is `check_cr_reached`, over the mutant written to a file under `$rgf_t`, and
+# no line outside its body measures `rec_sha`'s bytes (TOOL-dWitnessedBar-74 S1). It is seen red on
+# every run (S2, S3): a variant of the cut whose `sha` case reads `rec_sha=${_rg_v%?}`, one `diff` line
+# from the cut and one from its own mutant under the canary's `sed`, must make it return non-zero, or
+# the arm prints `the rec_sha byte check was not seen red on its liveness variant (<reason>)`, reds, and
+# leaves the `rec_sha` compare uncounted. The liveness check gates that count and adds none.
 # The breaks staged against it (S3): the loop without its `_rg_v=${_rg_v%$'\r'}` line, and a `sha` case
 # keeping every repeated key, `rec_sha=${rec_sha:+$rec_sha$'\n'}$_rg_v`. In the cut's own subshell
 # the hook half grades `rec_fp`, the CR strip on a second key, behind the same canary: RED against the hook's read loop without its one `${_rg_v%$'\r'}` strip
@@ -841,6 +847,14 @@ done
 # WHAT THIS DOES NOT CHECK: a strip spelled other than `%$'\r'}`, or spelled twice, which fails the
 # canary at its count rather than grading the CR; nor a `verdict` read by the hook, which reads none;
 # nor a `sha` key read by the CLI half, whose line prints the queried sha and never the record's.
+# Its CR is spelled in this top-level body, never inside a `$(...)`, which reads it as empty here.
+check_cr_reached() (   # file · record · var -> 0 only when var, read by name, is forty-one bytes ending in CR
+  LC_ALL=C
+  . "$1" || exit 1
+  read_green_file "$2"
+  _cc_v=${!3}
+  [ "${#_cc_v}" -eq 41 ] && [ "${_cc_v: -1}" = $'\r' ]
+)
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 rgf_c=cccccccccccccccccccccccccccccccccccccccc
 rgf_out=$("$PYBIN" -c 'import io, os, sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
@@ -867,18 +881,31 @@ rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
 rgf_rd=$( eval "$rgf_fn"; read_green_file "$rgf_rec"; printf '%s\t%s' "$rec_sha" "$rec_fp" )
 rgf_sha=${rgf_rd%%$'\t'*}; rgf_fp=${rgf_rd#*$'\t'}
 rgf_mut=$(printf '%s\n' "$rgf_fn" | sed 's/%[$].[\]r.}/}/')
+printf '%s\n' "$rgf_mut" > "$rgf_t/cut-mut.sh"
 rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^>')
 # The CR is a variable set out here: a `$'\r'` spelled inside `$(...)` reaches this node's bash as an
 # empty string, so `*$'\r'` there matched every value.
 rgf_crb=$'\r'
 rgf_mr=$( LC_ALL=C; eval "$rgf_mut"; read_green_file "$rgf_rec"
-  case "$rec_sha" in *"$rgf_crb") printf '%s cr' "${#rec_sha}" ;; *) printf '%s' "${#rec_sha}" ;; esac
-  case "$rec_fp" in *"$rgf_crb") printf ' %s cr' "${#rec_fp}" ;; *) printf ' %s' "${#rec_fp}" ;; esac )
+  case "$rec_fp" in *"$rgf_crb") printf '%s cr' "${#rec_fp}" ;; *) printf '%s' "${#rec_fp}" ;; esac )
 rgf_ok=0
-[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && [ "$rgf_mr" = "41 cr 41 cr" ] && rgf_ok=1
+[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && check_cr_reached "$rgf_t/cut-mut.sh" "$rgf_rec" rec_sha \
+  && [ "$rgf_mr" = "41 cr" ] && rgf_ok=1
 [ "$rgf_ok" = 1 ] \
   || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s); the CR-strip assertion is not counted"; fail=1; }
-[ "$rgf_ok" = 1 ] && a=$((a+1))
+# The liveness variant (TOOL-dWitnessedBar-74 S2): its `sha` value loses its CR after the read.
+printf '%s\n' "$rgf_fn" | sed 's/\(sha) rec_sha=\)\$_rg_v/\1${_rg_v%?}/' > "$rgf_t/cut-var.sh"
+rgf_vn=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
+sed 's/%[$].[\]r.}/}/' "$rgf_t/cut-var.sh" > "$rgf_t/cut-var-mut.sh"
+rgf_vmn=$(diff "$rgf_t/cut-var.sh" "$rgf_t/cut-var-mut.sh" | grep -c '^>')
+rgf_live=0
+if [ "$rgf_vn" != 1 ]; then rgf_why="variant changed $rgf_vn lines"
+elif [ "$rgf_vmn" != 1 ]; then rgf_why="mutant changed $rgf_vmn lines"
+elif check_cr_reached "$rgf_t/cut-var-mut.sh" "$rgf_rec" rec_sha; then rgf_why="it passed a value that lost its CR"
+else rgf_live=1; fi
+[ "$rgf_live" = 1 ] \
+  || { echo "gov-canary: the rec_sha byte check was not seen red on its liveness variant ($rgf_why)"; fail=1; }
+[ "$rgf_ok" = 1 ] && [ "$rgf_live" = 1 ] && a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
   || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
 [ "$rgf_ok" = 1 ] && a=$((a+1))
