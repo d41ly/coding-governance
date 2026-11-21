@@ -774,3 +774,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T11:20:06Z dispatch · item 971e3894 TOOL-dWitnessedBar-89 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-21T11:39:55Z brief · item TOOL-dWitnessedBar-90 · reason 9b00c5a24843 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-90-build-brief.md
+
+2026-11-21T11:42:14Z dispatch · item 197df554 TOOL-dWitnessedBar-90 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec memory/project/shell-role.txt tools/run-gates/run-gates.gov.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-90-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md

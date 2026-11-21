@@ -241,50 +241,8 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-# Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
-# reverse declaration). Stated ABSOLUTELY, never as a delta.
+# Raised to 80 by TOOL-dWitnessedBar-90, counting every arm built through order 47; stated ABSOLUTELY.
 FLOOR_ASSERTIONS=80
-# RAISED 76 -> 80 by TOOL-dWitnessedBar-85 on 2026-11-21, stated ABSOLUTELY: the floor read from
-# this source, 76, plus S1's per-variant counts, one for each liveness variant seen red on each
-# `CANARY_KEYS` pair, twice the words of `${CANARY_KEYS[*]}`, four today, the only increments this
-# unit adds (TOOL-dWitnessedBar-82 S1's rule). Counted by reading; no suite ran.
-# RAISED 74 -> 76 by TOOL-dWitnessedBar-84 on 2026-11-21, stated ABSOLUTELY by unit 82 S1's rule: the
-# floor read from this source, 74, plus the two visit-count checks of S14, the canary's beside its one
-# `check_canary_keys` call and the liveness loop's after the loop, the only increments this unit adds.
-# RAISED 72 -> 74 by TOOL-dWitnessedBar-82 on 2026-11-21, stated ABSOLUTELY (S1, under unit 73 S15's
-# rule): it counts every arm built through order 43, read from this source with each loop at its
-# population. Unit 73's 72, plus TOOL-dWitnessedBar-78's every-key record over `read_bar_file` (S7) and
-# its line-rule record over both readers (S13), one assertion each. Units 74, 76, 77, 79 and 80 add
-# none: their liveness loop and variants only decide whether the `rec_sha` and `rec_fp` compares count.
-# Counted by reading; no suite ran.
-# RAISED 54 -> 72 by TOOL-dWitnessedBar-73 on 2026-11-21, stated ABSOLUTELY (S15): the count a passing run
-# executes, read from this source with each loop at its population, the verdict backends' plant loop at
-# its 26 cases, the signer-temp sweep at its 5, the two PM_SCRUB copy loops at 2 each, and the shard
-# arm's `a+2` as 2. It read 68 before this unit, 14 above the floor then stated, and this unit adds 4: the every-key record, the `rec_` listing over a verdict-only record,
-# and the sweep's `is_file` and `stat-denied` stand-ins. Counted by reading; no suite ran.
-# RAISED 47 -> 54 by TOOL-dWitnessedBar-67 on 2026-11-21: the hook's rec_fp over a CR-ended fingerprint
-# line, the signer-temp sweep under its three stand-ins, the evaluated PM_SCRUB compare over the shipped
-# file and the pm-comment copy, and the single-assignment count, one assertion each. Counted by reading;
-# no suite ran.
-# RAISED 41 -> 47 by TOOL-dWitnessedBar-65 on 2026-11-21: the key-no-tab record read by the hook's
-# read_green_file and by read_tag_lines, and the PM_SCRUB reader's trailing-comment, one-line,
-# cut-under-a-comment and token-grammar copies, one assertion each. Counted by reading; no suite ran.
-# RAISED 38 -> 41 by TOOL-dWitnessedBar-63 on 2026-11-21: the scrub parity arm's first-and-last-name read
-# and its copy with the PM_SCRUB assignment taken out, and the key-no-tab plant in the verdict backends'
-# plant loop, one assertion each. Counted by reading; no suite ran.
-# RAISED 35 -> 38 by TOOL-dWitnessedBar-60 on 2026-11-20: the bar-scrub parity arm over the shipped files
-# and its two staged copies, one assertion each. Counted by reading; no suite ran.
-# RAISED 25 -> 35 by TOOL-dWitnessedBar-56 on 2026-11-20: its seven local-hook plants and three peer
-# plants in the verdict backends' plant loop, one assertion each. Counted by reading; no suite ran.
-# RAISED 21 -> 25 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-43, whose pass left the
-# floor where it was: its four peer plants, peer-signed, peer-unsigned, peer-self-tag and
-# peer-swapped-manifest, one assertion each in the same loop. Counted by reading; no suite ran.
-# Raised 20 -> 21 by TOOL-dWitnessedBar-22, which adds G11, the `tests`-to-claims compare.
-# Raised 19 -> 20 by TOOL-dWitnessedBar-12, which adds G10, the leg tags' shape and uniqueness arm.
-# Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
-# Raised 16 -> 17 by PLAY-dOrderedCharter-67, which adds the python-reads scanner's plants.
-# Raised 17 -> 18 by TOOL-aMeasuredDrag-4, which adds G8, the tags leg's unguarded pin.
-# Raised 18 -> 19 by TOOL-dDeclaredLoop-67, which adds G9, the `loop termination` leg's unguarded pin.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -965,14 +923,17 @@ rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^
 # else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`, or
 # `unread` alone when it returned 2 (TOOL-dWitnessedBar-84 S13, S14), its visit count one assertion.
 # A 3 takes no slot: its visited line is already on stderr, so it reds and the canary stays failed (-89 S4).
+# Any code outside 0 to 3 takes none either: it prints its own line naming the code, reds, and the canary
+# stays failed (TOOL-dWitnessedBar-90 S1).
 rgf_whats=(); rgf_ck=0
 if [ "$rgf_n" != 1 ]; then rgf_whats=("count $rgf_n")
 else a=$((a+1)); rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec"); rgf_ck=$?
   if [ "$rgf_ck" = 2 ]; then rgf_whats=("unread")
   elif [ "$rgf_ck" = 3 ]; then fail=1
+  elif [ "$rgf_ck" != 0 ] && [ "$rgf_ck" != 1 ]; then echo "gov-canary: check_canary_keys returned $rgf_ck, a code it does not define"; fail=1
   else for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi; fi
 rgf_ok=0
-[ "${#rgf_whats[@]}" = 0 ] && [ "$rgf_ck" != 3 ] && rgf_ok=1
+[ "${#rgf_whats[@]}" = 0 ] && { [ "$rgf_ck" = 0 ] || [ "$rgf_ck" = 1 ]; } && rgf_ok=1
 for rgf_what in "${rgf_whats[@]}"; do
   [ "$rgf_ok" = 1 ] \
     || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
