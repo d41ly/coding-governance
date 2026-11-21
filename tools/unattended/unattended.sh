@@ -2647,7 +2647,7 @@ read_claims() { # strict|soft|quiet|cached -> 0 with CLAIM_ROWS, or 1 with CL_WH
             for (i = 1; i <= nr; i++) { b = (i in bt) ? bt[i] : od[i]
               print rf[i] "\t" tp[i] > ENVIRON["CL_PAIRS"]; print rf[i] "\t" b > ENVIRON["CL_PAIRS"]
               print ((b in rn) && rn[b] == "-") > ENVIRON["CL_NEVER"]; print b > ENVIRON["CL_BEATS"] } }'
-    [ "$(cat "$d/walk" 2>/dev/null)" = ok ] || alive=0
+    CL_WALK=""; [ ! -f "$d/walk" ] || CL_WALK=$(<"$d/walk"); [ "$CL_WALK" = ok ] || alive=0
     read_first_seen <"$d/pairs" >"$d/seen"
     awk 'BEGIN { print "now" } $0 != "-"' "$d/seen" >"$d/stamps"
     date -u -f "$d/stamps" +%s >"$d/ages" 2>/dev/null || alive=0
@@ -3528,9 +3528,10 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   elif [ "${ft%% *}" = unreadable ]; then
     WC_WHY="the remote no longer holds it, and this node's feed names ${ft#unreadable }, which this clone cannot read, so the epoch a create would continue is unknown"; rc=1
   else
-    msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: %s\noffer-deadline: %s\nlast-fetch: %s' \
+    printf -v msg 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s\nepoch: %s\nkind: %s\nfleet-tag: %s\nrenews: %s\nwitness: %s\noffer: %s\noffer-deadline: %s\nlast-fetch: %s' \
       "${ref#"$LEASE_NS"/}" "$sl" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT" \
-      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "${WL_OFFER:--}" "${WL_ODL:--}" "$lf")
+      "$ep" "$kd" "${tag:--}" "${ren:--}" "${wit:--}" "${WL_OFFER:--}" "${WL_ODL:--}" "$lf"
+    msg=${msg%"${msg##*[!$'\n']}"}
     if ! c=$(build_gov_commit "$pt" "$msg"); then
       WC_WHY="the claim commit could not be built in this clone"; rc=2
     elif [ -n "$WL_QUEUE" ]; then
@@ -4476,7 +4477,7 @@ write_fence_beat() { # slug · [--after tip] -> one line; 0 a fence or none, 1 r
 # WHAT THIS DOES NOT CHECK: the body for secrets (gap-rt-44), and who files how many problems; an
 # entry is never pruned, so both namespaces only grow.
 REF_COMPONENT_CEILING=200
-derive_ref_segment() { # text -> the text with every byte outside [A-Za-z0-9_-] as %HH; rc 1 on an empty text
+derive_ref_segment() { # text -> the text with every byte outside [A-Za-z0-9_-] as %HH, printed and bound to _segment; rc 1 on an empty text
   local LC_ALL=C s="$1" o="" c i
   [ -n "$s" ] || return 1
   for ((i = 0; i < ${#s}; i++)); do
@@ -4486,11 +4487,11 @@ derive_ref_segment() { # text -> the text with every byte outside [A-Za-z0-9_-] 
       *) printf -v c '%%%02X' "'$c"; o+=$c ;;
     esac
   done
-  printf '%s\n' "$o"
+  _segment=$o; printf '%s\n' "$o"
 }
 derive_decision_key() { # item · fork -> `<item segment>+<fork segment>`; rc 1 when either is empty
   local a b
-  a=$(derive_ref_segment "$1") && b=$(derive_ref_segment "$2") || return 1
+  derive_ref_segment "$1" >/dev/null && a=$_segment && derive_ref_segment "$2" >/dev/null && b=$_segment || return 1
   printf '%s+%s\n' "$a" "$b"
 }
 derive_problem_id() { # session · item · subject · body file -> the first 12 hex digits; rc 1 when git cannot hash
@@ -4518,7 +4519,7 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
     comp=$(derive_decision_key "$it" "$fk") || { echo "register — not written · the decision key did not derive"; return 2; }
     n="decision key"
   else
-    comp=$(derive_ref_segment "$sub") || { echo "register — not written · the subject did not encode"; return 2; }
+    derive_ref_segment "$sub" >/dev/null && comp=$_segment || { echo "register — not written · the subject did not encode"; return 2; }
     n=subject
   fi
   [ "${#comp}" -le "$REF_COMPONENT_CEILING" ] || { echo "register — refused $n over ${#comp} bytes encoded"; return 2; }
@@ -4530,11 +4531,13 @@ write_register() { # decision <build> <item> <fork> <file> | problem <subject> <
   sid=${CLAUDE_CODE_SESSION_ID:-absent}; sid=${sid//[[:cntrl:]]/ }
   if [ "$kind" = decision ]; then
     ref="refs/gov/decisions/$b/$comp"
-    msg=$(printf 'gov-decision %s/%s\n\nbuild: %s\nitem: %s\nfork: %s\nsession: %s\n\n' "$b" "$comp" "$b" "$it" "$fk" "$sid"; cat -- "$f")
+    printf -v msg 'gov-decision %s/%s\n\nbuild: %s\nitem: %s\nfork: %s\nsession: %s\n\n' "$b" "$comp" "$b" "$it" "$fk" "$sid"
+    msg+=$(<"$f"); msg=${msg%"${msg##*[!$'\n']}"}
   else
     c=$(derive_problem_id "$sid" "$it" "$sub" "$f") || { echo "register — not written · the problem id did not derive"; return 2; }
     ref="refs/gov/problems/$comp/$c"
-    msg=$(printf 'gov-problem %s/%s\n\nsubject: %s\nitem: %s\nsession: %s\n\n' "$comp" "$c" "$sub" "$it" "$sid"; cat -- "$f")
+    printf -v msg 'gov-problem %s/%s\n\nsubject: %s\nitem: %s\nsession: %s\n\n' "$comp" "$c" "$sub" "$it" "$sid"
+    msg+=$(<"$f"); msg=${msg%"${msg##*[!$'\n']}"}
   fi
   resolve_claim_remote || { echo "register — not written $ref · the clone does not declare exactly one remote, check 24"; return 2; }
   c=$(build_gov_commit "" "$msg") || { echo "register — not written $ref · the commit could not be built in this clone"; return 2; }
@@ -4666,7 +4669,7 @@ RQ_WHY=""
 # Python's `split` folds, so such a copy reads as a collision rather than the same words.
 derive_request_fold() { # file -> its folded text on stdout
   local bom
-  bom=$(printf '\357\273\277')
+  printf -v bom '\357\273\277'
   LC_ALL=C sed "1s/^$bom//" "$1" | LC_ALL=C tr '\t\n\v\f\r' '     ' | LC_ALL=C tr -s ' ' | LC_ALL=C sed 's/^ //; s/ $//'
 }
 write_request_record() { # file -> 0 recorded or already recorded, 2 not written
@@ -4717,7 +4720,7 @@ write_request_record() { # file -> 0 recorded or already recorded, 2 not written
   fi
   remove_dir_lock "$cdir/requests.lock" "$tok"
   [ "$rc" = 0 ] || return 2
-  msg=$(printf 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid")
+  printf -v msg 'gov-request %s\n\ncontent-key: %s\nfleet-tag: %s\nsession: %s' "$key" "$key" "$tag" "$sid"; msg=${msg%"${msg##*[!$'\n']}"}
   resolve_claim_remote || { echo "request — $key · not written, the text kept · the clone does not declare exactly one remote, check 24"; return 2; }
   c=$(build_gov_commit "" "$msg") || { echo "request — $key · not written, the text kept · the commit could not be built in this clone"; return 2; }
   [ -n "$RUNLOG_GITDIR" ] || resolve_runlog_dirs || :
@@ -4772,7 +4775,7 @@ check_request_recorded() { # content key -> 0 recorded, 1 no record, 2 not read;
 # WHAT THIS DOES NOT CHECK: that the lap its caller names is the one it made; the cause and the item are
 # the caller's word, the cause held to the closed set by `budget.py`.
 run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 not drawn
-  local key="$1" cause="$2" item="$3" py d cdir s out rc tip c row n=0
+  local key="$1" cause="$2" item="$3" py d cdir s out rc tip c row m n=0
   [[ $key =~ ^[0123456789abcdef]{12}$ ]] || { echo "request-draw — not drawn · $key is no content key of 12 hex digits"; return 2; }
   py=$(resolve_python 2>/dev/null) && [ -n "$py" ] || { echo "request-draw — $key · not drawn · no python resolves, so the budget cannot be counted"; return 2; }
   d=$(resolve_kit_dir "$py" loop budget.py "$KIT_DIR" 2>/dev/null) && [ -n "$d" ] \
@@ -4811,7 +4814,8 @@ run_request_draw() { # content key · cause · item -> 0 drawn, 3 exhausted, 2 n
       3) rm -f "$s"; printf '%s\n' "$out"; return 3 ;;
       *) rm -f "$s"; printf '%s\n' "${out:-request-draw — $key · not drawn · budget.py exited $rc}"; return 2 ;;
     esac
-    c=$(build_gov_commit "$tip" "$(printf '%s %s\n\n%s' gov-request "$key" "$row")") \
+    printf -v m '%s %s\n\n%s' gov-request "$key" "$row"; m=${m%"${m##*[!$'\n']}"}
+    c=$(build_gov_commit "$tip" "$m") \
       || { rm -f "$s"; echo "request-draw — $key · not drawn · the row commit could not be built in this clone"; return 2; }
     write_gov_ref "refs/gov/requests/$key" "$tip" "$c" && rc=0 || rc=$?
     case "$rc" in
@@ -4862,10 +4866,11 @@ read_claim_ref() { # claim ref · claim.py dir · python -> 0 with CLM_KEY its c
   return 0
 }
 add_claim_key() { # claim ref · the claim header `claim.py body` rendered · one `key: value` line -> 0 written on the cached tip, 2 not written, its line printed
-  local ref="$1" tip c rc
+  local ref="$1" tip c rc m
   tip=$(GIT rev-parse -q --verify "refs/gov/remote/${ref#refs/gov/}^{commit}" 2>/dev/null) && tip=${tip%$'\r'} || tip=""
   [ -n "$tip" ] || { echo "claim not written — no cached tip of $ref to add '$3' to"; return 2; }
-  c=$(build_gov_commit "$tip" "$(printf '%s\n\n%s' "$2" "$3")") \
+  printf -v m '%s\n\n%s' "$2" "$3"; m=${m%"${m##*[!$'\n']}"}
+  c=$(build_gov_commit "$tip" "$m") \
     || { echo "claim not written — the commit adding '$3' could not be built in this clone"; return 2; }
   write_gov_ref "$ref" "$tip" "$c" && rc=0 || rc=$?
   [ "$rc" = 0 ] || { echo "claim not written — '$3' was not added to $ref: $GOVREF_WHY"; return 2; }
@@ -6328,7 +6333,7 @@ check_prompt_brief() { # slug · base
     *) echo "unattended: NOTE - PROMPT_BRIEF_CUTOFF is blank or not a YYYY-MM-DD date, so this prompt-mode build's record is not graded for a self-contained brief; it is read at the default-branch side of the pinned BASE, so declare one in $CONF there to turn it on: ${cut:-blank}" >&2
        return 0 ;;
   esac
-  readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
+  readme_of "$1" >/dev/null; rel=$_readme; dir=${rel%/*}
   opened=$(read_readme_opened "$base" "$rel")
   # Only a DATED README before the cutoff is grandfathered; an unreadable date is graded.
   case "$opened" in
@@ -6435,7 +6440,7 @@ check_prompt_placement() { # slug · base
   [ "${AUTH_MODE:-}" = prompt ] && [ -n "$base" ] || return 0
   cut=$(read_brief_cutoff "$AUTH_CONF_AT") || return 1
   case "$cut" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) return 0 ;; esac
-  readme_of "$1" >/dev/null; rel=$_readme; dir=$(dirname "$rel")
+  readme_of "$1" >/dev/null; rel=$_readme; dir=${rel%/*}
   opened=$(read_readme_opened "$base" "$rel")
   case "$opened" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) [[ "$opened" < "$cut" ]] && return 0 ;;
