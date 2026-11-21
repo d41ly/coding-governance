@@ -210,6 +210,24 @@ each run's peak overlap. It costs real sessions, so no leg runs it.
 installed scratch adopter and in a clone of the tree under test, with `bar.inline-red-fixes` and
 `pass.fast-legs` each on and off. Its docstring holds the steps and what neither case checks.
 
+`arm_presets` (KICK-dKeptSession-1 S5) grades the shipped preset store beside the kit,
+`presets.check_presets`' findings, then two halves comparing each preset's load, `presets.load_preset`
+through the loop kit's `guard.py --expansion`, with that rule run on each `[[selects]]` pair the preset
+assigns: the by-key half reds a refusal whose key and value no `[[selects]]` row names, the row-named half
+a row-named pair the rule refuses and the load admits; a pair the rule admits is named `presets-core-only ·
+not graded` until TOOL-dDeclaredLoop-101's judgement refuses it, and a loop kit that does not resolve
+announces both halves. Its cases are outcome cases: `presets-complete` plants a cut key, a refused value,
+the default preset off a default and a fifth table on a copy of the store; `presets-pairs` a broken pair in
+a preset, which the arm and `presets.py check` both red, then `policy.py check` admitting a file whose one
+revision sets a round count past its preset's ceiling, since the pair rules judge the store alone (§8
+F10); `presets-repo` a repository preset admitted and refused; and `presets-core-only` copies this kit,
+the loop kit whole and the playbook kit's `layers.toml`, its core rows stripped of the release slot,
+loads `standard` and `strict` there and reds a load refusing by key or admitting every value. WHAT THEY
+DO NOT CHECK: a core-only install's own refusal of `after-release-verifies`, which the register copy
+stands in for until that ask lands; the four loads over the shipped register, which `policy check`
+grades over the real tree; and a repository file's round count above its ceiling, which the loop kit's
+`review_bounds.py` refuses and its own fixture plants.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import ast
@@ -234,6 +252,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True  # a gate leg leaves no bytecode cache in an adopter's kit dir
 import policy  # noqa: E402  (the module beside this file)
 import budgets  # noqa: E402  (the size caps' module beside this file, TOOL-dGroundRules-9)
+import presets  # noqa: E402  (the named presets' module beside this file, KICK-dKeptSession-1)
 
 KIT = policy.KIT
 POLICY_FILE = (".governance", "policy.toml")
@@ -1011,6 +1030,89 @@ def arm_cap_census(repo, kit):
                          f"· {asked} request(s) in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
+# ---- the named presets (KICK-dKeptSession-1) ----------------------------------------------------
+
+LOOP_UNRESOLVED = "not graded · the loop kit does not resolve"
+
+
+def read_selects(loop):
+    """{(key, the value as compact JSON)} of the `[[selects]]` rows of `loop.toml` in the loop kit's
+    directory `loop`; a Refusal naming the file where it does not read."""
+    path = Path(loop) / "loop.toml"
+    try:
+        rows = tomllib.loads(path.read_text(encoding="utf-8")).get("selects") or []
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise policy.Refusal(path.as_posix(), 0, f"does not read: {exc}") from None
+    return {(r["key"], policy.render_json(r["value"])) for r in rows if isinstance(r, dict) and "key" in r and "value" in r}
+
+
+def check_preset_loads(store, kit, repo, loader):
+    """-> (the two halves' note, findings) for each shipped preset of `store`: its load by `loader`,
+    `presets.load_preset`'s signature, against the expansion rule run once on the `[[selects]]` pairs it
+    assigns. The by-key half reds a refusal whose key and value no `[[selects]]` row names; the
+    row-named half reds a row-named pair the rule refuses and the load admits, and names the pairs the
+    rule admits, which it cannot grade until TOOL-dDeclaredLoop-101's judgement refuses one. Where the
+    loop kit does not resolve from `kit`, both halves announce and nothing is a finding (§8 F7)."""
+    try:
+        loop = policy.resolve_kit_dir("loop", "guard.py", kit)
+    except LookupError:
+        return f"by-key half {LOOP_UNRESOLVED} · row-named half {LOOP_UNRESOLVED}", []
+    try:
+        named = read_selects(loop)
+    except policy.Refusal as exc:
+        return "the [[selects]] rows did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    findings, loads, graded, admitted = [], 0, 0, set()
+    for name in store.get("preset") or {}:
+        try:
+            load = loader(name, None, presets=store, here=kit, top=repo)
+        except policy.Refusal as exc:
+            findings.append((f"preset.{name}", f"the load did not answer: {exc.path}:{exc.line} · {exc.why}"))
+            continue
+        loads += 1
+        refused = {(k, policy.render_json(v)) for k, v, _w in load.refusals}
+        findings += [(f"preset.{name} · {k}", f"the load refuses {k} = {policy.render_toml_value(v)}, which no "
+                      f"[[selects]] row names: {why}") for k, v, why in load.refusals if (k, policy.render_json(v)) not in named]
+        pairs = [(policy.render_dotted(k), v) for k, v in load.assignment.items()
+                 if (policy.render_dotted(k), policy.render_json(v)) in named]
+        if not pairs:
+            continue
+        try:
+            rule = {i for i, _w in presets.run_expansion_verb(loop / "guard.py", pairs, repo)[0]}
+        except policy.Refusal as exc:
+            findings.append((f"preset.{name}", f"the expansion rule did not answer: {exc.why}"))
+            continue
+        for i, (k, v) in enumerate(pairs):
+            if i not in rule:
+                admitted.add(policy.render_toml_value(v).strip('"'))
+                continue
+            graded += 1
+            if (k, policy.render_json(v)) not in refused:
+                findings.append((f"preset.{name} · {k}", f"the expansion rule refuses {k} = "
+                                 f"{policy.render_toml_value(v)} and the load admits it"))
+    note = f"by-key half {loads} load(s) · row-named half {graded} refused pair(s) graded"
+    if admitted:
+        note += f" · presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits {', '.join(sorted(admitted))}"
+    return note, findings
+
+
+def arm_presets(repo, kit, loader=presets.load_preset):
+    """The shipped preset store beside `kit` (KICK-dKeptSession-1 S5): `presets.check_presets`' findings,
+    then the two load halves of `check_preset_loads`, the loads run in `repo`. A store that does not
+    read is the one finding; a store holding no preset is a population of 0, a finding."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    try:
+        store = presets.load_presets(kit)
+    except policy.Refusal as exc:
+        return 0, f"{presets.STORE} did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    findings = presets.check_presets(rows, store)
+    shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
+    note, more = check_preset_loads(store, kit, repo, loader) if shipped else ("no load ran", [])
+    n = len(presets.derive_presettable(rows, presets.derive_never(store)))
+    return len(shipped), f"{len(shipped)} preset(s), {n} presettable key(s) each · {note}", findings + more
+
+
 # One row per arm: its name, its function (repo, kit) -> (population, why, findings), what a
 # population of 0 means, `finding` or `announce` (TOOL-dGroundRules-21 S5), the choice the README's
 # "Each arm in an adopter" table opens its last column with, and the reason for that choice. Every row
@@ -1038,6 +1140,7 @@ ARMS = [
     Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"),
         empty="announce", why="a tree with no tracked code is legal"),
     Arm("arm_cap_census", arm_cap_census, empty="finding", why="the census ships in the kit, so it always has rows"),
+    Arm("arm_presets", arm_presets, empty="finding", why="the presets ship in the kit, so the store always holds them"),
 ]
 ARM = {a.name: a for a in ARMS}
 
@@ -2102,11 +2205,7 @@ def derive_strict_value(row, cell):
     return next((m for m in members if (m if isinstance(m, str) else policy.render_toml_value(m)) == cell), cell)
 
 
-def check_same_value(a, b):
-    """True when two policy values are one: a set-valued pair compared as a set, else type and value."""
-    if isinstance(a, list) and isinstance(b, list):
-        return {policy.render_json(m) for m in a} == {policy.render_json(m) for m in b}
-    return policy.check_member(a, [b])
+check_same_value = presets.check_same_value  # the one comparison of two policy values, the presets' module's
 
 
 def derive_strict_population(text, rows):
@@ -5428,6 +5527,216 @@ def run_pass_lane_case(name):
     return print_checks(name, checks)
 
 
+# ---- the named presets' cases (KICK-dKeptSession-1) ------------------------------------------------
+
+def set_preset_block(text, name, edit):
+    """The store's `text` with the `[preset.<name>]` table's body passed through `edit`."""
+    head = f"\n[preset.{name}]\n"
+    at = text.index(head) + len(head)
+    end = text.find("\n[", at)
+    end = len(text) if end < 0 else end + 1
+    return text[:at] + edit(text[at:end]) + text[end:]
+
+
+def render_fifth_preset(text):
+    """The store's `text` with a fifth table, the default preset's keys under a name the `preset` row lacks."""
+    body = []
+    set_preset_block(text, presets.derive_default_preset(policy.load_catalogue(KIT))[0], lambda b: body.append(b) or b)
+    return text.rstrip("\n") + "\n\n[preset.extra]\n" + body[0]
+
+
+# Each `presets-complete` plant (AC2) and the `presets-pairs` store plant (AC3): (edit of the store's
+# text, the preset and the key its finding must name, a needle of its why).
+PRESET_PLANTS = {
+    "key-cut": (lambda t: set_preset_block(t, "strict", lambda b: re.sub(r'(?m)^"hooks\.bypass" = .*\n', "", b)),
+                "strict", "hooks.bypass", "lacks"),
+    "value-refused": (lambda t: set_preset_block(t, "guarded", lambda b: re.sub(
+        r'(?m)^"hooks\.bypass" = .*$', '"hooks.bypass" = "maybe"', b)), "guarded", "hooks.bypass", "maybe"),
+    "default-moved": (lambda t: set_preset_block(t, "standard", lambda b: re.sub(
+        r'(?m)^"leases\.expiry-hours" = .*$', '"leases.expiry-hours" = 25', b)), "standard", "leases.expiry-hours",
+        "is not the row's default"),
+    "fifth-table": (render_fifth_preset, "extra", "preset", "`of` lacks"),
+}
+PAIR_PLANT = (lambda t: set_preset_block(t, "velocity", lambda b: re.sub(
+    r'(?m)^"review\.design\.round-count" = .*$', '"review.design.round-count" = 5', b)),
+    "velocity", "review.design.round-count", "review.max-rounds")
+
+
+def check_store_plant(scenario, repo, kit, plant):
+    """`plant` written over the kit copy's store, `arm_presets` run, then the store put back and run
+    again -> the two checks: red naming the plant's preset and key, then green."""
+    edit, name, key, needle = plant
+    store = kit / presets.STORE
+    shipped = store.read_bytes()
+    write_edit(store, edit)
+    _v, findings = run_arm(ARM["arm_presets"], repo, kit)
+    hit = any(k == f"preset.{name} · {key}" and needle in why for k, why in findings)
+    store.write_bytes(shipped)
+    verdict, clean = run_arm(ARM["arm_presets"], repo, kit)
+    seen = "; ".join(f"{k}: {w}" for k, w in findings) or "no finding"
+    return [(scenario, f"arm_presets names preset.{name} · {key}", hit, seen),
+            (scenario + ", unplanted", "arm_presets", not clean, "; ".join(f"{k}: {w}" for k, w in clean) or verdict)]
+
+
+def build_presets_repo(rows):
+    """`build_repo`'s repository with this kit's store copied beside its catalogue, and the three
+    modules `presets.py check` runs on there."""
+    repo, kit = build_repo(rows)
+    for name in (presets.STORE, "presets.py", "policy.py", "budgets.py"):
+        (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
+    return repo, kit
+
+
+def run_presets_complete(name):
+    """`presets-complete` (AC2): each plant of PRESET_PLANTS on a copy of the shipped store reds
+    `arm_presets` naming its preset and key, and the copy put back is green. The repository holds no
+    loop kit, so the load halves announce."""
+    repo, kit = build_presets_repo(policy.load_catalogue(KIT))
+    try:
+        checks = [c for plant, p in PRESET_PLANTS.items() for c in check_store_plant(plant, repo, kit, p)]
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
+def run_presets_pairs(name):
+    """`presets-pairs` (AC3, AC4): `velocity`'s `review.design.round-count` set past its
+    `review.max-rounds` on a copy of the store reds `arm_presets` naming the pair and the preset, and
+    `presets.py check` over that planted copy exits 1 naming `velocity` and both keys; and `policy.py
+    check` over a file whose only revision sets the round count past `standard`'s ceiling exits 0
+    valid, since the pair rules judge the store alone (§8 F10)."""
+    edit, preset, key, needle = PAIR_PLANT
+    repo, kit = build_presets_repo(policy.load_catalogue(KIT))
+    try:
+        checks = check_store_plant("velocity-pair", repo, kit, PAIR_PLANT)
+        store = kit / presets.STORE
+        shipped = store.read_bytes()
+        write_edit(store, edit)
+        checks.append(check_run("velocity-pair", "presets.py check", [sys.executable, str(kit / "presets.py"), "check"],
+                                lambda rc, o, e: rc == 1 and any(f"preset.{preset} · {key}" in ln and needle in ln
+                                                                 for ln in o.splitlines()), repo))
+        store.write_bytes(shipped)
+    finally:
+        remove_repo(repo)
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        over = build_reader_repo(t / "over", 'preset = "standard"\nreview.design.round-count = 4\n')
+        checks.append(check_get("override-past-ceiling", over, [], lambda rc, o, e: rc == 0 and "is valid" in o,
+                                verb="check"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_presets_repo(name):
+    """`presets-repo` (AC5): a `[presets.ours]` table extending `strict` with one override, named by
+    `preset`, reads valid; committed alone extending `lax`, or setting a key presets never touch, it is
+    refused naming the key."""
+    ours = 'preset = "ours"\n\n[presets.ours]\nextends = "{base}"\n{key} = {value}\n'
+    cases = (("extends-strict", ours.format(base="strict", key='"leases.expiry-hours"', value="12"), 0, "is valid"),
+             ("extends-lax", ours.format(base="lax", key='"leases.expiry-hours"', value="12"), 2, "presets.ours.extends"),
+             ("never-key", ours.format(base="strict", key='"policy-file.guard"', value='"owner-only"'), 2,
+              'presets.ours."policy-file.guard"'))
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        for scenario, text, want, needle in cases:
+            repo = build_reader_repo(t / scenario, text)
+            checks.append(check_get(scenario, repo, [], lambda rc, o, e, want=want, needle=needle: rc == want and (
+                needle in o if want == 0 else e.startswith(f"policy: refused · {POLICY_REL}:") and needle in e), verb="check"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+CORE_FLOW_POINT = "point.flow.release"  # the release slot `build.closes = after-release-verifies` selects
+
+
+def build_core_only_repo(t):
+    """A repository at `t` holding this kit's files, the loop kit whole and the playbook kit's
+    `layers.toml` at their own paths under the tool root, committed on main, the register copy's core
+    rows declaring no CORE_FLOW_POINT. -> (repo, kit copy)."""
+    repo = t / "core"
+    prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    kit = repo / prefix if prefix else repo
+    kit.mkdir(parents=True)
+    for p in KIT.iterdir():
+        if p.is_file() and p.suffix in (".py", ".toml", ".txt"):
+            (kit / p.name).write_bytes(p.read_bytes())
+    loop = policy.resolve_kit_dir("loop", "guard.py", KIT)
+    shutil.copytree(loop, kit.parent / loop.name, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    layers = policy.resolve_kit_dir("playbook", "layers.toml", loop) / "layers.toml"
+    register = kit.parent / layers.parent.name / layers.name
+    register.parent.mkdir()
+    register.write_bytes(re.sub(rb'(?m)^(declares = \[.*?)"%s", ' % CORE_FLOW_POINT.encode(), rb"\1", layers.read_bytes()))
+    run_fixture_git(repo, "init", "-q")
+    run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "a core-only register")
+    return repo, kit
+
+
+def plant_absent_by_key(name, table, presets=None, here=KIT, top="."):
+    """`absent-by-key`: a loader refusing every key a `[[selects]]` row names, whatever its value."""
+    keys = {k for k, _v in read_selects(policy.resolve_kit_dir("loop", "guard.py", here))}
+    assignment = presets_module.derive_preset_assignment(name, presets, table)
+    return presets_module.Load(assignment, [(policy.render_dotted(k), v, "planted: its key is a [[selects]] key")
+                                            for k, v in assignment.items() if policy.render_dotted(k) in keys], [])
+
+
+def plant_accept_all(name, table, presets=None, here=KIT, top="."):
+    """`accept-all`: a loader admitting every value."""
+    return presets_module.Load(presets_module.derive_preset_assignment(name, presets, table), [], [])
+
+
+presets_module = presets  # the plants' own parameter shadows the module's name
+
+
+def run_presets_core_only(name):
+    """`presets-core-only` (AC6, AC7): in a scratch tree whose register copy's core rows declare no
+    CORE_FLOW_POINT, `presets.py load` exits 0 for a preset whose `build.closes` selects nothing and 2
+    for one selecting the release slot, naming that key, its value and the point and no other key;
+    `arm_presets` prints no finding there, its row-named half grading each preset's refused pair, and
+    it reds the `absent-by-key` plant naming `standard` and the `accept-all` plant naming `strict`.
+    Only `standard` and `strict` load here; the four loads over the shipped register are `policy
+    check`'s, over the real tree (AC9)."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        repo, kit = build_core_only_repo(t)
+        store = presets.load_presets(kit)
+        selects = {n: any(policy.render_dotted(k) == "build.closes" and v == "after-release-verifies"
+                          for k, v in presets.derive_preset_assignment(n, store, None).items()) for n in store["preset"]}
+        want = {n: selects[n] for n in ("standard", "strict")}
+
+        def judge(refuses):
+            def ok(rc, o, e):
+                said = [ln for ln in o.splitlines() if " · refused · " in ln]
+                if not refuses:
+                    return rc == 0 and not said and " · loaded · " in o
+                return rc == 2 and len(said) == 1 and all(n in said[0] for n in (
+                    "build.closes", "after-release-verifies", CORE_FLOW_POINT))
+            return ok
+        argv = [sys.executable, str(kit / "presets.py"), "load"]
+        checks += [check_run(f"register without {CORE_FLOW_POINT}", f"presets.py load {n}", argv + [n], judge(r), repo)
+                   for n, r in want.items()]
+        verdict, findings = run_arm(ARM["arm_presets"], repo, kit)
+        graded = f"row-named half {sum(selects.values())} refused pair(s) graded"
+        checks.append((f"register without {CORE_FLOW_POINT}", f"arm_presets unplanted, {graded}",
+                       not findings and graded in verdict, "; ".join(f"{k}: {w}" for k, w in findings) or verdict))
+        for plant, loader, preset in (("absent-by-key", plant_absent_by_key, "standard"),
+                                      ("accept-all", plant_accept_all, "strict")):
+            _v, findings = run_arm(Arm(plant, lambda r, k, loader=loader: arm_presets(r, k, loader), "finding"), repo, kit)
+            checks.append((plant, f"arm_presets names preset.{preset} · build.closes",
+                           any(k == f"preset.{preset} · build.closes" for k, _w in findings),
+                           "; ".join(f"{k}: {w}" for k, w in findings) or "no finding"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", ARM["arm_shape"], seed_no_empty),
     ("shape-unknown-field", ARM["arm_shape"], seed_unknown_field),
@@ -5486,6 +5795,10 @@ CASES = [
     ("census-source-receipt", None, run_census_source_receipt),  # gov's source-mode receipt read as no receipt is
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
     *((c, None, run_pass_lane_case) for c in PASS_LANE_CASES),  # a pass-leg run and an inline red fix, end to end
+    ("presets-complete", None, run_presets_complete),  # the named presets (KICK-dKeptSession-1): the store's plants
+    ("presets-pairs", None, run_presets_pairs),  # a pair broken in a preset and over a repository's override
+    ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
+    ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders
 ]
 
 

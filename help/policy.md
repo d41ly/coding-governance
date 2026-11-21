@@ -114,6 +114,52 @@ allowed values and every check.
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
 
+## Presets
+
+A preset is a named, complete set of values for the policy keys, so a repository can pick a posture
+with one key, `preset`. Four ship in `tools/policy/presets.toml`: `velocity`, `standard`, `strict`
+and `guarded`. `standard` sets every key to its catalogue default. The reader does not apply a
+preset yet, so until dKeptSession's reader step lands a named preset changes no value you read.
+
+Some keys stay out of every preset: the file's `never` list names the keys presets never touch, such
+as `floor`, `preset` itself and `policy-file.guard`, because loosening the guard or switching an
+invariant off stays the owner's own choice. Every other key with a literal default has a value in
+every preset.
+
+The store also holds pairs of keys where one must be at least the other, such as `review.max-rounds`
+over `review.design.round-count`. Each pair rule is checked over the four presets only. Your own
+policy file may set a round count above its ceiling and still read valid; the review loop refuses
+that count when it runs, as it did before presets existed.
+
+- **Check the presets:** `python tools/policy/presets.py check` prints each preset with how many keys <!-- usage: script:tools/policy/presets.py#check daa13502 -->
+  it sets, and exits 1 naming the preset and the key for a missing key, a value the key's row
+  refuses, a `standard` value off its default, or a broken pair.
+- **Declare your own preset:** add a `[presets.<name>]` table to `.governance/policy.toml` with
+  `extends` naming a shipped preset and the keys you change, then set `preset = "<name>"`:
+
+  ```toml
+  preset = "ours"
+
+  [presets.ours]
+  extends = "strict"
+  "leases.expiry-hours" = 12
+  ```
+
+  `python tools/policy/policy.py check` refuses an `extends` naming no shipped preset and a key
+  presets may not set.
+- **Load a preset:** `python tools/policy/presets.py load strict --repo .` judges each of the <!-- usage: script:tools/policy/presets.py#load 8cba698f -->
+  preset's values by the loop kit's expansion rule, the same rule the loop guard applies, and exits 2
+  naming each value it refuses. On a core-only install `strict` and `guarded` still load, because the
+  release slot `build.closes = "after-release-verifies"` needs is a core point; refusing them there
+  waits on the loop kit's ask TOOL-dDeclaredLoop-101.
+- **Add a preset to the shipped store:** the kinds register's one verb copies a shipped preset into a
+  new table and adds its name to the `preset` key's values, then checks the store, putting both files
+  back when the check is red:
+
+  ```text
+  python <prefix>/playbook/core.py new preset <name> --from <preset>
+  ```
+
 ## Install
 
 `bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh f6cd6f1b -->

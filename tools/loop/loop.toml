@@ -2323,3 +2323,11 @@ point = "point.instruction.signed-proof"
 key = "instructions.edit"
 value = "flow-only"
 point = "point.instruction.flow"
+
+# build.closes = after-release-verifies needs point.flow.release, the release slot, Flow's core point in
+# Deploy where integrations' engines attach: `strict` and `guarded` close a build only after its release
+# verifies (KICK-dKeptSession-1 S4).
+[[selects]]
+key = "build.closes"
+value = "after-release-verifies"
+point = "point.flow.release"

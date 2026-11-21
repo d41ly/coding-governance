@@ -1308,14 +1308,15 @@ rename always leaves the record your stage follows; a stage tag of yours that di
 
 ## Making a new part
 
-Six kinds of the kinds register have a factory in this kit: a command, a policy key, a hook, a role,
-a workflow and a scenario. A factory writes a new instance that already conforms, then runs the kind's gate over
+Seven kinds of the kinds register have a factory in this kit: a command, a policy key, a preset, a
+hook, a role, a workflow and a scenario. A factory writes a new instance that already conforms, then runs the kind's gate over
 the whole population. You reach each one through the register's one verb, which appends your name and
 flags to the factory its row names:
 
 ```text
 python <prefix>/playbook/core.py new command <verb> --kit <id> --run <path>
 python <prefix>/playbook/core.py new policy-key <name> --allowed <toml> --default <toml> --summary <text> --usage <text> --owner <build>
+python <prefix>/playbook/core.py new preset <name> --from <preset>
 python <prefix>/playbook/core.py new hook <name> --kit <id> --event <event> [--matcher <m>]
 python <prefix>/playbook/core.py new role <slot> --workflow <name> --writes <class> --description <text> --reads <keys> --returns <text> --output <text> --ceiling <bytes>
 python <prefix>/playbook/core.py new workflow <name> --driver <driver> --harness <path|none> --roles <slots> --enforced-by <text> --trigger <text> --order <n> --step <step tag|none>
@@ -1337,6 +1338,11 @@ naming it.
   `policy-check:` line. A default the row's own `allowed` refuses is red on `arm_shape`. A loop bound or
   deadline key is red on `arm_direction`, since the factory writes no `direction`. It writes the
   catalogue only, never `.governance/policy.toml` or the mirror `.governance/policy.json`.
+- **A preset:** `python tools/loop/factories.py preset <name> --from <preset>` appends a <!-- usage: script:tools/loop/factories.py#preset 50dec72b -->
+  `[preset.<name>]` table to the policy kit's preset store, `presets.toml`, copying every key of the
+  shipped preset `--from` names, and adds the name to the policy catalogue's `preset` row. Its gate is
+  `arm_presets` of `policy check`, run in process. A `--from` that names no preset of the store, or a
+  name the store already holds, exits 2 before anything is written.
 - **A hook:** `python tools/loop/factories.py hook <name> --kit <id> --event <event> --matcher <m>` <!-- usage: script:tools/loop/factories.py#hook 7f9371c9 -->
   writes `<name>.js` and `<name>.fragment.json` beside the descriptor whose `id` is `--kit`, and a
   `[[files]]` row shipping each one where no `include` of that descriptor already does. `--matcher`
@@ -1368,7 +1374,10 @@ naming it.
   `command-new`, `policy-key-new`, `hook-new`, `role-new` and `workflow-new`. Each `-hand` case writes
   a hand-made instance that does not conform and expects the same gate red: `command-hand`,
   `policy-key-hand`, `hook-hand`, `role-hand` and `workflow-hand`. `scenario-new` and `scenario-hand`
-  do the same for a scenario, the hand row naming an entry step that does not exist. `factory-restores` gives a policy
+  do the same for a scenario, the hand row naming an entry step that does not exist. `preset-new` runs
+  the preset factory from `standard` and expects green, with the preset kind off the pending list of
+  `core.py kinds`; `preset-from-unknown` names a `--from` the store lacks and expects exit 2 with the
+  clone left clean. `factory-restores` gives a policy
   key a default its own row refuses, and expects exit 1 with the clone left clean.
   `factory-restores-create` runs the hook factory, which creates its files, after committing a hand
   fragment that holds the hook gate red, and expects exit 1 with no created file left on disk and the
