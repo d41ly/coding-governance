@@ -75,3 +75,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T17:51:12Z draw · re-dispatch · KICK-dKeptSession-3 · 7/132 · 20261121T175112Z-819c73
 
 2026-11-21T17:51:12Z dispatch · item e793d2fb KICK-dKeptSession-3 · reason tools/policy/policy.py tools/policy/check_policy.py tools/playbook/policy_value.py tools/playbook/render_playbook.py tools/playbook/instruction_units.py tools/govkit/entries/playbook.kit.toml tools/govkit/usage.toml coding-governance-agents.template.md AGENTS.md .governance/instructions.lock memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json help/policy.md help/charter.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-3-1-acceptance-ledger.md
+
+2026-11-21T18:13:13Z brief · item KICK-dKeptSession-34 · reason 3022f2c40e91 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-34-build-brief.md
+
+2026-11-21T18:14:39Z dispatch · item 7b25e1b9 KICK-dKeptSession-34 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-34-1-acceptance-ledger.md
