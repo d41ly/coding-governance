@@ -838,3 +838,6 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T15:46:35Z dispatch · item 74ae4b50 TOOL-dWitnessedBar-108 · reason memory/project/shell-role.txt
 
 2026-11-21T16:10:11Z brief · item TOOL-dWitnessedBar-108 · reason 035e2c32aa64 memory/builds/dWitnessedBar/prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md
+2026-11-21T16:12:34Z draw · fix-pass · TOOL-dWitnessedBar-108 · 128/180 · 20261121T161234Z-e9a21d
+
+2026-11-21T16:12:34Z dispatch · item 732e605d TOOL-dWitnessedBar-108 · reason tools/run-gates/leg_factory.py memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-108-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-108.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
