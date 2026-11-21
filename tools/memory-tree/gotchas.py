@@ -610,7 +610,7 @@ def cmd_check(root: str, conf: dict) -> int:
             bad.append(f"check 17: {m}/gotchas/INDEX.md is missing — run gotchas.py --write")
         elif read(idx) != want:
             bad.append(f"check 17: {m}/gotchas/INDEX.md is stale — run gotchas.py --write")
-    notes = []
+    notes, marks = [], {}
     if recs:
         paths = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
         ao = append_only_re(root)
@@ -652,6 +652,10 @@ def cmd_check(root: str, conf: dict) -> int:
             n = sum(1 for r in recs if r["kind"] == "class" and r["universal"])
             if n > budget and mode == "warn":
                 notes.append(f"BUDGET WARN — universal-gotchas · {m}/gotchas · {n} count over {budget} · {rule}")
+                # The runner's `gate-warn` marker, printed after its note where the notes print (TOOL-dWitnessedBar-29
+                # S2); the policy kit's module is loaded, since only it answers `warn`.
+                import budgets
+                marks[notes[-1]] = budgets.render_warn_marker(f"{m}/gotchas", f"universal-gotchas · {n} count over {budget}")
             elif n > budget:
                 bad.append(f"check 19: {n} universal record(s) against a budget of {budget} — every one "
                            f"is emitted on EVERY checklist, so raise the budget in a commit that says why ({rule})")
@@ -666,6 +670,8 @@ def cmd_check(root: str, conf: dict) -> int:
     # green run's output (TOOL-aGraftedHelix-3 S7) so a skip is never mistaken for a pass.
     for line in notes:
         print(line)
+        if line in marks:
+            print(marks[line])
     for line in bad:
         print("HYGIENE " + line)
     if advisory:
@@ -1276,7 +1282,9 @@ def cmd_selftest() -> int:
         tw, _cw = build_tree("with-ids", {
             "x.md": _rec("x", "d", f"Fires on `{PFX}some-gate.sh`. Nothing said about a gate.\n"),
             "inv.md": build_invariant("inv")},
-            {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\nORPHAN_ID_PIN="0"\n',
+            {".memory-tree.conf": conf_text + 'CHARTER="AGENTS.md"\n',
+             # The orphan waiver, empty, arms checks 13 and 14 (TOOL-dWitnessedBar-17 S4).
+             "memory/project/id-orphan-waiver.txt": "",
              "AGENTS.md": "# charter\n\nRead `memory/README.md` first.\n"})
 
         def run_framed(loader):

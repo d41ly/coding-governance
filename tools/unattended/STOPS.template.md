@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.133 -->
+<!-- gov:kit unattended@1.134 -->
 [memory/guides/UNATTENDED-STOPS.md · Level 3 · Binding for an unattended run that stops without finishing; yields to levels 0 to 2]
 # The unattended stop contract — HELD, the hold codes and the lease
 
@@ -735,26 +735,31 @@ is `aged`, and otherwise a bisection names the landing that introduced it. A pro
 answer reads `age unproven` and is never escalated: a leg with no `signature` whose far end is red
 WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed offender
 from a moved count line; red carrying all of them is `aged`. **The age decides the escalation, never
-the landing.** The policy is the pair of keys in the file `GATE_POLICY_FILE` names, both read at R
+the landing.** The bound is `INHERITED_RED_MAX_AGE` in the file `GATE_POLICY_FILE` names, read at R
 and parsed, never sourced. A blank `GATE_POLICY_FILE`, or a conf absent at R, reads the file the
-pre-push hook reads, `.githooks/gate-env.sh` at R, so the two readers cannot disagree. The kit
-default is `land`: that file absent too, a named policy file absent at R, and an absent or blank
-`INHERITED_RED` all read it, and `land` with no positive bound reads `land` with no bound. A value
-outside `park land` reads `park`. The item announces which.
+pre-push hook reads, `.githooks/gate-env.sh` at R, so the two readers cannot disagree.
 
-- **`land`, every red INHERITED at any age, on a bar whose verdict reads `tree_moved no`:** MET, and
-  the record gains `gates-inherited: <R8> <legs>`; the MET line names the legs read `aged`. The
-  pre-push hook reads the same policy at the same R and lands the push, printing the legs. An
+**Which red blocks is the policy key `verdict.blocks`**, read at R by `policy.py get --rev`, by the
+driver and the hook alike, and handed to the bar. The runner writes each red's `blocks`, `block` or
+`pass`, by its class: `own-only` passes `MIXED`, `CONTENDED` and `INHERITED`; `own-mixed-contended`
+passes `INHERITED`; `every-red` passes none; `OWN` and `DEAD PROBE` block under every value. No
+policy kit reads the catalogue default `own-only`; a read that fails or answers outside the three
+reads `every-red`. The item announces which, and `verdict_flow.py route` writes each red's route
+beside the bar's attribution.
+
+- **Every red's `blocks` reads `pass`, at any age, on a bar whose verdict reads `tree_moved no`:**
+  MET, and the record gains `gates-inherited: <R8> <legs>`; the MET line names the legs read `aged`.
+  The pre-push hook reads the same value at the same R and lands the push, printing the legs. An
   attended push lands over it too.
-- **`park`, declared:** UNMET, printing
-  `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
+- **Every red INHERITED and one blocking:** UNMET, printing
+  `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; verdict.blocks=<value>`.
   Take that hold in this order: commit the staged records, push the branch, reap the keepalive, then
   `--hold` with that code, condition and reason and `--reaped`. It refuses a dirty tree otherwise.
-- **Any leg OWN, MIXED, DEAD PROBE or CONTENDED, or a moved tree:** UNMET with the attribution
-  lines. That red is the run's, and so is every red on a bar whose diff edited its own grader (KF3).
+- **Any other blocking red, or a moved tree:** UNMET with the attribution lines. That red is the
+  run's, and so is every red on a bar whose diff edited its own grader (KF3).
 
-**Every inherited leg gets an owner on the record, and its age escalates it.** Once `ASKS_CMD` is
-declared, the item files one ask per INHERITED leg in the closing build's `BACKLOG.md`: a `seen`
+**Every red that passes gets an owner on the record, and its age escalates it.** Once `ASKS_CMD` is
+declared, the item files one ask per red reading `pass`, its text naming the class, in the closing build's `BACKLOG.md`: a `seen`
 locator pinned at R with the leg's `run` command, an `accept` clause, a SEV HIGH row and a KEEP row,
 staged and read back through `ASKS_CMD`. An `aged` leg's ask is SEV BLOCKER instead, its text
 `inherited red: leg <leg> red at <R8>, older than the <n>-landing age bound`, and the memory tree's

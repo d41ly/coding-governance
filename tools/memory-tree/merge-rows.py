@@ -36,6 +36,11 @@ A state the mapping does not hold conflicts too, so a missed row fails closed. A
 reproduce `tomllib`'s read of it fails closed, and the written bytes are re-cut before they are returned, so they
 parse, hold each key once and hold each chunk as one side wrote it.
 
+A FIFTH CLASS, THE BASELINE LEDGERS, IS ROWS OF TAB FIELDS (TOOL-dWitnessedBar-13). A ledger's home is
+declared in its registration rather than path-shaped, so `check_ledger` reads the header the factory in
+`legacy_ledger.py` rendered on all three sides. Its row plane is every line neither blank nor `#`, keyed
+by the header's key fields, and the row rule is "drained beats carried, the lower count wins".
+
 A GENERATED VIEW IS NEVER MERGED WITH AN AUTHORED SHARD. After the switch-over
 `memory/backlog/<FAMILY>.md` is RENDERED from the per-build files, and a branch forked before it
 still edits that path as an authored shard. Line-merging those two is silent damage in both
@@ -280,6 +285,21 @@ def resolve_view_layer():
     return _VIEW_LAYER
 
 
+_LEDGER_FACTORY = None
+
+
+def resolve_ledger_factory():
+    """This kit's own `legacy_ledger.py`, the baseline ledger factory whose rendered header names a ledger
+    (TOOL-dWitnessedBar-13 S6). LAZY and APPENDED for `resolve_view_layer`'s reasons: an import failure
+    raised from in here lands in the fail-closed handler, and the kit directory never shadows the stdlib."""
+    global _LEDGER_FACTORY
+    if _LEDGER_FACTORY is None:
+        sys.path.append(str(pathlib.Path(__file__).resolve().parent))
+        import legacy_ledger as LL  # noqa: PLC0415 — deliberately deferred; see above
+        _LEDGER_FACTORY = LL
+    return _LEDGER_FACTORY
+
+
 def read_kit_conf() -> dict:
     """`.memory-tree.conf` at the anchor root, through the kit's ONE parser.
 
@@ -445,17 +465,19 @@ def settled(lines: list[str]) -> list[str]:
     return out
 
 
-def census(lines: list[str]) -> dict[str, int]:
+def census(lines: list[str], plane=None) -> dict[str, int]:
     """How many times each ROW-SHAPED line occurs, keyed on the stripped text.
 
     Stripped because the question is about content, not endings: this driver's whole newline contract
     exists so a CRLF region survives as CRLF, and a census that compared raw bytes would answer "not
     a duplicate" for the same line arriving from a CRLF side and an LF side — or for one side's copy
     of a row landing as the file's final line with no terminator, which is the reachable shape.
+    `plane` is the `(predicate, key)` pair `merge` selected; None is the generic bullet plane.
     """
+    is_row = (plane or GENERIC_PLANE)[0]
     out: dict[str, int] = {}
     for ln in lines:
-        if not _ROW_RE.match(ln):
+        if not is_row(ln):
             continue
         s = ln.strip()
         if s:
@@ -544,7 +566,7 @@ def _over(merged: dict[str, int], inputs: list[dict[str, int]]) -> list[tuple]:
     return sorted((s, n, cap.get(s, 0)) for s, n in merged.items() if n > 1 and n > cap.get(s, 0))
 
 
-def no_new_duplicates(merged: list[str], *inputs: list[str], ids=row_ids) -> None:
+def no_new_duplicates(merged: list[str], *inputs: list[str], ids=row_ids, plane=None) -> None:
     """Refuse to write a row, or a record key, more times than the most any ONE input carried it.
 
     The backstop for everything the anchor grammar cannot key. The row plane guarantees conservation
@@ -561,11 +583,12 @@ def no_new_duplicates(merged: list[str], *inputs: list[str], ids=row_ids) -> Non
     `ids` IS THE RECORD KEYING AND IT IS A PARAMETER, decided by the caller from `%P` rather than
     sniffed from the content: `row_ids` for the id-anchored indexes, `measure_row_classes` for a
     per-build `BACKLOG.md`, whose grammar puts one ask's id at the head of every row about it. The
-    line half is unchanged by either, because a line is a line in both grammars.
+    line half is unchanged by either, because a line is a line in both grammars. A ledger's row plane
+    reaches the line half through `plane`, and its key census through `ids` (TOOL-dWitnessedBar-13).
     """
     clean = settled(merged)
     sides = [settled(side) for side in inputs]
-    over = _over(census(clean), [census(s) for s in sides])
+    over = _over(census(clean, plane), [census(s, plane) for s in sides])
     if over:
         s, n, was = over[0]
         raise DuplicatedContent(
@@ -776,6 +799,60 @@ def _row_key(line: str) -> str:
     return "raw:" + hashlib.sha1(body.encode("utf-8", "surrogateescape")).hexdigest()[:16]
 
 
+# THE ROW PLANE `merge` SELECTS ONCE AND PASSES TO EVERY READER OF ROWS: a predicate naming which lines
+# are rows and a key for each (TOOL-dWitnessedBar-13 S6). The generic plane is the bullet test and
+# `_row_key`, and every reader's default, so every non-ledger merge runs as it did before the ledger
+# class arrived; `build_ledger_plane` is the other one.
+GENERIC_PLANE = (_ROW_RE.match, _row_key)
+
+
+def build_ledger_plane(arity: int) -> tuple:
+    """A ledger's row plane: every line neither blank nor `#` is a row, keyed by its first `arity` TAB
+    fields, `arity` read from the header the factory rendered."""
+    def check_row(line: str) -> bool:
+        return bool(line.strip()) and not line.lstrip().startswith("#")
+
+    def derive_key(line: str) -> str:
+        return "row:" + "\t".join(f.strip() for f in _split_term(line)[0].split("\t")[:arity])
+    return check_row, derive_key
+
+
+def measure_ledger_keys(lines: list[str], plane: tuple) -> dict[str, int]:
+    """How many rows carry each ledger key — the `ids` census `no_new_duplicates` takes for a ledger, as
+    `measure_row_classes` is for a per-build backlog."""
+    is_row, row_key = plane
+    out: dict[str, int] = {}
+    for ln in lines:
+        if is_row(ln):
+            k = row_key(ln)
+            out[k] = out.get(k, 0) + 1
+    return out
+
+
+def check_ledger(path: str | None, lines: list) -> bool:
+    """Are the sides, `lines` in `%O`, `%A`, `%B` order, a ledger opening with its rendered header? The
+    home is declared rather than path-shaped, so the header the factory wrote decides, never `path`;
+    `%A` and `%B` both carry it, and `%O` carries it too or carries none, empty or a legacy grammar, as
+    a home both sides seeded or converted from one base has none (TOOL-dWitnessedBar-51 S31). Either
+    side with no header keeps the generic plane. Headers that disagree raise `StructureDrift`: a merge
+    cannot choose between two registrations."""
+    ll = resolve_ledger_factory()
+    heads = []
+    for n, side in enumerate(lines):
+        head = _split_term(side[0])[0] if side else ""
+        try:
+            ll.parse_header(head)
+        except ValueError:
+            if n == 0:
+                continue
+            return False
+        heads.append(head.strip())
+    if len(set(heads)) > 1:
+        raise StructureDrift(f"{path or 'the merged path'}: the three ledger headers disagree "
+                             f"({' | '.join(heads)}), so no one registration describes the merge")
+    return True
+
+
 def _token_of(body: str) -> str | None:
     """The key a token line names, or None when the line is structure."""
     if len(body) > 2 and body.startswith(_SENT) and body.endswith(_SENT):
@@ -783,22 +860,24 @@ def _token_of(body: str) -> str | None:
     return None
 
 
-def skeleton(lines: list[str]) -> tuple[list[str], dict[str, list[str]]]:
+def skeleton(lines: list[str], plane=None) -> tuple[list[str], dict[str, list[str]]]:
     """(the line list with every ROW replaced by its token, key -> the BODIES of its row lines).
 
     Bodies and not lines: the terminator a row carried in its source blob is used HERE, on the
     token, and nowhere else. On the way back a substituted row takes the terminator of the TOKEN's
     position in the merged skeleton (site 7), so carrying the source terminator any further is what
-    fuses two records onto one line when the merge relocates a formerly-final row.
+    fuses two records onto one line when the merge relocates a formerly-final row. `plane` is the
+    `(predicate, key)` pair `merge` selected; None is the generic bullet plane.
     """
+    is_row, row_key = plane or GENERIC_PLANE
     skel: list[str] = []
     rows: dict[str, list[str]] = {}
     for ln in lines:
         body, term = _split_term(ln)
-        if not _ROW_RE.match(ln):
+        if not is_row(ln):
             skel.append(ln)
             continue
-        k = _row_key(ln)
+        k = row_key(ln)
         rows.setdefault(k, []).append(body)
         skel.append(_SENT + k + _SENT + term)
     return skel, rows
@@ -829,7 +908,22 @@ def _conflict(ours: list[str] | None, theirs: list[str] | None) -> tuple:
     return ("conflict", [open_ln] + list(ours or []) + [_SEP] + list(theirs or []) + [close_ln])
 
 
-def resolve_rows(O: dict, A: dict, B: dict) -> dict[str, list[tuple]]:
+def _resolve_lower_count(a: list[str], b: list[str], arity: int) -> list[str] | None:
+    """The ledger rule for a key both sides changed: the side with the lower count, its sha and
+    disposition with it, or None where the counts tie or either side is not one row with a count."""
+    def read_count(bodies):
+        if len(bodies) != 1:
+            return None
+        fields = bodies[0].split("\t")
+        c = fields[arity].strip() if len(fields) > arity else ""
+        return int(c) if c.isascii() and c.isdigit() else None
+    ca, cb = read_count(a), read_count(b)
+    if ca is None or cb is None or ca == cb:
+        return None
+    return a if ca < cb else b
+
+
+def resolve_rows(O: dict, A: dict, B: dict, *, ledger_arity: int | None = None) -> dict[str, list[tuple]]:
     """key -> the LIST of entries it resolves to. An entry is one row body, or one marker block.
 
     A pure per-key decision with NO ordering — ordering is the skeleton's job. `key -> LIST` and
@@ -853,6 +947,12 @@ def resolve_rows(O: dict, A: dict, B: dict) -> dict[str, list[tuple]]:
     outcome is deliberate and guarded: if the row carries an id, `no_new_duplicates`' id half refuses
     it; if it carries none, it is a note and not a record, and keeping both is what an append-only
     record does.
+
+    THE LEDGER RULE, under `ledger_arity` (TOOL-dWitnessedBar-13 S6): drained beats carried, which the
+    one-sided delete branch already honours, and a key both sides changed takes the lower count with
+    that side's sha and disposition. Equal counts with a different sha or disposition stay a conflict.
+    A key both sides ADDED takes the lower count too, so a widen is never dropped at a merge's choice,
+    and a key one side took out and the other changed stays a conflict region (TOOL-dWitnessedBar-51 S31).
     """
     resolved: dict[str, list[tuple]] = {}
     order = list(O) + [k for k in A if k not in O] + [k for k in B if k not in O and k not in A]
@@ -862,12 +962,16 @@ def resolve_rows(O: dict, A: dict, B: dict) -> dict[str, list[tuple]]:
         if in_a and in_b:
             if A[k] == B[k]:
                 entries = rows(A[k])
+            elif not in_o and ledger_arity is not None and (lower := _resolve_lower_count(A[k], B[k], ledger_arity)):
+                entries = rows(lower)                 # a ledger key both added: the lower count wins
             elif not in_o:
                 entries = [_conflict(A[k], B[k])]     # both minted it, differently
             elif O[k] == A[k]:
                 entries = rows(B[k])                  # only theirs changed it
             elif O[k] == B[k]:
                 entries = rows(A[k])                  # only ours changed it
+            elif ledger_arity is not None and (lower := _resolve_lower_count(A[k], B[k], ledger_arity)):
+                entries = rows(lower)                 # a ledger: the lower count wins
             else:
                 entries = [_conflict(A[k], B[k])]     # all three differ
         elif in_a:
@@ -1147,7 +1251,7 @@ def reconcile(skel: list[str], resolved: dict, O: dict, A: dict, B: dict, term: 
 # The two new postconditions
 # --------------------------------------------------------------------------------------------
 
-def no_row_loss(merged: list[str], resolved: dict, facts: dict) -> None:
+def no_row_loss(merged: list[str], resolved: dict, facts: dict, plane=None) -> None:
     """CONSERVATION, over the written bytes: each key's row count equals what the plane resolved.
 
     NOT a uniqueness check, and the distinction is the whole point. "That row appears exactly once"
@@ -1162,13 +1266,15 @@ def no_row_loss(merged: list[str], resolved: dict, facts: dict) -> None:
     twice, and all five postconditions were silent. So the comparison is against what the
     reconciliation actually EMITTED into settled text, which is zero for a marker block and zero for
     a rule-4 substitution by construction, rather than against `len(resolved[key])` with a list of
-    excuses.
+    excuses. Rows are counted on the plane `merge` selected (`plane`, None the generic one): on the
+    bullet plane a ledger's TAB rows would count as nothing and every ledger merge would refuse.
     """
+    is_row, row_key = plane or GENERIC_PLANE
     seen: dict[str, int] = {}
     for ln in settled(merged):
-        if not _ROW_RE.match(ln):
+        if not is_row(ln):
             continue
-        k = _row_key(ln)
+        k = row_key(ln)
         seen[k] = seen.get(k, 0) + 1
     emitted = facts["emitted"]
     bad = []
@@ -1183,7 +1289,7 @@ def no_row_loss(merged: list[str], resolved: dict, facts: dict) -> None:
                       f"resolved them, e.g. {k!r} ({txt}) written x{got} against {want}")
 
 
-def structure_identity(merged: list[str], skel: list[str]) -> None:
+def structure_identity(merged: list[str], skel: list[str], plane=None) -> None:
     """The output's structure is the merged skeleton's structure, byte for byte, in order.
 
     MARKERS ARE EXCLUDED ON BOTH SIDES and that word is load-bearing. The skeleton carries git's own
@@ -1193,12 +1299,14 @@ def structure_identity(merged: list[str], skel: list[str]) -> None:
     headline case this unit exists for.
 
     Cheap, total, and it is the assertion that says out loud that structure correctness here is a
-    property of CONSTRUCTION rather than of a heuristic.
+    property of CONSTRUCTION rather than of a heuristic. Rows are told from structure on the plane
+    `merge` selected (`plane`, None the generic one).
     """
+    is_row = (plane or GENERIC_PLANE)[0]
     want = [ln for ln in skel
             if not _MARKER_RE.match(ln.lstrip()) and _token_of(_split_term(ln)[0]) is None]
     got = [ln for ln in merged
-           if not _MARKER_RE.match(ln.lstrip()) and not _ROW_RE.match(ln)]
+           if not _MARKER_RE.match(ln.lstrip()) and not is_row(ln)]
     if want == got:
         return
     for i, (w, g) in enumerate(zip(want, got)):
@@ -1356,11 +1464,19 @@ def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
             if _SENT in ln:
                 raise StructureDrift(f"{name} line {n} contains the token sentinel U+0001, so "
                                      f"tokenization cannot be unambiguous")
+    # THE LEDGER CLASS (TOOL-dWitnessedBar-13 S6), asked after the table class and the view/shard
+    # refusal and before the skeleton, since the plane it selects is what the skeleton splits by. The
+    # plane, its predicate and its key are chosen ONCE here and handed to every reader of rows below.
+    ledger_arity = None
+    plane = GENERIC_PLANE
+    if check_ledger(path, [o_lines, a_lines, b_lines]):
+        ledger_arity = len(resolve_ledger_factory().parse_header(_split_term(a_lines[0])[0])["fields"])
+        plane = build_ledger_plane(ledger_arity)
     term = _dominant(a_lines, b_lines, o_lines)
-    o_skel, O = skeleton(o_lines)
-    a_skel, A = skeleton(a_lines)
-    b_skel, B = skeleton(b_lines)
-    resolved = resolve_rows(O, A, B)
+    o_skel, O = skeleton(o_lines, plane)
+    a_skel, A = skeleton(a_lines, plane)
+    b_skel, B = skeleton(b_lines, plane)
+    resolved = resolve_rows(O, A, B, ledger_arity=ledger_arity)
     # The bool is deliberately discarded: whether the SKELETON conflicted is not the verdict. A
     # token-only region becomes an auto-resolve (rule 3) and any other becomes a conflict (rule 4),
     # and the verdict below is read off the bytes actually written.
@@ -1387,11 +1503,16 @@ def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
     # elements, and both new postconditions passed a list-level reading of the exact corruption they
     # exist to catch.
     by_class = check_build_backlog(path)
-    no_new_duplicates(merged, o_lines, a_lines, b_lines,
-                      ids=measure_row_classes if by_class else row_ids)
+    if ledger_arity is not None:
+        ids = lambda lines: measure_ledger_keys(lines, plane)  # noqa: E731 — the key census, bound to the plane
+    else:
+        ids = measure_row_classes if by_class else row_ids
+    no_new_duplicates(merged, o_lines, a_lines, b_lines, ids=ids, plane=plane)
+    # Unchanged on a ledger, and what it does not check there: its `sections` keys a line through the
+    # anchor grammar's `key`, which keys a bullet-led line only, so over TAB rows it compares nothing.
     no_misfiled_rows(merged, o_lines, a_lines, b_lines)
-    no_row_loss(merged, resolved, facts)
-    structure_identity(merged, skel)
+    no_row_loss(merged, resolved, facts, plane)
+    structure_identity(merged, skel, plane)
 
     # THE AUDIT LINE. Every number is derived from the written bytes and the three inputs AFTER the
     # fact — never from a counter incremented at an emit site, which is how the retired line came to
@@ -1400,9 +1521,11 @@ def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
     # the grammar is in step, and
     # a FAMILIES drift turns every row hashed without moving any other number.
     clean = settled(merged)
-    written = [ln for ln in clean if _ROW_RE.match(ln)]
-    keyed = sum(1 for ln in written if key(ln) is not None)
-    nrow = lambda side: sum(1 for ln in side if _ROW_RE.match(ln))  # noqa: E731 — used three times
+    is_row = plane[0]
+    written = [ln for ln in clean if is_row(ln)]
+    # A ledger row is keyed by construction — its key is its first TAB fields — so every one is keyed.
+    keyed = len(written) if ledger_arity is not None else sum(1 for ln in written if key(ln) is not None)
+    nrow = lambda side: sum(1 for ln in side if is_row(ln))  # noqa: E731 — used three times
     honoured = sum(1 for k, e in resolved.items() if not e)
     conflicted = any(ln.lstrip().startswith(_OPEN) for ln in merged)
     pairs = sum(1 for ln in merged if ln.lstrip().startswith(_OPEN))
@@ -1418,7 +1541,8 @@ def merge(o_lines, a_lines, b_lines, *, path=None) -> tuple[list[str], bool]:
           f"{len(written)} written ({keyed} keyed, {len(written) - keyed} hashed), "
           f"{honoured} deletes honoured, {len(facts['conflicts'])} row conflicts, "
           f"{facts['regions']} structure conflicts, "
-          f"census {'class-keyed' if by_class else 'generic'}, {verdict}", file=sys.stderr)
+          f"census {'ledger-keyed' if ledger_arity is not None else 'class-keyed' if by_class else 'generic'}, "
+          f"{verdict}", file=sys.stderr)
     return merged, conflicted
 
 

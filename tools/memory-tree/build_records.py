@@ -88,6 +88,11 @@ exactly where `Signals` stands. The door also refuses an `Answers` naming no rec
 build; every refusal exits 1, writing nothing. `--fixture --plant recommendation` stages a score record, the
 reason answering it, each refusal and their bindings.
 
+THE WIDEN KIND (TOOL-dWitnessedBar-14 S5): `<date>-build-<unit id>-widen-<n>.md`, a population's growth
+admitted with its reason: `Population`, `Keys` (each key backticked, its fields TAB-joined), `Reason` and
+`Caused-by`. It has no `new` door: the ratchet pack's `ratchet.py widen` calls `write_record` and writes the
+row `widened:<record stem>` beside it, and its `never gains` leg reads the record back through `read_record`.
+
 THE CARD KIND (TOOL-dPlacedRequest-2 S8): `<date>-build-<anchor id>-card-<n>.md`, a build's orientation card
 at one step, its snapshot, the anchor the transition kind's: `Build`, `Step` (one word), `Ref` (the card ref's
 commit, eight to forty hex digits, or `none`), then the card's text in one `~~~~` fenced block. `read_card`
@@ -109,8 +114,24 @@ holding a CR or an LF, or opening `**<Word>:**`, before it writes anything, so n
 field; every door's refusal exits 1, writing nothing. Its `lines`, written after the fields, are refused
 the same way, and so is a line that reads as a field.
 
+THE FLAKE KIND (TOOL-dWitnessedBar-8 S3): `<date>-build-<unit id>-flake-<n>.md`, one `test.flakes` run's
+verdicts: `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one fenced block of TAB rows, `<leg> · <first rc> ·
+<re-run rc or ->`, one per leg the run executed. It has no `new` door: the run-gates kit's `verdict_flow.py
+flakes` loads this factory as `keep_tails.py` does and calls `write_record`. The body's one reader is
+`read_flake_body`, its rows, and a row flaked where `derive_flaked` says so: its first rc a non-zero integer and
+its re-run rc 0. Both kits that read flake records, run-gates and drift, read them through these two
+(TOOL-dWitnessedBar-1 S7), so the grammar has this one home.
+
+THE GATE-HEALTH KIND (TOOL-dWitnessedBar-1 S4): `<date>-build-<unit id>-gate-health-<n>.md`, one gate-health
+measurement: `Measured` (the reliability bar, `<count>/10`), `Verdicts` (the `Run` of every flake record it
+read) and `Legs` (`<armed>/<bar legs>`). It has no `new` door: the drift kit's `drift_report.py --gate-health
+--write` loads this factory in-process and calls `write_record`, and the run-gates kit's `verdict_flow.py` reads
+the newest one's `Measured` as `verdict.flakes.entry`'s `measured` threshold.
+
 `build_records.py read <path>` prints one record's fields and every refusal: exit 0 well-formed, 1 malformed,
-2 an unreadable path or a pending kind.
+2 an unreadable path or a pending kind. A kind with a reader of its own is read by it; `exception` by
+`read_exception`; every other kind, `widen`, `leg-tail`, `flake` and `gate-health` among them, by
+`read_record` and its `KINDS` entry alone.
 
 ONE KIND LIST (PLAY-dOrderedCharter-42 S2): `KINDS`' keys are `tree_lib.TYPED_RECORD_KINDS`, the kinds the
 bindings reader admits and joins to their file names, and an import whose table differs from that tuple
@@ -213,6 +234,25 @@ KINDS = {
         "required": ("Stage", "Score", "Source", "Binds", "Reason", "Role", "Caused-by"),
         "closed": (("Score", RECOMMEND_SCORES), ("Binds", RECOMMEND_BINDS)),
     },
+    "widen": {   # TOOL-dWitnessedBar-14 S5: written by the ratchet pack's `ratchet.py widen`, no `new` door
+        "required": ("Population", "Keys", "Reason", "Caused-by"),
+        "closed": (),
+    },
+    "leg-tail": {   # TOOL-dWitnessedBar-25 S6: written by the run-gates kit's `keep_tails.py`, no `new` door;
+        # the tail itself is one fenced block after the fields
+        "required": ("Leg", "Hash", "Run", "Sha", "Cause"),
+        "closed": (),
+    },
+    "flake": {   # TOOL-dWitnessedBar-8 S3: written by the run-gates kit's `verdict_flow.py flakes`, no `new` door;
+        # one TAB row per executed leg in a fenced block after the fields
+        "required": ("Run", "Ended", "Sha", "Tree", "Legs"),
+        "closed": (),
+    },
+    "gate-health": {   # TOOL-dWitnessedBar-1 S4: written by the drift kit's `drift_report.py --gate-health --write`,
+        # no `new` door
+        "required": ("Measured", "Verdicts", "Legs"),
+        "closed": (),
+    },
     "card": {
         "required": ("Build", "Step", "Ref"),
         "closed": (),
@@ -305,6 +345,17 @@ def read_records(root, conf, kind, reader):
             others = ", ".join(o["path"] for o in group if o is not r)
             r["malformed"].append(("file name", f"shares {kind}-{n} with {others}"))
     return records
+
+
+# -------------------------------------------------------------------------------- the flake kind's body
+def read_flake_body(text):
+    """[(leg, first rc, re-run rc or -)], the TAB rows of a flake record's body (TOOL-dWitnessedBar-1 S7)."""
+    return [tuple(ln.split("\t")) for ln in text.replace("\r\n", "\n").split("\n") if ln.count("\t") == 2]
+
+
+def derive_flaked(first, rerun):
+    """True where a flake row flaked: its first rc a non-zero integer and its re-run rc 0."""
+    return first not in ("0", "-") and first.lstrip("-").isdigit() and rerun == "0"
 
 
 # -------------------------------------------------------------------------------- the exception kind
@@ -1318,8 +1369,10 @@ def main(argv):
         bad = read_probe_trigger(rel, text)["malformed"]
     elif kind == "probe":
         bad = read_probe(rel, text)["malformed"]
-    else:
+    elif kind == "exception":
         bad = read_exception(rel, text)["malformed"]
+    else:   # TOOL-dWitnessedBar-8 §8 F12: a kind with no rules of its own reads by its `KINDS` entry alone
+        bad = read_record(rel, text, kind)[1]
     for ln in text.replace("\r\n", "\n").split("\n"):
         if m := FIELD.match(ln):
             print(f"build-records: {rel} · {m.group(1)}: {m.group(2).strip()}")

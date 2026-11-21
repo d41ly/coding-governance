@@ -20,7 +20,7 @@
 #   unattended.sh --refused <slug> --item <tag> --key <key> --reason <text>  # record a refused item; --plan prints the frontier
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --rescope <slug> --flow <tag> --act <add|amend|exclude|supersede> --item <id> [--row <path>] --reason <text>
-#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...]
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [<path> ...] [--writes <path> ...] [--fix-of <red>]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--round-highs <N> --round-minors <N>] [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --trigger <slug> --subject <s> --cause owed|opt-in|recommendation|placement [--pin <path>]...   # fire a review: print its call's pin, trigger and review policy
@@ -92,7 +92,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.133 # gov:kit unattended@1.133 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.134 # gov:kit unattended@1.134 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -583,6 +583,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 
 # The bound itself. DEFAULTED rather than required, and ANNOUNCED rather than silent.
 #
@@ -1039,7 +1057,9 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass"
+# `fix-of` joined in TOOL-dWitnessedBar-21: `--dispatch --fix-of`'s history row, the red a fix pass is
+# declared against, read back by `check_fix_keeps`; not owed. The two held copies move with it.
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff refusal fix-pass fix-of"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -12522,29 +12542,26 @@ verb_resume() { # slug
   return 0
 }
 
-# ========================================================== THE INHERITED-RED POLICY — TOOL-dDerivedDocket-24
+# ========================================================== WHICH RED BLOCKS — TOOL-dWitnessedBar-3, -dDerivedDocket-24
 # A red the landing base already carries used to leave a run two answers, both bad: override
 # `gates-green`, which spends the one check between an unattended run and its landing, or abort. This
 # section is the third, and it is a POLICY rather than a judgment the run makes about itself.
 #
 # THE POLICY IS READ AT R AND NEVER FROM THE TREE. R is the tip `observe_anchor` saw the remote
-# advertise — never local main and never any other local ref, both of which the run can write. The
-# conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED AT R, and the two keys
-# `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R.
-# Both reads PARSE and never execute: one anchored match per key, the value's trailing comment and one
-# pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
-# a run that re-points the conf key moves nothing until a gated push has landed it.
+# advertise — never local main and never any other local ref, both of which the run can write. Which
+# red blocks is the policy key `verdict.blocks`, read by the policy kit's `policy.py get --rev R`
+# (TOOL-dWitnessedBar-3 S5): no policy kit reads the catalogue default `own-only`, and a reader that
+# fails or answers outside the three values reads `every-red`, because a typo must never land a red,
+# and so does a missing R. The conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED
+# AT R, and the age bound `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R; that
+# read PARSES and never executes: one anchored match, the value's trailing comment and one pair of
+# quotes stripped. A run that loosens its own copy of either therefore enables nothing until a gated
+# push has landed it. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY:
+# a red that passes lands at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
 #
-# BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
-# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named and
-# no hook file at R, a named one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
-# bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
-# never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
-# INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
-# INHERITED red lands under `land` at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
-#
-# WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
-# from the run record of a bar whose id this driver pinned, and never re-derived.
+# WHAT THIS DOES NOT DECIDE: whether a red is inherited, or whether it blocks. Both are the runner's
+# attribution record, the class and its ninth field `blocks`, read here from the run record of a bar
+# whose id this driver pinned, and never re-derived.
 #
 # TWO COPIES OF THIS PARSER, BYTE-IDENTICAL, and the second is the pre-push hook's. The hook ships
 # verbatim through another kit and cannot source this one, so the parse is spelled twice; the two
@@ -12567,22 +12584,21 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
-# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
-# hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
-# conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
-# before it defaults to land. Defaulting first made the two readers disagree in the direction that
-# strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
-# The path is spelled as the hook derives it; a named file is still the conf's, read as before.
+GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN AGE BOUND (closing review round 1, M7 and
+# M12). The hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says,
+# so when the conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at
+# the same R. The path is spelled as the hook derives it; a named file is still the conf's.
 # GP_POST_MERGE IS READ FROM THE HOOK'S OWN FILE AT R, whatever GATE_POLICY_FILE names
 # (TOOL-aFrugalTurnstile-9 S1, spec F3): the hook binds a post-merge red and the lander starts the
 # post-merge bar only where that file declares one, so a declaration read anywhere else could buy a
-# scoped close that no post-merge bar follows.
-read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
-  local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
-  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
+# scoped close that no post-merge bar follows. Which red blocks is `verdict.blocks`, read by
+# `read_gate_blocks` below at the same R (TOOL-dWitnessedBar-3 S5).
+read_gate_policy() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red), GP_MAX_AGE (a positive integer, or empty), GP_WHY and GP_POST_MERGE
+  local r=$1 conf path blob="" age bnd via="" hook=".githooks/gate-env.sh"
+  GP_POLICY=every-red; GP_MAX_AGE=""; GP_WHY=""; GP_POST_MERGE=""
   if [ -z "$r" ]; then
-    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
+    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at, which reads every-red"; return 0
   fi
   GP_POST_MERGE=$(read_policy_key "$(GIT show "$r:$hook" 2>/dev/null)" GATE_POST_MERGE)
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
@@ -12592,42 +12608,91 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
     path=$(read_policy_key "$conf" GATE_POLICY_FILE)
     [ -n "$path" ] || via="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}"
   fi
-  if [ -n "$via" ]; then
-    path=$hook
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="$via, and the pre-push hook's own $path is absent there too, so the kit default land applies, with no age bound"; return 0
-    fi
-  else
-    case "$path" in
-      /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-        GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
-    esac
-    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-      GP_POLICY=land
-      GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
-    fi
+  [ -z "$via" ] || path=$hook
+  case "$path" in
+    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+      read_gate_blocks "$r"
+      GP_WHY="$GP_WHY, with no age bound: GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+  esac
+  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+    read_gate_blocks "$r"
+    GP_WHY="$GP_WHY, with no age bound: $path is absent at ${r:0:8}${via:+; $via}"; return 0
   fi
-  pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
-  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings"; else bnd="no age bound"; fi
-  # THE BOUND TRAVELS UNDER EITHER POLICY when one is declared: the runner ages and owns each
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings, read from $path at ${r:0:8}"
+  else bnd="no positive INHERITED_RED_MAX_AGE in $path at ${r:0:8}, so no leg is aged and nothing is escalated"; fi
+  [ -z "$via" ] || bnd="$bnd; $via, so the file the pre-push hook reads decides"
+  # THE BOUND TRAVELS UNDER EVERY VALUE when one is declared: the runner ages and owns each
   # INHERITED leg with it, and the auto-filed ask names that owner and is escalated BLOCKER when the
   # leg reads aged. Nothing lands or holds on it.
-  case "$pol" in
-    land) GP_POLICY=land; GP_MAX_AGE=$age
-          if [ -n "$age" ]; then
-            GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
-          else
-            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, so no leg is aged and nothing is escalated"
-          fi ;;
-    park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
-    '')   GP_POLICY=land; GP_MAX_AGE=$age
-          GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
-    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
+  GP_MAX_AGE=$age
+  read_gate_blocks "$r"
+  GP_WHY="$GP_WHY, with $bnd"
+}
+
+# THE `verdict.blocks` VALUE AT R (TOOL-dWitnessedBar-3 S5), read through the policy kit's own reader
+# as `read_spec_audit_switch` finds it, `--rev` the advertised tip, so a run that loosens its own
+# policy file enables nothing. No policy kit reads the catalogue default `own-only`, announced; a
+# reader that exits non-zero or answers outside the three values reads `every-red`, because a typo must
+# never land a red. The pre-push hook reads the same key the same way at the same R.
+read_gate_blocks() { # R -> GP_POLICY (own-only|own-mixed-contended|every-red) and GP_WHY
+  local r=$1 py d out rc=0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    GP_POLICY=own-only; GP_WHY="no policy kit resolves beside this kit, so the catalogue default own-only applies"
+    return 0
+  fi
+  out=$("$py" "$d/policy.py" get verdict.blocks --rev "$r" 2>/dev/null) || rc=$?
+  out=${out%$'\r'}
+  case "$rc:$out" in
+    0:own-only|0:own-mixed-contended|0:every-red)
+      GP_POLICY=$out; GP_WHY="read by policy.py get at ${r:0:8}" ;;
+    *) GP_POLICY=every-red
+       GP_WHY="policy.py get verdict.blocks at ${r:0:8} exited $rc answering '$out', outside 'own-only own-mixed-contended every-red', which reads every-red" ;;
   esac
-  [ -z "$via" ] || GP_WHY="$GP_WHY; $via, so the file the pre-push hook reads decides"
+}
+
+# THE ROUTES OF A RED BAR (TOOL-dWitnessedBar-3 S6): the run-gates kit's `verdict_flow.py route` writes
+# the routing record beside the bar's attribution and prints one `route` line per red, relayed here.
+# It decides nothing this driver reads: the decision table reads the attribution's `blocks` field. A
+# kit or a python that does not resolve, or a route that refuses, is announced and changes nothing.
+# TOOL-dWitnessedBar-30 S4, S5 - THEN THE QUIET RE-RUN, after a route that wrote: `verdict_flow.py
+# quiet-rerun` runs each blocking CONTENDED red once alone on a quiet host, or waits, its lines relayed,
+# and each `owner  <leg>  ...` line it prints is filed as the owner item, a HIGH ask through
+# `write_leg_ask`, reused while one is OPEN for that leg, with the bar's capture put back after it.
+run_verdict_route() { # run dir · slug
+  local d=$1 slug=$2 py k out rc=0 line leg rb qf
+  [ -n "$d" ] && [ -f "$d/verdict" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "unattended: gates-green — no run-gates kit holding verdict_flow.py resolves beside this kit, so the reds are not routed"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_flow.py" route --run "$d" 2>&1) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/unattended: gates-green — /'
+  if [ "$rc" != 0 ]; then
+    echo "unattended: gates-green — verdict_flow.py route exited $rc, so the reds are not routed"
+    return 0
+  fi
+  rc=0
+  qf=$(mktemp) || { echo "unattended: gates-green — no scratch file for quiet-rerun, so no contended red was re-run"; return 0; }
+  "$py" "$k/verdict_flow.py" quiet-rerun --run "$d" >"$qf" 2>&1 || rc=$?
+  sed 's/^/unattended: gates-green — /' "$qf"
+  [ "$rc" = 0 ] || echo "unattended: gates-green — verdict_flow.py quiet-rerun exited $rc, so no contended red was re-run"
+  rb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "owner  "*) ;; *) continue ;; esac
+    leg=${line#owner  }; leg=${leg%%  *}
+    write_leg_ask "$slug" "$leg" "contended red, no quiet host: leg" \
+      "waited past flow.wait-ceiling · ${line#owner  "$leg"  } · accept the leg is re-run alone on a quiet host, or its contention is fixed" \
+      HIGH "a blocking CONTENDED red found no quiet host to re-run on within flow.wait-ceiling" \
+      "filed by an unattended run as the owner item a contended red's wait raises; outside this build's goal" || :
+  done <"$qf"
+  rm -f -- "$qf"
+  RB_OUT=${rb[0]}; RB_STDOUT=${rb[1]}; RB_TOOK=${rb[2]}; RB_ERR=${rb[3]}
+  return 0
 }
 
 # THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
@@ -12635,19 +12700,20 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
 #
 #   the verdict reads tree_moved yes                  moved   UNMET, naming the move
 #   no usable record (see below)                      none    UNMET exactly as before this unit
-#   every red INHERITED, at any age, policy land       land    MET, a gates-inherited fact
-#   every red INHERITED, policy park                   hold    UNMET, the hold line
-#   any OWN, MIXED, DEAD PROBE or CONTENDED            other   UNMET, the attribution lines
+#   every row's `blocks` reads pass, at any age        land    MET, a gates-inherited fact
+#   every red INHERITED, one reading block             hold    UNMET, the hold line
+#   anything else                                      other   UNMET, the attribution lines
 #
 # A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
 # with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
-# partial record is not an all-INHERITED one. THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an
-# aged leg, and one whose age is unproven, land under `land` like any other. GR_AGED names the legs
-# whose age reads `aged` — never an unproven one, since nothing proves it aged — for the BLOCKER
-# escalation and the MET line.
+# partial record is not an all-passing one. `blocks` is the row's ninth field, the runner's under the
+# `verdict.blocks` value this driver handed it (TOOL-dWitnessedBar-3 S5); anything but `pass` blocks.
+# THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an aged leg, and one whose age is unproven,
+# land like any other. GR_AGED names the legs whose age reads `aged` — never an unproven one, since
+# nothing proves it aged — for the BLOCKER escalation and the MET line.
 GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
 read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comma-joined) and GR_WHY
-  local d=$1 pol=$2 v tm fl wb n=0 inh=0 leg ver age
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 pass=0 leg ver age blk
   GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
   if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
     GR_WHY="the bar left no run record under the id this driver pinned"; return 0
@@ -12664,21 +12730,20 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comm
   if [ "$v" != RED ] || [ "$tm" != no ] || [ -n "$wb" ] || [ ! -f "$d/attribution" ]; then
     GR_WHY="the bar's record is not a RED verdict on an unmoved tree beside an attribution record"; return 0
   fi
-  while IFS=$'\t' read -r leg ver _ _ _ age _; do
+  while IFS=$'\t' read -r leg ver _ _ _ age _ _ blk _; do
     [ -n "$leg" ] || continue
     n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
-    [ "$ver" = INHERITED ] || continue
-    inh=$((inh + 1))
+    [ "$blk" = pass ] && pass=$((pass + 1))
     [ "$age" = aged ] && GR_AGED="$GR_AGED${GR_AGED:+,}$leg"
+    [ "$ver" = INHERITED ] && inh=$((inh + 1))
   done < "$d/attribution"
   if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
     GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
   fi
-  if [ "$inh" != "$n" ]; then
-    GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
-  fi
-  if [ "$pol" = land ]; then GR_STATE=land; return 0; fi
-  GR_STATE=hold
+  if [ "$pass" = "$n" ]; then GR_STATE=land; return 0; fi
+  if [ "$inh" = "$n" ]; then GR_STATE=hold; return 0; fi
+  GR_STATE=other
+  GR_WHY="a red leg blocks under verdict.blocks ${pol:-every-red} and not every red is INHERITED, so this red is the run's to fix"
   return 0
 }
 
@@ -12820,6 +12885,8 @@ derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> 
   printf '%s' "$((hi + 1))"
 }
 
+# An EMPTY ask or KEEP row is not written, so an existing file takes one disposition row alone, under its
+# `## Dispositions`, as `write_ask_closing`'s `CLOSED` row (TOOL-dWitnessedBar-30 S6).
 write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP row
   local f=$1 tmp
   tmp=$(mktemp) || return 1
@@ -12838,13 +12905,14 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
                   for (i = ai + 1; i < stop; i++) if (line[i] ~ /[^ \t]/) at = i }
         if (di) { dl = di; for (i = di + 1; i <= n; i++) if (line[i] ~ /[^ \t]/) dl = i }
         for (i = 1; i <= n; i++) {
-          if (!ai && di && i == di) { print "## Asks"; print a; print "" }
+          if (!ai && di && i == di && a != "") { print "## Asks"; print a; print "" }
           print line[i]
-          if (ai && i == at) print a
-          if (di && i == dl) { print s; print k }
+          if (ai && i == at && a != "") print a
+          if (di && i == dl) { print s; if (k != "") print k }
         }
-        if (!ai && !di) { print ""; print "## Asks"; print a; print ""; print "## Dispositions"; print s; print k }
-        else if (!di)   { print ""; print "## Dispositions"; print s; print k }
+        if (!ai && !di) { if (a != "") { print ""; print "## Asks"; print a }
+                          print ""; print "## Dispositions"; print s; if (k != "") print k }
+        else if (!di)   { print ""; print "## Dispositions"; print s; if (k != "") print k }
       }' "$f" > "$tmp"
   fi
   mv "$tmp" "$f"
@@ -13013,7 +13081,7 @@ read_roster_family() { # slug -> the first family of the build README's front-ma
 # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
 # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
 # file is not a backup.
-write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
+write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 or empty · ask row · SEV row · KEEP row · [SEV, HIGH] -> 0 filed
   local bl=$1 slug=$2 id=$3 what=$4 at8=$5 sev=${9:-HIGH} prior="" had=0 restored rc=0
   if [ -f "$bl" ]; then
     had=1
@@ -13025,7 +13093,7 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
   fi
   mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$6" "$7" "$8" && GIT add -- "$bl" 2>/dev/null
   if read_ask_back "$id" "$slug" "$sev"; then
-    echo "gates-green: filed ask $id for $what red at $at8, $sev, staged in $bl"
+    echo "gates-green: filed ask $id for $what${at8:+ red at $at8}, $sev, staged in $bl"
     case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
   else
     rc=1
@@ -13050,13 +13118,16 @@ write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask
 }
 
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid blk cand reused fam seq id argv file tok a s k cls
   local r8=${2:0:8} today sev filed=0
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
-  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
-    [ "$ver" = INHERITED ] || continue
+  # ONE ASK PER ROW READING `pass` (TOOL-dWitnessedBar-3 S5), the `ask` route: a red that lands still
+  # has an owner on the record. Its text names the class, `inherited red` for an INHERITED one.
+  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid blk _; do
+    [ "$blk" = pass ] || continue
+    cls=${ver,,}
     # THE SEV OWED: BLOCKER for an aged leg, HIGH for every other one, an unproven age included.
     sev=HIGH; [ "$age" = aged ] && sev=BLOCKER
     # REUSE FIRST, over this build's own filings for the same leg AND the same R, at the SEV owed.
@@ -13067,7 +13138,7 @@ write_inherited_asks() { # slug · R · run dir
         if read_ask_back "$cand" "$slug" "$sev"; then
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
-      done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
+      done < <(grep -F -- "$cls red: leg $leg red at $r8," "$bl" 2>/dev/null \
                  | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
     fi
     [ -z "$reused" ] || continue
@@ -13090,11 +13161,11 @@ write_inherited_asks() { # slug · R · run dir
     seq=$(derive_ask_seq "$fam" "$slug")
     id="$fam-$slug-$seq"
     if [ "$sev" = BLOCKER ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     elif [ "$own8" != - ] && [ -n "$own8" ]; then
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
     else
-      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+      a="- $id · filed $today · $cls red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     fi
     if [ "$sev" = BLOCKER ]; then
       s="- SEV · $id · BLOCKER · a merge-bar leg is red on the default branch, older than the age bound"
@@ -13129,97 +13200,137 @@ write_inherited_asks() { # slug · R · run dir
 # is. Blank or absent is DARK and makes no request; a value outside `[A-Za-z0-9._-]+` ending `.yml`
 # or `.yaml` is refused by name before any URL is built from it.
 #
-# THE READ: one anonymous HTTPS GET of the runs listing and one per page of that run's jobs, at the
-# literal host `api.github.com`, for the owner and repository parsed out of the anchor URL only when
-# its host is `github.com`. No redirect is followed, no credential is sent or read, every request is
-# bounded at 30 seconds and every response at 4 MiB. Every way the read can fail to see the job is a
-# DEAD PROBE line that files nothing: a non-GitHub anchor, a non-200 answer, no completed scheduled
-# run, no job named `held <suite>`, or fewer jobs read than the API declares. A green day prints a
-# zero red count beside a non-zero job count, so a broken probe cannot read as a clean one.
+# THE READ is the run-gates kit's `remote_verdict.py held <anchor URL> <workflow file>`
+# (TOOL-dWitnessedBar-6 S7), moved there whole beside the `remote-ci` slot's reader and sharing its one
+# bounded GET: anonymous HTTPS to the literal host `api.github.com`, no redirect, no credential, 30
+# seconds and 4 MiB. It prints one TAB row per `held <suite>` job and ONE liveness line, or ONE DEAD
+# PROBE line that files nothing; a green day prints a zero red count beside a non-zero job count, so a
+# broken probe cannot read as a clean one. The kit is found as `write_flake_releases` finds its own,
+# and a python or a kit that does not resolve prints one `held reader: DEAD PROBE` line.
 #
 # REUSED BEFORE IT IS FILED, over EVERY build's `BACKLOG.md`, not only this one's: a red the daily
 # job carries for a week would otherwise collect one HIGH ask per closing build. A job name is
 # untrusted text bound for a tracked file, so one carrying a backtick, a control character, the
 # ` · ` separator or the ` → ` arrow is refused and named, and so is a head sha R does not descend
 # from. Nothing here changes the caller's verdict.
-read_held_reds() { # anchor URL · workflow file name -> one TAB row per held job and ONE liveness line, or ONE DEAD PROBE line
-  local py
-  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
-    echo "held reader: DEAD PROBE — no python launcher resolves, so nothing was read"; return 0
+
+# TOOL-dWitnessedBar-8 S8 - THE LEG ASK, extracted from `write_held_asks` at its second instance, the
+# held flaky leg `gates-green` files on a red bar's `hold` line. The summary is `<form> <leg> <ask text>`.
+# REUSE FIRST, across every tracked BACKLOG.md: an OPEN ask of that SEV whose summary opens `<form> <leg> `
+# and the ask text's first word, so a leg whose name another extends (`recall floor arms`, `recall
+# floor`) is never taken for it. Else the id is minted in the build's roster family and the ask, SEV
+# and KEEP rows are written and read back through `write_ask_rows`, the two reasons their text, and the
+# views rendered. With ASKS_CMD blank nothing is written and the rows it would have filed are printed.
+# WHAT IT DOES NOT CHECK: that the leg is a leg of the bar, or that the text is true: the caller's.
+write_leg_ask() { # slug · leg · form · ask text · SEV · SEV reason · KEEP reason -> 0 filed or reused, 1 not; one line each
+  local slug=$1 leg=$2 form=$3 text=$4 sev=$5 bl f home cand fam id a s k at8=""
+  bl="$M/builds/$slug/BACKLOG.md"
+  if [ -n "${ASKS_CMD:-}" ]; then
+    for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
+      [ -f "$f" ] || continue
+      home=${f%/BACKLOG.md}; home=${home##*/}
+      while IFS= read -r cand; do
+        [ -n "$cand" ] || continue
+        if read_ask_back "$cand" "$home" "$sev"; then
+          echo "gates-green: ask $cand already OPEN $sev for ${form#*: } $leg in $f · reused"; return 0
+        fi
+      done < <(WLA_KEY="$form $leg ${text%% *} " awk '
+                 /^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed [^ ]+ · / {
+                   r = $0; sub(/^- [^ ]+ · filed [^ ]+ · /, "", r)
+                   if (substr(r, 1, length(ENVIRON["WLA_KEY"])) == ENVIRON["WLA_KEY"]) print $2
+                 }' "$f" 2>/dev/null)
+    done
   fi
-  RHR_URL="$1" RHR_WF="$2" "$py" -c '
-import json, os, re, sys, urllib.error, urllib.request
-try:
-    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
-except Exception:
-    pass
-def dead(why):
-    print("held reader: DEAD PROBE — " + why)
-    sys.exit(0)
-url, wf = os.environ["RHR_URL"].strip(), os.environ["RHR_WF"]
-if not re.fullmatch(r"[A-Za-z0-9._-]+\.ya?ml", wf):
-    dead("the workflow file name is outside [A-Za-z0-9._-]+ ending .yml or .yaml: " + repr(wf))
-m = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?", url)
-if not m:
-    dead("the anchor URL is not a github.com repository, so there is no public job listing to read: " + (url or "(none)"))
-class Refuse(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, *args, **kwargs):
-        return None
-opener, cap = urllib.request.build_opener(Refuse), 4 << 20
-def get(path):
-    req = urllib.request.Request("https://api.github.com" + path, headers={
-        "Accept": "application/vnd.github+json", "User-Agent": "unattended-held-reader"})
-    try:
-        with opener.open(req, timeout=30) as r:
-            status, body = r.status, r.read(cap + 1)
-    except urllib.error.HTTPError as e:
-        dead("GET " + path + " answered HTTP " + str(e.code))
-    except Exception as e:
-        dead("GET " + path + " did not answer: " + type(e).__name__)
-    if status != 200:
-        dead("GET " + path + " answered HTTP " + str(status))
-    if len(body) > cap:
-        dead("GET " + path + " answered more than the 4 MiB cap")
-    try:
-        return json.loads(body)
-    except ValueError:
-        dead("GET " + path + " answered something that is not JSON")
-base = "/repos/%s/%s/actions" % (m.group(1), m.group(2))
-runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&per_page=1").get("workflow_runs") or []
-if not runs:
-    dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
-rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
-# EVERY FIELD BEFORE THE LAST IS NON-EMPTY: the writer splits on TAB, which bash collapses, so an
-# empty sha would shift the conclusion out of its field and a red would read as no verdict at all.
-if not re.fullmatch(r"[0-9a-f]{40}", sha) or not isinstance(rid, int):
-    dead("the latest completed scheduled run carries no 40-hex head sha or integer id: %r %r" % (sha, rid))
-jobs, total, page = [], None, 1
-while True:
-    got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
-    total, batch = got.get("total_count"), got.get("jobs") or []
-    jobs += batch
-    if not batch or not isinstance(total, int) or len(jobs) >= total or page >= 50:
-        break
-    page += 1
-if not isinstance(total, int) or len(jobs) != total:
-    dead("run %s declares %s job(s) and %d were read" % (rid, total, len(jobs)))
-held = [j for j in jobs if str(j.get("name") or "").startswith("held ") and str(j.get("name"))[5:].strip()]
-if not held:
-    dead("run %s at %s carries %d job(s) and none is named held <suite>" % (rid, sha[:8], len(jobs)))
-red = 0
-for j in held:
-    c = str(j.get("conclusion") or "")
-    red += c in ("failure", "timed_out")
-    # A TAB, a newline, a CR or a NUL in a name would split the row; each becomes U+001F, a control
-    # character the writer refuses by name, so the row grammar holds and the refusal stays visible.
-    print("held\t%s\t%s\t%s\t%s" % (str(j["name"])[5:].translate({0: 31, 9: 31, 10: 31, 13: 31}), sha, rid, c))
-print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:8], len(held), red))
-' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
+  fam=$(read_roster_family "$slug")
+  if [ -z "$fam" ]; then
+    echo "gates-green: no ask filed for ${form#*: } $leg — the build README names no roster family, so there is no family to mint the id in"
+    return 1
+  fi
+  id="$fam-$slug-$(derive_ask_seq "$fam" "$slug")"
+  a="- $id · filed $(date -u +%Y-%m-%d) · $form $leg $text"
+  s="- SEV · $id · $sev · $6"
+  k="- KEEP · $id · $7"
+  if [ -z "${ASKS_CMD:-}" ]; then
+    echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
+    printf '    %s\n' "$a" "$s" "$k"
+    return 1
+  fi
+  # The read-back line names where the red was seen, which a held suite's text opens with.
+  case "$text" in "red at "*) at8=${text#red at }; at8=${at8%% *} ;; esac
+  write_ask_rows "$bl" "$slug" "$id" "${form#*: } $leg" "$at8" "$a" "$s" "$k" "$sev" || return 1
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S6 - THE CLOSING ROW, beside `write_leg_ask`: `- CLOSED · <id> · by <by> · <why>`
+# appended under the home's `## Dispositions` by `write_backlog_rows`, the grammar `backlog.py`'s
+# `_extract_status` reads, and the prefix `verdict_flow.py#read_flake_releases` dates a release by. Staged,
+# and the views rendered and staged through `write_ask_views`. An ask its home's BACKLOG.md does not file,
+# or one a CLOSED row already closes, is named and left as it is.
+# WHAT IT DOES NOT CHECK: that the ask is OPEN anywhere else, or that `why` is true: the caller's.
+write_ask_closing() { # ask id · home build slug · by (sha or id) · why -> 0 written or already closed, 1 not; one line each
+  local id=$1 home=$2 by=$3 why=$4 bl
+  bl="$M/builds/$home/BACKLOG.md"
+  if [ ! -f "$bl" ] || ! grep -qF -- "- $id · filed " "$bl"; then
+    echo "gates-green: ask $id not closed — $bl files no such ask"
+    return 1
+  fi
+  if grep -qF -- "- CLOSED · $id · " "$bl"; then
+    echo "gates-green: ask $id is already CLOSED in $bl · unchanged"
+    return 0
+  fi
+  if ! write_backlog_rows "$bl" "$home" "" "- CLOSED · $id · by $by · $why" "" || ! GIT add -- "$bl" 2>/dev/null; then
+    echo "gates-green: ask $id not closed — its CLOSED row could not be written and staged in $bl"
+    return 1
+  fi
+  echo "gates-green: closed ask $id, by $by, staged in $bl"
+  case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
+  write_ask_views 1 || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-30 S3, §8 F5 - THE RELEASES, after the bar on every return code beside
+# `write_held_asks`: the run-gates kit's `verdict_flow.py select` at R into a scratch file removed after,
+# each `release  <leg>  <ask id>  <reason>` line it prints turned into that ask's closing row by
+# `write_ask_closing`, by this tree's HEAD, its home the build the id names. A kit or a python that does
+# not resolve, or a select that refuses, is announced and closes nothing; never a verdict.
+write_flake_releases() { # R -> one line per release: closed or refused
+  local r=$1 py k out rc=0 tmp line rest leg id why home head
+  [ -n "$r" ] || { echo "gates-green: releases — no advertised tip was observed, so there is no R to select at"; return 0; }
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_flow.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: releases — no run-gates kit holding verdict_flow.py resolves beside this kit, so no quarantined leg is released"
+    return 0
+  fi
+  tmp=$(mktemp) || { echo "gates-green: releases — no scratch file for the selection, so no quarantined leg is released"; return 0; }
+  "$py" "$k/verdict_flow.py" select --rev "$r" --out "$tmp" >"$tmp.lines" 2>&1 || rc=$?
+  rm -f -- "$tmp" "$tmp.tmp"
+  if [ "$rc" != 0 ]; then
+    echo "gates-green: releases — verdict_flow.py select at ${r:0:8} exited $rc, so no quarantined leg is released"
+    sed 's/^/    /' "$tmp.lines"; rm -f -- "$tmp.lines"
+    return 0
+  fi
+  head=$(GIT rev-parse HEAD 2>/dev/null) || head=""
+  while IFS= read -r line; do
+    line=${line%$'\r'}
+    case "$line" in "release  "*) ;; *) continue ;; esac
+    rest=${line#release  }; leg=${rest%%  *}; rest=${rest#*  }; id=${rest%%  *}; why=${rest#*  }
+    home=${id#*-}; home=${home%-*}
+    if [[ ! $id =~ ^[A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+$ ]] || [ -z "$head" ] || [ "$why" = "$rest" ]; then
+      echo "gates-green: releases — no ask closed: the line is not release  <leg>  <ask id>  <reason>, or HEAD does not resolve: $line"
+      continue
+    fi
+    write_ask_closing "$id" "$home" "$head" "released: leg $leg, $why" || :
+  done <"$tmp.lines"
+  rm -f -- "$tmp.lines"
+  return 0
 }
 
 write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
-  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8 bl f home cand reused fam seq id
-  local argv file tok seen a s k today filed=0
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf line suite sha run concl sha8
+  local argv file tok seen py k
   local -a rows=()
   if [ -z "$r" ]; then
     echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
@@ -13235,14 +13346,19 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
     return 0
   fi
+  # TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's, found as write_flake_releases finds it.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates remote_verdict.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: held reader: DEAD PROBE — no python launcher, or no run-gates kit holding remote_verdict.py beside this kit, so nothing was read"
+    return 0
+  fi
   while IFS= read -r line; do
+    line=${line%$'\r'}
     case "$line" in
       held$'\t'*) rows+=("$line") ;;
       ?*) echo "gates-green: $line" ;;
     esac
-  done < <(read_held_reds "${AURL:-}" "$wf")
-  bl="$M/builds/$slug/BACKLOG.md"
-  today=$(date -u +%Y-%m-%d)
+  done < <("$py" "$k/remote_verdict.py" held "${AURL:-}" "$wf" 2>&1 || echo "held reader: DEAD PROBE — the reader exited $? without a verdict")
   for line in "${rows[@]}"; do
     IFS=$'\t' read -r _ suite sha run concl <<< "$line"
     case "$concl" in failure|timed_out) ;; *) continue ;; esac
@@ -13260,27 +13376,6 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
       echo "gates-green: no ask filed for held suite $suite — its head sha $sha is not an ancestor of R $r8 here, so the red is not proven on the default branch"
       continue
     fi
-    reused=""
-    if [ -n "${ASKS_CMD:-}" ]; then
-      for f in $(GIT ls-files -- ":(glob)$M/builds/*/BACKLOG.md" 2>/dev/null); do
-        [ -f "$f" ] || continue
-        home=${f%/BACKLOG.md}; home=${home##*/}
-        while IFS= read -r cand; do
-          [ -n "$cand" ] || continue
-          if read_ask_back "$cand" "$home" HIGH; then
-            echo "gates-green: ask $cand already OPEN HIGH for held suite $suite in $f · reused"; reused=1; break
-          fi
-        done < <(grep -F -- "held red: suite $suite red at " "$f" 2>/dev/null \
-                   | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
-        [ -z "$reused" ] || break
-      done
-    fi
-    [ -z "$reused" ] || continue
-    fam=$(read_roster_family "$slug")
-    if [ -z "$fam" ]; then
-      echo "gates-green: no ask filed for held suite $suite — the build README names no roster family, so there is no family to mint the id in"
-      continue
-    fi
     # THE LOCATOR: the suite's own script at that sha when the leg manifest the bar's header names
     # resolves it there, else the workflow file at that sha, which is where the suite's job is defined.
     if argv=$(read_leg_argv "$d" "$sha" "$suite") && [ -n "$argv" ]; then
@@ -13291,21 +13386,42 @@ write_held_asks() { # slug · R · bar run dir -> one line per red held suite: f
     else
       seen="seen \`.github/workflows/$wf\`@$sha8"
     fi
-    seq=$(derive_ask_seq "$fam" "$slug")
-    id="$fam-$slug-$seq"
-    a="- $id · filed $today · held red: suite $suite red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip"
-    s="- SEV · $id · HIGH · a held self-test is red on the default branch's daily job"
-    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
-    if [ -z "${ASKS_CMD:-}" ]; then
-      echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
-      printf '    %s\n' "$a" "$s" "$k"
-      continue
-    fi
-    write_ask_rows "$bl" "$slug" "$id" "held suite $suite" "$sha8" "$a" "$s" "$k" && filed=$((filed + 1))
+    # THE ONE LEG ASK (TOOL-dWitnessedBar-8 S8): reuse, mint, rows, read-back and views are its.
+    write_leg_ask "$slug" "$suite" "held red: suite" \
+      "red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip" \
+      HIGH "a held self-test is red on the default branch's daily job" \
+      "filed by an unattended run for the owning build; outside this build's goal" || :
   done
-  [ "$filed" -gt 0 ] || return 0
-  write_ask_views "$filed" || :
-  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
+}
+
+# TOOL-dWitnessedBar-6 S8 - THE PIN'S OWNER ITEM, after the held reader and the releases on the same
+# every-return-code site: under `verdict = remote-ci` the run-gates kit's `verdict_backends.py read` at R,
+# and a HELD slot, an unset pin or a workflow differing from it, filed through `write_leg_ask` as one
+# `pin held: backend remote-ci` ask, reused while open. Any other value reads and prints nothing; a kit
+# or a python that does not resolve, or a read that refuses, is announced and files nothing. Never a
+# verdict: the lander is what refuses a landing on the slot.
+write_pin_ask() { # slug · R -> at most one line: the slot's state, or the ask filed, reused or refused
+  local slug=$1 r=$2 py k out rc=0 why
+  [ -n "$r" ] || return 0
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! k=$(resolve_kit_dir "$py" run-gates verdict_backends.py "$KIT_DIR" 2>/dev/null) || [ -z "$k" ]; then
+    echo "gates-green: verdict slot — no run-gates kit holding verdict_backends.py resolves beside this kit, so no pin is read"
+    return 0
+  fi
+  out=$("$py" "$k/verdict_backends.py" read --sha "$r" 2>&1) || rc=$?
+  out=${out//$'\r'/}
+  case "$out" in
+    *"verdict: remote-ci · HELD · "*) ;;
+    *"verdict: remote-ci · "*) printf '%s\n' "$out" | sed -n 's/^verdict: /gates-green: verdict slot: /p'; return 0 ;;
+    *"verdict: "*) return 0 ;;
+    *) echo "gates-green: verdict slot — verdict_backends.py read at ${r:0:8} exited $rc, so no pin is read: ${out//$'\n'/ · }"; return 0 ;;
+  esac
+  why=$(printf '%s\n' "$out" | sed -n 's/^verdict: remote-ci · HELD · [0-9a-f]* · //p' | head -1)
+  write_leg_ask "$slug" remote-ci "pin held: backend" \
+    "held at ${r:0:8}: $why · accept the owner re-pins verdict.remote.pin or refuses the workflow change" \
+    HIGH "the remote-ci verdict slot reads HELD, so no remote verdict stands" \
+    "filed by an unattended run for the owner; a pin is the owner's to move" || :
   return 0
 }
 
@@ -13369,7 +13485,7 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
 #
 # TOOL-dUnstuckLanding-27 S3 - THE RECORD IS NOT ALL THE CLOSE STAGES. Over an inherited-only red
-# under `land`, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
+# that passes, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
 # views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
 # The set is read from THE BAR'S OWN RUN RECORD, `staged` beside its attribution, never from the
 # run-state file (implementation review round 2, M2 and L1): a fact there was one line a run could
@@ -13427,10 +13543,57 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the
 }
 
 # TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
-# reads its bar MET over an inherited-only red under `land`, or prints the hold line over one under
-# `park` (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
+# reads its bar MET over a red every row of which passes, or prints the hold line over an inherited-only
+# one that blocks (TOOL-dDeclaredLoop-17 S6): one `path@blob` line per path the close staged, the
 # blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
 # file, and every bar has a run record of its own, so a later bar never inherits an older set.
+# TOOL-dWitnessedBar-25 S5 - A RED BAR'S FAILING-LEG TAILS, COMMITTED AS `leg-tail` RECORDS. The run-gates
+# kit's keep verb reads `trace.leg-output` itself and, under `tail-by-hash`, writes one record per tail of
+# the run that no tracked record holds, under the build's record anchor `derive_review_signals` derives;
+# each record it wrote is staged, so it commits with the close's records. Every line it prints is echoed.
+# WHAT IT DOES NOT CHECK: the records' content, which is the keep verb's; a miss here never moves the
+# item, it is named and the close goes on.
+write_leg_tails() { # slug · the bar's pinned run id
+  run_leg_records "$1" keep_tails.py leg-tail --run "$2"
+  return 0
+}
+
+# TOOL-dWitnessedBar-8 S6 - ONE RUN-AND-STAGE for a run-gates verb that writes build records, extracted
+# from `write_leg_tails` at its second instance, `verdict_flow.py flakes`. The verb runs bounded under the
+# build's record anchor, `--build <slug> --unit <anchor>` appended to its arguments; every line it prints
+# is echoed, and each `<say>: wrote <path>` line's path is staged so it commits with the close's records.
+# RB_OUT holds what it printed for a caller that reads more of it. A miss is named and returns 1; it
+# never moves the item.
+run_leg_records() { # slug · the run-gates script · the record kind it writes · its arguments… -> 0 ran, 1 not run
+  local slug=$1 script=$2 kind=$3 py="" d="" kr _lt_line _lt_rel
+  shift 3
+  derive_review_signals "$slug" build
+  if [ -z "$_rs_anchor" ]; then
+    echo "unattended: gates-green — no $kind record written: the build's generated units region names no unit to anchor it"
+    return 1
+  fi
+  kr=$KIT_DIR
+  while [ -n "$kr" ] && [ ! -e "$kr/.git" ]; do kr=${kr%/*}; done
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" run-gates "$script" "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: gates-green — no $kind record written: no python launcher, or the run-gates kit's $script does not resolve beside this kit"
+    return 1
+  fi
+  RB_BOUND=120 run_bounded "$py" -B "${kr:-.}/$d/$script" "$@" --build "$slug" --unit "$_rs_anchor"
+  while IFS= read -r _lt_line; do
+    _lt_line=${_lt_line%$'\r'}
+    [ -n "$_lt_line" ] || continue
+    echo "unattended: gates-green — $_lt_line"
+    case "$_lt_line" in
+      [a-z]*": wrote "*)
+        case "${_lt_line%%: wrote *}" in *[!a-z-]*) continue ;; esac
+        _lt_rel=${_lt_line#*: wrote }; _lt_rel=${_lt_rel%% *}
+        stage_runmd "$_lt_rel" || echo "unattended: gates-green — the $kind record git could not stage: $_lt_rel" ;;
+    esac
+  done <<<"$RB_OUT"
+  return 0
+}
+
 write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
   local p b
   local -a ps=()
@@ -14164,50 +14327,6 @@ check_phase_gates() { # slug · from · to -> 0 where the move crosses no held e
   return 1
 }
 
-# write_bar_green <git dir> <head before> <rc> <kind> <base> <bar> <run id> — the close's bar's own
-# green, by tree (TOOL-aFrugalTurnstile-3 S1, design D3). The grammar is the pre-push hook's function
-# of the same name (TOOL-aFrugalTurnstile-2): the same preconditions, the same ten keys in the same
-# order, the same `.tmp` rename and the same `.shared` copy into the common dir from a linked worktree;
-# only `by` differs. The hook ships verbatim and sources no kit, so the grammar is spelled twice and
-# held together by a parity arm in this kit's suite, as `read_policy_key` is. SILENT on a red rc, whose
-# output is already the item's; otherwise ONE line, recorded or declined with why. A `kind scoped`
-# record goes to `gate-bar-green.scoped` (and `.scoped.shared`), the hook's slot rule
-# (TOOL-aFrugalTurnstile-11 S1), so it never replaces the full record its base names.
-write_bar_green() {
-  local g=$1 h=$2 rc=$3 kind=$4 base=$5 bar=$6 run=$7 tree dirty w paths="" cdir cdir_abs g_abs f=gate-bar-green
-  local -a words=()
-  local no="unattended: gates-green — no gate-bar-green written:"
-  [ "$rc" = 0 ] || return 0
-  case "$kind" in
-    full) ;;
-    scoped) f=gate-bar-green.scoped ;;
-    "") echo "$no the bar did not run full"; return 0 ;;
-    *) echo "$no the kind '$kind' is neither full nor scoped"; return 0 ;;
-  esac
-  case "$bar" in *$'\t'*|*$'\n'*) echo "$no the bar's command holds a tab or a newline"; return 0 ;; esac
-  if [ "$(GIT rev-parse HEAD 2>/dev/null)" != "$h" ]; then echo "$no HEAD moved"; return 0; fi
-  if ! dirty=$(GIT status --porcelain --ignore-submodules=untracked 2>/dev/null) || [ -n "$dirty" ]; then
-    echo "$no the tree is not clean"; return 0
-  fi
-  tree=$(GIT rev-parse -q --verify "$h^{tree}" 2>/dev/null)
-  if [ -z "$tree" ]; then echo "$no the tree of ${h:0:8} could not be read"; return 0; fi
-  read -ra words <<<"$bar"
-  for w in "${words[@]}"; do case "$w" in */*|*.sh) paths="$paths${paths:+ }$w" ;; esac; done
-  if ! { printf 'sha\t%s\ntree\t%s\nbar\t%s\nbar_paths\t%s\nkind\t%s\nbase\t%s\nselftests\t%s\nrun_id\t%s\nby\tunattended\nstamped\t%s\n' \
-           "$h" "$tree" "$bar" "$paths" "$kind" "$base" "${GATE_SELFTESTS:+1}" "$run" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-           > "$g/$f.tmp" && mv -f "$g/$f.tmp" "$g/$f"; } 2>/dev/null; then
-    echo "$no $g/$f could not be written"; return 0
-  fi
-  cdir=$(GIT rev-parse --git-common-dir 2>/dev/null) || cdir=""
-  cdir_abs=""; [ -n "$cdir" ] && cdir_abs=$(cd "$cdir" 2>/dev/null && pwd -P)
-  g_abs=$(cd "$g" 2>/dev/null && pwd -P) || g_abs=""
-  if [ -n "$cdir_abs" ] && [ -n "$g_abs" ] && [ "$cdir_abs" != "$g_abs" ]; then
-    cp "$g/$f" "$cdir_abs/$f.shared.tmp" 2>/dev/null \
-      && mv -f "$cdir_abs/$f.shared.tmp" "$cdir_abs/$f.shared" 2>/dev/null
-  fi
-  echo "unattended: gates-green — recorded $f for ${h:0:8} (kind $kind)"
-}
-
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
@@ -14240,18 +14359,18 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _ghb _gkind _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
-      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok
-      local -a _genv _grb
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
+      local _gh0 _ghk _gdec=full _gbase="" _gfull="" _grec="" _gdrc _gdl _gok _gfl _gfr _gfleg _gff
+      local -a _genv _grb _gfrom
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
-      # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
-      # INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
+      # ref: a run's own commit on local main loosening `verdict.blocks` with its own red would sit at
+      # R, read INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
       # id is PINNED, unpredictable and cleared first, because this arm reads THAT bar's record after
       # it and a record the runner never wrote must not be mistaken for one it did.
       _gr=${ASHA:-}
       read_gate_policy "$_gr"
-      echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
+      echo "unattended: gates-green — verdict.blocks reads $GP_POLICY: $GP_WHY"
       # TOOL-dDerivedDocket-27 S4 - THE BAR'S BOUND IS THE BACKSTOP `--preflight` PINNED, because
       # GATE_WALL is a working-tree declaration the run can edit and a bound that moves between the
       # two reads is two bounds. A record that predates the fact is recomputed HERE, announced; no
@@ -14270,12 +14389,13 @@ dod_met() { # slug · run-state file · item · checker
       fi
       if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
       # TOOL-aFrugalTurnstile-12 S1 - THE BAR'S KNOBS ARE SCRUBBED FROM EVERY CALL BELOW. Its rc-0
-      # result is recorded as a trusted gate-bar-green that stores neither the manifest nor the reuse
-      # mode, so a GATE_LEGS subset or a GATE_REUSE run inherited from the driver would certify the
-      # whole bar for this tree. The hook's BAR_SCRUBBED_KNOBS plus its docs knob; the parity arm in
-      # unattended.test.sh reds when the hook names one this list lacks. `GATE_REUSE_LINEAGE` too, which
+      # result is a gates-green the close trusts, so a GATE_LEGS subset or a GATE_REUSE run inherited
+      # from the driver would certify the whole bar for this tree. The list carries every name in the hook's
+      # BAR_SCRUBBED_KNOBS and BAR_CLEARED_KNOBS, plus its docs knob; unit 60's `check_bar_scrub_parity` arm in
+      # run-gates.gov.test.sh reds when the hook names one this list lacks (TOOL-dWitnessedBar-63 S29), since
+      # the parity arm in unattended.test.sh reads BAR_SCRUBBED_KNOBS alone. `GATE_REUSE_LINEAGE` too, which
       # this bar's GATE_FULL would turn into the runner's lineage reuse (TOOL-aSparedSpawn-33 S7).
-      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT" _gset=""
+      local _gk _gknobs="GATE_LEGS GATE_REUSE GATE_REUSE_LINEAGE GATE_DOCS_BASE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT GATE_BASE_FROM GATE_SELECTION GATE_REGEN_CHECK GATE_REUSE_PUSH GATE_REUSE_DIGEST_ENV GATE_REUSE_SAMPLE GATE_REUSE_DAY" _gset=""
       local -a _gscrub=(-u GATE_WALL)
       for _gk in $_gknobs; do
         _gscrub+=(-u "$_gk")
@@ -14292,7 +14412,10 @@ dod_met() { # slug · run-state file · item · checker
         else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$DRIVER_PID"; fi
         _gdir=""
         if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
-        _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+        # TOOL-dWitnessedBar-25 S2 - the bar's cause, this run, in the runner's verdict.
+        # TOOL-dWitnessedBar-8 S1 - and each red leg re-run once on the same tree, which moves no verdict
+        # and lets `verdict_flow.py route` and `flakes` read a red-then-green leg from the run record.
+        _genv=(GATE_RUN_ID="$_gid" GATE_CAUSE="run:$slug" GATE_VERDICT_BLOCKS="$GP_POLICY" GATE_RERUN=1)
         [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
         [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
         # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
@@ -14376,10 +14499,12 @@ dod_met() { # slug · run-state file · item · checker
             esac
           fi
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
+          # TOOL-dWitnessedBar-40 S2 - a `-` full base is an inherited green, which the runner cannot
+          # tell from GATE_BASE: it is told on the argv, so it writes no per-tree verdict of this bar.
+          _gfrom=(); [ "$_gfull" = - ] && _gfrom=(GATE_BASE_FROM=inherited)
           case "$_gdec" in
-            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" "${_genv[@]}" $GATE_CMD; _grc=$? ;;
+            scoped)  run_bounded env "${_gscrub[@]}" -u GATE_FULL GATE_BASE="$_gbase" ${_gfrom[@]+"${_gfrom[@]}"} "${_genv[@]}" $GATE_CMD; _grc=$? ;;
             covered) _grc=0 ;;
             *)       run_bounded env "${_gscrub[@]}" GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$? ;;
           esac
@@ -14389,7 +14514,6 @@ dod_met() { # slug · run-state file · item · checker
           # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
           # was: the project declares a command line, not a path.
           RB_BOUND=$_gbound
-          _ghb=$(GIT rev-parse HEAD 2>/dev/null)
           # shellcheck disable=SC2086
           run_bounded env "${_gscrub[@]}" "${_genv[@]}" $GATE_CMD; _grc=$?
           RB_BOUND=""
@@ -14404,6 +14528,11 @@ dod_met() { # slug · run-state file · item · checker
       # the writer's outcome reaches neither DOD_OUT nor this item's return.
       _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR"); WI_STAGED=""
       write_held_asks "$slug" "$_gr" "$_gdir"
+      # TOOL-dWitnessedBar-30 S3 - AND THE RELEASES, on the same every-return-code site: each quarantined
+      # leg `select` at R releases has its held-flaky-leg ask closed.
+      write_flake_releases "$_gr"
+      # TOOL-dWitnessedBar-6 S8 - AND THE PIN'S OWNER ITEM, under verdict = remote-ci, on the same site.
+      write_pin_ask "$slug" "$_gr"
       RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
@@ -14412,37 +14541,36 @@ dod_met() { # slug · run-state file · item · checker
       # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
       # writes nothing new and an older record can never answer for a newer bar.
       _gh=$(GIT rev-parse HEAD 2>/dev/null)
-      # TOOL-aFrugalTurnstile-3 S2 - THE BAR'S GREEN IS RECORDED BY TREE, in the grammar the push
-      # boundary writes, so a wrapper bar that never earns a usable runner stamp still leaves a green
-      # the boundary can read. `full` under `in-place`, whose bar always runs with GATE_FULL=1; under
-      # `primary` only when this process carries GATE_FULL=1, which the bar inherits. Base is empty
-      # except on the scoped arm below.
-      # WHAT THIS RECORD DOES NOT CHECK: it says this bar exited 0 on this tree, never that the push
-      # boundary will run the same bar; that equality is the reader's, which compares the bar string
-      # byte for byte.
-      # TOOL-aFrugalTurnstile-9 S5 - the kind and base are the bar that RAN: `scoped` with the base the
-      # boundary picked, and a `covered` close ran none, so it writes no record and no `gates-run` fact.
+      # THE BAR'S VERDICT PER TREE IS THE RUNNER'S OWN RECORD (TOOL-dWitnessedBar-4 S4): the runner
+      # this bar runs writes `<common-dir>/gate-verdict/<tree hash>`, so the close writes none.
+      # TOOL-aFrugalTurnstile-9 S5 - a `covered` close ran no bar, so it writes no `gates-run` fact.
       if [ "$_gdec" = covered ]; then
         echo "unattended: gates-green — met without a bar: the boundary reads this tree as covered by $_grec"
         GG_RUN_FACT=""; DOD_OUT=""; return 0
       fi
-      _gkind=""
-      if [ "$LANDER_MODE" = in-place ] || [ "${GATE_FULL:-}" = 1 ]; then _gkind=full; fi
-      if [ "$_gdec" = scoped ]; then _gkind=scoped; fi
-      # TOOL-aFrugalTurnstile-16 S1/S3: a scoped record names the FULL base the hook's writer would,
-      # and none is written over an inherited green, which no later push can adopt as a base.
-      if [ "$_gdec" = scoped ] && [ "$_gfull" = - ]; then
-        echo "unattended: gates-green — no gate-bar-green written: the boundary scoped from an inherited green, which no later push can adopt as a base"
-      else
-        [ -z "$_ggd" ] || write_bar_green "$_ggd" "$_ghb" "$_grc" "$_gkind" "$_gfull" "$GATE_CMD" "$_gid"
-      fi
       GG_RUN_FACT="$_gid ${_gh:0:8}"
       if [ "$_grc" = 0 ]; then
         [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+        # TOOL-dWitnessedBar-51 S15 - A GREEN BAR'S FLAKE RECORD, so gate health arms and a quarantine can
+        # release: `flakes --record-only` reads `verdict.flakes` itself, writes nothing under `retry-only`,
+        # and prints no re-entry. A BARE STATEMENT with the bar's capture put back after it; a miss rides
+        # `run_leg_records`' own lines and never moves the item.
+        if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+          _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+          run_leg_records "$slug" verdict_flow.py flake flakes --record-only --run "$_gdir" || :
+          RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+        fi
         DOD_OUT=""; return 0
       fi
       fact "$rel" gates-run >/dev/null; if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$_fact" ]; then
         set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+      fi
+      # TOOL-dWitnessedBar-25 S5 - THE RED BAR'S TAILS COMMIT WITH THE CLOSE'S RECORDS, staged here beside
+      # the `gates-run` fact. A BARE STATEMENT with the bar's capture put back after it, as the held asks'.
+      if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+        _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+        write_leg_tails "$slug" "$_gid"
+        RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       fi
       GG_RUN_FACT=""
       DOD_OUT=$RB_OUT
@@ -14486,16 +14614,44 @@ dod_met() { # slug · run-state file · item · checker
           fi ;;
         1)
           # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
-          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED, at any
-          # age, under `land` is MET (TOOL-dUnstuckLanding-16); the same under `park` is UNMET and
-          # prints the hold line the Skill acts on; anything else is UNMET with the attribution lines
-          # exactly as before that unit. The MET line names the aged legs, whose asks are BLOCKER.
+          # `read_gates_record` states it, first matching row wins. Every red row reading `pass`, at
+          # any age, is MET (TOOL-dWitnessedBar-3 S5, TOOL-dUnstuckLanding-16); every red INHERITED
+          # and one blocking is UNMET and prints the hold line the Skill acts on; anything else is
+          # UNMET with the attribution lines. The MET line names the aged legs, whose asks are BLOCKER.
+          # TOOL-dWitnessedBar-3 S6 - every red bar read here is ROUTED first, its routing record
+          # written beside the attribution, each route printed.
+          run_verdict_route "$_gdir" "$slug"
+          # TOOL-dWitnessedBar-8 S6 - AND ITS FLAKES, beside the route: `verdict_flow.py flakes` reads
+          # `verdict.flakes` itself, writes the run's flake record, staged by `run_leg_records`, and under
+          # `quarantine` prints one `hold  <leg>  <flakes>/<window>  <record ids>` line per leg to hold,
+          # each filed as the held-flaky-leg ask through `write_leg_ask`, reused while one is OPEN for
+          # that leg. The OPEN ask is the hold: the selection's `quarantine` row reads it at R. A BARE
+          # STATEMENT with the bar's capture put back after it, as the held asks'; a miss never moves it.
+          if [ -n "$_gdir" ] && [ -f "$_gdir/verdict" ]; then
+            _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+            if run_leg_records "$slug" verdict_flow.py flake flakes --run "$_gdir"; then
+              while IFS= read -r _gfl; do
+                _gfl=${_gfl%$'\r'}
+                case "$_gfl" in "hold  "*) ;; *) continue ;; esac
+                _gfr=${_gfl#hold  }; _gfleg=${_gfr%%  *}; _gfr=${_gfr#*  }; _gff=${_gfr%%  *}; _gfr=${_gfr#*  }
+                case "$_gff" in
+                  [0-9]*/[0-9]*) ;;
+                  *) echo "unattended: gates-green — no held-flaky-leg ask filed: the line is not hold  <leg>  <flakes>/<window>  <record ids>: $_gfl"; continue ;;
+                esac
+                write_leg_ask "$slug" "$_gfleg" "held flaky leg: leg" \
+                  "flaked ${_gff%/*} in its last ${_gff#*/} verdicts · seen $_gfr · accept the leg is released after its streak, or its flake is fixed" \
+                  MED "a merge-bar leg flaked at the entry threshold and is held from the bar until its ask closes" \
+                  "filed under verdict.flakes, which holds a leg while its held-flaky-leg ask is OPEN; closing it releases the leg" || :
+              done <<<"$RB_OUT"
+            fi
+            RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
+          fi
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)
               DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
             land|hold|other)
-              # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+              # S10 - an owner on the record for every red that passes, on every path whose record is usable.
               write_inherited_asks "$slug" "$_gr" "$_gdir"
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
@@ -14508,13 +14664,13 @@ dod_met() { # slug · run-state file · item · checker
                 else
                   _gesc="none aged past the ${GP_MAX_AGE}-landing age bound"
                 fi
-                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED; $_gesc"
+                DOD_OUT="gates-green MET over a red every row of which passes under verdict.blocks $GP_POLICY: $GR_LEGS red at ${_gr:0:8}; $_gesc"
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
                 # TOOL-dDeclaredLoop-17 S6: the hold's join reads this set, as the hand-off's does.
                 write_gates_staged "$_gdir" "$WI_STAGED"
-                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; verdict.blocks=$GP_POLICY"
                 DOD_OUT="hold · inherited-red · until probe gate · $_hold"
                 [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
                 DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $DRIVER_ARGV0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
@@ -17682,7 +17838,8 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py _fk_re _fk_a _at _arc _ae
+  local -a _fk_st=()
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -17712,6 +17869,29 @@ check_commit_message() { # commit message file
     PASSTRAILER) trl=none ;;
     "PASSTRAILER "*) trl=${trl#PASSTRAILER } ;;
     *) subj=$trl; trl="" ;;
+  esac
+  # THE CHARTER'S TRAILER, LAST (TOOL-dWitnessedBar-108 S9), asked of EVERY message a bound run's commit
+  # carries, `Pass: none` included, so before the `none` return below. The value is read from the
+  # charter, `AGENTS.md`, by the kit's one trailer reader, never typed here: an agent trailer naming the
+  # charter's address with another value, or a line after it, is refused with the line to write. Exit 2,
+  # an unreadable message, says so and the path checks continue. WHAT IT DOES NOT CHECK: a commit no run
+  # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
+  # Exit 0 is shared by `ok`, `none` and `unarmed`, and only `unarmed` is a check that did not run, so
+  # it alone is said (TOOL-dWitnessedBar-110 S4).
+  _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
+  _at=${_at//$'\r'/}
+  case "$_arc" in
+    0) case "$_at" in "ATTRIBUTION unarmed"*) echo "unattended: --check-commit did not check attribution: ${_at#ATTRIBUTION unarmed · }" ;; esac ;;
+    1) # the expected line, by the same reader's `read_charter_trailer`, so the repair names what it read
+       _ae=$("$py" -c 'import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct; print(ct.read_charter_trailer(sys.argv[2])[0])' \
+         "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
+       _ae=${_ae//$'\r'/}
+       _at=${_at#ATTRIBUTION refused · }
+       # The repair leads, so the site's signature is the literal its arm asserts (check-arms takes the
+       # longest literal run, and a leading interpolation would join its stripped prefix to it).
+       fail 49 "end the message with '$_ae' and nothing after it: $_at"
+       return 1 ;;
+    *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
@@ -17777,6 +17957,19 @@ check_commit_message() { # commit message file
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
     fi
+    # TOOL-dWitnessedBar-21 S4 - A FIX PASS'S KEEPS, before the walk's undeclared-path refusal, so a
+    # staged kept file meets the route and never a widening command the keeps would refuse. Only a
+    # key holding a `fix-of` row loads the spec facts and spawns the module; any other commit asks git
+    # nothing more than this one grep.
+    _fk_re=$'\n''o '"$u"' ([0-9a-f]+) '
+    if [[ $'\n'"$rows" =~ $_fk_re ]]; then
+      _fk_a=${BASH_REMATCH[1]}
+      if grep -qF -- " fix-of · item $_fk_a $u · reason " "$rel" 2>/dev/null; then
+        load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+        _fk_st=(); [ -z "$st" ] || mapfile -t _fk_st <<<"$st"
+        check_fix_keeps --check-commit "$rel" "$_fk_a $u" "" "" "${SPEC_PATH[$u]:-}" "${_fk_st[@]}" || return 1
+      fi
+    fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
     uncov=""; uncovl=""
     printf '%s\n' "$st" > "$CC_TMP"
@@ -17811,6 +18004,15 @@ check_commit_message() { # commit message file
       return 1
     fi
   done
+  # THE COMMIT CHECK'S WITNESS (TOOL-dWitnessedBar-2 S4), on its one admitting path for a commit whose
+  # Pass: trailer names an open dispatched pass: the message gains `Commit-Checked:
+  # unattended@<kit version>`, so a pass commit this hook never saw is told by the trailer's absence,
+  # which the pre-push hook and the pass-order leg read under `hooks.bypass`. A failed append prints one
+  # line and still admits: the trailer is evidence, and this check gains no refusal. Written at the
+  # START of the trailer block (TOOL-dWitnessedBar-108 S9, §8 F5), so the charter's trailer stays the
+  # message's last line, as the charter's "ends with" states and the attribution check above holds.
+  git interpret-trailers --in-place --where start --if-exists replace --trailer "Commit-Checked: unattended@$KIT_UNATTENDED_VERSION" "$msg" 2>/dev/null \
+    || echo "unattended: --check-commit admitted this pass commit and could not append its Commit-Checked: trailer to $msg, so the pre-push hook will read it as made past the commit check"
   return 0
 }
 
@@ -18152,6 +18354,86 @@ check_dispatch_specs() { # slug · unit... -> 0 clean, 1 after the refusals it p
   echo "unattended: --check-specs $slug — $*: none carries a refusal --dispatch makes from its spec files"
 }
 
+# ------------------------------------------------- TOOL-dWitnessedBar-21, A FIX PASS KEEPS ITS CHECK
+# A fix pass declared with `--dispatch --fix-of <red>`, `<red>` one of `leg:<leg name>` or
+# `acceptance`, may not write the red check's own files: the leg's argv words that name tracked files,
+# its gate script first, or the check files the unit's acceptance commands name. `fix_keeps.py` beside
+# this script derives them, run under the launcher `resolve_python` answers; its stdout is the kept
+# paths and its stderr `fix-of:` notes, `fix-of: tests <tags>|none` naming the leg's `tests` targets.
+# ONE HELPER HOLDS EVERY REFUSAL SITE this unit adds, three, so the driver's census stays under its
+# refusal ceiling: the red's shape, the module's refusal relayed (no launcher included), and a kept
+# path. It is asked for the red given now AND every red a `fix-of` row recorded at this key, so a
+# later `--dispatch` of the key without `--fix-of`, and `--check-commit` on it, are held to the same
+# keeps. The route both path refusals print is FIX_ROUTE. WHAT IT DOES NOT CHECK: a write that is
+# never declared or staged, and a key the unit takes after a commit moves HEAD, which is a new pass
+# with no keeps unless it is declared against a red again.
+FIX_ROUTE="a red check's own files change only through the tester, gov-tester, judging the red spec-wrong, which routes to Design as a new unit, whose own --dispatch is no fix pass and holds no keeps"
+check_fix_keeps() { # verb · run-state file · key · given (1 or empty) · red · spec · paths... -> 0, or 1 after check 49
+  local _fk_verb="$1" _fk_rel="$2" _fk_key="$3" _fk_given="$4" _fk_red="$5" _fk_spec="$6"
+  local _fk_shown _fk_l _fk_r _fk_py="" _fk_out _fk_why _fk_tests _fk_route _fk_p _fk_k
+  local -a _fk_reds=() _fk_lines=() _fk_kept=() _fk_args=()
+  shift 6
+  if [ -n "$_fk_given" ]; then
+    _fk_shown=${_fk_red:-(empty)}; _fk_shown=${_fk_shown//[$'\r\n']/ }
+    if case "$_fk_red" in acceptance|leg:?*) false ;; *) true ;; esac \
+       || case "$_fk_red" in *$'\n'*|*$'\r'*) true ;; *) false ;; esac \
+       || { [ -n "$BYPASS_BAN" ] && case "$_fk_red" in *"$BYPASS_BAN"*) true ;; *) false ;; esac; }; then
+      fail 49 "--fix-of names a red that is neither leg:<leg name> nor acceptance, or one carrying a line end or the declared bypass flag, so no kept file can be derived from it and nothing is recorded: $_fk_shown"
+      return 1
+    fi
+    _fk_reds+=("$_fk_red")
+  fi
+  _fk_l=$(grep -F -- " fix-of · item $_fk_key · reason " "$_fk_rel" 2>/dev/null)
+  [ -z "$_fk_l" ] || mapfile -t _fk_lines <<<"$_fk_l"
+  for _fk_l in "${_fk_lines[@]}"; do
+    _fk_r=${_fk_l#* · reason }; _fk_r=${_fk_r%$'\r'}
+    [ -n "$_fk_given" ] && [ "$_fk_r" = "$_fk_red" ] && continue
+    _fk_reds+=("$_fk_r")
+  done
+  [ "${#_fk_reds[@]}" -gt 0 ] || return 0
+  _fk_py=$(resolve_python 2>/dev/null) || _fk_py=""
+  for _fk_r in "${_fk_reds[@]}"; do
+    _fk_args=(--keeps "$_fk_r")
+    [ "$_fk_r" != acceptance ] || _fk_args+=(--spec "$_fk_spec")
+    _fk_why=""
+    if [ -z "$_fk_py" ]; then
+      _fk_why="no python launcher resolved, so fix_keeps.py did not run"
+    elif ! _fk_out=$("$_fk_py" "$KIT_DIR/fix_keeps.py" "${_fk_args[@]}" 2>&1); then
+      _fk_why=${_fk_out//[$'\r\n']/ }
+    fi
+    if [ -n "$_fk_why" ]; then
+      fail 49 "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: $_fk_r · $_fk_why"
+      return 1
+    fi
+    _fk_kept=(); _fk_lines=(); _fk_tests=""
+    [ -z "$_fk_out" ] || mapfile -t _fk_lines <<<"$_fk_out"
+    for _fk_l in "${_fk_lines[@]}"; do
+      _fk_l=${_fk_l%$'\r'}
+      case "$_fk_l" in
+        "") ;;
+        "fix-of: tests "*) _fk_tests=${_fk_l#fix-of: tests } ;;
+        "fix-of: "*) echo "unattended: $_fk_verb — $_fk_r · $_fk_l" >&2 ;;
+        *) _fk_kept+=("$_fk_l") ;;
+      esac
+    done
+    _fk_route=""
+    case "$_fk_tests" in
+      "") ;;
+      none) _fk_route="; the leg ${_fk_r#leg:} declares no tests edge" ;;
+      *) _fk_route="; the leg's tests edge names $_fk_tests, each the feature whose dossier names the code a code-miss fix belongs in" ;;
+    esac
+    for _fk_p in "$@"; do
+      [ -n "$_fk_p" ] || continue
+      for _fk_k in "${_fk_kept[@]}"; do
+        overlaps "$_fk_p" "$_fk_k" || continue
+        fail 49 "a fix pass keeps the red check's own files out of its write set, so $_fk_verb refuses $_fk_p, which covers or sits under $_fk_k, kept by the red $_fk_r: $FIX_ROUTE$_fk_route"
+        return 1
+      done
+    done
+  done
+  return 0
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair _dk _c1_own _c1_gen
@@ -18391,6 +18673,10 @@ verb_dispatch() { # slug · unit · writes...
   # when both appear, in this declaration or in a sibling's within the same group.
   grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
   [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
+  # TOOL-dWitnessedBar-21 S3 - THE KEEPS, after the per-path shape loop and above the spec-token window,
+  # the claim, the rework budget's draw and the row, so a refused fix pass draws and records nothing.
+  # A key already holding a `fix-of` row is held to its keeps whether or not this call names a red.
+  check_fix_keeps --dispatch "$rel" "$grp $unit" "${DP_FIX_OF_SET:-}" "${DP_FIX_OF:-}" "$_d_spec" "$@" || return 1
   # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
   # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
   # empties the sibling set at the moment the second pass declares, and condition 1 then passes by
@@ -18569,6 +18855,10 @@ SIBS
     fi
   fi
   park "$rel" dispatch "$grp $unit" "$want" || return 1
+  # The red this fix pass is declared against, at its key, read back by `check_fix_keeps` (S3).
+  if [ -n "${DP_FIX_OF_SET:-}" ]; then
+    park "$rel" fix-of "$grp $unit" "$DP_FIX_OF" || return 1
+  fi
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
   # THE SET NOW IN FORCE, which is the key's union and not the row just parked: a declaration naming
@@ -18962,7 +19252,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""; RS_FLOW=""; RS_ROW=""
-DP_WRITES=()
+DP_WRITES=(); DP_FIX_OF=""; DP_FIX_OF_SET=""
 RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=(); RR_OWNER_STOP=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
@@ -19009,6 +19299,8 @@ while [ $# -gt 0 ]; do
                       _dw_n=$((_dw_n+1)); shift
                     done
                     [ "$_dw_n" -gt 0 ] || DP_WRITES+=("") ;;
+    # SET is recorded apart from the value, so `--fix-of` with an empty value meets the shape refusal.
+    --fix-of)       DP_FIX_OF="${2:-}"; DP_FIX_OF_SET=1; shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --flow)         RS_FLOW="${2:-}"; shift 2 || shift ;;

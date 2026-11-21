@@ -350,6 +350,8 @@ def read_cap_answers(root, points) -> tuple[dict, list, bool]:
         census = {r.get("name"): r for r in tomllib.loads((kit / "caps.toml").read_text(encoding="utf-8")).get("cap", [])}
     except (LookupError, OSError, tomllib.TOMLDecodeError) as exc:
         return {}, [f"{SAY} — budgets unarmed · no policy kit found: {exc}"], False
+    if str(kit) not in sys.path:
+        sys.path.append(str(kit))   # `check_budget`'s marker factory, the kit's `render_warn_marker`
     asked = {p: (ROLE_CAP if p.startswith("role.") else CODE_CAP if p == CODE_SLOT else p) for p in points}
     asked = {p: c for p, c in asked.items() if c in census}
     caps: dict = {}
@@ -399,7 +401,16 @@ def check_budget(load_point, size, mode=None, answers=None) -> tuple[bool, list]
         else:
             word = "REFUSE" if use == "refuse" else "WARN"
             refused |= use == "refuse"
-            lines.append(f"{SAY} — BUDGET {word} · {load_point} · {size} bytes over {cap} {value} · {why}")
+            line = f"{SAY} — BUDGET {word} · {load_point} · {size} bytes over {cap} {value} · {why}"
+            if use != "refuse":
+                # The runner's `gate-warn` marker rides the warning's own item, on the line after it, so it prints
+                # wherever the list prints and no reader takes it for an item (TOOL-dWitnessedBar-29 S2).
+                try:
+                    import budgets
+                    line += "\n" + budgets.render_warn_marker(load_point, f"{cap} · {size} bytes over {value}")
+                except ImportError:
+                    pass
+            lines.append(line)
     return refused, lines
 
 

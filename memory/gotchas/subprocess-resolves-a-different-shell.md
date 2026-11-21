@@ -23,15 +23,17 @@ saw a six-path tree and reported collateral failures that drowned the real signa
 
 ## The fix
 
-Name the EXECUTABLE, not the command, and refuse the known launchers by path — `resolve_bash()`, with
-an environment override. THREE copies carry it, because a copy-installed kit cannot import across
-kit boundaries: `tools/memory-tree/corpus_ids.py`, `tools/run-gates/profile_bar.py`, and
-`tools/govkit/govkit.py` — the last paired with `resolve_shell_argv()`, which rewrites a descriptor
-argv's LEADING `bash` and nothing else. They do NOT agree on the probe: two ask whether the bash
-STARTS, `profile_bar` asks whether it can SEE THE SCRIPT, and only the second is the property the
-WSL launcher actually fails. Tracked as `TOOL-dSettledRoster-6`. An earlier revision of this line
-said TWO and named the function by a name it no longer has — which is how a count and a symbol
-written in prose beside the thing they describe both go stale in one sentence.
+Name the EXECUTABLE, not the command, by RUNNING each candidate. ONE rule does it: the
+`resolve_bash_py` block of `tools/lib/resolve_bash.py` and its JavaScript twin, the `resolve_bash_js`
+block of `tools/lib/resolve_bash.js` (TOOL-dWitnessedBar-26). `GOV_BASH` first, then Git's own
+`bin/bash.exe`, then PATH, each candidate run with `uname -s` and the caller's script; on Windows the
+answer must start `MINGW` or `MSYS`, so the WSL launcher, which answers `Linux` and drops the script
+argument, is refused under any name, and a System32 or WindowsApps path is never run. No candidate
+passing is a refusal naming each one tried, never the bare name. A copy-installed kit cannot import
+across kit boundaries, so every file that starts a bash carries the block inline behind its own
+adapter, and `tools/lib/resolve-python.test.sh`'s parity rows hold each copy to its canonical. Count
+the copies with `git grep -l '>>> resolve_bash_'`, never in prose here: an earlier revision of this
+paragraph counted two, then three, and named a function by a name it no longer had.
 
 The govkit instance is worth reading before assuming this class is rare. It sat RED on `main` and
 blocked every `push-main.sh`, and nobody saw it: the leg is GUARDED, so only `GATE_FULL=1` runs it,
@@ -39,6 +41,7 @@ and it only reproduces where WSL is INSTALLED. Nodes without WSL are green on th
 first root cause proposed for it was wrong in a way worth remembering — an old python was blamed,
 when every python on the node was 3.12+ and the old one belonged to the WSL the shell name pulled in.
 
-No machine gate on the CLASS: it has no source-level signature worth banning. The govkit copy is
-armed in its own selftest instead, including that the resolver never returns a System32 or
-WindowsApps path.
+The CLASS is gated by its source signature: `scan_bare_bash` in `tools/run-gates/measure_legs.py`
+lists every tracked `*.py` and `*.js` line outside the block that launches the bare name `bash`,
+falls back to it, or loops over PATH for it. It does not see a PATH lookup through a variable or a
+name bound to `"bash"` and launched later.

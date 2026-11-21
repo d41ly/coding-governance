@@ -6,8 +6,8 @@ inventories: `codebase-map/map_extractors.py`; gate: see `.codebase-map.conf` GA
 
 ## Layout
 - `FOUNDATION.md` — shared-substrate claims (same contract as a dossier).
-- `baseline.toml` — shrink-only ratchet baseline (backfill inventory; never add new keys).
-- `affordance-exempt.toml` — shrink-only grace list for dossiers predating `## Reuse affordance`
+- `baseline.txt` — shrink-only ratchet baseline (backfill inventory; never add new keys).
+- `affordance-exempt.txt` — shrink-only grace list for dossiers predating `## Reuse affordance`
   (seeded at adoption; a new dossier is never graced, a touch drops entries).
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.

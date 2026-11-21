@@ -4,9 +4,10 @@
     python <this kit>/py_reads.py                  # both arms: exit 0 green, 1 red, 2 refused
     python <this kit>/py_reads.py --names <file>   # the name arm over one file, `-` being stdin
     python <this kit>/py_reads.py --guards <leg>   # one leg's import closure and its gaps
+    python <this kit>/py_reads.py --list-params    # the params arm's measured keys and counts, the seed
     python <this kit>/py_reads.py --selftest       # the plants, each arm's failing case included
 
-TWO ARMS, one AST read each:
+THREE ARMS, one AST read each:
 
   guard  every leg of gate-legs.json with a non-empty `guard` whose argv runs a Python file: the
          entry's import closure, sibling kits reached through a literal `resolve_kit_dir` call
@@ -14,6 +15,10 @@ TWO ARMS, one AST read each:
          reuses its green, after an edit to that module alone.
   name   every tracked `*.py` outside the memory root: reds a name loaded and bound nowhere in its
          module, which raises only when that line runs.
+  params every tracked `*.py` outside the memory root: reds a parameter of a `def` that no name load
+         in its body reads, nested bodies included, unless the shrink-only `unread-params` ledger keeps
+         its `(path, function, parameter)` key, and reds a kept row no hit carries. `self`, `cls` and a
+         parameter opening `_` are never hits (TOOL-dWitnessedBar-108 S7).
 
 WHAT IT DOES NOT READ, printed on every run because a zero here reads as coverage to everyone who
 did not write it. The guard arm: a leg whose head is not Python, a module reached through a
@@ -21,10 +26,11 @@ subprocess, a `python -c` body, a data file a suite reads, a kit named by a comp
 `dynamic` row of the import walk. The name arm binds per MODULE, so a name bound in one function and
 read in another passes, and so do a read before its binding, an attribute, a name in a string or an
 `eval`, a Python script with no `.py` suffix, and every name of a file with a star import, which is
-skipped and counted.
+skipped and counted. The params arm: a lambda's parameter, and a parameter read only through
+`locals()` or a string.
 
-An unparsable file, an absent manifest and an empty population each exit 2 naming what could not
-be read, so a zero is never a reading of nothing. GOV-ONLY: this kit's descriptor withholds the file
+An unparsable file, an absent manifest, an empty population, and an absent `unread-params` home or
+registration each exit 2 naming what could not be read, so a zero is never a reading of nothing. GOV-ONLY: this kit's descriptor withholds the file
 from `govkit apply`, which is why it may import the memory-tree kit's walk and conf reader.
 """
 import ast
@@ -88,6 +94,10 @@ NAMES_NOT_READ = ("py-reads: names, not read · a name bound in one function and
                   "before its binding, an attribute, a name in a string or an eval, a Python script with "
                   "no .py suffix")
 NAMES_LINE = "py-reads: names · {} files read, {} star imports skipped"
+PARAMS_NOT_READ = "py-reads: params, not read · a lambda, a parameter read only through locals() or a string"
+PARAMS_LINE = "py-reads: params · {} hits, {} kept rows, {} unlisted, {} stale"
+PARAMS_POPULATION = "unread-params"  # the ledger population that keeps the params arm's tolerated hits
+UNUSED_SLOTS = ("self", "cls")  # never a hit, with any parameter opening `_`: the corpus's unused-slot spelling
 
 
 class Refused(Exception):
@@ -131,6 +141,22 @@ def scan_unbound_names(source):
             bound.add(x.rest)
     known = bound | set(dir(builtins)) | {"__file__", "__name__", "__doc__"}
     return sorted({x.id for x in ast.walk(tree) if isinstance(x, ast.Name) and isinstance(x.ctx, ast.Load)} - known)
+
+
+def scan_unread_params(source):
+    """-> `(function name, parameter)` for each positional, keyword-only, `*` or `**` parameter of each
+    `def` that no `ast.Name` load in the function's body reads, nested bodies included, in walk order.
+    `self`, `cls` and a parameter opening `_` are never hits. Raises what `ast.parse` raises."""
+    hits = []
+    for node in ast.walk(ast.parse(source)):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        a = node.args
+        params = [y.arg for y in a.posonlyargs + a.args + a.kwonlyargs + [z for z in (a.vararg, a.kwarg) if z]]
+        loads = {x.id for stmt in node.body for x in ast.walk(stmt)
+                 if isinstance(x, ast.Name) and isinstance(x.ctx, ast.Load)}
+        hits += [(node.name, y) for y in params if y not in loads and y not in UNUSED_SLOTS and not y.startswith("_")]
+    return hits
 
 
 def scan_kit_homes(path):
@@ -196,8 +222,9 @@ def derive_guard_gaps(legs, tool_root):
     return rows
 
 
-def scan_tracked_names(root, id_grammar):
-    """-> `(hits, files read, star imports)` over the tracked `*.py` outside the memory root."""
+def read_tracked_sources(root, id_grammar):
+    """-> `[(path, bytes)]` of the tracked `*.py` outside the memory root, sorted: the population the name
+    arm and the params arm both read. An empty one is a refusal."""
     memory_root = id_grammar.load_conf(root).get("MEMORY_ROOT", "").strip().strip("/")
     if not memory_root:
         raise Refused(f"{id_grammar.CONF_NAME} declares no MEMORY_ROOT, so the population has no boundary")
@@ -206,18 +233,62 @@ def scan_tracked_names(root, id_grammar):
                        text=True, encoding="utf-8", env=env, stdin=subprocess.DEVNULL)
     if p.returncode:
         raise Refused(f"git ls-files exited {p.returncode}, so the population is unknown: {p.stderr.strip()}")
+    sources = [(rel, (root / rel).read_bytes()) for rel in sorted(
+        r for r in p.stdout.split("\0") if r and not r.startswith(memory_root + "/")) if (root / rel).is_file()]
+    if not sources:
+        raise Refused(f"no tracked *.py outside {memory_root}/ under {root.as_posix()}: an empty population is not a pass")
+    return sources
+
+
+def scan_tracked_names(root, id_grammar):
+    """-> `(hits, files read, star imports)` over the tracked `*.py` outside the memory root."""
     hits, read, stars = [], 0, 0
-    for rel in sorted(r for r in p.stdout.split("\0") if r and not r.startswith(memory_root + "/")):
-        full = root / rel
-        if not full.is_file():
-            continue
-        missing = read_unbound_names(rel, full.read_bytes())
+    for rel, data in read_tracked_sources(root, id_grammar):
+        missing = read_unbound_names(rel, data)
         read += 1
         stars += missing is None
         hits += [(rel, name) for name in missing or []]
-    if not read:
-        raise Refused(f"no tracked *.py outside {memory_root}/ under {root.as_posix()}: an empty population is not a pass")
     return hits, read, stars
+
+
+def measure_unread_params(root, id_grammar):
+    """-> `{(path, function, parameter): hits}` of `scan_unread_params` over the name arm's population."""
+    measured = {}
+    for rel, data in read_tracked_sources(root, id_grammar):
+        try:
+            found = scan_unread_params(data.decode("utf-8"))
+        except (SyntaxError, UnicodeDecodeError, ValueError) as e:
+            raise Refused(f"{rel} does not parse, so its parameters were not read: {e}") from e
+        for function, param in found:
+            measured[(rel, function, param)] = measured.get((rel, function, param), 0) + 1
+    return measured
+
+
+def check_unread_params(root, measured):
+    """-> `(findings, kept)`: `compare_counts` of `measured` against the `unread-params` ledger under its
+    registration's direction, each finding `(finding, key, measured, kept)`, and the kept rows' counts by
+    key. The registration is read through the ledger factory's `read_registrations` and the home through
+    `read_ledger`; no registration, an absent home, a home whose first line is not its header and a
+    malformed row are each a refusal."""
+    import legacy_ledger  # noqa: PLC0415 - the ledger factory, on sys.path once load_readers ran
+    try:
+        regs = [r for r in legacy_ledger.read_registrations(root) if r.population == PARAMS_POPULATION]
+    except ValueError as e:
+        raise Refused(f"the [[ledger]] registrations do not read, so the params arm has no ledger: {e}") from e
+    if len(regs) != 1:
+        raise Refused(f"{len(regs)} [[ledger]] tables register {PARAMS_POPULATION}, not one, so the params arm has no ledger")
+    reg = regs[0]
+    if not (root / reg.home).is_file():
+        raise Refused(f"{reg.home} is absent, so nothing is kept; seed it: python <memory-tree kit>/legacy_ledger.py "
+                      f"seed --population {PARAMS_POPULATION}")
+    bad = legacy_ledger.check_home_readable(root / reg.home, legacy_ledger.render_header(reg))
+    if bad:
+        raise Refused(f"{reg.home}: {bad}")
+    rows, malformed = legacy_ledger.read_ledger(root, reg)
+    if malformed:
+        raise Refused(f"{reg.home}: {legacy_ledger.render_malformed(malformed[0])}")
+    kept = {key: row[0] for key, row in rows.items()}
+    return legacy_ledger.compare_counts(measured, kept, reg.direction), kept
 
 
 def read_unbound_names(label, data):
@@ -249,21 +320,36 @@ def print_name_hits(hits):
 
 
 def run_both(tool_root):
-    """Both arms over this tree, the two closing lines last."""
+    """The three arms over this tree, the closing lines last; the params arm runs after the name arm."""
     id_grammar, _ = load_readers()
     legs = read_legs(tool_root)
     rows = derive_guard_gaps(legs, tool_root)
     if not rows:
         raise Refused("no guarded leg runs a Python file: an empty population is not a pass")
     hits, read, stars = scan_tracked_names(tool_root.parent, id_grammar)
+    measured = measure_unread_params(tool_root.parent, id_grammar)
+    findings, kept = check_unread_params(tool_root.parent, measured)
     print_gaps(rows)
     print_name_hits(hits)
+    for finding, (path, function, param), have, want in findings:
+        print(f"py-reads: RED params · {path} · {function} · {param} · {finding} ({have or 0} measured, {want or 0} kept)")
     print(GUARDS_NOT_READ)
     print(NAMES_NOT_READ)
+    print(PARAMS_NOT_READ)
     unread = sum(1 for leg in legs if leg.get("guard")) - len(rows)
     print(f"py-reads: guards · {len(rows)} suites walked, {unread} guarded legs of another head not read")
     print(NAMES_LINE.format(read, stars))
-    return 1 if hits or any(gaps for _leg, _closure, gaps in rows) else 0
+    print(PARAMS_LINE.format(sum(measured.values()), len(kept), sum(f[0] == "undeclared site" for f in findings),
+                             sum(f[0] == "unmeasured row" for f in findings)))
+    return 1 if hits or findings or any(gaps for _leg, _closure, gaps in rows) else 0
+
+
+def run_list_params(tool_root):
+    """`--list-params`: each measured key's fields and its count, TAB-joined, the `unread-params` seed."""
+    id_grammar, _ = load_readers()
+    for (path, function, param), count in sorted(measure_unread_params(tool_root.parent, id_grammar).items()):
+        print(f"{path}\t{function}\t{param}\t{count}")
+    return 0
 
 
 def run_names(target):
@@ -303,6 +389,11 @@ def run_selftest():
 
     check("an undefined name reds", scan_unbound_names("print(planted)\n"), ["planted"])
     check("the same name defined is green", scan_unbound_names("planted = 1\nprint(planted)\n"), [])
+    check("an unread parameter is a hit", scan_unread_params("def f(planted):\n    return 1\n"), [("f", "planted")])
+    check("the same parameter read is none", scan_unread_params("def f(planted):\n    return planted\n"), [])
+    check("a parameter opening _ is none", scan_unread_params("def f(_planted):\n    return 1\n"), [])
+    check("a parameter read only in a nested function is none",
+          scan_unread_params("def f(planted):\n    def g():\n        return planted\n    return g\n"), [])
     with tempfile.TemporaryDirectory() as tmp:
         tools = pathlib.Path(tmp) / HERE.parent.name  # the scratch tool root carries this install's name
         for rel, text in (("kit-a/suite.py", "import helper\n"), ("kit-a/helper.py", "x = 1\n"),
@@ -343,8 +434,10 @@ def main(argv):
             return run_names(argv[1])
         if len(argv) == 2 and argv[0] == "--guards":
             return run_guards(argv[1], tool_root)
+        if argv == ["--list-params"]:
+            return run_list_params(tool_root)
         if argv:
-            raise Refused("usage: py_reads.py [--names <file>|--guards <leg>|--selftest]")
+            raise Refused("usage: py_reads.py [--names <file>|--guards <leg>|--list-params|--selftest]")
         return run_both(tool_root)
     except (Refused, OSError) as e:
         print(f"py-reads: REFUSED · {e}", file=sys.stderr)

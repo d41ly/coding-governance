@@ -37,6 +37,8 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 """
 
 [[gate_leg]]
+tag = "leg.check-agent-cap-restatement.agent-cap-restatement"
+tests = ["feature.agent-cap"]
 # TOOL-aScouredKit-12. Same shape as the kickoff leg: the waiver registry ships to `{prefix}/`, the
 # script defaults it to a literal `<prefix>/...`, and the miss is swallowed by a `2>/dev/null` — so at
 # any other prefix the gate exits 1 and names a path absent from the adopter's tree. The script
@@ -44,13 +46,31 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 # already knows. Line 74 of that same script reads MEMORY_ROOT properly; this is the other root.
 name = "agent-cap restatement"
 subject = "repo"
+purpose = "bans live prose stating a fan-out bound as a bare number"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.sh", "{prefix}/agent-cap-restatement-waivers.txt"]
 guard = []
 stage = ["step.test"]
+enforces = ["practice.one-fact"]
+
+[gate_leg.gov]
+argv = ["bash", "{prefix}/check-agent-cap-restatement.sh"]
+guard = []
+chunk = "product"
+ceiling = 640
 
 [[gate_leg]]
+tag = "leg.check-agent-cap-restatement.agent-cap-restatement-self-test"
+tests = ["feature.agent-cap"]
 name = "agent-cap restatement self-test"
 subject = "kit"
+purpose = "self-tests the agent-cap restatement gate"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]
+unguarded_why = "gov clears the row's guard: a guard naming the restatement gate would make every live spec whose Files touched trips it name this leg, so it runs whole whenever GATE_SELFTESTS asks"
 guard = ["{prefix}/check-agent-cap-restatement.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = []
+chunk = "selftests"
+ceiling = 1100

@@ -28,11 +28,20 @@ mutates_index = false
 why_no_adopter = "installation is a copy of a gate script plus its self-test; the gate is a pure ban and reads no sidecar, so there is nothing to seed (TOOL-aRepatriatedFork-30)"
 
 [[gate_leg]]
+tag = "leg.check-install-prefix.install-prefix-self-test"
+tests = ["feature.install-prefix"]
 name = "install-prefix self-test"
 subject = "kit"
+purpose = "arms the install-prefix ban red and green"
 argv = ["bash", "{prefix}/check-install-prefix.test.sh"]
 guard = ["{prefix}/check-install-prefix.sh"]
 stage = ["step.test"]
+enforces = ["practice.gate"]
+
+[gate_leg.gov]
+guard = ["{prefix}/", "{prefix}/lib/"]
+chunk = "selftests"
+ceiling = 1670
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -42,8 +51,17 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 """
 
 [[gate_leg]]
+tag = "leg.check-install-prefix.install-prefix-shipped-surface"
+tests = ["feature.install-prefix"]
 name = "install-prefix (shipped surface)"
 subject = "repo"
+purpose = "bans a kit path spelled in the shipped surface"
 argv = ["bash", "{prefix}/check-install-prefix.sh"]
 guard = []
 stage = ["step.test"]
+
+[gate_leg.gov]
+signature = ["bash", "{prefix}/check-install-prefix.sh", "--offenders"]
+guard = []
+chunk = "product"
+ceiling = 2940

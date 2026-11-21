@@ -71,9 +71,6 @@
 #                             nothing outside it is doc-only, and its bar skips each leg that DECLARES
 #                             `doc_reads` and none of whose paths moved. PARSED at the remote's tip, never
 #                             read from the sourced value; empty or absent is no doc class.
-#   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
-#                             PARSED at the remote's tip by the hook and the unattended driver, never
-#                             read from the sourced value; see the policy block below.
 #   INHERITED_RED_MAX_AGE=<n> the age bound, in first-parent landings, past which an inherited
 #                             red's ask is escalated BLOCKER. It decides no landing.
 #                             PARSED at the remote's tip by the hook and the unattended driver, never
@@ -89,18 +86,15 @@
 # which ref is the default, so a tracked file cannot choose which branch escapes the bar.
 GOV_KITROOT=tools
 
-# ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
-# Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against
-# the remote's own tip, at any age; one the run worsened still blocks. A red older than ten
-# first-parent landings lands with its ask escalated to BLOCKER (ruling TOOL-dUnstuckLanding-22,
-# superseding that part of D12-i4). The kit default is `land` since that ruling, and gov declares both
-# lines anyway, so the bound it escalates at is written here and not inherited from a default.
+# ---- THE INHERITED-RED AGE BOUND. TOOL-dDerivedDocket-24, ruling TOOL-dUnstuckLanding-22 ----------
+# Which red blocks a landing is the policy key `verdict.blocks` in `.governance/policy.toml`
+# (TOOL-dWitnessedBar-3); gov's is `own-mixed-contended`. A red older than ten first-parent landings
+# lands where that key lets it, with its ask escalated to BLOCKER.
 #
-# THESE TWO LINES ARE DATA, NOT SHELL, to both of their readers. `.githooks/pre-push` and the
-# unattended driver each PARSE them out of this file as committed at the remote's tip - never out of
-# the pushed tree and never by sourcing - so a branch that edits them here enables nothing until a
-# gated push has landed the edit. The source above still sets them as variables; nothing reads those.
-INHERITED_RED=land
+# THIS LINE IS DATA, NOT SHELL, to both of its readers. `.githooks/pre-push` and the unattended driver
+# each PARSE it out of this file as committed at the remote's tip - never out of the pushed tree and
+# never by sourcing - so a branch that edits it here enables nothing until a gated push has landed the
+# edit. The source above still sets it as a variable; nothing reads that.
 INHERITED_RED_MAX_AGE=10
 # THE DOC CLASS (TOOL-dThriftyLanding-5): the paths gov calls non-code. A push to the default branch
 # that changes nothing outside them is doc-only, and its bar skips each leg that DECLARES `doc_reads`

@@ -40,6 +40,8 @@ KIT_LIB="$TOOL_ROOT/lib"
 [ -f "$KIT_MT/id_grammar.py" ] || { echo "FAIL the id grammar is not in this kit at $KIT_MT/id_grammar.py, and check 26 keys every row through it — there is nothing to grade"; exit 2; }
 # shellcheck source=/dev/null
 . "$KIT_LIB/resolve-python.sh"
+. "$KIT_LIB/refuse-wrong-shell.sh"
+refuse_wrong_shell || exit 2
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
 # THE PYTHON STATE EVERY ARM RUNS UNDER IS DECLARED, never inherited. The hosted runner has neither
 # UTF-8 mode nor a bytecode opt-out; a node exporting either hid a red there. Without UTF-8 mode a

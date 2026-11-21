@@ -5,6 +5,7 @@
 #
 #   <prefix>/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
 #                                          --render     # an ADOPTED tree: the four rendered docs, nothing else
+#                                          --seed-pins  # the conf-scalar-pins ledger, seeded where absent
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -55,7 +56,7 @@ FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}
 # existed and still is, because defaulting a missing word to the verb that creates a tree is a
 # widening nobody asked for.
 MODE="${1:-}"
-case "$MODE" in --scaffold|--render|--arm-routing) ;; *) echo "usage: $0 --scaffold|--render|--arm-routing"; exit 2 ;; esac
+case "$MODE" in --scaffold|--render|--arm-routing|--seed-pins) ;; *) echo "usage: $0 --scaffold|--render|--arm-routing|--seed-pins"; exit 2 ;; esac
 
 # TOOL-aRoutedQuill-5 S5. The CANDIDATE product set, derived from THIS tree: every tracked top-level
 # directory with a trailing `/`, less the dot-directories and the directory holding MEMORY_ROOT. A
@@ -130,8 +131,8 @@ if [ "$MODE" = "--render" ]; then
 fi
 # An armed render with no declared row set would write a §5 holding one empty bullet. There is
 # one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
-# rather than a default to fall back on.
-if [ -z "$READINESS_ROWS" ]; then
+# rather than a default to fall back on. `--seed-pins` renders nothing, so it does not wait on the key.
+if [ "$MODE" != --seed-pins ] && [ -z "$READINESS_ROWS" ]; then
   echo "adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it." >&2
   exit 1
 fi
@@ -305,7 +306,45 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 _PY=$(resolve_python) || exit 2
+
+# TOOL-dWitnessedBar-46 S2. THE ADOPTER'S OWN SCALAR PINS, seeded into the `conf-scalar-pins` ledger the
+# `ratchet (keys, not a scalar)` leg grades, through the registration this kit's descriptor carries and
+# this kit's copy of the ledger factory. `seed` writes only an absent or unarmed home, so a second run
+# leaves an armed one byte-identical. Two callers: the end of `--scaffold`, and `--seed-pins`, which a
+# `[[regenerate]]` row runs at every `govkit update` unless GOVKIT_RERENDER=0 is exported, because an
+# update never reaches `--scaffold`.
+# A FAILED SEED DOES NOT STOP EITHER CALLER: its home records the failure or stays absent, and the leg
+# reds naming the command to run (S3). A kit left untracked registers nothing, so that seed refuses
+# here and the command it prints is the one to run once the kit is committed.
+seed_scalar_pins() {
+  local _sp_rc=0
+  "$_PY" "$HERE/legacy_ledger.py" seed --population conf-scalar-pins || _sp_rc=$?
+  [ "$_sp_rc" = 0 ] || echo "memory-tree: the conf-scalar-pins seed exited $_sp_rc; once $KIT_REL is committed, run: $_PY $KIT_REL/legacy_ledger.py seed --population conf-scalar-pins" >&2
+  return 0
+}
+if [ "$MODE" = --seed-pins ]; then
+  seed_scalar_pins
+  exit 0
+fi
 
 # CLOSING REVIEW ROUND 1 L4 (TOOL-aRepatriatedFork-10). Every `{{TOOL_ROOT}}<home>/<file>` the
 # templates cite is resolved for THIS install before the render, receipt row first: one sibling
@@ -684,9 +723,9 @@ render_all
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads is
-# written here: several are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py,
-# gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
+# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads as an
+# empty ratchet is written here, the two homes below that arm checks excepted: several are NAMED by
+# gates (check-arms.py, gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
 # than as an empty ratchet. Most gates read "absent" and "present and empty" identically, which is
 # what makes an omission invisible — and where one does NOT, as the index generator does not, the
 # omission is worse: it refuses, and the tree never scaffolds.
@@ -694,25 +733,66 @@ render_all
 # THE COUNT USED TO BE WRITTEN HERE ("ALL SIX") AND IT WENT STALE THE MOMENT A SEVENTH LANDED,
 # which is how `stale-header-waiver.txt` shipped missing. A number beside the thing it counts is
 # wrong on the next commit and nobody notices; the list below is the count.
-printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
-' > "$M/project/legacy-files.txt"
-printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
-' > "$M/project/curation-debt.txt"
-printf '# id-orphan-waiver.txt — ids cited in the present tense but never defined, deliberately (check 14).
-# Shrink-only against ORPHAN_ID_PIN; a waived id that now resolves, or that no present-tense file
-# cites, is a stale row and reds.
-' > "$M/project/id-orphan-waiver.txt"
-printf '# corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that
-# resolve to nothing (check 15). One row per (citing-file, cited-path), TAB-separated:
-#   <citing-file>\t<cited-path>\t<occurrences>\t<absent|moved:DEST>
-# Shrink-only against DEAD_PATH_PIN. Empty = every citation resolves.
-' > "$M/project/corpus-path-unresolved.txt"
-printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
-# text (check-arms.py). Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
+#
+# TWO HOMES ARE DELIBERATELY NOT WRITTEN: `id-orphan-waiver.txt` and `corpus-path-unresolved.txt`.
+# Each ARMS corpus_ids.py's checks by being present (check 14 and check 15, and either check 13), so
+# an absent home keeps its checks off, as the blank pins they replaced did (TOOL-dWitnessedBar-17
+# S4). A fresh tree's own rendered documents cite kit paths it may not hold, so writing them here
+# would red check 15 on the first run. Seeding either population writes its home and arms it:
+#   python <kit>/legacy_ledger.py seed --population id-orphan-waiver
+#
+# EVERY LEDGER HOME OPENS WITH ITS RENDERED HEADER (TOOL-dWitnessedBar-108 S3), the line its
+# `[[ledger]]` table in this kit's descriptor renders through `legacy_ledger.render_header`, which is
+# the line every reader compares. A home opening with prose reads as a legacy file owing a conversion
+# it never needed, and a header typed here is a second copy of the table that drifts. The descriptor
+# is read where it sits, never through `read_registrations`, which reads tracked descriptors only:
+# the runbook scaffolds before the kit is committed. A header that will not render stops the
+# scaffold with exit 2, since a home written without one is the defect itself. Called inside a
+# `{ ...; }` group, never `$(...)`, so that exit stops the script.
+render_ledger_header() { # population -> its home's header line on stdout, or exit 2 naming why
+  local _rh
+  if ! _rh=$("$_PY" -I -c '
+import sys, tomllib, types
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger
+def write_line(text):
+    sys.stdout.buffer.write((text + "\n").encode("utf-8"))
+with open(sys.argv[1] + "/kit.toml", "rb") as fh:
+    tables = [t for t in tomllib.load(fh).get("ledger", []) if isinstance(t, dict) and t.get("population") == sys.argv[2]]
+if len(tables) != 1:
+    write_line("%d [[ledger]] tables of %s/kit.toml name the population %s, not one" % (len(tables), sys.argv[1], sys.argv[2]))
+    sys.exit(1)
+bad = legacy_ledger._check_table(tables[0])
+if bad:
+    write_line("its [[ledger]] table does not register: " + "; ".join(bad))
+    sys.exit(1)
+write_line(legacy_ledger.render_header(types.SimpleNamespace(**tables[0])))
+' "$HERE" "$1" 2>&1); then
+    echo "memory-tree: $M/project/$1.txt has no rendered ledger header: ${_rh//$'\r'/}" >&2
+    exit 2
+  fi
+  printf '%s\n' "${_rh%$'\r'}"
+}
+{
+  render_ledger_header legacy-files
+  printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.\n'
+} > "$M/project/legacy-files.txt"
+{
+  render_ledger_header curation-debt
+  printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.\n'
+} > "$M/project/curation-debt.txt"
+# The comment states the LEDGER grammar and no field list of its own (TOOL-dWitnessedBar-108 S4): the
+# header above it names the key fields, and the pin reader, `check-arms.py`, reads exactly them.
+{
+  render_ledger_header unarmed-branches
+  printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
+# text (check-arms.py). Each row is the header'"'"'s key fields, then the count, the sha and the
+# disposition, TAB-separated.
 # SHRINK-ONLY, and EMPTY is the working state: a row appears only when a new branch lands that no
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
-' > "$M/project/unarmed-branches.txt"
+'
+} > "$M/project/unarmed-branches.txt"
 # build-readme-slot-limits.txt ships with its ROWS and without the origin repo's VALUES. A ceiling
 # measured against one corpus is a pin the adopter never measured, which is vacuous or permanently
 # red — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists
@@ -746,8 +826,11 @@ esac
 
 # readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
 # registry is a refusal and an empty one reds the adopter's first run on the FORWARD assertion.
-# Every row carries its reason inline and the pin equals the count, so the file the adopter receives
-# already satisfies both directions and the equality.
+# It is a LEDGER POPULATION (TOOL-dWitnessedBar-16 S7): its first line is the header the memory-tree
+# descriptor's `[[ledger]]` table renders, and each row is `<path> TAB <binding> TAB 1 TAB <sha> TAB
+# seeded`, the sha HEAD's or, before the adopter's first commit, forty zeros, as the factory's seed
+# stamps. An `exempt` row the base did not hold is refused, so the exemptions only shrink.
+_seed_sha=$(git rev-parse --verify --quiet HEAD 2>/dev/null) || _seed_sha=0000000000000000000000000000000000000000
 #
 # EVERY PROBE HERE IS TERMINATED. A no-match `grep` exits 1, and under `set -eu` that aborts the whole
 # scaffold silently — which is exactly what happened: this block landed unterminated, the script died
@@ -757,16 +840,15 @@ _rc=$({ git ls-files 2>/dev/null || true; find . -type f -not -path './.git/*' 2
       | sort -u | grep -E "^$M/builds/[^/]+/README\.md$" || true)
 _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 {
+  render_ledger_header readme-contract
   printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.\n'
   printf '# Asserted BOTH ways: a tracked build README named by no row refuses, and a row naming a\n'
-  printf '# path that is not one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and\n'
-  printf '# carries its reason after " - ". `exempt-pin:` is an EQUALITY with the measured count.\n'
-  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds\n'
-  printf '# nothing on day one and the leg says so on every run. Convert a row to bound when you\n'
-  printf '# conform that README.\n\n'
-  printf 'exempt-pin: %s\n\n' "$_rn"
+  printf '# path that is not one refuses. A `bound` row binds; an `exempt` row exempts, and one the\n'
+  printf '# base did not hold refuses. SEEDED at adoption (%s rows): every build README present\n' "$_rn"
+  printf '# starts EXEMPT, so the contract binds nothing on day one and the leg says so on every\n'
+  printf '# run. Rewrite a row to bound when you conform that README.\n'
   printf '%s\n' "$_rc" | grep . | while IFS= read -r f; do
-    printf '!%s - predates the contract in this tree; drains when its build is conformed\n' "$f"
+    printf '%s\texempt\t1\t%s\tseeded\n' "$f" "$_seed_sha"
   done || true
 } > "$M/project/readme-contract.txt"
 
@@ -775,10 +857,10 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is
 # measured from THEIR tree with the same predicate the leg uses, so gov's paths never travel.
 {
+  render_ledger_header method-carriers
   printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
-  printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
-  printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
-  printf '# <path>:<line> - that keying is what unpinned the install-prefix waiver registry.\n'
+  printf '# One ledger row each, keyed on PATH alone, never <path>:<line> - that keying is what\n'
+  printf '# unpinned the install-prefix waiver registry (TOOL-dWitnessedBar-16).\n'
   printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
   # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
   # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds
@@ -794,7 +876,7 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
       *.test.sh) continue ;;
     esac
     if grep -qF 'BUILD-METHOD.md' "$f" 2>/dev/null; then
-      printf '%s \xc2\xb7 declared at adoption; replace this with why it points at the method\n' "$f"
+      printf '%s\t1\t%s\tseeded\n' "$f" "$_seed_sha"
     fi
   done
 } > "$M/project/method-carriers.txt"
@@ -807,11 +889,14 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 # is GREEN at the merge-base and red at HEAD, on the arm asserting a freshly scaffolded tree is
 # clean. A descriptor claiming a file ships and an adopter that does not write it are two answers to
 # one question, and this was the copy that was wrong.
-printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
+{
+  render_ledger_header stale-header-waiver
+  printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
 # EMPTY IS THE EXPECTED STATE: the rows a tree needs are the headers that actually rotted in THAT
 # tree, so a list measured on another corpus is vacuous here. The file must EXIST even so — the
 # generator refuses a missing one, because a file nobody created is a decision nobody made.
-' > "$M/project/stale-header-waiver.txt"
+'
+} > "$M/project/stale-header-waiver.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")
@@ -823,6 +908,8 @@ done
 # builds/ starts empty; a .gitkeep would be an unsanctioned entry under check 3, so the first build
 # is what makes the directory tracked. The empty-population guard says so out loud on the first run.
 # Stage the tree FIRST so the generator (git ls-files) sees the files, then render + re-stage.
+# The scalar pins are seeded just before, so their home is staged with the tree (TOOL-dWitnessedBar-46 S2).
+seed_scalar_pins
 git add "$M" >/dev/null 2>&1 || true
 "$_PY" "$HERE/gen_build_index.py" --write
 git add "$M" >/dev/null 2>&1 || true
@@ -848,15 +935,17 @@ echo "     gate, and this kit installs one, so declare it measured:"
 echo "       $_PY $KIT_REL/check-arms.py --emit-floors    (paste its one line into .memory-tree.conf)"
 echo "  8. Bind your records (hygiene check 21). If $M/builds/*/{build,prompts,reviews}/ already"
 echo "     holds records, THE FIRST RUN IS RED: check 21 names every record carrying no Serves line,"
-echo "     and no pin value changes that — RECORD_UNBOUND_PIN bounds the deliberate 'none' escape,"
+echo "     and no population row changes that — $M/project/unbound-records.txt keys the deliberate"
+echo "     'none' escape,"
 echo "     never the absent line. Migrate in this ORDER:"
 echo "       a. See what is unbound:  $_PY $KIT_REL/gen_build_index.py --print-bindings"
 echo "          (read-only, writes nothing, always exits 0; 'A' rows are the work)"
 echo "       b. One mechanical pass: add '**Serves:** none — <why>' to each. No judgement about what"
 echo "          any document was about, so it is not a retrofit — and not a cutoff either: nothing"
 echo "          is exempted by date and every record stays visible."
-echo "       c. THEN measure: set RECORD_UNBOUND_PIN to the GRADED count check 21 prints on every run"
-echo "          ('grades <g> of N <n>'): N minus what RECORD_SERVES_CUTOFF or legacy-files.txt exempt."
-echo "          A pin above it is slack, and check 21 reds it."
+echo "       c. THEN seed it: $_PY $KIT_REL/legacy_ledger.py seed --population unbound-records"
+echo "          writes one row per GRADED unbound record check 21 prints on every run ('grades <g> of"
+echo "          N <n>'): N minus what RECORD_SERVES_CUTOFF or legacy-files.txt exempt. A row no graded"
+echo "          record matches is stale, and check 21 reds it."
 echo "       d. Drain it as you bind records for real: '**Serves:** <kind> <id> [<id>…]', kinds"
 echo "          <kind> from the closed list, and the grammar, in $M/HYGIENE.md, Record bindings."

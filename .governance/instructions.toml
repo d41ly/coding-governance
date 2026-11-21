@@ -38,7 +38,7 @@ tag = "repo.rule-06-the-codebase-map-is-memory-map-dossiers"
 level = 0
 type = "adopter-rule"
 scope = ["reader.every"]
-text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.toml`, which shrinks unless a recorded decision says otherwise."
+text = "The codebase map is `memory/map/`: dossiers under `features/`, and the keys none claims yet in `baseline.txt`, which shrinks unless a recorded decision says otherwise."
 
 [[unit]]
 tag = "repo.rule-07-work-state-is-read-from-the-generated-me"

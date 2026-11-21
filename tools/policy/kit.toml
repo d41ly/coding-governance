@@ -18,21 +18,19 @@ optional = [
 ]
 
 # Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
-# beside it, the module, the checker and the adopter; the legacy-home and unscanned-readers lists alone are withheld, below. A repository's own policy is the file the
+# beside it, the module, the checker and the adopter; the unscanned-readers list alone is withheld, below. A repository's own policy is the file the
 # adopter scaffolds OUTSIDE this directory, `.governance/policy.toml`, which no update rewrites.
 [[files]]
 include = "**"
 role = "engine"
 
-# THE LEGACY-HOME LIST IS WITHHELD (TOOL-dGroundRules-17). Its rows are gov's own legacy homes, so in
-# an adopter every row would read as stale and every adopter key as a new home. Withheld by claiming
-# the destination as `project-owned`, the mechanism the runlog descriptor explains: govkit has no
-# `exclude` key and `apply` never writes a project-owned file. Where the list is absent the
-# `arm_legacy_homes` arm announces itself not graded, and `lists --write` never creates it.
-# THE UNSCANNED-READERS LIST IS WITHHELD the same way (TOOL-dLandedOwners-3): its rows name gov's own
-# paths, which an adopter's tree does not hold, and an absent list is no rows.
+# THE UNSCANNED-READERS LIST IS WITHHELD (TOOL-dLandedOwners-3): its rows name gov's own paths, which an
+# adopter's tree does not hold, and an absent list is no rows. Withheld by claiming the destination as
+# `project-owned`, the mechanism the runlog descriptor explains: govkit has no `exclude` key and `apply`
+# never writes a project-owned file. The legacy-home list is no file of this kit: it lives at its ledger
+# home under the memory root, registered in govkit's registry (TOOL-dWitnessedBar-20 S8).
 [[files]]
-include = ["legacy-homes.txt", "unscanned-readers.txt"]
+include = ["unscanned-readers.txt"]
 role = "project-owned"
 
 # `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise, then
@@ -84,9 +82,18 @@ means = "adopted"
 # gov's alone, carried by an [[exempt_leg]] row in the deployer's registry: its subject is the code
 # in this directory.
 [[gate_leg]]
+tag = "leg.policy-kit.policy-check"
+tests = ["feature.policy"]
+enforces = ["principle.p16"]
 name = "policy check"
 subject = "repo"
+purpose = "checks the repository's own policy file"
 argv = ["python", "{kit}/check_policy.py"]
 guard = []
 ceiling = 120
 stage = ["step.test"]
+
+[gate_leg.gov]
+reads = { base = "its shrink-only list is compared with the one carried at the merge-base with the remote default branch (TOOL-dGroundRules-1).", history = "it reads that list out of history (TOOL-dGroundRules-1)." }
+guard = []
+chunk = "declarations"

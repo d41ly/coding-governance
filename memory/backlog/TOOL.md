@@ -438,6 +438,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-73](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5… |
 | [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
 | [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
+| [TOOL-dBoundRoles-76](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE MERGE-BAR GUIDE. TOOL-dWitnessedBar-84 S9 put… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | DEFERRED | MED | TOOL-dCalibratedLens-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -468,6 +469,8 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-111](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | REVIEW.COST WRITES NO SHAPE-RUN RECORD. TOOL-dDeclaredLoop-20 S3 only… |
 | [TOOL-dDeclaredLoop-113](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A pins.py mark VERB FOR THE DEVIATION CLASSIFIER.… |
 | [TOOL-dDeclaredLoop-114](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-16 | A NUMERIC PATCH DIRECTION FOR THE CLASSIFIER. TOOL-dDeclaredLoop-33's… |
+| [TOOL-dDeclaredLoop-118](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM ROW MAY NAME A PROGRAM OUTSIDE THE FIVE STEPS.… |
+| [TOOL-dDeclaredLoop-119](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-11-19 | AN ITEM THAT WRITES NO RECORD KIND HAS NO RETURNS VALUE.… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -581,6 +584,7 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-105](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPlacedRequest-109](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | THE SCRATCH-GUARD FLOOR SITS BELOW THE ROWS IT GUARDS.… |
 | [TOOL-dPlacedRequest-110](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-11-21 | held red: suite loop termination red at a0ae4dca on the daily held job,… |
+| [TOOL-dPlacedRequest-111](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
@@ -715,12 +719,22 @@ Cite ids, never line numbers.
 | [TOOL-dWellOiledMachine-62](../builds/dWellOiledMachine/BACKLOG.md) | DEFERRED | MED | TOOL-dWellOiledMachine-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dWellOiledMachine-128](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | THE PERIOD KEY HAS NO MONTH AND NO LANDING COUNT. derive_period knows… |
 | [TOOL-dWellOiledMachine-129](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | MED | — | 2026-11-03 | TWO STALL AND LOOP CLASSES HAVE NO WRITER. cl-dClosedLoop-0473 trends… |
-| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
-| [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-22 | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |
-| [TOOL-dWitnessedBar-34](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-12 | 2026-10-25 | PLAY-dOrderedCharter-50 S2 READS EACH KNOWN COPY. Its owed_rows.py… |
-| [TOOL-dWitnessedBar-35](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-26 | 2026-10-25 | TOOL-dGroundRules-25 S28 KEEPS THE BARE-BASH FALL-BACK. Its… |
-| [TOOL-dWitnessedBar-36](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-3 | 2026-10-25 | TOOL-dUnstuckLanding-11 ACCEPTS ON A KEY THIS BUILD RETIRES. Its… |
+| [TOOL-dWellOiledMachine-130](../builds/dWellOiledMachine/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put… |
+| [TOOL-dWitnessedBar-31](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dWitnessedBar-32](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE enforces EDGE ROW OMITS principle. PLAY-dOrderedCharter-7 S2 admits… |
+| [TOOL-dWitnessedBar-33](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE DOSSIERS' gate-legs CLAIMS AND THE LEGS' tests EDGES ARE ONE FACT… |
+| [TOOL-dWitnessedBar-35](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-10-25 | TOOL-dGroundRules-25 S28 KEEPS THE BARE-BASH FALL-BACK. Its… |
+| [TOOL-dWitnessedBar-36](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-10-25 | TOOL-dUnstuckLanding-11 ACCEPTS ON A KEY THIS BUILD RETIRES. Its… |
 | [TOOL-dWitnessedBar-37](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-28 | 2026-10-25 | PLAY-dOrderedCharter-36's KIND SCHEMA CANNOT SAY HOW A LEG WIDENS. It… |
-| [TOOL-dWitnessedBar-38](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-24 | 2026-10-25 | THE INTERPRETER-FLOOR ARM HAS THREE OWNERS ON PAPER.… |
-| [TOOL-dWitnessedBar-39](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | LOW | TOOL-dWitnessedBar-20 | 2026-10-25 | TOOL-dGroundRules-7 S2 TO S4 CHANGE ONCE TOOL-dWitnessedBar-20 LANDS.… |
+| [TOOL-dWitnessedBar-38](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | THE INTERPRETER-FLOOR ARM HAS THREE OWNERS ON PAPER.… |
+| [TOOL-dWitnessedBar-39](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-10-25 | TOOL-dGroundRules-7 S2 TO S4 CHANGE ONCE TOOL-dWitnessedBar-20 LANDS.… |
+| [TOOL-dWitnessedBar-98](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | 70 LEGS (DERIVED) ENFORCE NOTHING THE RULE CAN NAME.… |
+| [TOOL-dWitnessedBar-99](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-19 | FIVE REGISTRIES STAY IN THEIR GRAMMAR. TOOL-dWitnessedBar-16 §8 F16… |
+| [TOOL-dWitnessedBar-100](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE LOOP HAS NO VERB THAT PRINTS ONE ITEM'S OUTCOMES.… |
+| [TOOL-dWitnessedBar-101](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-11-20 | THE DRIFT VERB DOES NOT COMPOSE A KIND'S ROWS FROM ITS CALLER.… |
+| [TOOL-dWitnessedBar-102](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-11-20 | A REFUSED OVERLAY ROW WITHHOLDS EVERY LEG. TOOL-dWitnessedBar-28 §8 F7… |
+| [TOOL-dWitnessedBar-103](../builds/dWitnessedBar/BACKLOG.md) | DEFERRED | MED | TOOL-dWitnessedBar-28 | 2026-11-20 | THE RENDER COMPOSES A KIND WHOSE GOV ROWS ITS CALLER SUPPLIES.… |
+| [TOOL-dWitnessedBar-104](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY DOES NOT GUARD THE CHARTER. Its suite greps AGENTS.md… |
+| [TOOL-dWitnessedBar-105](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY DOES NOT GUARD ITS manifest-check READS. Its reverse… |
+| [TOOL-dWitnessedBar-113](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE SCRATCH-GUARD'S resolveCardBash PORTS THE OLD BASH ORDER.… |
+| [TOOL-dWitnessedBar-114](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | AN ADOPTER'S INSTRUCTIONS-LEGACY LIST READS EMPTY AFTER ITS UPDATE.… |

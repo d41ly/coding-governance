@@ -17,7 +17,8 @@ gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring"
   "leg ceilings clear their evidenced maximum", "run-gates run-log line",
   "receipt sync (installed files match the receipt)", "pre-push bar self-test",
   "held-halves selftest", "measure-legs selftest",
-  "python reads (a name never bound, an import outside its guard)"]
+  "python reads (a name never bound, an import outside its guard)",
+  "gate-leg conformance", "leg-factory selftest", "product-test contract (tests.product)"]
 kits = ["run-gates"]
 git-hooks = []
 harness-hooks = []
@@ -62,6 +63,9 @@ globs = [
   "tools/run-gates/kit.toml",
   "tools/run-gates/profile_bar.py",
   "tools/run-gates/profile_bar.test.sh",
+  "tools/run-gates/bar-wall-evidence.txt",
+  "tools/run-gates/precommit.py",
+  "tools/run-gates/product_tests.py",
   "tools/run-gates/gate-profiles.txt",
   "tools/run-gates/gate-fingerprint.sh",
   "tools/run-gates/run-gates.runlog.test.sh",

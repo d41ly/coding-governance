@@ -47,7 +47,7 @@ the point, expect to re-key and say so in the registry's own header.
 
 ## The gate
 
-No registry in this repo is keyed by line today. `tools/dead-path-waivers.txt` is keyed by the
+No registry in this repo is keyed by line today. `memory/project/dead-path-waivers.txt` is keyed by the
 waived line's TEXT and an occurrence ordinal instead (`TOOL-dHonouredPark-3`), which is this page's
 advice taken. The class stays for the next registry someone keys by position. Whatever gate owns
 such a registry is the thing that reds; what no gate covers is the RE-KEY, because nothing

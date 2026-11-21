@@ -54,10 +54,17 @@ the gate IS the check. Its leg runs it over whatever the target declared, and a 
 """
 
 [[gate_leg]]
+tag = "leg.check-line-length.line-length"
+tests = ["feature.playbook"]
 name = "line length"
 subject = "repo"
+purpose = "holds agent-instruction prose to a declared line length"
 argv = ["bash", "{prefix}/check-line-length.sh"]
 stage = ["step.test"]
+
+[gate_leg.gov]
+chunk = "product"
+ceiling = 300
 
 # The `line-length gate selftest` leg is NOT declared here. It is a leg on GOV's bar and carries
 # an [[exempt_leg]] row in <prefix>/govkit/registry.toml, for the reason recorded beside

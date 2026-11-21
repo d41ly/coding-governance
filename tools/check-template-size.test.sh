@@ -287,6 +287,21 @@ mkfile 1001 "$TMP/subj"
 # marker. Matching the marker alone left the arm green when the numbers were removed.
 expect_out "A6 one byte past the high-water warns AND exits 0" \
   "1000 -> 1001 (+1)" 0 bash "$GATE" "$TMP/subj" "" "$HW"
+# A6m · TOOL-dWitnessedBar-29 AC1: the line AFTER the warning is the runner's marker, its third TAB
+# field the key the gate read the row by, the record's own first field; at the high-water, none.
+hwkey=$(awk -F'\t' 'NR == 1 { print $1 }' "$HW")
+mout=$(bash "$GATE" "$TMP/subj" "" "$HW" 2>&1 | awk -F'\t' '
+  prev ~ /^TEMPLATE-SIZE WARN / && $1 == "gate-warn" && $2 == "size" { print $3 } { prev = $0 }')
+if [ -n "$hwkey" ] && [ "$mout" = "$hwkey" ]; then
+  say_ok "A6m the warning's next line is the marker, keyed as its high-water row"
+else
+  say_fail "A6m the warning's next line is the marker, keyed as its high-water row" \
+    "expected a marker naming '$hwkey' after the warning, got '$mout'"
+fi
+mkfile 1000 "$TMP/subj"
+expect_absent "A7m at the recorded high-water: no marker" "gate-warn" 0 \
+  bash "$GATE" "$TMP/subj" "" "$HW"
+mkfile 1001 "$TMP/subj"
 
 # --- A8 · --bump rewrites the subject's row and reports the delta -----------------------------------
 expect_out "A8 --bump re-records and names the delta" \

@@ -194,8 +194,8 @@ self-test-shaped when its manifest chunk is `selftests` or a resolved argv basen
 gov runs it on every bar. A shaped, non-exempt leg whose descriptor `subject` is not `kit` reds,
 since every adopter would run it on its default bar while gov holds it. Its zero-graded and
 zero-shaped liveness reds bind only while gov's manifest holds a row in chunk `selftests`, and an
-absent manifest is a note, as 7h treats it. Beside it, 7h holds a descriptor's `doc_reads` equal to
-gov's manifest row, and a declared `ceiling` to a positive integer equal to the manifest's, because
-the emitter carries both verbatim into adopters. The selftest stages 7j4's and the ceiling
-clause's breaks in `check_benched_probe_arms` and exercises the ceiling's emission and keep rule in
+absent manifest is a note. Each leg's one declaration renders gov's manifest row through the
+run-gates kit's leg factory, whose `--conform` grades a declared `ceiling` a positive integer, so no
+descriptor value is compared with the manifest any more (TOOL-dWitnessedBar-11). The selftest stages
+7j4's breaks in `check_benched_probe_arms` and exercises the ceiling's emission and keep rule in
 `check_ceiling_emission`. DEPL-aBenchedProbe-1, DEPL-aBenchedProbe-2.

@@ -4,6 +4,7 @@ frozen-row check, and the two helpers a step program writes through (TOOL-dSafeP
 
     python <prefix>/govkit/upgrade_steps.py list               # every row, ordered, with its commit
     python <prefix>/govkit/upgrade_steps.py list --window      # each translation-window member
+    python <prefix>/govkit/upgrade_steps.py list --ids         # every declared step id, the `landed-steps` seed
     python <prefix>/govkit/upgrade_steps.py frozen [--base <rev>]   # the `step-rows-frozen` leg
     python <prefix>/govkit/upgrade_steps.py fixture isolation [--plant <case>]   # the contract, observed
     python <prefix>/govkit/upgrade_steps.py fixture walk|update [--plant <case>]  # the walk, observed
@@ -363,6 +364,100 @@ OPT_IN_ALL = "opt_in_all"
 TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
 
 
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
+BASH_NAMES = ("bash.exe", "bash")
+
+
+def wrong_shell_at(path, wsl):
+    """True when `path` is a Windows checkout under WSL: `wsl` set and `path` under a single-letter
+    `/mnt/<drive>/`, WSL's mount of a Windows drive (TOOL-dWitnessedBar-27). The twin of the shell
+    block `refuse_wrong_shell`'s `wrong_shell_at` in `refuse-wrong-shell.sh` in the gov lib dir; a
+    WSL path on its own disk, and any path where no WSL marker is set, is green."""
+    p = str(path)
+    return bool(wsl) and len(p) > 6 and p.startswith("/mnt/") and "a" <= p[5] <= "z" and p[6] == "/"
+
+
+def scan_bash(script="", host=""):
+    r"""`(found, tried, refusal)`: the bash to run, found by RUNNING each candidate, never by its name.
+
+    GOV_BASH first, and when it is set nothing after it is tried; then Git's own `bin/bash.exe`, the
+    third parent of `git --exec-path`; then each PATH directory's BASH_NAMES, a System32 or
+    WindowsApps launcher reported and never run. A candidate passes when one run prints `uname -s` as
+    its first line and exits 0, `test -f` on `script` included when one is given; on a `windows` host
+    the answer must start MINGW or MSYS, so WSL's launcher, which answers `Linux` and drops `$1`, is
+    refused under any name (gotcha subprocess-resolves-a-different-shell). Past GOV_BASH every
+    candidate is run, `tried` holding one `<candidate>: <why>` for each and a repeat never twice;
+    `found` is the first that passed, or "" with `refusal` naming every `tried` line, and the bare name
+    `bash` is never returned. `host` is `windows` or `posix`, this host's when empty. No memo: an
+    adapter keeps its own, so this stays a function a truth table can call twice. On a `posix` host
+    the hosting file is judged first: WSL running it from a Windows checkout under `/mnt/` returns
+    no `found`, an empty `tried` and the wrong-shell refusal, before any candidate is tried."""
+    host = host or ("windows" if os.name == "nt" else "posix")
+    if host == "posix":
+        here = os.path.abspath(__file__)
+        wsl = bool(os.environ.get("WSL_DISTRO_NAME")) or os.path.exists("/proc/sys/fs/binfmt_misc/WSLInterop")
+        if wrong_shell_at(here, wsl):
+            return "", [], ("WSL is running " + here + " from a Windows checkout under /mnt/; "
+                            "run it with Git's bash (C:/Program Files/Git/bin/bash.exe)")
+    tried, seen = [], set()
+
+    def run_probe(cand):
+        try:
+            r = subprocess.run([cand, "-c", 'uname -s && { [ -z "$1" ] || test -f "$1"; }', "_", str(script)],
+                               stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            return "did not run"
+        u = r.stdout.decode("utf-8", "replace").replace("\x00", "").split("\n")[0].strip()
+        if not u:
+            return "did not run"
+        if host == "windows" and not u.startswith(("MINGW", "MSYS")):
+            return "answered " + u
+        return "runs" if r.returncode == 0 else "cannot see " + str(script)
+
+    def check_candidate(cand):
+        key = cand.lower() if host == "windows" else cand
+        if key in seen:
+            return False
+        seen.add(key)
+        low = cand.lower()
+        why = "a launcher" if "/system32/" in low or "/windowsapps/" in low else run_probe(cand)
+        tried.append(cand + ": " + why)
+        return why == "runs"
+
+    gov = os.environ.get("GOV_BASH", "")
+    if gov:
+        why = run_probe(gov)
+        tried.append(gov + ": " + why)
+        if why == "runs":
+            return gov, tried, ""
+        return "", tried, ("GOV_BASH is set to '" + gov + "' and " + why + ", so nothing after it is tried: "
+                           "an override that is set and unusable is refused, never a fall-through")
+    try:
+        r = subprocess.run(["git", "--exec-path"], stdin=subprocess.DEVNULL, capture_output=True, timeout=20)
+        ex = r.stdout.decode("utf-8", "replace").strip().replace("\\", "/") if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        ex = ""
+    found = ""
+    if not ex:
+        tried.append("git --exec-path: did not run")
+    else:
+        cand = "/".join(ex.rstrip("/").split("/")[:-3]) + "/bin/bash.exe"
+        if not os.path.isfile(cand):
+            tried.append(cand + ": absent")
+        elif check_candidate(cand):
+            found = cand
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in BASH_NAMES:
+            cand = (d.rstrip("/\\") + "/" + name).replace("\\", "/")
+            if d and os.path.isfile(cand) and check_candidate(cand):
+                found = found or cand
+    if found:
+        return found, tried, ""
+    return "", tried, ("no bash runs" + (" that can see " + str(script) if script else "") + ": "
+                       + "; ".join(tried) + "; set GOV_BASH to Git's bash")
+# <<< resolve_bash_py
+
+
 _BASH: str | None = None
 
 
@@ -382,7 +477,9 @@ def resolve_bash() -> str:
     because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
 
     A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
-    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
+    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub. The rule is the
+    one `resolve_bash_py` block above (TOOL-dWitnessedBar-26): GOV_BASH, Git's own `bin/bash.exe`,
+    then PATH, each RUN and a WSL launcher refused under any name; this adapter keeps the memo.
 
     WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
     check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
@@ -392,34 +489,11 @@ def resolve_bash() -> str:
     global _BASH
     if _BASH:
         return _BASH
-
-    def check_runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if check_runs(override):
-            _BASH = override
-            return _BASH
-        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
-                      f"that is set and unusable is this failure, not a fall-through.")
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                continue          # a launcher for a DIFFERENT filesystem
-            if not check_runs(cand):
-                continue          # on disk, cannot execute
-            _BASH = cand
-            return _BASH
-    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
-                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
+    found, _tried, refusal = scan_bash()
+    if not found:
+        raise Refusal(f"govkit: {refusal}")
+    _BASH = found
+    return _BASH
 
 
 def resolve_shell_argv(argv: list[str]) -> list[str]:
@@ -429,15 +503,12 @@ def resolve_shell_argv(argv: list[str]) -> list[str]:
     target chose and is none of govkit's business, and `sh` is left alone because substituting
     bash for it would change the language a target asked for.
 
-    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
-    exactly as it does today instead of newly refusing on a path that never needed this.
+    Raises `resolve_bash`'s Refusal when no bash resolves (TOOL-dWitnessedBar-26 S7): the argv
+    unchanged would hand the bare name to the loader, which on Windows answers with WSL's launcher.
     """
-    if not argv or argv[0] not in ("bash", "bash.exe"):
+    if not argv or argv[0] not in BASH_NAMES:
         return list(argv)
-    try:
-        return [resolve_bash()] + list(argv[1:])
-    except Refusal:
-        return list(argv)
+    return [resolve_bash()] + list(argv[1:])
 
 
 def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
@@ -2733,6 +2804,17 @@ def cmd_list(root, window: bool) -> int:
         print(f"upgrade-steps: {i} · {r.id} · {r.introduced} · {r.file}")
     for r in retired:
         print(f"upgrade-steps: retired · {r.id} -> {r.successor} · {r.retired} · {r.file}")
+    return 0
+
+
+def cmd_list_ids(root) -> int:
+    """`list --ids`, the `landed-steps` population's seed (TOOL-dWitnessedBar-18 S4): each step id the
+    working tree declares, an `[[upgrade]]` row's or a `[[retired]]` row's holding `/`, as `read_retired`
+    reads a step id, then the count `1`, TAB-separated. It reads no landed ref, so a step row and its
+    ledger row added together are measured in the commit that adds them."""
+    ids = [r.id for r in read_steps(root, None, None)] + [r.id for r in read_retired(root, None, None) if "/" in r.id]
+    for sid in dict.fromkeys(ids):
+        print(f"{sid}\t1")
     return 0
 
 
@@ -5199,6 +5281,8 @@ def main(argv: list[str]) -> int:
     try:
         if argv and argv[0] == "list" and argv[1:] in ([], ["--window"]):
             return cmd_list(root, argv[1:] == ["--window"])
+        if argv == ["list", "--ids"]:
+            return cmd_list_ids(root)
         if argv and argv[0] == "frozen" and (argv[1:] == [] or (len(argv) == 3 and argv[1] == "--base")):
             return cmd_frozen(root, argv[2] if len(argv) == 3 else None)
         if argv[:2] == ["fixture", "isolation"] and (
@@ -5212,7 +5296,7 @@ def main(argv: list[str]) -> int:
             if argv[:2] == ["fixture", family] and ((bare and len(argv) == 2) or (
                     len(argv) == 4 and argv[2] == "--plant" and argv[3] in plants)):
                 return run(argv[3] if len(argv) == 4 else None)
-        sys.stderr.write(f"usage: python upgrade_steps.py list [--window] | frozen [--base <rev>] | "
+        sys.stderr.write(f"usage: python upgrade_steps.py list [--window | --ids] | frozen [--base <rev>] | "
                          f"fixture isolation [--plant {'|'.join(FIXTURE_PLANTS)}] | "
                          f"fixture walk [--plant {'|'.join(WALK_PLANTS)}] | "
                          f"fixture lock --plant {'|'.join(LOCK_PLANTS)} | "

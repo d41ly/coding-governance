@@ -16,7 +16,7 @@ ARCH-bOrderlyAtlas-1.)
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
 | `check-memory-hygiene.sh` | the gate — 31 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20, 24, 27 and 28 to `row_grammar.py`, 26 to `transition_audit.py`, 29 and 30 to `gen_build_index.py`, its `--check-coverage` and `--check-asbuilt`, 31 to `build_records.py`, its `join red-fix`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
-| `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. Also the backlog-row grammar other engines import (`parse_row`, `census`), the `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` shard ratchets (blank = unarmed, announced as NOT MEASURED), `--emit-pin` for all three pins, and `--ages`, row age DERIVED from git. Check 27 is its `--check-relations [<base>]`: a decision row or gotcha added since the mainline merge-base whose top hit in the index `id_grammar.py` builds clears `NEAR_MATCH_GATE`'s floor must name it or carry a relation token (blank = NOT ARMED, announced); `--measure-relations [<floor> [<base>]]` replays the history to measure a floor before arming it. Check 28 is its `--check-content [<base>]`, always on: a decision row's or gotcha body's normalized text held by two identities reds when one holder was added since the mainline merge-base; a duplicate whose every holder had landed is counted, never reported. |
+| `row_grammar.py` | check 20 — one id, one row per row document. The tolerated duplicates are KEYED, one row per `(shard, id)` of `project/row-duplicates.txt`, both ways: a duplicate with no row reds and so does a row no duplicate matches; an absent home is the empty population, the strictest one (TOOL-dWitnessedBar-17 S1). Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. Also the backlog-row grammar other engines import (`parse_row`, `census`), each shard's live and unranked counts (the `live-rows` and `severity-unlabelled` populations, registered unseeded, announced as NOT MEASURED), `--list-duplicates`, the `row-duplicates` seed, and `--ages`, row age DERIVED from git. Check 27 is its `--check-relations [<base>]`: a decision row or gotcha added since the mainline merge-base whose top hit in the index `id_grammar.py` builds clears `NEAR_MATCH_GATE`'s floor must name it or carry a relation token (blank = NOT ARMED, announced); `--measure-relations [<floor> [<base>]]` replays the history to measure a floor before arming it. Check 28 is its `--check-content [<base>]`, always on: a decision row's or gotcha body's normalized text held by two identities reds when one holder was added since the mainline merge-base; a duplicate whose every holder had landed is counted, never reported. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. `--write` writes only the artifacts whose bytes moved, compared as the UTF-8 bytes it would write, so a CRLF copy is rewritten and the tree it leaves is the one a full rewrite leaves; it prints `build-index: wrote <n> artifact(s), <k> unchanged`. With `LIVE_DORMANT_DAYS` set, `LIVE.md` gains a `Last record` column, the newest date the build's own records carry, and an `Activity` column reading `active` or `dormant` against the newest record date in the tree, active rows first; blank renders the file unchanged. With `LIVE_LANDED_UNCLOSED` set to `1`, `LIVE.md` also gains a trailing `Landed-unclosed` column, each live build's non-terminal units whose id tracked product source cites, read by calling the drift-audit kit's own `non_terminal_specs_cited_by_product_source` signal in-process, so it is a candidate to close and never a verdict; the kit is a declared slot, so where it does not resolve the column reads `not-installed: drift-audit` and the render proceeds (PLAY-dOrderedCharter-17), an empty evidence population refuses rather than rendering zeros, and blank never imports it. Under `BACKLOG_MODE=builds` it also renders the family views and owns the `--asks` print modes and the `--new-build` scaffold; its `--selftest` compares [Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) against `backlog.py`'s declarations. With the policy key `memory.staged-render` reading `on` at the landed revision, through `tree_lib.read_policy_value` (TOOL-aTrimmedWait-10), `--write-staged` is the pre-commit hook's remedy for a `HYGIENE check <N> FAILED` refusal, N = 9: it writes only the artifacts whose bytes moved and stages them, with each removed orphan shard, into the index the hook was handed, and exits 0 only when it staged one, after which the hook grades the leg again; the key reading anything else, a refused read or no policy kit beside this one, an index other than the repository's own or its `.lock` (a partial commit), an unstaged render input, a data-loss guard or nothing moved each decline by name, write nothing and exit 1, and the hook refuses as before (TOOL-aTrimmedWait-3). |
 | `backlog.py` | the per-build ask model: the `BACKLOG.md` grammar, the spec-header verbs `closes` and `advances`, the order-free status fold, the verdicts as data (`VERDICT_CODES`), READY, and the family-view renderer with the one relocation recipe. A library that reads no tree; its arms run inside `gen_build_index.py --selftest`. |
 | `migrate_backlog.py` | the switch from shards to per-build asks: the planner (`--plan`), the switch-over writer (`--write`), the relocation engine (`--relocate` / `--ingest` / `--repair`), the straggler census (`--stragglers`) and the recipe (`--recipe`), plus `--selftest`. It calls `backlog.py`'s grammar and fold and `transition_audit.py`'s delta, and spells neither. |
@@ -39,7 +39,7 @@ ARCH-bOrderlyAtlas-1.)
 | `ANNOTATION-STYLE.template.md` | the annotation style guide, rendered to `memory/guides/ANNOTATION-STYLE.md`. |
 | `kit.toml` | this kit's descriptor for the deployer: file roles, the withheld self-tests, and the `requires_if` rows naming the playbook-render, unattended and review-harness kits. |
 | `README.md` | this file. |
-| `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from this kit's `id_grammar.py` and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
+| `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 waived, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--list-unbound` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a keyed registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from this kit's `id_grammar.py` and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every waiver is keyed per corpus; checks 13-15 are armed by the presence of `project/id-orphan-waiver.txt` (13, 14) and `project/corpus-path-unresolved.txt` (13, 15), which `--scaffold` writes neither of; check 16 is STRUCTURAL and behind none. `--list-unbound` is the `unbound-records` seed, asked of the hygiene gate's print mode of the same name. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--check-with-ids`, which the hygiene shell's unscoped run launches once to run `corpus_ids.py --check` and then `--check` in one interpreter over one memoized walk, each verb framed with its own exit code / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff, ranked by anchor specificity (`path`, then `directory`, then `basename`, universals first and outside the ranking) and cut at a tier boundary: whole tiers print in full while they fit `CHECKLIST_FULL_BUDGET`, 12, and every class from the first tier that does not prints as one line. No class leaves it. A `kind: invariant` record (a `decision:` key and five sections, graded by checks 18-19, its guard resolved against `LEG_MANIFEST`) is never ranked: it closes the checklist as the `# by design — <n> invariant(s) this selection touches` block, which the review harness hands its lenses as `byDesign`. The block is read at the subject's base, `--for-diff`'s range base or `--for-paths --base <rev>`, so an invariant the subject adds, edits or takes out prints as a `NEW/CHANGED invariant` item instead and never exempts its own change. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. With `ARMS_REFUSALS="graded"` a SECOND signature grades every refusal site that is not a fail call, an `exit 1` or `status=1` in a tracked `*.sh` outside the memory root, armed by its sibling suite or pinned with a five-field row whose reason the gate prints; blank, it prints one OFF line counting what it skips. Ships blank. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
@@ -151,6 +151,19 @@ pre-switch branch's shard edits from line-merging into a view, and git asks the 
 path whose attribute names it, so without that line git's own text merge completes the merge with
 nothing refusing it.
 
+**A baseline ledger merges through the same driver** (TOOL-dWitnessedBar-13). A ledger is the file
+the baseline ledger factory, this kit's `legacy_ledger.py`, keeps for one population a check
+tolerates: a header rendered from the population's `[[ledger]]` registration, then one TAB-separated
+row per key, `<key fields> TAB <count> TAB <sha> TAB <disposition>`. Its home is declared rather
+than path-shaped, so the driver's ledger class recognises it by that header on all three sides and
+never by `%P`; headers that disagree are a whole-file conflict. Over a ledger every line that is
+neither blank nor `#` is a row, keyed by the header's key fields, every postcondition reads that row
+plane, and the audit line's census field reads `ledger-keyed`. Two rows meet by one rule: a key one
+side drained and the other left alone is removed, and a key both sides changed keeps the lower count
+with that side's sha and disposition; equal counts that differ otherwise conflict. A ledger's
+attribute is one line beside the ones above, `<home> merge=rows`, which the unit that converts a
+population into a ledger adds; no second driver and no second `git config` line exist.
+
 The driver COMMAND is git config, so it is per node — and both of its path arguments carry the
 install prefix, so there is no single literal that starts in both layouts. Do not hand-type it; this
 one spelling is correct in both, because the runbook installs `check-wiring.sh` at `<root>/<prefix>/`
@@ -189,6 +202,82 @@ git ships `ours` as a merge STRATEGY, not a driver, so the attribute needs one p
 `git config merge.ours.driver true`. Unset, git silently falls back to the text merge and conflicts.
 `check-wiring.sh` reports the unset driver `UNWIRED`, sets it under `--fix` and `--session`, and never
 overwrites a value already set.
+
+## The ratchet pack — a population grows only through a widen record
+
+`ratchet.py` (TOOL-dWitnessedBar-14) grades every population a `[[ledger]]` table registers, one leg
+per row of retrofit's `[ratchet]` table, each reading through `legacy_ledger.py` and none counting on
+its own:
+
+| Leg | Verb | Refuses |
+|---|---|---|
+| `ratchet (never gains)` | `never-gains` | a key gained, a count raised or a ceiling exceeded against the compare base, an append-only base row edited or removed, and a `widened:` row `retrofit.widen` does not admit |
+| `ratchet (both ways)` | `both-ways` | for each registration whose `leg` names it, a measured key with no row or a row its seed no longer finds; one naming another leg prints `graded by <leg>` |
+| `ratchet (unarmed)` | `unarmed` | a `seed = []` registration, or a home recording a failed seed, whose home still holds rows |
+| `ratchet (populated)` | `populated` | an armed home holding no row, unless a seen-red line names the registration's leg, read through `seen_red.py`'s `read_seen_red_records`: it prints `admitted · seen red at <red sha8> in <record>`, and a line the reader refuses exits 2 (TOOL-dWitnessedBar-7 S10) |
+| `ratchet (seed laundering)` | `seed-laundering` | a base row re-dated or its disposition rewritten, or removed while its seed still measures it |
+| `ratchet (rename)` | `rename` | a `git mv` of a file holding `site` rows left keyed on the old path |
+| `ratchet (keys, not a scalar)` | `keys-not-scalar` | a `*_PIN` key a root `.<name>.conf` in the working tree, ignored ones excluded, assigns that `conf-scalar-pins` does not hold |
+| `ratchet (key shape)` | `key-shape` | a key field holding a number where its kind holds a label |
+| `ratchet selftest` | `--fixture` | every plant of `--fixture --plant <case>`, `untouched quiet` and `merge` among them |
+
+With no compare base a base leg prints `unresolved` and reds. A population the base holds nowhere,
+neither its home nor its header at another path, prints `new at <sha12>` with its row count. A leg
+with nothing to grade prints one `unarmed · <leg> · <why>` line and exits 0, which the runner shows
+as passed: read `unarmed` in the leg's output or in `ratchet.py --list`, which also prints the touch
+join `unarmed · build.scope (dScopedBuild)`. `keys-not-scalar` is the exception: an absent, unarmed
+or unregistered `conf-scalar-pins` exits 1 printing `unarmed conf-scalar-pins` and the seed command
+(TOOL-dWitnessedBar-46 S3), because it is the leg an adopter receives.
+
+**What an adopter receives** (TOOL-dWitnessedBar-46). A leg ships when every input it reads at an
+adopter ships with the kit or is seeded there:
+
+| Leg | Reads at an adopter | Ships |
+|---|---|---|
+| `ratchet (keys, not a scalar)` | the adopter's root confs in the working tree, ignored ones excluded, and its seeded `conf-scalar-pins` | yes |
+| `ratchet selftest` | its own scratch repositories | yes, held as a kit self-test |
+| `ratchet (never gains)` | every registered population and the base remote; `retrofit.widen` | no, `[[exempt_leg]]` |
+| `ratchet (both ways)` | every registration's seed run at HEAD | no |
+| `ratchet (unarmed)` | every registered home | no |
+| `ratchet (populated)` | every population and the seen-red records | no |
+| `ratchet (seed laundering)` | every population at the base | no |
+| `ratchet (rename)` | the base range | no |
+| `ratchet (key shape)` | every population | no |
+
+The seven gov-only legs are `[[exempt_leg]]` rows of govkit's registry, tagged `leg.gov.<slug>`. The
+adopter seeds `conf-scalar-pins` from its own confs with `legacy_ledger.py seed --population
+conf-scalar-pins`, at the end of `adopt-memory-tree.sh --scaffold` and through `--seed-pins`, which a
+`[[regenerate]]` row runs at every `govkit update` unless GOVKIT_RERENDER=0 is exported; a home already
+armed is left as it is. The seed is the registration's own argv, `ratchet.py keys-not-scalar --measure`
+in the memory-tree kit, run at
+the repository root, so an adopter whose kits sit under another prefix, or where `python` does not
+resolve, reads `unarmed conf-scalar-pins` until that argv resolves there.
+
+**The pins and cutoffs it grades** (TOOL-dWitnessedBar-17). The seven count pins once set in the confs
+are keyed populations: `ORPHAN_ID_PIN` and `DEAD_PATH_PIN` fold into `id-orphan-waiver` and
+`corpus-path-unresolved`; `ROW_DUPLICATE_PIN`, `RECORD_UNBOUND_PIN` and `DOSSIER_DECISIONS_EMPTY_PIN`
+are `row-duplicates`, `unbound-records` and `dossier-decisions-empty`, seeded by `row_grammar.py
+--list-duplicates`, `corpus_ids.py --list-unbound` and the codebase-map kit's `map_diff.py
+--list-empty-decisions`; `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` are `severity-unlabelled` and
+`live-rows`, registered with `seed = []`. Every `*_CUTOFF` date of the root confs in the working tree, ignored ones excluded, is a row of the
+`ceiling` population `date-cutoffs`, seeded by `ratchet.py measure-cutoffs`, its count the date as
+eight digits and a blank one `99991231`: a date moved later reds in `both ways` as `count rose`, and
+in `never gains` as `above ceiling` unless a widen record admits it. A seed argv spells its program
+`{prefix}/<kit>/<file>`, which the factory resolves against the tool root above its own copy.
+
+**The widen route.** A raise is admitted only with its reason on record:
+
+```bash
+python <prefix>/memory-tree/ratchet.py widen <population> --key "$(printf '%s\t%s' <field> <field>)" --reason "<why>" --unit <id>
+```
+
+The key is the row's key fields joined by one TAB, as the ledger row spells them.
+
+writes `<memory root>/builds/<build>/build/<date>-build-<id>-widen-<n>.md` (`Population`, `Keys`,
+`Reason`, `Caused-by`) and the row `widened:<record stem>` at HEAD's sha. Commit the record with the
+row: `never gains` admits a widened row only where that record is tracked, names the population and
+the key, and gives a reason. Under `retrofit.widen = "refuse"` the door writes nothing and the leg
+admits only a record the compare base already tracks. A widened row's count is not checked.
 
 ## Backlog modes — authored shards and per-build asks
 
@@ -425,6 +514,17 @@ are one subject, and what becomes of each open ask on a finished build. In order
   or `DEFERRED` and Field holds the `by`, `on` or `until` value, or `-`. Other columns are read by
   nobody; this repo's own records add `Rule`, `Spec`, `Evidence` and `Severity`.
 
+## Upgrading past the keyed pins — seven conf pins leave the confs (TOOL-dWitnessedBar-17)
+
+`ORPHAN_ID_PIN`, `DEAD_PATH_PIN`, `ROW_DUPLICATE_PIN`, `RECORD_UNBOUND_PIN`, `SEVERITY_UNLABELLED_PIN`
+and `LIVE_ROW_PIN` leave `.memory-tree.conf`, and `DOSSIER_DECISIONS_EMPTY_PIN` leaves
+`.codebase-map.conf`, through one `[[upgrade]]` step each at your next `govkit update`
+(`<kit>/<pin>-pin-to-ledger`). A counted pin's population is seeded at your HEAD first, and only then
+is the key removed and its `conf-scalar-pins` row drained; a seed that fails leaves both in place.
+A blank `ORPHAN_ID_PIN` or `DEAD_PATH_PIN` takes its waiver home with it, so checks 13-15 stay off as
+the blank pin left them; a home present arms them. The sections below that name these pins, and
+`row_grammar.py --emit-pin`, which `--list-duplicates` replaced, describe the kit before this step.
+
 ## Upgrading to 2.73 — check 20's population widened, and your bar may red on arrival
 
 Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
@@ -491,14 +591,16 @@ root that is not a `fail <n> "…"` call: an adopter's `--check` that prints a r
 gate's delegated block that prints a module's capture. The module docstring states the predicate,
 the reason walk, the `# arm-signature:` marker and what it does not check; read it there.
 
-**To switch it on**, set the key, then run `python <kit>/check-arms.py --emit-pin`. Its refusal rows
-carry five fields, the last a reason written as `REASON-OWED`, which the gate refuses: replace each
-with why no arm reaches that site, and paste the rows into `<MEMORY_ROOT>/project/unarmed-branches.txt`.
+**To switch it on**, set the key, then run `python <kit>/check-arms.py --emit-pin`. It prints each
+unarmed key's fields and count, `<gate> TAB <exit|status> TAB <signature> TAB <count>`, the measured
+rows the ledger factory reads: `<MEMORY_ROOT>/project/unarmed-branches.txt` is a ledger population
+(TOOL-dWitnessedBar-16), so write each as a ledger row under its header, the sha and `seeded` after
+the count, and record why no arm reaches the site in the commit or a widen record, never on the row.
 A site your sibling suite already drives is better ARMED than waived: lengthen that arm's assertion
 to the whole signature `--report` prints, or, for a delegated block, add a marker naming the text the
 arm already asserts. Then re-run `--emit-floors` and paste its line, because every script holding a
-site is now a gate whose floor counts sites. Every waived row prints a `check-arms: waived` line on
-every run, so the leg's log grows by one line per row.
+site is now a gate whose floor counts sites. Every waived site prints a `check-arms: waived` line on
+every run, so the leg's log grows by one line per site.
 
 **Check 24's block now prints its capture on a green run**, as blocks 20, 27 and 28 already did. A
 tree with `ROTATION_MODE` unset gains one `check 24: ROTATION_MODE is UNDECLARED` line on every full
@@ -565,13 +667,19 @@ owns the gate, or monthly, whichever comes first, and always when a ceiling reds
 **The retirement commit**, one per batch: the site and its arm gone; any pin row gone; the floor in
 `ARMS_FLOORS` lowered with a comment naming the decision; one row per retired row in
 `<MEMORY_ROOT>/project/refusal-retirements.txt` (declare the name in `PROJECT_REGISTRY_EXTRA`); and NO
-tombstone — a new refusal policing the retired surface is the growth this review exists to stop. A row:
+tombstone — a new refusal policing the retired surface is the growth this review exists to stop. The
+registry is an `append-only` ledger population (TOOL-dWitnessedBar-16), every field the check grades a
+key field, TAB-separated, under the header its `[[ledger]]` table renders. A row:
 
-    <decision id> · RETIRES <gate> check <n> "<signature head>" (x<sites>) · R1 <stores read> · R2 <ids> · R3 <how it survives> · R4 <why not security-shaped> · survivor <file> "<signature>" · replay "<refusal line>" · supersedes <id>
+    <decision id> TAB <gate> TAB <check n> TAB <R1 stores read> TAB <R2 ids> TAB <R3 how it survives> TAB <R4 why not security-shaped> TAB <survivor file> TAB <its signature> TAB <replay line> TAB 1 TAB <sha> TAB seeded
 
-`--check` reds a row missing any of R1 to R4, its survivor or its replay; a survivor file that no
-longer carries its signature; and a decision id no `<MEMORY_ROOT>/DECISIONS.md` row carries. The
-replay is the line the surviving refusal printed when the changed program was run once after the batch.
+The retired signature's head, its site count and the row it supersedes are the batch's commit and
+record, never the row's. `--check` reds a row with too few fields, the factory's malformed line; a
+unit field that is no decision id; a row whose R1 to R4, survivor or replay field is empty; a survivor
+file that no longer carries its signature; and a decision id no `<MEMORY_ROOT>/DECISIONS.md` row
+carries. The replay is the line the surviving refusal printed when the changed program was run once
+after the batch. Recording a new survivor rewrites a key field of an append-only row, which the
+`ratchet (never gains)` leg reds as `removed`: that edit is a new row, never a rewrite.
 
 **The ceiling.** `REFUSAL_CEILINGS="<gate>:<count>:<date>:<decision id> …"`, beside `ARMS_FLOORS`, counts
 the census the floor's first number counts. Above it is red, and the remedy is the review, not the
@@ -621,6 +729,14 @@ the signature it was recorded with. The replay line is prose; nothing re-runs it
   a refusal, and the file itself is required even when empty — a file nobody created is a decision
   nobody made. It ships EMPTY, and the kit declares a `[[hole]]` whose discharge probe reports it
   unarmed rather than passing silently.
+- **`legacy_ledger.py seed` admits a home whose directory exists, tracked files or none** — so the
+  codebase-map and drift-audit adopters, which seed through this kit's copy into a directory they have
+  just made, seed on a fresh install before its first commit, and a registered home under the
+  `memory/project/` the adopter creates does too. `seed` never creates a directory: a home whose
+  parent is absent is printed `unarmed <population> no directory <parent>` (the `--home` form names the home) and nothing
+  is written.
+  What it does not check: a file name the hygiene check's structure check refuses inside an existing
+  directory is written, and that check reds it at its next run, never silently (TOOL-dWitnessedBar-47).
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
 
 ## Codebase-map interop

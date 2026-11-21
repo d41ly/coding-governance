@@ -11,9 +11,9 @@ FIVE POPULATIONS, each read from <rev> against the working tree:
                 in the codebase map. Its ceiling-evidence.txt row only a measured bar run writes, so it
                 prints as a `deferred —` line and leaves the exit unchanged.
   leg removed   a name at <rev> absent now. Owes that no row of subject-pins.tsv, the map's
-                baseline.toml or selftest-budgets.txt names it.
-  key           every key of every gate-legs.json row. Owes membership in each `KNOWN` copy of
-                run-gates.test.sh.
+                baseline.txt or selftest-budgets.txt names it.
+  key           every key of every gate-legs.json row. Owes membership in `LEG_KEYS`, the one key set
+                of run-gates.test.sh.
   path deleted  `git diff --diff-filter=D <rev>`, renames read as a delete. Owes that no row of the
                 memory root's spawn-idiom-sites.txt, testsuite-count-waivers.txt or
                 unarmed-branches.txt names it.
@@ -29,13 +29,14 @@ and the policy kit's census and the `resolve` verb of `budgets.py`, the last as 
 kit's descriptor withholds the file from `govkit apply`, which is why it may import the first two.
 
 Exit 1 when any row is owed, 0 with a one-line count when none is, 2 on a refusal: a <rev> that
-names no commit, `KNOWN` copies that disagree, an absent registry file, or a reader's failure.
+names no commit, a canary holding no `LEG_KEYS` line, an absent registry file, or a reader's failure.
 """
 import argparse
 import fnmatch
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -121,16 +122,16 @@ def read_first_column(path: pathlib.Path) -> set:
     return {ln.split("\t")[0].strip() for ln in rows if ln.strip() and not ln.lstrip().startswith("#")}
 
 
-def read_known_copies(canary: pathlib.Path) -> list:
-    """Each `KNOWN = {...}` line of the canary, as a set of keys."""
+def read_known_copies(canary: pathlib.Path) -> set | None:
+    """The canary's one key set, its `LEG_KEYS="..."` line, as a set of keys; None where it holds none
+    (TOOL-dWitnessedBar-12 S4)."""
     if not canary.is_file():
-        raise Refused(f"{canary.as_posix()} is absent, so the key population has no KNOWN to read")
-    out = []
+        raise Refused(f"{canary.as_posix()} is absent, so the key population has no LEG_KEYS to read")
     for ln in canary.read_text(encoding="utf-8").splitlines():
-        s = ln.strip()
-        if s.startswith("KNOWN = {") and s.endswith("}"):
-            out.append({k.strip().strip('"') for k in s[len("KNOWN = {"):-1].split(",") if k.strip()})
-    return out
+        m = re.match(r'^LEG_KEYS="([^"]*)"', ln)
+        if m:
+            return set(m.group(1).split())
+    return None
 
 
 def read_cap_values(policy: pathlib.Path, root: pathlib.Path, caps: list) -> dict:
@@ -167,7 +168,7 @@ def derive_owed_rows(root: pathlib.Path, base: str, kits: dict) -> tuple:
     # ponytail: gov's memory root spelled once; this probe runs in no other tree.
     waivers = [root / "memory" / "project" / n
                for n in ("spawn-idiom-sites.txt", "testsuite-count-waivers.txt", "unarmed-branches.txt")]
-    for p in (legs_p, G.derive_registry_path(root), map_p / "baseline.toml"):
+    for p in (legs_p, G.derive_registry_path(root), map_p / m.BASELINE_FILE):
         if not p.is_file():
             raise Refused(f"{rel(p)} is absent, which is a refusal and never an empty population")
     legs = json.loads(legs_p.read_text(encoding="utf-8"))
@@ -201,19 +202,16 @@ def derive_owed_rows(root: pathlib.Path, base: str, kits: dict) -> tuple:
             if nm not in ceilings:
                 deferred.append((rel(ceiling_p), nm))
     if removed:
-        held = ((pins_p, pins), (map_p / "baseline.toml", set(tree.baseline.get("gate-legs", ()))),
+        held = ((pins_p, pins), (map_p / m.BASELINE_FILE, set(tree.baseline.get("gate-legs", ()))),
                 (budgets_p, read_first_column(budgets_p)))
         for path, rows in held:
             owed += [(rel(path), f"drop the row naming {nm}") for nm in removed if nm in rows]
-    copies = read_known_copies(canary_p)
-    if not copies:
-        raise Refused(f"{rel(canary_p)} holds no `KNOWN = {{...}}` line, so no key could be graded")
-    if any(c != copies[0] for c in copies):
-        raise Refused(f"the {len(copies)} KNOWN copies in {rel(canary_p)} disagree: "
-                      f"{sorted(set().union(*copies) - set.intersection(*copies))}")
+    leg_keys = read_known_copies(canary_p)
+    if not leg_keys:
+        raise Refused(f"{rel(canary_p)} holds no `LEG_KEYS=\"...\"` line, so no key could be graded")
     keys = sorted({k for r in legs if isinstance(r, dict) for k in r})
-    owed += [(rel(canary_p), f"`{k}` in each KNOWN copy, with its control pair")
-             for k in keys if k not in copies[0]]
+    owed += [(rel(canary_p), f"`{k}` in LEG_KEYS, with its control pair")
+             for k in keys if k not in leg_keys]
     gone = [p for p in run_git(root, "diff", "--name-only", "--no-renames", "--diff-filter=D", base,
                                "--").splitlines() if p]
     for path in waivers:
@@ -275,14 +273,16 @@ FIXTURE = {
                           'argv = ["bash", "{prefix}/fx/a.sh"]\n'),
     "kits/fx/a.sh": "exit 0\n",
     "kits/fx/gone.sh": "exit 0\n",
-    "kits/<rg>/run-gates.test.sh": ('KNOWN = {"name", "argv", "subject"}\n'
-                                          'KNOWN = {"name", "argv", "subject"}\n'),
+    "kits/<rg>/run-gates.test.sh": 'LEG_KEYS="name argv subject"\n',
     "kits/<rg>/selftest-budgets.txt": "old leg\t60\t\tfixture\n",
     "kits/<rg>/ceiling-evidence.txt": "fx leg\t1.0\t1\ta\t2026-11-04\trunner\n",
-    "memory/map/baseline.toml": "gate-legs = []\n",
+    # The map baseline and the arms pins are ledger populations (TOOL-dWitnessedBar-16): the first row of
+    # each is its header, and a pins row is `<path> TAB <check> TAB <signature> TAB <count> TAB <sha> TAB
+    # <disposition>`, whose first field `read_first_column` reads as the path in either grammar.
+    "memory/map/baseline.txt": "# ledger · baseline · key key kind,key · direction shrink-only · drain key\n",
     "memory/project/spawn-idiom-sites.txt": "# none\n",
     "memory/project/testsuite-count-waivers.txt": "# none\n",
-    "memory/project/unarmed-branches.txt": "kits/fx/gone.sh\texit\t1\ta fixture\tno arm\n",
+    "memory/project/unarmed-branches.txt": "kits/fx/gone.sh\texit\ta fixture\t1\tabcdef12\tseeded\n",
 }
 
 
@@ -356,10 +356,6 @@ def run_selftest() -> int:
         with open(s / "kits" / gk / "subject-pins.tsv", "a", encoding="utf-8", newline="\n") as f:
             f.write("new leg\trepo\t\n")
 
-    def add_known_twin(s):
-        (s / "kits" / rg / "run-gates.test.sh").write_text(
-            'KNOWN = {"name", "argv", "subject"}\nKNOWN = {"name", "argv"}\n', encoding="utf-8", newline="\n")
-
     def add_warn_breach(s):
         add_grown_file(s)
         (s / ".governance/policy.toml").write_text(f'[budgets]\nenforce = "warn"\n{json.dumps(cap)} = {limit}\n',
@@ -371,7 +367,7 @@ def run_selftest() -> int:
         ("a leg added with no pin row", add_leg, "HEAD", 1, "subject-pins.tsv <- new leg"),
         ("a leg removed whose budget row stays", remove_leg, "HEAD", 1,
          "selftest-budgets.txt <- drop the row naming old leg"),
-        ("a key outside KNOWN", add_stray_key, "HEAD", 1, "run-gates.test.sh <- `enforce` in each KNOWN"),
+        ("a key outside LEG_KEYS", add_stray_key, "HEAD", 1, "run-gates.test.sh <- `enforce` in LEG_KEYS"),
         ("a deleted script unarmed-branches.txt names", lambda s: (s / "kits/fx/gone.sh").unlink(),
          "HEAD", 1, "unarmed-branches.txt <- drop the row naming kits/fx/gone.sh"),
         ("a file grown past its cap", add_grown_file, "HEAD", 1, f"owed — {big} <- {limit + 1} bytes over cap"),
@@ -379,7 +375,6 @@ def run_selftest() -> int:
         ("a leg with no descriptor row", add_bare_leg, "HEAD", 1,
          "a descriptor's [[gate_leg]] or kits/" + gk + "/registry.toml's [[exempt_leg]] <- bare leg"),
         ("a leg no dossier claims", add_unclaimed_leg, "HEAD", 1, "gate-legs claim under memory/map/features/ <- unclaimed leg"),
-        ("two KNOWN copies that differ", add_known_twin, "HEAD", 2, "KNOWN copies in kits/" + rg + "/run-gates.test.sh disagree"),
         ("a leg with no ceiling row", add_owed_free_leg, "HEAD", 0, "deferred — kits/" + rg + "/ceiling-evidence.txt <- new leg"),
         # last: the budgets reader reads the landed policy, so this case commits it and no case runs after it
         ("a breach the warn mode admits", add_warn_breach, "HEAD", 0, "· 1 size breach(es) the switch's warn admits"),
@@ -433,8 +428,8 @@ def derive_rule_text() -> str:
         "                             else the registry, with its why\n"
         "  a dossier claim            by hand in the dossier's gate-legs claims, then\n"
         f"                             python {map_w} --write\n"
-        "  a KNOWN key                by hand in both KNOWN copies of run-gates.test.sh, with a\n"
-        "                             control pair\n"
+        "  a LEG_KEYS key             by hand in the one LEG_KEYS line of run-gates.test.sh, with\n"
+        "                             a control pair\n"
         "  a row naming a removed leg or a deleted path   deleted by hand (a pin row: selfcheck --write)\n"
         "  a file over its cap        a trim, or a raise in the minimal guard's one admitted shape\n"
         "  a deferred ceiling row     the main loop's close, after a measured bar:\n"

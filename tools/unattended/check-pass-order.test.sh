@@ -200,6 +200,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -651,7 +669,7 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waiver control: the fixture REDS with no registry" "$rc" "1"
 # COMMITTED, because the registry is read from the graded commit. An arm leaving it untracked
 # would exercise the uncommitted path H3 closed, and would pass either way.
-( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tthe control arm waives it\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'waive it' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waived violation: green" "$rc" "0"
@@ -660,12 +678,12 @@ has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
 # one that only ever matches the last line. The shipped registry has two rows and waived NOTHING
 # until the id list was flattened, while the single-row arm above passed throughout — the instance
 # was covered and the class was not.
-( cd "$T" && printf 'ARCH-tOrder-2\ta row BEFORE the real one\nARCH-tOrder-1\tthe unit that actually violates\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && printf 'ARCH-tOrder-2\t1\tabcdef12\tseeded\nARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'two rows' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "MULTI-row waiver: a row that is not the last still waives its unit" "$o" "BUILT at"
 has   "MULTI-row waiver: the stale sibling is still named" "$o" "ARCH-tOrder-2"
-( cd "$T" && printf 'ARCH-tOrder-99\tnothing matches this\n' > memory/project/pass-order-waiver.txt \
+( cd "$T" && printf 'ARCH-tOrder-99\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'stale row' --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "STALE waiver row: REDS" "$rc" "1"
@@ -741,7 +759,7 @@ rm -rf "$T"
 # ---- H3: an UNCOMMITTED waiver must not waive. Otherwise the waiver works for whoever wrote it and
 # ---- its stale-row red can never fire for anybody else, because the file is not in the pushed tree.
 T=$(mkfixture norun build-first)
-( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tnever committed\n' > memory/project/pass-order-waiver.txt )
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H3: an UNCOMMITTED waiver does not waive" "$rc" "1"
 rm -rf "$T"
@@ -875,7 +893,7 @@ rm -rf "$T"
 # ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted
 T=$(seed_range_fixture)
 ( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
-  && printf 'ARCH-tRange-1\tbuilt before its spec, landed as-is\n' > memory/project/pass-order-waiver.txt \
+  && printf 'ARCH-tRange-1\t1\tabcdef12\tseeded\n' > memory/project/pass-order-waiver.txt \
   && git add -A >/dev/null && git commit -q -m "waive ARCH-tRange-1" --no-verify && git push -q origin main \
   && write_range_spec 2 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-2 authored" --no-verify \
   && printf 'two\n' > ${PFX}p2.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-2: build the thing" --no-verify ) >/dev/null 2>&1
@@ -932,6 +950,72 @@ has   "range push line disagrees: the summary names the reason" "$o" "range whol
 o=$(cd "$T/work" && GATE_PUSH_BASE=$RG_TIP bash "$LEG" 2>&1); rc=$?
 same  "range push line agrees: RANGE mode, exit code" "$rc" "0"
 has   "range push line agrees: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
+rm -rf "$T"
+
+# ---- TOOL-dWitnessedBar-2 AC6: THE UNWITNESSED PASS COMMIT, under each value of `hooks.bypass`. The
+# ---- fixture's base commit adds the driver, so it carries `Commit-Checked` and is the anchor F8
+# ---- derives; the run's pinned BASE is that commit. Past it, one pass commit carries no
+# ---- `Commit-Checked:` trailer and one, the control, carries it. `refused` at HEAD exits 1 naming the
+# ---- first and never the second; `allowed` lists it as a note and exits 0; `--preview` lists it under
+# ---- either and exits 0. Staged red by deleting the policy read, so `refused` reads as `allowed`.
+PK_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
+seed_witness_fixture() { # hooks.bypass value · [noanchor] -> prints the fixture root; sets nothing else
+  local T
+  T=$(mktemp -d) || exit 2
+  ( cd "$T" || exit 2
+    git init -q . && git checkout -q -b main
+    git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    mkdir -p ${PFX}${KIT_NAME} "${PFX}${PK_DIR##*/}" .governance memory/builds/tWit/spec
+    cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-pass-order.sh" "$KIT/commit_trailers.py" ${PFX}${KIT_NAME}/
+    # A driver that never carried the trailer: no commit of this history adds it, so no anchor.
+    [ "${2:-}" != noanchor ] || sed -i 's/Commit-Checked/Commit-Unchecked/g' "${PFX}${KIT_NAME}/unattended.sh"
+    cp "$SRC_ROOT/$PK_DIR/policy.py" "$SRC_ROOT/$PK_DIR/budgets.py" "$SRC_ROOT/$PK_DIR/caps.toml" \
+       "$SRC_ROOT/$PK_DIR/catalogue.toml" "${PFX}${PK_DIR##*/}/"
+    printf '[hooks]\nbypass = "%s"\n' "$1" > .governance/policy.toml
+    printf 'MEMORY_ROOT=memory\nPASS_ORDER_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+    { printf -- '---\nslug: tWit\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tWit-1\n---\n# tWit\n'
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      printf '| [ARCH-tWit-1 — unit](spec/s1.md) | 1 | 2 | OPEN | rev-1 | 2026-06-01 |\n'
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tWit/README.md
+    git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+    printf '# tWit\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' \
+      "$(git rev-parse HEAD)" > memory/builds/tWit/RUN.md
+    git add -A >/dev/null; git commit -q -m "run state" --no-verify
+    printf 'one\n' > ${PFX}w1.sh; git add -A >/dev/null
+    git commit -q -m "ARCH-tWit-1: past the hooks" -m "Pass: ARCH-tWit-1" --no-verify
+    printf 'two\n' > ${PFX}w2.sh; git add -A >/dev/null
+    git commit -q -m "ARCH-tWit-1: through the check" -m "Pass: ARCH-tWit-1
+Commit-Checked: unattended@1.0" --no-verify
+  ) >/dev/null 2>&1
+  printf '%s' "$T"
+}
+SRC_ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
+for wv in refused allowed; do
+  T=$(seed_witness_fixture "$wv")
+  W_UN=$(git -C "$T" rev-parse --short=12 HEAD~1); W_OK=$(git -C "$T" rev-parse --short=12 HEAD)
+  o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+  if [ "$wv" = refused ]; then
+    same  "unwitnessed under refused: the leg reds" "$rc" "1"
+    has   "unwitnessed under refused: it names the commit made past the hooks" "$o" "$W_UN — a pass commit naming ARCH-tWit-1"
+    has   "unwitnessed under refused: the FAILED line says why" "$o" "pass-order FAILED — hooks.bypass is refused at HEAD, and these pass commits carry no Commit-Checked: trailer, so each was made past the commit check"
+  else
+    same  "unwitnessed under allowed: the leg stays green" "$rc" "0"
+    has   "unwitnessed under allowed: it lists the commit as a note" "$o" "pass-order: note — hooks.bypass is allowed at HEAD"
+    has   "unwitnessed under allowed: the note names the commit" "$o" "$W_UN — a pass commit naming ARCH-tWit-1"
+  fi
+  hasnt "unwitnessed under $wv: the witnessed control is never listed" "$o" "$W_OK"
+  has   "unwitnessed under $wv: the summary counts the range past the anchor" "$o" "1 unwitnessed pass commit(s) in 1 build range(s) past the Commit-Checked anchor"
+  o=$(cd "$T" && bash "$LEG" --preview 2>&1); rc=$?
+  same  "unwitnessed under $wv, --preview: exit status is not set" "$rc" "0"
+  has   "unwitnessed under $wv, --preview: the commit is listed" "$o" "pass-order --preview: unwitnessed pass commits, under hooks.bypass $wv:"
+  rm -rf "$T"
+done
+# ...and a history whose driver never carried the trailer has no anchor: no range is graded, and the
+# summary says so rather than reporting a clean count.
+T=$(seed_witness_fixture refused noanchor)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+has   "no anchor: the summary says no range is graded" "$o" "no Commit-Checked anchor in HEAD's history"
+same  "no anchor: nothing is refused, exit code" "$rc" "0"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"

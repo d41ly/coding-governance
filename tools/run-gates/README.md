@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.54` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.55` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -81,6 +81,17 @@ own, `fail` or `timeout`, so the ledger holds the leg's final verdict; reuse acc
 red row carries no key. The drift report sums `retried` across the run records as
 `legs_retried_after_timeout`.
 
+**The same-tree re-run, `GATE_RERUN=1`** (TOOL-dWitnessedBar-8). Every other red is re-run only when
+the bar is asked: after the serial retry and the reuse sample, inside the wall, each leg whose
+effective result is a numeric red runs once more, alone, on the same tree, into `<i>.rerun.*` beside
+its attempts and a `<i>.rerun.leg` row. A leg whose own ceiling fired is not, its quiet-host re-run
+being `TOOL-dWitnessedBar-30`'s, and a bar whose wall fired re-runs nothing. The re-run moves no
+verdict and no exit code, and writes no `gate-logs` file, so `log:` keeps naming the attempt that
+redded the run; a red-then-green leg prints `nondeterministic · <leg>`, as the sample does. The
+runner reads the knob once and unsets it, so a nested bar never inherits it; the unattended driver's
+`gates-green` bar sets it, and `verdict_flow.py route` and `flakes` read the rows it leaves (see "Which
+red blocks").
+
 ## The switch every adopter needs to know about
 
 **A leg declaring `subject = "kit"` is HELD.** It does not run on your bar unless you ask:
@@ -96,8 +107,12 @@ install or upgrade a kit, and after that only when you edit one.
 
 **`GATE_FULL=1` does NOT unlock them.** It means *ignore every leg guard*, and a kit's own tests are
 not a guard. A green bar without `GATE_SELFTESTS=1` says nothing about the kits — and the runner
-says so itself: held legs get their own verb, are subtracted from the total, and are named in the
-summary, `gates GREEN — 43/43 legs passed (42 held: kit self-tests, GATE_SELFTESTS=1 runs them)`.
+says so itself: held legs get their own verb, `GATE held  <name>  (<source>, <note>)`, are
+subtracted from the total, and are counted by source in the summary,
+`gates GREEN — <n>/<n> legs passed (<n> held: <n> kit, <n> quarantine, <n> level; GATE_SELFTESTS=1 runs the kit ones)`,
+a source with none left out. How many legs this repository holds is read from
+`python <prefix>/run-gates/leg_factory.py --conform`, whose count line ends `· <h> held · <u> unguarded`,
+never typed here.
 
 A leg that declares no `subject` defaults to `repo` and runs, so nothing you already had changes
 behaviour by arriving here. A whole manifest of held legs is REFUSED rather than reported green,
@@ -107,11 +122,64 @@ The state reaches two other readers: the deployer, which reads a held leg as `he
 leg that vanished, and the `gate-full-green` stamp, which records whether the run covered them so a
 push boundary cannot mistake a partial bar for a whole one.
 
+A held kit leg with a `guard` still skips under `GATE_SELFTESTS=1` when nothing it guards moved; one
+with none runs whole. That choice is declared: `leg_factory.py --conform`'s `held guard` arm refuses a
+held declaration carrying neither a guard nor a descriptor-only `unguarded_why`, the reason it runs
+whole, and refuses one carrying both.
+
+### Held by policy — the hold sources, the selection record and `verdict.held`
+
+Held is a policy over any leg (TOOL-dWitnessedBar-5). One predicate, `derive_hold_source`, names the
+SOURCE a leg is held by: `kit`, derived from the row as above; `quarantine` and `level`, read only
+from the selection record `GATE_SELECTION=<path>` names. That record is written at a revision R by
+`python <prefix>/run-gates/verdict_flow.py select --rev <R> --out <path>`, from inputs read at R and
+never from the working tree: a header naming the values it read, then one TAB row per held leg,
+`held · <leg> · <source> · <note>`. A `quarantine` row is a leg an OPEN held-flaky-leg ask names
+(TOOL-dWitnessedBar-8), its note `<count>/<window>, ask <id>`, printed `GATE held  <leg>  (quarantine,
+<note>)`: the asks are those the `ASKS_CMD` generator `.unattended.conf` declares at R prints, run in a
+scratch worktree at R, so a branch cannot quarantine a leg it breaks, and none where R declares no
+generator. A `level` row is a leg whose `level` is outside
+`tests.landing-levels`, none under `every-declared` or while `tests.without-cadence` reads
+`run-at-landing`. A selection-held leg is held whatever `GATE_SELFTESTS` says. A row whose source is
+outside `quarantine level`, `kit` included, or whose leg the manifest lacks, is printed and ignored,
+and its leg runs. The runner copies the record into the run record as `selection`, and the pre-push
+hook runs `verdict_flow.py select --check --run <run dir> --rev <R>` before it admits a verdict made
+under one: a row R does not derive refuses the push. The run record is the worktree's own and is swept,
+so the per-tree verdict carries the same rows as `selection` and `selection.<n>` (TOOL-dWitnessedBar-41,
+see "The verdict per tree"), and the hook re-derives them with `select --check --selection <path>`
+before it adopts that record from any worktree.
+
+The verdict record carries one `held.<n>` key per held leg beside the `held` count,
+`<leg> · <source> · <result>`, the result `unrun` for a leg the bar did not execute.
+
+A row's fifth field is its MODE, `hold` or `run`, a four-field row reading `hold` (TOOL-dWitnessedBar-30).
+A `run` leg executes in its ordinary slot, past its guard, the docs mode and the reuse cache, and
+writes its `.leg` row, so the flake record of a bar it ran in holds its result; that result is its
+`held.<n>`, `ok` or `fail`, printed `GATE held  <leg>  (quarantine, <note>; run outside the verdict:
+<result>)`, counted in `held` and never in `failed`, what ran or the verdict. `select` writes a
+`quarantine` row `run` when the leg's newest executed row in the flake records at R since its hold, the
+committer date of the commit filing its ask, ended more than 24 hours before the selection, or there is
+none, whatever `verdict.held` reads, so a quarantined leg runs at least once a day in any Test-step bar
+and its greens accrue; every other row is `hold`. `select --check` compares leg, source and note, never
+the mode. THE RELEASE: a quarantined leg whose rows since its hold open, newest first, with
+`verdict.flakes.release` greens (first rc 0; three by default, a red resetting the count), or whose
+manifest row at R differs from its row at that filing commit, is selected as ordinary, and `select`
+prints `release  <leg>  <ask id>  <reason>` naming the streak's run ids or the row change. The
+unattended driver's `gates-green` runs `select` at R after its bar on every return code, beside its
+held-job reader, and writes each such ask's `- CLOSED · <id> · by <HEAD> · <why>` row through its
+`write_ask_closing`, staged with the views it moves. No caller hands a bar a selection yet: that is the
+loop engine's Test step.
+
+`verdict.held` decides when held legs run: `on-demand`, the default and gov's, holds them at every bar
+unless `GATE_SELFTESTS` asks; `push-selected` makes the pre-push hook export `GATE_SELFTESTS=changed`
+for its bar when the pusher set nothing; `peer-or-cadence` holds them at the push and needs a runner
+declared elsewhere, `HELD_CI_WORKFLOW` in `.unattended.conf` at R, or `select` exits 2 naming it.
+
 ### `GATE_SELFTESTS=changed` — only the held legs whose kit moved
 
 A developer tool, and a Definition-of-Done one: no push boundary sets it (TOOL-aSparedSpawn-12, owner
-ruling F1). A held leg executes when any of these holds, and is otherwise held with
-`GATE held  <name>  (self-test, unchanged since <sha8>)`:
+ruling F1) unless `verdict.held` reads `push-selected` at R. A held leg executes when any of these
+holds, and is otherwise held with `GATE held  <name>  (kit, unchanged since <sha8>)`:
 
 - it has no last-run record, an unreadable one, one whose sha is not an ancestor of `HEAD`, or one
   earned under a different manifest row;
@@ -133,6 +201,14 @@ the run started and did not move, under any non-empty `GATE_SELFTESTS`, so a `GA
 seeds every record; a red or a retried pass removes it. The `gate-full-green` stamp of such a run
 says `selftests changed`, never `1`, and a push that runs the self-tests forces over it.
 
+Manifest order drives five readings, so moving a row is a change to each of them and never a no-op:
+the dispatch tie-break (legs dispatch largest-first by recorded seconds, and a tie keeps manifest
+order because the sort is stable); the report order, every `GATE` line and every `GATE warn` line, so
+the output is byte-stable at any width; the `fail.<n>` indices of the run-log line, numbered in that
+order up to their cap; the spec-token checker's `--legs-for`, which names each leg's first tripping
+guard in that order; and the held halves, whose `held_halves.py` partition lists each half's held legs
+in that order.
+
 ## Why it became a kit
 
 It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `<prefix>/lib/`,
@@ -152,10 +228,16 @@ file that had one, byte-identically, under the markers `<prefix>/lib/resolve-pyt
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
 | `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
+| `lib-verdict.sh` | the block table, SOURCED and never run: `derive_red_blocks <value> <class>` prints `block` or `pass` for one attributed red under a `verdict.blocks` value. The runner sources it beside `lib-attribute.sh`, and it is in KF3's list; see "Which red blocks" |
+| `verdict_flow.py` | a red bar's reds routed (`route --run <run dir>`, the routing record) and the tester's judgment of an `attribute` route recorded (`judge`), see "Which red blocks"; and the selection record a bar holds legs by, written at R (`select --rev <R> --out <path>`) and re-derived there (`select --check --run <run dir> --rev <R>`, or `--selection <path>` for a per-tree verdict's rebuilt rows), see "Held by policy"; and a red bar's `flake` record with the holds it justifies (`flakes --run <run dir> --build <slug> --unit <id>`, and `flakes --check`), see "Which red blocks" |
 | `post-merge.sh` | the post-merge bar: the full bar on a landed sha, run through `--hold` in a scratch worktree, its verdict published as the remote ref `refs/gov/bar-red`; see "The post-merge bar" |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file, both walked with `--untracked-files=all` so a file inside a new directory is hashed rather than collapsed into its `?? dir/` line; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
+| `bar-wall-evidence.txt` | gov's whole-bar wall time per node, written by `GOV_NODE=<tag> python profile_bar.py --record`; withheld from the payload |
+| `precommit.py` | the derived commit-time list behind `--precommit`: every manifest row's `precommit` argv its `guard` trips; see "The commit-time list is derived" below |
+| `keep_tails.py` | the keep verb: a red run's failing-leg tails, which the runner keeps by hash, committed as `leg-tail` records under `trace.leg-output = "tail-by-hash"`; see "The run record" below |
+| `product_tests.py` | the product-test contract: the rows carrying `level` graded against `tests.product`, and the runner adapters' rows the leg factory renders; see "The product-test contract" below |
 | `measure_legs.py` | the gate profiler: every manifest leg run clean and unbounded, serially or under a load cap, each in its own Windows Job Object and profiled to its processes; see "The gate profiler" below |
 | `fixtures/measure-legs/` | the fixture legs and manifests `measure_legs.py --selftest` runs |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
@@ -191,6 +273,18 @@ The argv tokens are the four the descriptors already spell: `{kit}`, `{prefix}`,
 and `{map_root}`. An argv beginning `python` or `python3` runs under the reader's own interpreter.
 Rows sharing one write and one check are one item.
 
+A `[[generated]]` row may carry a `when`, and is no item where it does not hold. It has two forms,
+and neither runs a command; any other spelling is refused (TOOL-dWitnessedBar-45):
+
+| `when` | holds when |
+|---|---|
+| `"<conf file>:<KEY>=<value>"` | the conf at the repo root reads that value for the key |
+| `"exists:<path>"` | the path, its tokens resolved as an argv's are, exists in the tree; resolved to an absolute path (`/…`, `X:…`) or one holding a `..` segment, it is refused (TOOL-dWitnessedBar-62) |
+
+The leg factory's row carries `when = "exists:{prefix}/govkit/govkit.py"`: its render reads govkit,
+which never reaches an adopter, so an adopter's `--regen-list` names the row skipped and its bar
+does not refuse at stage 1 on a check that cannot run there.
+
 **Stages run in order, the items of one stage concurrently**, because one stage's outputs are
 disjoint and a later stage reads an earlier one's:
 
@@ -220,7 +314,8 @@ untracked file first, because the build-index generator enumerates tracked files
 record until it is added. A write that exits non-zero is followed by its own check: a fresh check
 makes it `declined`, which a kit's adopter is when it renders nothing in a state its kit declares
 legal, and the stage goes on. A write whose check is not fresh FAILS, and a failed write stops
-before the next stage. `--list` names every `[[regenerate]]` row it skips for carrying no stage.
+before the next stage. `--list` names every row it skips, each with its reason: a `[[regenerate]]`
+row for carrying no stage, a `[[generated]]` row for a `when` that does not hold.
 
 | exit | `--regen` | `--regen-check` |
 |---|---|---|
@@ -254,7 +349,9 @@ and a green earned over an uncommitted regeneration could never be reused. A tre
 descriptor at the tool root prints one line and spawns nothing. `GATE_REGEN_CHECK=0` skips the
 check with a line naming the knob. A stale output then reds only where its own leg runs in that bar,
 and a guard can skip that leg, so a skip can turn a refusal into a green. The pre-push hook therefore
-scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6).
+scrubs the knob from the bar that lands (TOOL-aPrimedIndex-6), and from the bars whose green they record
+the hook, post-merge (`PM_SCRUB`) and the unattended driver (`_gknobs`) all drop `GATE_REGEN_CHECK`
+(TOOL-dWitnessedBar-60).
 
 ### The lander regenerates over its merged tree
 
@@ -557,9 +654,11 @@ It makes a detached scratch worktree of `<sha>` at `<common-dir>/gate-pm.<pid>`,
 `bash <kit>/run-gates.sh`) and runs it with `GATE_FULL=1` through this kit's own
 `run-gates.sh --hold`, so it queues on the host turnstile like any other bar. Only three keys of that
 file apply: `GOV_GATE_CMD`, `GATE_SELFTESTS` and `GOV_PYTHON`, and a line naming `GOV_GATE_CMD` in
-any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. The caller's `GIT_DIR` family,
-interpreter knobs, arm seams, `GATE_REUSE`, `GATE_RUN_ID` and `GATE_TURNSTILE_HOLDER` are dropped
-and named on one `post-merge: not honoured from the environment:` line. The remote is the lander's
+any other shape, such as `export GOV_GATE_CMD=…`, is a refusal. Every knob `PM_SCRUB` in
+`post-merge.sh` lists is dropped and named on one `post-merge: not honoured from the environment:`
+line: the caller's `GIT_DIR` family, interpreter knobs, arm seams, the reuse modes, `GATE_RUN_ID`,
+`GATE_TURNSTILE_HOLDER`, and every knob the pre-push hook scrubs or clears for a bar, which the gov
+suite's scrub parity arm holds it to (TOOL-dWitnessedBar-60). The remote is the lander's
 ladder (`GOV_REMOTE`, which `--remote` sets), and the sha must be an ancestor of that remote's
 default branch as this clone last fetched it.
 
@@ -579,9 +678,9 @@ overwrite. A ref object missing locally counts as not an ancestor, which keeps t
 
 **Two records, under the git common dir.** `gate-post-merge` holds the last verdict for a reader with
 no network: `sha`, `verdict` (`GREEN`, `RED` or `REFUSED`), `run_id`, `published` (`pushed`,
-`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. A
-GREEN also writes `gate-bar-green.shared` in the boundary's record grammar with `kind full` and
-`by post-merge`. When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
+`cleared`, `kept`, `none` or `failed`), `why`, `remote` (the name, never a URL) and `stamped`. The
+landed tree's verdict is the runner's own per-tree record, written from the scratch worktree into the
+same common dir (see "The verdict per tree"). When the bar was the runner, its run record is copied to `gate-run/<run id>/` before
 the worktree goes, so a red's leg output survives, and an exit 0 counts green only when that record
 reads `verdict GREEN`.
 
@@ -851,6 +950,72 @@ leg starts: left set, every leg would inherit it, and a leg that drives a nested
 kit's own suites do in scratch clones, would reuse one run directory for every nested bar. A pin
 names ONE run.
 
+**The verdict names its run and its cause** (TOOL-dWitnessedBar-25). The `verdict` file carries
+`run_id`, the id its header names, and `cause`, the act that started the bar: `GATE_CAUSE` as its
+caller exports it, read once and removed before any leg starts, as `GATE_RUN_ID` is, so a leg's nested
+runner never names its caller's cause. The callers that pin a run id export one: the pre-push hook
+`push:<pushed sha>`, `post-merge.sh` `post-merge:<landed sha>`, the unattended close `run:<slug>` and
+`pass-legs.sh` `pass:<head sha>`. With none exported it reads `attended`, and a value outside
+`[A-Za-z0-9._:@-]+` reads `attended` too, with one `run-gates: GATE_CAUSE refused` line on stderr.
+
+**A failing leg's output tail is kept by its hash.** For each failed leg, in manifest order, the
+runner cuts the last 60 lines of its redacted `<i>.out` copy (its retry's copy for a leg retried alone),
+at most their last 8192 bytes, hashes them as git hashes a blob, writes them to
+`<common-dir>/gate-tails/<hash>` where no file holds that hash (where one does, it sets that file's
+modification time to now with `touch -c`), and adds `tail.<n>` `<hash> <leg name>` to the verdict, `<n>`
+from 1. A failed leg with no copy keeps the empty tail. The directory is the COMMON dir's, so every
+worktree of a clone writes one directory and a tail outlives the worktree that produced it. After the
+run sweep, the tails directory keeps every hash a retained run of ANY worktree of the clone names, read
+from `<common-dir>/gate-run/*/verdict` and `<common-dir>/worktrees/*/gate-run/*/verdict`, and every
+tail modified less than `TAIL_GRACE_S` ago, seven days, so a tail a bar still running in another
+worktree wrote before its verdict names it survives. A staging temp the writer leaves when a bar dies,
+any name opening `tail.` (`tail.<n><n>.tmp`, `tail.XXXXXXXX`, either with `.cut`), is never kept as a
+tail: it is removed once older than `TAIL_GRACE_S`, and a fresh one is kept (TOOL-dWitnessedBar-56 S13).
+The sweep prints one `run-gates: tails swept` line with the counts it removed and kept. **What the sweep does not check:** a sweep that reads a tail's
+time just before another worktree's bar freshens it can still remove it.
+
+**A size warning a passing leg prints is shown, not buried** (TOOL-dWitnessedBar-29). A green leg's
+output stays in the work dir, so a `TEMPLATE-SIZE WARN` or `BUDGET WARN` line inside one reached
+nobody. Every size-warning emitter prints a MARKER on the line after its human warning, on the same
+stream: `gate-warn<TAB><class><TAB><subject><TAB><detail>`, the class `size`, the subject the path the
+warning measured (repo-relative inside the repository, else the warning's own subject, such as a
+roster slot or a rule's line), the detail free text; the policy kit's `budgets.render_warn_marker`
+builds it for the Python emitters. After the pool drains, the serial retry, the reuse sample and the
+red legs' re-run, `scan_leg_warnings` runs ONE `grep -F` over the copies of the legs that passed —
+`<i>.out` where `<i>.rc` reads `0`, `<i>.retry.out` where `<i>.retry.rc` does, a held leg a selection's
+`run` row executed from its first attempt alone — and never over a failed, skipped, unrun held or
+reused leg, a sample's second look or a red leg's re-run. Each marker line is one summary line before
+the `----` line, in manifest order, on stdout and in `gate-last-summary.txt`:
+
+```text
+GATE warn  build-method size  (memory/guides/BUILD-METHOD.md: 28351 -> 29326 (+975) over high-water; grown by TOOL-dX-4)
+gates GREEN — 141/141 legs passed (1 warned)
+```
+
+`grown by` is `routed_commits.py --newest-unit HEAD <subject>` from the memory-tree kit, reached
+through `resolve_kit_dir`: the newest non-merge commit touching the subject whose unit a spec defines,
+one python spawn per distinct subject and none on a run with no warning. It names the newest unit that
+CHANGED the file, which may have shrunk it, not a proven grower. It reads `-` and names why — no
+memory-tree kit, an attribution that failed, or no commit naming a specced unit (every subject that is
+not a path). The verdict gains `warned<TAB><n>` and one `warn.<k><TAB><leg name><TAB><class><TAB><subject><TAB><unit>`
+per warning, `<k>` from 1, after `tail.<n>`; the value keeps its inner TABs, so a reader splits it
+itself. A warning never moves the verdict or the exit code, and `profile_bar.py` reads `GATE warn` as
+an annotation. **What it does not check:** a warning printed with no marker, or a marker a leg prints
+for any other reason.
+
+**The keep verb commits them.** `python keep_tails.py --run <run id> --build <slug> --unit <unit id>`,
+run in the repository, reads `trace.leg-output` through the policy kit's `policy.py get`, the catalogue
+default where that reader cannot run. Under `tail-by-hash`, the default, it writes one `leg-tail`
+record per `tail.<n>` of the run through the memory-tree record factory's `write_record`: fields `Leg`,
+`Hash`, `Run`, `Sha` and `Cause`, then the tail in one fenced block, each span runlog's `scan_secrets`
+finds replaced by its placeholder; a hash a tracked `leg-tail` record holds is skipped. Under
+`node-local` it writes nothing and says `trace.leg-output is node-local`. Exit 0 when every tail is
+written or skipped, 1 when one is not kept (its file gone, its bytes not hashing to its name, or a line
+`write_record` refuses), 2 on a refusal before any write. The unattended close runs it on its bar's red
+path, under the build's record anchor, and stages what it wrote with the `gates-run` fact.
+`keep_tails.py --selftest` plants its own scratch repositories. **What it does not check:** that a tail
+decodes or that its cut lands on a character boundary, or secret shapes runlog's table does not know.
+
 **Every bar also leaves one line in the run log.** From its EXIT trap the runner appends one
 `ev=once` line to `runlog/gates.log` under the git COMMON dir, in the runlog kit's grammar, so the
 primary tree and every linked worktree of a clone write one file, and a run that ran the bar
@@ -887,6 +1052,149 @@ started. CLEAN means
 file's name true, and an implementation that forgets one passes every arm written for the others.
 The stamp also records `manifest`, the repo-relative path of the leg manifest the run read, and the
 pre-push hook trusts it only for a runner bar reading that manifest.
+
+## The verdict per tree — `gate-verdict/<tree hash>`
+
+The record kind `verdict` (TOOL-dWitnessedBar-4) is what the latest bar said about one TREE, written
+by this runner alone, GREEN or not. It is two files of one grammar, `<key>TAB<value>` lines read by
+key, keys in the runlog grammar (an all-digit suffix is an index), so a key added later is ADDITIVE
+and changes no reader:
+
+| File | Written | Keys this runner writes |
+|---|---|---|
+| `<git-dir>/gate-run/<run id>/verdict` | every run, last | the run record's keys plus `tree`: the tree hash of `HEAD` when the run started clean, `-` otherwise; `run_id`; `cause`; `tail.<n>` per failing leg; and `warned` with one `warn.<k>` per size warning a passing leg printed (see "The run record") |
+| `<common-dir>/gate-verdict/<tree hash>` and `<tree hash>.scoped` | every run that started clean and did not move | `tree`, `sha`, `verdict`, `kind` (`full` under `GATE_FULL`, `scoped` otherwise), `base` (the resolved `BASE` a scoped run diffed against, empty on a full one), `manifest`, `manifest_blob`, `fingerprint`, `selftests`, `reused`, `reused_cache` (the full-green stamp's two counts), `run_id`, `selection`, `selection.<n>` and `selection_ignored` (below), `cause`, `tail.<n>` per failing leg, `stamped`, `by` (`runner`) |
+
+The files live in the git COMMON dir, so every worktree of a clone reads one directory, and are
+written through a temp name and a rename. A full run writes the bare tree file and a scoped one the
+`.scoped` file, so a scoped run never overwrites the full record its base rests on: two slots per
+tree, and the last run of a tree in a slot wins, GREEN or RED. A run that started dirty or whose tree
+moved writes none, and says so on one line; a written one prints its path.
+
+**The selection it ran under** (TOOL-dWitnessedBar-41, -56). `selection` is the `git hash-object --stdin`
+of the CANONICAL TEXT of the file `GATE_SELECTION` named: the rows the runner ACCEPTED and only those, in
+file order, one trailing CR cut, each LF-terminated. A row is accepted when it has four or five TAB
+fields, the first `held`, a source of `quarantine` or `level`, a fifth if present `hold` or `run`, and a
+leg the manifest carries, the field rule `verdict_flow.py`'s `read_selection` applies. Every other row is
+printed, left out of the text and the keys, and counted as `selection_ignored <n>`; a blank or `#` line
+is no row. It reads `none` when the run read no `GATE_SELECTION` or the knob named no file, and
+`selection_ignored` reads 0. One `selection.<n>` per accepted row, `<n>` from 1, holds
+`<leg><TAB><source><TAB><note>`, and `<TAB><mode>` where the row has a fifth field: the row with its
+`held` field cut and its TABs kept, so a ` · ` inside a note round-trips. The hook rebuilds each row as
+`held<TAB>` plus that value, hashes the text the same way, and runs `verdict_flow.py select --check
+--selection` over it at R, at most once per hash per push: a record with no `selection` key, rows that do
+not hash to it, or a row R does not derive is not adopted. A record written before the TAB form, its
+values joined with ` · `, rebuilds to another hash and is refused once, so the first push of such a tree
+runs its bar.
+
+**Two more runs write none** (TOOL-dWitnessedBar-40), each saying why on one line. A run in docs mode
+(`GATE_DOCS_BASE` resolved) ran fewer legs than a scoped bar from the same base, which the record
+cannot say: `run-gates: no gate-verdict written — docs mode`. A scoped run whose base is an inherited
+green rests on a base no full record names: `run-gates: no gate-verdict written — scoped on an
+inherited green, as the run record header's base_from row reads`; that header row carries a third field,
+`inherited`, beside its source (TOOL-dWitnessedBar-56 S10). The runner learns that from `GATE_BASE_FROM`, `inherited` or `full` (any other
+value reads `full`), read once and removed before any leg starts, as `GATE_RUN_ID` is; the pre-push
+hook exports it beside `GATE_BASE` in its inherited-green branch, and the unattended close on its
+scoped bar where `--decide` named `-` as the full base.
+
+**Readers.** `.githooks/pre-push` reads the pushed tree's two files as candidates, for this runner's
+own bar only, and adopts one only when it reads `verdict GREEN` and passes the predicates a
+`gate-full-green` stamp passes (ancestry, lag, fingerprint, manifest path and blob, self-tests, and a
+non-zero `reused_cache` refused), and carries at least one of `reused` and `reused_cache`: a record
+with neither cannot say whether its run reused a leg, so it is refused where a keyless runner stamp
+is not, and the `not covered` line names the missing pair; and whose `selection` R derives, as above. A full record covers the push and no bar runs, and a scoped one
+covers only a push scoping from its base. The loop kit's transition writer reads the full file at
+`item.test.exit` and refuses the move into deploying unless it reads GREEN. Nothing writes it but the
+runner: the hook, the unattended close and the post-merge verifier each run the runner, so none of
+them writes a record of its own. A clone's older `gate-bar-green*` files are left on disk and read by
+nothing.
+
+**What it does not check:** which legs a scoped run skipped; `kind`, `base` and the run record under
+`run_id` say what ran.
+
+## Verdict backends — `[[verdict_backend]]`
+
+TOOL-dWitnessedBar-6. The policy key `verdict` names the backend a landing's verdict comes from. A
+backend is a `[[verdict_backend]]` row in a kit descriptor, `name`, `reader` (`<module>:<function>`
+under that kit), `off_node` (a boolean) and `owner`, read across every `<prefix>/*/kit.toml` by
+`read_backends` in `verdict_backends.py`. govkit's install does not read the table, as with `[[drive]]` and
+`[[command]]`, and a name declared twice is refused naming both descriptors. This kit declares three:
+
+| Row | Reader | `off_node` | Stands when |
+|---|---|---|---|
+| `local-hook` (the default) | `read_local_verdict` | false | the full `<common-dir>/gate-verdict/<tree hash>` above reads `verdict GREEN` and passes the hook's two record predicates, the reuse pair and the selection re-derived at the landed revision (TOOL-dWitnessedBar-56 S7, S8); the `.scoped` slot never counts |
+| `peer-node` | `read_peer_verdict` | true | `refs/gov/verdict/<sha>`, fetched from the remote, is an annotated tag on the SHA whose `tree` is its tree, whose `node` is not this node's `GOV_NODE`, signed by the key `verdict.peer.signers` registers for that `node`, whose `verdict` is `GREEN`, and whose pinned files derive `verdict.remote.pin` under `dispatch-closure` (TOOL-dWitnessedBar-43) |
+| `remote-ci` | `read_remote_verdict` in `remote_verdict.py` | true | the witness rule below holds; the row also declares its `workflow`, `job` and bar `step` |
+
+**One read, five states.** `read_verdict(backend, sha, tree)` returns `Verdict(state, witness, why)`;
+`python verdict_backends.py read [--backend <name>] --sha <sha>` prints `verdict: <backend> · <state>
+· <sha8> · <why>` and exits 0 on `GREEN`, 1 otherwise, 2 on a refusal. `GREEN`, `RED`, `NONE`, `HELD`
+and `DEAD PROBE`: only `GREEN` stands. With no `--backend` it reads `verdict` at the landed revision
+through the policy kit's `policy.py get`, a reader's refusal passed on and never read as
+`local-hook`; `check_backend` refuses a value no row declares, naming it and the declared names. Only
+this kit with no policy kit beside it reads the catalogue default, saying so on one line.
+
+**Is the row off-node.** `python verdict_backends.py off-node [--backend <name>]` reads `verdict` as
+`read` does where no `--backend` is given, finds its row by `check_backend`, and prints
+`verdict-backends: off-node · <name> · <true|false> · off-node backends: <names>`, the names every
+declared row with `off_node = true`. It exits 0 when the row is off-node, 1 when it is not, 2 on a
+refusal. The lander, passing the value it already read, and the pre-push hook, passing none, ask it
+under `hooks.bypass = refused`, which refuses every landing while `verdict` names no off-node backend,
+because a hook on the bypassing node cannot refuse its own bypass (TOOL-dWitnessedBar-2).
+
+**The peer.** `python verdict_backends.py verify-peer [--remote <name>]`, run on a second node under
+its `GOV_NODE`, lists `refs/gov/candidate/*` and `refs/gov/verdict/*` with one bounded `git ls-remote`,
+and for each candidate with no verdict fetches it, runs this kit's `run-gates.sh` on it under
+`GATE_FULL=1` in a detached worktree of the node's own clone, and pushes an annotated tag
+`refs/gov/verdict/<sha>` whose message is the full slot's `verdict`, `tree` and `run_id` lines and a
+`node` line, in the slot's `<key>TAB<value>` grammar. `refs/gov/bar-red` is the precedent. The tag is
+SIGNED, `git -c gpg.format=ssh tag -s` under the operator's own `user.signingkey`, its local name
+deleted once pushed; `verify-peer` refuses, exit 2, before any `ls-remote` where `user.signingkey`
+reads empty (TOOL-dWitnessedBar-43).
+
+**The peer's two checks** (TOOL-dWitnessedBar-43). SIGNER: `read_peer_verdict` reads
+`verdict.peer.signers` at the landed revision, never the working tree or the candidate, writes its
+members, one allowed-signers line `<node tag> <key type> <base64 key>` each with no options field, to a
+temp file under the common git dir, removed after, and runs `git -c gpg.ssh.allowedSignersFile=<file>
+verify-tag --raw`; the verdict stands only when that exits 0 and its `Good "git" signature for
+<principal>` line, which git writes to standard error, names the tag's `node` line and not this node.
+An unsigned tag, an unknown key, a bad signature (git's `Signature verification failed`, a tag whose
+message changed after it was signed, TOOL-dWitnessedBar-56 S15) or another principal reads `NONE`; the
+key unset reads `NONE`, `no signer table`; a verify that cannot run, `ssh-keygen` absent included, an
+`ls-remote` or `fetch` that fails and a refused policy read are `DEAD PROBE`. The key is owner-only: the loop guard refuses
+an agent's change to it off a live run's branch, as it does `verdict.remote.pin`. Each node's operator
+registers the node's public key with the owner. SOURCE: `check_pin_source` in `remote_verdict.py`, the
+one source rule `remote-ci` applies too, over the same three keys, so a candidate that rewrites the
+leg manifest reads `HELD`. Under `verdict.remote.pin-scope = workflow` a peer read is `HELD` naming the
+key outside `app-only`, because that scope pins only the remote workflow, which no peer runs: a peer
+verdict stands only once the owner sets `dispatch-closure` and pins under it.
+
+**The witness rule**, `remote_verdict.py`. KEY: a push run whose `head_sha` is the SHA, the SHA's tree
+resolved in this clone. WRITER: the run's check suite app slug `github-actions`, its `path` the row's
+`workflow`, its event `push`, and the row's `job`. LIVENESS: that job's `step` concluded `success`,
+never `skipped`. SOURCE: the files `verdict.remote.pin-scope` names (`workflow`: the workflow;
+`dispatch-closure`: also `run-gates.sh`, the leg manifest and `.githooks/gate-env.sh`) derive, at the
+SHA, the id `verdict.remote.pin` holds: `git hash-object --stdin` over their sorted `<path> <blob id>`
+lines, through `check_pin_source`. `verdict.remote.trust` = `pinned-workflow` or `owner-reviews-workflow-change` reads differing
+files `HELD`; `app-only` skips the source and reads a pass `GREEN` with witness `claimed`. The three
+keys are read at the landed revision; no pin reads `HELD`, `no pin`; a failed read is `DEAD PROBE`.
+Every GET goes through `read_api`: https to `api.github.com` only, no redirect, no credential, 30 s,
+4 MiB. `--responses <dir>` points it at canned files named by `derive_response_name`, an arm seam.
+`python remote_verdict.py pin` prints the pinned lines and id at HEAD and writes nothing.
+
+**The held reader** moved here too: `python remote_verdict.py held <anchor URL> <workflow file>`,
+`read_held_runs`, prints what the unattended kit's retired `read_held_reds` printed, one TAB row per
+`held <suite>` job and one liveness line, or one DEAD PROBE line; `write_held_asks` files the reds.
+
+**Its readers.** `check_landing_verdict` in `push-main.sh` before each landing push: `local-hook` lands as
+before; under another value only `GREEN` lands, a `peer-node` SHA not yet green published as
+`refs/gov/candidate/<sha>` first. The unattended driver's gates-green term files a `remote-ci` `HELD`
+read as one owner item. `verdict_backends.py --fixture --plant <case>` runs each plant in a scratch
+directory, and `run-gates.gov.test.sh` runs them.
+
+**What it does not check:** that a peer ran the bar its tag names, beyond the pinned files it ran it
+from; that `GOV_NODE` is unique; that a registered key is still held only by its node; that the pinned
+files are all the bar job executes.
 
 ## Every leg may declare a `ceiling`, and the runner holds it to it
 
@@ -941,6 +1249,22 @@ node would have to be defaulted, and one that raises nothing. The row lands in t
 carrying its source, so a number somebody measured by hand never reads as one the runner watched,
 and `--check` names those legs apart from the rest.
 
+**Evidence is keyed by leg AND node** (TOOL-dWitnessedBar-10). A row keeps its six fields, `<leg>`,
+`<max seconds>`, `<readings>`, `<node>`, `<date>`, `<source>`, and one leg may carry one row per node.
+Every `--write` needs `GOV_NODE`, and refuses naming it when it is unset rather than defaulting to
+`a`, because a node-keyed row written under a defaulted tag overwrites that node's evidence. It
+raises or holds only the writing node's rows and carries every other node's byte-identical, so two
+nodes' writes touch different rows. `--check` grades each ceiling against the largest reading across
+nodes and prints `ceiling-evidence: <k> of <n> legs evidenced on one node only`, a report and never a
+failure. The runner's dispatch prior and `pass_legs.py`'s cost read take the same per-leg maximum.
+
+**The whole-bar wall time is committed too.** `GOV_NODE=<tag> python profile_bar.py --record [--out
+<log>]` distils the last record of `<git-dir>/gate-profile.jsonl` into the tracked
+`bar-wall-evidence.txt`, one TAB-separated row per node: `<node>`, `<date>`, `<sha8>`, `<wall
+seconds>`, `<legs run>`, `<width>`. It replaces that node's row with the latest reading, not a
+maximum, because a wall time measures a bar and bounds nothing. It refuses, writing nothing, a last
+record taken with `--scoped` (a guarded run is not the whole bar) and an unset `GOV_NODE`.
+
 **Only a reading the census found free of foreign gate work argues a ceiling.** `derive-ceilings.py`
 admits a run-record reading only when its `foreign` field reads `0`, and sets the rest aside under
 one reason each, first match: a positive count is `contended`, and anything else, `unknown` or a
@@ -960,15 +1284,95 @@ the load it was taken under. Say in that text what else was running.
 stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
 turn a leg into a pass or a skip.
 
-## The leg manifest is the kit dir's SIBLING
+## The leg manifest is the kit dir's SIBLING, and it is GENERATED
+
+Each leg is declared ONCE: a `[[gate_leg]]` row of its kit's descriptor when an adopter receives it,
+else an `[[exempt_leg]]` row of the deployer's registry carrying its whole row beside its `why`. Where
+gov's own run differs from what an adopter receives, gov's value sits under the row's
+`[gate_leg.gov]` sub-table, key by key; an empty list there removes the key from gov's row.
+`leg_factory.py --write` renders `<prefix>/gate-legs.json` from every declaration, `pass_leg` included
+through `pass_legs.py`'s own rule; `--check` names each leg the file holds differently, and
+`regen.py` runs it at stage 1; `--conform`, the `gate-leg conformance` leg, adds every field arm over
+every declaration. Never hand-edit the manifest. Declare a new leg with
+`python <prefix>/run-gates/leg_factory.py new <name> --kit <id> --argv <json> --subject <kit|repo>
+--purpose <text> --enforces <tag>`, or `--exempt <why>` in place of `--kit` for a registry row; the
+kinds register reaches the same verb as `python <prefix>/playbook/core.py new gate-leg <name> ...`
+(TOOL-dWitnessedBar-11).
+
+In a tree with no govkit, which is every adopter's, `leg_factory.py` still loads: `--write`, `--check`,
+`--list` and `new` exit 2 naming the places they looked for govkit, and `--conform` grades every field
+arm over the `[[gate_leg]]` rows of the tree's `*/kit.toml` descriptors, read through `regen.py`'s
+reader. It prints `fresh: not graded here — no govkit` and `enforces: not graded here — no govkit`,
+since the render and the registries those arms read are gov's; it does not read the registry's
+`[[exempt_leg]]` rows or the flat entries' descriptors the playbook kit lands beside its engine
+(TOOL-dWitnessedBar-45).
 
 `<prefix>/gate-legs.json`, DERIVED from this kit's own location rather than spelled, so a one-segment
 install resolves it at any prefix. `GATE_LEGS` still outranks the derivation, which is the seam both
 harnesses drive so a nested run never re-enters the real bar.
 
-Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `reads`, `scope_of`, `signature`, `stage`, `subject`.
+Leg-row keys: `argv`, `ceiling`, `chunk`, `doc_reads`, `enforces`, `guard`, `name`, `pack`, `pass_leg`, `precommit`, `purpose`, `reads`, `scope_of`, `signature`, `stage`, `subject`, `tag`, `tests`.
 
-Each is a key some row of the manifest carries.
+Each is a key some row of the manifest carries. `tag` is the leg's `leg.<owner>.<name>` tag in the
+leg namespace, beside its free-text `name`, which stays the key every file keyed by leg joins on;
+the canary's one key set is `LEG_KEYS` in `run-gates.test.sh`. `tests` lists the features a leg
+tests (`feature.<f>`) and `enforces` the principles and practices it enforces; both are edges from
+the row's `tag`, read by the playbook kit's edge check (`edge_grammar.py --check`), declared once, on the
+leg's one declaration, which renders the manifest row, and neither travels into an adopter's
+manifest. The gov canary compares `tests` with the map dossiers' `gate-legs` claims in
+both directions (TOOL-dWitnessedBar-22). `purpose` says what the leg is for: one line of 1 to 60
+characters, no two legs sharing one: its shape and uniqueness are `leg_factory.py --conform`'s
+`purpose` arm, and selfcheck 7h grades its presence until TOOL-dWitnessedBar-51 moves it; it travels into an
+adopter's manifest from run-gates 1.52, `LEG_KEY_FLOORS["purpose"]` (TOOL-dWitnessedBar-19).
+`precommit` is the argv the pre-commit hook runs for the leg, in the manifest's `{prefix}` grammar,
+declared beside the row's `argv` in the same tokens and overridden under `[gate_leg.gov]` wherever
+`argv` is; it travels into an adopter's manifest from run-gates 1.53, `LEG_KEY_FLOORS["precommit"]`
+(TOOL-dWitnessedBar-10).
+`level` is in `LEG_KEYS` from run-gates 1.54, `LEG_KEY_FLOORS["level"]`, and no row of gov's manifest
+carries it, so it is not on the list above: a row carrying it is a product-test leg, its level one of
+`unit`, `integration`, `e2e` or `performance`. See "The product-test contract" below
+(TOOL-dWitnessedBar-9).
+
+**The product-test contract — `tests.product`.** `product_tests.py check`, the leg `product-test
+contract (tests.product)`, reads `tests.product` through the policy kit's `policy.py get`, or its
+catalogue default with the reason where that reader refuses, and grades the manifest's rows carrying
+`level` against it. The four levels are the ones the catalogue's `tests.landing-levels` row names.
+
+| `tests.product` | the product-test rows the manifest may hold | `check` is red when |
+|---|---|---|
+| `none` | none | any row carries `level` |
+| `declared` | the repository's own rows carrying `level`; no adapter row is rendered | a level is outside the four, or no row carries one and a runner's `detect` names one |
+| `declared-with-runners` (the default) | those, plus one adapter row per level each detected runner declares | a level is outside the four, or a detected runner's row is missing from the manifest |
+
+A runner adapter is a `[[test_runner]]` row of a kit descriptor, holding `runner`, a `detect` argv,
+the `levels` it can run and an `argv` spelling `{level}`; the guardrails kit's pytest row is the
+first. `leg_factory.py` runs each `detect` in the tree and, where one names a level, reads
+`tests.product` and adds one row per detected level after the declarations: name `<runner> <level>
+tests`, tag `leg.<runner>.<level>`, `pack` `product-tests` and its `level`. A tree no runner detects
+spends no policy read. `check` prints the value and where it was read, each product-test row with its
+level, and the count; a tree with no product test and no runner prints `0 product-test legs declared`
+and exits 0, the zero printed so it is never read as coverage. Gov holds no product suite, so gov's
+row runs `check --fixture`, one planted repository per value, printing `case <name>: red|green` and
+exiting 1 where a case reads otherwise than it is planted to. WHAT IT DOES NOT CHECK: that a leg
+carrying a level runs tests of that level, or that an adopter whose legs the deployer emitted, rather
+than the factory rendered, holds its adapter rows.
+
+**The commit-time list is derived, not typed in the hook.** `run-gates.sh --precommit` hands over to
+`precommit.py` before any bar machinery exists, as `--regen` does. It reads the manifest beside this
+kit (or `--legs <path>`), lists the staged set once, as the runner's `changed` counts it (`git diff
+--cached --name-only --no-renames`, no status filter: a staged deletion lists its path and a staged
+rename both its source and its destination, so either trips a guard its source sits under; the
+`leg-factory selftest` leg's trigger parity arm reds the two copies disagreeing), and for every row
+carrying `precommit`, in manifest order, prints `pre-commit: <name> not tripped` when the row's
+`guard` names no staged path, or runs the argv and prints `pre-commit: <name> ok` or
+`pre-commit: <name> FAILED (rc <n>)`. A row
+with no `guard` runs at every commit. A row whose argv names a script absent from the tree prints the
+hook's announced skip and is not a failure. It exits 1 when any run failed; `--list` prints each row's
+name, argv and trigger and runs nothing. The pre-commit hook calls it once, after its memory hygiene
+block, which stays hand-named because its commit-time form is a grade, a check-9 render and a regrade
+that no one argv states; the hygiene leg declares no `precommit`. WHAT IT DOES NOT CHECK: a trigger
+narrower than the bar's `guard` — the commit-time trigger IS the guard, so an unguarded leg costs its
+run at every commit.
 
 The manifest does NOT travel. A target's leg list is emitted from the selected kits' `[[gate_leg]]`
 blocks; seeding an adopter with gov's leg names is the class
@@ -1175,21 +1579,21 @@ worktree of `R` under the git common dir, under `R`'s ceiling for that row — a
 red leg in manifest order, then a summary:
 
 ```
-GATE attr  <leg>  INHERITED · offenders <n> · at <R8>
-GATE attr  <leg>  MIXED · inherited <i> · own <o> · at <R8>
-GATE attr  <leg>  OWN · <reason>
-GATE attr  <leg>  CONTENDED · timed out after <n>s; not re-run at R
-GATE attr  <leg>  DEAD PROBE · <reason>
-attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>]
+GATE attr  <leg>  INHERITED · offenders <n> · at <R8> · passes
+GATE attr  <leg>  MIXED · inherited <i> · own <o> · at <R8> · blocks
+GATE attr  <leg>  OWN · <reason> · blocks
+GATE attr  <leg>  CONTENDED · timed out after <n>s; not re-run at R · blocks
+GATE attr  <leg>  DEAD PROBE · <reason> · blocks
+attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>] · verdict.blocks <value>[, none handed] · <b> blocking
 ```
 
 The same rows land in the run record as `attribution`, TAB-separated: leg, verdict, inherited, own,
-the full `R` sha, age, owner sha8, owner id, reason — the reason LAST, the three age columns `-`
-where no age was asked. **It changes no exit code**: a bar that was red is red.
-What to DO with a verdict is a policy, and the policy is not this runner's.
+the full `R` sha, age, owner sha8, owner id, blocks, reason — the reason LAST, the three age columns
+`-` where no age was asked, and `blocks` the word "Which red blocks" below derives. **It changes no
+exit code**: a bar that was red is red. What to DO with a verdict is the landing readers'.
 
 The classifier, first match wins. **OWN, forced** when the diff between `R` and the working tree
-touches this runner, `gate-fingerprint.sh`, `lib-attribute.sh` or the pre-push hook `core.hooksPath`
+touches this runner, `gate-fingerprint.sh`, `lib-attribute.sh`, `lib-verdict.sh` or the pre-push hook `core.hooksPath`
 names — a run that edited its grader cannot vouch for any verdict. **CONTENDED** when the leg's own
 ceiling fired (124 under a positive bound, or 137 under one whose seconds reached it); it is not
 re-run. **OWN** when `R` has no row for the leg, its argv differs from `R`'s, the diff touches its
@@ -1223,14 +1627,96 @@ With the bound set, each INHERITED leg runs once more at `R~n`, `R`'s n-th first
 from `R`'s row in the same scratch worktree. Red there carrying every offender L carries appends
 `aged at R~<n>`; otherwise a bisection of the window names the landing that introduced the red,
 `age <k> · owner <sha8> <id>`. A probe that cannot answer appends `age unproven`. The age decides
-no landing (ruling `TOOL-dUnstuckLanding-22`): under an exported `land` the inherited-green stamp is
-written whenever every red leg reads INHERITED, at any age and with or without a bound, its
-`max_age` empty when none was handed; the unattended driver escalates an `aged` leg's ask to
-BLOCKER. Without a `signature` the offenders are the output's
+no landing (ruling `TOOL-dUnstuckLanding-22`): the inherited-green stamp is written whenever every
+red leg's row reads `pass` under a handed `GATE_VERDICT_BLOCKS`, at any age and with or without a
+bound, its `max_age` empty when none was handed; the unattended driver escalates an `aged` leg's
+ask to BLOCKER. Without a `signature` the offenders are the output's
 non-blank lines: red with every line of L's is red there, and red with ANY other output cannot be
 answered, because text cannot tell a fixed offender from a moved count line. Such a leg is aged
 only while its text holds still or shrinks toward L's; one whose red prints a changing count
 declares a `signature` to be aged across it.
+
+### Which red blocks — `GATE_VERDICT_BLOCKS=<value>`
+
+The policy key `verdict.blocks` decides which red of a red bar blocks its landing (TOOL-dWitnessedBar-3).
+The pre-push hook and the unattended driver each read it at `R` through the policy kit's `policy.py get
+--rev`, and hand it to the bar as `GATE_VERDICT_BLOCKS`; the runner reads it once and removes it, as it
+does `GATE_ATTRIBUTE`. Each attributed red's class is joined to `block` or `pass` by `lib-verdict.sh`:
+
+| class | `own-only` | `own-mixed-contended` | `every-red` |
+|---|---|---|---|
+| OWN | block | block | block |
+| MIXED | pass | block | block |
+| CONTENDED | pass | block | block |
+| INHERITED | pass | pass | block |
+| DEAD PROBE | block | block | block |
+| no row, or an unknown class | block | block | block |
+
+An absent value reads `every-red`, said on the summary; an unknown one reads `every-red` too. A red bar
+lands only when every attribution row reads `pass`: the hook's `check_inherited_verdict` and the
+driver's `read_gates_record` read that field and never re-decide it, and `lib-verdict.sh` is in KF3's
+list, so a diff that edits the table reads every red OWN.
+
+`python verdict_flow.py route --run <run dir>` joins each red to one route by its class and writes the
+routing record `<run dir>/routing` (leg, class, blocks, route, judgment, next): a red whose same-tree
+re-run reads `ok` routes `flakes`, ahead of every other row; a passing red routes
+`ask`; a blocking OWN or MIXED red `attribute`, the tester's; CONTENDED `quiet-rerun`; DEAD PROBE, or a
+red the attribution omits, `probe-repair`; INHERITED `fix-unit`. The unattended driver's `gates-green`
+runs it on every red bar it reads. `verdict_flow.py judge --run <run dir> --leg <name> --judgment
+<word>` records the tester's `code-miss` or `spec-wrong` on an `attribute` row and fills `next` by
+`verdict.red-route`; it reads the judgments through the loop kit's `loop_lib.py items --tag`, the verb
+`TOOL-dWitnessedBar-100` asks for, and exits 2 naming it until it lands.
+
+THE QUIET-HOST RE-RUN (TOOL-dWitnessedBar-30). `route` stamps a `quiet-rerun` row `routed <epoch>`, the
+stamp of the newest sibling run record naming the leg when its row there still reads `rerun waiting`,
+else now, so a contended red's wait spans the bars each pass runs. `python verdict_flow.py quiet-rerun
+--run <run dir>` takes each such row not yet re-run: when `profile_bar.py#check_quiet` reads `true`, no
+foreign bar visible on the host by PowerShell or, where none exists, `ps -eo pid=,args=`, both under the
+liveness assertion that this process's own command line is read, it runs the leg once, alone, through
+this runner under a one-row manifest (`GATE_LEGS`), `GATE_FULL=1` and `GATE_SELFTESTS=1`, attributed
+against the R its attribution row names (`GATE_ATTRIBUTE`), its run record `<run id>-quiet-<n>` beside
+the bar's. Green writes `rerun ok`, the red cleared as contention; red re-attributes the row and routes
+it by its new class, `rerun red <class>`. Otherwise it prints `awaiting quiet host  <leg>  since
+<routed at>`, and once the wait exceeds `flow.wait-ceiling` hours `owner  <leg>  contended, no quiet host
+within <h> h`, writing `rerun owner`. A state other than `waiting` is final and never re-run. The
+unattended driver runs it after `route` on every red bar it reads and files each `owner` line as a HIGH
+`contended red, no quiet host: leg <leg>` ask through `write_leg_ask`, once per leg while it is OPEN.
+
+`python verdict_flow.py flakes --run <run dir> --build <slug> --unit <id>` is `test.flakes`
+(TOOL-dWitnessedBar-8), and acts as `verdict.flakes` reads: under `retry-only` it writes nothing; under
+`record` and `quarantine` it writes one `flake` record through the memory-tree factory's
+`write_record`, `Run`, `Ended`, `Sha`, `Tree` and `Legs`, then one TAB row per executed leg, `<leg> ·
+<first rc> · <re-run rc or ->`. A flake is a row whose first rc is not 0 and whose re-run rc is, as the
+factory's `derive_flaked` says, and the rows are read through its `read_flake_body`. It then runs the
+drift kit's gate-health measurement in the repository's top, bounded at 60 seconds, `drift_report.py
+--gate-health --selection <the run's selection record, or an empty temporary file> --write --build <slug>
+--unit <id> --with <the record it wrote>`, and prints every line it prints, so a `drift-report: wrote
+<path>` line's gate-health record is staged beside the flake record;
+no drift kit, a non-zero exit or the bound firing prints one `flakes  gate-health · <why>` line, and
+`flakes` still exits 0. The holds it prints read the threshold in force before that record. Under
+`quarantine` it prints `hold  <leg>  <flakes>/<window>  <record ids>` for each leg whose flakes in its
+last `<window>` rows, newest `Ended` first across every tracked flake record and after its last
+release, reach `verdict.flakes.entry`, and that no OPEN held-flaky-leg ask names: a declared
+`<count>/<window>`, or under `measured` the newest gate-health record's `Measured`, 2/10 until the
+factory registers that kind and one is tracked. A release is the committer date of the commit adding
+the CLOSED row of the leg's held-flaky-leg ask. The unattended driver's `gates-green` runs it beside
+`route` on every red bar, under the build's record anchor, stages the record, and files each `hold`
+line as a MED `held flaky leg: leg <leg> flaked <n> in its last <window> verdicts` ask through its
+`write_leg_ask`; that OPEN ask is the hold the selection's `quarantine` row reads. `flakes --check`
+reds an OPEN held-flaky-leg ask whose leg had fewer flakes, in its window at the ask's filing date,
+than the threshold in force then.
+
+MIGRATION NOTE: `verdict.blocks` replaces the gate-file key `INHERITED_RED=park|land`, which the hook,
+the driver and this runner (as `GATE_INHERITED_RED`) no longer read. The govkit upgrade step
+`govkit/inherited-red-to-verdict-blocks` reads both files the key lived in, `.githooks/gate-env.sh`,
+the hook's, and the file `GATE_POLICY_FILE` names in `.unattended.conf`, the driver's, each where
+present. It writes a declared `park` as `every-red` and `land` as `own-mixed-contended` into the
+target's `.governance/policy.toml`, any other non-blank value as `every-red`, as both readers read it,
+and takes the assignments out; where the two files differ, the stricter value, `every-red`, wins. Where
+the policy file already sets `verdict.blocks` to another value the step refuses, printing `conflict ·
+verdict.blocks · policy <value> · gate <value>`, exits 1 and writes nothing. An undeclared key leaves
+the catalogue default `own-only`. The age bound `INHERITED_RED_MAX_AGE` stays. The whole step is in
+`help/upgrade-steps.md`, "Where `INHERITED_RED`'s value lives".
 
 ## The report tail contract
 

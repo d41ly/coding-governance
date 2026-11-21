@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-54 — the `exists:` spelling of a generated row's `when` reaches its other two readers, and the three readers are held to agree
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-5 · 2026-11-19 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,16 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
 | [2026-10-25-build-TOOL-dWitnessedBar-54-deviation-541.md](../build/2026-10-25-build-TOOL-dWitnessedBar-54-deviation-541.md) | deviation | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-54-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-54-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md](../build/2026-11-21-build-TOOL-dWitnessedBar-1-runlog-5a748574.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 TOOL-dWitnessedBar-106 TOOL-dWitnessedBar-107 TOOL-dWitnessedBar-108 TOOL-dWitnessedBar-109 TOOL-dWitnessedBar-110 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief.md) | journal | TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-45 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief.md) | journal | TOOL-dWitnessedBar-46 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-54-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-54-build-brief.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
+| [2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md](../reviews/2026-11-21-review-TOOL-dWitnessedBar-1-closing-diff-review-round1.md) | diff-review | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 
 <!-- /gen:spec-records -->
 
@@ -21,8 +28,9 @@ The round-1 spec audit of units 40 to 51
 confirmed finding **id 42 at HIGH**, its item **H2**, alone in that item. `TOOL-dWitnessedBar-45` S1
 gives a `[[generated]]` row's `when` the form `exists:<path>` and migrates only `regen.py`. Two other
 readers exist. govkit's selfcheck requires `when` to fullmatch `<conf>:<KEY>=<value>`
-(`tools/govkit/govkit.py:2470`), so it fails gov's own tree, closed. `resolve_generated_indexes`
-(`tools/unattended/lib-unattended.sh:883-886`) splits the value into conf `exists` and key
+(`tools/govkit/govkit.py#selfcheck`, its `_gwbad` test), so it fails gov's own tree, closed.
+`resolve_generated_indexes` (`tools/unattended/lib-unattended.sh#resolve_generated_indexes`) splits
+the value into conf `exists` and key
 `{prefix}/govkit/govkit.py`, compares an empty answer and `continue`s, so the factory's generated
 manifest drops out of `GENERATED_INDEXES` with no message, open. This unit takes the report's fix: both
 readers learn the form, and a parity arm holds all three to one answer. It repairs
@@ -32,15 +40,18 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
 
 - **S1** — The shell reader. `resolve_generated_indexes` reads a `when` beginning `exists:` as a path:
   it resolves `{prefix}`, `{kit}`, `{memory_root}` and `{map_root}` as `regen.resolve_argv` does,
-  `{prefix}` being the reader's own `_rg_tool` or `.` (`lib-unattended.sh:849`), and keeps the row only
-  when that path exists under the repository root. A path left with a token it cannot resolve skips the
-  row with the line `:891` prints for a path token, naming the `when`. The `<conf>:<KEY>=<value>` form
-  reads as today. Observed by AC1.
-- **S2** — The descriptor check. govkit selfcheck's `_gwbad` (`govkit.py:2470`) admits, beside
-  `<conf>:<KEY>=<value>`, `exists:<path>` whose path is non-empty and carries no token outside
-  `regen.TOKENS` (`tools/run-gates/regen.py:48`); its refusal message names both forms, and the
-  `when with no conf part` case of `tools/govkit/selftest.py:4340-4341` expects the new message.
-  Observed by AC2.
+  `{prefix}` being the tool root the reader derives from its own path, `_rg_tool`, or `.` where that
+  is empty (`tools/unattended/lib-unattended.sh@1c5ed3436d86:857`), and keeps the row only when that
+  path exists under the repository root. A path left with a token it cannot resolve skips the row with
+  a stderr line of the shape the reader prints for a path token it cannot resolve
+  (`tools/unattended/lib-unattended.sh@1c5ed3436d86:899`), naming the `when`. The
+  `<conf>:<KEY>=<value>` form reads as today. Observed by AC1.
+- **S2** — The descriptor check. govkit selfcheck's `_gwbad` test (`tools/govkit/govkit.py#selfcheck`)
+  admits, beside `<conf>:<KEY>=<value>`, `exists:<path>` whose path is non-empty and carries no token
+  outside `regen.TOKENS` (`tools/run-gates/regen.py#TOKENS`); its refusal message names both forms,
+  and the `when with no conf part` case of the `[aWP r2]` arm
+  (`tools/govkit/selftest.py@45513099a87c:7587-7588`), which expects the substring
+  `a when shaped <conf>:<KEY>=<value>`, expects the new message. Observed by AC2.
 - **S3** — The three readers agree. `tools/govkit/selftest.py` gains an arm over a scratch tree holding
   one `[[generated]]` row per `when` form, a conf form that holds, one that does not, an `exists:` path
   present, one absent and one with an unknown token: `regen.build_items` and `resolve_generated_indexes`
@@ -50,8 +61,9 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
 ## 3. Non-goals (OUT)
 
 - The `exists:` form, the factory row's `when` and `regen.py`'s reading: `TOOL-dWitnessedBar-45`'s.
-- govkit's own shell-reader parity of `[[generated]]` rows (`govkit.py:2436-2464`), which compares the
-  raw `when` string both ways and is unchanged by a new value shape.
+- govkit's own shell-reader parity of `[[generated]]` rows (`tools/govkit/govkit.py#selfcheck`, its
+  `_read_shell_generated_rows` comparison), which compares the raw `when` string both ways and is
+  unchanged by a new value shape.
 - A bug-class entry "a spelling change strands its readers", the report's left-shift text: S3 gates the
   class for this key.
 - The selfcheck observation on the built tree that unit 45's §7 never names: the minors batch's id 30
@@ -67,15 +79,32 @@ readers learn the form, and a parity arm holds all three to one answer. It repai
 
 ### Evidence
 
-- The readers, found by `git grep -n '"when"\|get("when")\|^when'` over `tools/`: `regen.check_when`
-  (`tools/run-gates/regen.py:140-146`, called at `:186`), govkit selfcheck 6c (`govkit.py:2469-2477`),
-  and the awk-and-shell reader of `resolve_generated_indexes` (`lib-unattended.sh:876`, `:883-886`).
-- `_gen_tokens = {"memory_root", "map_root", "kit"}` (`govkit.py:2455`) bounds a row's `path`, not its
-  `when`; `regen.TOKENS` adds `prefix` (`regen.py:48`), and regen resolves `{prefix}` to the tool
-  directory (`:176`).
-- The driver and its two checkers resolve `GENERATED_INDEXES` through this reader
-  (`tools/unattended/unattended.sh:750`, `check-unattended.sh:361`, `check-pass-order.sh:130`,
-  `check-brief-recorded.sh:188`).
+- The readers, DERIVED 2026-11-19 at `4e5497fb7`, the same three as at `98e33d71c`, by
+  `git grep -nE 'get\("when"\)|\["when"\]|\^when\[|"when", "w"' -- 'tools/*.py' 'tools/*.sh' 'tools/*.js'`:
+  `regen.check_when` (`tools/run-gates/regen.py#check_when`, called in
+  `tools/run-gates/regen.py#build_items`), govkit selfcheck 6c (`tools/govkit/govkit.py#selfcheck`,
+  its `_gwbad` test and its shell-row parity), and the awk-and-shell reader of
+  `tools/unattended/lib-unattended.sh#resolve_generated_indexes`. The command's other hits are outside
+  the population: `tools/loop/loop_table.py` reads the `when` of `tools/loop/loop.toml` rows, never a
+  `[[generated]]` row, and `tools/runlog/model.py` and `tools/runlog/selftest.py` read a spec mark's
+  `when` field.
+- `_gen_tokens = {"memory_root", "map_root", "kit"}` (`tools/govkit/govkit.py#selfcheck`) bounds a
+  row's `path`, not its `when`; `regen.TOKENS` adds `prefix` (`tools/run-gates/regen.py#TOKENS`), and
+  `tools/run-gates/regen.py#build_items` resolves `{prefix}` to the tool directory, or `.` at a root
+  install.
+- `tools/run-gates/regen.py#build_items` makes an item only of a `[[generated]]` row carrying all of
+  `write`, `check` and `stage`, and `tools/run-gates/regen.py#check_operand` refuses one whose script
+  is not in the tree, so each row of S3's scratch tree carries the three and names a script the tree
+  holds; `resolve_generated_indexes` keeps a row carrying a `path` and a `generator`.
+- Selfcheck 6c requires every `[[generated]]` row to carry a `generator` file beside its descriptor
+  and a `why` (`tools/govkit/govkit.py#selfcheck`, the refusal beside `_gwbad`). So the factory row
+  TOOL-dWitnessedBar-11 S2 adds to `tools/run-gates/kit.toml` carries a `generator`, the pair AC1
+  reads.
+- The driver and three of its checkers resolve `GENERATED_INDEXES` through this reader, each at its
+  `GENERATED_INDEXES=$(resolve_generated_indexes …)` line: `tools/unattended/unattended.sh@6386416b1626:928`,
+  `tools/unattended/check-unattended.sh@287ccb81fe28:520`,
+  `tools/unattended/check-pass-order.sh@f708d377c752:304` and
+  `tools/unattended/check-brief-recorded.sh@8649c1b2cff3:362`.
 
 ### The forms, read three ways
 
@@ -92,11 +121,15 @@ Minted: nothing by name; one selftest arm and a widened refusal message.
 
 ### Migration
 
-None: the only `exists:` row is unit 45's, and it lands one step earlier.
+None: the only `exists:` row is unit 45's, and it lands in the same merge, one commit earlier.
 
 ### Rollout
 
-Live at landing, one step after `TOOL-dWitnessedBar-45`.
+Live at landing. This unit and `TOOL-dWitnessedBar-45` land on local main in one merge, unit 45's
+commit first and this unit's second, and the bar runs once over both (unit 45 §8 F3). Neither is green
+alone: govkit selfcheck refuses the factory row's `exists:` `when` until S2 lands, and its leg carries
+no `guard` in `tools/gate-legs.json`, so it runs on every bar; and S3's arm needs unit 45's `exists:`
+reading in `regen.py`.
 
 ### Files touched (estimate)
 
@@ -126,10 +159,11 @@ Live at landing, one step after `TOOL-dWitnessedBar-45`.
 
 - **AC1** — When `bash -c '. tools/unattended/lib-unattended.sh && resolve_generated_indexes "$PWD" "" memory'`
   runs at gov's root on the built tree, its output names the leg factory's generated path paired with
-  its generator; in a scratch copy with `tools/govkit/` removed, it does not, and no line is lost
-  silently.
+  its generator; in a scratch clone with `tools/govkit/` deleted from its working tree, it does not,
+  and no line is lost silently.
   Red when: the reader keeps the conf-only parse, so the pair drops out with no message.
-  fixture: a scratch copy under `%TEMP%/<short-name>`; the tree holds none.
+  fixture: a scratch clone under `%TEMP%/<short-name>`, a clone because the reader lists descriptors
+  with `git ls-files` and derives its tool root from the `.git` above it; the tree holds none.
 - **AC2** — When `python tools/govkit/govkit.py selfcheck` runs on the built tree, it reports no
   `[[generated]]` row failure; with the factory row's `when` set to `exists:` in a scratch copy, it
   fails naming both admitted forms.
@@ -142,7 +176,7 @@ Live at landing, one step after `TOOL-dWitnessedBar-45`.
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `routed-commits selftest` · `memory hygiene`
+`govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `recall floor arms` · `routed-commits selftest` · `memory hygiene`
 
 The unattended kit's own suites are waived for this build's landing (README rule), so S1 is observed by
 AC1 and S3's arm, not by that kit's suites.
@@ -164,13 +198,30 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 · five `when` forms read by
   (HIGH, item H2).
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-3 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
+  `tools/govkit/govkit.py`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-27-spec-tokens-brief; nothing
+  else moved.
+- rev-4 · 2026-11-19 · §1 · S1 S2 · §3 · §4 Evidence, Migration, Rollout · AC1 · §10 · re-grounded at
+  `98e33d71c` per brief 2026-11-19-prompt-TOOL-dWitnessedBar-46-reground-brief: line citations become
+  `path#symbol` or blob-pinned; the reader population is re-derived by one stated command, with
+  `loop_table.py` and runlog named outside it; the callers of `resolve_generated_indexes` are four, at
+  moved lines; S3's scratch rows carry `write`, `check` and `stage`, the rows `build_items` admits;
+  AC1's scratch is a clone; and the Rollout lands this unit with TOOL-dWitnessedBar-45 in one merge,
+  unit 45 first, under one bar, per unit 45 §8 F3.
+- rev-5 · 2026-11-19 · S2 · §4 Evidence · §10 · re-grounded at `4e5497fb7` per brief
+  2026-11-19-prompt-TOOL-dWitnessedBar-14-reground-3-brief. The `[aWP r2]` case S2 rewrites moved,
+  re-pinned to its new blob. The reader population was re-derived by its stated command and holds the
+  same three. The four `GENERATED_INDEXES` callers and the lib-unattended blob are unchanged. The
+  evidence names selfcheck 6c's `generator` requirement, which makes the factory row of
+  TOOL-dWitnessedBar-11 S2 carry the pair AC1 reads. Every other claim was re-read at HEAD and holds.
 
 ## 10. Reuse audit
 
 The seams extended are the two readers themselves, `resolve_generated_indexes` and selfcheck 6c, and
 `regen.TOKENS` with `resolve_argv`'s token rule, which both now follow rather than a third token list.
 `python tools/codebase-map/reuse_lookup.py "evaluate a generated row when condition in the shell reader"`
-ranked `rows`, `row`, `read` and `read_text`, generic stems of no condition reader, so no existing seam
-fits beyond the readers named.
+ranked `rows`, `row`, `read_text`, `read`, `read_bytes`, `read_git` and `read_memory_tree`, re-run at
+`98e33d71c`, generic stems of no condition reader, so no existing seam fits beyond the readers named.
+At `4e5497fb7` the three readers and `regen.TOKENS` are unchanged.
 
 Recall terms used: `python tools/memory-recall/query.py "how do the readers of a generated row condition agree" --terms "generated when regen check_when govkit selfcheck _gwbad resolve_generated_indexes GENERATED_INDEXES shell reader parity"`

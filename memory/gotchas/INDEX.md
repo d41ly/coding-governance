@@ -166,7 +166,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [step-depends-on-a-later-build](step-depends-on-a-later-build.md) | class | 9 |  | a step's item, a route into a shared mechanism or an expansion's registration needs a node only a later build in the chain builds, so the step cannot run between the two landings, and a check that reads only backticked citations never sees it |
 | [structured-record-split-on-whitespace](structured-record-split-on-whitespace.md) | class | 1 |  | a multi-field record iterated with an unquoted shell expansion degenerates into its first field, and every assertion built on the later fields becomes unfalsifiable |
 | [subagent-scratch-overwrites-the-parents-files](subagent-scratch-overwrites-the-parents-files.md) | class | 5 |  | a subagent shares its parent session's scratchpad, so a snapshot it names like a file the parent keeps there overwrites that file silently, and the scratch guard admits the write |
-| [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 4 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
+| [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 8 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
 | [suite-edited-while-bash-executes-it](suite-edited-while-bash-executes-it.md) | class | 2 |  | bash reads a script incrementally by byte offset, so editing a suite file while a long run of it is executing corrupts the parse at the old offset and the run dies with a syntax error that names no edit |
 | [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 4 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
 | [summary-rewrites-the-text-it-carries](summary-rewrites-the-text-it-carries.md) | class | 1 |  | a compaction summary that reproduces a block as verbatim quietly rewrites the lines that look wrong in it, so the defects the block carried read as fixed and the copy passes for the original |
@@ -177,6 +177,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [topology-sweep](topology-sweep.md) | class | 7 |  | a change to a file where a worktree, merge or concurrent-run trap already bit is swept for the whole domain, a linked worktree's git dir to a commit under a running suite, not only for the one instance recorded at that file |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
+| [trailer-parse-reads-only-the-final-block](trailer-parse-reads-only-the-final-block.md) | class | 3 |  | a reader that selects trailers through git interpret-trailers --parse sees only the message's final trailer block, so a trailer followed by any plain line reads as absent |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
 | [trapped-signal-waits-for-the-foreground-child](trapped-signal-waits-for-the-foreground-child.md) | class | 4 |  | a bash script that TRAPS TERM, HUP or INT runs the handler only after its foreground child returns, so a killed script outlives the kill for as long as that child runs |
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 38 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
@@ -192,6 +193,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-176 record(s): 173 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+177 record(s): 174 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

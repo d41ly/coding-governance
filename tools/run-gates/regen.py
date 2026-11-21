@@ -14,7 +14,8 @@ WHAT IT READS. Every TRACKED `kit.toml` one directory below the tool root, the p
 unattended kit's `resolve_generated_indexes` reads, with tomllib. The tree is the current directory's
 git toplevel; the tool root is where this kit sits below its own repository, applied to that tree. Two tables declare an item:
   - a `[[generated]]` row carrying `write`, `check` (argv arrays) and `stage` (a positive integer),
-    all three or none — an index over the records or the code;
+    all three or none — an index over the records or the code; its optional `when`, either
+    `<conf>:<KEY>=<value>` or `exists:<path>`, skips it where it does not hold, and `--list` says so;
   - a `[[regenerate]]` row carrying `stage` — a render from a kit template. Its check is the row's
     own `check` argv, else its kit's `[check]` argv; a staged row with neither is refused.
 Rows sharing one write and one check are ONE item. Stage 1 renders from kit templates, stage 2 the
@@ -34,7 +35,9 @@ A write that exits non-zero is followed by its own check, and a fresh check make
 kit's adopter may decline to render in a state it declares legal (TOOL-aPrimedIndex-7).
 """
 import importlib.util
+import ntpath
 import os
+import posixpath
 import shutil
 import signal
 import subprocess
@@ -137,12 +140,31 @@ def resolve_argv(argv, ctx, where):
     return out
 
 
-def check_when(root, when, where):
-    """True when a row's `when = "<conf>:<KEY>=<value>"` holds at the repo root."""
-    conf, _, kv = str(when).partition(":")
+def check_when(root, when, ctx, where):
+    """True when a row's `when` holds at the repo root: `<conf>:<KEY>=<value>` when the conf's key reads
+    that value, `exists:<path>` when the path, its tokens resolved as an argv's are, exists in the tree
+    (TOOL-dWitnessedBar-45 S1). Neither form runs a command; any other spelling is a Refusal, and so is
+    an `exists:` path that, resolved, leaves the tree by govkit's `derive_contained_rel` rule, applied
+    inline since this copy-installed kit cannot import govkit (TOOL-dWitnessedBar-63 S11): with every
+    `\\` folded to `/` it normalises to `.`, `..` or a `../` climb or is absolute, `ntpath` reads it as
+    absolute, it holds a colon, or the folded path holds a `..` segment (TOOL-dWitnessedBar-62 S22)."""
+    shape = f"{where}: a when must read <conf file>:<KEY>=<value> or exists:<path>, got {when!r}"
+    w = str(when)
+    if w.startswith("exists:"):
+        if not w[len("exists:"):]:
+            raise Refusal(shape)
+        rel = resolve_argv([w[len("exists:"):]], ctx, where)[0]
+        folded = rel.replace("\\", "/")
+        norm = posixpath.normpath(folded)
+        if norm in (".", "..") or norm.startswith("../") or posixpath.isabs(norm) or ntpath.isabs(rel) \
+                or ":" in rel or ".." in folded.split("/"):
+            raise Refusal(f"{where}: an exists: path must be repo-relative inside the tree, with no '..' "
+                          f"segment, got {when!r}")
+        return (root / rel).exists()
+    conf, _, kv = w.partition(":")
     key, eq, want = kv.partition("=")
     if not conf or not key or not eq:
-        raise Refusal(f"{where}: a when must read <conf file>:<KEY>=<value>, got {when!r}")
+        raise Refusal(shape)
     return read_conf_value(root / conf, key) == want
 
 
@@ -165,7 +187,8 @@ def check_operand(argv, root, where):
 
 def build_items(root, tool_rel, descriptors, skipped=None):
     """Every declared item, joined by its (write, check) pair, sorted into run order. A `[[regenerate]]`
-    row carrying no `stage` is not an item; when `skipped` is a list, each such row is added to it."""
+    row carrying no `stage`, and a `[[generated]]` row whose `when` does not hold, is not an item; when
+    `skipped` is a list, each such row is added to it with its own reason."""
     mem = read_conf_value(root / ".memory-tree.conf", "MEMORY_ROOT") or "memory"
     mapr = read_conf_value(root / ".codebase-map.conf", "MAP_ROOT")
     if mapr is None:
@@ -183,7 +206,10 @@ def build_items(root, tool_rel, descriptors, skipped=None):
             if len(keys) != 3:
                 raise Refusal(f"{where}: carries {', '.join(keys)} of write, check and stage, and a row "
                               f"carries all three or none")
-            if "when" in row and not check_when(root, row["when"], where):
+            if "when" in row and not check_when(root, row["when"], ctx, where):
+                if skipped is not None:
+                    skipped.append(f"{kit} · [[generated]] {row.get('path', '(no path)')} · its when "
+                                   f"{row['when']} does not hold")
                 continue
             path = resolve_argv([str(row.get("path") or "")], ctx, where)[0] if row.get("path") else ""
             add = (check_operand(resolve_argv(row["write"], ctx, where), root, where),
@@ -197,7 +223,8 @@ def build_items(root, tool_rel, descriptors, skipped=None):
                 if "check" in row:
                     raise Refusal(f"{where}: carries a check and no stage, so it joins no stage")
                 if skipped is not None:
-                    skipped.append(f"{kit} · [[regenerate]] {render_argv(resolve_argv(row.get('argv'), ctx, where))}")
+                    skipped.append(f"{kit} · [[regenerate]] {render_argv(resolve_argv(row.get('argv'), ctx, where))}"
+                                   f" · carries no stage, so no bar regenerates it")
                 continue
             chk = row.get("check") or kit_check
             if not chk:
@@ -241,7 +268,7 @@ def resolve_bash(probe):
     try:
         spec.loader.exec_module(mod)
         found, _tried = mod.resolve_bash(str(probe))
-    except Exception:  # noqa: BLE001 - any failure to load or run the resolver falls back to PATH
+    except Exception:  # noqa: BLE001 - any failure to load or run the resolver is main's refusal
         return ""
     return found
 
@@ -274,11 +301,15 @@ def run_command(argv, root, bound):
     run = list(argv)
     if run[0] in ("python", "python3"):
         run[0] = sys.executable
+    elif run[0] == "bash":
+        # THE RESOLVED BASH ALONE, never a PATH lookup of the name (TOOL-dWitnessedBar-26): `main`
+        # refuses before any row runs where none resolved, so an empty `BASH` never reaches here.
+        run[0] = BASH
     else:
         # ON PATH, FIRST. Windows' process creation searches its system directory BEFORE `PATH`, and on
         # a node with WSL installed `bash` there is WSL's, which cannot read a linked worktree's `.git`
         # file and reported every Git-Bash check "not a git repo" (measured 2026-10-11, node `a`).
-        run[0] = (BASH if run[0] == "bash" else "") or shutil.which(run[0]) or run[0]
+        run[0] = shutil.which(run[0]) or run[0]
     env = dict(os.environ, GIT_OPTIONAL_LOCKS="0")
     # NO INHERITED PWD. bash keeps an inherited PWD that names its working directory by another
     # spelling, and node `a`'s TEMP is an 8.3 short name git spells long: an adopter comparing the two
@@ -312,14 +343,14 @@ def print_tail(out):
 
 
 def print_items(items, skipped=()):
-    """`--list`: every item in run order, each `[[regenerate]]` row skipped for carrying no stage, then a
-    derived count line, so a row the verb does not run is never silent (review L3)."""
+    """`--list`: every item in run order, each row skipped with the reason it carries, then a derived
+    count line, so a row the verb does not run is never silent (review L3)."""
     for i in items:
         print(f"regen: stage {i['stage']} · {i['kit']} · {', '.join(i['outputs'])}")
         print(f"regen:   write  {render_argv(i['write'])}")
         print(f"regen:   check  {render_argv(i['check'])}")
     for s in skipped:
-        print(f"regen: skipped · {s} · carries no stage, so no bar regenerates it")
+        print(f"regen: skipped · {s}")
     stages = sorted({i['stage'] for i in items})
     print(f"regen: {len(items)} declared across {len({i['kit'] for i in items})} kit(s), "
           f"in {len(stages)} stage(s)")
@@ -459,6 +490,10 @@ def main(argv):
         return 0
     if any(a == "bash" for i in items for a in (i["write"][0], i["check"][0])):
         BASH = resolve_bash(root / f"{descriptors[0][0]}/kit.toml")
+        if not BASH:
+            print("regen: REFUSED — a staged row runs bash and no bash resolved that can see this tree; "
+                  "set GOV_BASH to Git's bash")
+            return 2
     if argv[1] == "--check":
         return run_checks(items, root, jobs, bound)
     return run_writes(items, root, jobs, bound)

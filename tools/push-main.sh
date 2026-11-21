@@ -370,8 +370,13 @@ derive_push_failure() {  # -> refused | unreachable | unchanged | refenced | fen
 # NOTHING PUSHED IS NOT UNGATED. When the remote already held the commit, git runs the hook with no ref
 # lines, the hook exits as `skip-nondefault` and writes no record, and git still exits 0; that
 # re-run of a landing that already happened is reported as such (closing review round 1).
+# THE UNGATED LANDING IS RECORDED (TOOL-dWitnessedBar-2 S3): one `bypass=ungated-landing` line through
+# `write_bypass_line`, under the `hooks.bypass` value `check_landing_verdict` read, its `tree_verdict`
+# the runner-written per-tree verdict of the pushed SHA's tree as the run-gates kit's `local-hook`
+# reader reads it: GREEN or RED as its line reads, `none` for every other state or where no reader
+# answers. So a hook killed after a green bar is told from a push no bar judged. The exit is unmoved.
 check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when the hook allowed it; else the UNGATED report and 1
-  local pushed=$1 was=$2 sha="" run=""
+  local pushed=$1 was=$2 sha="" run="" tv=none got py dir out
   if [ "$pushed" = "$was" ]; then
     echo "push-main: $remote/$def already held ${pushed:0:8} before this push, so nothing was pushed and no hook verdict is owed." >&2
     return 0
@@ -379,7 +384,37 @@ check_push_allow() {  # pushed sha · the remote's tip before the push -> 0 when
   [ -f "$allowfile" ] && IFS=$'\t' read -r sha run < "$allowfile"
   [ -n "$sha" ] && [ "$sha" = "$pushed" ] && return 0
   echo "push-main: landed UNGATED — git reports ${pushed:0:8} pushed to $remote/$def, but the pre-push hook left no allow record for it${sha:+ (its record names ${sha:0:8})} in $allowfile. The hook was killed before it decided: on Git for Windows a hook that dies by a signal reads as success. The commit is on $remote and NO bar certified it; NOT writing the lander marker. Run the bar on $remote/$def and decide whether to keep it." >&2
+  if got=$(resolve_lander_kit run-gates verdict_backends.py); then
+    py=${got%%$'\t'*} dir=${got#*$'\t'}
+    out=$(cd "$top" && "$py" "$top/$dir/verdict_backends.py" read --backend local-hook --sha "$pushed" 2>/dev/null)
+    case "$out" in
+      *"verdict: local-hook · GREEN · "*) tv=GREEN ;;
+      *"verdict: local-hook · RED · "*) tv=RED ;;
+    esac
+  fi
+  write_bypass_line ungated-landing "$pushed" "${HOOKS_BYPASS:-allowed}" "$tv"
   return 1
+}
+
+# `write_bypass_line <kind> <sha> <policy> [<tree verdict>]` records one hook bypass (TOOL-dWitnessedBar-2
+# S2): one `ev=once` line, `decision=bypass`, in the pushes journal, `runlog/pushes.log` under the git
+# common dir, in the runlog kit's grammar, and one `bypass:` line on stderr. BYTE-IDENTICAL in the
+# lander and the pre-push hook, which ships verbatim and sources no kit; the lander suite holds the
+# pair. EVIDENCE, NEVER AN INPUT: nothing branches on the line, a failed append prints one line and
+# moves no exit, and `GOV_RUNLOG=0` writes no journal line. Every value is a fixed token or hex, so
+# none needs the grammar's escaping, and the line is far under its cap.
+write_bypass_line() { # kind · sha · policy · [tree verdict] -> one journal line and one stderr line
+  local t gcd tab=$'\t'
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  echo "bypass: $1 · ${2:0:8} · hooks.bypass $3${4:+ · tree verdict $4} · recorded in runlog/pushes.log" >&2
+  [ "${GOV_RUNLOG:-}" != 0 ] || return 0
+  gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || gcd=""
+  if [ -n "$gcd" ] && { [ -d "$gcd/runlog" ] || mkdir "$gcd/runlog" 2>/dev/null; } \
+     && { printf '%s\n' "v=1${tab}t=$t${tab}p=pushes${tab}ev=once${tab}decision=bypass${tab}bypass=$1${tab}sha=$2${tab}policy=$3${4:+${tab}tree_verdict=$4}" >> "$gcd/runlog/pushes.log"; } 2>/dev/null; then
+    return 0
+  fi
+  echo "${0##*/}: run log — cannot append to ${gcd:-(no git dir resolved)}/runlog/pushes.log, so this bypass is not recorded there; the exit is unaffected" >&2
+  return 0
 }
 
 write_lander_marker() {  # -> 1 when the push landed but the record could not be written
@@ -1333,6 +1368,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 # The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
 # canonical copy named on its marker line and gated by the resolve-python self-test's parity
 # table. A shell consumer runs it with the python it already resolved, so the receipt rung is
@@ -1624,8 +1677,117 @@ write_merge_fold() {  # first parent · second parent · message -> 0 HEAD is th
 # THE SUBJECT NAMES THE SLUG AND NO UNIT ID. `build_commit` in the unattended kit joins a commit to
 # a unit by the unit id as a whole token in its subject, so a unit id here would make the landing
 # merge that unit's build commit and move every verdict derived from it.
-cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
-  local branch oldb R t dirt msg
+# `read_verdict_tree` sets VERDICT_TREE to `verdict.tree` (TOOL-dWitnessedBar-4 S5), read through the
+# policy kit's `policy.py get` (TOOL-dGroundRules-2), the kit found by `resolve_lander_kit`. Where
+# either cannot run, or the reader prints no value of the key, it is the catalogue default
+# `prepared-merge` (TOOL-dGroundRules-3), and one line on stderr says why.
+read_verdict_tree() {
+  local got rc py dir v
+  VERDICT_TREE=prepared-merge
+  got=$(resolve_lander_kit policy policy.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict.tree reads its catalogue default, prepared-merge: $got" >&2
+    return 0
+  fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
+  if ! v=$(cd "$top" && "$py" "$top/$dir/policy.py" get verdict.tree 2>/dev/null); then
+    echo "push-main: verdict.tree reads its catalogue default, prepared-merge: the reader, policy.py get, did not answer" >&2
+    return 0
+  fi
+  v=${v%$'\r'}
+  case "$v" in
+    prepared-merge|build-tip) VERDICT_TREE=$v ;;
+    *) echo "push-main: verdict.tree reads its catalogue default, prepared-merge: the reader printed '$v', which is no value of the key" >&2 ;;
+  esac
+}
+
+# `check_landing_verdict <sha>` reads `verdict` before each landing push (TOOL-dWitnessedBar-6 S10),
+# as `read_verdict_tree` reads its key: the policy kit found by `resolve_lander_kit`, then `policy.py
+# get`. Under `local-hook` it lands as today. Under any other backend the run-gates kit's
+# `verdict_backends.py read` judges the SHA about to be pushed, `check_backend` first, and only GREEN
+# lands; under `peer-node` a SHA not yet GREEN is published as `refs/gov/candidate/<sha>` for a peer's
+# `verify-peer`, and the lander exits rather than polling. A reader that refuses, or a value no row
+# declares, refuses before any push. Only a lander with no policy kit beside it reads the catalogue
+# default, said on one line. What it does NOT check: that a peer will ever run.
+# `hooks.bypass` (TOOL-dWitnessedBar-2 S1, S6) is read here too, into HOOKS_BYPASS, which the UNGATED
+# record names. Under `refused` the registry's `off-node` verb is asked whether the `verdict` row is
+# off-node, before the `local-hook` return, and every landing is refused while it is not: a hook on
+# this node cannot refuse its own bypass, so `refused` stands on an off-node witness or not at all. A
+# reader that does not answer reads the catalogue default `allowed`, said on one line.
+check_landing_verdict() {  # sha -> 0 lands; 1 refused, the state or the refusal named on stderr
+  local sha=$1 got rc py dir v out state b
+  HOOKS_BYPASS=allowed
+  got=$(resolve_lander_kit policy policy.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict reads its catalogue default, local-hook, and hooks.bypass its default, allowed: $got" >&2
+    return 0
+  fi
+  py=${got%%$'\t'*} dir=${got#*$'\t'}
+  if ! v=$(cd "$top" && "$py" "$top/$dir/policy.py" get verdict 2>&1); then
+    echo "push-main: verdict does not read, so nothing is pushed: ${v//$'\n'/ · }" >&2
+    return 1
+  fi
+  v=${v%$'\r'}
+  b=$(cd "$top" && "$py" "$top/$dir/policy.py" get hooks.bypass 2>/dev/null) || b=""
+  b=${b%$'\r'}
+  case "$b" in
+    allowed|refused) HOOKS_BYPASS=$b ;;
+    *) echo "push-main: hooks.bypass reads its catalogue default, allowed: the reader, policy.py get, answered '${b:-nothing}'" >&2 ;;
+  esac
+  if [ "$HOOKS_BYPASS" = refused ]; then
+    got=$(resolve_lander_kit run-gates verdict_backends.py); rc=$?
+    if [ "$rc" != 0 ]; then
+      echo "push-main: hooks.bypass is refused and no backend registry answers whether verdict $v is off-node ($got), so nothing is pushed" >&2
+      return 1
+    fi
+    out=$(cd "$top" && "$py" "$top/${got#*$'\t'}/verdict_backends.py" off-node --backend "$v" 2>&1); rc=$?
+    [ -z "$out" ] || printf '%s\n' "$out" >&2
+    case "$rc" in
+      0) ;;
+      1) echo "push-main: hooks.bypass is refused and verdict $v is no off-node backend, so nothing is pushed: a hook on this node cannot refuse its own bypass, and only an off-node witness can; set verdict to one of the off-node backends: ${out##*off-node backends: }" >&2
+         return 1 ;;
+      *) echo "push-main: hooks.bypass is refused and the backend registry refused verdict $v (named above), so nothing is pushed" >&2
+         return 1 ;;
+    esac
+  fi
+  [ "$v" = local-hook ] && return 0
+  got=$(resolve_lander_kit run-gates verdict_backends.py); rc=$?
+  if [ "$rc" != 0 ]; then
+    echo "push-main: verdict is $v and no backend reader answers ($got), so nothing is pushed" >&2
+    return 1
+  fi
+  dir=${got#*$'\t'}
+  out=$(cd "$top" && GOV_REMOTE=$remote "$py" "$top/$dir/verdict_backends.py" read --backend "$v" --sha "$sha" 2>&1); rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out" >&2
+  [ "$rc" = 0 ] && return 0
+  if [ "$rc" != 1 ]; then
+    echo "push-main: verdict $v is refused (named above), so nothing is pushed" >&2
+    return 1
+  fi
+  if [ "$v" = peer-node ]; then
+    if git push --porcelain "$remote" "$sha:refs/gov/candidate/$sha" >/dev/null 2>&1; then
+      echo "push-main: published refs/gov/candidate/$sha on $remote, for a peer node's verify-peer" >&2
+    else
+      echo "push-main: refs/gov/candidate/$sha could not be published on $remote" >&2
+    fi
+  fi
+  state=$(printf '%s\n' "$out" | sed -n 's/^verdict: [^ ]* · \(.*\) · [0-9a-f]\{8\} · .*/\1/p' | head -1)
+  echo "push-main: verdict $v reads ${state:-no state} for ${sha:0:8}, not GREEN, so nothing is pushed to $def" >&2
+  return 1
+}
+
+# `print_merge_witness` — the one line naming which tree Test verifies: the value, HEAD and its tree.
+print_merge_witness() {
+  local h tr
+  h=$(git rev-parse --verify HEAD 2>/dev/null) || h=""
+  tr=$(git rev-parse -q --verify "HEAD^{tree}" 2>/dev/null) || tr=""
+  echo "push-main: test.merge $VERDICT_TREE ${h:0:8} tree $tr"
+}
+
+# `check_run_branch` — HEAD is a run's own branch, not detached and not the default branch, over a
+# clean tree. The branch on stdout; else the refusal on stderr and 1.
+check_run_branch() {
+  local branch dirt
   branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -z "$branch" ]; then
     echo "push-main: HEAD is detached, and preparing a landing moves the branch it is made on — check the run's branch out first." >&2
@@ -1646,8 +1808,33 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     printf '%s\n' "$dirt" | sed 's/^/    /' >&2
     return 1
   fi
+  printf '%s\n' "$branch"
+}
+
+# `--prepare` reads `verdict.tree` first (TOOL-dWitnessedBar-4 S5, F3): under `prepared-merge` it merges
+# the run's branch onto the advertised tip, as it always did; under `build-tip` it makes no merge and
+# pins the branch tip, and `--land` makes the landing merge (F4). Either way it prints the witness line.
+cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing could be observed
+  local branch R rc
+  branch=$(check_run_branch) || return 1
   R=$(resolve_tip) || return 3
   read_tip_object "$R" || return 3
+  read_verdict_tree
+  if [ "$VERDICT_TREE" = build-tip ]; then
+    echo "push-main: pinned $(git rev-parse --short=8 HEAD) — verdict.tree is build-tip, so no merge is made before the bar; --land makes the landing merge"
+  else
+    write_prepared_merge "$branch" "$R"; rc=$?
+    [ "$rc" = 0 ] || return "$rc"
+  fi
+  print_merge_witness
+  return 0
+}
+
+# `write_prepared_merge <branch> <R>` — merge <branch>, checked out, onto the advertised tip R, mint,
+# walk and regenerate into the merge, and move the branch to it: `--prepare`'s merge path, which
+# `--land` takes too under `build-tip` (F4).
+write_prepared_merge() {  # -> 0 prepared (or already was) · 1 refused
+  local branch=$1 R=$2 oldb t msg gfsnap
   oldb=$(git rev-parse --verify HEAD)
   # IDEMPOTENT. A branch whose tip is already a merge onto this very tip is already prepared, and
   # preparing it again would stack a second merge that `--land` then refuses.
@@ -1757,18 +1944,28 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   return 0
 }
 
-# `--land`: push the prepared merge, and only it, as the default branch.
+# `--land`: push the prepared merge, and only it, as the default branch. Under `verdict.tree` =
+# `build-tip` (TOOL-dWitnessedBar-4 S5, F4) `--prepare` pinned the branch tip and made no merge, so
+# where HEAD carries no prepared merge onto the advertised tip, `--land` makes it first, through
+# `--prepare`'s merge path; on a race the loop comes back here and merges onto the new tip.
 cmd_land() {
-  local attempt R t rc cls pushed
+  local attempt R t rc cls pushed branch
   attempt=1
+  read_verdict_tree
   while [ "$attempt" -le "$max" ]; do
     R=$(resolve_tip) || exit 3
     read_tip_object "$R" || exit 3
+    if [ "$VERDICT_TREE" = build-tip ] && ! check_prepared_merge "$R" >/dev/null 2>&1; then
+      echo "push-main: verdict.tree is build-tip and HEAD carries no merge onto ${R:0:8}, so the landing merge is made now" >&2
+      branch=$(check_run_branch) || exit 1
+      write_prepared_merge "$branch" "$R" >&2 || exit 1
+    fi
     if ! t=$(check_prepared_merge "$R"); then
       [ "$attempt" -gt 1 ] && echo "push-main: $remote/$def moved again between the re-prepare and this attempt." >&2
       exit 1
     fi
     check_carry_set "$R" || exit 1
+    check_landing_verdict "$(git rev-parse --verify HEAD)" || exit 1
     # THE FENCE READ, once per attempt and before the verdict files are cleared (TOOL-dPlacedRequest-15
     # S3): a refusal has printed its line and pushes nothing, and the case below exits 1 on it.
     if ! read_fence_line; then
@@ -1813,7 +2010,7 @@ cmd_land() {
         # first-parent line. Re-preparing keeps the invariant on every attempt, and the merge that
         # was already graded stays an ancestor of what is finally pushed.
         echo "push-main: push rejected — $remote/$def advanced during the gate; re-preparing onto the new tip and re-gating..." >&2
-        cmd_prepare || exit $?
+        [ "$VERDICT_TREE" = build-tip ] || cmd_prepare || exit $?
         attempt=$((attempt + 1)) ;;
       refenced)
         # THIS HOLDER'S OWN WRITE MOVED THE LEASE (TOOL-dPlacedRequest-29 S3): the default branch did
@@ -1976,6 +2173,7 @@ while [ "$attempt" -le "$max" ]; do
     fi
   fi
 
+  check_landing_verdict "$(git rev-parse --verify "refs/heads/$def")" || exit 1
   # THE FENCE READ under `--slug`, once per attempt and before the clear (TOOL-dPlacedRequest-15 S3,
   # S6); with no slug it reads nothing and the push below is today's. A refusal pushes nothing.
   if ! read_fence_line; then

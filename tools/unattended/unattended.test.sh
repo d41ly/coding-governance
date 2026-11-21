@@ -211,6 +211,24 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
+# >>> refuse_wrong_shell — canonical copy: refuse-wrong-shell.sh in gov's lib dir (byte-identical; gated)
+wrong_shell_at() {   # <abs path> <wsl 0|1>; returns 0 when the path is a Windows checkout under WSL
+  [ "$2" = 1 ] || return 1
+  case "$1" in /mnt/[a-z]/*) return 0 ;; esac
+  return 1
+}
+refuse_wrong_shell() {
+  _rws_wsl=0
+  { [ -n "${WSL_DISTRO_NAME:-}" ] || [ -e /proc/sys/fs/binfmt_misc/WSLInterop ]; } && _rws_wsl=1
+  _rws_p=${BASH_SOURCE[0]:-$0}
+  case "$_rws_p" in /*) ;; *) _rws_p=$PWD/$_rws_p ;; esac
+  wrong_shell_at "$_rws_p" "$_rws_wsl" || return 0
+  echo "refuse_wrong_shell: WSL's bash is running $_rws_p from a Windows checkout under /mnt/;" >&2
+  echo "refuse_wrong_shell: run it with Git's bash (C:/Program Files/Git/bin/bash.exe)." >&2
+  return 1
+}
+# <<< refuse_wrong_shell
+refuse_wrong_shell || exit 2
 _rkd_py=$(resolve_python) || { echo "FAIL no usable python, so the sibling kits cannot be resolved"; exit 2; }
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
@@ -5576,89 +5594,28 @@ fixture
 run --preflight tRun --keepalive-id k1 >/dev/null
 miss "$(run --close tRun)" "GATEPROBE-should-not-appear"
 
-# ---- TOOL-aFrugalTurnstile-3 AC6/AC7: A GREEN CLOSE LEAVES THE BOUNDARY'S `gate-bar-green`, naming
-# ---- the declared GATE_CMD, only when its bar ran full; a bar run without GATE_FULL under `primary`
-# ---- and a red bar write none. RED against the driver at bef97330, which has no writer. The probe is
-# ---- TRACKED and the run-state file `--preflight` writes is committed, so the tree the writer reads
-# ---- is clean. GATE_FULL is spelled on every call: the bar that runs this suite exports it.
+# ---- TOOL-dWitnessedBar-4 S4, amending TOOL-aFrugalTurnstile-3 AC6-AC8: THE CLOSE WRITES NO RECORD OF
+# ---- ITS OWN. The verdict per tree is the runner's (`<common-dir>/gate-verdict/<tree hash>`), so a green
+# ---- close leaves no `gate-bar-green`, and the parity arm that held the driver's grammar to the hook's
+# ---- left with both writers. A red bar still blocks the close. Amended under the build README's rule
+# ---- that waives this kit's suites for dWitnessedBar's landing, and not observed in the build.
 fg_gd=$(git rev-parse --absolute-git-dir)
-reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+reset_tree; readme tRun; rm -f "$fg_gd"/gate-bar-green*
 printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
 mkconf "true" "bash probe-gate.sh"
 fixture
 run --preflight tRun --keepalive-id k1 >/dev/null; fixture
 out=$(GATE_FULL=1 run --close tRun)
-hit  "$out" "unattended: gates-green — recorded gate-bar-green for $(git rev-parse HEAD | cut -c1-8) (kind full)"
-same "TOOL-aFrugalTurnstile-3 AC6 the close's record names the declared GATE_CMD" \
-  "$(awk -F'\t' '$1=="bar"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "bash probe-gate.sh"
-same "TOOL-aFrugalTurnstile-3 AC6 the close's record is written by unattended" \
-  "$(awk -F'\t' '$1=="by"{print $2}' "$fg_gd/gate-bar-green" 2>/dev/null)" "unattended"
-reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
-printf '#!/usr/bin/env bash\nexit 0\n' > probe-gate.sh
-mkconf "true" "bash probe-gate.sh"
-fixture
-run --preflight tRun --keepalive-id k1 >/dev/null; fixture
-out=$(GATE_FULL= run --close tRun)
-hit  "$out" "unattended: gates-green — no gate-bar-green written: the bar did not run full"
-same "TOOL-aFrugalTurnstile-3 AC7 a bar run without GATE_FULL under primary writes no record" \
-  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
-reset_tree; readme tRun; rm -f "$fg_gd/gate-bar-green"
+miss "$out" "gate-bar-green"
+same "TOOL-dWitnessedBar-4 S4 a green close writes no gate-bar-green of its own" \
+  "$(ls "$fg_gd" | grep -c '^gate-bar-green')" "0"
+reset_tree; readme tRun
 printf '#!/usr/bin/env bash\nexit 1\n' > probe-gate.sh
 mkconf "true" "bash probe-gate.sh"
 fixture
 run --preflight tRun --keepalive-id k1 >/dev/null; fixture
 out=$(GATE_FULL=1 run --close tRun)
 hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
-miss "$out" "gate-bar-green"
-same "TOOL-aFrugalTurnstile-3 AC7 a red bar writes no record" \
-  "$([ -e "$fg_gd/gate-bar-green" ] && echo present || echo absent)" "absent"
-
-# ---- TOOL-aFrugalTurnstile-3 AC8: THE RECORD'S GRAMMAR IS SPELLED TWICE, in the pre-push hook and in
-# ---- this driver, because the hook ships verbatim and sources no kit; this arm holds the two together
-# ---- as `read_policy_key`'s copies are held. Both functions are cut out of their shipped files by
-# ---- `slice_fn`'s awk and sed, called alike in one clean scratch repo, and their key columns compared
-# ---- with each other and with the ten keys in order. A copy of the driver's with `by` dropped must
-# ---- FAIL that comparison, or the comparison is one that cannot fail.
-fg_hook="${HERE%/"$KIT_REL"}/.githooks/pre-push"
-fg_s=$(grep -n '^write_bar_green()' "$fg_hook" 2>/dev/null | cut -d: -f1)
-if [ -z "$fg_s" ]; then
-  echo "SKIP TOOL-aFrugalTurnstile-3 AC8 parity arm: no write_bar_green() in the pre-push hook at $fg_hook, so there is no second spelling to hold the driver's against"
-else
-  fg_keys=$(printf '%s\n' sha tree bar bar_paths kind base selftests run_id by stamped)
-  fg_e=$(awk -v s="$fg_s" 'NR>s && /^}/ {print NR; exit}' "$fg_hook")
-  eval "$(sed -n "${fg_s},${fg_e}p" "$fg_hook" | sed '1s/^write_bar_green()/write_hook_bar_green()/')"
-  slice_fn write_bar_green
-  fg_w=$(mktemp -d)
-  ( cd "$fg_w" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
-      && git config core.autocrlf false && echo a > a && git add a && git commit -q -m one --no-verify ) >/dev/null 2>&1
-  fg_pp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
-             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
-             && cut -f1 "$g/gate-bar-green" )
-  fg_ud=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
-             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
-             && cut -f1 "$g/gate-bar-green" )
-  same "TOOL-aFrugalTurnstile-3 AC8 the hook's record carries the ten keys in order" "$fg_pp" "$fg_keys"
-  same "TOOL-aFrugalTurnstile-3 AC8 the driver's record carries the hook's keys in order" "$fg_ud" "$fg_pp"
-  # TOOL-aFrugalTurnstile-16 AC2: the key column alone let the two writers disagree on `base`, so a
-  # kind scoped record with a base is compared WHOLE, every line but `by` and `stamped`, which differ
-  # by design. Both write the scoped slot.
-  fg_sp=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
-             && write_hook_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
-             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
-  fg_su=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green.scoped" \
-             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 scoped "$(git rev-parse HEAD)" "bash probe-gate.sh" fg-run >/dev/null \
-             && grep -v -e '^by	' -e '^stamped	' "$g/gate-bar-green.scoped" )
-  n=$((n+1)); [ -n "$fg_sp" ] && [ "$fg_sp" = "$fg_su" ] \
-    || { echo "FAIL TOOL-aFrugalTurnstile-16 AC2 the hook's and the driver's kind scoped records differ beyond by and stamped: [$fg_sp] vs [$fg_su]"; st=1; }
-  eval "$(declare -f write_bar_green | sed 's/by\\tunattended\\n//')"
-  fg_dk=$( cd "$fg_w" && g=$(git rev-parse --absolute-git-dir) && rm -f "$g/gate-bar-green" \
-             && write_bar_green "$g" "$(git rev-parse HEAD)" 0 full "" "bash probe-gate.sh" fg-run >/dev/null \
-             && cut -f1 "$g/gate-bar-green" )
-  n=$((n+1)); [ -n "$fg_dk" ] && [ "$fg_dk" != "$fg_pp" ] \
-    || { echo "FAIL TOOL-aFrugalTurnstile-3 AC8 a driver copy with the by key dropped still compared equal to the hook's keys, so the parity comparison cannot fail: [$fg_dk]"; st=1; }
-  unset -f write_bar_green write_hook_bar_green
-  rm -rf "$fg_w"
-fi
 reset_tree
 
 # ---- TOOL-aFrugalTurnstile-12 AC3: THE CLOSE'S BAR SCRUBS EVERY KNOB THE HOOK SCRUBS. The hook's
@@ -7804,6 +7761,37 @@ git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
 
+# ---- TOOL-dWitnessedBar-21 - A FIX PASS KEEPS ITS CHECK. The shape refusal of `check_fix_keeps`,
+# ---- called directly on the READY unit above, records no row; then each plant of `fix_keeps.py
+# ---- --fixture`, which builds its own repository with the leg `fx canary` and drives a copy of this
+# ---- kit's driver: the leg's suite file refused at --dispatch and at --check-commit, the product file
+# ---- admitted with one fix-of row, an acceptance fixture kept and its product not, an unknown leg
+# ---- refused by name. RED-first: with the helper's two calls deleted, every refusing plant FAILs.
+_fk_before=$(git hash-object memory/builds/tRun/RUN.md)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --fix-of bogus)
+hit "$o" "--fix-of names a red that is neither leg:<leg name> nor acceptance, or one carrying a line end or the declared bypass flag, so no kept file can be derived from it and nothing is recorded: "
+same "a --fix-of of the wrong shape records nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$_fk_before"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-test-file 2>&1)
+hit "$o" "a fix pass keeps the red check's own files out of its write set, so "
+hit "$o" "fix-of: PASS writes-test-file"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-product 2>&1)
+hit "$o" "fix-of: PASS writes-product"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant commit-test-file 2>&1)
+hit "$o" "so --check-commit refuses tools/fx/fx.test.sh"
+hit "$o" "fix-of: PASS commit-test-file"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant acceptance-fixture 2>&1)
+hit "$o" "fix-of: PASS acceptance-fixture"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant unknown-leg 2>&1)
+hit "$o" "--fix-of cannot derive the red check's own files, so this fix pass is refused rather than run with its check unbounded: "
+hit "$o" "fix-of: PASS unknown-leg"
+# TOOL-dWitnessedBar-51 (AC16 AC31): a light-profile spec's acceptance section is read by heading text, and
+# a file under the red leg's kit `fixtures/` is kept. RED-first: with `read_leg_files` keeping argv files
+# only, writes-fixture FAILs; with a section read by position, light-profile does.
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant light-profile 2>&1)
+hit "$o" "fix-of: PASS light-profile"
+o=$("$_rkd_py" "$HERE/fix_keeps.py" --fixture --plant writes-fixture 2>&1)
+hit "$o" "fix-of: PASS writes-fixture"
+
 # ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are one parallel group, which
 # ---- the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
 # ---- is refused while that producer is OPEN, even though its pass was dispatched just above, and
@@ -7922,9 +7910,12 @@ if [ -f "$STC" ]; then
   mkdir -p "./${PFX}" memory/project
   cp "$STC" ${PFX}check-spec-tokens.py
   # The checker's spec filename date is the memory-tree kit's one pattern (TOOL-dTrueNorth-16 S32), so
-  # its design_lib.py and the tree_lib.py that imports sit beside it, where the checker loads them.
+  # its design_lib.py and the tree_lib.py that imports sit beside it, where the checker loads them,
+  # and so does the ledger factory its waiver registry is read through, with the two modules that
+  # imports (TOOL-dWitnessedBar-16).
   mkdir -p "./${PFX}memory-tree"
-  cp "$HERE/../$MT_KIT/design_lib.py" "$HERE/../$MT_KIT/tree_lib.py" "./${PFX}memory-tree/"
+  cp "$HERE/../$MT_KIT/design_lib.py" "$HERE/../$MT_KIT/tree_lib.py" "$HERE/../$MT_KIT/legacy_ledger.py" \
+    "$HERE/../$MT_KIT/backlog.py" "$HERE/../$MT_KIT/coverage_join.py" "./${PFX}memory-tree/"
   printf '[{"name":"g"}]\n' > ${PFX}gate-legs.json
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
   printf 'SPEC_DIRECT_CUTOFF="2026-08-01"\n' > .memory-tree.conf
@@ -8261,7 +8252,7 @@ if [ -f "$STC" ]; then
   miss "$o" "$sd_admit"
   printf '%s\n' "$sd_clean" > "$sd_spec"
   # TOOL-aSmoothedDispatch-8 AC3 stale: a stale waiver row beside a foreign-only red refuses.
-  printf 'no-spec-makes-this\tdeliberate, for this arm\n' >> memory/project/spec-token-waivers.txt
+  printf 'no-spec-makes-this\t1\tabcdef12\tseeded\n' >> memory/project/spec-token-waivers.txt
   rm -f .git/unattended/spec-tokens.tRun.key
   hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "$sd_refuse"
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
@@ -9862,6 +9853,90 @@ if [ -n "$_cckit" ]; then
   hit  "$out" "the commit-time check did NOT run"
 fi
 git reset -q --hard
+rm -f "$CCM"
+
+# ---- TOOL-dWitnessedBar-108 S10: THE CHARTER'S TRAILER, LAST. --check-commit asks it of every message a
+# ---- bound run's commit carries, `Pass: none` included, reading the value from the fixture's own
+# ---- AGENTS.md, which the last arm moves to show it is read and never typed. Against the parent the
+# ---- two refusals exit 0 and the admitted pass message ends with `Commit-Checked:`. Against the
+# ---- parent of TOOL-dWitnessedBar-109 each message whose agent line is followed by a plain line exits
+# ---- 0, and `--fixture` prints no attribution line.
+CCM=$(mktemp)
+build_check_commit_fixture
+_fx_at='Co-Authored-By: Fx <fx@example.invalid>'
+printf '# charter\n\n- **Commit trailer:** every agent commit ends with `%s`.\n' "$_fx_at" > AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits the charter's trailer last under Pass: none, exit code" "$rc" "0"
+printf 'records\n\nPass: none\nCo-Authored-By: Fx 2 <fx@example.invalid>\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value of the charter's trailer, exit code" "$rc" "1"
+hit  "$out" "UNATTENDED check 49 FAILED"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+hit  "$out" "end the message with '$_fx_at' and nothing after it"
+printf 'records\n\nPass: none\n%s\nCommit-Checked: unattended@0\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a line after the charter's trailer, exit code" "$rc" "1"
+hit  "$out" "the message's last line is 'Commit-Checked: unattended@0'"
+printf 'records\n\nPass: none\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a message carrying no agent trailer, exit code" "$rc" "0"
+# TOOL-dWitnessedBar-109: an agent line is read wherever git keeps it, a plain line after it included
+printf 'records\n\nCo-Authored-By: Fx 2 <fx@example.invalid>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value followed by a plain line, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+printf 'records\n\nPass: none\nCo-Authored-By: Fx 2 <fx@example.invalid>\n\nlater note\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value followed by a blank line and prose, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+printf 'records\n\nPass: none\n%s\n\nlater note\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses the charter's trailer followed by a blank line and prose, exit code" "$rc" "1"
+hit  "$out" "the message's last line is 'later note'"
+printf 'records\n\nCo-Authored-By : Fx 2 <fx@example.invalid>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value spaced before its colon then prose, exit code" "$rc" "1"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+out=$("$_rkd_py" "$HERE/commit_trailers.py" --fixture 2>&1); rc=$?
+same "the trailer reader's --fixture passes its attribution cases, exit code" "$rc" "0"
+hit  "$out" "fixture · attribution · the charter's trailer last · ok"
+hit  "$out" "fixture · attribution · another value, then a plain line · refused"
+hit  "$out" "fixture · attribution · another value, a blank line and prose · refused"
+hit  "$out" "fixture · attribution · the charter's trailer, a blank line and prose · refused"
+hit  "$out" "fixture · attribution · another value spaced before its colon, then prose · refused"
+hit  "$out" "fixture · attribution · no agent trailer · none"
+hit  "$out" "fixture · attribution · the charter's trailer last, then a space and a tab · ok"
+# AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a pass message ending with the charter's trailer, exit code" "$rc" "0"
+hit  "$(cat "$CCM")" "Commit-Checked: unattended@"
+same "the admitted pass message still ends with the charter's trailer" "$(grep -v '^#' "$CCM" | grep . | tail -n 1)" "$_fx_at"
+git reset -q --hard
+# the value is READ from the charter: moved and committed, the first message is refused
+sed -i 's/`Co-Authored-By: Fx </`Co-Authored-By: Fx 3 </' AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter moved" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads the charter's trailer, so a moved value refuses the old one, exit code" "$rc" "1"
+# TOOL-dWitnessedBar-109 A4: the record's drifted value, followed by a plain line, under the address it names
+sed -i 's/`Co-Authored-By: Fx 3 <fx@example.invalid>`/`Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`/' AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter names the agent's address" --no-verify
+printf 'records\n\nPass: none\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nsee above\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses the drifted agent value followed by a plain line, exit code" "$rc" "1"
+hit  "$out" "is not the charter's 'Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>'"
+# TOOL-dWitnessedBar-110 S5: a charter with no fact line is admitted, and the check says it did not run
+printf '# charter\n' > AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter names no trailer" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a message under a charter with no fact line, exit code" "$rc" "0"
+hit  "$out" "unattended: --check-commit did not check attribution: the charter"
+hit  "$out" "holds no line opening"
 rm -f "$CCM"
 
 # ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one
@@ -14614,14 +14689,14 @@ init_declared_merge() { # $1 = the gate-env line committed at R
   printf '%s\n' "$1" > "$ip_dir/.githooks/gate-env.sh"
   ipgit add -A >/dev/null && ipgit commit -q -m "declaration" --no-verify
   ip_base=$(ipgit rev-parse HEAD); ipgit checkout -q unit
-  ipprep ""; rm -f "$ip_out/argv.txt" "$ip_out/barenv.txt" "$ft9_gd/gate-bar-green" "$ft9_gd/gate-bar-green.scoped"
+  ipprep ""; rm -f "$ip_out/argv.txt" "$ip_out/barenv.txt"
 }
-ft9_gd=$(ipgit rev-parse --absolute-git-dir)
+# The close's record checks (AC1's kind full, AC2's scoped slot) left with its writer (TOOL-dWitnessedBar-4
+# S4), amended under the build README's rule that waives this kit's suites for dWitnessedBar's landing.
 init_declared_merge "GATE_POST_MERGE=local"; ft9_h=$(ipgit rev-parse HEAD)
 out=$(FT9_DECISION="full stale$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC1 the hook is asked --decide <HEAD> <R>" "$(tr '\n' ' ' < "$ip_out/argv.txt" 2>/dev/null)" "--decide $ft9_h $ip_base "
 same "TOOL-aFrugalTurnstile-9 AC1 a full answer runs the bar with GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
-same "TOOL-aFrugalTurnstile-9 AC1 the record reads kind full" "$(awk -F'\t' '$1=="kind"{print $2}' "$ft9_gd/gate-bar-green" 2>/dev/null)" "full"
 hit "$out" "pre-push --decide answered 'full stale'"
 # ---- TOOL-aFrugalTurnstile-12 AC1/AC2: THE BAR'S KNOBS EXPORTED BY THE DRIVER'S CALLER NEVER REACH
 # ---- THE BAR whose green is recorded as the whole bar's. RED against the driver at d4e5927f: the stub
@@ -14634,8 +14709,6 @@ hit "$out" "not honoured from the environment by this bar: GATE_LEGS GATE_REUSE 
 init_declared_merge "GATE_POST_MERGE=local"
 out=$(FT9_DECISION="scoped $ip_base$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC2 a scoped answer runs the bar with GATE_FULL unset" "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
-same "TOOL-aFrugalTurnstile-9 AC2 the scoped slot reads kind scoped and the decision's base" \
-  "$(awk -F'\t' '$1=="kind"||$1=="base"{print $2}' "$ft9_gd/gate-bar-green.scoped" 2>/dev/null | tr '\n' ' ')" "scoped $ip_base "
 init_declared_merge "GATE_POST_MERGE=local"; ft9_gr=$(grep '^gates-run:' "$ip_dir/memory/builds/tRun/RUN.md")
 out=$(FT9_DECISION="covered gate-bar-green@1234abcd$ft9_b"STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 same "TOOL-aFrugalTurnstile-9 AC3 a covered answer runs no bar" "$([ -e "$ip_out/barenv.txt" ] && echo ran || echo absent)" "absent"
@@ -15310,7 +15383,7 @@ else
     printf 'MEMORY_ROOT=memory\nDISCIPLINES="tool"\nFAMILIES="tool:EXMP"\nBACKLOG_MODE="builds"\nASK_CUTOFF="2026-06-01"\n' \
       > .memory-tree.conf
     mkdir -p memory/project memory/builds/aFoo/spec memory/builds/aBar memory/builds/tRun
-    printf 'memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n' \
+    printf 'memory/builds/aBar/README.md\t1\tabcdef12\tseeded\n' \
       > memory/project/stale-header-waiver.txt
     printf -- '---\nslug: aBar\nthis line has no colon\n---\n' > memory/builds/aBar/README.md
     for _s in aFoo tRun; do
@@ -16435,11 +16508,12 @@ ih_dir=$(mktemp -d); ih_oroot=$(mktemp -d); ih_origin="$ih_oroot/origin.git"; ih
   # spelled: AC19's real runner reads it beside its own kit directory, and the stub bar's header
   # names the same path through IHMAN, which `run_ih` hands it.
   printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
-  printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+  printf 'INHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+  mkdir -p .governance; printf '[verdict]\nblocks = "every-red"\n' > .governance/policy.toml
   cat > bin/bar.sh <<'IHB'
 #!/usr/bin/env bash
 { printf 'GATE_ATTRIBUTE=%s\n' "${GATE_ATTRIBUTE-<unset>}"
-  printf 'GATE_INHERITED_RED=%s\n' "${GATE_INHERITED_RED-<unset>}"
+  printf 'GATE_VERDICT_BLOCKS=%s\n' "${GATE_VERDICT_BLOCKS-<unset>}"
   printf 'GATE_INHERITED_RED_MAX_AGE=%s\n' "${GATE_INHERITED_RED_MAX_AGE-<unset>}"
   printf 'GATE_RUN_ID=%s\n' "${GATE_RUN_ID-<unset>}"; } > "$IHOUT/barenv.txt"
 [ "${IH_RC:-1}" = 0 ] && exit 0
@@ -16447,10 +16521,14 @@ d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
 printf 'head\t%s\ntree_clean\t%s\nmanifest\t%s\n' "$(git rev-parse HEAD)" "${IH_CLEAN:-yes}" "$IHMAN" > "$d/header"
 ih_f=1; [ -n "${IH_SECOND:-}" ] && ih_f=2
 printf 'verdict\tRED\nfailed\t%s\ntree_moved\t%s\n' "$ih_f" "${IH_MOVED:-no}" > "$d/verdict"
-printf 'x leg\t%s\t1\t0\t%s\t%s\t%s\t%s\tstub\n' "${IH_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:--}" \
-  "${IH_AGE:-3}" "${IH_OWN8:-0badc0de}" "${IH_OWNID:--}" > "$d/attribution"
+# THE NINTH FIELD, `blocks`, by the run-gates kit's own table under the value the driver handed.
+. "$IHLIB"
+printf 'x leg\t%s\t1\t0\t%s\t%s\t%s\t%s\t%s\tstub\n' "${IH_VERDICT:-INHERITED}" "${GATE_ATTRIBUTE:--}" \
+  "${IH_AGE:-3}" "${IH_OWN8:-0badc0de}" "${IH_OWNID:--}" \
+  "$(derive_red_blocks "${GATE_VERDICT_BLOCKS:-}" "${IH_VERDICT:-INHERITED}")" > "$d/attribution"
 if [ -n "${IH_SECOND:-}" ]; then
-  printf 'y leg\t%s\t1\t0\t%s\t3\t0badc0de\t-\tstub\n' "$IH_SECOND" "${GATE_ATTRIBUTE:--}" >> "$d/attribution"
+  printf 'y leg\t%s\t1\t0\t%s\t3\t0badc0de\t-\t%s\tstub\n' "$IH_SECOND" "${GATE_ATTRIBUTE:--}" \
+    "$(derive_red_blocks "${GATE_VERDICT_BLOCKS:-}" "$IH_SECOND")" >> "$d/attribution"
 fi
 echo "GATE FAIL  x leg  (exit 1)"
 echo "GATE attr  x leg  ${IH_VERDICT:-INHERITED} · stub"
@@ -16538,20 +16616,29 @@ IHS
   git add -A >/dev/null && git commit -q -m base --no-verify
   git push -q origin main
 ) >/dev/null 2>&1
-run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" && run_main_at_head run_driver "$@" 2>&1 ); }
+IH_RGK=run-gates  # the runner kit, named once
+run_ih() { ( cd "$ih_dir" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main IHOUT="$ih_out" IHMAN="$TOOL_REL/gate-legs.json" IHLIB="$HERE/../$IH_RGK/lib-verdict.sh" && run_main_at_head run_driver "$@" 2>&1 ); }
 run_ih_repo() { git -C "$ih_dir" "$@"; }
 IHOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
-# R's policy body on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets
-# IH_R to the tip the remote now advertises. An optional second body lands on the UNIT branch only.
-build_ih_policy() { # R's gate-env body (printf %b) · [the unit branch's own body]
+# R's policy on main, pushed; a fresh unit branch on top of it, preflighted and attested; sets IH_R to
+# the tip the remote now advertises. An optional second policy lands on the UNIT branch only. A policy
+# is `<verdict.blocks value>|<gate-env body>` (TOOL-dWitnessedBar-3): the value is written into
+# .governance/policy.toml, an empty one leaving no key there, so the catalogue default own-only reads.
+write_ih_policy() { # `<value>|<gate-env body>` -> both files in the fixture's working tree
+  printf '%b' "${1#*|}" > "$ih_dir/.githooks/gate-env.sh"
+  mkdir -p "$ih_dir/.governance"
+  if [ -n "${1%%|*}" ]; then printf '[verdict]\nblocks = "%s"\n' "${1%%|*}" > "$ih_dir/.governance/policy.toml"
+  else printf '[runtime]\nagents-in-flight = 6\n' > "$ih_dir/.governance/policy.toml"; fi
+}
+build_ih_policy() { # R's policy · [the unit branch's own policy]
   run_ih_repo reset -q --hard; run_ih_repo clean -qfd
   run_ih_repo checkout -q main
-  printf '%b' "$1" > "$ih_dir/.githooks/gate-env.sh"
+  write_ih_policy "$1"
   run_ih_repo add -A >/dev/null; run_ih_repo commit -q --allow-empty -m "policy at R" --no-verify
   run_ih_repo push -q -f origin main
   IH_R=$(run_ih_repo rev-parse main)
   run_ih_repo checkout -q -B unit main
-  if [ -n "${2:-}" ]; then printf '%b' "$2" > "$ih_dir/.githooks/gate-env.sh"; run_ih_repo add -A >/dev/null; fi
+  if [ -n "${2:-}" ]; then write_ih_policy "$2"; run_ih_repo add -A >/dev/null; fi
   run_ih_repo commit -q --allow-empty -m "unit work" --no-verify
   run_ih --preflight tRun --keepalive-id k1 >/dev/null
   add_facts "$ih_dir/memory/builds/tRun/RUN.md" "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
@@ -16559,20 +16646,22 @@ build_ih_policy() { # R's gate-env body (printf %b) · [the unit branch's own bo
 }
 write_ih_asks() { printf 'ASKS_CMD="bash bin/asks.sh"\n' >> "$ih_dir/.unattended.conf"; run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m asks --no-verify; }
 read_ih_facts() { cat "$ih_dir/memory/builds/tRun/RUN.md"; }
-IH_LAND='INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n'
-IH_PARK='INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n'
+IH_LAND='own-mixed-contended|INHERITED_RED_MAX_AGE=10\n'
+IH_PARK='every-red|INHERITED_RED_MAX_AGE=10\n'
 
-# AC5 and AC18: under land at R an inherited-only bar is MET and the record gains gates-inherited; the
-# bar is attributed against the tip the remote ADVERTISES and handed the policy read there.
+# AC5 and AC18: under own-mixed-contended at R an inherited-only bar is MET and the record gains
+# gates-inherited; the bar is attributed against the tip the remote ADVERTISES and handed the value
+# read there, and its red is routed (TOOL-dWitnessedBar-3 S6).
 build_ih_policy "$IH_LAND"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 10-landing age bound"
+hit  "$out" "gates-green — verdict.blocks reads own-mixed-contended: read by policy.py get at ${IH_R:0:8}, with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended: x leg red at ${IH_R:0:8}; none aged past the 10-landing age bound"
+hit  "$out" "unattended: gates-green — route  x leg  INHERITED · pass · ask"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
 hit  "$(read_ih_facts)" "gates-run: unattended-"
 same "AC18 the bar is attributed against the advertised tip" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
-same "AC5 the bar is handed the policy read at R" "$(grep '^GATE_INHERITED_RED=' "$ih_out/barenv.txt")" "GATE_INHERITED_RED=land"
+same "AC5 the bar is handed the value read at R" "$(grep '^GATE_VERDICT_BLOCKS=' "$ih_out/barenv.txt")" "GATE_VERDICT_BLOCKS=own-mixed-contended"
 same "AC5 the bar is handed the bound read at R" "$(grep '^GATE_INHERITED_RED_MAX_AGE=' "$ih_out/barenv.txt")" "GATE_INHERITED_RED_MAX_AGE=10"
 # AC9, the dark half on that same MET close: the three rows are printed and the BACKLOG is untouched.
 hit  "$out" "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
@@ -16581,38 +16670,39 @@ hit  "$out" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the defau
 hit  "$out" "- KEEP · ARCH-tRun-2 · filed by an unattended run for the owning build; outside this build's goal"
 same "AC9 a dark auto-file writes no BACKLOG" "$(run_ih_repo status --porcelain -- memory/builds/tRun/BACKLOG.md)" ""
 
-# AC5 and AC1, the driver's half: R says park and the branch commits land into its OWN copy. The item
-# reads R's park and prints the hold line; a working-tree reader would have read land and MET.
+# AC5 and AC1, the driver's half: R reads every-red and the branch loosens its OWN copy. The item
+# reads R's every-red and prints the hold line; a working-tree reader would have read the loosened
+# value and MET.
 build_ih_policy "$IH_PARK" "$IH_LAND"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=park, read from .githooks/gate-env.sh at ${IH_R:0:8}"
+hit  "$out" "gates-green — verdict.blocks reads every-red: read by policy.py get at ${IH_R:0:8}"
 hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
-miss "$out" "gates-green MET over an inherited-only red"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
+miss "$out" "gates-green MET over"
 
-# AC18: local main carries a commit the remote lacks, setting land and introducing the red. R is the
-# ADVERTISED tip, so the item reads park; a local-main R would read the run's own land.
+# AC18: local main carries a commit the remote lacks, loosening the value and introducing the red. R is
+# the ADVERTISED tip, so the item reads every-red; a local-main R would read the run's own value.
 build_ih_policy "$IH_PARK"
 run_ih_repo checkout -q main
-printf '%b' "$IH_LAND" > "$ih_dir/.githooks/gate-env.sh"
-run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "local main grants land" --no-verify
+write_ih_policy "$IH_LAND"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "local main loosens the value" --no-verify
 run_ih_repo checkout -q unit; run_ih_repo merge -q --no-ff main -m "take local main" >/dev/null
 out=$(run_ih --close tRun $IHOVR)
 same "AC18 GATE_ATTRIBUTE is the advertised tip, never local main" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
 
-# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): under land an aged row is
-# MET and names itself aged, with no hold line; land beside a blank, zero or non-numeric bound reads
-# land with NO bound, announced, and is MET saying nothing is escalated.
+# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): an aged row that passes is
+# MET and names itself aged, with no hold line; a blank, zero or non-numeric bound reads NO bound,
+# announced, and is MET saying nothing is escalated.
 build_ih_policy "$IH_LAND"
 out=$(IH_AGE=aged run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 10-landing age bound, so each ask is BLOCKER: x leg"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended: x leg red at ${IH_R:0:8}; aged past the 10-landing age bound, so each ask is BLOCKER: x leg"
 miss "$out" "hold · "
 for _b in "" 0 ten; do
-  build_ih_policy "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n"
+  build_ih_policy "own-mixed-contended|INHERITED_RED_MAX_AGE=$_b\n"
   out=$(run_ih --close tRun $IHOVR)
-  hit "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, so no leg is aged and nothing is escalated"
-  hit "$out" "every one INHERITED; no age bound is declared, so no leg is aged and nothing is escalated"
+  hit "$out" "gates-green — verdict.blocks reads own-mixed-contended: read by policy.py get at ${IH_R:0:8}, with no positive INHERITED_RED_MAX_AGE in .githooks/gate-env.sh at ${IH_R:0:8}, so no leg is aged and nothing is escalated"
+  hit "$out" "x leg red at ${IH_R:0:8}; no age bound is declared, so no leg is aged and nothing is escalated"
 done
 
 # ---- closing review round 1 M12 (id 18): the branches TOOL-dUnstuckLanding-16 flipped from park to
@@ -16635,39 +16725,39 @@ remove_ih_tip() { # -> main and the remote back at the commit before set_ih_tip'
 build_ih_policy "$IH_LAND"
 set_ih_tip "git rm -q .unattended.conf .githooks/gate-env.sh"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads land: the project conf is absent at ${IH_R:0:8}, so no policy file is named, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+hit  "$out" "gates-green — verdict.blocks reads own-mixed-contended: read by policy.py get at ${IH_R:0:8}, with no age bound: .githooks/gate-env.sh is absent at ${IH_R:0:8}; the project conf is absent at ${IH_R:0:8}, so no policy file is named"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended"
 remove_ih_tip
 build_ih_policy "$IH_LAND"
 set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf && git rm -q .githooks/gate-env.sh"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+hit  "$out" "gates-green — verdict.blocks reads own-mixed-contended: read by policy.py get at ${IH_R:0:8}, with no age bound: .githooks/gate-env.sh is absent at ${IH_R:0:8}; GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended"
 remove_ih_tip
 build_ih_policy "$IH_PARK"
 set_ih_tip "sed -i 's|^GATE_POLICY_FILE=.*|GATE_POLICY_FILE=\"fx/none.sh\"|' .unattended.conf"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE names fx/none.sh, which is absent at ${IH_R:0:8}, so the kit default land applies, with no age bound"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+hit  "$out" "gates-green — verdict.blocks reads every-red: read by policy.py get at ${IH_R:0:8}, with no age bound: fx/none.sh is absent at ${IH_R:0:8}"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
 remove_ih_tip
 build_ih_policy "$IH_PARK"
 set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf"
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=park, read from .githooks/gate-env.sh at ${IH_R:0:8}; GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, so the file the pre-push hook reads decides"
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
-miss "$out" "gates-green MET over an inherited-only red"
+hit  "$out" "gates-green — verdict.blocks reads every-red: read by policy.py get at ${IH_R:0:8}, with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}; GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, so the file the pre-push hook reads decides"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
+miss "$out" "gates-green MET over"
 remove_ih_tip
 
-# TOOL-dUnstuckLanding-16 AC4: INHERITED_RED undeclared at R, a bound of 2 and one aged INHERITED leg,
+# TOOL-dUnstuckLanding-16 AC4: verdict.blocks undeclared at R (own-only), a bound of 2 and one aged INHERITED leg,
 # the witness armed. The policy reads the kit default land, the item is MET with a gates-inherited
 # fact, and the build's own BACKLOG gains one ask whose SEV reads BLOCKER, read back through ASKS_CMD.
 # Nothing outside the build's folder is staged. RED against the filer this replaced, which files HIGH
 # and so is REMOVED by a witness reading BLOCKER, and against the table that held an aged leg.
-IH_UNDECL='INHERITED_RED_MAX_AGE=2\n'
+IH_UNDECL='|INHERITED_RED_MAX_AGE=2\n'
 build_ih_policy "$IH_UNDECL"; write_ih_asks
 out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green — the inherited-red policy reads land: .githooks/gate-env.sh at ${IH_R:0:8} declares no INHERITED_RED, so the kit default land applies, with an age bound of 2 first-parent landings"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 2-landing age bound, so each ask is BLOCKER: x leg"
+hit  "$out" "gates-green — verdict.blocks reads own-only: read by policy.py get at ${IH_R:0:8}, with an age bound of 2 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-only: x leg red at ${IH_R:0:8}; aged past the 2-landing age bound, so each ask is BLOCKER: x leg"
 hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER, staged in memory/builds/tRun/BACKLOG.md"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
@@ -16681,7 +16771,7 @@ same "TOOL-dUnstuckLanding-16 AC4 nothing outside the build's folder is staged" 
 for _a in 1 -; do
   build_ih_policy "$IH_UNDECL"; write_ih_asks
   out=$(IH_AGE="$_a" run_ih --close tRun $IHOVR)
-  hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 2-landing age bound"
+  hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-only: x leg red at ${IH_R:0:8}; none aged past the 2-landing age bound"
   hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
   hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
   miss "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "older than the"
@@ -16690,10 +16780,10 @@ done
 # AC6: gates-green twice over the same aged leg at the same R files ONE BLOCKER — the second reads the
 # first back OPEN at BLOCKER and reuses it. Under park, so the item can run again on the same run;
 # the SEV follows the age under either policy. An ask read back at another SEV is NOT reused (F3).
-build_ih_policy "INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\n"; write_ih_asks
+build_ih_policy "every-red|INHERITED_RED_MAX_AGE=2\n"; write_ih_asks
 out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER"
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
 run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records: the BLOCKER ask" --no-verify
 out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green: ask ARCH-tRun-2 already OPEN for leg x leg at ${IH_R:0:8} · reused"
@@ -16701,14 +16791,14 @@ same "TOOL-dUnstuckLanding-16 AC6 the reuse staged no BACKLOG row" "$(run_ih_rep
 same "TOOL-dUnstuckLanding-16 AC6 one BLOCKER for the leg at R" "$(grep -c '^- SEV · ARCH-tRun-[0-9]* · BLOCKER · ' "$ih_dir/memory/builds/tRun/BACKLOG.md")" "1"
 out=$(IH_AGE=aged IH_ASK_SEV=HIGH run_ih --close tRun $IHOVR)
 miss "$out" "already OPEN for leg x leg"
-# ...and a second leg reading OWN beside the aged one, under land: UNMET with the attribution lines and
-# no hold line — a red of the run's own never lands, at any age of its neighbour.
+# ...and a second leg reading OWN or MIXED beside the aged one, under own-mixed-contended: UNMET with
+# the attribution lines and no hold line — a red that blocks never lands, at any age of its neighbour.
 for _v in OWN MIXED; do
-  build_ih_policy "$IH_UNDECL"
+  build_ih_policy "own-mixed-contended|INHERITED_RED_MAX_AGE=2\n"
   out=$(IH_AGE=aged IH_SECOND="$_v" run_ih --close tRun $IHOVR)
   hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
   hit  "$out" "GATE attr  y leg  $_v · stub"
-  miss "$out" "gates-green MET over an inherited-only red"
+  miss "$out" "gates-green MET over"
   miss "$out" "hold · "
 done
 
@@ -16716,9 +16806,9 @@ done
 build_ih_policy "$IH_LAND"
 out=$(IH_MOVED=yes run_ih --close tRun $IHOVR)
 hit  "$out" "the bar's verdict reads tree_moved yes: the tree moved while it ran, so no verdict describes the commit being closed, whatever its attribution says"
-miss "$out" "gates-green MET over an inherited-only red"
+miss "$out" "gates-green MET over"
 
-# TOOL-dDerivedDocket-27 AC13: one leg INHERITED beside one leg MIXED, under land, is UNMET with the
+# TOOL-dDerivedDocket-27 AC13: one leg INHERITED beside one leg MIXED, under own-mixed-contended, is UNMET with the
 # attribution lines and no hold line. The quantifier is UNIVERSAL: RED against a table copy that
 # lands when ANY red is INHERITED, which would commit LANDING over a new red.
 build_ih_policy "$IH_LAND"
@@ -16726,7 +16816,7 @@ out=$(IH_SECOND=MIXED run_ih --close tRun $IHOVR)
 hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit  "$out" "GATE attr  y leg  MIXED · stub"
 hit  "$out" "GATE attr  x leg  INHERITED · stub"
-miss "$out" "gates-green MET over an inherited-only red"
+miss "$out" "gates-green MET over"
 miss "$out" "hold · "
 
 # AC6: the replayed aStagedLane override over an OWN attribution is refused, numbered; over an
@@ -16782,7 +16872,7 @@ hit  "$out" "phase ABORTED"
 # and accept; a witness that returns no row gets the rows REMOVED and named.
 build_ih_policy "$IH_LAND"; write_ih_asks
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+hit  "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended"
 hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
 hit  "$(run_ih_repo diff --cached -- memory/builds/tRun/BACKLOG.md)" "+- ARCH-tRun-2 · filed "
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" " · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\` · accept the leg is green at the default branch's tip"
@@ -16816,7 +16906,7 @@ f4_dir=$(mktemp -d)
          > memory/builds/tRun/BACKLOG.md \
     && git add -A && git commit -q -m authored --no-verify ) >/dev/null 2>&1
 cp "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md"
-printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\tARCH-tRun-1\tstub\n' "$(git -C "$f4_dir" rev-parse HEAD)" \
+printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\tARCH-tRun-1\tpass\tstub\n' "$(git -C "$f4_dir" rev-parse HEAD)" \
   > "$f4_dir/.git/f4-run/attribution"
 : > "$TMP/f4-not-a-dir"
 # A `cp` that fails ONE of the filer's two copies, first on PATH: a script and not a shell function,
@@ -16902,7 +16992,15 @@ slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
 readme_of() { _readme="$M/builds/$1/README.md"; printf '%s' "$_readme"; }
 read_leg_argv() { return 1; }
 derive_ask_seq() { printf '7'; }
-read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
+# TOOL-dWitnessedBar-6 S7: the reader is the run-gates kit's `remote_verdict.py held`, so the stub is a
+# kit holding that file, found through the resolver the writer calls; it records its argv and prints rows.
+h9_kit="$h9_dir/.git/h9-kit"; mkdir -p "$h9_kit"
+printf '%s\n' 'import os, sys' 'sys.stdout.reconfigure(encoding="utf-8", newline="\n")' \
+  'open(os.environ["H9_CALLS"], "a", encoding="utf-8").write(" ".join(sys.argv[1:]) + "\n")' \
+  'rows = os.environ.get("H9_ROWS", "")' 'print(rows) if rows else None' \
+  'print("held reader: run 9 at stub · 4 held job(s) read · 3 red")' > "$h9_kit/remote_verdict.py"
+resolve_kit_dir() { [ "$2 $3" = "run-gates remote_verdict.py" ] && [ -z "${H9_NO_KIT:-}" ] && printf '%s\n' "$h9_kit"; }
+export H9_CALLS="$h9_dir/.git/h9-calls"
 run_h9() { # R -> the sliced writer's output over the arm's repository, with ASKS_CMD blank
   local M=memory ASKS_CMD="" CONF=.unattended.conf AURL=https://github.com/o/r.git
   ( cd "$h9_dir" || exit 2; write_held_asks tRun "$1" ""; echo "h9-rc=$?" ) 2>&1
@@ -16922,8 +17020,12 @@ n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a refused HEL
 printf 'HELD_CI_WORKFLOW="remote-ci.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam armed --no-verify
 h9_r=$(git -C "$h9_dir" rev-parse HEAD)
 h9_off=$(git -C "$h9_dir" commit-tree -p HEAD -m off "$(git -C "$h9_dir" rev-parse 'HEAD^{tree}')")
-H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
+out=$(H9_NO_KIT=1 run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader: DEAD PROBE — no python launcher, or no run-gates kit holding remote_verdict.py beside this kit, so nothing was read"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a kit that does not resolve still reached a reader"; st=1; }
+export H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
 out=$(run_h9 "$h9_r")
+same "held: the moved reader is called as remote_verdict.py held <anchor> <workflow>" "$(cat "$h9_dir/.git/h9-calls")" "held https://github.com/o/r.git remote-ci.yml"
 hit  "$out" "gates-green: held reader: run 9 at stub · 4 held job(s) read · 3 red"
 hit  "$out" "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
 hit  "$out" " · held red: suite ok suite red at ${h9_r:0:8} on the daily held job, run 9 · seen \`.github/workflows/remote-ci.yml\`@${h9_r:0:8} · accept the suite is green on the daily held job at the default branch's tip"
@@ -16934,8 +17036,8 @@ hit  "$out" "h9-rc=0"
 miss "$out" "suite green suite"
 miss "$out" "suite bad"
 n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
-unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
-unset H9_ROWS
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq resolve_kit_dir run_h9
+unset H9_ROWS H9_CALLS H9_NO_KIT h9_kit
 rm -rf "$h9_dir"
 # TOOL-aSparedSpawn-6: the block above left doubles of driver functions in this shell, or unset
 # them. Re-sourcing the driver restores every definition before an in-process call can meet one.
@@ -16947,11 +17049,11 @@ rm -rf "$h9_dir"
 # hold is accepted too; the BACKLOG holds one ask, one SEV and one KEEP for that leg and R.
 build_ih_policy "$IH_PARK"; write_ih_asks
 out=$(run_ih --close tRun $IHOVR)
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red"
 hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}"
 run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records: the staged rows and the gates-run fact" --no-verify
 run_ih_repo push -q origin unit
-out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park" --reaped k1)
+out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red" --reaped k1)
 hit  "$out" "phase HELD · code inherited-red · until probe gate"
 run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m held --no-verify
 run_ih --resume tRun --keepalive-id k2 >/dev/null
@@ -16960,7 +17062,7 @@ out=$(run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green: ask ARCH-tRun-2 already OPEN for leg x leg at ${IH_R:0:8} · reused"
 same "AC23 the reuse staged no BACKLOG row" "$(run_ih_repo diff --cached --name-only -- memory/builds/tRun/BACKLOG.md)" ""
 run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records again" --no-verify
-out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park" --reaped k2)
+out=$(run_ih --hold tRun --code inherited-red --until "probe gate" --reason "x leg red at ${IH_R:0:8}, INHERITED; verdict.blocks=every-red" --reaped k2)
 hit  "$out" "phase HELD · code inherited-red · until probe gate"
 ih_bl="$ih_dir/memory/builds/tRun/BACKLOG.md"
 same "AC23 one ask for the leg at R" "$(grep -c "inherited red: leg x leg red at ${IH_R:0:8}," "$ih_bl")" "1"
@@ -16984,7 +17086,7 @@ out=$(run_ih --close tRun $IHOVR)
 miss "$out" "already OPEN for leg x leg at ${ih_r1:0:8}"
 hit  "$out" "gates-green: filed ask ARCH-tRun-3 for leg x leg red at ${IH_R:0:8}"
 
-# AC19: the REAL runner as GATE_CMD, its one leg red at L and identically red at R, under land at R.
+# AC19: the REAL runner as GATE_CMD, its one leg red at L and identically red at R, under own-mixed-contended at R.
 # The item is MET reading the attribution file THAT runner wrote, and the row carries the age and
 # owner columns before the reason. The runner's path is DERIVED from this repository's own declared
 # GATE_CMD and installed at the same relative path in the fixture, so no kit path is spelled here;
@@ -16994,7 +17096,7 @@ ih_rg=$(sed -n 's/^GATE_CMD="bash \(.*\)"$/\1/p' "$ih_top/.unattended.conf" | he
 if [ -n "$ih_rg" ] && [ -f "$ih_top/$ih_rg" ]; then
   run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
   mkdir -p "$ih_dir/${ih_rg%/*}"
-  for _f in "${ih_rg##*/}" lib-attribute.sh gate-profiles.txt gate-fingerprint.sh; do
+  for _f in "${ih_rg##*/}" lib-attribute.sh lib-verdict.sh gate-profiles.txt gate-fingerprint.sh; do
     cp "$ih_top/${ih_rg%/*}/$_f" "$ih_dir/${ih_rg%/*}/$_f" 2>/dev/null
   done
   sed -i "s|^GATE_CMD=.*|GATE_CMD=\"bash $ih_rg\"|" "$ih_dir/.unattended.conf"
@@ -17003,10 +17105,10 @@ if [ -n "$ih_rg" ] && [ -f "$ih_top/$ih_rg" ]; then
   run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "the real runner, at R too" --no-verify
   build_ih_policy "$IH_LAND"
   out=$(run_ih --close tRun $IHOVR)
-  hit "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}"
+  hit "$out" "gates-green MET over a red every row of which passes under verdict.blocks own-mixed-contended: x leg red at ${IH_R:0:8}"
   _ih_rec=$(ls -1td "$ih_dir"/.git/gate-run/unattended-*/ 2>/dev/null | head -1)
   n=$((n+1))
-  awk -F'\t' -v r="$IH_R" 'NF != 9 || $1 != "x leg" || $2 != "INHERITED" || $5 != r || $6 !~ /^[0-9]+$/ || $7 !~ /^[0-9a-f]{8}$/ { bad = 1 }
+  awk -F'\t' -v r="$IH_R" 'NF != 10 || $1 != "x leg" || $2 != "INHERITED" || $5 != r || $6 !~ /^[0-9]+$/ || $7 !~ /^[0-9a-f]{8}$/ || $9 != "pass" { bad = 1 }
       END { exit (bad || NR != 1) }' "${_ih_rec}attribution" 2>/dev/null \
     || { echo "FAIL AC19 the real runner's attribution row does not carry the age and owner columns before the reason"; head -2 "${_ih_rec}attribution" 2>/dev/null; st=1; }
   run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
@@ -17017,11 +17119,16 @@ else
 fi
 
 # AC11, the driver's half: its own reader, sliced out of the SHIPPED driver and run over the
-# repository this suite lives in at HEAD, resolves land with an age bound of 10.
-slice_fn read_policy_key; slice_fn read_gate_policy
-_o=$( cd "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)" && CONF=".unattended.conf" \
+# repository this suite lives in at HEAD, resolves the verdict.blocks value the policy kit's own
+# reader answers there (TOOL-dWitnessedBar-3), with an age bound of 10.
+slice_fn read_policy_key; slice_fn read_gate_policy; slice_fn read_gate_blocks; slice_fn resolve_python
+eval "$(sed -n '/^resolve_kit_dir() {/,/^}/p' "$HERE/lib-unattended.sh")"
+IH_PK=policy  # the policy kit, named once
+_ih_top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)
+_w=$( cd "$_ih_top" && python "$HERE/../$IH_PK/policy.py" get verdict.blocks --rev HEAD 2>/dev/null ); _w=${_w%$'\r'}
+_o=$( cd "$_ih_top" && CONF=".unattended.conf" KIT_DIR="$HERE" \
       && read_gate_policy "$(git rev-parse HEAD)" && printf '%s %s' "$GP_POLICY" "$GP_MAX_AGE" )
-same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10"
+same "AC11 this repository at HEAD reads its own verdict.blocks with a bound of 10" "$_o" "${_w:-own-only} 10"
 
 cd "$TMP" || exit 2
 rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
@@ -17029,7 +17136,7 @@ rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
 # ================ TOOL-dMendedRecall-2: the auto-file re-renders and stages the views its rows move ==
 # ---- SELF-CONTAINED, for the in-place block's reason, and composed from that block and the one
 # ---- above: the in-place block's stub lander and overrides, and the inherited-red block's stub bar
-# ---- writing one INHERITED leg under INHERITED_RED=land. What neither holds is the REAL generator
+# ---- writing one INHERITED leg under the default own-only. What neither holds is the REAL generator
 # ---- and a pre-commit running its `--check`, the predicate the hygiene gate's index-freshness check
 # ---- delegates to, so a records commit carrying the rows without their views is REFUSED here as it
 # ---- is in a real tree. Over the BASE kit this close failed 69, read when the unit was built; that
@@ -17075,7 +17182,7 @@ else
       printf '# build method\n' > memory/guides/BUILD-METHOD.md
       printf '#!/usr/bin/env bash\nexit 0\n' > fx/x.sh
       printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
-      printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+      printf 'INHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
       cat > bin/lander.sh <<'RVL'
 #!/usr/bin/env bash
 m=""
@@ -17089,7 +17196,7 @@ RVL
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
 printf 'head\t%s\ntree_clean\tyes\nmanifest\t%s\n' "$(git rev-parse HEAD)" "$RVMAN" > "$d/header"
 printf 'verdict\tRED\nfailed\t1\ntree_moved\tno\n' > "$d/verdict"
-printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tstub\n' "${GATE_ATTRIBUTE:--}" > "$d/attribution"
+printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tpass\tstub\n' "${GATE_ATTRIBUTE:--}" > "$d/attribution"
 echo "GATE FAIL  x leg  (exit 1)"
 echo "GATE attr  x leg  INHERITED · stub"
 exit 1
@@ -23160,7 +23267,7 @@ build_ln_inherited() { # [fail|delete] -> a hand-off node's run, preflighted and
       "m='$TOOL_REL/gate-legs.json'" \
       'printf "head\t%s\ntree_clean\tyes\nmanifest\t%s\n" "$(git rev-parse HEAD)" "$m" > "$d/header"' \
       'printf "verdict\tRED\nfailed\t1\ntree_moved\tno\n" > "$d/verdict"' \
-      'printf "x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tstub\n" "${GATE_ATTRIBUTE:--}" > "$d/attribution"' \
+      'printf "x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tpass\tstub\n" "${GATE_ATTRIBUTE:--}" > "$d/attribution"' \
       'echo "GATE FAIL  x leg  (exit 1)"' 'exit 1' > bar.sh
     cat > bin/asks.sh <<'LNA'
 #!/usr/bin/env bash
@@ -23862,7 +23969,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 4056 -> 4065 by TOOL-dPlacedRequest-97: the id-less fence's 9 region-eight assertions off the
 # diff's own lines, 8 `same` and 1 `hit`, two of the `same` from one row run by a two-pass loop over a
 # literal list; no skip branch. No suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=4065
+# Merged over the dPlacedRequest raises at the dWitnessedBar landing: the +2 below is ours.
+# RAISED 4065 -> 4067 by TOOL-dWitnessedBar-56 on 2026-11-20 for TOOL-dWitnessedBar-51, whose pass left the
+# floor where it was: its AC16 AC31 arm's two `hit` lines in region three, the light-profile and
+# writes-fixture plants of fix_keeps.py, each unconditional, so FLOOR_SHARD_3 carries the same +2. COUNTED
+# off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=4067
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -24083,7 +24195,8 @@ FLOOR_SHARD_2=229
 # RAISED 450 -> 451 by TOOL-aLightenedLoop-8: the same 1 region-three assertion, see FLOOR_ASSERTIONS.
 # RAISED 445 -> 463 by TOOL-aTrimmedWait-1: the same 18 region-three --check-specs assertions, see FLOOR_ASSERTIONS.
 # MERGED at TOOL-aTrimmedWait-12's reconcile of local main at 5d48501da: the base 445, plus main's 6, plus this branch's 18 = 469.
-FLOOR_SHARD_3=469
+# RAISED 469 -> 471 by TOOL-dWitnessedBar-56 on 2026-11-20: TOOL-dWitnessedBar-51's AC16 AC31 arm, two `hit`s in region three, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_3=471
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
 # RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
 # RAISED 383 -> 386 by TOOL-aSmoothedDispatch-1 on 2026-11-10: the same net 3 region-four --writes split assertions, see FLOOR_ASSERTIONS.
