@@ -671,3 +671,14 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T02:26:54Z dispatch · item b8eee8c4 TOOL-dWitnessedBar-70 · reason memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-70-widen-12.md
 
 2026-11-21T02:35:21Z brief · item TOOL-dWitnessedBar-71 · reason 4e89eab6c490 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-71-build-brief.md
+
+2026-11-21T02:37:31Z dispatch · item 7378b97c TOOL-dWitnessedBar-71 · reason memory/project/shell-role.txt tools/lib/resolve-python.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-71-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-71.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T02:41:11Z draw · re-dispatch · TOOL-dWitnessedBar-71 · 115/180 · 20261121T024111Z-55e698
+
+2026-11-21T02:41:11Z dispatch · item 7378b97c TOOL-dWitnessedBar-71 · reason memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-71-widen-13.md
+2026-11-21T02:43:19Z draw · re-dispatch · TOOL-dWitnessedBar-71 · 116/180 · 20261121T024319Z-6db340
+
+2026-11-21T02:43:19Z dispatch · item 7378b97c TOOL-dWitnessedBar-71 · reason memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-71-deviation-712.md
+2026-11-21T02:46:57Z draw · re-dispatch · TOOL-dWitnessedBar-71 · 117/180 · 20261121T024657Z-6302b6
+
+2026-11-21T02:46:57Z dispatch · item 7378b97c TOOL-dWitnessedBar-71 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

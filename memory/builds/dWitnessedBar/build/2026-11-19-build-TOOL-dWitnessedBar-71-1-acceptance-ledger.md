@@ -1,0 +1,19 @@
+# TOOL-dWitnessedBar-71 — acceptance ledger
+
+**Serves:** journal TOOL-dWitnessedBar-71
+
+No merge bar, no self-test suite and no gate leg ran in this pass. The criteria were observed on node d,
+2026-11-21 (`uname -s` `MINGW64_NT-10.0-22621`, GNU bash 5.3.9 `x86_64-pc-cygwin`, git 2.54.0.windows.1),
+through scratch probes that `eval` the suite's own lines, cut from `tools/lib/resolve-python.test.sh`:
+`run_planted_git`'s definition, S2's proof from `ll_planted=0; LLP=` to its failure line, and the corrupt-HEAD
+loop's `67 AC5` assertion, under exported `GIT_CONFIG_NOSYSTEM=1` and an empty `GIT_CONFIG_GLOBAL`, with
+`LL` at scratch directories under `%TEMP%/p71real` and `%TEMP%/p71mutant`, and stand-ins for `ok` and `bad`
+spelled as the suite's own. The suite passed `bash -n`. The shell-role seed measures the suite at 1381 past
+1371, widened under `2026-11-21-build-TOOL-dWitnessedBar-71-widen-13`. Section `2o` as a whole, and the
+`New arm:` line's RED-first observation, are the main loop's at the close. (DERIVED from the builder's probe)
+
+**Evidences:** TOOL-dWitnessedBar-71
+- AC1 — `reftable` — a scratch repository from `run_planted_git init -q` read `reftable` and `refs/heads/main`; `GIT_CONFIG_COUNT` read unset in the calling shell after it, and under a caller's exported `GIT_CONFIG_COUNT=1` naming `core.autocrlf` the caller's count, key and value read back `1 core.autocrlf false`. The Red-when, a hostile file exported as `GIT_CONFIG_GLOBAL` and an inner isolated `git init`, read `files` and `refs/heads/master`. `grep -n 'GIT_CONFIG_COUNT=2' tools/lib/resolve-python.test.sh` printed one line, `run_planted_git`'s body inside section `2o`'s corrupt-HEAD block. (DERIVED from the builder's probe)
+- AC2 — `resolve-python: the hostile git config is not in effect` — with the five assignments deleted from the cut `run_planted_git`, the proof printed `FAIL resolve-python: the hostile git config is not in effect (71 S2: a planted git init read 'files' and 'refs/heads/master', not reftable and refs/heads/main)`, left `ll_planted` 0, and the `67 AC5` assertion printed nothing over a fixture built without `--ref-format=files`. Section `2o` run whole from a scratch copy is OWED to the main loop at the close. (DERIVED from the builder's probe)
+- AC3 — `files` — under the plant, a fixture from `run_planted_git -c init.defaultBranch=master init -q --ref-format=files` read `files` and `refs/heads/master` and the `67 AC5` assertion held; one built with `--ref-format=files` deleted read `reftable`, and the assertion printed `FAIL 67 AC5: the noflag fixture read ref format 'reftable', not files`. The `child` builder runs through `run_planted_git` and gains the same assertion naming `child`. The five loop fixtures and `child` graded in the suite itself, and both staged breaks, are OWED to the main loop at the close. (DERIVED from the builder's probe)
+- AC4 — `Five fresh` — `grep -n 'Four fresh' tools/lib/resolve-python.test.sh` printed nothing, and `grep -n 'Five fresh' tools/lib/resolve-python.test.sh` printed the corrupt-HEAD block's header line, which says the four broken fixtures exit 1 and `chain` arms.
