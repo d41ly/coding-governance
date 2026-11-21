@@ -2563,7 +2563,8 @@
       "{prefix}/run-gates/",
       "{prefix}/gate-legs.json",
       ".githooks/pre-push",
-      "memory/guides/MERGE-BAR.md"
+      "memory/guides/MERGE-BAR.md",
+      ".githooks/"
     ],
     "chunk": "selftests",
     "subject": "repo",
