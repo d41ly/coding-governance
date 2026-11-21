@@ -24423,6 +24423,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_slot_run_id",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
+    },
+    {
       "id": "read_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -34331,6 +34336,11 @@
       "id": "run_stale_plant",
       "kind": "function",
       "file": "tools/govkit/fixtures/stale_edges.py"
+    },
+    {
+      "id": "run_stale_slot_plant",
+      "kind": "function",
+      "file": "tools/run-gates/verdict_backends.py"
     },
     {
       "id": "run_step_gate_fixture",

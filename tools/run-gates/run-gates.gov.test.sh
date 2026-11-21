@@ -242,7 +242,8 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised to 80 by TOOL-dWitnessedBar-90, counting every arm built through order 47; stated ABSOLUTELY.
-FLOOR_ASSERTIONS=80
+FLOOR_ASSERTIONS=81
+# RAISED 80 -> 81 by TOOL-dWitnessedBar-107: the peer-stale-slot plant's loop case.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -777,12 +778,14 @@ a=$((a+1))
 # the fetch cannot bring in and a verify with no ssh-keygen read DEAD PROBE, and a tag edited after it
 # was signed NONE naming the bad signature. TOOL-dWitnessedBar-63 (AC11, AC12): `key-no-tab`, a bare
 # `reused` line read as an absent key, and the no-ssh-keygen read sweeping an aged signer temp while it
-# keeps a young one. WHAT THIS DOES NOT CHECK: a
+# keeps a young one. TOOL-dWitnessedBar-107: `peer-stale-slot`, verify-peer refusing a stale slot the
+# bar did not write, a reused GREEN and a GREEN on a failed bar, then publishing a fresh RED and a
+# witnessed GREEN under the run_id the bar wrote. WHAT THIS DOES NOT CHECK: a
 # real GitHub answer, a real peer's bar, or the lander under peer-node (push-main.test.sh's arm 43).
 for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache:1 reused-alone:1 no-pair:1 \
                no-selection:1 edited-selection:1 underived-selection:1 clean:0 key-no-tab:1 peer:1 peer-signed:0 peer-unsigned:2 \
                peer-self-tag:1 peer-swapped-manifest:0 peer-tip-missing:1 peer-no-ssh-keygen:0 \
-               peer-bad-signature:1 remote-green:0 \
+               peer-bad-signature:1 remote-green:0 peer-stale-slot:0 \
                swapped-workflow:0 other-path:1 step-skipped:1 api-404:1 held:0; do
   a=$((a+1))
   vb_plant=${vb_case%%:*}
