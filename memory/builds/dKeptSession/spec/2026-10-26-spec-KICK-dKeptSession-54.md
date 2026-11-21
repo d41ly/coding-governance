@@ -1,6 +1,6 @@
 # KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 |
+| [2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -30,7 +31,8 @@ unit restated the answer as the code gives it. `KICK-dKeptSession-34` rev-3 now 
 itself and builds it: the refusal in `get`, the unassigned class of `preset-every-key`, and the cap
 read through the caps module in `preset-derived-cap`. So this unit builds nothing. It is the
 observation that id 21 is answered, made against unit 34's cases once unit 34 lands (order 4), one
-step before this unit's order 5.
+step before this unit's order 5, and against `get` itself in a strict-named scratch repository,
+which `KICK-dKeptSession-2`'s landed step now reads.
 
 ## 2. Scope (IN)
 
@@ -40,14 +42,15 @@ step before this unit's order 5.
   Observed by AC1.
 - **S2** — id 21. The cap's value, read as `python budgets.py resolve` reads it, the caps module
   being the one reader of a derived cap (`tools/policy/policy.py#DerivedDefault`). Carried by
-  `KICK-dKeptSession-34` S3; this unit observes the `get` half of that case's repository. Observed
-  by AC2.
+  `KICK-dKeptSession-34` S3, whose case runs `budgets.py resolve` alone and never `get`; this unit
+  observes `get` on the case's cap in a strict-named scratch repository of its own. Observed by
+  AC2.
 - **S3** — id 21. The `preset-every-key` case's unassigned derived rows expect `get`'s
   `DerivedDefault` refusal, never a `default` source with a value. Carried by
   `KICK-dKeptSession-34` S2; this unit observes it. Observed by AC1.
 - **S4** — id 21. The ledger. This unit's acceptance ledger answers AC1 and AC2 with the output of
-  unit 34's two cases at unit 34's landing; no file of the policy kit changes for this unit.
-  Observed by AC1 and AC2.
+  unit 34's two cases at unit 34's landing and of the two `get` probes; no file of the policy kit
+  changes for this unit. Observed by AC1 and AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -84,6 +87,18 @@ Read at HEAD `c2a407b0`, 2026-11-21.
 - Probed in this tree: `python tools/policy/policy.py get roles.effort.default` and `get` on the
   `budgets."AGENTS.md"` cap each exit 2 with the `DerivedDefault` reason, while `python
   tools/policy/budgets.py resolve --explain AGENTS.md` prints its row with source `default`.
+- Probed at `b3698899`, after `KICK-dKeptSession-2` landed, in a scratch repository committing only
+  `preset = "strict"`: this kit's `policy.py get roles.effort.default --rev HEAD` and `get
+  'budgets."guide-bytes"' --rev HEAD` each exit 2 with nothing on stdout and one stderr line opening
+  `policy: refused · ` and carrying `carries a derived default no reader computes yet`, while `get
+  hooks.bypass --rev HEAD --explain` prints `refused` with source `preset`. The store's `check`
+  names both rows among its six unassigned derived rows.
+- `preset-every-key` prints one line per shipped preset, `<n> assigned key(s) from the preset, <m>
+  never key(s) as the absent file · every read as wanted`, and a closing `0 wrong`; no line names a
+  key, so the case passing is the observation of S3, never a key read off its line.
+- `KICK-dKeptSession-34` S3's `preset-derived-cap` runs `budgets.py resolve --explain <cap>` in its
+  two repositories and never `get`, and removes them; its cap is `guide-bytes` over this kit's
+  census, as that unit's AC2 pins it.
 
 ### What carries rev-2's items
 
@@ -120,7 +135,7 @@ None: every file rev-2 named is `KICK-dKeptSession-34`'s at its rev-3.
 - error / empty / loading states — the refusal is dGroundRules', unchanged.
 - observability — `get --explain` is not reached for such a row; the refusal names the row.
 - risks — none new.
-- testing — the two observations of §6, over unit 34's cases.
+- testing — the two observations of §6, over unit 34's cases and two `get` probes.
 - migration — none.
 - user docs — none: `help/policy.md#how-to-use-it` already says `get` refuses a key whose default
   is derived until the file sets it, and `help/size-caps.md` gives `budgets.py resolve` as the way to
@@ -129,16 +144,21 @@ None: every file rev-2 named is `KICK-dKeptSession-34`'s at its rev-3.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python check_policy.py --fixture preset-every-key` runs after
-  `KICK-dKeptSession-34` lands, it passes, and each preset's line reads `roles.effort.default` and
-  one census cap of `budgets.*` as refused with the `DerivedDefault` reason, never a `preset` source.
+  `KICK-dKeptSession-34` lands, it exits 0 with `0 wrong` and no `WRONG` line, and when `python
+  tools/policy/policy.py get roles.effort.default --rev HEAD` runs in a scratch repository committing
+  only `preset = "strict"`, it exits 2 with nothing on stdout and a stderr line opening `policy:
+  refused · ` and carrying `carries a derived default no reader computes yet`.
   Red when: an unassigned derived row reads any value through `get`, under a `preset` or a `default`
   source.
-  fixture: unit 34's `run_preset_every_key` class, absent from the tree until unit 34 lands.
-- **AC2** — When `python check_policy.py --fixture preset-derived-cap` runs, it passes, and in its
-  strict repository `python policy.py get` on the case's cap key exits 2 with the `DerivedDefault`
-  reason.
+  fixture: unit 34's unassigned class of `run_preset_every_key`, absent until unit 34 lands; the
+  probe holds today at `b3698899`.
+- **AC2** — When `python check_policy.py --fixture preset-derived-cap` runs, it exits 0 with no
+  `WRONG` line, and when `python tools/policy/policy.py get 'budgets."guide-bytes"' --rev HEAD` runs
+  in AC1's scratch repository, it exits 2 with nothing on stdout and the same `DerivedDefault`
+  reason, naming `budgets.guide-bytes`.
   Red when: `get` answers the cap under the preset.
-  fixture: unit 34's `preset-derived-cap` case, absent from the tree until unit 34 lands.
+  fixture: unit 34's `preset-derived-cap` case, absent until unit 34 lands; the cap is the one
+  that case reads, `guide-bytes` PINNED by unit 34's AC2.
 
 ## 7. Gates
 
@@ -160,6 +180,12 @@ none
   no case and no arm is built here, so Files touched is empty, the `New arm:` line goes to unit 34,
   and AC2 observes only the `get` half of `preset-derived-cap`. Every line citation became a
   `path#symbol` citation.
+- rev-4 · 2026-11-21 · §1 · S2 · S4 · §4 · §5 · AC1 · AC2 · checked for behaviour against the tree
+  after units 1, 19, 33 and 2 landed, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief`. `preset-every-key` names no key on its
+  lines and unit 34's `preset-derived-cap` never runs `get`, so AC1 and AC2 each read their case's
+  pass and add a `get` probe in a strict-named scratch repository, which holds at `b3698899`; the
+  evidence records the probe, the case's line and the pinned cap.
 
 ## 10. Reuse audit
 

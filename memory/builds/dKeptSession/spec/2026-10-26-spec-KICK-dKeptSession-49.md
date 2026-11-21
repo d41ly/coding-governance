@@ -1,6 +1,6 @@
 # KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 |
+| [2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -50,6 +51,15 @@ step after it (order 5).
   reader, and its §4 Migration sentence read as S1 here: the JS is edited, and a pre-unit mirror reads
   stale because the reader expects the store, not because the mirror names it. Answered in unit 40's
   acceptance ledger. Observed by AC1.
+- **S3** — The kit copy. `MIRROR_KIT_FILES` (`tools/policy/check_policy.py#MIRROR_KIT_FILES`) gains
+  `presets.py` and `presets.STORE`, so `build_landed_repo` and `build_limit_repo`, its two users,
+  copy both. A stale read falls through to the kit copy's `policy-shim.sh get`, and that copy's
+  `policy.py` refuses a strict-named file with no `presets.py` beside it (§4), so AC1 and AC2 could
+  not answer at all. This is the copy's second instance: `KICK-dKeptSession-40`'s
+  `mirror-presets-stale` branch reads a strict-named file through the same copy, so where that unit
+  landed a per-branch copy of the two files, its names move into this list, written once. Every
+  other case of the two builders names no preset, so `presets.py` is never imported there, and the
+  store, committed in each, records one blob id on both sides. Observed by AC1 and AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -90,6 +100,17 @@ Read at HEAD `c2a407b0`, 2026-11-21.
   Python side.
 - `render_mirror` writes `legacy_blobs` from the inputs it records
   (`tools/policy/policy.py#render_mirror`), today `LEGACY_INPUTS`, both repository-relative.
+- Probed at `b3698899`, after `KICK-dKeptSession-2` landed, over `build_landed_repo` with
+  `preset = "strict"` above `LANDED_POLICY`: a stale mirror read through a kit copy of
+  `MIRROR_KIT_FILES` alone exits 2, `policy: refused · <kit copy>/presets.py:0 · presets.py, the
+  named presets' module, does not import`; with `presets.py` and `presets.toml` copied, a mirror
+  rendered and pushed as L and then strict's `hooks.bypass` set to `allowed` in the copy's store and
+  pushed, `node policy-mirror.js get hooks.bypass --explain` reads FRESH and prints `refused`, the
+  defect, unit 40 not yet landed. `arm_mirror_landed` over that repository found nothing.
+- `MIRROR_KIT_FILES` is `(*READER_FILES, "policy-mirror.js", "policy-shim.sh")`, and `READER_FILES`
+  holds no preset file: `KICK-dKeptSession-2` copied `presets.py` into its one scenario's kit alone
+  (`tools/policy/check_policy.py#run_resolution_order`), and `KICK-dKeptSession-40` rev-4's evidence
+  that unit 2 widens `READER_FILES` did not land.
 
 ### The check
 
@@ -116,7 +137,10 @@ mirror is re-rendered. That is the stale-once the sibling spec meant, now true b
 ### Files touched (estimate)
 
 - `tools/policy/policy-mirror.js`: `MIRROR_KIT_INPUTS` and S1 in `readMirrorAt`
-- `tools/policy/check_policy.py`: the `mirror-pre-unit-stale` branch and its `CASES` row
+- `tools/policy/check_policy.py`: the `mirror-pre-unit-stale` branch and its `CASES` row, and S3's
+  two names in `MIRROR_KIT_FILES`
+
+No new function, so the symbol map does not move; the kickoff manifest watches neither path.
 
 ### Alternatives rejected
 
@@ -133,7 +157,10 @@ mirror is re-rendered. That is the stale-once the sibling spec meant, now true b
   recorded `null`, as an absent legacy input does today.
 - observability — the reason prefix `mirror stale at <L8>` the reader already prints.
 - risks — every pre-unit mirror reads stale until re-rendered, by design; reads fall through to the
-  shim, never to a wrong value.
+  shim, never to a wrong value. A mirror rendered by a policy kit at another path than the reader's
+  records the store under that path, so the reader's expected path is absent and it reads stale; in
+  an install the renderer and the reader are one kit copy, and the fixtures copy the kit to its own
+  path (`tools/policy/check_policy.py#build_limit_repo`).
 - testing — the case of §6 and the arm in §7.
 - migration — §4.
 - user docs — none: `help/policy.md` does not describe the mirror's inputs.
@@ -141,18 +168,23 @@ mirror is re-rendered. That is the stale-once the sibling spec meant, now true b
 ## 6. Acceptance criteria
 
 The fixture is a branch of `run_mirror_landed` over `build_landed_repo`, as `mirror-stale-legacy`
-is: a scratch repository under `%TEMP%` whose kit copy carries `presets.toml`, its policy file
-naming `preset = "strict"`, and `.governance/policy.json` planted from `render_mirror` at HEAD with
-the store's key taken out of `legacy_blobs`, the bytes a pre-unit render writes, committed and pushed
-as the landed revision.
+is: a scratch repository under `%TEMP%` whose kit copy carries `presets.py` and `presets.toml` (S3),
+its policy file `preset = "strict"` above `LANDED_POLICY` with `policy-file.on-invalid =
+"last-valid"`, and `.governance/policy.json` planted from `render_mirror` at HEAD with the store's
+key taken out of `legacy_blobs`, the bytes a pre-unit render writes, committed and pushed as the
+landed revision. The branch ends, as every branch does, in `arm_mirror_landed`, which must find
+nothing.
 
-- **AC1** — When the `mirror-pre-unit-stale` case lands one changed strict value in the kit copy's
-  `presets.toml` and runs `node policy-mirror.js get hooks.bypass --repo <repo> --explain`, its
-  reason opens `mirror stale at` and it answers the new value.
-  Red when: a copy taking its list from `Object.keys(doc.legacy_blobs)` reads FRESH and answers the
-  old value.
-- **AC2** — When the same case runs with `presets.toml` unchanged, the read still opens its reason
-  `mirror stale at`.
+- **AC1** — When the `mirror-pre-unit-stale` case commits strict's `hooks.bypass` set to `allowed` in
+  the kit copy's `presets.toml`, pushes it alone and runs `node policy-mirror.js get hooks.bypass
+  --repo <repo> --explain`, it exits 0 printing `allowed`, its stderr line reading `policy:
+  hooks.bypass · preset · mirror stale at <L8>; ` and the reader's reason.
+  Red when: a copy taking its list from `Object.keys(doc.legacy_blobs)` reads FRESH and answers
+  `refused`, as the probe in §4 did, or the read refuses for want of `presets.py`.
+  fixture: `KICK-dKeptSession-2`'s step, landed at `b3698899`, and `KICK-dKeptSession-40`'s store
+  key in the render, order 4.
+- **AC2** — When the same case runs with `presets.toml` unchanged, the read exits 0 printing
+  `refused`, its stderr line still reading `policy: hooks.bypass · preset · mirror stale at <L8>; `.
   Red when: a mirror that omits an input the reader expects reads FRESH because the omitted input
   happens not to have moved.
 
@@ -179,6 +211,12 @@ none
   rev-3 wording; §3 gained the guard and the repository-relative inputs, each shown not to need the
   list; the fixture is named as a `run_mirror_landed` branch over `build_landed_repo`, and the ACs
   observe the reason prefix the reader prints. §7's leg line takes the guarded legs its paths trip.
+- rev-4 · 2026-11-21 · S3 · §4 · §5 · §6 · AC1 · AC2 · checked for behaviour against the tree after
+  units 1, 19, 33 and 2 landed, under the brief `2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief`.
+  S3 added: a probe at `b3698899` showed a stale read through the landed kit copy refuses for want of
+  `presets.py`, so `MIRROR_KIT_FILES` carries it and the store, unit 40's branch being the copy's
+  first instance. The fixture names its `on-invalid` line and its closing arm; AC1 and AC2 name the
+  value, the source and the exit each read prints; §5 states the renderer and reader sharing a path.
 
 ## 10. Reuse audit
 
