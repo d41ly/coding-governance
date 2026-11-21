@@ -2189,10 +2189,11 @@ done
 run_card "DPR16 AC15 --card --write over nine claims, two released" "$CWT" 0 "claims — 9 on the remote · " --card --write --session "$NONCE-c16"
 cl_cell=$(read_claims_cell "$NONCE-c16")
 cl_nold=0; cl_nskip=0
-while IFS= read -r cl_l; do
+mapfile -t cl_lines <<<"$cl_cell"
+for cl_l in "${cl_lines[@]}"; do
   if [[ $cl_l == *rRelOld* ]]; then cl_nold=$((cl_nold + 1)); fi
   if [[ $cl_l == *skipped:* ]]; then cl_nskip=$((cl_nskip + 1)); fi
-done <<<"$cl_cell"
+done
 check_eq "DPR16 AC15 sRel's row reads released, a terminal-rank row beside it, rRelOld hidden, no skipped line" \
   "  sRel · n1 · released · beat Ns · released · key K|terminal|0|0" \
   "$(printf '%s\n' "$cl_cell" | grep -m1 '^  sRel · ')|$(printf '%s\n' "$cl_cell" | grep -A1 '^  sRel · ' | tail -1 | sed -E 's/.* · ([a-z]+) · key K$/\1/')|$cl_nold|$cl_nskip"
@@ -2411,7 +2412,8 @@ if [ -f "$cs_fx" ]; then
     fi
   done
   cs_n=0
-  while IFS= read -r cs_l; do if [ -n "$cs_l" ]; then cs_n=$((cs_n + 1)); fi; done <<<"$cs_list"
+  mapfile -t cs_lines <<<"$cs_list"
+  for cs_l in "${cs_lines[@]}"; do if [ -n "$cs_l" ]; then cs_n=$((cs_n + 1)); fi; done
   check_eq "TOOL-dPlacedRequest-99 S1 the suite ran every plant --list names" "$cs_n" "$cs_ran"
 fi
 
