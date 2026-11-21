@@ -25473,6 +25473,7 @@ memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-63-devia
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-64-deviation-641.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-crosscheck-returns.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	BUILD-METHOD M4
+memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-1-departures-build.md	BUILD-METHOD M4
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	tools/unattended/unattended.sh:852
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md	BUILD-METHOD M3
 memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md	HYGIENE check 12
@@ -25616,7 +25617,6 @@ memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-62-sp
 memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md	unattended.test.sh:708-714
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/playbook/render_playbook.py:347
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/lib-unattended.sh:188-197
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/unattended.sh:2070-2462
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	tools/unattended/unattended.sh:2087
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md	unattended.sh:2411-2412
@@ -25666,25 +25666,9 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/push-main.sh:262
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/push-main.sh:978
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md	tools/unattended/unattended.sh:2419
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	tools/memory-tree/tree_lib.py:28
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	tools/unattended/unattended.sh:2290
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md	unattended.sh:2162
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/memory-tree/tree_lib.py:28
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/unattended/unattended.sh:2172-2186
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md	tools/unattended/unattended.sh:2180
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/roles/roles_lib.py:65
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md	tools/unattended/unattended.sh:2087
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	manifest-check.sh:310-314
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	runlog_lib.py:522
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	skills/session-kickoff/manifest-check.sh:311-315
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/memory-tree/row_grammar.py:1475-1479
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/roles/handoff.py:307
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/runlog/runlog_lib.py:522
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2285
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:2396
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	tools/unattended/unattended.sh:3548
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md	unattended.sh:3548
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	scratch-guard.js:667-671
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	skills/session-kickoff/manifest-check.sh:310-317
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md	tools/memory-tree/tree_lib.py:27
@@ -25695,59 +25679,33 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tool
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md	tools/unattended/unattended.sh:2219-2220
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:3940
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/gen_build_index.py:4069-4071
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:2396
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md	tools/unattended/unattended.sh:4183-4192
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2118
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md	tools/unattended/unattended.sh:2145-2147
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2318-2360
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2325-2360
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md	tools/unattended/unattended.sh:2331-2354
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md	tools/unattended/unattended.sh:2118
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-27.md	tools/run-gates/post-merge.sh:301
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/push-main.sh:262-292
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/push-main.sh:953-1008
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/resume-tick.sh:305-310
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md	tools/unattended/unattended.sh:2275
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	skills/session-kickoff/manifest-check.sh:1054
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/memory-tree/tree_lib.py:28
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:13-20
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md	tools/roles/workflows.toml:18-20
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md	tools/memory-tree/row_grammar.py:1475-1479
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:2260-2262
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md	tools/unattended/unattended.sh:8884
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:641-643
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	skills/session-kickoff/manifest-check.sh:645-655
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md	tools/unattended/unattended.sh:671-677
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	memory/map/generated/symbols.json:3826
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:375-400
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:645-700
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	skills/session-kickoff/manifest-check.sh:662
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/hooks/scratch-guard.js:667
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/memory-tree/row_grammar.py:1475
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/playbook/render_playbook.py:347
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/roles/handoff.py:279
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/run-gates/post-merge.sh:301
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/run-gates/run-selftests.sh:293-310
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:2112-2113
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:2136
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md	tools/unattended/unattended.sh:3398
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md	tools/unattended/unattended.sh:2118
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/lib/health-log.sh:14-61
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/lib/resolve-python.test.sh:180
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	tools/unattended/unattended.sh:2338
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	unattended.sh:2331-2354
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md	unattended.sh:2338
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	tools/unattended/unattended.sh:2325-2360
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	tools/unattended/unattended.sh:2347
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md	unattended.sh:2347
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	resolve-python.test.sh:213
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	resolve-python.test.sh:221
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md	tools/unattended/unattended.sh:2331-2354
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md	tools/lib/health-log.sh:21-23
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/memory-tree/gen_build_index.py:793
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/memory-tree/tree_lib.py:28
@@ -25756,119 +25714,16 @@ memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3579
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md	tools/unattended/unattended.sh:3763
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md	tools/unattended/unattended.sh:2260
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	manifest-check.sh:220-229
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	manifest-check.sh:560
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	skills/session-kickoff/manifest-check.sh:228
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/playbook/render_playbook.py:424
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/push-main.sh:304
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	tools/unattended/unattended.sh:9037
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2202
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2260-2263
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:2261-2263
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md	unattended.sh:546
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:880
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	push-main.sh:896-902
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md	tools/push-main.sh:921
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	push-main.sh:921
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md	tools/memory-tree/gotchas.py:65
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md	tools/unattended/unattended.sh:2118
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2118
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md	tools/unattended/unattended.sh:2181
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md	tools/unattended/unattended.test.sh:6098
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	check-spec-tokens.py:530
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:220
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:220-229
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	manifest-check.sh:655
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	resolve-python.test.sh:218
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	skills/session-kickoff/manifest-check.sh:228
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	stop-guard.js:97
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/hooks/scratch-guard.js:667
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/lib/resolve-python.test.sh:213-221
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/lib/resolve-python.test.sh:218
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/run-gates/run-selftests.sh:294
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/stop-guard.js:106-114
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/unattended.sh:13936
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	tools/unattended/unattended.sh:2263
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:13936
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:2260-2263
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:2347-2348
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md	unattended.sh:3389
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/memory-tree/gen_build_index.py:793
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/memory-tree/tree_lib.py:28
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:11866-11869
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:12762
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md	tools/unattended/unattended.sh:3975-4041
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md	tools/unattended/unattended.sh:2181
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	skills/session-kickoff/manifest-check.sh:648
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-python.test.sh:218
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/lib/resolve-remote.sh:3-7
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/push-main.sh:514-516
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2165
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md	tools/unattended/unattended.sh:2335-2350
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:514-526
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:516
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md	tools/push-main.sh:880
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md	tools/unattended/unattended.test.sh:6098
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M6
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	skills/session-kickoff/manifest-check.sh:653-654
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	tools/memory-tree/gotchas.py:276-279
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md	tools/unattended/unattended.sh:2171
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/push-main.sh:880
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/unattended/unattended.sh:1359-1375
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md	tools/unattended/unattended.sh:8110
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:2170
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md	tools/unattended/unattended.sh:8536
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md	tools/roles/handoff.py:97
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-brief-recorded.sh:381
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/check-pass-order.sh:356
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/unattended/unattended.sh:1350-1353
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	tools/workflows/unattended-build.js:608-613
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md	unattended.sh:1350
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M3
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/lib-unattended.sh:2057
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1359-1375
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:1364
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.sh:13746-13758
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:6399-6411
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/unattended/unattended.test.sh:708
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md	tools/workflows/unattended-build.js:608-613
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M4
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	BUILD-METHOD M8
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md	HYGIENE check 25
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/memory-tree/tree_lib.py:27
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md	tools/unattended/unattended.sh:852
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/gen_build_index.py:3185
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/roles/handoff.py:166
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3389
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md	tools/unattended/unattended.sh:3404
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:216
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:363-364
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	skills/session-kickoff/manifest-check.sh:555
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/govkit/entries/kickoff-manifest.kit.toml:6-9
 memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/memory-tree/tree_lib.py:27
-memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md	tools/roles/roles_lib.py:36-40
 memory/builds/dPolishedVitrine/README.md	BUILD-METHOD M4
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	BUILD-METHOD M4
 memory/builds/dPolishedVitrine/build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md	run-gates.evidence.test.sh:643
@@ -38254,7 +38109,6 @@ memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md	BUILD-METHOD M6
 memory/gotchas/arm-literal-strands-on-message-edit.md	check-unattended.test.sh:714
 memory/gotchas/fold-text-is-unreviewed-surface.md	BUILD-METHOD M8
 memory/guides/BUILD-METHOD.md	HYGIENE check 5
-memory/guides/SESSION-KICKOFF.md	BUILD-METHOD M2
 memory/guides/UNATTENDED-ASKS.md	BUILD-METHOD M2
 memory/map/features/build-method.md	kit-dogfood-parity.test.sh:30
 memory/map/features/build-method.md	tools/memory-tree/adopt-memory-tree.sh:59

@@ -17,7 +17,8 @@
 # prints every row's reason on every run, green included. No total is written here: the scanner
 # derives them.
 .githooks/pre-push	fixed-temp	2	the bar-green stamp, git dir and common dir; predates the lint; drained by deleting this row in the commit that fixes it
-skills/session-kickoff/manifest-check.sh	fixed-temp	3	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; two card rewrites in its `mktemp -d` scratch; predates the lint; drained by deleting this row in the commit that fixes it
+skills/session-kickoff/card-store.fixture.sh	fixed-temp	8	the fixture's set-asides of real files, never a temp it writes: the conf and the driver moved aside and back, and the bare remote taken offline and restored, each inside the fixture's own `mktemp -d` scratch; drained by deleting this row in the commit that fixes it
+skills/session-kickoff/manifest-check.sh	fixed-temp	5	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; two card rewrites in its `mktemp -d` scratch; predates the lint; and the pockets block's two re-renders (TOOL-dPlacedRequest-9 S4), each a fixed name inside that same `mktemp -d` scratch, a directory whose own name nobody knows before it is made; drained by deleting this row in the commit that fixes it
 tools/branch-reconcile/adopt-branch-reconcile.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
 tools/check-template-size.sh	fixed-temp	1	the high-water file, `.tmp.$$`; predates the lint; drained by deleting this row in the commit that fixes it
 tools/check-wiring.sh	fixed-temp	2	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; an EOL rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it
@@ -25,6 +26,8 @@ tools/codebase-map/adopt-codebase-map.sh	fixed-temp	1	a rendered file in the tar
 tools/lib/health-log.sh	fixed-temp	1	the canonical `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
 tools/memory-recall/adopt-memory-recall.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
 tools/memory-tree/adopt-memory-tree.sh	fixed-temp	2	a rendered file and the slot-limits file in the target; predates the lint; drained by deleting this row in the commit that fixes it
+tools/push-main.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10, the block four kits carry byte-identically, inlined here by dPlacedRequest beside the feed block; drained by deleting this row in the commit that fixes it
+tools/run-gates/post-merge.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10, the block four kits carry byte-identically, inlined here by dPlacedRequest beside the feed block; drained by deleting this row in the commit that fixes it
 tools/run-gates/run-gates.sh	fixed-temp	1	the `health_log_sh` trim, ask TOOL-aPairedSlots-10; predates the lint; drained by deleting this row in the commit that fixes it
 tools/runlog/adopt-runlog.sh	fixed-temp	1	the rendered skill in the target; predates the lint; drained by deleting this row in the commit that fixes it
 tools/unattended/adopt-unattended.sh	fixed-temp	1	the conf rewrite in the target; predates the lint; drained by deleting this row in the commit that fixes it

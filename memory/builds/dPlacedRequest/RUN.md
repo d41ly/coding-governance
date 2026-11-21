@@ -9,276 +9,597 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: TOOL-dPlacedRequest-22=DEFERRED
-units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
-gates-run: unattended-179294186236034214068-3349317 cac8516c
-parked-surfaced: yes
+gates-run: unattended-179523792223167627694-3443211 b97435c0
+parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
+asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO TOOL-dPlacedRequest-109=OPEN TOOL-dPlacedRequest-110=OPEN
+units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-96 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 TOOL-dPlacedRequest-100
 hold-run: 
-hold-streak: 1 · at f19637c7
+hold-streak: 1 · at da3dc3ea
 resume-owed: none · owner
-held-at: 2026-10-25T06:16:30Z
-hold-reason: spec audit round 3 (wf_22df4547-5f4, units 35-43) wedges on a lens tool call no unattended agent can clear; resume it attended or clear the pending tool prompt
+held-at: 2026-11-21T09:12:26Z
+hold-reason: the landing's pre-push routed-commits range refuses six earlier Red-fix commits outside the inline lane's limits (parked: routed-commits-lane-limits); every other red the run caused is fixed and 21 inherited reds remain, each held red on main's daily job with an open ask
 hold-until: owner
-hold-code: host-owner-action
-held-from: REVIEWING
-refreshed-at: 60d60e69404d01caf230f5c448474adee4d21ee8 · park · 0 touching
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 316dcb69d3774b4449864b40cd0007151bdeba12
-phase: LANDING
+witness: 6b3ebc8308414624d538f94e36d218eb9771af48
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
-run-branch: refs/heads/branch/unattended-dplacedrequest-f41432
+run-branch: refs/heads/branch/unattended-dplacedrequest-42a7be
 anchor-kind: default-branch
-cli-version: 2.1.308
-lease-utc: 2026-10-25T07:45:30Z
+cli-version: 2.1.326
+lease-utc: 2026-11-21T11:07:06Z
 pid-image: claude.exe
-host: compeeto-agent
-pid: 22224
-session: a4a72c24-4423-4b1e-9176-5acec5cc094f
-keepalive: 58fcd084
-anchor-url: https://github.com/d41ly/coding-governance.git
-anchor-sha: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
+host: compeeto
+pid: 27268
+session: dec54915-9f6d-416a-abf5-d4658b7ca977
+keepalive: 2439436f
+anchor-url: https://github.com/d41ly/coding-governance
+anchor-sha: 9e21ac760dc0a43d6ed007396922722ccee98d57
 anchor-ref: refs/heads/main
-base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
+base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 
 ## Parked
 
-2026-10-25T00:28:06Z rescope · item add TOOL-dPlacedRequest-23 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 21 at HIGH, item H3
+2026-11-19T04:43:32Z review · item dPlacedRequest-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 25 · folded 34 · promoted 0 · disposition fold
+2026-11-19T05:52:49Z budget · frozen · 63 unit(s) · 130
+2026-11-19T05:52:49Z draw · review-round · dPlacedRequest-spec-set-r2 · 1/130 · 20261119T055249Z-5f4e9a
 
-2026-10-25T00:28:08Z rescope · item add TOOL-dPlacedRequest-24 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 56 at HIGH, item H9
+2026-11-19T05:52:49Z review · item dPlacedRequest-spec-set-r2 · reason verdict CLEAN · blockers 0 · round-highs 4 · round-minors 25 · CONVERGED · highs 4 · minors 25 · folded 29 · promoted 0 · disposition fold
+2026-11-19T06:46:56Z draw · review-round · dPlacedRequest-spec-set-r3 · 2/130 · 20261119T064656Z-50cda6
 
-2026-10-25T00:28:09Z rescope · item add TOOL-dPlacedRequest-25 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 20 at HIGH, item H1 shared with id 1
+2026-11-19T06:46:56Z review · item dPlacedRequest-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 18 · folded 20 · promoted 0 · disposition fold
 
-2026-10-25T00:28:11Z rescope · item add TOOL-dPlacedRequest-26 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 1 at HIGH, item H1 shared with id 20
+2026-11-19T06:50:21Z dispatch · item 88f3b413 TOOL-dPlacedRequest-11 · reason tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/README.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh tools/loop/README.md help/loop.md .githooks/pre-push .githooks/pre-push.test.sh tools/govkit/subject-pins.tsv memory/map/generated
 
-2026-10-25T00:28:13Z rescope · item add TOOL-dPlacedRequest-27 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 52 at HIGH, item H6
+2026-11-19T06:52:34Z brief · item TOOL-dPlacedRequest-11 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T07:10:11Z draw · re-dispatch · TOOL-dPlacedRequest-11 · 3/130 · 20261119T071011Z-12b13f
 
-2026-10-25T00:28:14Z rescope · item add TOOL-dPlacedRequest-28 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 53 at HIGH, item H7
+2026-11-19T07:10:11Z dispatch · item 9fdc501a TOOL-dPlacedRequest-11 · reason memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-11-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-11.md
+2026-11-19T07:11:48Z draw · re-dispatch · TOOL-dPlacedRequest-11 · 4/130 · 20261119T071148Z-067a23
 
-2026-10-25T00:28:17Z rescope · item add TOOL-dPlacedRequest-29 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 51 at HIGH, item H5
+2026-11-19T07:11:48Z dispatch · item 9fdc501a TOOL-dPlacedRequest-11 · reason memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-11-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-11.md .githooks/pre-push .githooks/pre-push.test.sh help/loop.md memory/guides/UNATTENDED-STOPS.md tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/loop/README.md tools/push-main.sh tools/push-main.test.sh tools/run-gates/post-merge.sh tools/unattended/README.md tools/unattended/STOPS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/govkit/subject-pins.tsv memory/map/generated
 
-2026-10-25T00:28:19Z rescope · item add TOOL-dPlacedRequest-30 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 54 at HIGH, item H4 shared with id 22
+2026-11-19T07:32:56Z dispatch · item dc9f0c27 TOOL-dPlacedRequest-13 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/lib/resolve-python.test.sh tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/unattended/unattended.test.sh tools/run-gates/post-merge.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/govkit/subject-pins.tsv help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-13.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-13-1-acceptance-ledger.md
 
-2026-10-25T00:28:21Z rescope · item add TOOL-dPlacedRequest-31 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 22 at HIGH, item H4 shared with id 54
+2026-11-19T07:39:45Z brief · item TOOL-dPlacedRequest-13 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T00:28:24Z rescope · item add TOOL-dPlacedRequest-32 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 55 at HIGH, item H8
+2026-11-19T08:04:18Z dispatch · item b34330ca TOOL-dPlacedRequest-1 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/playbook/render_playbook.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh help/loop.md memory/map/generated tools/govkit/subject-pins.tsv memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-1-1-acceptance-ledger.md
 
-2026-10-25T00:28:27Z rescope · item add TOOL-dPlacedRequest-33 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) finding id 6 at HIGH, item H2
+2026-11-19T08:07:38Z brief · item TOOL-dPlacedRequest-1 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T00:28:30Z rescope · item add TOOL-dPlacedRequest-34 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) findings at MEDIUM ids 2 3 4 5 7 8 9 10 11 13 14 15 16 23 24 25 26 27 28 32 33 34 35 36 37 38 39 44 45 46 47 48 49 50 57 58 59 60 61 62 63 65 66 67 68 69 70 71 72 73 and at LOW ids 12 17 18 19 29 30 31 40 41
+2026-11-19T08:55:29Z dispatch · item 45d59991 TOOL-dPlacedRequest-27 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-27.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-27-1-acceptance-ledger.md
 
-2026-10-25T00:57:42Z review · item dPlacedRequest-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 59 · disposition promote
+2026-11-19T08:57:08Z brief · item TOOL-dPlacedRequest-27 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T01:58:27Z rescope · item add TOOL-dPlacedRequest-35 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 1 at HIGH, item H2
+2026-11-19T09:06:17Z dispatch · item 6edaf99b TOOL-dPlacedRequest-17 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/govkit/subject-pins.tsv memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-17-1-acceptance-ledger.md
 
-2026-10-25T01:58:34Z rescope · item add TOOL-dPlacedRequest-36 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 2 at HIGH, item H1 shared with ids 13 24 32
+2026-11-19T09:17:21Z brief · item TOOL-dPlacedRequest-17 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T01:58:36Z rescope · item add TOOL-dPlacedRequest-37 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 13 at HIGH, item H1 shared with ids 2 24 32
+2026-11-19T09:41:29Z dispatch · item 7a5d1987 TOOL-dPlacedRequest-23 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-23-1-acceptance-ledger.md
 
-2026-10-25T01:58:38Z rescope · item add TOOL-dPlacedRequest-38 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 24 at HIGH, item H1 shared with ids 2 13 32
+2026-11-19T09:43:47Z brief · item TOOL-dPlacedRequest-23 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T01:58:39Z rescope · item add TOOL-dPlacedRequest-39 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 32 at HIGH, item H1 shared with ids 2 13 24
+2026-11-19T09:53:15Z dispatch · item d1ef94ba TOOL-dPlacedRequest-24 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-24.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-24-1-acceptance-ledger.md
 
-2026-10-25T01:58:41Z rescope · item add TOOL-dPlacedRequest-40 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 26 at HIGH, item H3
+2026-11-19T10:21:17Z brief · item TOOL-dPlacedRequest-24 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T01:58:43Z rescope · item add TOOL-dPlacedRequest-41 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 33 at HIGH, item H4
+2026-11-19T10:31:09Z dispatch · item fb6691ef TOOL-dPlacedRequest-25 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-25.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-25-1-acceptance-ledger.md
 
-2026-10-25T01:58:44Z rescope · item add TOOL-dPlacedRequest-42 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 36 at HIGH, item H5
+2026-11-19T10:33:59Z brief · item TOOL-dPlacedRequest-25 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T01:58:46Z rescope · item add TOOL-dPlacedRequest-43 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md findings at MEDIUM ids 3 4 5 6 7 8 15 16 17 18 19 22 23 25 27 28 29 30 34 35 37 38 39 41 and at LOW ids 9 10 11 12 20 21 31 40 42 43
+2026-11-19T10:45:59Z dispatch · item 917222bb TOOL-dPlacedRequest-16 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh help/loop.md memory/map/generated tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/loop/budget.py tools/govkit/subject-pins.tsv memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md
 
-2026-10-25T02:22:02Z review · item dPlacedRequest-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 34 · disposition promote
+2026-11-19T11:15:25Z brief · item TOOL-dPlacedRequest-16 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T11:16:19Z draw · re-dispatch · TOOL-dPlacedRequest-16 · 5/130 · 20261119T111619Z-280c9d
 
-2026-10-25T06:15:38Z decision · item Spec audit round 3 (workflow wf_22df4547-5f4, units 35-43) cannot finish: its grounding lens agent wedged three times, and its failure-envelope lens twice, on a Bash tool call that never returned (45, 14 and 10+ minutes) while no process of theirs ran, the same probes completing at once in the main session. Every wedged call ran rm -rf on a variable path inside its scratch dir; round 2's literal-path rm -rf calls passed. Most likely a tool-approval prompt a workflow agent cannot answer with no owner present. · reason Options seen: resume again (wedged 3 of 3 for grounding); edit the lens prompts in tools/workflows/tier2-review.js (product code, outside this records-only spec run and its write gate); close round 3 on four lenses (the harness has no such knob, and a degraded round is not an audit). Refused all three; held for an owner turn: approve or clear the pending tool prompt, or resume the round from wf_22df4547-5f4 attended.
+2026-11-19T11:16:19Z dispatch · item 675237ee TOOL-dPlacedRequest-16 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md
+2026-11-19T11:49:25Z draw · re-dispatch · TOOL-dPlacedRequest-16 · 6/130 · 20261119T114925Z-f7c57c
 
-2026-10-25T06:16:32Z hold · item host-owner-action · reason until owner · reaped 37ace83d · resume none(owner)
+2026-11-19T11:49:25Z dispatch · item 675237ee TOOL-dPlacedRequest-16 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/loop.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md tools/unattended/STOPS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated tools/govkit/subject-pins.tsv
+2026-11-19T11:56:24Z draw · fix-pass · TOOL-dPlacedRequest-16 · 7/130 · 20261119T115624Z-480c57
 
-2026-10-25T07:45:37Z resume · item dPlacedRequest · reason held · keepalive 58fcd084 · manual
+2026-11-19T11:56:24Z dispatch · item c29e05fc TOOL-dPlacedRequest-16 · reason tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-16-1-acceptance-ledger.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-16.md
 
-2026-10-25T07:59:17Z review · item dPlacedRequest-spec-set-r3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 4 · minors 34 · disposition promote
+2026-11-19T12:03:00Z dispatch · item 1f3742a0 TOOL-dPlacedRequest-26 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-26.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-26-1-acceptance-ledger.md
 
-2026-10-25T08:05:35Z rescope · item add TOOL-dPlacedRequest-44 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 26 at BLOCKER, item B1
+2026-11-19T12:04:51Z brief · item TOOL-dPlacedRequest-26 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T08:05:36Z rescope · item add TOOL-dPlacedRequest-45 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 21 at HIGH, item H1
+2026-11-19T12:15:33Z dispatch · item 34ceebb9 TOOL-dPlacedRequest-36 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-36.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-36-1-acceptance-ledger.md
 
-2026-10-25T08:05:38Z rescope · item add TOOL-dPlacedRequest-46 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 32 at HIGH, item H2
+2026-11-19T12:17:28Z brief · item TOOL-dPlacedRequest-36 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T08:05:40Z rescope · item add TOOL-dPlacedRequest-47 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 33 at HIGH, item H3
+2026-11-19T12:28:23Z dispatch · item 56b2f9af TOOL-dPlacedRequest-37 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-37.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-37-1-acceptance-ledger.md
 
-2026-10-25T08:05:41Z rescope · item add TOOL-dPlacedRequest-48 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 16 at HIGH, item H4
+2026-11-19T12:30:43Z brief · item TOOL-dPlacedRequest-37 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T08:05:43Z rescope · item add TOOL-dPlacedRequest-49 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md findings at MEDIUM ids 1 2 3 4 5 8 9 10 11 14 15 20 22 23 24 27 28 34 35 36 37 38 and at LOW ids 6 7 12 13 17 18 19 25 29 30 31 39
+2026-11-19T12:40:14Z dispatch · item 3a060d14 TOOL-dPlacedRequest-38 · reason tools/lib/resolve-python.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-38.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-38-1-acceptance-ledger.md
 
-2026-10-25T09:11:18Z rescope · item add TOOL-dPlacedRequest-50 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md finding id 1 at HIGH, item H1
+2026-11-19T12:43:06Z brief · item TOOL-dPlacedRequest-38 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T09:11:19Z rescope · item add TOOL-dPlacedRequest-51 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md finding id 10 at HIGH, item H2
+2026-11-19T12:58:57Z dispatch · item 1121a9d9 TOOL-dPlacedRequest-39 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-39-1-acceptance-ledger.md
 
-2026-10-25T09:11:21Z rescope · item add TOOL-dPlacedRequest-52 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md findings at MEDIUM ids 3 4 5 6 7 11 12 13 14 17 18 20 21 23 24 29 31 32 34 36 and at LOW ids 2 8 9 15 25 26 27 35
+2026-11-19T13:03:26Z brief · item TOOL-dPlacedRequest-39 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T13:04:39Z draw · re-dispatch · TOOL-dPlacedRequest-39 · 8/130 · 20261119T130439Z-0d8786
 
-2026-10-25T09:28:03Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 28 · disposition promote
+2026-11-19T13:04:39Z dispatch · item 7af14438 TOOL-dPlacedRequest-39 · reason tools/lib/resolve-python.test.sh
+2026-11-19T13:12:10Z draw · re-dispatch · TOOL-dPlacedRequest-39 · 9/130 · 20261119T131210Z-d01894
 
-2026-10-25T10:20:59Z rescope · item add TOOL-dPlacedRequest-53 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md finding id 1 at HIGH, item H1, whose defect ids 7 and 18 of item M1 also report
+2026-11-19T13:12:10Z dispatch · item 7af14438 TOOL-dPlacedRequest-39 · reason tools/lib/resolve-python.test.sh memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-39-1-acceptance-ledger.md tools/lib/gov-feed.sh tools/run-gates/post-merge.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-39.md
 
-2026-10-25T10:21:01Z rescope · item add TOOL-dPlacedRequest-54 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md finding id 16 at HIGH, item H2
+2026-11-19T13:21:14Z dispatch · item 615abc9e TOOL-dPlacedRequest-41 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-41.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-41-1-acceptance-ledger.md
 
-2026-10-25T10:21:03Z rescope · item add TOOL-dPlacedRequest-55 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md finding id 22 at HIGH, item H3
+2026-11-19T13:23:22Z brief · item TOOL-dPlacedRequest-41 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T10:21:06Z rescope · item add TOOL-dPlacedRequest-56 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md findings at MEDIUM ids 2 3 7 8 9 12 13 18 19 23 24 25 and at LOW ids 4 5 6 10 11 14 15 20 21 26
+2026-11-19T13:47:10Z dispatch · item 03c82f55 TOOL-dPlacedRequest-20 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-20-1-acceptance-ledger.md
 
-2026-10-25T10:35:00Z review · item dPlacedRequest-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 22 · disposition promote
+2026-11-19T13:48:59Z brief · item TOOL-dPlacedRequest-20 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T14:11:12Z draw · re-dispatch · TOOL-dPlacedRequest-20 · 10/130 · 20261119T141112Z-d0d1b8
 
-2026-10-25T11:17:11Z rescope · item add TOOL-dPlacedRequest-57 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md finding id 1 at HIGH, item H1, whose defect ids 8 and 21 of item M1 also report
+2026-11-19T14:11:13Z dispatch · item 8ce867dc TOOL-dPlacedRequest-20 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-20.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-20-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md
 
-2026-10-25T11:17:13Z rescope · item add TOOL-dPlacedRequest-58 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md finding id 20 at HIGH, item H2
+2026-11-19T14:26:42Z dispatch · item 62e752c5 TOOL-dPlacedRequest-18 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-18-1-acceptance-ledger.md
 
-2026-10-25T11:17:15Z rescope · item add TOOL-dPlacedRequest-59 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md findings at MEDIUM ids 2 8 9 10 14 16 17 21 and at LOW ids 3 4 5 6 7 11 12 13 15 18 19 22 23
+2026-11-19T14:28:49Z brief · item TOOL-dPlacedRequest-18 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T14:31:01Z draw · re-dispatch · TOOL-dPlacedRequest-18 · 11/130 · 20261119T143101Z-eb06c6
 
-2026-10-25T11:35:17Z review · item dPlacedRequest-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 21 · disposition promote
+2026-11-19T14:31:01Z dispatch · item b3c3f715 TOOL-dPlacedRequest-18 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-18.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-18-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md
 
-2026-10-25T12:11:49Z rescope · item add TOOL-dPlacedRequest-60 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md finding id 16 at HIGH, item H1, whose defect id 6 of item L3 also reports
+2026-11-19T15:09:06Z dispatch · item 4cfcf56b TOOL-dPlacedRequest-28 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-28.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-28-1-acceptance-ledger.md
 
-2026-10-25T12:11:51Z rescope · item add TOOL-dPlacedRequest-61 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md findings at MEDIUM ids 1 2 3 7 9 10 14 15 17 18 20 and at LOW ids 4 5 6 8 11 12 13 21 22
+2026-11-19T15:27:58Z brief · item TOOL-dPlacedRequest-28 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T12:22:47Z review · item dPlacedRequest-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 20 · disposition promote
+2026-11-19T15:49:43Z dispatch · item 51f85852 TOOL-dPlacedRequest-12 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-12-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md
 
-2026-10-25T12:49:49Z rescope · item add TOOL-dPlacedRequest-62 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md finding id 13 at HIGH, item H1
+2026-11-19T15:55:02Z brief · item TOOL-dPlacedRequest-12 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T15:55:55Z draw · re-dispatch · TOOL-dPlacedRequest-12 · 12/130 · 20261119T155555Z-adcad6
 
-2026-10-25T12:49:54Z rescope · item add TOOL-dPlacedRequest-63 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md findings at MEDIUM ids 1 2 6 8 9 11 14 16 21 22 23 24 and at LOW ids 3 4 5 7 10 12 15 17 18
+2026-11-19T15:55:55Z dispatch · item 0e62fd84 TOOL-dPlacedRequest-12 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-12.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-12-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
 
-2026-10-25T13:08:58Z review · item dPlacedRequest-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 21 · disposition promote
+2026-11-19T16:08:32Z dispatch · item 02b9dc08 TOOL-dPlacedRequest-42 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-42.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-42-1-acceptance-ledger.md
 
-2026-10-25T13:39:11Z rescope · item add TOOL-dPlacedRequest-64 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md findings at MEDIUM ids 1 2 3 7 9 13 19 20 21 and at LOW ids 4 5 6 10 11 12 14 15 18 23
+2026-11-19T16:10:09Z brief · item TOOL-dPlacedRequest-42 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:00:59Z review · item dPlacedRequest-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 19 · disposition promote
+2026-11-19T16:20:08Z dispatch · item c3ffe872 TOOL-dPlacedRequest-15 · reason tools/push-main.sh tools/push-main.test.sh tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-15.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-15-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md
 
-2026-10-25T14:14:23Z rescope · item defer TOOL-dPlacedRequest-11 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T16:26:51Z brief · item TOOL-dPlacedRequest-15 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:14:25Z rescope · item defer TOOL-dPlacedRequest-13 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T16:54:39Z dispatch · item 60df6910 TOOL-dPlacedRequest-19 · reason tools/loop/request.py tools/loop/kit.toml tools/loop/selftest.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-19-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md
+2026-11-19T17:10:11Z draw · re-dispatch · TOOL-dPlacedRequest-19 · 13/130 · 20261119T171011Z-e045ea
 
-2026-10-25T14:14:27Z rescope · item defer TOOL-dPlacedRequest-1 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:10:11Z dispatch · item 7ac71f3f TOOL-dPlacedRequest-19 · reason tools/loop/request.py tools/loop/kit.toml tools/loop/README.md tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/loop.md tools/run-gates/selftest-budgets.txt help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-19-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md
 
-2026-10-25T14:14:29Z rescope · item defer TOOL-dPlacedRequest-27 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:11:23Z brief · item TOOL-dPlacedRequest-19 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T17:16:06Z draw · re-dispatch · TOOL-dPlacedRequest-19 · 14/130 · 20261119T171606Z-49b335
 
-2026-10-25T14:14:30Z rescope · item defer TOOL-dPlacedRequest-17 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:16:06Z dispatch · item 0dd2d5fc TOOL-dPlacedRequest-19 · reason tools/loop/request.py tools/loop/kit.toml tools/loop/README.md tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/loop.md tools/run-gates/selftest-budgets.txt help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-19-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
+2026-11-19T17:26:27Z draw · re-dispatch · TOOL-dPlacedRequest-19 · 15/130 · 20261119T172627Z-595f6d
 
-2026-10-25T14:14:32Z rescope · item defer TOOL-dPlacedRequest-23 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:26:27Z dispatch · item 0dd2d5fc TOOL-dPlacedRequest-19 · reason tools/loop/request.py tools/loop/kit.toml tools/loop/README.md tools/unattended/unattended.sh tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/unattended.test.sh tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/loop.md tools/run-gates/selftest-budgets.txt help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-19.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-19-1-acceptance-ledger.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt memory/guides/SESSION-KICKOFF.md
 
-2026-10-25T14:14:34Z rescope · item defer TOOL-dPlacedRequest-24 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:36:21Z dispatch · item d3e7f8e1 TOOL-dPlacedRequest-29 · reason tools/push-main.sh tools/push-main.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-29.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-29-1-acceptance-ledger.md
 
-2026-10-25T14:14:36Z rescope · item defer TOOL-dPlacedRequest-25 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:38:02Z brief · item TOOL-dPlacedRequest-29 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:14:38Z rescope · item defer TOOL-dPlacedRequest-16 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T17:59:55Z dispatch · item 08987e05 TOOL-dPlacedRequest-30 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-30-1-acceptance-ledger.md help/loop.md
 
-2026-10-25T14:14:40Z rescope · item defer TOOL-dPlacedRequest-26 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:01:37Z brief · item TOOL-dPlacedRequest-30 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:14:42Z rescope · item defer TOOL-dPlacedRequest-36 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:15:01Z dispatch · item 23ac1488 TOOL-dPlacedRequest-31 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-31.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-31-1-acceptance-ledger.md help/loop.md
 
-2026-10-25T14:14:43Z rescope · item defer TOOL-dPlacedRequest-37 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:17:44Z brief · item TOOL-dPlacedRequest-31 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:14:46Z rescope · item defer TOOL-dPlacedRequest-38 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:28:32Z dispatch · item 0572d812 TOOL-dPlacedRequest-32 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-32-1-acceptance-ledger.md help/loop.md
 
-2026-10-25T14:14:47Z rescope · item defer TOOL-dPlacedRequest-39 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:33:20Z brief · item TOOL-dPlacedRequest-32 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T18:45:22Z draw · fix-pass · TOOL-dPlacedRequest-32 · 16/130 · 20261119T184522Z-e3dd15
 
-2026-10-25T14:14:49Z rescope · item defer TOOL-dPlacedRequest-41 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:45:22Z dispatch · item b822de43 TOOL-dPlacedRequest-32 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-32-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
 
-2026-10-25T14:14:51Z rescope · item defer TOOL-dPlacedRequest-20 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:53:08Z dispatch · item a201620e TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
 
-2026-10-25T14:14:53Z rescope · item defer TOOL-dPlacedRequest-18 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T18:59:14Z brief · item TOOL-dPlacedRequest-9 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T19:15:54Z draw · re-dispatch · TOOL-dPlacedRequest-9 · 17/130 · 20261119T191554Z-8c2a50
 
-2026-10-25T14:14:56Z rescope · item defer TOOL-dPlacedRequest-28 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T19:15:54Z dispatch · item 355b2418 TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/selftest.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
+2026-11-19T19:53:52Z draw · re-dispatch · TOOL-dPlacedRequest-9 · 18/130 · 20261119T195352Z-17766a
 
-2026-10-25T14:14:57Z rescope · item defer TOOL-dPlacedRequest-12 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T19:53:53Z dispatch · item 5ab86530 TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/selftest.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh AGH8 K2 skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/steps/kickoff-manifest/facts-to-overlay.before.json .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
+2026-11-19T19:55:01Z draw · re-dispatch · TOOL-dPlacedRequest-9 · 19/130 · 20261119T195501Z-5542f5
 
-2026-10-25T14:14:59Z rescope · item defer TOOL-dPlacedRequest-42 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T19:55:01Z dispatch · item 5ab86530 TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/selftest.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/steps/kickoff-manifest/facts-to-overlay.before.json .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
+2026-11-19T20:27:58Z draw · fix-pass · TOOL-dPlacedRequest-9 · 20/130 · 20261119T202758Z-a25862
 
-2026-10-25T14:15:02Z rescope · item defer TOOL-dPlacedRequest-15 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T20:27:58Z dispatch · item 7901e7c9 TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/selftest.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/steps/kickoff-manifest/facts-to-overlay.before.json .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
+2026-11-19T20:30:01Z draw · fix-pass · TOOL-dPlacedRequest-9 · 21/130 · 20261119T203001Z-e492d2
 
-2026-10-25T14:15:03Z rescope · item defer TOOL-dPlacedRequest-19 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T20:30:01Z dispatch · item 47c47f11 TOOL-dPlacedRequest-9 · reason tools/playbook/instruction_units.py tools/playbook/readers.toml tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/selftest.py skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md help/upgrade-steps.md memory/guides/SESSION-KICKOFF.md .governance/instructions.toml .governance/steps/kickoff-manifest/facts-to-overlay.before.json .governance/policy.json help/orientation-card.md help/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-9-1-acceptance-ledger.md
 
-2026-10-25T14:15:05Z rescope · item defer TOOL-dPlacedRequest-29 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T20:48:59Z dispatch · item 65d23356 TOOL-dPlacedRequest-2 · reason skills/session-kickoff/manifest-check.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md tools/hooks/scratch-guard.js tools/loop/loop_transition.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/HYGIENE.template.md tools/policy/catalogue.toml .governance/policy.json help/orientation-card.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md memory/HYGIENE.md
 
-2026-10-25T14:15:08Z rescope · item defer TOOL-dPlacedRequest-30 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T20:56:10Z brief · item TOOL-dPlacedRequest-2 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T21:03:25Z draw · re-dispatch · TOOL-dPlacedRequest-2 · 22/130 · 20261119T210325Z-e63ffb
 
-2026-10-25T14:15:10Z rescope · item defer TOOL-dPlacedRequest-31 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:03:25Z dispatch · item e3952ab6 TOOL-dPlacedRequest-2 · reason skills/session-kickoff/manifest-check.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md tools/hooks/scratch-guard.js tools/loop/loop_transition.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/HYGIENE.template.md tools/policy/catalogue.toml .governance/policy.json help/orientation-card.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md memory/HYGIENE.md tools/hooks/scratch-guard.test.sh memory/guides/SESSION-KICKOFF.md
+2026-11-19T21:22:33Z draw · re-dispatch · TOOL-dPlacedRequest-2 · 23/130 · 20261119T212233Z-892b8b
 
-2026-10-25T14:15:12Z rescope · item defer TOOL-dPlacedRequest-32 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:22:33Z dispatch · item e3952ab6 TOOL-dPlacedRequest-2 · reason skills/session-kickoff/manifest-check.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md tools/hooks/scratch-guard.js tools/loop/loop_transition.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/HYGIENE.template.md tools/policy/catalogue.toml .governance/policy.json help/orientation-card.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md memory/HYGIENE.md tools/hooks/scratch-guard.test.sh memory/guides/SESSION-KICKOFF.md tools/govkit/registry.toml
+2026-11-19T21:42:28Z draw · fix-pass · TOOL-dPlacedRequest-2 · 24/130 · 20261119T214228Z-8745ab
 
-2026-10-25T14:15:13Z rescope · item defer TOOL-dPlacedRequest-9 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:42:28Z dispatch · item aa358454 TOOL-dPlacedRequest-2 · reason skills/session-kickoff/manifest-check.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md tools/hooks/scratch-guard.js tools/loop/loop_transition.py tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/memory-tree/HYGIENE.template.md tools/policy/catalogue.toml .governance/policy.json help/orientation-card.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md memory/HYGIENE.md tools/hooks/scratch-guard.test.sh memory/guides/SESSION-KICKOFF.md tools/govkit/registry.toml
 
-2026-10-25T14:15:15Z rescope · item defer TOOL-dPlacedRequest-2 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:46:09Z dispatch · item f8a692f0 TOOL-dPlacedRequest-40 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-40-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
 
-2026-10-25T14:15:17Z rescope · item defer TOOL-dPlacedRequest-40 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:49:07Z brief · item TOOL-dPlacedRequest-40 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:15:19Z rescope · item defer TOOL-dPlacedRequest-33 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T21:59:24Z dispatch · item 86fbcf6e TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-19-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md
+2026-11-19T22:15:11Z draw · re-dispatch · TOOL-dPlacedRequest-33 · 25/130 · 20261119T221511Z-f73f8f
 
-2026-10-25T14:15:22Z rescope · item defer TOOL-dPlacedRequest-8 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:15:11Z dispatch · item f4c3094a TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md
 
-2026-10-25T14:15:24Z rescope · item defer TOOL-dPlacedRequest-6 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:18:22Z brief · item TOOL-dPlacedRequest-33 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-19T22:21:05Z draw · re-dispatch · TOOL-dPlacedRequest-33 · 26/130 · 20261119T222105Z-59f87f
 
-2026-10-25T14:15:26Z rescope · item defer TOOL-dPlacedRequest-7 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:21:05Z dispatch · item d7e28e91 TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
+2026-11-19T22:35:36Z draw · re-dispatch · TOOL-dPlacedRequest-33 · 27/130 · 20261119T223536Z-41eadf
 
-2026-10-25T14:15:28Z rescope · item defer TOOL-dPlacedRequest-4 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:35:36Z dispatch · item d7e28e91 TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt skills/session-kickoff/manifest-check.test.sh tools/govkit/registry.toml
+2026-11-19T22:39:20Z draw · re-dispatch · TOOL-dPlacedRequest-33 · 28/130 · 20261119T223920Z-24f365
 
-2026-10-25T14:15:30Z rescope · item defer TOOL-dPlacedRequest-10 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:39:20Z dispatch · item d7e28e91 TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt skills/session-kickoff/manifest-check.test.sh tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md
+2026-11-19T22:41:40Z draw · fix-pass · TOOL-dPlacedRequest-33 · 29/130 · 20261119T224140Z-fc0645
 
-2026-10-25T14:15:32Z rescope · item defer TOOL-dPlacedRequest-14 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:41:40Z dispatch · item 3a285847 TOOL-dPlacedRequest-33 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-33-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt skills/session-kickoff/manifest-check.test.sh tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md help/orientation-card.md
 
-2026-10-25T14:15:34Z rescope · item defer TOOL-dPlacedRequest-5 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T22:48:49Z dispatch · item cb1a8a1e TOOL-dPlacedRequest-8 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-8-1-acceptance-ledger.md tools/loop/item-schema.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated
+2026-11-19T23:02:25Z draw · re-dispatch · TOOL-dPlacedRequest-8 · 30/130 · 20261119T230225Z-b8bae8
 
-2026-10-25T14:15:36Z rescope · item defer TOOL-dPlacedRequest-21 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:02:25Z dispatch · item f25386d0 TOOL-dPlacedRequest-8 · reason .claude/skills/unattended/SKILL.md help/loop.md memory/guides/UNATTENDED-VERBS.md memory/map/generated tools/loop/item-schema.toml tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/template-size-limits.txt tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-8-1-acceptance-ledger.md
 
-2026-10-25T14:15:39Z rescope · item defer TOOL-dPlacedRequest-3 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:03:19Z brief · item TOOL-dPlacedRequest-8 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:15:42Z rescope · item defer TOOL-dPlacedRequest-34 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:26:51Z dispatch · item fac8a6a2 TOOL-dPlacedRequest-6 · reason tools/loop/loop.toml tools/loop/loop_lib.py help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-6-1-acceptance-ledger.md help/loop.md memory/map/generated tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/item-schema.toml
 
-2026-10-25T14:15:45Z rescope · item defer TOOL-dPlacedRequest-35 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:29:39Z brief · item TOOL-dPlacedRequest-6 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:15:47Z rescope · item defer TOOL-dPlacedRequest-43 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:44:58Z dispatch · item 109bea63 TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/subject-pins.tsv tools/govkit/registry.toml tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/ceiling-evidence.txt tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md
 
-2026-10-25T14:15:49Z rescope · item defer TOOL-dPlacedRequest-46 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-19T23:46:05Z brief · item TOOL-dPlacedRequest-7 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T00:01:25Z draw · re-dispatch · TOOL-dPlacedRequest-7 · 31/130 · 20261120T000125Z-2a6a16
 
-2026-10-25T14:15:52Z rescope · item defer TOOL-dPlacedRequest-47 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T00:01:25Z dispatch · item a57c059c TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/ceiling-evidence.txt tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md
+2026-11-20T00:17:05Z draw · re-dispatch · TOOL-dPlacedRequest-7 · 32/130 · 20261120T001705Z-5ad0f4
 
-2026-10-25T14:15:54Z rescope · item defer TOOL-dPlacedRequest-44 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T00:17:05Z dispatch · item 5d186f0f TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md
+2026-11-20T00:40:16Z draw · re-dispatch · TOOL-dPlacedRequest-7 · 33/130 · 20261120T004016Z-683759
 
-2026-10-25T14:15:56Z rescope · item defer TOOL-dPlacedRequest-45 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T00:40:16Z dispatch · item 222f05e8 TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md tools/loop/README.md
+2026-11-20T00:43:04Z draw · re-dispatch · TOOL-dPlacedRequest-7 · 34/130 · 20261120T004304Z-ed5638
 
-2026-10-25T14:15:58Z rescope · item defer TOOL-dPlacedRequest-48 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T00:43:04Z dispatch · item 222f05e8 TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md tools/loop/README.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/builds/dPlacedRequest/README.md
+2026-11-20T00:55:29Z draw · fix-pass · TOOL-dPlacedRequest-7 · 35/130 · 20261120T005529Z-394fe9
 
-2026-10-25T14:16:01Z rescope · item defer TOOL-dPlacedRequest-50 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T00:55:29Z dispatch · item b1f8f916 TOOL-dPlacedRequest-7 · reason .governance/policy.json help/loop.md memory/HYGIENE.md memory/map/features/loop.md memory/map/generated tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/loop/kit.toml tools/loop/loop.toml tools/loop/loop_lib.py tools/loop/probe.py tools/memory-tree/HYGIENE.template.md tools/memory-tree/build_records.py tools/memory-tree/tree_lib.py tools/playbook/core-pending.txt tools/policy/catalogue.toml tools/run-gates/selftest-budgets.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-7-1-acceptance-ledger.md tools/loop/README.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/builds/dPlacedRequest/README.md memory/backlog/TOOL.md
 
-2026-10-25T14:16:03Z rescope · item defer TOOL-dPlacedRequest-49 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T01:01:11Z dispatch · item 5a751503 TOOL-dPlacedRequest-4 · reason .claude/agents/gov-orienter.md help/loop.md memory/guides/UNATTENDED-VERBS.md memory/map/generated tools/gate-legs.json tools/loop/kit.toml tools/loop/placement.py tools/playbook/core-pending.txt tools/roles/README.md tools/roles/agents/gov-orienter.agent.md tools/unattended/VERBS.template.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/loop.md memory/guides/SESSION-KICKOFF.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-4-1-acceptance-ledger.md
 
-2026-10-25T14:16:05Z rescope · item defer TOOL-dPlacedRequest-51 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T01:20:58Z brief · item TOOL-dPlacedRequest-4 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:16:08Z rescope · item defer TOOL-dPlacedRequest-52 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T01:41:24Z dispatch · item 01b3c970 TOOL-dPlacedRequest-10 · reason tools/loop/placement.py tools/roles/agents/gov-orienter.agent.md .claude/agents/gov-orienter.md tools/roles/README.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-10.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-10-1-acceptance-ledger.md
 
-2026-10-25T14:16:11Z rescope · item defer TOOL-dPlacedRequest-53 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T01:45:16Z brief · item TOOL-dPlacedRequest-10 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
 
-2026-10-25T14:16:13Z rescope · item defer TOOL-dPlacedRequest-54 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T01:58:30Z dispatch · item 26301edd TOOL-dPlacedRequest-14 · reason tools/loop/budget.py tools/loop/placement.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-14-1-acceptance-ledger.md tools/unattended/unattended.test.sh
 
-2026-10-25T14:16:15Z rescope · item defer TOOL-dPlacedRequest-55 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:04:36Z brief · item TOOL-dPlacedRequest-14 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T02:05:44Z draw · re-dispatch · TOOL-dPlacedRequest-14 · 36/130 · 20261120T020544Z-d65a8d
 
-2026-10-25T14:16:17Z rescope · item defer TOOL-dPlacedRequest-56 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:05:44Z dispatch · item 1e2a4b18 TOOL-dPlacedRequest-14 · reason tools/loop/budget.py tools/loop/placement.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-14-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
+2026-11-20T02:30:53Z draw · fix-pass · TOOL-dPlacedRequest-14 · 37/130 · 20261120T023053Z-f7aed5
 
-2026-10-25T14:16:20Z rescope · item defer TOOL-dPlacedRequest-57 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:30:53Z dispatch · item ade7a0d1 TOOL-dPlacedRequest-14 · reason tools/loop/budget.py tools/loop/placement.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-14-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
 
-2026-10-25T14:16:23Z rescope · item defer TOOL-dPlacedRequest-58 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:35:25Z dispatch · item 694e83fc TOOL-dPlacedRequest-5 · reason tools/loop/placement.py tools/loop/breakpoints.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-5-1-acceptance-ledger.md tools/unattended/unattended.test.sh
 
-2026-10-25T14:16:25Z rescope · item defer TOOL-dPlacedRequest-60 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:39:40Z brief · item TOOL-dPlacedRequest-5 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T02:40:42Z draw · re-dispatch · TOOL-dPlacedRequest-5 · 38/130 · 20261120T024042Z-504d22
 
-2026-10-25T14:16:27Z rescope · item defer TOOL-dPlacedRequest-59 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:40:43Z dispatch · item 8c3d875c TOOL-dPlacedRequest-5 · reason tools/loop/placement.py tools/loop/breakpoints.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-5-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
+2026-11-20T02:55:05Z draw · re-dispatch · TOOL-dPlacedRequest-5 · 39/130 · 20261120T025505Z-41d564
 
-2026-10-25T14:16:29Z rescope · item defer TOOL-dPlacedRequest-61 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T02:55:05Z dispatch · item 8c3d875c TOOL-dPlacedRequest-5 · reason tools/loop/placement.py tools/loop/breakpoints.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-5-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt help/spec-audit.md
+2026-11-20T03:03:50Z draw · fix-pass · TOOL-dPlacedRequest-5 · 40/130 · 20261120T030350Z-d2920b
 
-2026-10-25T14:16:31Z rescope · item defer TOOL-dPlacedRequest-62 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T03:03:50Z dispatch · item ed4c66e4 TOOL-dPlacedRequest-5 · reason tools/loop/placement.py tools/loop/breakpoints.py tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-5-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt help/spec-audit.md
 
-2026-10-25T14:16:33Z rescope · item defer TOOL-dPlacedRequest-63 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T03:10:40Z dispatch · item 25785c2d TOOL-dPlacedRequest-21 · reason tools/loop/claim.py tools/loop/loop_transition.py tools/loop/kit.toml tools/gate-legs.json tools/playbook/core-pending.txt tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/memory-tree/gen_build_index.py help/loop.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-21-1-acceptance-ledger.md tools/unattended/unattended.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/loop.md memory/guides/SESSION-KICKOFF.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt
 
-2026-10-25T14:16:35Z rescope · item defer TOOL-dPlacedRequest-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+2026-11-20T03:14:22Z brief · item TOOL-dPlacedRequest-21 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T03:25:13Z draw · re-dispatch · TOOL-dPlacedRequest-21 · 41/130 · 20261120T032513Z-49a62c
 
-2026-10-25T15:50:30Z override · item specs-audited · reason the owner's ruling ends the spec-audit chain at the first round confirming no HIGH and no BLOCKER ('stop auditing specs once there are no more highs left', memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md); round 9 confirmed none, so its batch unit TOOL-dPlacedRequest-64 closes with no audit naming it, as M4 provides when a chain ends
+2026-11-20T03:25:13Z dispatch · item e8a9a1e7 TOOL-dPlacedRequest-21 · reason tools/loop/claim.py tools/loop/loop_transition.py tools/loop/kit.toml tools/gate-legs.json tools/playbook/core-pending.txt tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/memory-tree/gen_build_index.py help/loop.md memory/map/generated tools/unattended/unattended.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/loop.md memory/guides/SESSION-KICKOFF.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-21-1-acceptance-ledger.md
 
-2026-10-25T15:50:30Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by nine spec-audit rounds, and the owner's ruling record names the audit chain as the review of this spec-only diff (memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md); the build run's closing diff review over its code meets it
+2026-11-20T04:24:50Z dispatch · item 3a5e4bc1 TOOL-dPlacedRequest-3 · reason tools/loop/loop.toml tools/loop/loop_lib.py skills/session-kickoff/SKILL.md memory/guides/SESSION-KICKOFF.md help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-3-1-acceptance-ledger.md
+
+2026-11-20T04:26:48Z brief · item TOOL-dPlacedRequest-3 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T04:36:28Z draw · fix-pass · TOOL-dPlacedRequest-3 · 42/130 · 20261120T043628Z-acc1de
+
+2026-11-20T04:36:28Z dispatch · item 4680bf19 TOOL-dPlacedRequest-3 · reason tools/loop/loop.toml tools/loop/loop_lib.py skills/session-kickoff/SKILL.md memory/guides/SESSION-KICKOFF.md help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-3-1-acceptance-ledger.md tools/loop/README.md
+
+2026-11-20T04:41:09Z dispatch · item 127f4495 TOOL-dPlacedRequest-34 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh .githooks/pre-push tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md skills/session-kickoff/RESUME.md tools/playbook/render_playbook.py tools/loop/loop_lib.py tools/loop/request.py tools/loop/placement.py tools/loop/budget.py tools/loop/claim.py tools/loop/probe.py tools/loop/loop.toml tools/govkit/steps/kickoff_facts_to_overlay.py .githooks/pre-push.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/map/features/loop.md memory/map/features/unattended-stops.md memory/gotchas/decision-re-derived-by-a-second-process.md memory/map/generated/symbols.json tools/lib/resolve-python.test.sh help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-34-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md
+
+2026-11-20T04:43:12Z brief · item TOOL-dPlacedRequest-34 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T05:10:54Z draw · re-dispatch · TOOL-dPlacedRequest-34 · 43/130 · 20261120T051054Z-24d423
+
+2026-11-20T05:10:54Z dispatch · item be1af09b TOOL-dPlacedRequest-34 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh .githooks/pre-push tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md skills/session-kickoff/RESUME.md tools/playbook/render_playbook.py tools/loop/loop_lib.py tools/loop/request.py tools/loop/placement.py tools/loop/budget.py tools/loop/claim.py tools/loop/probe.py tools/loop/loop.toml tools/govkit/steps/kickoff_facts_to_overlay.py .githooks/pre-push.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/map/features/loop.md memory/map/features/unattended-stops.md memory/gotchas/decision-re-derived-by-a-second-process.md memory/map/generated/symbols.json tools/lib/resolve-python.test.sh help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-34-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md tools/unattended/lib-unattended.sh .unattended.conf tools/loop/README.md
+2026-11-20T05:14:37Z draw · re-dispatch · TOOL-dPlacedRequest-34 · 44/130 · 20261120T051437Z-c05755
+
+2026-11-20T05:14:37Z dispatch · item be1af09b TOOL-dPlacedRequest-34 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh .githooks/pre-push tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md skills/session-kickoff/RESUME.md tools/playbook/render_playbook.py tools/loop/loop_lib.py tools/loop/request.py tools/loop/placement.py tools/loop/budget.py tools/loop/claim.py tools/loop/probe.py tools/loop/loop.toml tools/govkit/steps/kickoff_facts_to_overlay.py .githooks/pre-push.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/map/features/loop.md memory/map/features/unattended-stops.md memory/gotchas/decision-re-derived-by-a-second-process.md memory/map/generated/symbols.json tools/lib/resolve-python.test.sh help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-34-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md tools/unattended/lib-unattended.sh .unattended.conf tools/loop/README.md tools/loop/loop_items.py
+2026-11-20T05:21:10Z draw · fix-pass · TOOL-dPlacedRequest-34 · 45/130 · 20261120T052110Z-8b1acb
+
+2026-11-20T05:21:10Z dispatch · item 75d626b1 TOOL-dPlacedRequest-34 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh .githooks/pre-push tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md skills/session-kickoff/RESUME.md tools/playbook/render_playbook.py tools/loop/loop_lib.py tools/loop/request.py tools/loop/placement.py tools/loop/budget.py tools/loop/claim.py tools/loop/probe.py tools/loop/loop.toml tools/govkit/steps/kickoff_facts_to_overlay.py .githooks/pre-push.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/map/features/loop.md memory/map/features/unattended-stops.md memory/gotchas/decision-re-derived-by-a-second-process.md memory/map/generated/symbols.json tools/lib/resolve-python.test.sh help/loop.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-34-1-acceptance-ledger.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md tools/unattended/lib-unattended.sh .unattended.conf tools/loop/README.md tools/loop/loop_items.py help/orientation-card.md
+2026-11-20T05:34:10Z draw · fix-pass · TOOL-dPlacedRequest-34 · 46/130 · 20261120T053410Z-997570
+
+2026-11-20T05:34:10Z dispatch · item 1f1b1d62 TOOL-dPlacedRequest-34 · reason tools/lib/gov-feed.sh tools/lib/gov-ref.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md tools/run-gates/post-merge.sh tools/push-main.sh tools/push-main.test.sh .githooks/pre-push tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/SKILL.md skills/session-kickoff/RESUME.md tools/playbook/render_playbook.py tools/loop/loop_lib.py tools/loop/request.py tools/loop/placement.py tools/loop/budget.py tools/loop/claim.py tools/loop/probe.py tools/loop/loop.toml tools/govkit/steps/kickoff_facts_to_overlay.py .githooks/pre-push.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/map/features/loop.md memory/map/features/unattended-stops.md memory/gotchas/decision-re-derived-by-a-second-process.md memory/map/generated/symbols.json tools/lib/resolve-python.test.sh help/loop.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/template-size-limits.txt tools/govkit/registry.toml memory/guides/SESSION-KICKOFF.md tools/hooks/scratch-guard.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-34-1-acceptance-ledger.md
+
+2026-11-20T06:04:05Z dispatch · item c8afcf2b TOOL-dPlacedRequest-35 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-35-1-acceptance-ledger.md
+
+2026-11-20T06:05:25Z brief · item TOOL-dPlacedRequest-35 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T06:14:45Z dispatch · item 1ec16f9c TOOL-dPlacedRequest-46 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-46-1-acceptance-ledger.md
+
+2026-11-20T06:17:08Z brief · item TOOL-dPlacedRequest-46 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T06:28:08Z draw · re-dispatch · TOOL-dPlacedRequest-46 · 47/130 · 20261120T062808Z-011deb
+
+2026-11-20T06:28:08Z dispatch · item be880efe TOOL-dPlacedRequest-46 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-46-1-acceptance-ledger.md
+
+2026-11-20T06:43:01Z dispatch · item 7bcd8b1b TOOL-dPlacedRequest-47 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-47.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-47-1-acceptance-ledger.md tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md
+
+2026-11-20T07:01:35Z brief · item TOOL-dPlacedRequest-47 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T07:32:43Z dispatch · item 6bd9c2cc TOOL-dPlacedRequest-43 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md help/loop.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/hooks/scratch-guard.js tools/push-main.sh tools/run-gates/run-selftests.sh tools/loop/placement.py memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-43-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md tools/unattended/README.md
+
+2026-11-20T07:34:30Z brief · item TOOL-dPlacedRequest-43 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T07:39:02Z draw · re-dispatch · TOOL-dPlacedRequest-43 · 48/130 · 20261120T073902Z-593201
+
+2026-11-20T07:39:02Z dispatch · item dac2af17 TOOL-dPlacedRequest-43 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md help/loop.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/hooks/scratch-guard.js tools/push-main.sh tools/run-gates/run-selftests.sh tools/loop/placement.py memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-43-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md tools/unattended/README.md help/orientation-card.md tools/hooks/scratch-guard.test.sh tools/push-main.test.sh
+2026-11-20T08:12:08Z draw · fix-pass · TOOL-dPlacedRequest-43 · 49/130 · 20261120T081208Z-47b84a
+
+2026-11-20T08:12:08Z dispatch · item afa399f6 TOOL-dPlacedRequest-43 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md help/loop.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/card-store.fixture.sh tools/hooks/scratch-guard.js tools/push-main.sh tools/run-gates/run-selftests.sh tools/loop/placement.py memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-43-1-acceptance-ledger.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md tools/unattended/README.md help/orientation-card.md tools/hooks/scratch-guard.test.sh tools/push-main.test.sh
+
+2026-11-20T08:39:11Z dispatch · item 4941c2fe TOOL-dPlacedRequest-44 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-44.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-44-1-acceptance-ledger.md
+
+2026-11-20T08:40:52Z brief · item TOOL-dPlacedRequest-44 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T08:47:15Z dispatch · item 3eddba95 TOOL-dPlacedRequest-45 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-45.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-45-1-acceptance-ledger.md
+
+2026-11-20T08:55:55Z brief · item TOOL-dPlacedRequest-45 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T09:02:38Z dispatch · item 451a6891 TOOL-dPlacedRequest-48 · reason tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-48.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-48-1-acceptance-ledger.md
+
+2026-11-20T09:04:17Z brief · item TOOL-dPlacedRequest-48 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T09:15:12Z dispatch · item 18672c47 TOOL-dPlacedRequest-50 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-50-1-acceptance-ledger.md
+
+2026-11-20T09:17:06Z brief · item TOOL-dPlacedRequest-50 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T09:24:07Z draw · fix-pass · TOOL-dPlacedRequest-50 · 50/130 · 20261120T092407Z-febeb5
+
+2026-11-20T09:24:07Z dispatch · item 71587e06 TOOL-dPlacedRequest-50 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-50.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-50-1-acceptance-ledger.md
+
+2026-11-20T09:58:15Z dispatch · item e69a8d66 TOOL-dPlacedRequest-49 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/orientation-card.md tools/unattended/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-49-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md
+
+2026-11-20T09:59:51Z brief · item TOOL-dPlacedRequest-49 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T10:05:34Z draw · re-dispatch · TOOL-dPlacedRequest-49 · 51/130 · 20261120T100534Z-70eb67
+
+2026-11-20T10:05:34Z dispatch · item 05b542ef TOOL-dPlacedRequest-49 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/orientation-card.md tools/unattended/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-49-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/push-main.sh tools/run-gates/post-merge.sh
+2026-11-20T10:33:20Z draw · fix-pass · TOOL-dPlacedRequest-49 · 52/130 · 20261120T103320Z-efed63
+
+2026-11-20T10:33:20Z dispatch · item c13d3e31 TOOL-dPlacedRequest-49 · reason tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md help/orientation-card.md tools/unattended/README.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-49.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-49-1-acceptance-ledger.md help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/push-main.sh tools/run-gates/post-merge.sh
+
+2026-11-20T10:38:57Z dispatch · item 04003a2d TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
+
+2026-11-20T10:41:21Z brief · item TOOL-dPlacedRequest-51 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T10:48:24Z draw · fix-pass · TOOL-dPlacedRequest-51 · 53/130 · 20261120T104824Z-5d66e8
+
+2026-11-20T10:48:24Z dispatch · item 67bdca25 TOOL-dPlacedRequest-51 · reason memory/gotchas/a-merge-of-the-default-branch-read-as-additions.md memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-51.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-51-1-acceptance-ledger.md
+
+2026-11-20T11:19:10Z dispatch · item 476df731 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
+
+2026-11-20T11:21:01Z brief · item TOOL-dPlacedRequest-52 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T11:25:44Z draw · re-dispatch · TOOL-dPlacedRequest-52 · 54/130 · 20261120T112544Z-3c7062
+
+2026-11-20T11:25:44Z dispatch · item 3b1d2bec TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
+2026-11-20T11:42:31Z draw · fix-pass · TOOL-dPlacedRequest-52 · 55/130 · 20261120T114231Z-efeb66
+
+2026-11-20T11:42:31Z dispatch · item 498c52a7 TOOL-dPlacedRequest-52 · reason tools/unattended/unattended.test.sh tools/lib/gov-feed.sh tools/unattended/unattended.sh tools/run-gates/post-merge.sh tools/push-main.sh tools/lib/resolve-python.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/guides/SESSION-KICKOFF.md memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-52-1-acceptance-ledger.md
+
+2026-11-20T11:50:58Z dispatch · item 5302d10d TOOL-dPlacedRequest-53 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-53-1-acceptance-ledger.md
+
+2026-11-20T11:53:47Z brief · item TOOL-dPlacedRequest-53 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T12:03:06Z draw · fix-pass · TOOL-dPlacedRequest-53 · 56/130 · 20261120T120306Z-97cf01
+
+2026-11-20T12:03:06Z dispatch · item 6b72811a TOOL-dPlacedRequest-53 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-53.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-53-1-acceptance-ledger.md
+
+2026-11-20T12:07:39Z dispatch · item ad4b0197 TOOL-dPlacedRequest-54 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-54-1-acceptance-ledger.md
+
+2026-11-20T12:09:19Z brief · item TOOL-dPlacedRequest-54 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T12:14:44Z draw · fix-pass · TOOL-dPlacedRequest-54 · 57/130 · 20261120T121444Z-3b1acf
+
+2026-11-20T12:14:44Z dispatch · item 225bd968 TOOL-dPlacedRequest-54 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-54.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-54-1-acceptance-ledger.md
+
+2026-11-20T12:19:45Z dispatch · item 71c3404f TOOL-dPlacedRequest-55 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-55-1-acceptance-ledger.md
+
+2026-11-20T12:21:43Z brief · item TOOL-dPlacedRequest-55 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T12:28:17Z draw · fix-pass · TOOL-dPlacedRequest-55 · 58/130 · 20261120T122817Z-05c9a0
+
+2026-11-20T12:28:17Z dispatch · item f973248a TOOL-dPlacedRequest-55 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-55.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-55-1-acceptance-ledger.md
+
+2026-11-20T13:06:07Z dispatch · item a18ee28e TOOL-dPlacedRequest-56 · reason tools/unattended/unattended.test.sh skills/session-kickoff/manifest-check.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-56.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-56-1-acceptance-ledger.md
+
+2026-11-20T13:08:00Z brief · item TOOL-dPlacedRequest-56 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T13:22:26Z dispatch · item 68a7dfee TOOL-dPlacedRequest-57 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-57.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-57-1-acceptance-ledger.md
+
+2026-11-20T13:25:32Z brief · item TOOL-dPlacedRequest-57 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+
+2026-11-20T13:34:48Z dispatch · item bf4a4b91 TOOL-dPlacedRequest-58 · reason tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-58-1-acceptance-ledger.md
+
+2026-11-20T13:37:28Z brief · item TOOL-dPlacedRequest-58 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T13:47:50Z draw · fix-pass · TOOL-dPlacedRequest-58 · 59/130 · 20261120T134750Z-2c4b9e
+
+2026-11-20T13:47:50Z dispatch · item 570fafa1 TOOL-dPlacedRequest-58 · reason tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-58.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-58-1-acceptance-ledger.md
+
+2026-11-20T13:53:53Z dispatch · item f5dd1beb TOOL-dPlacedRequest-60 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-60-1-acceptance-ledger.md
+
+2026-11-20T13:55:56Z brief · item TOOL-dPlacedRequest-60 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T14:01:19Z draw · fix-pass · TOOL-dPlacedRequest-60 · 60/130 · 20261120T140119Z-e5f6c4
+
+2026-11-20T14:01:19Z dispatch · item 80fbb019 TOOL-dPlacedRequest-60 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-60.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-60-1-acceptance-ledger.md
+
+2026-11-20T14:44:20Z dispatch · item 4179a941 TOOL-dPlacedRequest-59 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-59-1-acceptance-ledger.md
+
+2026-11-20T14:47:59Z brief · item TOOL-dPlacedRequest-59 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T15:00:13Z draw · fix-pass · TOOL-dPlacedRequest-59 · 61/130 · 20261120T150013Z-69a0ae
+
+2026-11-20T15:00:13Z dispatch · item eab56e88 TOOL-dPlacedRequest-59 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-59.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-59-1-acceptance-ledger.md
+
+2026-11-20T15:08:23Z dispatch · item 39ebe377 TOOL-dPlacedRequest-61 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-61-1-acceptance-ledger.md
+
+2026-11-20T15:11:32Z brief · item TOOL-dPlacedRequest-61 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T15:18:27Z draw · fix-pass · TOOL-dPlacedRequest-61 · 62/130 · 20261120T151827Z-5d987b
+
+2026-11-20T15:18:27Z dispatch · item 34981ce0 TOOL-dPlacedRequest-61 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-61.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-61-1-acceptance-ledger.md
+
+2026-11-20T15:24:11Z dispatch · item d2533e23 TOOL-dPlacedRequest-62 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-62-1-acceptance-ledger.md
+
+2026-11-20T15:25:55Z brief · item TOOL-dPlacedRequest-62 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T15:33:35Z draw · fix-pass · TOOL-dPlacedRequest-62 · 63/130 · 20261120T153335Z-eb5f9f
+
+2026-11-20T15:33:35Z dispatch · item 8f7a58df TOOL-dPlacedRequest-62 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-62.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-62-1-acceptance-ledger.md
+
+2026-11-20T15:38:22Z dispatch · item 02daa1f0 TOOL-dPlacedRequest-63 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-63-1-acceptance-ledger.md
+
+2026-11-20T15:40:12Z brief · item TOOL-dPlacedRequest-63 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T15:49:33Z draw · fix-pass · TOOL-dPlacedRequest-63 · 64/130 · 20261120T154933Z-41769b
+
+2026-11-20T15:49:34Z dispatch · item 7a0c55f2 TOOL-dPlacedRequest-63 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-63-1-acceptance-ledger.md
+2026-11-20T15:51:50Z draw · fix-pass · TOOL-dPlacedRequest-63 · 65/130 · 20261120T155150Z-2c25e7
+
+2026-11-20T15:51:50Z dispatch · item 44ac4bed TOOL-dPlacedRequest-63 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-63.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-63-1-acceptance-ledger.md
+
+2026-11-20T15:55:59Z dispatch · item 1d436a92 TOOL-dPlacedRequest-64 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-64-1-acceptance-ledger.md
+
+2026-11-20T15:57:33Z brief · item TOOL-dPlacedRequest-64 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T16:05:19Z draw · fix-pass · TOOL-dPlacedRequest-64 · 66/130 · 20261120T160519Z-9022e8
+
+2026-11-20T16:05:19Z dispatch · item 3a057a50 TOOL-dPlacedRequest-64 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-64-1-acceptance-ledger.md
+2026-11-20T16:07:18Z draw · fix-pass · TOOL-dPlacedRequest-64 · 67/130 · 20261120T160718Z-d6b5c7
+
+2026-11-20T16:07:18Z dispatch · item ab7501fe TOOL-dPlacedRequest-64 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-64-1-acceptance-ledger.md
+2026-11-20T16:15:13Z draw · re-dispatch · TOOL-dPlacedRequest-64 · 68/130 · 20261120T161513Z-d7ae07
+
+2026-11-20T16:15:13Z dispatch · item fbf8e094 TOOL-dPlacedRequest-64 · reason memory/builds/dPlacedRequest/spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-64-1-acceptance-ledger.md
+
+2026-11-20T16:29:18Z review · item dPlacedRequest · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 2
+2026-11-20T16:44:59Z draw · review-round · dPlacedRequest · 69/130 · 20261120T164459Z-4c66dc
+
+2026-11-20T16:45:00Z review · item dPlacedRequest · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 6 · NON-CONVERGENT · highs 4 · minors 8 · to units · disposition promote
+
+2026-11-20T16:47:25Z rescope · item add TOOL-dPlacedRequest-95 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-95-closing-review-spec-brief.md)
+
+2026-11-20T16:47:26Z rescope · item add TOOL-dPlacedRequest-96 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md)
+
+2026-11-20T16:47:27Z rescope · item add TOOL-dPlacedRequest-97 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-97-closing-review-spec-brief.md)
+
+2026-11-20T16:47:28Z rescope · item add TOOL-dPlacedRequest-98 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-98-closing-review-spec-brief.md)
+
+2026-11-20T16:47:29Z rescope · item add TOOL-dPlacedRequest-99 · reason promoted by the closing diff review's NON-CONVERGENT exit at round 2 (memory/builds/dPlacedRequest/prompts/2026-11-20-prompt-TOOL-dPlacedRequest-99-closing-review-spec-brief.md)
+
+2026-11-20T18:07:09Z rescope · item add TOOL-dPlacedRequest-100 · reason finding 29 HIGH of 2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit, entry-claim routes a stale build lease as a live holder
+
+2026-11-20T18:34:40Z rescope · item add TOOL-dPlacedRequest-100 · reason promoted by the spec audit of units 95 to 99 (finding 29, a new mechanism on spec 96): memory/builds/dPlacedRequest/reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md
+2026-11-20T18:35:01Z draw · review-round · dPlacedRequest-spec-set-r4 · 70/130 · 20261120T183501Z-d748b4
+
+2026-11-20T18:35:01Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 27 · folded 31 · promoted 1 · to units · disposition promote
+
+2026-11-20T18:37:02Z decision · item spec-audit-chain-ceiling · reason the spec audit chain stopped at its 4-round ceiling: round 4 audited the closing review's promoted units TOOL-dPlacedRequest-95 to -99 (CONVERGED, 0 blockers, 5 highs, 31 findings folded at rev-2) and promoted finding 29, a new mechanism on spec 96, to TOOL-dPlacedRequest-100, specced at rev-1 and unaudited; options: (a) audit unit 100 as a fifth round past the ceiling, (b) build units 95 to 100 now and close with specs-audited overridden for unit 100 alone, (c) stop the run here
+
+2026-11-20T18:37:42Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-20T18:37:42Z hold · item owner-decision · reason until owner · reaped 447082a8 · resume none(owner)
+
+2026-11-20T20:52:25Z resume · item dPlacedRequest · reason held · keepalive 65b12df9 · manual
+
+2026-11-20T21:02:47Z dispatch · item 1d91509a TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
+
+2026-11-20T21:03:51Z brief · item TOOL-dPlacedRequest-95 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T21:16:21Z draw · fix-pass · TOOL-dPlacedRequest-95 · 71/130 · 20261120T211621Z-85cabd
+
+2026-11-20T21:16:21Z dispatch · item e98bd44e TOOL-dPlacedRequest-95 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/run-gates/selftest-budgets.txt memory/gotchas/foreign-code-runs-on-the-ambient-credential.md memory/gotchas/INDEX.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-95.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-95-1-acceptance-ledger.md
+
+2026-11-20T21:27:34Z dispatch · item c5109c95 TOOL-dPlacedRequest-96 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-96-1-acceptance-ledger.md
+
+2026-11-20T21:29:10Z brief · item TOOL-dPlacedRequest-96 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T21:38:41Z draw · fix-pass · TOOL-dPlacedRequest-96 · 72/130 · 20261120T213841Z-9b6774
+
+2026-11-20T21:38:41Z dispatch · item a946e70c TOOL-dPlacedRequest-96 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-96.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-96-1-acceptance-ledger.md
+
+2026-11-20T21:46:37Z dispatch · item bcd76be5 TOOL-dPlacedRequest-97 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-97-1-acceptance-ledger.md
+
+2026-11-20T21:48:11Z brief · item TOOL-dPlacedRequest-97 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T21:58:49Z draw · fix-pass · TOOL-dPlacedRequest-97 · 73/130 · 20261120T215849Z-383d50
+
+2026-11-20T21:58:49Z dispatch · item 7b78e4c2 TOOL-dPlacedRequest-97 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-97.md memory/builds/dPlacedRequest/build/2026-11-20-build-TOOL-dPlacedRequest-97-1-acceptance-ledger.md
+
+2026-11-20T22:02:39Z dispatch · item ad80dfc6 TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md
+
+2026-11-20T22:04:11Z brief · item TOOL-dPlacedRequest-98 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T22:14:42Z draw · re-dispatch · TOOL-dPlacedRequest-98 · 74/130 · 20261120T221442Z-59d479
+
+2026-11-20T22:14:42Z dispatch · item c989f8bc TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md memory/gotchas/INDEX.md
+2026-11-20T22:21:17Z draw · fix-pass · TOOL-dPlacedRequest-98 · 75/130 · 20261120T222117Z-bf2b20
+
+2026-11-20T22:21:17Z dispatch · item a35f91bb TOOL-dPlacedRequest-98 · reason tools/push-main.test.sh tools/run-gates/selftest-budgets.txt memory/project/testsuite-count-waivers.txt memory/gotchas/fixture-inherits-ambient-machine-state.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-98.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-98-1-acceptance-ledger.md memory/gotchas/INDEX.md
+
+2026-11-20T22:27:52Z dispatch · item c498b8f7 TOOL-dPlacedRequest-99 · reason skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-selftests.sh tools/run-gates/selftest-budgets.txt tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md tools/push-main.sh tools/push-main.test.sh tools/hooks/scratch-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/gotchas/budget-row-not-remeasured-after-added-arms.md memory/gotchas/global-set-and-never-read.md memory/gotchas/floor-left-below-the-arms-it-guards.md memory/gotchas/usage-exit-list-lags-its-function.md memory/gotchas/INDEX.md memory/map/features/session-kickoff.md memory/map/features/unattended.md memory/map/generated/MAP.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-99-1-acceptance-ledger.md
+
+2026-11-20T22:29:24Z brief · item TOOL-dPlacedRequest-99 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T22:56:49Z draw · re-dispatch · TOOL-dPlacedRequest-99 · 76/130 · 20261120T225649Z-3b2649
+
+2026-11-20T22:56:49Z dispatch · item 48144fcb TOOL-dPlacedRequest-99 · reason skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-selftests.sh tools/run-gates/selftest-budgets.txt tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md tools/push-main.sh tools/push-main.test.sh tools/hooks/scratch-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/gotchas/budget-row-not-remeasured-after-added-arms.md memory/gotchas/global-set-and-never-read.md memory/gotchas/floor-left-below-the-arms-it-guards.md memory/gotchas/usage-exit-list-lags-its-function.md memory/gotchas/INDEX.md memory/map/features/session-kickoff.md memory/map/features/unattended.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-99-1-acceptance-ledger.md
+2026-11-20T23:10:25Z draw · fix-pass · TOOL-dPlacedRequest-99 · 77/130 · 20261120T231025Z-a0405d
+
+2026-11-20T23:10:25Z dispatch · item 5d8b869d TOOL-dPlacedRequest-99 · reason skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/card-store.fixture.sh skills/session-kickoff/manifest-check.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-selftests.sh tools/run-gates/selftest-budgets.txt tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md tools/push-main.sh tools/push-main.test.sh tools/hooks/scratch-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/gotchas/budget-row-not-remeasured-after-added-arms.md memory/gotchas/global-set-and-never-read.md memory/gotchas/floor-left-below-the-arms-it-guards.md memory/gotchas/usage-exit-list-lags-its-function.md memory/gotchas/INDEX.md memory/map/features/session-kickoff.md memory/map/features/unattended.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/map/generated/CARDS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-99.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-99-1-acceptance-ledger.md
+
+2026-11-20T23:16:42Z dispatch · item f99ccb12 TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py
+
+2026-11-20T23:18:57Z brief · item TOOL-dPlacedRequest-100 · reason c73699d13acb memory/builds/dPlacedRequest/prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md
+2026-11-20T23:29:01Z draw · fix-pass · TOOL-dPlacedRequest-100 · 78/130 · 20261120T232901Z-011e8c
+
+2026-11-20T23:29:01Z dispatch · item 179180dd TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
+2026-11-20T23:32:22Z draw · fix-pass · TOOL-dPlacedRequest-100 · 79/130 · 20261120T233222Z-6f0835
+
+2026-11-20T23:32:22Z dispatch · item 3b4afd7c TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
+2026-11-20T23:34:36Z draw · fix-pass · TOOL-dPlacedRequest-100 · 80/130 · 20261120T233436Z-366cbc
+
+2026-11-20T23:34:36Z dispatch · item 526eb7d1 TOOL-dPlacedRequest-100 · reason tools/unattended/unattended.sh tools/loop/claim.py tools/run-gates/selftest-budgets.txt help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dPlacedRequest/spec/2026-11-20-spec-TOOL-dPlacedRequest-100.md memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-1-acceptance-ledger.md tools/loop/placement.py memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-100-red-fix-36.md
+
+2026-11-20T23:39:49Z decision · item landing-merge-protected-skills: the landing must merge origin/main (173 commits past the merge base 9e21ac760, 7 conflicted files), and the merge changes the sandbox-protected .claude/skills/lexicon/SKILL.md and .claude/skills/unattended/SKILL.md; options: (a) the owner confirms the pinned git origin in the app (Help, Troubleshooting, Review Pinned Git Origins) and the run merges, (b) the owner rules a plain git merge acceptable, (c) the owner merges main into the run branch · reason the app takes protected .claude/skills files only from an origin the owner confirmed, and a raw git merge or the lander's --prepare writes the same files, so taking either routes around that guard; no resolver the mandate delegates may confirm an origin
+
+2026-11-21T02:25:49Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-21T02:25:49Z hold · item owner-decision · reason until owner · reaped 65b12df9 · resume none(owner)
+
+2026-11-21T02:37:16Z resume · item dPlacedRequest · reason held · keepalive c039c97c · manual
+
+2026-11-21T09:11:56Z decision · item routed-commits-lane-limits · reason Six Red-fix commits on the run branch sit outside the inline lane's limits: 52181f51, 0c82930f, ed0cffd2, f6516b55 and 3e87e4cc edit spec paths (L3) and 2ae363bf touches 5 paths and 90 lines (L1). routed_commits.py's RANGE half, which the pre-push hook runs over the landing range, reads no waiver, so push-main.sh --land would be refused. Options: (a) replay the run branch from the first violator's parent, each spec hunk in its own records commit and 2ae363bf in two, then force-push the run branch, as dSkippedRecord repaired the same red on 2026-11-20; (b) a unit that lets the RANGE half honour an owner-recorded waiver for limits findings; (c) the owner lands by hand. The run recommends (a), and refuses it unattended because it rewrites about 350 built commits, two merges among them.
+
+2026-11-21T09:12:29Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dPlacedRequest && bash tools/push-main.sh --land --slug dPlacedRequest && bash tools/unattended/unattended.sh --settle dPlacedRequest
+
+2026-11-21T09:12:29Z hold · item owner-decision · reason until owner · reaped c039c97c · resume none(owner)
+
+2026-11-21T11:07:12Z resume · item dPlacedRequest · reason held · keepalive 2439436f · manual

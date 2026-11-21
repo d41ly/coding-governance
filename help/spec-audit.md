@@ -29,7 +29,11 @@ Under `opt-in` an audit is owed where:
 
 Under neither, none is owed, and the tooling says so instead of running one. The unattended
 driver's preflight names the source it read: `opted in by policy review.design: <value> · <date>`, or
-`not owed by policy review.design: <value>`, beside the README and project forms. One `[review]`
+`not owed by policy review.design: <value>`, beside the README and project forms. Where none of those
+owes it, your own request for a spec audit on a live build, placed as a `breakpoint` and declared by
+`placement.py breakpoint` (see "Asking for a review on a live build" in `help/loop.md`), makes it owed
+once the record is at BASE, and the preflight says `opted in by placement`; it can only add an audit,
+never cancel one. One `[review]`
 table cannot hold `design = "owed"` beside the `[review.design]` table that `review.design.rounds`
 lives in, so set the key only where you set no round keys. In an attended session the opt-in pack
 below still reads the README and the conf alone. The opt-in is the

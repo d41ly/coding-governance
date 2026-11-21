@@ -872,11 +872,13 @@ git --git-dir="$G12" update-ref refs/gov/runs/tRun "$G12_C"
 mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"
 run_tick_over "$TICK" --dry-run
 check_hit  "$OUT" "resume-tick: tRun · $FX · beat · --beat tRun would run (dry-run)" "GH1 AC12 a dry run names the beat row"
-check_same "GH1 AC12 ...and pushes nothing" "$(git --git-dir="$G12" rev-parse refs/gov/runs/tRun)" "$G12_C"
+check_same "GH1 AC12 ...and pushes nothing" "$(git --git-dir="$G12" rev-parse refs/gov/runs/tRun) $(git --git-dir="$G12" rev-parse -q --verify refs/gov/leases/tRun/build || echo none)" "$G12_C none"
 run_tick_over "$TICK"
 check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH1 AC12 a LIVE run's tick renews its claim through --beat"
 check_miss "$OUT" "skip · verdict LIVE" "GH1 AC12 ...and never falls to the generic skip"
-n12=$(git --git-dir="$G12" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^beat-utc: //p')
+# The beat writes the slug's build lease on the legacy tip (TOOL-dPlacedRequest-1), so the renewed claim
+# is read at refs/gov/leases/tRun/build (TOOL-dPlacedRequest-34 S35).
+n12=$(git --git-dir="$G12" log -1 --format=%B refs/gov/leases/tRun/build | sed -n 's/^beat-utc: //p')
 check_same "GH1 AC12 the claim's beat moved off the seeded one" "$([ -n "$n12" ] && [ "$n12" != "$(git --git-dir="$G12" log -1 --format=%B "$G12_C" | sed -n 's/^beat-utc: //p')" ] && echo moved || echo unmoved)" "moved"
 rm -rf "$G12"
 
@@ -897,15 +899,15 @@ mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/l
 G11_SID=${CLAUDE_CODE_SESSION_ID-}; unset CLAUDE_CODE_SESSION_ID
 run_tick_over "$TICK"
 check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id renews the run's claim"
-check_same "GH11 AC1 ...under the lease's session, never absent" "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^session: //p')" "$SID"
+check_same "GH11 AC1 ...under the lease's session, never absent" "$(git --git-dir="$G11" log -1 --format=%B refs/gov/leases/tRun/build | sed -n 's/^session: //p')" "$SID"
 G11_OUT=$(cd "$FX" && CLAUDE_CODE_SESSION_ID="$SID" CLAUDE_PID=999999999 bash "$KIT/unattended.sh" --resume tRun --keepalive-id kT 2>&1); G11_RC=$?
 check_same "GH11 AC1 the holder's resume under the lease's session exits 0" "$G11_RC" "0"
 check_miss "$G11_OUT" "UNATTENDED check 108 FAILED" "GH11 AC1 ...and reads the claim the tick wrote as its own"
-git --git-dir="$G11" update-ref -d refs/gov/runs/tRun
+git --git-dir="$G11" update-ref -d refs/gov/runs/tRun; git --git-dir="$G11" update-ref -d refs/gov/leases/tRun/build
 run_tick_over "$TICK"
 check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id creates a claim over an empty remote"
 check_same "GH11 AC1 the created claim names the lease's session, keepalive, host and lease-utc" \
-  "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n -e 's/^host: //p' -e 's/^session: //p' -e 's/^keepalive: //p' -e 's/^lease-utc: //p' | tr '\n' ' ')" \
+  "$(git --git-dir="$G11" log -1 --format=%B refs/gov/leases/tRun/build | sed -n -e 's/^host: //p' -e 's/^session: //p' -e 's/^keepalive: //p' -e 's/^lease-utc: //p' | tr '\n' ' ')" \
   "$G11_HOST $SID kT $OLD_UTC "
 [ -z "$G11_SID" ] || export CLAUDE_CODE_SESSION_ID="$G11_SID"
 rm -rf "$G11"

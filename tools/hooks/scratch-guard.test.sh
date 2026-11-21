@@ -1726,6 +1726,114 @@ run_sub_hook '{"hook_event_name":"SubagentStart","session_id":"sgtest-r1","cwd":
 check_sub_context "S-AC7 a numeric cwd and no CLAUDE_PROJECT_DIR -> exit 0, stdout and stderr EMPTY" "$?" empty
 SG_PROJECT="$SG_CWD_FIX"
 
+# ---- TOOL-dPlacedRequest-2 AC10: readCard asks the kickoff checker's --card --path, never derives it ----
+# A stub checker answering a planted card's path is read; one that exits 1 printing nothing reads as
+# no card, named — the failing case, a checker that does not answer read as a card. readCard's third
+# argument is the checker, so no resolver is involved; the source holds the call and no join of its own.
+sg_cc="$TMP/cardcheck"; mkdir -p "$sg_cc"
+printf 'card — the stub card\n' > "$sg_cc/stub-card.md"
+# The stub prints its own directory as its bash spells it, a /tmp/… mount on Windows among them.
+printf '%s\n' '#!/usr/bin/env bash' 'cd "${0%/*}" && printf "%s\n" "$PWD/stub-card.md"' > "$sg_cc/answers.sh"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$sg_cc/silent.sh"
+sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null" : c.text.trim())' "$HOOK" "$SGFIX/.git" "$sg_cc/answers.sh" 2>&1)
+[ "$sg_got" = "card — the stub card" ] && { echo "ok   AC10 readCard reads the path the checker answers"; pass=$((pass+1)); } \
+  || { echo "FAIL AC10 readCard reads the path the checker answers: $sg_got"; fail=$((fail+1)); }
+sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : "read")' "$HOOK" "$SGFIX/.git" "$sg_cc/silent.sh" 2>&1)
+case "$sg_got" in "null · (no card: the kickoff checker's --card --path did not answer"*) echo "ok   AC10 a checker that does not answer reads as no card, named"; pass=$((pass+1)) ;;
+  *) echo "FAIL AC10 a checker that does not answer reads as no card, named: $sg_got"; fail=$((fail+1)) ;; esac
+if grep -q "'--card', '--path'" "$HOOK" && [ "$(grep -c "'orientation', sid" "$HOOK")" = 0 ]; then
+  echo "ok   AC10 the hook asks --card --path and joins no card path of its own"; pass=$((pass+1))
+else echo "FAIL AC10 the hook asks --card --path and joins no card path of its own"; fail=$((fail+1)); fi
+
+# ---- TOOL-dPlacedRequest-34 AC28 (S28): readCard RUNS each bash candidate, and folds an MSYS answer ----
+# (i) A stub bash FIRST on PATH that cannot run the checker, a non-running bash.exe on Windows and a bash
+# exiting 1 elsewhere, is passed over, and the PATH bash after it reads the card the checker answers.
+# (ii) On Windows, a checker printing the card's `/c/…` spelling is read at its `C:/` path, the bash
+# given as GOV_BASH and nothing but node's directory on PATH, so no cygpath can answer and only the fold
+# turns the path native. Staged against a bare `bash` and an existence-only resolver, (i) reds, the stub
+# answering or chosen; staged against no fold, (ii) reds, `/c/…` naming no file. WHAT THIS DOES NOT
+# CHECK: (ii) off Windows, where no drive spelling exists to fold, which prints one skip line naming it;
+# the Git for Windows defaults after PATH, which a host with a working PATH bash never reaches.
+sg_sb="$TMP/stubbash"; mkdir -p "$sg_sb"
+sg_node=$(command -v node)
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) sg_win=1; printf 'not a program\n' > "$sg_sb/bash.exe" ;;
+  *) sg_win=""; printf '#!/bin/sh\nexit 1\n' > "$sg_sb/bash"; chmod +x "$sg_sb/bash" ;;
+esac
+sg_got=$(env -u GOV_BASH PATH="$sg_sb:$PATH" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim())' "$HOOK" "$SGFIX/.git" "$sg_cc/answers.sh" 2>&1)
+[ "$sg_got" = "card — the stub card" ] && { echo "ok   AC28 a bash first on PATH that cannot run the checker is passed over, and the card is read"; pass=$((pass+1)); } \
+  || { echo "FAIL AC28 a bash first on PATH that cannot run the checker is passed over, and the card is read: $sg_got"; fail=$((fail+1)); }
+if [ -n "$sg_win" ]; then
+  sg_cm=$(cygpath -m "$sg_cc/stub-card.md")
+  sg_cd=${sg_cm:0:1}; sg_cu="/${sg_cd,,}${sg_cm:2}"
+  printf '%s\n' '#!/usr/bin/env bash' "printf '%s\\n' '$sg_cu'" > "$sg_cc/answers-msys.sh"
+  sg_got=$(GOV_BASH="$(cygpath -m "$(command -v bash)")" PATH="${sg_node%/*}" "$sg_node" -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log(c.text === null ? "null · " + c.shown : c.text.trim() + " · " + (/^[A-Za-z]:\//.test(c.path) ? "native" : "as printed " + c.path))' "$HOOK" "$SGFIX/.git" "$sg_cc/answers-msys.sh" 2>&1)
+  [ "$sg_got" = "card — the stub card · native" ] && { echo "ok   AC28 a checker printing $sg_cu is read at its native path"; pass=$((pass+1)); } \
+    || { echo "FAIL AC28 a checker printing an MSYS /c/ path is read at its native path $sg_cm: $sg_got"; fail=$((fail+1)); }
+else
+  echo "  skip — AC28 (ii) the MSYS /c/ fold: this host is not Windows, so no drive spelling exists to fold and nothing was read"
+fi
+
+# ---- TOOL-dPlacedRequest-43 AC18 (S18): readCard's two spawns pass runLiveness' whole option set ----
+# A stub checker that never answers, and one that backgrounds a sleeping child holding its stdout and
+# exits, each read as no card, named, within the bound plus 1 s; the bound is read from the hook's own
+# CARD_PATH_BOUND_MS, never typed here. readCard's body, cut from `function readCard(` to the next line
+# opening `function `, spells the kill signal twice. Staged against the spawn with no kill signal, the
+# count reds; on Windows node's own timeout already bounds both stubs, so the count is the red there.
+# WHAT THIS DOES NOT CHECK: a checker that ignores SIGKILL, which no process can.
+sg_bound=$(sed -n 's/^const CARD_PATH_BOUND_MS = \([0-9][0-9]*\)$/\1/p' "$HOOK")
+printf '#!/usr/bin/env bash\nexec sleep 60\n' > "$sg_cc/hung.sh"
+printf '#!/usr/bin/env bash\nsleep 60 &\nexit 0\n' > "$sg_cc/orphan.sh"
+for sg_c in hung orphan; do
+  sg_got=$(node -e 'const t = Date.now(); const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1", process.argv[3]); console.log((c.text === null && c.shown.startsWith("(no card: ") ? "none" : "read") + " " + (Date.now() - t <= Number(process.argv[4]) + 1000 ? "bounded" : "late"))' "$HOOK" "$SGFIX/.git" "$sg_cc/$sg_c.sh" "${sg_bound:-0}" 2>&1)
+  [ "$sg_got" = "none bounded" ] && { echo "ok   AC18 a $sg_c checker reads as no card within ${sg_bound}ms plus 1 s"; pass=$((pass+1)); } \
+    || { echo "FAIL AC18 a $sg_c checker reads as no card within ${sg_bound:-?}ms plus 1 s: $sg_got"; fail=$((fail+1)); }
+done
+sg_got=$(awk '/^function readCard\(/ { f = 1; print; next } f && /^function / { f = 0 } f' "$HOOK" | grep -c "killSignal: 'SIGKILL'")
+[ "$sg_got" = 2 ] && { echo "ok   AC18 readCard's body passes the kill signal on both spawns"; pass=$((pass+1)); } \
+  || { echo "FAIL AC18 readCard's body passes the kill signal on both spawns: $sg_got"; fail=$((fail+1)); }
+
+# ---- TOOL-dPlacedRequest-95 AC1 (S1): the hook never runs a checker its target's tree tracks ------
+# The target is a scratch repository tracking one manifest-check.sh that writes a marker and prints
+# nothing. Three fixtures reach it, each through a copy of this kit's scripts: (1) readCard over the
+# target's common dir with no checker argument, the copy in a directory outside any repository, so no
+# install-side rung answers; (2) the same through a copy inside a scratch repository tracking two
+# checkers, so the hook's own toplevel rung misses; (3) the copy of (1) fed a main-loop PreToolUse
+# payload of `git -C <target> commit`. Each holds when the target tracks its checker, no marker
+# exists, and the card reads absent naming no kickoff checker. Staged against the hook at 95c3103ad,
+# whose third rung walked the target's toplevel, every fixture writes the marker.
+# WHAT THIS DOES NOT CHECK: the write gate's route reader, which reaches the same readCard through
+# renderRouteText and is not driven here; a hook whose own install the kit resolver answers for.
+sg95="$TMP/sg95"; sg95_t="$sg95/target"; sg95_own="$sg95/own"
+mkdir -p "$sg95/hk" "$sg95_own/hk" "$sg95_own/a" "$sg95_own/b" "$sg95_t"
+cp "$HERE"/*.js "$sg95/hk/"; cp "$HERE"/*.js "$sg95_own/hk/"
+# The marker is spelled as node spells the scratch dir, forward slashes, so any bash writes the one file.
+# The slash is `posix.sep`, never a quoted "/" literal: MSYS rewrites one inside a native program's
+# argument to Git's install root.
+sg95_m="$(cd "$sg95" && node -p 'const p = require("path"); process.cwd().split(p.sep).join(p.posix.sep)')/marker"
+sg95_tc=$(cd "$sg95_t" && node -p 'const p = require("path"); process.cwd().split(p.sep).join(p.posix.sep)')
+printf '#!/usr/bin/env bash\n: > "%s"\n' "$sg95_m" > "$sg95_t/manifest-check.sh"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$sg95_own/a/manifest-check.sh"; cp "$sg95_own/a/manifest-check.sh" "$sg95_own/b/"
+git init -q "$sg95_t" && $SGGIT -C "$sg95_t" add manifest-check.sh && $SGGIT -C "$sg95_t" commit -q -m target
+git init -q "$sg95_own" && $SGGIT -C "$sg95_own" add a b && $SGGIT -C "$sg95_own" commit -q -m own
+sg95_tracked=$(git -C "$sg95_t" ls-files -- manifest-check.sh)
+for sg95_f in "1 a copy outside any repository:$sg95/hk" "2 a copy in a repository tracking two checkers:$sg95_own/hk"; do
+  rm -f "$sg95/marker"
+  sg_got=$(node -e 'const c = require(process.argv[1]).readCard(process.argv[2], "sgtest-c1"); console.log(c.text === null ? "null · " + c.shown : "read")' "${sg95_f#*:}/scratch-guard.js" "$sg95_t/.git" 2>&1)
+  case "$sg95_tracked;$sg_got" in
+    "manifest-check.sh;null · (no card: no kickoff checker"*) [ ! -e "$sg95/marker" ] \
+      && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: the target's tracked checker is not run, the card reads absent naming no kickoff checker"; pass=$((pass+1)); } \
+      || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: the target's tracked checker ran and wrote its marker"; fail=$((fail+1)); } ;;
+    *) echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture ${sg95_f%%:*}: tracked '$sg95_tracked', read: $sg_got"; fail=$((fail+1)) ;;
+  esac
+done
+rm -f "$sg95/marker"; sg_hook=$HOOK; HOOK="$sg95/hk/scratch-guard.js"
+run_card "TOOL-dPlacedRequest-95 AC1 fixture 3 a git -C <target> commit -> allow, the card absent naming no kickoff checker" 0 "one;;orientation card absent;;no kickoff checker" "git -C '$sg95_tc' commit -m x" session_id=sgtest-c1 "cwd=$SG_CWD_WT"
+HOOK=$sg_hook
+[ "$sg95_tracked" = manifest-check.sh ] && [ ! -e "$sg95/marker" ] \
+  && { echo "ok   TOOL-dPlacedRequest-95 AC1 fixture 3: the commit's PreToolUse ran no checker the target tracks"; pass=$((pass+1)); } \
+  || { echo "FAIL TOOL-dPlacedRequest-95 AC1 fixture 3: tracked '$sg95_tracked', or the target's checker ran and wrote its marker"; fail=$((fail+1)); }
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
@@ -1767,8 +1875,16 @@ n=$((pass+fail))
 # counted by hand under the same rule.
 # 390 = 388 + the 2 policy-file rows of TOOL-dDeclaredLoop-2 above, at dDeclaredLoop's reconcile of origin/main
 # 4e6ac5f7c, counted by hand under the same rule.
+# 393 = 390 + the 3 readCard rows TOOL-dPlacedRequest-2 added for its AC10 (the stub's path read, the
+# silent checker read as no card, the source's one call), counted by hand under the same rule.
+# 396 = 393 + the 3 readCard rows TOOL-dPlacedRequest-43 added for its AC18 (the hung checker, the
+# orphaned grandchild, the body's two kill signals), counted by hand under the same rule.
+# 400 = 396 + the 4 rows TOOL-dPlacedRequest-95 added for its AC1 (fixtures 1 and 2 one each, fixture 3
+# its run_card row and its marker row), counted by hand under the same rule.
+# 401 = 400 + the every-host TOOL-dPlacedRequest-34 AC28 row, left out of the count until TOOL-dPlacedRequest-99 S7;
+# AC28's MSYS-fold row runs on a MINGW, MSYS or CYGWIN host alone, and its skip elsewhere keeps it out.
 # The pin sits alone on its line because the testsuite-counts leg reads it anchored.
-FLOOR_ASSERTIONS=390
+FLOOR_ASSERTIONS=401
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

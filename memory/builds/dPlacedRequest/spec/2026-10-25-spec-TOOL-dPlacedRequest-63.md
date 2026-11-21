@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-63 — the round-7 promotions' minors: every inventory row names its base, the sweep places its own criteria, one run-fact clause, a CR the arm can see, and criteria that read what they amend
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-5 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,18 @@
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-63-deviation-631.md](../build/2026-10-25-build-TOOL-dPlacedRequest-63-deviation-631.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
+| [2026-11-20-build-TOOL-dPlacedRequest-63-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dPlacedRequest-63-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-63-deviation-720.md](../build/2026-11-21-build-TOOL-dPlacedRequest-63-deviation-720.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-63-deviation-721.md](../build/2026-11-21-build-TOOL-dPlacedRequest-63-deviation-721.md) | deviation | — |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-12-pass-red-fix-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-12-pass-red-fix-brief.md) | research | TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief.md) | research | TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
+| [2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief.md](../prompts/2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief.md) | research | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-62 |
 | [2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-62 |
+| [2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -19,16 +30,12 @@
 The spec audit of the round-7 promotions
 (`memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md`)
 exited CONVERGED with 22 confirmed findings. Its one high, finding 13, is unit 62. This unit is the
-batch BUILD-METHOD M4 makes of the rest: 12 MEDIUM and 9 LOW findings by raw id, one scope item per
-id, each naming its finding and, in brackets, the review item holding it (M1 to M8, L1 to L8). Four
-review items hold more than one id (M2: 2, 9 and 23; M3: 6 and 16; M4: 8 and 22; L3: 5 and 12).
-Findings 11 and 7 report one defect at two binding grades, items M5 and L4, and each keeps its own
-item and its own observation.
-
-Findings 10 and 15 land on unit 60 and the rest on unit 61 and on the specs and code its pass
-leaves, so this unit repairs none in particular and sits above every unit of the build, at order
-35, after unit 62 at 34. It is built after units 60, 61 and 62, and every edit is made in place on
-what their passes left. Criterion ACn observes item Sn.
+batch `doc.build-method#m4-the-spec-audit-owed-only-where-the-build-or-its-project-declares-it`
+makes of the rest: 12 MEDIUM and 9 LOW findings by raw id, one scope item per id, each naming its
+finding and, in brackets, the review item holding it (M1 to M8, L1 to L8). Four review items hold
+more than one id (M2: 2, 9 and 23; M3: 6 and 16; M4: 8 and 22; L3: 5 and 12). Findings 11 and 7
+report one defect at two binding grades, items M5 and L4, and each keeps its own item. It sits at
+order 35, after unit 62 at 34.
 
 | Item | Finding | Severity | Lands on |
 |---|---|---|---|
@@ -49,307 +56,228 @@ what their passes left. Criterion ACn observes item Sn.
 | S20 | 17 (L7) | LOW | units 57, 61 |
 | S21 | 18 (L8) | LOW | units 56, 61 |
 
+Units 43, 44, 52, 54, 56, 57 and 60 are CLOSED, and the charter's P19 keeps built work out of
+in-place rewrites; units 59 and 61 are DEFERRED, and a builder writes no spec. Re-grounded on
+2026-11-20 against the tree at `52981af4d` by
+`2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, each item is one of four
+kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
+observes item Sn.
+
+| Kind | Items |
+|---|---|
+| observes the text units 59 and 61 carry, the fold of this unit's order | S1, S7 to S10, S12, S14, S19 |
+| observes the live specs at this unit's pass | S4 |
+| observes a closed unit's text or the block it froze, by a probe | S11, S18 |
+| closed by a landed unit, or resolved in §4 as text a closed spec froze | S2, S3, S5, S6, S13, S15 to S17, S20, S21 |
+
+Narrowed from rev-4: no item edits a spec, and this unit builds nothing. The CRLF row, the blank
+class and the tab row are built by unit 59 with its function (F5), the inventory and its excluded
+table are unit 59's live sweep, and the oracle's head lives whole in unit 59's §4.
+
 ## 2. Scope (IN)
 
-Every edit to another unit's spec is in place, one rev bump per spec with its §9 line naming this
-unit and the items it carries. "The run's base", "the fixture's base" and "extracted" are 61 §2's,
-as unit 62 narrows the last and S19 joins its bullet half. "The sweep" is 61 §4's and "the reverse
-direction" is 61 S4's.
+"The sweep" is unit 59 §4's live sweep, and `bullet`, `sec` and `entries` are 59 §4's readers.
 
-- **S1** — finding 1 (M1). The reverse direction matches `RUN\.md|fixture's( later)? base`, so 59
-  AC2's `fixture's later base` reads as named. This unit's pass runs it over every inventory row of
-  54 §4 as units 59 and 61 leave it, and writes the base wording into each row's criterion that
-  lacks it: `the fixture's base` on a fixture row, and the `base:` fact of `RUN.md` on a run row.
-  The `49 S3` row is read through 44 AC1, the criterion it names. Measured today, the rows no unit
-  rewords are 43 AC24, 52 AC11 to AC14 and AC17, 54 AC1, 57 AC1 and 59 AC21; S3 owns 61 AC20. 61
-  S4 and S12, its Files touched and its Edges name 43 and 52. Observed by AC1.
-- **S2** — finding 2 (M2). 54 §4's `Excluded, text only` sub-table, as unit 61 leaves it, names 61
-  AC4 and AC13, each with the phrase that matched, and 61 S1's excluded list names them. 61 §4
-  Evidence's hit set names 56 AC19. Observed by AC2.
-- **S3** — finding 9 (M2). 61 AC20 is an inventory row of 54 §4, and its bullet says it runs on 54's
-  no-merge fixture with the fixture's base. 61 S1's row list names it. Observed by AC3.
-- **S4** — finding 23 (M2). The sweep's population is the whole spec folder, the specs of units 60
-  to 63 included. At this unit's pass every hit is an inventory row or an excluded row, 62's and
-  63's hits too, and 54 §4 Evidence records the hit set measured then. 61 §4 Evidence's pinned set
-  points at that record. Observed by AC4.
-- **S5** — finding 6 (M3). 61 S10 restates 57 AC2's clause "names `RUN.md` and `## Run facts`" in
-  place, to "names `RUN.md` and `extract_run_facts`", and 57 AC2 as unit 61 leaves it reads so.
-  Observed by AC5.
-- **S6** — finding 16 (M3). 61 AC10 greps the plain spelling: 57's AC2 bullet, extracted, holds no
-  `Run facts`, and 44's AC1 bullet, extracted, meets 57 AC2's name clause. Observed by AC6.
-- **S7** — finding 8 (M4). The CRLF row's invocation is spelled. The arm lifts `CLAIM_KV_AWK` out
-  of the shipped driver bytes, the way `slice_fn` lifts a function, and runs `awk -v BINMODE=3`
-  over that text. An environment prefix is not the form. 61 S11, its §4 Evidence's GNU Awk bullet
-  and its §7 `New arm:` line say so, and the Evidence bullet names the forms measured. Observed by
-  AC7.
-- **S8** — finding 22 (M4). 61 AC11 is restated to that invocation. The lifted function reads the
-  CRLF row's `status` as `live`, and a copy without its CR strip reads `live` and a CR. Under the
-  environment prefix both read `live`, which AC11 records as the form that cannot go red on node a.
-  This unit's pass runs the staged copy. Observed by AC8.
-- **S9** — finding 11 (M5). 61 AC4's first clause reads 59's AC3 bullet, extracted, and requires
-  it to hold the widened pattern `oracle[^.]*(runs|run |prints|exits)`. Observed by AC9.
-- **S10** — finding 14 (M6). 61 §8 F1, its §5 risks line and its last Alternatives bullet are
-  restated from the driver. At a shared order the workflow reaches 56 before 57 by id
-  (`tools/workflows/unattended-build.js:608-613`), and `--dispatch` then refuses 56 with fail 49
-  while 57 is neither CLOSED nor WONTDO (`tools/unattended/unattended.sh:13746-13758`, asserted at
-  `tools/unattended/unattended.test.sh:6399-6411`). That refusal is option (c)'s existing seam, so
-  (c) is not a new leg. Option (a) and S7 stand, S7's reason being that the index reads true.
-  Observed by AC10.
-- **S11** — finding 21 (M7). 61 §4's head sketch opens with `base=$1` and the
-  `git rev-parse -q --verify "$base^{commit}"` refusal printing `version oracle: base does not
-  resolve`, ahead of `t=`, as 54 §4 has them. 44 §4, as unit 61 leaves it, holds them in that place.
-  61 AC20 gains both observations of AC11. Observed by AC11.
-- **S12** — finding 24 (M8). `CLAIM_KV_AWK`'s bare branch matches `/^[a-z-]+:[[:blank:]]*$/`, the
-  class the trim uses, in `tools/unattended/unattended.sh` and in the sketches of 61 §4 and 59 §4.
-  The S7 arm of 59 gains a `renews:` plus tab row beside the two-space row, and 61 AC16 names it.
-  `read_claims` passes `bare` 0, so its reads are unchanged. Observed by AC12.
-- **S13** — finding 3 (L1). 61 S14 says that 57 AC2's no-sha clause reads unit 60 S1's bounded
-  output, an edit unit 60 makes and 61 does not repeat. 61 AC14 reads 57's AC2 bullet instead of
-  re-running 60's command. Observed by AC13.
-- **S14** — finding 4 (L2). 61 S20 writes the whole head into 44 §4 alone, and 59 S21 is a pointer
-  to 44 §4, as 61 S13 has it. 61 AC13 gains a clause over 59's S21 bullet. Observed by AC14.
-- **S15** — finding 5 (L3). 61 S19 and 57 §4 cite the read's semantics from its parts.
-  `extract_run_facts` (`tools/unattended/lib-unattended.sh:2057`) keeps the `## Run facts` section
-  and its CRs, the `sed` expression takes any run of blanks after `base:`, and `tr -d '\r'` takes
-  the CR. Beside `fact` (`tools/unattended/unattended.sh:1359-1375`) the one difference is a tab
-  after `base:`, which `fact` keeps. Observed by AC15.
-- **S16** — finding 12 (L3). 61 AC19 and its §4 Evidence bullet name the scratch file's bytes: a
-  `## Run facts` heading, then `base:<sha>`, each line ending CRLF. Observed by AC16.
-- **S17** — finding 7 (L4). 61 AC4 runs the pattern 59's AC3 bullet states, as S9 extracts it,
-  and requires 44 AC2 and 56 AC10 among its hits. Observed by AC17.
-- **S18** — finding 10 (L5). 60 AC3 requires a §9 line of 57 naming this edit:
-  `grep -cE 'TOOL-dPlacedRequest-60\b.*AC2'` over 57's §9 prints at least 1. Observed by AC18.
-- **S19** — finding 15 (L6), the skeptic's corrected fix. Unit 60 S1's form is the one reader of a
-  labelled bullet, and its output is joined by `| tr '\n' ' ' | tr -s ' '`. 60 S1 and 57 AC2's
-  spelled read, as unit 60 leaves it, append the join. 61 §2's "Extracted", as unit 62 narrows it,
-  names the joined form for S and AC bullets. It says why the sweep keeps its own join: the sweep
-  reads every bullet of a file in one pass, which a label reader cannot. Observed by AC19.
-- **S20** — finding 17 (L7). 61 S10's list gains 57 AC1's phrase naming S1's reader, reworded to
-  "read by `extract_run_facts`". 61 AC10 becomes a sweep of the spec folder. Observed by AC20.
-- **S21** — finding 18 (L8). 61 S7's update list gains 56 §3's "No renumbering of any order"
-  bullet, restated to name S7's moves. 61 AC7 gains the order prose of 59 §1 and the edges of 56 and
-  57. Observed by AC21.
+- **S1** — finding 1 (M1). Made in 59's rev-7 (F4): the sweep reads the reverse direction in the same
+  pass, its alternation `RUN\.md|fixture's( later)? base`, so 59's AC2 wording, the fixture's later
+  base, reads as named. The inventory rows of the closed specs stand as built. Observed by AC1.
+- **S2** — finding 2 (M2). Resolved in §4: spec 54 is CLOSED and carries no inventory, so no
+  excluded sub-table is written; the sweep asks each hit its base and needs no placement list.
+  NOT OBSERVED here: spec text.
+- **S3** — finding 9 (M2). Resolved in §4: 61's AC20 reads spec text and walks no history, so it is no
+  inventory row. NOT OBSERVED here: spec text.
+- **S4** — finding 23 (M2). Made in 59's S3: the sweep's population is every spec neither CLOSED nor
+  WONTDO, read at the pass that observes it. Left, the sweep run at this unit's pass. Observed by
+  AC4.
+- **S5** — finding 6 (M3). Closed by `TOOL-dPlacedRequest-57` rev-5: its AC2 reads 54's AC1 and names
+  no `## Run facts` clause. NOT OBSERVED here: spec text.
+- **S6** — finding 16 (M3). Resolved in §4: 57's S1 names the section by its heading in prose and
+  reads it by `extract_run_facts`, and 44's AC1 is frozen; 61's AC10 greps the awk copy's spelling.
+  NOT OBSERVED here: spec text.
+- **S7** — finding 8 (M4). Made in 59's §4: the CRLF row lifts `CLAIM_KV_AWK` out of the shipped
+  driver bytes by `slice_fn CLAIM_KV_AWK var` and runs `awk -v BINMODE=3`, and 59's Evidence names
+  each form measured per input path. Observed by AC7.
+- **S8** — finding 22 (M4). Made in 59's §4 and its `New arm:` line: the row prints `live|4`, and the
+  staged copy without the strip reads live and a CR. Observed by AC8.
+- **S9** — finding 11 (M5). Made in 59's §4: the widened pattern is the sweep's own, and no criterion
+  carries a copy of it to run. Observed by AC9.
+- **S10** — finding 14 (M6). Made in 61's rev-6: its F1, §5 risks line and last Alternatives bullet
+  are restated from the driver, naming `--dispatch`, fail 49 and the roster sort, with option (c)'s
+  existing seam the fail-49 refusal. Observed by AC10.
+- **S11** — finding 21 (M7). Satisfied: spec 56's block opens with `base=$1` and the
+  `rev-parse -q --verify` refusal, and 59's §4 block keeps both in that place. Left, its observation.
+  Observed by AC11.
+- **S12** — finding 24 (M8). Made in 59's S7: loose mode trims with `[[:blank:]]` alone, and the rows
+  hold a tab row beside the two-space row. Observed by AC12.
+- **S13** — finding 3 (L1). Closed by 57 rev-5: unit 60's bounded read is made in 57's AC2, and 61's
+  S14 records it. NOT OBSERVED here: spec text.
+- **S14** — finding 4 (L2). Made in 59's rev-7: S21 carries the block whole in 59's §4, so the head
+  is stated once, and 44's block is frozen and superseded. Observed by AC14.
+- **S15** — finding 5 (L3). Resolved in §4: 57's Evidence cites `fact` and `extract_run_facts` by
+  symbol, the parts of the read. NOT OBSERVED here: spec text.
+- **S16** — finding 12 (L3). Resolved in §4: 61's S19 is resolved, and 57's Evidence names the CRLF
+  file it measured. NOT OBSERVED here: spec text.
+- **S17** — finding 7 (L4). Resolved in §4: 44's AC2 and 56's AC10 sit in CLOSED specs outside the
+  sweep's population. NOT OBSERVED here: spec text.
+- **S18** — finding 10 (L5). Satisfied by 57's rev-5 entry, which names unit 60 and AC2. Left, its
+  observation by `entries`. Observed by AC18.
+- **S19** — finding 15 (L6). Made in 59's §4 readers: `bullet` is unit 60 S1's form with the join
+  appended, and the sweep keeps its own join, reading every bullet of a file in one pass. Observed by
+  AC19.
+- **S20** — finding 17 (L7). Resolved in §4: 57's AC1 names S1's command, and 57 is CLOSED.
+  NOT OBSERVED here: spec text.
+- **S21** — finding 18 (L8). Resolved in §4: no order moves, so 56's renumbering non-goal stays
+  true. NOT OBSERVED here: spec text.
 
 ## 3. Non-goals (OUT)
 
-- No second mechanism for the high: unit 62 owns finding 13. S11, S14 and S19 extend the readers and
-  criteria it restates.
-- No change to which keys `read_claims` reads or to its completeness check: S12 widens the bare
-  branch alone, which only the walk's keys reach.
-- No edit to `TOOL-dPlacedRequest-34`: it sits 82 bytes under 48128, and S13 reads 57 AC2 instead.
-- No sequencing in the run that builds this unit: that run plans its roster before this pass, so
-  S10 corrects the record only.
-- No driver knob for the arm: §8 F2.
-- No new gate leg, no lint over spec criteria and no new bug-class record: the arm rows join an
-  existing suite, and the closing review's left-shift decides any record (BUILD-METHOD M8).
+- No edit to any spec, and no code: the folds are made in 59's rev-7 and 61's rev-6, and the closed
+  specs are resolved in §4 (F4, F5).
+- No second mechanism for the high: unit 62 owns finding 13.
+- No change to which keys `read_claims` reads: unit 59's S7 owns the reader.
+- No new gate leg, no lint over spec criteria and no new bug-class record: the closing review's
+  left-shift decides any (`doc.build-method#m8-closing-the-build`).
 
 ### Edges
 
-- **consumes-from** `TOOL-dPlacedRequest-61` — §1, §2's preamble, S1, S4, S7, S10, S11, S12, S14, S19, S20, §4's sketches and Evidence, §5, §7, §8 F1 and AC4, AC7, AC10, AC11, AC13, AC14, AC16, AC19 and AC20, which every item but S18 amends
-- **consumes-from** `TOOL-dPlacedRequest-62` — §2's narrowed "Extracted" and the restated AC13 and AC20, which S11, S14 and S19 extend
-- **consumes-from** `TOOL-dPlacedRequest-60` — S1's bounded form and AC3, which S18 and S19 amend
-- **consumes-from** `TOOL-dPlacedRequest-54` — §4's inventory, its excluded sub-table and its Evidence as unit 61 leaves them, and AC1, which S1 to S4 amend
-- **consumes-from** `TOOL-dPlacedRequest-57` — AC1, AC2 and §4 as units 60 and 61 leave them, which S1, S5, S15, S19 and S20 amend
-- **consumes-from** `TOOL-dPlacedRequest-59` — AC3, AC21, S21 and §4's key reader sketch as unit 61 leaves them, and the S7 arm, which S1, S9, S12, S14 and S17 amend
-- **consumes-from** `TOOL-dPlacedRequest-44` — §4's oracle as unit 61 leaves it, which S11 gives the base refusal
-- **consumes-from** `TOOL-dPlacedRequest-52` — AC11 to AC14 and AC17, which S1 gives the fixture's base
-- **consumes-from** `TOOL-dPlacedRequest-43` — AC24, which S1 gives the `base:` fact of `RUN.md`
-- **consumes-from** `TOOL-dPlacedRequest-56` — §3's renumbering bullet, which S21 restates
-- **hands-off** `TOOL-dPlacedRequest-64` — S1, S7, S10, S11, S15, S19, §4's readers, sketches and Evidence, §5, §6's preamble, §8 F2, §10, Edges, AC1, AC7, AC8, AC10, AC11, AC15, AC18, AC19 and AC21 as this unit's pass leaves them, which that unit's items for every finding but 6, 10, 18 and 19 amend
+- **consumes-from** `TOOL-dPlacedRequest-59` — S3, S7, S21, §4's readers, sweep, key reader, rows and block, Evidence, the `New arm:` line and AC7 as its rev-7 leaves them, which every observing item reads
+- **consumes-from** `TOOL-dPlacedRequest-61` — §8 F1, §5 and the Alternatives as its rev-6 leaves them, which S10 observes
+- **consumes-from** `TOOL-dPlacedRequest-62` — the section form, made in unit 59's readers, which every `sec` read uses
+- **consumes-from** `TOOL-dPlacedRequest-60` — S1's bounded form and AC3, frozen, which S18 and S19 observe
+- **consumes-from** `TOOL-dPlacedRequest-57` — AC1, AC2, §4 and the rev-5 entry, frozen, which S5, S13, S15, S18 and S20 observe or resolve
+- **consumes-from** `TOOL-dPlacedRequest-54` — §4, frozen, which S2 resolves
+- **consumes-from** `TOOL-dPlacedRequest-56` — §3's renumbering non-goal and §4's block, frozen, which S11 and S21 read
+- **consumes-from** `TOOL-dPlacedRequest-44` — AC1, AC2 and §4's oracle, frozen and superseded, which S6, S14 and S17 resolve
+- **consumes-from** `TOOL-dPlacedRequest-52` — AC11 to AC14 and AC17, frozen with the oracle's criteria moved to unit 55, which S1 resolves
+- **consumes-from** `TOOL-dPlacedRequest-43` — AC24, frozen, which S1 resolves
+- **hands-off** `TOOL-dPlacedRequest-64` — §6's preamble, AC10 and AC18 as this rev leaves them, which that unit's folded items observe
 
 ## 4. Design
 
-### The reverse direction, as this unit leaves it (S1, S4, S19)
+### The folds (F4)
 
-```bash
-d=memory/builds/dPlacedRequest/spec
-bullet() { awk "/^- \*\*$2\*\*/{f=1;print;next} f&&/^(- |#|\$)/{exit} f" \
-  "$d/2026-10-25-spec-TOOL-dPlacedRequest-$1.md" | tr '\n' ' ' | tr -s ' '; }
-# for each inventory row "<unit> <label>" of 54 §4; the 49 S3 row reads 44 AC1
-bullet "$u" "$l" | grep -qE "RUN\.md|fixture's( later)? base" || echo "red: $u $l"
-```
+| This unit's items | Made in |
+|---|---|
+| S1, S4, S9 | 59's S3, §4's live sweep and AC3 |
+| S7, S8, S12 | 59's S7, §4's key reader and rows, Evidence and `New arm:` line |
+| S14 | 59's S21 and §4's block |
+| S19 | 59 §4's `bullet` |
+| S10 | 61's §8 F1, §5 risks line and last Alternatives bullet |
 
-`bullet` is unit 60 S1's form with the label as an argument and S19's join appended. `\*\*` after
-the label keeps `AC1` from reading `AC10`.
+Units 59 and 61 are built before this one, at orders 31 and 33, and `--dispatch` refuses this unit
+while either is neither CLOSED nor WONTDO, so every criterion here reads text and code their passes
+have landed.
 
-### The CRLF row's invocation (S7, S8)
+### The closed specs' text (S2, S3, S5, S6, S13, S15 to S17, S20, S21)
 
-```bash
-s=$(grep -n "^CLAIM_KV_AWK='" "$SCRIPT" | cut -d: -f1)
-e=$(awk -v s="$s" "NR>s && /'\$/ {print NR; exit}" "$SCRIPT")
-eval "$(sed -n "${s},${e}p" "$SCRIPT")"      # the shipped text, lifted as slice_fn lifts a function
-printf 'status: live\r\n' | awk -v BINMODE=3 "$CLAIM_KV_AWK"'
-  BEGIN { K["status"] = 1 } { kv($0, K, v, 0) } END { print (v["status"] == "live") }'
-```
+The closing mechanism is P19: a CLOSED spec is a frozen record, so its text stands as built, and the
+fact each finding asked for stands here or in unit 59.
 
-### The key reader's bare branch (S12)
-
-```
-bare and line ~ /^[a-z-]+:[[:blank:]]*$/ -> k = before ":";  value = ""
-```
-
-### The oracle's head, opening (S11)
-
-```bash
-base=$1
-git rev-parse -q --verify "$base^{commit}" >/dev/null \
-  || { echo "version oracle: base does not resolve"; exit 2; }
-t=$(git rev-list --first-parent --min-parents=2 --max-count=1 HEAD --)
-# the rest as 61 §4's sketch states it
-```
+- S2, S3: no inventory and no excluded sub-table exist; the sweep asks every hit for its base, and a
+  criterion that only reads text never matches the pattern without naming one.
+- S5, S13: 57's AC2 reads 54's AC1 by unit 60's bounded form and names no `## Run facts` clause.
+- S6: 57's S1 reads by `tools/unattended/lib-unattended.sh#extract_run_facts`; 61's AC10 greps 57's
+  S1 for the awk copy `/^## Run facts/`, the spelling a second reader would carry.
+- S15, S16: 57's Evidence cites `tools/unattended/unattended.sh#fact` and `extract_run_facts` by
+  symbol and measured a CRLF file holding `base:<sha>` with no space.
+- S17: 44's AC2 and 56's AC10 are CLOSED criteria; the sweep reads live specs only.
+- S20: 57's AC1 reads `b` by S1's command, frozen as built.
+- S21: 56's §3 says no order is renumbered, and none is (61's S7).
 
 ### Evidence
 
-- Measured 2026-10-25 on node a: the reverse direction over the rows of 59 S3 and 61 S1, read by
-  `bullet`, was red on 43 AC24, 44 AC1 to AC3, 49 S3, 52 AC11 to AC14 and AC17, 54 AC1, 55 AC1 and
-  AC2, 56 AC6 and AC10, 57 AC1, 59 AC21 and 61 AC20. 52 AC29 does not exist yet. Units 57 and 59
-  reword 44's, 49's, 55's and 56's rows, so S1's list is the rest. PINNED at that date; S1
-  re-measures at this pass.
-- GNU Awk 5.4.0 on node a, over `status: live` and a CR: the default read printed length 12,
-  `BINMODE=3 awk` as an environment prefix 12, `awk -v BINMODE=3` 13 and `BEGIN{BINMODE=3}` 13,
-  from a file and through a pipe. Measured 2026-10-25. PINNED at that date.
-- `extract_run_facts` piped to S10's `sed` and `tr` printed nothing over a CRLF file holding only
-  `base:<sha>`, and the sha over the same file with a `## Run facts` CRLF line first. A tab after
-  `base:` was taken by the `sed`. Measured 2026-10-25.
-- `fact` strips a trailing CR at `tools/unattended/unattended.sh:1364` and leading spaces only at
-  `:1371`. Read 2026-10-25.
-- `tools/unattended/unattended.test.sh:708` defines `slice_fn`, which evals a function out of the
-  shipped driver bytes by its line span. Read 2026-10-25.
-- 57's §9 holds one line naming `TOOL-dPlacedRequest-60`, the round-7 hands-off fold, and
-  `grep -cE 'TOOL-dPlacedRequest-60\b.*AC2'` over 57's §9 printed 0. Measured 2026-10-25.
-- `grep -lE "/\^## Run facts/|S1'?s .awk."` over the spec folder printed 57's spec alone, and
-  `grep -c 'shared order\|at this order'` printed 1 over 56 and 1 over 57. Measured 2026-10-25.
+- Measured 2026-11-20 on node a with GNU Awk 5.4.0, over `status: live` and a CR: through a pipe
+  `BEGIN{BINMODE=3}` printed length 12 and `awk -v BINMODE=3` 13. PINNED at that date.
+- `sec 59 '### The live sweep'` held `oracle[^.]*(runs|run |prints|exits)` and the base alternation,
+  and the sweep over the folder printed nothing for 59's rev-7. Measured 2026-11-20.
+- 57's revision log holds a rev-5 entry naming `TOOL-dPlacedRequest-60` and AC2, and `entries 57`
+  piped to `grep -cE 'TOOL-dPlacedRequest-60\b.*AC2'` printed 1. Measured 2026-11-20.
 - `grep -c 'neither CLOSED nor WONTDO, so the consumer would build' tools/unattended/unattended.sh`
-  printed 1, the fail-49 message at `:13758`. Read 2026-10-25.
-- The sweep over 62's and 63's specs as written printed `63 AC11`, the one criterion of the two
-  that runs the oracle, which names the fixture's base. Measured 2026-10-25.
+  printed 1, the fail-49 message of `tools/unattended/unattended.sh#verb_dispatch`. Read 2026-11-20.
 
 ### Files touched (estimate)
 
-- `memory/builds/dPlacedRequest/spec/`: the specs of units 43, 44, 52, 54, 56, 57, 59, 60 and 61,
-  each edit a rev bump with its §9 line
-- `tools/unattended/unattended.sh`: S12 in `CLAIM_KV_AWK`
-- `tools/unattended/unattended.test.sh`: the CRLF invocation and the tab row in 59's S7 arm
+None: every item's text is made in units 59 and 61 or resolved here, and the code is unit 59's.
 
 ### Alternatives rejected
 
-- **Two batches.** S18 and S19 write 60, and S19 also writes 61 §2 beside every item landing on 61,
-  so no split gives M6 two disjoint write sets.
-- **The reverse direction limited to the rows 59 S4 and S5 reword (finding 1's second fix).** It
-  leaves inventory rows whose criteria state no base, the case the direction exists to catch.
+- **Build the CRLF invocation and the tab row at this pass (rev-4's S7, S8 and S12).** Unit 59 builds
+  the function and its rows whole, and a second pass over them is a copy of the same edit.
 - **A `CLAIM_BINMODE` knob on the driver's calls (finding 8's first form).** It adds an environment
-  surface to a shipped kit for a test arm's sake.
-- **Taking S14 and AC14 out of 61 (finding 3's first fix).** It leaves 61's item list with a gap
-  and no criterion of 61's own for finding 6.
+  surface to a shipped kit for a test row's sake.
+- **Reword each red inventory row's criterion (rev-4's S1).** The rows sit in CLOSED specs, and the
+  sweep reads the live ones, which can still change.
 
 ## 5. Production-readiness checklist
 
-- security — S12 widens the bare branch alone, which `read_claims` never reaches with `bare` 0, so
-  the strict reader admits nothing it refused before.
-- perf / scale — one class change in one awk branch; one sweep and one reverse pass over the spec
-  folder at this pass.
-- error / empty / loading states — S11 names the empty base's refusal; S1 prints each red row.
-- observability — S4 records the hit set measured at this pass, and S8 records which invocation
-  cannot go red.
-- risks — S1's derived list may differ from the pinned one; a red row outside it is amended the same
-  way, Files touched and Edges first.
-- testing — the probes of §6 and the arm rows of §7.
-- migration — none: every surface is new in this build.
-- user docs — none beyond the specs: no user-facing behaviour changes.
+- security — none: a read of spec text and of a closed unit's record.
+- perf / scale — one `awk` per read, and one sweep over the spec folder at this pass.
+- error / empty / loading states — a label or heading that names nothing prints nothing, which fails
+  the clause that reads it.
+- observability — the sweep prints each bullet that names no base.
+- risks — this unit observes text two earlier passes landed; a stale carrier reads red here and is
+  named in this pass's return as an owed spec-writer edit.
+- testing — the probes of §6.
+- migration — none: spec text.
+- user docs — none: spec text.
 
 ## 6. Acceptance criteria
 
-`bullet <unit> <label>` and the reverse direction are §4's. `sec <file> <prefix>` is unit 62 §4's.
-The oracle fixtures are units 52's and 54's under `%TEMP%` with a short name.
+`bullet`, `sec` and `entries` are unit 59 §4's readers, `bullet` the joined form 64's S9 and S10
+placed there; a `<unit>` operand names that unit's spec.
 
-- **AC1** — When the reverse direction reads each inventory row of 54 §4, it prints no `red:` line.
-  Over a scratch copy of 52 whose AC11 bullet names no base, it prints `red: 52 AC11`. 61's S4
-  bullet names `fixture's( later)? base`.
-  Red when: an inventory row's criterion states no base.
-  fixture: the scratch copy is made under the run's scratch directory.
-- **AC2** — When 54 §4's `Excluded, text only` sub-table is read, it names `61 AC4` and `61 AC13`,
-  each with a phrase, and 61 §4 Evidence's hit set names `56 AC19`.
-  Red when: a hit among the batch's own criteria has no placement.
-- **AC3** — When 54 §4's inventory is read, it holds a `61 AC20` row, and `bullet 61 AC20` names
-  `fixture's base`.
-  Red when: a criterion of the batch that walks history is placed as text only.
-- **AC4** — When the sweep reads the folder with units 60 to 63 present, every hit is an inventory
-  row or an excluded row, `63 AC11` among the rows. 54 §4 Evidence holds that hit set under this
-  pass's date.
-  Red when: the pinned set predates the specs it sweeps.
-  figure: the hit set DERIVED at this pass.
-- **AC5** — When `bullet 57 AC2` is read, it names `RUN.md` and `extract_run_facts`, and
-  `bullet 61 S10` names the restated clause.
-  Red when: a replacement leaves the clause it replaces standing.
-- **AC6** — When `bullet 57 AC2` is read, `grep -c 'Run facts'` over it prints 0, and `bullet 44 AC1`
-  names `RUN.md` and `extract_run_facts`. `bullet 61 AC10` names `grep -c 'Run facts'`.
-  Red when: a criterion greps for a retired heading in one spelling only.
-- **AC7** — When `bullet 61 S11` and 61's §7 `New arm:` line are read, each names `-v BINMODE=3`,
-  and 61 §4 Evidence's GNU Awk bullet names `BEGIN{BINMODE=3}` and the environment prefix.
+- **AC1** — When `sec 59 '### The live sweep'` is read, it holds `RUN\.md|fixture's( later)? base`,
+  and `printf "the fixture's later base\n"` piped to `grep -cE "RUN\.md|fixture's( later)? base"`
+  prints 1. `bullet 59 S3` names `63's S1 and S9`.
+  Red when: a criterion naming its base in a sibling's wording reads as naming none.
+- **AC4** — When 59 §4's live sweep runs at this unit's pass over `memory/builds/dPlacedRequest/spec/`,
+  it prints nothing, and `grep -L -E '^\*\*Status:\*\* (CLOSED|WONTDO)'` over the folder lists this
+  spec.
+  Red when: the population predates the specs it sweeps.
+  figure: the hit set DERIVED at observation.
+- **AC7** — When `sec 59 "### The suite's rows"` is read, it names `slice_fn CLAIM_KV_AWK var` and
+  `awk -v BINMODE=3`, and `sec 59 '### Evidence'` names `too late for stdin` and
+  `BEGIN{BINMODE=3}`. At this pass, `printf 'status: live\r\n' | awk 'BEGIN{BINMODE=3}{print length($0)}'`
+  prints 12 and the same under `awk -v BINMODE=3` prints 13.
   Red when: a platform knob is spelled in a form that leaves the CR dropped.
-- **AC8** — When the CRLF row runs §4's lifted `CLAIM_KV_AWK` under `awk -v BINMODE=3`, `status`
-  reads `live`. A copy without `sub(/\r$/, "", line)` reads `live` and a CR, and under the
-  environment prefix both read `live`. `bullet 61 AC11` names `-v BINMODE=3`.
-  Red when: the staged break cannot go red on the machine the evidence came from.
-- **AC9** — When `bullet 59 AC3` is read, it holds `oracle[^.]*(runs|run |prints|exits)`, and
-  `bullet 61 AC4` names `59 AC3`.
-  Red when: a criterion reads its own copy of a pattern instead of the edited one.
-- **AC10** — When 61's §8 F1 span is read, it names `--dispatch` and `fail 49`, and
-  `grep -c 'It is a new leg\|That is harmless'` over 61's spec prints 0.
+  figure: 12 and 13 PINNED on node a with GNU Awk 5.4.0, 2026-11-20.
+- **AC8** — When `bullet 59 AC7` is read, it names `live|4`, and 59's `New arm:` line names
+  `sub(/\r$/, "", line)` and `live and a CR`.
+  Red when: a staged break prints a value a failed lift also prints.
+- **AC9** — When `bullet 59 AC3` is read, it names `§4's live sweep` and holds no `[^.]`.
+  Red when: a criterion runs its own copy of a pattern instead of the edited one.
+- **AC10** — When `sec 61 '## 8.'` is read, its F1 span names `--dispatch`, `fail 49` and
+  `unattended-build.js#ordered`; `tr -s '[:space:]' ' '` over 61's spec, piped to
+  `grep -c 'is a new leg\|That is harmless'`, prints 0; and
   `grep -c 'neither CLOSED nor WONTDO, so the consumer would build' tools/unattended/unattended.sh`
   prints 1.
   Red when: a fork is resolved on an account of the driver the code contradicts.
-- **AC11** — When `sec` reads 44's `### The oracle` section, `base does not resolve` sits on a line
-  before the first `rev-list`. On 54's no-merge fixture, with the fixture's base given as the empty
-  string, the oracle prints `version oracle: base does not resolve` and exits 2. 61 §4's head sketch
-  opens `base=$1`.
+- **AC11** — When `sec 59 '### The one version oracle'` is read, `base=$1` sits on a line before
+  `base does not resolve`, which sits before the first `rev-list`, and `bullet 59 AC21` names
+  `deadbeefdeadbeefdeadbeefdeadbeefdeadbeef` and `the empty string`.
   Red when: an empty base reaches the ancestor test and is refused with the wrong line.
-- **AC12** — When the arm's row feeds `renews:` and a tab to the walk's call, the value is empty, as
-  for `renews:` and two spaces. A copy whose bare branch reads `[ ]*` leaves the key absent.
-  `bullet 61 AC16` names the tab row.
-  Red when: a key reader's match and its trim use two whitespace classes.
-- **AC13** — When `bullet 61 AC14` is read, it names 57's AC2 bullet and its `Red when:` names an
-  unbounded read. `bullet 57 AC2` holds `f&&/^(- |#|$)/{exit}`.
-  Red when: a criterion re-runs a sibling's fixed command and never reads the text it certifies.
-- **AC14** — When `bullet 59 S21` is read, `grep -c 'merge-base --is-ancestor'` over it prints 0 and
-  it names `44 §4`. `bullet 61 S20` names 44 §4 and not 59 S21, and `bullet 61 AC13` names `59 S21`.
+- **AC12** — When `sec 59 '### The shared key reader'` is read, it holds `[[:blank:]]` and no
+  `[ \t]`, and `sec 59 "### The suite's rows"` names `with a tab`.
+  Red when: a tab after the colon parses otherwise than two spaces.
+- **AC14** — When `bullet 59 S21` is read, it names `§4's block` and `superseded`, and
+  `grep -lE '^t=\$\(git rev-list'` over the specs neither CLOSED nor WONTDO prints 59's spec alone.
   Red when: a sketch stated once has two copies.
-- **AC15** — When `bullet 61 S19` is read, it names `extract_run_facts`, `lib-unattended.sh:2057`
-  and `tr -d`, and 57's `### The read, at the close` section, read by `sec`, names
-  `extract_run_facts`.
-  Red when: a contract cites a reader the pipeline does not run.
-- **AC16** — When S10's read of 61 reads a scratch file holding `## Run facts` then `base:<sha>`,
-  each line ending CRLF, it prints the bare sha. Without the heading it prints nothing.
-  `bullet 61 AC19` names `## Run facts`.
-  Red when: a fixture written from the criterion's text reads as no base.
-  fixture: the scratch file is made under the run's scratch directory.
-- **AC17** — When the pattern `bullet 59 AC3` holds is grepped over each joined bullet of the
-  folder, 44 AC2 and 56 AC10 are among its hits, and under `oracle[^.]*(runs|run )` neither is.
-  `bullet 61 AC4` names the pattern's source as `59 AC3`.
-  Red when: a criterion passes whichever pattern 59 AC3 states.
-- **AC18** — When `awk '/^## 9\./{f=1;next} /^## /{f=0} f'` reads 57's §9,
-  `grep -cE 'TOOL-dPlacedRequest-60\b.*AC2'` over it prints at least 1, and `bullet 60 AC3` names
-  that pattern. Over a scratch copy of 57 without unit 60's §9 line it prints 0.
+- **AC18** — When `entries 57` is piped to `grep -cE 'TOOL-dPlacedRequest-60\b.*AC2'`, it prints at
+  least 1, and over a scratch copy of 57 without unit 60's revision entry it prints 0.
   Red when: a record check is green before the unit it records is built.
-- **AC19** — When `bullet 60 S1` and `bullet 57 AC2` are read, each names `tr -s ' '`, and 61's §2
-  preamble names the joined form and the sweep's own join. Over a scratch copy of 59 whose AC4
-  wraps between `fixture's` and `base`, `bullet` finds `fixture's base` and unit 60 S1's form
-  without the join does not.
+  fixture: the scratch copy is made under the run's scratch directory.
+- **AC19** — When `sec 59 '### The criterion readers'` is read, its `bullet` holds `tr -s ' '`; over a
+  scratch copy of 59 whose AC21 wraps between `fixture's` and `base`, `bullet` finds `fixture's base`
+  and unit 60 S1's form without the join does not.
   Red when: one bullet has two readers that disagree on a wrapped phrase.
   fixture: the scratch copy is made under the run's scratch directory.
-- **AC20** — When `grep -rlE "/\^## Run facts/|S1'?s .awk." memory/builds/dPlacedRequest/spec/`
-  runs, every path it prints is 61's or 63's spec, and `bullet 57 AC1` names `extract_run_facts`.
-  Red when: a copy of a superseded reader survives in a sibling.
-- **AC21** — When 59's §1 is read, it names `order 32` and `order 31`, and 56's §3 holds no
-  `No renumbering of any order`. `sec` over the `### Edges` sections of 56 and 57, piped to
-  `grep -c 'shared order\|at this order'`, prints 0 for each.
-  Red when: a renumbering leaves prose citing the old orders.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
 
-New arm: tools/unattended/unattended.test.sh · covers AC8 AC12 · the CRLF row staged against the lifted function without its CR strip under `awk -v BINMODE=3`, and the tab row against a bare branch matching spaces only · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+No new arm: every criterion is a read of spec text or a sweep of it, and unit 59's arm carries the
+rows.
 
 ## 8. Open questions
 
@@ -357,35 +285,71 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC12 · the CRLF row 
   criterion, the rows derived by running the reverse direction at this pass; (b) the reverse
   direction limited to the rows 59 S4 and S5 reword. (b) leaves rows whose criteria state no base.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's first fix judged sound, with
-  its criterion over the built folder. widens: none · relaxes: none
+  its criterion over the built folder. widens: none · relaxes: none. Overtaken at rev-5: the rows
+  sit in CLOSED specs, so the reverse direction runs over the live specs inside 59's sweep (F4).
 - **F2 — How does the CRLF row's `BINMODE` reach the shared function (S7)?** (a) The arm lifts
   `CLAIM_KV_AWK` out of the shipped driver bytes and runs it under `awk -v BINMODE=3`; (b) the
   driver's two calls take `-v BINMODE="${CLAIM_BINMODE:-0}"` and the arm sets the variable. (b) adds
-  an environment surface to a shipped kit, which BUILD-METHOD M3's veto 2 discards. RESOLVED (agent,
-  2026-10-25, delegated): (a), rung 3, on the `slice_fn` seam. widens: none · relaxes: none
+  an environment surface to a shipped kit, which
+  `doc.build-method#m3-forks-the-decision-rule-and-the-limit-of-your-authority`'s veto 2 discards.
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, on the `slice_fn` seam. widens: none · relaxes: none · Made
+  in 59's S7 at its rev-7 (F5).
 - **F3 — How is finding 3 closed (S13)?** (a) 61 AC14 reads 57's AC2 bullet; (b) 61 S14 and AC14
   taken out, citing 60 AC1 and AC2. (b) leaves a gap in 61's items and no criterion of 61's own for
   finding 6. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the review's second fix judged
-  sound, the option keeping a criterion that can fail. widens: none · relaxes: none
+  sound, the option keeping a criterion that can fail. widens: none · relaxes: none. Overtaken at
+  rev-5: 57 rev-5 made the bounded read, and 61's S14 records it closed.
+- **F4 — Are this unit's amendments to specs 59 and 61 made at its pass or now?** (a) Now, once, in
+  59's rev-7 and 61's rev-6, this unit reduced to observing that text; (b) at this unit's pass, by a
+  builder. (b) has a builder write a spec, which no builder does. Recommendation: (a).
+  RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; both specs are DEFERRED, so each amendment is
+  a spec act the re-grounding makes once, as the brief's fold rule names. widens: none · relaxes:
+  none
+- **F5 — What becomes of an item that edits a CLOSED spec, and who builds the rows?** (a) The closed
+  text resolved in §4 naming P19, and the rows built by unit 59 with its function; (b) the closed
+  specs edited, and the rows built at this pass. (b) rewrites built work and edits code 59 builds
+  whole. Recommendation: (a). RESOLVED (agent, 2026-11-20, delegated): (a), rung 3; P19 freezes
+  units 43, 44, 52, 54, 56, 57 and 60, and the rows are 59's design. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-7 promotions' 12
   MEDIUM and 9 LOW findings.
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
+- rev-3 · 2026-11-19 · §3 · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 2 (H1), the claim that unit 34 sits
+  under 48128 is re-pinned on the disposal's dated measurement, 47885 bytes at its rev-12, PINNED 2026-11-19 (a figure
+  rev-4 corrected). §7 also
+  names `scratch-guard self-test` and `tier2-review self-test`, the legs the spec-token guard join names
+  for `tools/unattended/unattended.sh` in Files touched.
+- rev-4 · 2026-11-19 · §3 · §4 Files touched · §7 · §9 rev-3 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: findings 1, 6 and 13 (M1), unit 34 measured
+  47885 bytes at rev-12, PINNED 2026-11-19, 243 under 48128; finding 17 (M8), this unit's own pass regenerates
+  `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- rev-5 · 2026-11-20 · §1 · §2 S1 to S21 · §3 · §4 · §5 · §6 AC1 to AC19 · §7 · §8 F1 to F5 · §10 ·
+  re-grounded by `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`: this
+  unit's amendments made in 59's rev-7 and 61's rev-6 (F4), the CRLF row, the blank class and the
+  tab row built by unit 59 (F5), so each such item reduces to observing that text; the closed
+  specs' items resolved in §4 (F5); unit 64's citations by anchor and its readers made here and in
+  59; Files touched now none, and §7 loses the legs its code owed; line citations swapped for symbol
+  citations, and the build method's sections for their alias tags.
+- editorial · 2026-11-21 · §8 F2 · no rev bump, the status stays CLOSED: the mark re-wrapped so its
+  widens and relaxes values share its first line, the period after its relaxes value a middle-dot
+  separator, and the departures report reads each as none, per
+  `2026-11-21-prompt-TOOL-dPlacedRequest-46-mark-rewrap-brief`.
 
 ## 10. Reuse audit
 
-Each item extends the unit its finding names, and the new text reuses four seams: unit 60 S1's
-bullet form for every labelled read, unit 62's section form for every `###` read, `slice_fn`
-(`tools/unattended/unattended.test.sh:708`) for S7's lift of the shipped text, and the fail-49 edge
-refusal of `--dispatch` (`tools/unattended/unattended.sh:13746-13758`) for S10's account.
-`python tools/codebase-map/reuse_lookup.py "keep a carriage return visible to awk so a line reader's
-strip is observable"` ranked `read`, `read_text` and `read_conf`, name stems only, none a CR-aware
-reader: no existing seam fits beyond `slice_fn`. `python tools/memory-recall/query.py "how is a spec
-audit's minor findings batch promoted into one unit that amends the batch spec its predecessor round
-wrote"` returned TOOL-aDistilledCharter-7, TOOL-aGraftedHelix-32 and -36, `TOOL-dPlacedRequest-61`,
-`TOOL-dPlacedRequest-52` and `TOOL-dPlacedRequest-59`, batches of the same kind. None disagrees with
-source.
+The seams extended: unit 59 §4's readers and live sweep for every read; `slice_fn` in
+`tools/unattended/unattended.test.sh`, whose variable mode unit 59 builds, for S7's lift; and the
+fail-49 refusal of `tools/unattended/unattended.sh#verb_dispatch` for S10's account. The brief's
+named seam, the governance-ref factory `tools/unattended/unattended.sh#write_gov_ref`, writes refs,
+and this unit writes none. `python tools/codebase-map/reuse_lookup.py "refuse dispatch of a consumer
+whose producer unit at the same order is not closed"`, run 2026-11-20, ranked `note`, `units`,
+`same` and `PolicyRefused`, name stems only, none a dispatch refusal: no existing seam fits beyond
+`verb_dispatch`. `python tools/memory-recall/query.py "re-ground a deferred minors batch whose
+amendments to sibling specs fold into one spec and whose target specs are closed"` with the terms
+below returned the minors batches of dKeptSession and aDistilledCharter and unit 56's re-grounding;
+none disagrees with source.
 
-Recall terms used: minors batch promote medium low round finding inventory reverse direction BINMODE extract_run_facts renumber
+Recall terms used: re-ground deferred minors batch fold closed spec P19 frozen observe BINMODE slice_fn verb_dispatch sweep

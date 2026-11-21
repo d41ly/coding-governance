@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-9 · 2026-11-19 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-65 TOOL-dPlacedRequest-70 TOOL-dPlacedRequest-73
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card
@@ -20,11 +20,27 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-2-deviation-21.md](../build/2026-10-25-build-TOOL-dPlacedRequest-2-deviation-21.md) | deviation | — |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-26-build-TOOL-dPlacedRequest-2-deviation-22.md](../build/2026-10-26-build-TOOL-dPlacedRequest-2-deviation-22.md) | deviation | — |
+| [2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dPlacedRequest-2-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-deviation-660.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-deviation-660.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-deviation-661.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-deviation-661.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-deviation-662.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-deviation-662.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-deviation-663.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-deviation-663.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-41.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-41.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-42.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-42.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-43.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-43.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-44.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-44.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-49.md](../build/2026-11-21-build-TOOL-dPlacedRequest-2-red-fix-49.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-20 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-52 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -72,7 +88,10 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   `step <state>` and `READY — none yet` alone, so the next step orients afresh; `fixed-at-start`
   re-publishes nothing, except at a terminal state. Every value publishes at a terminal state. With
   no kickoff engine resolved the writer prints `card — skipped: no kickoff engine` and its transition
-  stands. Observed by AC4.
+  stands. A `--terminal` follow whose `<state>` the build's newest `card` record already names in its
+  `Step` field, read as S6's lookup reads the snapshot, writes no second `card` record and prints
+  `card — snapshot kept: <state> already recorded`, so a close that follows before `--unlease` and
+  the writer's own follow at that transition leave one terminal record. Observed by AC4 and AC13.
 - **S5** — The snapshot. Under `card.snapshot` (v2:1174), `terminal-only`, the default, writes a
   `card` record at the `--terminal` follow only, and `every-transition` at every follow and at the
   READY publish. The record is committed alone, subject `card snapshot(<slug>): <state>`, in the
@@ -94,9 +113,16 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   `resume.context` (v2:1177) and `partial — <n> uncommitted path(s) · resume.partial: <value>` under
   `resume.partial` (v2:1176). `fresh-when-idle`, the default, recommends a fresh session when the
   hook payload's `transcript_path` was last written more than `RESUME_IDLE_S = 300` seconds before
-  the replay; `always-resume` recommends resuming, and reads as `fresh-when-idle` while gov's entry
-  file `CLAUDE.md` carries no `@.claude/orientation-card.md` line, printing that override
-  (v2:1177, `cl-dClosedLoop-0150`); `always-fresh` always recommends a fresh session. The
+  the replay, and also when that path is absent or empty, names no file, or `stat -c %Y` cannot read
+  its time, printing `resume — fresh recommended: transcript absent (resume.context:
+  fresh-when-idle)`, as the card-owner reader reads such a transcript dead
+  (`skills/session-kickoff/manifest-check.sh@0784ef8f:969-998`); `always-resume` recommends resuming, and reads as `fresh-when-idle` unless the
+  card-import fixture's recorded verdict, read by `read_card_fixture_verdict` (KICK-dKeptSession-12
+  S2), answers `pass`, printing the override in KICK-dKeptSession-12 S3's own line,
+  `(resume.context: always-resume read as fresh-when-idle · card-import fixture red: <why>)`, `<why>`
+  the reader's reason (v2:1177, `cl-dClosedLoop-0150`). While `declare -F` finds no such reader, as until dKeptSession lands, the
+  verdict reads `red: no recorded run` (§8 F5). The entry file `CLAUDE.md` is not consulted;
+  `always-fresh` always recommends a fresh session. The
   `partial —` line names the value's act, which `skills/session-kickoff/SKILL.md`'s resume paragraph
   states: `continue-item` keeps the work and continues the routed item, its witness still owed;
   `restart-item` commits the work to a side branch `partial/<slug>/<sid8>` and restores the tree to
@@ -123,14 +149,22 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   path under a bound, as `resolve_card_path` in `tools/roles/handoff.py` (:255) already does; a
   checker that does not answer reads as no card, named. Observed by AC10.
 - **S11** — The five keys, each read once per verb through dGroundRules' `policy.py get` (I24) by
-  `read_card_policy <key>`, a bounded call resolved as an optional sibling; until that reader lands,
-  each reads v2's catalogue default. Their catalogue rows land through TOOL-dDeclaredLoop-6 S4's
-  `python tools/playbook/core.py new policy-key <name> … --owner dPlacedRequest`, each with its v2
-  values and default. A refused read prints `card — skipped: <key> refused` and writes the session
-  card only, as today. Observed by AC11.
+  `read_card_policy <key>`, built on `read_spec_audit_switch`'s pattern
+  (`tools/unattended/unattended.sh#read_spec_audit_switch`): the policy kit found through the engine's
+  own `resolve_kit_dir`, a closed `case` over the five key words refusing any other, and one literal
+  `"$py" "$d/policy.py" get <key>` line per key; a kit that does not resolve reads v2's catalogue
+  default with one NOTE naming the key. Their five rows already exist in `tools/policy/catalogue.toml`,
+  owner `dPlacedRequest`, landed by TOOL-dGroundRules-1 at `c9bd97720`; this unit adds no row through
+  the policy-key factory and edits a row in place only where a value differs from v2. A refused read prints `card — skipped: <key> refused` and writes the session
+  card only, as today. Because each key is spelled on its own `get` line, `READER_SHAPES`' existing
+  `policy.py get` row in `tools/policy/check_policy.py` counts it where the reader is defined, and no
+  row is added: ask TOOL-dPlacedRequest-73's unread card key is answered by the literal lines, as the
+  audit's finding 16 rules, and `TOOL-dPlacedRequest-1` S12 builds `read_lease_policy` the same way.
+  Observed by AC11, AC14 and AC15.
 - **S12** — The fixture, `bash skills/session-kickoff/card-store.fixture.sh --plant <case>`: a
   scratch repository and a bare remote in the system temp directory, a stub policy kit answering the
-  planted values, and the case's observation printed, exit 0 when it holds. Observed by AC1 to AC12.
+  planted values, and the case's observation printed, exit 0 when it holds. Its plants include
+  `close-follow-twice`, which AC13 runs. Observed by AC1 to AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -154,9 +188,11 @@ fresh session recommended by `resume.context` and partial work handled by `resum
 - **hands-off** `TOOL-dPlacedRequest-3` — `refs/gov/builds/<slug>/card`, published at READY and resolved through `manifest-check.sh --card --path`, the path reader `entry.orient` names as its body
 - **consumes-from** external — dDeclaredLoop, built before this build run: `write_transition` (TOOL-dDeclaredLoop-3 S5), the `terminal` set (TOOL-dDeclaredLoop-15 S1), `claims.py`'s verdict (TOOL-dDeclaredLoop-8 S3), the policy-key factory (TOOL-dDeclaredLoop-6 S4)
 - **consumes-from** external — dOrderedCharter's `write_card_file` (PLAY-dOrderedCharter-8 S2), record factory (PLAY-dOrderedCharter-7 S7) and `TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42 S1); dGroundRules' `policy.py get`
+- **consumes-from** external — dKeptSession, a child build: `read_card_fixture_verdict` (KICK-dKeptSession-12 S2), the switch S7 reads; until it lands the verdict reads red (§8 F5)
 - **hands-off** `TOOL-dPlacedRequest-33` — the `remote-ref` store's publish and follow, which that unit routes through the driver's `--card-ref write`, dark behind `RUN_CLAIMS`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 - **hands-off** `TOOL-dPlacedRequest-49` — `skills/session-kickoff/card-store.fixture.sh`, which that unit's item for finding 3 gives the `publish-late` plant
+- **hands-off** external — KICK-dKeptSession-12 S3, the switch S7 builds with that unit's own override line, which that unit finds present instead of building it; filed as an ask on dKeptSession
 
 ## 4. Design
 
@@ -229,7 +265,7 @@ transition the loop kit records.
 
 ### Files touched (estimate)
 
-- `skills/session-kickoff/manifest-check.sh`: the verbs, and the inline `gov_ref_sh` and `gov_feed_sh` blocks; `KIT_MANIFEST_VERSION` moved
+- `skills/session-kickoff/manifest-check.sh`: the verbs, and the inline `gov_ref_sh` and `gov_feed_sh` blocks; the kit version is minted by the lander (TOOL-aMendedFleet-65; TOOL-dPlacedRequest-34 S59)
 - `tools/lib/resolve-python.test.sh`: the two parity rows gain the kickoff engine's copies
 - `skills/session-kickoff/manifest-check.test.sh`: the arms the §7 line declares
 - `skills/session-kickoff/card-store.fixture.sh`
@@ -239,11 +275,23 @@ transition the loop kit records.
 - `tools/memory-tree/build_records.py`: the `card` kind row
 - `tools/memory-tree/tree_lib.py`: `card` in `TYPED_RECORD_KINDS`
 - `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `card` in the closed kind list
-- `tools/policy/catalogue.toml`: five rows, through the factory
+- `tools/policy/catalogue.toml`: the five `card.*` and `resume.*` rows exist; edited in place only
+  where a value differs from v2
 - `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
 - `help/orientation-card.md`: the build card's stores, the follow and the resume lines
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
+  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
+  only
 
 ### Alternatives rejected
+
+- **A `READER_SHAPES` row for `read_card_policy <key>` and `read_lease_policy <key>` calls.** It
+  counts a key at each call while the reader re-derives `read_spec_audit_switch`'s resolution and
+  refusal wording beside it, and it widens the policy kit for two wrappers; the literal `get` lines
+  need no row (the audit's finding 16). A row for every `read_<name>_policy <key>` wrapper also
+  matches `read_gate_policy "$_gr"` (`tools/unattended/unattended.sh@875eaadf:11939`), whose argument
+  is a revision.
 
 - **The card in the run claim's message.** The claim carries eight keys
   (`tools/unattended/unattended.sh:2411-2412`) for a run, not a build, and mixing the two records
@@ -267,7 +315,7 @@ transition the loop kit records.
 - testing — S12's plants, red and green.
 - migration — none.
 - user docs — `help/orientation-card.md`, TOOL-dPlacedRequest-9's page, gains the build card's
-  sections.
+  sections; no reader shape is added, so `help/policy.md` is unchanged.
 
 ## 6. Acceptance criteria
 
@@ -298,10 +346,17 @@ transition the loop kit records.
   the cache.
   Red when: a lookup trusts a cache whose `# card-ref` differs from the ref, or another node finds no card.
 - **AC7** — When the plants `context-idle`, `context-always-resume` and `context-always-fresh` replay
-  over a transcript last written 1800 seconds earlier, the `resume —` line recommends fresh, resume
-  and fresh; with `context-no-import`, `always-resume` and no import line in `CLAUDE.md`, it
-  recommends fresh and names the override.
-  Red when: a value is ignored, or `always-resume` holds while the import is unwired.
+  over a transcript last written 1800 seconds earlier, with no import line in `CLAUDE.md` and a stub
+  `read_card_fixture_verdict` exported by `export -f` printing `pass`, the `resume —` line recommends
+  fresh, resume and fresh; with `context-fixture-red`, `always-resume`, the card import line present
+  in `CLAUDE.md` and the stub printing `red: no recorded run`, it
+  recommends fresh and prints `(resume.context: always-resume read as fresh-when-idle · card-import
+  fixture red: no recorded run)`, KICK-dKeptSession-12 S3's line, and with no stub exported it does
+  the same. With `context-transcript-absent`, the payload's `transcript_path` removed, and again with
+  it naming a deleted file, `fresh-when-idle` prints `resume — fresh recommended: transcript absent`.
+  Red when: a value is ignored, `always-resume` holds while the verdict is not `pass`, the import
+  line moves the recommendation, or a missing transcript recommends resuming or prints nothing.
+  fixture: the stub stands in for KICK-dKeptSession-12's reader, which the tree does not hold.
 - **AC8** — When the plants `partial-continue`, `partial-restart` and `partial-ask` replay over a
   tree with two uncommitted paths, the `partial —` line reads `2 uncommitted path(s)` and names its
   value, and `grep -n "partial/<slug>/<sid8>" skills/session-kickoff/SKILL.md` finds the restart act.
@@ -314,21 +369,39 @@ transition the loop kit records.
   `readCard`'s call, and `grep -c "'orientation', sid" tools/hooks/scratch-guard.js` prints `0`.
   Red when: the hook derives the card path itself beside the checker's.
 - **AC11** — When `python -c "import tomllib, sys; print(sorted(r['name'] for r in tomllib.load(open(sys.argv[1], 'rb'))['key'] if r.get('owner') == 'dPlacedRequest' and r['name'].split('.')[0] in ('card', 'resume')))" catalogue.toml`
-  runs in the policy kit's directory, it prints the five keys, and `git grep -n "read_card_policy card.store" -- skills/session-kickoff/manifest-check.sh`
-  finds the read.
-  Red when: a key has no row, or is read in a shape the reader-coverage arm does not count.
-  fixture: the catalogue is dGroundRules', untracked until it builds.
+  runs in the policy kit's directory, it prints the five keys, a guard on rows the base already holds.
+  The half the unit moves: `python -c "import sys; sys.path.insert(0, sys.argv[1]); import check_policy; k = check_policy.scan_reader_keys(sys.argv[2]); print(sorted(x for x in k if x.startswith(sys.argv[3])))" tools/policy . card.`, run at the repository root over the built tree, prints a list holding `card.follows`,
+  `card.snapshot` and `card.store`, where at the base it prints `[]`, and
+  `git grep -n "read_card_policy card.store" -- skills/session-kickoff/manifest-check.sh` finds the read.
+  Red when: a key is read in a shape the reader-coverage arm does not count.
+  fixture: none; the rows are tracked since `c9bd97720`.
 - **AC12** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over the
   `snapshot-terminal` plant's repository with its record committed, it prints an `S` row for the
   `-card-1.md` record with kind `card` and the anchor id, and no `A` row for it.
   Red when: the kind is missing from `TYPED_RECORD_KINDS`, so the factory refuses at import or the
   record reads malformed.
+- **AC13** — When the plant `close-follow-twice` runs `--card --follow --build tFix --to withdrawn
+  --terminal` twice, as a close's own follow and the transition writer's follow do, the build folder
+  holds one `card` record whose `Step` reads `withdrawn`, and the second follow prints
+  `card — snapshot kept: withdrawn already recorded`.
+  Red when: the second follow writes a second `card` record naming the same terminal state.
+- **AC14** — When `python -c "import sys; sys.path.insert(0, sys.argv[1]); import check_policy; k = check_policy.scan_reader_keys(sys.argv[2]); print(sorted(x for x in k if x.split('.')[0] in ('card', 'resume')))" tools/policy <repo>`
+  runs over a scratch repository whose one tracked file `reader.sh` is the built `read_card_policy`
+  definition, cut from `manifest-check.sh` by `awk` from its `read_card_policy() {` line to its
+  column-0 `}`, it prints the five keys; over the same
+  repository holding only the call `read_card_policy card.store`, the shape ask
+  TOOL-dPlacedRequest-73 names, it prints `[]`, the red that ask records.
+  Red when: a key the reader reads is not returned, so it reds as unread.
+  fixture: a `git init` repository in the system temp directory, `reader.sh` committed; none today.
+- **AC15** — When `grep -c 'policy.py" get card\.\|policy.py" get resume\.'` runs over the
+  `read_card_policy` cut, it prints 5, and `grep -c 'policy.py" get "\$'` over it prints 0.
+  Red when: a key is passed to `get` in a variable, which reader coverage reads as unread.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
+`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `routed-commits selftest` · `policy fixtures` · `codebase-map coverage + freshness`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 AC4 AC6 AC9 · the publish, follow, lookup and R7 arms over a scratch bare remote, the failing case a lookup trusting a stale cache · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 AC4 AC6 AC9 AC13 · the publish, follow, lookup and R7 arms over a scratch bare remote, the failing case a lookup trusting a stale cache · none
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against a stub checker, the failing case a checker that does not answer read as a card · none
 
@@ -352,6 +425,18 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   carrier and the clause names `resume.partial`. RESOLVED (agent, 2026-10-25, delegated): covered,
   rung 3.
   grants: PLAY-dClosedLoop-3 the resume paragraph's three resume.partial acts in skills/session-kickoff/SKILL.md
+- **F5 — S7's switch is `read_card_fixture_verdict`, minted by KICK-dKeptSession-12 in dKeptSession,
+  a child build landing after this unit; what does this unit build?** The reader is neither in the
+  tree nor minted by this build or a parent. Options: (a) S7 calls the reader when `declare -F` finds
+  it and reads its absence as `red: no recorded run`, KICK-dKeptSession-12 S2's own reason, so
+  `always-resume` reads `fresh-when-idle` until a pass is recorded, observed on an exported stub
+  (AC7); (b) S7 builds no override, KICK-dKeptSession-12 S3 building the switch in this code as its
+  §8 F3 says, so `always-resume` resumes unguarded until then; (c) a verdict reader minted here, a
+  second reader of KICK-dKeptSession-12's verdict file. (c) writes one rule twice; (b) leaves AC7
+  observing nothing of the switch. Recommendation (a), the reading `cl-dClosedLoop-0150` gives a
+  fixture that never passed. RESOLVED (agent, 2026-11-19, delegated): (a), rung 3; the absent reader
+  reads as KICK-dKeptSession-12 S2's own `red: no recorded run`, so the switch is observable now and
+  no veto trips. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -368,6 +453,31 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 5: the record serves as
   `card`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list, its binding observed; no
   `new card` door is claimed.
+- rev-6 · 2026-11-19 · §2 S4, S7, S11 · §3 Edges · §4 Files touched, Alternatives rejected · §6 AC7,
+  AC13, AC14 · §7 · §8 F5 · adopts asks TOOL-dPlacedRequest-65, TOOL-dPlacedRequest-70 and
+  TOOL-dPlacedRequest-73 per the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: the
+  card-import fixture's verdict is S7's switch, the import line not consulted (F5 resolved (a)); a
+  repeated terminal follow writes one `card` record; `READER_SHAPES` reads `read_card_policy <key>`,
+  its red seen at `6e9c6062`, and, a discovery adopted by this build run, `read_lease_policy <key>`
+  too; §7 gains the two legs the spec-token guard join names.
+- rev-7 · 2026-11-19 · §2 S7, S11, S12 · §3 Edges · §4 Files touched · §5 · §6 AC7, AC11, AC15 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`:
+  finding 19 (M6), a hands-off to KICK-dKeptSession-12 S3 names the switch this unit builds, its ask
+  filed on dKeptSession, and S7 and AC7 pin that unit's override line; finding 25 (M7), help/policy.md
+  and tools/policy/README.md join the write set naming the third reader shape, the §5 user-docs line
+  names them, and AC15 greps the page; finding 26 (M8), the five `card.*` and `resume.*` rows already
+  exist at `c9bd97720`, so S11 drops the factory step, and AC11 reads `scan_reader_keys` over the built
+  tree; finding 8 (L2), S12 reads AC1 to AC13 and lists the `close-follow-twice` plant; finding 20
+  (L6), the check_policy.py bullet names both readers; finding 24 (H6), the kit version is the
+  lander's to mint.
+- rev-8 · 2026-11-19 · §2 S7, S11 · §4 Files touched, Alternatives rejected · §5 · §6 AC7, AC14, AC15 ·
+  §10 · folds `2026-11-19-review-TOOL-dPlacedRequest-13-spec-audit`: finding 16 (M4),
+  `read_card_policy` is built on `read_spec_audit_switch`'s pattern, one literal `get` line per key, so
+  `READER_SHAPES`, `help/policy.md` and `tools/policy/README.md` leave the write set and AC14 and AC15
+  observe the literal lines; finding 32 (L11), an absent, empty or unstattable transcript recommends
+  fresh under `fresh-when-idle`, and AC7 plants it.
+- rev-9 · 2026-11-19 · §4 Files touched · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
+  regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
 
 ## 10. Reuse audit
 
@@ -383,5 +493,9 @@ orientation card to a remote ref and cache it by object id"` ranked name stems (
 `build_commit`, `render_cards_md`), none a card store, so no existing seam holds the per-build key.
 `python tools/memory-recall/query.py` returned scout B's row, KICK-aReplayedCard-1 (partly superseded
 by TOOL-aGraftedHelix-2) and TOOL-dDeclaredLoop-8's scout row; the last is the re-key S6 reuses.
+S11's reader is built on `read_spec_audit_switch` (`tools/unattended/unattended.sh#read_spec_audit_switch`),
+the driver's one policy reader, whose header spells each key on a literal `get` line because
+`tools/policy/check_policy.py#READER_SHAPES` reads a key passed in a variable as unread; so no row is
+added to that table.
 
 Recall terms used: `python tools/memory-recall/query.py "where does a build's orientation card live across sessions and nodes" --terms "orientation card refs/gov/builds card.store card.snapshot card.follows resume.context resume.partial cache object id"`

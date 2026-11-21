@@ -37,6 +37,21 @@ merge (`TOOL-dSweptBranches-20`, seven `memory/` files gained by the default bra
 Skip merge commits (`--no-merges`), or measure from the CURRENT default tip or the merge base (three
 dots), or walk `--ancestry-path` from the branch's own start. Never `--first-parent` alone.
 
+## A merge onto the default tip
+
+`tools/push-main.sh --prepare` merges the branch ONTO the tip it will push, first parent that tip.
+
+| Shape, run on that merge | Reads the branch's commits |
+|---|---|
+| `git log --first-parent --no-merges <base>..HEAD` | no, the default branch's commits only (the vacuous oracle) |
+| `git log --first-parent -p <base>..HEAD`, or `--name-status` | yes, the whole branch diff, attributed to the merge |
+| `git log --no-merges HEAD^1..HEAD^2` | yes, every one |
+
+Measured 2026-11-20 (PINNED) over a base, two branch commits, the first bumping a version line, one
+commit on the default branch past the branch point, and a --no-ff merge of the branch onto it.
+
+The fix: name the parent. A check on a prepared merge walks `HEAD^1..HEAD^2`.
+
 ## Where it applies
 
 The sites `TOOL-dSweptBranches-20` classified, with their verdicts in that build's audit record:
@@ -50,6 +65,8 @@ The sites `TOOL-dSweptBranches-20` classified, with their verdicts in that build
   merge can stage; it fails closed, as a doubt.
 - `tools/runlog/model.py`, `tools/memory-tree/row_grammar.py` and `tools/memory-tree/check-verdict-epoch.sh`
   read ranges in shapes the table marks safe.
+- `tools/push-main.sh` builds the prepared merge in `--prepare`, first parent the advertised tip,
+  so a check run there on the merge reads the shapes of "A merge onto the default tip".
 
 ## Related
 

@@ -69,6 +69,9 @@ if str(KIT) not in sys.path:
 from loop_lib import read_memory_tree, resolve_kit_dir  # noqa: E402  this kit's inline copy of the sibling resolver
 
 SAY = "loop-witness"
+# The remote every loop fixture repository pushes to, named apart from any real one: kit code names no remote
+# by literal (check-remote-literals.sh), and a fixture with one remote reads the remote ladder's only-remote rung.
+FIXTURE_REMOTE = "upstream"
 #: The default bound of one re-run command, in seconds.
 TIMEOUT = 600
 EXPECT = re.compile(r"(?P<exit>-?\d+|timeout):(?P<hash>[0-9a-f]{12})")

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.131 -->
+<!-- gov:kit unattended@1.133 -->
 [memory/guides/UNATTENDED-VERBS.md · Level 3 · Binding with the unattended protocol, the verbs a run calls; yields to levels 0 to 2]
 # Unattended runs — the verbs
 
@@ -495,25 +495,206 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
   AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
-- `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
-  beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by
-  slug. `--with-key` adds a sixth field, the claim's key, a `k1:` key over its claim ref and its run
-  record's blob at the default branch's tracking ref (`k1:?` where that record is absent; `-` where
-  python or the loop kit does not resolve), and only that form spends the key's one python spawn; a
-  driver released before the flag ignores it and prints five;
+- `--claims` — every run claim and lease on the remote, one TAB-separated row each: name, node or
+  fleet tag, status, beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or
+  `unknown`, sorted by name. The name is the slug of a build lease or a legacy claim and the tail
+  of a unit or cadence lease; the second field is a lease's `fleet-tag` and a legacy
+  `refs/gov/runs/<slug>` claim's `node`. `--with-key` adds a sixth field, the claim's key, a `k1:`
+  key over its ref, `refs/gov/leases/<tail>` or the legacy one, and its run
+  record's blob at the default branch's tracking ref (`k1:?` where that record is absent or the lease
+  is a cadence run's; `-` where python or the loop kit does not resolve), and only that form spends
+  the key's one python spawn; a driver released before the flag ignores it and prints five;
   `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
   an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
   and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
-  'refs/gov/runs/*'` still shows a leftover one. It takes no slug and decides nothing about who
+  'refs/gov/*'` still shows a leftover one. It takes no slug and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
+- `--lease` — one lease of a build, a unit, a cadence run or a request: `--lease acquire|renew|release|take-over
+  build <slug>`, `unit <slug> <id>`, `run <cadence> <period>` or `request <content key>`, the key twelve
+  lower-case hex digits (PINNED) that `--request` printed, `--witness <sha>` on a renewal and
+  `--as landed|aborted|withdrawn` on a release; `--lease flush` pushes this node's queued offline
+  writes. `--lease offer <kind> <name> [<sub>] --to <fleet tag>` offers an absent or `released`
+  lease to one node for `leases.offer-seconds`, printing `lease — <tail> · offer <target> · epoch <n>`,
+  and `--to <fleet tag>/<session>` to one session of it; inside the window every other node, and
+  every other session of the named one, is refused `offered`. A tag `fleet.toml` does not hold, or
+  a session half that is empty, `absent` or no legal segment, exits 2 before any read. Each reads
+  the remote's leases, derives its row through the stops guide's `lease` column,
+  writes by compare-and-swap and prints ONE line: `lease — <tail> · <act> · epoch <n>` (exit 0),
+  `lease refused — <cause> · <tail> · <holder>` (exit 1; `live-holder`, `tombstone`, `epoch-fence`,
+  `overlap`, `offline`, or an offer's `offered`, naming its target, and `terminal`), or
+  `lease not written — <why>` (exit 2: no session, `CLAUDE_CODE_SESSION_ID` unset, empty or
+  `absent`, at a holder act, `acquire`, `take-over`, `renew`, `release` or `offer`, before any read,
+  while `flush`, `prune` and `fence` run with no session; a bad segment, a level `leases.granularity` excludes, a refused policy key, a node with no `fleet.toml` row, a witness
+  that records no transition and is no open question, or an offline write whose ref's newest queued
+  line is no readable queued commit, `<tail> · queued commit unreadable; nothing queued`, nothing
+  queued). An acquisition runs the overlap probe first.
+  An acquisition of a request lease first reads `refs/gov/requests/<content key>` alone, one bounded
+  `ls-remote` that fetches nothing: a remote holding no such record refuses it `no-record` (exit 1)
+  and writes nothing, and a read that does not answer is `lease not written` (exit 2). Its record
+  carries `kind: request` and `slug: -`, any node may claim it, and its overlap probe names no build.
+  `--lease fence build <slug>` is the fence an effect push carries, and it writes nothing: one read,
+  then `fence — <lease ref> <tip> <beat>` (exit 0) where this session holds the lease, the beat a
+  commit on the tip with a fresh `beat-utc` and `renews: no` that the lander pushes with `--atomic`
+  under `--force-with-lease=<lease ref>:<tip>` beside the branch; `fence — none · <why>` (exit 0)
+  with `RUN_CLAIMS` off or no lease on the remote; or the `lease refused` line above (exit 1).
+  `--lease fence build <slug> --after <tip>` is the re-fence the lander asks for when its fenced
+  push failed on a lease tip that moved from `<tip>`, the full sha its fence read: the fence line on
+  the new tip only where this session holds the lease, `<tip>` is on the new tip's first-parent
+  chain and the new tip's `epoch` is `<tip>`'s; a later epoch, a tip off that chain, leases off and
+  no lease on the remote are each `lease refused — epoch-fence` (exit 1), a foreign holder keeping
+  its own cause word, and a read that does not answer `lease refused — offline` (exit 1), which the
+  lander reads `unreachable`. `--after` on any other act, or no full sha, exits 2.
+  `--lease status <kind> <name> [<sub>]` reads one lease and writes nothing: one TAB-separated line,
+  `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>` (exit 0); a
+  read that does not answer is `lease not written` (exit 2). `placement.py check` reads it, never
+  `--claims`, which names no session. An offer is refused `offered` over an offer still open, whoever
+  it names, and when `--to` names the caller's own tag or its own session on it, and `tombstone` over
+  a build or unit tombstone, `terminal` kept for a cadence or legacy claim. A create whose feed commit
+  git cannot read is refused `epoch-fence` for a build or unit lease and is a plain create at epoch 1
+  for a cadence run (TOOL-dPlacedRequest-34).
+  Dark behind `RUN_CLAIMS` like every claim: while it is not `on` every act but `fence` prints
+  `lease — off · <tail>` and exits 0, writing nothing; `UNATTENDED-STOPS.md` §7 is the grammar, the
+  record, the epoch and the four `leases.*` keys.
+- `--register` — two create-only registers on the remote, each entry ONE parentless commit written
+  by compare-and-swap with an empty expected sha, so a second write of one ref is refused, never
+  written beside the first. `--register decision <build> <item> <fork> <file>` writes
+  `refs/gov/decisions/<build>/<key>`, the key the item and the fork each encoded and joined by `+`,
+  never the decision's wording; `--register problem <subject> <item> <file>` writes
+  `refs/gov/problems/<encoded subject>/<id>`, the id the first 12 hex digits (PINNED) of `git hash-object`
+  over the filer's session, the item it filed from (`none` outside one), the raw subject and the
+  body's bytes, each followed by a NUL, so new text on one subject lands beside and a retried filing
+  is refused. The encoding writes every byte outside `[A-Za-z0-9_-]` as `%` and two upper-case hex
+  digits, so a subject is one legal ref component and an empty text is refused; the encoded subject,
+  or the joined key, is refused over `REF_COMPONENT_CEILING` (200 bytes, PINNED) before any commit. The
+  record is `gov-decision <build>/<key>` or `gov-problem <encoded subject>/<id>`, a blank line, the
+  `key: value` lines (`build`, `item`, `fork`, `session`; or `subject`, `item`, `session`), a blank
+  line and the body, which is refused over 4096 bytes (PINNED) or carrying a NUL or a control byte other than
+  tab and newline. It prints ONE line: `register — written <ref>` (exit 0); `register — exists
+  <ref>` and then the first entry's record, read by one bounded fetch (exit 1); or
+  `register — not written · <why>`, `register — refused <subject|decision key> over <n> bytes
+  encoded` or `register — off` (exit 2). Dark behind `RUN_CLAIMS` like every claim; no entry is
+  ever deleted or rewritten. It takes no slug.
+- `--card-ref` — `--card-ref write <slug> --message <file>`, the build card's ref on the remote,
+  written for the kickoff engine's `remote-ref` card store, which calls it bounded with the commit
+  message it rendered in the file (TOOL-dPlacedRequest-33). Dark behind `RUN_CLAIMS`: while the
+  switch is not `on` it prints `card-ref — off` and exits 0, reading and writing nothing, so an
+  adopter that leaves it off publishes its card to the clone and the build folder only. With it on,
+  the slug is held to the build-folder grammar, the clone's one remote is resolved (check 24),
+  `refs/gov/builds/<slug>/card` is read by one bounded fetch into this node's cache, and one commit
+  on the tip read is written by compare-and-swap, joining the change feed. It prints ONE line:
+  `card-ref — builds/<slug>/card · <sha8>` (exit 0); `card-ref lost — <sha8 of the remote tip,
+  re-read once>` (exit 1), on which the engine re-renders once and calls again; or `card-ref not
+  written — <why>` (exit 2). Neither refusal is a numbered one. `--card-ref lookup <slug>` is the
+  engine's one read of that ref, read-only: one bounded, pruned fetch from the remote the claims
+  resolve, never a literal `origin`, into this node's cache `refs/gov/remote/builds/<slug>/card`,
+  with `--no-write-fetch-head`, its sightings appended to the feed; it prints `card-ref — <commit>`
+  and the commit's message, `card-ref — none` where the remote holds no card, `card-ref — off`, or
+  `card-ref not read — <why>` (exit 2). The engine reads that cache ref and no local card ref.
+- `--request` — `--request <file>`, an owner's request that is not yet a build, recorded by its
+  content key: the first 12 hex digits (PINNED) of the SHA-256 over the loop kit's `request.py key`
+  normalisation of the text, case, whitespace, ISO dates, emphasis and links folded, the file
+  decoded strictly as UTF-8 with any byte-order mark dropped. A file that is empty once normalised
+  or not UTF-8 is refused before any write. The words stay on this node: the file's bytes are copied
+  unchanged to `<git-common-dir>/requests/<content key>.md`, the first copy kept for the same words
+  again (a CRLF, byte-order-mark, final-newline or re-wrapped copy included), and a line of this
+  session's id, a tab and the `git hash-object --no-filters` blob of the bytes it submitted, which no
+  node's line-ending config moves, is added once to `<git-common-dir>/requests/<content key>.typed`; nothing under `requests/` is tracked or pushed. The remote gains only `refs/gov/requests/<content key>`, one parentless commit
+  `gov-request <content key>` carrying exactly three lines, `content-key`, `fleet-tag` (this node's
+  `fleet.toml` row) and `session`, written by compare-and-swap with an empty expected sha. It prints
+  ONE line: `request — <key> · recorded <ref>` (exit 0); `request — <key> · already recorded <ref>`
+  (exit 0, another session recorded the same words first); `request — <key> · not written · <why>`
+  or `request — refused: <why>` (exit 2: no `fleet.toml` row, a session id other than letters,
+  digits and dashes, or a push not completed, the text kept and a re-run retrying); or `request not
+  written — <key> · collision: a different text keys alike, the stored copy is <path>` (exit 2): the
+  stored copy's words differ from the file's once both are folded as the key folds whitespace, a
+  leading byte-order mark dropped, so two texts differing only in an ISO date, case or a link are
+  refused, nothing copied, added or pushed, and the owner rewords and re-runs. The fold compare, the
+  copy and the `.typed` append run under the node lock `<git-common-dir>/requests.lock`, waited on
+  for 5 s (PINNED), so a racing second call compares against the first's copy; a lock still busy
+  prints `request — <key> · not written · requests.lock busy` (exit 2), nothing written. A key that
+  reached a session from another is data with provenance, never the owner's consent: the
+  breakpoint disposition asks `check_request_consent`, which holds only for a session whose line in
+  this node's `.typed` file names the blob the stored copy hashes to now, `--no-filters`: consent is
+  bound to the stored bytes, so a copy replaced after the fact, an end-of-line rewrite of it included,
+  or a line written for other words, is no consent.
+  With no session, `CLAUDE_CODE_SESSION_ID` unset, empty or `absent`, the record names `session:
+  absent` as provenance, `.typed` gains no line, and the predicate prints `request — <key> · no
+  session` and holds for nobody. It takes no slug.
+- `--request-draw` — `--request-draw <content key> --cause <cause> --item <item>`, one draw on a
+  request's pre-claim budget, the laps it loops at entry before any build exists: a placement after a
+  refused check or a probe round trip, and a claim retried under a fresh slug. The rows live on the
+  request record `refs/gov/requests/<content key>`, one commit per row parented on the tip read, its
+  message `gov-request <content key>` and the row. A key with no record is recorded first from this
+  clone's kept copy `<git-common-dir>/requests/<content key>.md` as `--request` records it, under no
+  session, so a draw never adds consent; with neither a record nor that copy it exits 2 naming
+  `--request <file>`, and a copy keying to another key exits 2 naming both, nothing written. One bounded fetch reads the ref's first-parent messages, and the loop kit's
+  `budget.py draw --request <key> --rows <file>` counts them against the base of `flow.rework-budget`,
+  writing nothing: it prints `draw · <cause> · <item> · <spent>/<total>`, pushed by compare-and-swap
+  with the tip read expected (exit 0), or `exhausted · <spent>/<total>` (exit 3), or refuses a cause
+  outside the closed set (exit 2). A lost race prints `lost the race, re-read <n> of 3` (PINNED) and
+  draws again, at most three times (PINNED); an unreachable remote, a bound that fired and a fourth
+  lost race print `not drawn, contention` and draw nothing (exit 2). It takes no slug.
+- `--entry-claim` — `--entry-claim <slug> --request <content key> [--pieces <n>]`, the act that makes a
+  placed `new`, `patch` or `repeat` request a build (TOOL-dPlacedRequest-21). The loop kit's `claim.py`
+  reads the placement's claim lines and refuses another disposition (exit 1), a slug `--new-build` would
+  refuse and, on a repeat, a missing or non-positive `--pieces`, the count the owner asked for (exit 2,
+  one line), before any remote read. One bounded `ls-remote --exit-code` of `refs/gov/claims/<slug>`
+  follows: where it exists, one bounded fetch reads its `claimant-key`, this claimant's (`<fleet
+  tag>:<session>`) resuming at the first step not witnessed with no slug pre-check, another key drawing
+  `route-back` on `item.entry.claim` through `--request-draw` and exiting 5, a fresh slug owed (3 once
+  the request's budget is spent); with none, the memory-tree kit's `check_slug_claimed` runs as the local
+  pre-check and the claim is created by compare-and-swap with an empty expected sha, its body the
+  claimant key, session, content key, disposition, reason, scenarios and facts, and on a patch the origin
+  slug and its newest default-branch commit. A read or create that does not answer takes
+  `leases.offline`: `refuse` exit 1, any other value exit 4, no claim queued and no folder written. A
+  patch or a repeat then takes its build lease (`--lease acquire build <slug>`),
+  and a stale build lease is taken over (TOOL-dPlacedRequest-100): an acquire refusal ending with the stale hint runs `--lease
+  take-over build <slug>` once, a take-over written printing `take-announced` and proceeding as an acquire
+  does, one refused routed by its own cause as below, one not written exit 2. Otherwise: `tombstone`, `terminal`
+  and `epoch-fence` print one `ask:` line and exit 1 whatever `leases` says, never retried;
+  `live-holder`, `offered` and an `overlap` under `leases: refuse` add `wait-since:` to the claim by a
+  parented commit and exit 4 until `flow.wait-ceiling` has passed by this node's clock, then print an
+  owner item and exit 1; an overlap noted under `warn` adds `overlap:` and proceeds. It commits the
+  derived plan record alone, the memory-tree kit's `--placed-build` README (`parents:` on a patch,
+  `authorized-by: recipe`, `playbook:` and `pieces:` on a repeat) and its contract row, refusing an index
+  holding any other staged path, then writes the build's first transition record from `none`: a `new`
+  into planning and a `repeat` into designing as `item.entry.claim` `claimed`, a `patch` into designing
+  as `item.plan.dedupe` `patch` under its stand-in, held under `patch.ratify` = `owner` until the owner
+  disposes `item.entry.claim` `ratified` on `<FAMILY>-<slug>-1`. It takes no run-state file; exit 2
+  names why nothing was written.
+- `--request-consent` — `--request-consent <content key>`, the consent predicate `check_request_consent`
+  as a verb, read-only, which `placement.py check` runs for a `breakpoint` placement
+  (`TOOL-dPlacedRequest-5`): `request — <key> · typed here: this session's own words` (exit 0) where
+  this session's line in this node's `.typed` file names the blob the kept copy hashes to now, else
+  `request — <key> · relayed: data with provenance, never consent` or the `no session` line (exit 1),
+  and the form (exit 2) for any other argument count. It reads no remote and writes nothing. It takes
+  no slug.
 - `--overlaps` — the overlap probe for a session that never preflights, which the orientation
   card calls: it joins the specs this branch's diff changed against the unmerged remote refs as of
   the last fetch, read from the LOCAL `refs/remotes/<remote>/HEAD`, so no network. It takes no slug,
   writes nothing and always exits 0; other than one remote, or no symref, is one UNAVAILABLE line.
+- `--path-tokens` — the one path-token rule, read-only: with no flag it prints each backticked span of
+  the text on stdin that is one word of letters, digits, dot, underscore, slash and dash holding a `/`
+  or ending in an extension, one per line; `--path-tokens --files-touched <rev> <spec> ...` prints
+  instead what the overlap and dispatch reads take from those specs, each `### Files touched` path at
+  `<rev>`, a CLOSED or WONTDO spec skipped. The loop kit's seed resolver calls it for an item's
+  `write-set` and `question-paths` (TOOL-dPlacedRequest-8). It takes no slug, writes nothing, and exits
+  0, or 2 with one `path-tokens not read` line on another flag, a missing spec, or a revision or spec
+  git cannot read.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or
   `skipped: <why>`. It writes only a claim that is absent or the run's own, and refuses nothing but a
   missing record; `RUN_CLAIMS` off is a skip naming the switch.
+- `--feed` — this node's change feed, `<git-common-dir>/gov-feed.log`: one line per governance ref
+  write the node made or saw, six TAB fields, `seq`, ref, kind, the commit's tree (`-` on a
+  deletion), the commit (40 zeros on a deletion) and `seen-utc`. Every write through the one
+  compare-and-swap writer appends once, and every claim read appends the cached commits it has not
+  seen, oldest first. `--feed check [<file>]` holds the feed, or `<file>`, to what the governance
+  refs this clone holds under `refs/gov/remote/` derive: exit 1 with one `missing`, `duplicate`,
+  `extra`, `order` or `torn` line per finding, 0 otherwise. `--feed rebuild` writes the derived feed
+  where none is present, `seq` from 1, and exits 2 naming one that is. `--feed print [--from <seq>]`
+  replays every event at or after `<seq>`, in file order. It takes no slug and reads no remote;
+  `UNATTENDED-STOPS.md` §7 is what the feed records.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it
@@ -712,6 +893,10 @@ one are two acts with two authorizations.
    by policy review.design: <value> · <date>` under `owed` or a Tier-2 spec under `owed-above-tier`,
    the date BASE's, and `unattended: spec-audit — not owed by policy review.design: <value>` under
    `off` or `owed-above-tier` with no Tier-2 spec; a policy file that does not read there is check 55.
+   Where none of those owes it and the build's folder at BASE holds the owner's placed `spec audit`, a
+   disposition record of `item.entry.place` disposed `breakpoint` that `placement.py breakpoint`
+   writes (`TOOL-dPlacedRequest-5`), the line reads `unattended: spec-audit — opted in by placement,
+   the owner's placed spec audit at BASE, so it is owed: <date>`, the date BASE's; it only adds.
    The audit is OPT-IN per build (owner ruling of
    2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the project default at
    the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is
@@ -831,6 +1016,12 @@ the run, which makes "the owner was asked at the start" a property of the commit
    `not asked — the brief draws on nothing outside the prompt`. From `PROMPT_BRIEF_CUTOFF`,
    the first preflight refuses a record that breaks this shape and a build with no such record.
    A `spec-audit:` ask counts only inside `## The prompt`, never in a section the run wrote.
+   **Before writing the build folder, place the prompt**: record it with `--request <file>`, place it
+   under the content key that prints with the loop kit's `placement.py place` and `check`, and write
+   the passed block under a `## Placement` section of the record, its `request: <content key>` line
+   first. From `PROMPT_BRIEF_CUTOFF` the first preflight refuses at check 119 a record with no such
+   section, a disposition that opens no build (anything but `new`, `patch` and `repeat`) and a block
+   `check` refuses, so a prompt that continues or amends a live build is routed there instead.
 4. **Commit, then PUSH THE BRANCH**, in that order, under `published`. Skip the push and preflight
    refuses with `the remote advertises no tip for the branch this run is on, so nothing published
    authorizes it`. Under `local` the commit is enough and no push is owed.
@@ -966,7 +1157,8 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   SPEC, then — only where the build or its project declares the audit — AUDIT and DISPOSAL, and hands
   back the ordered roster on a terminal `--review` verdict, or at SPEC completion when the audit is
   off. Pass `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`
-  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`;
+  or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, or any other `opted in by` line, and omit
+  it on `not owed (opt-in)`;
   the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
   A caller passes `disposal`, the value of the `spec-disposal:` line `--plan <slug> --paths` prints,
   and omits the arg on `absent`. That line is the one answer `SPEC_FOLD_CUTOFF`, the run's first-commit
@@ -1211,9 +1403,16 @@ render that refuses blocks nothing; say so in the wrap-up.
 
 ### Land
 
-Under `primary`, run `LANDER` from the primary tree; under `in-place`, `LANDER --land --slug <slug>`
-from this worktree, then `--landed`, which there OBSERVES and writes nothing — commit nothing after
-the push. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
+Under `primary`, run `LANDER --slug <slug>` from the primary tree; under `in-place`, `LANDER --land
+--slug <slug>` from this worktree, then `--landed`, which there OBSERVES and writes nothing — commit
+nothing after the push. The slug fences the push on the build's lease (`--lease fence` above): the
+lander exits 1 pushing nothing on a `lease refused` line or a fence read it cannot parse, `fenced`
+when the lease was taken after the read, so end the run `--abort <slug> --code claim-lost`, and
+`unfenced` when the remote refuses `--atomic`. A lease moved by this holder's own write at the same
+epoch, the tick's `--beat` during the bar among them, is `refenced` by `--lease fence --after`: the
+lander retries within its attempt bound without re-preparing, on a fence read from the new tip; a
+re-fence read that does not answer is `unreachable`, exit 1 with no abort remedy: retry the landing
+once the remote answers. Never with a hook-bypass flag: the lander reconciles the remote BEFORE the gate, and the
 gate greps the run-state file for the flag. Reconcile from the remote's own default branch onto the
 run branch: on a `--prepare` conflict, `git merge <remote>/<default-branch>`, resolve, commit and
 prepare again. After ANY merge of the remote's default branch into the run branch, mid-build

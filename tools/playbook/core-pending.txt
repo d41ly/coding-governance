@@ -19,14 +19,12 @@ principle	principle.p25	dBoundRoles
 principle	principle.p27	dOrderedCharter
 principle	principle.p29	dBoundRoles
 principle	principle.p30	dTotalRecall
-principle	principle.p31	dPlacedRequest
 principle	principle.p32	dPlacedRequest
 principle	principle.p33	dOrderedCharter
 principle	principle.p34	dOrderedCharter
 principle	principle.p35	dTrueNorth
 principle	principle.p36	dWellOiledMachine
 principle	principle.p37	dSafePassage
-principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
 practice	practice.yagni	dWitnessedBar
 practice	practice.reuse	dWitnessedBar

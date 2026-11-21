@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22
+**Status:** CLOSED · rev-7 · 2026-11-20 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22 · closes TOOL-dPlacedRequest-68
 
 **Carries:** cl-dClosedLoop-0123@626c316e whole
 **Carries:** node:policy-key.placement
@@ -15,11 +15,27 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 | [2026-10-26-build-TOOL-dPlacedRequest-4-deviation-41.md](../build/2026-10-26-build-TOOL-dPlacedRequest-4-deviation-41.md) | deviation | — |
+| [2026-11-20-build-TOOL-dPlacedRequest-4-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dPlacedRequest-4-1-acceptance-ledger.md) | journal | — |
+| [2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-22.md](../build/2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-22.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-23.md](../build/2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-23.md) | red-fix | — |
+| [2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-24.md](../build/2026-11-20-build-TOOL-dPlacedRequest-4-red-fix-24.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-4-deviation-688.md](../build/2026-11-21-build-TOOL-dPlacedRequest-4-deviation-688.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-4-deviation-689.md](../build/2026-11-21-build-TOOL-dPlacedRequest-4-deviation-689.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-4-deviation-690.md](../build/2026-11-21-build-TOOL-dPlacedRequest-4-deviation-690.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-37.md](../build/2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-37.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-39.md](../build/2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-39.md) | red-fix | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-1-asks-adopt-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-20 |
+| [2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dPlacedRequest-11-build-brief.md) | research | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-4-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-4-1-spec-writer.md) | journal | — |
+| [2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
+| [2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md](../reviews/2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round2.md) | diff-review | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
 
 <!-- /gen:spec-records -->
 
@@ -68,11 +84,20 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
   observations: <n>
   placer: agent | declared | owner
   check: pending | pass | refused <why> | recorded <why>
+  reenters: <unit id>#<F-id>
   ```
 
   `reason` and `evidence` pass `render_redacted` (`tools/runlog/runlog_lib.py:553`) and are cut to 240 bytes
   each, so a value that reaches the remote through the claim commit carries no secret and no request text
-  past that cap. The newest block is the placement; earlier blocks are the loop's history. Observed by AC5.
+  past that cap. The newest block is the placement; earlier blocks are the loop's history. The
+  `reenters:` line is optional: a block that re-enters a decided item, an owner's late answer placed as
+  an `amend` (TOOL-dFurnishedOrders-16 S8), carries it, and `read_placement` reads a block without it,
+  or with `reenters: none`, as `none`. `add_placement` writes one only when its caller passes the item,
+  refusing before any write a value `check_reenters_item` refuses. That function is the one check of
+  the shape `<unit id>#<F-id>`, an `<F-id>` being `F` and digits, in `tools/loop/placement.py`, and
+  TOOL-dFurnishedOrders-16 S9's `check_late_answer` calls it rather than spelling the shape again.
+  `check` keeps the line, and `record` prints it after `disposition` when it is not `none`. Observed
+  by AC5 and AC12.
 - **S5** — `placement.check`, read as S2 reads `placement`, default `refuse` (v2:1171). `check` re-evaluates
   the newest block against the facts each disposition rests on (orientation.md:157-163, the table in §4)
   and writes its verdict into that block's `check:` line. Under `refuse` a failed fact prints
@@ -90,8 +115,11 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
 - **S7** — The hand-off to the claim. `python tools/loop/placement.py record --request <content key>` prints
   the newest passed block's `disposition`, `build`, `playbook` and `reason` lines, the lines TOOL-dPlacedRequest-21's
   `entry.claim` writes into the claim commit for `new`, `patch` and `repeat` (shared interface I23), so the
-  disposition is carried there until dWellOiledMachine's intake kind lands (RC-9). A block whose `check:` is
-  not `pass` or `recorded` prints nothing and exits 1. Observed by AC8.
+  disposition is carried there until dWellOiledMachine's intake kind lands (RC-9). A block carrying a
+  `reenters:` line other than `none` prints it right after `disposition`, and
+  `TOOL-dPlacedRequest-10` S5's `scenarios:` and `facts:` follow `reason:` once that unit lands. A
+  block whose `check:` is not `pass` or `recorded` prints nothing and exits 1. Observed by AC8 and
+  AC12.
 - **S8** — The owner-item stand-in (C2-F7). Until Plan's and Design's items land, a passed placement whose
   route enters Plan or Design (`new` to Plan; `amend`, `patch` and `repeat` to Design, flow-steps.md:124)
   prints `placement: owner item — <disposition> <build or content key> · claim refs/gov/claims/<slug>`
@@ -149,6 +177,7 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
 - **hands-off** `TOOL-dPlacedRequest-21` — `disposition`, the lines `placement.py record` prints for the claim commit
 - **hands-off** `TOOL-dPlacedRequest-3` — `disposition`, the verbs `place` and `check` the placing items name as their bodies
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** external — TOOL-dFurnishedOrders-16 S8's `place --late`, the one caller that passes `add_placement` a `reenters:` item, its S9's `check_late_answer`, which calls `check_reenters_item` for the item's shape, and its S10, which finds the line present
 
 ## 4. Design
 
@@ -182,11 +211,11 @@ scout return ──place──▶ <git-common-dir>/requests/<key>.placement  (bl
 | Minted | Kind |
 |---|---|
 | `tools/loop/placement.py` and its verbs `place`, `check`, `record`, `--fixture` | module, CLI |
-| `place_request`, `check_placement`, `read_placement`, `print_claim_lines` | functions, `tools/loop/placement.py` |
+| `add_placement`, `check_placement`, `read_placement`, `print_claim_lines`, `check_reenters_item` | functions, `tools/loop/placement.py` |
 | `STAND_INS` | table, `tools/loop/placement.py` |
 | `check_prompt_placement` | bash function, `tools/unattended/unattended.sh` |
 | `## Placement` | prompt-record section |
-| `placed-utc`, `build`, `playbook`, `placer`, `check` | placement record keys, beside I18's `disposition` and `reason` |
+| `placed-utc`, `build`, `playbook`, `placer`, `check`, `reenters` | placement record keys, beside I18's `disposition` and `reason` |
 | `held-owner`, `observations-unverified` | `check` answers |
 
 Each function name is put to `python tools/lexicon/lexicon.py --suggest <name> --as py.function` (and
@@ -219,6 +248,10 @@ at the first preflight after landing; a run already past its first preflight is 
 - `tools/unattended/VERBS.template.md`: the step-3 sentence
 - `memory/guides/UNATTENDED-VERBS.md`: its render
 - `help/loop.md`: a placement section
+- `memory/map/generated/`: regenerated by the codebase-map kit's `gen_map.py --write` in this
+  unit's own pass wherever its diff mints, renames or deletes a function the symbol extractor reads,
+  so `gen_map.py --check` exits 0 after the pass; `TOOL-dPlacedRequest-34` S38 is the final re-check
+  only
 
 ### Alternatives rejected
 
@@ -292,13 +325,22 @@ at the first preflight after landing; a run already past its first preflight is 
   `loop placement fixtures` carries `enforces` holding `principle.p22`, and its argv names
   `placement.py --fixture`.
   Red when: the leg carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
+- **AC12** — When `python placement.py --fixture --plant late-answer` appends, through `add_placement`,
+  a block reading `disposition: amend` and `reenters: TOOL-tFix-1#F2`, as an owner's late answer is
+  placed, `read_placement` returns that item, a passing `check` keeps the line, and `record` prints
+  AC8's claim lines with `reenters: TOOL-tFix-1#F2` immediately after `disposition`; a block written
+  without the line reads `none` and `record` prints AC8's claim lines and no `reenters:` line, however
+  many claim lines a later unit adds; `reenters: TOOL-tFix-1` is refused by `check_reenters_item` and
+  no block is written.
+  Red when: the block cannot carry the line, `check` loses it, a malformed item is written, or the
+  plant counts the claim lines.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `govkit acceptance matrix`
+`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `codebase-map coverage + freshness`
 
-New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC5 AC6 AC7 AC8 AC9 · the `loop placement fixtures` leg's plants, its failing case staged by `continue-closed` with the check reading the return's text · none
-New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode preflight case whose `## Placement` block reads `continue`, its failing case staged by removing `check_prompt_placement`'s call · none
+New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC5 AC6 AC7 AC8 AC9 AC12 · the `loop placement fixtures` leg's plants, its failing case staged by `continue-closed` with the check reading the return's text · none
+New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode preflight case whose `## Placement` block reads `continue`, its failing case staged by removing `check_prompt_placement`'s call · none · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14, and each covered criterion's own probe is the observation at landing
 
 ## 8. Open questions
 
@@ -343,6 +385,23 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode p
   `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 31: the leg
   `loop placement fixtures` carries `enforces`, P22's, whose v2 `[enforcement]` row names
   `cl-dClosedLoop-0123`.
+- rev-5 · 2026-11-19 · §2 S4 · §3 Edges · §4 Inventory · §6 AC12 · §7 · adopts ask
+  TOOL-dPlacedRequest-68 per the brief `2026-11-19-prompt-TOOL-dPlacedRequest-1-1-spec-writer`: the
+  placement block carries an optional `reenters: <unit id>#<F-id>` line, written by
+  TOOL-dFurnishedOrders-16 S8's late answer and observed on the `late-answer` plant; §7 gains the
+  three legs the spec-token guard join names.
+- rev-6 · 2026-11-19 · §2 S4, S7 · §3 Edges · §4 Inventory · §6 AC12 · §7 · folds `2026-11-19-review-TOOL-dPlacedRequest-11-spec-audit`: findings 2 and 27 (M1), AC12
+  names AC8's claim lines and the `reenters:` line's place instead of a count, and S7 names that
+  optional line after `disposition` and TOOL-dPlacedRequest-10 S5's `scenarios:` and `facts:` after
+  `reason:`; finding 21 (L7), one predicate `check_reenters_item` checks the `<unit id>#F<digits>`
+  shape, named in the hands-off so TOOL-dFurnishedOrders-16 S9 calls it; finding 4 (M3), the unattended.test.sh arm cites README rule 8 and owes its clean reading to PLAY-dClosedLoop-14.
+- rev-7 · 2026-11-19 · §4 Files touched · §7 · folds
+  `2026-11-19-review-TOOL-dPlacedRequest-1-spec-audit`: finding 17 (M8), this unit's own pass
+  regenerates `memory/map/generated/`, named in Files touched, and §7 names its leg.
+- editorial · 2026-11-20 · §2 S4 · §3 Edges · §4 Inventory · §6 AC12 · no rev bump, the status stays
+  CLOSED: the function that appends a placement block is re-cited as `add_placement`, renamed for
+  the naming lexicon in an inline red fix of the pass legs, per
+  `2026-11-20-prompt-TOOL-dPlacedRequest-4-pass-red-fix-brief`.
 
 ## 10. Reuse audit
 

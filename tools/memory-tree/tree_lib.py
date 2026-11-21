@@ -505,9 +505,13 @@ BIND_HEAD_LINES = 12
 # commands re-run at a commit, written by a stand-in or an executor and never by a door. `transition`
 # (TOOL-dDeclaredLoop-3 S2) is a build's stage move, written by the loop kit's transition writer alone.
 # `recommendation` (TOOL-dDeclaredLoop-22 S1) is a stage exit's review recommendation, a command's score or a
-# role's reason, written through the factory's door by the unattended driver's `--recommend`.
+# role's reason, written through the factory's door by the unattended driver's `--recommend`. `card`
+# (TOOL-dPlacedRequest-2 S8) is a build's orientation card at one step, its snapshot, written by the
+# kickoff engine through the factory's `write_record`, no door. `probe-trigger` and `probe`
+# (TOOL-dPlacedRequest-7 S6) are a probe opened at an item boundary and the probe it opened, its head, its
+# method, its run lines and its verdict, written by the loop kit's probe.py through `write_record`, no door.
 TYPED_RECORD_KINDS = ("deviation", "exception", "override", "change", "red-fix", "disposition", "acceptance",
-                      "transition", "recommendation")
+                      "transition", "recommendation", "card", "probe-trigger", "probe")
 RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research") + TYPED_RECORD_KINDS
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally

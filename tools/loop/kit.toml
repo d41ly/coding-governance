@@ -5,12 +5,14 @@ id = "loop"
 home = "loop"
 layer = "layer.flow"
 scope = "repo"
-# The two edges this core kit keeps into an expansion, each at a core point and each degrading where
+# The three edges this core kit keeps into an expansion, each at a core point and each degrading where
 # that kit does not resolve: position.py reads a build's refusal rows through the runlog kit's run-state
-# reader (TOOL-dDeclaredLoop-14), and stage_coverage.py reads the codebase-map kit's dossier claims
-# (TOOL-dDeclaredLoop-4).
+# reader (TOOL-dDeclaredLoop-14), placement.py redacts a recorded reason through the runlog kit's
+# `render_redacted` (TOOL-dPlacedRequest-4), and stage_coverage.py reads the codebase-map kit's dossier
+# claims (TOOL-dDeclaredLoop-4).
 optional = [
   { part = "position.py", point = "point.runtime.reading", fallback = "the refusal rows read unarmed, the reason said" },
+  { part = "placement.py", point = "point.runtime.reading", fallback = "the placement exits 2 unarmed, naming the kit that did not resolve" },
   { part = "stage_coverage.py", point = "point.memory.consult", fallback = "the stage coverage leg refuses, naming the kit that did not resolve" },
 ]
 # The kit's version constant; README.md's first line carries the marker that equals it.
@@ -71,6 +73,32 @@ version_from = { file = "loop_lib.py", pattern = "^KIT_LOOP_VERSION = " }
 # copy, and imports only loop_lib.py beside it, so its reach takes no edge; the session-kickoff checker
 # and the unattended driver each find it by `resolve_kit_dir` and print a skipped or `-` form where it
 # does not resolve. Its leg is gov's own [[exempt_leg]].
+# The request key (TOOL-dPlacedRequest-19): request.py keys an owner's request by its text through the
+# memory-tree kit's `derive_content_key` in row_grammar.py, under the edge above, and imports loop_lib.py
+# beside it; the unattended driver finds it by `resolve_kit_dir` for `--request` and refuses the verb
+# naming it where it does not resolve. Its leg, `loop request fixtures`, is gov's own [[exempt_leg]], no
+# row here.
+# The probe program (TOOL-dPlacedRequest-7): probe.py writes the probe-trigger and probe records through the
+# memory-tree kit's `write_record` under the edge above, reads the probe policy keys through the policy kit by
+# `read_policy_kit` and `probe.points` at a build's pin through composition.py's `read_tag_policy`, and re-runs
+# a method through loop_witness.py's `rerun` beside it, so it takes no edge to the policy kit: a kit that does
+# not resolve exits 2 `unarmed`. Its leg, `loop probe fixtures`, is gov's own [[exempt_leg]], no row here.
+# The placement predicate (TOOL-dPlacedRequest-4): placement.py reads a build's status through the memory-tree
+# kit's index generator and record factory under the edge above, the placement keys through the policy kit by
+# `read_policy_kit`, the runlog kit's `render_redacted` and a build lease through the unattended driver's
+# `--claims`, each found by `resolve_kit_dir`, so it takes no edge to any of them: a kit that does not resolve
+# exits 2 `unarmed`, never a default, and an unreadable lease is a refused fact. The driver's prompt-mode
+# preflight finds it the same way. Its leg, `loop placement fixtures`, is gov's own [[exempt_leg]], no row here.
+# The claim (TOOL-dPlacedRequest-21): claim.py, the python half of the unattended driver's `--entry-claim`,
+# reads the placement's claim lines through placement.py beside it, the slug pre-check and the placed build's
+# scaffold through the memory-tree kit's index generator under the edge above, `patch.ratify`, `leases` and
+# `flow.wait-ceiling` through the policy kit by `read_policy_kit`, and writes the first transition record
+# through loop_transition.py, whose writer reads its `check_patch_ratified`; the driver finds it by
+# `resolve_kit_dir`, so it takes no edge: a kit that does not resolve exits 2 `unarmed`, never a default.
+# Its leg, `loop claim fixtures`, is gov's own [[exempt_leg]], no row here.
+# The code seed (TOOL-dPlacedRequest-8): loop_lib.py's `resolve_item_seed` runs the unattended driver's
+# `--path-tokens`, found by `resolve_kit_dir`, so it takes no edge, the driver's kit requiring this one,
+# and prints `unarmed` where the driver does not resolve; its plants ride the `loop definition` leg.
 # The position engine (TOOL-dDeclaredLoop-7): position.py reads commits, acceptance records and the
 # front matter through the memory-tree kit under the edge above, the run facts through the policy kit
 # by `read_policy_kit`, and each unit's M2 state from the unattended driver's `--plan`, found by

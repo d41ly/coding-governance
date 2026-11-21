@@ -254,6 +254,15 @@ ROLES_HOME=$(resolve_kit_dir "$TESTPY" roles handoff.py "$HERE") || exit 2
 mkdir -p "$TMP/kit/$HOOKS_HOME" "$TMP/kit/$ROLES_HOME"
 cp "$HERE/format-guard.js" "$HERE/scratch-guard.js" "$HERE/agent-cap.js" "$TMP/kit/$HOOKS_HOME/"
 HOOK="$TMP/kit/$HOOKS_HOME/format-guard.js"
+# The hook's card reader asks the kickoff checker where a session's card lives, resolved from the hook's
+# OWN install (TOOL-dPlacedRequest-2 S10), so the copy carries a stub checker where that probe looks: it
+# answers --card --path alone, with the orientation folder of the fixture's git common dir, and no arm
+# reads the real kickoff kit.
+case $HOOKS_HOME in */*) KICKOFF_HOME=${HOOKS_HOME%/*}/session-kickoff ;; *) KICKOFF_HOME=session-kickoff ;; esac
+mkdir -p "$TMP/kit/$KICKOFF_HOME"
+printf '%s\n' '[ "${1:-} ${2:-} ${3:-}" = "--card --path --session" ] || exit 2' \
+  'd=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1' \
+  'echo "$d/orientation/$4.md"' > "$TMP/kit/$KICKOFF_HOME/manifest-check.sh"
 export GOV_PYTHON="$TESTPY"
 
 # The native spelling of a directory: node reads the payload's cwd as a Windows path on Windows, and

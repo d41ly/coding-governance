@@ -1816,6 +1816,11 @@
       "introduced": null,
       "state": "applied",
       "via": "witness"
+    },
+    {
+      "id": "kickoff-manifest/facts-to-overlay",
+      "introduced": null,
+      "state": "applied"
     }
   ]
 }
