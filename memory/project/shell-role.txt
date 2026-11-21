@@ -104,7 +104,7 @@ tools/run-gates/pass-legs.sh	314	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/run-gates/post-merge.sh	309	db4b2b67022cf13a4e72e9bc2520c5f4ca445e3d	widened:2026-11-20-build-TOOL-dWitnessedBar-60-widen-4
 tools/run-gates/profile_bar.test.sh	315	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/run-gates/run-gates.evidence.test.sh	2452	17034486d5eba7a753c1a739fc1e4c27cb3fed6d	widened:2026-11-21-build-TOOL-dWitnessedBar-67-widen-11
-tools/run-gates/run-gates.gov.test.sh	787	1f34660b7146f7a67d19acce7e72d1c3e13c7305	widened:2026-11-21-build-TOOL-dWitnessedBar-77-widen-19
+tools/run-gates/run-gates.gov.test.sh	797	5fcd2dc19152b4cd159b719d43184239e6da5d17	widened:2026-11-21-build-TOOL-dWitnessedBar-79-widen-20
 tools/run-gates/run-gates.runlog.test.sh	994	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/run-gates/run-gates.sh	3737	e1c032c126113a13c55ce92953e546b36a3a7a19	widened:2026-11-21-build-TOOL-dWitnessedBar-63-widen-6
 tools/run-gates/run-gates.test.sh	3179	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1

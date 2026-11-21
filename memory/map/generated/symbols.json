@@ -6823,6 +6823,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "check_key_variant",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
       "id": "check_kind_row",
       "kind": "function",
       "file": "tools/playbook/core.py"
