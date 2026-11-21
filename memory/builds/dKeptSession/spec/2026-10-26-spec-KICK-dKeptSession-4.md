@@ -1,6 +1,6 @@
 # KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0142@816ff525 whole
 
@@ -158,7 +158,7 @@ which moved none of the symbols below but `RESOLUTION_ORDER`, now holding unit 2
 - `adopt-policy.sh`'s written branch runs `policy.py scaffold` with `2>/dev/null` and, on any
   failure, prints `policy: the scaffold could not be written to <file>` and exits 1. `check-arms.py`
   counts a reasoned `exit 1` as a branch (`tools/memory-tree/check-arms.py#EXIT_RE`), and
-  `ARMS_FLOORS` in `.memory-tree.conf` pins `tools/policy/adopt-policy.sh:4:4`.
+  `ARMS_FLOORS` in `.memory-tree.conf` pins the adopter's row at four branches, all four armed.
 - One `build_source_snapshot` of this tree took 12.3 seconds, PINNED 2026-11-21 at `c2c9d3d6` by one
   timed run.
 - The kickoff manifest's `watch:` list (`memory/guides/SESSION-KICKOFF.md`) names none of the
@@ -342,6 +342,9 @@ New arm: tools/policy/adopt-policy.test.sh · covers AC4 AC5 · arms for a scaff
   the adopter suite's arms by number; S3 states the kept call's exits; S2 keeps the adopter's census
   of reasoned `exit 1`s. Files touched gains the symbol map and the docstring; the evidence names
   the suites that run the deployer over a policy selection and the pinned snapshot cost.
+- rev-5 · 2026-11-21 · §4 · the `ARMS_FLOORS` evidence line describes the adopter's floor row
+  instead of quoting its `path:number:number` spelling, which the positional leg read as an unlisted
+  line citation; under the brief `2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief`.
 
 ## 10. Reuse audit
 

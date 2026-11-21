@@ -1,6 +1,6 @@
 # KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 4 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 4 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -75,7 +75,7 @@ step after unit 2 (order 4).
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-2` — `read_preset_value`'s read of `presets.toml`, the resolution input this unit records in the mirror (id 47), and `READER_FILES`, whose store copy the landed-repository fixture carries
+- **consumes-from** `KICK-dKeptSession-2` — `read_preset_value`'s read of `presets.toml`, the resolution input this unit records in the mirror (id 47), read beside the running `policy.py`, so this unit's case copies the store and `presets.py` into its kit copy
 - **hands-off** `KICK-dKeptSession-49` — the store recorded under `legacy_blobs`, which that unit makes the JS reader expect rather than discover (id 22)
 - **hands-off** `KICK-dKeptSession-50` — `derive_mirror_inputs` and the mirror's `legacy_blobs`, whose upgrade from a pre-unit mirror that unit observes (id 48)
 - **hands-off** `KICK-dKeptSession-56` — `.governance/policy.json` as a write, the gates section's legs and the README's mirror text, the batch's S29, S25 and S42 (ids 40, 34, 41)
@@ -100,10 +100,17 @@ step after unit 2 (order 4).
   reader's answer, its reason prefixed `mirror stale at <L8>; `, and under any other value it refuses
   (`tools/policy/policy-mirror.js#readPolicy`), which is the `mirror-stale-refuse` branch's red.
 - `build_landed_repo` copies `MIRROR_KIT_FILES`, which spreads `READER_FILES`
-  (`tools/policy/check_policy.py#build_landed_repo`); `KICK-dKeptSession-2` S3 adds `presets.py` and
-  `presets.toml` to `READER_FILES`, so the case's kit copy carries the store with no copy added here.
-  `run_mirror_landed` ends every branch by `arm_mirror_landed` over its repository, which must find
-  nothing for this branch as it does for `mirror-stale-legacy`.
+  (`tools/policy/check_policy.py#build_landed_repo`), and neither holds `presets.py` or
+  `presets.toml` at `b3698899`, after `KICK-dKeptSession-2` landed: that unit copied `presets.py` only
+  inside `run_resolution_order`. Its step reads the store beside the running `policy.py`
+  (`tools/policy/policy.py#read_kit_presets`), so the shim's read in a copy lacking both files refuses
+  naming `presets.py`. `KICK-dKeptSession-49` S3 widens `MIRROR_KIT_FILES` with both, at order 5,
+  after this unit, so this unit's branch copies the two files itself and leaves the shared tuple to
+  that unit. It edits strict's table in the copy by KICK-dKeptSession-1's store helper
+  (`tools/policy/check_policy.py#set_preset_block`).
+- `run_mirror_landed` ends every branch by `arm_mirror_landed` over its repository, which must find
+  nothing for this branch as it does for `mirror-stale-legacy`; it compares only the keys the policy
+  file sets, `preset` among them, none of which the store's edit moves.
 - Every other `render_mirror` caller, `build_repo`, `set_landed`, `arm_mirror_parity` and the playbook's
   `read_tag_policy` (`tools/playbook/policy_value.py#read_tag_policy`), already reads
   `derive_catalogue_rel` in the same render. `adopt-policy.sh --scaffold` and its suite run gov's kit
@@ -127,7 +134,9 @@ mirror is re-rendered in this unit (S3).
 ### Files touched (estimate)
 
 - `tools/policy/policy.py`: S1 and S2
-- `tools/policy/check_policy.py`: the `mirror-presets-stale` case and its `CASES` row
+- `tools/policy/check_policy.py`: the `mirror-presets-stale` case, its `CASES` row, and the
+  branch's own copy of `tools/policy/presets.py` and `tools/policy/presets.toml` into its kit copy,
+  `MIRROR_KIT_FILES` left as it stands
 - `tools/policy/README.md`: the mirror section
 - `help/policy.md`: the guard section's list of the mirror's inputs
 - `.governance/policy.json`: re-rendered by `mirror --write`
@@ -158,10 +167,12 @@ mirror is re-rendered in this unit (S3).
 - **AC1** — When `grep -n "def derive_kit_rel\|def derive_catalogue_rel" policy.py` runs in the
   policy kit, both print, and `derive_catalogue_rel`'s body is one call to `derive_kit_rel(CATALOGUE)`.
   Red when: the prefix read is written twice.
-- **AC2** — When the `mirror-presets-stale` branch of `run_mirror_landed` commits `preset =
-  "strict"` above `LANDED_POLICY`'s `policy-file.on-invalid = "last-valid"`, commits the mirror
-  `render_mirror` gives at that commit and pushes it as L, then commits strict's `hooks.bypass` set
-  to `allowed` in the kit copy's `presets.toml` and pushes that alone, `node policy-mirror.js get
+- **AC2** — When the `mirror-presets-stale` branch of `run_mirror_landed` copies this kit's
+  `presets.py` and `presets.toml` into the kit copy `build_landed_repo` made, LF-ended as that
+  builder copies, commits them with `preset = "strict"` above `LANDED_POLICY`'s
+  `policy-file.on-invalid = "last-valid"`, commits the mirror `render_mirror` gives at that commit and
+  pushes it as L, then commits strict's `hooks.bypass` set to `allowed` in the copy's `presets.toml`
+  by `set_preset_block` and pushes that alone, `node policy-mirror.js get
   hooks.bypass --repo <repo> --explain` exits 0 printing `allowed`, its stderr line reading
   `policy: hooks.bypass · preset · mirror stale at <L8>; ` and the reader's reason, and the branch's
   closing `arm_mirror_landed` finds nothing.
@@ -217,6 +228,13 @@ New arm: tools/policy/check_policy.py · covers AC2 AC3 · the `mirror-presets-s
   lands each commit by a push, and names the closing `arm_mirror_landed`; the store's copy is named
   as unit 2's `READER_FILES` widening, and every other `render_mirror` caller checked; S3 and a new
   AC5 take `help/policy.md`'s guard line, so that page and the symbol map join Files touched.
+- rev-5 · 2026-11-21 · §3 · §4 · AC2 · under 2026-11-21-prompt-KICK-dKeptSession-3-precheck-brief,
+  folding the correction the KICK-dKeptSession-49 writer relayed at `b3698899`, after unit 2 landed:
+  rev-4's claim that unit 2 puts `presets.py` and `presets.toml` in `READER_FILES` is false, since that
+  unit copied `presets.py` inside `run_resolution_order` alone, so AC2's branch copies both files into
+  its kit copy itself and edits the store by `set_preset_block`; `MIRROR_KIT_FILES` stays for unit
+  49's S3, which builds after this unit; the Edges bullet and the evidence say so, and Files touched
+  names the copy.
 
 ## 10. Reuse audit
 

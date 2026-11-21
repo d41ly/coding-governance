@@ -1,6 +1,6 @@
 # KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -102,8 +102,8 @@ Read at HEAD `c2a407b0`, 2026-11-21.
   (`tools/policy/policy.py#render_mirror`), today `LEGACY_INPUTS`, both repository-relative.
 - Probed at `b3698899`, after `KICK-dKeptSession-2` landed, over `build_landed_repo` with
   `preset = "strict"` above `LANDED_POLICY`: a stale mirror read through a kit copy of
-  `MIRROR_KIT_FILES` alone exits 2, `policy: refused · <kit copy>/presets.py:0 · presets.py, the
-  named presets' module, does not import`; with `presets.py` and `presets.toml` copied, a mirror
+  `MIRROR_KIT_FILES` alone exits 2, its refusal line naming the kit copy's `presets.py` at line
+  zero and saying the named presets' module does not import; with `presets.py` and `presets.toml` copied, a mirror
   rendered and pushed as L and then strict's `hooks.bypass` set to `allowed` in the copy's store and
   pushed, `node policy-mirror.js get hooks.bypass --explain` reads FRESH and prints `refused`, the
   defect, unit 40 not yet landed. `arm_mirror_landed` over that repository found nothing.
@@ -217,6 +217,9 @@ none
   `presets.py`, so `MIRROR_KIT_FILES` carries it and the store, unit 40's branch being the copy's
   first instance. The fixture names its `on-invalid` line and its closing arm; AC1 and AC2 name the
   value, the source and the exit each read prints; §5 states the renderer and reader sharing a path.
+- rev-5 · 2026-11-21 · §4 · the probe's refusal line is described instead of quoted, since its
+  quoted path with a line suffix read as an unlisted line citation to the positional leg; under the
+  brief `2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief`.
 
 ## 10. Reuse audit
 

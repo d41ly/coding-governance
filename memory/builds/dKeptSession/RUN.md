@@ -68,3 +68,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T17:17:17Z brief · item KICK-dKeptSession-2 · reason 7f0285b83e86 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-2-build-brief.md
 
 2026-11-21T17:18:39Z dispatch · item bd980b21 KICK-dKeptSession-2 · reason tools/policy/policy.py tools/policy/presets.py tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-2-1-acceptance-ledger.md
+
+2026-11-21T17:44:26Z brief · item KICK-dKeptSession-3 · reason 9cfd9ae78e94 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-3-build-brief.md
+
+2026-11-21T17:45:50Z dispatch · item c1aa24bf KICK-dKeptSession-3 · reason tools/policy/policy.py tools/policy/check_policy.py tools/playbook/policy_value.py tools/playbook/render_playbook.py tools/playbook/instruction_units.py tools/govkit/entries/playbook.kit.toml tools/govkit/usage.toml .governance/instructions.lock memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json help/policy.md help/charter.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-3-1-acceptance-ledger.md
