@@ -22243,8 +22243,6 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/runlog/selftest.py:355-356
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/kit.toml:62-65
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/unattended-build.template.js:2078
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-18.md	tools/unattended/unattended.sh:1066
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-18.md	tools/unattended/unattended.sh:4183-4192
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	BUILD-METHOD M3
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	BUILD-METHOD M4
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	catalogue.toml:223
