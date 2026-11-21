@@ -1599,25 +1599,39 @@ kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprin
 force=""; lag=0
 rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_reused_cache=""
 read_green_file() { # path -> rec_sha rec_fp rec_blob rec_man rec_st rec_reused rec_reused_cache, each empty when absent
+  local _rg_l="" _rg_k="" _rg_v=""
   rec_sha=""; rec_fp=""; rec_blob=""; rec_man=""; rec_st=""; rec_reused=""; rec_reused_cache=""
   [ -f "$1" ] || return 0
-  # Each key as the runner's `read_record_keys` and `read_tag_lines` read it: the last line of a repeated
-  # key wins, and one trailing CR is stripped (TOOL-dWitnessedBar-65 S15).
-  rec_sha=$(awk -F'\t' '$1=="sha"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  rec_fp=$(awk -F'\t' '$1=="fingerprint"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  rec_blob=$(awk -F'\t' '$1=="manifest_blob"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  # WHICH MANIFEST THE BLOB BELONGS TO (TOOL-aFrugalTurnstile-1 S4). Absent reads as the kit sibling,
-  # in check_green_record, because that is what every stamp written before the key existed ran.
-  rec_man=$(awk -F'\t' '$1=="manifest"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
-  # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
-  # "covered everything" would make each of them certify legs it never ran.
-  rec_st=$(awk -F'\t' '$1=="selftests"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  # HOW MANY LEGS THE RUN REUSED, and how many of them from the cache (TOOL-aSparedSpawn-13 S8, -32
-  # S8), the pair predicate 9 reads. Each is empty when absent; what an absent one means is
-  # predicate 9's to say.
-  rec_reused=$(awk -F'\t' '$1=="reused"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
-  rec_reused_cache=$(awk -F'\t' '$1=="reused_cache"{v=$2} END{sub(/\r$/, "", v); print v}' "$1" 2>/dev/null)
+  # Each key as the runner's `read_record_keys` and `read_tag_lines` read it: each line is read WHOLE,
+  # so its CR reaches the strip; a line with no TAB is no key (TOOL-dWitnessedBar-63 S19); the value is
+  # everything after the first TAB (-62 S24); one trailing CR is stripped and the last line of a
+  # repeated key wins (-65 S15, -69 S1). An unreadable file leaves every variable empty.
+  while IFS= read -r _rg_l || [ -n "$_rg_l" ]; do
+    case "$_rg_l" in
+      *$'\t'*) ;;
+      *) _rg_l=""; continue ;;
+    esac
+    _rg_k=${_rg_l%%$'\t'*}; _rg_v=${_rg_l#*$'\t'}
+    _rg_v=${_rg_v%$'\r'}
+    case "$_rg_k" in
+      sha) rec_sha=$_rg_v ;;
+      fingerprint) rec_fp=$_rg_v ;;
+      manifest_blob) rec_blob=$_rg_v ;;
+      # WHICH MANIFEST THE BLOB BELONGS TO (TOOL-aFrugalTurnstile-1 S4). Absent reads as the kit sibling,
+      # in check_green_record, because that is what every stamp written before the key existed ran.
+      manifest) rec_man=$_rg_v ;;
+      # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
+      # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
+      # "covered everything" would make each of them certify legs it never ran.
+      selftests) rec_st=$_rg_v ;;
+      # HOW MANY LEGS THE RUN REUSED, and how many of them from the cache (TOOL-aSparedSpawn-13 S8, -32
+      # S8), the pair predicate 9 reads. Each is empty when absent; what an absent one means is
+      # predicate 9's to say.
+      reused) rec_reused=$_rg_v ;;
+      reused_cache) rec_reused_cache=$_rg_v ;;
+    esac
+    _rg_l=""
+  done 2>/dev/null < "$1"
 }
 
 # THE CANDIDATE STAMPS (TOOL-dThriftyLanding-2). `--git-dir` is per WORKTREE, so a full green earned in
