@@ -12,6 +12,8 @@ close. The suite passed `bash -n`. The shell-role seed measures the suite at 784
 `rec_sha` and `rec_fp` compares' existing counts, so `a` counts 2 over this slice as before and the floor
 stays as `TOOL-dWitnessedBar-73` S15 states it (DERIVED from the builder's probe).
 
+The floor that counts this unit's arms is `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.gov.test.sh` as `TOOL-dWitnessedBar-82` S1 restates it after unit 78, answering the New-arm line's floor clause, which cites `TOOL-dWitnessedBar-73` S15 (`TOOL-dWitnessedBar-82` S3).
+
 **Evidences:** TOOL-dWitnessedBar-76
 - AC1 — `fingerprint:rec_fp` — S3's `fingerprint` `sed` over the cut changed one `diff` line and the
   canary's `sed` over that variant one; sourced over the record, its mutant gave
