@@ -8448,6 +8448,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "check_scenario_policy",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
+    },
+    {
       "id": "check_scenarios",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -8616,6 +8621,11 @@
       "id": "check_skill_install",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "check_slot",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
     },
     {
       "id": "check_slot_table",
@@ -13501,6 +13511,16 @@
       "id": "derive_skill_steps",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_slot_assignment",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
+      "id": "derive_slot_policy",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "derive_slot_units",
@@ -20193,6 +20213,11 @@
       "file": "tools/loop/probe.py"
     },
     {
+      "id": "read_build_slot",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_build_slug",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -23543,6 +23568,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "read_repo_policy",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "read_repo_root",
       "kind": "function",
       "file": "tools/loop/scenario.py"
@@ -23861,6 +23891,11 @@
       "id": "read_scenario_rows",
       "kind": "function",
       "file": "tools/loop/scenario.py"
+    },
+    {
+      "id": "read_scenario_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_scope_reds",
@@ -24296,6 +24331,11 @@
       "id": "read_stderr_tail",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_stdin_object",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
     },
     {
       "id": "read_stem",
@@ -32018,6 +32058,11 @@
       "file": "tools/govkit/docs_leg.py"
     },
     {
+      "id": "run_pairs",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "run_parity_plant",
       "kind": "function",
       "file": "tools/govkit/shims.py"
@@ -32276,6 +32321,11 @@
       "id": "run_presets_repo",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_presets_verb",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "run_prior_resume",
@@ -32933,9 +32983,19 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "run_slot",
+      "kind": "function",
+      "file": "tools/policy/presets.py"
+    },
+    {
       "id": "run_slot_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "run_slots",
+      "kind": "function",
+      "file": "tools/loop/scenario.py"
     },
     {
       "id": "run_sourced",

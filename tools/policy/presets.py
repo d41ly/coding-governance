@@ -3,6 +3,8 @@ this file, its completeness check, the repository side `validate` calls, and the
 
     python <this kit>/presets.py check                        # the shipped store; exit 0 green, 1 red
     python <this kit>/presets.py load <name> [--repo <dir>]   # one preset's load; exit 0, 2 refused
+    python <this kit>/presets.py slot [--repo <dir>]          # a scenario's slot on stdin; exit 0, 1 refused
+    python <this kit>/presets.py pairs                        # `slot`'s answer on stdin; exit 0, 1 refused
 
 THE STORE. One `[preset.<name>]` table per shipped preset, each assigning every presettable key by a
 quoted dotted key, `"hooks.bypass" = "refused"`; a top-level `never` list, the keys presets never
@@ -47,6 +49,16 @@ RESOLUTION_ORDER, answers a key the file does not set from the named preset's as
 `derive_declared_presets`, the file's `[presets]` table rebuilt from the reader's flattened leaves
 (KICK-dKeptSession-2).
 
+A SCENARIO'S SLOT (KICK-dKeptSession-20), the loop kit's `scenario.py check` running both verbs as
+subprocesses. `slot --repo <dir>` reads `{"scenario", "preset", "overrides"}` as JSON on stdin and
+refuses a preset that is no shipped name and each override key `check_preset_key` refuses: no
+catalogue row, a key presets never touch, a derived row `literal` lacks, or a value `check_value`
+refuses. Otherwise it prints `{"scenario", "assignment"}`, the assignment keyed by dotted key: the
+slot's preset's, else the preset `<dir>`'s working-tree policy file names, else the `preset` row's
+default, with the overrides on top and the file's own keys on top of both. `pairs` reads that object
+on stdin and refuses each pair `check_pairs` returns over it. Each prints one `presets: refused ·
+<scenario> · <key> · <why>` line per refusal and exits 1.
+
 WHAT THIS DOES NOT CHECK: that a preset's values are the posture its name promises, only that it is
 complete, inside each key's schema and inside the pairs; a pair whose two values are not both numbers
 is a finding, never a comparison; a repository file's own pair, which `validate` leaves to
@@ -56,6 +68,7 @@ TOOL-dDeclaredLoop-101 judges a point no installed expansion attaches at.
 
 Exit 0 green or loaded, 1 red, 2 usage, a refused load or a store that does not read.
 """
+import json
 import os
 import re
 import subprocess
@@ -333,16 +346,64 @@ def check_repo_presets(doc, text, rows):
     return out
 
 
-def read_repo_table(repo):
-    """The `[presets]` table of `repo`'s working-tree policy file, None where it has none."""
+def read_repo_policy(repo):
+    """`repo`'s working-tree policy file parsed, {} where it has none; a Refusal where it does not parse."""
     path = Path(repo, policy.POLICY_REL)
     if not path.is_file():
-        return None
+        return {}
     try:
-        doc = tomllib.loads(policy.derive_bomless_text(path.read_text(encoding="utf-8")))
+        return tomllib.loads(policy.derive_bomless_text(path.read_text(encoding="utf-8")))
     except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
         raise policy.Refusal(policy.POLICY_REL, 0, f"does not parse: {exc}") from None
+
+
+def read_repo_table(repo):
+    """The `[presets]` table of `repo`'s working-tree policy file, None where it has none."""
+    doc = read_repo_policy(repo)
     return doc.get(REPO_TABLE) if isinstance(doc.get(REPO_TABLE), dict) else None
+
+
+def check_slot(slot, store, rows):
+    """[(key, why)] for a scenario's `slot`, `{"preset", "overrides"}`, against the store and the catalogue
+    `rows`: a preset that is no shipped name, overrides that are no table, and each override key
+    `check_preset_key` refuses, a key presets never touch among them (KICK-dKeptSession-20)."""
+    out = []
+    shipped = store.get("preset") if isinstance(store.get("preset"), dict) else {}
+    name = slot.get("preset")
+    if name is not None and not (isinstance(name, str) and name in shipped):
+        out.append((PRESET_KEY[0], f"{policy.render_json(name)} names no shipped preset, one of "
+                                   f"{policy.render_json(sorted(shipped))}: a scenario names a shipped preset only"))
+    overrides = {} if slot.get("overrides") is None else slot["overrides"]
+    if not isinstance(overrides, dict):
+        return out + [("overrides", "is not a table from a dotted policy key to its value")]
+    never = derive_never(store)
+    presettable = {r["name"] for r in derive_presettable(rows, never, derive_literal(store))}
+    for key, value in overrides.items():
+        try:
+            row = policy.read_catalogue_row(policy.parse_key(key), rows)
+        except policy.Refusal:
+            row = None
+        why = check_preset_key(row, value, never, presettable)
+        if why:
+            out.append((key, why))
+    return out
+
+
+def derive_slot_assignment(slot, store, doc, rows):
+    """{key path: value} a build placed under `slot` reads, `doc` the repository's parsed policy file: the
+    slot's preset's assignment, else the preset the file names, else the `preset` row's default, with the
+    slot's overrides on top and the file's own keys on top of both. A Refusal for a name no preset holds."""
+    declared = doc.get(REPO_TABLE) if isinstance(doc.get(REPO_TABLE), dict) else None
+    name = slot.get("preset")
+    if name is None:
+        name = doc.get(PRESET_KEY[0]) if PRESET_KEY[0] in doc else derive_default_preset(rows)[0]
+    else:
+        declared = None   # a scenario names a shipped preset only (KICK-dKeptSession-20 §8 F2)
+    out = dict(derive_preset_assignment(name, store, declared, rows))
+    out.update({policy.parse_key(k): v for k, v in (slot.get("overrides") or {}).items()})
+    own = {k: v for k, v in doc.items() if k not in (REPO_TABLE, PRESET_KEY[0])}
+    out.update({segs: v for _raw, segs, _row, v in scan_preset_keys(own, rows)})
+    return out
 
 
 def derive_declared_presets(table):
@@ -393,7 +454,7 @@ def load_preset(name, table, presets=None, here=KIT, top="."):
     return Load(assignment, [(pairs[i][0], pairs[i][1], why) for i, why in refused], lines)
 
 
-USAGE = "usage: python presets.py check | load <name> [--repo <dir>]"
+USAGE = "usage: python presets.py check | load <name> [--repo <dir>] | slot [--repo <dir>] | pairs"
 
 
 def run_check():
@@ -438,10 +499,77 @@ def run_load(name, repo):
     return 0
 
 
+def read_stdin_object(*keys):
+    """The JSON object on stdin when it holds a string `scenario` and each of `keys`, else None."""
+    try:
+        got = json.loads(sys.stdin.buffer.read().decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return None
+    ok = isinstance(got, dict) and isinstance(got.get("scenario"), str) and all(k in got for k in keys)
+    return got if ok else None
+
+
+def run_slot(repo):
+    """`slot --repo <repo>`: a scenario's slot on stdin checked by `check_slot`, then the assignment a
+    build under it reads printed as JSON keyed by dotted key: -> 0, 1 refused, 2 usage or a store or
+    file that does not read."""
+    slot = read_stdin_object()
+    if slot is None:
+        print(f'{USAGE} · slot reads {{"scenario", "preset", "overrides"}} as JSON on stdin', file=sys.stderr)
+        return 2
+    rows = policy.load_catalogue(KIT)
+    try:
+        store = load_presets()
+        doc = read_repo_policy(repo)
+    except policy.Refusal as exc:
+        print(f"{SAY}: refused · {exc.path}:{exc.line} · {exc.why}")
+        return 2
+    refusals = check_slot(slot, store, rows)
+    for key, why in refusals:
+        print(f"{SAY}: refused · {slot['scenario']} · {key} · {why}")
+    if refusals:
+        return 1
+    try:
+        assignment = derive_slot_assignment(slot, store, doc, rows)
+    except policy.Refusal as exc:
+        print(f"{SAY}: refused · {exc.path}:{exc.line} · {exc.why}")
+        return 2
+    print(json.dumps({"scenario": slot["scenario"], "assignment": {policy.render_dotted(k): v for k, v in
+                                                                  assignment.items()}}, sort_keys=True, default=str))
+    return 0
+
+
+def run_pairs():
+    """`pairs`: `slot`'s `{"scenario", "assignment"}` on stdin, each pair `check_pairs` breaks in it one
+    refusal: -> 0, 1 refused, 2 usage or a store that does not read."""
+    got = read_stdin_object("assignment")
+    if got is None or not isinstance(got["assignment"], dict):
+        print(f'{USAGE} · pairs reads {{"scenario", "assignment"}} as JSON on stdin', file=sys.stderr)
+        return 2
+    try:
+        store = load_presets()
+        assignment = {policy.parse_key(k): v for k, v in got["assignment"].items()}
+    except policy.Refusal as exc:
+        print(f"{SAY}: refused · {exc.path}:{exc.line} · {exc.why}")
+        return 2
+    pairs = derive_pairs(store)
+    found = check_pairs(pairs, assignment, got["scenario"])
+    for _hi, lo, why in found:
+        print(f"{SAY}: refused · {got['scenario']} · {lo} · {why}")
+    if found:
+        return 1
+    print(f"{SAY}: pairs · {got['scenario']} · {len(pairs)} pair(s) held")
+    return 0
+
+
 def main(argv):
     sys.stdout.reconfigure(encoding="utf-8", newline="\n")
     if argv == ["check"]:
         return run_check()
+    if argv[:1] == ["slot"] and (len(argv) == 1 or (len(argv) == 3 and argv[1] == "--repo")):
+        return run_slot(argv[2] if len(argv) == 3 else ".")
+    if argv == ["pairs"]:
+        return run_pairs()
     if len(argv) in (2, 4) and argv[0] == "load" and (len(argv) == 2 or argv[2] == "--repo"):
         return run_load(argv[1], argv[3] if len(argv) == 4 else ".")
     print(USAGE, file=sys.stderr)

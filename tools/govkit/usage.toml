@@ -245,7 +245,7 @@ id = "script:{prefix}/policy/policy.py#get"
 shape = "verb"
 entry = "{prefix}/policy/policy.py"
 verb = "get"
-flags = ["--rev=", "--explain", "--json"]
+flags = ["--rev=", "--build=", "--explain", "--json"]
 
 [[usage]]
 id = "script:{prefix}/policy/policy.py#check"

@@ -16,7 +16,7 @@ written through, are KICK-dKeptSession-19's.
     python <this kit>/policy.py lists --write   # drain the three lists; none ever gains a row
     python <this kit>/policy.py scaffold --preset <name>   # print the starter .governance/policy.toml
     python <this kit>/policy.py scaffold --preset <name> --kept <file>   # one line where <file>'s preset differs
-    python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
+    python <this kit>/policy.py get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
     python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
     python <this kit>/policy.py settings [--write|--check] [<file>]  # the harness's two concurrency settings
@@ -35,8 +35,10 @@ working tree, and parses it with tomllib, never by sourcing it: `read_policy_key
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
 with no remote at all the local default branch, and every reason names its sha through the read's
 one `rev_phrase`, which the mirror's render spells `{rev}` (TOOL-dGroundRules-65). A key resolves in
-RESOLUTION_ORDER, spelled once: the file's value, then the value of the preset the file names, from
-`presets.py`'s one assignment (KICK-dKeptSession-2), then the catalogue default with its reason. A
+RESOLUTION_ORDER, spelled once: the file's value, then for a read naming a build the slot of the
+scenarios that build is placed under, read through the loop kit's `scenario.py slots`
+(KICK-dKeptSession-20), then the value of the preset the file names, from `presets.py`'s one
+assignment (KICK-dKeptSession-2), then the catalogue default with its reason. A
 file `validate` refuses never reads a default: the whole file falls back to its last valid revision
 on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
 
@@ -726,11 +728,12 @@ def read_last_valid_value(path, row, read):
     at = f"{valid[:8]}, walked back from {read['rev_phrase']}"
     if "on_invalid" not in read:
         on_path = parse_key("policy-file.on-invalid")
-        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, at).value
+        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, at,
+                                              build=read["build"]).value
     on = read["on_invalid"]
     if on != "last-valid":  # deny by default: only the one fallback value falls back
         raise Refusal(POLICY_REL, first.line, f"{what}; policy-file.on-invalid is {on} at {valid[:8]}")
-    hit = read_ordered_value(path, row, table, at)
+    hit = read_ordered_value(path, row, table, at, build=read["build"])
     # ponytail: the opening names the revision read without its how-phrase, so it takes the phrase's
     # head before ", ": a sha8 holds no comma and the render's `{rev}` none, so the head is one or the other.
     named = read["rev_phrase"].split(", ", 1)[0]
@@ -752,9 +755,9 @@ def check_revision(repo, rev):
     return f"policy: check · every key falls back to the last valid revision · policy-file.on-invalid is {hit.value}: {hit.reason}"
 
 
-def read_file_value(path, row, table, rev_phrase):
-    """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` is
-    unread: every step of the resolution order shares this signature, `rev_phrase` the read's."""
+def read_file_value(path, row, table, rev_phrase, *, build=None):
+    """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` and
+    `build` are unread: every step of the resolution order shares this signature, `rev_phrase` the read's."""
     if table is None or path not in table:
         return None
     return Resolution(table[path], "file", f"set in {POLICY_REL} at {rev_phrase}")
@@ -801,7 +804,33 @@ def read_preset_assignment(name, declared):
     return PRESET_ASSIGNMENT_SLOT[0][1]
 
 
-def read_preset_value(path, row, table, rev_phrase):
+def read_scenario_value(path, row, table, rev_phrase, *, build=None):
+    """Resolution(value, "preset", reason) from the slot of the scenarios the read's build is placed
+    under (KICK-dKeptSession-20 S5), `build` the read's `{"slug", "slot"}`: the override whose key
+    `parse_key` reads as `path`, else the slot's preset's value at the exact path, a shipped preset's
+    through `read_preset_assignment` (§8 F2); else None. No build and a `null` slot answer None before
+    any import, so a kit copy without `presets.py` reads as before, and so does a row `never` names.
+    `table` is unread: the file's own values answer before this step (§8 F1)."""
+    slot = None if build is None else build.get("slot")
+    if slot is None:
+        return None
+    store = read_kit_presets()  # imports presets.py beside this file, or refuses naming it
+    import presets
+    if row.get("name") in presets.derive_never(store):
+        return None
+    for key, held in (slot.get("overrides") or {}).items():
+        if parse_key(key) == path:
+            return Resolution(held["value"], "preset", f"scenario {held['from']} override at {rev_phrase}")
+    named = slot.get("preset")
+    if named:
+        assignment = read_preset_assignment(named["name"], {})
+        if path in assignment:
+            return Resolution(assignment[path], "preset",
+                              f"scenario {named['from']} preset {named['name']} at {rev_phrase}")
+    return None
+
+
+def read_preset_value(path, row, table, rev_phrase, *, build=None):
     """Resolution(value, "preset", reason) where the parsed `table` names a `preset` whose assignment
     holds `path`, looked up by exact path alone, else None (KICK-dKeptSession-2 S1). An absent file
     (`table` None) and a file naming no preset answer None before any import, so a kit copy without
@@ -819,7 +848,7 @@ def read_preset_value(path, row, table, rev_phrase):
     return Resolution(assignment[path], "preset", f"preset {name} at {rev_phrase}")
 
 
-def read_default_value(path, row, table, rev_phrase):
+def read_default_value(path, row, table, rev_phrase, *, build=None):
     """Resolution(the row's default, "default", reason), the reason naming the revision by
     `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`. A
     row with no `default` is a Refusal naming it, never an invented value, and so is a row whose
@@ -837,36 +866,66 @@ def read_default_value(path, row, table, rev_phrase):
 
 
 # The one order a key resolves in (TOOL-dGroundRules-3): `resolve` calls each step with (path, row,
-# table, rev_phrase) and the first Resolution answers: the file, the preset it names
+# table, rev_phrase) and the keyword `build`, and the first Resolution answers: the file, the slot of
+# the scenarios the read's build is placed under (KICK-dKeptSession-20), the preset the file names
 # (KICK-dKeptSession-2), the catalogue default.
-RESOLUTION_ORDER = (read_file_value, read_preset_value, read_default_value)
+RESOLUTION_ORDER = (read_file_value, read_scenario_value, read_preset_value, read_default_value)
 
 
-def read_ordered_value(path, row, table, rev_phrase):
+def read_ordered_value(path, row, table, rev_phrase, *, build=None):
     """The first Resolution RESOLUTION_ORDER answers for `path` over a parsed `table`, None for an
-    absent file, each reason naming the revision by `rev_phrase`."""
+    absent file, each reason naming the revision by `rev_phrase`; `build` the read's `{"slug", "slot"}`,
+    None for a read naming no build, handed to every step."""
     for step in RESOLUTION_ORDER:
-        hit = step(path, row, table, rev_phrase)
+        hit = step(path, row, table, rev_phrase, build=build)
         if hit is not None:
             return hit
     # Unreachable while the default step stands, which answers or refuses: deny, never a None value.
     raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {rev_phrase}")
 
 
-def read_revision(repo, rev=None, rows=None):
+def read_build_slot(repo, slug, sha):
+    """The slot the build `slug` reads at `sha`: what the loop kit's `scenario.py slots --build <slug>
+    --rev <sha>` prints, parsed, run once with cwd `repo` and `GIT_ENV_LEAKS` unset, as
+    `presets.run_expansion_verb` runs its verb. The loop kit not found is a Refusal carrying the
+    lookup's reason, and the verb exiting non-zero one carrying its first line (KICK-dKeptSession-20 §8
+    F4): a build's posture that cannot be read is refused, never read unscoped."""
+    try:
+        script = resolve_kit_dir("loop", "scenario.py", KIT) / "scenario.py"
+    except LookupError as exc:
+        raise Refusal((KIT / "policy.py").as_posix(), 0, f"--build {slug} reads the loop kit's scenario.py "
+                      f"slots, and {exc}") from None
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    try:
+        p = subprocess.run([sys.executable, str(script), "slots", "--build", slug, "--rev", sha], cwd=str(repo),
+                           env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except OSError as exc:
+        raise Refusal(script.as_posix(), 0, f"slots did not run: {exc}") from None
+    lines = [ln for ln in (p.stdout + p.stderr).replace("\r", "").splitlines() if ln.strip()]
+    if p.returncode != 0:
+        raise Refusal(script.as_posix(), 0, lines[0] if lines else f"slots exited {p.returncode}")
+    try:
+        return json.loads(p.stdout)
+    except ValueError:
+        raise Refusal(script.as_posix(), 0, f"slots printed no JSON: {lines[0] if lines else '(no output)'}") from None
+
+
+def read_revision(repo, rev=None, rows=None, build=None):
     """The per-revision read `resolve_read` answers from (TOOL-dGroundRules-5): the revision, `rev`
     resolved to a full sha, else the landed one, and how it was found; the policy text there;
     `validate`'s problems; and the parsed table, None for an absent or invalid file. The last valid
     revision, its `policy-file.on-invalid` and the agent limit's `FANOUT_CAP` line join it on first
     need. A dict, so a render reads git once for every key. `rev_phrase`, `<sha8>, <how>`, is the one
     spelling of the revision read that every reason names (TOOL-dGroundRules-65); `render_mirror` sets
-    it to `{rev}`."""
+    it to `{rev}`. `build` is None on a read naming no build, else `{"slug": build, "slot":
+    read_build_slot(...)}`, the verb run once per read at the read's sha (KICK-dKeptSession-20 S3)."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     rows = (load_catalogue(KIT) if rows is None else list(rows)) + read_overlay_policies(repo, sha)
     text, problems = read_checked_text(repo, sha, rows)
     table = None if text is None or problems else parse_policy(text)
+    scoped = None if build is None else {"slug": build, "slot": read_build_slot(repo, build, sha)}
     return {"repo": repo, "sha": sha, "how": how, "rev_phrase": f"{sha[:8]}, {how}", "text": text,
-            "problems": problems, "table": table, "rows": rows}
+            "problems": problems, "table": table, "rows": rows, "build": scoped}
 
 
 def resolve_read(path, row, read):
@@ -878,15 +937,16 @@ def resolve_read(path, row, read):
     if read["problems"]:
         hit = read_last_valid_value(path, row, read)
     else:
-        hit = read_ordered_value(path, row, read["table"], read["rev_phrase"])
+        hit = read_ordered_value(path, row, read["table"], read["rev_phrase"], build=read["build"])
     return derive_lowered_limit(hit, read) if path == AGENTS_PATH else hit
 
 
-def resolve(key, repo=".", rev=None):
+def resolve(key, repo=".", rev=None, build=None):
     """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
-    read, `rev` resolved to a full sha, else the landed revision."""
+    read, `rev` resolved to a full sha, else the landed revision; `build` a build's slug, whose
+    scenarios' slot the read takes, None for the repository's values alone."""
     path = parse_key(key)
-    read = read_revision(repo, rev)
+    read = read_revision(repo, rev, build=build)
     return resolve_read(path, read_catalogue_row(path, read["rows"]), read)
 
 
@@ -1714,28 +1774,30 @@ def cmd_scaffold(argv):
 
 
 USAGE = ("usage: python policy.py lists --check | lists --write | scaffold --preset <name> [--kept <file>]"
-         " | get <key> [--rev <rev>] [--explain] [--json]"
+         " | get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]"
          " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
          " | settings [--write|--check] [<settings-file>] | preset --diff [--section | --line] [--rev <rev>]")
 
 
 def cmd_get(argv):
-    """`get <key> [--rev <rev>] [--explain] [--json]`, run in the repository to read: the value on
-    stdout, a string as itself, a number or a boolean in TOML's spelling, a list one member per line;
-    under `--json` one JSON object of the Resolution's three fields instead, the form the mirror
-    helper reads through its shim. `--explain` adds `policy: <key> · <source> · <reason>` on stderr.
-    A Refusal prints its line there, nothing on stdout, exit 2."""
+    """`get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]`, run in the repository to read:
+    the value on stdout, a string as itself, a number or a boolean in TOML's spelling, a list one member
+    per line; under `--json` one JSON object of the Resolution's three fields instead, the form the
+    mirror helper reads through its shim. `--build` reads the key as that build reads it, under the
+    slot of the scenarios it is placed under (KICK-dKeptSession-20). `--explain` adds `policy: <key> ·
+    <source> · <reason>` on stderr. A Refusal prints its line there, nothing on stdout, exit 2."""
     import argparse
     ap = argparse.ArgumentParser(prog="policy.py get")
     ap.add_argument("key")
     ap.add_argument("--rev")
+    ap.add_argument("--build")
     ap.add_argument("--explain", action="store_true")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")  # a shell reading the value gets no CR
     try:
-        hit = resolve(args.key, ".", args.rev)
+        hit = resolve(args.key, ".", args.rev, build=args.build)
         if args.json:
             check_json_value(args.key, hit.value)
     except Refusal as exc:
