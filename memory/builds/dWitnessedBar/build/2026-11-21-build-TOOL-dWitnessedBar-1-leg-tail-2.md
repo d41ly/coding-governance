@@ -18,5 +18,5 @@ sh-hygiene:   [near miss] 82 site(s) in 69 file(s) — `rev-parse --show-*` with
 sh-hygiene:   [near miss] 3 site(s) in 3 file(s) — a comment carrying the gated spelling — it never runs
 sh-hygiene: 1 finding(s). With GIT_DIR set and no GIT_WORK_TREE, which git exports into a linked worktree's hooks and merge drivers, git takes the current directory for the top of the work tree, so a probe asked from a moved directory answers about that directory as if it were the root.
   tools/unattended/lib-unattended.sh: the location probe `-C "$here" --show-toplevel` is asked bare and no registry row declares it — scrub each site in place:
-    tools/unattended/lib-unattended.sh:213: top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
+    tools/unattended/lib-unattended.sh@9d2e1e71:213: top=$(unset GIT_DIR GIT_WORK_TREE; git -C "$here" rev-parse --show-toplevel 2>/dev/null) || top=$here
 ```
