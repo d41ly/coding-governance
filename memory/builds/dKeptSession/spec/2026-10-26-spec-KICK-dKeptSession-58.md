@@ -1,6 +1,6 @@
 # KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-59 KICK-dKeptSession-60 |
+| [2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-10-26-review-KICK-dKeptSession-57-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-57-spec-audit.md) | spec-audit | KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-57 KICK-dKeptSession-62 |
 
 <!-- /gen:spec-records -->
@@ -83,12 +84,18 @@ that id 9 is answered, made against unit 34's landed case, at order 6 after unit
   source compare and the strict mode `refuse`, and its Gates section declares that case's arm.
 - `KICK-dKeptSession-54` rev-3 observes unit 34's cases, its AC2 only the `get` half of
   `preset-derived-cap`, and names the mode column a non-goal left to unit 34 and this unit.
+- With unit 2's step landed, the mode already follows the preset. In two scratch repositories on
+  `main`, one committing `preset = "strict"` as its policy file and one an empty file, this tree's
+  `budgets.py resolve --explain guide-bytes`, the first census row of class `switch`, not a family,
+  whose home is not `limits:`, printed `refuse` with `budgets.enforce is refuse` and `warn` with
+  `budgets.enforce is warn`, each with value `-` and source `none`, since neither repository holds
+  the cap's home (probe, 2026-11-21).
 
 ### The rows
 
 | Preset | value | mode | source | `--explain` rule |
 |---|---|---|---|---|
-| none | the cap's derived value | `warn` | as resolved | `budgets.enforce is warn` |
+| none | as resolved, `-` where the cap's home holds none | `warn` | as resolved | `budgets.enforce is warn` |
 | `strict` | the same | `refuse` | the same | `budgets.enforce is refuse` |
 
 ### Inventory
@@ -127,16 +134,18 @@ None: S1 and S2 observe unit 34's landed case, and S3 is this unit's own accepta
 ## 6. Acceptance criteria
 
 The fixture is unit 34's landed `preset-derived-cap` case and its scratch repositories under
-`%TEMP%`.
+`%TEMP%`, and for AC2 two scratch repositories of its own there.
 
 - **AC1** — When `python check_policy.py --fixture preset-derived-cap` runs on unit 34's landed
   case, it passes, having read `budgets.py resolve --explain <cap>` with no preset and under strict,
   the value and source columns equal and the mode `warn` then `refuse`.
   Red when: the landed case compares whole rows and reds on the mode, or passes a copy of
   `budgets.py` ignoring the preset's `budgets.enforce`.
-- **AC2** — When `python budgets.py resolve --explain <cap>` runs in that repository under strict,
-  stderr carries `budgets.enforce is refuse`.
-  Red when: the rule names `warn`, so strict's switch never reached the caps module.
+- **AC2** — When this kit's `python budgets.py resolve --explain <cap>` runs in a scratch repository
+  on `main` whose one commit holds the policy file `preset = "strict"`, `<cap>` being the census row
+  unit 34's case picks, it exits 0 and stderr carries `budgets.enforce is refuse`; in one whose
+  committed file is empty, `budgets.enforce is warn`.
+  Red when: the rule names `warn` under strict, so strict's switch never reached the caps module.
 
 ## 7. Gates
 
@@ -171,6 +180,11 @@ none
   text is void, so S3 becomes this unit's ledger answer from unit 34's case; the Goal, the `get`
   non-goal, the Evidence bullet and the Edges payloads re-cite unit 54 at rev-3. Narrowed: this unit
   now supersedes no text and builds nothing.
+- rev-6 · 2026-11-21 · AC2 · §4 · §6 · checked for behaviour under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief`. Moved: AC2 named "that repository", one
+  unit 34's case removes when it ends, so it now names the two scratch repositories it runs in; the
+  Evidence records the probe that observed both rows on the landed tree, and the rows table the `-`
+  value a repository without the cap's home reads. Narrowed: nothing.
 
 ## 10. Reuse audit
 

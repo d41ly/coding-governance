@@ -108,11 +108,11 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | DEFERRED | rev-4 | 2026-11-21 |
-| [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
-| [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
-| [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
-| [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | DEFERRED | rev-6 | 2026-11-21 |
+| [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | DEFERRED | rev-5 | 2026-11-21 |
@@ -163,7 +163,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 215 bound to this build, across 4 record folder(s).
+Records: 217 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

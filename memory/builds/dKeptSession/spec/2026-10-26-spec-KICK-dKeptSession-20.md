@@ -1,6 +1,6 @@
 # KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0158@19d3fbd9 whole
 
@@ -21,7 +21,9 @@
 | [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-25 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-20-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-20-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-2-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md) | research | KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
+| [2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md) | research | KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -51,18 +53,28 @@ key presets never touch, seen on two builds under scenarios with different prese
   `run_check` beside `check_scenarios`, over each extended row carrying a slot, and each refusal it
   returns prints as `check`'s others do, `loop: refused · <scenario> · <why>`. It finds the policy
   kit's `presets.py` through `loop_lib.py`'s `resolve_kit_dir("policy", "presets.py", KIT)` and runs
-  two verbs this unit adds as subprocesses in the repository. `presets.py slot --repo <root>` reads
-  `{"scenario", "preset", "overrides"}` as JSON on stdin; it refuses a preset that is no shipped
-  name, an override key no catalogue row names or one the store's `never` list names, and a value
-  `check_value` refuses, and otherwise prints the slot's assignment as JSON: the slot's preset with
-  its overrides on top and the repository file's own keys on top of both. `presets.py pairs` reads
-  that assignment on stdin and refuses each pair of the store's `pairs` list it breaks. Each refusal
-  names the scenario, the key and the rule. A row carrying a slot where the policy kit does not
-  resolve makes `check` print `loop: unarmed · <why>` and exit 2, `run_check`'s answer for a kit
-  that does not resolve; a pack whose rows carry no slot runs no verb. Observed by AC4 and AC5.
+  two verbs this unit adds as subprocesses in the repository, cwd `<root>`, `GIT_ENV_LEAKS` unset.
+  `presets.py slot --repo <root>` reads `{"scenario", "preset", "overrides"}` as JSON on stdin; it
+  refuses a preset that is no shipped name, and each override key `check_preset_key(row, value,
+  never, presettable)` refuses (`tools/policy/presets.py#check_preset_key`): no catalogue row, a
+  `never` key ("a key presets never touch"), a derived row `literal` lacks, or a value `check_value`
+  refuses. Otherwise it prints `{"scenario", "assignment"}`, the assignment keyed by dotted key: the
+  slot's preset's, else the preset the repository file names, else the `preset` row's default, with
+  the overrides on top and the file's own keys on top of both. `presets.py pairs` reads that object
+  on stdin and refuses each pair `check_pairs(derive_pairs(store), <assignment>, <scenario>)` returns
+  (`tools/policy/presets.py#check_pairs`). Each verb exits 0, 1 printing one `presets: refused ·
+  <scenario> · <key> · <why>` line per refusal, or 2 on a usage error or a store that does not
+  read. `check_scenario_policy` reads exit 1's lines as `<scenario> · <key> · <why>` refusals and
+  any other non-zero exit as one refusal naming the verb and its first line, never a pass. A row
+  carrying a slot where the policy kit does not resolve makes `check` print `loop: unarmed · <why>`
+  and exit 2, `run_check`'s answer for a kit that does not resolve; a pack whose rows carry no slot
+  runs no verb. Observed by AC4 and AC5.
 - **S3** — The build on a read. `read_revision(repo, rev=None, rows=None, build=None)` in
-  `tools/policy/policy.py` sets `read["build"]`: `None` with no build, else `{"slug": <slug>,
-  "slot": <what S4's verb prints>}`, read once per read. `resolve(key, repo=".", rev=None,
+  `tools/policy/policy.py` sets `read["build"]` on every read: `None` with no build, else `{"slug":
+  <slug>, "slot": <what S4's verb prints>}`, the verb run once per read with cwd `repo` and
+  `GIT_ENV_LEAKS` unset, as `presets.run_expansion_verb` runs its verb. Its existing callers pass
+  `repo`, `rev` and `rows` by position (`tools/loop/floor.py`, `tools/loop/breakpoints.py`,
+  `tools/policy/budgets.py`, `tools/playbook/policy_value.py`), so none moves. `resolve(key, repo=".", rev=None,
   build=None)` passes it, and `python policy.py get <key> --build <slug>` names it.
   `read_ordered_value` takes a keyword-only `build=None` and hands it to each step of
   `RESOLUTION_ORDER`, `resolve_read` and `read_last_valid_value` passing `read["build"]`. This unit
@@ -82,11 +94,13 @@ key presets never touch, seen on two builds under scenarios with different prese
   where a kit does not resolve. Observed by AC1 and AC6.
 - **S5** — The step. `read_scenario_value(path, row, table, rev_phrase, *, build=None)` in
   `tools/policy/policy.py`, inserted after `read_file_value` and before `read_preset_value`,
-  answers `None` with no build, for a `null` slot and for a row the store's `never` list names.
-  Otherwise it answers the slot's override for the key as `Resolution(<value>, "preset", "scenario
-  <from> override at <rev_phrase>")`, else the value `derive_preset_assignment` gives the slot's
-  preset for the key as `Resolution(<value>, "preset", "scenario <from> preset <name> at
-  <rev_phrase>")`, else `None`. `read_revision` runs the verb through `policy.py`'s inline
+  answers `None` with no build and for a `null` slot before any import, so a kit copy without
+  `presets.py` reads as before, and then for a row `derive_never(read_kit_presets())` names.
+  Otherwise it answers the override whose key `parse_key` reads as the path, as `Resolution(<value>,
+  "preset", "scenario <from> override at <rev_phrase>")`, else the slot's preset's value at the exact
+  path from `read_preset_assignment(<name>, {})`, unit 2's cached seam, shipped presets only (§8 F2),
+  as `Resolution(<value>, "preset", "scenario <from> preset <name> at <rev_phrase>")`, else `None`.
+  `read_revision` runs the verb through `policy.py`'s inline
   `resolve_kit_dir("loop", "scenario.py", KIT)` with the read's sha as `--rev`. The loop kit not
   found, and the verb exiting non-zero, are each a `Refusal`, the first carrying the lookup's reason
   and the second the verb's first line (§8 F4). Observed by AC1, AC2, AC3 and AC6.
@@ -96,8 +110,12 @@ key presets never touch, seen on two builds under scenarios with different prese
   scenarios and the field, so the verb exits 1 and `get --build` exits 2; under `declared-order` the
   later scenario wins. Observed by AC6.
 - **S7** — The pages. `help/policy.md`'s "Where a value comes from" bullet and the policy kit
-  README's reader section state the four sources a build's read takes, and `help/loop.md`'s "Your
-  own scenario" paragraph names the slot. Observed by AC7.
+  README's reader section state the four sources a build's read takes, the bullet showing `python
+  tools/policy/policy.py get <key> --build <slug>`; `help/loop.md`'s "Your own scenario" paragraph
+  names the slot. The docs leg tests each `--flag` a page shows against its verb's `[[usage]]` row
+  (`tools/govkit/docs_leg.py`), so the `script:{prefix}/policy/policy.py#get` row of
+  `tools/govkit/usage.toml` gains `--build=`, and the page's `get` anchor takes the fingerprint
+  `docs_leg.py --fingerprints` then prints. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -115,8 +133,8 @@ key presets never touch, seen on two builds under scenarios with different prese
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, its `never` and `pairs` lists and `derive_preset_assignment`, which the slot reads and may not cross
-- **consumes-from** `KICK-dKeptSession-2` — `RESOLUTION_ORDER` with `read_preset_value`, ahead of which the step is inserted, and the `preset` source a preset's value answers with
+- **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, its `never` and `pairs` lists, `check_preset_key` and `check_pairs`, which the slot reads and may not cross
+- **consumes-from** `KICK-dKeptSession-2` — `RESOLUTION_ORDER` with `read_preset_value`, ahead of which the step is inserted, `read_preset_assignment` and `read_kit_presets`, which the step reads a preset through, and the `preset` source a preset's value answers with
 - **consumes-from** external — TOOL-dDeclaredLoop-27's landed scenario kind: the row schema, `derive_extended_rows`, `check_scenarios`, `read_scenario_rows`, the conflict rule and the `scenario` field `derive_move_scenarios` records on each move; dGroundRules' landed reader, `read_revision`, `read_ordered_value`, `resolve_read`, `resolve` and `get`
 - **hands-off** `KICK-dKeptSession-44` — the `pairs` verb's evaluation, which the batch's S41 routes through `check_preset_pairs` (id 43)
 
@@ -148,6 +166,17 @@ key presets never touch, seen on two builds under scenarios with different prese
 - The policy kit reaches a sibling through its inline `resolve_kit_dir` and answers a miss itself, as
   `derive_legacy_homes` does for the roles kit (`tools/policy/policy.py#resolve_kit_dir`,
   `#derive_legacy_homes`).
+- Unit 1 landed the slot's checks: `check_preset_key` refuses `runtime.agents-in-flight = 9` as "a
+  key presets never touch", and `check_pairs` over velocity's assignment with
+  `review.design.round-count` at 4 returns the pair `review.max-rounds`, `review.design.round-count`
+  (probe over `tools/policy/presets.py`, 2026-11-21). Unit 2 landed `read_preset_assignment(name,
+  declared)`, the store read once per process (`tools/policy/policy.py#read_preset_assignment`).
+- The composition refuses a row key the kind's schema declares no `[[field]]` for
+  (`tools/playbook/overlay_rows.py`), so the two fields need their schema rows; a dotted override key
+  renders quoted through `render_toml_value` (`tools/loop/loop_items.py#render_toml_value`).
+- `read_transitions("tNone", ".")` answers `[]` for a build with no folder (probe, 2026-11-21), and
+  the plants' scratch is on `main` with no remote (`tools/loop/composition.py#build_composition_base`),
+  so `get` reads local `main`.
 
 ### The order a build's read takes
 
@@ -160,9 +189,10 @@ read_revision(repo, rev, rows, build):
                     "slot": <loop kit>/scenario.py slots --build <build> --rev <sha>}   # S4, once
 
 read_scenario_value(path, row, table, rev_phrase, *, build=None):
-    if build is None or build["slot"] is None or row["name"] in never:   return None
-    if <key> in slot["overrides"]:   return Resolution(v, "preset", "scenario <from> override at <rev>")
-    if slot["preset"]:  v = derive_preset_assignment(<name>, presets, table).get(path)
+    if build is None or build["slot"] is None:   return None              # before any import
+    if row["name"] in derive_never(read_kit_presets()):   return None
+    if an override's parse_key == path:   return Resolution(v, "preset", "scenario <from> override at <rev>")
+    if slot["preset"]:  v = read_preset_assignment(<name>, {}).get(path)
                         if v is not None: return Resolution(v, "preset", "scenario <from> preset <name> at <rev>")
     return None
 ```
@@ -216,11 +246,14 @@ naming no build passes `build=None` through every step.
 - `tools/loop/scenario.py`: `FIELDS`, `INHERITED`, `check_scenario_policy` in `run_check`,
   `derive_slot_policy`, the `slots` verb and the three plants
 - `tools/loop/README.md`: the scenario section's field list
-- `tools/policy/presets.py`: the `slot` and `pairs` verbs
+- `tools/policy/presets.py`: the `slot` and `pairs` verbs, its docstring and `USAGE`
 - `tools/policy/policy.py`: the step, the `build` keyword, `get --build`
 - `tools/policy/README.md`: the order with its fourth source
-- `help/policy.md`: the "Where a value comes from" bullet
+- `tools/govkit/usage.toml`: `--build=` on the `policy.py#get` row
+- `help/policy.md`: the "Where a value comes from" bullet and its `get` anchor's fingerprint
 - `help/loop.md`: the "Your own scenario" paragraph
+- `memory/map/generated/symbols.json`: the new functions, regenerated as the commit hook's
+  codebase-map leg requires; the kickoff manifest watches none of these paths
 
 ### Alternatives rejected
 
@@ -267,8 +300,11 @@ naming no build passes `build=None` through every step.
 
 The plants run in `build_scenario_base`'s scratch (`tools/loop/scenario.py#build_scenario_base`),
 which holds the loop, playbook, memory-tree, policy and roles kits
-(`tools/loop/loop_items.py#SCRATCH_KITS`) and the builds `tFix` and `tFix2`. `slot-builds` commits a
-policy file naming `preset = "standard"` and two overlay rows extending `scenario.feature`:
+(`tools/loop/loop_items.py#SCRATCH_KITS`) and the builds `tFix` and `tFix2`. As the other plants run
+`check` and the transition writer, each verb is this tree's, run in the scratch by
+`run_scratch_verb`: `policy.py` is the one `resolve_kit_dir("policy", "policy.py", KIT)` finds, passed
+as an absolute path, which `KIT / <path>` keeps. `slot-builds` commits a policy file naming `preset =
+"standard"` and two overlay rows extending `scenario.feature`, in this order:
 `scenario.adopter.strict-slot`, admitted by `entry=feature` with `precision=high`, carrying `preset =
 "strict"`, and `scenario.adopter.velocity-slot`, admitted by `entry=feature` with `pace=fast`,
 carrying `preset = "velocity"`. It moves `tFix` out of `none` with `precision=high` and `tFix2` with
@@ -300,7 +336,8 @@ carrying `preset = "velocity"`. It moves `tFix` out of `none` with `precision=hi
   the pair `review.max-rounds`, `review.design.round-count`; and `python scenario.py check` over gov's
   own pack, whose rows carry no slot, exits 0.
   Red when: a slot breaks a pair rule, or a pack with no slot fails on a policy verb.
-- **AC6** — When `python scenario.py --fixture --plant slot-conflict` moves `tFix` out of `none` with
+- **AC6** — When `python scenario.py --fixture --plant slot-conflict`, over `slot-builds`' two rows
+  in their order and no policy file, moves `tFix` out of `none` with
   both `precision=high` and `pace=fast`, `get hooks.bypass --build tFix` exits 2 naming both slotted
   scenarios and `preset` under the default `flow.scenario-conflict`, `refuse`; and once the plant
   commits `scenario-conflict = "declared-order"` under `[flow]` it prints `allowed`, the later
@@ -308,15 +345,18 @@ carrying `preset = "velocity"`. It moves `tFix` out of `none` with `precision=hi
   Red when: a disagreement settles silently.
 - **AC7** — When `grep -n "scenario" policy.md` runs in the help directory, the "Where a value comes
   from" bullet names the file, the scenario, the preset and the default in that order; `grep -n
-  "preset" loop.md` prints the slot's sentence in "Your own scenario"; and `grep -n "overrides"
-  README.md` in the loop kit prints the scenario section's field list.
-  Red when: a page omits the build's scenario source or the slot's fields.
+  "preset" loop.md` prints the slot's sentence in "Your own scenario"; `grep -n "overrides"
+  README.md` in the loop kit prints the scenario section's field list; and `grep -n -A4
+  "policy/policy.py#get" usage.toml` in the deployer's directory prints a `flags` line holding
+  `--build=`, a flag that row lacks at c2a407b0.
+  Red when: a page omits the build's scenario source or the slot's fields, or shows a flag its
+  usage row lacks.
 
 ## 7. Gates
 
-`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `loop scenario fixtures` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `build-index selftest` · `gotchas selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms`
+`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `loop scenario fixtures` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `routed-commits selftest` · `build-index selftest` · `gotchas selftest` · `memory-recall kit selftest` · `recall floor` · `recall floor arms`
 
-New arm: tools/loop/scenario.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the plants `slot-builds`, `slot-conflict` and `slot-refused`, staged red by a scratch policy kit whose `RESOLUTION_ORDER` omits `read_scenario_value` and a scratch `scenario.py` whose `run_check` skips `check_scenario_policy` · none
+New arm: tools/loop/scenario.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the plants `slot-builds`, `slot-conflict` and `slot-refused`, staged red by the checkout's `RESOLUTION_ORDER` without `read_scenario_value` and its `run_check` without `check_scenario_policy`, each edit reverted after · none
 
 ## 8. Open questions
 
@@ -397,6 +437,14 @@ New arm: tools/loop/scenario.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the plants 
   `pairs` verb is this unit's, since KICK-dKeptSession-44 builds after it; the criteria move from a
   `check_policy.py` case to three loop plants (F5), and `check_policy.py` leaves the Files touched.
   Narrowed: the AC4 fixture note, which `SCRATCH_KITS` already satisfies.
+- rev-6 · 2026-11-21 · S2 · S3 · S5 · S7 · AC6 · AC7 · §3 Edges · §4 · §6 · §7 · checked for behaviour
+  under the brief `2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief`. Re-cited on unit 1's and
+  unit 2's landed code: the verbs call `check_preset_key` and `check_pairs`, and the step reads
+  `read_preset_assignment`, never `derive_preset_assignment` over the flattened table, which would
+  refuse. Moved: the verbs' stdin, stdout and exits, a verb exiting non-zero being a refusal and never
+  a pass; the step's no-build return before any import; the subprocesses' cwd and environment; the
+  plants' runner and the conflict plant's row order; `usage.toml` and the symbol map join Files
+  touched. Narrowed: nothing.
 
 ## 10. Reuse audit
 
@@ -407,7 +455,8 @@ The seams extended: TOOL-dDeclaredLoop-27's landed scenario kind, its schema fil
 `read_transitions` (`tools/loop/loop_transition.py#read_transitions`); dGroundRules'
 `RESOLUTION_ORDER`, `read_ordered_value`, `read_revision`, `resolve_read`, `resolve`, `cmd_get` and
 the inline `resolve_kit_dir` (`tools/policy/policy.py`); KICK-dKeptSession-1's `never` and `pairs`
-lists and `derive_preset_assignment`, and KICK-dKeptSession-2's step. `python
+lists, `check_preset_key` and `check_pairs` (`tools/policy/presets.py`), and KICK-dKeptSession-2's
+step with its `read_preset_assignment`. `python
 tools/codebase-map/reuse_lookup.py "scenario row field inherited through extends and read per
 build"` ranked `rows`, `row`, `read_text` and `read`, name stems only, then `read_policy_kit`
 (`tools/loop/loop_parents.py`), the in-process policy read `read_scenario_policy` already takes for

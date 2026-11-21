@@ -1,6 +1,6 @@
 # KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md](../build/2026-11-21-build-KICK-dKeptSession-1-reground-orders-1-6-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-60 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-60 |
+| [2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-60 |
 | [2026-10-26-review-KICK-dKeptSession-57-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-57-spec-audit.md) | spec-audit | KICK-dKeptSession-58 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-57 KICK-dKeptSession-62 |
 
 <!-- /gen:spec-records -->
@@ -28,8 +29,8 @@ confirmed finding **id 10 at HIGH**, report item **H3**. Id 23 shares the item a
 
 `KICK-dKeptSession-49` S1 adds a hand-typed JS list, `MIRROR_KIT_INPUTS = ["presets.toml"]` in
 `tools/policy/policy-mirror.js`, beside Python's `derive_mirror_inputs` (`KICK-dKeptSession-40` S2).
-Its Non-goals hand "the parity of the two input lists" to `KICK-dKeptSession-50`, which has no item,
-criterion or arm for it. The next kit input added on the Python side alone is then recorded by the
+At rev-1 its Non-goals handed "the parity of the two input lists" to `KICK-dKeptSession-50`, which has
+no item, criterion or arm for it; rev-5 names this unit beside it. The next kit input added on the Python side alone is then recorded by the
 render but never expected by the reader, so a mirror rendered before it reads FRESH in JS while
 `policy.py get` answers the new value: the defect unit 49 closes, back on the next input. This unit
 adds the parity case. It repairs `KICK-dKeptSession-49` and builds one step after it (order 6).
@@ -37,15 +38,15 @@ adds the parity case. It repairs `KICK-dKeptSession-49` and builds one step afte
 ## 2. Scope (IN)
 
 - **S1** — id 10. The case. A fixture case `mirror-input-parity` in `tools/policy/check_policy.py`,
-  one row of `CASES`, reads `policy-mirror.js`'s text, takes the one `MIRROR_KIT_INPUTS = [...]`
+  one outcome row of `CASES`, `("mirror-input-parity", None, run_mirror_input_parity)`, its function
+  answering `(assertions, wrong)` as every outcome case does, reads `policy-mirror.js`'s text, takes the one `MIRROR_KIT_INPUTS = [...]`
   array literal by regex and parses it as JSON, and asserts that `{policy.derive_kit_rel(n) for n in
   MIRROR_KIT_INPUTS}` equals `set(policy.derive_mirror_inputs()) - set(policy.LEGACY_INPUTS)`, each
   read from the kit's own `policy.py`. A missing or unparseable literal reds the case, never passes
   it. Observed by AC1 and AC2.
-- **S2** — id 10. The sibling text superseded by name. `KICK-dKeptSession-49`'s second Non-goal,
-  "the parity of the two input lists: id 48, `KICK-dKeptSession-50`", reads as S1 here: this unit
-  owns the parity, and unit 50 owns only the upgrade path. Answered in unit 49's acceptance ledger.
-  Observed by AC3.
+- **S2** — id 10. The sibling text. `KICK-dKeptSession-49` rev-5's Non-goals already hand the
+  parity of the two input lists to this unit beside unit 50's upgrade path, so this unit supersedes
+  no text of it. NOT OBSERVED: a placement unit 49's own text already makes, with no behaviour.
 
 ## 3. Non-goals (OUT)
 
@@ -57,7 +58,7 @@ adds the parity case. It repairs `KICK-dKeptSession-49` and builds one step afte
 
 ### Edges
 
-- **consumes-from** `KICK-dKeptSession-49` — `MIRROR_KIT_INPUTS` in `policy-mirror.js` and its parity non-goal, which this unit gates and supersedes (id 10)
+- **consumes-from** `KICK-dKeptSession-49` — `MIRROR_KIT_INPUTS` in `policy-mirror.js` and its parity non-goal, which this unit gates (id 10)
 - **hands-off** `KICK-dKeptSession-60` — the `mirror-input-parity` case, which that unit's rule paragraph names as the check a new input meets (id 23)
 - **hands-off** `KICK-dKeptSession-62` — the `mirror-input-parity` case, which the batch's item for id 33 widens to the repository-relative inputs
 - **hands-off** `KICK-dKeptSession-63` — the `mirror-input-parity` case's literal read and §7's leg line, which the batch's S8 and S26 anchor and count and its S13 completes at reconcile (ids 11, 31, 18)
@@ -68,7 +69,8 @@ adds the parity case. It repairs `KICK-dKeptSession-49` and builds one step afte
 ### Evidence
 
 - spec-49 S1 mints `MIRROR_KIT_INPUTS` as `["presets.toml"]`, each name spelled `<kitRel>/<name>`;
-  its Non-goals hand the parity to unit 50, and spec-50's S1 to S4 cover only the upgrade re-render.
+  its rev-5 Non-goals hand the parity to unit 50 and this unit, and spec-50's S1 to S4 cover only
+  the upgrade re-render.
 - spec-40 S1 mints `derive_kit_rel(name)` in `policy.py` and S2 has `derive_mirror_inputs()` return
   `LEGACY_INPUTS` plus `derive_kit_rel("presets.toml")`. Neither stands at c2a407b0, and
   `budgets.py` carries its own `derive_kit_rel()` with no argument
@@ -79,6 +81,11 @@ adds the parity case. It repairs `KICK-dKeptSession-49` and builds one step afte
 - `run_fixture(only)` runs the one `CASES` row its name selects (`tools/policy/check_policy.py#run_fixture`),
   and the guard trace keeps a case's read of `policy-mirror.js`, a file under the `policy fixtures`
   leg's guard (`tools/policy/check_policy.py#check_guard_trace`).
+- A copy of the kit outside a repository cannot run the case: `derive_catalogue_rel`, whose body
+  spec-40 S1 makes `derive_kit_rel`'s, refuses where `git rev-parse --show-prefix` answers nothing
+  (`tools/policy/policy.py#derive_catalogue_rel`), and `run_fixture` outside a repository traces
+  nothing, which `check_guard_trace` reds (`tools/policy/check_policy.py#run_fixture`). AC2 is
+  staged in the checkout instead.
 
 ### The case
 
@@ -100,7 +107,10 @@ None: the case reads the kit's own two files.
 
 ### Files touched (estimate)
 
-- `tools/policy/check_policy.py`: the `mirror-input-parity` case
+- `tools/policy/check_policy.py`: the `mirror-input-parity` case, `run_mirror_input_parity` and its
+  `CASES` row
+- `memory/map/generated/symbols.json`: `run_mirror_input_parity`, regenerated as the commit hook's
+  codebase-map leg requires; the kickoff manifest watches neither path
 
 ### Alternatives rejected
 
@@ -129,20 +139,17 @@ The fixture is the policy kit's own checkout, the case reading `policy-mirror.js
 
 - **AC1** — When `python check_policy.py --fixture mirror-input-parity` runs, it passes.
   Red when: the two kit lists differ.
-- **AC2** — When the case runs over a scratch copy of the kit under `%TEMP%` whose
-  `derive_mirror_inputs` adds `derive_kit_rel("extra.toml")` to the Python list only, it reds naming
-  `extra.toml`.
+- **AC2** — When the checkout's `derive_mirror_inputs` is edited to return
+  `derive_kit_rel("extra.toml")` beside the store, the Python list alone, `python check_policy.py
+  --fixture mirror-input-parity` reds naming `extra.toml`; with the edit reverted, AC1's run passes.
   Red when: the one-sided addition passes, so a later input is recorded by the render and never
   expected by the reader.
-- **AC3** — When unit 49's acceptance ledger is read, its parity non-goal is answered by
-  `mirror-input-parity`.
-  Red when: the ledger still points the parity at unit 50.
 
 ## 7. Gates
 
-`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest`
+`lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `recall floor` · `recall floor arms`
 
-New arm: tools/policy/check_policy.py · covers AC1 AC2 · the parity case, staged red by a scratch kit whose Python list carries an input the JS list lacks · none
+New arm: tools/policy/check_policy.py · covers AC1 AC2 · the parity case, staged red by the checkout's Python list carrying an input the JS list lacks, the edit reverted after · none
 
 ## 8. Open questions
 
@@ -161,6 +168,12 @@ none
   as it stands with the overlay beside `.agent-cap.conf`, the case's three names are qualified by the
   `policy` module since `budgets.py` holds its own `derive_kit_rel`, section-number pointers to
   sibling specs became section names, and the leg line names each guarded leg. Narrowed: nothing.
+- rev-5 · 2026-11-21 · §1 · S1 · S2 · AC2 · AC3 · §3 Edges · §4 · §7 · checked for behaviour under
+  the brief `2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief`. Moved: AC2 is staged in the
+  checkout, since a kit copy outside a repository refuses `derive_kit_rel` and reds the guard trace
+  whatever the lists hold; S1 names its outcome row and function, and the symbol map joins Files
+  touched. Narrowed: unit 49 rev-5's Non-goals already name this unit, so S2 supersedes nothing and
+  AC3, a read of unit 49's ledger, goes.
 
 ## 10. Reuse audit
 
