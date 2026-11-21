@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 45 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 45 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -18,6 +18,8 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-fix-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-h1-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-round10-h1-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-84 |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-85-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-85-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 |
 
 <!-- /gen:spec-records -->
@@ -31,7 +33,7 @@ exited CONVERGED with 22 confirmed findings: no BLOCKER; three HIGH, ids 1, 17 a
 and LOW into one unit, or two only where they split into disjoint write sets by M6's clauses so that
 both build concurrently. §4 "Why one unit" says why these stay one. Each finding is named by report id
 and is its own scope item, including where the report merged ids into one item. The minors land on
-units 76 to 84, so this unit repairs no single unit and builds above every unit in the build
+units 76 to 84, so this unit repairs no single unit and builds above every unit it repairs
 (order 45).
 
 | Report item | Severity | Report id | Lands on | Scope item |
@@ -75,13 +77,16 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
   lines it printed and names this unit. Observed by AC2.
 - **S3** — id 3. One return contract for `check_canary_keys`. It returns 0 when it printed nothing; 1
   when it printed at least one variable and no call of `check_cr_reached` returned 2; and 2 when any
-  call returned 2. The liveness loop requires, on each variant's mutant, return 1 and output exactly
-  `<var>`, and on a 2 prints `TOOL-dWitnessedBar-84` S13's `could not be sourced or read (rc 2)`
-  reason. Observed by AC3.
-- **S4** — id 4. Unit 84's ledger obligations observed. The lines 84 S6, S7 and S10 require are each
-  graded by this unit's AC4: unit 74's ledger beside AC3 names `TOOL-dWitnessedBar-84` S6; the ledgers
-  of units 74 and 76 beside AC1 name `check_cr_reached` or `check_canary_keys` and
-  `TOOL-dWitnessedBar-84`; unit 78's ledger beside AC8 names `_derive_case_keys`. Observed by AC4.
+  call returned 2 or its visit count failed, as `TOOL-dWitnessedBar-84` S13 and S14 built; today a
+  printed variable returns 0. `check_key_variant` requires, on each variant's mutant, return 1 and
+  output exactly `<var>`: a 2 keeps 84 S13's `could not be sourced or read (rc 2)` reason, and any
+  other return prints the passed reason. S3, S10 and S17 rewrite existing lines only, so the
+  `memory/project/shell-role.txt` row stands. Observed by AC3.
+- **S4** — id 4. Unit 84's ledger obligations observed. The lines 84 S6, S7 and S10 require, which
+  unit 84's pass `e1ad4ef32` wrote, are graded by this unit's AC4 and this unit writes none of them:
+  unit 74's ledger beside AC3 names `TOOL-dWitnessedBar-84` S6; the ledgers of units 74 and 76 beside
+  AC1 name `check_cr_reached` or `check_canary_keys` and `TOOL-dWitnessedBar-84`; unit 78's ledger
+  beside AC8 names `_derive_case_keys`. Observed by AC4.
 - **S5** — id 9. One pass-commit lookup. Every observation this build makes at a unit's pass commit,
   82 AC1, 83 S3 and AC3, 84 AC3 and AC17, and those of S7, S11 and S16 here, locates the commit with
   `build_commit` over `cdfbd1cf..HEAD`, the build folder `memory/builds/dWitnessedBar` and the conf's
@@ -96,38 +101,44 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
   `New arm: tools/run-gates/run-gates.gov.test.sh`, the rule `scan_arm_covers` reads. The command is
   §4's owner derivation. Unit 83's ledger beside AC1 records the owner it names beside the one 83
   AC1's pipeline names. Observed by AC6.
-- **S7** — id 11. The owner line's side, and the last restatement. This unit adds a gov-canary arm
-  (S17), so S6 names it as the owner at the close. Its builder restates `FLOOR_ASSERTIONS` absolutely,
-  at the count the suite executes on a passing run at this pass, by `TOOL-dWitnessedBar-82` S1's rule.
-  The comment naming `TOOL-dWitnessedBar-88` is the one line directly above `FLOOR_ASSERTIONS=<n>`, and
-  no earlier owner sits on that line. The ledgers of unit 82 beside AC1, unit 84 beside AC17 and unit
-  85 beside AC2 each record the line `grep -B1` read above the constant at their pass commits.
-  Observed by AC7.
+- **S7** — id 11. The owner line's side, and no restatement here. S6 names `TOOL-dWitnessedBar-90`
+  the floor's owner, so the owner line directly above `FLOOR_ASSERTIONS=<n>` is unit 90's (90 S11),
+  and no unit before it writes one. S3, S10 and S17 add no increment of `a`, so by
+  `TOOL-dWitnessedBar-82` S1's rule the count a passing run executes here is the value the file
+  holds, 80 (PINNED 2026-11-21 by `grep '^FLOOR_ASSERTIONS='`). The builder leaves the constant and
+  its comments as they stand; any other count is a divergence it returns. The ledgers of unit 82
+  beside AC1, unit 84 beside AC17 and unit 85 beside AC2 each record the line `grep -B1` read above
+  the constant at their pass commits; unit 82's, absent at HEAD, is written at the close from its
+  pass commit by S5's lookup. Observed by AC7.
 - **S8** — id 14. The assignment line is bare. `FLOOR_ASSERTIONS=<n>` carries nothing after the
-  number, which `tools/check-testsuite-counts.sh:94` reads with `^FLOOR_ASSERTIONS=[0-9]+$`. This unit's
-  §7 names `testsuite counts (every bar self-test prints one)`, the leg §7 of units 82 and 84 omit, and
-  the ledgers of unit 82 beside AC1 and unit 84 beside AC17 name that leg. Observed by AC8.
+  number, which `tools/check-testsuite-counts.sh#compliant` reads as `^FLOOR_ASSERTIONS=[0-9]+$`.
+  This unit's §7 names `testsuite counts (every bar self-test prints one)`, the leg §7 of units 82
+  and 84 omit, and the ledgers of unit 82 beside AC1 and unit 84 beside AC17 name that leg. Observed
+  by AC8.
 - **S9** — id 18. The single-copy probe keyed on the measure. §4's measure probe prints every line of
   the suite outside `check_cr_reached`'s body that holds a byte measure, `wc -c`, `tail -c`, `od`,
   `cut -c`, a `${#` expansion or a `: -1}` slice, together with a `rec_` name, an indirect `${!`
-  expansion or a variable `CANARY_KEYS` names, the names derived from the `CANARY_KEYS` line. Unit
-  84's ledger beside AC2 names this probe as the whole-suite single-copy observation. Observed by AC9.
-- **S10** — id 19. The `<key>)` edit admits every spelling bash reads the same. The liveness loop's
-  match is `\(<key>)[[:space:]]*<var>=\)"\{0,1\}\${\{0,1\}_rg_v}\{0,1\}"\{0,1\}`, with an unescaped `{`
+  expansion or a variable `CANARY_KEYS` names, the names derived from the `CANARY_KEYS` line. The body
+  closes on a lone `)`, so the skipped range ends at `^\)$`; a `^}` end skips `check_canary_keys` too.
+  Unit 84's ledger beside AC2 names this probe as the whole-suite single-copy observation. Observed by
+  AC9.
+- **S10** — id 19. The `<key>)` edit admits every spelling bash reads the same. The match in
+  `check_key_variant`, 84 S6's today, becomes
+  `\(<key>)[[:space:]]*<var>=\)"\{0,1\}\${\{0,1\}_rg_v}\{0,1\}"\{0,1\}`, with an unescaped `{`
   after `\$`, so `$_rg_v`, `"$_rg_v"`, `${_rg_v}`, `"${_rg_v}"` and an aligned arm are each edited in
   one line with their spacing kept. The replacement is written unquoted. Unit 84's ledger beside AC6
   names this match as the one the loop uses. Observed by AC10.
 - **S11** — id 21. The canary's guard covers its reads under `.githooks/`. The `run-gates gov canary`
-  row's `guard` in `tools/gate-legs.json` gains `.githooks/`, after its existing entries, because the
-  reverse shard-contract block opens every `.sh` argv of the manifest under `$ROOT` and four of them
-  sit there. Nine legs carry that entry today, so it is broad over `BROAD_LEG_FLOOR` and the spec-tokens
-  join owes the canary on no spec for it. The two other such reads,
-  `skills/session-kickoff/manifest-check.sh` and `skills/session-kickoff/manifest-check.test.sh`, take
-  one ask row in `memory/builds/dWitnessedBar/BACKLOG.md` under the family's next free id, naming
-  `DEPL-aScoutedSeam-1`, `KICK-aScoutedSeam-1` and `TOOL-dWitnessedBar-27`, the live specs listing
-  them under Files touched, with a `SEV` disposition line. Unit 78 AC5 and unit 84 AC16 stage a
-  manifest lacking the hook entry, which the built guard's `.githooks/` still trips, so each is
-  observed at its own unit's pass commit by S5's lookup and recorded there. Observed by AC11.
+  row's `guard` in `tools/govkit/registry.toml` gains `.githooks/` last, rendered into
+  `tools/gate-legs.json` by `leg_factory.py --write`, because the reverse shard-contract block opens
+  every `.sh` argv of the manifest under `$ROOT` and four sit there. `memory/guides/SESSION-KICKOFF.md`
+  is re-stamped, as unit 84's pass did. The entry is broad over `BROAD_LEG_FLOOR`, so the spec-tokens
+  join owes the canary on no spec for it. The two other such reads, `skills/session-kickoff/manifest-check.sh` and
+  its test, take one ask row in `memory/builds/dWitnessedBar/BACKLOG.md` under the family's next free
+  id, naming `DEPL-aScoutedSeam-1` and `KICK-aScoutedSeam-1`, the live specs listing them under Files
+  touched, with a `SEV` line; its commit carries the renders `gen_build_index.py --write` moves. Unit
+  78 AC5 and unit 84 AC16 stage a manifest lacking the hook entry, which `.githooks/` still trips, so
+  each is observed at its own pass commit by S5's lookup and recorded there. Observed by AC11.
 - **S12** — id 6. The New-arm list's length, recorded. Unit 83's ledger beside AC1 records the
   length 83 AC1's pipeline prints at the close, beside the 20 that 83 §4 and its AC1 figure line
   state and the 24 it printed at `162f4ec8c`, naming units 79, 80, 82 and 84 as the specs that 20
@@ -144,21 +155,24 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
   ledger beside AC1 records that `TOOL-dWitnessedBar-80` S1 writes `${_rg_v%?}x` where 76 S3 wrote
   `${_rg_v%?}`, and names 79 AC1 and 80 AC1 as the observation of the current length and tail
   variants on the `fingerprint` arm. Unit 72's ledger beside AC1, where 77 S2 and 84 S5 record the
-  staged `fingerprint` variant, names that variant as `${_rg_v%?}x`. Observed by AC15.
-- **S16** — id 15. The render's whole output named. Unit 84's ledger beside AC7 names every file under
-  `memory/map/generated/` that unit 84's pass commit changed, as
-  `git show --stat --format= <sha> -- memory/map/generated/` lists them, since
-  `tools/codebase-map/gen_map.py --write` renders the whole directory and 84's Files touched names
-  `symbols.json` alone. Observed by AC16.
+  staged `fingerprint` variant, already names it as `${_rg_v%?}x` from 84 S5's record, and the close
+  adds this unit's name there. Observed by AC15.
+- **S16** — id 15. The render's whole output named. `tools/codebase-map/gen_map.py --write` renders
+  all of `memory/map/generated/`, and 84's Files touched names `symbols.json` alone. Unit 84's pass
+  changed no file there, as `git show --stat --format= <sha> -- memory/map/generated/` lists. Its
+  ledger beside AC7 records that empty list beside its `gen_map.py --check` pass, never as coverage
+  alone. Observed by AC16.
 - **S17** — id 20. The length variant's other-variable reason. When the length variant's mutant
   output holds `<var>` and another name, the arm prints `TOOL-dWitnessedBar-74` S3's line for `<var>`
   with the reason `the length variant named <other> whose CR arrived`, sets `fail=1`, leaves unit 66
   S2's assertion uncounted as 79 S3's other reasons do, and the variant adds nothing to `a` under
-  `TOOL-dWitnessedBar-85` S1. Observed by AC17.
+  `TOOL-dWitnessedBar-85` S1. The length call's fifth argument to `check_key_variant`, `it named` on
+  both calls today, becomes `the length variant named`. Observed by AC17.
 - **S18** — id 22. The owner read from one line. 83 AC1's comment is read as
-  `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1`, and that line names
-  the owner S6 derives and no other unit id. Unit 83's ledger beside AC1 records the line. Observed by
-  AC18.
+  `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1`. At the close, after
+  unit 90 writes the owner line (S7), it names the owner S6 derives and no other unit id; at this pass
+  it is the `TOOL-aShardedFloor-2` comment's second line. Unit 83's ledger beside AC1 records the
+  line. Observed by AC18.
 - **S19** — id 23. One platform rule for unit 81's records. Unit 81's two breaks are owed on a
   Windows node, the rule 81 S1 and AC2 state, and the records 81 AC3 grades take the same rule: unit
   76's ledger lines that 81 S4 writes carry a `uname -s` beginning `MINGW` or `MSYS`. A close on any
@@ -172,8 +186,10 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
   observes, and a claim or criterion it answers is answered in that unit's acceptance ledger by name,
   as `TOOL-dWitnessedBar-78` §3 does for units 68 to 73.
 - The canary's guard entries for `skills/session-kickoff/manifest-check.sh` and its test. S11 files
-  the ask that carries them, because an exact entry would owe the canary on three live specs, two of
-  them in a build with no `BACKLOG.md`; §8 F3.
+  the ask that carries them, because an exact entry would owe the canary on two live specs of
+  `aScoutedSeam`, a build with no `BACKLOG.md`; §8 F3.
+- The floor's owner line, which is unit 90's (S7). Unit 28 is deferred unbuilt, and no item here
+  waits on it.
 - The left-shift gates the report names: the checklist entries, a hygiene check that re-runs a DERIVED
   figure's pipeline, a spec-tokens check that reds a `git log | grep` pass-commit lookup, a spec-tokens
   check for a ledger obligation no criterion greps, and a gate leg deriving a held suite's `$ROOT`
@@ -193,7 +209,7 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
 - **consumes-from** `TOOL-dWitnessedBar-82` — S1's restatement rule, AC1 and its §4 figure, which S5, S7, S8 and S13 locate, place or restate (ids 9, 11, 14 and 16)
 - **consumes-from** `TOOL-dWitnessedBar-83` — S1's owner, AC1's pipeline and comment read, and S3's pass-commit record, which S5, S6, S12 and S18 derive, record or read (ids 6, 9, 10 and 22)
 - **consumes-from** `TOOL-dWitnessedBar-84` — S2's probe, S6's match, S7's render, S9's guard, S13's return codes, S14's restatement and AC3, AC10, AC16 and AC17, which S3 to S5, S7 to S11, S14 and S16 widen, count or answer (ids 3, 4, 5, 9, 11, 14, 15, 18, 19 and 21)
-- **consumes-from** `TOOL-dWitnessedBar-85` — S1's per-variant count and S2's restated floor, which S17's reason leaves uncounted and S7 restates after (ids 11, 14, 20 and 22)
+- **consumes-from** `TOOL-dWitnessedBar-85` — S1's per-variant count and S2's restated floor, which S17's reason leaves uncounted and S7 leaves standing (ids 11, 14, 20 and 22)
 - **consumes-from** `TOOL-dWitnessedBar-87` — the answer to 76 AC2's own break, which S1 names as the answer for unit 76's readers (id 2)
 - **hands-off** `TOOL-dWitnessedBar-89` — S3's contract, S6's derivation, S7's restatement, S10's match, S11's and S19's ask rows, AC13 and AC19, which unit 89 completes (ids 1, 3, 4, 7, 8, 10, 12 and 14 of the round-1 spec audit of units 85 to 88)
 - **hands-off** `TOOL-dWitnessedBar-90` — S6's owner rule, which names unit 90 the floor's owner, and the owner derivation S6, AC6 and AC18 run, which unit 90 makes name each failure (ids 13 and 21 of the round-1 spec audit of unit 89)
@@ -203,61 +219,56 @@ item L6 (id 22) are one defect at two grades, and M7 (id 14) shares its placemen
 
 ### Why one unit
 
-M4 admits a second unit only so that the two halves build concurrently. The suite half, S3, S7, S8,
-S10 and S17, writes `tools/run-gates/run-gates.gov.test.sh`. S11 writes `tools/gate-legs.json`, which
-the suite reads as its manifest, M6 clause 2. The ledger items record the arm runs and pass commits
-the suite half and S11 produce, so each reads the other half's output as an acceptance input, clause
-2 again, and S11 and S19 both write `memory/builds/dWitnessedBar/BACKLOG.md`, a shared record under
-clause 3. No split leaves two disjoint write sets, and dispatch is strictly sequential, a shared order
-included (`tools/workflows/unattended-build.js:76`), so a split would buy no concurrency. One unit
+M4 admits a second unit only so that the two halves build concurrently. The suite half, S3, S10 and
+S17, writes `tools/run-gates/run-gates.gov.test.sh`. S11 writes `tools/govkit/registry.toml` and its
+render `tools/gate-legs.json`, which the suite reads as its manifest, M6 clause 2. The ledger items
+record the arm runs and pass commits the suite half and S11 produce, so each reads the other half's
+output as an acceptance input, clause 2 again, and S11 and S19 both write
+`memory/builds/dWitnessedBar/BACKLOG.md`, a shared record under clause 3. No split leaves two
+disjoint write sets, and dispatch is strictly sequential, a shared order included
+(`tools/workflows/unattended-build.js@94be07370:78`), so a split would buy no concurrency. One unit
 holds all 19 findings, as `TOOL-dWitnessedBar-84` §4 held its 16.
 
 ### Evidence
 
-- `tools/run-gates/run-gates.gov.test.sh:91-95`, read on 2026-10-25: `a=0`, two comment lines naming
-  `TOOL-aShardedFloor-2`, `FLOOR_ASSERTIONS=16`, then `# Raised 15 -> 16 by TOOL-dDerivedDocket-23`
-  below the constant. `:441-457` hold the reverse shard-contract block, which opens each manifest `.sh`
-  argv under `root`.
-- `tools/check-testsuite-counts.sh:94` requires `^FLOOR_ASSERTIONS=[0-9]+$`, and the leg that runs it,
-  `testsuite counts (every bar self-test prints one)`, has no guard (`tools/gate-legs.json`).
-- `tools/gate-legs.json:1184-1196`: the gov canary's guard is `{prefix}/run-gates/` and
-  `{prefix}/gate-legs.json`. A walk of the manifest on 2026-10-25 found six `.sh` argv outside the
-  tool root: `.githooks/pre-commit.test.sh`, `.githooks/pre-push.runlog.test.sh`,
-  `.githooks/pre-push.test.sh`, `.githooks/straggler-guard.test.sh`,
-  `skills/session-kickoff/manifest-check.sh` and `skills/session-kickoff/manifest-check.test.sh`; and
-  nine legs whose guard carries `.githooks/`.
-- `tools/check-spec-tokens.py:331` sets `BROAD_LEG_FLOOR = 5`. `derive_tripped_legs` (`:625-634`)
-  returns one guard per leg, the first that trips in manifest order, so `.githooks/` placed after the
-  exact `.githooks/pre-push` entry leaves `--legs-for .githooks/pre-push` printing that entry.
-- Live specs naming `skills/session-kickoff/manifest-check.sh` and its test under Files touched, read
-  on 2026-10-25: `DEPL-aScoutedSeam-1` and `KICK-aScoutedSeam-1` (SPECCED) and `TOOL-dWitnessedBar-27`
-  (OPEN). `memory/builds/aScoutedSeam/` holds no `BACKLOG.md`.
-- `build_commit` (`tools/unattended/lib-unattended.sh:1186`) matches the id as a whole token through
-  `read_attribution_tokens` (`:1149`), which reads a `Pass: none` trailer as naming no unit, and skips
-  a commit touching only the build folder, the generated indexes or the shared records.
-- `tools/workflows/unattended-build.js:607-612` sorts by `order`, an unordered unit at `1e9`, then by
-  id string. `tools/memory-tree/gen_build_index.py:1553` sorts the `gen:build-units` region by
-  `(order is None, order, id)`, the same order, and `verb_plan` in `tools/unattended/unattended.sh`
-  takes its unit set and order from that region. `extract_gates` (`tools/check-spec-tokens.py:495`)
-  cuts §7 by heading text, and `scan_arm_covers` (`:1322`) reads a `New arm:` line only at column 0
-  inside it.
-- Probed on this node on 2026-10-25 (GNU sed 4.9, GNU bash 5.3.9 `x86_64-pc-cygwin`): S10's match with
-  the replacement `${_rg_v:1}`, and again with `${_rg_v%?}x`, rewrote `sha) rec_sha=$_rg_v`,
-  `"$_rg_v"`, `${_rg_v}`, `"${_rg_v}"` and `sha)   rec_sha=$_rg_v` in one line each, keeping the
-  alignment, and left the `fingerprint)` arm alone. The canary's `sed 's/%[$].[\]r.}/}/'` changed no
-  line of the tail-edited result.
-- The same day, §4's measure probe printed the planted `${!v}` line, the planted `$rec_fp` line and a
-  `${#rec_sha}` line from a scratch file, skipped a measure inside `check_cr_reached`'s body and a
-  `$bg_x` measure, and printed nothing over the suite as it stands.
-- `tools/codebase-map/gen_map.py:143-151` renders `inventories.json`, `MAP.md`, `CARDS.md` and
-  `symbols.json` under `memory/map/generated/`.
-- New-arm list: 83 AC1's pipeline printed 24 specs at `162f4ec8c`, from unit 12 at order 5 to unit 84
-  at order 44. With units 85 and 88, which carry a gov-canary New-arm line, it prints 26 at the commit
-  that adds this spec, the last line naming this spec at order 45. PINNED at that commit; S13's AC
-  re-derives it there.
-- §4's owner derivation, run on 2026-10-25 over the README region rendered at `162f4ec8c`, printed 24
-  and `spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md`, agreeing with 83 AC1's pipeline there; the
-  region names units 85 to 88 once the index is re-rendered.
+Read on 2026-11-21 at `94be07370`.
+
+- `tools/run-gates/run-gates.gov.test.sh@94be07370:243-287`: `a=0`, the `TOOL-aShardedFloor-2`
+  comment's two lines, `FLOOR_ASSERTIONS=80`, then every `RAISED` and `Raised` line.
+  `@94be07370:782-792` is the reverse shard-contract block, opening each manifest `.sh` argv.
+- `check_cr_reached` closes on a lone `)` (`@94be07370:884-893`); the next `^}` closes
+  `check_canary_keys` (`@94be07370:907`). A `$rec_fp` measure planted in that body printed only under
+  the `^\)$` range; over the suite the probe printed nothing.
+- `#check_canary_keys` returns 2 on any 2 or a failed visit count, else 0. `#check_key_variant`
+  takes `it named` as both liveness calls' fifth argument (`@94be07370:985-988`) and edits with 84
+  S6's match (`@94be07370:914`).
+- The suite's 850 code lines are its shell-role row (PINNED 2026-11-21 by
+  `sh_hygiene.py --shell-role --measure . tools/run-gates/run-gates.gov.test.sh`).
+- The registry's `run-gates gov canary` guard holds `.githooks/pre-push` and no `.githooks/`. The
+  manifest holds six `.sh` argv outside the tool root, four under `.githooks/` and S11's two, and nine
+  legs guard `.githooks/`. `memory/guides/SESSION-KICKOFF.md` watches `tools/gate-legs.json`.
+- `tools/check-spec-tokens.py#BROAD_LEG_FLOOR` is 5; `#derive_tripped_legs` keeps each leg's first
+  tripping guard in row order, so `--legs-for .githooks/pre-push` still prints `.githooks/pre-push`.
+- Live specs (`#check_live_header`) listing both `manifest-check` files under Files touched:
+  `DEPL-aScoutedSeam-1` and `KICK-aScoutedSeam-1`; `TOOL-dWitnessedBar-27` is CLOSED.
+  `memory/builds/aScoutedSeam/` holds no `BACKLOG.md`.
+- `tools/unattended/lib-unattended.sh#build_commit` matches a whole-token id via
+  `#read_attribution_tokens`, which reads `Pass: none` as no unit, and skips a commit touching only
+  the build folder, the generated indexes or the shared records.
+- `tools/workflows/unattended-build.js@94be07370:692-697` and
+  `tools/memory-tree/gen_build_index.py#render_region` sort by order, unordered last, then id, and
+  `verb_plan` reads that region. `tools/check-spec-tokens.py#extract_gates` cuts §7 by heading, and
+  `#scan_arm_covers` reads a `New arm:` line at column 0 only.
+- Under GNU sed 4.9 and bash 5.3.9 (cygwin), S10's match with either variant's replacement edited
+  each of its five `sha)` spellings in one line, kept the alignment and left `fingerprint)` alone;
+  the canary's `sed` then changed only the strip.
+- `tools/codebase-map/gen_map.py#_artifacts` renders every file under `memory/map/generated/`, and
+  `git show --stat --format= e1ad4ef32 -- memory/map/generated/` prints nothing.
+- New-arm list: 83 AC1's pipeline printed 24 specs at `162f4ec8c`, unit 12 at order 5 to unit 84 at
+  order 44, and 26 at the commit that adds this spec, with units 85 and 88, the last line this spec at
+  order 45. PINNED at that commit; AC13 re-derives it there.
+- §4's owner derivation printed 24 and unit 84's spec at `162f4ec8c`, and prints 28 and unit 90's
+  spec (PINNED 2026-11-21).
 
 ### The owner derivation
 
@@ -272,15 +283,15 @@ python -c "import importlib.util as u, re; s = u.spec_from_file_location('cst', 
 ```bash
 F=tools/run-gates/run-gates.gov.test.sh
 awk -v keys="$(sed -n 's/^CANARY_KEYS=//p' "$F" | grep -oE ':[A-Za-z_][A-Za-z0-9_]*' | tr -d : | tr '\n' ' ')" \
-  'BEGIN{n=split(keys,k," ")} /^check_cr_reached\(\)/,/^}/{next} {m=($0 ~ /wc -c|tail -c|od |cut -c|[$][{]#|: -1[}]/); v=($0 ~ /[$][{]!|rec_[a-z_]+/); for(i=1;i<=n;i++) if(index($0,k[i])) v=1; if(m && v) print FNR": "$0}' "$F"
+  'BEGIN{n=split(keys,k," ")} /^check_cr_reached\(\)/,/^\)$/{next} {m=($0 ~ /wc -c|tail -c|od |cut -c|[$][{]#|: -1[}]/); v=($0 ~ /[$][{]!|rec_[a-z_]+/); for(i=1;i<=n;i++) if(index($0,k[i])) v=1; if(m && v) print FNR": "$0}' "$F"
 ```
 
 ### Inventory
 
 Minted: `check_canary_keys`'s return codes 0 and 1 beside 84 S13's 2; S17's reason
 `the length variant named <other> whose CR arrived`; S10's match; the `.githooks/` guard entry; S11's
-ask row and, on a close off Windows, S19's; the restated `FLOOR_ASSERTIONS` and its owner line. No
-function, plant, flag or file. Naming cells: none apply.
+ask row and, on a close off Windows, S19's. No function, plant, flag, file or floor change. Naming
+cells: none apply.
 
 ### Migration
 
@@ -288,16 +299,22 @@ None: no stored data changes. S11 widens when one leg runs and narrows nothing.
 
 ### Rollout
 
-Live at landing, at order 45, after every other unit of the build, the last of them
-`TOOL-dWitnessedBar-84`, `-85` and `-86` at order 44. S1, S2, S4, S5, S7, S8, S11, S12, S14 to S16, S18
-and S19 are answered in other units' ledgers at the close.
+Live at landing, at order 45, building alone; units 89 and 90 follow. S4 stands at HEAD. S1, S2, S5,
+S7 to S12, S14 to S16, S18 and S19 are answered in other units' ledgers at the close.
 
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.gov.test.sh`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml`
+- `tools/gate-legs.json`, rendered by `leg_factory.py --write`
+- `memory/guides/SESSION-KICKOFF.md`, its `last-audit` re-stamped
 - `memory/builds/dWitnessedBar/BACKLOG.md`
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered by
+  `gen_build_index.py --write`
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md`, its status header and
+  records region
+- `memory/builds/dWitnessedBar/build/`, this unit's acceptance ledger
 
 ### Alternatives rejected
 
@@ -330,7 +347,7 @@ and S19 are answered in other units' ledgers at the close.
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n 'lost its CR' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-80*acceptance-ledger*`
-  runs at the close, it prints one line naming `TOOL-dWitnessedBar-74`, `TOOL-dWitnessedBar-76`,
+  runs at the close, a printed line names `TOOL-dWitnessedBar-74`, `TOOL-dWitnessedBar-76`,
   `TOOL-dWitnessedBar-81`, `TOOL-dWitnessedBar-87` and `TOOL-dWitnessedBar-88`.
   Red when: a spec still quotes the reason unit 80 stands in place of with no answer recorded for it.
   permission: the ledger is written at the close.
@@ -343,9 +360,10 @@ and S19 are answered in other units' ledgers at the close.
   Red when: 76 AC3's break reaches a variant for which no reason is defined.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
   permission: the arm's run is the main loop's, at the close.
-- **AC3** — When a probe cuts `check_cr_reached`, `check_canary_keys` and the `CANARY_KEYS` definition
-  out of the suite file with `awk '/^check_canary_keys\(\)/,/^}/' tools/run-gates/run-gates.gov.test.sh`
-  and its like for the other two, sources them, and calls
+- **AC3** — When a probe cuts `check_canary_keys` out of the suite file with
+  `awk '/^check_canary_keys\(\)/,/^}/' tools/run-gates/run-gates.gov.test.sh`, `check_cr_reached`
+  with the range `/^check_cr_reached\(\)/,/^\)$/`, and the `CANARY_KEYS=` and `rgf_km=` lines,
+  sources them, and calls
   `check_canary_keys` on the length variant's `sha` mutant, built as 79 AC1 builds it, over the AC12
   record, it returns 1 and prints exactly `rec_sha`. On the unedited cut it returns 0 and prints
   nothing, and with a `<file>` that does not exist it returns 2.
@@ -353,13 +371,12 @@ and S19 are answered in other units' ledgers at the close.
   tests which key was named.
   fixture: the AC12 record, which `TOOL-dWitnessedBar-68` S1 and `TOOL-dWitnessedBar-67` S2 build.
 - **AC4** — When `grep -n 'AC3' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-74*acceptance-ledger*`
-  runs at the close, a printed line names `TOOL-dWitnessedBar-84` S6; when
+  runs at the pass, a printed line names `TOOL-dWitnessedBar-84` S6; when
   `grep -n 'AC1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-7[46]*acceptance-ledger*` runs,
   each ledger prints a line naming `check_cr_reached` or `check_canary_keys` with
   `TOOL-dWitnessedBar-84`; and `grep -n 'AC8' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-78*acceptance-ledger*`
   prints a line naming `_derive_case_keys`.
   Red when: unit 74 AC3 stands red beside 84 AC6 with no ledger line reconciling them.
-  permission: the ledgers are written at the close.
 - **AC5** — In a fixture repository under `%TEMP%/<short-name>` holding a commit that touches the
   path the `git log` below names, with a subject naming `TOOL-tFix-1` and the trailer
   `Pass: none`, then a second such commit with no trailer, `build_commit <base>..HEAD TOOL-tFix-1 memory/builds/tFix "" ""`
@@ -370,6 +387,7 @@ and S19 are answered in other units' ledgers at the close.
   prints a line holding a forty-hex sha in each of the three ledgers.
   Red when: a records or fold commit naming the id is graded as the unit's pass.
   fixture: a fixture repository under `%TEMP%/<short-name>`.
+  permission: the ledgers are written at the close.
 - **AC6** — When §4's owner derivation runs at the close, it prints a non-zero length and an owner
   path, and `grep -n 'AC1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-83*acceptance-ledger*`
   prints a line holding that owner's id and `TOOL-dWitnessedBar-88`. In a scratch clone holding a
@@ -378,15 +396,16 @@ and S19 are answered in other units' ledgers at the close.
   while 83 AC1's pipeline names another; a planted spec whose `New arm:` line sits in §4 is not listed.
   Red when: the owner differs from the unit the dispatcher builds last among those adding an arm.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
-- **AC7** — At this unit's pass commit, by S5's lookup, in a scratch clone,
-  `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1` prints a comment naming
-  `TOOL-dWitnessedBar-88` and no other unit id, and the arm prints `PASS (<n> assertions)` with `<n>`
-  equal to the value. When `grep -n 'grep -B1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-8[245]*acceptance-ledger*`
-  runs at the close, each of the three ledgers prints a line holding the comment it read.
-  Red when: the last arm sits above the floor, or an owner comment sits where the read cannot see it.
+- **AC7** — At this unit's pass commit, by S5's lookup, `grep '^FLOOR_ASSERTIONS='` and
+  `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1` each print what they
+  print at its first parent, and in a scratch clone there the arm prints `PASS (<n> assertions)` with
+  `<n>` equal to the value. When `grep -n 'grep -B1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-8[245]*acceptance-ledger*`
+  runs at the close, each of the three ledgers prints a line naming the comment it read.
+  Red when: a unit before the owner writes a comment above the constant, or the floor stands apart
+  from the count a passing run executes.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
   figure: both numbers are DERIVED at observation time.
-  permission: the arm's run is the main loop's, at the close.
+  permission: the arm's run is the main loop's, and unit 82's ledger line is written, at the close.
 - **AC8** — When `grep -cE '^FLOOR_ASSERTIONS=[0-9]+$' tools/run-gates/run-gates.gov.test.sh` and
   `grep -c '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh` run on the built tree, each prints
   1, and `grep -n 'testsuite counts' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-8[24]*acceptance-ledger*`
@@ -395,8 +414,8 @@ and S19 are answered in other units' ledgers at the close.
   permission: the ledgers are written at the close.
 - **AC9** — When §4's measure probe runs on the built tree it prints nothing. Over a scratch copy
   holding `[ "$(printf %s "${!v}" | wc -c)" -eq 41 ]` inside the liveness loop it prints that line, and
-  over one holding `[ "$(printf %s "$rec_fp" | wc -c)" -eq 41 ]` outside `check_cr_reached` it prints
-  that line. `grep -n 'AC2' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-84*acceptance-ledger*`
+  over one holding `[ "$(printf %s "$rec_fp" | wc -c)" -eq 41 ]` inside `check_canary_keys`'s body it
+  prints that line. `grep -n 'AC2' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-84*acceptance-ledger*`
   prints a line naming `TOOL-dWitnessedBar-88`.
   Red when: a second copy of the comparison in an indirect spelling stands with the probe silent.
   fixture: scratch copies under `%TEMP%/<short-name>`.
@@ -414,7 +433,7 @@ and S19 are answered in other units' ledgers at the close.
   built tree it prints a line holding `run-gates gov canary <- .githooks/ [`, and
   `--legs-for .githooks/pre-push` prints a line holding `run-gates gov canary <- .githooks/pre-push`.
   `grep -n 'manifest-check' memory/builds/dWitnessedBar/BACKLOG.md` prints an ask row naming
-  `DEPL-aScoutedSeam-1`, `KICK-aScoutedSeam-1` and `TOOL-dWitnessedBar-27`. When
+  `DEPL-aScoutedSeam-1` and `KICK-aScoutedSeam-1`. When
   `grep -n 'AC5' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-78*acceptance-ledger*` and
   `grep -n 'AC16' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-84*acceptance-ledger*` run at
   the close, each prints a line holding `build_commit`.
@@ -448,10 +467,10 @@ and S19 are answered in other units' ledgers at the close.
   Red when: a ledger names a variant text the suite no longer holds as the one staged.
   permission: the ledgers are written at the close.
 - **AC16** — When `grep -n 'AC7' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-84*acceptance-ledger*`
-  runs at the close, a printed line names each file
-  `git show --stat --format= <sha> -- memory/map/generated/` lists for unit 84's pass commit, and
-  `TOOL-dWitnessedBar-88`.
-  Red when: the render rewrites a generated file no record names.
+  runs at the close, a printed line holds `memory/map/generated/`, `gen_map.py --check` and
+  `TOOL-dWitnessedBar-88`, and `git show --stat --format= e1ad4ef32 -- memory/map/generated/` prints
+  nothing.
+  Red when: the render rewrites a generated file no record names, or an empty list stands alone.
   permission: the ledger is written at the close.
 - **AC17** — In a scratch clone of the built tree whose suite copy's `check_canary_keys` prints every
   `CANARY_KEYS` variable whenever any check fails, the arm prints
@@ -461,11 +480,11 @@ and S19 are answered in other units' ledgers at the close.
   fixture: a scratch clone under `%TEMP%/<short-name>`.
   permission: the arm's run is the main loop's, at the close.
 - **AC18** — When `grep -B1 '^FLOOR_ASSERTIONS=' tools/run-gates/run-gates.gov.test.sh | head -1 | grep -oE 'TOOL-[A-Za-z]+-[0-9]+' | sort -u`
-  runs on the built tree, it prints exactly the id of the owner §4's derivation names, and
-  `grep -n 'grep -B1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-83*acceptance-ledger*`
-  prints a line holding that id.
+  runs at the close, after unit 90's pass, it prints exactly the id of the owner §4's derivation
+  names, and `grep -n 'grep -B1' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-83*acceptance-ledger*`
+  prints a line holding that id. At this unit's pass it prints nothing.
   Red when: a stale owner sits in the window, or the owner line sits below the constant.
-  permission: the ledger is written at the close.
+  permission: the owner line is unit 90's, and the ledger is written at the close.
 - **AC19** — When `grep -n 'TOOL-dWitnessedBar-81' memory/builds/dWitnessedBar/build/*TOOL-dWitnessedBar-7[46]*acceptance-ledger*`
   runs at the close, every printed line holds a `uname -s` value beginning `MINGW` or `MSYS`, or the
   word `owed` with the id of an ask row in `memory/builds/dWitnessedBar/BACKLOG.md`.
@@ -474,17 +493,15 @@ and S19 are answered in other units' ledgers at the close.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `spec tokens (a spec's own names resolve)` · `testsuite counts (every bar self-test prints one)` · `recall floor` · `recall floor arms` · `policy fixtures` · `memory hygiene`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `spec tokens (a spec's own names resolve)` · `testsuite counts (every bar self-test prints one)` · `portability (shell lines only shrink)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `policy fixtures` · `memory hygiene`
 
-`run-gates canary`, `run-gates gov canary` and `measure-legs selftest` are owed for
-`tools/gate-legs.json`; `recall floor` and `recall floor arms` for the paths under `memory/`.
-`govkit selfcheck` grades S11's entry's class, `spec tokens (a spec's own names resolve)` reads it in
-its guards join, and `testsuite counts (every bar self-test prints one)` reads the assignment line S7
-and S8 write. The held legs run only when the main loop sets GATE_SELFTESTS at the close
-(`tools/run-gates/run-gates.sh:3129-3131`), which `SELFTESTS_OWED_PATHS="tools/"` does
-(`.unattended.conf:40`).
+The canary pair and `measure-legs selftest` are owed for `tools/gate-legs.json`, the other
+`govkit` legs and `policy fixtures` for the registry, the `recall` pair for `memory/`; the rest grade
+S11's entry, S8's line, S3's row and the re-stamp. Held legs run when the main loop sets
+GATE_SELFTESTS at the close (`tools/run-gates/run-gates.sh#derive_hold_source`), as
+`.unattended.conf#SELFTESTS_OWED_PATHS` does.
 
-New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 AC10 AC17 · the length variant's other-variable reason and the widened `<key>)` match, staged red by a scratch suite whose `check_canary_keys` prints every variable on any failure (reaches `the length variant named rec_fp whose CR arrived`) and by a match that admits one spelling (reaches `variant changed 0 lines` on a braced arm) · FLOOR_ASSERTIONS restated absolutely by S7, the last restatement, its owner the unit S6 derives
+New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 AC10 AC17 · the length variant's other-variable reason and the widened `<key>)` match, staged red by a scratch suite whose `check_canary_keys` prints every variable on any failure (reaches `the length variant named rec_fp whose CR arrived`) and by a match that admits one spelling (reaches `variant changed 0 lines` on a braced arm) · FLOOR_ASSERTIONS unchanged, these arms adding no increment (S7); the owner line is unit 90's
 
 ## 8. Open questions
 
@@ -511,8 +528,8 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 AC10 AC17 · the le
   the report names, so it fails AC11's Red-when for that suite; veto 1 discards it. (c) leaves the
   stale green the finding describes, failing AC11; veto 1 discards it. An exact entry for the
   `skills/session-kickoff/` reads is narrow, so the spec-tokens join would owe the canary on two
-  SPECCED specs of a build with no `BACKLOG.md` and on audited `TOOL-dWitnessedBar-27`, which this run
-  may not edit; that half takes the ask, as 84 §8 F2 did for the charter. RESOLVED (agent, 2026-10-25,
+  SPECCED specs of a build with no `BACKLOG.md`; that half takes the ask, as 84 §8 F2 did for the
+  charter. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 3, the one survivor; its follow-up is S11's ask row.
   widens: none · relaxes: none
 - **F4 — Which platform rule do unit 81's two records take (id 23)?** Options: (a) a Windows node for
@@ -538,17 +555,21 @@ New arm: tools/run-gates/run-gates.gov.test.sh · covers AC2 AC10 AC17 · the le
 - rev-5 · 2026-11-19 · §7 · the leg line gains `policy fixtures`, whose manifest guard holds the §4 path
   `tools/gate-legs.json`, per brief 2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief; nothing else
   moved.
+- rev-6 · 2026-11-21 · §1 to §4 · §6 to §8 · §10 · re-grounded at `94be07370` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-88-reground-brief. S7 leaves the floor at 80 with the
+  owner line unit 90's; S9's range ends at `^\)$`; S11 writes the registry; citations pinned.
 
 ## 10. Reuse audit
 
 Each item extends the seam its finding names. S3 extends `check_canary_keys` and 84 S13's return codes.
-S5 calls `build_commit` (`tools/unattended/lib-unattended.sh:1186`), which
+S5 calls `tools/unattended/lib-unattended.sh#build_commit`, which
 `python tools/codebase-map/reuse_lookup.py "which commit built a unit"` ranked as a SEAM, as
 `TOOL-dWitnessedBar-62` S16 rules. S6 reads the `gen:build-units` region `gen_build_index.py` renders
 and `--plan` reads, with `extract_gates` and the column-0 rule of `scan_arm_covers`. S9 widens 84 S2's
-probe; S10 widens the liveness loop's existing `<key>)` edit; S11 adds an entry to the existing guard
-and files an ask row as `TOOL-dWitnessedBar-84` S9 does. The ledger items use the acceptance ledger of
-`memory/HYGIENE.md` "Acceptance ledger". S7's restatement follows `TOOL-dWitnessedBar-82` S1's rule.
+probe; S10 widens `check_key_variant`'s `<key>)` edit; S11 adds an entry to the existing registry
+guard and files an ask row as `TOOL-dWitnessedBar-84` S9 does. The ledger items use the acceptance
+ledger of `memory/HYGIENE.md` "Acceptance ledger". S7 reads the floor by `TOOL-dWitnessedBar-82` S1's
+rule.
 `python tools/codebase-map/reuse_lookup.py "derive build order and the last unit declaring an arm from spec headers"`
 ranked `arm`, `build`, `units`, `armed` and `build_commit`, none a reader of build order beyond the
 region and readers named above, so no existing seam fits beyond those.

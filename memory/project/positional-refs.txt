@@ -37761,17 +37761,6 @@ memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md	BUILD-
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-85.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-86.md	BUILD-METHOD M3	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/check-spec-tokens.py:331	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/check-spec-tokens.py:495	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/check-testsuite-counts.sh:94	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/codebase-map/gen_map.py:143-151	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/gate-legs.json:1184-1196	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/memory-tree/gen_build_index.py:1553	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/run-gates/run-gates.gov.test.sh:91-95	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/run-gates/run-gates.sh:3129-3131	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/unattended/lib-unattended.sh:1186	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/workflows/unattended-build.js:607-612	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
-memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md	tools/workflows/unattended-build.js:76	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md	BUILD-METHOD M4	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md	tools/run-gates/run-gates.gov.test.sh:91-95	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md	tools/run-gates/run-gates.sh:3889	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
