@@ -11,6 +11,7 @@
 - TOOL-dPlacedRequest-68 · filed 2026-10-26 · THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16 places an owner's late answer as an `amend` that names the item it re-enters, `reenters: <unit id>#<F-id>`, and TOOL-dPlacedRequest-4 S4's placement block has no such line · accept TOOL-dPlacedRequest-4 S4's block carries an optional `reenters:` line, seen on a fixture late answer
 - TOOL-dPlacedRequest-69 · filed 2026-10-26 · THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item table names the tester's actor `role:tester`, and TOOL-dWitnessedBar-23 S7 writes `role:gov-tester`; TOOL-dFurnishedOrders-15 uses `role:gov-tester` for the four tester items · accept TOOL-dPlacedRequest-7's item table spells the actor `role:gov-tester`, amended by a rev bump with its §9 line
 - TOOL-dPlacedRequest-73 · filed 2026-10-26 · A CARD KEY READ THROUGH `read_card_policy` HAS NO READER. `check_policy.py`'s `READER_SHAPES` counts a shell read only in the literal `policy.py get <key>` shape, so every card key TOOL-dPlacedRequest-2 S11 reads through `read_card_policy`, and `plan.kickoff` and `kickoff.runs` once dRankedPlan lands, shows as unread (TOOL-dRankedPlan-7 §8 F5, TOOL-dRankedPlan-8 §8 F6) · accept `scan_reader_keys` run over a planted shell file whose one read of a key is `read_card_policy <key>` returns that key, seen red on the planted file before the row lands
+- TOOL-dPlacedRequest-74 · filed 2026-11-21 · THE GOV CANARY GUARDS THE PRE-PUSH HOOK. TOOL-dWitnessedBar-73 S6 put `.githooks/pre-push` in the `run-gates gov canary` guard, and TOOL-dPlacedRequest-11 names the hook in its Files touched, so `python tools/check-spec-tokens.py --spec` prints `run-gates gov canary <- .githooks/pre-push` for its spec (TOOL-dWitnessedBar-78 S9, derived 2026-11-21) · accept TOOL-dPlacedRequest-11's §7 owes `run-gates gov canary` once it leaves DEFERRED, and `check-spec-tokens.py --spec` over its spec prints no `run-gates gov canary <- .githooks/pre-push` hit
 
 ## Dispositions
 
@@ -24,3 +25,4 @@
 - SEV · TOOL-dPlacedRequest-68 · MED · a late answer's placement cannot name what it re-enters
 - SEV · TOOL-dPlacedRequest-69 · LOW · the item check reads the tester's items as an undeclared role
 - SEV · TOOL-dPlacedRequest-73 · MED · the reader-coverage arm reds every card key read through `read_card_policy` once dPlacedRequest lands
+- SEV · TOOL-dPlacedRequest-74 · LOW · a carried spec that edits the hook lands without the gov canary on its leg line, so its close never runs the arms that read the hook

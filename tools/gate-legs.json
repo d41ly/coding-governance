@@ -2559,6 +2559,7 @@
       "{prefix}/run-gates/run-gates.gov.test.sh"
     ],
     "guard": [
+      "{prefix}/",
       "{prefix}/run-gates/",
       "{prefix}/gate-legs.json",
       ".githooks/pre-push"

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed
 
-**Status:** INPROGRESS · rev-5 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-5 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,9 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-78-deviation-781.md](../build/2026-10-25-build-TOOL-dWitnessedBar-78-deviation-781.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-78-deviation-782.md](../build/2026-10-25-build-TOOL-dWitnessedBar-78-deviation-782.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-78-round8-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-78-round8-fix-return.md) | research | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-78-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-78-1-acceptance-ledger.md) | journal | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-78-widen-21.md](../build/2026-11-21-build-TOOL-dWitnessedBar-78-widen-21.md) | widen | — |
+| [2026-11-21-build-TOOL-dWitnessedBar-78-widen-22.md](../build/2026-11-21-build-TOOL-dWitnessedBar-78-widen-22.md) | widen | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-78-round8-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-78-round8-fix-brief.md) | research | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-51-spec-tokens-brief.md) | journal | TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-88 |
