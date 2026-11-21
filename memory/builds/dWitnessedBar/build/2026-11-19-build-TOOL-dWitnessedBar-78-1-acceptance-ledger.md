@@ -16,6 +16,8 @@ gov suite's 820 (`tools/gate-lint/sh_hygiene.py#measure_code_lines`), widened un
 1731 against its row's 1720. The §7 legs and the `New arm:` line's RED-first observation are the main (DERIVED from the builder's probe)
 loop's at the close. (DERIVED from the builder's probe)
 
+The floor that counts this unit's arms, its every-key record and its line-rule record, is `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.gov.test.sh` as `TOOL-dWitnessedBar-82` S1 restates it, answering the New-arm line's floor clause, which names `TOOL-dWitnessedBar-82` (`TOOL-dWitnessedBar-82` S3).
+
 **Evidences:** TOOL-dWitnessedBar-78
 - AC1 — `for count 0` — with `ROOT` at a copy of the built hook whose `read_green_file` has its `_rg_v=${_rg_v%$'\r'}` line deleted, the canary lines printed `gov-canary: the planted CR never reached read_green_file on MINGW64_NT-10.0-22621 for count 0; the CR-strip assertion is not counted`, then the compare's line naming `rec_sha` with `'b…b\r'` and the compare's line naming `rec_fp` with `'c…c\r'`, `a` 0, `fail` 1. Over the built hook they printed nothing, `rgf_seen` ` rec_sha rec_fp`, `a` 2. The arm's own run is OWED at the close.
 - AC2 — `for count 0` — unit 70's and unit 72's ledger lines for AC3 now quote that line and the compare's own line, naming `rec_sha` and `rec_fp` respectively, and name `TOOL-dWitnessedBar-78`; the close's grep is OWED.

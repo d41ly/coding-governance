@@ -243,7 +243,13 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=72
+FLOOR_ASSERTIONS=74
+# RAISED 72 -> 74 by TOOL-dWitnessedBar-82 on 2026-11-21, stated ABSOLUTELY (S1, under unit 73 S15's
+# rule): it counts every arm built through order 43, read from this source with each loop at its
+# population. Unit 73's 72, plus TOOL-dWitnessedBar-78's every-key record over `read_bar_file` (S7) and
+# its line-rule record over both readers (S13), one assertion each. Units 74, 76, 77, 79 and 80 add
+# none: their liveness loop and variants only decide whether the `rec_sha` and `rec_fp` compares count.
+# Counted by reading; no suite ran.
 # RAISED 54 -> 72 by TOOL-dWitnessedBar-73 on 2026-11-21, stated ABSOLUTELY (S15): the count a passing run
 # executes, read from this source with each loop at its population, the verdict backends' plant loop at
 # its 26 cases, the signer-temp sweep at its 5, the two PM_SCRUB copy loops at 2 each, and the shard
