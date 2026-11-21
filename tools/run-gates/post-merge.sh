@@ -529,6 +529,9 @@ remove_dir_lock() { # lock dir · owner token -> removes it only while its owner
 # gives two events one `seq` and loses none; `seq` and `seen-utc` are node-local and never compared; a
 # ref's events from before a deletion of it are outside every chain git holds and are not compared;
 # a retry made after another event of its ref landed appends again, an event that did happen.
+# A staging name beside <dest> that nobody can know before it is written: <dest>.<SRANDOM twice>.tmp, or
+# mktemp -u's where bash has no SRANDOM; 1 when neither names one. The run-gates runner carries the same line.
+derive_temp_path() { if [ -n "${SRANDOM:-}" ]; then printf -v "$1" '%s.%s%s.tmp' "$2" "$SRANDOM" "$SRANDOM"; else printf -v "$1" '%s' "$(mktemp -u "$2.XXXXXXXX" 2>/dev/null)"; [ -n "${!1}" ]; fi; }
 add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the event appended once
   local ref="$1" c="${2:-}" d k t=- r s=0 l n now tok rc=0
   [ -n "${EPOCHSECONDS:-}" ] || { printf 'feed: NOTE - no EPOCHSECONDS, bash 5 or later is required\n' >&2; return 0; }
@@ -567,8 +570,8 @@ add_feed_event() {   # ref · commit, or empty for a deletion -> 0 always, the e
     TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
     if ! printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "$ref" "$k" "$t" "$c" "$now" >>"$d/gov-feed.log" 2>/dev/null; then
       printf 'feed: NOTE - %s/gov-feed.log could not be written, so this write of %s at %s is not in the feed\n' "$d" "$ref" "$c" >&2
-    elif ! { printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq"; } 2>/dev/null; then
-      rm -f "$d/gov-feed.seq.$$" 2>/dev/null
+    elif st=""; ! { derive_temp_path st "$d/gov-feed.seq" && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq"; } 2>/dev/null; then
+      [ -z "$st" ] || rm -f "$st" 2>/dev/null
       printf 'feed: NOTE - %s/gov-feed.seq could not be written; the next append reads the log past it\n' "$d" >&2
     fi
     exit 0 ) || rc=$?
@@ -663,15 +666,17 @@ check_feed() {       # cache prefix · [feed file, the node's by default] -> one
       exit bad }'
 }
 write_feed() {       # cache prefix -> rc 0 the derived feed written, rc 2 naming a feed already present
-  local pre="${1%/}/" d now n=0 l
+  local pre="${1%/}/" d now n=0 l lt="" st=""
   [ -n "${GOVFEED_DIR:-}" ] || GOVFEED_DIR=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || GOVFEED_DIR=""
   d=${GOVFEED_DIR%$'\r'}
   [ -n "$d" ] || { printf 'feed: no git common dir resolves here, so no feed was rebuilt\n'; return 2; }
   if [ -e "$d/gov-feed.log" ]; then printf 'feed: a feed is present, so nothing was rebuilt over it: %s\n' "$d/gov-feed.log"; return 2; fi
   TZ=UTC printf -v now '%(%Y-%m-%dT%H:%M:%SZ)T' -1
-  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$d/gov-feed.log.$$" \
-    && printf '%s\n' "$n" >"$d/gov-feed.seq.$$" && mv -f "$d/gov-feed.seq.$$" "$d/gov-feed.seq" && mv -f "$d/gov-feed.log.$$" "$d/gov-feed.log" \
-    || { rm -f "$d/gov-feed.log.$$" "$d/gov-feed.seq.$$"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  derive_temp_path lt "$d/gov-feed.log" && derive_temp_path st "$d/gov-feed.seq" \
+    || { printf 'feed: no staging name resolves beside %s, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
+  { while IFS= read -r l; do n=$((n + 1)); printf '%s\t%s\t%s\n' "$n" "$l" "$now"; done < <(derive_feed_events "$pre"); } >"$lt" \
+    && printf '%s\n' "$n" >"$st" && mv -f "$st" "$d/gov-feed.seq" && mv -f "$lt" "$d/gov-feed.log" \
+    || { rm -f "$lt" "$st"; printf 'feed: %s could not be written, so no feed was rebuilt\n' "$d/gov-feed.log"; return 2; }
   printf 'feed: rebuilt %s event(s) from %s into %s\n' "$n" "$pre" "$d/gov-feed.log"
   return 0
 }
