@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-95 — unit 92 AC5 reads the write grant through the shipped parser and containment test, so a declared ancestor of the spec directory reds
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 | [2026-10-25-build-TOOL-dWitnessedBar-95-deviation-951.md](../build/2026-10-25-build-TOOL-dWitnessedBar-95-deviation-951.md) | deviation | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-brief.md) | journal | — |
+| [2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -20,15 +22,16 @@ The round-1 spec audit of units 91 and 92
 confirmed finding **id 8 at HIGH**, report item **H3**. No other id shares the item.
 
 `TOOL-dWitnessedBar-92` AC5 checks that no pass of unit 92 declares the spec directory by grepping
-its dispatch rows for the literal ` memory/builds/dWitnessedBar/spec/?( |$)` (spec-92 lines 422-423).
-`--check-commit` admits a staged path through `covers` (`tools/unattended/unattended.sh:13555`), and
-`covers` admits every path under a declared directory (`tools/unattended/lib-unattended.sh:745-749`).
-A declaration of `memory`, `memory/` or `memory/builds/dWitnessedBar/` therefore grants writes under
-`spec/` while AC5's count prints 0.
+its dispatch rows for the literal ` memory/builds/dWitnessedBar/spec/?( |$)` (92 AC5's first
+sentence). `--check-commit` admits a staged path through `covers`
+(`tools/unattended/unattended.sh#check_commit_message`), and `covers` admits every path under a
+declared directory (`tools/unattended/lib-unattended.sh#covers`). A declaration of `memory`,
+`memory/` or `memory/builds/dWitnessedBar/` therefore grants writes under `spec/` while AC5's count
+prints 0.
 
 This unit replaces AC5's dispatch half with a check that reads the declarations through
 `read_pass_declarations` and asks `covers` of each declared path. It repairs
-`TOOL-dWitnessedBar-92` and builds one step after it (order 49).
+`TOOL-dWitnessedBar-92`, which landed at `186cad841`, and builds one step after it (order 49).
 
 ## 2. Scope (IN)
 
@@ -41,13 +44,15 @@ This unit replaces AC5's dispatch half with a check that reads the declarations 
   has no dispatch row, so an empty read cannot pass. The rest of 92 AC5 stands. Observed by AC1, AC2
   and AC3.
 - **S2** — id 8. The red case 92 AC5 lacks. In a scratch copy of `memory/builds/dWitnessedBar/RUN.md`
-  carrying a dispatch row of unit 92 that declares `memory/builds/dWitnessedBar/`, the grant check
-  prints `GRANTS SPEC memory/builds/dWitnessedBar/` and exits 1, where 92 AC5's literal count prints 0.
-  Observed by AC2.
-- **S3** — Unit 92 answered. Unit 92's acceptance ledger records the grant check's last line on the
-  built tree as a note under its `- AC5` answer. The note is a continuation line, two spaces in,
-  opening with the label `TOOL-dWitnessedBar-95 S3` and carrying the backticked `WIDE 0` and the word
-  `covers` on that one physical line. Observed by AC4.
+  with a dispatch row of unit 92 appended that declares `memory/builds/dWitnessedBar/`, the grant
+  check prints `GRANTS SPEC memory/builds/dWitnessedBar/` and exits 1, where 92 AC5's literal count
+  prints 0. Observed by AC2.
+- **S3** — Unit 92 answered. Unit 92's acceptance ledger,
+  `2026-11-19-build-TOOL-dWitnessedBar-92-1-acceptance-ledger.md`, records the grant check's last
+  line on the built tree as a note under its `- AC5` answer. The note is a continuation line, two
+  spaces in, opening with the label `TOOL-dWitnessedBar-95 S3` and carrying the backticked `WIDE 0`
+  and the word `covers` on that one physical line. That shape is read by 92 §4's note check as
+  spelled and as `TOOL-dWitnessedBar-94` S1 anchors it. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -59,6 +64,8 @@ This unit replaces AC5's dispatch half with a check that reads the declarations 
   fact.
 - The report's left-shift text, a spec-lint rule refusing a criterion that greps `--writes` paths. No
   clause of this build names it.
+- Unit 28, deferred unbuilt on asks TOOL-dWitnessedBar-101 to -103. No item here reads it, so none
+  waits with it.
 
 ### Edges
 
@@ -68,25 +75,37 @@ This unit replaces AC5's dispatch half with a check that reads the declarations 
 
 ### Evidence
 
-- `tools/unattended/unattended.sh:13538` walks each unit of the `Pass:` trailer, and `:13555` admits a
-  staged path when `covers "$q" "$p"` holds for some declared `q`. `:13565` and `:13577` refuse the
-  rest with `stages paths outside the set it declared before dispatch`.
-- `covers` (`tools/unattended/lib-unattended.sh:745-749`) returns 0 when the second path is the first
-  or sits under it, after `normpath`. `is_repo_root` (`:754-758`) names `""`, `.` and `./`, which
-  `covers` does not, and `--dispatch` refuses them (`tools/unattended/unattended.sh:13807`).
-- `read_pass_declarations` (`tools/unattended/lib-unattended.sh:1116`) prints one line per dispatch
-  key in the raw row's shape, `<utc> dispatch · item <anchor> <unit> · reason <paths>`. Without its
-  `current` argument it prints every key, so a unit with several passes prints one line per pass.
-- Probed on 2026-10-25 with `lib-unattended.sh` sourced: `covers` returned 0 against
+Read on 2026-11-21 at `d31ee066d`. Unit 92 is CLOSED at `186cad841`; unit 28 is deferred unbuilt.
+
+- `tools/unattended/unattended.sh#check_commit_message` walks each unit of the `Pass:` trailer. It
+  builds that unit's declaration from `read_pass_declarations "$rel" current`, the unit's last key
+  alone, and admits a staged path when `covers "$q" "$p"` holds for some declared `q`, the
+  declaration split unquoted by `for q in $decl`. Its two `fail 49` lines refuse the rest with
+  `stages paths outside the set it declared before dispatch`.
+- `tools/unattended/lib-unattended.sh#covers` returns 0 when the second path is the first or sits
+  under it, after `#normpath`. `#is_repo_root` names `""`, `.` and `./`, which `covers` does not, and
+  `tools/unattended/unattended.sh#verb_dispatch` refuses them, and any `--writes` path carrying `*`,
+  `?`, `[` or `]`, with `fail 49`.
+- `tools/unattended/lib-unattended.sh#read_pass_declarations` prints one line per dispatch key in the
+  raw row's shape, `<utc> dispatch · item <anchor> <unit> · reason <paths>`. Without its `current`
+  argument it prints every key, so a unit with several passes prints one line per pass.
+- `memory/builds/dWitnessedBar/RUN.md` holds one dispatch row of unit 92, `item 5518fe43`, which
+  declares its own spec file and `memory/builds/dWitnessedBar/build`, never the spec directory. 92
+  AC5's literal count over it printed 0 at the pass (unit 92's acceptance ledger, `- AC5`) and again
+  on 2026-11-21 (DERIVED).
+- Probed on 2026-11-21 with `lib-unattended.sh` sourced: `covers` returned 0 against
   `memory/builds/dWitnessedBar/spec/x` for `memory`, `memory/`, `memory/builds/dWitnessedBar/`,
   `memory/builds/dWitnessedBar/spec` and `memory/builds/dWitnessedBar/spec/`, and 1 for
-  `memory/builds/dWitnessedBar/build/`. `is_repo_root` returned 0 for `.`, `./` and `""`.
-- §4's grant check was probed on 2026-10-25 over scratch copies of `memory/builds/dWitnessedBar/RUN.md`,
-  each with one dispatch row of unit 92 appended. A row declaring
-  `memory/builds/dWitnessedBar/build/` printed `ROWS 1 WIDE 0`, exit 0. Rows declaring
+  `memory/builds/dWitnessedBar/build/` and for unit 92's own spec file. `is_repo_root` returned 0 for
+  `.`, `./` and `""`, and `covers .` returned 1 against `memory/x`.
+- §4's grant check was probed on 2026-11-21. Over the live file it printed `ROWS 1 WIDE 0`, exit 0.
+  Over scratch copies with one dispatch row of unit 92 appended under a new anchor, a row declaring
+  `memory/builds/dWitnessedBar/build/` printed `ROWS 2 WIDE 0`, exit 0. Rows declaring
   `memory/builds/dWitnessedBar/` and `memory` each printed their `GRANTS SPEC` line and
-  `ROWS 1 WIDE 1`, exit 1, where 92 AC5's literal count printed 0. Over the live file, which holds no
-  dispatch row, it printed `ROWS 0 WIDE 0`, exit 1.
+  `ROWS 2 WIDE 1`, exit 1, where 92 AC5's literal count printed 0. Over a copy with unit 92's
+  dispatch row removed it printed `ROWS 0 WIDE 0`, exit 1.
+- 92 §4's note check, fed `95|S3|92|AC5|WIDE 0` and `95|S3|92|AC5|covers` on 2026-11-21, printed
+  `NO NOTE 95 S3 WIDE 0` and `NO NOTE 95 S3 covers`, exit 1: unit 92's ledger holds no S3 note yet.
 
 ### The grant check
 
@@ -114,8 +133,9 @@ echo "ROWS $rows WIDE $wide"
 [ "$rows" -ge 1 ] && [ "$wide" = 0 ]
 ```
 
-The declared paths are split unquoted, as `--check-commit` splits them at `:13555`. `--dispatch`
-refuses a declared path carrying a glob character, so the split expands nothing.
+The declared paths are split unquoted, as `check_commit_message` splits them. `--dispatch` refuses a
+declared path carrying a glob character, so the split expands nothing. The loop reads a file, never a
+here-string fed from `$(...)`.
 
 ### Inventory
 
@@ -129,20 +149,29 @@ None: no stored data changes.
 
 ### Rollout
 
-After unit 92's pass commit, where 92 AC5's dispatch half ran. The unit takes order 49, one above
-unit 92's 48, beside units 93, 94 and 96. The scratch-copy red runs at the close, and the note is
-written then.
+Live at landing, at order 49, one above unit 92's 48, beside units 93, 94 and 96; unit 97 (order 50)
+consumes all four. The pass writes this unit's acceptance ledger, and AC1 runs at it over the live
+file. AC2's and AC3's scratch copies run at the close, and S3's note is written then, once 92's
+`- AC5` answer stands.
 
 ### Files touched (estimate)
 
-- `memory/builds/dWitnessedBar/build/`
+- `memory/builds/dWitnessedBar/build/`, this unit's acceptance ledger
+  `2026-11-19-build-TOOL-dWitnessedBar-95-1-acceptance-ledger.md` at the pass, and S3's note in
+  `2026-11-19-build-TOOL-dWitnessedBar-92-1-acceptance-ledger.md` at the close
+- `memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-95.md`, its status header
+- `memory/builds/dWitnessedBar/RUN.md`
+- `memory/builds/dWitnessedBar/README.md`, `memory/backlog/TOOL.md` and `memory/LIVE.md`, rendered
+  by `gen_build_index.py --write`, with any `gen:spec-records` region the `--write` moves
+  (`TOOL-dWitnessedBar-92` S5)
 
 ### Alternatives rejected
 
 - **Widen the literal to the spec directory and each of its ancestors.** It spells the containment
   rule a second time beside `covers`, so a change to `normpath` moves one and not the other.
-- **`read_pass_declarations ... current`, the report's spelling.** It keeps only the unit's last key,
-  so a first pass that declared an ancestor and a second that did not would pass.
+- **`read_pass_declarations ... current`, the report's spelling and `check_commit_message`'s read.**
+  It keeps only the unit's last key, so a first pass that declared an ancestor and a second that did
+  not would pass.
 
 ## 5. Production-readiness checklist
 
@@ -153,28 +182,29 @@ written then.
 - observability — each granting path is printed by name.
 - risks — a declaration that grants `spec/` and is never used still reds, which is the intended
   reading of 92 S5's withdrawal.
-- testing — AC1 after the pass commit; AC2 and AC3 by scratch copy at the close; AC4 by ledger.
+- testing — AC1 at the pass; AC2 and AC3 by scratch copy at the close; AC4 by ledger at the close.
 - migration — none.
 - user docs — none under `help/`; no user-facing surface changes.
 
 ## 6. Acceptance criteria
 
-- **AC1** — After unit 92's pass commit, §4's grant check, run with `SCRATCH` set, prints a last line
-  `ROWS <n> WIDE 0` with `n` at least 1 and exits 0.
+- **AC1** — Over the live `memory/builds/dWitnessedBar/RUN.md`, §4's grant check, run with `SCRATCH`
+  set, prints a last line `ROWS <n> WIDE 0` with `n` at least 1 and exits 0.
   Red when: a pass of unit 92 declares the spec directory or an ancestor of it.
-  figure: `n` is DERIVED at observation time from the dispatch rows of unit 92.
+  figure: `n` is DERIVED at observation time from the dispatch rows of unit 92; 1 on 2026-11-21.
 - **AC2** — In a scratch copy of `memory/builds/dWitnessedBar/RUN.md` with the row
   `<utc> dispatch · item <sha8> TOOL-dWitnessedBar-92 · reason memory/builds/dWitnessedBar/` appended,
-  the grant check run with `RUNSTATE` naming the copy prints `GRANTS SPEC memory/builds/dWitnessedBar/`
-  and `ROWS 1 WIDE 1` and exits 1. Over the same copy,
-  `grep -E ' dispatch · item [0-9a-f]+ TOOL-dWitnessedBar-92 '` piped to
+  `<sha8>` an anchor no row of unit 92 holds, the grant check run with `RUNSTATE` naming the copy
+  prints `GRANTS SPEC memory/builds/dWitnessedBar/` and a last line `ROWS <n> WIDE 1`, and exits 1.
+  Over the same copy, `grep -E ' dispatch · item [0-9a-f]+ TOOL-dWitnessedBar-92 '` piped to
   `grep -cE ' memory/builds/dWitnessedBar/spec/?( |$)'` prints 0. The same holds with `memory` in
   place of the build directory.
   Red when: a declared ancestor of the spec directory passes the grant check.
-  fixture: a scratch copy under the run's scratch directory; the live file holds no row of unit 92
-  before its dispatch.
-- **AC3** — In a scratch copy of `memory/builds/dWitnessedBar/RUN.md` with no dispatch row of unit 92,
-  the grant check prints `ROWS 0 WIDE 0` and exits 1.
+  fixture: a scratch copy under the run's scratch directory.
+  figure: `n` is DERIVED, one above AC1's; 2 on 2026-11-21.
+- **AC3** — In a scratch copy of `memory/builds/dWitnessedBar/RUN.md` with every dispatch row of
+  unit 92 removed by `grep -vE ' dispatch · item [0-9a-f]+ TOOL-dWitnessedBar-92 · reason '`, the
+  grant check prints `ROWS 0 WIDE 0` and exits 1.
   Red when: an empty read of the dispatch rows passes as a narrow grant.
   fixture: a scratch copy under the run's scratch directory.
 - **AC4** — When 92 §4's note check is fed `95|S3|92|AC5|WIDE 0` and `95|S3|92|AC5|covers`, it prints
@@ -188,7 +218,8 @@ written then.
 
 `recall floor` and `recall floor arms` are owed for the ledgers under `memory/`. AC2 and AC3 run by
 scratch copy at the close. This unit adds no arm and moves none, so it declares no `New arm:` line,
-and `TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owner.
+and 92 §4's owner derivation still names unit 90 the floor's owner: run on 2026-11-21 it printed 28
+and `spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md` (DERIVED).
 
 ## 8. Open questions
 
@@ -207,14 +238,18 @@ and `TOOL-dWitnessedBar-88` S6's derivation still names unit 90 the floor's owne
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 91 and 92, id 8
   (HIGH, item H3).
+- rev-2 · 2026-11-21 · §1 to §4 · §6 · §7 · §10 · re-grounded at `d31ee066d` per
+  2026-11-19-prompt-TOOL-dWitnessedBar-95-reground-brief. Code citations moved to symbols; unit 92's
+  landed dispatch row makes AC1 a pass-time read, AC2's figure one above AC1's and AC3's copy a
+  removal; Evidence re-probed; Files touched listed exactly; intent unchanged.
 
 ## 10. Reuse audit
 
-The seams are `read_pass_declarations` (`tools/unattended/lib-unattended.sh:1116`), the shipped
-parser of dispatch rows, and `covers` (`:745`) with `is_repo_root` (`:754`), the containment test
+The seams are `read_pass_declarations` (`tools/unattended/lib-unattended.sh#read_pass_declarations`),
+the shipped parser of dispatch rows, and `#covers` with `#is_repo_root`, the containment test
 `--check-commit` admits a write through. The grant check calls them and spells neither again.
 `python tools/codebase-map/reuse_lookup.py "which declared write paths cover a directory a pass may not write"`
-ranked `write`, `note`, `write_text` and `declares`, none a reader of dispatch declarations, so the
-two library seams named above are the ones extended.
+ranked `write`, `write_text`, `note` and `write_commit` first on 2026-11-21, none a reader of
+dispatch declarations, so the two library seams named above are the ones extended.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a check tell a declared write grant that covers a directory through an ancestor" --terms "dispatch writes declaration covers ancestor directory read_pass_declarations grant spec directory check-commit narrow"`
