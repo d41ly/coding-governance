@@ -62,7 +62,7 @@ tools/lib/python-floor.sh	24	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/refuse-wrong-shell.sh	119	b82c0f53dd1223fab306f59bef735b3f1ceecb29	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
 tools/lib/render-doc.sh	205	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/lib/resolve-python.sh	133	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/lib/resolve-python.test.sh	1381	7378b97c79521671386d51bb585a25cbcf12ebd1	widened:2026-11-21-build-TOOL-dWitnessedBar-71-widen-13
+tools/lib/resolve-python.test.sh	1420	0688706490e6ded275a3c3a67c0979e36cdbd608	widened:2026-11-21-build-TOOL-dWitnessedBar-73-widen-17
 tools/lib/resolve-remote.sh	33	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/loop/adopt-loop.sh	147	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
@@ -104,7 +104,7 @@ tools/run-gates/pass-legs.sh	314	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/run-gates/post-merge.sh	309	db4b2b67022cf13a4e72e9bc2520c5f4ca445e3d	widened:2026-11-20-build-TOOL-dWitnessedBar-60-widen-4
 tools/run-gates/profile_bar.test.sh	315	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
 tools/run-gates/run-gates.evidence.test.sh	2452	17034486d5eba7a753c1a739fc1e4c27cb3fed6d	widened:2026-11-21-build-TOOL-dWitnessedBar-67-widen-11
-tools/run-gates/run-gates.gov.test.sh	738	ba3a0a5ed925e0a43e70ff5c8a8e75a28591dd35	widened:2026-11-21-build-TOOL-dWitnessedBar-75-widen-16
+tools/run-gates/run-gates.gov.test.sh	773	0688706490e6ded275a3c3a67c0979e36cdbd608	widened:2026-11-21-build-TOOL-dWitnessedBar-73-widen-17
 tools/run-gates/run-gates.runlog.test.sh	994	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/run-gates/run-gates.sh	3737	e1c032c126113a13c55ce92953e546b36a3a7a19	widened:2026-11-21-build-TOOL-dWitnessedBar-63-widen-6
 tools/run-gates/run-gates.test.sh	3179	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1

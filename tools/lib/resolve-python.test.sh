@@ -1534,6 +1534,11 @@ out=$(LLR="$LLU" run_ll seed --population p --widen R1)
 # with `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL` naming an empty scratch file, unset after it.
 # A fifth fixture, `chain`, holds only the branch file `ref: refs/heads/other` with no `other`: a commit
 # would create `other`, so the seed reads it as unborn and arms p at the null SHA (S13, AC11).
+# TOOL-dWitnessedBar-73 S1, S2 (AC1, AC2): the branch flag and the branch-file read are graded apart.
+# Under the plant, each fixture's `git symbolic-ref HEAD`, and `child`'s below, must print
+# `refs/heads/master`, so a builder without `-c init.defaultBranch=master` reds naming the fixture and
+# `refs/heads/main`; and every fixture but `detached`, which writes `.git/HEAD`, must hold a file at
+# `.git/` plus that output after its write, so a literal branch name its HEAD does not name reds.
 LL_DANGLING=1111111111111111111111111111111111111111
 export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL="$LL/fixture-global"; : > "$GIT_CONFIG_GLOBAL"
 # TOOL-dWitnessedBar-71 S1, S2: the hostile git config AC5 names, planted at command scope, which S6's
@@ -1560,6 +1565,8 @@ for ll_fx in garbage missing loop detached chain; do
   ll_fmt=$(git -C "$LLC" rev-parse --show-ref-format 2>&1 | tr -d '\r')
   [ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the $ll_fx fixture read ref format '$ll_fmt', not files"; ok
   ll_ref=$(git -C "$LLC" symbolic-ref HEAD | tr -d '\r')
+  [ "$ll_planted" = 0 ] || [ "$ll_ref" = refs/heads/master ] \
+    || bad "73 AC1: the $ll_fx fixture's HEAD names '$ll_ref', not refs/heads/master, so its builder's -c init.defaultBranch=master did not hold under the plant"; ok
   case $ll_fx in
     garbage) printf 'garbage\n' > "$LLC/.git/$ll_ref" ;;
     missing) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/$ll_ref" ;;
@@ -1567,6 +1574,8 @@ for ll_fx in garbage missing loop detached chain; do
     detached) printf '%s\n' "$LL_DANGLING" > "$LLC/.git/HEAD" ;;
     chain) printf 'ref: refs/heads/other\n' > "$LLC/.git/$ll_ref" ;;
   esac
+  [ "$ll_fx" = detached ] || [ -f "$LLC/.git/$ll_ref" ] \
+    || bad "73 AC2: the $ll_fx fixture wrote no branch file at .git/$ll_ref, the ref its HEAD names"; ok
   out=$(LLU="$LLC" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--population", "p"]))')
   if [ "$ll_fx" = chain ]; then
     { [ "$out" = rc=0 ] && grep -qxF "armed p 2" "$LL/py.out" && ! grep -q Traceback "$LL/py.err" \
@@ -1595,6 +1604,36 @@ ll_reasons=$(sed -n 's/^unarmed [^ ]* no HEAD: //p' "$LL/py.out" | sort -u)
   && grep -q '^unarmed x1 no HEAD: .' "$LL/py.out" && [ -n "$ll_reasons" ] && [ "$(printf '%s\n' "$ll_reasons" | wc -l)" -eq 1 ] \
   && [ ! -e "$LLC/memory/project/p.txt" ] && [ ! -e "$LLC/memory/project/x1.txt" ] && ! grep -q Traceback "$LL/py.err"; } \
   || bad "67 AC7: seed --all over p and x1 on the garbage HEAD did not give each one no-HEAD line with one reason and no home: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+# TOOL-dWitnessedBar-73 S23 (AC21): the same route over no registration. A files-backed `git init` whose
+# branch file holds `garbage`, one file staged and no `kit.toml`: `seed --all` prints nothing on stdout,
+# `seed: no HEAD: <reason>` on stderr, and exits 0, nothing being left unarmed; the populated case above
+# exits 1 after its two lines (§8 F2). RED against an empty case silent on both streams, as it was.
+LLE="$LL/corrupt-empty"; mkdir -p "$LLE"
+{ run_planted_git -c init.defaultBranch=master init -q --ref-format=files "$LLE" && git -C "$LLE" config core.autocrlf false \
+  && printf 'x\n' > "$LLE/f.txt" && git -C "$LLE" add f.txt && ll_eref=$(git -C "$LLE" symbolic-ref HEAD | tr -d '\r') \
+  && printf 'garbage\n' > "$LLE/.git/$ll_eref"; } || bad "73 AC21: the registration-less garbage fixture could not be built"; ok
+out=$(LLU="$LLE" run_ll_py 'sys.exit(L.main(["legacy_ledger.py", "seed", "--all"]))')
+{ [ "$out" = rc=0 ] && [ ! -s "$LL/py.out" ] && grep -q '^seed: no HEAD: .' "$LL/py.err" && ! grep -q Traceback "$LL/py.err"; } \
+  || bad "73 AC21: seed --all on a garbage HEAD with no registration did not exit 0 with stdout empty and seed: no HEAD: on stderr: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+# TOOL-dWitnessedBar-73 S11 (AC11): the later probes' failures, in the unborn `chain`, the one fixture
+# whose seed reaches all three probes. A stand-in for `subprocess.run` raising `TimeoutExpired`, then
+# one raising `OSError`, replaces the call whose argv holds `symbolic-ref`, then the one holding
+# `for-each-ref`, as unit 65 AC7's two replace the `--verify` call: each gives the one no-HEAD line
+# `_run_git`'s exit-127 route reads, `git not runnable: `, and no Traceback. RED against a seed bounding
+# only the `rev-parse` call, so a later probe's failure escapes.
+for ll_fx in symbolic-ref:timeout symbolic-ref:oserror for-each-ref:timeout for-each-ref:oserror; do
+  out=$(LLU="$LL/corrupt-chain" run_ll_py '_run = L.subprocess.run
+def run(argv, **kw):
+    if sys.argv[2] not in argv:
+        return _run(argv, **kw)
+    if sys.argv[3] == "timeout":
+        raise L.subprocess.TimeoutExpired(argv, 60)
+    raise OSError(8, "planted exec failure")
+L.subprocess.run = run
+sys.exit(L.run_seed_cli(["--population", "p"], "."))' "${ll_fx%%:*}" "${ll_fx#*:}")
+  { [ "$out" = rc=1 ] && grep -q '^unarmed p no HEAD: git not runnable: ' "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
+    || bad "73 AC11: seed in the chain fixture under a ${ll_fx#*:} ${ll_fx%%:*} call did not read no HEAD: git not runnable: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+done
 
 # ---- 2o, the bounded git calls, the child-ref reason and the hex-named refs (TOOL-dWitnessedBar-67) ----
 # A one-commit fixture, `child`, built as the corrupt-HEAD block builds its own. AC6 (S7): a stand-in for
@@ -1615,20 +1654,44 @@ LLK="$LL/child"; mkdir -p "$LLK/tools/fx" "$LLK/memory/project"
 ll_fmt=$(git -C "$LLK" rev-parse --show-ref-format 2>&1 | tr -d '\r')
 [ "$ll_planted" = 0 ] || [ "$ll_fmt" = files ] || bad "67 AC5: the child fixture read ref format '$ll_fmt', not files"; ok
 ll_kref=$(git -C "$LLK" symbolic-ref HEAD | tr -d '\r'); ll_khead=$(git -C "$LLK" rev-parse HEAD | tr -d '\r')
+[ "$ll_planted" = 0 ] || [ "$ll_kref" = refs/heads/master ] \
+  || bad "73 AC1: the child fixture's HEAD names '$ll_kref', not refs/heads/master, so its builder's -c init.defaultBranch=master did not hold under the plant"; ok
+# TOOL-dWitnessedBar-73 S4, S5 (AC4, AC5): the recorder records each call's argv, past `git -C <root>`,
+# beside its `timeout`, one `git call <args> timeout <t>` line each. In `corrupt-missing` the set holds
+# root discovery, `rev-parse --show-toplevel`, and the registration read, `ls-files -z`, each at 60,
+# the calls `_run_git` bounds beside the SHA resolution. Across the `--sha` seed in `child`, the seed in
+# `corrupt-missing` and the seed in the unborn `chain`, the union holds each member unit 67 S7 names:
+# the HEAD probe `rev-parse --verify --quiet HEAD^{commit}`, `symbolic-ref`, `for-each-ref` and the
+# `--sha` resolution `rev-parse --verify --quiet <sha>^{commit}`, and a missing member fails naming it.
+# RED against a `for-each-ref` spawned outside `subprocess.run`. WHAT THIS DOES NOT CHECK: a spawn
+# through a `subprocess` helper that itself calls `run`, such as `check_output`, which records as a call.
 LL_RECORD='_run, _calls = L.subprocess.run, []
 def run(argv, **kw):
     if argv and argv[0] == "git":
-        _calls.append(kw.get("timeout"))
+        _calls.append((list(argv), kw.get("timeout")))
     return _run(argv, **kw)
 L.subprocess.run = run
 rc = L.run_seed_cli(sys.argv[2:], ".")
-print("git calls %d timeouts %s" % (len(_calls), sorted(set(repr(t) for t in _calls))))
+print("git calls %d timeouts %s" % (len(_calls), sorted(set(repr(t) for _, t in _calls))))
+for argv, t in _calls:
+    print("git call %s timeout %r" % (" ".join(argv[3:] if argv[1:2] == ["-C"] else argv[1:]), t))
 sys.exit(rc)'
-for ll_fx in child corrupt-missing; do
+ll_union=
+for ll_fx in child corrupt-missing corrupt-chain; do
   ll_args=(--population p); [ "$ll_fx" != child ] || ll_args+=(--sha "$ll_khead")
   out=$(LLU="$LL/$ll_fx" run_ll_py "$LL_RECORD" "${ll_args[@]}")
   { grep -qE "^git calls ([2-9]|[1-9][0-9]+) timeouts \['60'\]$" "$LL/py.out" && ! grep -q Traceback "$LL/py.err"; } \
     || bad "67 AC6: a git call of the seed ${ll_args[*]} in the $ll_fx fixture ran without timeout=60: $out / $(tr '\n' '|' < "$LL/py.out") / $(tr '\n' '|' < "$LL/py.err")"; ok
+  ll_union+=$(grep '^git call ' "$LL/py.out")$'\n'
+  [ "$ll_fx" != corrupt-missing ] \
+    || { grep -qxF 'git call rev-parse --show-toplevel timeout 60' "$LL/py.out" && grep -qxF 'git call ls-files -z timeout 60' "$LL/py.out"; } \
+    || bad "73 AC4: the seed in corrupt-missing recorded no rev-parse --show-toplevel or no ls-files -z call at timeout 60: $(grep '^git call ' "$LL/py.out" | tr '\n' '|')"; ok
+done
+[ -n "${ll_union//$'\n'/}" ] || bad "73 AC5: the recorder recorded no git call across child, corrupt-missing and corrupt-chain"; ok
+for ll_m in "HEAD^{commit}:rev-parse --verify --quiet HEAD^{commit} " "symbolic-ref:symbolic-ref " "for-each-ref:for-each-ref " \
+            "--sha ^{commit}:rev-parse --verify --quiet $ll_khead^{commit} "; do
+  grep -qF "git call ${ll_m#*:}" <<<"$ll_union" \
+    || bad "73 AC5: the recorded git calls across child, corrupt-missing and corrupt-chain hold no ${ll_m%%:*} call: ${ll_union//$'\n'/|}"; ok
 done
 rm -f "$LLK/memory/project/p.txt"
 git -C "$LLK" branch a/b && git -C "$LLK" symbolic-ref HEAD refs/heads/a || bad "67 AC16: the child ref could not be planted"; ok

@@ -2560,7 +2560,8 @@
     ],
     "guard": [
       "{prefix}/run-gates/",
-      "{prefix}/gate-legs.json"
+      "{prefix}/gate-legs.json",
+      ".githooks/pre-push"
     ],
     "chunk": "selftests",
     "subject": "repo",
