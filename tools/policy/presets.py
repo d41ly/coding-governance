@@ -42,6 +42,11 @@ copy of it. `load` prints one `refused` line per refused key and exits 2; the lo
 exits 2 naming it. `--repo <dir>` reads that repository's working-tree policy file for its declared
 presets and runs the verb there; the working directory by default.
 
+THE READER'S STEP. `policy.read_preset_value`, between the file and the default in `policy.py`'s
+RESOLUTION_ORDER, answers a key the file does not set from the named preset's assignment, over
+`derive_declared_presets`, the file's `[presets]` table rebuilt from the reader's flattened leaves
+(KICK-dKeptSession-2).
+
 WHAT THIS DOES NOT CHECK: that a preset's values are the posture its name promises, only that it is
 complete, inside each key's schema and inside the pairs; a pair whose two values are not both numbers
 is a finding, never a comparison; a repository file's own pair, which `validate` leaves to
@@ -338,6 +343,21 @@ def read_repo_table(repo):
     except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
         raise policy.Refusal(policy.POLICY_REL, 0, f"does not parse: {exc}") from None
     return doc.get(REPO_TABLE) if isinstance(doc.get(REPO_TABLE), dict) else None
+
+
+def derive_declared_presets(table):
+    """The policy file's `[presets]` table, nested as `derive_preset_assignment` reads it, rebuilt from
+    `table`, the {key path: value} leaves `policy.parse_policy` flattened: each path under
+    `("presets",)` re-nested below its name (KICK-dKeptSession-2 S5). {} where the file declares none."""
+    out = {}
+    for path, value in (table or {}).items():
+        if len(path) < 2 or path[0] != REPO_TABLE:
+            continue
+        node = out
+        for seg in path[1:-1]:
+            node = node.setdefault(seg, {})
+        node[path[-1]] = value
+    return out
 
 
 def run_expansion_verb(guard, pairs, top="."):

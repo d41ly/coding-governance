@@ -66,15 +66,17 @@ allowed values and every check.
   - With no default branch named and no `main` it refuses naming the missing ref: `git remote set-head <remote> -a`, or `export GOV_DEFAULT_BRANCH=<branch>`, names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
-  `tools/policy/policy.py`: the value the file sets, else the catalogue default. `--explain` says
-  which, after the sha and how the revision was found:
+  `tools/policy/policy.py`: the value the file sets, else the value of the preset the file names,
+  else the catalogue default. `--explain` says which, after the sha and how the revision was found:
   - the file sets the key: `file · set in .governance/policy.toml at <sha>, <how>`;
-  - the file does not set it: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
+  - the file names a preset that sets the key: `preset · preset <name> at <sha>, <how>`;
+  - the file does not set it and names no preset, or its preset does not set the key: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
   - there is no file at that revision: `default · .governance/policy.toml is absent at <sha>, <how>; the catalogue default`.
 
-  A file that names a `preset` reads the catalogue default too, for now: the reason adds
-  `; the file names preset <name>, not applied until dKeptSession adds presets to this reader`.
-  A value you set in the file always wins over the default.
+  A value you set in the file always wins over the preset, and the preset over the default. A file
+  that names no preset reads the catalogue default, which is what `standard` sets anyway. Naming
+  `strict` or `guarded` refuses hook bypass, among other keys; until the reliability bar lands, a
+  repository naming one may stall on hook refusals, so try it on a branch first.
 - **When the file is invalid:** a file that is not TOML, sets a value outside its key's allowed
   values, or sets a key no catalogue row names is invalid, and an invalid file NEVER reads the
   catalogue defaults, because a default may be looser than what you chose. `policy-file.on-invalid` <!-- usage: policy:policy-file.on-invalid 89965eb1 -->
@@ -126,8 +128,11 @@ allowed values and every check.
 
 A preset is a named, complete set of values for the policy keys, so a repository can pick a posture
 with one key, `preset`. Four ship in `tools/policy/presets.toml`: `velocity`, `standard`, `strict`
-and `guarded`. `standard` sets every key to its catalogue default. The reader does not apply a
-preset yet, so until dKeptSession's reader step lands a named preset changes no value you read.
+and `guarded`. `standard` sets every key to its catalogue default. Name one with `preset =
+"strict"` and every key your file does not set reads that preset's value, `get --explain` printing
+`preset · preset strict at <sha>, <how>`; a key you set yourself still wins. A preset of your own,
+a `[presets.<name>]` table with `extends` naming a shipped one, reads its base's values with its
+own keys on top.
 
 Some keys stay out of every preset: the file's `never` list names the keys presets never touch, such
 as `floor`, `preset` itself and `policy-file.guard`, because loosening the guard or switching an
