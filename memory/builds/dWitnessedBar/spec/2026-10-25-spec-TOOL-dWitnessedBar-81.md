@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-81-deviation-811.md](../build/2026-10-25-build-TOOL-dWitnessedBar-81-deviation-811.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-81-deviation-812.md](../build/2026-10-25-build-TOOL-dWitnessedBar-81-deviation-812.md) | deviation | — |
 | [2026-11-19-build-TOOL-dWitnessedBar-81-1-acceptance-ledger.md](../build/2026-11-19-build-TOOL-dWitnessedBar-81-1-acceptance-ledger.md) | journal | — |
+| [2026-11-19-build-TOOL-dWitnessedBar-81-1-builder-return.md](../build/2026-11-19-build-TOOL-dWitnessedBar-81-1-builder-return.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-81-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-build-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-brief.md) | journal | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-spec-writer.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-81-reground-spec-writer.md) | journal | — |
