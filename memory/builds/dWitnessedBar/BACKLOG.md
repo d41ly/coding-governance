@@ -56,3 +56,5 @@
 - SEV · TOOL-dWitnessedBar-112 · MED · the close bar reds on `step-rows-frozen`, so the build cannot close
 - SEV · TOOL-dWitnessedBar-113 · LOW · the card reader can pick a PATH bash before Git's where the canonical would not
 - SEV · TOOL-dWitnessedBar-114 · MED · an adopter carrying unrendered instruction files reds its render gate at the update that brings this
+- CLOSED · TOOL-dWitnessedBar-111 · by 871d58171 · on the owner's ruling, playbook/adopter-rules-to-overlay retired to playbook/adopter-rules-to-overlay-2, whose witness reads a converted rule by its derived tag as well as its text; gov first reads rule 06's correction applied
+- CLOSED · TOOL-dWitnessedBar-112 · by 871d58171 · on the owner's ruling, the floor step's program is back at its landed bytes; a node with no bash still spawns no bare bash and reads a traceback, deviation 262
