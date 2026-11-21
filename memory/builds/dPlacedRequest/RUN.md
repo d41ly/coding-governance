@@ -21,8 +21,8 @@ hold-code: owner-decision
 held-from: BUILDING
 refreshed-at: 4a7fff390790a4d5debec6bf77fd27661ba9a2da · park · 84 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 6277b70848ba4179ec4ec801b8d45c0da95c03ee
-phase: BUILDING
+witness: 2db4a921f14d08e1ab752d2047deba13628a9233
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
