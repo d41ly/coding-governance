@@ -1748,7 +1748,7 @@ write_fence_fixture() { # -> FX/o.git, FX/a holding the lease fx, FX/b; rc 1 wit
       && git push -q --no-verify origin main && git remote set-head origin -a >/dev/null ) || return 1
   git clone -q "$FX/o.git" "$FX/b" && git -C "$FX/b" config core.hooksPath .githooks || return 1
   fx_line=$(cd "$FX/a" && bash "${KIT_REL}$_fn_k/unattended.sh" --lease acquire build fx 2>&1)
-  printf '%s\n' "$fx_line" | grep -q '^lease — fx/build · create'
+  [[ $'\n'$fx_line == *$'\n''lease — fx/build · create'* ]]
 }
 read_fence_tips() { echo "main $(git --git-dir="$FX/o.git" rev-parse refs/heads/main) lease $(git --git-dir="$FX/o.git" rev-parse -q --verify refs/gov/leases/fx/build)"; }
 run_fence_land() { ( cd "$FX/a" && bash "$lander" "$@" 2>&1 ); }
@@ -1891,9 +1891,9 @@ else
     m52=$(git --git-dir="$FX/o.git" rev-parse main)
     printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
       'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
     out52=$(run_fence_land --land --slug fx); rc52=$?
-    p52=$(cat "$FX/planted" 2>/dev/null); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
+    p52=""; [ ! -f "$FX/planted" ] || p52=$(<"$FX/planted"); l52=$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)
     g52="$rc52 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$(git -C "$FX/a" rev-parse HEAD)" ] && [ "$(git -C "$FX/a" rev-parse HEAD^1)" = "$m52" ] && echo main) $([ -n "$p52" ] && [ "$l52" != "$p52" ] && [ "$(git --git-dir="$FX/o.git" rev-parse "$l52^")" = "$p52" ] && echo beat)"
     case "$g52|$out52" in
       *"re-preparing"*) bad "52 a same-holder lease move re-prepared the landing: [$g52] $out52" ;;
@@ -1909,9 +1909,10 @@ else
     printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
       'e=$(git log -1 --format=%B refs/plant/tip | sed -n "s/^epoch: //p")' \
       'git log -1 --format=%B refs/plant/tip | sed -e "s/^epoch: .*/epoch: $((e + 1))/" -e "s/^session: .*/session: sB/" | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
     out53=$(run_fence_land --land --slug fx); rc53=$?
-    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$(cat "$FX/planted" 2>/dev/null)" ] && echo planted)"
+    p53=""; [ ! -f "$FX/planted" ] || p53=$(<"$FX/planted")
+    g53="$rc53 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m53" ] && echo unchanged) $([ "$(git --git-dir="$FX/o.git" rev-parse refs/gov/leases/fx/build)" = "$p53" ] && echo planted)"
     case "$g53|$out53" in
       *"re-fencing on"*) bad "53 a take-over at the epoch plus one was retried as the holder's own write: [$g53] $out53" ;;
       "1 unchanged planted|"*"push-main: fenced — the lease"*) ok "53 a take-over at the epoch plus one under another session refuses the landing fenced, the branch unmoved" ;;
@@ -1933,7 +1934,7 @@ exec bash \"$FX/real-driver\" \"\$@\""
     m54=$(git --git-dir="$FX/o.git" rev-parse main)
     printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
       'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-      'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+      'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
     out54=$(run_fence_land --land --slug fx); rc54=$?
     g54="$rc54 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m54" ] && echo unchanged)"
     case "$g54|$out54" in
@@ -1960,7 +1961,7 @@ exec bash \"$FX/real-driver\" \"\$@\""
       m55=$(git --git-dir="$FX/o.git" rev-parse main)
       printf '%s\n' 'git fetch -q origin +refs/gov/leases/fx/build:refs/plant/tip || exit 1' \
         'git log -1 --format=%B refs/plant/tip | git commit-tree "refs/plant/tip^{tree}" -p refs/plant/tip > ../planted || exit 1' \
-        'git push -q --no-verify origin "$(cat ../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
+        'git push -q --no-verify origin "$(<../planted):refs/gov/leases/fx/build"' > "$FX/plant-once"
       out55=$(run_fence_land --land --slug fx); rc55=$?
       g55="$rc55 $([ "$(git --git-dir="$FX/o.git" rev-parse main)" = "$m55" ] && echo unchanged)"
       case "$g55|$out55" in

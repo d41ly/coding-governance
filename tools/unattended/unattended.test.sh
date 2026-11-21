@@ -1205,7 +1205,8 @@ reset_tree
 # ---- path tokens and none of its prose. Staged red by dropping the `/`-or-extension half of
 # ---- read_path_tokens' test, which prints the span `two-words`.
 pt_spec=memory/builds/tPt/spec/2026-11-20-spec-X-tPt-1.md
-add_overlap_commit "$pt_spec" "$(printf '# X-tPt-1 — pt\n\n**Status:** OPEN · rev-1 · 2026-11-20 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/pt.sh`, through `read_path_tokens` and `two-words`\n\n## 5. next\n\n- `src/after.sh`\n')"
+printf -v pt_txt '# X-tPt-1 — pt\n\n**Status:** OPEN · rev-1 · 2026-11-20 · node z · Tier-1\n\n### Files touched (estimate)\n\n- `src/pt.sh`, through `read_path_tokens` and `two-words`\n\n## 5. next\n\n- `src/after.sh`\n'
+add_overlap_commit "$pt_spec" "${pt_txt%$'\n'}"
 pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --files-touched HEAD "$pt_spec" 2>/dev/null); pt_rc=$?
 printf '%s\n' "$pt_spec" > .git/pt-list
 pt_ref=$(load_driver_conf >/dev/null 2>&1 && read_files_touched HEAD .git/pt-list)
@@ -1213,7 +1214,7 @@ same "DPR8 AC7 --path-tokens --files-touched exits 0" "$pt_rc" "0"
 same "DPR8 AC7 --path-tokens --files-touched prints the declared path alone" "$pt_out" "src/pt.sh"
 same "DPR8 AC7 --path-tokens --files-touched prints what read_files_touched prints" "$pt_out" "$pt_ref"
 pt_out=$(printf 'is `src/a.sh` racing `src/b.sh`, or `read_path_tokens` and `two words.md`?\n' | GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens 2>/dev/null); pt_rc=$?
-same "DPR8 AC7 --path-tokens prints the path tokens of stdin" "$pt_rc $pt_out" "0 $(printf 'src/a.sh\nsrc/b.sh')"
+same "DPR8 AC7 --path-tokens prints the path tokens of stdin" "$pt_rc $pt_out" $'0 src/a.sh\nsrc/b.sh'
 pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --files-touched HEAD 2>/dev/null); pt_rc=$?
 same "DPR8 --path-tokens --files-touched with no spec exits 2 naming the form" "$pt_rc $pt_out" "2 path-tokens not read — the form is --path-tokens --files-touched <rev> <spec> [<spec> ...]"
 pt_out=$(GOV_RUNLOG=0 bash "$SCRIPT" --path-tokens --frob </dev/null 2>/dev/null); pt_rc=$?
