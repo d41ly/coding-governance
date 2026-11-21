@@ -735,8 +735,9 @@ python <prefix>/loop/composition.py --selftest
 ## The scenario kind, `scenario.py`
 
 A build records what kind of work it is, and the flow it runs follows (TOOL-dDeclaredLoop-27). The
-register's `kind.scenario` row names `scenario-schema.toml` as its schema, owner seat 1 and five scalar
-fields, `extends`, `admits`, `entry`, `activates` and `then`; gov's pack is `scenarios.toml`, the
+register's `kind.scenario` row names `scenario-schema.toml` as its schema, owner seat 1 and seven scalar
+fields, `extends`, `admits`, `entry`, `activates`, `then`, `preset` and `overrides`, the last two the
+slot (KICK-dKeptSession-20); gov's pack is `scenarios.toml`, the
 `scenario` namespace's source, holding five rows that activate nothing, and a repository adds its own
 in its overlay. Every read composes through the playbook kit's `compose --kind scenario`, reached by
 `loop_items.read_composition`, and `derive_extended_rows` reads each row through its `extends` chain.
@@ -754,13 +755,25 @@ move leaves giving way (`derive_step_scenarios`). `position.py` reads the newest
 activated item rows at its pin through `read_activated_rows` and lists `scenario=<tags> · <n>
 activated`. `check_scenarios(rows, data, kinds)` holds the rules, the activatable kinds read from the
 register through the playbook kit's `pins.read_row_kinds` and the cycles through `scan_cycles`.
-`select` and `check` are the CLI, and `--fixture --plant <case>` runs one of `PLANTS` over
+
+The slot scopes policy to the builds a scenario places: `preset`, a shipped preset's name, and
+`overrides`, a table from a dotted policy key to its value, each inherited through `extends` whole.
+`check` holds each slotted row to `check_scenario_policy`, which runs the policy kit's `presets.py slot`
+and `presets.py pairs` as subprocesses, so a slot setting a key presets never touch, a value outside its
+key's schema or a value breaking a pair rule is refused. `slots --build <slug> --rev <rev>` prints the
+slot a build reads as JSON: the scenarios its newest move carrying `scenario` names, their slots composed
+in declared order by `derive_slot_policy`, a disagreement settled as `flow.scenario-conflict` says, and
+`null` where no placed row carries one. The policy kit's `get <key> --build <slug>` runs it, and reads
+the slot after the file's own values and before the repository's preset.
+
+`select`, `check` and `slots` are the CLI, and `--fixture --plant <case>` runs one of `PLANTS` over
 `composition.py`'s base with a second build `tFix2`; `check --selftest` is gov's `loop scenario
 fixtures` leg.
 
 ```bash
 python <prefix>/loop/scenario.py select --fact entry=patch
 python <prefix>/loop/scenario.py check
+python <prefix>/loop/scenario.py slots --build <slug> --rev HEAD
 python <prefix>/loop/scenario.py check --selftest
 ```
 

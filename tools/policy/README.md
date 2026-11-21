@@ -33,7 +33,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `presets.toml` | the named presets (KICK-dKeptSession-1): one `[preset.<name>]` table per shipped preset, `velocity`, `standard`, `strict` and `guarded`, each assigning every presettable key by a quoted dotted key; the `never` list, the keys presets never touch; the `literal` list, `maintain.fixes` and `review.<stage>`, the derived-default rows the presets assign literal values while every other derived row reads unassigned (KICK-dKeptSession-33); and the `pairs` list of `[<higher>, <lower>]` keys. Its one writer is the preset kind's factory, `core.py new preset <name> --from <preset>` |
-| `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, `derive_declared_presets`, which the reader's preset step passes it, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion` |
+| `presets.py` | the presets' module: `load_presets`, `derive_preset_assignment`, `derive_declared_presets`, which the reader's preset step passes it, the store's check `check_presets` and its `check` verb, the repository side `check_repo_presets` that `validate` calls only for a file holding a `presets` table, and the core-only load `load_preset` and its `load` verb, through the loop kit's `guard.py --expansion`, and a scenario's slot, `check_slot` and `derive_slot_assignment` behind the `slot` and `pairs` verbs the loop kit's `scenario.py check` runs (KICK-dKeptSession-20) |
 | `adopt-policy.sh` | the adopter: `--scaffold --preset <name>` and `--check` |
 | `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 
@@ -203,9 +203,10 @@ deleted list.
   default `standard` where it names none, is not `<name>`, it prints the kept-file line
   `policy: <file> keeps its preset "<its>", not the answer "<name>": …`, exit 0; a file that does not
   decode or parse prints nothing (S3).
-- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
+- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--build <slug>] [--explain] [--json]` — run in the repository to
   read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
-  list one member per line, LF-ended. `--json` prints one JSON object of `reason`, `source` and
+  list one member per line, LF-ended. `--build` reads it as that build reads it, under the slot of
+  the scenarios it is placed under (KICK-dKeptSession-20). `--json` prints one JSON object of `reason`, `source` and
   `value` instead, the form the mirror helper reads. `--explain` adds `policy: <key> · <source> · <reason>` on
   stderr, the reason naming the sha8 and how the revision was found. Exit 0, or 2 with one
   `policy: refused · <path>:<line> · <why>` line and nothing on stdout.
@@ -228,7 +229,7 @@ deleted list.
 
 ## The reader
 
-`resolve(key, repo=".", rev=None)` is the one reader every consumer calls, `get` its CLI. It carries
+`resolve(key, repo=".", rev=None, build=None)` is the one reader every consumer calls, `get` its CLI. It carries
 `read_policy_key`'s contract (the unattended kit, `THE POLICY IS READ AT R AND NEVER FROM THE TREE`)
 to TOML: the file as committed at a revision, read with `git show`, parsed with `tomllib`, never
 sourced and never opened from the working tree. The shell parser and its copies stay as they are
@@ -248,10 +249,22 @@ symbol, never by line, so no later edit strands the citation (TOOL-dGroundRules-
   `<key> = 0`, so `budgets."CLAUDE.md"` is two segments. `read_catalogue_row` finds its row by the
   name rule above; no row refuses, naming the catalogue.
 - **The value.** `parse_policy` maps each leaf's segment tuple to its value; a table is never a
-  value. `resolve` runs `RESOLUTION_ORDER`, the one order, and the first step to answer wins; each
-  step takes `(path, row, table, rev_phrase)`, `table` None for an absent file, and names the
-  revision read only through `rev_phrase`, the read's `<sha8>, <how>`. `read_file_value`
-  answers `Resolution(value, "file", reason)` where the file sets the key; `read_preset_value`
+  value. `resolve` runs `RESOLUTION_ORDER`, the one order of four sources, the file, the build's
+  scenario, the file's preset and the default, and the first step to answer wins; each step takes
+  `(path, row, table, rev_phrase)` and the keyword `build`, `table` None for an absent file and
+  `build` None for a read naming no build, and names the revision read only through `rev_phrase`,
+  the read's `<sha8>, <how>`. `read_file_value`
+  answers `Resolution(value, "file", reason)` where the file sets the key; `read_scenario_value`
+  (KICK-dKeptSession-20), for a read naming a build, answers from the slot of the scenarios the build
+  is placed under: an override the slot sets, `scenario <scenario> override at <rev_phrase>`, else
+  the slot's shipped preset's value, `scenario <scenario> preset <name> at <rev_phrase>`, each with
+  source `preset`; it answers None with no build, a `null` slot, before importing `presets.py`, and a
+  `never` key. The slot is `read["build"]`, `{"slug", "slot"}`, which `read_revision(repo, rev, rows,
+  build)` reads once per read by running the loop kit's `scenario.py slots --build <slug> --rev
+  <sha>`, found through the inlined `resolve_kit_dir`; the loop kit not found, and the verb exiting
+  non-zero, a conflict between two placed scenarios under `flow.scenario-conflict = "refuse"` among
+  them, are each a Refusal, so a build's posture that cannot be read is never read unscoped.
+  `get <key> --build <slug>` names the build. `read_preset_value`
   (KICK-dKeptSession-2), where the file names a `preset`, answers that preset's value with source
   `preset` and the reason `preset <name> at <rev_phrase>`, looked up by exact path in
   `read_preset_assignment`, `presets.derive_preset_assignment` over the store `read_kit_presets`

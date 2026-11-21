@@ -5,7 +5,7 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. These keys have <!-- usage: script:tools/policy/policy.py#get af650e87 -->
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. These keys have <!-- usage: script:tools/policy/policy.py#get f4d25789 -->
 consumers today, each family documented on its own page:
 
 - `runtime.agents-in-flight`, which `policy.py settings --write` renders into the harness's
@@ -56,6 +56,7 @@ allowed values and every check.
   you have not committed and pushed does not change what it prints, and once a gate reads its
   policy through it, an uncommitted edit cannot change what that gate enforces.
   - `--rev <rev>` reads the file at that commit instead, `--rev HEAD` for your last commit.
+  - `--build <slug>` reads the key as that build reads it, under its scenario's slot (below).
   - `--explain` adds one line on stderr naming where the value came from and the commit:
     `policy: budgets.enforce · file · set in .governance/policy.toml at 3708a705, <remote>/main, the landed revision`.
   - It refuses, exit 2 with one `policy: refused · <path>:<line> · <why>` line, a key no catalogue
@@ -66,14 +67,24 @@ allowed values and every check.
   - With no default branch named and no `main` it refuses naming the missing ref: `git remote set-head <remote> -a`, or `export GOV_DEFAULT_BRANCH=<branch>`, names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
-  `tools/policy/policy.py`: the value the file sets, else the value of the preset the file names,
-  else the catalogue default. `--explain` says which, after the sha and how the revision was found:
+  `tools/policy/policy.py`, four sources: the file, then a build's scenario, then the preset, then the default.
+  That is the value the file sets, else, for a read naming a build, the slot of the scenarios that
+  build is placed under, else the value of the preset the file names, else the catalogue default.
+  `python tools/policy/policy.py get <key> --build <slug>` reads a key as that build reads it; a read
+  naming no build takes the repository's values alone. `--explain` says which, after the sha and how
+  the revision was found:
   - the file sets the key: `file · set in .governance/policy.toml at <sha>, <how>`;
+  - the build's scenario overrides the key: `preset · scenario <scenario> override at <sha>, <how>`;
+  - the build's scenario names a preset that sets the key: `preset · scenario <scenario> preset <name> at <sha>, <how>`;
   - the file names a preset that sets the key: `preset · preset <name> at <sha>, <how>`;
   - the file does not set it and names no preset, or its preset does not set the key: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
   - there is no file at that revision: `default · .governance/policy.toml is absent at <sha>, <how>; the catalogue default`.
 
-  A value you set in the file always wins over the preset, and the preset over the default. A file
+  A value you set in the file always wins over a scenario's slot, the slot over the preset, and the
+  preset over the default. Two scenarios a build is placed under that name two presets, or set one
+  key to two values, settle as `flow.scenario-conflict` says: under `refuse`, the default, the read
+  is refused naming both. A build read that cannot reach the loop kit is refused, never read
+  without its scenario. A file
   that names no preset reads the catalogue default, which is what `standard` sets anyway. Naming
   `strict` or `guarded` refuses hook bypass, among other keys; until the reliability bar lands, a
   repository naming one may stall on hook refusals, so try it on a branch first.

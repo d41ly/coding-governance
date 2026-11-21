@@ -757,7 +757,12 @@ below); `select` and the transition writer take them as `--fact <name>=<value>` 
 with `adopter` at its second segment. `extends` names the scenario whose facts, entry step, activated
 rows and hand-overs it starts from, each key you set standing in place of the parent's whole. Its
 `activates` holds, per kind tag, the rows it adds to that kind's composition for a build placed under
-it, each meeting every refusal an overlay row of that kind meets:
+it, each meeting every refusal an overlay row of that kind meets. Its slot, `preset` and `overrides`,
+sets policy for the builds placed under it alone: `preset = "strict"` names a shipped preset, and
+`overrides = { "review.max-rounds" = 5 }` sets keys on top of it, so a high-precision scenario runs
+strict while the repository runs standard. A build reads the slot after your policy file's own values
+and before the repository's preset (`python tools/policy/policy.py get <key> --build <slug>` shows it),
+and `check` refuses a slot that sets a key presets never touch or breaks a pair rule:
 
 ```toml
 [[scenario]]
