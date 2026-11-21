@@ -15570,7 +15570,10 @@ check_commit_message() { # commit message file
        _ae=$("$py" -c 'import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct; print(ct.read_charter_trailer(sys.argv[2])[0])' \
          "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
        _ae=${_ae//$'\r'/}
-       fail 49 "--check-commit: ${_at#ATTRIBUTION refused · }; end the message with '$_ae' and nothing after it"
+       _at=${_at#ATTRIBUTION refused · }
+       # The repair leads, so the site's signature is the literal its arm asserts (check-arms takes the
+       # longest literal run, and a leading interpolation would join its stripped prefix to it).
+       fail 49 "end the message with '$_ae' and nothing after it: $_at"
        return 1 ;;
     *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
