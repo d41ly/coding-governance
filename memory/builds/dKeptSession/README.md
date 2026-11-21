@@ -87,7 +87,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 64 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** INPROGRESS · 64 unit(s) · node d · opened 2026-10-21 · streams kickoff
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42
@@ -99,7 +99,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 |---|---|---|---|---|---|
 | [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | CLOSED | rev-9 | 2026-11-21 |
 | [KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts](spec/2026-10-26-spec-KICK-dKeptSession-19.md) | 2 | 2 | CLOSED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-33 — the preset store's rule for the derived-default rows: unassigned where v2 restates the default, literal where a preset differs](spec/2026-10-26-spec-KICK-dKeptSession-33.md) | 2 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-33 — the preset store's rule for the derived-default rows: unassigned where v2 restates the default, literal where a preset differs](spec/2026-10-26-spec-KICK-dKeptSession-33.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-2 — the preset step in dGroundRules' reader](spec/2026-10-26-spec-KICK-dKeptSession-2.md) | 3 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-3 — the charter's preset section: the posture and only the keys that differ](spec/2026-10-26-spec-KICK-dKeptSession-3.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-34 — the reader's preset step answers None for a row the preset leaves unassigned, so a derived default reads with source default under every preset](spec/2026-10-26-spec-KICK-dKeptSession-34.md) | 4 | 2 | DEFERRED | rev-4 | 2026-11-21 |
