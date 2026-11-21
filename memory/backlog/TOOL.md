@@ -738,3 +738,4 @@ Cite ids, never line numbers.
 | [TOOL-dWitnessedBar-105](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE GOV CANARY DOES NOT GUARD ITS manifest-check READS. Its reverse… |
 | [TOOL-dWitnessedBar-113](../builds/dWitnessedBar/BACKLOG.md) | OPEN | LOW | — | 2026-11-21 | THE SCRATCH-GUARD'S resolveCardBash PORTS THE OLD BASH ORDER.… |
 | [TOOL-dWitnessedBar-114](../builds/dWitnessedBar/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | AN ADOPTER'S INSTRUCTIONS-LEGACY LIST READS EMPTY AFTER ITS UPDATE.… |
+| [TOOL-dWitnessedBar-1000](../builds/dWitnessedBar/BACKLOG.md) | OPEN | HIGH | — | 2026-11-21 | held red: suite unattended driver selftest shard 6/8 red at c2a407b0 on… |
