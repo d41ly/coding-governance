@@ -1,6 +1,6 @@
 # KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers
 
-**Status:** DEFERRED · rev-2 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
 
 **Carries:** cl-dClosedLoop-0163@709e57f9 whole
 
@@ -16,6 +16,8 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 |
+| [2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -38,9 +40,15 @@ a planted card that omits it.
   called by `render_pointers` (KICK-dKeptSession-13 S2) after its `item —` line, prints `budget —
   <answer>`, `<answer>` the one line `python <loop kit>/budget.py state --build <slug>` prints:
   `open <spent>/<total>`, `spent`, or `unfrozen <spent>/<total>`. The loop kit is resolved by
-  `resolve_kit_file loop budget.py`, as `print_rekeyed_card` resolves `claims.py`. With no loop kit
-  it prints `budget — skipped: no loop kit`, and a call that fails or does not answer within
-  `CARD_BUDGET_BOUND` prints `budget — skipped: <why>`. Observed by AC1, AC3.
+  `resolve_kit_file loop budget.py`, as `print_rekeyed_card` resolves `claims.py`. The call runs in
+  `$ROOT`, the toplevel the engine changes into at start, since `budget.py`'s `main` reads its build
+  under the working directory (`tools/loop/budget.py#main`); stdin closed, its output into a scratch
+  file under `timeout -k 2 "$CARD_BUDGET_BOUND"`, as `derive_map_block` bounds the map
+  (`skills/session-kickoff/manifest-check.sh#derive_map_block`). With no loop kit it prints `budget —
+  skipped: no loop kit`; no Python, or no working `timeout -k`, prints the skip `derive_map_block`
+  prints for the same cause with the `budget —` prefix; a call that exits non-zero or does not answer
+  within `CARD_BUDGET_BOUND` prints `budget — skipped: <why>`, the forms §4's table gives. Observed by
+  AC1, AC3.
 - **S2** — The check. `budget` is appended to KICK-dKeptSession-13's `POINTER_LINES`, so
   `check_card_pointers` fails `--card --check` on a stored card whose `## pointers` section carries no
   `budget —` line, naming it. A `skipped` line is a line, so a node with no loop kit still passes.
@@ -49,16 +57,28 @@ a planted card that omits it.
   boundary `card.pointers` admits, and at each publish and follow `write_build_card` makes, so a draw
   shows at the next one after it lands. Observed by AC4.
 - **S4** — The plants `budget-open`, `budget-spent`, `budget-unfrozen`, `budget-omitted` and
-  `budget-no-kit` in `skills/session-kickoff/card-store.fixture.sh`'s `PLANTS`, the copied loop
-  kit's `budget.py` a stub answering the line planted in KICK-dKeptSession-13's plant file, and
-  `budget-no-kit` with no `budget.py` in the copy. Observed by AC1 to AC4.
+  `budget-no-kit` in `skills/session-kickoff/card-store.fixture.sh`'s `PLANTS`. `write_card_fixture`
+  writes the copied loop kit's `budget.py` as a stub for every plant, as KICK-dKeptSession-13 S9
+  writes its `position.py`: it answers `state --build <slug>` with the line planted in that unit's
+  plant file, `open 0/4` where none is planted, so no plant runs the real module, whose
+  `read_policy_kit` would import the stub policy kit's script and exit. In `budget-no-kit` the copy
+  holds no `budget.py` at all, and `resolve_kit_file` then answers nothing. No card path imports a
+  name from `budget` at module level: `loop_transition.py` imports it inside `write_transition` alone, and
+  `termination.py`, its one module-level importer, is imported inside a function of
+  `loop_transition.py`. Observed by AC1 to AC4.
 - **S5** — `help/orientation-card.md`'s pointers section (KICK-dKeptSession-13 S10) gains the
   `budget —` line, its three answers, and that only the owner raises the budget. Observed by AC5.
 - **S6** — The reader. `python tools/loop/budget.py state --build <slug>` prints
   `budget_state(build, root)`'s one line and exits 0, beside the `origin` and `ending` subcommands in
   `main` (`tools/loop/budget.py#main`) and refused as they are: `loop: budget · refused · <why>` or
   `loop: unarmed · <why>`, exit 2. The usage line and the module docstring name it, and `PLANTS`
-  gains `state-answers`, one fixture case printing each of the three answers. Observed by AC6.
+  gains `state-answers`, one fixture case printing each of the three answers. As each other verb of
+  `budget.py` is, it is documented: `tools/govkit/usage.toml` gains the row
+  `script:{prefix}/loop/budget.py#state`, verb `state`, flags `--build=`, and `help/loop.md` one
+  bullet beside "See the ending" anchored with the fingerprint `python tools/govkit/docs_leg.py
+  --fingerprints` prints for that row. The `docs` leg tests every inline `python` span on a page
+  under `help/` against the verb rows, so a page showing `budget.py state` with no row is a
+  `COMMAND` finding (`tools/govkit/docs_leg.py#check_page_command`). Observed by AC6, AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -111,6 +131,8 @@ reading, so it can never disagree with the reader the draw sites use. `budget_st
 
 `CARD_BUDGET_BOUND = 10` seconds, env-overridable for the fixture only, as `CARD_CLI_BOUND` is;
 PINNED 2026-11-21, the figure rev-1 chose, `budget.py` reading the build's homes with no remote call.
+`python tools/loop/budget.py ending --build dKeptSession`, which makes the same `read_budget_rows`
+read and more, took 1.1 s twice on node a (PINNED 2026-11-21), so the bound is ample.
 
 ### Migration
 
@@ -127,10 +149,15 @@ Live at landing, the line and its reader landing together.
 - `skills/session-kickoff/manifest-check.sh`: `render_budget_line`, the `POINTER_LINES` word
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names `manifest-check.sh`
-- `skills/session-kickoff/manifest-check.test.sh`: the arm the §7 line declares
-- `skills/session-kickoff/card-store.fixture.sh`: S4's plants
+- `skills/session-kickoff/manifest-check.test.sh`: the arm the §7 line declares, `FLOOR_ASSERTIONS`
+  raised by one per plant of S4, as the suite counts one `ok` row per plant `--list` names
+- `skills/session-kickoff/card-store.fixture.sh`: S4's plants and the stub `budget.py`
 - `tools/loop/budget.py`: S6's subcommand and its fixture case
+- `tools/govkit/usage.toml`: S6's `#state` row
+- `help/loop.md`: S6's bullet and its usage anchor
 - `help/orientation-card.md`: S5's line
+- `memory/map/generated/symbols.json`: `render_budget_line`, regenerated by `gen_map.py --write`,
+  which the bar's codebase-map leg grades
 
 ### Alternatives rejected
 
@@ -153,7 +180,7 @@ Live at landing, the line and its reader landing together.
 - risks — a stub or absent loop kit hides the budget behind `skipped`; the help page says so.
 - testing — S4's plants and S6's case, red and green.
 - migration — none.
-- user docs — `help/orientation-card.md`, S5.
+- user docs — `help/orientation-card.md`, S5; `help/loop.md`, S6's verb.
 
 ## 6. Acceptance criteria
 
@@ -169,22 +196,28 @@ Live at landing, the line and its reader landing together.
 - **AC3** — When the plant `budget-no-kit` writes the pointers with no `budget.py` resolvable, the
   line reads `budget — skipped: no loop kit` and `--card --check` exits 0.
   Red when: a missing kit refuses the card, or prints no line.
-- **AC4** — When the plant `budget-open` moves the stub's planted line to `open 4/10` between two
-  item boundaries, the second boundary's card reads `budget — open 4/10`.
+- **AC4** — When the plant `budget-open` plants `open 4/10` and a new `--boundary` key in
+  KICK-dKeptSession-13's plant file between two `--card --boundary` runs, so the second one crosses
+  and publishes under `every-item`, the ref's card then reads `budget — open 4/10`.
   Red when: a boundary re-renders the section with the earlier figure.
 - **AC5** — When `grep -n "budget —" help/orientation-card.md` runs, it finds S5's line naming
   `open`, `spent` and `unfrozen`.
   Red when: the page does not name the line.
 - **AC6** — When `python tools/loop/budget.py --fixture --plant state-answers` runs, it prints one
-  `open`, one `spent` and one `unfrozen` answer from three planted builds, each equal to
-  `budget_state`'s for that build, and exits 0.
-  Red when: `state` prints a line `budget_state` did not answer, or exits non-zero on a held build.
+  `open`, one `spent` and one `unfrozen` answer from three planted builds, each compared with
+  `budget_state`'s for that build, then `loop: fixture · state-answers · held`, and exits 0, as
+  `run_budget_plant` ends every case.
+  Red when: `state` prints a line `budget_state` did not answer, or exits non-zero on a held build,
+  which prints `MISSED` and exits 1.
+- **AC7** — When `python tools/govkit/docs_leg.py --fingerprints` runs, its row for the `state` verb
+  of `budget.py` names `help/loop.md` as its page.
+  Red when: the verb ships with no usage row, or its page carries no anchor for it.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `loop budget fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `loop budget fixtures` · `policy fixtures` · `docs` · `help page commands` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 · the budget line over a stub loop kit, the failing case a stored card whose `## pointers` lacks `budget —` passing `--card --check` · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4 · the budget line over a stub loop kit, the failing case a stored card whose `## pointers` lacks `budget —` passing `--card --check` · `FLOOR_ASSERTIONS`, raised by one per new plant
 
 New arm: tools/loop/budget.py · covers AC6 · the `state-answers` fixture case, the failing case a `state` line that differs from `budget_state`'s answer · none
 
@@ -224,6 +257,15 @@ New arm: tools/loop/budget.py · covers AC6 · the `state-answers` fixture case,
   is resolved by `resolve_kit_file`; the refresh follows KICK-dKeptSession-13 rev-4's render at every
   publish and follow; the stub answers from that unit's plant file; the unfrozen answer re-spelled
   to `<spent>/<total>`; the kickoff manifest's re-stamp and the guarded legs added.
+- rev-3 · 2026-11-21 · S1 · S4 · S6 · §4 · §5 · AC4 · AC6 · AC7 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief`: S1's call placed in `$ROOT` and bounded
+  as `derive_map_block` bounds the map, with its two node skips; the stub `budget.py` written for
+  every plant, since the real module run under the stub policy kit exits, and shown to break no
+  import; S6's verb given its usage row and `help/loop.md` bullet, which a page showing it requires,
+  and AC7 to observe them; AC4 made a crossing, since only a crossing publishes; AC6's `held` line
+  and exit stated as `run_budget_plant` prints them; the bound's read measured; `policy fixtures`,
+  which `tools/loop/` trips since KICK-dKeptSession-1, the docs and govkit legs, the floor raise and
+  `symbols.json` added.
 
 ## 10. Reuse audit
 

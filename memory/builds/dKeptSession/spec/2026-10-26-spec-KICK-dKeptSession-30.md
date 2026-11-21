@@ -1,6 +1,6 @@
 # KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,6 +16,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 |
 | [2026-11-21-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md) | research | KICK-dKeptSession-9 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
@@ -39,8 +40,10 @@ step after it (order 13).
 
 ## 2. Scope (IN)
 
-- **S1** — id 16. The window, `derive_context_window(model, root=None)` in
-  `tools/runlog/extract.py`, returning `(tokens, source)`:
+- **S1** — id 16. The window, `derive_context_window(model, root=None, held=None)` in
+  `tools/runlog/extract.py`, returning `(tokens, source)`. `held` is `(path, events)` for a
+  transcript its caller has already parsed: where that path is among the population below, its
+  events stand in for a second parse of it (§8 F2). The window is the first of:
   1. `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, when it is set to a positive integer, with source `env`. It
      is the harness's own variable for a model's real window (§4 Evidence), read and never written.
   2. Otherwise the smallest rung of `CONTEXT_WINDOW_RUNGS = (200000, 1000000)` at or above the
@@ -57,12 +60,16 @@ step after it (order 13).
   3. With no observation for `model`, the bottom rung, with source `no observation`.
   Observed by AC1, AC2, AC3 and AC4.
 - **S2** — id 16. The readers re-pointed. `measure_context_fill(transcript, until=None)` divides by
-  `derive_context_window(<the event's model>, root=<the transcript's projects root>)`, the
-  transcript's parent's parent. `derive_context_fill(ev, window=None)` takes an explicit window, or
-  derives one from `ev["model"]` under the default root, so `KICK-dKeptSession-9`'s per-stage rows
+  `derive_context_window(<the event's model>, root=<the transcript's projects root>, held=<its own
+  path and events>)`, the root the transcript's parent's parent, and returns `(share, tokens,
+  source)`, `(None, None, None)` with no main usage, in place of the bare share
+  `KICK-dKeptSession-14` S1 returns. Its one caller is that unit's `cmd_context` in
+  `tools/runlog/runlog.py`, which unpacks it. `derive_context_fill(ev, window=None)` takes an
+  explicit window, or derives one from `ev["model"]` under the default root, so `KICK-dKeptSession-9`'s per-stage rows
   read the same window with no change to their call. `python tools/runlog/runlog.py context
   <transcript>`, minted by `KICK-dKeptSession-14` S1, keeps its stdout, `<n>%` or `none`, and prints
-  `context: window <tokens> · <source>` on stderr. Observed by AC1, AC2 and AC5.
+  `context: window <tokens> · <source>` on stderr, nothing there for `none`. Observed by AC1, AC2 and
+  AC5.
 - **S3** — id 16. The constant retired. `CONTEXT_WINDOW_TOKENS` is deleted, not left beside the
   rungs, and `KICK-dKeptSession-14` §4 "The window" and §8 F2 are superseded by name here and
   answered in that unit's acceptance ledger. Observed by AC5.
@@ -77,7 +84,12 @@ step after it (order 13).
   the store's other scenarios are, each a key of its `scenarios` table holding an `about` string and
   a `main` list of records. One selftest case in `tools/runlog/selftest.py` writes them by
   `build_scenario` (`tools/runlog/selftest.py#build_scenario`) into one scratch projects root, or the
-  first alone, as each criterion says. Observed by AC1 to AC4.
+  first alone, as each criterion says. The selftest's launcher in `main` already points every ambient
+  root at a decoy and pops the store override before any arm (`tools/runlog/selftest.py#main`); it
+  pops the harness's window variable of S1 beside it, so no node's harness setting moves this case or
+  `KICK-dKeptSession-14`'s `context-fill` case, and AC4's read sets it in its own child's
+  environment. `ASSERTION_FLOOR` rises by the case's checks and the three decoy checks `main` runs
+  after every `test_` function, with a `RAISED` comment pricing them. Observed by AC1 to AC4.
 - **S5** — id 16. `help/orientation-card.md`'s `context —` paragraph, written by
   `KICK-dKeptSession-14` S9 in the section "When a session resumes", says the window is derived per
   model from the node's observed usage and names `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, in place of the
@@ -89,7 +101,7 @@ step after it (order 13).
 - A policy key for the window. No clause names one, and §8 F1 records why it is not taken.
 - A model-to-window table. A transcript's `model` field does not say which window the account runs,
   as §4 measures.
-- A cache of the observation. One scan costs about two seconds on this node (§5), and
+- A cache of the observation. One scan costs two to four seconds on this node (§5), and
   `KICK-dKeptSession-56` S11 memoises it per model and root.
 - The report's left-shift entry, a checklist line that a pinned UNVERIFIED platform constant cites a
   node measurement. No clause of this build names that checklist.
@@ -156,9 +168,13 @@ None. No stored state holds a fill; every read derives it.
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`: S1, S2 and S3
-- `tools/runlog/selftest.py`: the window case
+- `tools/runlog/runlog.py`: `cmd_context` unpacking S2's triple and printing the stderr line
+- `tools/runlog/selftest.py`: the window case, the launcher's dropped variable and the
+  `ASSERTION_FLOOR` raise
 - `tools/runlog/fixtures/transcripts.json`: S4's two scenarios
 - `help/orientation-card.md`: S5
+- `memory/map/generated/symbols.json`: `derive_context_window`, regenerated by `gen_map.py --write`,
+  which the bar's codebase-map leg grades
 
 ### Alternatives rejected
 
@@ -175,14 +191,20 @@ None. No stored state holds a fill; every read derives it.
 - security — transcripts are read, never written, and only token counts and model ids leave them.
 - perf / scale — one scan per call over at most 20 main transcripts, each main file alone through
   `extract_session`: 2.14 s over 244 MB for the newest 20 sessions on this node (PINNED, 2026-11-21),
-  against 9.35 s over 1124 MB for the same sessions' full trees (PINNED, 2026-11-21). Reading only
-  each file's last megabyte is the upgrade if a boundary shows it.
+  against 9.35 s over 1124 MB for the same sessions' full trees (PINNED, 2026-11-21); re-measured at
+  `79144f3f` under the unattended run's load, 3.5 s over 260 MB twice (PINNED 2026-11-21). The
+  scan runs inside every `runlog.py context` call, which `KICK-dKeptSession-14` S5 bounds at
+  `CARD_CONTEXT_BOUND`, 5 s PINNED there; the session's own transcript is normally among the newest
+  20, so S1's `held` keeps the call at one parse of it (§8 F2). Reading only each file's last
+  megabyte is the upgrade if a boundary shows it.
 - error / empty / loading states — an unreadable transcript is skipped; no observation reads the
   bottom rung with its source named; a non-integer variable is ignored with its source unchanged.
 - observability — `runlog.py context` names the window and its source on stderr.
 - risks — a model never observed past 200k on a node reads the 200k rung, so its first session
   there errs towards going fresh, the cheaper error by RT-1's measurement, until one session passes
-  200k or the variable is set.
+  200k or the variable is set. A node whose scan passes `CARD_CONTEXT_BOUND` reads `context —
+  skipped:` in the replay, and its boundary act, which prints nothing on a skip, does not fire;
+  `KICK-dKeptSession-56` S11's memo is per process and does not shorten one call.
 - testing — the selftest case of §6 and the arm in §7.
 - migration — none.
 - user docs — `help/orientation-card.md`, S5.
@@ -212,9 +234,9 @@ None. No stored state holds a fill; every read derives it.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case over the two scenarios, staged red by a copy of `extract.py` dividing by 200000 · none
+New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case over the two scenarios, staged red by a copy of `extract.py` dividing by 200000 · `ASSERTION_FLOOR`, raised by the case's checks and its three decoy checks
 
 ## 8. Open questions
 
@@ -226,6 +248,16 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
   criterion, a 900k turn reading under 100%. (a) meets AC1 to AC4 and adds no surface.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most capable survivor.
   widens: none · relaxes: none
+- **F2 — How does the scan fit the 5 s `CARD_CONTEXT_BOUND`, PINNED by KICK-dKeptSession-14?**
+  The scan now runs inside every `runlog.py context` call, beside that call's own parse of the session's
+  transcript, which is normally among the newest 20 and so parsed twice. Options: (a) S1's `held`,
+  the caller's parsed transcript standing in for its file in the scan, the bound unchanged; (b) (a)
+  and the bound raised in `manifest-check.sh`; (c) neither. (b) moves a watched engine constant
+  from a unit that touches no engine file, and lengthens every slow replay, whose position read
+  already takes up to 10 s (PINNED by KICK-dKeptSession-13); (c) pays the duplicate parse, 1.5 s on
+  this node's largest main transcript (`KICK-dKeptSession-14` §4), on every call. RESOLVED (agent,
+  2026-11-21, delegated): (a), rung 3; it removes the one avoidable parse and adds no surface, and the
+  residue, a node whose scan alone passes the bound, is named in §5. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -240,6 +272,13 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
   names `policy fixtures`, which `extract.py` trips; §3's cache non-goal points at unit 56's memo.
   Nothing narrowed: unit 14 and every name this unit re-points are unbuilt at this base, so no
   landed unit satisfies an item.
+- rev-4 · 2026-11-21 · S1 · S2 · S4 · §4 · §5 · §7 · §8 F2 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief`: S2's stderr line needs the window from
+  the one reader, so `measure_context_fill` returns it beside the share and `runlog.py`, where
+  `cmd_context` prints it, joins Files touched; the selftest's launcher drops the harness's window
+  variable, which would otherwise move this case and unit 14's on any node that sets it; the scan
+  re-measured and weighed against unit 14's replay bound, F2 ruling that the caller's own parse
+  stands in for its file; the floor raise and `symbols.json` added.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 12 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 12 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0152@da455c7f whole
 **Carries:** node:policy-key.context.on-full
@@ -21,6 +21,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-15-orders-11-12-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-15-orders-11-12-reground-brief.md) | research | KICK-dKeptSession-15 |
+| [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-30 KICK-dKeptSession-9 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -79,7 +80,9 @@ to go fresh there, by `context.on-full` and `context.threshold`.
 - **S4** — The replay line, `render_context_line`, in I10's `context —` slot (KICK-dKeptSession-12
   S5), after KICK-dKeptSession-15's `position —` and `lead —` lines and before the `now —` line,
   which stays last, from `CARD_TRANSCRIPT`, which
-  `read_session_id` already keeps from the payload (`#read_session_id`). Under `fresh-at-boundary`
+  `read_session_id` already keeps from the payload (`#read_session_id`); that reader reads the
+  payload only when no `--session` is given, so a replay run with one reads no transcript and prints
+  the no-path skip. Under `fresh-at-boundary`
   it prints `context — <n>% of window · past <threshold> · fresh at next item boundary
   (context.on-full: fresh-at-boundary)` at or past the threshold, and `context — <n>% of window ·
   under <threshold>` below it; under `compact-with-card`, `context — <n>% of window (context.on-full:
@@ -105,15 +108,23 @@ to go fresh there, by `context.on-full` and `context.threshold`.
   repository plants, plants `context.on-full` and `context.threshold` at their defaults in the stub
   policy kit, and has that stub append each key it is asked to a log beside `CARD_STUB_POLICY`. The
   boundary plants write a crossing's `--boundary` key into the plant file outside the repository
-  that KICK-dKeptSession-13 S9's stub loop kit answers from, and add no second loop stub. Observed
-  by AC3 to AC6, AC10.
+  that KICK-dKeptSession-13 S9's stub loop kit answers from, and add no second loop stub. The stub
+  `runlog.py` is written at the path `resolve_kit_file runlog runlog.py` answers over the gov tree,
+  as the stub `policy.py` is, since the fixture copies no runlog kit; the replay plants pipe their
+  payload on stdin with no `--session`, as the fixture's `replay` plant does. The suite's
+  `FLOOR_ASSERTIONS` rises by one per new plant
+  (`skills/session-kickoff/manifest-check.test.sh@b771dadeb50a:2489`). Observed by AC3 to AC6, AC10.
 - **S8** — The `context-fill` scenario in `tools/runlog/fixtures/transcripts.json`, written as the
   store's other scenarios are by `build_scenario` (`tools/runlog/selftest.py#build_scenario`), and
-  one selftest case over it in `tools/runlog/selftest.py`. Observed by AC1.
+  one selftest case over it in `tools/runlog/selftest.py`, its `ASSERTION_FLOOR` raised by the case's
+  checks and the three decoy checks `main` runs after every `test_` function, with a `RAISED` comment
+  pricing them as the floor's others do (`tools/runlog/selftest.py#main`). Observed by AC1.
 - **S9** — `help/orientation-card.md`'s section "When a session resumes" gains the `context —` lines,
   the two values and the threshold, and that the measure is the last turn's tokens over a pinned
-  window; `tools/runlog/README.md`'s transcript-extractor block gains the `context` command. Observed
-  by AC9.
+  window; `tools/runlog/README.md`'s transcript-extractor block gains the `context` command. The help
+  page shows no `runlog.py` command: `runlog.py` has no `[[usage]]` row, and the `docs` leg reds a
+  page command naming a tracked entrypoint with none as `UNROWED`
+  (`tools/govkit/docs_leg.py#check_page_command`). Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -157,6 +168,10 @@ to go fresh there, by `context.on-full` and `context.threshold`.
   RT-1 revised.
 - The fixture's replay plants match `context-*|partial-*|terminal-route` in one `case` arm, so a plant
   named `context-…` would run that arm.
+- KICK-dKeptSession-1's landed `tools/policy/presets.toml` assigns `context.on-full` and
+  `context.threshold` their catalogue defaults in all four presets, so AC8's two reads hold whether
+  or not a policy file names a preset; `policy.py get` printed `fresh-at-boundary` and `60%` here at
+  `79144f3f`.
 - The harness on this node accepts `additionalContext` in a PreToolUse hook's output (F1).
 
 ### The lines
@@ -205,11 +220,16 @@ card routing a build.
 
 - `tools/runlog/extract.py`: S1, `measure_ready_tree` re-pointed to `derive_context_tokens`
 - `tools/runlog/runlog.py`: the `context` subcommand
-- `tools/runlog/selftest.py`: S8's case
+- `tools/runlog/selftest.py`: S8's case and its `ASSERTION_FLOOR` raise
 - `tools/runlog/fixtures/transcripts.json`: S8's scenario
 - `tools/runlog/README.md`: S9's command line
-- `skills/session-kickoff/manifest-check.sh`: S2 to S5; `KIT_MANIFEST_VERSION` moved
+- `skills/session-kickoff/manifest-check.sh`: S2 to S5
+- `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
+  names `manifest-check.sh`
 - `skills/session-kickoff/card-store.fixture.sh`: S7's plants and stubs
+- `skills/session-kickoff/manifest-check.test.sh`: `FLOOR_ASSERTIONS` raised by the five plants
+- `memory/map/generated/symbols.json`: the new Python and shell functions, regenerated by
+  `gen_map.py --write`, which the bar's codebase-map leg grades
 - `tools/policy/catalogue.toml`: the two rows' `summary` and `usage`
 - `tools/policy/unsummarised-keys.txt`: drained by `lists --write`
 - `help/orientation-card.md`: S9
@@ -286,11 +306,11 @@ card routing a build.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: skills/session-kickoff/card-store.fixture.sh · covers AC3 AC5 AC6 AC10 · the boundary act and the replay line over the stub runlog and policy kits, the failing case a crossing past the threshold that prints nothing · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 AC4 AC5 AC6 AC10 · the boundary act and the replay line of the `fill-*` plants of `card-store.fixture.sh` over the stub runlog and policy kits, run by the suite's card-store block, the failing case a crossing past the threshold that prints nothing · `FLOOR_ASSERTIONS`, raised by one per new plant
 
-New arm: tools/runlog/selftest.py · covers AC1 · the fill over the `context-fill` scenario, the failing case a later subagent usage read as the main session's · none
+New arm: tools/runlog/selftest.py · covers AC1 · the fill over the `context-fill` scenario, the failing case a later subagent usage read as the main session's · `ASSERTION_FLOOR`, raised by the case's checks and its three decoy checks
 
 ## 8. Open questions
 
@@ -347,6 +367,14 @@ New arm: tools/runlog/selftest.py · covers AC1 · the fill over the `context-fi
   after the verb finishes; S5's bound is the transcript read's own inside that verb, the hook bound
   gone; S6 names unit 13's `agent_id` skip beside `agent_type`; S7's boundary plants write their key
   into unit 13's stub plant file, no second loop stub; the edge and §5's perf and risks follow.
+- rev-5 · 2026-11-21 · S4 · S7 · S8 · S9 · §4 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief`: `CARD_TRANSCRIPT` is read only with no
+  `--session`, so the replay plants pipe their payload as the `replay` plant does; the stub
+  `runlog.py` placed where the engine's resolver finds it, the fixture copying no runlog kit; the
+  help page kept free of a `runlog.py` command, which the `docs` leg reds as `UNROWED`; AC8
+  re-grounded on KICK-dKeptSession-1's presets; the kickoff manifest's re-stamp, both suites'
+  floor raises and `symbols.json` added, the version bump left to the lander, and the plant arm
+  homed in the suite that runs it.
 
 ## 10. Reuse audit
 

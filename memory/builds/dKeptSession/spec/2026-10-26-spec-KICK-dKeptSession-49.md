@@ -1,6 +1,6 @@
 # KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale
 
-**Status:** INPROGRESS · rev-5 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** INPROGRESS · rev-6 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,7 +14,9 @@
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-orders-5-reground-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 |
 | [2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief.md) | research | KICK-dKeptSession-4 KICK-dKeptSession-50 KICK-dKeptSession-54 |
+| [2026-11-21-prompt-KICK-dKeptSession-49-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-49-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-49-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-49-build-brief.md) | research | — |
+| [2026-11-21-prompt-KICK-dKeptSession-49-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-49-divergence-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -45,22 +47,35 @@ step after it (order 5).
   key the stored `legacy_blobs` records that the first list does not hold, all in its one
   `git cat-file --batch-check` call. `legacyStale` holds where any path of that list has a recorded
   id differing from its id at the landed revision, a path absent from the stored map differing from
-  every id, `null` included, so such a mirror reads STALE. Observed by AC1 and AC2.
+  every id, `null` included, so such a mirror reads STALE. The file's header comment, step 3 of its
+  evaluation order, and `readMirrorAt`'s own comment name that list in place of "each path of the
+  mirror's `legacy_blobs`". Observed by AC1 and AC2.
 - **S2** — id 22. The sibling text superseded by name. `KICK-dKeptSession-40` S2's "and
   `policy-mirror.js`, which compares every key of `legacy_blobs`, reads a changed store STALE with no
   edit", its §4 Evidence sentence "Neither holds a list of its own, so neither is edited" for the JS
   reader, and its §4 Migration sentence read as S1 here: the JS is edited, and a pre-unit mirror reads
-  stale because the reader expects the store, not because the mirror names it. Answered in unit 40's
-  acceptance ledger. Observed by AC1.
+  stale because the reader expects the store, not because the mirror names it. Answered in this
+  unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-49-1-acceptance-ledger.md`,
+  which quotes those three passages of unit 40's spec and states S1 supersedes them; unit 40 is
+  CLOSED, so neither its spec nor its ledger is written (F1). Observed by AC1 and AC4.
 - **S3** — The kit copy. `MIRROR_KIT_FILES` (`tools/policy/check_policy.py#MIRROR_KIT_FILES`) gains
   `presets.py` and `presets.STORE`, so `build_landed_repo` and `build_limit_repo`, its two users,
   copy both. A stale read falls through to the kit copy's `policy-shim.sh get`, and that copy's
   `policy.py` refuses a strict-named file with no `presets.py` beside it (§4), so AC1 and AC2 could
   not answer at all. This is the copy's second instance: `KICK-dKeptSession-40`'s
-  `mirror-presets-stale` branch reads a strict-named file through the same copy, so where that unit
-  landed a per-branch copy of the two files, its names move into this list, written once. Every
-  other case of the two builders names no preset, so `presets.py` is never imported there, and the
-  store, committed in each, records one blob id on both sides. Observed by AC1 and AC2.
+  `mirror-presets-stale` branch copies the same two files into the kit itself
+  (`tools/policy/check_policy.py#run_mirror_landed`), so that branch's copy loop goes and its two
+  names live in this list, written once. Every other case of the two builders names no preset, so
+  `presets.py` is never imported there, and the store, committed in each, records one blob id on
+  both sides. Observed by AC1 and AC2.
+- **S4** — The kit README. The helper clause of `tools/policy/README.md#the-mirror`, "the helper
+  reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE",
+  describes only the recorded keys. It is corrected to S1's list: the helper compares, beside the
+  policy file and the catalogue, every name of `MIRROR_KIT_INPUTS` by the kit's prefix and every
+  other key the mirror records, and reads STALE a mirror whose recorded id differs at L, that lacks
+  an expected key, or that carries no `legacy_blobs`. The guard's sentence below it, which reads the
+  staged mirror's own keys, stays true (§3). Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -88,7 +103,7 @@ step after it (order 5).
 
 ### Evidence
 
-Read at HEAD `c2a407b0`, 2026-11-21.
+Read at HEAD `c2a407b0`, 2026-11-21; S2, S3, S4 and the probe below re-read at `cd808f85`.
 
 - `readMirrorAt(top, landed, kitRel)` sets `legacy` to `Object.keys(doc.legacy_blobs)`, asks
   `git cat-file --batch-check` for the policy file, `<kitRel>/catalogue.toml` and each of `legacy`
@@ -101,17 +116,25 @@ Read at HEAD `c2a407b0`, 2026-11-21.
   Python side.
 - `render_mirror` writes `legacy_blobs` from the inputs it records
   (`tools/policy/policy.py#render_mirror`), today `LEGACY_INPUTS`, both repository-relative.
-- Probed at `b3698899`, after `KICK-dKeptSession-2` landed, over `build_landed_repo` with
-  `preset = "strict"` above `LANDED_POLICY`: a stale mirror read through a kit copy of
-  `MIRROR_KIT_FILES` alone exits 2, its refusal line naming the kit copy's `presets.py` at line
-  zero and saying the named presets' module does not import; with `presets.py` and `presets.toml` copied, a mirror
-  rendered and pushed as L and then strict's `hooks.bypass` set to `allowed` in the copy's store and
-  pushed, `node policy-mirror.js get hooks.bypass --explain` reads FRESH and prints `refused`, the
-  defect, unit 40 not yet landed. `arm_mirror_landed` over that repository found nothing.
+- Probed at `b3698899` over `build_landed_repo` with `preset = "strict"` above `LANDED_POLICY`: a
+  stale mirror read through a kit copy of `MIRROR_KIT_FILES` alone exits 2, its refusal line naming
+  the kit copy's `presets.py` at line zero and saying the named presets' module does not import.
+- Probed at `cd808f85`, unit 40 landed, by a scratch script in `tools/policy/` building AC1's
+  fixture with `build_landed_repo`, the two preset files copied, `render_mirror` at HEAD with the
+  `tools/policy/presets.toml` key removed, pushed as L. With the store changed and pushed, the
+  landed reader exits 0 printing `refused`, its stderr line `policy: hooks.bypass · preset · preset
+  strict at <L8>, the landed revision` with no `mirror stale at`, the defect. A scratch copy of
+  `policy-mirror.js` carrying S1, `["presets.toml"]` spelled from `kitRel` and joined ahead of the
+  recorded keys, exits 0 printing `allowed`, its stderr line opening `policy: hooks.bypass · preset ·
+  mirror stale at <L8>; `; with the store unchanged it prints `refused` under the same prefix. In
+  all four runs `arm_mirror_landed` found nothing over the 3 keys the policy file sets (DERIVED,
+  that probe), since `hooks.bypass` is not one of them.
 - `MIRROR_KIT_FILES` is `(*READER_FILES, "policy-mirror.js", "policy-shim.sh")`, and `READER_FILES`
-  holds no preset file: `KICK-dKeptSession-2` copied `presets.py` into its one scenario's kit alone
-  (`tools/policy/check_policy.py#run_resolution_order`), and `KICK-dKeptSession-40` rev-4's evidence
-  that unit 2 widens `READER_FILES` did not land.
+  holds no preset file (`tools/policy/check_policy.py#MIRROR_KIT_FILES`). `KICK-dKeptSession-40`'s
+  `mirror-presets-stale` branch copies `presets.py` and `presets.STORE` into its kit itself, in a
+  loop of its own (`tools/policy/check_policy.py#run_mirror_landed`).
+- The helper clause of `tools/policy/README.md#the-mirror` names only the recorded ids, and
+  `MIRROR_KIT_INPUTS` appears nowhere in that README; `help/policy.md` names no mirror input.
 
 ### The check
 
@@ -137,11 +160,14 @@ mirror is re-rendered. That is the stale-once the sibling spec meant, now true b
 
 ### Files touched (estimate)
 
-- `tools/policy/policy-mirror.js`: `MIRROR_KIT_INPUTS` and S1 in `readMirrorAt`
-- `tools/policy/check_policy.py`: the `mirror-pre-unit-stale` branch and its `CASES` row, and S3's
-  two names in `MIRROR_KIT_FILES`
+- `tools/policy/policy-mirror.js`: `MIRROR_KIT_INPUTS`, S1 in `readMirrorAt`, and its two comments
+- `tools/policy/check_policy.py`: the `mirror-pre-unit-stale` branch and its `CASES` row, S3's two
+  names in `MIRROR_KIT_FILES`, and the `mirror-presets-stale` branch's copy loop removed
+- `tools/policy/README.md`: S4's helper clause
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-49-1-acceptance-ledger.md`:
+  S2's answer beside the criteria observed
 
-No new function, so the symbol map does not move; the kickoff manifest watches neither path.
+No new function, so the symbol map does not move; the kickoff manifest watches none of these paths.
 
 ### Alternatives rejected
 
@@ -164,7 +190,8 @@ No new function, so the symbol map does not move; the kickoff manifest watches n
   path (`tools/policy/check_policy.py#build_limit_repo`).
 - testing — the case of §6 and the arm in §7.
 - migration — §4.
-- user docs — none: `help/policy.md` does not describe the mirror's inputs.
+- user docs — `help/policy.md` does not describe the mirror's inputs, so no page under `help/`
+  moves; the kit README's helper clause is S4.
 
 ## 6. Acceptance criteria
 
@@ -188,16 +215,33 @@ nothing.
   `refused`, its stderr line still reading `policy: hooks.bypass · preset · mirror stale at <L8>; `.
   Red when: a mirror that omits an input the reader expects reads FRESH because the omitted input
   happens not to have moved.
+- **AC3** — `tr -s ' \r\n' ' ' < tools/policy/README.md | grep -c "the helper reads a mirror whose
+  recorded id differs at L"` prints `0`, and the same pipe into `grep -c "MIRROR_KIT_INPUTS"` prints
+  `1`: the squeezed README is one line, so each count is 0 or 1.
+  Red when: the clause names only the recorded keys, as at `cd808f85`, where the two print `1` and
+  `0`.
+- **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "compares
+  every key of"` prints `1`, and into `grep -c "Neither holds a list of its own"` prints `1`; and
+  `git diff --name-only <pass base> HEAD --` over unit 40's spec and its
+  `2026-11-21-build-KICK-dKeptSession-40-1-acceptance-ledger.md` prints nothing.
+  Red when: S2's answer lands in a record of unit 40, or this unit's ledger quotes none of the
+  passages it supersedes.
 
 ## 7. Gates
 
-`policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/policy/check_policy.py · covers AC1 AC2 · a planted pre-unit mirror, with and without a changed store, staged red by a copy of `policy-mirror.js` that lists only the mirror's recorded keys · none
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S2's answer to unit 40's superseded wording recorded?** Unit 40 is CLOSED, built
+  at order 4, and its ledger says nothing about the JS reader's input list. (a) Unit 40's acceptance
+  ledger, a record of a closed unit written by a later one; (b) this unit's own acceptance ledger,
+  naming the unit 40 spec text it supersedes. Recommendation (b): a CLOSED unit's records are never
+  written by a later unit. RESOLVED (agent, 2026-11-21, delegated): (b), rung 3, the main loop's
+  ruling in `2026-11-21-prompt-KICK-dKeptSession-49-divergence-brief`; (a) rejected.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -221,6 +265,11 @@ none
 - rev-5 · 2026-11-21 · §4 · the probe's refusal line is described instead of quoted, since its
   quoted path with a line suffix read as an unlisted line citation to the positional leg; under the
   brief `2026-11-21-prompt-KICK-dKeptSession-4-precheck-brief`.
+- rev-6 · 2026-11-21 · S1 · S2 · S3 · S4 · §4 · §5 · AC3 · AC4 · §8 · the builder's divergence
+  resolved under the brief `2026-11-21-prompt-KICK-dKeptSession-49-divergence-brief`. S2's answer
+  moves to this unit's own ledger, F1 resolved (b); S4 corrects the kit README's helper clause, AC3
+  observing it; AC4 observes the ledger; S3 removes unit 40's landed per-branch copy; S1 names the
+  reader's two comments; §4 re-probed both criteria at `cd808f85`.
 
 ## 10. Reuse audit
 

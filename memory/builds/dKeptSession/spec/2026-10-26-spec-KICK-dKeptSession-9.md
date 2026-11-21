@@ -1,6 +1,6 @@
 # KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0147@9a464fcd whole
 **Carries:** node:policy-key.orient.budget
@@ -24,6 +24,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-20 KICK-dKeptSession-25 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 |
 | [2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md) | research | KICK-dKeptSession-30 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -189,6 +190,13 @@ gap-orient-06).
   `--check` prints a `loop: step` line per step inside a full grade of the definition
   (`tools/loop/loop_lib.py#main`).
 - No source defines the evidence ceiling or the owner's number (scout C); §8 F1 and F2 settle both.
+- Probed 2026-11-21 in a scratch repository with the landed presets: `policy.py get orient.budget`
+  reads the policy file at the committed revision, never the working tree, printed
+  `warn-at-evidence-ceiling` under a committed `preset = "strict"` and `record-only` under
+  `standard`, and refused where `main` named no commit, the clone having no remote and
+  `GOV_DEFAULT_BRANCH` unset. A committed `budgets.orient-calls` with no census row made the file
+  invalid, `orient-calls names no row of the cap census`, and every key fell back to the last valid
+  revision under `policy-file.on-invalid`'s default.
 
 ### The report
 
@@ -233,22 +241,34 @@ measured 2026-10-14).
 
 `derive_orient_calls_plant` builds a repository holding one planted projects dir: a main transcript
 running `unattended.sh --preflight fx`, then more tool calls than its `budgets.orient-calls` value,
-then one `Edit`. Its `extra` sets that value and `orient.budget = "owner-ceiling"`, its argv runs
-`runlog.py extract --orient` there, its warn mark is `BUDGET WARN — orient-calls` and its refuse
-mark `budgets.enforce is refuse`, as the other switch plants spell theirs.
+then one `Edit`. Its `copies` are the runlog and policy kit directories, so the copied `runlog.py`
+finds `policy.py` and `budgets.py` beside it and `budgets.py` reads the copied census, which holds
+S6's row; its argv runs the copied `runlog.py extract --orient` there. Its `extra` is `"orient-calls"
+= <n>`, which lands under the `[budgets]` table `BUDGET_POLICY` opens
+(`tools/policy/check_policy.py#build_cap_repo`). `orient.budget = "owner-ceiling"` is written by its
+`post`, an `[orient]` table appended to the policy file and committed, because `derive_zero_plant`
+replaces a plant's whole `extra` and keeps its `post`
+(`tools/policy/check_policy.py#derive_zero_plant`): carried in `extra`, the zero mode would read `record-only`, run no `budgets.py check`, and pass
+whatever S6 does with a 0. Its warn mark is `BUDGET WARN — orient-calls` and its refuse mark
+`budgets.enforce is refuse`, as the other switch plants spell theirs.
 
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`
 - `tools/runlog/runlog.py`
-- `tools/runlog/selftest.py`
+- `tools/runlog/selftest.py`: the arm and its `ASSERTION_FLOOR` raise, the arm's checks and its
+  three decoy checks priced in a `RAISED` comment (`tools/runlog/selftest.py#main`)
 - `tools/runlog/README.md`
 - `tools/policy/caps.toml`
 - `tools/policy/check_policy.py`
 - `tools/gate-legs.json`
+- `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
+  names `tools/gate-legs.json`
 - `tools/loop/loop_lib.py`
 - `tools/govkit/usage.toml`
 - `help/loop.md`
+- `memory/map/generated/symbols.json`: the five new functions of the Inventory, regenerated by
+  `gen_map.py --write`, which the bar's codebase-map leg grades
 
 ### Alternatives rejected
 
@@ -282,7 +302,9 @@ mark `budgets.enforce is refuse`, as the other switch plants spell theirs.
 
 The fixture is a projects dir under `%TEMP%` holding planted main transcripts that each run
 `unattended.sh --preflight fx` and later one `Edit`, and a fixture repository whose loop transition
-record moves `fx` into `designing`, with its policy file as each criterion plants it.
+record moves `fx` into `designing`, with its policy file as each criterion plants it, committed on
+the repository's `main`: the policy reader reads that revision and no uncommitted file, so a
+criterion's planted value lands only in a commit (§4 Evidence).
 
 - **AC1** — When `python runlog.py extract --orient <dir> --slug fx --repo <repo>` runs, it prints one
   `orient row` per session file, each with its `calls`, `tokens`, `context` and `action=edit`, and a
@@ -326,9 +348,9 @@ record moves `fx` into `designing`, with its policy file as each criterion plant
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `policy check` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `loop definition` · `loop definition fixtures` · `docs` · `help page commands` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `policy check` · `scratch-guard self-test` · `routed-commits selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `loop definition` · `loop definition fixtures` · `docs` · `help page commands` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted count past the first edit, two stages, strict, standard and owner-ceiling policy files, and a stage under the floor, staged against the base extract, which has no `--orient` mode · none
+New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted count past the first edit, two stages, strict, standard and owner-ceiling policy files, and a stage under the floor, staged against the base extract, which has no `--orient` mode · `ASSERTION_FLOOR`, raised by the arm's checks and its three decoy checks
 New arm: tools/policy/check_policy.py · covers AC9 · the `budgets-cap-orient-calls` case's plant under `warn`, `refuse` and `zero`, staged against a census with no `orient-calls` row · none
 
 ## 8. Open questions
@@ -410,6 +432,13 @@ New arm: tools/policy/check_policy.py · covers AC9 · the `budgets-cap-orient-c
   S14's fields. Narrowed: the `orient.budget` catalogue row is landed, so its non-goal is an
   observation. Every line-number citation re-cited by symbol or blob pin; the Gates line names every
   leg the Files touched trip.
+- rev-7 · 2026-11-21 · S6 · §4 · §6 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief`: the census plant writes `orient.budget`
+  through its `post`, since `derive_zero_plant` replaces `extra` whole and the zero mode would
+  otherwise pass on `record-only` without reading the cap, and copies the runlog and policy kits it
+  runs; the policy reader probed on the landed presets, so §6's fixture commits its policy file;
+  the kickoff manifest's re-stamp, which `tools/gate-legs.json` on its watch line owes, the runlog
+  floor raise and `symbols.json` added, with `recall floor` on the Gates line.
 
 ## 10. Reuse audit
 
