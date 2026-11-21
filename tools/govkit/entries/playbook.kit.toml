@@ -110,6 +110,13 @@ probe = "role_roster"
 kit = "roles"
 why = "the Agent roles section: one `- ` line per role, printed by the roles kit's own `roster` verb so that kit stays the one reader of role files; only reachable when the roles block survives (TOOL-aOrientedCast-18)"
 
+[[placeholder]]
+key = "PRESET_SECTION"
+class = "derived"
+probe = "preset_section"
+kit = "policy"
+why = "the Policy preset section: the preset the policy file names and each key it moves off that preset, printed by the policy kit's own `preset --diff --section` verb so that kit stays the one reader of the policy file; only reachable when the policy block survives (KICK-dKeptSession-3)"
+
 # --- LEGACY: names a v3.x template uses and v4.0 does not. KEPT DECLARED (TOOL-aDistilledCharter-2
 # rev-2, closing review round 1, R1): an adopter's template is a SEED that `govkit update` never
 # rewrites, so after an update the v4.0 engine renders the adopter's v3.x template, and a refusal on

@@ -165,6 +165,17 @@ that count when it runs, as it did before presets existed.
 
   `python tools/policy/policy.py check` refuses an `extends` naming no shipped preset and a key
   presets may not set.
+- **The charter's preset section:** `python tools/policy/policy.py preset --diff` prints the preset <!-- usage: script:tools/policy/policy.py#preset 657bb54f -->
+  your file names, `standard (the default)` when it names none, then one line per key whose value
+  is not that preset's, such as `hooks.bypass` set to `allowed` under `strict`, or `- no key differs`. A
+  key your file leaves alone reads the preset's value, so only the keys you moved are listed. It
+  reads the committed file at the landed revision, as `get` does; `--rev <rev>` reads another
+  commit. Its `--section` form is what the charter's `## Policy preset — the posture and its
+  exceptions` section shows wherever the policy kit is installed: at most 12 key lines, then one
+  `- … (+<k>)` line pointing back at this verb. Its `--line` form is the last line of the charter's
+  instruction map. A charter rendered before you changed the file shows the old keys, and the
+  render's `--check` reds it until you render it again. Where the verb refuses, exit 2 with its
+  `policy: refused` line, the charter render refuses too, naming `PRESET_SECTION`.
 - **Load a preset:** `python tools/policy/presets.py load strict --repo .` judges each of the <!-- usage: script:tools/policy/presets.py#load 8cba698f -->
   preset's values by the loop kit's expansion rule, the same rule the loop guard applies, and exits 2
   naming each value it refuses. On a core-only install `strict` and `guarded` still load, because the

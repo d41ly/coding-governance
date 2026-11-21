@@ -156,8 +156,10 @@ carries no envelope until the owner rules on its size row, and every check print
 The charter's map section lists the documents at each level, one line per level, and how each level
 loads, so an agent rebuilds the hierarchy after a reset. While a document is held, one more line, opening
 `held —`, says it reads at its row's level: the one exception to the rule that unenveloped text is data.
-The last line, `preset —`, names the active policy preset; until presets exist it says so and points at
-`policy.py get <key> --explain` for where each value comes from. After a `compact` or a `resume` the
+The last line, `preset —`, is the policy kit's `policy.py preset --diff --line`: the preset your policy
+file names and how many keys it moves off that preset, with `policy.py preset --diff` to list them. Where
+that read refuses, or takes longer than 3 seconds, the line says `unread` and points at the verb and at
+`policy.py get <key> --explain`, and the reason goes to stderr, never into the charter. After a `compact` or a `resume` the
 session's replay prints the same map first, in the charter's envelope, then the orientation card.
 
 ## The drive section
