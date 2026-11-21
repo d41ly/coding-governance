@@ -1,6 +1,6 @@
 # KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,9 +12,12 @@
 | [2026-10-26-build-KICK-dKeptSession-30-deviation-301.md](../build/2026-10-26-build-KICK-dKeptSession-30-deviation-301.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-30-deviation-302.md](../build/2026-10-26-build-KICK-dKeptSession-30-deviation-302.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 |
+| [2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md](../build/2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief.md) | research | KICK-dKeptSession-9 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -31,7 +34,8 @@ reads up to about 490% and the default `context.threshold` of 60% fires at 120k 
 the real window: under `fresh-at-boundary` every owner session past 120k is told to end at its next
 item boundary. This unit replaces the constant with a window derived per model from what the node's
 own transcripts show the window holds, and lets the harness's own window variable win. It repairs
-`KICK-dKeptSession-14` and builds one step after it (order 13).
+`KICK-dKeptSession-14`, which is unbuilt at base `c2a407b0` and builds at order 12, and builds one
+step after it (order 13).
 
 ## 2. Scope (IN)
 
@@ -41,11 +45,15 @@ own transcripts show the window holds, and lets the harness's own window variabl
      is the harness's own variable for a model's real window (§4 Evidence), read and never written.
   2. Otherwise the smallest rung of `CONTEXT_WINDOW_RUNGS = (200000, 1000000)` at or above the
      largest context the node has observed for `model`, with source `observed <n> on <model>`.
-     The observation is the largest `derive_context_tokens(ev)` over the main-source `usage`
-     events whose `model` is `model`, and the largest `pre_tokens` of the `compact` events, over
-     the newest `CONTEXT_WINDOW_SCAN` (20) main transcripts under `root`. `root` defaults to the
-     harness's projects root, `~/.claude/projects`. An observation past the top rung is its own
-     window.
+     The population is the newest `CONTEXT_WINDOW_SCAN` (20) main transcripts under `root` by
+     modification time, taken as `measure_ready_tree` takes its mains, `root.glob("*/*.jsonl")`
+     filtered by `SID_RE` (`tools/runlog/extract.py#measure_ready_tree`). Each is read by one
+     `extract_session(SessionTree(sid=<stem>, main=<path>))`, a tree holding the main file alone,
+     so no agent file is parsed (`tools/runlog/extract.py#SessionTree`). The observation is the
+     largest `derive_context_tokens(ev)` over its `usage` events whose `src` is `main` and whose
+     `model` is `model`, and the largest integer `pre_tokens` of its `compact` events.
+     `root` defaults to the harness's projects root, `~/.claude/projects`. An observation past the
+     top rung is its own window. An unreadable transcript is skipped.
   3. With no observation for `model`, the bottom rung, with source `no observation`.
   Observed by AC1, AC2, AC3 and AC4.
 - **S2** — id 16. The readers re-pointed. `measure_context_fill(transcript, until=None)` divides by
@@ -53,24 +61,27 @@ own transcripts show the window holds, and lets the harness's own window variabl
   transcript's parent's parent. `derive_context_fill(ev, window=None)` takes an explicit window, or
   derives one from `ev["model"]` under the default root, so `KICK-dKeptSession-9`'s per-stage rows
   read the same window with no change to their call. `python tools/runlog/runlog.py context
-  <transcript>` keeps its stdout, `<n>%` or `none`, and prints `context: window <tokens> · <source>`
-  on stderr. Observed by AC1, AC2 and AC5.
+  <transcript>`, minted by `KICK-dKeptSession-14` S1, keeps its stdout, `<n>%` or `none`, and prints
+  `context: window <tokens> · <source>` on stderr. Observed by AC1, AC2 and AC5.
 - **S3** — id 16. The constant retired. `CONTEXT_WINDOW_TOKENS` is deleted, not left beside the
   rungs, and `KICK-dKeptSession-14` §4 "The window" and §8 F2 are superseded by name here and
   answered in that unit's acceptance ledger. Observed by AC5.
   **Readers:** by name: READER NOT IN TREE — the constant is minted by unit 14 S1 and spelled only
   by that unit's unbuilt fill function and help paragraph, so no tracked reader spells it at this
-  base · by value: NO VALUE READERS — its only value readers are unit 14's fill and unit 9's
-  per-stage column, both unbuilt at this base, which divide by it and which S2 re-points.
+  base, a grep of the tracked tree finding none · by value: NO VALUE READERS — its only value
+  readers are unit 14's fill and unit 9's per-stage column, both unbuilt at this base, which divide
+  by it and which S2 re-points.
 - **S4** — id 16. The fixture. Two scenarios in `tools/runlog/fixtures/transcripts.json`,
   `context-window` with a last main usage of 150000 tokens on `fixture-model`, and
   `context-window-sibling` with one main usage of 900000 tokens on the same model, written the way
-  the store's other scenarios are. One selftest case in `tools/runlog/selftest.py` writes them into one
-  scratch projects root, or the first alone, as each criterion says. Observed by AC1 to AC4.
-- **S5** — id 16. `help/orientation-card.md`'s `context —` paragraph says the window is derived per
+  the store's other scenarios are, each a key of its `scenarios` table holding an `about` string and
+  a `main` list of records. One selftest case in `tools/runlog/selftest.py` writes them by
+  `build_scenario` (`tools/runlog/selftest.py#build_scenario`) into one scratch projects root, or the
+  first alone, as each criterion says. Observed by AC1 to AC4.
+- **S5** — id 16. `help/orientation-card.md`'s `context —` paragraph, written by
+  `KICK-dKeptSession-14` S9 in the section "When a session resumes", says the window is derived per
   model from the node's observed usage and names `CLAUDE_CODE_MAX_CONTEXT_TOKENS`, in place of the
-  word "pinned".
-  Observed by AC6.
+  word "pinned". Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -78,7 +89,8 @@ own transcripts show the window holds, and lets the harness's own window variabl
 - A policy key for the window. No clause names one, and §8 F1 records why it is not taken.
 - A model-to-window table. A transcript's `model` field does not say which window the account runs,
   as §4 measures.
-- A cache of the observation. One scan costs under a second on this node (§5).
+- A cache of the observation. One scan costs about two seconds on this node (§5), and
+  `KICK-dKeptSession-56` S11 memoises it per model and root.
 - The report's left-shift entry, a checklist line that a pinned UNVERIFIED platform constant cites a
   node measurement. No clause of this build names that checklist.
 
@@ -95,39 +107,45 @@ own transcripts show the window holds, and lets the harness's own window variabl
 
 ### Evidence
 
-- A probe over the 40 newest coding-governance transcripts on this node, run 2026-10-26, read main
-  usage maxima of 967091 tokens on `claude-opus-5-5` over 35195 usages, 922025 on `claude-opus-5`,
-  and 95946 on `claude-opus-4-8` over 69. The audit's own probe found 27748 of 31116 main usages
-  above 200000. PINNED, measured 2026-10-26; S1 re-derives it at every call.
-- Eight compaction records on this node carry `compactMetadata.preTokens` between 834709 and
-  949239. A window holds at least what was compacted out of it.
+- A probe over the 40 newest coding-governance main transcripts on this node, run 2026-11-21, read
+  main usage maxima of 967711 on `claude-opus-5-5` and 966217 on `claude-opus-5` (PINNED,
+  2026-11-21), and 48963 of its 57351 main usages above 200000 (PINNED, 2026-11-21). The
+  2026-10-26 probe read 967091 on `claude-opus-5-5` and 95946 on `claude-opus-4-8` (PINNED,
+  2026-10-26). S1 re-derives the maxima at every call.
+- The same transcripts hold 76 compaction records whose `compactMetadata.preTokens` lie between
+  208465 and 988875 (PINNED, 2026-11-21). A window holds at least what was compacted out of it.
 - No transcript record names the window. The `model` field reads `claude-opus-5-5` whatever the
   window, and a grep for `contextWindow` and `context_window` over the transcripts printed nothing.
-- The installed harness, `claude --version` 2.1.292, carries the text "set
+- The installed harness, `claude --version` 2.1.319, carries the text "set
   CLAUDE_CODE_MAX_CONTEXT_TOKENS to its real window" and "append [1m] to the model name for 1M"
-  (`grep -a -o` over the binary on PATH, 2026-10-26). The 1M rung is the harness's own figure.
+  (`grep -a -o` over the binary on PATH, 2026-11-21, as at 2.1.292 on 2026-10-26). The 1M rung is
+  the harness's own figure.
 - `extract_session` already yields `model` on every usage event and `pre_tokens` on every compact
-  event (`tools/runlog/extract.py:818-821`, and `:834-836` with the usage event built at `:835`),
-  so the scan needs no new parser field.
+  event, `None` where `preTokens` is not an integer (`tools/runlog/extract.py#_build_events`,
+  `tools/runlog/extract.py#_scan_record`), so the scan needs no new parser field.
 - `measure_ready_tree` globs main transcripts as `root.glob("*/*.jsonl")` filtered by `SID_RE`
-  (`:1209`). The scan takes the same population, newest first by modification time.
+  (`tools/runlog/extract.py#measure_ready_tree`). The scan takes the same population, newest first
+  by modification time.
+- `SessionTree` defaults its agent, workflow-agent and workflow tuples to empty
+  (`tools/runlog/extract.py#SessionTree`), so a tree naming the main file alone needs no new helper.
 
 ### The read
 
 ```
-derive_context_window("claude-opus-5-5")  -> (1000000, "observed 967091 on claude-opus-5-5")
+derive_context_window("claude-opus-5-5")  -> (1000000, "observed 967711 on claude-opus-5-5")
 derive_context_window("fixture-model")    -> (200000, "no observation")
 CLAUDE_CODE_MAX_CONTEXT_TOKENS=500000     -> (500000, "env")
 ```
 
-The scan reads each file's lines and parses only those carrying `"usage"` or `preTokens`. It runs
-through `extract_session` only where a line needs it, so a long transcript costs one pass of reads.
+The scan runs `extract_session` over each main file alone, as `KICK-dKeptSession-14` S1 reads its
+one transcript. The full session tree, agent files included, took about four times as long over the
+same 20 sessions (§5), and the fill reads the main source only.
 
 ### Inventory
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `derive_context_window` | function, `tools/runlog/extract.py` | `py.function`, asked at the pass |
+| `derive_context_window` | function, `tools/runlog/extract.py` | `py.function`, `derive`, OK |
 | `CONTEXT_WINDOW_RUNGS`, `CONTEXT_WINDOW_SCAN` | constants, `tools/runlog/extract.py` | none declared |
 | `context-window`, `context-window-sibling` | fixture scenarios | none |
 
@@ -149,12 +167,16 @@ None. No stored state holds a fill; every read derives it.
 - **The session's own maximum alone.** A fresh 1M-window session reads its first 200k against a
   200k rung, the defect's own range, until it passes 200k.
 - **The window from the model id.** The transcript records `claude-opus-5-5` for both windows.
+- **The full session tree per transcript.** It parses every agent file for a read that keeps only
+  main-source events.
 
 ## 5. Production-readiness checklist
 
 - security — transcripts are read, never written, and only token counts and model ids leave them.
-- perf / scale — one scan per call over at most 20 main transcripts: 0.84 s over 210 MB on this node,
-  measured 2026-10-26. Reading only each file's last megabyte is the upgrade if a boundary shows it.
+- perf / scale — one scan per call over at most 20 main transcripts, each main file alone through
+  `extract_session`: 2.14 s over 244 MB for the newest 20 sessions on this node (PINNED, 2026-11-21),
+  against 9.35 s over 1124 MB for the same sessions' full trees (PINNED, 2026-11-21). Reading only
+  each file's last megabyte is the upgrade if a boundary shows it.
 - error / empty / loading states — an unreadable transcript is skipped; no observation reads the
   bottom rung with its source named; a non-integer variable is ignored with its source unchanged.
 - observability — `runlog.py context` names the window and its source on stderr.
@@ -190,7 +212,7 @@ None. No stored state holds a fill; every read derives it.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case over the two scenarios, staged red by a copy of `extract.py` dividing by 200000 · none
 
@@ -211,17 +233,26 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-45`, `KICK-dKeptSession-46`,
   `KICK-dKeptSession-47`, `KICK-dKeptSession-48`, `KICK-dKeptSession-56` mirrored, the other ends of
   the edges the round-1 promotions' audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S1 · S2 · S3 · S4 · S5 · §3 · §4 · §5 · §7 · §10 · re-grounded on the run's
+  BASE `c2a407b0` under the brief `2026-11-21-prompt-KICK-dKeptSession-30-orders-13-reground-brief`.
+  S1's scan is now one `extract_session` per main file alone, re-priced in §5; §4's probe and the
+  harness text re-measured at 2.1.319; every line-number citation re-cited by symbol; the Gates line
+  names `policy fixtures`, which `extract.py` trips; §3's cache non-goal points at unit 56's memo.
+  Nothing narrowed: unit 14 and every name this unit re-points are unbuilt at this base, so no
+  landed unit satisfies an item.
 
 ## 10. Reuse audit
 
 The seam extended is `KICK-dKeptSession-14`'s fill in `tools/runlog/extract.py`, its
 `derive_context_tokens` reused as the observation's sum, with `measure_ready_tree`'s main-transcript
-glob (`tools/runlog/extract.py:1209`) and `extract_session`'s `model` and `pre_tokens` fields
-(`:818-821`, `:834-836`). `python tools/codebase-map/reuse_lookup.py "derive the context window size
-of a model from observed session usage"` ranked `extract_session` and `resolve_session_tree` in
-`tools/runlog/extract.py`, the seam named here, and `build_run_model` and four `derive_*` functions by
-name stem only; none derives a window, so no existing seam fits the derivation itself and it is
-minted beside the sum it reuses.
+glob (`tools/runlog/extract.py#measure_ready_tree`), `extract_session`'s `model` and `pre_tokens`
+fields (`tools/runlog/extract.py#_build_events`) and `SessionTree`'s defaults for a main-only tree
+(`tools/runlog/extract.py#SessionTree`). Re-run at `c2a407b0`, `python
+tools/codebase-map/reuse_lookup.py "derive the context window size of a model from observed session
+usage"` ranked `usage` in `tools/unattended/unattended.sh` and nine `derive_*` functions of other
+kits by name stem only; none derives a window, so no existing seam fits the derivation itself and it
+is minted beside the sum it reuses. The recall query below returned this build's own specs 14, 30 and
+47 and scout C's row; no landed unit derives a window.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the context window a session's fill
 is a share of derived" --terms "context window CONTEXT_WINDOW_TOKENS fill threshold fresh-at-boundary

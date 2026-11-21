@@ -113,16 +113,16 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-37 — the card-fixture verdict records the version of the claude binary the fixture launched, never the session's environment](spec/2026-10-26-spec-KICK-dKeptSession-37.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-38 — the card-fixture verdict passes only while the tested binary is both PATH's and the session's, and an unknown version is red](spec/2026-10-26-spec-KICK-dKeptSession-38.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers](spec/2026-10-26-spec-KICK-dKeptSession-26.md) | 10 | 2 | DEFERRED | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-15 — a compaction's summary read as a lead, never a source](spec/2026-10-26-spec-KICK-dKeptSession-15.md) | 11 | 2 | DEFERRED | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`](spec/2026-10-26-spec-KICK-dKeptSession-14.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000](spec/2026-10-26-spec-KICK-dKeptSession-30.md) | 13 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | DEFERRED | rev-5 | 2026-11-05 |
+| [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-37 — the card-fixture verdict records the version of the claude binary the fixture launched, never the session's environment](spec/2026-10-26-spec-KICK-dKeptSession-37.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-38 — the card-fixture verdict passes only while the tested binary is both PATH's and the session's, and an unknown version is red](spec/2026-10-26-spec-KICK-dKeptSession-38.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers](spec/2026-10-26-spec-KICK-dKeptSession-26.md) | 10 | 2 | DEFERRED | rev-2 | 2026-11-21 |
+| [KICK-dKeptSession-15 — a compaction's summary read as a lead, never a source](spec/2026-10-26-spec-KICK-dKeptSession-15.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`](spec/2026-10-26-spec-KICK-dKeptSession-14.md) | 12 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000](spec/2026-10-26-spec-KICK-dKeptSession-30.md) | 13 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | DEFERRED | rev-6 | 2026-11-21 |
 | [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path](spec/2026-10-26-spec-KICK-dKeptSession-45.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -136,12 +136,12 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it](spec/2026-10-26-spec-KICK-dKeptSession-51.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 | [KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key](spec/2026-10-26-spec-KICK-dKeptSession-27.md) | 18 | 2 | DEFERRED | rev-4 | 2026-10-26 |
-| [KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it](spec/2026-10-26-spec-KICK-dKeptSession-24.md) | 19 | 2 | DEFERRED | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it](spec/2026-10-26-spec-KICK-dKeptSession-24.md) | 19 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 | [KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind](spec/2026-10-26-spec-KICK-dKeptSession-10.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed](spec/2026-10-26-spec-KICK-dKeptSession-25.md) | 21 | 2 | DEFERRED | rev-4 | 2026-11-05 |
-| [KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload](spec/2026-10-26-spec-KICK-dKeptSession-21.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id](spec/2026-10-26-spec-KICK-dKeptSession-6.md) | 23 | 2 | DEFERRED | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices](spec/2026-10-26-spec-KICK-dKeptSession-7.md) | 24 | 2 | DEFERRED | rev-4 | 2026-11-05 |
+| [KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed](spec/2026-10-26-spec-KICK-dKeptSession-25.md) | 21 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload](spec/2026-10-26-spec-KICK-dKeptSession-21.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id](spec/2026-10-26-spec-KICK-dKeptSession-6.md) | 23 | 2 | DEFERRED | rev-2 | 2026-11-21 |
+| [KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices](spec/2026-10-26-spec-KICK-dKeptSession-7.md) | 24 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message](spec/2026-10-26-spec-KICK-dKeptSession-35.md) | 25 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-42 — a dependent's transition acknowledges the notices it has consumed, so a parent's notice never holds the dependent until the wait ceiling](spec/2026-10-26-spec-KICK-dKeptSession-42.md) | 25 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight](spec/2026-10-26-spec-KICK-dKeptSession-8.md) | 25 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -163,18 +163,18 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 156 bound to this build, across 4 record folder(s).
+Records: 165 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-dKeptSession-65.
 
-Ids whose spec moved past its audited revision: KICK-dKeptSession-1@rev-1 KICK-dKeptSession-10@rev-1 KICK-dKeptSession-11@rev-1 KICK-dKeptSession-12@rev-1 KICK-dKeptSession-13@rev-1 KICK-dKeptSession-14@rev-1 KICK-dKeptSession-16@rev-1 KICK-dKeptSession-17@rev-1 KICK-dKeptSession-18@rev-1
-KICK-dKeptSession-19@rev-1 KICK-dKeptSession-2@rev-1 KICK-dKeptSession-20@rev-1 KICK-dKeptSession-21@rev-1 KICK-dKeptSession-22@rev-1 KICK-dKeptSession-23@rev-1 KICK-dKeptSession-25@rev-1 KICK-dKeptSession-27@rev-1 KICK-dKeptSession-28@rev-1 KICK-dKeptSession-3@rev-1 KICK-dKeptSession-30@rev-1
-KICK-dKeptSession-31@rev-1 KICK-dKeptSession-32@rev-1 KICK-dKeptSession-33@rev-1 KICK-dKeptSession-34@rev-1 KICK-dKeptSession-35@rev-1 KICK-dKeptSession-36@rev-1 KICK-dKeptSession-37@rev-1 KICK-dKeptSession-38@rev-1 KICK-dKeptSession-39@rev-1 KICK-dKeptSession-4@rev-1 KICK-dKeptSession-40@rev-1
-KICK-dKeptSession-41@rev-1 KICK-dKeptSession-42@rev-1 KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-45@rev-1 KICK-dKeptSession-46@rev-1 KICK-dKeptSession-47@rev-1 KICK-dKeptSession-48@rev-1 KICK-dKeptSession-49@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-50@rev-1
-KICK-dKeptSession-52@rev-1 KICK-dKeptSession-53@rev-1 KICK-dKeptSession-54@rev-1 KICK-dKeptSession-55@rev-1 KICK-dKeptSession-56@rev-1 KICK-dKeptSession-57@rev-1 KICK-dKeptSession-58@rev-1 KICK-dKeptSession-59@rev-1 KICK-dKeptSession-60@rev-1 KICK-dKeptSession-61@rev-1 KICK-dKeptSession-62@rev-1
-KICK-dKeptSession-63@rev-1 KICK-dKeptSession-64@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
+Ids whose spec moved past its audited revision: KICK-dKeptSession-1@rev-1 KICK-dKeptSession-10@rev-1 KICK-dKeptSession-11@rev-1 KICK-dKeptSession-12@rev-1 KICK-dKeptSession-13@rev-1 KICK-dKeptSession-14@rev-1 KICK-dKeptSession-15@rev-1 KICK-dKeptSession-16@rev-1 KICK-dKeptSession-17@rev-1
+KICK-dKeptSession-18@rev-1 KICK-dKeptSession-19@rev-1 KICK-dKeptSession-2@rev-1 KICK-dKeptSession-20@rev-1 KICK-dKeptSession-21@rev-1 KICK-dKeptSession-22@rev-1 KICK-dKeptSession-23@rev-1 KICK-dKeptSession-24@rev-1 KICK-dKeptSession-25@rev-1 KICK-dKeptSession-26@rev-1 KICK-dKeptSession-27@rev-1
+KICK-dKeptSession-28@rev-1 KICK-dKeptSession-3@rev-1 KICK-dKeptSession-30@rev-1 KICK-dKeptSession-31@rev-1 KICK-dKeptSession-32@rev-1 KICK-dKeptSession-33@rev-1 KICK-dKeptSession-34@rev-1 KICK-dKeptSession-35@rev-1 KICK-dKeptSession-36@rev-1 KICK-dKeptSession-37@rev-1 KICK-dKeptSession-38@rev-1
+KICK-dKeptSession-39@rev-1 KICK-dKeptSession-4@rev-1 KICK-dKeptSession-40@rev-1 KICK-dKeptSession-41@rev-1 KICK-dKeptSession-42@rev-1 KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-45@rev-1 KICK-dKeptSession-46@rev-1 KICK-dKeptSession-47@rev-1 KICK-dKeptSession-48@rev-1
+KICK-dKeptSession-49@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-50@rev-1 KICK-dKeptSession-52@rev-1 KICK-dKeptSession-53@rev-1 KICK-dKeptSession-54@rev-1 KICK-dKeptSession-55@rev-1 KICK-dKeptSession-56@rev-1 KICK-dKeptSession-57@rev-1 KICK-dKeptSession-58@rev-1 KICK-dKeptSession-59@rev-1
+KICK-dKeptSession-6@rev-1 KICK-dKeptSession-60@rev-1 KICK-dKeptSession-61@rev-1 KICK-dKeptSession-62@rev-1 KICK-dKeptSession-63@rev-1 KICK-dKeptSession-64@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

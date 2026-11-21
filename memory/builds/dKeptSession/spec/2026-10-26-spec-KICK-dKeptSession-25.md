@@ -1,6 +1,6 @@
 # KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0504@b051ecfa whole
 **Carries:** node:item.mailbox.answer
@@ -252,7 +252,7 @@ first beat after the accepting landing, with no change here.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/unattended/unattended.test.sh · covers AC2 AC3 AC4 AC5 · the answer, the default and the wait arms over planted mail commits, feed lines and lease chains, AC4 staged by a scratch copy whose beat passes no witness · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 New arm: tools/loop/selftest.py · covers AC1 · the row with its `deadline` removed, red under the `wait` rule · none
@@ -336,6 +336,10 @@ New arm: tools/loop/selftest.py · covers AC1 · the row with its `deadline` rem
 - rev-4 · 2026-11-05 · §2 S1 · §3 Edges · §8 F6 · F6 resolved by the owner to (a), the prose-`returns`
   ask filed in dDeclaredLoop's `BACKLOG.md`, under the brief
   `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
+- rev-5 · 2026-11-21 · §7 · the leg line names `scratch-guard self-test`, `tier2-review self-test`
+  and `policy fixtures`, the legs whose manifest guards §4's `tools/unattended/unattended.sh` and
+  `tools/govkit/govkit.py` trip, as the spec-tokens guards join named at the build run's spec stage
+  under the brief `2026-11-21-prompt-KICK-dKeptSession-1-build-brief`; no other section moved.
 
 ## 10. Reuse audit
 

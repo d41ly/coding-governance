@@ -33,7 +33,6 @@ ran, and resumed a returned writer where a later return moved its spec.
 - 54: spec 34 rev-3 carries 54's S1-S4 — sent to W3 writer.
 - 58: spec 34 rev-3 carries 58's S1-S2 — sent back to W4 writer (resumed).
 - 32: spec 3's verb opens "- preset — <name>", new --section form; "- no key differs" unchanged, 32 AC2 holds.
-- pinned-facts: stale row spec-59 "4 records" in memory/project/unpinned-facts.txt -> run check pinned-facts --shrink after all writers return.
 - 58 rev-4: S1,S2 now observations of unit 34's preset-derived-cap; S3 supersedes 54's 'same row' text (answered in unit 54's ledger); Files touched none.
 - 44 S1/AC1: unit 1 now prints the not-graded line itself (`presets-core-only · not graded · TOOL-dDeclaredLoop-2 S8 admits after-release-verifies`); S1 shrinks to observation.
 - 56 S41: met by 33 S1 (its policy.py:132 cite stale). 56 S25: met by 33's Gates line.
@@ -43,4 +42,4 @@ ran, and resumed a returned writer where a later return moved its spec.
 - 62 S1: the restated cases' arm for unit 54 is unit 34's now; 54 carries no arm.
 - 44 S13: still owns the written branch; unit 4 adds an exit-2 refusal (no policy file and no --preset) and passes its kept branch's exit through.
 - 56 S38: stands; 54 AC1 still observes preset-every-key.
-- 63 S19/AC19 and its consumes-from 58 edge: void (58 rev-5 S3 is its own ledger answer; 54 answers by unit 34s case output) — re-point or drop.
+- 63 S19/AC19 and its consumes-from 58 edge: void (58 rev-5 S3 is its own ledger answer; 54 answers by the case output of KICK-dKeptSession-34) — re-point or drop.

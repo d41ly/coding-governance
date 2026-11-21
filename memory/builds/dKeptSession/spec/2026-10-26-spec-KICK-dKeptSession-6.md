@@ -1,6 +1,6 @@
 # KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 23 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 23 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0144@c41201f3 whole
 
@@ -161,7 +161,7 @@ landing it changes no delivery.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the ring arms over a post, AC2 staged by a recorder in place of `run_mail_ring` and a planted lost write · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 
@@ -189,6 +189,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the ri
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 6, scout B row 2, Shared interfaces
   I8, I19 and I25, coordination item 7, FI-6 and v2:1167.
+- rev-2 · 2026-11-21 · §7 · the leg line names `scratch-guard self-test`, `tier2-review self-test`
+  and `policy fixtures`, the legs whose manifest guards §4's `tools/unattended/unattended.sh` and
+  `tools/govkit/govkit.py` trip, as the spec-tokens guards join named at the build run's spec stage
+  under the brief `2026-11-21-prompt-KICK-dKeptSession-1-build-brief`; no other section moved.
 
 ## 10. Reuse audit
 

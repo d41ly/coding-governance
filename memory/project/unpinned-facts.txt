@@ -11394,11 +11394,6 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-57-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	48KiB
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	5 lines
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-12.md	1800 seconds
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	122 bytes
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-13.md	541 bytes
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	117 s
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-14.md	200000 tokens
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-15.md	10s
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	20 seconds
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-21.md	23 lines
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	4096 bytes
@@ -11406,9 +11401,7 @@ memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	60 secon
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-24.md	7200 seconds
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-3.md	160 bytes
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	150000 tokens
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	210 MB
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	900000 tokens
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	967091 tokens
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-38.md	37 records
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	10 s
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	12 s

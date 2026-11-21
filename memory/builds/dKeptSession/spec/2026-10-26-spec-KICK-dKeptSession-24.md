@@ -1,6 +1,6 @@
 # KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 19 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 19 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0162@6ce67958 whole
 
@@ -211,7 +211,7 @@ change.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 
@@ -245,6 +245,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 24, scout B row 7 and its disagreement
   5, Shared interfaces I17, I20 and I23, v2:1263, v2:1582 and TOOL-dPlacedRequest-17 S1, S4.
+- rev-2 · 2026-11-21 · §7 · the leg line names `scratch-guard self-test`, `tier2-review self-test`
+  and `policy fixtures`, the legs whose manifest guards §4's `tools/unattended/unattended.sh` and
+  `tools/govkit/govkit.py` trip, as the spec-tokens guards join named at the build run's spec stage
+  under the brief `2026-11-21-prompt-KICK-dKeptSession-1-build-brief`; no other section moved.
 
 ## 10. Reuse audit
 

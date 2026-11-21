@@ -1,6 +1,6 @@
 # KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 22 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 22 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0159@ad40c608 whole
 **Carries:** node:policy-key.mailbox.notice
@@ -271,7 +271,7 @@ default `every-item` it reads one policy value per call and returns.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `manifest-check self-test` · `scratch-guard self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `check-wiring self-test` · `hook destinations (every declared hook path ships)` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `manifest-check self-test` · `scratch-guard self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `check-wiring self-test` · `hook destinations (every declared hook path ships)` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `tier2-review self-test`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC4 AC5 AC6 AC7 · the notice arms over two clones and one bare origin, AC1 staged by a scratch copy that skips the fetch and AC4 by a stubbed spawn · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 · the `mail-notice-boundary` plant, red with the notice step left out of the boundary verb · none
@@ -312,6 +312,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 · the `mai
   point 3, and v2:1234-1235, v2:1556-1557.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-44` mirrored, the other ends of
   the edges the round-1 spec audit's promoted units declare; no other section moved.
+- rev-3 · 2026-11-21 · §7 · the leg line names `tier2-review self-test`, the leg whose manifest
+  guard §4's `tools/unattended/unattended.sh` trips, as the spec-tokens guards join named at the
+  build run's spec stage under the brief `2026-11-21-prompt-KICK-dKeptSession-1-build-brief`; no
+  other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices
 
-**Status:** DEFERRED · rev-4 · 2026-11-05 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 24 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 24 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0145@b38efe3e whole
 **Carries:** node:policy-key.deps.coordination
@@ -269,7 +269,7 @@ moving build, so a build no other build depends on posts nothing.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures`
 
 New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · the seven `--plant` cases, `deps-wait` staged red by the gate read without its value · none
 New arm: tools/loop/selftest.py · covers AC7 · the Design-exit notices over a two-build fixture, red with the notice call left out · none
@@ -331,6 +331,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the landed notice,
 - rev-4 · 2026-11-05 · §2 S3 · §3 Non-goals · §8 F5 · F5 resolved by the owner to (a), the
   `--lease show build <slug>` read verb asked of dPlacedRequest in its `BACKLOG.md`, under the brief
   `2026-11-05-prompt-KICK-dKeptSession-1-owner-forks`; no other section moved.
+- rev-5 · 2026-11-21 · §7 · the leg line names `scratch-guard self-test`, `tier2-review self-test`
+  and `policy fixtures`, the legs whose manifest guards §4's `tools/unattended/unattended.sh` and
+  `tools/govkit/govkit.py` trip, as the spec-tokens guards join named at the build run's spec stage
+  under the brief `2026-11-21-prompt-KICK-dKeptSession-1-build-brief`; no other section moved.
 
 ## 10. Reuse audit
 
