@@ -51,6 +51,9 @@ trap 'rm -rf "$S"' EXIT
 # conversion or signing cannot move what it observes; the repository's own config is set below.
 : > "$S/gitconfig"; export GIT_CONFIG_GLOBAL="$S/gitconfig" GIT_CONFIG_NOSYSTEM=1
 R="$S/repo"; O="$S/origin.git"; OUT="$S/out"
+# The fixture repository's one remote, named apart from any real one: kit code names no remote by literal
+# (check-remote-literals.sh), and the driver reads a repository of one remote through the ladder's only-remote rung.
+FX_REMOTE=upstream
 export CARD_STUB_POLICY="$S/policy.txt"
 MISSED=0
 
@@ -61,7 +64,8 @@ print_card_held() {
 }
 # set_card_policy <key> <value, a set comma-joined, empty for the empty set>
 set_card_policy() {
-  grep -v "^$1=" "$CARD_STUB_POLICY" > "$CARD_STUB_POLICY.x" 2>/dev/null; mv -f "$CARD_STUB_POLICY.x" "$CARD_STUB_POLICY"
+  local t; t=$(mktemp "$CARD_STUB_POLICY.XXXXXXXX") || exit 2
+  grep -v "^$1=" "$CARD_STUB_POLICY" > "$t" 2>/dev/null; mv -f "$t" "$CARD_STUB_POLICY"
   printf '%s=%s\n' "$1" "$2" >> "$CARD_STUB_POLICY"
 }
 # run_card_engine <tree> <engine args…> — stdin closed, stdout and stderr to $OUT; the engine's exit.
@@ -114,8 +118,9 @@ write_card_fixture() {
   set_card_policy card.snapshot terminal-only
   set_card_policy resume.context fresh-when-idle
   set_card_policy resume.partial continue-item
-  git -C "$R" add -A && git -C "$R" commit -q -m "fixture: the build tFix" && git -C "$R" branch -M main \
-    && git -C "$R" remote add origin "$O" && git -C "$R" push -q origin main 2>/dev/null || return 1
+  git -C "$R" add -A && ! git -C "$R" diff --cached --quiet && git -C "$R" commit -q -m "fixture: the build tFix" \
+    && git -C "$R" branch -M main && git -C "$R" remote add "$FX_REMOTE" "$O" \
+    && git -C "$R" push -q "$FX_REMOTE" main 2>/dev/null || return 1
   run_card_engine "$R" --card --write --session t1
 }
 
@@ -182,7 +187,7 @@ case "$PLANT" in
     f=$(ROOT="$R" MC_DIR="$HERE" resolve_kit_file unattended unattended.sh); [ -n "$f" ] || { echo "card-store: no driver resolves in $R"; exit 2; }
     printf '%s\n' 'case "${1:-} ${2:-}" in' \
       '  "--card-ref lookup") echo "card-ref — none"; exit 0 ;;' \
-      '  "--card-ref write") c=$(git commit-tree "$(git mktree </dev/null)" -m "gov-card tFix") && git push -q origin "$c:'"$REF"'" 2>/dev/null; exec sleep 60 ;;' \
+      '  "--card-ref write") c=$(git commit-tree "$(git mktree </dev/null)" -m "gov-card tFix") && git push -q '"$FX_REMOTE"' "$c:'"$REF"'" 2>/dev/null; exec sleep 60 ;;' \
       'esac' 'echo "claims: off"' > "$f"
     CARD_PUBLISH_BOUND=2 run_card_append
     print_card_held "AC17 a killed publish whose write landed names the store unknown" "$(grep -qx 'card — remote-ref unknown: no answer within 2s' "$OUT"; echo $?)"
