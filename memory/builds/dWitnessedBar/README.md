@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -190,7 +190,7 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-999
 | [TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded](spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md) | 45 | 2 | CLOSED | rev-6 | 2026-11-21 |
 | [TOOL-dWitnessedBar-89 — the round-1 audit of units 85 to 88, 13 minors batched: a visited failure on its own code, a whole-token match, one owner line and pinned records](spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md) | 46 | 2 | CLOSED | rev-4 | 2026-11-21 |
 | [TOOL-dWitnessedBar-90 — the round-1 audit of unit 89, 15 minors batched: a canary verdict on every code, the built match on quoted arms, selectors keyed on their unit, criteria that can red and a derivation that names each failure](spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md) | 47 | 2 | CLOSED | rev-3 | 2026-11-21 |
-| [TOOL-dWitnessedBar-91 — unit 90 AC2 counts the quoted `sha)` arm, not every `rec_sha="`, so a correct build passes and the reader's resets stay](spec/2026-10-25-spec-TOOL-dWitnessedBar-91.md) | 48 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [TOOL-dWitnessedBar-91 — unit 90 AC2 counts the quoted `sha)` arm, not every `rec_sha="`, so a correct build passes and the reader's resets stay](spec/2026-10-25-spec-TOOL-dWitnessedBar-91.md) | 48 | 2 | INPROGRESS | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-92 — the round-1 audit of unit 90, 13 minors batched: a call site isolated from the floor, ledger notes labelled and placed under their answer, criteria that can red, a narrower write grant and a derivation that names every exit](spec/2026-10-25-spec-TOOL-dWitnessedBar-92.md) | 48 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-93 — unit 92's note check places a row when one selected note sits under its answer, so one label and token answering two criteria passes](spec/2026-10-25-spec-TOOL-dWitnessedBar-93.md) | 49 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 | [TOOL-dWitnessedBar-94 — unit 92's note check matches a label only where it opens a continuation line, so another note's prose cannot stand in for a missing note](spec/2026-10-25-spec-TOOL-dWitnessedBar-94.md) | 49 | 2 | DEFERRED | rev-1 | 2026-10-25 |
@@ -199,7 +199,7 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-999
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 900 bound to this build, across 4 record folder(s).
+Records: 901 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
