@@ -888,11 +888,16 @@ rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^
 rgf_crb=$'\r'
 rgf_mr=$( LC_ALL=C; eval "$rgf_mut"; read_green_file "$rgf_rec"
   case "$rec_fp" in *"$rgf_crb") printf '%s cr' "${#rec_fp}" ;; *) printf '%s' "${#rec_fp}" ;; esac )
+# The line's slot names the first check that failed (TOOL-dWitnessedBar-75 S1, S2): the count, as
+# `count <n>`, then `rec_sha`, then `rec_fp`; a later check never runs past an earlier failure.
+rgf_what=
+if [ "$rgf_n" != 1 ]; then rgf_what="count $rgf_n"
+elif ! check_cr_reached "$rgf_t/cut-mut.sh" "$rgf_rec" rec_sha; then rgf_what=rec_sha
+elif [ "$rgf_mr" != "41 cr" ]; then rgf_what=rec_fp; fi
 rgf_ok=0
-[ -n "$rgf_fn" ] && [ "$rgf_n" = 1 ] && check_cr_reached "$rgf_t/cut-mut.sh" "$rgf_rec" rec_sha \
-  && [ "$rgf_mr" = "41 cr" ] && rgf_ok=1
+[ -z "$rgf_what" ] && rgf_ok=1
 [ "$rgf_ok" = 1 ] \
-  || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s); the CR-strip assertion is not counted"; fail=1; }
+  || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
 # The liveness variant (TOOL-dWitnessedBar-74 S2): its `sha` value loses its CR after the read.
 printf '%s\n' "$rgf_fn" | sed 's/\(sha) rec_sha=\)\$_rg_v/\1${_rg_v%?}/' > "$rgf_t/cut-var.sh"
 rgf_vn=$(diff <(printf '%s\n' "$rgf_fn") "$rgf_t/cut-var.sh" | grep -c '^>')
