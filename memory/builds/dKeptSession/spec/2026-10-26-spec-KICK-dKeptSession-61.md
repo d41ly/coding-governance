@@ -1,6 +1,6 @@
 # KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-21-build-KICK-dKeptSession-17-reground-orders-27-29-returns.md](../build/2026-11-21-build-KICK-dKeptSession-17-reground-orders-27-29-returns.md) | research | KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-41 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md) | research | KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-41 |
+| [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-53 KICK-dKeptSession-55 |
 | [2026-10-26-review-KICK-dKeptSession-57-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-57-spec-audit.md) | spec-audit | KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-57 KICK-dKeptSession-62 |
 
 <!-- /gen:spec-records -->
@@ -55,8 +56,13 @@ repairs `KICK-dKeptSession-53` and builds one step after it (order 27).
   `derive_mail_chain` passes `chain`, unit 53's plants included. Observed by AC1 and AC2.
 - **S3** — id 31. The sibling text superseded by name. `KICK-dKeptSession-53` S1's "over one parent's
   rows of `read_mail_rows`' one read" reads as S2 here: the order is read over every row the parent
-  wrote, the ack set over the rows addressed to the dependent. Answered in unit 53's acceptance
-  ledger. Observed by AC1.
+  wrote, the ack set over the rows addressed to the dependent. Answered in this unit's own
+  acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md`,
+  which quotes that passage of unit 53's spec and states S2 supersedes it. Unit 53 builds at order 26
+  and is CLOSED when this unit builds, so neither its spec nor its ledger is written (F2).
+  `KICK-dKeptSession-63` AC20 still reads this answer in unit 53's ledger; that unbuilt spec is
+  re-pointed by its own revision, not here. Observed by AC1 and AC4.
 - **S4** — id 31. The plant `chain-two-dependents` of `python tools/loop/loop_transition.py --fixture
   --plant <case>`, in `PLANTS` and run by `run_transition_fixture`: unit 53's scratch repository with a
   second dependent, §6's fixture. Observed by AC1 to AC3.
@@ -123,6 +129,8 @@ None: no notice exists before `KICK-dKeptSession-7`.
 - `tools/loop/loop_transition.py`: S2 in `derive_mail_chain`, `write_consumed_acks` and
   `read_mail_rows`, and S4's plant
 - `tools/unattended/VERBS.template.md`: the `--mail` section's `--sent` flag
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-61-1-acceptance-ledger.md`:
+  S3's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -166,10 +174,15 @@ dependents `dA` and `dB`; session `s1` posts `confirmed` K1 to `dA` then `dB`, a
 - **AC3** — When `bash unattended.sh --mail read <parent> --local --sent` runs in that repository, it
   prints four rows, each carrying `seq` and `after` in columns 12 and 13.
   Red when: a row addressed to the other dependent is missing.
+- **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "over one
+  parent's rows of"` prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 53's spec
+  and its acceptance ledger prints nothing.
+  Red when: S3's answer lands in a record of unit 53, or this unit's ledger does not quote the
+  passage it supersedes.
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop transition record` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop transition record` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependent take-over plant, staged red by a copy of `derive_mail_chain` reading only the dependent's filtered rows · none
 
@@ -182,6 +195,15 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependen
   rung 3; `KICK-dKeptSession-63` S11 settles the chain on the one reader and rules (a)'s names never
   minted, and `local` is the landed spelling of that batch's `cache` mode, so (b) builds one reader
   and no name a later unit removes. widens: none · relaxes: none
+- **F2 — Where is S3's answer to unit 53's superseded wording recorded?** Unit 53 builds at order
+  26, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 53's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 53 spec text
+  it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the earlier unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -200,6 +222,13 @@ New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · the two-dependen
   arm move from the absent `tools/loop/selftest.py` to a `loop_transition.py` plant; the columns
   numbered as spec-5 rev-9 and spec-27 rev-5 number them; the leg line names the guarded legs and
   `loop transition record`.
+- rev-6 · 2026-11-21 · S3 · §4 · AC4 · §7 · §8 · S3's answer to unit 53 moves to this unit's own
+  acceptance ledger, which joins Files touched and trips the two `recall floor` legs now on §7's leg
+  line; F2 resolved (b) and AC4 observing the quoted passage, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`; the class of `KICK-dKeptSession-50`'s
+  divergence, which unit 49's rev-6 first resolved. S3 names unit 63's AC20, which still reads the
+  answer in unit 53's ledger. `policy fixtures`, whose guard holds `tools/loop/`, joins the leg line
+  too.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md](../build/2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-55 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-55 |
+| [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-55 KICK-dKeptSession-61 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -54,7 +55,11 @@ remove. This unit orders the parent's rows by what they say and by the session c
   AC2, AC3 and AC4.
 - **S3** — id 4. The sibling text superseded by name. `KICK-dKeptSession-42` S2's "earlier by
   `first-seen`" reads as S1 and S2 here, and unit 42 §4's table row "superseded by a current one"
-  means superseded by key or by the chain. Answered in unit 42's acceptance ledger. Observed by AC1.
+  means superseded by key or by the chain. Answered in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-53-1-acceptance-ledger.md`,
+  which quotes both passages of unit 42's spec and states S1 and S2 supersede them. Unit 42 builds
+  at order 25 and is CLOSED when this unit builds, so neither its spec nor its ledger is written
+  (F1). Observed by AC1 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -117,6 +122,8 @@ None: no notice exists before `KICK-dKeptSession-7`.
 
 - `tools/loop/loop_transition.py`: S1, S2 in `write_consumed_acks`, and the two plants
 - `help/loop.md`: the guard table's superseded row, S2
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-53-1-acceptance-ledger.md`:
+  S3's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -160,16 +167,29 @@ of key K1, then a take-over session `s2`'s `changed` of key K2, the `changed` si
 - **AC4** — When `grep -n "content key or by the session chain" loop.md` runs in `help/`, it prints
   the guard table's row for a superseded `confirmed` or `changed`.
   Red when: the owner's page still describes supersession by arrival.
+- **AC5** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "from the
+  same parent, earlier by"` prints `1`, and into `grep -c "superseded by a current one"` prints `1`;
+  and `git diff --name-only <pass base> HEAD --` over unit 42's spec and its acceptance ledger
+  prints nothing.
+  Red when: S3's answer lands in a record of unit 42, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
-`loop transition record` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC2 AC3 · unit 27's take-over plant with the `changed` sighted first, and a later key, staged red by a scratch copy of `write_consumed_acks` ordering by `first-seen` · none
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S3's answer to unit 42's superseded wording recorded?** Unit 42 builds at order
+  25, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 42's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 42 spec text
+  it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the earlier unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -185,6 +205,12 @@ none
   writes; the arm moves from the absent `tools/loop/selftest.py` to `loop_transition.py`'s plants;
   the leg line gains `loop transition record` and `docs`. Narrowed: a predecessor addressed to
   another dependent is left to `KICK-dKeptSession-61`, named in §3.
+- rev-5 · 2026-11-21 · S3 · §4 · AC5 · §7 · §8 · S3's answer to unit 42 moves to this unit's own
+  acceptance ledger, which joins Files touched and trips the two `recall floor` legs now on §7's leg
+  line; F1 resolved (b) and AC5 observing the quoted passages, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`; the class of `KICK-dKeptSession-50`'s
+  divergence, which unit 49's rev-6 first resolved. `policy fixtures`, whose guard holds
+  `tools/loop/`, joins the leg line too.
 
 ## 10. Reuse audit
 

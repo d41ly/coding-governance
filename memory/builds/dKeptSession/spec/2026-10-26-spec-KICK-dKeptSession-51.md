@@ -1,6 +1,6 @@
 # KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it
 
-**Status:** DEFERRED · rev-2 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 |
+| [2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief.md) | research | KICK-dKeptSession-50 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-61 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
 <!-- /gen:spec-records -->
@@ -54,7 +55,11 @@ after it (order 17).
   accept line: the child's Runtime spec states the ninth position. Observed by AC3.
 - **S4** — id 39. The sibling text superseded by name. `KICK-dKeptSession-22` S4 and its `hands-off
   external` edge to dWellOiledMachine join `KICK-dKeptSession-31` S4's superseded list, with the act
-  at position 9. Each is answered in unit 22's acceptance ledger, citing S3's ask. Observed by AC3.
+  at position 9. Each is answered in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md`,
+  which quotes both passages of unit 22's spec, states the ninth position supersedes them, and cites
+  S3's ask. Unit 22 builds at order 15 and is CLOSED when this unit builds, so neither its spec nor
+  its ledger is written (F1). Observed by AC3 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -109,6 +114,8 @@ None: no act exists, and no message exists before this build.
 - `tools/unattended/VERBS.template.md`: S2
 - `memory/guides/UNATTENDED-VERBS.md`: S2's render
 - `memory/builds/dWellOiledMachine/BACKLOG.md`: S3's ask row and its `SEV` row
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-51-1-acceptance-ledger.md`:
+  S4's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -141,6 +148,11 @@ None: no act exists, and no message exists before this build.
   prints the ask row naming the ninth field, and `python tools/memory-tree/gen_build_index.py --asks
   --build dWellOiledMachine` lists that ask's id.
   Red when: the child build's only statement of the position is unit 22's superseded edge.
+- **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "a seventh
+  field of S2"` prints `1`, and into `grep -c "joins S2 as a seventh field"` prints `1`; and `git
+  diff --name-only <pass base> HEAD --` over unit 22's spec and its acceptance ledger prints
+  nothing.
+  Red when: S4's answer lands in a record of unit 22, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
@@ -148,7 +160,15 @@ None: no act exists, and no message exists before this build.
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S4's answer to unit 22's superseded wording recorded?** Unit 22 builds at order
+  15, before this unit, so it is CLOSED when this unit builds, and its ledger is in neither this
+  unit's Files touched nor its write set. (a) Unit 22's acceptance ledger, a record of a closed unit
+  written by a later one; (b) this unit's own acceptance ledger, quoting the unit 22 spec text it
+  supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the earlier unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -160,6 +180,10 @@ none
   backlog holds three asks, so S3's row is placed by grammar, not by count, and AC3 reads the row
   itself; `scratch-guard self-test` and `tier2-review self-test` joined the leg line. Nothing narrowed:
   no landed unit states the position.
+- rev-3 · 2026-11-21 · S4 · §4 · AC4 · §8 · S4's answer to unit 22 moves to this unit's own
+  acceptance ledger, which joins Files touched, F1 resolved (b) and AC4 observing the quoted
+  passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-50-divergence-brief`; the class of
+  `KICK-dKeptSession-50`'s divergence, which unit 49's rev-6 first resolved.
 
 ## 10. Reuse audit
 
