@@ -10,7 +10,7 @@ at three scratch trees under `%TEMP%/w72`: HEAD's `.githooks/pre-push` and two c
 `diff` line from it. The suite passed `bash -n`. The shell-role seed's `measure_code_lines` measures the
 suite at 716 past 715, widened under `2026-11-21-build-TOOL-dWitnessedBar-72-widen-14`. No `a=$((a+1))`
 was added: the `rec_fp` compare's increment is now behind the canary as the `rec_sha` compare's is, so
-over the hook `a` counts what it did before and the floor stays as it was. The §7 legs and the
+over the hook `a` counts what it did before and the floor stays as it was. The §7 legs and the (DERIVED from the builder's probe)
 `New arm:` line's RED-first observation are the main loop's at the close.
 
 **Evidences:** TOOL-dWitnessedBar-72
