@@ -31898,6 +31898,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_mirror_upgrade",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_missing_target_plant",
       "kind": "function",
       "file": "tools/govkit/shims.py"
