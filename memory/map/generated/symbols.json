@@ -13560,7 +13560,27 @@
     {
       "id": "derive_temp_path",
       "kind": "function",
+      "file": "tools/lib/gov-feed.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/run-gates/post-merge.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_temp_path",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_template_rel",
