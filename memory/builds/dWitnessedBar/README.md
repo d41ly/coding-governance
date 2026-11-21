@@ -187,7 +187,7 @@ ids TOOL-dWitnessedBar-999
 | [TOOL-dWitnessedBar-84 — the round-1 audit of units 74 to 78, 16 minors batched: single-copy checks reading what exists, a sed admitting the quoted arm, honest return codes, counted loops, one key derivation, the guide guarded, records on one line](spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md) | 44 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [TOOL-dWitnessedBar-85 — each liveness variant seen red on each key adds to the canary's count, so the restated floor sees a variant that is no longer there](spec/2026-10-25-spec-TOOL-dWitnessedBar-85.md) | 44 | 2 | CLOSED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-86 — a suite run with either liveness variant missing is seen below the floor, and the floor claims of units 79, 80 and 82 are recorded against that red](spec/2026-10-25-spec-TOOL-dWitnessedBar-86.md) | 44 | 2 | CLOSED | rev-3 | 2026-11-21 |
-| [TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded](spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md) | 45 | 2 | DEFERRED | rev-5 | 2026-10-25 |
+| [TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded](spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md) | 45 | 2 | DEFERRED | rev-6 | 2026-11-21 |
 | [TOOL-dWitnessedBar-89 — the round-1 audit of units 85 to 88, 13 minors batched: a visited failure on its own code, a whole-token match, one owner line and pinned records](spec/2026-10-25-spec-TOOL-dWitnessedBar-89.md) | 46 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dWitnessedBar-90 — the round-1 audit of unit 89, 15 minors batched: a canary verdict on every code, the built match on quoted arms, selectors keyed on their unit, criteria that can red and a derivation that names each failure](spec/2026-10-25-spec-TOOL-dWitnessedBar-90.md) | 47 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-91 — unit 90 AC2 counts the quoted `sha)` arm, not every `rec_sha="`, so a correct build passes and the reader's resets stay](spec/2026-10-25-spec-TOOL-dWitnessedBar-91.md) | 48 | 2 | DEFERRED | rev-2 | 2026-10-25 |
@@ -199,7 +199,7 @@ ids TOOL-dWitnessedBar-999
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 880 bound to this build, across 4 record folder(s).
+Records: 882 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
