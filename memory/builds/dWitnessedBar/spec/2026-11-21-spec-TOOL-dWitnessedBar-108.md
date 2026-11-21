@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-108 — the closing review round 1's four minors batched: a staged removal trips the commit-time guard, scaffolded ledger homes open with their rendered header, an unread parameter reds, and the charter's trailer is checked at commit time
 
-**Status:** INPROGRESS · rev-1 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
+**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

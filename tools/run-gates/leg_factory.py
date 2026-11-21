@@ -857,7 +857,14 @@ def check_precommit_trigger(scratch):
         run_git("clean", "-fdq")
         stage()
         runner_says = read_runner_verdict("a/")
-        hook_says = any(precommit.check_guard_trips(p, "a/") for p in precommit.read_staged(scratch))
+        # `read_staged` inherits the caller's environment, as the hook needs; a GIT_DIR git exports
+        # to a pre-push hook in a linked worktree would point it away from the scratch repository.
+        aside = {k: os.environ.pop(k) for k in [k for k in os.environ if k.startswith("GIT_")]}
+        try:
+            staged = precommit.read_staged(scratch)
+        finally:
+            os.environ.update(aside)
+        hook_says = any(precommit.check_guard_trips(p, "a/") for p in staged)
         ok = runner_says is not None and runner_says == hook_says
         failed += not ok
         print(f"arm {'ok  ' if ok else 'FAIL'}  trigger parity, {case} — the runner's changed says "
