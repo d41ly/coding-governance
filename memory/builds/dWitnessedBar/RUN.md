@@ -796,3 +796,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T13:11:32Z brief · item TOOL-dWitnessedBar-95 · reason f8a89d6f9813 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-95-build-brief.md
 
 2026-11-21T13:13:52Z dispatch · item 4cd455e5 TOOL-dWitnessedBar-95 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-95.md memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-95-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-95.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-11-21T13:22:48Z brief · item TOOL-dWitnessedBar-96 · reason 24f049362df2 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-96-build-brief.md
