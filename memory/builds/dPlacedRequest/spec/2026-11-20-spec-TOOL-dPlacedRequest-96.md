@@ -11,6 +11,7 @@
 | [2026-11-20-build-TOOL-dPlacedRequest-96-1-acceptance-ledger.md](../build/2026-11-20-build-TOOL-dPlacedRequest-96-1-acceptance-ledger.md) | journal | — |
 | [2026-11-20-build-TOOL-dPlacedRequest-96-red-fix-33.md](../build/2026-11-20-build-TOOL-dPlacedRequest-96-red-fix-33.md) | red-fix | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-96-deviation-731.md](../build/2026-11-21-build-TOOL-dPlacedRequest-96-deviation-731.md) | deviation | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-96-red-fix-51.md](../build/2026-11-21-build-TOOL-dPlacedRequest-96-red-fix-51.md) | red-fix | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-96-closing-review-spec-brief.md) | research | — |
 | [2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md](../reviews/2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-95 TOOL-dPlacedRequest-97 TOOL-dPlacedRequest-98 TOOL-dPlacedRequest-99 |
 
