@@ -43,3 +43,8 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T14:46:05Z draw · re-dispatch · KICK-dKeptSession-1 · 3/132 · 20261121T144605Z-f38af8
 
 2026-11-21T14:46:05Z dispatch · item 1de08794 KICK-dKeptSession-1 · reason tools/policy/presets.toml tools/policy/presets.py tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md tools/loop/guard.py tools/loop/loop.toml tools/loop/factories.py tools/loop/README.md tools/playbook/kinds.toml tools/playbook/core-pending.txt tools/gate-legs.json help/reference/kinds.md help/policy.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md tools/check-line-length.test.sh tools/hooks/agent-cap.test.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh
+
+2026-11-21T15:34:23Z brief · item KICK-dKeptSession-1 · reason 0b2fea5d1b46 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-rebuild-brief.md
+2026-11-21T15:35:49Z draw · re-dispatch · KICK-dKeptSession-1 · 4/132 · 20261121T153549Z-69cdb6
+
+2026-11-21T15:35:49Z dispatch · item 897f5ab9 KICK-dKeptSession-1 · reason help/policy.md help/reference/kinds.md tools/gate-legs.json tools/govkit/usage.toml tools/loop/README.md tools/loop/factories.py tools/loop/guard.py tools/loop/loop.toml tools/playbook/core-pending.txt tools/playbook/kinds.toml tools/policy/README.md tools/policy/check_policy.py tools/policy/policy.py tools/policy/presets.py tools/policy/presets.toml memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-1-1-acceptance-ledger.md
