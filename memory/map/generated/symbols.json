@@ -5483,6 +5483,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "check_canary_keys",
+      "kind": "function",
+      "file": "tools/run-gates/run-gates.gov.test.sh"
+    },
+    {
       "id": "check_cap",
       "kind": "function",
       "file": "tools/policy/budgets.py"
