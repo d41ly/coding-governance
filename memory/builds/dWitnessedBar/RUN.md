@@ -848,3 +848,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T16:34:01Z rescope · item add TOOL-dWitnessedBar-109 · reason the closing diff review round 2 (NON-CONVERGENT) promotes its HIGH item: the attribution check reads only git's final trailer block, so a trailer followed by prose reads none
 
 2026-11-21T16:34:02Z rescope · item add TOOL-dWitnessedBar-110 · reason the closing diff review round 2 (NON-CONVERGENT) promotes its minors M1, M2, L1, L2 and L3, batched into one unit
+
+2026-11-21T16:51:33Z brief · item TOOL-dWitnessedBar-109 · reason 58c4d9239e0a memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-109-build-brief.md
