@@ -132,3 +132,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T23:07:19Z brief · item KICK-dKeptSession-16 · reason 0243d2e02294 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-16-build-brief.md
 
 2026-11-21T23:08:49Z dispatch · item ca43769b KICK-dKeptSession-16 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/unpurposed-namespaces.txt tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-16-1-acceptance-ledger.md
+
+2026-11-21T23:51:02Z rescope · item add KICK-dKeptSession-67 · reason pass-tree.sh's regen runs mirror --write over the uncommitted merge, and cmd_mirror refuses while a mirror input differs from HEAD, so no pass changing tools/policy/catalogue.toml or presets.toml can merge: KICK-dKeptSession-16's green pass is refused, and 14 open specs touch those inputs. A blocker between the run and its landing is a discovery (protocol section 11), adopted as this unit.
+
+2026-11-21T23:51:02Z rescope · item defer KICK-dKeptSession-16 · reason its green pass (8426252e0 plus its mirror commit 4ee5af863) cannot merge until KICK-dKeptSession-67 lets pass-tree.sh merge a pass that changes a mirror input; re-dispatched after 67 lands
