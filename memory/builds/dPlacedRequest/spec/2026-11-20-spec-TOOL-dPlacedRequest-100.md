@@ -13,6 +13,7 @@
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-1-spec-writer.md) | journal | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-owner-chain-stop.md) | research | — |
 | [2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md](../prompts/2026-11-20-prompt-TOOL-dPlacedRequest-100-pin-fact-brief.md) | research | — |
+| [2026-11-21-prompt-TOOL-dPlacedRequest-100-owner-merge-ruling.md](../prompts/2026-11-21-prompt-TOOL-dPlacedRequest-100-owner-merge-ruling.md) | research | — |
 
 <!-- /gen:spec-records -->
 
