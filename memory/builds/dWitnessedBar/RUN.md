@@ -21,20 +21,20 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · handoff · ? touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: bdbd89e9550f54eba2b74e0cc41b6410e0e5a337
-phase: HELD
+witness: 87e59f99004b09af0d46d7849f24cfb6a5a4b9b2
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dwitnessedbar-2ed3b3
 anchor-kind: default-branch
 cli-version: 2.1.326
-lease-utc: 2026-11-19T14:53:52Z
+lease-utc: 2026-11-21T18:42:34Z
 pid-image: claude.exe
 host: compeeto
 pid: 30016
 session: 0a586af7-47fb-45dc-b963-7ee82521f7da
-keepalive: 0b5bfd26
+keepalive: 1f189298
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 9e21ac760dc0a43d6ed007396922722ccee98d57
 anchor-ref: refs/heads/main
@@ -880,3 +880,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T18:20:04Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dWitnessedBar && bash tools/push-main.sh --land --slug dWitnessedBar && bash tools/unattended/unattended.sh --settle dWitnessedBar
 
 2026-11-21T18:20:04Z hold · item owner-decision · reason until owner · reaped 0b5bfd26 · resume none(owner)
+
+2026-11-21T18:42:39Z resume · item dWitnessedBar · reason held · keepalive 1f189298 · manual
