@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-9 — every scratch path under one owned, swept root, and every tree removed by one chmod-and-retry helper
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 6 · closes TOOL-dQuietDisk-27
 
 <!-- gen:spec-records -->
 
@@ -20,7 +20,10 @@ leaves git's read-only objects in the temp folder on Windows
 (`memory/builds/dQuietDisk/build/2026-11-20-build-TOOL-dQuietDisk-19-analysis.md`, §8 and rework
 K12). This unit gives Python one removal helper and one owned-root helper, gives bash the bar's own
 owner record and dead-owner sweep as one shared block, moves every swallowing removal onto the
-helper, and adds a lint that reds a new one.
+helper, and adds a lint that reds a new one. It also closes the two gaps ask TOOL-dQuietDisk-27
+records in the bar's owned root: a native Windows child reads `TEMP` and `TMP`, which the runner
+does not redirect, and a bar nested under an adopter runner's own owned `TMPDIR` counts and sweeps
+that scratch instead of the real temp root.
 
 ## 2. Scope (IN)
 
@@ -36,7 +39,8 @@ helper, and adds a lint that reds a new one.
   temp dir and returns it. Otherwise it first sweeps each `gate-work.*` under the temp dir whose
   owner line names a `py:` pid that is not alive and this repository's git common dir. It then
   makes its own `gate-work.*` with an owner line `py:<pid>TAB<common dir>TAB<epoch>`, written
-  tmp-then-rename, sets `tempfile.tempdir` to its `tmp`, and registers `remove_tree` of it at exit.
+  tmp-then-rename, sets `tempfile.tempdir` to its `tmp`, exports `TMPDIR`, `TEMP` and `TMP` as that
+  `tmp` so the suite's child processes land there too, and registers `remove_tree` of it at exit.
   A pid that cannot be judged reads as alive. Observed by AC2 and AC3.
 - **S3** — Every `shutil.rmtree(..., ignore_errors=True)` and every
   `TemporaryDirectory(..., ignore_cleanup_errors=True)` under `tools/`, `skills/` and `.githooks/`
@@ -50,9 +54,13 @@ helper, and adds a lint that reds a new one.
   by value: NO VALUE READERS — no caller reads a removal's result today, and S1's return is new.
 - **S4** — The bash face, the canonical block `owned_work_sh` in `tools/lib/owned-scratch.sh`. It
   defines `write_work_owner <dir> <common>` and `scan_dead_work <ambient> <own dir> <common>`, lifted
-  from `run-gates.sh`'s two functions with their globals made arguments. `run-gates.sh` carries the
-  block in their place and calls it with `$WORK`, `$GATE_AMBIENT_TMP` and `$WORK_COMMON`, so its
-  lines and health events are unchanged. `run-selftests.sh` carries it too: its sweep root becomes
+  from `run-gates.sh`'s two functions with their globals made arguments. The block calls
+  `derive_temp_path`, `ts_alive` and `add_health_event` and defines none of them, as the runner's
+  body does today, so the owner write keeps its unpredictable staging name. `run-selftests.sh`
+  already carries `health_log_sh` and gains the two one-line helpers the runner holds
+  (`tools/run-gates/run-gates.sh@e4699ee75:962`, `:1828`). `run-gates.sh` carries the block in
+  their place and calls it with `$WORK`, the swept root S8 names and `$WORK_COMMON`, so its lines
+  and health events are unchanged. `run-selftests.sh` carries it too: its sweep root becomes
   `mktemp -d "${TMPDIR:-/tmp}/gate-work.XXXXXXXX"` with an owner line, and it calls
   `scan_dead_work` before its first row. Observed by AC6 and AC7.
 - **S5** — Two `PARITY_ROWS` rows join `tools/lib/resolve-python.test.sh`, one per Python block, and
@@ -64,6 +72,22 @@ helper, and adds a lint that reds a new one.
   a shrink-only ledger with the header the encoding-posture ledger carries, holding a row only for a
   site a reviewer waives with a reason. A leg runs it over `tools`, `skills` and `.githooks`.
   Observed by AC9.
+- **S7** — Native children (ask TOOL-dQuietDisk-27, gap 1). Where `run-gates.sh` exports `TMPDIR`
+  as `$WORK/tmp` before the first leg, it exports `TEMP` and `TMP` to the same value, spelled as
+  `mktemp -d` returned it. MSYS converts all three for a native child, so a native node or python
+  leg's temp lands inside the owned root. `run-selftests.sh` sets the same three where it sets a
+  row's `TMPDIR`. Observed by AC10.
+- **S8** — The outer ambient root (ask TOOL-dQuietDisk-27, gap 2). An adopter runner that already
+  redirects `TMPDIR` to its own owned scratch exports `GATE_OUTER_AMBIENT_TMP`, the temp root it
+  was itself started under. When that variable is non-empty and names a directory, `run-gates.sh`
+  takes it as its swept root, `RG_SWEPT_TMP`: the `TMPDIR entries` count and `tmpdir_entries`
+  record read it, and `scan_dead_work` sweeps it. The bar's own `gate-work.*` is still made under
+  `${TMPDIR:-/tmp}`, inside the outer runner's scratch, as today. When the variable is unset or
+  empty, the swept root is `$GATE_AMBIENT_TMP` and nothing changes. When it names no directory,
+  the runner prints one NOTE line naming it and keeps today's root. The runner reads it once and
+  unsets it before any leg dispatches, so a bar nested inside a leg never inherits it. The name
+  joins `BAR_INERT_KNOBS` in `.githooks/pre-push.test.sh` with its reason line, and the run-gates
+  README's scratch section names it. Observed by AC11 and AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -79,46 +103,61 @@ helper, and adds a lint that reds a new one.
   `copytree` of a kit, `clone --no-hardlinks` and an unrooted `mktemp`. They are TOOL-dQuietDisk-23.
 - No kit version bump by hand: `govkit.py mint` writes every owed bump at the lander.
 - No policy key. Removing a tree and owning a root save no answer, so the cache rule does not reach
-  them, and their off value would be a leak.
+  them, and their off value would be a leak. `GATE_OUTER_AMBIENT_TMP` is not a switch either: it
+  names a directory an outer runner holds, and unset is today's behaviour.
+- No outer-root read in the Python face. `enter_owned_tempdir()` nests inside whatever owned
+  `TMPDIR` it is given and removes its own root at exit, so the root it sweeps is the one it sits in.
+- No move of where a bar makes its own `gate-work.*`. Under an adopter runner it stays inside that
+  runner's scratch, which the runner removes.
+- No edit in incms. Its `scripts/gate.sh` exporting the variable is that repository's change.
 
 ### Edges
 
-none
+- **hands-off** external — incms `scripts/gate.sh` exports `GATE_OUTER_AMBIENT_TMP` as the temp
+  root it started under, in that repository under its own governance, once a minted run-gates kit
+  carrying S8 reaches it through `govkit update`
 
 ## 4. Design
 
 ### Where the code was read
 
-Code at `609cd40b1`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, by symbol or as
-`<path>@609cd40b1:<line>`. The population was also read at this branch's HEAD `a5537b925`, because
-TOOL-dSweptScratch-1 landed on main after dWitnessedBar forked and moved many sites.
+Code at `e4699ee75`, the build base: the merge that brought dWitnessedBar's land tip `ed833f684`
+into this run, as the owner ruled on 2026-11-22. It holds both lines rev-1 read separately,
+dWitnessedBar's and main's with TOOL-dSweptScratch-1. A citation is by symbol or
+`<path>@e4699ee75:<line>`.
 
 ### The population, read over the real tree first
 
 The predicate: an AST `Call` whose callee is named `rmtree` with the keyword `ignore_errors=True`,
 or `TemporaryDirectory` with `ignore_cleanup_errors=True`, over every tracked `*.py` under `tools/`
-and `skills/`. Run on 2026-11-20:
+and `skills/`. The first two rows were run on 2026-11-20:
 
 | Tree | `rmtree` sites | `TemporaryDirectory` sites | Files | Of them, shipped by a kit |
 |---|---|---|---|---|
 | `609cd40b1` | 59 | 11 | 33 | 22 files, 40 sites |
 | HEAD `a5537b925` | 35 | 11 | 15 | 12 files, 26 sites |
+| base `e4699ee75` | 45 | 11 | 21 | 16 files, 34 sites |
 
 The 11 `TemporaryDirectory` sites are all in `tools/govkit/upgrade_steps.py` (10) and
 `tools/govkit/selftest.py` (1). A line grep finds 57 and 12 at `609cd40b1`; the AST reads a call
-split across lines, which the grep misses. "Shipped" is `python tools/govkit/govkit.py shipped` at
-HEAD. The hand-written hooks, `git grep -nE "onexc|onerror"` at HEAD, sit in 19 files, among them
-`tools/memory-tree/deviation_join.py#remove_tree`, `tools/govkit/upgrade_walk.py#remove_tree` and
-`tools/govkit/step_gate.py`. The build's base is the merge of both lines, so the builder re-runs the
-predicate there with `--cleanup --measure` and moves what it prints. figure: DERIVED at the build's
-base; the table is PINNED at the two shas named.
+split across lines, which the grep misses. "Shipped" is `python tools/govkit/govkit.py shipped`, run at
+`a5537b925` for the first two rows and at `e4699ee75` for the third. The `e4699ee75` row was read on
+2026-11-22 over `tools/`, `skills/` and `.githooks/`, which holds none. The merge of dWitnessedBar's
+land tip added ten `rmtree` sites over `a5537b925`, among them
+`tools/run-gates/verdict_flow.py`, `tools/run-gates/leg_factory.py` and
+`tools/run-gates/verdict_backends.py`. The hand-written hooks, `git grep -nE "onexc|onerror"` at
+`e4699ee75`, sit in 23 files, among them `tools/memory-tree/deviation_join.py#remove_tree`,
+`tools/govkit/upgrade_walk.py#remove_tree`, `tools/govkit/step_gate.py` and
+`tools/lib/commit_trailers.py`. The builder re-runs the predicate at the pass's own base with
+`--cleanup --measure` and moves what it prints. figure: DERIVED at the pass's base; the table is
+PINNED at the three shas named.
 
 ### The copy rule
 
-`tools/lib/` ships nothing (`tools/govkit/registry.toml@609cd40b1:237`), so a shipped file carries
+`tools/lib/` ships nothing (`tools/govkit/registry.toml@e4699ee75:253`), so a shipped file carries
 the block inline between `# >>> remove_tree_py — canonical copy: owned_scratch.py in gov's lib dir`
 and `# <<< remove_tree_py`, as `common_dir.py`'s copies do (`tools/lib/common_dir.py`), and the
-parity table holds each copy to the canonical block (`tools/lib/resolve-python.test.sh@609cd40b1:405`).
+parity table holds each copy to the canonical block (`tools/lib/resolve-python.test.sh@e4699ee75:405`).
 `deviation_join.remove_tree` keeps its name because `loop_witness.remove_tree` calls it.
 
 ### The owner line both faces read
@@ -131,6 +170,38 @@ py:<pid>\t<git common dir>\t<start epoch>   python: a native pid, judged by the 
 The Python liveness check is `os.kill(pid, 0)` on POSIX and `OpenProcess` with
 `GetExitCodeProcess` on Windows. Any error is "alive", the direction that keeps a directory.
 
+### The two gaps of ask TOOL-dQuietDisk-27
+
+The owned-root block sits at `tools/run-gates/run-gates.sh@e4699ee75:2399-2465`, byte-identical to
+its body at `609cd40b1` and only moved. It sets `GATE_AMBIENT_TMP=${TMPDIR:-/tmp}`, makes `$WORK`
+there, sweeps `"$GATE_AMBIENT_TMP"/gate-work.*`, counts `"$GATE_AMBIENT_TMP"/*` into
+`TMPDIR_ENTRIES` and exports only `TMPDIR` (`:2465`). The incms session measured both gaps
+(`memory/builds/dQuietDisk/BACKLOG.md`, ask TOOL-dQuietDisk-27): `os.tmpdir()` in a native node
+child returned `%TEMP%` until `TEMP` and `TMP` were exported too, and under incms `scripts/gate.sh`
+the count and the sweep read incms's fresh scratch.
+
+```bash
+GATE_AMBIENT_TMP=${TMPDIR:-/tmp}                 # unchanged: where $WORK is made
+RG_SWEPT_TMP=$GATE_AMBIENT_TMP                   # what the count and the sweep read
+if [ -n "${GATE_OUTER_AMBIENT_TMP:-}" ]; then
+  if [ -d "$GATE_OUTER_AMBIENT_TMP" ]; then RG_SWEPT_TMP=$GATE_OUTER_AMBIENT_TMP
+  else echo "run-gates: NOTE - GATE_OUTER_AMBIENT_TMP names no directory, so the bar counts and sweeps $GATE_AMBIENT_TMP" >&2; fi
+fi
+unset GATE_OUTER_AMBIENT_TMP
+# ... scan_dead_work "$RG_SWEPT_TMP" "$WORK" "$WORK_COMMON"; the count globs "$RG_SWEPT_TMP"/*
+export TMPDIR="$WORK/tmp" TEMP="$WORK/tmp" TMP="$WORK/tmp"
+```
+
+Under an outer root the count no longer includes this bar's own dir, which sits in the outer
+runner's scratch; two nested bars over one unchanged outer root still print one figure. The
+variable's name was checked with `python tools/lexicon/lexicon.py --suggest GATE_OUTER_AMBIENT_TMP
+--as constant`, which answers that the declaration carries no `constant` cell (its declared cells
+are `js.function`, `js.type`, `py.function`, `py.type` and `sh.function`). So no lexicon cell grades
+an environment name, and the runner's knob census is its one grader: every `GATE_` name the runner
+reads must sit in exactly one class (`.githooks/pre-push.test.sh@e4699ee75:1940`). It is inert there
+because it moves only a count and a sweep that needs a dead owner of this repository, never a leg
+or a verdict. `GATE_AMBIENT_TMP` itself stays as that census classes it, assigned in the runner.
+
 ### Inventory
 
 | Minted identifier | Kind | Naming cell | Graded by |
@@ -140,30 +211,39 @@ The Python liveness check is `os.kill(pid, 0)` on POSIX and `OpenProcess` with
 | `--cleanup`, arm `cleanup` | scanner mode and arm | the scanner's `ARMS` tuples | its `--selftest` |
 | `cleanup-sites` | ledger population | `.memory-tree.conf` `PROJECT_REGISTRY_EXTRA` | `memory hygiene` |
 | `cleanup posture (a tree removal that swallows its error)` | gate leg | `tools/gate-legs.json` | `run-gates canary` |
+| `GATE_OUTER_AMBIENT_TMP` | environment variable an outer runner exports | `BAR_INERT_KNOBS` | `pre-push self-test`'s knob census |
+| `RG_SWEPT_TMP` | runner variable | none | the fixture bars of section 6 |
 
 ### Files touched (estimate)
 
 `tools/lib/owned_scratch.py` · `tools/lib/owned-scratch.sh` · `tools/lib/resolve-python.test.sh` ·
 `tools/run-gates/run-gates.sh` · `tools/run-gates/run-selftests.sh` ·
 `tools/gate-lint/encoding_posture.py` · `memory/project/cleanup-sites.txt` · `.memory-tree.conf` ·
-`tools/gate-legs.json` · `memory/guides/SESSION-KICKOFF.md`
+`tools/gate-legs.json` · `memory/guides/SESSION-KICKOFF.md` · `.githooks/pre-push.test.sh` ·
+`tools/run-gates/README.md`
 
-Plus every file the predicate and the hook grep name at the build's base. At HEAD those are:
+Plus every file the predicate and the hook grep name at the pass's base. At `e4699ee75` those are
+42 files:
 
-`tools/branch-reconcile/selftest.py` · `tools/govkit/fixture_target.py` · `tools/govkit/selftest.py` ·
-`tools/govkit/upgrade_steps.py` · `tools/govkit/upgrade_walk.py` · `tools/govkit/step_gate.py` ·
-`tools/loop/factories.py` · `tools/loop/claims.py` · `tools/memory-recall/check-recall.py` ·
-`tools/memory-recall/query.py` · `tools/memory-recall/test_recall_floor.py` ·
-`tools/memory-recall/selftest.py` · `tools/memory-tree/gen_build_index.py` ·
-`tools/memory-tree/deviation_join.py` · `tools/memory-tree/commit_trailers.py` ·
-`tools/playbook/check_layers.py` · `tools/playbook/fixtures/composition.py` ·
-`tools/playbook/edge_grammar.py` · `tools/playbook/gov_tag.py` · `tools/playbook/load_sets.py` ·
-`tools/playbook/writing_practice.py` · `tools/policy/check_policy.py` ·
-`tools/process-monitor/selftest.py` · `tools/run-gates/held_halves.py` ·
-`tools/run-gates/measure_legs.py` · `tools/run-gates/check-receipt.py` ·
-`tools/run-gates/owed_rows.py` · `tools/runlog/selftest.py` · `tools/lexicon/selftest.py` ·
-`tools/lib/commit_trailers.py` · `tools/unattended/commit_trailers.py` ·
-`.githooks/pre_push_bar_selftest.py`
+`.githooks/pre_push_bar_selftest.py` · `tools/branch-reconcile/selftest.py` ·
+`tools/govkit/fixture_target.py` · `tools/govkit/selftest.py` · `tools/govkit/step_gate.py` ·
+`tools/govkit/steps/conf_pins_to_ledger.py` · `tools/govkit/steps/kickoff_facts_to_overlay.py` ·
+`tools/govkit/steps/registry_to_ledger.py` · `tools/govkit/upgrade_steps.py` ·
+`tools/govkit/upgrade_walk.py` · `tools/lexicon/selftest.py` · `tools/lib/commit_trailers.py` ·
+`tools/loop/claims.py` · `tools/loop/factories.py` · `tools/memory-recall/check-recall.py` ·
+`tools/memory-recall/query.py` · `tools/memory-recall/selftest.py` ·
+`tools/memory-recall/test_recall_floor.py` · `tools/memory-tree/commit_trailers.py` ·
+`tools/memory-tree/convert_registry.py` · `tools/memory-tree/deviation_join.py` ·
+`tools/memory-tree/gen_build_index.py` · `tools/memory-tree/ratchet.py` ·
+`tools/playbook/check_layers.py` · `tools/playbook/edge_grammar.py` ·
+`tools/playbook/fixtures/composition.py` · `tools/playbook/gov_tag.py` ·
+`tools/playbook/load_sets.py` · `tools/playbook/writing_practice.py` ·
+`tools/policy/check_policy.py` · `tools/process-monitor/selftest.py` ·
+`tools/run-gates/check-receipt.py` · `tools/run-gates/held_halves.py` ·
+`tools/run-gates/leg_factory.py` · `tools/run-gates/measure_legs.py` ·
+`tools/run-gates/owed_rows.py` · `tools/run-gates/product_tests.py` ·
+`tools/run-gates/verdict_backends.py` · `tools/run-gates/verdict_flow.py` ·
+`tools/runlog/selftest.py` · `tools/unattended/commit_trailers.py` · `tools/unattended/fix_keeps.py`
 
 The kickoff manifest's `watch:` line names `tools/run-gates/run-gates.sh`,
 `tools/run-gates/run-selftests.sh`, `tools/gate-legs.json` and `.memory-tree.conf`, so the commit
@@ -183,7 +263,8 @@ that stages them re-stamps the manifest's `last-audit`.
 
 - security: removal stays inside directories the run made or a dead owner of this repository made,
   matched by common dir as `scan_dead_work` matches today. An unreadable or foreign owner line is
-  never swept.
+  never swept. `GATE_OUTER_AMBIENT_TMP` moves which directory the sweep lists, never its predicate,
+  so an exported value can only remove a dead bar's `gate-work.*` of this repository.
 - perf / scale: `enter_owned_tempdir` lists the temp dir's `gate-work.*` entries once per suite;
   the glob reads names, not every entry's metadata.
 - error / empty / loading states: a removal that still fails returns False and raises nothing, as
@@ -196,7 +277,10 @@ that stages them re-stamps the manifest's `last-audit`.
 - testing: the probes of section 6 and the scanner's `--selftest`.
 - migration: N/A — no stored data; a root left by a run before this unit has no owner and is never
   swept, as today.
-- user docs: N/A — no page under `help/` names a cleanup call or a scratch root.
+- user docs: no page under `help/` names a cleanup call or a scratch root. The kit README's
+  scratch section, `tools/run-gates/README.md` "The scratch directory — owned, redirected and
+  swept", gains `TEMP` and `TMP` beside `TMPDIR` and a paragraph on `GATE_OUTER_AMBIENT_TMP`: who
+  exports it, what it moves, and that unset is today's behaviour.
 
 ## 6. Acceptance criteria
 
@@ -207,9 +291,11 @@ that stages them re-stamps the manifest's `last-audit`.
   Red when: the read-only objects survive, or a failure raises.
 - **AC2** — When a probe runs with `TMPDIR` inside a planted `gate-work.x/tmp` holding `gate-work.x/owner`,
   `enter_owned_tempdir()` returns that `tmp` and makes no directory. Run with an ambient `TMPDIR`, it
-  makes one `gate-work.*` holding an owner line that starts `py:`, and the directory is gone after
+  makes one `gate-work.*` holding an owner line that starts `py:`, a child `python -c` it starts
+  prints that root's `tmp` for each of `TMPDIR`, `TEMP` and `TMP`, and the directory is gone after
   the process exits.
-  Red when: a nested run makes a second root, or a direct run's root outlives it.
+  Red when: a nested run makes a second root, a direct run's root outlives it, or a child reads
+  the ambient temp dir.
 - **AC3** — When a probe plants, under one ambient dir, a root owned by a dead `py:` pid of this
   repository, one by a live `py:` pid, one by a dead `py:` pid of another common dir, and one by a
   bash pid, and calls `enter_owned_tempdir()`, only the first is removed.
@@ -247,12 +333,40 @@ that stages them re-stamps the manifest's `last-audit`.
   test inverted, it exits 1.
   Red when: the new mode's rows do not execute.
 
+- **AC10** — When a probe builds a fixture bar under `%TEMP%/<short-name>`, in the shape the
+  runner's own suites build one, whose manifest declares one leg running
+  `node -e "process.exit(require('os').tmpdir().includes('gate-work.') ? 0 : 1)"`, and runs the
+  fixture's copy of the runner from Git Bash, the leg passes and the bar exits 0. With the `TEMP` and
+  `TMP` export deleted from the fixture's copy of the runner, the same leg is red. When
+  `grep -n "TEMP=" tools/run-gates/run-selftests.sh` runs, it prints the row launch line, setting
+  `TEMP` and `TMP` beside `TMPDIR`.
+  Red when: a native child's `os.tmpdir()` still answers the ambient `%TEMP%`.
+  fixture: a host with `node` on `PATH`, as gov's hooks already require.
+- **AC11** — When the probe makes an outer root A holding a planted `gate-work.dead`, whose owner
+  names a dead MSYS pid and the fixture's git common dir, and two other entries, points `TMPDIR` at
+  an empty directory B, exports `GATE_OUTER_AMBIENT_TMP` as A, and runs the fixture bar, the sweep
+  line names the planted pid, `gate-work.dead` is gone and the bar prints `TMPDIR entries 2`. Its
+  one leg, `bash -c '[ -z "${GATE_OUTER_AMBIENT_TMP+x}" ]'`, passes, and the bar's own
+  `gate-work.*` was made under B. Run again with the variable unset, the planted dir survives and
+  the bar prints `TMPDIR entries 1`, B's count, as today. With the variable naming a missing
+  directory, the runner prints its NOTE line and behaves as the unset run.
+  Red when: a nested bar still counts and sweeps the outer runner's scratch, or a leg inherits the
+  variable.
+- **AC12** — When `grep -n "GATE_OUTER_AMBIENT_TMP" .githooks/pre-push.test.sh` runs, it prints the
+  variable's reason line in the knob classes comment and the `BAR_INERT_KNOBS` line naming it. When
+  `grep -n "GATE_OUTER_AMBIENT_TMP" tools/run-gates/README.md` runs, it prints a line of the
+  scratch section.
+  Red when: the runner reads a `GATE_` name the knob census does not class, or the README does
+  not name it.
+
 No verdict moves: each touched suite keeps its arm lines and exit code (AC5), and the runners keep
-their lines and their sweep predicate for bash-owned roots (AC6, AC7).
+their lines and their sweep predicate for bash-owned roots (AC6, AC7). Exporting `TEMP` and `TMP`
+and reading an outer root move where a temp file lands and which root is counted and swept, never
+a leg's result (AC10, AC11).
 
 ## 7. Gates
 
-`encoding posture (text IO names its encoding)` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates turnstile` · `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `pre-push run-log line` · `measure-legs selftest` · `run-selftests self-test` · `scratch-guard self-test` · `routed-commits selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `tier2-review self-test` · `codebase-map kit selftest` · `recall floor` · `recall floor arms` · `process-monitor census selftest` · `runlog selftest` · `branch-reconcile selftest` · `lexicon selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`encoding posture (text IO names its encoding)` · `pre-push self-test` · `shell-hygiene selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `run-gates turnstile` · `run-gates evidence` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `pre-push run-log line` · `measure-legs selftest` · `run-selftests self-test` · `scratch-guard self-test` · `routed-commits selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `tier2-review self-test` · `codebase-map kit selftest` · `recall floor` · `recall floor arms` · `process-monitor census selftest` · `runlog selftest` · `branch-reconcile selftest` · `lexicon selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `playbook render selftest` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
 New arm: tools/gate-lint/encoding_posture.py · covers AC4 AC9 · the --cleanup mode's selftest rows; a planted swallowing removal split over two lines, and a TemporaryDirectory with ignore_cleanup_errors, each staged in a fixture tree · FLOOR_ASSERTIONS rises by the rows added
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the three new PARITY_ROWS rows; each failing case is staged by one changed byte in a copy · none
@@ -273,12 +387,22 @@ none
   (`tools/govkit/upgrade_steps.py`) and TOOL-dQuietDisk-17 and -18 (`tools/govkit/selftest.py`)
   write, at orders 1 to 5. No unit depends on this one, so it runs after all of them and moves the
   sites they leave.
+- rev-2 · 2026-11-22 · closes TOOL-dQuietDisk-27 and re-grounded at e4699ee75 (dWitnessedBar's
+  land tip merged), under `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. Ask 27's two gaps
+  join as S7 and S8, with AC10 to AC12: `TEMP` and `TMP` exported beside `TMPDIR` by both runners,
+  and `GATE_OUTER_AMBIENT_TMP`, the outer runner's ambient root, read for the count and the sweep
+  and classed inert in the pre-push knob census. S2 exports the three names from the Python face
+  too, the same class. S4 states the three helpers the lifted block calls. What moved: the
+  owned-root block to `run-gates.sh` lines 2399 to 2465, unchanged in body; the population to 45
+  `rmtree` and 11 `TemporaryDirectory` sites in 21 files, and the hooks to 23 files, so the file
+  list is re-derived; the registry exemption to line 253; the base to `e4699ee7`.
 
 ## 10. Reuse audit
 
 The seams extended: the bar's owner record and dead-owner sweep
 (`tools/run-gates/run-gates.sh#write_work_owner`, `#scan_dead_work`, TOOL-dDerivedDocket-25), lifted
-into one block rather than copied; the chmod-and-retry hook of
+into one block rather than copied, and its owned-root block, which S7 and S8 extend in place
+rather than beside it; the chmod-and-retry hook of
 `tools/memory-tree/deviation_join.py#remove_tree`, which becomes the canonical `remove_tree`; the
 copy rule of `PARITY_ROWS`; and `tools/gate-lint/encoding_posture.py`'s AST population walk and its
 shrink-only ledger through `legacy_ledger`, which the new mode reuses.
@@ -291,7 +415,17 @@ Recall returned TOOL-dSweptScratch-1 (CLOSED on main, `5a311c9fa`), which moved 
 local hooks and stated in its §3 that a killed run's leak was out of its reach; this unit is that
 reach. It also returned TOOL-aBranchedMandate-6, which measured the read-only-object mechanism, and
 TOOL-dQuietDisk-23, the other G-C clauses. The owning chain build is dWitnessedBar (Test: gate
-health); its branch changes `run-gates.sh` and `run-selftests.sh`, and no spec of it at
-`609cd40b1` changes the owner record or the sweep.
+health); its branch changes `run-gates.sh` and `run-selftests.sh`, and no spec of it changes the
+owner record or the sweep, at `609cd40b1` or at `e4699ee75`: the block's body is byte-identical at
+both. The re-ground read `git log 609cd40b1..ed833f684` over both runners and
+`.githooks/pre-push.test.sh`, and the specs added since, units 106 to 110. Two overlaps are named
+for the merge. Three files the population moves are dWitnessedBar's own,
+`tools/run-gates/verdict_flow.py`, `tools/run-gates/leg_factory.py` and
+`tools/run-gates/verdict_backends.py`. The knob census S8 joins classes names from its units 5,
+8, 25, 40 and 56, and its units 63, 106 and 110 changed `.githooks/pre-push.test.sh` after
+`609cd40b1`; S8 adds one name and one reason line there. The incms side is TOOL-dQuietDisk-27's source: the incms
+fix-4 session's notes in the shared notes folder, `fix4-incms-notes-for-gov.md`, ask for exactly
+these two changes, and its `scripts/gate.sh` records that it owes the export once gov names the
+variable.
 
-Recall terms used: rmtree ignore_errors onexc remove_tree chmod read-only scratch owned sweep gate-work owner TMPDIR
+Recall terms used: rmtree ignore_errors onexc remove_tree chmod read-only scratch owned sweep gate-work owner TMPDIR TEMP TMP ambient nested outer runner knob census

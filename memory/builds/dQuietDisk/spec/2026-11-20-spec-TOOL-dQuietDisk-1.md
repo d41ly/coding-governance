@@ -1,6 +1,6 @@
 # TOOL-dQuietDisk-1 — one store of immutable history verdicts, keyed by the ids each one reads, with one `cat-file --batch` reader
 
-**Status:** SPECCED · rev-1 · 2026-11-20 · node d · Tier-2 · base 609cd40b · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-11-22 · node d · Tier-2 · base e4699ee7 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md](../build/2026-11-20-build-TOOL-dQuietDisk-1-agent-ledger.md) | journal | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 TOOL-dQuietDisk-26 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-brief.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
 | [2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md](../prompts/2026-11-20-prompt-TOOL-dQuietDisk-1-spec-brief.md) | research | TOOL-dQuietDisk-2 TOOL-dQuietDisk-3 TOOL-dQuietDisk-4 TOOL-dQuietDisk-5 TOOL-dQuietDisk-6 TOOL-dQuietDisk-7 TOOL-dQuietDisk-8 TOOL-dQuietDisk-9 TOOL-dQuietDisk-10 TOOL-dQuietDisk-11 TOOL-dQuietDisk-12 TOOL-dQuietDisk-13 TOOL-dQuietDisk-14 TOOL-dQuietDisk-15 TOOL-dQuietDisk-16 TOOL-dQuietDisk-17 TOOL-dQuietDisk-18 TOOL-dQuietDisk-19 |
+| [2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-1-spec-writer.md) | journal | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-owner-build-on-land-branch.md) | research | — |
 | [2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md](../prompts/2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task.md) | research | TOOL-dQuietDisk-14 TOOL-dQuietDisk-9 TOOL-dQuietDisk-19 |
 
@@ -43,8 +44,9 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
   path that cannot be read disables the store for that run. Observed by AC3.
 - **S4** — An item file opens with one header line naming the schema tag, its key and its body
   length. A missing, unreadable, truncated or foreign-version file reads as a miss, never as a
-  verdict. Every write goes to a sibling temp file, then `os.replace`, so two bars that write the
-  same key or different keys at once lose nothing and leave no temp file. Observed by AC3 and AC4.
+  verdict. Every write goes to a sibling temp file that `tempfile.mkstemp` names in the item's own
+  directory, then `os.replace`, as the reuse cache's writer does. So two bars that write the same
+  key or different keys at once lose nothing and leave no temp file. Observed by AC3 and AC4.
 - **S5** — The tip. `read_tip()` and `write_tip(sha)` keep the leg's last graded tip in
   `tips/<scope>`, where the scope is the first 16 hex of the SHA-256 of the absolute git dir. Each
   worktree keeps its own tip and every worktree shares the items. Observed by AC5.
@@ -72,17 +74,20 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
   carry the module whole, and `tools/unattended/lib-unattended.sh` carries the `history_store_sh`
   block, so the two copy-installed kits units 2 to 4 grade inside hold their own copies. Two rows
   join `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`, one per block. Observed by AC9.
-- **S11** — `python tools/lib/history_store.py --selftest` runs the module's arms in a scratch
-  repository it builds and removes, printing one line per arm and a count line. A held leg,
-  `history-store selftest`, runs it, with subject `kit`, chunk `selftests` and a guard naming the
-  module and the bash face. Observed by AC10.
+- **S11** — `python tools/lib/history_store.py --selftest` runs the module's arms in its own scratch
+  repository, printing one line per arm and a count line. A held leg,
+  `history-store selftest`, runs it, with subject `kit`, chunk `selftests`, a ceiling of 120 s and a
+  guard naming the module and the bash face. Because every held leg must carry a budget row, the
+  leg's row joins `tools/run-gates/selftest-budgets.txt`, calibrated as that file's header states:
+  the worst direct reading times 1.5, floored at 60 s, with the reading named in the row's note.
+  Observed by AC10 and AC12.
 
 ## 3. Non-goals (OUT)
 
 - No leg is wired to the store or the reader. `check-pass-order.sh`, `check-brief-recorded.sh` and
   `routed_commits.py` are units 2, 3 and 4.
 - No change to the reuse cache's key. The `head $RG_HEAD` line of `build_key_text`
-  (`tools/run-gates/run-gates.sh@609cd40b1:3507`) stays: a history leg's whole-run verdict does
+  (`tools/run-gates/run-gates.sh@e4699ee75:3553`) stays: a history leg's whole-run verdict does
   depend on HEAD, and the store makes the leg cheap rather than reusable across commits.
 - No migration of the existing coprocesses. `upgrade_steps.py#derive_introduced` and
   `tools/drift-audit/drift_report.py` hold their own `--batch` process, and
@@ -107,22 +112,25 @@ reads and by the grading code's own bytes, with a last graded tip per leg. The s
 
 ### Where the code was read
 
-Every citation is at `609cd40b1`, the tip of `branch/unattended-dwitnessedbar-2ed3b3`, written
-`<path>@609cd40b1:<line>` or by symbol. The units build on dWitnessedBar's landed tip.
+Every citation is at `e4699ee75`, the build base: the merge that brought dWitnessedBar's land tip
+`ed833f684` into this run, as the owner ruled on 2026-11-22. A citation is written
+`<path>@e4699ee75:<line>` or by symbol.
 
 ### The seams this extends
 
 - The reuse cache lives at `$RG_COMMON_RAW/gate-cache`
-  (`tools/run-gates/run-gates.sh@609cd40b1:3605`), one file per entry under `<key[0:2]>/<key>`,
-  written tmp-then-rename (`tools/run-gates/run-gates.sh@609cd40b1:5821`). The store takes the same
-  home, layout and write rule, under its own directory.
+  (`tools/run-gates/run-gates.sh@e4699ee75:3651`), one file per entry under `<key[0:2]>/<key>`.
+  Its writer is one python block that opens at `tools/run-gates/run-gates.sh@e4699ee75:5988`; it
+  stages each entry through `tempfile.mkstemp` in the entry's directory and moves it with
+  `os.replace` (`tools/run-gates/run-gates.sh@e4699ee75:6029`). The store takes the same home,
+  layout and write rule, under its own directory.
 - The one revision-blob reader is `upgrade_steps.py#blob_at`. Its batch branch writes
   `<commit>:<path>` and reads the `<oid> <type> <size>` header and `size + 1` bytes. It reads a
   short header as None, so an end of stream reads as "no such blob". `BatchReader` keeps the header
   parse and separates the two answers (S2).
-- The copy rule. `tools/lib/` ships nothing (`tools/govkit/registry.toml@609cd40b1:237`), so a
+- The copy rule. `tools/lib/` ships nothing (`tools/govkit/registry.toml@e4699ee75:253`), so a
   copy-installed kit carries a shared primitive inline, gated by `PARITY_ROWS` in
-  `tools/lib/resolve-python.test.sh@609cd40b1:405`. `tools/lib/legacy_ledger.py` with its copies in
+  `tools/lib/resolve-python.test.sh@e4699ee75:405`. `tools/lib/legacy_ledger.py` with its copies in
   `tools/gate-lint/` and `tools/memory-tree/` is the whole-module precedent, and
   `tools/unattended/commit_trailers.py` the unattended kit's.
 - The live-generation shape of TOOL-aPiecewiseGrade-1 S4 is not needed here. Its entries are
@@ -182,12 +190,14 @@ caller grades that question as it does today.
 `tools/lib/history_store.py` · `tools/lib/history-store.sh` · `tools/unattended/history_store.py` ·
 `tools/memory-tree/history_store.py` · `tools/unattended/lib-unattended.sh` ·
 `tools/lib/resolve-python.test.sh` · `tools/policy/catalogue.toml` · `help/reference/policy.md` ·
-`tools/gate-legs.json` · `memory/guides/SESSION-KICKOFF.md`
+`tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` · `memory/guides/SESSION-KICKOFF.md`
 
 The kickoff manifest's `watch:` line names `tools/gate-legs.json`, so the commit that adds the leg
 re-stamps the manifest's `last-audit`. A new file under `tools/unattended/` and
 `tools/memory-tree/` is claimed by each kit's `include = "**"` row
-(`tools/unattended/kit.toml@609cd40b1:26`, `tools/memory-tree/kit.toml@609cd40b1:30`).
+(`tools/unattended/kit.toml@e4699ee75:26`, `tools/memory-tree/kit.toml@e4699ee75:30`).
+`tools/run-gates/selftest-budgets.txt` is asserted both ways, so a held leg with no row is a
+failure (its header, `tools/run-gates/selftest-budgets.txt@e4699ee75:16`).
 
 ### Alternatives rejected
 
@@ -270,13 +280,20 @@ re-stamps the manifest's `last-audit`. A new file under `tools/unattended/` and
   Red when: a copy is not claimed by its kit, or the check reads differently.
   permission: read-only against the adopters' main checkouts, never their `gov-upgrade` worktrees.
   fixture: the adopters reach the copies only after a minted version and their own `govkit update`.
+- **AC12** — When `grep -n "^history-store selftest" tools/run-gates/selftest-budgets.txt` runs, it
+  prints one row whose budget is at least 60 and whose note names the direct reading it was
+  calibrated from. When
+  `grep -n -A16 '"name": "history-store selftest"' tools/gate-legs.json` runs, the row it prints
+  holds `"ceiling": 120`.
+  Red when: the held leg lands with no budget row, a budget under the floor, or no ceiling.
+  figure: DERIVED, the budget from the builder's direct reading of the leg's own argv.
 
 This unit moves no verdict: it adds no reader to any existing leg, so every leg's rc and output stay
 as they were. The process saving is each consumer's, counted in units 2, 3 and 4.
 
 ## 7. Gates
 
-`kit epoch (shipped bytes move, the version moves)` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
+`kit epoch (shipped bytes move, the version moves)` · `python resolver (behaviour + inline parity + idiom ban)` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `scratch-guard self-test` · `routed-commits selftest` · `branch-guard self-test` · `tier2-review self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `playbook render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `line length`
 
 New arm: tools/lib/history_store.py · covers AC3 AC10 · the module's --selftest; its failing case is staged by reading an end of stream as missing, or by keying on the index blob of a code path · none
 New arm: tools/lib/resolve-python.test.sh · covers AC9 · the two new PARITY_ROWS rows; their failing case is staged by one changed byte in either copy · none
@@ -291,14 +308,23 @@ none
 
 - rev-1 · 2026-11-20 · initial draft. Order 1, as briefed: the write set is disjoint from
   TOOL-dQuietDisk-14's, the other order-1 unit, and units 2 to 4 consume it at order 2.
+- rev-2 · 2026-11-22 · re-grounded at e4699ee75 (dWitnessedBar's land tip merged), under
+  `2026-11-22-prompt-TOOL-dQuietDisk-1-reground-task`. What moved: every `run-gates.sh` citation
+  (the `head $RG_HEAD` line to 3553, the cache home to 3651, its writer to 5988 and 6029), the
+  registry's `{prefix}/lib` exemption to line 253, and the base to `e4699ee7`. S4 names the
+  `mkstemp` staging the reuse cache's writer uses. S11 and AC12 add the leg's ceiling and its
+  budget row, which `tools/run-gates/selftest-budgets.txt` demands of every held leg and which
+  rev-1 missed. No dWitnessedBar unit built after `609cd40b1` holds a history store or a batch
+  reader (section 10), so the design is otherwise unchanged.
 
 ## 10. Reuse audit
 
 The seams extended: the reuse cache's home and write rule (`tools/run-gates/run-gates.sh`, the
 `REUSE_CACHE` block, TOOL-aSparedSpawn-13), the batch protocol of `upgrade_steps.py#blob_at`, and
 the copy rule of `PARITY_ROWS` with `tools/lib/legacy_ledger.py` as its whole-module precedent.
-`tools/lib/` holds no `cat-file` reader at the base: `git grep -n "cat-file" 609cd40b1 -- tools/lib/`
-prints nothing. The existing readers are `upgrade_steps.py#derive_introduced`'s held process,
+`tools/lib/` holds no `cat-file` reader at the base: `git grep -n "cat-file" e4699ee75 -- tools/lib/`
+prints nothing. The three files `tools/lib/` gained since `609cd40b1` are `gov-feed.sh`,
+`gov-ref.sh` and `home_graded.py`; none is a store or a reader. The existing readers are `upgrade_steps.py#derive_introduced`'s held process,
 `tools/drift-audit/drift_report.py`'s, and the one-shot batches of `routed_commits.py` and
 `tools/lexicon/lexicon.py`. The brief's "already hold coprocesses" is stale for the last two: each
 sends its whole question set to one `run_git` call and holds no process. No existing seam fits
@@ -313,6 +339,17 @@ Recall returned TOOL-dUnstuckLanding-7 and -17, the RANGE-mode history legs, TOO
 the routed-commits leg outgrowing its ceiling with no push base, and TOOL-dScopedBuild-14's reuse
 scout naming the deviation join's policy read. Owning chain builds: dWitnessedBar (Test: gate
 health, the reuse cache) and dScopedBuild (Build: the history-derived exit base), whose legs this
-store serves. No dWitnessedBar spec at `609cd40b1` defines a history store.
+store serves. No dWitnessedBar spec defines a history store, at `609cd40b1` or at `e4699ee75`.
+The re-ground read `git log 609cd40b1..ed833f684` over `tools/lib/`, `run-gates.sh`,
+`verdict_flow.py`, `lib-unattended.sh` and `routed_commits.py`, and the five dWitnessedBar specs
+added since, units 106 to 110. `verdict_flow.py` holds the flake ledger, the quarantine and the
+red routing, and none of it keys a verdict by the ids a history item reads. The only file that
+newly runs `cat-file --batch` is `tools/unattended/unattended.test.sh`, a one-shot listing in a
+fixture. So there is no store to extend and no reader to fold in. Every file this unit writes
+outside its new ones also moved on that line: `lib-unattended.sh`, `resolve-python.test.sh`,
+`gate-legs.json`, `selftest-budgets.txt`, the policy catalogue and its help page, and the kickoff
+manifest. The base now holds those moves. Each write here is additive, one block, two parity rows,
+one leg, one budget row and one key, beside the manifest's `last-audit` re-stamp. They are named here so the merge onto dWitnessedBar's
+landing can reconcile them.
 
 Recall terms used: history leg verdict cache incremental pass-order brief-recorded routed_commits gate-cache reuse key HEAD cat-file batch
