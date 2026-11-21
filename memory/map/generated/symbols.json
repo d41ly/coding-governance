@@ -32253,6 +32253,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_floor_read",
+      "kind": "function",
+      "file": ".githooks/pre-push.test.sh"
+    },
+    {
       "id": "run_floor_readers",
       "kind": "function",
       "file": "tools/loop/guard.py"

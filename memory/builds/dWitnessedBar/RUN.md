@@ -814,3 +814,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T14:20:28Z rescope · item add TOOL-dWitnessedBar-108 · reason the closing diff review round 1 promotes its minors M1, M2, L1 and L2, batched into one unit
 
 2026-11-21T14:45:15Z brief · item TOOL-dWitnessedBar-106 · reason ac2e62d8de5b memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-106-build-brief.md
+
+2026-11-21T14:47:53Z dispatch · item 1ed4aae3 TOOL-dWitnessedBar-106 · reason .githooks/pre-push .githooks/pre-push.test.sh help/policy.md memory/map/generated/symbols.json memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-106-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-106.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T14:59:54Z draw · re-dispatch · TOOL-dWitnessedBar-106 · 124/180 · 20261121T145954Z-884836
+
+2026-11-21T14:59:54Z dispatch · item 1ed4aae3 TOOL-dWitnessedBar-106 · reason memory/project/shell-role.txt memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-106-widen-26.md memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-106-deviation-1061.md
