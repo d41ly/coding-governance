@@ -1,0 +1,11 @@
+# TOOL-dWitnessedBar-94 — acceptance ledger
+
+**Serves:** journal TOOL-dWitnessedBar-94
+
+No merge bar, no self-test suite and no gate leg ran in this pass. This unit writes records only: it touches no code file and mints no function. Its pass-time probe ran on node d, 2026-11-21, from base `05ab4b7fc`, over scratch roots under the run's scratch directory, with 92 §4's note check cut from spec-92 at `d31ee066d` and a copy carrying S1's pattern, `^  +TOOL-dWitnessedBar-$u $s([^0-9]|\$)`. Every line marked OWED is the main loop's at the close, after the last unit is terminal: AC1's to AC3's fixtures, S3's note in unit 92's ledger and AC4's read of it (§4 Rollout).
+
+**Evidences:** TOOL-dWitnessedBar-94
+- AC1 — `NO NOTE 90 S1` — at the pass, a scratch 89 ledger whose only note under `- AC4` opens `TOOL-dWitnessedBar-90 S9`, holds the backticked `for unread` and cites `TOOL-dWitnessedBar-90 S1` in prose, fed `90|S1|89|AC4|` and `90|S9|89|AC4|for unread`, printed `NO NOTE 90 S1`, exit 1, through the check with S1's pattern, and `NOTES OK 2`, exit 0, through spec-92's unreplaced script (PINNED 2026-11-21). OWED: the fixture's run at the close, with the fragments of units 93, 96 and 97 composed beside S1's.
+- AC2 — `NOTES OK 2` — at the pass, the same scratch root with the continuation line `  TOOL-dWitnessedBar-90 S1` added under `- AC4` printed `NOTES OK 2`, exit 0, through the check with S1's pattern (PINNED 2026-11-21). OWED: the fixture's run at the close.
+- AC3 — `NO NOTE 90 S1` — at the pass, a scratch 89 ledger holding `- AC4 — TOOL-dWitnessedBar-90 S1` alone, fed `90|S1|89|AC4|`, printed `NO NOTE 90 S1`, exit 1, through the check with S1's pattern, and `NOTES OK 1`, exit 0, through spec-92's unreplaced script (PINNED 2026-11-21). OWED: the fixture's run at the close.
+- AC4 — `NOTES OK 1` — at the pass, the check with S1's pattern fed `94|S3|92|AC3|NO NOTE 90 S1` printed `NO NOTE 94 S3 NO NOTE 90 S1`, exit 1, over the live `2026-11-19-build-TOOL-dWitnessedBar-92-1-acceptance-ledger.md`, and `NOTES OK 1`, exit 0, over a scratch copy holding S3's note under `- AC3` (PINNED 2026-11-21). OWED: S3's note labelled `TOOL-dWitnessedBar-94 S3`, a continuation line two spaces in under the `- AC3` answer of that ledger carrying the backticked `NO NOTE 90 S1`, and the note check's read of it, at the close.
