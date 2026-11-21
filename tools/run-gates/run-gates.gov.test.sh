@@ -815,26 +815,29 @@ for vb_case in registry:2 unregistered:0 undeclared:0 local-green:1 reused-cache
 done
 
 # ---- THE KEY-NO-TAB RECORD'S CRLF AND REPEATED KEY, READ BY THE HOOK (TOOL-dWitnessedBar-65 AC12, S15) ----
-# The `key-no-tab` plant's record also holds `verdict<TAB>GREEN<CR>` and two `sha` lines, and the plant
-# above reads it on `local-hook`, which reaches the pair line only where the verdict reads GREEN. Here the
-# same lines are read by the hook's `read_green_file`, cut from the hook alone, and by `read_tag_lines`,
-# the reader `local-hook` goes through, over the file's bytes: both take the second `sha`, and
-# `read_tag_lines` reads `GREEN`. RED against a hook read printing every match. WHAT THIS DOES NOT
-# CHECK: a CR on a key `read_green_file` reads, which TOOL-dWitnessedBar-66 plants, or a `verdict` read
-# by the hook, which reads none.
+# The `key-no-tab` plant's record holds `verdict<TAB>GREEN<CR>` and two `sha` lines, and the plant above
+# reads it on `local-hook`, which reaches the pair line only where the verdict reads GREEN. Here those
+# lines, the second `sha` CR-ended too (TOOL-dWitnessedBar-66 S1), are read by the hook's
+# `read_green_file`, cut from the hook alone, and by `read_tag_lines`, the reader `local-hook` goes
+# through, over the file's bytes: both take the second `sha`, CR stripped, and `read_tag_lines` reads
+# `GREEN`. The hook half grades `rec_sha`, the variable each staged break reaches: RED against a `sha`
+# read of `$1=="sha"{print $2}`, printing every match, and against one lacking ` sub(/\r$/, "", v);`.
+# WHAT THIS DOES NOT CHECK: on Git for Windows, gawk's text-mode read and bash `$(...)` lose the CR
+# before the strip sees it, so the second break reds only where both hand the CR on; nor a `verdict`
+# read by the hook, which reads none.
 rgf_t=$(mktemp -d); rgf_a=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; rgf_b=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-printf 'verdict\tGREEN\r\nsha\t%s\nsha\t%s\n' "$rgf_a" "$rgf_b" > "$rgf_t/record"
+printf 'verdict\tGREEN\r\nsha\t%s\nsha\t%s\r\n' "$rgf_a" "$rgf_b" > "$rgf_t/record"
 rgf_fn=$(awk '/^read_green_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
 rgf_sha=$( eval "$rgf_fn"; read_green_file "$rgf_t/record"; printf '%s' "$rec_sha" )
 a=$((a+1))
 [ -n "$rgf_fn" ] && [ "$rgf_sha" = "$rgf_b" ] \
-  || { echo "gov-canary: the hook's read_green_file read sha as '${rgf_sha//$'\n'/|}' over two sha lines, not the second, or did not cut from the hook"; fail=1; }
+  || { rgf_v=${rgf_sha//$'\n'/|}; rgf_cr='\r'; echo "gov-canary: the hook's read_green_file set rec_sha to '${rgf_v//$'\r'/$rgf_cr}' over two sha lines, the second CR-ended, not the second sha with its CR stripped, or did not cut from the hook"; fail=1; }
 rgf_py=$("$PYBIN" -c 'import sys; sys.path.insert(0, sys.argv[1]); import verdict_backends as V
-r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), r.get("sha"))' \
+r = V.read_tag_lines(open(sys.argv[2], encoding="utf-8", newline="").read()); print(repr(r.get("verdict")), repr(r.get("sha")))' \
   "$KITDIR" "$rgf_t/record" 2>&1 | tr -d '\r')
 a=$((a+1))
-[ "$rgf_py" = "'GREEN' $rgf_b" ] \
-  || { echo "gov-canary: read_tag_lines over the CRLF verdict and two sha lines read '$rgf_py', not 'GREEN' and the second sha"; fail=1; }
+[ "$rgf_py" = "'GREEN' '$rgf_b'" ] \
+  || { echo "gov-canary: read_tag_lines over the CRLF verdict and two sha lines, the second CR-ended, read '$rgf_py', not 'GREEN' and the second sha"; fail=1; }
 rm -rf "$rgf_t"
 
 # ---- EVERY BAR CALLER THAT RECORDS A TRUSTED GREEN SCRUBS WHAT THE HOOK CLEARS (TOOL-dWitnessedBar-60) --
