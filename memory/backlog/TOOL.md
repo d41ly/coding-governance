@@ -580,6 +580,7 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-103](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS budget-row-not-remeasured-after-added-arms EARNED A GATE AT… |
 | [TOOL-dPlacedRequest-105](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-11-20 | THE CLASS fixture-passes-by-finding-nothing EARNED A GATE AT ITS SECOND… |
 | [TOOL-dPlacedRequest-109](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-11-21 | THE SCRATCH-GUARD FLOOR SITS BELOW THE ROWS IT GUARDS.… |
+| [TOOL-dPlacedRequest-110](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-11-21 | held red: suite loop termination red at a0ae4dca on the daily held job,… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |

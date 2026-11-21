@@ -88,3 +88,8 @@ TOOL-dFairHearing-30	late row: its --brief row is in RUN.md at 3cf918a65, the re
 TOOL-dFairHearing-32	late row: its --brief row is in RUN.md at 884bcb6e6, the records commit after its build commit fb755fa80, because the pass left RUN.md out and the main loop committed it with the builder's return
 TOOL-dFairHearing-37	late row: its --brief row is in RUN.md at ff578b9df, the records commit after its build commit 6d768c563, because the pass left RUN.md out and the main loop committed it with the builder's return
 TOOL-dFairHearing-39	late row: its --brief row is in RUN.md at 603b0aef0, the records commit after its build commit f27f8fa6a, because the pass left RUN.md out and the main loop committed it with the builder's return
+#
+# THE dPlacedRequest ROW is a MISREAD, written by that run's close on 2026-11-21. The unit's builder committed a
+# red fix first, 7f5603188, trailered `Pass: TOOL-dPlacedRequest-100` beside `Red-fix: loop placement fixtures`,
+# and the build-commit pick takes it as the build; the build commit is 246f7c26e, which carries its brief row.
+TOOL-dPlacedRequest-100	misread: 7f5603188 is the builder's red-fix commit (Red-fix: loop placement fixtures) ahead of its build; the build commit is 246f7c26e, trailered Pass: TOOL-dPlacedRequest-100, which carries its brief row
