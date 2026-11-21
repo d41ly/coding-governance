@@ -138,7 +138,7 @@ a marker of their own, so their key is new to the fixture's store.
   `cp -- "$f" "$cdir/requests/$key.md.$$"` and `mv -n` onto `$key.md`, then the `.typed` append, then
   `remove_dir_lock`; read 2026-11-20.
 - The driver before unit 43's lock copies through the same temporary sibling
-  (`tools/unattended/unattended.sh@7e00d7e0:4626`, the blob at `3fc16744c`), so the stub fires on it
+  (`tools/unattended/unattended.sh@7e00d7e0:4626`, the blob at `dac2af17c`), so the stub fires on it
   too and the staged red reads the lock alone.
 - The suite already places PATH stubs ahead of the driver: the `TOOL-dPlacedRequest-43` block writes a
   `git` stub into `$GH_BIN` and runs `PATH="$GH_BIN:$PATH" run_proc`
@@ -187,7 +187,7 @@ origin and clone under `%TEMP%`, `RUN_CLAIMS=on`, driven by `run_request_arm`.
   `grep -c ''` over `<key>.typed` prints 1, and `git for-each-ref refs/gov/requests` run in the
   fixture's bare origin lists the key once.
   Red when: B copies; the staged case is the arm run with `SCRIPT` set to the driver of a worktree at
-  `3fc16744c`, before unit 43's lock, where B exits 0 and the stored copy is `b.md`.
+  `dac2af17c`, before unit 43's lock, where B exits 0 and the stored copy is `b.md`.
   figure: the one `.typed` line and the one ref PINNED; the 5 s wait and the 10 s hold PINNED,
   read 2026-11-20.
 - **AC2** — When the third call runs `--request b.md` after A ends, it exits 2 printing `collision`.
@@ -204,7 +204,7 @@ origin and clone under `%TEMP%`, `RUN_CLAIMS=on`, driven by `run_request_arm`.
 
 `unattended kit gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the placed request race, staged by the driver of a worktree at `3fc16744c`, before unit 43's lock · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` rise by the block's count · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the placed request race, staged by the driver of a worktree at `dac2af17c`, before unit 43's lock · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_8` rise by the block's count · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -241,7 +241,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the placed
   sibling the copy lands in (F2); S2's outcomes re-checked against the lock, B exiting 2 with
   `requests.lock busy`; S4 and AC4 reduced to an observation of spec 43's AC30, folded by its F6;
   the fixture named as the 43 block's lease fixture; S5 names the floors; the red stage named as the
-  driver at `3fc16744c`; line citations swapped for symbol citations and blob pins.
+  driver at `dac2af17c`; line citations swapped for symbol citations and blob pins.
 - rev-10 · 2026-11-20 · §1 · §3 · §4 · §5 · the inline red fix `2026-11-20-prompt-TOOL-dPlacedRequest-44-pass-red-fix-brief`: each line carrying the request lock's wait pins it as PINNED on that line.
 
 ## 10. Reuse audit

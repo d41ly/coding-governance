@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-33
 
-The unit was built from its spec at rev-8 (PINNED) on base `64a6f71ec`. The driver gained
+The unit was built from its spec at rev-8 (PINNED) on base `d7e28e91d`. The driver gained
 `tools/unattended/unattended.sh#write_card_ref` behind the `--card-ref write <slug> --message <file>`
 dispatch arm, dark behind `RUN_CLAIMS`; the kickoff engine's
 `skills/session-kickoff/manifest-check.sh#write_build_card` now calls it bounded, as
@@ -57,7 +57,7 @@ waived for this build's landing by README rule 8. The floors rose by the same 22
 list, so `.claude/skills/unattended/SKILL.md`'s size row rose by the 55 bytes (DERIVED) of that line,
 under the run-raise terms of `tools/template-size-limits.txt`; its decision row is the main loop's.
 
-**The checklist, acted on.** The bug-class checklist over the pass commit `be32c5006` selected 60
+**The checklist, acted on.** The bug-class checklist over the pass commit `3a2858473` selected 60
 classes (DERIVED: 54 by an anchor and 6 universal). Three needed a change.
 refusal-branch-with-no-arm: the engine's three new unwritten answers, no `.unattended.conf`, no
 driver, and a driver refusal relayed, had no arm, so the fixture gained the plant `publish-unwritten`

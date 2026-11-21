@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-96 — a foreign stale lease can be taken over again, and its hint prints
 
-**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -22,7 +22,7 @@
 The closing diff review of this build, round 1
 (`memory/builds/dPlacedRequest/reviews/2026-11-20-review-TOOL-dPlacedRequest-1-64-closing-diff-round1.md`),
 confirmed item **H2** at HIGH, finding id 3, and the round-2 exit promoted it to this unit. Commit
-b7e369eeb put the `lease:foreign-released` row of `check_claim_writable` in place of the
+c29e05fc0 put the `lease:foreign-released` row of `check_claim_writable` in place of the
 `lease:foreign-stale` row instead of beside it, so a dead holder's lease falls to the `lease:*`
 catch-all for every act. `--lease take-over` can no longer take a stale lease, and `--lease acquire`
 never prints its take-over hint. This unit restores the row and gates the class. The third loss the
@@ -73,7 +73,7 @@ lease:foreign-tombstone) ...as at the base...
 lease:*) CW_CAUSE=live-holder; return 1 ;;
 ```
 
-It is the row commit 71f85d59f added, byte for byte, read by `git show 71f85d59f`. The verb's
+It is the row commit e9aae5cce added, byte for byte, read by `git show e9aae5cce`. The verb's
 refusal line already appends ` · stale, so --lease take-over takes it` when `CW_HINT` is set, and the
 writer already announces a `take-announced` act and raises the epoch, so nothing else moves.
 
@@ -99,7 +99,7 @@ announced take is `tools/unattended/unattended.sh#write_claim`'s; the run column
   content, not by a line count: every line after the `local` lines whose every statement is a bare
   `CW_<NAME>=` assignment, up to the first line that is not. At the base it is two lines, and
   `CW_HINT=` sits only on the second, so a one-line exclusion would count it assigned. Staged against
-  the column at 95c3103ad, the arm names `CW_HINT` as read and never assigned; that reading is
+  the column at 2b4cc0bd4, the arm names `CW_HINT` as read and never assigned; that reading is
   recorded as its RED-first one.
 
 The unattended kit's own suites are waived for this build's landing (README rule 8): the arms are
@@ -138,7 +138,7 @@ direct probe of the driver.
   --lease acquire build tStale` runs under session `s2`, it exits 1 printing `stale, so --lease
   take-over takes it`; and `--lease take-over build tStale` under `s2` then exits 0 printing
   `take-announced`, the remote lease's `epoch:` one above the planted one.
-  Red when: the stale row is absent; the driver at 95c3103ad is that break, and there acquire prints
+  Red when: the stale row is absent; the driver at 2b4cc0bd4 is that break, and there acquire prints
   `live-holder` with no hint and take-over exits 1, its RED-first reading.
   fixture: the scratch clone and origin, built by the probe; the tree holds none.
   permission: the suite that carries the arm is waived for this landing by README rule 8, so this probe
@@ -148,7 +148,7 @@ direct probe of the driver.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · the stale build lease taken over and the static CW_* join, staged against the lease column at 95c3103ad that lacks the stale row, where the static arm names CW_HINT read and never assigned · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 · the stale build lease taken over and the static CW_* join, staged against the lease column at 2b4cc0bd4 that lacks the stale row, where the static arm names CW_HINT read and never assigned · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 
@@ -160,14 +160,14 @@ none
   finding id 3), by the round-2 exit's disposition.
 - rev-2 · 2026-11-20 · §4 · §7 · folded 2026-11-20-review-TOOL-dPlacedRequest-95-99-spec-audit finding
   id 12 (M8): the static arm's reset exclusion is defined by content, and its red reading at
-  95c3103ad names `CW_HINT`. §1 · §3 · repair unit `TOOL-dPlacedRequest-100`, promoted by the same
+  2b4cc0bd4 names `CW_HINT`. §1 · §3 · repair unit `TOOL-dPlacedRequest-100`, promoted by the same
   record's finding id 29 (H4): the Goal no longer claims the entry claim is repaired here, a non-goal
   leaves `run_entry_claim` to that unit, and the edge to it is declared.
 
 ## 10. Reuse audit
 
 The seam extended is the lease column of `tools/unattended/unattended.sh#check_claim_writable`, and
-the row restored is the one 71f85d59f wrote; the arm reuses `TOOL-dPlacedRequest-17` AC2's fixture
+the row restored is the one e9aae5cce wrote; the arm reuses `TOOL-dPlacedRequest-17` AC2's fixture
 helpers rather than a new clock plant. `python tools/codebase-map/reuse_lookup.py "lease classified
 stale is taken over"` ranked `resolveLease` in `tools/unattended/run-lease.js` and
 `check_lease_only_diff`, name stems only, neither a seam for this row. The recall query below returned

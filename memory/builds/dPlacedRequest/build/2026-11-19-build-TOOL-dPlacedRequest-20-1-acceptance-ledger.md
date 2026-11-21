@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-20
 
-The unit was built from its spec at rev-6 on base `cfc890886`. `--lease offer <kind> <name> [<sub>] (PINNED)
+The unit was built from its spec at rev-6 on base `8ce867dce`. `--lease offer <kind> <name> [<sub>] (PINNED)
 --to <fleet tag>[/<session>]` is a new act of `tools/unattended/unattended.sh#run_lease_verb`: before
 any read it holds the session half to `tools/unattended/unattended.sh#check_lease_segment`, refuses an
 empty or `absent` one, and asks `tools/unattended/unattended.sh#check_fleet_tag` whether the playbook

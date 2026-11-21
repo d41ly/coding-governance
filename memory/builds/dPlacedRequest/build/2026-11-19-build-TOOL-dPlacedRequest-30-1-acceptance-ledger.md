@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-30
 
-The unit was built from its spec at rev-6 (PINNED) on base `b6cd64767`. `tools/unattended/unattended.sh#write_request_record`
+The unit was built from its spec at rev-6 (PINNED) on base `0c2ddd6f8`. `tools/unattended/unattended.sh#write_request_record`
 now compares, once the key and the common dir resolve and before the store is made, the stored copy
 `<git-common-dir>/requests/<key>.md` with the file, both through the new
 `tools/unattended/unattended.sh#derive_request_fold` (a leading BOM dropped, every run of space, tab, CR, LF,

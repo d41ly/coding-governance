@@ -135,7 +135,7 @@ them.
   carries the S6 bullet plus only bullets `up` would refuse, and every `repo.kickoff.` row's text was
   a §B bullet.
   Gov runs the step first, on its own tree (P38), after its pass gives a value to gov's two §B
-  bullets that carry none, so its run refuses none (PINNED, 2026-11-19 at `eb28fd672`). Having no
+  bullets that carry none, so its run refuses none (PINNED, 2026-11-19 at `ab0ef5dc3`). Having no
   bold label, they are named by opening: "An unattended run is bound by directives"
   (`memory/guides/SESSION-KICKOFF.md@5afa045407:61`) and "An unattended run declares a mode"
   (`memory/guides/SESSION-KICKOFF.md@5afa045407:62`). The template keeps its placeholder bullets,
@@ -233,7 +233,7 @@ The section has no cap of its own (§8 F5). Its room is the card's one cap, `CAR
 in `skills/session-kickoff/manifest-check.sh` beside the card's other bounds, minus the bytes of
 the card's other parts, measured by `derive_pockets_block` each time a card is composed (S4). The
 example above is what the largest card on this node would carry after its append. The figures,
-each PINNED on 2026-11-19 at `1508879be`:
+each PINNED on 2026-11-19 at `eafbba502`:
 
 | Figure | Value | How measured |
 |---|---|---|
@@ -241,7 +241,7 @@ each PINNED on 2026-11-19 at `1508879be`:
 | top-level bullets of gov's §B, before the first `###` | 36 | PINNED: `awk` over `memory/guides/SESSION-KICKOFF.md` |
 | their bytes, one newline each | 7084 | PINNED: the same `awk`, `LC_ALL=C` |
 | of them past the `line` budget, so `block` units | 15 | PINNED: the same `awk` |
-| of them `check_statement` refuses | 2 | PINNED at `eb28fd672`: `check_statement` over each S1 row |
+| of them `check_statement` refuses | 2 | PINNED at `ab0ef5dc3`: `check_statement` over each S1 row |
 | the template's §B bullets, and of them refused | 5 and 4 | PINNED: the same probe over the template |
 | cards under this node's git common dir `orientation/` | 58 | PINNED: `wc -c` over each |
 | the largest of them, in bytes | 7777 | PINNED: the same `wc -c` |

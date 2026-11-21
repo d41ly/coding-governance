@@ -35,7 +35,7 @@ succeeds: on a retried attempt the stale `once` means A never holds, and the sta
 arm's wait return at once, so B runs against an A outside its window and the arm judges a race it
 never placed.
 
-Re-grounded on 2026-11-20 against the tree at `78b81e5ec` by
+Re-grounded on 2026-11-20 against the tree at `61b097906` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`. Units 48 and 52 are CLOSED,
 and unit 52 rebuilt the race block: each attempt clears the three files before A starts. So the
 clear is built, and the amendment this unit ordered to `TOOL-dPlacedRequest-56` is made in that

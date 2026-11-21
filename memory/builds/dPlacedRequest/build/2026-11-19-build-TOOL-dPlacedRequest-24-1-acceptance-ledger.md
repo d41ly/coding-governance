@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-24
 
-The unit was built from its spec at rev-8 on base `42a1ec25b`, starting from the first dispatch's
+The unit was built from its spec at rev-8 on base `d1b37939a`, starting from the first dispatch's
 partial patch for S1 to S4, whose S5 branch (the `ls-remote` read and the `landed` line in
 `tools/unattended/unattended.sh#write_gov_queue`) was removed with the spec's S5. The shared
 `write_dir_lock` family, `read_proc_token`, `check_proc_gone` and `PT_TOKEN` now sit in the

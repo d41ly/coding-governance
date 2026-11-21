@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-97 — the lease fence knows an id-less run's own claim by its keepalive
 
-**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -142,7 +142,7 @@ and its clean reading is owed with PLAY-dClosedLoop-14, and AC1 observes the cha
   build tKa` runs, it exits 0 printing one `fence — refs/gov/leases/tKa/build` line naming the tip and a
   beat; and with the run-state file's fact changed to `keepalive: K2` the same command exits 1 printing
   `lease refused — live-holder`.
-  Red when: the `lease` mode never compares a keepalive; the driver at 95c3103ad is that break, and
+  Red when: the `lease` mode never compares a keepalive; the driver at 2b4cc0bd4 is that break, and
   there the first command exits 1 printing `lease refused — live-holder`, its RED-first reading.
   fixture: the scratch clone, origin and run-state file, built by the probe; the tree holds none.
   permission: the suite that carries the arm is waived for this landing by README rule 8, so this probe
@@ -152,7 +152,7 @@ and its clean reading is owed with PLAY-dClosedLoop-14, and AC1 observes the cha
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 · the id-less run claim fenced, its mismatched-keepalive twin and an acquire by a present session that is not the record's, staged against the lease column at 95c3103ad that compares no keepalive · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/unattended/unattended.test.sh · covers AC1 · the id-less run claim fenced, its mismatched-keepalive twin and an acquire by a present session that is not the record's, staged against the lease column at 2b4cc0bd4 that compares no keepalive · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
 
 ## 8. Open questions
 

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-14
 
-The unit was built from its spec at rev-6 (PINNED) on base `7dc12c126`. `tools/loop/budget.py` gains the
+The unit was built from its spec at rev-6 (PINNED) on base `1e2a4b181`. `tools/loop/budget.py` gains the
 request arm of `draw`, `--request <key>`, `--request-text <file>` and `--rows <file>`, in
 `tools/loop/budget.py#print_request_draw`, counting the rows `tools/loop/budget.py#read_request_rows` reads
 from the request record's first-parent messages, and answering through

@@ -10,7 +10,7 @@
 
 ### Goal
 
-The closing diff review of this build exited NON-CONVERGENT at round 2 (`--review` recorded `disposition promote`). This unit is one HIGH finding, promoted to a unit of its own. Write its spec so a builder can close each finding below with the mechanism the record's fix names (the skeptic judged most fixes SOUND; where the record gives the skeptic's class-level fix, take that), and so each criterion is observed RED-first against the tree as it stands at 95c3103ad.
+The closing diff review of this build exited NON-CONVERGENT at round 2 (`--review` recorded `disposition promote`). This unit is one HIGH finding, promoted to a unit of its own. Write its spec so a builder can close each finding below with the mechanism the record's fix names (the skeptic judged most fixes SOUND; where the record gives the skeptic's class-level fix, take that), and so each criterion is observed RED-first against the tree as it stands at 2b4cc0bd4.
 
 ### Items
 
@@ -18,7 +18,7 @@ The closing diff review of this build exited NON-CONVERGENT at round 2 (`--revie
 
 ### Acceptance
 
-Spec `TOOL-dPlacedRequest-97` exists at rev-1, DEFERRED, order 37, with one scope item and one criterion per finding, each criterion naming its `New arm:` and its RED-first reading against the tree at 95c3103ad; `check-memory-hygiene.sh --only 12,25 --spec`, the spec-token checker, a PLAIN `python tools/playbook/writing_practice.py check pinned-facts` and `bash tools/unattended/unattended.sh --check-specs dPlacedRequest TOOL-dPlacedRequest-97` report nothing.
+Spec `TOOL-dPlacedRequest-97` exists at rev-1, DEFERRED, order 37, with one scope item and one criterion per finding, each criterion naming its `New arm:` and its RED-first reading against the tree at 2b4cc0bd4; `check-memory-hygiene.sh --only 12,25 --spec`, the spec-token checker, a PLAIN `python tools/playbook/writing_practice.py check pinned-facts` and `bash tools/unattended/unattended.sh --check-specs dPlacedRequest TOOL-dPlacedRequest-97` report nothing.
 
 ### Gates
 

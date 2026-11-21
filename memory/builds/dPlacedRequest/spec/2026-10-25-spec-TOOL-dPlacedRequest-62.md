@@ -36,7 +36,7 @@ criterion reads a `###` section from the line after its heading to the next `##`
 It sits at order 34, after unit 61 at 33.
 
 Units 59 and 61 are DEFERRED, and a builder writes no spec. Re-grounded on 2026-11-20 against the
-tree at `8a52e8e3b` by `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, the
+tree at `52981af4d` by `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, the
 amendments this unit ordered are made now, once, in their texts (F2): the section form is `sec` among
 unit 59's §4 readers, the one definition of the batch's readers (F3); 61's AC13 is folded into 59's
 AC13 by 61's S13; and 61's AC20 reads 59's one version oracle by `sec`. Unit 64's amendments to this

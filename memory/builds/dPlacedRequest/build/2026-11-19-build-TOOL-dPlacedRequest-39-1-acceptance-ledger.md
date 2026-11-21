@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-39
 
-The unit was built from its spec at rev-4 on base `728cd444f`. `tools/lib/gov-feed.sh#add_feed_event` (PINNED)
+The unit was built from its spec at rev-4 on base `7af144383`. `tools/lib/gov-feed.sh#add_feed_event` (PINNED)
 keeps its clock test, its common-dir cache and its git reads in the caller's shell and runs the lock
 take, the key check, the counter and the append in a subshell `( … ) || rc=$?`, whose `EXIT` trap,
 armed on the line after the take, calls `tools/lib/gov-feed.sh#remove_dir_lock` with the call's

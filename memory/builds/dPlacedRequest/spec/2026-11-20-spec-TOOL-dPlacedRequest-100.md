@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-100 — the entry claim takes over a stale build lease instead of waiting on it
 
-**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base 95c3103a · streams tooling · order 38
+**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -149,23 +149,23 @@ prints `take-announced`, leaves the remote lease's `epoch:` one above the plante
   0 printing `take-announced`, the remote lease's `epoch:` one above the planted one and no
   `wait-since:` on the claim.
   Red when: `run_entry_claim` routes the stale refusal by its cause word alone; staged by the tip's
-  `claim.py` beside the driver of 95c3103ad, the claim exits 4 printing `claim waiting`, its RED-first
+  `claim.py` beside the driver of 2b4cc0bd4, the claim exits 4 printing `claim waiting`, its RED-first
   reading.
   fixture: the throwaway repository and bare remote the plant builds; the tree holds none.
   cost: one plant, under a minute on node d (UNVERIFIED, an estimate from the row's PINNED 120 s proxy over 13 plants).
 - **AC2** — When `grep -c 'stale, so --lease take-over takes it' tools/unattended/unattended.sh` runs,
   it prints 1, and `grep -c 'LEASE_STALE_HINT' tools/unattended/unattended.sh` prints at least 3.
-  Red when: the hint is typed in two places; at 95c3103ad the second grep prints 0, its RED-first
+  Red when: the hint is typed in two places; at 2b4cc0bd4 the second grep prints 0, its RED-first
   reading.
 - **AC3** — When `grep -c 'a stale build lease is taken over' help/loop.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md`
   runs, it prints 1 for each file.
-  Red when: a page omits the route; at 95c3103ad each count is 0, its RED-first reading.
+  Red when: a page omits the route; at 2b4cc0bd4 each count is 0, its RED-first reading.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop claim fixtures` · `every held leg is budgeted, every budget row resolves` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/loop/claim.py · covers AC1 · the stale-holder plant, staged by the tip's claim.py beside the driver of 95c3103ad, whose entry claim waits on the stale lease · the loop claim fixtures row's plants token raised by one
+New arm: tools/loop/claim.py · covers AC1 · the stale-holder plant, staged by the tip's claim.py beside the driver of 2b4cc0bd4, whose entry claim waits on the stale lease · the loop claim fixtures row's plants token raised by one
 
 ## 8. Open questions
 

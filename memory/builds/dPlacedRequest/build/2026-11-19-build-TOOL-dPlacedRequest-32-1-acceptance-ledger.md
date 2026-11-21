@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-32
 
-The unit was built from its spec at rev-5 (PINNED) on base `67fc0923d`. The session is
+The unit was built from its spec at rev-5 (PINNED) on base `48f901dd0`. The session is
 `CLAUDE_CODE_SESSION_ID`, read as `${CLAUDE_CODE_SESSION_ID:-absent}` where `TOOL-dPlacedRequest-19` and
 `TOOL-dPlacedRequest-1` read it, so unset, empty and the literal `absent` are the one value `absent`, no
 session (S1). `tools/unattended/unattended.sh#write_request_record` still writes the remote record with

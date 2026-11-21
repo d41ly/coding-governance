@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-3
 
-The unit was built from its spec at rev-6 (PINNED) on base `537c5837e`. The loop definition gains the
+The unit was built from its spec at rev-6 (PINNED) on base `1be745470`. The loop definition gains the
 entry program's five rows, `item.entry.orient`, `item.entry.place`, `item.entry.place-check`,
 `item.entry.place-owner` and `item.entry.claim`, first among the item rows of `tools/loop/loop.toml`,
 and loses the `[[stand-in]]` row for `item.entry.claim`. `tools/loop/loop_lib.py#PROGRAM_SEGMENTS` gains

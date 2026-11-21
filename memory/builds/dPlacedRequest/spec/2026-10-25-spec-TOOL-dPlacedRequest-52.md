@@ -57,7 +57,7 @@ build, at order 27, after units 49 and 51 at 26.
 | S28 | 27 (L6) | LOW | unit 44 |
 
 Every unit the minors land on is now CLOSED, the charter's P19 keeps built work out of in-place
-rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `0d700d256` by
+rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `e57eca71b` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`, each item is one of four
 kinds, and the scope ids are kept so the siblings that cite them still resolve:
 
@@ -354,7 +354,7 @@ the walk, the `DPR39` block's `gov_feed_sh` cut for the trap, and `manifest-chec
 driver for the card, each `RUN_CLAIMS=on` unless stated.
 
 - **AC1** — When the placed-race block runs over the built driver, its first kept attempt passes the
-  `DPR48 AC1` and `DPR48 AC2` rows; run with `SCRIPT` set to the driver of a worktree at `3fc16744c`,
+  `DPR48 AC1` and `DPR48 AC2` rows; run with `SCRIPT` set to the driver of a worktree at `dac2af17c`,
   before unit 43's lock, B exits 0 inside the bound, the attempt is kept, and the `DPR48 AC1` rows
   fail.
   Red when: an unlocked driver's race is discarded as an overrun and the block passes.

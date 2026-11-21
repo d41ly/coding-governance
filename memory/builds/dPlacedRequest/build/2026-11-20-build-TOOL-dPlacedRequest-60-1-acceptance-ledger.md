@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-60
 
-The unit was observed from its spec at rev-6 on base `c9829c8c4`. Built: nothing, as the spec's Files
+The unit was observed from its spec at rev-6 on base `c4dbce6a3`. Built: nothing, as the spec's Files
 touched estimate states; its three items were folded by the re-grounding into the AC2 and revision
 log of `TOOL-dPlacedRequest-57` at rev-5, which this pass reads and does not edit. No gate, suite or
 bar ran in this pass. Every reading below is the criterion's own command run over the tree, or over

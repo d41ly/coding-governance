@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-47
 
-The unit was built from its spec at rev-7 on base `0bca98088`. It changes no driver code: the guard
+The unit was built from its spec at rev-7 on base `6d9ee5b93`. It changes no driver code: the guard
 it pins, the walk's `step` in `tools/unattended/unattended.sh#read_claims` testing the threshold only
 for a ref and commit present in `seen`, was already in the tree. The region-eight block of
 `tools/unattended/unattended.test.sh` after the TOOL-dPlacedRequest-46 block writes `unguarded.sh`

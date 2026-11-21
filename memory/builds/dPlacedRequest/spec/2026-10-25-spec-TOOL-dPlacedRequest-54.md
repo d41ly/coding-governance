@@ -37,7 +37,7 @@ the oracle walks its commits, finds no `KIT_` line and reads a clean build witho
 of this one. This unit's fix is the own-merge test: the merge found must be this build's own, or the
 oracle refuses with exit 2.
 
-Re-grounded on 2026-11-20 against the tree at `0d700d256` by
+Re-grounded on 2026-11-20 against the tree at `e57eca71b` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`. Specs 44 and 34 are CLOSED,
 and the charter's P19 keeps them as built; unit 52 is DEFERRED. The oracle now has one home, the §4
 block of `TOOL-dPlacedRequest-55`, which carries this unit's test whole (that unit's F3). So no item
@@ -120,7 +120,7 @@ on the prepared merge after the last `--prepare`, with the observing run's base.
   `msg="merge: $SLUG — land onto $remote/$def at ${R:0:8}"`; read 2026-11-20.
 - Measured 2026-10-25 on node a before `--prepare`: fact 1 alone returned `c63aabbb`, dOrderedCharter's
   landing, and the oracle without the test walked it and exited 0. PINNED at that date.
-- Measured 2026-11-20 on node a in this worktree at `0d700d256`, with the base the run-state file's
+- Measured 2026-11-20 on node a in this worktree at `e57eca71b`, with the base the run-state file's
   `## Run facts` section holds, `9e21ac76`: fact 1 returned `9e21ac76`, subject
   `merge: dDeclaredLoop — land onto origin/main at c1f80c00`; unit 55's block printed `version
   oracle: no prepared merge on HEAD` and exited 2, and a copy without the subject and ancestor tests

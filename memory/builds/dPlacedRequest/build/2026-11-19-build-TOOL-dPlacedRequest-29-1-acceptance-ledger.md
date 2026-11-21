@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-29
 
-The unit was built from its spec at rev-3 (PINNED) on base `0080f3432`. The driver's fence act,
+The unit was built from its spec at rev-3 (PINNED) on base `83c9bb274`. The driver's fence act,
 `tools/unattended/unattended.sh#write_fence_beat`, takes `--after <tip>`: the same one read, and the
 fence line on the new tip only where the `lease` column reads `mine`, `<tip>` is on the new tip's
 first-parent chain and the two epochs are equal; every other reading is `lease refused — epoch-fence`,

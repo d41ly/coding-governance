@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-2
 
-The unit was built from its spec at rev-9 (PINNED) on base `4f6532a75`. The kickoff engine,
+The unit was built from its spec at rev-9 (PINNED) on base `e3952ab6d`. The kickoff engine,
 `skills/session-kickoff/manifest-check.sh`, gains the build card: `read_card_policy`, one literal
 `policy.py get` line per key; `render_build_card`; `write_build_card`, the publish to each store
 `card.store` selects, the ref written through the inline `gov_ref_sh` block's `write_gov_ref` with the

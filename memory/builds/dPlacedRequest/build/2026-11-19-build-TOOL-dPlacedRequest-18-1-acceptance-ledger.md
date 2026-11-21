@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-18
 
-The unit was built from its spec at rev-4 on base `a77031982`. `tools/unattended/unattended.sh#check_cadence_segment`
+The unit was built from its spec at rev-4 on base `b3c3f715b`. `tools/unattended/unattended.sh#check_cadence_segment`
 holds a cadence to the tag grammar's `seg` production, `[a-z0-9][a-z0-9-]*` within 64 bytes (PINNED, the
 grammar's cap), under `LC_ALL=C` so the range is ASCII under any collation and the length counts bytes; a
 refusal sets `LEASE_WHY` to `outside seg [a-z0-9][a-z0-9-]*` or `over 64 bytes (<n>)` and prints it (S1).

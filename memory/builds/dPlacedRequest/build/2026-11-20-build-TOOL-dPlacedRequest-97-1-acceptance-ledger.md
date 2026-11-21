@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-97
 
-The unit was built from its spec at rev-2 on base `a0fe07954`. Built: S1, a second `mine` row in the
+The unit was built from its spec at rev-2 on base `0cd868191`. Built: S1, a second `mine` row in the
 `lease` mode of `tools/unattended/unattended.sh#check_claim_writable`, below the session row and above
 the `same` row, matching where a run-state file is handed, either session is `absent`, the record's
 fleet tag is this node's, and its `keepalive` is present, not `absent`, and equal to that file's
@@ -27,7 +27,7 @@ and fences again, then removes the run-state file and fences a last time.
 - AC1 — `fence — refs/gov/leases/tKa/build` — the probe over the driver at this pass: the id-less fence exited 0 printing one line `fence — refs/gov/leases/tKa/build <the planted tip> <a beat sha>`, the tip the one the probe planted. (DERIVED)
 - AC1 — `keepalive: K2` — the probe then rewrote the run-state fact to `keepalive: K2` and the same fence exited 1 printing `lease refused — live-holder · tKa/build · node a · session absent · … · status live · verdict live`. (DERIVED)
 - AC1 — `lease refused — live-holder` — between the two fences, the acquire under `CLAUDE_CODE_SESSION_ID=s2`, the run-state file still holding `keepalive: K`, exited 1 printing `lease refused — live-holder · tKa/build · node a · session absent · …`, the origin's tip unmoved: the `--lease` verbs hand no run-state file and gain no identity. (DERIVED)
-- AC1 — `95c3103ad` — the RED reading: the same probe through a scratch clone of this repository checked out at that commit, its driver blob `0e8038fd5`, printed the first id-less fence exit 1 `lease refused — live-holder · tKa/build · node a · session absent · … · verdict live`, the acquire and the `K2` fence exit 1 with the same line. (DERIVED)
+- AC1 — `2b4cc0bd4` — the RED reading: the same probe through a scratch clone of this repository checked out at that commit, its driver blob `0e8038fd5`, printed the first id-less fence exit 1 `lease refused — live-holder · tKa/build · node a · session absent · … · verdict live`, the acquire and the `K2` fence exit 1 with the same line. (DERIVED)
 
 ## Readings beside the criteria
 
@@ -45,7 +45,7 @@ and fences again, then removes the run-state file and fences a last time.
 - A guards probe over the driver at this pass read each of the three refused, exit 1, `lease refused — live-holder`, and a last replant under tag `a`, `K` on both, fence again, exit 0: the refusals are the guards' and not the fixture's. (DERIVED)
 - It selected `guard-above-a-fold-makes-its-fallback-dead`: the new row sits above the `same` row, which needs a present session equal to the record's; the new row matches only with the handed session or the record's `absent`, and the fence derives its session from the same variable the `same` row reads, so no `same` reading moves. (DERIVED)
 - It selected `fixture-passes-by-finding-nothing` and `liveness-negative-from-another-population`: the arm's first row asserts the plant reads tag `a`, `session: absent` and `keepalive: K` before any fence, and the loop's rows assert each replant's fields beside its refusal. (DERIVED)
-- It selected `staged-break-substitutes-a-synthetic-value` and `test-oracle-read-from-a-historical-sha`: the RED reading ran the driver as committed at `95c3103ad`, and the arm reads no sha. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value` and `test-oracle-read-from-a-historical-sha`: the RED reading ran the driver as committed at `2b4cc0bd4`, and the arm reads no sha. (DERIVED)
 - It selected `an-attested-count-must-count-what-the-grader-counts` and `insert-after-a-key-that-occurs-twice`: each `same` and `hit` moves the suite's `n` by one per execution, and the floor edited is the effective `FLOOR_ASSERTIONS`, not the shadowed one above it. (DERIVED)
 - It selected `two-answers-to-one-question`: the column's earlier sentence saying the column is handed no keepalive now says the `--lease` verbs hand none, beside the new sentence naming the fence. (DERIVED)
 - It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line. (DERIVED)
@@ -56,5 +56,5 @@ None.
 
 ## Owed at the close
 
-- `New arm:` `tools/unattended/unattended.test.sh`, the TOOL-dPlacedRequest-97 block, nine assertions, the floors raised; its RED-first observation against the lease column at `95c3103ad` and its GREEN reading inside the suite are the close's, its clean reading owed with PLAY-dClosedLoop-14 under README rule 8. (DERIVED)
+- `New arm:` `tools/unattended/unattended.test.sh`, the TOOL-dPlacedRequest-97 block, nine assertions, the floors raised; its RED-first observation against the lease column at `2b4cc0bd4` and its GREEN reading inside the suite are the close's, its clean reading owed with PLAY-dClosedLoop-14 under README rule 8. (DERIVED)
 - The legs the spec's Gates section names, run once by the main loop.

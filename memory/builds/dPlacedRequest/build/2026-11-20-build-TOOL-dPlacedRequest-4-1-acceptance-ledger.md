@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-4
 
-The unit was built from its spec at rev-7 (PINNED) on base `7936d33ed`. `tools/loop/placement.py` is new:
+The unit was built from its spec at rev-7 (PINNED) on base `948b8b7a5`. `tools/loop/placement.py` is new:
 the verbs `place`, `check` and `record`, the functions `tools/loop/placement.py#place_request`,
 `tools/loop/placement.py#check_placement`, `tools/loop/placement.py#read_placement`,
 `tools/loop/placement.py#print_claim_lines` and `tools/loop/placement.py#check_reenters_item`, the table

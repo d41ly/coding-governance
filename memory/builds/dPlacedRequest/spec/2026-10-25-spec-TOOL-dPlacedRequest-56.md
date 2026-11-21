@@ -55,7 +55,7 @@ of the build, at order 29, after units 53 to 55 at 28.
 | S22 | 26 (L7) | LOW | unit 52 |
 
 Every unit the minors land on is now CLOSED, the charter's P19 keeps built work out of in-place
-rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `78b81e5ec` by
+rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `61b097906` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`, each item is one of four
 kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
 observes item Sn.

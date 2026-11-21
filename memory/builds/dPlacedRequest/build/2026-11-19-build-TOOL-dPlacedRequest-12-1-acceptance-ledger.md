@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-12
 
-The unit was built from its spec at rev-5 (PINNED) on base `2125460bb`. `tools/unattended/unattended.sh#derive_ref_segment`
+The unit was built from its spec at rev-5 (PINNED) on base `0e62fd84e`. `tools/unattended/unattended.sh#derive_ref_segment`
 writes every byte outside `[A-Za-z0-9_-]` as `%HH` under `LC_ALL=C` and refuses an empty text (S1);
 `tools/unattended/unattended.sh#derive_decision_key` joins the item's and the fork's segments with `+` (S2);
 `tools/unattended/unattended.sh#derive_problem_id` cuts `git hash-object --stdin` over the session, the item,

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-34
 
-The unit was built from its spec at rev-13 (PINNED) on base `52d334e87`, a sweep of the round-1 spec
+The unit was built from its spec at rev-13 (PINNED) on base `be1af09ba`, a sweep of the round-1 spec
 audit's minors written before most of this run's units landed. Each item was probed against the tree
 first: where a later unit had already done the work, no code changed and the probe is recorded below;
 where it was owed and buildable it was built; S41 conflicts with the tree and is listed under "Items
@@ -147,7 +147,7 @@ First-pass readings, restated one criterion per line in the block that closes th
 - AC57, AC58 — as the design record says; `request.py` is absent at `c63aabbb`.
 - AC2, AC3, AC4, AC14, AC15, AC33, AC40, AC43, AC54 — owed to the close's driver-suite arms.
 
-## Second pass, 2026-11-20 — the owed items, on base `e1a89844b`
+## Second pass, 2026-11-20 — the owed items, on base `81409da27`
 
 The unit was re-dispatched at rev-14 (PINNED) for what the first pass left: S43 and S47, owed; S41,
 diverged and since restated over the kept copy; and the four suite arms named and not written. This
@@ -184,7 +184,7 @@ ran, and no `--selftest`; each reading below is a probe of the changed code on t
   over a two-commit chain whose create is parentless.
 - AC43 — over a planted 10000-commit (PINNED) chain, the newest 50 (PINNED) sighted 60 s (PINNED) before
   the read and the rest 172800 s (PINNED) before it, `--claims` read `tBig` `stale` from both a scratch copy of the driver at
-  `e1a89844b` and this pass's; the whole verb took 1229 ms (DERIVED) against 1611 ms (DERIVED), a
+  `81409da27` and this pass's; the whole verb took 1229 ms (DERIVED) against 1611 ms (DERIVED), a
   ratio of 1.31 (DERIVED), the rest of the verb's fetch, sightings and spawns being fixed cost on this
   node. The log alone read 139 to 142 ms (DERIVED) whole and 34 to 49 ms (DERIVED) streamed and
   stopped after 51 (PINNED) commits. AC43's five-fold figure is not met by the whole verb on this node;

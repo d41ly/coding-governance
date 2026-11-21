@@ -144,7 +144,7 @@ P40; the owner's CL-4 and FR-1).
 
 ### Evidence
 
-Every citation below was read at `1ee23aaa`.
+Every citation below was read at `b41e4d04`.
 
 - No project-level request record exists. The verbatim record of a prompt today is build-scoped,
   under `<build>/prompts/` (`tools/unattended/unattended.sh#read_audit_ask_record`, the prompt record
@@ -407,7 +407,7 @@ New arm: tools/loop/request.py · covers AC1 AC7 · its `--selftest` plants, the
   existence check is a separate bounded read and the claim read is unchanged; S4 and §4 name the
   awk tail classifier in `read_claims`, the `case` in `derive_claim_keys` and the
   `check_cross_run_overlap` call in `run_lease_verb`; §5 and S6 name `help/loop.md`'s `--lease`
-  paragraph; every line citation is a `path#symbol` citation or a blob-pinned line, read at `1ee23aaa`.
+  paragraph; every line citation is a `path#symbol` citation or a blob-pinned line, read at `b41e4d04`.
   §7's leg line gains the legs the spec-token guard join names for the registries in Files touched,
   and names the new leg in prose under it, since the leg join refuses a name the manifest lacks.
 
@@ -426,7 +426,7 @@ module self-test, `tools/loop/loop_lib.py#run_selftest_cases`, run by a leg of i
 key to the remote"` ranked name-stem hits (`key`, `records`, `write_record`, `check_lease_only_diff`),
 none a request record. Scout B's citations of the card store, the prompt record reader
 (`tools/unattended/unattended.sh#read_audit_ask_record`) and `tools/runlog/runlog_lib.py#scan_secrets`
-agreed with source when re-read at `1ee23aaa`.
+agreed with source when re-read at `b41e4d04`.
 
 Recall terms used: `python tools/memory-recall/query.py "how does an owner request reach another node
 without its text leaving the node" --terms "request record content key relay lease claim owner

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-58
 
-The unit was built from its spec at rev-5 on base `1b4c56284`. Built: S2, the absence test after the
+The unit was built from its spec at rev-5 on base `c817c0402`. Built: S2, the absence test after the
 clear and before A in the placed race's attempt loop of `tools/unattended/unattended.test.sh`, its
 `DPR58 AC1` row placed before the `DPR48 AC3` row, the block's header naming the reset, and the two
 floors. S1 is unit 52's clear, observed under AC2. No gate, suite or bar ran in this pass. Every

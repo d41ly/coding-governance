@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-95 — the kickoff hook never runs a checker it resolved from its target's tree
 
-**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-20 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -185,7 +185,7 @@ a builder who adds a function regenerates it by `python tools/codebase-map/gen_m
   `grep '^FLOOR_ASSERTIONS=' tools/hooks/scratch-guard.test.sh` prints a value above 396 and a comment
   line above it names `TOOL-dPlacedRequest-95`; and
   `grep -c "cwd..s repository tracks" tools/hooks/scratch-guard.js` prints 0.
-  Red when: the resolver walks `cwd`, or the arm or its floor is missing; the hook at 95c3103ad is
+  Red when: the resolver walks `cwd`, or the arm or its floor is missing; the hook at 2b4cc0bd4 is
   that break, and the same probe there writes the marker in each fixture, `gotchas.py` does not
   print `foreign-code-runs-on-the-ambient-credential`, the first grep prints 0, the floor reads 396 and the comment names the `cwd`
   rung, its RED-first reading.
@@ -195,7 +195,7 @@ a builder who adds a function regenerates it by `python tools/codebase-map/gen_m
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `scratch-guard self-test` · `every held leg is budgeted, every budget row resolves` · `agent-cap self-test` · `format-guard self-test` · `hook destinations self-test` · `policy fixtures` · `verifier fan-out self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/hooks/scratch-guard.test.sh · covers AC1 · the three fixtures of §4, staged against the hook at 95c3103ad whose third rung runs the clone's tracked checker and writes the marker · FLOOR_ASSERTIONS raised by the arm's rows
+New arm: tools/hooks/scratch-guard.test.sh · covers AC1 · the three fixtures of §4, staged against the hook at 2b4cc0bd4 whose third rung runs the clone's tracked checker and writes the marker · FLOOR_ASSERTIONS raised by the arm's rows
 
 ## 8. Open questions
 

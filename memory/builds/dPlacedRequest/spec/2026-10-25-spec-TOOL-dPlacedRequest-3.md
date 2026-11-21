@@ -191,7 +191,7 @@ The owner row's deadline answers the `wait` rule (§8 F14). `entry.claim` needs 
 
 `entry.orient`'s placing outcome is computed, never typed: it is the value `python tools/policy/policy.py
 get placement` returns at the item boundary (I24), `agent-places` by the catalogue default (PINNED,
-`tools/policy/catalogue.toml` at 62c7df7f). One outcome per value is how a policy that chooses an item's
+`tools/policy/catalogue.toml` at e211ea71). One outcome per value is how a policy that chooses an item's
 successor is declared (flow-steps' `[rules]`).
 
 ### The placing route table
@@ -299,12 +299,12 @@ Live on landing: the loop legs read the rows at the next bar.
 - security — the rows only declare; every write is a sibling's verb behind its own boundary, and the
   owner row's record is written by the record factory.
 - perf / scale — five rows beside the 75 rows the definition reads today (PINNED, `loop: items` at
-  62c7df7f); Step 1 drops from five git reads to one on a carded session.
+  e211ea71); Step 1 drops from five git reads to one on a carded session.
 - error / empty / loading states — an absent intake is recorded absent; a card whose key moved is
   re-derived, never trusted; an unanswered owner placement files an ask at its deadline.
 - observability — each route names its target, and a stand-in route names its tool by path.
-- risks — `skills/session-kickoff/SKILL.md` measures 19378 bytes (PINNED, at 62c7df7f)
-  against its 18432 bytes row (PINNED, at 62c7df7f), the switch in `warn`: S6 rewrites Step 1 in
+- risks — `skills/session-kickoff/SKILL.md` measures 19378 bytes (PINNED, at e211ea71)
+  against its 18432 bytes row (PINNED, at e211ea71), the switch in `warn`: S6 rewrites Step 1 in
   place, S5 adds one paragraph, and the builder reports the measured figure; a raise is the owner's.
 - testing — staged breaks of the rows under the loop checks (§6).
 - migration — S4's deletion and S8's member only.
@@ -482,7 +482,7 @@ S6 under its `warn` switch (§5 risks); the recall floor legs guard the re-stamp
   to (b), by `2026-11-05-prompt-TOOL-dPlacedRequest-3-owner-forks`: each ask is the one this build's run
   files in dDeclaredLoop's `BACKLOG.md`, where §3, §4 and §5 pointed at the open forks.
 - rev-6 · 2026-11-20 · §1 · §2 S1, S2, S3, S4, S5, S7, S8 · §3 · §4 · §5 · §6 AC1 to AC9 · §7 · §8 F2,
-  F5, F7, F8, F9, F10 to F14 · §10 · re-grounded on the tree at 62c7df7f by
+  F5, F7, F8, F9, F10 to F14 · §10 · re-grounded on the tree at e211ea71 by
   `2026-11-20-prompt-TOOL-dPlacedRequest-3-reground-brief`: `probe` to the probe tool's stand-in; S8's
   `entry` segment; inline routes, stand-ins under the prefix; the orient row's `map`; the owner row's
   deadline; the claim's needs, exits and `waits`; tree verbs; `## pockets`; citations by symbol or tag.
@@ -492,7 +492,7 @@ S6 under its `warn` switch (§5 risks); the recall floor legs guard the re-stamp
 The seam S8 extends is `PROGRAM_SEGMENTS` in `tools/loop/loop_lib.py`, read by
 `tools/loop/loop_lib.py#check_program` alone: `python tools/codebase-map/reuse_lookup.py "admit an item
 program that sits in no step beside the review and probe programs"` ranked `check_program` a seam
-(fan-in 3, PINNED at 62c7df7f), and a grep for the tuple and for the `review` and `probe` program keys
+(fan-in 3, PINNED at e211ea71), and a grep for the tuple and for the `review` and `probe` program keys
 over `tools/loop/` found no other reader. The rows reuse the definition's `[[item]]` grammar and the
 landed verbs §4 names; the kickoff text reuses the R6 predicate, the `tree —` cell, the `now —` line
 and the `## pockets` section of `skills/session-kickoff/manifest-check.sh`. `python

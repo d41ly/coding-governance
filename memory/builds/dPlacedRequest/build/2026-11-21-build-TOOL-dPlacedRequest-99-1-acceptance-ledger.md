@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-99
 
-The unit was built from its spec at rev-2 on base `57513c1df`. Built: S1, the kickoff suite's
+The unit was built from its spec at rev-2 on base `48144fcbd`. Built: S1, the kickoff suite's
 card-store loop reading `card-store.fixture.sh --list`, its liveness row, its `TMP` normalised by
 `cygpath -m` where `cygpath` exists, its floor raised and the stale count on the floor comment
 corrected; S2, a resolver arm in each of the run-gates and kickoff suites; S3, `read_fence_line`'s
@@ -25,7 +25,7 @@ row's plants run alone as `python <the module> --fixture --plant <name>` over th
 - AC1 — `card-store.fixture.sh` — `--list | grep -c .` printed 34, and each of the 34 names run alone over this pass's engine exited 0 with every observation line `held` and no `MISSED` line: the 30 earlier plants in 613 s and S4's four in 119 s, node d. (DERIVED)
 - AC1 — `FLOOR_ASSERTIONS` — over the tip, `grep -c 'for cs_plant in publish publish-off'` printed 0, `grep -c 'cs_fx" --list'` printed 1, `grep -c 'the suite ran every plant --list names'` printed 1 and `grep '^FLOOR_ASSERTIONS='` printed `FLOOR_ASSERTIONS=408`, each over the kickoff suite. (DERIVED)
 - AC1 — `selftest-budgets.txt` — the `manifest-check self-test` row reads 4860, no longer 3820, and its note names the 34 plants `card-store.fixture.sh --list | grep -c .` prints. (DERIVED)
-- AC1 — `manifest-check self-test` — the RED reading over the base `57513c1df`, whose kickoff suite still holds the hand list as at `95c3103ad`: the loop grep printed 1, the floor read 379 and the row read 3820. (DERIVED)
+- AC1 — `manifest-check self-test` — the RED reading over the base `48144fcbd`, whose kickoff suite still holds the hand list as at `2b4cc0bd4`: the loop grep printed 1, the floor read 379 and the row read 3820. (DERIVED)
 - AC2 — `TOOL-dPlacedRequest-99 S2` — over the tip, the grep printed 2 for `tools/run-gates/run-selftests.test.sh`, the arm's label and its comment, its row writing tag `s` above tag `t`, and 3 for the kickoff suite, the comment and the two rows of the upper-cased `USERNAME` run; the kickoff floor reads 408. (DERIVED)
 - AC2 — `resolve_node_tag` — under `env -u GOV_NODE`, the function cut by `awk` with `_rs_reg_rx` from the run-gates kit's self-test runner, over a scratch root whose `AGENTS.md` holds the node's user's first character at tag `s` above the user at tag `t`, printed `t`; over a scratch copy staged with the substring compare it printed `s`. (DERIVED)
 - AC2 — `derive_node_tag` — under `env -u GOV_NODE`, the function cut from `skills/session-kickoff/manifest-check.sh` over a scratch registry naming the user at tag `q`, with `USERNAME` upper-cased, printed `node — q · <the user>`; over a copy staged with the case-sensitive compare it printed `UNKNOWN`. (DERIVED)
@@ -54,7 +54,7 @@ row's plants run alone as `python <the module> --fixture --plant <name>` over th
 - The placement leg's 29 plants by direct CLI took: (PINNED)
   79.2 s (PINNED)
 - which by the same rule needs a ceiling of at least 199.2, so its ceiling moved from 120 to 200 and the reading was recorded the same way; `pass_legs.py --apply` then changed no `pass_leg` field. (DERIVED)
-- Eight of placement's plants MISSED at the base on a `TypeError` in the format string of its lease-status read, `tools/loop/placement.py@57513c1df:595`, two `%s` fed one value. The loop kit is outside this write set, so the cause is reported, not fixed, and the `loop placement fixtures` leg reds at the close until it is. (DERIVED)
+- Eight of placement's plants MISSED at the base on a `TypeError` in the format string of its lease-status read, `tools/loop/placement.py@48144fcbd:595`, two `%s` fed one value. The loop kit is outside this write set, so the cause is reported, not fixed, and the `loop placement fixtures` leg reds at the close until it is. (DERIVED)
 - The loop rows' runtime `PLANTS` and the readings, by direct CLI over the base: witness 11 in 20.7 s, splice 14 with `check` in 9.3 s, parent routes 8 in 5.8 s, transition 13 with `check` in 33.4 s, placement 29 in 79.2 s, review bounds 14 in 10.0 s, termination 16 with `check` in 18.1 s, definition 55 in 21.3 s, breakpoints 14 in 88.3 s, guard 45 in 69.1 s, budget 41 in 177.7 s, position 31 in 68.3 s, factories 15 in 481.8 s. (PINNED)
 - The other nine loop rows already priced every plant their module holds, and took the token alone. (DERIVED)
 - The computed-witness row names its commit, `202e287fb`, where `PLANTS` held 4 against today's 11, so it was re-read; the splice row's `e9dbe0bb8` resolves to no object in this clone, so it was re-read as a row naming none. (DERIVED)
@@ -62,7 +62,7 @@ row's plants run alone as `python <the module> --fixture --plant <name>` over th
 - The run-gates suite pins `SELFTEST_FLOOR`, not `FLOOR_ASSERTIONS`, so by S2's wording its new arms move no floor; the pin is a minimum and the arms do not lower the count. (DERIVED)
 - The kit-epoch rule binds at the push boundary, where the lander mints each moved kit's version, so no version carrier moved in this pass. (DERIVED)
 
-- The bug-class checklist over the pass commit `f1b6cd352` selected `portability-sweep`: the kickoff arm upper-cased the user with a bash-4 case expansion the suite used nowhere else, now `tr '[:lower:]' '[:upper:]'`, probed to print the user upper-cased. (DERIVED)
+- The bug-class checklist over the pass commit `ff2ff2c35` selected `portability-sweep`: the kickoff arm upper-cased the user with a bash-4 case expansion the suite used nowhere else, now `tr '[:lower:]' '[:upper:]'`, probed to print the user upper-cased. (DERIVED)
 - It selected `refusal-branch-with-no-arm`: `check_plant_tokens`'s import-failure finding had no arm, so the run-gates suite gains one, a scratch module raising at import; the same function, cut and run over that module, printed `which did not import` and returned 1. (DERIVED)
 - It selected `fixture-passes-by-finding-nothing`: the S8 arm's first row compares named placeholders rather than two captures that could both be empty, a fix made before the pass commit from the same checklist read over the paths, and over an empty stand-in driver it fails. The S1 liveness row and the S5 control's graded count hold their populations. (DERIVED)
 - It selected `a-spelling-change-strands-its-readers`: no file under `skills/`, `tools/` or `help/` quotes a `card —` success line or the lander's re-fence `unreachable` wording; arm 54 matches the line's unchanged prefix. (DERIVED)

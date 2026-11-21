@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-42
 
-The unit was built from its spec at rev-3 (PINNED) on base `b0c21c920`. The behaviour the spec asks for was
+The unit was built from its spec at rev-3 (PINNED) on base `7b49146f0`. The behaviour the spec asks for was
 already in the tree: `TOOL-dPlacedRequest-28` moved the feed read into
 `tools/unattended/unattended.sh#write_claim`, where a `create` on an empty tip calls
 `tools/unattended/unattended.sh#read_feed_lease_tip` whether the write pushes or queues, and

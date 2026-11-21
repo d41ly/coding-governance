@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-63
 
-The unit was observed from its spec at rev-5 on base `17dd857c2`. It builds nothing and touches no
+The unit was observed from its spec at rev-5 on base `4009c1d2e`. It builds nothing and touches no
 product file: every criterion reads the text of the CLOSED specs 59, 61 and 57, or the driver,
 through the readers `sec`, `bullet` and `entries` and the live sweep, each cut from its fence in spec
 59's `### The criterion readers` and `### The live sweep` sections and sourced unchanged. No gate,

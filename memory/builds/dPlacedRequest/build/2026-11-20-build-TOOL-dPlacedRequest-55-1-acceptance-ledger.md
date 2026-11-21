@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-55
 
-The unit was built from its spec at rev-3 on base `3b663e72e`. It touches no product file: the
+The unit was built from its spec at rev-3 on base `c7eff5161`. It touches no product file: the
 oracle is the block under the spec's "The oracle the close runs" heading, and this pass observes it
 on scratch fixture repositories. No gate, suite or bar ran in this pass. The block was cut by `awk`
 from the spec into a scratch file under the session scratch and run by `bash` with the fixture's base

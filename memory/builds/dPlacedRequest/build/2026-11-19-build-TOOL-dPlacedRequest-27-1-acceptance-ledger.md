@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-27
 
-The unit was built from its spec at rev-2 on base `013c010e7`. Each criterion below was observed by a
+The unit was built from its spec at rev-2 on base `e0af6715a`. Each criterion below was observed by a
 probe of this unit's own code: `tools/lib/gov-ref.sh` and `tools/lib/gov-feed.sh` sourced in a scratch
 bare origin and two clones under the node's short temp path, `GOVREF_RUNNER` a plain runner, the feed
 in a fresh `GOVFEED_DIR`; the planted copies are `sed` cuts of the `gov_feed_sh` block the driver

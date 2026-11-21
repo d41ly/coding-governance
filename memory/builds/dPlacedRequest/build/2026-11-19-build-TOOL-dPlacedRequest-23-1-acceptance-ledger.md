@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-23
 
-The unit was built from its spec at rev-3 on base `13805a01f`. The driver already held the split the
+The unit was built from its spec at rev-3 on base `0d877e288`. The driver already held the split the
 spec states: `tools/unattended/unattended.sh#read_claims` refuses a failed `strict` read with check
 109 and returns before any policy read, and `leases.offline` is read only inside
 `tools/unattended/unattended.sh#run_lease_verb`, so no driver line changed. The pass adds the stops

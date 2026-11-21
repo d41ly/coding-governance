@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-95
 
-The unit was built from its spec at rev-2 on base `cd30d3d2c`. Built: S1, the resolver
+The unit was built from its spec at rev-2 on base `2280c00a7`. Built: S1, the resolver
 `tools/hooks/scratch-guard.js#resolveKickoffChecker` cut to the two rungs it reads from the hook's
 own install, the kit resolver from `__dirname` and the one tracked `manifest-check.sh` of the hook's
 own toplevel, its `cwd` parameter and the walk over `[__dirname, cwd]` gone, its one call in
@@ -30,8 +30,8 @@ home and temp, never the suite, against the fixed hook.
 - AC1 — `grep -c 'TOOL-dPlacedRequest-95' tools/hooks/scratch-guard.test.sh` — printed 8. (DERIVED)
 - AC1 — `grep '^FLOOR_ASSERTIONS=' tools/hooks/scratch-guard.test.sh` — printed `FLOOR_ASSERTIONS=400`, above 396, and the comment line three lines above it names TOOL-dPlacedRequest-95 and its rows. (DERIVED)
 - AC1 — `grep -c "cwd..s repository tracks" tools/hooks/scratch-guard.js` — printed 0. (DERIVED)
-- AC1 — `95c3103ad` — the RED reading: the same probe through copies of the hook's scripts at that base wrote the marker in each fixture, fixtures one and two reading `(no card: the kickoff checker's --card --path did not answer: exit 0: nothing printed)` and fixture three exiting 0 with the same text on its witness line. (DERIVED)
-- AC1 — `TOOL-dPlacedRequest-95` — the block probe printed four `ok` rows and no `FAIL` against the fixed hook; its RED-first reading against the hook at `95c3103ad` is owed to the close, below. (DERIVED)
+- AC1 — `2b4cc0bd4` — the RED reading: the same probe through copies of the hook's scripts at that base wrote the marker in each fixture, fixtures one and two reading `(no card: the kickoff checker's --card --path did not answer: exit 0: nothing printed)` and fixture three exiting 0 with the same text on its witness line. (DERIVED)
+- AC1 — `TOOL-dPlacedRequest-95` — the block probe printed four `ok` rows and no `FAIL` against the fixed hook; its RED-first reading against the hook at `2b4cc0bd4` is owed to the close, below. (DERIVED)
 
 ## Readings beside the criteria
 
@@ -44,11 +44,11 @@ home and temp, never the suite, against the fixed hook.
 - The hooks kit's version carrier was not moved by hand: `tools/govkit/govkit.py#cmd_epoch` states the lander mints the bump at the push boundary and a branch owes none, and this build's earlier hook moves, units 2, 34 and 43, carry no hand bump either. (DERIVED)
 - MSYS rewrites a quoted `"/"` inside a native program's argument to Git's install root, so the arm spells its forward slash through `path.posix.sep`; the first draft's marker path was mangled that way and the first probe read was discarded. (DERIVED)
 
-- The bug-class checklist over the pass commit selected `portability-sweep`: fixture three's payload spelled the target unquoted, so a scratch path holding a space would split it; the arm now single-quotes it, and the block probe read all four rows `ok` again under a scratch directory whose name holds a space, while the probe's quoted form still wrote the marker at `95c3103ad` and not at this pass. (DERIVED)
+- The bug-class checklist over the pass commit selected `portability-sweep`: fixture three's payload spelled the target unquoted, so a scratch path holding a space would split it; the arm now single-quotes it, and the block probe read all four rows `ok` again under a scratch directory whose name holds a space, while the probe's quoted form still wrote the marker at `2b4cc0bd4` and not at this pass. (DERIVED)
 - It selected `fixture-passes-by-finding-nothing`: each row holds only when the target tracks its checker and the card's text names no kickoff checker, so a fixture that built nothing or a hook that never reached `readCard` reads `FAIL`, and the marker the same fixtures wrote at the base is the liveness of the marker check. (DERIVED)
 - It selected `budget-row-not-remeasured-after-added-arms` and `an-attested-count-must-count-what-the-grader-counts`: the row is re-priced as a proxy above and its leg reading is owed below; each of the arm's rows moves the executed count by exactly one, on `ok` or on `FAIL`. (DERIVED)
 - It selected `held-suite-guard-misses-a-sibling-kit`: the arm copies only the hooks kit's own scripts, the kit resolver among them, and reads no sibling kit's file. (DERIVED)
-- It selected `staged-break-substitutes-a-synthetic-value`: the RED reading ran the hook's scripts as committed at `95c3103ad`, not a hand-made break. (DERIVED)
+- It selected `staged-break-substitutes-a-synthetic-value`: the RED reading ran the hook's scripts as committed at `2b4cc0bd4`, not a hand-made break. (DERIVED)
 - It selected `ledger-token-wrapped-across-a-line-joins-nothing`: every answer keeps its tokens on one line. (DERIVED)
 
 ## Items diverged
@@ -57,6 +57,6 @@ None.
 
 ## Owed at the close
 
-- `New arm:` `tools/hooks/scratch-guard.test.sh`, the TOOL-dPlacedRequest-95 block, four rows, `FLOOR_ASSERTIONS` raised to 400; its RED-first observation against the hook at `95c3103ad` and its GREEN reading inside the suite are the close's. (DERIVED)
+- `New arm:` `tools/hooks/scratch-guard.test.sh`, the TOOL-dPlacedRequest-95 block, four rows, `FLOOR_ASSERTIONS` raised to 400; its RED-first observation against the hook at `2b4cc0bd4` and its GREEN reading inside the suite are the close's. (DERIVED)
 - The `scratch-guard self-test` budget row's re-price from the main loop's first reading of the leg alone.
 - The legs the spec's Gates section names, run once by the main loop.

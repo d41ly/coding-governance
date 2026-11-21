@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-25
 
-The unit was built from its spec at rev-3 on base `0575ae861`. `renews` now has one derivation,
+The unit was built from its spec at rev-3 on base `0a7e5508f`. `renews` now has one derivation,
 `tools/unattended/unattended.sh#derive_lease_renews`, called once per lease write by
 `tools/unattended/unattended.sh#write_claim` over the epoch read (empty on a create), the epoch it
 writes, `leases.renewal` and a witness verdict. The verdict is the verb's

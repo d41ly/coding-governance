@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-28
 
-The unit was built from its spec at rev-4 (PINNED) on base `a2a6af2d2`, the second dispatch after the first
+The unit was built from its spec at rev-4 (PINNED) on base `66868d39e`, the second dispatch after the first
 returned a divergence. `tools/unattended/unattended.sh#read_feed_lease_tip` holds the read
 `tools/unattended/unattended.sh#run_lease_verb` made inline under "THE EPOCH FOR LIFE", its `awk` and its
 `cat-file` unchanged, and prints nothing, `tombstone <commit>` or `<commit> <epoch>` (S1).

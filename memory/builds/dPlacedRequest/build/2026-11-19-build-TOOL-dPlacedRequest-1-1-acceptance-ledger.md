@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-1
 
-The unit was built from its spec at rev-9 on base `a250e173d`. Each criterion below was observed by a
+The unit was built from its spec at rev-9 on base `7f5206a9c`. Each criterion below was observed by a
 probe of this unit's own code: the driver `tools/unattended/unattended.sh` run as a process in scratch
 fixtures under the node's short temp path, each a bare origin with its HEAD set and clones holding the
 suite's conf keys under `RUN_CLAIMS="on"` and `USERNAME=daily-agent`, policy values planted as the

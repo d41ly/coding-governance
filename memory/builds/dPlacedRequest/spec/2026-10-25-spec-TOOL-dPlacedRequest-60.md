@@ -34,7 +34,7 @@ bullet "the same way" as 44's AC1, a range that closes only at the next criterio
 34's last criterion, so the range ran to the end of the file, and the clause that the bullet names
 `TOOL-dPlacedRequest-44` could pass on a later revision line while AC59 carried no pointer.
 
-Re-grounded on 2026-11-20 against the tree at `78b81e5ec` by
+Re-grounded on 2026-11-20 against the tree at `61b097906` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`. Unit 57 is DEFERRED, so the
 amendment this unit ordered is made now, once, in 57's rev-5 text (F2). Unit 34 is CLOSED and its
 AC59 frozen, so 57's AC2 no longer reads it: it reads 54's AC1 through the same closers, and its red

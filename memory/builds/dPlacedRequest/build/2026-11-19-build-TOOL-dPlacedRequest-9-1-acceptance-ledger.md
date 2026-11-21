@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-9
 
-The unit was built from its spec at rev-6 (PINNED) on base `5f874dfc6`. The playbook kit gains the
+The unit was built from its spec at rev-6 (PINNED) on base `63cd4c82f`. The playbook kit gains the
 `pockets` verb, `tools/playbook/instruction_units.py#run_pockets`, reading the units the card's slot
 composes through `tools/playbook/overlay.py#derive_slot_units` with the selector `reader.card`, which
 `tools/playbook/readers.toml` now declares. The kickoff engine gains

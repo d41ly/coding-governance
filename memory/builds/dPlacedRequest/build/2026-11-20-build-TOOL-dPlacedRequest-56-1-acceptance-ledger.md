@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-56
 
-The unit was built from its spec at rev-8 on base `a511688d9`. It builds the product its first
+The unit was built from its spec at rev-8 on base `634946b2a`. It builds the product its first
 section lists as left: the scratch-directory case in `skills/session-kickoff/manifest-check.test.sh`
 (S7, S8) and the torn-stamp and duplicate-key rows in `tools/unattended/unattended.test.sh` (S20,
 S22), each suite's floors raised with a `RAISED` comment. Every other item is observed by a probe or

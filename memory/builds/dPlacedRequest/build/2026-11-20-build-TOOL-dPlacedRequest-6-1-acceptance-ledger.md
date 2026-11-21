@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-6
 
-The unit was built from its spec at rev-4 (PINNED) on base `98a80993b`. `tools/loop/loop.toml` declares
+The unit was built from its spec at rev-4 (PINNED) on base `844063a15`. `tools/loop/loop.toml` declares
 `map = "base"` on the ten (DERIVED) items of the spec's declarations table and `unfolds = ["kit",
 "policy"]` on `item.design.inventory`. The loop reader gained `tools/loop/loop_lib.py#check_item_maps`,
 run by `--check` after the seeds, with the namespace words read from the playbook kit's
@@ -45,7 +45,7 @@ code: `python tools/loop/loop_lib.py --check` over this tree, its own `--fixture
   was refused as outside the values; with `namespaces` None a row unfolding `nope` drew no refusal and
   the `unarmed` line. The `conf-readers-declared` plant still held, exit 0 (PINNED).
 
-**The checklist, acted on.** The bug-class checklist over the pass commit `8157ae7ea` selected 29
+**The checklist, acted on.** The bug-class checklist over the pass commit `5770e6f85` selected 29
 classes (DERIVED: 23 by an anchor and 6 universal). Two needed a change.
 rule-stated-with-no-check-that-fails: two refusal branches had no arm, so `unfold-not-list` sets
 `item.design.inventory`'s `unfolds` to the string `kit` and exited 1 (PINNED) naming the item, and

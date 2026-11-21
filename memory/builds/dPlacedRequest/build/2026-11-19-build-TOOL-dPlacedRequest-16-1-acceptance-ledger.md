@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-16
 
-The unit was built from its spec at rev-8 on base `5f71c0608`. A lease is never deleted by the kit
+The unit was built from its spec at rev-8 on base `675237eee`. A lease is never deleted by the kit
 but a run's tombstone. `tools/unattended/unattended.sh#read_claims` reads the status `released` with
 the verdict `released`, stamps `gov-last-fetch` on every read that answered, and carries the walk's
 renewing beat out as the row's `beat-sha` field.

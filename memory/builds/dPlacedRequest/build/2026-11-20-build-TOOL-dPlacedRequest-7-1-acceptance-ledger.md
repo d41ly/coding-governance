@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-7
 
-The unit was built from its spec at rev-9 (PINNED) on base `d78f9957e`. `tools/loop/loop.toml` gains the
+The unit was built from its spec at rev-9 (PINNED) on base `222f05e8b`. `tools/loop/loop.toml` gains the
 probe program's eight (DERIVED) `[[item]]` rows at `step = "none"`, five (DERIVED) `[[trigger-cause]]`
 rows, the `[[record-version]]` rows of `record-kind.probe-trigger` and `record-kind.probe`, the
 `probe-rerun` computed witness serving `item.probe.run`, and the outcome `probe` routed to the probe
@@ -76,7 +76,7 @@ the parsed definition, or one `--fixture --plant` case of `tools/loop/probe.py` 
   `tools/loop/termination.py#check_termination` over gov's composition returned no finding, so no
   counted cycle passes a probe item.
 - AC10 — the catalogue read printed the four `probe.*` keys, and the `probe.points` row read `set` and
-  `[]`. After the pass commit `0c406e7e1`, `check_policy.scan_reader_keys` at the repository root
+  `[]`. After the pass commit `09732d80b`, `check_policy.scan_reader_keys` at the repository root
   printed a list holding `probe.experiment.authority`, `probe.observations`, `probe.points` and
   `probe.raise`, and `git grep -n "probe.raise" -- probe.py` in the loop kit's directory found the
   literal-key read `policy.resolve("probe.raise", str(root))`. The same list held one message text
@@ -100,7 +100,7 @@ the parsed definition, or one `--fixture --plant` case of `tools/loop/probe.py` 
   (PINNED) on the run's node; after the checklist pass the eighteen (DERIVED) plants held in 111 s
   (PINNED) under load and 49 s (PINNED) again, and the budget row prices the worst reading.
 
-**The checklist, acted on.** The bug-class checklist over the pass commit `0c406e7e1` selected 40
+**The checklist, acted on.** The bug-class checklist over the pass commit `09732d80b` selected 40
 classes (DERIVED: 34 by an anchor and 6 universal). Four needed a change.
 rule-stated-with-no-check-that-fails: refusal branches had no arm, so the plant `refusals` stages a bad
 `--asker`, `--request` and `--build`, a retried trigger, pin, design, run, judge and return, a pin of a
@@ -123,7 +123,7 @@ forged-field rule; the probe verbs strip the inherited git variables through
 alone; the cause with no rule in `tools/loop/probe.py#check_trigger_cause`, which needs a definition row
 the tree does not hold; and a pin whose commit git refuses.
 
-The checklist over the checklist commit `678142129` selected 25 classes (DERIVED: 19 by an anchor and 6
+The checklist over the checklist commit `b1f8f9160` selected 25 classes (DERIVED: 19 by an anchor and 6
 universal). One needed a change: ledger-token-wrapped-across-a-line-joins-nothing, since this ledger's
 quoted refusal lines were wrapped mid-span, and each is now one line.
 

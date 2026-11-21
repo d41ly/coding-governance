@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-5
 
-The unit was built from its spec at rev-7 (PINNED) on base `7775ef415`. A placement block gains the
+The unit was built from its spec at rev-7 (PINNED) on base `8c3d875c8`. A placement block gains the
 `breakpoint` key, written only where the return carries it (`tools/loop/placement.py#add_placement`,
 `tools/loop/placement.py#render_placement_block`). `tools/loop/placement.py#check_breakpoint` is the
 `breakpoint` row of `tools/loop/placement.py#check_disposition_fact`: a name

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-57
 
-The unit was observed from its spec at rev-5 on base `786ebb028`. The spec touches no product file:
+The unit was observed from its spec at rev-5 on base `64092870f`. The spec touches no product file:
 the read is criterion text and the oracle is the block of `TOOL-dPlacedRequest-56`'s design section,
 so this pass is the ledger alone. No gate, suite or bar ran in this pass. The block under that
 spec's "The oracle the close runs" heading was cut by `awk` into the run's scratch directory and run

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-21
 
-The unit was built from its spec at rev-9 (PINNED) on base `6053cf840`. The unattended driver gains
+The unit was built from its spec at rev-9 (PINNED) on base `efce704ca`. The unattended driver gains
 `--entry-claim <slug> --request <content key> [--pieces <n>]` in
 `tools/unattended/unattended.sh#run_entry_claim`, its claim ref read through
 `tools/unattended/unattended.sh#read_claim_ref` and its later keys added by

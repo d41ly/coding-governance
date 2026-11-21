@@ -32,7 +32,7 @@ The spec audit of this build, round 1
 confirmed **finding 6 at HIGH**, its item **H2**. `TOOL-dPlacedRequest-2` pushes
 `refs/gov/builds/<slug>/card` at every READY append, with the `remote-ref` store selected by default,
 "Live at landing" and no `RUN_CLAIMS` switch. The kickoff engine is linked into every project's skills
-directory (`WIRE-INTO-PROJECT.md@a161887b4674:71`), so on their next kit update every adopter's
+directory (`WIRE-INTO-PROJECT.md@76049fc990c5:71`), so on their next kit update every adopter's
 sessions would write governance refs to the shared remote without opting in, while units 1 (§8 F2)
 and 12 (§8 F3) settle the same question the other way. The engine never reads the conf's switch
 itself: the driver is its one reader (`skills/session-kickoff/manifest-check.sh#derive_claims_line`,

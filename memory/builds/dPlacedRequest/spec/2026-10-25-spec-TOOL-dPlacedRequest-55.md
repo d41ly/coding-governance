@@ -32,7 +32,7 @@ ends `if git log … -p "$r" -- … | grep -E …; then exit 1; fi; exit 0` read
 and no `pipefail` is set. When the walk dies (a partial clone missing blobs offline, a bad object, a
 signal), `grep` matches nothing and the oracle certifies "no version bump" over a walk it never read.
 
-Re-grounded on 2026-11-20 against the tree at `0d700d256` by
+Re-grounded on 2026-11-20 against the tree at `e57eca71b` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`. The oracle is not product
 code: it is a spec's command block, run once at the close on the prepared merge. Spec 44 wrote it, is
 CLOSED, and the charter's P19 keeps its block as built; on a clean build that block's last `grep`

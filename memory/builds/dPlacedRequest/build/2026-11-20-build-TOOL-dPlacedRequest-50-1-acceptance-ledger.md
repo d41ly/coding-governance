@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-50
 
-The unit was built from its spec at rev-6 on base `1731847f5`. Its F2 ruling makes S1 and S2
+The unit was built from its spec at rev-6 on base `d8feb5fdd`. Its F2 ruling makes S1 and S2
 observations of spec 47's built arm and text, so this pass builds nothing: no driver line, no arm
 row and no function moved, and spec 47, CLOSED, is untouched. No gate, suite or bar ran in this pass.
 

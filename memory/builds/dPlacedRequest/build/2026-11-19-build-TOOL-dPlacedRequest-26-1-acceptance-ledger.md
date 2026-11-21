@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-26
 
-The unit was built from its spec at rev-3 on base `8654b7474`. The walk the spec designs already (PINNED)
+The unit was built from its spec at rev-3 on base `cb82a2743`. The walk the spec designs already (PINNED)
 stands in `tools/unattended/unattended.sh#read_claims`: TOOL-dPlacedRequest-17's spec rev-5 built (PINNED)
 the age pass's walk from each row's tip while the `epoch` is the tip's (an absent `epoch` reads 0), (PINNED)
 taking the newest commit whose `renews` reads `yes` or is absent, else the tenure's opening commit.

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-15
 
-The unit was built from its spec at rev-6 (PINNED) on base `a1c5630e4`. The driver gains the `fence` act of
+The unit was built from its spec at rev-6 (PINNED) on base `45df28985`. The driver gains the `fence` act of
 `--lease`, `tools/unattended/unattended.sh#write_fence_beat`, dispatched for `build <slug>` only. The lander
 gains `tools/push-main.sh#read_fence_line`, `tools/push-main.sh#check_fence_beat` and
 `tools/push-main.sh#write_effect_push`, the one push both landing paths now make, and carries the

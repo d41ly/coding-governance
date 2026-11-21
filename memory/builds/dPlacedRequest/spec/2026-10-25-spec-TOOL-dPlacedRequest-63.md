@@ -58,7 +58,7 @@ order 35, after unit 62 at 34.
 
 Units 43, 44, 52, 54, 56, 57 and 60 are CLOSED, and the charter's P19 keeps built work out of
 in-place rewrites; units 59 and 61 are DEFERRED, and a builder writes no spec. Re-grounded on
-2026-11-20 against the tree at `8a52e8e3b` by
+2026-11-20 against the tree at `52981af4d` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, each item is one of four
 kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
 observes item Sn.

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-38
 
-The unit was built from its spec at rev-6 on base `9152c6068`. Section 2a of (PINNED)
+The unit was built from its spec at rev-6 on base `084483004`. Section 2a of (PINNED)
 `tools/lib/resolve-python.test.sh` sits right after the `PARITY_ROWS` loop:
 `tools/lib/resolve-python.test.sh#check_feed_copies` takes the carrier files, cuts each one's
 `gov_feed_sh` block with the file's own `blk`, and sources it after the canonical `health_log_sh` cut

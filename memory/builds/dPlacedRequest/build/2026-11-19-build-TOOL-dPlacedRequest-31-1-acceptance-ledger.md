@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-31
 
-The unit was built from its spec at rev-4 (PINNED) on base `3100d2abd`. `tools/unattended/unattended.sh#write_request_record`
+The unit was built from its spec at rev-4 (PINNED) on base `ef4109d58`. `tools/unattended/unattended.sh#write_request_record`
 now appends `<session><TAB><blob>` to `<git-common-dir>/requests/<key>.typed`, the blob `GIT hash-object --
 <file>` of the bytes this session submitted, once per session and blob; a hash that does not answer, or
 answers other than an object id, is refused through the append's own `this session could not be added to`

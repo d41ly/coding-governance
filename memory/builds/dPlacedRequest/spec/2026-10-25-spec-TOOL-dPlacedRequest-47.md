@@ -35,7 +35,7 @@ wrote carried no guard for a commit the feed has not sighted. That guard is in t
 commit present in `seen`, and the walk fills `seen` only from feed lines whose `seen-utc` is
 ISO-shaped, so neither an unset stamp nor the feed's `-` placeholder reaches the compare. The
 verdict pass of the same function prints `unknown` with age `-` for a row whose tip or beat has no
-sighting. Both came in with `TOOL-dPlacedRequest-34`'s bounded walk, commit 84130eaeb.
+sighting. Both came in with `TOOL-dPlacedRequest-34`'s bounded walk, commit 1e47be845.
 
 No arm pins the guard. The `TOOL-dPlacedRequest-35` block of `tools/unattended/unattended.test.sh`
 says it does not drive an unsighted commit at the threshold test and hands that case to this unit.

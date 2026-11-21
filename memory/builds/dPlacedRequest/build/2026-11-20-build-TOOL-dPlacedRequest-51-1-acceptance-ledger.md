@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-51
 
-The unit was built from its spec at rev-3 on base `b4db035dd`. Its Files touched names no product
+The unit was built from its spec at rev-3 on base `0e40dbb85`. Its Files touched names no product
 file: the class record's section "A merge onto the default tip" gains the split rows and the fixture
 line under its table, and no new line backticks a path, so `memory/gotchas/INDEX.md` does not move.
 No gate, suite or bar ran in this pass. Every reading is a `grep` of the record or `git log` over a

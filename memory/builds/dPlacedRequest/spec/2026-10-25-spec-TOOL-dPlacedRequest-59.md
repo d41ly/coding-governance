@@ -55,7 +55,7 @@ which unit 57 closes at HIGH. It sits at order 31, after units 58 and 60 at 30.
 | S21 | 23 (L10) | LOW | units 44, 54 |
 
 Every unit the minors land on is now CLOSED, the charter's P19 keeps built work out of in-place
-rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `8a52e8e3b` by
+rewrites, and a builder writes no spec. Re-grounded on 2026-11-20 against the tree at `52981af4d` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, each item is one of four
 kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
 observes item Sn.

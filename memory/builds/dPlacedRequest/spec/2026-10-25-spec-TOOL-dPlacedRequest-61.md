@@ -56,7 +56,7 @@ unit 60 closes at HIGH. It sits at order 33, after unit 59 at 31.
 
 Units 44, 48, 50, 54, 56, 57 and 58 are CLOSED, and the charter's P19 keeps built work out of
 in-place rewrites; unit 59 is DEFERRED, and a builder writes no spec. Re-grounded on 2026-11-20
-against the tree at `8a52e8e3b` by
+against the tree at `52981af4d` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-59-orders-31-36-reground-brief`, each item is one of three
 kinds. The scope ids are kept so the siblings that cite them still resolve, and criterion ACn
 observes item Sn.

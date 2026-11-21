@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-43
 
-The unit was built from its spec at rev-11 on base `3fc16744c`. Built: S9 (the stops guide's
+The unit was built from its spec at rev-11 on base `dac2af17c`. Built: S9 (the stops guide's
 `leases.offline` row names `--entry-claim`), S14 and S33 (`--no-filters` on the `.typed` append in
 `tools/unattended/unattended.sh#write_request_record` and on the read in
 `tools/unattended/unattended.sh#check_request_consent`), S16 and S17 (`CARD_PUBLISH_BOUND` beside
@@ -22,7 +22,7 @@ CLI over a scratch fixture, the fixture repositories under the node's short temp
 THE BLOCK PROBE, the reading the lines below cite as "the block": the new region-eight block of
 `tools/unattended/unattended.test.sh`, run alone over the suite's own prelude and fixture helpers,
 never the suite, printed no failing row; it executes 25 rows, 24 `same` and `hit` lines and (DERIVED)
-the one `mutate` of `build_claim_held`. Over the base driver `3fc16744c` the AC14, AC33 and AC30 rows
+the one `mutate` of `build_claim_held`. Over the base driver `dac2af17c` the AC14, AC33 and AC30 rows
 fail, four in all; the other rows observe code landed units built and read the same there. (DERIVED)
 
 **Evidences:** TOOL-dPlacedRequest-43

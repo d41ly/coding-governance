@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-41
 
-The unit was built from its spec at rev-3 on base `ca7905d6c`. The offline branch of (PINNED)
+The unit was built from its spec at rev-3 on base `7c7516c16`. The offline branch of (PINNED)
 `tools/unattended/unattended.sh#run_lease_verb` now takes `gov-queue.lock` through
 `tools/unattended/unattended.sh#write_gov_queue_hold` before it reads anything, reads the ref's newest
 queued commit through `tools/unattended/unattended.sh#read_gov_queue_head`, and hands it to
@@ -41,7 +41,7 @@ answered stamped `gov-last-fetch`.
   ref, the flush printed `yield` for both lines, the second naming that an earlier queued write of it
   yielded, the health log gained 2 `lease-yielded` lines, the origin kept the foreign commit, and the (DERIVED)
   queue held 0 lines. (DERIVED)
-- The staged red, the base's driver: a checkout of `ca7905d6c`'s `tools/` in a scratch repository, the (PINNED)
+- The staged red, the base's driver: a checkout of `7c7516c16`'s `tools/` in a scratch repository, the (PINNED)
   same probe printed `lease not written — tOff/build holds no lease to release` for the release, 1 (DERIVED)
   queue line, and after the flush the origin's tOff read `status: live`, the lease the node released (DERIVED)
   still held; tOff2's flush yielded 1 line and left the release unqueued. The spec's red-when names (DERIVED)

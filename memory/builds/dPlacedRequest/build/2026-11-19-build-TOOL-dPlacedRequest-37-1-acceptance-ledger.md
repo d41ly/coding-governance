@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-37
 
-The unit was built from its spec at rev-6 on base `281fabfb7`. The tree already met S1: (PINNED)
+The unit was built from its spec at rev-6 on base `97862913b`. The tree already met S1: (PINNED)
 TOOL-dPlacedRequest-24 minted `NODE_LOCK_BOUND=10` at the top of the `gov_feed_sh` block and the (PINNED)
 feed's take passes it as the hold of `tools/lib/gov-feed.sh#write_dir_lock_wait`, so S1 and AC2 were
 observed, not rebuilt. S3 is the one code change: `tools/lib/gov-feed.sh#add_feed_event` tests

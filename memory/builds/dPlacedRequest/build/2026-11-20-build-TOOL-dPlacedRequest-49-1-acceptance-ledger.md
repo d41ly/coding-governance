@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-49
 
-The unit was built from its spec at rev-7 on base `e292371f8`. Built: S2, S5, S6, S8, S20, S23, S26,
+The unit was built from its spec at rev-7 on base `05b542efd`. Built: S2, S5, S6, S8, S20, S23, S26,
 S28, S32, S33 and S34; probed: S12 and S22; nothing for the items the spec's §4 closes or resolves.
 `tools/lib/gov-feed.sh#write_dir_lock` sets `_fl_mine=1` once its `mkdir` lands and writes `owner`
 before `until`; `tools/lib/gov-feed.sh#add_feed_event`'s subshell empties `_fl_mine`, arms its `EXIT`

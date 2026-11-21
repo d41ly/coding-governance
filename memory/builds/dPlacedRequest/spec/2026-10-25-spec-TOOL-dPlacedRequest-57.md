@@ -35,7 +35,7 @@ spec run lands, so a base typed by one run names, in the next, a commit before t
 landing: the oracle then walks the spec run's landing as this build's merge, and the own-merge test
 protects nothing. Every close-time read passes the base of the run doing the reading.
 
-Re-grounded on 2026-11-20 against the tree at `78b81e5ec` by
+Re-grounded on 2026-11-20 against the tree at `61b097906` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-56-orders-29-30-reground-brief`. Units 54, 44 and 34 are
 CLOSED, and the charter's P19 keeps them as built. Spec 54 rev-6 already runs its AC1 with the base
 this unit's S1 reads, and its AC3 is out; spec 44's AC1 and spec 34's AC59 are frozen. The one

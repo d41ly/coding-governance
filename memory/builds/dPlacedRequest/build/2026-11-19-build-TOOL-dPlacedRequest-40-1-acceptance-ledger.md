@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-40
 
-The unit was built from its spec at rev-3 (PINNED) on base `e7abc136d`. In
+The unit was built from its spec at rev-3 (PINNED) on base `84b0d1e5e`. In
 `tools/unattended/unattended.sh#run_lease_verb` the `TOOL-dPlacedRequest-32` S4 refusal now sits inside one
 `case` on the act, right after the `RUN_CLAIMS` switch: `prune`, `flush`, `fence` and `status` are the exempt
 list and pass with no session; `acquire`, `take-over`, `renew`, `release` and `offer` are written as the

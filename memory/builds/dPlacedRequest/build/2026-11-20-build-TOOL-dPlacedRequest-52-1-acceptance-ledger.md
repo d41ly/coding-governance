@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-52
 
-The unit was built from its spec at rev-10 on base `ce4a81a9a`. Built: S3 and S4, the placed race's
+The unit was built from its spec at rev-10 on base `3b1d2bec8`. Built: S3 and S4, the placed race's
 attempt loop in `tools/unattended/unattended.test.sh`; S19, the skip signal in
 `skills/session-kickoff/manifest-check.sh#run_driver_bounded` and its four callers; S20, the guarded
 trap of `tools/lib/gov-feed.sh#add_feed_event`, its header, the three carried copies and the release
@@ -13,7 +13,7 @@ of the changed code: a cut of a function or a loop sourced over a stub, or an `a
 file, each run under the session scratch or the node's short temp path.
 
 **Evidences:** TOOL-dPlacedRequest-52
-- AC1 — the placed-race block — owed to the close: the driver suite's run judges the `DPR48 AC1` and `DPR48 AC2` rows on the first kept attempt, and its red runs the block with `SCRIPT` at `3fc16744c`; this pass probed the attempt loop alone, below under AC3 and AC4.
+- AC1 — the placed-race block — owed to the close: the driver suite's run judges the `DPR48 AC1` and `DPR48 AC2` rows on the first kept attempt, and its red runs the block with `SCRIPT` at `dac2af17c`; this pass probed the attempt loop alone, below under AC3 and AC4.
 - AC9 — `size join` — owed to the close: the line is the spec-tokens leg's output, which a role agent may not run; see Items diverged.
 - AC5 — `awk '/^write_request_record\(\)/{f=1} f; f&&/^}/{exit}'` over the driver, then `grep -n 'cp -- '`, printed one line naming `$key.md.$$`, after the `write_dir_lock_wait` line and before the `remove_dir_lock` line of the cut. (DERIVED)
 - AC10 — `sed '/^## 9\./,$d'` over spec 43 piped to `grep -o 47104 | wc -l` printed 0, and the same cut holds `read_size_ceilings`. (PINNED)
@@ -45,6 +45,6 @@ file, each run under the session scratch or the node's short temp path.
 ## Owed at the close
 
 - AC9, by the `spec tokens` leg.
-- AC1, AC3, AC4, AC20, AC25 and AC26 in the suite run, and each `New arm:` line's RED-first observation: the race block's staged sleep of 11 s (PINNED) after `pr_t0` on the first attempt and on every attempt, and AC1 with `SCRIPT` at `3fc16744c`; the trap arm's unguarded copy; the renews loop's two copies.
+- AC1, AC3, AC4, AC20, AC25 and AC26 in the suite run, and each `New arm:` line's RED-first observation: the race block's staged sleep of 11 s (PINNED) after `pr_t0` on the first attempt and on every attempt, and AC1 with `SCRIPT` at `dac2af17c`; the trap arm's unguarded copy; the renews loop's two copies.
 - AC19's suite arm in `manifest-check.test.sh`, and its RED against callers reading rc 125 alone.
 - The legs the spec's Gates section names, run once by the main loop.

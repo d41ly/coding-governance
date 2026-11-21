@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-10
 
-The unit was built from its spec at rev-4 (PINNED) on base `c965feaac`. `tools/loop/placement.py` gains
+The unit was built from its spec at rev-4 (PINNED) on base `513c64c94`. `tools/loop/placement.py` gains
 `tools/loop/placement.py#derive_entry_fact` over the table `tools/loop/placement.py#ENTRY_FACTS` (shared
 interface I20), the scenario arm of `tools/loop/placement.py#check_placement` in
 `tools/loop/placement.py#check_placement_scenarios`, the default-aware selection

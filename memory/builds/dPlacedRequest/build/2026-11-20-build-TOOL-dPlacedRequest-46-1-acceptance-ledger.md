@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-46
 
-The unit was built from its spec at rev-6 on base `971c932d5`. The walk's `step` in
+The unit was built from its spec at rev-6 on base `4c3162038`. The walk's `step` in
 `tools/unattended/unattended.sh#read_claims` gains one stop after the tenure's end and before the
 renewing beat: a commit whose `renews` reads `-` stops the row there and stands for the beat, so the
 verdict pass's existing never-stale read of that flag decides the row and no older commit of the

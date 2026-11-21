@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-8
 
-The unit was built from its spec at rev-7 (PINNED) on base `bf6abc3b2`. The item kind's schema,
+The unit was built from its spec at rev-7 (PINNED) on base `475d7cf21`. The item kind's schema,
 `tools/loop/item-schema.toml`, gained the `seed`, `map` and `unfolds` field rows, each scalar's `widens`
 order its value set; thirteen (DERIVED) role items of `tools/loop/loop.toml` declare a `seed`. The loop
 reader gained `tools/loop/loop_lib.py#check_item_seeds`, `tools/loop/loop_lib.py#read_seed_values`,
@@ -40,7 +40,7 @@ driver run over this tree and over a scratch repository holding only a one-line 
   plan record carries a scope; dRankedPlan's plan.record arms it`.
 - AC7 — `bash tools/unattended/unattended.sh --path-tokens --files-touched HEAD <this spec>` exited 0
   (PINNED) and printed 13 (DERIVED) paths, byte-identical to what the base's own `read_files_touched`,
-  extracted from `bf6abc3b2` and sourced alone, printed for the same spec.
+  extracted from `475d7cf21` and sourced alone, printed for the same spec.
 - AC8 — `grep -n "question-paths" loop.md` in `help/` finds the new section on the seed, which names the
   four values and the `seed` command, and the item kind's field list.
 - Other answers, by probe: a missing `--unit`, a `--build` of `../x`, a unit no spec defines, an item no
@@ -50,7 +50,7 @@ driver run over this tree and over a scratch repository holding only a one-line 
   refusals, no spec after `--files-touched`, another flag, and a spec git cannot read, each exited 2
   (PINNED) with one `path-tokens not read` line. The `conf-readers-declared` plant still held.
 
-**The checklist, acted on.** The bug-class checklist over the pass commit `76d584249` selected 63
+**The checklist, acted on.** The bug-class checklist over the pass commit `cdd51b2d4` selected 63
 classes (DERIVED: 57 by an anchor and 6 universal). Two needed a change. refusal-branch-with-no-arm:
 the resolver's refusals were probed by hand only, so `seed-write` now also runs a missing `--unit`, a
 missing `--build`, a `--build` of `../tFix`, a unit no spec defines and a spec written but never

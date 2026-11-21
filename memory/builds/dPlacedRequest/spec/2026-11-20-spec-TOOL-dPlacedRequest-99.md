@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-99 — the closing review's minors: every plant on a gate, a resolver arm, honest re-fence and card outcomes, a re-priced row and three loose ends
 
-**Status:** CLOSED · rev-2 · 2026-11-21 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-21 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -398,7 +398,7 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   row of `tools/run-gates/selftest-budgets.txt` no longer reads 3820 and its note names the plant count
   that `bash skills/session-kickoff/card-store.fixture.sh --list | grep -c .` prints.
   Red when: the loop names a hand list, or the liveness row, the floor rise or the re-price is missing;
-  at 95c3103ad the loop names 8 of the 30 plants `--list` prints, the second and third greps print 0,
+  at 2b4cc0bd4 the loop names 8 of the 30 plants `--list` prints, the second and third greps print 0,
   the floor reads 379 and the row reads 3820, its RED-first reading.
   cost: about fourteen minutes on node d for the thirty-four runs, by §4's readings.
 - **AC2** — When `grep -c 'TOOL-dPlacedRequest-99 S2' tools/run-gates/run-selftests.test.sh` and
@@ -411,7 +411,7 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   user's first character at tag `s` above the user at tag `t`, prints `t`, and a probe evaluating
   `derive_node_tag`, cut from `skills/session-kickoff/manifest-check.sh`, over a scratch registry naming
   the user, with `USERNAME` upper-cased, prints that row's tag and not `UNKNOWN`.
-  Red when: an arm is missing, or a resolver matches by substring or case-sensitively; at 95c3103ad
+  Red when: an arm is missing, or a resolver matches by substring or case-sensitively; at 2b4cc0bd4
   both greps print 0 and the floor reads 379, its RED-first reading. The build also runs the two probes
   against scratch copies staged with the pre-S20 `case` line and the case-sensitive compare, where they
   print `s` and `UNKNOWN`, the reading each new arm must red on.
@@ -422,7 +422,7 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   `awk` from `tools/push-main.sh` with the functions it calls, against a stub driver whose `--after`
   answer is the exit-2 `lease not written — x` line, and again against a bad-beat fence line, it prints
   `unreachable` each time and no `claim-lost` on stderr.
-  Red when: a non-answer returns 1, or the classifier reads a non-answer as `fenced`; at 95c3103ad both
+  Red when: a non-answer returns 1, or the classifier reads a non-answer as `fenced`; at 2b4cc0bd4 both
   non-answers return 1, and the classifier probe prints `fenced` with the `claim-lost` remedy, its
   RED-first reading.
 - **AC4** — When `bash skills/session-kickoff/card-store.fixture.sh --plant follow-offline-publish` and
@@ -431,7 +431,7 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   run, each exits 0, its follow's card carries the foreign publish's tail, and `resolve_build_card`
   prints that same card.
   Red when: the stored tail is read ref-first, or a cache is served over a newer foreign publish;
-  staged by the fixture beside a copy of the engine at 95c3103ad, each offline plant prints `MISSED`
+  staged by the fixture beside a copy of the engine at 2b4cc0bd4, each offline plant prints `MISSED`
   with the older tail, and beside rev-1's rule 1 each foreign plant prints `MISSED` with the cache's
   tail, its RED-first reading.
 - **AC5** — When a probe evaluates `check_plant_tokens`, cut by `awk` from the run-gates kit's self-test
@@ -441,7 +441,7 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   two plants and adding one more by `PLANTS.update`, under a row reading `plants=2`, it reports that row
   with 3; and `grep -c 'observed' memory/gotchas/budget-row-not-remeasured-after-added-arms.md` prints
   at least 1.
-  Red when: a row's count differs from the plants its module's self-test runs; at 95c3103ad the
+  Red when: a row's count differs from the plants its module's self-test runs; at 2b4cc0bd4 the
   placement row prices fifteen plants against 29, no check reads it, and the record names `--write`
   alone, its RED-first reading.
   figure: 29 and 3 are DERIVED by the runtime count at the probe; 15 and 2 are the staged breaks.
@@ -449,31 +449,31 @@ the lander suite's floor whenever `TOOL-dPlacedRequest-98` has pinned one.
   `tail from cache`; and `python tools/memory-tree/gotchas.py --for-paths skills/session-kickoff/manifest-check.sh`
   prints `global-set-and-never-read`; and `grep -c 'global-set-and-never-read.md' memory/map/features/session-kickoff.md`
   prints 1.
-  Red when: `CARD_STORED_FROM` is assigned and read nowhere; at 95c3103ad
+  Red when: `CARD_STORED_FROM` is assigned and read nowhere; at 2b4cc0bd4
   `grep -rn CARD_STORED_FROM skills tools` prints only lines that assign it or name it in a comment,
   its RED-first reading.
 - **AC7** — When `grep -n '^FLOOR_ASSERTIONS=' tools/hooks/scratch-guard.test.sh` runs, it prints a value
   one above the pin the file held before this unit, and `grep -c '^# [0-9]* = [0-9]* + .*AC28'
   tools/hooks/scratch-guard.test.sh` prints 1.
-  Red when: the floor leaves AC28's rows out; at 95c3103ad the pin reads 396 and the second grep prints 0,
+  Red when: the floor leaves AC28's rows out; at 2b4cc0bd4 the pin reads 396 and the second grep prints 0,
   its RED-first reading.
 - **AC8** — When `grep -c '0 claimed, 1 refused, 2 not written, 3 spent, 4 waiting, 5 a fresh slug owed'
   tools/unattended/unattended.sh` runs, it prints 2, the usage line and `run_entry_claim`'s header;
   and `python tools/memory-tree/gotchas.py --for-paths tools/unattended/unattended.sh` prints
   `usage-exit-list-lags-its-function`; and `grep -c 'usage-exit-list-lags-its-function.md'
   memory/map/features/unattended.md` prints 1.
-  Red when: the usage line omits a return or spells one in other words; at 95c3103ad the same grep
+  Red when: the usage line omits a return or spells one in other words; at 2b4cc0bd4 the same grep
   prints 1, the header alone, its RED-first reading.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `manifest-check self-test` · `run-selftests self-test` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `policy fixtures` · `codebase-map coverage + freshness` · `push-main self-test` · `scratch-guard self-test` · `agent-cap self-test` · `hook destinations self-test` · `verifier fan-out self-test` · `review-join self-test` · `unattended kit gate` · `tier2-review self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC4 AC6 · the hand list of 8 restored, the case-sensitive node compare restored, and the engine of 95c3103ad under the four S4 plants · FLOOR_ASSERTIONS raised by the rows added
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC4 AC6 · the hand list of 8 restored, the case-sensitive node compare restored, and the engine of 2b4cc0bd4 under the four S4 plants · FLOOR_ASSERTIONS raised by the rows added
 New arm: tools/run-gates/run-selftests.test.sh · covers AC2 AC5 · the substring case restored, a budget copy whose placement token reads 15, and a scratch module growing PLANTS by update under a token of 2 · none, the suite pins no floor
 New arm: tools/hooks/scratch-guard.test.sh · covers AC7 · the every-host AC28 row deleted with sg_win forced empty, which reds the raised floor on any host, node d's MINGW64 included, where the Windows-only row would otherwise absorb the deletion · FLOOR_ASSERTIONS raised by one
-New arm: tools/unattended/unattended.test.sh · covers AC8 · the usage line of 95c3103ad, which omits the returns 2 and 3, and a return of a variable with no pinning comment · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
-New arm: tools/push-main.test.sh · covers AC3 · the exit-2 answer and the bad-beat fence line on the after call, staged against the classifier of 95c3103ad that reads both as fenced · the floor TOOL-dPlacedRequest-98 pins, raised by the two rows
+New arm: tools/unattended/unattended.test.sh · covers AC8 · the usage line of 2b4cc0bd4, which omits the returns 2 and 3, and a return of a variable with no pinning comment · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/push-main.test.sh · covers AC3 · the exit-2 answer and the bad-beat fence line on the after call, staged against the classifier of 2b4cc0bd4 that reads both as fenced · the floor TOOL-dPlacedRequest-98 pins, raised by the two rows
 
 ## 8. Open questions
 

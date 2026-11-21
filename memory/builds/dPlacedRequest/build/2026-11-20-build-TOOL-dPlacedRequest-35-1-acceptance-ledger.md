@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-35
 
-The unit was built from its spec at rev-4 on base `b10497c86`. The bounded walk TOOL-dPlacedRequest-34 (PINNED)
+The unit was built from its spec at rev-4 on base `14f7d2e87`. The bounded walk TOOL-dPlacedRequest-34 (PINNED)
 built in `tools/unattended/unattended.sh#read_claims` tested the renewing beat under an `ep[c] == te[i]`
 guard ahead of the tenure stop, so it already read no age across an epoch change, as that unit's
 `Decided:` line records. This pass puts the three tests of the walk's `step` in S1's stated order, the

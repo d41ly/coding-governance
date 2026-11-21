@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-98 — the fenced-landing arms fail, never skip, when their fixture fails
 
-**Status:** CLOSED · rev-2 · 2026-11-21 · node d · Tier-2 · base 95c3103a · streams tooling · order 37
+**Status:** CLOSED · rev-2 · 2026-11-21 · node d · Tier-2 · base 2b4cc0bd · streams tooling · order 37
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -179,7 +179,7 @@ step failed.
   under `skipped=0` and `floor not compared` under `skipped=1`; and
   `grep -c 'TOOL-dPlacedRequest-98' tools/run-gates/selftest-budgets.txt` prints 1.
   Red when: the fixture reads the live registry or the ambient `GOV_NODE`, or the floor is compared on
-  a partial install; the suite at 95c3103ad is that break, and there the same probe's function returns
+  a partial install; the suite at 2b4cc0bd4 is that break, and there the same probe's function returns
   1 because the acquire is refused, with no floor line, no compare to cut, the waiver row present and
   the budget row naming no unit of this build, its RED-first reading.
   fixture: the scratch worktree and the fixture's clones, built by the probe; the tree holds none.
@@ -190,7 +190,7 @@ step failed.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `push-main self-test` · `every held leg is budgeted, every budget row resolves` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `harness arms (fail branches armed or pinned)` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates`
 
-New arm: tools/push-main.test.sh · covers AC1 · the fixture's registry with daily-agent renamed, which the suite at 95c3103ad answers with the skip and all cases ok · FLOOR_ASSERTIONS pinned at the count the suite prints with every block running, compared only where no dependency skip fired
+New arm: tools/push-main.test.sh · covers AC1 · the fixture's registry with daily-agent renamed, which the suite at 2b4cc0bd4 answers with the skip and all cases ok · FLOOR_ASSERTIONS pinned at the count the suite prints with every block running, compared only where no dependency skip fired
 
 ## 8. Open questions
 

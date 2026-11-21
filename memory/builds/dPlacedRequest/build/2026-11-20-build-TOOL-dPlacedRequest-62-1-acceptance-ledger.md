@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-62
 
-The unit was observed from its spec at rev-3 on base `1f1774d4c`. It builds nothing and touches no
+The unit was observed from its spec at rev-3 on base `e0f220cd9`. It builds nothing and touches no
 product file: every criterion reads the text of specs 59, 61, 54 and 52, frozen at their close,
 through the readers `sec`, `bullet` and `entries` cut from the fence of spec 59's
 `### The criterion readers` section and sourced unchanged. No gate, suite or bar ran in this pass.

@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-19
 
-The unit was built from its spec at rev-7 (PINNED) on base `689ef0382`. The loop kit gains
+The unit was built from its spec at rev-7 (PINNED) on base `0dd2d5fc3`. The loop kit gains
 `tools/loop/request.py`, whose `tools/loop/request.py#derive_request_content_key` keys a request through the
 memory-tree kit's `tools/memory-tree/row_grammar.py#derive_content_key`, found by `read_memory_tree` in
 `tools/loop/loop_lib.py`, and whose `key` verb reads the file through
@@ -87,7 +87,7 @@ observed by its own CLI over files in that scratch directory, each plant run one
   row's proxy.
 - The legs the spec's section 7 names, the kit gate's check 26 over the new verb among them.
 
-**The checklist, acted on.** The bug-class checklist over the pass commit `60c744ca9` selected 60 (DERIVED)
+**The checklist, acted on.** The bug-class checklist over the pass commit `c06b6c2f4` selected 60 (DERIVED)
 classes by anchor and 6 (DERIVED) universal. One needed a change. refusal-branch-with-no-arm: the
 lease's malformed key and third segment, a request that is not UTF-8, a session id outside letters,
 digits and dashes, no file and a file that is not there, and the push and the record read that do not

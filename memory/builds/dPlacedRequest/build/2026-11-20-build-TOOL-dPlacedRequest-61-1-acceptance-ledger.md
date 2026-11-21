@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-61
 
-The unit was observed from its spec at rev-6 on base `435fd5664`. It builds nothing and touches no
+The unit was observed from its spec at rev-6 on base `cf41657ba`. It builds nothing and touches no
 product file: every criterion reads spec 59's text, frozen at its close, or spec 57's, through the
 readers `bullet`, `sec` and `entries` cut from the fence of spec 59's `### The criterion readers`
 section and sourced unchanged. The items its spec marks NOT OBSERVED are resolved in its §4 and

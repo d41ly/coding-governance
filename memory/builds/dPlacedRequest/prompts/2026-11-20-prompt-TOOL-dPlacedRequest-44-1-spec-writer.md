@@ -104,7 +104,7 @@ Not supplied, optional: `input:spec`, `input:code`.
 ### brief:goal
 
 Units 44, 45, 48 and 50 (order 25, all DEFERRED) each repair a unit this run has since built and CLOSED:
-`TOOL-dPlacedRequest-43` (rev-11, CLOSED at 555e5923f) and `TOOL-dPlacedRequest-47` (rev-7, CLOSED at 6f75267ca).
+`TOOL-dPlacedRequest-43` (rev-11, CLOSED at c96319ad2) and `TOOL-dPlacedRequest-47` (rev-7, CLOSED at c0c7531b8).
 Unit 43's re-ground already folded unit 44's S3 and unit 48's S4 into spec 43 (its F6), and spec 47 rev-7 already
 carries the mixed-tenure criterion unit 50 asks for. The charter's P19 keeps built work out of in-place rewrites, so
 no item of these four may edit spec 43 or spec 47. Re-ground all four specs so a builder can build each as written,

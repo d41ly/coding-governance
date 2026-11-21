@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-36
 
-The unit was built from its spec at rev-5 on base `49ebe8d8b`. TOOL-dPlacedRequest-24 had moved the (PINNED)
+The unit was built from its spec at rev-5 on base `0e047f564`. TOOL-dPlacedRequest-24 had moved the (PINNED)
 factory into the `gov_feed_sh` block of `tools/lib/gov-feed.sh` and both carriers, so the two event
 calls of `tools/lib/gov-feed.sh#write_dir_lock` now read `resolve_health_log "${ROOT:-${1%/*}}"`, the
 block's comment states how the path is found, the canonical header states the carrier requirement,

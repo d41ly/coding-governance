@@ -40,7 +40,7 @@ finding and, in brackets, the review item holding it. Criterion ACn observes ite
 
 Every unit the minors land on is now CLOSED, and the charter's P19 keeps built work out of in-place
 rewrites, so no item edits a spec and the builder writes none. Re-grounded on 2026-11-20 against the
-tree at `3007c7e52`, each item is one of three kinds, and the scope ids are kept so the siblings that
+tree at `393cc71e6`, each item is one of three kinds, and the scope ids are kept so the siblings that
 cite them still resolve:
 
 | Kind | Items |
@@ -272,7 +272,7 @@ fact each finding asked for stands here, or in the code an item of this unit bui
 
 ### Evidence
 
-Probed 2026-11-20 at `3007c7e52`:
+Probed 2026-11-20 at `393cc71e6`:
 
 - `CARD_FETCH_BOUND` defaults to 20, `CARD_CLAIMS_BOUND` to 15 and `CARD_PUBLISH_BOUND` to 140, at
   the blob pins S1 and S2 cite (`d55b7b28`).

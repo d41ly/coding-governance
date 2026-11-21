@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-59
 
-The unit was built from its spec at rev-7 on base `fad08da21`. Built: item S7 alone, the shared
+The unit was built from its spec at rev-7 on base `a6b248b8b`. Built: item S7 alone, the shared
 claim-line reader `tools/unattended/unattended.sh#CLAIM_KV_AWK`, which both programs of
 `tools/unattended/unattended.sh#read_claims` prepend, and its suite rows in
 `tools/unattended/unattended.test.sh#read_kv_row`, with `tools/unattended/unattended.test.sh#slice_fn`

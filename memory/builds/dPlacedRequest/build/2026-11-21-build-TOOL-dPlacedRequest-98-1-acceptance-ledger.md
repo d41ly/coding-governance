@@ -2,8 +2,8 @@
 
 **Serves:** journal TOOL-dPlacedRequest-98
 
-The unit was built from its spec at rev-2 on base `6d4c35b4f`, whose lander suite is byte-identical to
-the one at `95c3103ad`. Built: S1. In `tools/push-main.test.sh#write_fence_fixture` the fixture makes,
+The unit was built from its spec at rev-2 on base `c989f8bc0`, whose lander suite is byte-identical to
+the one at `2b4cc0bd4`. Built: S1. In `tools/push-main.test.sh#write_fence_fixture` the fixture makes,
 under `$FX` and outside both clones, a scratch kit tree that is a git root of its own, holding copies
 of the driver's kit, the playbook kit (found beside the lander by its `render_playbook.py`, copied to
 `playbook/` so the driver's kit probe finds it) and, where the install has them, the `policy` and
@@ -39,7 +39,7 @@ reads the pin from the `FLOOR_ASSERTIONS=` line, and evaluates the cut with `n` 
 - AC1 — `testsuite-count-waivers.txt` — over the tip, `grep -cx 'tools/push-main.test.sh' memory/project/testsuite-count-waivers.txt` printed 0. (DERIVED)
 - AC1 — `FAIL` — the floor probe under `skipped=0` printed `FAIL — the suite ran 100 assertions, below its floor of 101 …` and set `fail=1`; under `skipped=1` it printed `push-main.test: floor not compared — a dependency skip fired` and left `fail=0`. (DERIVED)
 - AC1 — `selftest-budgets.txt` — over the tip, `grep -c 'TOOL-dPlacedRequest-98' tools/run-gates/selftest-budgets.txt` printed 1. (DERIVED)
-- AC1 — `95c3103ad` — the RED reading, over the base worktree whose suite matches `95c3103ad`'s byte for byte: the fixture probe's function returned 1, the acquire refused and the origin holding no lease, `fleet-tag:` empty; `grep -c '^FLOOR_ASSERTIONS=[0-9]*$'` printed 0; the floor probe found no closing compare to cut; the waiver grep printed 1; the budget grep printed 0, the `push-main self-test` row naming `TOOL-dSafePassage-42` and no unit of this build. (DERIVED)
+- AC1 — `2b4cc0bd4` — the RED reading, over the base worktree whose suite matches `2b4cc0bd4`'s byte for byte: the fixture probe's function returned 1, the acquire refused and the origin holding no lease, `fleet-tag:` empty; `grep -c '^FLOOR_ASSERTIONS=[0-9]*$'` printed 0; the floor probe found no closing compare to cut; the waiver grep printed 1; the budget grep printed 0, the `push-main self-test` row naming `TOOL-dSafePassage-42` and no unit of this build. (DERIVED)
 
 ## Readings beside the criteria
 
@@ -73,7 +73,7 @@ reads the pin from the `FLOOR_ASSERTIONS=` line, and evaluates the cut with `n` 
 - It selected `an-attested-count-must-count-what-the-grader-counts` and `insert-after-a-key-that-occurs-twice`: no `ok` sits in a subshell, a pipe or a helper called more than once, and `FLOOR_ASSERTIONS` is assigned on one line only. (DERIVED)
 - It selected `ledger-token-wrapped-across-a-line-joins-nothing` and `empty-field-collapses-unless-it-is-last`: every answer keeps its tokens on one line, and the budget row keeps its empty third field between two tabs, as before. (DERIVED)
 
-- Both probes re-ran over a fresh scratch worktree of the committed tip `190aaad26`, its suite blob `31a8fa373`, the registry edited as above: the fixture returned 0 with `fleet-tag:` reading `a`, and the floor probe printed the `FAIL` line under `skipped=0` and `floor not compared` under `skipped=1`. (DERIVED)
+- Both probes re-ran over a fresh scratch worktree of the committed tip `a35f91bb7`, its suite blob `31a8fa373`, the registry edited as above: the fixture returned 0 with `fleet-tag:` reading `a`, and the floor probe printed the `FAIL` line under `skipped=0` and `floor not compared` under `skipped=1`. (DERIVED)
 
 ## Items diverged
 
@@ -81,6 +81,6 @@ None.
 
 ## Owed at the close
 
-- `New arm:` `tools/push-main.test.sh` — the fenced-landing fixture over a registry with `daily-agent` renamed, which the suite at `95c3103ad` answers with the skip and `all cases ok`; its RED-first observation in the suite and its GREEN reading, and the pin's confirmation: the count the suite prints with every block running must equal `FLOOR_ASSERTIONS`, raised or lowered inline by the main loop where its reading differs.
+- `New arm:` `tools/push-main.test.sh` — the fenced-landing fixture over a registry with `daily-agent` renamed, which the suite at `2b4cc0bd4` answers with the skip and `all cases ok`; its RED-first observation in the suite and its GREEN reading, and the pin's confirmation: the count the suite prints with every block running must equal `FLOOR_ASSERTIONS`, raised or lowered inline by the main loop where its reading differs.
 - The `push-main self-test` leg's measured reading against its ceiling, and the ceiling move §4 routes to the main loop where the reading exceeds it.
 - The legs the spec's Gates section names, run once by the main loop.

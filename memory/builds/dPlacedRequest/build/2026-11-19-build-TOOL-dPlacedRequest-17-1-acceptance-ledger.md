@@ -2,7 +2,7 @@
 
 **Serves:** journal TOOL-dPlacedRequest-17
 
-The unit was built from its spec at rev-5 on base `a33105588`. Each criterion below was observed by a
+The unit was built from its spec at rev-5 on base `6f1645487`. Each criterion below was observed by a
 probe of this unit's own code: the driver's `--claims` run in a scratch clone with a bare origin under
 the node's short temp path, `RUN_CLAIMS` on, each lease planted on the origin by `commit-tree` with
 explicit parents and each sighting a line appended to the clone's `gov-feed.log`. The red copies are a

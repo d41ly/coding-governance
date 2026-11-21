@@ -141,7 +141,7 @@ A clean build prints the header line and nothing after it.
   `0 commits` and the refusal, exit 1. With one commit planted on top of the merge it took the
   merge-base form and printed `· 3 commits` and both version lines; 3 is PINNED, two branch commits
   and the planted one.
-- Measured 2026-11-20 on this run's branch tip at `555e5923f`: the merge-base form walked 235 commits (PINNED)
+- Measured 2026-11-20 on this run's branch tip at `c96319ad2`: the merge-base form walked 235 commits (PINNED)
   and printed no `KIT_` line, and the block's exit was 1, the status `grep` gives no match.
 
 ### Files touched (estimate)
@@ -190,7 +190,7 @@ its acceptance ledger.
   0, and the AC24 paragraph of that spec, cut by `awk '/^- \*\*AC24\*\*/{f=1} f&&/^- \*\*AC2[5-9]\*\*/{exit} f'`
   and squeezed by `tr -s '[:space:]' ' '`, names `TOOL-dPlacedRequest-44`.
   Red when: a first-parent oracle stands in spec 43 beside this one.
-  figure: 0 PINNED, read 2026-11-20 at `555e5923f`.
+  figure: 0 PINNED, read 2026-11-20 at `c96319ad2`.
 
 ## 7. Gates
 

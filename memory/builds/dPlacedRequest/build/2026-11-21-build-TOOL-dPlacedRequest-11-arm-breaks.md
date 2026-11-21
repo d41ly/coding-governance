@@ -3,9 +3,9 @@
 # TOOL-dPlacedRequest-11 — the staged breaks the close's arm observations used
 
 The build method owes each `New arm:` line a RED reading on its staged break and a GREEN one once restored. These ran
-at VERIFYING in scratch clones of `2db4a921f` on node d, LF-normalised, with `TMPDIR` in POSIX form. A break is a text
+at VERIFYING in scratch clones of `0f767b340` on node d, LF-normalised, with `TMPDIR` in POSIX form. A break is a text
 replacement applied by a scratchpad helper, or a file checked out at an older commit: `9e21ac760` is the run's pinned
-BASE, and `95c3103ad` is the tree the closing review read. The unattended kit's suites are waived for this landing
+BASE, and `2b4cc0bd4` is the tree the closing review read. The unattended kit's suites are waived for this landing
 (README rule), so its 47 arm lines are not observed here (PINNED). The GREEN readings of the manifest-check, push-main,
 run-selftests and pre-push suites' arms are the flagged bar's, on the prepared merge.
 
@@ -167,7 +167,7 @@ run-selftests and pre-push suites' arms are the flagged bar's, on the prepared m
 | TOOL-dPlacedRequest-5 | `tools/loop/breakpoints.py` | `u5-placed-unhooked` | FAIL placed | breakpoint fixtures PASS |
 | TOOL-dPlacedRequest-14 | `tools/loop/budget.py` | `u14-draw-removed` | FAIL placement-loop | budget fixtures PASS |
 | TOOL-dPlacedRequest-21 | `tools/loop/claim.py` | `u21-route-leases-first` | FAIL refusals | claim fixtures PASS |
-| TOOL-dPlacedRequest-100 | `tools/loop/claim.py` | driver at `95c3103ad` | stale-holder MISSED, exit 4, epoch unmoved | claim fixtures PASS |
+| TOOL-dPlacedRequest-100 | `tools/loop/claim.py` | driver at `2b4cc0bd4` | stale-holder MISSED, exit 4, epoch unmoved | claim fixtures PASS |
 | TOOL-dPlacedRequest-19 | `tools/loop/request.py` | `u19-raw-bytes-key` | FAIL normalised-pair | request fixtures PASS |
 | TOOL-dPlacedRequest-7 | `tools/loop/probe.py` | `u7-run-refuted` | FAIL run-refuted | probe fixtures PASS |
 | TOOL-dPlacedRequest-8 | `tools/loop/loop_lib.py` | `u8-seed-bad` | FAIL seed-bad, and the other seed plants | loop definition fixtures PASS |
@@ -179,17 +179,17 @@ run-selftests and pre-push suites' arms are the flagged bar's, on the prepared m
 | TOOL-dPlacedRequest-2 | `tools/hooks/scratch-guard.test.sh` | `u2-silent-checker-as-card` | FAIL AC10 | scratch-guard PASS |
 | TOOL-dPlacedRequest-43 | `tools/hooks/scratch-guard.test.sh` | `u43-no-kill-signal` | FAIL AC18, three rows | scratch-guard PASS |
 | TOOL-dPlacedRequest-34 | `tools/hooks/scratch-guard.test.sh` | `u34-bare-bash`, `u34-no-fold` | FAIL AC28 | scratch-guard PASS |
-| TOOL-dPlacedRequest-95 | `tools/hooks/scratch-guard.test.sh` | hook at `95c3103ad` | FAIL AC1, all three fixtures | scratch-guard PASS |
+| TOOL-dPlacedRequest-95 | `tools/hooks/scratch-guard.test.sh` | hook at `2b4cc0bd4` | FAIL AC1, all three fixtures | scratch-guard PASS |
 | TOOL-dPlacedRequest-99 | `tools/hooks/scratch-guard.test.sh` | `u99-every-host-row`, `u99-sg-win-empty` | NOT RED: the suite stays green | scratch-guard PASS |
 | TOOL-dPlacedRequest-11 | `tools/lib/resolve-python.test.sh` | `u11-post-merge-byte` | FAIL `gov_ref_sh` copy drifted | flagged bar |
 | TOOL-dPlacedRequest-13 | `tools/lib/resolve-python.test.sh` | `u13-helper-removed` | FAIL the feed-writer census | flagged bar |
 | TOOL-dPlacedRequest-34 | `tools/lib/resolve-python.test.sh` | `u34-cands-reorder` | FAIL the readCard order row | flagged bar |
 | TOOL-dPlacedRequest-11 | `.githooks/pre-push.test.sh` | `u11-clear-any-push` | FAIL 8b | pre-push PASS |
 | TOOL-dPlacedRequest-34 | `.githooks/pre-push.test.sh` | `u34-base-missing-predicate` | FAIL 9c | pre-push PASS |
-| TOOL-dPlacedRequest-99 | `tools/run-gates/run-selftests.test.sh` | runner at `95c3103ad` | FAIL S5, four arms | flagged bar |
+| TOOL-dPlacedRequest-99 | `tools/run-gates/run-selftests.test.sh` | runner at `2b4cc0bd4` | FAIL S5, four arms | flagged bar |
 | TOOL-dPlacedRequest-99 | `tools/run-gates/run-selftests.test.sh` | `u99-substring-tag` | FAIL S2 | flagged bar |
 | TOOL-dPlacedRequest-15, -29, -34, -43, -99 | `tools/push-main.test.sh` | lander at `9e21ac760` | FAIL arms 42 to 56 and the floor | flagged bar |
-| TOOL-dPlacedRequest-98 | `tools/push-main.test.sh` | suite at `95c3103ad`, registry renamed | the skip line for 42-53 | flagged bar |
+| TOOL-dPlacedRequest-98 | `tools/push-main.test.sh` | suite at `2b4cc0bd4`, registry renamed | the skip line for 42-53 | flagged bar |
 | TOOL-dPlacedRequest-1, -2, -9, -16, -49, -52, -56, -99 | `skills/session-kickoff/manifest-check.test.sh` | engine at `9e21ac760` | FAIL rows naming each unit | flagged bar |
 | TOOL-dPlacedRequest-33, -34, -43 | `skills/session-kickoff/card-store.fixture.sh` | engine at `9e21ac760` | FAIL each owned plant | flagged bar |
 
@@ -199,7 +199,7 @@ run-selftests and pre-push suites' arms are the flagged bar's, on the prepared m
   floor, so deleting the every-host AC28 row with the fold row forced off still passes; the floor that holds on every
   host is the measured count less the Windows-only row. Unit 99 is CLOSED, so this stands as a departure and an ask.
 - **Three push-main arms fail under every lander tried**: 37, 39 and 40 red with the lander at the run's BASE, at
-  `55fd5b426` and with the suite of `95c3103ad`, so they do not read this build's lander changes; the flagged bar's
+  `3fbf691da` and with the suite of `2b4cc0bd4`, so they do not read this build's lander changes; the flagged bar's
   HEAD reading decides whether they are red at HEAD.
 - **The resolve-python suite reds six rows at HEAD in the clone** that no commit of this build touched: three inline
   `resolve_python` copies, one `guarded_write_py` copy and the two idiom bans. They are inherited from the base.

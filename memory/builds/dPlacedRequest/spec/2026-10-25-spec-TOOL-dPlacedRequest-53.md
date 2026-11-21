@@ -35,7 +35,7 @@ matching lines, so over one line it prints 0 or 1: the three criteria stayed red
 their items were built, and the "named in two places" property each existed to check was never
 decided.
 
-Re-grounded on 2026-11-20 against the tree at `0d700d256` by
+Re-grounded on 2026-11-20 against the tree at `e57eca71b` by
 `2026-11-20-prompt-TOOL-dPlacedRequest-52-orders-27-28-reground-brief`. Unit 52 is DEFERRED, so the
 rewrite this unit ordered is a spec act, made once at unit 52's rev-10 (F2), and no builder writes
 it. The re-grounding of unit 52 left none of the three counts standing: its AC1 judges the placed
@@ -90,7 +90,7 @@ structure; that rule stands for any count a later criterion asks above 1.
 - Measured 2026-10-25 on node a over a hand-written sample whose two `S25` sit in two paragraphs
   before a `## 9.` heading: `flat | grep -c 'S25'` printed 1, and `flat | grep -o 'S25' | wc -l`
   printed 2. PINNED at that date.
-- Measured 2026-11-20 at `0d700d256`, before unit 52's rev-10, by
+- Measured 2026-11-20 at `e57eca71b`, before unit 52's rev-10, by
   `grep -n -A1 "grep -c" memory/builds/dPlacedRequest/spec/*.md` read for "at least": unit 52's AC1,
   AC6 and AC9 were the only criteria pairing `flat` with a count above 1; unit 59's hit is a
   criterion whose own search pattern spells the shape, not a count of the shape; every other hit
