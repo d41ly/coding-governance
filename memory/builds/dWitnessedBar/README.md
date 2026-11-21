@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -194,12 +194,12 @@ ids TOOL-dWitnessedBar-105 TOOL-dWitnessedBar-999
 | [TOOL-dWitnessedBar-92 — the round-1 audit of unit 90, 13 minors batched: a call site isolated from the floor, ledger notes labelled and placed under their answer, criteria that can red, a narrower write grant and a derivation that names every exit](spec/2026-10-25-spec-TOOL-dWitnessedBar-92.md) | 48 | 2 | CLOSED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-93 — unit 92's note check places a row when one selected note sits under its answer, so one label and token answering two criteria passes](spec/2026-10-25-spec-TOOL-dWitnessedBar-93.md) | 49 | 2 | CLOSED | rev-2 | 2026-11-21 |
 | [TOOL-dWitnessedBar-94 — unit 92's note check matches a label only where it opens a continuation line, so another note's prose cannot stand in for a missing note](spec/2026-10-25-spec-TOOL-dWitnessedBar-94.md) | 49 | 2 | CLOSED | rev-2 | 2026-11-21 |
-| [TOOL-dWitnessedBar-95 — unit 92 AC5 reads the write grant through the shipped parser and containment test, so a declared ancestor of the spec directory reds](spec/2026-10-25-spec-TOOL-dWitnessedBar-95.md) | 49 | 2 | INPROGRESS | rev-2 | 2026-11-21 |
+| [TOOL-dWitnessedBar-95 — unit 92 AC5 reads the write grant through the shipped parser and containment test, so a declared ancestor of the spec directory reds](spec/2026-10-25-spec-TOOL-dWitnessedBar-95.md) | 49 | 2 | CLOSED | rev-2 | 2026-11-21 |
 | [TOOL-dWitnessedBar-96 — unit 92's note check reads a token's value through an optional pattern column, so a derivation note must name the launcher and exit 0](spec/2026-10-25-spec-TOOL-dWitnessedBar-96.md) | 49 | 2 | DEFERRED | rev-2 | 2026-11-21 |
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 923 bound to this build, across 4 record folder(s).
+Records: 924 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
