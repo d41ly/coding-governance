@@ -1,6 +1,6 @@
 # KICK-dKeptSession-38 — the card-fixture verdict passes only while the tested binary is both PATH's and the session's, and an unknown version is red
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md](../build/2026-11-21-build-KICK-dKeptSession-16-reground-orders-7-13-returns.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-26 |
+| [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -39,6 +40,9 @@ as red. It repairs `KICK-dKeptSession-12` and builds one step after it (order 9)
   `read_claude_version`'s answer now (`KICK-dKeptSession-37` S1) and equals
   `read_session_cli_version`'s answer now (`KICK-dKeptSession-12` S1). Otherwise it answers `red:
   recorded under cli <old>, PATH now <new>` or `red: fixture ran cli <x>, this session runs <y>`.
+  The tests run in one order and the first that fails answers: the verdict word and the blob as
+  `KICK-dKeptSession-12` S2 has them, then S2's unknown sides, then PATH, then the session; so a
+  recorded red keeps its own reason, and a verdict that is no pass spawns no `claude --version`.
   Observed by AC1 and AC2.
 - **S2** — id 58. Unknown is red. A recorded `cli unknown`, a `read_claude_version` answering
   `unknown: <why>` or a `read_session_cli_version` answering no version reads `red: cli version
@@ -46,7 +50,10 @@ as red. It repairs `KICK-dKeptSession-12` and builds one step after it (order 9)
   by AC3.
 - **S3** — id 58. The plants `fixture-cli-path-differs`, the recorded version equal to the session's
   and PATH's stub different, and `fixture-cli-unknown`, on `PLANTS` in
-  `skills/session-kickoff/card-store.fixture.sh`. Observed by AC1 to AC3.
+  `skills/session-kickoff/card-store.fixture.sh`. `KICK-dKeptSession-12` S6's `context-always-resume`
+  and `fixture-stale` each put a stub `claude` first on PATH answering `9.9.2`, the version their
+  plant exports in `AI_AGENT`, since the reader now reads PATH's binary and the node running the
+  suite holds another one or none. Observed by AC1 to AC3 and AC5.
 - **S4** — id 58. `help/orientation-card.md`'s verdict paragraph (`KICK-dKeptSession-12` S7) says a
   pass holds only while the tested version is PATH's and the session's. `KICK-dKeptSession-12` S2's
   one version comparison, `recorded under cli <old>, now <new>`, is superseded by name here and
@@ -76,6 +83,8 @@ as red. It repairs `KICK-dKeptSession-12` and builds one step after it (order 9)
   2026-11-21).
 - `derive_cli_line` already compares the two for the `cli —` cell and treats neither as known when
   `AI_AGENT` names no version (`skills/session-kickoff/manifest-check.sh#derive_cli_line`).
+- `KICK-dKeptSession-12` rev-5's plants export `AI_AGENT=claude-code_9-9-2_agent` and record `cli
+  9.9.2`, since the suite unsets `AI_AGENT` before its first arm; none puts a `claude` on PATH.
 - `derive_resume_lines` calls `read_card_fixture_verdict` when `declare -F` finds it, resumes on its
   first line reading `pass`, and otherwise prints `card-import fixture red: <why>`
   (`skills/session-kickoff/manifest-check.sh#derive_resume_lines`), so every answer below reaches the
@@ -105,8 +114,8 @@ None: no verdict file exists before `KICK-dKeptSession-12`.
 - `skills/session-kickoff/manifest-check.sh`: S1 and S2
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names `manifest-check.sh`
-- `skills/session-kickoff/card-store.fixture.sh`: S3's plants
-- `skills/session-kickoff/manifest-check.test.sh`: the arm in §7
+- `skills/session-kickoff/card-store.fixture.sh`: S3's plants and the two re-pointed ones
+- `skills/session-kickoff/manifest-check.test.sh`: the arm in §7, `FLOOR_ASSERTIONS` raised by two
 - `help/orientation-card.md`: S4
 
 ### Alternatives rejected
@@ -147,12 +156,16 @@ None: no verdict file exists before `KICK-dKeptSession-12`.
 - **AC4** — When `grep -n "PATH" help/orientation-card.md` runs, the verdict paragraph names both
   comparisons.
   Red when: the page describes one comparison.
+- **AC5** — When `bash card-store.fixture.sh --plant context-always-resume` and `--plant
+  fixture-stale` run from a shell whose PATH holds no `claude`, each exits 0 with every line `held`.
+  Red when: either plant reads the node's own PATH, so it passes only where a `claude` happens to
+  answer 9.9.2.
 
 ## 7. Gates
 
 `manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 · the two plants over stub PATH binaries and planted `AI_AGENT` values, staged red by a copy comparing with `read_session_cli_version` alone · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC5 · the two plants over stub PATH binaries and planted `AI_AGENT` values, and the two re-pointed plants, staged red by a copy comparing with `read_session_cli_version` alone · `FLOOR_ASSERTIONS`, raised by one per new plant
 
 ## 8. Open questions
 
@@ -170,6 +183,11 @@ none
   `resume —` line's text re-cited to the landed `derive_resume_lines`; the probe's versions and the
   table re-spelled to this node's; the kickoff manifest's re-stamp and the guarded legs added, the
   kit version left to the lander.
+- rev-4 · 2026-11-21 · S1 S3 · §4 Evidence, Files touched · AC5 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief`: the reader's test order stated, so a red
+  verdict keeps its reason and spawns nothing; `KICK-dKeptSession-12`'s `context-always-resume` and
+  `fixture-stale`, which read PATH once this unit lands, given a stub `claude` and observed by the new
+  AC5; the floor raised by the two new plants. No new function, so the symbol map does not move.
 
 ## 10. Reuse audit
 

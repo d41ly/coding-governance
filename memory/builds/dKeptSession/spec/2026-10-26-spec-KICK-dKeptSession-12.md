@@ -1,6 +1,6 @@
 # KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 8 · advances KICK-dKeptSession-29 · closes KICK-dKeptSession-66
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 8 · advances KICK-dKeptSession-29 · closes KICK-dKeptSession-66
 
 **Carries:** cl-dClosedLoop-0150@1c3b5ca1 whole
 
@@ -22,6 +22,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-12-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-12-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-16-orders-7-8-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-orders-7-8-reground-brief.md) | research | KICK-dKeptSession-16 |
+| [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -46,8 +47,12 @@ flow-roles H14).
 ## 2. Scope (IN)
 
 - **S1** — The verdict's record. `manifest-check.sh --card --fixture-run <scratch-dir>`, a card verb
-  beside the others the card argument loop takes, runs the kickoff engine's sibling
-  `card-compaction.fixture.sh <scratch-dir>`, found beside the engine as `MC_DIR` names it, and
+  beside the others the card argument loop takes, its value held as `--build`'s is, runs `bash
+  card-compaction.fixture.sh <scratch-dir>`, the kickoff engine's sibling found beside the engine as
+  `MC_DIR` names it. It takes no `--session` and reads no stdin: it is answered once `CARD_DIR`
+  resolves and before `read_session_id`, as `--path --build` is, since that reader refuses every
+  verb but `path` and `follow` without a session id; `--build` beside it is refused as it is beside
+  `--write`, and the `--card needs one of` refusal names it. `write_card_fixture_verdict` then
   `write_card_fixture_verdict` writes one line to `<git-common-dir>/orientation/card-fixture.verdict`
   (the card directory `CARD_DIR` names): `card-fixture — <verdict> · fixture <blob8> · cli <version>
   · <iso>`. `<verdict>` is `pass` for exit 0, `red <limb>` for exit 1 with the limb the fixture's
@@ -57,7 +62,8 @@ flow-roles H14).
   parse extracted from `derive_cli_line` (`skills/session-kickoff/manifest-check.sh#derive_cli_line`),
   which then calls it, so the version is read by one rule. With no fixture at that path the verb
   exits 2 and writes nothing. The verb writes nothing else outside the scratch directory but the
-  harness transcripts the fixture names as its one outside write. Observed by AC4.
+  harness transcripts the fixture names as its one outside write. It prints the line it wrote and
+  exits 0, whatever the verdict. Observed by AC4.
 - **S2** — The verdict's reader, `read_card_fixture_verdict`, defined in `manifest-check.sh`,
   printing `pass` only when the recorded verdict is `pass`, its blob equals the installed fixture's
   blob now, and its version equals `read_session_cli_version`'s answer now; otherwise `red: <why>`,
@@ -65,18 +71,22 @@ flow-roles H14).
   cli <old>, now <new>` and `no fixture installed`. A line that does not match S1's grammar reads
   `no recorded run`. Observed by AC1, AC2, AC3.
 - **S3** — The switch, observed and not built. TOOL-dPlacedRequest-2 S7 built it in
-  `derive_resume_lines`: once S2 defines the reader, its `declare -F` test finds it, and the
-  `always-resume` arm prints the override in this unit's own line, `(resume.context: always-resume
-  read as fresh-when-idle · card-import fixture red: <why>)`, `<why>` S2's reason with its `red: `
-  cut. This unit builds no second switch and edits no arm of that `case`; `fresh-when-idle` and
-  `always-fresh` are unchanged, and an idle session under a red verdict is never recommended to
-  resume. Observed by AC1, AC2.
+  `derive_resume_lines`: the `always-resume` arm prints the override in this unit's own line,
+  `(resume.context: always-resume read as fresh-when-idle · card-import fixture red: <why>)`, `<why>`
+  S2's reason with its `red: ` cut. This unit builds no second switch and changes no arm's
+  condition; `fresh-when-idle` and `always-fresh` decide as before, and an idle session under a red
+  verdict is never recommended to resume. The arm's `declare -F` test and its `red: no recorded run`
+  default are cut, since S2 defines the reader in the same file and both are then unreachable, and
+  the comment above the function stops saying the reader may be undefined. Observed by AC1, AC2.
 - **S4** — The worktree. Every `resume —` line that recommends fresh carries `· in <tree>` after its
-  recommendation and before its `(resume.context: …)` note. `<tree>` is the path of the `tree —`
-  cell (`skills/session-kickoff/manifest-check.sh#render_tree_cell`) in the stored build card that
-  `resolve_build_card` (`#resolve_build_card`) wrote to `$CARD_TMP/bc.found` before its re-key, read
-  by `read_stored_tree_cell`, when `git worktree list --porcelain` lists that path on this node, else
-  `· in a new worktree of <slug>`, as it is when no card was found. The re-keyed card is never read
+  recommendation and before its `(resume.context: …)` note: the `always-fresh` line's text and the
+  `fresh recommended: …` values of `rec` gain it, the `resume recommended: …` value does not, and no
+  arm's condition moves. `<tree>` is the path of the `tree —` cell
+  (`skills/session-kickoff/manifest-check.sh#render_tree_cell`), its first field up to ` · `, in the
+  stored build card `resolve_build_card` (`#resolve_build_card`) wrote to `$CARD_TMP/bc.found` before
+  its re-key, read by `read_stored_tree_cell`. That path stands where a `worktree <path>` line of `git
+  worktree list --porcelain` on this node equals it byte for byte; otherwise the text is `· in a new
+  worktree of <slug>`, as it is when no card was found. The re-keyed card is never read
   for it: its startup cells are re-rendered in the replaying session's own tree. Observed by AC5.
 - **S5** — The replay order, I10. `print_replay`
   (`skills/session-kickoff/manifest-check.sh#print_replay`) prints, as landed, `derive_map_block`'s
@@ -97,7 +107,12 @@ flow-roles H14).
   override `CARD_FIXTURE`, as `CARD_CAP_BYTES`'s override exists for the self-test
   (`skills/session-kickoff/manifest-check.sh@ec2414351da8:246`). The suite runs every plant `--list`
   names, and its `FLOOR_ASSERTIONS` rises by one per new plant
-  (`skills/session-kickoff/manifest-check.test.sh@b771dadeb50a:2489`). Observed by AC1 to AC6.
+  (`skills/session-kickoff/manifest-check.test.sh@b771dadeb50a:2489`). Every context plant and every
+  new plant exports `AI_AGENT=claude-code_9-9-2_agent`, and a recorded verdict carries `cli 9.9.2`,
+  so no outcome reads the version of the session that runs the suite, or reads none on a node
+  without one. `context-fixture-red` replays once, through the engine's own reader, since an exported
+  stub no longer reaches it; the `· in` plants read the path they expect by `git -C "$R" rev-parse
+  --show-toplevel`, the bytes the `tree —` cell spells. Observed by AC1 to AC6.
 - **S7** — `help/orientation-card.md` (TOOL-dPlacedRequest-9's page), its "When a session resumes"
   section, gains a paragraph: the verdict file, the verb that records it, what makes a pass stale,
   and the tree a fresh recommendation names; its example `resume —` line carries the `· in` text.
@@ -152,6 +167,13 @@ flow-roles H14).
   publisher's startup cells, `tree —` among them, into the build card, and `resolve_build_card`
   re-keys it with the startup cells re-rendered here, so only its pre-re-key copy names the
   publisher's tree.
+- `read_session_id` refuses every card verb but `path` and `follow` when no session id comes from
+  stdin's payload or `--session`, after reading stdin when it is not a terminal; a plant runs the
+  engine with stdin closed (`skills/session-kickoff/card-store.fixture.sh#run_card_engine`).
+- `print_replay` calls `resolve_build_card` in a command substitution and keeps `CARD_TMP` across
+  the re-key, so `$CARD_TMP/bc.found` is still on disk when `derive_resume_lines` runs; the plants
+  `context-idle`, `context-always-fresh` and `context-transcript-absent` grep each `resume —` line
+  whole, so each moves with S4.
 - `manifest-check.sh` is on the kickoff manifest's `watch:` line
   (`memory/guides/SESSION-KICKOFF.md@e1fc70813070:7`), and the manifest check's staged leg refuses a
   commit staging a watched path that does not move `last-audit`.
@@ -201,6 +223,9 @@ Live at landing. A node starts recommending resumption under `always-resume` onl
 - `skills/session-kickoff/manifest-check.test.sh`: `FLOOR_ASSERTIONS` and its count comment
 - `memory/guides/SESSION-KICKOFF.md`: the `last-audit` re-stamp the watched engine owes
 - `help/orientation-card.md`: S7's paragraph and example
+- `memory/map/generated/symbols.json`: the four new shell functions, regenerated by `gen_map.py
+  --write`, which the bar's codebase-map leg grades; the commit hook runs that leg for `.py` and
+  `.js` paths only
 
 ### Alternatives rejected
 
@@ -320,6 +345,12 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
   `context-fixture-red` and `context-always-resume` re-pointed at a recorded verdict; the kit
   version bump dropped from Files touched, since the lander mints it; the kickoff manifest's
   re-stamp added there.
+- rev-5 · 2026-11-21 · S1 S3 S4 S6 · §4 Evidence, Files touched · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief`: `--fixture-run` answered before
+  `read_session_id`, which would refuse it with no session or wait on stdin; its exit and printed
+  line stated; S3 no longer says it edits no arm, since S4's text reaches the fresh lines those arms
+  print, and the `declare -F` guard S2 makes unreachable is cut; the plants pinned to their own
+  `AI_AGENT` and to the tree bytes git spells; `symbols.json` added.
 
 ## 10. Reuse audit
 

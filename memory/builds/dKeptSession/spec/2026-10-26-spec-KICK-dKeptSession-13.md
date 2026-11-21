@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers
@@ -23,6 +23,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 |
+| [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-37 KICK-dKeptSession-38 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -54,8 +55,10 @@ defines the item boundary, I12, the one point every later session unit reads at.
   by AC4.
 - **S2** — The section, I11. `render_pointers <slug> <boundary file>` in
   `skills/session-kickoff/manifest-check.sh` prints `## pointers` and three lines: `records — <kind>
-  <path> · …`, from S3; `forks — <spec path>§8 · …`, each `forked —` unit's tracked spec under the
-  build's `spec/` folder, or `none`; and `item — <instance key|none> · at <sha8>`, the boundary's
+  <path> · …`, from S3; `forks — <spec path> §8 · …`, each `forked —` unit's tracked spec under the
+  build's `spec/` folder, or `none`, the `§8` a word apart because `extract_card_tokens` reads a glued
+  `<path>§8` as one path token that no tracked file matches, a miss `check_card` reds
+  (`skills/session-kickoff/manifest-check.sh#extract_card_tokens`); and `item — <instance key|none> · at <sha8>`, the boundary's
   answer and the HEAD it was derived at. A source that does not resolve prints `<word> — skipped:
   <why>` on its line, and the `item —` line then still ends ` · at <sha8>`. KICK-dKeptSession-26 and
   KICK-dKeptSession-5 add the `budget —` and `mail —` lines below these. The required lines are one
@@ -112,7 +115,11 @@ defines the item boundary, I12, the one point every later session unit reads at.
   it starts S6 detached, with `--out` naming that file, the checker `resolveKickoffChecker` answers
   run by the bash `resolveCardBash` finds, and returns without waiting. The step never refuses and
   fails open: a throw prints nothing and the call proceeds. `checker` overrides the resolved one,
-  for the self-test's stub. Observed by AC5.
+  for the self-test's stub. It returns the context text, `''` when none, and is exported beside
+  `checkRoleGate`; `main` writes `{ hookSpecificOutput: { hookEventName: 'PreToolUse',
+  additionalContext } }` and then returns rather than calling `process.exit(0)`, as its SubagentStart
+  branch does, since that exit does not wait for a piped stdout on every platform
+  (`tools/hooks/scratch-guard.js#main`). Observed by AC5.
 - **S8** — The transition. `write_card_follow`'s write re-renders the section through S4's
   `write_pointers` under both values of `card.pointers`, so a follow never carries a pointer from
   before it. Observed by AC3.
@@ -123,7 +130,12 @@ defines the item boundary, I12, the one point every later session unit reads at.
   kit answers `CARD_STUB_POLICY`'s values: a `--boundary` key per call, and for `<slug> --json` a
   planted JSON, exit code and delay, the stub's default answer so no case runs the real engine.
   KICK-dKeptSession-15 and KICK-dKeptSession-14 plant their own values into that file and add no
-  second stub. Observed by AC1 to AC7.
+  second stub. No path the card-store plants run imports a name from `position.py`: `claims.py`
+  imports `loop_lib` beside the standard library, and the snapshot's Python imports
+  `loop_transition`, whose top-level imports reach `loop_lib`, `loop_parents`, `loop_table`,
+  `loop_checklist` and `loop_witness` and no `position` name (`skills/session-kickoff/manifest-check.sh#CARD_SNAPSHOT_PY`).
+  `write_card_fixture` plants `card.pointers` at `every-item` beside the five keys it plants, since
+  the stub policy kit exits non-zero for a key no plant set. Observed by AC1 to AC7.
 - **S10** — `help/orientation-card.md` gains a section on the pointers: each line, when it is
   rewritten under each value, and that an item boundary is noticed at the session's next shell call
   after a commit and reported at the call after the verb finishes. Observed by AC8.
@@ -188,7 +200,7 @@ defines the item boundary, I12, the one point every later session unit reads at.
 ```
 ## pointers
 records — journal memory/builds/dX/build/2026-10-27-build-KICK-dX-1-agent-ledger.md · spec-audit memory/builds/dX/reviews/2026-10-27-review-KICK-dX-1-spec-audit.md
-forks — memory/builds/dX/spec/2026-10-27-spec-KICK-dX-3.md§8
+forks — memory/builds/dX/spec/2026-10-27-spec-KICK-dX-3.md §8
 item — item.build.base@KICK-dX-2#3f9c2a71 · at 8c1e0b42
 ```
 
@@ -237,7 +249,8 @@ Live at landing for a session whose card file routes a build. A session with no 
 - `skills/session-kickoff/manifest-check.sh`: S2, S4 to S6, S8
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names `manifest-check.sh`
-- `skills/session-kickoff/manifest-check.test.sh`: the arm the §7 line declares
+- `skills/session-kickoff/manifest-check.test.sh`: the arm the §7 line declares, `FLOOR_ASSERTIONS`
+  raised by the five plants
 - `skills/session-kickoff/card-store.fixture.sh`: S9's plants
 - `tools/memory-tree/gen_build_index.py`: `--latest-records`
 - `tools/hooks/scratch-guard.js`: S7's step
@@ -247,6 +260,8 @@ Live at landing for a session whose card file routes a build. A session with no 
 - `help/reference/policy.md`: re-rendered by `render_playbook.py --reference`
 - `memory/project/docs-undocumented.txt`: S5, the `policy:card.pointers` row taken off
 - `help/orientation-card.md`: S10's section
+- `memory/map/generated/symbols.json`: the new Python, shell and JS functions, regenerated by
+  `gen_map.py --write` as the commit hook's codebase-map leg requires
 
 ### Alternatives rejected
 
@@ -322,7 +337,7 @@ Live at landing for a session whose card file routes a build. A session with no 
   naming `card.pointers` and its two values.
   Red when: the page does not describe the section.
 - **AC9** — When `python tools/policy/policy.py get card.pointers` runs in a repository whose policy
-  file sets no value, it prints `every-item`, and after `policy.py lists --write`
+  file sets no value and names no preset, as this repository's does, it prints `every-item`, and after `policy.py lists --write`
   `tools/policy/unsummarised-keys.txt` no longer names `card.pointers`.
   Red when: the row is still unsummarised.
 - **AC10** — When `python tools/memory-tree/gen_build_index.py --latest-records dKeptSession` runs,
@@ -341,9 +356,9 @@ Live at landing for a session whose card file routes a build. A session with no 
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `policy check` · `help reference pages` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `policy check` · `policy fixtures` · `help reference pages` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC6 AC11 · the pointers and boundary verbs over a stub loop kit, the failing case a crossing that leaves the ref's `item —` unchanged · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC6 AC11 · the pointers and boundary verbs over a stub loop kit, the failing case a crossing that leaves the ref's `item —` unchanged · `FLOOR_ASSERTIONS`, raised by one per new plant
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC5 · the boundary step against a stub checker, the failing case a step that starts the checker on an unchanged HEAD · none
 
@@ -373,7 +388,7 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
   `RECORD_KIND_TOKENS`, a member added only by a spec through PLAY-dOrderedCharter-42's one-list
   rule, so the line holds at most one entry per member and never grows with the build's record
   count. widens: none · relaxes: none. Re-derived 2026-11-21: the tuple holds sixteen members
-  (`tools/memory-tree/tree_lib.py#TYPED_RECORD_KINDS`); this build's line, PINNED 2026-11-21, reads
+  (`tools/memory-tree/tree_lib.py#RECORD_KIND_TOKENS`); this build's line, PINNED 2026-11-21, reads
   410 bytes over four kinds, an entry near 130 bytes (PINNED), so a build carrying all sixteen bounds
   it near 2.1 KB against `CARD_CAP_BYTES` 8192 (`manifest-check.sh#CARD_CAP_BYTES`); a card it
   pushes past the cap is refused whole by S4 and AC6.
@@ -428,6 +443,13 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
   `policy:card.pointers` row standing on `memory/project/docs-undocumented.txt`, so S5's re-render
   takes it off in the same commit, the list joins Files touched, AC12 observes the anchor present and
   the row gone, and §7 names the `docs` leg.
+- rev-6 · 2026-11-21 · S2 S7 S9 · §4 Files touched · AC9 · §7 · §8 F3 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief`: the `forks —` line's `§8` set a word apart,
+  since glued to the path it is a citation miss that reds `--card --check` on the card AC11 holds
+  green; the hook step's return, export and stdout write stated, `main` ending in a return; the stub
+  policy kit given `card.pointers`, and the stub `position.py` shown to break no import of the plants;
+  `policy fixtures` named, KICK-dKeptSession-1 having put the loop kit under its guard; F3's tuple
+  re-cited; the floor raised by the five plants; `symbols.json` added.
 
 ## 10. Reuse audit
 
