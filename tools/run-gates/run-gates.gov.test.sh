@@ -978,6 +978,40 @@ rgf_kf=$( eval "$rgf_fn"; read_green_file "$rgf_t/keys.rec"; for rgf_kv in $rgf_
 a=$((a+1))
 [ -n "${rgf_vars// /}" ] && [ -z "$rgf_kf" ] \
   || { echo "gov-canary: over a record holding each key the cut's case labels name ($(printf '%s\n' "$rgf_pairs" | grep -c .) derived: ${rgf_vars:-none}), old then new CR-ended, these did not read exactly new: ${rgf_kf:-none}"; fail=1; }
+# EVERY KEY `read_bar_file` READS (TOOL-dWitnessedBar-78 S7, AC8): the same derived planting over the
+# hook's cut `read_bar_file`, its `<label>) bg_<name>=` lines, in a third record; every derived variable
+# must read exactly `new`, and the derivation must hold `base`, `max_age` and `blocks`, the inherited
+# green's keys (S8). RED against a `read_bar_file` keeping `IFS=$'\t' read -r k v` (it names a `bg_*`
+# variable). WHAT THIS DOES NOT CHECK: the `selection.[1-9]*` label, which fills `bg_sel_rows` and is
+# outside the derivation.
+rbf_fn=$(awk '/^read_bar_file\(\)/,/^}/' "$ROOT/.githooks/pre-push")
+rbf_pairs=$(printf '%s\n' "$rbf_fn" | sed -n 's/^[[:space:]]*\([A-Za-z_]*\)) \(bg_[A-Za-z_]*\)=.*/\1 \2/p')
+rbf_vars=$(printf '%s\n' "$rbf_pairs" | awk 'NF == 2 { print $2 }' | sort -u | tr '\n' ' ')
+: > "$rgf_t/bar-keys.rec"; printf '%s\n' "$rbf_pairs" > "$rgf_t/bar-pairs.txt"  # a file, not a here-string from a substitution
+rbf_miss=
+while read -r rgf_k rgf_kn; do
+  [ -n "$rgf_k" ] && printf '%s\told\n%s\tnew\r\n' "$rgf_k" "$rgf_k" >> "$rgf_t/bar-keys.rec"
+done < "$rgf_t/bar-pairs.txt"
+for rgf_k in base max_age blocks; do
+  grep -q "^$rgf_k " "$rgf_t/bar-pairs.txt" || rbf_miss="$rbf_miss $rgf_k"
+done
+rbf_kf=$( eval "$rbf_fn"; read_bar_file "$rgf_t/bar-keys.rec"; for rgf_kv in $rbf_vars; do [ "${!rgf_kv}" = new ] || printf '%s ' "$rgf_kv"; done )
+a=$((a+1))
+[ -n "${rbf_vars// /}" ] && [ -z "$rbf_kf" ] && [ -z "$rbf_miss" ] \
+  || { echo "gov-canary: over a record holding each key read_bar_file's case labels name ($(printf '%s\n' "$rbf_pairs" | grep -c .) derived: ${rbf_vars:-none}; missing:${rbf_miss:- none}), old then new CR-ended, these did not read exactly new: ${rbf_kf:-none}"; fail=1; }
+# THE LINE RULES, OVER BOTH READERS (TOOL-dWitnessedBar-78 S13, AC14): a fourth record holds
+# `manifest<TAB>x<TAB>`, a bare `fingerprint` and a final `selftests<TAB>on` with no LF. Each cut reads
+# the manifest as `x<TAB>`, no fingerprint, and `on`; the subshell prints each variable that does not.
+# RED against a `read_green_file` splitting with `IFS=$'\t'` (it names `rec_man`) and against a loop
+# without `|| [ -n "$_rg_l" ]` (it names `rec_st`). Its TAB is spelled in this top-level body.
+rlr_x=x$'\t'
+printf 'manifest\tx\t\nfingerprint\nselftests\ton' > "$rgf_t/lines.rec"
+rlr_bad=$( eval "$rgf_fn"; eval "$rbf_fn"; read_green_file "$rgf_t/lines.rec"; read_bar_file "$rgf_t/lines.rec"
+  [ "$rec_man" = "$rlr_x" ] || printf 'rec_man '; [ -z "$rec_fp" ] || printf 'rec_fp '; [ "$rec_st" = on ] || printf 'rec_st '
+  [ "$bg_man" = "$rlr_x" ] || printf 'bg_man '; [ -z "$bg_fp" ] || printf 'bg_fp '; [ "$bg_st" = on ] || printf 'bg_st ' )
+a=$((a+1))
+[ -n "$rgf_fn" ] && [ -n "$rbf_fn" ] && [ -z "$rlr_bad" ] \
+  || { echo "gov-canary: over a record holding manifest x and a trailing TAB, a bare fingerprint and an unterminated selftests on, these did not read as the line rules give (x TAB, empty, on): ${rlr_bad:-a reader did not cut from the hook}"; fail=1; }
 # THE HOOK READS NO `verdict` KEY (TOOL-dWitnessedBar-73 S14, AC14). A fresh `bash -c` sources only the
 # cut and calls it on a record holding only `verdict<TAB>GREEN`: `compgen -v rec_` must list exactly the
 # variables the derivation above names, each empty, and the shell prints only the names that are not.

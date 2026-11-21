@@ -1678,29 +1678,55 @@ fi
 # a candidate costs no process. Each is empty when the file or the key is absent. `bg_sel_rows` holds
 # each `selection.<n>` value at index <n> (TOOL-dWitnessedBar-41 S2), an index of up to six digits.
 read_bar_file() {
-  local k v n ln
+  local _rb_l="" _rb_k="" _rb_v="" _rb_n=""
   bg_sha=""; bg_tree=""; bg_kind=""; bg_base=""; bg_st=""; bg_run=""; bg_by=""
   bg_fp=""; bg_blob=""; bg_man=""; bg_verdict=""; bg_reused=""; bg_reused_cache=""
-  bg_sel=""; bg_sel_rows=()
+  bg_age=""; bg_blocks=""; bg_sel=""; bg_sel_rows=()
   [ -f "$1" ] || return 0
-  # A `selection.<n>` value is the row past its first TAB, byte for byte (TOOL-dWitnessedBar-56 S1): `read`
-  # with a TAB IFS would drop an empty last field's TAB, and the row would no longer hash as written.
-  # A line with no TAB is no key at all (TOOL-dWitnessedBar-63 S19): a bare `selection.<n>` would
-  # otherwise read its own key as its value.
-  while IFS= read -r ln; do
-    case "$ln" in *$'\t'*) ;; *) continue ;; esac
-    IFS=$'\t' read -r k v <<<"$ln"
-    case "$k" in selection.[1-9]*) v=${ln#*$'\t'} ;; esac
-    case "$k" in
-      sha) bg_sha=$v ;; tree) bg_tree=$v ;; kind) bg_kind=$v ;; base) bg_base=$v ;;
-      selftests) bg_st=$v ;; run_id) bg_run=$v ;; by) bg_by=$v ;; verdict) bg_verdict=$v ;;
-      fingerprint) bg_fp=$v ;; manifest_blob) bg_blob=$v ;; manifest) bg_man=$v ;;
-      reused) bg_reused=$v ;; reused_cache) bg_reused_cache=$v ;; selection) bg_sel=$v ;;
-      selection.[1-9]*)
-        n=${k#selection.}
-        case "$n" in *[!0-9]*|???????*) ;; *) bg_sel_rows[$n]=$v ;; esac ;;
+  # One read rule for every green record, `read_green_file`'s (TOOL-dWitnessedBar-69 S1, -78 S7): each
+  # line is read WHOLE, an unterminated last one included; a line with no TAB is no key (-63 S19), so a
+  # bare `selection.<n>` never reads its own key as its value; the value is everything after the first
+  # TAB, byte for byte, so a `selection.<n>` row keeps an empty last field's TAB (-56 S1); one trailing
+  # CR is stripped, as `read_tag_lines` strips it from every value; the last line of a repeated key wins.
+  while IFS= read -r _rb_l || [ -n "$_rb_l" ]; do
+    case "$_rb_l" in
+      *$'\t'*) ;;
+      *) _rb_l=""; continue ;;
     esac
-  done < "$1"
+    _rb_k=${_rb_l%%$'\t'*}; _rb_v=${_rb_l#*$'\t'}
+    _rb_v=${_rb_v%$'\r'}
+    case "$_rb_k" in
+      sha) bg_sha=$_rb_v ;;
+      tree) bg_tree=$_rb_v ;;
+      kind) bg_kind=$_rb_v ;;
+      base) bg_base=$_rb_v ;;
+      selftests) bg_st=$_rb_v ;;
+      run_id) bg_run=$_rb_v ;;
+      by) bg_by=$_rb_v ;;
+      verdict) bg_verdict=$_rb_v ;;
+      fingerprint) bg_fp=$_rb_v ;;
+      manifest_blob) bg_blob=$_rb_v ;;
+      manifest) bg_man=$_rb_v ;;
+      reused) bg_reused=$_rb_v ;;
+      reused_cache) bg_reused_cache=$_rb_v ;;
+      max_age) bg_age=$_rb_v ;;
+      blocks) bg_blocks=$_rb_v ;;
+      selection) bg_sel=$_rb_v ;;
+      selection.[1-9]*)
+        _rb_n=${_rb_k#selection.}
+        case "$_rb_n" in *[!0-9]*|???????*) ;; *) bg_sel_rows[$_rb_n]=$_rb_v ;; esac ;;
+    esac
+    _rb_l=""
+  done 2>/dev/null < "$1"
+}
+
+# read_inherited_green <path> — the ten `ig_*` keys of `gate-inherited-green`, read through
+# `read_bar_file` (TOOL-dWitnessedBar-78 S8) under `bg_*` locals, so a caller's record is kept.
+read_inherited_green() {
+  local bg_sha bg_tree bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man bg_verdict bg_reused bg_reused_cache bg_age bg_blocks bg_sel bg_sel_rows
+  read_bar_file "$1"
+  ig_sha=$bg_sha; ig_fp=$bg_fp; ig_blob=$bg_blob; ig_man=$bg_man; ig_st=$bg_st
+  ig_base=$bg_base; ig_age=$bg_age; ig_blocks=$bg_blocks; ig_reused=$bg_reused; ig_reused_cache=$bg_reused_cache
 }
 
 # check_green_manifest <manifest path> <label> — TOOL-aFrugalTurnstile-1's manifest rule, one copy
@@ -1917,7 +1943,7 @@ check_bar_record() {
 # write LOCAL copies here, so the caller's record is kept.
 check_bar_base() {
   local want=$1 f found="" bt
-  local bg_sha bg_tree bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man bg_verdict bg_reused bg_reused_cache bg_sel bg_sel_rows
+  local bg_sha bg_tree bg_kind bg_base bg_st bg_run bg_by bg_fp bg_blob bg_man bg_verdict bg_reused bg_reused_cache bg_age bg_blocks bg_sel bg_sel_rows
   if [ -z "$want" ]; then force="it is a scoped green that names no base"; return 0; fi
   for f in "${green_candidates[@]}"; do
     read_bar_file "$f"
@@ -2114,17 +2140,7 @@ echo "pre-push: verdict.blocks at ${main_remote:0:8} reads $PP_POLICY — $PP_WH
 # FULL force it does not lift still names why it was not used.
 inh_sha=""; inh_why=""
 if [ -n "$force" ] && [ -f "$gd/gate-inherited-green" ]; then
-  _ig="$gd/gate-inherited-green"
-  ig_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$_ig" 2>/dev/null)
-  ig_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$_ig" 2>/dev/null)
-  ig_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$_ig" 2>/dev/null)
-  ig_man=$(awk -F'\t' '$1=="manifest"{print $2}' "$_ig" 2>/dev/null)
-  ig_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$_ig" 2>/dev/null)
-  ig_base=$(awk -F'\t' '$1=="base"{print $2}' "$_ig" 2>/dev/null)
-  ig_age=$(awk -F'\t' '$1=="max_age"{print $2}' "$_ig" 2>/dev/null)
-  ig_blocks=$(awk -F'\t' '$1=="blocks"{print $2}' "$_ig" 2>/dev/null)
-  ig_reused=$(awk -F'\t' '$1=="reused"{print $2}' "$_ig" 2>/dev/null)
-  ig_reused_cache=$(awk -F'\t' '$1=="reused_cache"{print $2}' "$_ig" 2>/dev/null)
+  read_inherited_green "$gd/gate-inherited-green"
   full_force=$force
   if [ "$ig_blocks" != "$PP_POLICY" ]; then
     inh_why="the inherited green was written under verdict.blocks ${ig_blocks:-none} and the value at ${main_remote:0:8} is $PP_POLICY"
