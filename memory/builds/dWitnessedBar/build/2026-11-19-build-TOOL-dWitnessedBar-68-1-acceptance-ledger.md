@@ -8,7 +8,7 @@ probe that `eval`s the AC12 arm's own lines, cut from `tools/run-gates/run-gates
 header and its closing `rm -rf`, with `$KITDIR` set to `tools/run-gates`, and keeps the arm's `mktemp -d`
 until it has read the record. The suite passed `bash -n`. Its shell-role count, measured by the gate-lint
 kit's seed, is 636 past the 611 row, widened under `2026-11-21-build-TOOL-dWitnessedBar-68-widen-10`. The
-§7 legs and the `New arm:` line's RED-first observation are the main loop's at the close.
+§7 legs and the `New arm:` line's RED-first observation are the main loop's at the close. (DERIVED from the builder's probe)
 
 **Evidences:** TOOL-dWitnessedBar-68
 - AC1 — `od -c` — over the record the arm's call named, `<top>/work/.git/gate-verdict/2fba3d25...`, `od -c` showed `\r  \n` after `G R E E N`, after the forty `b` and after `reused_cache\t0`; `grep -c '^reused_cache'` printed 2 and `grep -c '^selection'` printed 2 (`selection`, `selection.1`); the path's last segment equalled `git rev-parse HEAD^{tree}` run in `<top>/work`.
