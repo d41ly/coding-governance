@@ -15,8 +15,8 @@ through `check_key_variant`, and the arm's liveness loop from its `rgf_seen=` li
 
 **Evidences:** TOOL-dWitnessedBar-79
 - AC1 — `${_rg_v:1}` — S1's `sha` edit over the cut, then the canary's `sed`, each counted one `diff` line;
-  the sourced mutant over the record read `rec_sha` as 40 bytes, `od -c` of its last byte `\r`, and `rec_fp`
-  as 41. The `fingerprint` edit counted one and one, and read `rec_fp` as 40 bytes ending `\r` and `rec_sha`
+  the sourced mutant over the record read `rec_sha` as 40 bytes, `od -c` of its last byte `\r`, and `rec_fp` (DERIVED from the builder's probe)
+  as 41. The `fingerprint` edit counted one and one, and read `rec_fp` as 40 bytes ending `\r` and `rec_sha` (DERIVED from the builder's probe)
   as 41 (DERIVED from the builder's probe).
 - AC2 — `the length variant passed a value one byte short` — over the suite as built the loop printed no line,
   `fail` 0, `rgf_seen` ` rec_sha rec_fp`. Over a scratch suite copy whose `check_cr_reached` compares the
