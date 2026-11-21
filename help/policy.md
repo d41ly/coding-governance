@@ -132,7 +132,10 @@ preset yet, so until dKeptSession's reader step lands a named preset changes no 
 Some keys stay out of every preset: the file's `never` list names the keys presets never touch, such
 as `floor`, `preset` itself and `policy-file.guard`, because loosening the guard or switching an
 invariant off stays the owner's own choice. Every other key with a literal default has a value in
-every preset.
+every preset, and so do `maintain.fixes` and the six review stage keys, `review.plan` to
+`review.maintain`, though their defaults are derived: the store's `literal` list names those two
+rows. Every other key with a derived default, such as `budgets.*`, `roles.effort.<role>` and
+`review.<stage>.effort`, has a value in no preset, and a preset of yours may not set one either.
 
 The store also holds pairs of keys where one must be at least the other, such as `review.max-rounds`
 over `review.design.round-count`. Each pair rule is checked over the four presets only. Your own
@@ -140,8 +143,10 @@ policy file may set a round count above its ceiling and still read valid; the re
 that count when it runs, as it did before presets existed.
 
 - **Check the presets:** `python tools/policy/presets.py check` prints each preset with how many keys <!-- usage: script:tools/policy/presets.py#check daa13502 -->
-  it sets, and exits 1 naming the preset and the key for a missing key, a value the key's row
-  refuses, a `standard` value off its default, or a broken pair.
+  it sets, then one `unassigned` line naming the derived-default keys no preset sets, and exits 1
+  naming the preset and the key for a missing key, a value the key's row refuses, a derived
+  default's text used as a value, a review stage key one preset sets and another lacks, a
+  `standard` value off its default, or a broken pair.
 - **Declare your own preset:** add a `[presets.<name>]` table to `.governance/policy.toml` with
   `extends` naming a shipped preset and the keys you change, then set `preset = "<name>"`:
 

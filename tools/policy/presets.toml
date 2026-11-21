@@ -1,9 +1,11 @@
 # presets.toml - the policy kit's shipped presets (KICK-dKeptSession-1): one `[preset.<name>]` table per
 # preset, each a complete assignment of the presettable keys by quoted dotted key, so `leases` and
 # `leases.granularity` sit side by side. A presettable key is a catalogue row `never` does not name whose
-# default is literal. Seeded once from the design record's `[presets]` section, each presettable row that
-# table lacks at its catalogue default; `presets.py check` holds it complete, inside each key's schema and
-# inside the pair rules. `core.py new preset <name> --from <preset>` is its one writer.
+# default is literal or which `literal` names. Seeded once from the design record's `[presets]` section,
+# each presettable row that table lacks at its catalogue default; `presets.py check` holds it complete,
+# inside each key's schema and inside the pair rules. `core.py new preset <name> --from <preset>` is its
+# one writer. A derived-default row `literal` does not name, such as `budgets.*` or
+# `roles.effort.<role>`, carries no key in any preset and reads unassigned (KICK-dKeptSession-33).
 
 # The keys presets never touch: loosening the guard or switching an invariant off stays an owner choice.
 never = ["floor", "preset", "policy-file.guard", "policy-file.proof", "policy-file.on-invalid",
@@ -13,6 +15,10 @@ never = ["floor", "preset", "policy-file.guard", "policy-file.proof", "policy-fi
          "runtime.agents-in-flight", "budgets.pinned", "memory.mirror", "runtime.owner-harness",
          "runtime.act-harness", "runtime.act-auth", "roles.harness.<role>", "roles.auth.<role>",
          "platforms.supported", "platforms.provision"]
+
+# The derived-default rows the presets assign literal values, each spelled in every preset: v2 gives
+# these literal cells, and restates the derived default on every other such row.
+literal = ["maintain.fixes", "review.<stage>"]
 
 # Each pair [higher, lower]: in every preset, and in a repository's effective assignment, `higher` is at
 # least `lower`.
@@ -183,6 +189,7 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "integrations.tracker" = "none"
 "maintain.host" = "session-start"
 "maintain.cadence" = "weekly"
+"maintain.fixes" = ["reap", "prune landed", "regenerate stale", "defer dormant", "records-only fixes", "close finished run records"]
 "maintain.on-breach" = "report"
 "maintain.events" = ["default-branch-red"]
 "maintain.reading-tree" = "worktree"
@@ -195,6 +202,12 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "maintain.interpreter-eol" = "file"
 "observability.run-record" = "none"
 "patch.ratify" = "auto"
+"review.plan" = "opt-in"
+"review.design" = "opt-in"
+"review.build" = "opt-in"
+"review.test" = "opt-in"
+"review.deploy" = "opt-in"
+"review.maintain" = "opt-in"
 "review.recommendation" = "advice"
 "review.build.when" = "per-build"
 "review.findings" = "blocker-own"
@@ -424,6 +437,7 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "integrations.tracker" = "none"
 "maintain.host" = "session-start"
 "maintain.cadence" = "daily"
+"maintain.fixes" = ["reap", "prune landed", "regenerate stale", "defer dormant", "records-only fixes", "close finished run records"]
 "maintain.on-breach" = "file-ask"
 "maintain.events" = ["default-branch-red", "release-verify-failed", "session-start-breach"]
 "maintain.reading-tree" = "clean-base"
@@ -436,6 +450,12 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "maintain.interpreter-eol" = "file"
 "observability.run-record" = "per-run"
 "patch.ratify" = "auto"
+"review.plan" = "opt-in"
+"review.design" = "opt-in"
+"review.build" = "owed"
+"review.test" = "opt-in"
+"review.deploy" = "opt-in"
+"review.maintain" = "opt-in"
 "review.recommendation" = "advice"
 "review.build.when" = "per-build"
 "review.findings" = "blocker-high-own"
@@ -665,6 +685,7 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "integrations.tracker" = "none"
 "maintain.host" = "os-scheduler"
 "maintain.cadence" = "daily"
+"maintain.fixes" = ["reap", "regenerate stale"]
 "maintain.on-breach" = "red-leg"
 "maintain.events" = ["default-branch-red", "release-verify-failed", "session-start-breach"]
 "maintain.reading-tree" = "clean-base"
@@ -677,6 +698,12 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "maintain.interpreter-eol" = "file"
 "observability.run-record" = "per-run"
 "patch.ratify" = "owner"
+"review.plan" = "opt-in"
+"review.design" = "owed"
+"review.build" = "owed"
+"review.test" = "owed-above-tier"
+"review.deploy" = "owed-above-tier"
+"review.maintain" = "opt-in"
 "review.recommendation" = "binding"
 "review.build.when" = "per-unit"
 "review.findings" = "all-own"
@@ -906,6 +933,7 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "integrations.tracker" = "none"
 "maintain.host" = "os-scheduler"
 "maintain.cadence" = "daily"
+"maintain.fixes" = ["reap", "prune landed", "regenerate stale", "defer dormant", "records-only fixes", "close finished run records"]
 "maintain.on-breach" = "file-ask"
 "maintain.events" = ["default-branch-red", "release-verify-failed", "session-start-breach"]
 "maintain.reading-tree" = "clean-base"
@@ -918,6 +946,12 @@ pairs = [["review.max-rounds", "review.design.round-count"], ["install.deprecati
 "maintain.interpreter-eol" = "file"
 "observability.run-record" = "per-run"
 "patch.ratify" = "auto"
+"review.plan" = "opt-in"
+"review.design" = "owed-above-tier"
+"review.build" = "owed"
+"review.test" = "opt-in"
+"review.deploy" = "opt-in"
+"review.maintain" = "opt-in"
 "review.recommendation" = "binding-above-tier"
 "review.build.when" = "per-build"
 "review.findings" = "blocker-high-own"
