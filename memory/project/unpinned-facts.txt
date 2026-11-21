@@ -12390,7 +12390,6 @@ memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-2.md	60 s
 memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-3.md	383 records
 memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-4.md	54 s
 memory/builds/dPavedRoad/spec/2026-11-10-spec-TOOL-dPavedRoad-4.md	963 s
-memory/builds/dPlacedRequest/RUN.md	69 units
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md	109 bytes
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md	49043 bytes
 memory/builds/dPlacedRequest/build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md	450 bytes
@@ -12420,6 +12419,8 @@ memory/builds/dPlacedRequest/build/2026-10-26-build-TOOL-dPlacedRequest-1-regrou
 memory/builds/dPlacedRequest/build/2026-10-26-build-TOOL-dPlacedRequest-1-reground-returns.md	48198 bytes
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	4 specs
 memory/builds/dPlacedRequest/build/2026-11-05-build-TOOL-dPlacedRequest-1-parents-crosscheck.md	6 specs
+memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-39.md	25 lines
+memory/builds/dPlacedRequest/build/2026-11-21-build-TOOL-dPlacedRequest-4-red-fix-39.md	268 files
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	334 s
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	6 calls
 memory/builds/dPlacedRequest/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md	69 specs

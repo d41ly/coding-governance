@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179523792223167627694-3443211 b97435c0
+gates-run: unattended-17952593412338706263-496420 bfa5f311
 parked-surfaced: yes, 4 surfaced
 keepalive-reaped: yes
 asks-at-landing: TOOL-dPlacedRequest-22=OPEN TOOL-dPlacedRequest-65=CLOSED TOOL-dPlacedRequest-66=CLOSED TOOL-dPlacedRequest-67=CLOSED TOOL-dPlacedRequest-68=CLOSED TOOL-dPlacedRequest-69=CLOSED TOOL-dPlacedRequest-70=CLOSED TOOL-dPlacedRequest-71=CLOSED TOOL-dPlacedRequest-73=CLOSED TOOL-dPlacedRequest-74=OPEN TOOL-dPlacedRequest-75=OPEN TOOL-dPlacedRequest-76=OPEN TOOL-dPlacedRequest-77=OPEN TOOL-dPlacedRequest-78=OPEN TOOL-dPlacedRequest-79=OPEN TOOL-dPlacedRequest-80=OPEN TOOL-dPlacedRequest-81=OPEN TOOL-dPlacedRequest-82=OPEN TOOL-dPlacedRequest-83=OPEN TOOL-dPlacedRequest-84=WONTDO TOOL-dPlacedRequest-85=WONTDO TOOL-dPlacedRequest-86=WONTDO TOOL-dPlacedRequest-87=OPEN TOOL-dPlacedRequest-88=WONTDO TOOL-dPlacedRequest-89=WONTDO TOOL-dPlacedRequest-90=OPEN TOOL-dPlacedRequest-91=WONTDO TOOL-dPlacedRequest-92=WONTDO TOOL-dPlacedRequest-93=WONTDO TOOL-dPlacedRequest-94=WONTDO TOOL-dPlacedRequest-101=WONTDO TOOL-dPlacedRequest-102=OPEN TOOL-dPlacedRequest-103=OPEN TOOL-dPlacedRequest-104=WONTDO TOOL-dPlacedRequest-105=OPEN TOOL-dPlacedRequest-106=WONTDO TOOL-dPlacedRequest-107=WONTDO TOOL-dPlacedRequest-108=WONTDO TOOL-dPlacedRequest-109=OPEN TOOL-dPlacedRequest-110=OPEN
