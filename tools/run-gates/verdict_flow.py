@@ -548,7 +548,7 @@ def read_keys(path):
     return keys
 
 
-def run_quiet_leg(run, row, n, top, here=HERE):
+def run_quiet_leg(run, row, n, top):
     """(new class or None where green, said line): `row`'s leg run once, alone, by this kit's runner in
     `top` under a one-row manifest, `GATE_FULL=1` and `GATE_SELFTESTS=1` so no guard, hold or kit rule
     skips it, attributed against the R its attribution row names; its run record `<run id>-quiet-<n>`

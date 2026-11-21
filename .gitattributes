@@ -135,6 +135,8 @@ memory/project/drift-baselines.txt merge=rows
 memory/project/positional-refs.txt merge=rows
 memory/project/positional-producers.txt merge=rows
 memory/project/unpinned-facts.txt merge=rows
+# TOOL-dWitnessedBar-108 S7: the params arm's kept parameters, a shrink-only ledger keyed by path, function and parameter.
+memory/project/unread-params.txt merge=rows
 memory/project/instructions-legacy.txt merge=rows
 memory/project/landed-steps.txt merge=rows
 # TOOL-dWitnessedBar-20 S7: the legacy policy homes list, a ledger keyed by conf and key.

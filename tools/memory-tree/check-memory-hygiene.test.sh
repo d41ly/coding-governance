@@ -2795,6 +2795,52 @@ n=$((n+1))
 for r in id-orphan-waiver.txt corpus-path-unresolved.txt; do
   [ -e "$A/memory/project/$r" ] && { echo "FAIL adopt-memory-tree.sh --scaffold wrote memory/project/$r, which arms checks 13-15 on a fresh tree"; st=1; }
 done
+# ...and NO SCAFFOLDED HOME OWES A CONVERSION IT NEVER NEEDED (TOOL-dWitnessedBar-108 S5). Every
+# `*-to-ledger` [[upgrade]] of this kit's descriptor runs its `witness` argv over the scaffolded tree
+# and owes exit 0, and every [[ledger]] table whose home the scaffold wrote owes that home's first
+# line equal to `render_header` of the table, read through the kit's own `legacy_ledger` and never
+# through the adopter's `render_ledger_header`. Both populations are ENUMERATED from the descriptor,
+# so a later registration is covered with no edit here, and an empty one is a FAIL, never coverage.
+# WHAT IT DOES NOT CHECK: a home the scaffold leaves absent, which the witness answers as applied,
+# and the rows of a seeded home, which the seed-across arms grade.
+n=$((n+1))
+_swo=$("$_PY" -I -c '
+import pathlib, subprocess, sys, tomllib, types
+here, target, py = sys.argv[1:4]
+sys.path.insert(0, here)
+import legacy_ledger
+def write_line(text):
+    sys.stdout.buffer.write((text + "\n").encode("utf-8"))
+data = tomllib.loads(pathlib.Path(here, "kit.toml").read_text(encoding="utf-8"))
+ran = compared = failed = 0
+for up in data.get("upgrade", []):
+    if not str(up.get("id", "")).endswith("-to-ledger"):
+        continue
+    ran += 1
+    argv = [py if a == "python" else a.replace("{gov}", here + "/..").replace("{target}", target) for a in up["witness"]]
+    p = subprocess.run(argv, capture_output=True, stdin=subprocess.DEVNULL, timeout=300)
+    if p.returncode:
+        failed += 1
+        said = (p.stdout + p.stderr).decode("utf-8", "replace").strip().splitlines()
+        write_line("FAIL scaffold ledger · %s · its witness exited %d: %s" % (up["id"], p.returncode, said[-1] if said else "(silent)"))
+for table in data.get("ledger", []):
+    home = pathlib.Path(target, table["home"])
+    if not home.is_file():
+        continue
+    compared += 1
+    first = home.read_bytes().decode("utf-8", "replace").split("\n")[0].rstrip("\r")
+    want = legacy_ledger.render_header(types.SimpleNamespace(**table))
+    if first != want:
+        failed += 1
+        write_line("FAIL scaffold ledger · %s · its first line is %r, not the rendered header %r" % (table["home"], first[:100], want))
+if not ran:
+    failed += 1
+    write_line("FAIL scaffold ledger · (no upgrade) · the descriptor read no -to-ledger [[upgrade]] row: an empty population is not coverage")
+if not compared:
+    failed += 1
+    write_line("FAIL scaffold ledger · (no home) · no [[ledger]] home of the descriptor was scaffolded: an empty population is not coverage")
+sys.exit(1 if failed else 0)
+' "$HERE" "$A" "$_PY" 2>&1) || { printf '%s\n' "$_swo" | grep . || echo "FAIL scaffold ledger · the arm itself exited non-zero and printed nothing"; st=1; }
 n=$((n+1))
 # TOOL-dFramedEntrypoint, round-2 M1/B1 — the KIT COPY the scaffolder writes into, which nothing
 # asserted. The block above runs the adopter with the kit OUTSIDE the target tree, which is the flow

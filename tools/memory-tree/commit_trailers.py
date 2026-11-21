@@ -26,6 +26,7 @@ answer who a commit is attributed to, and each consumer names its own:
     python commit_trailers.py tokens <git-log revision arguments>   # one tokenised line per commit
     python commit_trailers.py unchecked <git-log revision arguments>   # each pass commit with no Commit-Checked:
     python commit_trailers.py message <file>                        # a message not yet committed
+    python commit_trailers.py attribution <file> <charter file>    # the message's agent trailer, last
     python commit_trailers.py --print-commits                       # the commit class's members
     python commit_trailers.py --fixture                             # three planted commits, both views
 """
@@ -261,6 +262,66 @@ def read_message_ids(text) -> str:
     return " ".join(derive_tokens(" ".join(subject)))
 
 
+#: The charter's fact line naming the agent-commit trailer, and the scissors line past which git reads nothing.
+CHARTER_TRAILER_LEAD = "- **Commit trailer:**"
+_SCISSORS = re.compile(r"# -+ >8 -+")
+
+
+def read_charter_trailer(path) -> tuple:
+    """`(line, why)`: the first backticked span of the first line of the charter at `path` opening
+    `CHARTER_TRAILER_LEAD`, the trailer every agent commit ends with, and `why` empty; or an empty line
+    and why none was read: the file absent or unreadable, no such line, or no backticked span on it
+    (TOOL-dWitnessedBar-108 S8)."""
+    try:
+        text = pathlib.Path(path).read_bytes().decode("utf-8", "replace")
+    except OSError as exc:
+        return "", f"the charter {path} could not be read: {exc}"
+    for line in text.split("\n"):
+        if line.startswith(CHARTER_TRAILER_LEAD):
+            m = re.search(r"`([^`]+)`", line)
+            if m:
+                return m.group(1).strip(), ""
+            return "", f"the charter {path}'s commit-trailer line carries no backticked trailer"
+    return "", f"the charter {path} holds no line opening '{CHARTER_TRAILER_LEAD}'"
+
+
+def check_message_attribution(text, expected) -> tuple:
+    """`(state, detail)` of a commit message against the charter's trailer line `expected`
+    (TOOL-dWitnessedBar-108 S8). The agent trailers are the `Co-Authored-By` trailers, key in any case,
+    of git's own trailer parse, whose `<...>` address equals the expected value's. `unarmed` where
+    `expected` is empty; `none` where no agent trailer is carried; `refused` naming both values where
+    one is not the expected value, or naming the last line where the message's last line, CRs stripped,
+    `#` and blank lines dropped and nothing read past a scissors line, is not `expected`; else `ok`.
+    WHAT IT DOES NOT CHECK: a `core.commentChar` other than `#`."""
+    if not expected:
+        return "unarmed", "the charter names no commit trailer, so no attribution was checked"
+    raw = text if isinstance(text, bytes) else text.encode("utf-8", "surrogateescape")
+    key, _sep, value = expected.partition(":")
+    value = value.strip()
+    address = re.search(r"<[^<>]*>", value)
+    address = address.group(0) if address else value
+    proc = subprocess.run(["git", "interpret-trailers", "--parse"], input=raw, capture_output=True)
+    found = [m.group(1).strip() for m in re.finditer(r"(?im)^" + re.escape(key.strip()) + r": *(.*)$",
+                                                      proc.stdout.decode("utf-8", "replace"))]
+    agent = [v for v in found if (m := re.search(r"<[^<>]*>", v)) and m.group(0) == address]
+    if not agent:
+        return "none", f"no {key.strip()}: trailer naming {address}"
+    wrong = [v for v in agent if v != value]
+    if wrong:
+        return "refused", f"the trailer '{key.strip()}: {wrong[0]}' is not the charter's '{expected}'"
+    last = ""
+    for line in raw.decode("utf-8", "replace").split("\n"):
+        line = line.replace("\r", "")
+        if _SCISSORS.fullmatch(line.rstrip()):
+            break
+        if line.startswith("#") or not line.strip():
+            continue
+        last = line
+    if last != expected:
+        return "refused", f"the message's last line is '{last}', not the charter's '{expected}'"
+    return "ok", f"the message ends with the charter's '{expected}'"
+
+
 def build_fixture(top) -> pathlib.Path:
     """The three planted commits, oldest first, in a fresh repository under `top`: a subject id with no
     trailer, a subject id with `Pass: none`, and no subject id with a trailer id. The caller's git
@@ -308,6 +369,17 @@ def main(argv=None) -> int:
         if args[:1] == ["message"] and len(args) == 2:
             print(read_message_ids(pathlib.Path(args[1]).read_bytes()))
             return 0
+        if args[:1] == ["attribution"] and len(args) == 3:
+            # 0 for ok, none and unarmed, 1 for refused, 2 for a message file that cannot be read.
+            try:
+                text = pathlib.Path(args[1]).read_bytes()
+            except OSError as exc:
+                print(f"ATTRIBUTION unreadable · the message {args[1]} could not be read: {exc}")
+                return 2
+            expected, why = read_charter_trailer(args[2])
+            state, detail = check_message_attribution(text, expected)
+            print(f"ATTRIBUTION {state} · {why or detail}")
+            return 1 if state == "refused" else 0
         if args == ["--print-commits"]:
             try:
                 out = run_git(os.getcwd(), ["rev-list", "HEAD"])
@@ -331,7 +403,7 @@ def main(argv=None) -> int:
         print(f"{SAY}: refused · {exc}", file=sys.stderr)
         return 2
     print(f"{SAY}: usage: tokens <git-log revision arguments> | unchecked <git-log revision arguments>"
-          " | message <file> | --print-commits | --fixture",
+          " | message <file> | attribution <file> <charter file> | --print-commits | --fixture",
           file=sys.stderr)
     return 2
 # <<< commit_trailers_py

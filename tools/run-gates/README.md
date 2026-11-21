@@ -1359,9 +1359,13 @@ than the factory rendered, holds its adapter rows.
 
 **The commit-time list is derived, not typed in the hook.** `run-gates.sh --precommit` hands over to
 `precommit.py` before any bar machinery exists, as `--regen` does. It reads the manifest beside this
-kit (or `--legs <path>`), lists the staged set once, and for every row carrying `precommit`, in
-manifest order, prints `pre-commit: <name> not tripped` when the row's `guard` names no staged path,
-or runs the argv and prints `pre-commit: <name> ok` or `pre-commit: <name> FAILED (rc <n>)`. A row
+kit (or `--legs <path>`), lists the staged set once, as the runner's `changed` counts it (`git diff
+--cached --name-only --no-renames`, no status filter: a staged deletion lists its path and a staged
+rename both its source and its destination, so either trips a guard its source sits under; the
+`leg-factory selftest` leg's trigger parity arm reds the two copies disagreeing), and for every row
+carrying `precommit`, in manifest order, prints `pre-commit: <name> not tripped` when the row's
+`guard` names no staged path, or runs the argv and prints `pre-commit: <name> ok` or
+`pre-commit: <name> FAILED (rc <n>)`. A row
 with no `guard` runs at every commit. A row whose argv names a script absent from the tree prints the
 hook's announced skip and is not a failure. It exits 1 when any run failed; `--list` prints each row's
 name, argv and trigger and runs nothing. The pre-commit hook calls it once, after its memory hygiene

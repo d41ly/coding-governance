@@ -259,7 +259,13 @@ row may carry no `type`: it registers a key that carries a value and no edge, wh
 `Gov-Policy:`, `Red-fix:` and `Commit-Checked:` are, so gov's one trailer reader reads it and no edge
 is read from it. `Commit-Checked: unattended@<kit version>` is written by the unattended commit check
 onto a pass commit it admitted, and a pass commit without it is one the check never saw, which the
-`hooks.bypass` policy key records and, set to `refused`, refuses.
+`hooks.bypass` policy key records and, set to `refused`, refuses. It is written with `--where start`, at
+the start of the trailer block, so the charter's agent-commit trailer stays the message's last line.
+That same check asks the trailer reader's `attribution` verb of every message a bound run's commit
+carries, `Pass: none` included: the value is read from the charter's `Commit trailer` fact line in
+`AGENTS.md`, and a `Co-Authored-By:` trailer naming the charter's address with another value, or any
+line after the charter's trailer, is refused with code 49 naming the line to end the message with. A
+message with no such trailer, or a charter with no fact line, is admitted.
 Where no `edges.toml` is installed, or it holds no `[[trailer]]` row, the reader reads a closed floor of
 keys, `Pass`, `Decided`, `Gov-Transition`, `Gov-Policy`, `Red-fix` and `Commit-Checked`, refuses any other by name, and
 says once on stderr that the check was skipped; a table with rows decides alone. A `serves` trailer is read as edges only when every comma-separated target is a well-formed address; a

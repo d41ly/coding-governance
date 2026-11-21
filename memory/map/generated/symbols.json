@@ -7118,6 +7118,21 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_message_attribution",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "check_message_attribution",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "check_message_attribution",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
       "id": "check_method",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -7636,6 +7651,11 @@
       "id": "check_practice_arms",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_precommit_trigger",
+      "kind": "function",
+      "file": "tools/run-gates/leg_factory.py"
     },
     {
       "id": "check_preflip",
@@ -8981,6 +9001,11 @@
       "id": "check_unmerged_live",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_unread_params",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "check_untouched_r3",
@@ -17708,6 +17733,11 @@
       "file": "tools/workflows/replay_scorer.py"
     },
     {
+      "id": "measure_unread_params",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "measure_view_delta",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -20591,6 +20621,21 @@
       "id": "read_charter_table",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_charter_trailer",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "read_charter_trailer",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "read_charter_trailer",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "read_checked_text",
@@ -25038,6 +25083,11 @@
       "file": "tools/memory-tree/ratchet.py"
     },
     {
+      "id": "read_tracked_sources",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "read_tracked_tails",
       "kind": "function",
       "file": "tools/run-gates/keep_tails.py"
@@ -27521,6 +27571,11 @@
       "id": "render_ledger_head",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "render_ledger_header",
+      "kind": "function",
+      "file": "tools/memory-tree/adopt-memory-tree.sh"
     },
     {
       "id": "render_ledger_row",
@@ -32948,6 +33003,11 @@
       "file": "tools/run-gates/leg_factory.py"
     },
     {
+      "id": "run_list_params",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
+    },
+    {
       "id": "run_live",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -35776,6 +35836,11 @@
       "id": "scan_unit_ids",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "scan_unread_params",
+      "kind": "function",
+      "file": "tools/run-gates/py_reads.py"
     },
     {
       "id": "scan_verdicts",

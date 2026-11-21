@@ -67,9 +67,9 @@ tools/lib/resolve-remote.sh	33	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/loop/adopt-loop.sh	147	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-recall/adopt-memory-recall.sh	239	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-recall/recall-opened.test.sh	100	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/memory-tree/adopt-memory-tree.sh	604	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
+tools/memory-tree/adopt-memory-tree.sh	638	74ae4b50d5490259b4001885e0653e42354c725f	widened:2026-11-21-build-TOOL-dWitnessedBar-108-widen-27
 tools/memory-tree/check-memory-hygiene.sh	2187	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
-tools/memory-tree/check-memory-hygiene.test.sh	3355	b82c0f53dd1223fab306f59bef735b3f1ceecb29	widened:2026-11-20-build-TOOL-dWitnessedBar-62-widen-5
+tools/memory-tree/check-memory-hygiene.test.sh	3393	74ae4b50d5490259b4001885e0653e42354c725f	widened:2026-11-21-build-TOOL-dWitnessedBar-108-widen-27
 tools/memory-tree/check-method-carriers.sh	223	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-tree/check-method-carriers.test.sh	81	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/memory-tree/check-verdict-epoch.sh	339	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
@@ -136,8 +136,8 @@ tools/unattended/run-unattended-gates.sh	364	7a787b95c6b545ee206c4efe75f5c268c7b
 tools/unattended/runlog-writer.test.sh	738	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/stall-recorder.test.sh	350	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/unattended/stop-guard.test.sh	618	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
-tools/unattended/unattended.sh	9780	fc999262ba59a3fa7e84f41ca90c185fe765ef9e	widened:2026-11-20-build-TOOL-dWitnessedBar-51-widen-1
-tools/unattended/unattended.test.sh	13901	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
+tools/unattended/unattended.sh	9792	74ae4b50d5490259b4001885e0653e42354c725f	widened:2026-11-21-build-TOOL-dWitnessedBar-108-widen-27
+tools/unattended/unattended.test.sh	13935	74ae4b50d5490259b4001885e0653e42354c725f	widened:2026-11-21-build-TOOL-dWitnessedBar-108-widen-27
 tools/workflows/check-protocol-parity.test.sh	698	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/workflows/check-review-join.sh	408	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
 tools/workflows/check-review-join.test.sh	533	7a787b95c6b545ee206c4efe75f5c268c7bb725f	seeded
