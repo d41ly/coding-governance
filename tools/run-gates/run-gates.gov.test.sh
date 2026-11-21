@@ -898,16 +898,19 @@ rgf_sha=${rgf_rd%%$'\t'*}; rgf_fp=${rgf_rd#*$'\t'}
 rgf_mut=$(printf '%s\n' "$rgf_fn" | sed 's/%[$].[\]r.}/}/')
 printf '%s\n' "$rgf_mut" > "$rgf_t/cut-mut.sh"
 rgf_n=$(diff <(printf '%s\n' "$rgf_fn") <(printf '%s\n' "$rgf_mut") | grep -c '^>')
-# The line's slot names the first check that failed (TOOL-dWitnessedBar-75 S1, S2): the count, as
-# `count <n>`, then the first variable `check_canary_keys` prints, so `rec_sha` before `rec_fp`; no
-# byte check runs past a failed count (TOOL-dWitnessedBar-76 S2, §8 F3).
-rgf_what=
-if [ "$rgf_n" != 1 ]; then rgf_what="count $rgf_n"
-else rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec"); rgf_what=${rgf_miss%%$'\n'*}; fi
+# The line's slot (TOOL-dWitnessedBar-75 S1, S2) takes each value of `rgf_whats`, one line apiece
+# (TOOL-dWitnessedBar-77 S1): `count <n>` alone when the count failed, so no byte check runs past it,
+# else every variable `check_canary_keys` prints, in its order, so `rec_sha` before `rec_fp`.
+rgf_whats=()
+if [ "$rgf_n" != 1 ]; then rgf_whats=("count $rgf_n")
+else rgf_miss=$(check_canary_keys "$rgf_t/cut-mut.sh" "$rgf_rec")
+  for rgf_g in $rgf_miss; do rgf_whats+=("$rgf_g"); done; fi
 rgf_ok=0
-[ -z "$rgf_what" ] && rgf_ok=1
-[ "$rgf_ok" = 1 ] \
-  || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
+[ "${#rgf_whats[@]}" = 0 ] && rgf_ok=1
+for rgf_what in "${rgf_whats[@]}"; do
+  [ "$rgf_ok" = 1 ] \
+    || { echo "gov-canary: the planted CR never reached read_green_file on $(uname -s) for $rgf_what; the CR-strip assertion is not counted"; fail=1; }
+done
 # The liveness variants (TOOL-dWitnessedBar-74 S2, TOOL-dWitnessedBar-76 S3): one per CANARY_KEYS
 # pair, its own key's value losing its CR after the read; `check_canary_keys` on its mutant must print
 # exactly that key's variable. `rgf_seen` lists the variables seen red, and only those compares count.
