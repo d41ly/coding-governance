@@ -95,7 +95,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 88 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
@@ -170,7 +170,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-69 — both readers of the green record read it with a line read that keeps every byte, so their one-CR strip is the only thing that removes a CR](spec/2026-10-25-spec-TOOL-dWitnessedBar-69.md) | 39 | 2 | CLOSED | rev-5 | 2026-11-21 |
 | [TOOL-dWitnessedBar-70 — the CRLF record arm proves its planted CR reaches `read_green_file` before any CR-strip assertion counts, and each staged red is recorded with its failing line from a Windows node](spec/2026-10-25-spec-TOOL-dWitnessedBar-70.md) | 39 | 2 | CLOSED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-71 — AC5's hostile git config reaches the fixture `git init` as command-scope environment config, which S6's isolation cannot mask, and the arm proves it is in effect before grading](spec/2026-10-25-spec-TOOL-dWitnessedBar-71.md) | 40 | 2 | CLOSED | rev-3 | 2026-11-21 |
-| [TOOL-dWitnessedBar-72 — the `fingerprint` CRLF line's strip is proven reachable by the same canary, so unit 67's `rec_fp` break can turn red on Windows](spec/2026-10-25-spec-TOOL-dWitnessedBar-72.md) | 40 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [TOOL-dWitnessedBar-72 — the `fingerprint` CRLF line's strip is proven reachable by the same canary, so unit 67's `rec_fp` break can turn red on Windows](spec/2026-10-25-spec-TOOL-dWitnessedBar-72.md) | 40 | 2 | INPROGRESS | rev-4 | 2026-11-21 |
 | [TOOL-dWitnessedBar-74 — the canary's `rec_sha` byte check is seen red on every run, against a one-line variant whose `sha` value loses its CR after the read](spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md) | 40 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [TOOL-dWitnessedBar-75 — the CR-reach canary's failure line names the check that failed, so a red at its line count cannot pass for a red at its byte check](spec/2026-10-25-spec-TOOL-dWitnessedBar-75.md) | 40 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-73 — the round-1 audit of units 66 and 67, its 23 minors batched: fixtures, populations, the hook guard, every key and filesystem call exercised, predicates and records](spec/2026-10-25-spec-TOOL-dWitnessedBar-73.md) | 41 | 2 | DEFERRED | rev-4 | 2026-10-25 |
@@ -198,7 +198,7 @@ ids TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitn
 | [TOOL-dWitnessedBar-97 — the round-1 audit of units 91 and 92, 10 minors batched: derivation notes naming launcher, exit and script, an isolated third clone, pass commits read through the shipped seams, unit 91's note graded and every unit ledger read](spec/2026-10-25-spec-TOOL-dWitnessedBar-97.md) | 50 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 790 bound to this build, across 4 record folder(s).
+Records: 791 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
