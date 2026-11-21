@@ -1000,10 +1000,11 @@ def derive_lowered_limit(hit, read):
 # ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------
 
 MIRROR_REL = ".governance/policy.json"
-# Each legacy input the resolution reads, by its path at the revision read: the mirror records its
-# blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as STALE. A unit
-# adding a resolution input adds its path here (TOOL-dGroundRules-21 S17). The instruction overlay is
-# one: its `[[policy]]` rows are the `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
+# Each repository-relative input the resolution reads, by its path at the revision read: the mirror
+# records its blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as
+# STALE (TOOL-dGroundRules-21 S17). The instruction overlay is one: its `[[policy]]` rows are the
+# `adopter.` keys' rows (PLAY-dOrderedCharter-32 S7).
+# The rule for adding one is THE RULE in `tools/policy/README.md`, "The mirror" (KICK-dKeptSession-60).
 LEGACY_INPUTS = (LEGACY_FANOUT, OVERLAY_REL)
 
 

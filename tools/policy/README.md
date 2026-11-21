@@ -340,7 +340,10 @@ own code (KICK-dKeptSession-49): beside the policy file and the catalogue, every
 records, and reads STALE a mirror whose recorded id differs at L, that lacks an expected key, or
 that carries no `legacy_blobs`, so a landing that changes the conf alone is never read through a
 mirror holding the old limit, and a mirror rendered before the store joined reads stale. THE RULE: a
-unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.
+unit adding a repository-relative resolution input adds its path to `LEGACY_INPUTS`, so its blob
+joins this map; a unit adding a kit-relative input adds its name to `derive_mirror_inputs` in
+`policy.py` and to `MIRROR_KIT_INPUTS` in `policy-mirror.js`, and
+`python check_policy.py --fixture mirror-input-parity` (KICK-dKeptSession-59) reds the two lists apart.
 
 `keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
 pattern row matches, each with its `Resolution`. The bytes are sorted, two-space indented, ASCII and
