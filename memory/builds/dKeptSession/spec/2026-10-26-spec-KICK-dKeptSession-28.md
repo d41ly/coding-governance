@@ -1,6 +1,6 @@
 # KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0165@8c92ee12 whole
 
@@ -21,7 +21,9 @@
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-28-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-28-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-2-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md) | research | KICK-dKeptSession-22 KICK-dKeptSession-31 |
+| [2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -105,6 +107,15 @@ and reads messages is KICK-dKeptSession-5's. A node's membership is asked of the
 - The unattended kit's `requires` names no playbook kit, though `check_fleet_tag` and
   `resolve_fleet_tag` already read one (`tools/unattended/kit.toml`); KICK-dKeptSession-44 S27 adds it.
 - No recipient code exists: `git grep -n -i recipient -- tools skills` finds nothing at this tree.
+- A probe sourcing the driver at this tree (2026-11-21) read `check_fleet_tag` 0 for `a` and `b`, and
+  1 for `z` and for the empty tag, `LEASE_WHY` naming `fleet.toml`; `check_slug_shape` 0 for `fx`, 1
+  for `3x` and the empty slug; `UNIT_ID_ERE` anchored matching `KICK-fx-3` and `KICK-3x-3`, never
+  `fx` or `KICK-fx-x`. These are the exits AC1 to AC3 name.
+- The suite's lease arms run the tracked driver, `bash "$SCRIPT"` (`run_lease_arm` in
+  `tools/unattended/unattended.test.sh`), so `check_fleet_tag` there reads the tracked
+  `tools/playbook/fleet.toml`, as this unit's arm does; no fixture copy of the driver is made.
+- `memory/map/generated/symbols.json` lists every shell function of `unattended.sh` by name, so the
+  two minted here move it.
 
 ### The grammar
 
@@ -126,6 +137,8 @@ and reads messages is KICK-dKeptSession-5's. A node's membership is asked of the
 
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
+- `memory/map/generated/symbols.json`: `check_mail_recipient` and `check_mail_addressed`, regenerated
+  by `gen_map.py --write`, which the bar's codebase-map leg grades
 
 ### Alternatives rejected
 
@@ -176,7 +189,7 @@ and reads messages is KICK-dKeptSession-5's. A node's membership is asked of the
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `lexicon naming predicates` · `memory hygiene`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · each legal and illegal recipient, an unknown fleet tag, an unread registry and the matcher's cases, staged against the base driver, which has no recipient checker · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
@@ -216,6 +229,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · each l
   5's `--mail` entry (F3), so the guide files leave Files touched; the external edge and the edge to
   unit 44 re-pointed at `check_fleet_tag`; the two guarded driver legs named and the playbook, govkit
   and recall legs dropped with their files; the arm's floor effect stated.
+- rev-4 · 2026-11-21 · §4 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief`: every exit AC1 to AC3 names probed on the
+  sourced driver and recorded; the suite's arms shown to run the tracked driver and fleet registry, so
+  no fixture copy needs the playbook kit; `symbols.json`, which the two functions move, added with the
+  `recall floor` legs its path trips. No landed unit since base touched a cited symbol.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-KICK-dKeptSession-48-deviation-481.md](../build/2026-10-26-build-KICK-dKeptSession-48-deviation-481.md) | deviation | — |
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 |
 | [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 
@@ -47,7 +48,9 @@ builds one step after it (order 14).
   larger window. Observed by AC3.
 - **S3** — id 43. The override observed on the mixed root. A selftest case reads unit 30's AC2 root,
   the 150000-token `context-window` beside the 900000-token `context-window-sibling`, with the
-  variable set to 200000. Observed by AC1.
+  variable set to 200000 in its own child's environment, `build_arm_env`'s with the one key added,
+  since the selftest's `main` pops it before any arm (unit 30 S4), as unit 30's AC4 read sets it.
+  Observed by AC1.
 - **S4** — id 43. The sibling text superseded by name. `KICK-dKeptSession-30`'s risks line, which
   prices only a model never observed past 200k, reads both directions as S1 states them, and unit 30
   AC2's `15%` is the 1M session's share, never a 200k session's. Answered in unit 30's acceptance
@@ -78,7 +81,10 @@ builds one step after it (order 14).
   source `env`, and its S2 prints `context: window <tokens> · <source>` on stderr.
 - `help/orientation-card.md` holds the section "When a session resumes" at `c2a407b0`, and no
   `context —` paragraph yet: units 14 and 30 write it, so this unit edits their landed paragraph.
-- `derive_context_window` is not in the tree at `c2a407b0`: unit 30 mints it.
+- `derive_context_window` is not in the tree at `c2a407b0` nor at the run's tree of 2026-11-21:
+  unit 30 mints it at order 13.
+- No import is added: `record.py`, which the `policy fixtures` leg's runlog-record plant imports,
+  imports `extract` at module level (`tools/runlog/record.py`).
 
 ### The reads on the mixed root
 
@@ -98,7 +104,10 @@ None.
 ### Files touched (estimate)
 
 - `tools/runlog/extract.py`: S1, the docstring
-- `tools/runlog/selftest.py`: S3's case
+- `tools/runlog/selftest.py`: S3's case, one `test_` function, and the `ASSERTION_FLOOR` raise with
+  its `RAISED` comment
+- `memory/map/generated/symbols.json`: the case's `test_` function, regenerated by `gen_map.py
+  --write`, which the bar's codebase-map leg grades
 - `help/orientation-card.md`: S2
 
 ### Alternatives rejected
@@ -138,9 +147,9 @@ None.
 
 ## 7. Gates
 
-`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/runlog/selftest.py · covers AC1 · the mixed root read with the variable at 200000, staged red by a copy of `extract.py` ranking the observation above the variable · none
+New arm: tools/runlog/selftest.py · covers AC1 · the mixed root read with the variable at 200000, staged red by a copy of `extract.py` ranking the observation above the variable · `ASSERTION_FLOOR`, raised by the case's checks and its three decoy checks
 
 ## 8. Open questions
 
@@ -163,6 +172,11 @@ New arm: tools/runlog/selftest.py · covers AC1 · the mixed root read with the 
   unbuilt; S2 names the section and the two units that write the paragraph; the more-common-window
   claim re-read from unit 30 rev-3 and pinned; every section-number reference to unit 30 named by
   its section. Nothing narrowed: units 14 and 30 are unbuilt, so no landed unit satisfies an item.
+- rev-4 · 2026-11-21 · S3 · §4 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief`: S3's case sets the variable in its own
+  child's environment, since unit 30 rev-4 has the selftest's `main` pop it before any arm; the
+  policy fixture's import of `extract` shown unbroken; the floor raise and `symbols.json`, with the
+  `recall floor` legs its path trips, added. No landed unit since base touched a cited symbol.
 
 ## 10. Reuse audit
 

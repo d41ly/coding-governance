@@ -123,7 +123,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`](spec/2026-10-26-spec-KICK-dKeptSession-14.md) | 12 | 2 | DEFERRED | rev-5 | 2026-11-21 |
 | [KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000](spec/2026-10-26-spec-KICK-dKeptSession-30.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | DEFERRED | rev-7 | 2026-11-21 |
-| [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path](spec/2026-10-26-spec-KICK-dKeptSession-45.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | DEFERRED | rev-4 | 2026-11-21 |
@@ -163,7 +163,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 233 bound to this build, across 4 record folder(s).
+Records: 235 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
