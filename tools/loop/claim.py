@@ -70,7 +70,7 @@ if str(KIT) not in sys.path:
 sys.modules.setdefault("claim", sys.modules[__name__])
 from loop_lib import read_memory_tree, resolve_kit_dir, resolve_memory_root, run_selftest_cases  # noqa: E402
 from loop_parents import read_policy_kit  # noqa: E402
-from loop_witness import read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
+from loop_witness import FIXTURE_REMOTE, read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git, write_fixture_files  # noqa: E402
 
 SAY = "claim"
 #: The claims namespace on the remote, shared interface I23, and this node's cache of it, which
@@ -403,9 +403,9 @@ def write_claim_fixture(top, policy):
         run_fixture_git(root, "config", name, value)
     run_fixture_git(root, "add", "-A")
     run_fixture_git(root, "commit", "-q", "-m", "the claim fixture")
-    run_fixture_git(root, "push", "-q", "origin", "main")
-    run_fixture_git(root, "fetch", "-q", "origin")
-    run_fixture_git(root, "remote", "set-head", "origin", "main")
+    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+    run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
+    run_fixture_git(root, "remote", "set-head", FIXTURE_REMOTE, "main")
     key = derive_request_content_key(FX_TEXT)
     store = pathlib.Path(run_fixture_git(root, "rev-parse", "--path-format=absolute", "--git-common-dir")) / "requests"
     write_fixture_files(store, {"%s.md" % key: FX_TEXT})
@@ -432,7 +432,7 @@ def write_fixture_claim_commit(root, slug, lines, parent=None):
                           encoding="utf-8", check=True, env=read_clean_env()).stdout.strip()
     msg = "\n".join([CLAIM_HEADER % slug, ""] + lines)
     sha = run_fixture_git(root, "commit-tree", tree, *(["-p", parent] if parent else []), "-m", msg)
-    run_fixture_git(root, "push", "-q", "origin", "%s:%s/%s" % (sha, CLAIM_NS, slug))
+    run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s/%s" % (sha, CLAIM_NS, slug))
     return sha
 
 
@@ -529,8 +529,8 @@ def check_claim_plant(case, top, seen, bad):
         check("resumed", run_entry(), 0, "claimed by this claimant", "scaffold committed", "recorded none -> designing")
         write_fixture_files(root, {".governance/policy.toml": '[leases]\noffline = "refuse"\n'})
         run_fixture_git(root, "commit", "-q", "-am", "leases.offline refuse")
-        run_fixture_git(root, "push", "-q", "origin", "main")
-        run_fixture_git(root, "fetch", "-q", "origin")
+        run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+        run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
         origin.rename(top / "origin.gone")
         got = run_entry(the_slug="dElsewhereNow")
         origin = top / "origin.gone"
@@ -543,7 +543,7 @@ def check_claim_plant(case, top, seen, bad):
         tree = subprocess.run(["git", "mktree"], cwd=str(root), input="", capture_output=True, text=True,
                               encoding="utf-8", check=True, env=read_clean_env()).stdout.strip()
         stone = run_fixture_git(root, "commit-tree", tree, "-p", tip, "-m", msg)
-        run_fixture_git(root, "push", "-q", "origin", "%s:%s" % (stone, lease))
+        run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "%s:%s" % (stone, lease))
         got = run_entry()
         check("tombstone", got, 1, "tombstone", "ask: %s · tombstone · request %s" % (slug, key))
         if got[1].count("ask: ") != 1:
@@ -637,12 +637,12 @@ def check_claim_plant(case, top, seen, bad):
         write_fixture_files(root, {"tools/zq-shared/x.txt": "theirs\n"})
         run_fixture_git(root, "add", "-A")
         run_fixture_git(root, "commit", "-q", "-m", "another branch")
-        run_fixture_git(root, "push", "-q", "origin", "other")
+        run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "other")
         run_fixture_git(root, "checkout", "-q", "main")
         write_fixture_files(root, {"tools/zq-shared/x.txt": "ours\n"})
         run_fixture_git(root, "add", "-A")
         run_fixture_git(root, "commit", "-q", "-m", "this run's edit")
-        run_fixture_git(root, "fetch", "-q", "origin")
+        run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
         check("overlap", run_entry(), 0, "overlap noted", "recorded none -> designing")
         log = read_remote_log(claim_ref)
         if not log or "overlap: " not in log[0][1]:

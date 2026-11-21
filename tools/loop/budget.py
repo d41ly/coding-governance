@@ -146,7 +146,7 @@ from loop_transition import (BUDGET_FIELDS, FX_BUILD, FX_SPEC, FX_UNIT, VALUE,  
                              read_record_channels, read_transition_commits, read_transition_records,
                              read_transitions, render_transition_trailer, write_transition, write_transition_plant,
                              write_transition_record)
-from loop_witness import (read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git,  # noqa: E402
+from loop_witness import (FIXTURE_REMOTE, read_clean_env, read_git, remove_tree, resolve_bash, run_fixture_git,  # noqa: E402
                           write_fixture_files)
 from request import KEY_HEX, derive_request_content_key, read_request_text  # noqa: E402
 
@@ -819,14 +819,14 @@ def run_request_draw_plant(case):
             place = ("place", "--declared", "continue", FX_DONE)
             run_placement_verb(*place)
             run_placement_verb("check")
-            run_fixture_git(root, "remote", "set-url", "origin", (top / "gone.git").as_posix())
+            run_fixture_git(root, "remote", "set-url", FIXTURE_REMOTE, (top / "gone.git").as_posix())
             rc, out = run_draw()
             check(rc == 2 and "not drawn, contention" in out, "an unreachable remote answered %d %r" % (rc, out[-200:]))
             rc, out = run_placement_verb(*place)
             check(rc == 2 and "pre-claim draw not recorded — " in out and "drew nothing, so no block is written" in out
                   and read_block_count() == 1,
                   "a re-placement with the remote unreachable answered %d, %d blocks: %r" % (rc, read_block_count(), out[-200:]))
-            run_fixture_git(root, "remote", "set-url", "origin", origin.as_posix())
+            run_fixture_git(root, "remote", "set-url", FIXTURE_REMOTE, origin.as_posix())
             check(len(read_ref_rows()) == 1, "an unreachable draw added a row")
             write_fixture_files(store, {"abcdefabcdef.md": "Words that key to another request\n"})
             rc, out = run_driver_verb("--request-draw", "abcdefabcdef", "--cause", "route-back", "--item", PLACE_ITEM)
@@ -879,8 +879,8 @@ def run_request_draw_plant(case):
                                                          "terminal")
             run_fixture_git(root, "add", "-A")
             run_fixture_git(root, "commit", "-q", "-m", "the owner places")
-            run_fixture_git(root, "push", "-q", "origin", "main")
-            run_fixture_git(root, "fetch", "-q", "origin")
+            run_fixture_git(root, "push", "-q", FIXTURE_REMOTE, "main")
+            run_fixture_git(root, "fetch", "-q", FIXTURE_REMOTE)
             rc, out = run_placement_verb("place", "--owner", str(root / rel))
             check(rc == 0 and "placer owner" in out and "draw · " not in out, "the owner's placement answered %s" % out[-200:])
             check(read_block_count() == 2 and len(read_ref_rows()) == 5,
