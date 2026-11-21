@@ -1,6 +1,6 @@
 # KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 23 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 23 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0144@c41201f3 whole
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-5 |
 | [2026-11-21-prompt-KICK-dKeptSession-6-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-6-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md) | research | KICK-dKeptSession-7 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
@@ -43,13 +44,14 @@ dWellOiledMachine declares in Runtime's `[extend]`
   was lost or not completed calls it never. Observed by AC2.
 - **S2** — `deps.messaging` (`live-and-mailbox`, `live-only`, `mailbox-only`, or a registered doorbell;
   default `live-and-mailbox`; the landed row in `tools/policy/catalogue.toml`, owner dKeptSession), read
-  as `read_lease_policy` reads its keys (`tools/unattended/unattended.sh#read_lease_policy`): the
-  python `resolve_python` answers, the policy kit `resolve_kit_dir` finds, and its `get
-  deps.messaging`, the key spelled whole on its own line. A doorbell name fails `check_value`
-  (`tools/policy/policy.py#check_value`) until a registry admits it, so a policy file naming one is
-  invalid and reads its last valid revision or refuses. A refusal, a printed value outside the three,
-  or no policy kit found reads the catalogue default and prints one `unattended: NOTE` line naming the
-  key. Observed by AC1 and AC4.
+  through `read_lease_policy deps.messaging`, a new arm of the driver's one shell policy reader
+  (`tools/unattended/unattended.sh#read_lease_policy`): its catalogue default, one literal `policy.py
+  get deps.messaging` line, the three values as its closed set, and the key on its NOTE's and its
+  refusal's key lists. A doorbell name fails `check_value` (`tools/policy/policy.py#check_value`)
+  until a registry admits it, so a policy file naming one is invalid and reads its last valid
+  revision or refuses. No policy kit found reads the default under the reader's one NOTE; where the
+  reader returns 1, a refusal or a value outside the three, the point takes the default and prints
+  one `unattended: NOTE -` line naming the key and `LP_VALUE`. Observed by AC1 and AC4.
 - **S3** — The ring, by value. Under `mailbox-only` the point rings nothing and the post prints
   `ring — off (deps.messaging: mailbox-only)`. Under `live-and-mailbox` and `live-only` it rings each
   live channel the harness offers, the empty set today (§8 F1), and prints
@@ -102,7 +104,12 @@ dWellOiledMachine declares in Runtime's `[extend]`
   default branch (`tools/policy/policy.py#derive_landed_revision`), so a fixture's planted value
   reads only once pushed and fetched.
 - The driver has no `--mail` verb at base; `KICK-dKeptSession-5` (order 16) lands the post this unit
-  extends.
+  extends, and `KICK-dKeptSession-24` (order 19) makes it read `flow.wait-ceiling` first, a refused
+  read refusing the post. The policy file falls back or refuses whole, never one key
+  (`tools/policy/policy.py#read_last_valid_value`), so a file refusing `deps.messaging` refuses that
+  read too and no ring is reached; and the tracked driver resolves the policy kit beside its own
+  directory (`tools/lib/resolve_kit_dir.py#resolve_kit_dir`), never a stub in the clone it runs in.
+  AC4 therefore stages its refusal at the reader.
 
 ### The tail, in order
 
@@ -129,8 +136,11 @@ branch's (`tools/push-main.sh@78f40c3c2475:27`).
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.sh`: `run_mail_ring` and its call in the post's tail
-- `tools/unattended/unattended.test.sh`: the arms of §7
+- `tools/unattended/unattended.sh`: `run_mail_ring`, its call in the post's tail, and
+  `read_lease_policy`'s `deps.messaging` arm
+- `tools/unattended/unattended.test.sh`: the arms of §7, and the effective `FLOOR_ASSERTIONS` and its
+  region's `FLOOR_SHARD_<k>` raised by their counted assertions
+- `memory/map/generated/symbols.json`: `run_mail_ring`, a new shell function
 - `tools/unattended/VERBS.template.md`: the `ring —` line
 - `memory/guides/UNATTENDED-VERBS.md`: its render, the copy `check-unattended.sh` holds equal
 - `help/loop.md`: the `ring —` sentence in the `--mail` paragraph
@@ -158,7 +168,8 @@ branch's (`tools/push-main.sh@78f40c3c2475:27`).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/unattended/unattended.sh --mail post` posts a message with no
+- **AC1** — When `bash tools/unattended/unattended.sh --mail post` posts a `landed` message, which
+  needs no `--default` (`KICK-dKeptSession-24` S2), with no
   `deps.messaging` set, its output ends `ring — none · no live channel in this harness (stand-in
   dWellOiledMachine)`; with `deps.messaging = "mailbox-only"` set, it ends
   `ring — off (deps.messaging: mailbox-only)`.
@@ -174,10 +185,12 @@ branch's (`tools/push-main.sh@78f40c3c2475:27`).
 - **AC3** — When `deps.messaging = "live-only"` is set as AC1 sets it, the post still moves the mail
   ref and prints `ring — none`, exit 0.
   Red when: `live-only` skips the mailbox.
-- **AC4** — When the `deps.messaging` read is refused, staged by a scratch clone whose
-  `tools/policy/policy.py` is a stub printing a refusal and exiting 2, the post rings as
-  `live-and-mailbox` and prints one NOTE naming `deps.messaging`, exit 0.
-  Red when: a refused read rings nothing silently or fails the post.
+- **AC4** — When a shell that has sourced `tools/unattended/unattended.sh` wraps `read_lease_policy`
+  so `deps.messaging` returns 1 with a refusal in `LP_VALUE` and every other key reads through the
+  driver's own, then runs `run_mail_ring <ref> <id>`, it prints one NOTE naming `deps.messaging` and
+  `ring — none · no live channel in this harness (stand-in dWellOiledMachine)`, the
+  `live-and-mailbox` line, and returns 0.
+  Red when: a refused read rings nothing silently or returns non-zero.
 - **AC5** — When `grep -n 'ring —\|deps.messaging'` runs over `tools/unattended/VERBS.template.md`
   and over `help/loop.md`, both are found in each file's `--mail` entry.
   Red when: the ring line is undocumented.
@@ -186,7 +199,7 @@ branch's (`tools/push-main.sh@78f40c3c2475:27`).
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `docs`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the ring arms over a post, AC2 staged by a recorder in place of `run_mail_ring` and a planted lost write · none
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the ring arms over a post, AC2 staged by a recorder in place of `run_mail_ring` and a planted lost write · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` rise by its counted assertions
 
 ## 8. Open questions
 
@@ -227,6 +240,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the ri
   the `subject-pins.tsv` regeneration, which no leg change of this unit owes, with `policy fixtures`
   off the leg line; the arm's floor reads none, as the suite declares no assertion floor; widened by
   the `help/loop.md` sentence the charter's docs rule owes, with `docs` on the leg line.
+- rev-4 · 2026-11-21 · S2 · §4 · AC1 · AC4 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: S2 reads through a new arm of
+  `read_lease_policy` and names the point's NOTE on the reader's return 1; a stub policy kit in a
+  scratch clone is never the one the tracked driver resolves, and a whole-file refusal also refuses
+  unit 24's `flow.wait-ceiling` read before any ring, so AC4 wraps the reader in a sourced shell and
+  calls `run_mail_ring` itself; AC1 posts a `landed` message, which needs no `--default`; the suite
+  does declare an assertion floor, so §7's arm and Files touched name it; `symbols.json` joined.
 
 ## 10. Reuse audit
 

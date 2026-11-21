@@ -1,6 +1,6 @@
 # KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 20 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 20 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0148@ab3d7b8c whole
 **Carries:** node:policy-key.mailbox.reads
@@ -21,6 +21,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-10-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-10-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md) | research | KICK-dKeptSession-25 KICK-dKeptSession-21 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-5 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -55,8 +56,12 @@ one item-boundary point `KICK-dKeptSession-13` provides, and gives the `intake` 
   `--out` and emits that file at the session's next Bash or PowerShell call after the verb finishes
   (its S7), never on the call that noticed the boundary. Observed by AC2.
 - **S2** — The interrupt, `read_mail_interrupts(repo, slug, local)` in `tools/loop/position.py`,
-  behind the CLI flag `--mail-interrupts`, which takes a slug and is refused beside `--json`,
-  `--next-line`, `--check-refusal` or `--fixture`. It runs `[bash, driver, "--mail", "read", slug,
+  behind the bare CLI flag `--mail-interrupts`, which reads the positional `<slug>`
+  (`tools/loop/position.py#main`) and is refused without one and beside `--json`, `--next-line`,
+  `--check-refusal` or `--fixture`. The `script:{prefix}/loop/position.py` row of
+  `tools/govkit/usage.toml` gains `--mail-interrupts` and `--local` in its `flags`, so the docs leg
+  tests the page's commands against them, and the row's anchor in `help/loop.md` is re-stamped with the
+  fingerprint `python tools/govkit/docs_leg.py --fingerprints` prints. It runs `[bash, driver, "--mail", "read", slug,
   "--open"]`, `"--local"` appended when `local`, in `repo` with stdin closed, under unit 5's
   `MAIL_GUARD_SECONDS` in `tools/loop/loop_transition.py`, the bound of that unit's read of the same
   verb (its S9). The driver and the bash are found as `read_handover` finds them:
@@ -69,7 +74,13 @@ one item-boundary point `KICK-dKeptSession-13` provides, and gives the `intake` 
   keep their landed `interrupt — mailbox · unarmed` line and read no mail, so `derive_item_boundary`,
   which calls `derive_position`, never reads it (§8 F2). A mailbox line changes no answer; refusing a
   transition over an open message is unit 5's guard. The module docstring's WHAT THIS DOES NOT CHECK
-  names this flag as the one mailbox read. Exit 0. Observed by AC1.
+  names this flag as the one mailbox read. Exit 0. Each `mail-` plant joins `FX_DRIVER`, so its
+  scratch repository holds the `.unattended.conf` copied from this tree, set `RUN_CLAIMS="on"` there,
+  since a conf with it off reads `mail — off` and no row; the driver is this tree's, located beside
+  the loop kit, never a copy; the messages are commits pushed straight to the plant's bare remote, as
+  unit 5 S13's plants push theirs; and a planted policy file is committed before the plant's push of
+  `main`, since `resolve` reads `refs/remotes/<remote>/main` and never the working tree
+  (`tools/policy/policy.py#derive_landed_revision`). Observed by AC1.
 - **S3** — `mailbox.reads` (`every-item`, `transitions-only`, `every-item-amendments-at-transitions`;
   default `every-item`), its row landed in `tools/policy/catalogue.toml`, owner dKeptSession. It is
   read as the loop kit reads every policy key: `read_policy_kit()`
@@ -192,8 +203,13 @@ build with no open mail prints no mailbox line at a boundary.
 
 ### Files touched (estimate)
 
-- `tools/loop/position.py`: `read_mail_interrupts`, `--mail-interrupts`, `--local`, five plants, the
-  docstring's mailbox sentence
+- `tools/loop/position.py`: `read_mail_interrupts`, `--mail-interrupts`, `--local`, five plants with
+  their cases and `FX_DRIVER` members, the docstring's mailbox sentence
+- `tools/govkit/usage.toml`: `--mail-interrupts` and `--local` in the `position.py` row's `flags`
+- `tools/run-gates/selftest-budgets.txt`: the `loop position fixtures` row's `plants=<n>` token five
+  above the count the units before it leave, its reading re-priced by direct CLI (DERIVED:
+  `len(PLANTS)` of `tools/loop/position.py`, 31 read on 2026-11-21 before unit 13's `boundary`)
+- `memory/map/generated/symbols.json`: `read_mail_interrupts` and `run_mail_interrupts`
 - `skills/session-kickoff/manifest-check.sh`: `run_mail_interrupts` inside `--card --boundary`
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names `manifest-check.sh`
@@ -202,7 +218,8 @@ build with no open mail prints no mailbox line at a boundary.
 - `tools/policy/catalogue.toml`: the `mailbox.reads` row's `summary` and `usage`
 - `tools/policy/unsummarised-keys.txt`: drained by `lists --write`
 - `help/reference/policy.md`: re-rendered by `render_playbook.py --reference`
-- `help/loop.md`: the mailbox interrupt paragraph
+- `help/loop.md`: the mailbox interrupt paragraph, and the `script:tools/loop/position.py` anchor
+  re-stamped
 
 ### Alternatives rejected
 
@@ -241,8 +258,9 @@ build with no open mail prints no mailbox line at a boundary.
   answer.
   Red when: the flag prints `unarmed` with the driver present, an answered message is listed, or a
   plain engine call reads the mailbox.
-  fixture: the plant's scratch repository holds a bare remote with the messages' mail refs,
-  `RUN_CLAIMS=on`, and the unattended kit copied from this tree, as the `plan-line` plant copies it.
+  fixture: the plant's scratch repository, a `FX_DRIVER` member holding the copied `.unattended.conf`
+  set `RUN_CLAIMS="on"`, and its bare remote holding the messages' mail refs, pushed straight; the
+  driver is the one beside this tree's loop kit (S2).
 - **AC2** — When `bash skills/session-kickoff/card-store.fixture.sh --plant mail-boundary` runs
   `--card --boundary` with the session card at `item — K1`, the stub engine answering `K2` and its
   `--mail-interrupts` answer one line, the output holds `boundary — K1 → K2` and then that
@@ -260,17 +278,23 @@ build with no open mail prints no mailbox line at a boundary.
   Red when: the `intake` is listed at the boundary, or the `changed` is held.
   figure: the held count is PINNED, the plant's one `intake`.
 - **AC5** — When `python tools/loop/position.py --fixture --plant mail-unarmed` runs
-  `--mail-interrupts` with the unattended kit removed from the plant's copy, it prints
-  `interrupt — mailbox · unarmed` naming the driver and exits 0.
+  `--mail-interrupts` with `resolve_kit_dir` rebound for the run to the real locator over an empty
+  scratch directory as `here`, as `KICK-dKeptSession-36`'s `mail-no-driver` stages its miss, it prints
+  `interrupt — mailbox · unarmed` naming the `unattended` kit and exits 0.
   Red when: a missing driver raises, or reads as an empty mailbox.
 - **AC6** — When `python tools/loop/position.py --fixture --plant mail-refused` runs
-  `--mail-interrupts` with `mailbox.reads` planted outside its allowed set, so `resolve` refuses it,
-  it reads `every-item`, lists `mail-open`'s open messages and prints one `loop: NOTE -` line naming
+  `--mail-interrupts` with `mailbox.reads` planted outside its allowed set in the remote's first
+  revision of `.governance/policy.toml`, so `resolve` refuses it, since an invalid file over a valid
+  one reads that one, as `read_last_valid_value` in `tools/policy/policy.py` rules, it reads `every-item`, lists
+  `mail-open`'s open messages and prints one `loop: NOTE -` line naming
   `mailbox.reads`.
   Red when: a refused read silences the interrupt.
 - **AC7** — When `grep -n 'mail-interrupts\|mailbox.reads\|intake' help/loop.md` runs, each is found
-  in the section "Where a build is, and what runs next".
-  Red when: the page does not state the read point.
+  in the section "Where a build is, and what runs next"; and `python tools/govkit/docs_leg.py
+  --fingerprints` prints `script:tools/loop/position.py` with the fingerprint its `help/loop.md`
+  anchor carries.
+  Red when: the page does not state the read point, or the anchor keeps the fingerprint from before
+  `--mail-interrupts`.
 - **AC8** — When `python tools/policy/policy.py get mailbox.reads` runs in a repository whose policy
   file sets no value, it prints `every-item`, and after `policy.py lists --write`
   `tools/policy/unsummarised-keys.txt` no longer names `mailbox.reads`.
@@ -278,10 +302,10 @@ build with no open mail prints no mailbox line at a boundary.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `policy check` · `help reference pages` · `loop position fixtures` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `routed-commits selftest` · `policy check` · `help reference pages` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `docs` · `loop position fixtures` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/position.py · covers AC1 AC3 AC4 AC5 AC6 · the five `--plant` cases, `mail-open` staged red by the interrupt left `unarmed` · none
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 · the `mail-boundary` plant, staged red by the step run with no crossing · none
+New arm: tools/loop/position.py · covers AC1 AC3 AC4 AC5 AC6 · the five `--plant` cases, `mail-open` staged red by the interrupt left `unarmed` · the `loop position fixtures` row's `plants=<n>` token rises by five
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 · the `mail-boundary` plant, staged red by the step run with no crossing · `FLOOR_ASSERTIONS` rises by the plant's rows
 
 ## 8. Open questions
 
@@ -334,6 +358,16 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 · the `mai
   `policy fixtures`, `routed-commits selftest`, `policy check`, `help reference pages`, `loop position
   fixtures` and the recall legs joined the leg line, `kit epoch` left it; every line-number citation
   became a blob pin.
+- rev-5 · 2026-11-21 · S1 · S2 · §4 · AC1 · AC5 · AC6 · AC7 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: the `plan-line` plant copies the driver's
+  conf, never its kit, so AC1's fixture is a `FX_DRIVER` plant with `RUN_CLAIMS` on and AC5 stages
+  the miss by the real locator over an empty `here`; `resolve` reads the landed revision, so a plant
+  commits its policy file before pushing `main`, and AC6's invalid file is the first revision, since
+  one over a valid file reads that file; `--mail-interrupts` reads the positional slug and joins
+  `usage.toml`'s `position.py` row, whose `help/loop.md` anchor AC7 observes; the plants move the
+  `loop position fixtures` token; `symbols.json`, `usage.toml` and the budget row joined Files
+  touched, the manifest-check arm names its floor, and `docs` and the three govkit legs whose guard
+  holds `usage.toml` joined the leg line.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 19 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 19 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0162@6ce67958 whole
 
@@ -15,6 +15,8 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-5 |
 | [2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-36-orders-17-19-reground-brief.md) | research | KICK-dKeptSession-36 KICK-dKeptSession-27 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -38,15 +40,20 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
   read through `read_lease_policy flow.wait-ceiling`, a new arm of
   `tools/unattended/unattended.sh#read_lease_policy` (§8 F6): its catalogue default `72` beside the
   other keys' defaults, one literal `policy.py get flow.wait-ceiling` line, and the number check its
-  lease bounds take. A policy kit that does not resolve writes that default under the function's one
-  NOTE, which names the key; a refused `get` refuses the post with exit 2 naming the refusal, before
-  any commit is built. Every message carries one, whatever its kind (§8 F2). Observed by AC1 and AC5.
+  lease bounds take, the key joining its NOTE's and its refusal's key lists. That `get` answers at the
+  landed revision: the file's value, then the preset the file names, then the catalogue default
+  (`tools/policy/policy.py#RESOLUTION_ORDER`). A policy kit that does not resolve writes that default
+  under the reader's one NOTE; a refused `get` refuses the post with exit 2 naming the refusal, before
+  any commit is built. Every message carries one, whatever its kind, `--mail ack`'s included (§8 F2).
+  Observed by AC1 and AC5.
 - **S2** — The declared default. `--mail post` takes `--default <text>` into the I17 field `default`.
   A `question` or a `confirm-request` posted without `--default` is refused with exit 2 naming the
   flag, before any commit is built; every other kind writes `default: ack`. The text is a record
   value, so `build_gov_message` refuses one carrying a newline (`KICK-dKeptSession-5` S4), and this
-  unit refuses one carrying any other control byte but tab, or longer than S4's body limit.
-  Observed by AC1.
+  unit refuses one carrying any other control byte but tab, or longer than S4's body limit. Each
+  `question` or `confirm-request` post the units before this one land in
+  `tools/unattended/unattended.test.sh`, unit 5's AC4 arm and `KICK-dKeptSession-23`'s cases among
+  them, gains `--default`, so each keeps the row or refusal it observes. Observed by AC1.
 - **S3** — The judgment, `check_mail_deadline <ref> <commit> <hours>` (I23), in
   `tools/unattended/unattended.sh`, the name `tools/unattended/unattended.sh#check_lease_witness`
   already probes with `declare -F`. It spells `<ref>` as the feed keys it, a leading
@@ -55,7 +62,14 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
   fraction truncated to the whole second, which `read_lease_bound` then calls with its
   output unchanged; and returns the code of `check_deadline_passed <ref> <commit> <seconds>`
   (`tools/unattended/unattended.sh#check_deadline_passed`): 0 passed, 1 not yet, 2 not sighted. An
-  `<hours>` that is not a non-negative number returns 2. Observed by AC2, AC3 and AC4.
+  `<hours>` that is not a non-negative number returns 2. With it defined beside unit 5's
+  `read_mailbox`, `check_lease_witness`'s `declare -F` probe of the two names can no longer fail in
+  the driver, so this unit deletes the probe, the suite's DPR1 AC11 assertion that the question exits
+  2 with the two functions absent, and the `check_mail_deadline` stub both DPR1 lease arms export,
+  which a process run of the driver loses to its own (§8 F7). **Readers:** by name:
+  `tools/unattended/unattended.sh` and `tools/unattended/unattended.test.sh`, the only files that
+  spell the probe and the stub; by value: NO VALUE READERS, since the probe gates a read and stores
+  nothing. Observed by AC2, AC3, AC4 and AC8.
 - **S4** — The sightings. `KICK-dKeptSession-5`'s `read_mailbox` runs `add_feed_sightings` after its
   fetch (unit 5 S6), and its writer builds every message commit by `build_gov_commit` under the fixed
   `gov-claim` identity (unit 5 S2), which the sightings walk requires. The walk keys a cached ref
@@ -69,10 +83,19 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
   the columns `KICK-dKeptSession-27` appends after unit 5's `reply`, so `--mail read` prints an `expired` row beside the
   asker's declared answer. The transition guard of
   `KICK-dKeptSession-5` refuses on `open` rows only, so an expired message lets the recipient's
-  transitions go on. Observed by AC2, AC3 and AC4.
+  transitions go on, and unit 5 S10's disposal takes the `expired` row, its record's `State`
+  `expired`; where unit 5 landed a disposal set without `expired`, this unit adds it. A record with no
+  `deadline`, as every commit a fixture pushes straight is, reads `-` in both columns and judges 2,
+  so it stays `open`: the DPR1 lease arms' question still renews. Each suite arm comparing a whole
+  row gains the two columns. The plant `mail-expired` of `tools/loop/loop_transition.py`'s fixture,
+  seeded as unit 5's `mail-open` is, plants its question's sighting 31 hours old in the fixture's
+  `gov-feed.log`, `deadline: 30`, so the move records past the guard. Observed by AC2, AC3 and AC4.
 - **S6** — The verbs guide: the `--mail` section unit 5 adds to `tools/unattended/VERBS.template.md`
   (rendered to `memory/guides/UNATTENDED-VERBS.md`) states `--default`, the `deadline` field, the
-  observer rule and the `expired` state. Observed by AC7.
+  observer rule and the `expired` state. The `--mail` paragraph unit 5 adds to `help/loop.md` names
+  `--default` and `expired`, its `verb:unattended.sh:--mail` anchor re-stamped with the fingerprint
+  `python tools/govkit/docs_leg.py --fingerprints` prints, since `--default` joins the flags that
+  fingerprint hashes (`tools/govkit/docs_leg.py#read_verb_usage`). Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -111,6 +134,21 @@ early, gap-conc-14's class, which TOOL-dPlacedRequest-17 S3 closed for leases in
   and the reader admits an integer or a fraction for that type (`tools/policy/policy.py#check_value`);
   `python tools/policy/policy.py get flow.wait-ceiling` printed `72` on this tree at this rev.
   DERIVED: the catalogue row is the owning source; the printed value re-derives from it.
+- `get` reads `.governance/policy.toml` at the landed revision, `refs/remotes/<remote>/<branch>`,
+  never the working tree (`tools/policy/policy.py#derive_landed_revision`), so a fixture's value reads
+  once committed, pushed and fetched, as the suite's `write_lease_policy` does. A file `validate`
+  refuses reads its last valid first-parent revision and refuses only where none precedes it
+  (`tools/policy/policy.py#read_last_valid_value`), which DPR1 AC17 stages with an unparsable first
+  revision after a fresh `write_lease_fixture`. Probed 2026-11-21 in a scratch clone (PINNED): a file
+  setting `wait-ceiling = 30` under `[flow]` printed 30, an invalid file over it printed 30 with exit
+  0, an invalid first revision exited 2, and `preset = "strict"` printed 168 (`tools/policy/presets.toml`).
+- `check_lease_witness` reads the mailbox only where `declare -F` finds `read_mailbox` and
+  `check_mail_deadline`; the suite's DPR1 AC11 and AC12 arms export a `check_mail_deadline` stub, and
+  AC11 asserts that with neither exported the question exits 2 (`tools/unattended/unattended.test.sh`).
+- The unattended suite runs no transition writer; a move over mail is observed by the loop kit's
+  `mail-` plants (spec-5 AC6), and each plant moves the `plants=<n>` token of the `loop transition
+  record` row (`tools/run-gates/run-selftests.sh#check_plant_tokens`).
+- The lander mints kit versions, so a branch owes no bump (`tools/push-main.sh@78f40c3c2475:27`).
 - The loop kit's waits declare `deadline = "policy.flow.wait-ceiling"` (`tools/loop/loop.toml`), the
   shape TOOL-dDeclaredLoop-33 S5 gives a wait.
 
@@ -155,6 +193,7 @@ kind that only needs acknowledging (`changed`, `landed`, `overlap`, `takeover`, 
 | `derive_bound_seconds` | shell function | `derive`, OK |
 | `--default` | flag of `--mail post` | none |
 | `expired` | a state of I20's rows | none |
+| `mail-expired` | plant of `loop_transition.py --fixture` | none |
 
 ### Migration
 
@@ -169,8 +208,18 @@ change.
 
 - `tools/unattended/unattended.sh`: `check_mail_deadline`, `derive_bound_seconds` and
   `read_lease_bound`'s call of it, `read_lease_policy`'s new arm, the post's two fields, the
-  sightings call's argument, the `expired` state and its two columns, `KIT_UNATTENDED_VERSION` moved
-- `tools/unattended/unattended.test.sh`: the arms of §7
+  sightings call's argument, the `expired` state and its two columns, and `check_lease_witness`'s
+  `declare -F` probe deleted
+- `tools/unattended/unattended.test.sh`: the arms of §7; `--default` on the earlier units' question
+  posts; the two columns on whole-row comparisons; DPR1 AC11's absent-functions assertion and both
+  arms' `check_mail_deadline` stub deleted; the effective `FLOOR_ASSERTIONS` and its region's
+  `FLOOR_SHARD_<k>` moved by the net count
+- `tools/loop/loop_transition.py`: the `mail-expired` plant and its case, and `expired` in the
+  disposal set only where unit 5 landed none
+- `tools/run-gates/selftest-budgets.txt`: the `loop transition record` row's `plants=<n>` token one
+  above the count the units before it leave, its reading re-priced by direct CLI (DERIVED: `len(PLANTS)`)
+- `memory/map/generated/symbols.json`: `check_mail_deadline` and `derive_bound_seconds`
+- `help/loop.md`: `--default` and `expired` in the `--mail` paragraph, its anchor re-stamped
 - `tools/unattended/VERBS.template.md`: the `--mail` section's flag, field and state
 - `memory/guides/UNATTENDED-VERBS.md`: its render
 
@@ -196,23 +245,31 @@ change.
   deadline and never advances it.
 - testing — the probes of §6 and the arms of §7.
 - migration — none.
-- user docs — `memory/guides/UNATTENDED-VERBS.md`; no `help/` page covers the unattended kit.
+- user docs — `memory/guides/UNATTENDED-VERBS.md` and the `--mail` paragraph of `help/loop.md`.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash tools/unattended/unattended.sh --mail post` posts a `question` with
-  `--default no` in a fixture whose policy file plants `flow.wait-ceiling = 30`, the new mail commit's
-  message carries `deadline: 30` and `default: no`; the same post without `--default` exits 2 naming
-  `--default` and builds no commit; a `landed` post carries `default: ack`.
-  Red when: a message is written with no deadline, or a question with no declared default.
+  `--default no` after `write_lease_policy` lands `wait-ceiling = 30` under `[flow]`, the new mail
+  commit's message carries `deadline: 30` and `default: no`; the same post without `--default` exits
+  2 naming `--default` and builds no commit; a `landed` post carries `default: ack`; and with the file
+  landed as `preset = "strict"` alone, a post carries `deadline: 168`.
+  Red when: a message is written with no deadline, a question with no declared default, or the
+  post reads a value other than the one `get` answers at the landed revision.
   fixture: a scratch clone with a bare origin under `%TEMP%`, `RUN_CLAIMS=on`, a fleet tag and
   `CLAUDE_CODE_SESSION_ID` set.
+  figure: 30 is the fixture's PINNED literal; 168 is DERIVED by `policy.py get flow.wait-ceiling` in
+  that clone.
 - **AC2** — When a question addressed to `build:<slug>` with `deadline: 30` has its feed line, keyed
   `refs/gov/mail/…`, planted with `seen-utc` 31 hours ago, `--mail read <slug>` prints its row with the
-  state `expired` and the `default` column `no`, and `python loop_transition.py record` for that build
-  is not refused by the mail guard; with the line planted one hour ago it prints `open`, and the record
-  is refused naming the message id. This is the clause's planted question nobody answers.
-  Red when: an unanswered question blocks the transition past its deadline.
+  state `expired` and the `default` column `no`, and `--mail read <slug> --open --ids` prints `none`;
+  with the line planted one hour ago the row reads `open` and `--ids` prints its id. When `python
+  tools/loop/loop_transition.py --fixture --plant mail-expired` runs, the move records, exit 0, its
+  trailer carrying `disposed=<id>` and its `mailbox-message` record `**State:** expired`, where unit
+  5's `--plant mail-open` over an unexpired question exits 1. This is the clause's planted question
+  nobody answers.
+  Red when: an unanswered question blocks the transition past its deadline, as a guard reading
+  `expired` as `open` shows.
 - **AC3** — When the question's commit carries a committer date 25 hours before now, as a holder a
   day behind the reader stamps it, its `deadline` is 24 and this node's feed sights it a minute ago,
   `--mail read` prints it `open`; a scratch copy of the driver whose `check_mail_deadline` ages
@@ -227,9 +284,9 @@ change.
   Red when: an unsighted or malformed deadline reads `expired`, or a fraction of an hour is dropped.
   figure: PINNED, the planted ages are the fixture's own literals.
 - **AC5** — When `--mail post` runs from a scratch copy of the driver with no policy kit beside it,
-  it writes `deadline: 72` and prints one NOTE naming `flow.wait-ceiling`; when the fixture's policy
-  file is planted invalid, so `policy.py get` refuses, the post exits 2 naming the refusal and builds
-  no commit.
+  it writes `deadline: 72` and prints one NOTE whose key list names `flow.wait-ceiling`; when a fresh
+  `write_lease_fixture` lands an unparsable first policy revision, as DPR1 AC17 stages one, so
+  `policy.py get` exits 2, the post exits 2 naming the refusal and builds no commit.
   Red when: a refused read writes a deadline, or an unresolved policy kit writes a value other than
   the catalogue default.
 - **AC6** — When clone A posts a message and clone B runs `--mail read <slug>`, B's `gov-feed.log`
@@ -238,14 +295,22 @@ change.
   Red when: the read path sights nothing, or keys the line under another spelling, so every fetched
   message stays `open` for ever.
 - **AC7** — When `grep -n -- '--default\|deadline\|expired\|first saw'` runs over
-  `tools/unattended/VERBS.template.md`, each is found in its `--mail` section.
-  Red when: the guide states no deadline rule.
+  `tools/unattended/VERBS.template.md`, each is found in its `--mail` section; `grep -n -- '--default'
+  help/loop.md` finds the `--mail` paragraph; and `python tools/govkit/docs_leg.py --fingerprints`
+  prints `verb:unattended.sh:--mail` with the fingerprint that paragraph's anchor carries.
+  Red when: the guide states no deadline rule, or the anchor keeps the fingerprint from before
+  `--default`.
+- **AC8** — When `grep -c 'declare -F check_mail_deadline' tools/unattended/unattended.sh` runs it
+  prints 0, and `grep -c "functions absent" tools/unattended/unattended.test.sh` prints 0.
+  Red when: a probe that can no longer fail stays in the driver, or the suite still asserts its
+  absent case.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `scratch-guard self-test` · `tier2-review self-test` · `policy check` · `policy fixtures` · `loop transition record` · `docs`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · the deadline arms over planted feed lines and mail commits, staged by a scratch copy whose judgment reads the commit's own date · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` move by the arms' count less DPR1 AC11's retired assertion, counted off the diff
+New arm: tools/loop/loop_transition.py · covers AC2 · the `mail-expired` plant, staged by a guard reading `expired` as `open` · the `loop transition record` row's `plants=<n>` token rises by one
 
 ## 8. Open questions
 
@@ -280,6 +345,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
   RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the charter's `[reuse]` and `[security]`
   rules, since (b) is a second reader and writes a deadline the adopter's invalid file never
   declared. widens: none · relaxes: none
+- **F7 — What becomes of `check_lease_witness`'s `declare -F` probe once both names it probes ship in
+  the driver?** Options: (a) delete it, with the suite's assertion of its absent case and the stub
+  the lease arms export; (b) keep it and stage the absent case over a scratch copy deleting
+  `check_mail_deadline`; (c) keep it and drop only the assertion, a branch nothing observes.
+  RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the charter's `[yagni]` rule deletes rather
+  than disables, and (b) and (c) keep a probe no shipped driver can fail. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -302,6 +373,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
   §4's files by the `subject-pins.tsv` regeneration no leg change needs, and §7 by the five govkit
   and policy-fixtures legs it pulled in, `policy check` named for the new reader; every line-number
   citation replaced by a `path#symbol` or blob pin.
+- rev-4 · 2026-11-21 · S1 · S2 · S3 · S5 · S6 · §4 · §5 · AC1 · AC2 · AC5 · AC7 · AC8 · §7 · §8 F7 ·
+  checked for behaviour under `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: `get` answers at
+  the landed revision through the landed preset step, so AC1 lands its file by `write_lease_policy`
+  and reads a preset, and AC5 stages a refusal as DPR1 AC17 does, an invalid file over a valid one
+  reading that one; AC2's transition is the loop kit's `mail-expired` plant, the unattended suite
+  running no writer; S2 adds `--default` to the earlier units' question posts; S3 deletes the
+  `declare -F` probe and its absent-case assertion (F7, AC8); S5 disposes `expired` and keeps
+  no-deadline records `open`; S6 and AC7 re-stamp `help/loop.md`'s `--mail` anchor; the version move
+  left Files touched, which gained `symbols.json`, the plant and its budget row; `policy fixtures`,
+  `loop transition record` and `docs` joined §7.
 
 ## 10. Reuse audit
 

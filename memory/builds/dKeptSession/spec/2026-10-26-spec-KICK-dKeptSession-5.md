@@ -1,6 +1,6 @@
 # KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition
 
-**Status:** DEFERRED · rev-10 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-11 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0143@cafeb575 whole
 **Carries:** node:record-kind.mailbox-message
@@ -27,6 +27,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md) | research | KICK-dKeptSession-22 KICK-dKeptSession-31 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 |
 | [2026-11-21-prompt-KICK-dKeptSession-5-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-5-orders-16-17-reground-brief.md) | research | KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
@@ -35,14 +36,12 @@
 
 ## 1. Goal
 
-A build can reach the session working on another build, a message survives its writer, and a build's
+A build reaches the session working on another, a message outlives its writer, and a build's
 transition waits on the messages addressed to it (gap-flow-06). Each writing session appends to its own
-ref, `refs/gov/mail/<slug>/<fleet tag>/<session>`, so writers never contend for one chain (gap-conc-04;
-the owner's NT-16). A message's kind comes from one closed set checked on write, through the
-coordination verbs only; every transition reads the build's messages and is refused while one
-addressed to it is neither answered nor acknowledged, until `flow.wait-ceiling` passes; it disposes
-what was answered, the card shows what is open, and the transition log keeps what was disposed
-(coordination item 6; the whole-design audit's C2-F15).
+ref, `refs/gov/mail/<slug>/<fleet tag>/<session>`, so writers never contend (gap-conc-04; NT-16). A
+kind comes from one closed set checked on write; a transition is refused while a message addressed to
+the build is neither answered nor acknowledged, until `flow.wait-ceiling` passes, and its log keeps
+what it disposed; the card shows what is open (coordination item 6; C2-F15).
 
 ## 2. Scope (IN)
 
@@ -56,8 +55,7 @@ what was answered, the card shows what is open, and the transition log keeps wha
   `mail — not written: <the cause resolve_fleet_tag printed>`, exit 2. Observed by AC1, AC9.
 - **S2** — The writer, `write_mail_ref <ref> <tip read> <message>`: the three `GOVREF_` names set as
   `write_card_ref` sets them (`tools/unattended/unattended.sh#write_card_ref`), then
-  `build_gov_commit <tip read> <message>` (`tools/lib/gov-ref.sh#build_gov_commit`, inline in the
-  driver's `gov_ref_sh` block) under the fixed `gov-claim` identity, and `write_gov_ref <ref> <tip
+  `build_gov_commit <tip read> <message>` (`tools/lib/gov-ref.sh#build_gov_commit`) under the fixed `gov-claim` identity, and `write_gov_ref <ref> <tip
   read> <commit>`. Each post is one commit parented on its ref's previous tip,
   and a session's first post is the one parentless commit. rc 0 written, 1 lost, 2 not completed with
   `GOVREF_WHY`. It is the only function that writes a mail ref. Observed by AC1, AC9.
@@ -67,15 +65,15 @@ what was answered, the card shows what is open, and the transition log keeps wha
   in `tools/loop/loop_lib.py` reads it as `read_dispositions` reads `[dispositions]`, and `check_loop` grades the table where present as it
   grades that one (`tools/loop/loop_lib.py#check_loop`): an absent table, an empty list, a repeated
   member or one outside `SEG` is `LoopError`. `python tools/loop/loop_lib.py --mail-kinds` prints the
-  kinds one per line, exit 0, or `loop: <why>`, exit 1; its usage line and docstring name it. The
+  kinds one per line, exit 0, or `loop: <why>`, exit 1, its usage line naming it. The
   driver reaches it through `resolve_python` and its `resolve_kit_dir` for the `loop` home; a post whose
   kind is not printed there, or made where no loop kit resolves, is refused before any commit, exit 2,
   naming the set or the missing kit. Observed by AC2.
 - **S4** — The record (I17), built by `build_gov_message <header> <body file> <key> <value> …`: the
   header, a blank line, one `key: value` line per pair, a blank line, the body with its trailing
-  newlines cut. That is the layout `write_register` writes inline today, so the one builder is extracted here at its
-  second instance and `write_register` calls it for both its forms, its record bytes and every
-  `register —` line it prints unchanged; its own per-field checks stay where they are. The builder
+  newlines cut. `write_register` writes that layout inline today, so the builder is extracted at its
+  second instance and `write_register` calls it for both forms, its bytes, its `register —` lines and
+  its field checks unchanged. The builder
   refuses, rc 2 with `GOVMSG_WHY` carrying the words `write_register` prints today, a body over 4096
   bytes (PINNED, the cap `write_register` holds), a body carrying a NUL or a control byte other than
   tab and newline, and an empty value or one carrying a control byte. A message's header is
@@ -88,8 +86,7 @@ what was answered, the card shows what is open, and the transition log keeps wha
   record factory would refuse at disposal (F7); `resolve_claim_remote`, check 24; one bounded, pruned fetch of
   `+refs/gov/mail/<slug>/*:refs/gov/remote/mail/<slug>/*` with `write_card_ref`'s options, then
   `add_feed_sightings refs/gov/remote/`; the id, `derive_message_id <slug> <item> <pass> <kind>
-  <subject> <answers> <to> none`, the eight-field id KICK-dKeptSession-31 S1 lands first in order 16,
-  and `check_mail_duplicate <slug> <id>` (KICK-dKeptSession-22); the tip read from this session's cache ref `refs/gov/remote/mail/<slug>/<tag>/<segment>`; `write_mail_ref`. It
+  <subject> <answers> <to> none`, KICK-dKeptSession-31 S1's eight fields, and `check_mail_duplicate <slug> <id>` (KICK-dKeptSession-22); the tip read from this session's cache ref `refs/gov/remote/mail/<slug>/<tag>/<segment>`; `write_mail_ref`. It
   prints `mail — posted <id> · <ref>` and exits 0; a duplicate or a lost write exits 1; a refusal or
   a write not completed exits 2. Observed by AC1, AC2, AC9.
 - **S6** — The one reader (I20), `read_mailbox <who> soft|strict`, `<who>` a slug passing
@@ -97,8 +94,7 @@ what was answered, the card shows what is open, and the transition log keeps wha
   `check_mail_addressed` checks neither argument's form (KICK-dKeptSession-28 S4); any other `<who>`
   exits 2 before any fetch. `resolve_claim_remote`; one bounded fetch of
   `+refs/gov/mail/*:refs/gov/remote/mail/*` with `--prune`, then `add_feed_sightings refs/gov/remote/`,
-  every landed caller's prefix, the walk naming each ref by what follows it
-  (`tools/lib/gov-feed.sh#derive_feed_events`); one `git log --first-parent --source` over every cached
+  every landed caller's prefix (`tools/lib/gov-feed.sh#derive_feed_events`); one `git log --first-parent --source` over every cached
   mail ref, none run where none is cached, since `git log` given no revision walks HEAD
   (KICK-dKeptSession-22 S3), its `key: value` lines split in one `awk` by `CLAIM_KV_AWK`'s `read_kv`
   in its strict form (`tools/unattended/unattended.sh#CLAIM_KV_AWK`). It prints one
@@ -131,15 +127,17 @@ what was answered, the card shows what is open, and the transition log keeps wha
   driver `resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"` and the bash
   `resolve_bash(driver)` (`tools/loop/loop_witness.py#resolve_bash`, `None` where none sees it), as `write_card_follow` runs the
   kickoff engine (`tools/loop/loop_transition.py#write_card_follow`); that one read serves the guard
-  and the disposal (F9). Open rows raise `TransitionRefused`, which `record` prints as
-  `refused — <slug> · mail open <id> …` and exits 1, writing nothing. Passing, each but the last with
+  and the disposal (F9). Open rows raise `MailHeld`, a `TransitionRefused` subclass in the same file,
+  which `record` prints as `refused — <slug> · mail open <id> …` and exits 1, writing nothing
+  (`tools/loop/loop_transition.py#main`); `claim.py`'s first move catches it as it catches
+  `PatchHeld`, printing `claim held — <slug> · mail open <id> …`, exit 1 (F10). Passing, each but the last with
   one `loop: mail · unarmed · <why>` line: `mail — off`; the locator's `LookupError`; a `root` with no
   `.unattended.conf`, whose `RUN_CLAIMS` cannot be on (S11), where nothing is launched; zero rows.
-  Refused, exit 2, as unknown and never none: a located driver no bash can see, `refused — <slug> ·
-  mail unknown: no bash that can see <driver>` (KICK-dKeptSession-36 S3), a read answering nothing
-  within the bound, and any other read exiting non-zero with no row, naming its exit and first line.
-  Only `build:` and `unit:` recipients gate (F2), which the
-  `build:<slug>` read selects by construction. Observed by AC5, AC6.
+  Raised as `ValueError`, which `record` prints after `loop: unanswered · ` and exits 2 on, as unknown
+  and never none: a located driver no bash can see, `mail unknown: no bash that can see <driver>`
+  (KICK-dKeptSession-36 S3), a read answering nothing within the bound, and any other read exiting
+  non-zero with no row, naming its exit and first line. Only `build:` and `unit:` recipients gate
+  (F2), which the `build:<slug>` read selects by construction. Observed by AC5, AC6, AC12.
 - **S10** — The disposal: past the guard, the rows of that read whose state is `answered`, `acked`
   or, once KICK-dKeptSession-24 adds it, `expired`, whose id no move of `before`, the writer's
   `read_transitions(build, root)` (`tools/loop/loop_transition.py#read_transitions`), names in its
@@ -150,12 +148,10 @@ what was answered, the card shows what is open, and the transition log keeps wha
   record per disposed id after this move's record and before step 6 commits, its paths joining
   `wrote`, so step 4's staged-index refusal never sees them and the one commit stages them beside the
   transition record; a failed commit leaves none behind. Observed by AC6.
-- **S11** — The switch and the stand-in. Every mail write runs only while `RUN_CLAIMS` is `on`, the
-  rule `write_register` keeps, and otherwise prints `mail — off` and writes nothing: exit 2 for a post
-  and an ack, exit 0 for a read, which prints no row. The verbs write the ref directly through
-  `write_gov_ref` until dTotalRecall lands the record door, whose `[[door]]` row in
-  `tools/playbook/doors.toml` still reads `pending = "dTotalRecall"`; this unit marks the hand-over at
-  `write_mail_ref` (F4). Observed by AC7.
+- **S11** — The switch and the stand-in. Every mail write runs only while `RUN_CLAIMS` is `on`, and otherwise prints `mail — off` and writes nothing: exit 2 for a post
+  and an ack, exit 0 for a read, which prints no row. The verbs write through `write_gov_ref`
+  until dTotalRecall's record door lands, its `[[door]]` row in `tools/playbook/doors.toml` reading
+  `pending = "dTotalRecall"`, the hand-over marked at `write_mail_ref` (F4). Observed by AC7.
 - **S12** — The record kind `record-kind.mailbox-message`: a `KINDS` row
   (`tools/memory-tree/build_records.py#KINDS`) requiring `Id`,
   `From`, `To`, `Kind`, `Subject`, `Answers`, `State`, `Reply` and `Ref`, with no closed field, and its
@@ -164,23 +160,22 @@ what was answered, the card shows what is open, and the transition log keeps wha
   `write_record` writes `<date>-build-<anchor id>-mailbox-message-<n>.md`, its own `**Serves:**
   mailbox-message <anchor id>` line, the body one `~~~~` fenced block in `lines`, as `card`'s text is. `read_mailbox_message(path, text)`, beside `read_card`, is the
   reader `build_records.py read` dispatches to: a missing field, or no single fenced block, is
-  malformed. The landed `read_bindings` joins the file name both ways. The anchor is
+  malformed. The anchor is
   `resolve_build_anchor` (TOOL-dDeclaredLoop-3 §8 F2). Observed by AC6, AC11.
 - **S13** — The card's `mail —` line (I11): `render_mail_line <slug>` in
   `skills/session-kickoff/manifest-check.sh`, called by `render_pointers` (KICK-dKeptSession-13 S2)
   after the `budget —` line (KICK-dKeptSession-26 S1), `mail` appended to `POINTER_LINES`. It runs
   `run_driver_bounded "$CARD_CLAIMS_BOUND" <out> <err> --mail read <slug> --open --ids`
-  (`skills/session-kickoff/manifest-check.sh#run_driver_bounded`), as `derive_claims_line` reads
-  `--claims`, printing `mail — <id> <id> …`, `mail — none`, `mail — skipped: RUN_CLAIMS is off` on the
+  (`skills/session-kickoff/manifest-check.sh#run_driver_bounded`), printing `mail — <id> <id> …`, `mail — none`, `mail — skipped: RUN_CLAIMS is off` on the
   read's `mail — off`, or `mail — skipped: <why>` for an unresolved driver, a non-zero exit or the
   bound passed. The plants `mail-open`, `mail-none` and `mail-off` join
-  `skills/session-kickoff/card-store.fixture.sh`'s `PLANTS`, each pushing its planted message commit, and
-  `mail-none` its `ack`, straight to the fixture's bare remote, never through a post: the fixture's
-  playbook kit is a stub holding no `render_playbook.py`, so `resolve_fleet_tag` refuses one there. Observed by AC8.
+  `skills/session-kickoff/card-store.fixture.sh`'s `PLANTS`, each pushing its message commit, and
+  `mail-none` its `ack`, straight to the fixture's bare remote, never posted, since its stub
+  playbook kit holds no `render_playbook.py` for `resolve_fleet_tag`. Observed by AC8.
 - **S14** — The documentation. The verbs guide `tools/unattended/VERBS.template.md` gains the `--mail`
-  entry beside `--register` and `--card-ref`: the three verbs, the ref, the kinds, the four recipient
-  forms (KICK-dKeptSession-28 S1, moved here by its §8 F3), the id's eight fields in order
-  (KICK-dKeptSession-22 S2 and -31 S1, by 31's §8 F2), the record, the states, the row's columns and
+  entry: the three verbs, the ref, the kinds, the four recipient
+  forms (KICK-dKeptSession-28 S1), the id's eight fields in order
+  (KICK-dKeptSession-22 S2, -31 S1), the record, the states, the row's columns and
   the exit codes, rendered to `memory/guides/UNATTENDED-VERBS.md`. `help/loop.md` gains the guard and
   the disposal under "Recording a build's move", and beside `--register`'s paragraph under "Claim keys"
   the `--mail` one, naming the four recipient forms and carrying the `verb:unattended.sh:--mail`
@@ -190,55 +185,52 @@ what was answered, the card shows what is open, and the transition log keeps wha
 
 ## 3. Non-goals (OUT)
 
-- No deadline: KICK-dKeptSession-24 judges `flow.wait-ceiling`, adding the `expired` state S10
-  disposes and the `check_mail_deadline` the landed `check_lease_witness` waits on.
+- No deadline: KICK-dKeptSession-24's `check_mail_deadline` and the `expired` state S10 disposes.
 - No `answer` verb or answering role: KICK-dKeptSession-25.
-- No `seq`, `after` or `content-key`: KICK-dKeptSession-27 adds them to S4's keys and S6's row.
+- No `seq`, `after` or `content-key`: KICK-dKeptSession-27's.
 - No notice at items or tool calls, and no fetch stamp: KICK-dKeptSession-21 and -10.
 - No live ring: KICK-dKeptSession-6.
 - No bash resolver of its own: KICK-dKeptSession-36's. No refusal of a non-zero read with rows:
   KICK-dKeptSession-44's.
 - No `[[record-version]]` row: no loop item returns or reads the kind, so
   `tools/loop/loop_items.py#check_record_versions` owes none.
-- No prune of a closed build's mailbox, and no copy of undisposed messages into its folder: the close
-  program's.
-- No secret scan of a body: gap-rt-44, dWellOiledMachine's; S4 caps and shape-checks it.
+- No prune of a closed build's mailbox, nor a copy of its open messages: the close program's.
+- No secret scan of a body: dWellOiledMachine's (gap-rt-44).
 - No record door: dTotalRecall's.
 
 ### Edges
 
 - **consumes-from** `KICK-dKeptSession-13` — `## pointers`, the card section whose `mail —` line S13 writes
-- **consumes-from** `KICK-dKeptSession-28` — `check_mail_recipient`, which the post refuses an illegal recipient by, and `check_mail_addressed`, which the reader selects rows by
-- **consumes-from** `KICK-dKeptSession-22` — `derive_message_id`, each message's id, and `check_mail_duplicate`, which refuses a retried post
-- **hands-off** `KICK-dKeptSession-23` — `read_mailbox` and `write_mail_ref`, the one mail writer whose every landed write the change feed records
-- **hands-off** `KICK-dKeptSession-27` — `read_mailbox`, whose row and record that unit extends with `seq`, `after` and `content-key`
+- **consumes-from** `KICK-dKeptSession-28` — `check_mail_recipient`, the post's recipient check, and `check_mail_addressed`, the reader's row filter
+- **consumes-from** `KICK-dKeptSession-22` — `derive_message_id` and `check_mail_duplicate`, the id and the retry refusal
+- **hands-off** `KICK-dKeptSession-23` — `read_mailbox` and `write_mail_ref`, whose landed writes the feed records
+- **hands-off** `KICK-dKeptSession-27` — `read_mailbox`, whose row and record that unit extends
 - **hands-off** `KICK-dKeptSession-24` — `read_mailbox`, whose rows that unit judges against `flow.wait-ceiling` and marks `expired`
-- **hands-off** `KICK-dKeptSession-10` — `read_mailbox`, which the item-boundary read arms the position engine's mailbox interrupt with
+- **hands-off** `KICK-dKeptSession-10` — `read_mailbox`, which arms the engine's mailbox interrupt
 - **hands-off** `KICK-dKeptSession-25` — `read_mailbox`, whose `question` rows that unit answers through `--mail answer`
 - **hands-off** `KICK-dKeptSession-21` — `read_mailbox`, whose unread ids the notice lists
 - **hands-off** `KICK-dKeptSession-6` — `read_mailbox` and the post's tail, where the live ring rings after the write
-- **hands-off** `KICK-dKeptSession-7` — `read_mailbox`, through which the dependency notices are posted and read
-- **consumes-from** external — dPlacedRequest, landed: `write_gov_ref`, `build_gov_commit`, `derive_ref_segment`, the `RUN_CLAIMS` rule, the register record, `add_feed_sightings`, `read_first_seen`, `resolve_fleet_tag`, and `check_lease_witness`, which reads S6's row
+- **hands-off** `KICK-dKeptSession-7` — `read_mailbox`, which carries the dependency notices
+- **consumes-from** external — dPlacedRequest, landed: the gov ref writer pair, `derive_ref_segment`, the `RUN_CLAIMS` rule, the register, the feed, `resolve_fleet_tag` and `check_lease_witness`
 - **consumes-from** external — dDeclaredLoop, landed: TOOL-dDeclaredLoop-1's `loop.toml` and `loop_lib.py`, and -3's `write_transition`, `TRANSITION_FIELDS` and `read_transitions`
-- **hands-off** external — dTotalRecall's record door, through which the coordination verbs write once it lands
-- **hands-off** `KICK-dKeptSession-31` — `--mail post`'s id step, the eight-argument call this unit writes with its `--to` value and `none`, for that unit's eight-field derivation (id 54)
-- **hands-off** `KICK-dKeptSession-36` — S9's guard launch through the inline `resolve_bash`, whose resolver and missing-shell refusal that unit holds (id 22)
-- **hands-off** `KICK-dKeptSession-39` — S12's factory row and tuple member, whose closed-list entry in the hygiene guide that unit writes (id 32)
-- **hands-off** `KICK-dKeptSession-42` — `write_transition`'s guard and `--mail ack`, through which that unit acknowledges the notices a dependent consumed (id 55)
+- **hands-off** external — dTotalRecall's record door, the verbs' writer once it lands
+- **hands-off** `KICK-dKeptSession-31` — `--mail post`'s eight-argument id call (id 54)
+- **hands-off** `KICK-dKeptSession-36` — S9's launch through `resolve_bash` and its missing-shell refusal (id 22)
+- **hands-off** `KICK-dKeptSession-39` — S12's factory row, whose hygiene-guide entry that unit writes (id 32)
+- **hands-off** `KICK-dKeptSession-42` — `write_transition`'s guard and `--mail ack`, which acknowledge a dependent's notices (id 55)
 - **hands-off** `KICK-dKeptSession-44` — `--mail post`'s kinds and fetch and the guard's non-zero read, the batch's S28 to S30 (ids 56, 59, 60)
-- **hands-off** `KICK-dKeptSession-56` — S12's factory row, which the batch's S13 lands in this unit's own pass with its tuple member, naming `build-index selftest` (id 11)
-- **hands-off** `KICK-dKeptSession-62` — `--mail ack`, `write_mail_ref` and S9's guard read, which the batch's S14 and S15 make one read and one ref update (ids 15, 32)
-- **hands-off** `KICK-dKeptSession-63` — `read_mailbox`'s modes, `write_mail_ref`'s signature and `--mail ack`, which the batch's S11, S12 and S15 extend (ids 14, 15, 25)
-- **hands-off** `KICK-dKeptSession-64` — S5's exits, S7's `acked` state and S8's `--mail ack`, which the batch's S1 to S3 narrow for a skip (ids 4, 15, 19)
+- **hands-off** `KICK-dKeptSession-56` — S12's factory row, landed in this unit's pass, naming `build-index selftest` (id 11)
+- **hands-off** `KICK-dKeptSession-62` — `--mail ack`, `write_mail_ref` and S9's guard read, the batch's S14 and S15 (ids 15, 32)
+- **hands-off** `KICK-dKeptSession-63` — `read_mailbox`'s modes, `write_mail_ref`'s signature and `--mail ack`, the batch's S11, S12 and S15 (ids 14, 15, 25)
+- **hands-off** `KICK-dKeptSession-64` — S5's exits, S7's `acked` state and S8's `--mail ack`, the batch's S1 to S3 (ids 4, 15, 19)
 - **hands-off** `KICK-dKeptSession-65` — S6's strict fetch and rows, S7's precedence and S8's addressed-to check, read by the batch's S1, S2 and S12 (ids 1, 11, 21, 20)
 
 ## 4. Design
 
 ### Evidence
 
-- No mail code exists: `git grep -n "refs/gov/mail" -- tools skills` finds the census's planted push
-  in `tools/lib/resolve-python.test.sh` and the lease arms' `read_mailbox` stubs in
-  `tools/unattended/unattended.test.sh`, which a process run of the driver loses to its own definition.
+- No mail code exists: `git grep -n "refs/gov/mail" -- tools skills` finds only the census's planted
+  push and the lease arms' `read_mailbox` stubs, which a process run of the driver loses to its own.
 - An extension field's value matches `tools/loop/loop_transition.py#VALUE`, so I21 joins ids by `+`.
 - `write_record` refuses a field value holding a CR or an LF or opening `**<Word>:**`, and any line
   after the fields that reads as a field (`tools/memory-tree/build_records.py#write_record`), so a
@@ -248,8 +240,7 @@ what was answered, the card shows what is open, and the transition log keeps wha
   sees every message.
 - Probed 2026-11-21: `check_slug` prints a `check 1 FAILED` line on stdout and sets `status`
   (`tools/unattended/unattended.sh#fail`); the driver exits 2 in a root with no `.unattended.conf`
-  (`#load_driver_conf`), as every transition plant's root and the `adapt.py`, `composition.py` and
-  `termination.py` fixtures' are; `--fleet-tag` answered `d` here and `a` under `GOV_NODE=a`. The
+  (`#load_driver_conf`), as every transition plant's root does; `--fleet-tag` answered `d` here and `a` under `GOV_NODE=a`. The
   lander mints kit versions, so a branch owes no bump (`tools/push-main.sh`).
 
 ### The record
@@ -276,10 +267,10 @@ Does the ref segment stay one component?
 | Minted | Kind | Lexicon cell |
 |---|---|---|
 | `--mail` | verb, with `post`, `read` and `ack` | none |
-| `derive_mail_ref`, `write_mail_ref`, `build_gov_message`, `read_mailbox`; `render_mail_line` | shell functions, the driver; `manifest-check.sh` | `sh.function`, OK by `lexicon.py` |
+| `derive_mail_ref`, `write_mail_ref`, `build_gov_message`, `read_mailbox`; `render_mail_line` | shell functions, the driver; `manifest-check.sh` | `sh.function`, OK |
 | `read_mail_kinds` (and `--mail-kinds`); `read_mail_rows`, `write_mail_records`; `read_mailbox_message` | Python, `loop_lib.py`; `loop_transition.py`; `build_records.py` | `py.function`, OK |
-| `disposed`; `MAIL_GUARD_SECONDS`; `mailbox-message`; `reply` | `TRANSITION_FIELDS` member; constant, `loop_transition.py`; `KINDS` row and tuple member; S6's eleventh column | none |
-| `mail-kinds-repeated`; `mail-open`, `mail-disposed`; `mail-open`, `mail-none`, `mail-off` | plants: `loop_lib.py`; `loop_transition.py`; the card store | none |
+| `disposed`; `MAIL_GUARD_SECONDS`, `MailHeld`; `mailbox-message`; `reply` | `TRANSITION_FIELDS` member; constant and class, `loop_transition.py`; `KINDS` row and tuple member; S6's eleventh column | `MailHeld` `py.type`, OK; else none |
+| `mail-kinds-repeated`; `mail-open`, `mail-disposed`; `mail-held`; `mail-open`, `mail-none`, `mail-off` | plants: `loop_lib.py`; `loop_transition.py`; `claim.py`; the card store | none |
 | `refs/gov/mail/`, `refs/gov/remote/mail/` | ref namespaces | none |
 
 `MAIL_GUARD_SECONDS` is 30 (PINNED), twice `CARD_CLAIMS_BOUND`'s 15
@@ -295,7 +286,12 @@ refs, the card's claims read two namespaces.
 - `memory/guides/UNATTENDED-VERBS.md`: its render
 - `tools/loop/loop.toml`: the `[mail]` table
 - `tools/loop/loop_lib.py`: `read_mail_kinds`, the grade, `--mail-kinds` and its plant
-- `tools/loop/loop_transition.py`: the guard, the disposal, `disposed`, the bound and plants
+- `tools/loop/loop_transition.py`: the guard, `MailHeld`, the disposal, `disposed`, the bound and plants
+- `tools/loop/claim.py`: the `MailHeld` arm and the `mail-held` plant
+- `tools/run-gates/selftest-budgets.txt`: the `plants=<n>` token
+  `tools/run-gates/run-selftests.sh#check_plant_tokens` grades, each row re-priced by direct CLI:
+  `loop transition record` 13 to 15, `loop definition fixtures` 55 to 56, `loop claim fixtures` 14
+  to 15 (DERIVED: each module's `len(PLANTS)`, read 2026-11-21)
 - `tools/memory-tree/build_records.py`: the `mailbox-message` row and `read_mailbox_message`
 - `tools/memory-tree/tree_lib.py`: the `TYPED_RECORD_KINDS` member
 - `skills/session-kickoff/manifest-check.sh`: `render_mail_line` and the `POINTER_LINES` word
@@ -310,29 +306,26 @@ refs, the card's claims read two namespaces.
 
 - **One ref per build.** Eight writers took 4.5 times the ideal compare-and-swap attempts, against 1.0
   with one ref per sender (gap-conc-04).
-- **The recipient's build in the ref**, and **the guard refusing on an unreachable remote**: F1, F3.
 - **The kinds in the driver.** coordination item 6 puts the closed set in the loop definition.
 
 ## 5. Production-readiness checklist
 
 - security — a new write surface on the shared remote, only through `write_gov_ref`, dark behind
   `RUN_CLAIMS`; every field validated once at the write (S4, S5, F7); a session writes its own ref.
-- perf / scale — a post: one bounded fetch and one push; a read: one bounded fetch and one `git log`;
-  a transition: one read.
-- error / empty / loading states — S1, S3, S4 and S5 refuse before a commit; an unreachable remote
-  reads the named local copy under `soft`; S9 names an unarmed or unrunnable guard.
+- perf / scale — a post: one fetch and one push; a read: one fetch and one `git log`; a move: one read.
+- error / empty / loading states — S1 to S5 refuse before a commit; `soft` reads a named local copy;
+  S9 names an unarmed or unrunnable guard.
 - observability — every outcome is one `mail —` line; a refused transition names every open id.
 - risks — an unanswered message holds its recipient's transitions until KICK-dKeptSession-24's
   deadline; no mail ref is pruned before the close program.
 - testing — §6 and the arms in §7.
-- migration — none: the namespace, the table and the record kind are new.
+- migration — none: all three are new.
 - user docs — the verbs guide, `help/loop.md` and `help/orientation-card.md`, S14.
 
 ## 6. Acceptance criteria
 
-The fixture is a bare remote and two clones under `%TEMP%` with short names, `RUN_CLAIMS` on, each
-clone's sessions a distinct `CLAUDE_CODE_SESSION_ID`, clone A under `GOV_NODE=a` and B under `b`, so
-its tags hold on any node, and the loop kit and the transition writer installed.
+The fixture: a bare remote and two clones under `%TEMP%`, `RUN_CLAIMS` on, each session its own
+`CLAUDE_CODE_SESSION_ID`, clone A under `GOV_NODE=a` and B under `b`, the loop kit installed.
 
 - **AC1** — When clone A's session `s1` posts two messages from `fx` and session `s2` posts one, the
   remote holds `refs/gov/mail/fx/a/s1` with a first-parent chain of two commits (PINNED, the
@@ -359,7 +352,7 @@ its tags hold on any node, and the loop kit and the transition writer installed.
 - **AC6** — The `mail-` plants write the driver's conf, `RUN_CLAIMS` on, and a bare remote, as
   `tools/loop/placement.py`'s `write_placement_fixture` does, pushing the `question` and `ack`. When
   `python tools/loop/loop_transition.py --fixture --plant mail-open` runs, the move over the unanswered
-  `question` exits 1 printing `mail open <id>`, writing no commit; `--plant mail-disposed`, after the
+  `question` exits 1 printing `refused — ` and `mail open <id>`, no commit; `--plant mail-disposed`, after the
   `ack`, writes in one transition commit a trailer and a log record carrying `disposed=<id>` and one
   `<date>-build-<anchor>-mailbox-message-1.md` with `**Serves:** mailbox-message <anchor>` and
   `**State:** acked`, which `python tools/memory-tree/build_records.py read <path>` reads with exit 0;
@@ -385,21 +378,28 @@ its tags hold on any node, and the loop kit and the transition writer installed.
 - **AC11** — When `python tools/memory-tree/build_records.py --fixture --plant typed-kinds` runs, it
   prints `build-records: PASS typed-kinds` with `mailbox-message` among the kinds it wrote and bound.
   Red when: the `KINDS` row lands without its tuple member, and the factory's import refuses.
+- **AC12** — When a `python -c` probe rebinds `loop_witness.resolve_bash` to answer `None` and calls
+  `read_mail_rows` over a root whose `.unattended.conf` sets `RUN_CLAIMS` on, it raises `ValueError`
+  reading `mail unknown: no bash that can see <driver>`; and `python tools/loop/claim.py --fixture
+  --plant mail-held`, a `question` to `build:<slug>` pushed to its bare remote before the claim,
+  prints `claim held — <slug> · mail open <id>` and `claim: mail-held · … · held`.
+  Red when: a driver no bash sees reads as absent, or a held claim names a missing row.
 
 ## 7. Gates
 
-`unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `loop definition` · `loop definition fixtures` · `loop transition record` · `loop item kind` · `memory-hygiene self-test` · `build-index selftest` · `docs` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `loop definition` · `loop definition fixtures` · `loop transition record` · `loop claim fixtures` · `loop item kind` · `memory-hygiene self-test` · `build-index selftest` · `docs` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC7 AC9 · two sessions' refs, an unlisted kind, a bad body, an ack, a cross-ref duplicate, a failed fetch, the switch off and no session, staged against the base driver, which has no mail verb · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` rise by its counted assertions
-New arm: tools/loop/loop_transition.py · covers AC6 · the `mail-open` and `mail-disposed` plants, staged by a planted guard reading no mail · none
-New arm: tools/loop/loop_lib.py · covers AC2 · the `mail-kinds-repeated` plant, staged against a `check_loop` that grades no `[mail]` table · none
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC7 AC9 · each criterion's case, staged against the base driver, which has no mail verb · the effective `FLOOR_ASSERTIONS` and its region's `FLOOR_SHARD_<k>` rise by its counted assertions
+New arm: tools/loop/loop_transition.py · covers AC6 · the `mail-open` and `mail-disposed` plants, staged by a planted guard reading no mail · the `loop transition record` row's `plants=<n>` token rises by two
+New arm: tools/loop/loop_lib.py · covers AC2 · the `mail-kinds-repeated` plant, staged against a `check_loop` that grades no `[mail]` table · the `loop definition fixtures` row's `plants=<n>` token rises by one
+New arm: tools/loop/claim.py · covers AC12 · the `mail-held` plant, staged by a claim whose `TransitionRefused` arm names a row miss · the `loop claim fixtures` row's `plants=<n>` token rises by one
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the three card-store plants, staged by a pointers writer omitting the `mail —` line · `FLOOR_ASSERTIONS` rises by the three plants' rows
 
 ## 8. Open questions
 
 - **F1 — Whose build names a mail ref?** (a) The sender's, readers selecting by `to`; (b) the
-  recipient's. (b) puts a new session's retry outside the clause's duplicate check over "the build's
-  per-session refs", and leaves a `node:` or `project` message no build. Rung 1, cl-0160's check.
+  recipient's. (b) puts a new session's retry outside the duplicate check, and leaves a
+  `node:` or `project` message no build. Rung 1, cl-0160's check.
   RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — Which recipients gate a build's transition?** (a) `build:` and `unit:` recipients of the build;
   (b) those and every `node:` and `project` message. (b) lets one broadcast hold every build. Rung 1,
@@ -408,9 +408,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the thre
 - **F3 — What does the guard read when the fetch fails?** (a) The local copy, named; (b) refuse the
   transition. (b) stops every offline build, against P40's "alone and offline". Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F4 — How is the record door's stand-in registered?** (a) Marked at `write_mail_ref`, the one
-  writer, with the hand-over named in §3; (b) a `[[stand-in]]` row, as the brief proposed. (b) is red
-  under TOOL-dDeclaredLoop-13 S8, which admits only a transition-table item, and the record door is
-  none. Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+  writer, with the hand-over named in §3; (b) a `[[stand-in]]` row, red under TOOL-dDeclaredLoop-13 S8,
+  which admits only a transition-table item. Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F5 — Does a reply need a reply?** (a) `answer` and `ack` read `reply` and never gate; (b) every
   kind gates until answered. (b) makes each `ack` hold the asker until acknowledged, so no exchange
   ends, against P39's "every loop ends". Rung 3. RESOLVED (agent, 2026-10-26,
@@ -433,6 +432,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the thre
   rows refusing and its `answered` and `acked` rows disposed; (b) an `--open` read, then a second fetch for
   the disposal, a reply landing between them splitting the two judgments. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3;
   one snapshot decides both. widens: none · relaxes: none
+- **F10 — How does a claim report the guard?** `tools/loop/claim.py#write_first_transition` reads a
+  `TransitionRefused` as a row miss. Options: (a) a `MailHeld` subclass it catches first; (b) one
+  arm reworded for both; (c) none. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; `PatchHeld`'s
+  shape, where (c) names a missing row. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -440,18 +443,18 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the thre
   `selfcheck` derives their rows from the gate-legs manifest alone, one per leg, and this unit adds
   no leg, so no row moves.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-31`, `KICK-dKeptSession-36`,
-  `KICK-dKeptSession-39`, `KICK-dKeptSession-42`, `KICK-dKeptSession-44` mirrored, the other ends of
-  the edges the round-1 spec audit's promoted units declare; no other section moved.
-- rev-3 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-56` mirrored, the other ends of the
-  edges the round-1 promotions' audit's disposal declared
-- rev-4 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored, the other ends of
-  the edges the round-2 promotions' audit's disposal declared
-- rev-5 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-63` mirrored, the other ends of
-  the edges the round-3 promotions' audit's disposal declared
-- rev-6 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-64` mirrored, the other ends of
-  the edges the round-4 minors batch's audit's disposal declared
-- rev-7 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored, the other ends of
-  the edges the round-5 minors batch's audit's disposal declared
+  `KICK-dKeptSession-39`, `KICK-dKeptSession-42`, `KICK-dKeptSession-44` mirrored from the round-1
+  spec audit's promoted units; no other section moved.
+- rev-3 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-56` mirrored
+  from the round-1 promotions' audit's disposal
+- rev-4 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-62` mirrored
+  from the round-2 promotions' audit's disposal
+- rev-5 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-63` mirrored
+  from the round-3 promotions' audit's disposal
+- rev-6 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-64` mirrored
+  from the round-4 minors batch's audit's disposal
+- rev-7 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored
+  from the round-5 minors batch's audit's disposal
 - rev-8 · 2026-10-26 · §2 S10, S12 · §4 The transition, in order · §6 AC6 · re-grounded on
   dDeclaredLoop at `783f1ad3a` by the cross-check record
   `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, rows 13 and 16: the
@@ -474,6 +477,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the thre
   other non-zero read with no row; plants push straight to their remotes; the fixture pins
   `GOV_NODE`; the lander's version bump and the `v2` cite dropped; `symbols.json` added; two floors
   named; the transition table S9 and S10 restate dropped, and prose tightened, under the size cap.
+- rev-11 · 2026-11-21 · S9 · §4 · AC6 · AC12 · §7 · §8 F10 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: S9's unknown cases print `loop: unanswered`,
+  exit 2, and only `MailHeld` prints `refused —`, exit 1, `claim.py` reporting it held (F10); three
+  `plants=<n>` rows, AC12 and `loop claim fixtures` added; prose cut under the size cap.
 
 ## 10. Reuse audit
 
@@ -483,13 +490,10 @@ The seams extended are the gov ref writer pair `build_gov_commit` and `write_gov
 extracts at its second instance (`tools/unattended/unattended.sh#write_register`); `CLAIM_KV_AWK`,
 `add_feed_sightings` and `read_first_seen`; `read_dispositions` (`tools/loop/loop_lib.py#read_dispositions`),
 which `read_mail_kinds` mirrors; `write_card_follow`'s sibling-kit launch; the factory's `KINDS` and
-`TYPED_RECORD_KINDS`; and `run_driver_bounded`. The probe `python tools/codebase-map/reuse_lookup.py
-"append a message commit to a per-session ref by compare-and-swap and read every message"` ranked
-`read_text`, `read`, `read_git`, `read_clean_env`, `write_commit` and `build_commit`
-(`tools/unattended/lib-unattended.sh#build_commit`) by name stem: `read_clean_env` is S9's launch
-environment; `build_commit` builds a records commit, not a gov ref. The map ranks
-none of the driver's shell seams; they were found by reading the driver.
+`TYPED_RECORD_KINDS`; and `run_driver_bounded`. `python tools/codebase-map/reuse_lookup.py "append a
+message commit to a per-session ref by compare-and-swap and read every message"` ranked name stems,
+`read_clean_env`, S9's launch environment, among them; it ranks none of the driver's shell seams,
+found by reading the driver.
 
-Recall terms used: `python tools/memory-recall/query.py "which build's mailbox does a session write and
-read" --terms "mailbox per build per-session ref refs/gov/mail append-only transition refused
-unanswered acknowledged disposed write_gov_ref write_card_ref read_dispositions"`
+Recall terms used: mailbox per-session ref refs/gov/mail append-only transition refused unanswered
+acknowledged disposed write_gov_ref write_card_ref read_dispositions

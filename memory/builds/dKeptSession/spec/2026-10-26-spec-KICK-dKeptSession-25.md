@@ -1,6 +1,6 @@
 # KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 21 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 21 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0504@b051ecfa whole
 **Carries:** node:item.mailbox.answer
@@ -22,6 +22,7 @@
 | [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-20 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-21 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-5 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -60,7 +61,7 @@ driver's own witness is a transition alone (`tools/unattended/unattended.sh#read
   then posts one message of kind `answer` through unit 5 S5's post path, as its `--mail ack` posts:
   from `<slug>`, addressed to `build:<from-build>` of that row, `answers: <question id>`, the row's
   subject, and the body file with one line `cites <path>@<sha>` per cite appended, held to unit 5
-  S4's body checks. It prints the post's `mail — posted <id> · <ref>` line and exits as the post does.
+  S4's body checks, and `KICK-dKeptSession-24` S1's `deadline` and S2's `default: ack`. It prints the post's `mail — posted <id> · <ref>` line and exits as the post does.
   Observed by AC2.
 - **S3** — The outcome, `derive_mail_answer_outcome <slug> <question id>` in
   `tools/unattended/unattended.sh`, from `read_mailbox <slug> soft`'s rows alone (unit 5 S6 and S7,
@@ -71,8 +72,9 @@ driver's own witness is a transition alone (`tools/unattended/unattended.sh#read
 - **S4** — The declared wait renews the lease. `read_lease_renewal`, the witness the driver derives
   for every claim write it makes of its own run, `--beat`'s included (`write_claim_beat` calls
   `write_claim`, which calls it), gains one step under `progress`. Where no transition newer than the
-  record's witness is found, it takes the oldest `question` row addressed to the build whose state is
-  `open`, S3's `awaiting`, by `first-seen`, and runs the landed `check_lease_witness <slug> <that
+  record's witness is found, it reads `read_mailbox <slug> soft 2>/dev/null`, as `check_lease_witness`
+  reads it, so a write's output is unchanged where no question is open; takes the oldest `question`
+  row addressed to the build whose state is `open`, S3's `awaiting`, by `first-seen`; and runs the landed `check_lease_witness <slug> <that
   row's commit>`, which writes nothing (§8 F7). On the verdict `question` it sets `LR_VERDICT` to
   `question`, `LR_WITNESS` to the full sha in `LW_SHA` and `LR_WAIT` to the row's id, so
   `derive_lease_renews` writes `renews: yes` (`tools/unattended/unattended.sh#derive_lease_renews`).
@@ -87,7 +89,11 @@ driver's own witness is a transition alone (`tools/unattended/unattended.sh#read
 - **S6** — The docs: the `--mail` section unit 5 adds to `tools/unattended/VERBS.template.md`
   (rendered to `memory/guides/UNATTENDED-VERBS.md`) gains `--mail answer`, `--cite` and the wait's
   renewal, and `help/loop.md`'s section "The entry items: orienting, placing and claiming a request"
-  gains the `item.entry.mailbox-answer` row. Observed by AC6.
+  gains the `item.entry.mailbox-answer` row. `--mail answer`'s usage row adds `--cite` to the flags
+  the `verb:unattended.sh:--mail` fingerprint hashes (`tools/govkit/docs_leg.py#read_verb_usage`), so
+  the anchor unit 5 places in `help/loop.md`'s `--mail` paragraph is re-stamped with the fingerprint
+  `python tools/govkit/docs_leg.py --fingerprints` prints, and that paragraph names `--mail answer`.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -126,8 +132,9 @@ driver's own witness is a transition alone (`tools/unattended/unattended.sh#read
 - The landed lease writer: under `progress` a write renews on a `new` transition verdict or a
   `question` verdict (`tools/unattended/unattended.sh#derive_lease_renews`). `check_lease_witness`
   answers `question` for the commit of an `open` question row and `question-closed`, exit 1, for one
-  in any other state, `expired` included; it reads the mailbox only where `declare -F` finds
-  `read_mailbox` and `check_mail_deadline` (`tools/unattended/unattended.sh#check_lease_witness`).
+  in any other state, `expired` included (`tools/unattended/unattended.sh#check_lease_witness`). Its
+  `declare -F` probe of `read_mailbox` and `check_mail_deadline` is deleted by `KICK-dKeptSession-24`
+  S3 once both ship in the driver, so it always reads the mailbox.
   TOOL-dPlacedRequest-1, CLOSED, carries `closes TOOL-dPlacedRequest-67`, the ask this spec's F4 filed.
 - The driver's own claim writes take their witness from `read_lease_renewal`, which looks for a
   transition alone (`tools/unattended/unattended.sh#read_lease_renewal`); `--beat` renews through
@@ -191,19 +198,22 @@ None: no question exists before unit 5 lands.
 
 ### Rollout
 
-Behind `RUN_CLAIMS` with every mail verb. The question witness arms where `declare -F` finds unit 5's
-`read_mailbox` and unit 24's `check_mail_deadline`, both earlier in build order, so S4 renews from the
-first beat after this unit lands.
+Behind `RUN_CLAIMS` with every mail verb. The question witness reads unit 5's `read_mailbox`, whose
+deadline judgment unit 24 adds, both earlier in build order, so S4 renews from the first beat after
+this unit lands.
 
 ### Files touched (estimate)
 
 - `tools/loop/loop.toml`: the `item.entry.mailbox-answer` row in the entry program
 - `tools/unattended/unattended.sh`: `--mail answer` and its usage row, `derive_mail_answer_outcome`,
   `read_lease_renewal`'s question step, and the beat's ` · wait question` suffix
-- `tools/unattended/unattended.test.sh`: the arms of §7
+- `tools/unattended/unattended.test.sh`: the arms of §7, and the effective `FLOOR_ASSERTIONS` and its
+  region's `FLOOR_SHARD_<k>` raised by their counted assertions
 - `tools/unattended/VERBS.template.md`: `--mail answer`, `--cite`, the wait's renewal
 - `memory/guides/UNATTENDED-VERBS.md`: its render
-- `help/loop.md`: the `item.entry.mailbox-answer` row in the entry items section
+- `help/loop.md`: the `item.entry.mailbox-answer` row in the entry items section, and `--mail answer`
+  in the `--mail` paragraph with its anchor re-stamped
+- `memory/map/generated/symbols.json`: `derive_mail_answer_outcome`, a new shell function
 
 ### Alternatives rejected
 
@@ -252,12 +262,12 @@ first beat after this unit lands.
   path exits 2 with no commit.
   Red when: a question is answered twice, or an answer cites a record that does not exist.
   fixture: a scratch clone with a bare origin under `%TEMP%`, `RUN_CLAIMS=on`, two builds and a
-  fleet tag.
+  fleet tag, the question posted with `--default no`, which `KICK-dKeptSession-24` S2 requires.
 - **AC3** — When a question with `deadline: 30` is planted to an unattended build and nobody answers,
   with its feed line sighted one hour ago `derive_mail_answer_outcome` prints `awaiting` and
-  `python tools/loop/loop_transition.py record` is refused naming the id; with the line planted 31
-  hours ago it prints `defaulted`, the record is written, and `--mail read` shows the question
-  `expired` with its `default`.
+  `--mail read <slug> --open --ids` prints its id, the row unit 5's guard refuses on; with the line
+  planted 31 hours ago it prints `defaulted`, `--open --ids` prints `none`, and `--mail read` shows
+  the question `expired` with its `default`.
   Red when: an unattended build answers before the deadline, or blocks past it.
   figure: the deadline and both sightings are PINNED fixture literals.
 - **AC4** — When a question addressed to the build was sighted 30 hours ago with `deadline: 72`, no
@@ -279,12 +289,15 @@ first beat after this unit lands.
   Red when: an expired or answered wait keeps renewing, or a wait outranks a newer transition.
   figure: the sighting is a PINNED fixture literal.
 - **AC6** — When `grep -n -- '--mail answer\|--cite\|wait question' tools/unattended/VERBS.template.md`
-  runs, and `grep -n 'item.entry.mailbox-answer' help/loop.md`, each is found.
-  Red when: the verb or the item is undocumented.
+  runs, and `grep -n 'item.entry.mailbox-answer\|--mail answer' help/loop.md`, each is found; and
+  `python tools/govkit/docs_leg.py --fingerprints` prints `verb:unattended.sh:--mail` with the
+  fingerprint the `--mail` paragraph's anchor carries.
+  Red when: the verb or the item is undocumented, or the anchor keeps the fingerprint from before
+  `--cite`.
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop definition` · `loop item kind` · `loop termination` · `docs` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `loop definition` · `loop item kind` · `loop termination` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/unattended/unattended.test.sh · covers AC2 AC3 AC4 AC5 · the answer, the default and the wait arms over planted mail commits, feed lines and lease chains, AC4 staged by a scratch copy whose `read_lease_renewal` skips the question step · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
 
@@ -416,6 +429,13 @@ the row, and its landed `wait-no-deadline` plant already observes the rule's red
   `subject-pins.tsv` regeneration left §4, and `policy fixtures`, `kit epoch` and the four govkit
   legs left §7, which gained the three loop legs and `docs`. Every line-number citation became a
   `path#symbol` or blob pin.
+- rev-7 · 2026-11-21 · S2 · S4 · S6 · §4 · AC2 · AC3 · AC6 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: the unattended suite runs no transition
+  writer, so AC3 observes the guard's input, `--mail read --open --ids`, in place of a `record` run;
+  S4 reads the mailbox with its stderr discarded, as `check_lease_witness` does; unit 24 deletes the
+  `declare -F` probe §4 and Rollout cited; AC2's question carries unit 24's `--default`; `--cite`
+  moves the `--mail` fingerprint, so S6 and AC6 re-stamp the anchor; `symbols.json` and the suite's
+  floors joined Files touched; `policy fixtures`, whose guard holds `tools/loop/`, joined §7.
 
 ## 10. Reuse audit
 

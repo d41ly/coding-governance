@@ -1,6 +1,6 @@
 # KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 22 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 22 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0159@ad40c608 whole
 **Carries:** node:policy-key.mailbox.notice
@@ -19,6 +19,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-10-orders-20-22-reground-brief.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 |
+| [2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief.md) | research | KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-6 KICK-dKeptSession-5 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -111,8 +112,10 @@ pass commits is 7.5 minutes, gap-conc-05's figures (PINNED,
   new arms of `read_lease_policy` (`tools/unattended/unattended.sh#read_lease_policy`), the driver's
   one shell reader of policy keys, to which `KICK-dKeptSession-24` S1 adds `flow.wait-ceiling`: each a
   literal `policy.py get` line, the closed set or the lease bounds' number check, and the catalogue
-  default under the reader's one NOTE where no policy kit resolves. A refused `get` reads the
-  catalogue default and prints one `unattended: NOTE -` line naming the key and the refusal. The
+  default under the reader's one NOTE where no policy kit resolves, both keys joining its NOTE's and
+  its refusal's key lists. Where the reader returns 1, a refused `get` or a value outside the set,
+  `--mail notice` takes that key's catalogue default and prints one `unattended: NOTE -` line naming
+  the key and the reader's `LP_VALUE`. The
   boundary verb and the hook read neither key. Both rows gain `summary` and `usage`; `python
   tools/policy/policy.py lists --write` drains them from `tools/policy/unsummarised-keys.txt`, and
   `help/reference/policy.md` is re-rendered by `python tools/playbook/render_playbook.py
@@ -122,7 +125,13 @@ pass commits is 7.5 minutes, gap-conc-05's figures (PINNED,
 - **S9** — The docs: the `--mail` section unit 5 adds to `tools/unattended/VERBS.template.md`
   (rendered to `memory/guides/UNATTENDED-VERBS.md`) gains `--mail notice`, `--local`, `--ring`, the
   stamp and the hook; `help/loop.md` gains the `notice —` line beside unit 10's mailbox interrupt,
-  under "Where a build is, and what runs next". Observed by AC8.
+  under "Where a build is, and what runs next". The docs leg anchors every hook on one page or lists
+  it in the shrink-only `memory/project/docs-undocumented.txt` (`tools/govkit/docs_leg.py`), so that
+  paragraph carries the `hook:mail-notice` anchor; and `--mail notice`'s usage row adds `--item`,
+  `--local` and `--ring` to the flags the `verb:unattended.sh:--mail` fingerprint hashes
+  (`tools/govkit/docs_leg.py#read_verb_usage`), so the anchor unit 5 places in `help/loop.md`'s
+  `--mail` paragraph is re-stamped. Each anchor carries the fingerprint `python
+  tools/govkit/docs_leg.py --fingerprints` prints. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -241,13 +250,16 @@ a first notice writes the stamp.
   names `manifest-check.sh`
 - `skills/session-kickoff/card-store.fixture.sh`: the `mail-notice-boundary` plant
 - `skills/session-kickoff/manifest-check.test.sh`: its arm
-- `tools/unattended/unattended.test.sh`: the arms of §7
+- `tools/unattended/unattended.test.sh`: the arms of §7, and the effective `FLOOR_ASSERTIONS` and its
+  region's `FLOOR_SHARD_<k>` raised by their counted assertions
 - `tools/unattended/VERBS.template.md`: the `--mail` section's notice rows
 - `memory/guides/UNATTENDED-VERBS.md`: its render
 - `tools/policy/catalogue.toml`: the two mailbox rows' `summary` and `usage`
 - `tools/policy/unsummarised-keys.txt`: drained by `lists --write`
 - `help/reference/policy.md`: re-rendered by `render_playbook.py --reference`
-- `help/loop.md`: the `notice —` line
+- `help/loop.md`: the `notice —` line with the `hook:mail-notice` anchor, and the `--mail`
+  paragraph's anchor re-stamped
+- `memory/map/generated/symbols.json`: the shell and JS functions minted
 
 ### Alternatives rejected
 
@@ -279,7 +291,8 @@ a first notice writes the stamp.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When clone A posts a `question` to `build:<slug>` and clone B, at its next item boundary,
+- **AC1** — When clone A posts a `question` to `build:<slug>`, with the `--default` that
+  `KICK-dKeptSession-24` S2 requires, and clone B, at its next item boundary,
   runs `bash tools/unattended/unattended.sh --mail notice <slug> --item <key>`, B prints
   `mail — 1 unread for <slug> · <id> · fetched · item <key>`; a scratch copy of the driver whose
   notice skips its fetch prints `mail — none`. This is the clause's message posted on one node shown
@@ -296,12 +309,13 @@ a first notice writes the stamp.
 - **AC3** — When `bash skills/session-kickoff/card-store.fixture.sh --plant mail-notice-boundary` runs
   `--card --boundary` across a crossing with one message in B's mailbox, the output holds
   `notice — mail — 1 unread` before unit 10's `interrupt — mailbox` line and the stub engine records
-  `--mail-interrupts --local`; with `mailbox.notice = "off"` planted it holds no `notice —` line, unit
-  10's line still lists the message and the stub records no `--local`; with no crossing it runs no
-  notice.
+  `--mail-interrupts --local`; with `mailbox.notice` planted `off` by `set_card_policy`, since the
+  fixture's stub policy kit answers only planted keys, it holds no `notice —` line, unit 10's line
+  still lists the message and the stub records no `--local`; with no crossing it runs no notice.
   Red when: a crossing shows no notice, `off` silences the disposal, or a boundary fetches twice.
-- **AC4** — When `mailbox.notice = "every-tool-call"` and `mailbox.fetch-seconds = 10` are planted on
-  B, one `--mail notice <slug>` on B writes the stamp, A posts, and B's hook is fed one `PostToolUse`
+- **AC4** — When `mailbox.notice = "every-tool-call"` and `mailbox.fetch-seconds = 10` land on the
+  origin and are fetched on B, as `write_lease_policy` lands a file, since `get` reads the landed
+  revision, one `--mail notice <slug>` on B writes the stamp, A posts, and B's hook is fed one `PostToolUse`
   payload for B's session every two seconds through `node mail-notice.js` in the unattended kit, a
   payload within 20 seconds of the post (PINNED, twice the planted interval) prints an `additionalContext`
   naming the id, and `<stamp>.fetching` was created once per interval; with S6 stubbed to spawn
@@ -313,10 +327,11 @@ a first notice writes the stamp.
   set, or for a session bound to no build, prints nothing;
   `grep -c 'execFileSync\|spawnSync\|readPolicy' mail-notice.js` prints 0 there.
   Red when: the tool call waits on the network, spawns `git`, or reads the policy kit.
-- **AC6** — When the policy reads of `mailbox.notice` and `mailbox.fetch-seconds` are refused,
-  `--mail notice <slug>` prints the notice as `every-item` and one `unattended: NOTE -` line naming
-  each key, and the stamp's first line reads `"notice": "every-item"`, so the hook fed a payload
-  prints nothing.
+- **AC6** — When the policy reads of `mailbox.notice` and `mailbox.fetch-seconds` are refused, staged
+  as DPR1 AC17 stages a refusal, an unparsable first policy revision after a fresh
+  `write_lease_fixture`, `--mail notice <slug>` prints the notice as `every-item` and one
+  `unattended: NOTE -` line per key, naming it, and the stamp's first line reads
+  `"notice": "every-item"`, so the hook fed a payload prints nothing.
   Red when: a refused read changes the behaviour from the default.
 - **AC7** — When `--mail notice <slug> --ring <ref> <id>` runs with a ref outside
   `refs/gov/mail/<build>/<tag>/<segment>` or an id of eleven hex digits, it exits 2 and fetches
@@ -324,8 +339,11 @@ a first notice writes the stamp.
   ring ever delivered, AC1's boundary still shows the message.
   Red when: a ring carries a fact the receiver acts on, or a lost ring loses the message.
 - **AC8** — When `grep -n -- '--mail notice\|--local\|--ring\|mail-notice'` runs over
-  `tools/unattended/VERBS.template.md`, and `grep -n 'notice —' help/loop.md`, each is found.
-  Red when: the notice is undocumented.
+  `tools/unattended/VERBS.template.md`, and `grep -n 'notice —' help/loop.md`, each is found; and
+  `python tools/govkit/docs_leg.py --fingerprints` prints `hook:mail-notice` and
+  `verb:unattended.sh:--mail`, each with `help/loop.md` and the fingerprint its anchor there carries.
+  Red when: the notice is undocumented, the hook is anchored nowhere, or the `--mail` anchor keeps
+  the fingerprint from before `--mail notice`.
 - **AC9** — When `python tools/policy/policy.py get mailbox.notice` and `get mailbox.fetch-seconds`
   run in a repository whose policy file sets neither, they print `every-item` and `60`, and after
   `policy.py lists --write` `tools/policy/unsummarised-keys.txt` names neither key.
@@ -336,7 +354,7 @@ a first notice writes the stamp.
 `unattended kit gate` · `manifest-check self-test` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `routed-commits selftest` · `policy check` · `help reference pages` · `check-wiring self-test` · `hook destinations (every declared hook path ships)` · `docs` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC4 AC5 AC6 AC7 · the notice arms over two clones and one bare origin, AC1 staged by a scratch copy that skips the fetch and AC4 by a stubbed spawn · `FLOOR_ASSERTIONS` and its shard floor rise by the arms' count, counted off the diff
-New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 · the `mail-notice-boundary` plant, red with the notice step left out of the boundary verb · none
+New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 · the `mail-notice-boundary` plant, red with the notice step left out of the boundary verb · `FLOOR_ASSERTIONS` rises by the plant's rows
 
 ## 8. Open questions
 
@@ -412,6 +430,13 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 · the `mai
   `subject-pins.tsv` regeneration left §4, and `kit epoch` and the five govkit legs left §7, which
   gained `policy fixtures`, `routed-commits selftest`, `policy check`, `help reference pages` and
   `docs`. Every line-number citation became a `path#symbol` or blob pin.
+- rev-5 · 2026-11-21 · S8 · S9 · §4 · AC1 · AC3 · AC4 · AC6 · AC8 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-24-precheck-brief`: `get` reads the landed revision, so AC4
+  lands its values on the origin and AC6 stages its refusal as DPR1 AC17 does; the card-store
+  fixture's stub policy refuses an unplanted key, so AC3 plants `off` by `set_card_policy`; S8 states
+  the notice's own default and NOTE on the reader's return 1; AC1's question carries unit 24's
+  `--default`; the docs leg needs the new hook anchored and the `--mail` anchor re-stamped (S9, AC8);
+  `symbols.json` and the suites' floors joined Files touched and §7.
 
 ## 10. Reuse audit
 
