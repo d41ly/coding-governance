@@ -1,6 +1,6 @@
 # KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 7 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 7 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0154@62e72743 whole
 
@@ -54,38 +54,57 @@ reading that key as a stand-in until dTotalRecall lands it.
   absent `purpose`, and a field other than `name` and `purpose` are each a finding naming the row.
   Observed by AC4.
 - **S4** — The awaiting list. `derive_unpurposed(rows, namespaces)` names the derived namespaces no
-  `[[namespace]]` row covers, and `tools/policy/unpurposed-namespaces.txt` holds them, written and
-  graded through KICK-dKeptSession-19's `write_shrink_list(kit, name, header, derived)` and
-  `check_shrink_list(kit, name, derived, compare)` (I7), given this list's file name, its header and
-  `derive_unpurposed`'s names, never a hand-rolled copy. `policy.py lists --check` and
-  `lists --write` (`tools/policy/policy.py#cmd_lists`) grade and drain it as the fourth list, beside
-  `unsummarised-keys.txt`, `legacy-homes.txt` and KICK-dKeptSession-19's `unnamed-keys.txt`, against
-  the one compare base `cmd_lists` already reads (`tools/policy/policy.py#resolve_compare_base`).
-  The list ships to adopters: the kit's `include = "**"` engine rule (`tools/policy/kit.toml`)
-  already covers it, so `kit.toml` is unchanged. Observed by AC2, AC3.
+  `[[namespace]]` row covers, and `tools/policy/unpurposed-namespaces.txt` holds them, written through
+  KICK-dKeptSession-19's `write_shrink_list(kit, name, header, derived)` and graded by
+  `check_unpurposed_list(kit, compare)`, which returns `check_shrink_list(kit, UNPURPOSED_LIST,
+  <derive_unpurposed's names>, compare, UNPURPOSED_WHY)` (`tools/policy/policy.py#check_shrink_list`,
+  I7), the one grade `lists --check` and S7's arm both call, as `check_unnamed_list` is
+  (`tools/policy/policy.py#check_unnamed_list`). `UNPURPOSED_WHY` is `a new policy namespace declares
+  no purpose: add a [[namespace]] row`, the `unlisted` reason that function gives a derived name the
+  list lacks; its other two findings are its own, stale and added above the base. `policy.py lists
+  --check` prints `policy lists: unpurposed-namespaces.txt · <note>` and its findings, and `lists
+  --write` prints `policy lists: wrote unpurposed-namespaces.txt · drained <n>: <names>`, each as the
+  fourth list after `unsummarised-keys.txt`, `unnamed-keys.txt` and `legacy-homes.txt`, against the
+  one compare base `cmd_lists` reads (`tools/policy/policy.py#cmd_lists`); its docstring's "three"
+  becomes "four". The list ships to adopters: the kit's `include = "**"` engine rule
+  (`tools/policy/kit.toml`) covers it and its `project-owned` rule names three other lists, so
+  `kit.toml` is unchanged. Observed by AC2, AC3, AC6.
 - **S5** — The rule, `memory.map-purpose` read through the one Python reader
-  `resolve(key, repo, rev)` (`tools/policy/policy.py#resolve`, I8). Under `review`: a namespace with
-  no purpose row that the list carries is printed `awaiting review` and is no finding; one the list
-  does not carry, or carries above its compare base, is a new namespace and is red, naming the
-  namespace and the remedy, a `[[namespace]]` row. Observed by AC1, AC2.
+  `resolve(key, repo)` (`tools/policy/policy.py#resolve`, I8), which reads the repository's landed
+  revision, never its working tree. Under `review`: the namespaces with no purpose row that the list
+  carries print as one line, `policy purposes: <a> awaiting review · <name>, <name>, …`, sorted, and
+  are no finding; one the list does not carry, or carries above its compare base, is a new namespace
+  and is red, `<name>: UNPURPOSED_WHY`. The arm prints its lines itself before it returns, as
+  `arm_cap_census` prints its `cap census:` lines (`tools/policy/check_policy.py#arm_cap_census`).
+  Observed by AC1, AC2.
 - **S6** — The stand-in. `ledger`, `derive` and `refuse` are dTotalRecall's to arm
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md@9bf3b4c91952:1377`):
   this unit grades every value as `review` and prints one line, `policy purposes: memory.map-purpose
   <value> is dTotalRecall's to arm; graded as review until it lands`, for any value but `review`. A
-  refused read takes the catalogue row's default `review` (the `memory.map-purpose` row of
-  `tools/policy/catalogue.toml`) with one NOTE, as I8 states. Observed by AC5.
+  read `resolve` refuses, such as a repository with no landed revision yet, takes the catalogue row's
+  default `review` (the `memory.map-purpose` row of `tools/policy/catalogue.toml`) and prints one line,
+  `policy purposes: NOTE - memory.map-purpose did not read (<why>); graded as review, its catalogue
+  default`, as I8 states; it is no finding, since every value grades as `review` and the read moves
+  only which line prints. Observed by AC5.
 - **S7** — The arm `arm_purposes(repo, kit)` in `tools/policy/check_policy.py`'s `ARMS`
   (`tools/policy/check_policy.py#ARMS`), its population the derived namespaces, announced as
   `<n> namespace(s), <p> purposed, <a> awaiting review`, with `empty = "finding"` and its `why`,
   since the catalogue ships in the kit; findings are S3's and S4's. Its row in both of the kit
-  README's arm tables, "The arms" and "Each arm in an adopter" (`tools/policy/README.md`), which
-  the case `arms-empty-declared` joins to `ARMS`
-  (`tools/policy/check_policy.py#run_arms_empty_declared`), and the list's row in that README's file
-  table. Fixture cases `purposes-new`, `purposes-listed`, `purposes-drain`, `purposes-shape` and
-  `purposes-map-purpose` in `CASES` (`tools/policy/check_policy.py#CASES`), each a seed case or an
-  outcome case as that table's two forms admit, and the seed loop of `run_fixture`
-  (`tools/policy/check_policy.py#run_fixture`) saving and restoring the new list beside
-  `policy.LIST`. Observed by AC1 to AC5.
+  README's arm tables, "The arms" and "Each arm in an adopter" (`tools/policy/README.md`), the second
+  joined to `ARMS` both ways by the case `adopter-fresh-target`
+  (`tools/policy/check_policy.py#run_fresh_target`, `#extract_arm_rows`), its last column opening
+  `finding`; the list's row in that README's file table; and the list in its "The CLIs" paragraph on
+  `lists`. `purposes-new` is a seed case on `ARM["arm_purposes"]`, its seed appending
+  `render_planted_row(None)`'s `zz.planted` and returning `("zz", "declares no purpose")`; the other
+  four are outcome cases, one runner over them. `build_repo` copies the new list into the kit copy
+  beside `policy.LIST`, and `run_fixture`'s seed loop saves and restores it in its `files`
+  (`tools/policy/check_policy.py#build_repo`, `#run_fixture`): without the copy every namespace reads
+  unlisted and every seed case's unplanted run reds. `purposes-drain` runs the copy's own `policy.py
+  lists` as a subprocess, so its kit copy holds `READER_FILES`, the catalogue, `policy.LIST` and the
+  new list, committed and pushed to one bare remote, as `build_legacy_repo` builds its copy
+  (`tools/policy/check_policy.py#build_legacy_repo`); `cmd_lists` grades the module's own `KIT`.
+  `purposes-map-purpose` commits its policy file and moves `refs/remotes/upstream/main` to that
+  commit, since `resolve` reads the landed revision. Observed by AC1 to AC5.
 - **S8** — The review, done once in this unit's build pass, as PM-5's `review` orders: for each
   listed namespace whose `[[key]]` rows carry a `summary`, a purpose derived from those summaries is
   written as its `[[namespace]]` row and the source rows are cited in the unit's journal record; the
@@ -127,6 +146,17 @@ reading that key as a stand-in until dTotalRecall lands it.
   too: `read_policy_members` (`tools/govkit/step_gate.py#read_policy_members`),
   `read_policy_usage` (`tools/govkit/docs_leg.py#read_policy_usage`) and `extract_policy`
   (`tools/playbook/tag_index.py#extract_policy`).
+- Landed since this spec's base, read 2026-11-21: `check_shrink_list` takes a fifth argument, the
+  reason a derived name the list lacks is given, and the factory, `check_unnamed_list` and the
+  three-list `cmd_lists` are KICK-dKeptSession-19's; `build_repo` copies the catalogue,
+  `policy.LIST` and the cap census alone into its kit copy; every shipped preset assigns
+  `memory.map-purpose = "review"` (`tools/policy/presets.toml`), so the preset step answers as the
+  default does. A seed case runs its one arm alone, so the planted `zz` reds no other arm's case, and
+  the loop kit's `policy-key` factory gates on `POLICY_KEY_ARMS`, four arms without this one
+  (`tools/loop/factories.py#POLICY_KEY_ARMS`). The reader-coverage scan skips `check_policy.py`
+  (`tools/policy/check_policy.py#derive_scanned_files`), so the arm's read books no reader, and the
+  mirror's `catalogue_blob` is re-rendered by the lander at each landing (`tools/policy/README.md`,
+  "Regenerated at every landing"), so a catalogue edit owes no `.governance/policy.json` here.
 - The hand-rolled lists today are `check_list` and `write_list`
   (`tools/policy/policy.py#check_list`, `#write_list`) and the legacy-home list
   (`#check_legacy_homes`, `#write_legacy_homes`), graded by `cmd_lists` against one
@@ -168,8 +198,9 @@ Of them, 14 have at least one summarised row S8 can derive from, PINNED at the s
 ### The arm's lines
 
 ```
-policy-check: arm_purposes · 0 finding(s) · 59 namespace(s), 14 purposed, 45 awaiting review
+policy purposes: 45 awaiting review · actions, annotations, …
 policy purposes: memory.map-purpose refuse is dTotalRecall's to arm; graded as review until it lands
+policy-check: arm_purposes · 1 finding(s) · 60 namespace(s), 14 purposed, 45 awaiting review
   zz: a new policy namespace declares no purpose: add a [[namespace]] row
 ```
 
@@ -177,9 +208,9 @@ policy purposes: memory.map-purpose refuse is dTotalRecall's to arm; graded as r
 
 | Minted | Kind | Lexicon cell |
 |---|---|---|
-| `load_namespaces`, `derive_policy_namespaces`, `check_namespaces`, `derive_unpurposed` | functions, `tools/policy/policy.py` | `py.function`, OK by `lexicon.py --suggest` |
-| `UNPURPOSED_LIST`, `UNPURPOSED_HEADER` | constants, `tools/policy/policy.py` | none |
-| `arm_purposes` | arm, `tools/policy/check_policy.py` | `py.function`, OK by `lexicon.py --suggest` |
+| `load_namespaces`, `derive_policy_namespaces`, `check_namespaces`, `derive_unpurposed`, `check_unpurposed_list` | functions, `tools/policy/policy.py` | `py.function`, OK by `lexicon.py --suggest` |
+| `UNPURPOSED_LIST`, `UNPURPOSED_HEADER`, `UNPURPOSED_WHY` | constants, `tools/policy/policy.py` | none |
+| `arm_purposes`, `seed_namespace_new`, `run_purposes_case` | arm, seed and outcome runner, `tools/policy/check_policy.py` | `py.function`, OK by `lexicon.py --suggest` |
 | `[[namespace]]` | catalogue table | none |
 | `unpurposed-namespaces.txt` | shrink-only list | none |
 | `purposes-new`, `purposes-listed`, `purposes-drain`, `purposes-shape`, `purposes-map-purpose` | fixture cases | none |
@@ -198,10 +229,13 @@ catalogue and list the same way.
 
 - `tools/policy/catalogue.toml`: the `[[namespace]]` rows S8 derives
 - `tools/policy/policy.py`: S1 to S6, and `cmd_lists` grading the fourth list
-- `tools/policy/check_policy.py`: `arm_purposes`, its five fixture cases and the seed loop's saved list
+- `tools/policy/check_policy.py`: `arm_purposes`, its five fixture cases, `build_repo`'s copy and the
+  seed loop's saved list
 - `tools/policy/unpurposed-namespaces.txt` (new)
-- `tools/policy/README.md`: the arm's two table rows and the list's file row
+- `tools/policy/README.md`: the arm's two table rows, the list's file row and "The CLIs" `lists` text
 - `help/policy.md`: S9's section
+- `memory/map/generated/symbols.json`: the new functions, regenerated by `gen_map.py --write` as the
+  commit hook's codebase-map leg requires; the kickoff manifest watches none of these paths
 
 ### Alternatives rejected
 
@@ -238,16 +272,17 @@ catalogue and list the same way.
   `unpurposed-namespaces.txt` at the base, with no row, is printed `awaiting review` and the arm is
   green.
   Red when: a listed namespace reds, or is graded without being printed.
-- **AC3** — When `python check_policy.py --fixture purposes-drain` gives a listed namespace a row,
-  `policy.py lists --check` reds it as stale, `lists --write` drains it, and `--check` then exits 0.
+- **AC3** — When `python check_policy.py --fixture purposes-drain` gives a listed namespace a row in
+  its kit copy, that copy's `policy.py lists --check` exits 1 naming it `stale`, `lists --write`
+  drains it, and `--check` then exits 0.
   Red when: a purposed namespace stays listed, or a written list gains a name its base lacked.
 - **AC4** — When `python check_policy.py --fixture purposes-shape` plants a `[[namespace]]` row naming
   no key's namespace, a duplicate `name`, an empty `purpose` and an unknown field, `check_namespaces`
   prints four findings, one per row, and no `[[key]]` arm changes its verdict.
   Red when: any of the four passes, or `load_catalogue` reads a `[[namespace]]` row as a key.
-- **AC5** — When `python check_policy.py --fixture purposes-map-purpose` sets `memory.map-purpose =
-  "refuse"` in the planted policy file, the arm prints the stand-in line naming `refuse` and its
-  verdict equals AC2's.
+- **AC5** — When `python check_policy.py --fixture purposes-map-purpose` commits `memory.map-purpose =
+  "refuse"` in the planted policy file at the landed revision, the arm prints the stand-in line naming
+  `refuse` and its verdict equals AC2's.
   Red when: another value changes the grading, or changes it silently.
 - **AC6** — When `python policy.py lists --check` runs in the policy kit, its line for
   `unpurposed-namespaces.txt` names the base and the count, and the count equals the derived
@@ -311,6 +346,13 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 · the five 
   `zz.planted`; the Gates line names the policy legs and every guarded leg the Files touched trip.
   Narrowed: `tools/policy/kit.toml` dropped from Files touched, since its `include = "**"` engine
   rule already ships the list; no landed unit builds any of S1 to S9.
+- rev-4 · 2026-11-21 · S4 S5 S6 S7 · §4 Evidence, Inventory, Files touched · AC3 AC5 · checked for
+  behaviour under `2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief`: the grade called with
+  `check_shrink_list`'s landed fifth argument through `check_unpurposed_list`; the README join
+  re-cited to `adopter-fresh-target`; `build_repo` copying the list, without which every seed case's
+  unplanted run reds; `purposes-drain` given a kit copy its own `policy.py` grades; AC5's file
+  committed and landed, since `resolve` reads the landed revision; the awaiting and NOTE lines
+  pinned; `symbols.json` added. Population re-measured 2026-11-21 at `40c5217f`, unchanged.
 
 ## 10. Reuse audit
 

@@ -83,3 +83,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T18:27:05Z brief · item KICK-dKeptSession-40 · reason d67bf8d161c1 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-40-build-brief.md
 
 2026-11-21T18:30:03Z dispatch · item ec95533c KICK-dKeptSession-40 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/presets.py tools/policy/presets.toml tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-40-1-acceptance-ledger.md
+
+2026-11-21T18:44:16Z brief · item KICK-dKeptSession-4 · reason aab981689f69 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-4-build-brief.md
+
+2026-11-21T18:45:45Z dispatch · item eabd0d44 KICK-dKeptSession-4 · reason tools/policy/kit.toml tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/policy.py tools/policy/check_policy.py memory/map/generated/symbols.json tools/policy/README.md tools/govkit/selftest.py tools/govkit/steps/kickoff_facts_to_overlay.py tools/govkit/matrix.py tools/govkit/usage.toml help/policy.md help/tutorial/adopt-gov.md help/tasks/change-a-gov-rule.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-4-1-acceptance-ledger.md
