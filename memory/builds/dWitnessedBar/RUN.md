@@ -812,3 +812,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T14:20:27Z rescope · item add TOOL-dWitnessedBar-107 · reason the closing diff review round 1 promotes H2: verify-peer signs and publishes a per-tree slot the current bar run did not write
 
 2026-11-21T14:20:28Z rescope · item add TOOL-dWitnessedBar-108 · reason the closing diff review round 1 promotes its minors M1, M2, L1 and L2, batched into one unit
+
+2026-11-21T14:45:15Z brief · item TOOL-dWitnessedBar-106 · reason ac2e62d8de5b memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-106-build-brief.md
