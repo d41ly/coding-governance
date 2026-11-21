@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-108 — the closing review round 1's four minors batched: a staged removal trips the commit-time guard, scaffolded ledger homes open with their rendered header, an unread parameter reds, and the charter's trailer is checked at commit time
 
-**Status:** CLOSED · rev-1 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
+**Status:** INPROGRESS · rev-1 · 2026-11-21 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 51 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-27.md) | widen | — |
 | [2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md](../build/2026-11-21-build-TOOL-dWitnessedBar-108-widen-28.md) | widen | — |
 | [2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md](../prompts/2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md) | journal | — |
+| [2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-build-brief-2.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-brief.md) | journal | — |
 | [2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md](../prompts/2026-11-21-prompt-TOOL-dWitnessedBar-108-promotion-spec-writer.md) | journal | — |
 
