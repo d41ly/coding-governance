@@ -50,8 +50,8 @@ observation of each `New arm:` line: `preset-diff` on its two staged breaks, `ch
   `bcea1d47`).
 - AC6 — `render_instruction_map` over the `map-held` plant's tree, a repository holding no commit:
   the last line was `preset — ` and `PRESET_LINE_UNREAD`, and stderr carried one line,
-  `instruction-map: preset — unread · policy: refused · .governance/policy.toml:0 · refs/heads/main
-  names no commit in this repository, …`.
+  opening `instruction-map: preset — unread · policy: refused ·`, naming the policy file at line zero and
+  saying `refs/heads/main` names no commit in this repository.
 - AC7 — `grep -n "preset --diff" policy.md charter.md` in `help/` printed `policy.md`'s bullet
   naming the charter's preset section beside the `script:tools/policy/policy.py#preset` anchor, and
   `charter.md`'s two lines of the map paragraph.
