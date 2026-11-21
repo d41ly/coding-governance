@@ -13,7 +13,7 @@ AC12 arm's. The second sources the arm's own lines, cut from the suite from `che
 `rm -rf "$rgf_t"`, with `ROOT` at a scratch tree holding each copy, so the record is the one
 `run_local_plant` builds, under `TMPDIR` at `%TEMP%/w75`. The suite passed `bash -n`. The shell-role
 seed measures the suite at 738 past 735, widened under `2026-11-21-build-TOOL-dWitnessedBar-75-widen-16`
-and the row set to that measured count. No `a=$((a+1))` was added. The §7 legs and the `New arm:`
+and the row set to that measured count. No `a=$((a+1))` was added. The §7 legs and the `New arm:` (DERIVED from the builder's probe)
 line's RED-first observation are the main loop's at the close.
 
 **Evidences:** TOOL-dWitnessedBar-75
