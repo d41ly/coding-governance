@@ -1044,7 +1044,8 @@ raised: [[retired]] row 1 needs a non-empty string id and successor" ] \
 # suite and the pre-push suite drive through their own callers.
 gr="$TMP/gov-ref"; mkdir -p "$gr"
 gr_got=$(cd "$gr" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@x GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@x \
-  GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$gr/no-hooks" bash -c '
+  GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$gr/no-hooks" \
+  GIT_CONFIG_KEY_1=advice.graftFileDeprecated GIT_CONFIG_VALUE_1=false bash -c '
   . "$1"; . "$2"
   git init -q --bare origin.git && git init -q work && cd work || exit 2
   git remote add origin ../origin.git
