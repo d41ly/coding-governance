@@ -1,6 +1,6 @@
 # KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 4 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 4 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-2-orders-3-4-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-2-orders-3-4-reground-brief.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 |
+| [2026-11-21-prompt-KICK-dKeptSession-3-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-3-precheck-brief.md) | research | KICK-dKeptSession-3 KICK-dKeptSession-34 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -46,11 +47,17 @@ step after unit 2 (order 4).
   the mirror records the store's blob, `mirror --write` refuses while the store is uncommitted, and
   `policy-mirror.js`, which compares every key of `legacy_blobs`, reads a changed store STALE with no
   edit. `LEGACY_INPUTS` keeps its literal line, which the `guard-mirror-inputs-join` scenario of
-  `run_guard_case` rewrites to plant an input. Observed by AC2, AC3 and AC4.
+  `run_guard_case` rewrites to plant an input. `derive_kit_rel` refuses only where
+  `derive_catalogue_rel` already refuses in the same render, so no caller of `render_mirror` gains a
+  refusal. Observed by AC2, AC3 and AC4.
 - **S3** — id 47. The render and the text. gov's `.governance/policy.json` is re-rendered by
   `python tools/policy/policy.py mirror --write`, gaining the store's entry under `legacy_blobs`, and
   the mirror section of `tools/policy/README.md` names the store among the recorded inputs, its JSON
-  example included. Observed by AC4.
+  example included. The guard section of `help/policy.md`, whose parenthetical says the
+  `legacy_blobs` record holds "today `.agent-cap.conf` alone", names its three inputs, the fanout
+  conf, the instruction overlay and the policy kit's `presets.toml`, since the guard refuses a mirror
+  staged beside a changed store from this unit on (`tools/policy/guard.py#check_mirror_render`).
+  Observed by AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -89,6 +96,20 @@ step after unit 2 (order 4).
   inputs a staged mirror must agree with (`tools/policy/guard.py#check_mirror_render`). Neither
   holds a list of its own, so neither is edited.
 - `presets.toml` sits in the kit, so its path is the kit prefix plus the name, as the catalogue's is.
+- A STALE mirror answers only where `policy-file.on-invalid` reads `last-valid`: it then returns the
+  reader's answer, its reason prefixed `mirror stale at <L8>; `, and under any other value it refuses
+  (`tools/policy/policy-mirror.js#readPolicy`), which is the `mirror-stale-refuse` branch's red.
+- `build_landed_repo` copies `MIRROR_KIT_FILES`, which spreads `READER_FILES`
+  (`tools/policy/check_policy.py#build_landed_repo`); `KICK-dKeptSession-2` S3 adds `presets.py` and
+  `presets.toml` to `READER_FILES`, so the case's kit copy carries the store with no copy added here.
+  `run_mirror_landed` ends every branch by `arm_mirror_landed` over its repository, which must find
+  nothing for this branch as it does for `mirror-stale-legacy`.
+- Every other `render_mirror` caller, `build_repo`, `set_landed`, `arm_mirror_parity` and the playbook's
+  `read_tag_policy` (`tools/playbook/policy_value.py#read_tag_policy`), already reads
+  `derive_catalogue_rel` in the same render. `adopt-policy.sh --scaffold` and its suite run gov's kit
+  against an outside target, where the store's kit-relative path is absent on both sides of
+  `cmd_mirror`'s walk, so its `mirror deferred` line still names the policy file first
+  (`tools/policy/adopt-policy.test.sh`).
 
 ### Inventory
 
@@ -108,7 +129,10 @@ mirror is re-rendered in this unit (S3).
 - `tools/policy/policy.py`: S1 and S2
 - `tools/policy/check_policy.py`: the `mirror-presets-stale` case and its `CASES` row
 - `tools/policy/README.md`: the mirror section
+- `help/policy.md`: the guard section's list of the mirror's inputs
 - `.governance/policy.json`: re-rendered by `mirror --write`
+- `memory/map/generated/symbols.json`: the two new functions, regenerated as the commit hook's
+  codebase-map leg requires
 
 ### Alternatives rejected
 
@@ -126,18 +150,22 @@ mirror is re-rendered in this unit (S3).
 - risks — every existing mirror reads stale once after landing, by design.
 - testing — the case of the acceptance section and the arm in the gates section.
 - migration — the Migration sub-head above.
-- user docs — `tools/policy/README.md`'s mirror section names the store among the inputs (S3).
+- user docs — `tools/policy/README.md`'s mirror section and `help/policy.md`'s guard section name
+  the store among the inputs (S3).
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n "def derive_kit_rel\|def derive_catalogue_rel" policy.py` runs in the
   policy kit, both print, and `derive_catalogue_rel`'s body is one call to `derive_kit_rel(CATALOGUE)`.
   Red when: the prefix read is written twice.
-- **AC2** — When the `mirror-presets-stale` case renders the mirror over a landed revision whose
-  policy file names `strict`, then lands a change to strict's `hooks.bypass` in the kit's
-  `presets.toml` without re-rendering, `node policy-mirror.js get hooks.bypass --explain` reports
-  the mirror stale and answers the new value.
-  Red when: the mirror reads FRESH and answers the old value.
+- **AC2** — When the `mirror-presets-stale` branch of `run_mirror_landed` commits `preset =
+  "strict"` above `LANDED_POLICY`'s `policy-file.on-invalid = "last-valid"`, commits the mirror
+  `render_mirror` gives at that commit and pushes it as L, then commits strict's `hooks.bypass` set
+  to `allowed` in the kit copy's `presets.toml` and pushes that alone, `node policy-mirror.js get
+  hooks.bypass --repo <repo> --explain` exits 0 printing `allowed`, its stderr line reading
+  `policy: hooks.bypass · preset · mirror stale at <L8>; ` and the reader's reason, and the branch's
+  closing `arm_mirror_landed` finds nothing.
+  Red when: the mirror reads FRESH and answers `refused`, or the read refuses.
 - **AC3** — When `python policy.py mirror --print` runs in that case's repository, its
   `legacy_blobs` names the kit's `presets.toml` path beside `.agent-cap.conf` and
   `.governance/instructions.toml`.
@@ -146,6 +174,9 @@ mirror is re-rendered in this unit (S3).
   render, it prints `policy: mirror fresh`, and `.governance/policy.json`'s `legacy_blobs` holds
   the store's path in gov, the policy kit's directory plus `presets.toml`.
   Red when: gov's committed mirror predates the input.
+- **AC5** — When `grep -n "legacy_blobs" policy.md` runs in the help directory, the guard section's
+  line names `presets.toml` and no longer reads `.agent-cap.conf` alone.
+  Red when: the page still names one input.
 
 ## 7. Gates
 
@@ -180,6 +211,12 @@ New arm: tools/policy/check_policy.py · covers AC2 AC3 · the `mirror-presets-s
   and the README text, so `.governance/policy.json` and `tools/policy/README.md` join Files touched;
   AC2 names its policy file and AC4 is added; F1 ruled for the caps module's same-named reader;
   every line citation re-cited by symbol; the guarded legs named.
+- rev-4 · 2026-11-21 · S2 · S3 · §4 · §5 · AC2 · AC5 · §7 · checked for behaviour against the tree
+  after KICK-dKeptSession-1 landed, by 2026-11-21-prompt-KICK-dKeptSession-3-precheck-brief: AC2's
+  seed sets `policy-file.on-invalid = "last-valid"`, without which the helper refuses a stale mirror,
+  lands each commit by a push, and names the closing `arm_mirror_landed`; the store's copy is named
+  as unit 2's `READER_FILES` widening, and every other `render_mirror` caller checked; S3 and a new
+  AC5 take `help/policy.md`'s guard line, so that page and the symbol map join Files touched.
 
 ## 10. Reuse audit
 
