@@ -37807,3 +37807,7 @@ tools/workflows/unattended-build.test.sh	gh32-pathless.js:3	1	9e21ac760dc0a43d6e
 tools/workflows/unattended-build.test.sh	gh36-mid.js:2	1	9e21ac760dc0a43d6ed007396922722ccee98d57	seeded
 memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 13	1	d49338c23bad37c7de568b883194dd3e12b2e17f	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
 memory/builds/dWitnessedBar/build/2026-11-21-build-TOOL-dWitnessedBar-1-leg-tail-7.md	HYGIENE check 15	1	d49338c23bad37c7de568b883194dd3e12b2e17f	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-31
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 13	1	1cb84d40f652a207a66b1da4849e312fa51f8d61	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-31.md	HYGIENE check 15	1	1cb84d40f652a207a66b1da4849e312fa51f8d61	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 13	1	1cb84d40f652a207a66b1da4849e312fa51f8d61	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
+memory/builds/dWitnessedBar/build/2026-11-22-build-TOOL-dWitnessedBar-1-widen-32.md	HYGIENE check 15	1	1cb84d40f652a207a66b1da4849e312fa51f8d61	widened:2026-11-22-build-TOOL-dWitnessedBar-1-widen-32
