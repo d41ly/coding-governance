@@ -1,6 +1,6 @@
 # KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md](../build/2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
@@ -54,8 +55,11 @@ it (order 25).
   refused post, among the lines `write_transition` returns or on the verb's output; the transition
   and the landing still succeed, as `KICK-dKeptSession-7` §5 states. Observed by AC3.
 - **S4** — id 4. `KICK-dKeptSession-7` AC7 is superseded by name by AC1, which observes two
-  dependents over three Design exits; that unit's acceptance ledger answers AC7 with AC1's output.
-  Observed by AC1.
+  dependents over three Design exits. This unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-35-1-acceptance-ledger.md`,
+  answers AC7 with AC1's output and quotes its "with one dependent README naming it in" and "a
+  second move out of Design posts". Unit 7 builds at order 24 and is CLOSED when this unit builds, so
+  neither its spec nor its ledger is written (F1). Observed by AC1 and AC5.
 - **S5** — The user page. `help/loop.md`'s notices paragraph (`KICK-dKeptSession-7` S7) names the
   pass on each notice and the `notice — not posted` line. Observed by AC4.
 
@@ -121,6 +125,8 @@ None: no notice exists before `KICK-dKeptSession-7`.
 - `tools/unattended/unattended.sh`: S2 and S3 in `verb_landed`, and `KIT_UNATTENDED_VERSION` moved
 - `tools/unattended/unattended.test.sh`: the landed arm extended
 - `help/loop.md`: S5's sentence
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-35-1-acceptance-ledger.md`:
+  S4's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -167,17 +173,30 @@ parent, a bare origin under `%TEMP%` and `RUN_CLAIMS=on`, planted by `loop_trans
 - **AC4** — When `grep -n "notice — not posted" loop.md` runs in `help/`, it prints the notices
   paragraph's sentence, which also names `--pass`.
   Red when: the owner's page does not say a refused notice is printed.
+- **AC5** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "with one
+  dependent README naming it in"` prints `1`, and into `grep -c "a second move out of Design
+  posts"` prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 7's spec and its
+  acceptance ledger prints nothing.
+  Red when: S4's answer lands in a record of unit 7, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
-`loop transition record` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/loop_transition.py · covers AC1 AC3 · the `notices-two-dependents` and `notices-refused` plants, each rebinding the spawn the writer imports inside its function and restoring it after the run, staged red by a scratch copy dropping `--pass` · none
 New arm: tools/unattended/unattended.test.sh · covers AC2 · two landings to one dependent · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S4's answer to unit 7's superseded criterion recorded?** Unit 7 builds at order
+  24, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 7's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 7 spec text it
+  supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -193,6 +212,11 @@ none
   gains `loop transition record`, `kit epoch`, `docs` and the guarded `scratch-guard self-test` and
   `tier2-review self-test`; line citations re-cited by symbol. Narrowed: no unlanded-log case, since
   a refused `before` refuses the move.
+- rev-4 · 2026-11-21 · S4 · §4 · AC5 · §7 · §8 · S4's answer to unit 7 moves to this unit's own
+  acceptance ledger, which joins Files touched and trips the two `recall floor` legs now on §7's leg
+  line; F1 resolved (b) and AC5 observing the quoted passages, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class KICK-dKeptSession-49 rev-6
+  first resolved. `policy fixtures`, whose guard holds `tools/loop/`, joins the leg line too.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-KICK-dKeptSession-31-deviation-311.md](../build/2026-10-26-build-KICK-dKeptSession-31-deviation-311.md) | deviation | — |
 | [2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md](../build/2026-11-21-build-KICK-dKeptSession-45-reground-orders-14-19-returns.md) | research | KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-36 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-1 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md) | research | KICK-dKeptSession-22 KICK-dKeptSession-5 |
 | [2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-22 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
@@ -42,18 +43,24 @@ eight-field id from its first build.
   that order, each absent one written `none`, so two messages differing only in recipient or only in
   content key carry two ids. It still takes no session and no time. `KICK-dKeptSession-22` S4's act
   joins as the ninth field. Observed by AC1, AC2 and AC4.
-- **S2** — id 54. The callers, handed off. No caller of `derive_message_id` exists when this unit
-  builds, so it changes none. `KICK-dKeptSession-5` S5's `--mail post` passes its `--to` value as
+- **S2** — id 54. The callers, handed off. No product caller of `derive_message_id` exists when this
+  unit builds, so it changes none; its one suite caller is `KICK-dKeptSession-22`'s arm (S4). `KICK-dKeptSession-5` S5's `--mail post` passes its `--to` value as
   `<to>` and `none` as `<content-key>`, and `KICK-dKeptSession-27` S3 later passes the key it
   computes from `--interface` (§3 Edges, F2). NOT OBSERVED here: unit 5's criteria observe its post,
   and AC3 observes two recipients at the one derivation every post calls.
 - **S3** — id 54. The retry stays refused. Equal fields, the recipient and key included, are still
   one message, so a post retried after a crash, from this session or another, is refused exactly as
   `KICK-dKeptSession-22` AC3 and AC4 state. Observed by AC4.
-- **S4** — id 54. The sibling text superseded by name. `KICK-dKeptSession-22` S2's "six fields" and
-  AC2's "any one of the six fields" read eight fields from this unit's landing, and this unit's
-  acceptance ledger answers each. `KICK-dKeptSession-5` S5's call is written with eight arguments in
-  that unit's own spec (F2). Observed by AC1.
+- **S4** — id 54. The sibling text superseded by name. `KICK-dKeptSession-22` S2's "over those six
+  fields in that order" and AC2's "changing any one of the six fields changes it" read eight fields
+  from this unit's landing. Answered in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-31-1-acceptance-ledger.md`,
+  which quotes those two passages of unit 22's spec and states S1 supersedes them; unit 22 is CLOSED
+  by then, so neither its spec nor its ledger is written (F3). That unit's arm in `tools/unattended/unattended.test.sh` calls the
+  six-argument form; this unit appends `none none` to each of its calls, so the arm observes unit 22's
+  criteria over the eight-field id, whatever arity rule the function keeps. The arm pins no literal
+  id: its ids are derived at run time. `KICK-dKeptSession-5` S5's call is written with eight arguments
+  in that unit's own spec (F2). Observed by AC1 and AC5, and by unit 22's arm staying green.
 
 ## 3. Non-goals (OUT)
 
@@ -93,7 +100,9 @@ eight-field id from its first build.
   brief's Serves line also takes (`memory/builds/dKeptSession/README.md`, its spec index;
   `memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md`).
 - No mail code exists: `git grep -n -E "derive_message_id|check_mail_duplicate|derive_gov_id" --
-  tools skills` finds nothing at this tree.
+  tools skills` finds nothing at this tree; at this unit's build the one caller is unit 22's arm.
+- `memory/map/generated/symbols.json` lists a shell function by its id, kind and file alone, so a
+  function gaining two fields moves no row, and this unit mints none.
 
 ### The cases
 
@@ -114,7 +123,9 @@ None. No message exists before this build, so no stored id changes.
 ### Files touched (estimate)
 
 - `tools/unattended/unattended.sh`: `derive_message_id`
-- `tools/unattended/unattended.test.sh`: the arm in §7
+- `tools/unattended/unattended.test.sh`: the arm in §7, and `none none` appended to unit 22's calls
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-31-1-acceptance-ledger.md`:
+  S4's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -157,10 +168,16 @@ The fixture is `KICK-dKeptSession-22`'s scratch repository under `%TEMP%`, whose
   `check_mail_duplicate fx <a>` returns 1 naming `s1`'s ref.
   Red when: the retry's id differs from `<a>`, so the added fields broke `KICK-dKeptSession-22`'s
   refusal.
+- **AC5** — When `tr -s ' \r\n' ' '` over this unit's acceptance ledger is piped into `grep -c "over
+  those six fields in that order"` it prints `1`, and into `grep -c "changing any one of the six
+  fields changes it"` it prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 22's spec
+  and its acceptance ledger prints nothing.
+  Red when: S4's answer lands in a record of unit 22, or this unit's ledger quotes none of the
+  passages it supersedes.
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · two recipients at one exit, two keys to one recipient and an unchanged retry, staged against a copy of the driver carrying the six-field id · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
@@ -180,6 +197,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · two re
   builds a call and a paragraph only to rewrite them, and moves an order verb other units read.
   RESOLVED (agent, 2026-11-21, delegated): (a), rung 3; the index already builds this unit first, so
   the post is written once over the id it keeps. widens: none · relaxes: none
+- **F3 — Where is S4's answer to unit 22's superseded wording recorded?** Unit 22 is CLOSED when this
+  unit builds. Options: (a) unit 22's acceptance ledger, a record of a closed unit written by a later
+  one; (b) this unit's own acceptance ledger, quoting the unit 22 spec text it supersedes.
+  Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED unit's records
+  are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. (a) rejected. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -195,6 +218,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · two re
   bare origin and the switch dropped from the fixture; AC5 withdrawn with S5; the edge from unit 5
   re-worded to the call that unit writes; spec 7's `--interface` and the two child builds re-cited; the two guarded
   driver legs named and the recall legs dropped with the guide; the arm's floor effect stated.
+- rev-4 · 2026-11-21 · S2 · S4 · §4 · AC5 · §7 · §8 F3 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief`: unit 22's arm, built one step before, named
+  as the one caller at this build, its six-argument calls widened to eight in the file already
+  touched; `symbols.json` shown not to move; by the main loop's addition to that brief, S4's answer
+  moved to this unit's own ledger, quoting unit 22's two passages, F3 resolved (b), AC5 observing it,
+  the ledger in Files touched with the `recall floor` legs its path trips. AC1 to AC4 read against
+  unit 22's rev-7 functions; no landed unit since base touched a cited symbol.
 
 ## 10. Reuse audit
 

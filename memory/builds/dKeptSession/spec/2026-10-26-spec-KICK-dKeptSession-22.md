@@ -1,6 +1,6 @@
 # KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 15 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 15 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0160@3e3e0128 whole
 
@@ -19,6 +19,8 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-22-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-22-1-spec-writer.md) | journal | — |
+| [2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief.md) | research | KICK-dKeptSession-31 KICK-dKeptSession-5 |
 | [2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-orders-14-16-reground-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-31 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -42,7 +44,9 @@ its hashing at the second instance.
   field followed by one NUL, then, when `--file` is given, that file's bytes followed by one NUL.
   The cut is the repository's id convention (PINNED, §4 Evidence).
   Zero fields with `--file` hash the file's bytes and their NUL alone, the form KICK-dKeptSession-27
-  S3's content key takes. rc 1 when the file cannot be read or git cannot hash. It is the second
+  S3's content key takes. rc 1 when the file cannot be read or git cannot hash: the file is tested
+  before the pipe, since the landed pipe answers rc 0 over a missing file, hashing the fields alone
+  (§4 Evidence). It is the second
   instance of `derive_problem_id` (`tools/unattended/unattended.sh#derive_problem_id`,
   TOOL-dPlacedRequest-12 S3), so the one derivation is extracted here: that function calls
   `derive_gov_id --file <body file> <session> <item> <subject>`, its output on every readable body
@@ -56,7 +60,8 @@ its hashing at the second instance.
   the build (I16, KICK-dKeptSession-5 S1), then one `GIT log --source --first-parent` across all of
   them, its format the source ref, a tab and the subject, matching a subject equal to
   `gov-mail <build>/<id>`, I17's header (KICK-dKeptSession-5 S4). rc 0 when no ref holds it, an empty
-  cache included; rc 1 printing `mail — duplicate <id> · <ref>` naming the first ref the log prints
+  cache included: with no ref listed the log is never run, since `git log` given no revision reads
+  HEAD and exits 128 in a repository with no commit. rc 1 printing `mail — duplicate <id> · <ref>` naming the first ref the log prints
   it under; rc 2 when the cache cannot be read. It reads the cache only; its caller fetches first.
   Observed by AC3, AC4, AC5.
 - **S4** — The act joins later: once dWellOiledMachine's Runtime mints acts, the act is a seventh
@@ -114,6 +119,15 @@ its hashing at the second instance.
   cl-0160 drops the session by the owner's FK-1-7.
 - No message id exists: `git grep -n -E "derive_message_id|check_mail_duplicate|derive_gov_id" --
   tools skills` finds nothing at this tree.
+- A probe sourcing the driver at this tree (2026-11-21) printed one id from `derive_problem_id s1
+  entry.claim push-main.sh body.txt` and from AC1's hand pipe; over a missing body file it printed
+  the fields-only hash with rc 0, so S1's rc 1 is new. `git log --source --first-parent` over no
+  revision exited 128 in a repository with no commit; `for-each-ref refs/gov/remote/mail/fx/` listed
+  `fx`'s session refs and none of `fxy`'s.
+- `derive_problem_id`'s one caller is `write_register`; the suite's register arms run the tracked
+  driver (`run_register_arm` in `tools/unattended/unattended.test.sh`), so no fixture copy of the
+  driver needs the new functions. `memory/map/generated/symbols.json` lists each of the driver's shell
+  functions, so the three minted here move it.
 
 ### The three red cases
 
@@ -135,6 +149,7 @@ its hashing at the second instance.
 
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
+- `memory/map/generated/symbols.json`: the three functions, regenerated by `gen_map.py --write`
 
 ### Alternatives rejected
 
@@ -168,8 +183,9 @@ The fixture for AC3 to AC5 is a scratch repository under `%TEMP%` whose cache re
 - **AC1** — When a probe sources `unattended.sh` and runs `derive_problem_id s1 entry.claim push-main.sh
   body.txt` and the landed derivation by hand, `printf 's1\0entry.claim\0push-main.sh\0' | cat -
   body.txt` with a trailing NUL piped to `git hash-object --stdin`, the two print the same 12 hex.
+  `derive_gov_id --file` over a missing file returns 1.
   Red when: the extraction changes a problem id, as a planted `derive_gov_id` that drops the file's
-  trailing NUL shows.
+  trailing NUL shows, or a missing file hashes the fields alone with rc 0, as the landed pipe does.
 - **AC2** — When `derive_message_id fx 'item.design.exit@1#0a1b2c3d' 1 question I16 none` runs twice,
   once under `CLAUDE_CODE_SESSION_ID=s1` and once under `s2`, both print one 12-hex id; changing any
   one of the six fields changes it.
@@ -182,12 +198,14 @@ The fixture for AC3 to AC5 is a scratch repository under `%TEMP%` whose cache re
   Red when: a check reading only the poster's own ref returns 0, as a planted copy shows.
 - **AC5** — When two `ack`s from one item and pass answer two planted messages, their two
   `derive_message_id` outputs differ, and `check_mail_duplicate` returns 0 for each before either is
-  planted and 0 for the second after the first is.
-  Red when: the second acknowledgement is refused as a duplicate of the first.
+  planted, in a fresh scratch repository holding no commit and no mail ref, and 0 for the second
+  after the first is.
+  Red when: the second acknowledgement is refused as a duplicate of the first, or the empty cache
+  returns 2, as a check running the log over no ref shows.
 
 ## 7. Gates
 
-`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `lexicon naming predicates` · `memory hygiene`
+`unattended kit gate` · `scratch-guard self-test` · `tier2-review self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · the problem id's bytes, the session excluded, a retry on the same and on another session's ref, and two acknowledgements, staged against the base driver, which has no message id · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
@@ -223,6 +241,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   `write_feed_success`; S4 names the units that move the act; the guide text left to unit 5; the two
   guarded driver legs named; the arm's floor effect stated. Nothing narrowed: no landed unit builds
   a message id.
+- rev-7 · 2026-11-21 · S1 · S3 · §4 · AC1 · AC5 · §7 · checked for behaviour under
+  `2026-11-21-prompt-KICK-dKeptSession-22-precheck-brief`: AC1's two derivations probed equal on the
+  sourced driver; S1's rc 1 shown new, the landed pipe answering 0 over a missing file, and AC1
+  observes it; S3's empty cache shown to need no log run, a log over no ref exiting 128, and AC5
+  observes it; `symbols.json`, which the three functions move, added with the `recall floor` legs
+  its path trips. No landed unit since base touched a cited symbol.
 
 ## 10. Reuse audit
 

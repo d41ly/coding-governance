@@ -1,6 +1,6 @@
 # KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 36 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 36 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-65-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-65-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-65-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-65-promoted-fix-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 |
 
 <!-- /gen:spec-records -->
 
@@ -34,8 +35,11 @@ report item it shares:
 Ids sharing a report item describe one defect, so each takes its own item and one edit closes the
 group. Every finding lands on unit 64, so this unit builds one step after it (order 36) and amends
 what that unit built. Where an item supersedes a text of unit 64, of unit 63 or of a sibling, it
-does so by name, and that unit's acceptance ledger answers the superseded text by this unit's id
-(AC13).
+does so by name, and this unit's own acceptance ledger,
+`memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-65-1-acceptance-ledger.md`,
+quotes that text as it stands at that unit's rev and answers it by this unit's id (AC13, F4). Every
+unit whose text or record an item answers builds before order 36 and is CLOSED when this unit
+builds, so neither its spec nor its ledger is written.
 
 ## 2. Scope (IN)
 
@@ -77,7 +81,8 @@ does so by name, and that unit's acceptance ledger answers the superseded text b
   `GOV_REMOTE=planted` returns an environment without `GOV_REMOTE`" and 63 §7's
   `tools/runlog/selftest.py` arm line are superseded by name, as unit 64 S10's subject. The clause
   reads as "a process started under `GOV_REMOTE=planted` reaches no case with `GOV_REMOTE` set".
-  Unit 64 AC17's list of superseded 63 texts gains both. Observed by AC13.
+  Both are answered in this unit's own ledger; unit 64 AC17's list, answered in unit 64's own ledger
+  at its pass, is not re-opened. Observed by AC13.
 - **S9** — id 3, M6. Unit 64 AC11's rise reads as derived from its diff range: the effective
   `FLOOR_ASSERTIONS` pin rises by the counted assertions of every case the diff adds, less those it
   takes out. That covers 63's whole `tools/unattended/unattended.test.sh` arm, unit 64's S1, S3 and
@@ -120,14 +125,16 @@ does so by name, and that unit's acceptance ledger answers the superseded text b
 - **S18** — id 7, L4. Every reference to another spec's item in the ask row and in unit 64 S18 and
   AC18 is spelled with its id in full, `TOOL-dPlacedRequest-13 S3` and `TOOL-dPlacedRequest-13 S4`,
   never a bare `S3` or `S4`, which in unit 64 name its own items. Observed by AC9.
-- **S19** — id 8, L5. Unit 64 S17's citations read as the `def` lines, with the call and glob lines
-  said as such: `scan_preflights` at `tools/runlog/extract.py:991` calls `_check_inside` at `:1004`;
-  `measure_tree` at `:1131` and `measure_ready_tree` at `:1204` glob without it, at `:1135` and
-  `:1209`. 63's ledger answer to its `_check_inside` sentence carries these. Observed by AC13.
+- **S19** — id 8, L5. Unit 64 S17's citations read as the definitions, each cited by symbol, with
+  the call and glob said as such: `scan_preflights` (`tools/runlog/extract.py#scan_preflights`) calls
+  `_check_inside` (`tools/runlog/extract.py#_check_inside`); `measure_tree`
+  (`tools/runlog/extract.py#measure_tree`) and `measure_ready_tree`
+  (`tools/runlog/extract.py#measure_ready_tree`) glob without it. This unit's ledger answers 63 §4's
+  `_check_inside` sentence and unit 64 S17 with these, quoting 63's "glob alone". Observed by AC13.
 - **S20** — id 13, L6. Unit 64 §3's left-shift bullet names an owner for each gate it defers. This
   unit's pass files one ask row per gate of §4's left-shift table in
-  `memory/builds/dKeptSession/BACKLOG.md`, each with a `SEV ·` row, and unit 64's ledger answers the
-  bullet with the minted ids. Observed by AC10.
+  `memory/builds/dKeptSession/BACKLOG.md`, each with a `SEV ·` row, and this unit's ledger answers
+  the bullet with the minted ids. Observed by AC10.
 - **S21** — id 14, L7. Unit 64 S16's reword of the prompt string at line 2078 is made in
   `tools/workflows/unattended-build.template.js` alone, then rendered into
   `tools/workflows/unattended-build.js` by the kit's `[[regenerate]]` argv
@@ -155,8 +162,8 @@ does so by name, and that unit's acceptance ledger answers the superseded text b
 
 ## 3. Non-goals (OUT)
 
-- Rewording unit 64 or a sibling spec: each superseded text is named here and answered in its
-  unit's ledger.
+- Rewording unit 64 or a sibling spec: each superseded text is named here and answered in this
+  unit's own ledger (F4).
 - Building any gate of §4's left-shift table: each is an ask S20 files, owned by that row.
 - A `soft` or `strict` argument on `--mail ack`: §8 F1.
 - A gate leg that runs `tools/unattended/unattended.test.sh`: the leg is withheld by the ruling
@@ -251,7 +258,8 @@ feed lines a later unit appends.
 - `tools/runlog/selftest.py`: S4, S5
 - `tools/lib/resolve-python.test.sh`: S25
 - `tools/workflows/unattended-build.template.js`, `tools/workflows/unattended-build.js`: S21
-- `memory/builds/dKeptSession/build/`: the ledger answers of S2, S7, S8, S17, S19 and S20
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-65-1-acceptance-ledger.md`:
+  the answers of S2, S7, S8, S17, S19 and S20, beside the criteria observed
 - `memory/builds/dKeptSession/spec/`: S26's leg lines, at reconcile
 - `memory/builds/dKeptSession/BACKLOG.md`, `memory/backlog/KICK.md`,
   `memory/builds/dKeptSession/README.md`: S20, S23
@@ -261,7 +269,7 @@ feed lines a later unit appends.
 ### Alternatives rejected
 
 - **Two batches.** The mail items and the rest both write `tools/unattended/unattended.test.sh`
-  (S1 and S9) and the ledgers under `memory/builds/dKeptSession/build/`, and S20 writes an authored
+  (S1 and S9) and this unit's own acceptance ledger, and S20 writes an authored
   backlog shard, so the two write sets are not disjoint by M6's clauses.
 - **Making unit 5 S7's precedence explicit and superseding it, for S1.** §8 F2.
 - **Keeping `add_feed_event` after the walk, for S13.** §8 F3.
@@ -343,8 +351,8 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   Red when: the row leaves the walk's order open, or a bare `S3` names the wrong unit's item.
 - **AC10** — When `grep -n "SEV · KICK-dKeptSession-"` runs over
   `memory/builds/dKeptSession/BACKLOG.md`, it prints one row for each of the nine gates of §4's
-  left-shift table beside the existing one, each id with its ask row, and unit 64's ledger answer to
-  its §3 left-shift bullet names those ids.
+  left-shift table beside the existing one, each id with its ask row, and this unit's ledger answer
+  to unit 64's §3 left-shift bullet names those ids.
   Red when: a gate of the table has no row.
 - **AC11** — When `git diff HEAD~1 -- tools/workflows/unattended-build.template.js` and the same diff
   of `tools/workflows/unattended-build.js` are read at this unit's pass commit, their changed lines
@@ -354,13 +362,17 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   `MARKER_LEAD='(# |// )'` over a scratch file holding a `// >>> s` ... `// <<< s` block followed by
   trailing lines, it prints the block and none of the trailing lines.
   Red when: the closer still reads `^# <<< `, so the block runs to the end of the file.
-- **AC13** — When `grep -n "KICK-dKeptSession-65"` runs over unit 64's acceptance ledger, it prints
-  an answer to each unit 64 text superseded here: S1, S3, S5, S7, S9, S10, S13, S14, S16, S17, S18,
-  §3's left-shift bullet, §4's Evidence, sketch, Files touched and S1 alternative, §7's leg line,
-  runlog arm and reconcile note, AC5, AC8,
-  AC9, AC10, AC11, AC17 and AC18; and over 63's ledger, answers to AC14's `build_arm_env` clause,
-  §7's runlog arm line and the `_check_inside` sentence carrying `:991`, `:1131` and `:1204`.
-  Red when: a superseded text has no answer.
+- **AC13** — When this unit's ledger is read, it holds an answer by this unit's id to each unit 64
+  text superseded here: S1, S3, S5, S7, S9, S10, S13, S14, S16, S17, S18, §3's left-shift bullet,
+  §4's Evidence, sketch, Files touched and S1 alternative, §7's leg line, runlog arm and reconcile
+  note, AC5, AC8, AC9, AC10, AC11, AC17 and AC18; and to unit 63's AC14 `build_arm_env` clause, its
+  §7 runlog arm line and its `_check_inside` sentence, cited by symbol as S19 states.
+  `tr -s ' \r\n' ' '` over it piped into `grep -c` prints `1` for each of "read, which is the id's",
+  "for subprocess runs only", "state from read_mailbox <slug> cache", "the spec-tokens checks and the
+  reconcile step", "returns an environment without" and "glob alone"; and `git diff --name-only
+  <pass base> HEAD -- memory/builds/dKeptSession/build/` lists no acceptance ledger but this unit's
+  own.
+  Red when: a superseded text has no answer, or an answer lands in a record of the unit it names.
 - **AC14** — When `python tools/memory-tree/gen_build_index.py --write` runs after this unit's pass
   commit, `git status --porcelain -- memory/backlog memory/builds/dKeptSession/README.md memory/builds/dPlacedRequest/README.md`
   prints nothing.
@@ -368,7 +380,7 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
 
 ## 7. Gates
 
-`build-index selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `tier2-review self-test` · `scratch-guard self-test` · `policy fixtures` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The reconcile adds `policy fixtures`, and `loop selftest` once dDeclaredLoop lands it, to the line
 above, by unit 64 S9 and S26 here.
@@ -397,10 +409,27 @@ New arm: tools/lib/resolve-python.test.sh · covers AC12 · a `// >>> s` block f
   works, since `add_feed_event` is keyed and appends nothing twice, but it leaves two appenders on
   one exit and an order a later edit can flip. (a) leaves one appender per input shape. RESOLVED
   (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
+- **F4 — Where are the answers to the texts of units 64, 63 and the siblings recorded?** Units 63
+  and 64 build before this unit, so each is CLOSED when this unit builds, and their ledgers are in
+  neither this unit's Files touched nor its write set. (a) Each named unit's acceptance ledger, a
+  record of a closed unit written by a later one; (b) this unit's own acceptance ledger, quoting each
+  text it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a
+  CLOSED unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled.
+  Rejected: (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, the round-5 minors batch's audit's minors batch.
+- rev-2 · 2026-11-21 · §1 · S8 · S19 · S20 · §3 · §4 · AC10 · AC13 · §7 · §8 · every answer the
+  items placed in units 64 and 63's ledgers moves to this unit's own acceptance ledger, which joins
+  Files touched, F4 resolved (b) and AC13 observing the quoted passages, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class KICK-dKeptSession-49 rev-6
+  first resolved. AC13 reads this unit's own ledger, since neither unit 63's spec nor unit 64's
+  writes this unit's id into its ledger. S19's line citations re-cited by symbol. §7's line gains
+  `scratch-guard self-test` and `policy fixtures`, which the spec-token checker's guards join named
+  at rev-1; the ledger's path trips the two `recall floor` legs, already on it.
 
 ## 10. Reuse audit
 

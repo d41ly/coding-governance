@@ -22245,7 +22245,6 @@ memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-a
 memory/builds/dKeptSession/reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md	tools/workflows/unattended-build.template.js:2078
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md	BUILD-METHOD M3
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	BUILD-METHOD M4
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	catalogue.toml:223
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/codebase-map/map_lib.py:149
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/format-guard.js:248
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md	tools/hooks/scratch-guard.js:1615
@@ -22319,7 +22318,6 @@ memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/ch
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/check-spec-tokens.py:1543-1579
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/check-spec-tokens.test.sh:199-207
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/lib/resolve-python.test.sh:213
-memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/runlog/extract.py:991
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/runlog/selftest.py:355-356
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/unattended/kit.toml:47-50
 memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md	tools/workflows/kit.toml:115-116

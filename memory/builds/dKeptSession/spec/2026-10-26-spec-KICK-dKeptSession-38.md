@@ -1,6 +1,6 @@
 # KICK-dKeptSession-38 — the card-fixture verdict passes only while the tested binary is both PATH's and the session's, and an unknown version is red
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-26 |
 | [2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-16-precheck-brief.md) | research | KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -56,8 +57,12 @@ as red. It repairs `KICK-dKeptSession-12` and builds one step after it (order 9)
   suite holds another one or none. Observed by AC1 to AC3 and AC5.
 - **S4** — id 58. `help/orientation-card.md`'s verdict paragraph (`KICK-dKeptSession-12` S7) says a
   pass holds only while the tested version is PATH's and the session's. `KICK-dKeptSession-12` S2's
-  one version comparison, `recorded under cli <old>, now <new>`, is superseded by name here and
-  answered in that unit's acceptance ledger. Observed by AC4.
+  one version comparison, `recorded under cli <old>, now <new>`, is superseded by name here.
+  Answered in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-38-1-acceptance-ledger.md`,
+  which quotes unit 12 S2's "and its version equals" clause and that reason, and states S1 and S2
+  supersede them. Unit 12 builds at order 8 and is CLOSED when this unit builds, so neither its spec
+  nor its ledger is written (F1). Observed by AC4 and AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -117,6 +122,8 @@ None: no verdict file exists before `KICK-dKeptSession-12`.
 - `skills/session-kickoff/card-store.fixture.sh`: S3's plants and the two re-pointed ones
 - `skills/session-kickoff/manifest-check.test.sh`: the arm in §7, `FLOOR_ASSERTIONS` raised by two
 - `help/orientation-card.md`: S4
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-38-1-acceptance-ledger.md`:
+  S4's answer beside the criteria observed
 
 ### Alternatives rejected
 
@@ -160,16 +167,29 @@ None: no verdict file exists before `KICK-dKeptSession-12`.
   fixture-stale` run from a shell whose PATH holds no `claude`, each exits 0 with every line `held`.
   Red when: either plant reads the node's own PATH, so it passes only where a `claude` happens to
   answer 9.9.2.
+- **AC6** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "and its
+  version equals"` prints `1`, and into `grep -c "recorded under cli <old>, now <new>"` prints `1`;
+  and `git diff --name-only <pass base> HEAD --` over unit 12's spec and its acceptance ledger prints
+  nothing.
+  Red when: S4's answer lands in a record of unit 12, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `policy fixtures` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC5 · the two plants over stub PATH binaries and planted `AI_AGENT` values, and the two re-pointed plants, staged red by a copy comparing with `read_session_cli_version` alone · `FLOOR_ASSERTIONS`, raised by one per new plant
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S4's answer to unit 12's superseded wording recorded?** Unit 12 builds at order
+  8, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 12's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 12 spec text
+  it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -188,6 +208,12 @@ none
   verdict keeps its reason and spawns nothing; `KICK-dKeptSession-12`'s `context-always-resume` and
   `fixture-stale`, which read PATH once this unit lands, given a stub `claude` and observed by the new
   AC5; the floor raised by the two new plants. No new function, so the symbol map does not move.
+- rev-5 · 2026-11-21 · S4 · §4 · AC6 · §7 · §8 · S4's answer to unit 12 moves to this unit's own
+  acceptance ledger, which joins Files touched, F1 resolved (b) and AC6 observing the quoted
+  passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
+  KICK-dKeptSession-49 rev-6 first resolved. The ledger's path trips the two `recall floor` legs,
+  already on §7's leg line; `policy fixtures`, whose guard holds
+  `skills/session-kickoff/manifest-check.sh`, joins it.
 
 ## 10. Reuse audit
 

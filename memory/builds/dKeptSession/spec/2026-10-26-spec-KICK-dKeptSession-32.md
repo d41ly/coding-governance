@@ -1,6 +1,6 @@
 # KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-orders-6-reground-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
 | [2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-20-precheck-brief.md) | research | KICK-dKeptSession-20 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -57,8 +58,12 @@ builds one step after it (order 6).
   --diff` (`KICK-dKeptSession-3` S1), each run in that repository as the reader cases run this kit's
   `policy.py`. Observed by AC1 and AC2.
 - **S4** — id 1. `KICK-dKeptSession-4` S2's "above dGroundRules' tables" is superseded by name here:
-  the tables hold only the rows S1 writes. Its AC3 is answered in that unit's acceptance ledger with
-  AC1's output. Observed by AC1.
+  the tables hold only the rows S1 writes. Its AC3, "the line after the target's header comment is
+  `preset = "strict"`", is answered with AC1's output. Both answers are in this unit's own
+  acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-32-1-acceptance-ledger.md`,
+  which quotes the two passages. Unit 4 is CLOSED, built at order 5 before this unit's order 6, so
+  neither its spec nor its ledger is written (F3). Observed by AC1 and AC6.
 - **S5** — id 1. The kit's own calls. `run_fresh_target` already names the preset answer at
   `KICK-dKeptSession-4` S4, so its count follows S1 with no edit here. The other four calls of
   `render_scaffold` in `tools/policy/check_policy.py`, in `run_arms_empty_target`, twice,
@@ -158,6 +163,8 @@ None. A policy file already scaffolded is the repository's own and is never rewr
 - `tools/policy/README.md`: the `scaffold` line, S6
 - `memory/map/generated/symbols.json`: `run_scaffold_preset`, regenerated as the commit hook's
   codebase-map leg requires; the kickoff manifest watches none of these paths
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-32-1-acceptance-ledger.md`:
+  S4's answers beside the criteria observed
 
 ### Alternatives rejected
 
@@ -206,6 +213,11 @@ The fixture is dGroundRules' `check_policy.py --fixture`, one scratch repository
   scaffold` entry's line saying a row the named preset assigns is written as a comment, a phrase no
   line of the README holds at c2a407b0.
   Red when: the kit's text still says the scaffold writes every literal-defaulted row.
+- **AC6** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "above
+  dGroundRules' tables"` prints `1`, and into `grep -c "the line after the target's header comment
+  is"` prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 4's spec and its
+  acceptance ledger prints nothing.
+  Red when: S4's answers land in a record of unit 4, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
@@ -231,6 +243,15 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 · the `scaffold-preset`
   `KICK-dKeptSession-56` S28's explicit preset at each call holds under either. RESOLVED (agent,
   2026-11-21, delegated): (a), rung 3, fewer open questions; no case but `scaffold-preset` reads a
   preset's scaffold. widens: none · relaxes: none
+- **F3 — Where are S4's answers to unit 4's superseded wording recorded?** Unit 4 builds at order 5,
+  one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither this
+  unit's Files touched nor its write set. (a) Unit 4's acceptance ledger, a record of a closed unit
+  written by a later one; (b) this unit's own acceptance ledger, quoting the unit 4 spec text it
+  supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -252,6 +273,11 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 · the `scaffold-preset`
   4 S4; AC4's grep runs at the repository root and reads each call rather than an empty match; S6
   and AC5 bring the kit README's `scaffold` line; the example's comment takes S1's spelling.
   Narrowed: nothing.
+- rev-5 · 2026-11-21 · S4 · §4 · AC6 · §8 · S4's answers to unit 4 move to this unit's own
+  acceptance ledger, which joins Files touched, F3 resolved (b) and AC6 observing the quoted
+  passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
+  KICK-dKeptSession-49 rev-6 first resolved. The ledger's path trips the two `recall floor` legs,
+  already on §7's leg line.
 
 ## 10. Reuse audit
 

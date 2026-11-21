@@ -1,6 +1,6 @@
 # KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 35 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 35 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-64-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-64-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-64-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-64-promoted-fix-brief.md) | research | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-65 |
 | [2026-10-26-review-KICK-dKeptSession-64-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -34,8 +35,11 @@ report item:
 Ids sharing a report item describe one defect, so each takes its own item and one edit closes the
 group. Every finding lands on unit 63, so this unit builds one step after it (order 35) and amends
 what that unit built. Where an item supersedes a text of unit 63 or of a sibling, it does so by
-name, and that unit's acceptance ledger answers the superseded text by this unit's id (AC2, AC4 and
-AC17).
+name, and this unit's own acceptance ledger,
+`memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-64-1-acceptance-ledger.md`,
+quotes that text as it stands at that unit's rev and answers it by this unit's id (AC2, AC4, AC17,
+F2). Every unit whose text or record an item answers builds before order 35 and is CLOSED when this
+unit builds, so neither its spec nor its ledger is written.
 
 ## 2. Scope (IN)
 
@@ -52,14 +56,15 @@ AC17).
   rc 1, refused) never reach an id S1 reads as acked. An rc 1 on an id not read as acked, any rc 2,
   or a failed addressed-to check refuses the batch with exit 2. Exit 1 stays a lost write, so
   `KICK-dKeptSession-42` AC4's `ack not posted` refusal reads it unchanged. The `--mail ack` line of
-  `tools/unattended/VERBS.template.md` and of its render states the skip and the three exits. The
-  ledgers of units 5 and 22 answer the two superseded texts. Observed by AC2.
+  `tools/unattended/VERBS.template.md` and of its render states the skip and the three exits. This
+  unit's ledger answers the two superseded texts, quoting unit 5 S5's "a duplicate or a lost write
+  exits 1" and unit 22's row "a post retried after a crash, same session". Observed by AC2.
 - **S3** — id 19, M1. A batch whose every id S1 skips exits 0 and writes nothing. A mixed batch
   lands only the ids not skipped, in one `write_mail_ref`, and exits as that write does. 63 AC15
   reads with the second call's exit asserted `0` and a mixed batch `<a> <c>`, `<a>` already acked,
   that lands only `<c>`'s ack. Observed by AC1 and AC3.
 - **S4** — id 1, M2. Every sibling text 63 §2 supersedes or says "reads as", and that 63 AC27
-  leaves out, is answered in its unit's acceptance ledger by this unit's pass. They are unit 59's §4
+  leaves out, is answered in this unit's own acceptance ledger at its pass. They are unit 59's §4
   literal-read sketch (63 S8 and S26); unit 61's AC3, its §4 Files touched with "`derive_mail_chain`
   and its caller", its §5 observability and user-docs lines and its §7 arm (63 S11 and S22, and S5
   here); and unit 62's S19 (63 S23), S31 (63 S24) and §5's "seven definitions" (63 S2). The unit 62
@@ -74,17 +79,19 @@ AC17).
   loop-selftest AC3 case and its §5 lines, each re-pointed or answered here ·
   by value: NO VALUE READERS — the verb's rows are read only by unit 61's AC3 case, which this item
   re-points.
-- **S6** — id 2, M4. 63 AC9 reads as S7's class. Each unit of the population 63 S9 derives, by
-  `python tools/check-spec-tokens.py --legs-for` over every unit's `### Files touched (estimate)`,
-  carries exactly one ledger line: the leg list, a `GAP —` line with the query's exit and output,
-  or a `NOT RUN —` line with the reason. No line names a leg the manifest at that pass lacks. Units
+- **S6** — id 2, M4. 63 AC9 reads as S7's class. 63's own ledger carries exactly one line for each
+  unit of the population 63 S9 derives, by `python tools/check-spec-tokens.py --legs-for` over every
+  unit's `### Files touched (estimate)`: the leg list, a `GAP —` line with the query's exit and
+  output, or a `NOT RUN —` line with the reason. No line names a leg the manifest at that pass lacks. Units
   58, 59, 60 and 61 are members of that population, never lines fixed in advance, and 63's ledger
   lists the population it derived. Observed by AC6.
 - **S7** — id 20, M4. 63 S17 reads as the class: a ledger line names a leg only when
   `tools/gate-legs.json` at that pass carries it, and otherwise opens
   `NOT RUN — <leg> not declared`, for `policy fixtures` and `loop selftest` alike and for any leg a
   later base declares.
-  This unit's pass writes or corrects the lines of units 58 to 61 by that rule. Observed by AC7.
+  This unit's own ledger carries the lines of units 58 to 61 by that rule; where a line 63 wrote
+  in its own ledger breaks the rule, this unit's ledger quotes it beside the corrected line, and
+  63's ledger is not rewritten. Observed by AC7.
 - **S8** — id 3, M5. 63 S13's sentence "This unit's pass re-checks the step on its own tree" is
   withdrawn, because on a tree whose manifest lacks the leg that check cannot fail. The step's
   liveness is this unit's probe over a scratch repository whose manifest declares the leg. The step
@@ -146,7 +153,7 @@ AC17).
 - **S17** — id 8, L3. 63 §4 Evidence's `_check_inside` sentence reads as: `_check_inside` (defined
   at `tools/runlog/extract.py:176`) guards `scan_preflights` (`:1004`) among others (`:252`, `:258`,
   `:278`, `:961`), while `measure_tree` (`:1135`) and `measure_ready_tree` (`:1209`) glob without
-  it. 63's ledger answers the sentence. Observed by AC17.
+  it. This unit's ledger answers the sentence, quoting its "glob alone". Observed by AC17.
 - **S18** — id 9, L4. The walk of S13's row is TOOL-dPlacedRequest-13 S4's `add_feed_sightings`,
   never a second walk: after S3 sets the cache ref `refs/gov/remote/<tail>`, `write_gov_ref`'s
   success exit calls that walk over the one ref, either by the existing function or by S4's walk
@@ -167,7 +174,8 @@ AC17).
 
 ## 3. Non-goals (OUT)
 
-- Rewording sibling specs: each superseded text is named here and answered in its unit's ledger.
+- Rewording sibling specs: each superseded text is named here and answered in this unit's own
+  ledger (F2).
 - The report's left-shift gates: the ledger lint, the spec-tokens checks and the reconcile step in
   the lander are each a separate gate, so a separate unit by M2, and no clause of this build names
   the bug-class checklist.
@@ -181,9 +189,9 @@ AC17).
 - **consumes-from** `KICK-dKeptSession-63` — the batched `--mail ack`, the `cache` and `sent` read, S9's population, S13's and S17's rules, S14's scrub, S24's reword, S25's marker lead and §8 F1's ask row, which every item here amends (all 20 ids)
 - **consumes-from** `KICK-dKeptSession-5` — S5's exit contract, S7's `acked` state and S8's `--mail ack` and its addressed-to check, which S1 to S3 order and narrow for a skip (ids 4, 15, 19)
 - **consumes-from** `KICK-dKeptSession-22` — the retry row of its red-case table and `check_mail_duplicate`'s rc 1, which S2 supersedes for `--mail ack` (id 15)
-- **consumes-from** `KICK-dKeptSession-59` — §4's literal-read sketch, whose ledger answer S4 reads (id 1)
+- **consumes-from** `KICK-dKeptSession-59` — §4's literal-read sketch, which S4 answers in this unit's ledger (id 1)
 - **consumes-from** `KICK-dKeptSession-61` — AC3, §4 Files touched, §5, §7's arm and the loop-selftest case, which S4 reads and S5 re-points to `--mail read <parent> --cached --sent` (ids 1, 12)
-- **consumes-from** `KICK-dKeptSession-62` — S19, S31, §5's "seven definitions" and S15 and §4's ack-chain sketch, whose ledger answers S4 reads (id 1)
+- **consumes-from** `KICK-dKeptSession-62` — S19, S31, §5's "seven definitions" and S15 and §4's ack-chain sketch, which S4 answers in this unit's ledger (id 1)
 - **consumes-from** external — TOOL-dPlacedRequest-13 S3's success exit and S4's `add_feed_sightings`, and TOOL-dPlacedRequest-11 S1's input shapes, which the amended ask row names (S13, S18)
 - **hands-off** external — the amended ask row in `memory/builds/dPlacedRequest/BACKLOG.md`, for dPlacedRequest to build (S13, S18)
 - **hands-off** `KICK-dKeptSession-65` — the batched `--mail ack`'s skip and order, S5's retirement, S7's and S9's reconcile rules, S10's scrub, S13's and S18's ask row, S14's marker lead, S16's reword, S17's citations, §3's left-shift bullet, §4's Evidence and sketch and AC5, AC8 to AC11, AC17 and AC18, which the batch amends (all 26 ids of the round-5 minors batch's audit)
@@ -245,14 +253,15 @@ feed lines a later unit appends.
 - `tools/workflows/unattended-build.js`, `tools/workflows/unattended-build.template.js`,
   `tools/workflows/unattended-build.test.sh`: S16
 - `memory/map/generated/symbols.json`: S20
-- `memory/builds/dKeptSession/build/`: the ledger lines of S2, S4, S6, S7 and S17
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-64-1-acceptance-ledger.md`:
+  the answers and lines of S2, S4, S7 and S17, beside the criteria observed
 - `memory/builds/dKeptSession/spec/`: S9's leg lines, at reconcile
 - `memory/builds/dPlacedRequest/BACKLOG.md`: S13's and S18's ask row
 
 ### Alternatives rejected
 
 - **Two batches.** The mail half and the rest both write `tools/unattended/unattended.sh` (S1 and
-  S15) and the ledgers under `memory/builds/dKeptSession/build/` (S2 and S6), so the two write sets
+  S15) and this unit's own acceptance ledger (S2 and S7), so the two write sets
   are not disjoint by M6's clauses.
 - **An rc 1 from `check_mail_duplicate` read as the skip, for S1.** That reads any equal-fields
   collision as acked; the `acked` state of unit 5 S7 is the one predicate that says an ack exists.
@@ -286,8 +295,9 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   stderr, the second call prints `mail — already acked <a>`, prints no `DUPCHECK <a>`, exits `0`,
   and leaves the session ref's tip, read by `git rev-parse`, where the first call put it.
   Red when: the duplicate check runs first and the second call exits 2 with `mail — duplicate`.
-- **AC2** — When `grep -n "KICK-dKeptSession-64"` runs over the acceptance ledgers of units 5 and
-  22, it prints the answers to unit 5's S5 duplicate exit and unit 22's retry row, and
+- **AC2** — When this unit's ledger is read, it answers unit 5's S5 duplicate exit and unit 22's
+  retry row by this unit's id, and `tr -s ' \r\n' ' '` over it piped into `grep -c` prints `1` for
+  each of "a duplicate or a lost write exits 1" and "a post retried after a crash, same session"; and
   `grep -n "already acked" tools/unattended/VERBS.template.md` prints the `--mail ack` line stating
   exit 0 for a skip, 1 for a lost write and 2 for a refusal.
   Red when: either superseded text has no answer, or the line names the skip without its exit.
@@ -296,9 +306,10 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   `1`; and
   `--mail ack <slug> <a> <a>` exits `0` with the tip unchanged.
   Red when: the mixed batch exits 2, lands nothing, or lands a second ack of `<a>`.
-- **AC4** — When `grep -n "KICK-dKeptSession-64"` runs over the acceptance ledgers of units 59, 61
-  and 62, it prints an answer to each text S4 names, and every answer to the unit 62 sketch spells
-  "S15 and §4's ack-chain sketch".
+- **AC4** — When this unit's ledger is read, it holds an answer by this unit's id to each text S4
+  names, of units 59, 61 and 62, and every answer to the unit 62 sketch spells "S15 and §4's
+  ack-chain sketch"; `tr -s ' \r\n' ' '` over it piped into `grep -c "and its docstring says so"`
+  prints `1`, unit 62 S19 quoted.
   Red when: one listed text has no answer, so unit 61's AC3 stays in force.
 - **AC5** — When `grep -c -e read_mail_chain -e "--mail chain"` runs over
   `tools/unattended/unattended.sh`, `tools/unattended/VERBS.template.md` and
@@ -306,12 +317,14 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   `grep -n -- "--cached --sent" selftest.py`, run in the loop kit's directory, prints unit 61's AC3 case.
   Red when: the verb still prints rows, or unit 61's case still calls it.
 - **AC6** — When a probe re-derives 63 S9's population with `check-spec-tokens.py --legs-for` over
-  every unit's Files touched and reads the ledger, each unit in it carries exactly one line opening
-  with a leg list, `GAP —` or `NOT RUN —`, and 63's ledger lists the population.
+  every unit's Files touched and reads 63's own ledger, which 63 S9 writes at order 34, each unit in
+  it carries exactly one line opening with a leg list, `GAP —` or `NOT RUN —`, and that ledger lists
+  the population.
   Red when: a unit of the population has no line, or has two.
   figure: DERIVED, the population re-derived by the query at the pass.
-- **AC7** — When a probe reads every leg named on a leg-list line S7 wrote and compares it with the
-  `name` values `python -c` reads from that pass's `tools/gate-legs.json`, every one is declared;
+- **AC7** — When a probe reads every leg named on a leg-list line S7 wrote in this unit's ledger and
+  compares it with the `name` values `python -c` reads from that pass's `tools/gate-legs.json`,
+  every one is declared;
   where the manifest declares neither leg, the lines owing them open
   `NOT RUN — policy fixtures not declared` and `NOT RUN — loop selftest not declared`.
   Red when: a line names `policy fixtures` while the manifest lacks it.
@@ -363,17 +376,21 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   runs, it prints nothing, and `grep -c 'candidates for one parallel group'` prints `1` over each of
   `tools/workflows/unattended-build.js` and `tools/workflows/unattended-build.template.js`.
   Red when: the shipped workflow prompt still says a shared order is one parallel group.
-- **AC17** — When `grep -n "KICK-dKeptSession-64"` runs over 63's acceptance ledger, it prints the
-  answers to each 63 text superseded here: S7, S11, S13, S14, S15, S17, S24, S25, AC9, AC13, AC15,
-  AC24, §4 Evidence's `_check_inside` sentence, §4 Files touched, §7's first arm line and §8 F1.
-  Red when: a superseded text has no answer.
+- **AC17** — When this unit's ledger is read, it holds an answer by this unit's id to each 63 text
+  superseded here: S7, S11, S13, S14, S15, S17, S24, S25, AC9, AC13, AC15, AC24, §4 Evidence's
+  `_check_inside` sentence, §4 Files touched, §7's first arm line and §8 F1. `tr -s ' \r\n' ' '`
+  over it piped into `grep -c` prints `1` for each of "This unit's pass re-checks the step on its own
+  tree", "a selftest leg runs when" and "glob alone"; and `git diff --name-only <pass base> HEAD --
+  memory/builds/dKeptSession/build/` lists no acceptance ledger but this unit's own.
+  Red when: a superseded text has no answer, or an answer lands in a record of the unit it names.
 - **AC18** — When `grep -n` reads the same ask row, it names `add_feed_sightings` and
   TOOL-dPlacedRequest-13 S4 as the walk S3 calls, and `grep -c "first-parent commit between"` over
   the row prints `0`.
   Red when: the row asks for a second walk in `write_gov_ref`.
-- **AC19** — When 63's ledger answer to its AC13 is read, it names the
-  `spec tokens (a spec's own names resolve)` leg's `guards` hits as the criterion and carries no `--legs-for` population, and
-  AC8's probe reads the join's output, never `print_legs_for`'s.
+- **AC19** — When this unit's ledger answer to 63's AC13, whose `--legs-for` population S19
+  withdraws, is read, it names the `spec tokens (a spec's own names resolve)` leg's `guards` hits as
+  the criterion and carries no `--legs-for` population, and AC8's probe reads the join's output,
+  never `print_legs_for`'s.
   Red when: the reconcile's re-check still takes its population from `--legs-for`.
 - **AC20** — When `python tools/codebase-map/gen_map.py --check` runs at this unit's pass it exits
   `0`, and `grep -c '"derive_kit_imports"' memory/map/generated/symbols.json` prints `1`.
@@ -381,7 +398,7 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
 
 ## 7. Gates
 
-`build-index selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `tier2-review self-test` · `scratch-guard self-test` · `policy fixtures` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `pre-push run-log line` · `run-gates run-log line` · `runlog selftest` · `recall floor` · `recall floor arms` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The loop kit's `loop selftest` leg runs its cases once dDeclaredLoop has landed it; S9 adds the name
 to the line above at that reconcile.
@@ -401,12 +418,31 @@ New arm: tools/lib/resolve-python.test.sh · covers AC14 · a `// >>>` block cou
   meaning for a deletion or a create. (d) reuses the one walk, keeps S3's deletion branch, and
   meets AC13, AC18 and 63's AC16 through the same ask row. RESOLVED (agent, 2026-10-26, delegated):
   (d), rung 3. widens: none · relaxes: none
+- **F2 — Where are the answers to the texts of unit 63 and the siblings recorded?** Units 5, 22, 59,
+  61, 62 and 63 build before this unit, so each is CLOSED when this unit builds, and their ledgers
+  are in neither this unit's Files touched nor its write set. (a) Each named unit's acceptance
+  ledger, a record of a closed unit written by a later one; (b) this unit's own acceptance ledger,
+  quoting each text it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b),
+  rung 3; a CLOSED unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6
+  ruled. Rejected: (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, the round-4 minors batch's audit's minors batch.
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored, the other ends of
   the edges the round-5 minors batch's audit's disposal declared
+- rev-3 · 2026-11-21 · §1 · S2 · S4 · S6 · S7 · S17 · §3 · §4 · AC2 · AC4 · AC6 · AC7 · AC17 ·
+  AC19 · §7 · §8 · every answer and line the items placed in units 5, 22, 59, 61, 62 and 63's
+  ledgers moves to this unit's own acceptance ledger, which joins Files touched, F2 resolved (b) and
+  AC2, AC4 and AC17 observing the quoted passages, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class KICK-dKeptSession-49 rev-6
+  first resolved. AC2, AC4 and AC17 read this unit's own ledger, since no named unit's spec writes
+  this unit's id into its ledger; AC19 reads this unit's answer to 63's AC13, which 63's spec does
+  not write; AC6 still reads 63's own ledger, whose lines 63 rev-4 S9 writes at order 34. §7's line
+  gains `scratch-guard self-test` and `policy fixtures`, which the spec-token checker's guards join
+  named at rev-2; the ledger's path trips the two `recall floor` legs, already on it.
 
 ## 10. Reuse audit
 

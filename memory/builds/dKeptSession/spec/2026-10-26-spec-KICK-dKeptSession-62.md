@@ -1,6 +1,6 @@
 # KICK-dKeptSession-62 — the round-2 promotions' audit's 32 minor findings, closed after every unit they land on is built
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 33 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 33 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-57-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-57-promoted-fix-brief.md) | research | KICK-dKeptSession-57 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-review-KICK-dKeptSession-57-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-57-spec-audit.md) | spec-audit | KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-57 |
 
 <!-- /gen:spec-records -->
@@ -35,16 +36,19 @@ Three minors are a sibling's defect at another grade: id 33 is H3's at MEDIUM
 (`KICK-dKeptSession-59`, whose case its item widens), id 36 is id 6's at LOW, and id 8 is id 38's at
 LOW. The minors land on eleven units, so this unit is one write set and takes the order past every
 unit of the build (order 33): each item amends code its unit has built. Where an item supersedes a
-sibling spec's text, it does so by name, and that unit's acceptance ledger answers the superseded
-text.
+sibling spec's text, it does so by name, and this unit's own acceptance ledger,
+`memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-62-1-acceptance-ledger.md`,
+quotes that text as it stands at that unit's rev and answers it (F3). Every unit whose text or
+record an item answers builds before order 33 and is CLOSED when this unit builds, so neither its
+spec nor its ledger is written.
 
 ## 2. Scope (IN)
 
 - **S1** — id 2, M1. Units 49, 50 and 54 add `check_policy.py` arms and units 52, 53 and 55 add loop
   selftest arms, and `KICK-dKeptSession-56` S25 and S27's lists omit all six. Those lists gain them by
-  name, and at this unit's pass each of the six units' ledgers gains one OBSERVED line by
-  `KICK-dKeptSession-57` S3's rule, naming `policy fixtures` (49, 50, 54) or `loop selftest` (52,
-  53, 55) as the leg that runs its arm at the close. Observed by AC1.
+  name, and at this unit's pass this unit's own ledger gains one OBSERVED line for each of the six
+  units by `KICK-dKeptSession-57` S3's rule, naming `policy fixtures` (49, 50, 54) or `loop selftest`
+  (52, 53, 55) as the leg that runs its arm at the close. Observed by AC1.
 - **S2** — id 3, M2. `KICK-dKeptSession-56` AC15's `grep -c 'claude --version'` is superseded by the
   invocation's count, as `KICK-dKeptSession-37` AC1 pins it: `grep -c 'claude --version </dev/null'
   manifest-check.sh` prints `1`, inside `read_claude_version`. Observed by AC2.
@@ -140,7 +144,8 @@ text.
   `grep -c '".claude"'` keeps its base figure beside it, `1` at line 198. Observed by AC25.
 - **S29** — id 16, L2. `KICK-dKeptSession-45` §4 Evidence's second bullet reads: the literal ignores
   `CLAUDE_CONFIG_DIR`, the decoy it misses, while `build_arm_env` also decoys `HOME` and `USERPROFILE`.
-  NOT OBSERVED: an evidence sentence with no behaviour; unit 45's ledger answers it by this name.
+  NOT OBSERVED: an evidence sentence with no behaviour; this unit's ledger answers it by this name,
+  quoting the bullet's "what the literal misses is". Observed by AC1.
 - **S30** — id 39, L2. `KICK-dKeptSession-45` AC1's probe aims every `DECOY_VARS` member but
   `CLAUDE_CONFIG_DIR` at the empty directory, `HOME` and `USERPROFILE` among them. Observed by AC26.
 - **S31** — id 30, L3. `render_order`'s docstring in `tools/memory-tree/gen_build_index.py` reads:
@@ -154,7 +159,8 @@ text.
 ## 3. Non-goals (OUT)
 
 - The fixes of ids 1, 9, 10, 23 and 31: units 57 to 61.
-- Rewording sibling specs: each superseded text is named here and answered in its unit's ledger.
+- Rewording sibling specs: each superseded text is named here and answered in this unit's own
+  ledger (F3).
 - The report's left-shift checklist entries and hygiene arms: no clause of this build names the
   bug-class checklist, and each arm is a separate gate, so a separate unit by M2. Where an item's
   criterion is the class arm, it says so (S20, S26).
@@ -178,7 +184,7 @@ text.
 - **consumes-from** `KICK-dKeptSession-59` — the `mirror-input-parity` case, which S24 widens to the whole list (id 33)
 - **hands-off** external — the two template texts of S31, `memory/TEMPLATE-SPEC.md:84` and `tools/memory-tree/SPEC-TEMPLATE.template.md:84`, governance carriers BUILD-METHOD M3's veto 2 reserves to the owner (§8 F1)
 - **hands-off** `KICK-dKeptSession-63` — S1, S15, S19, S20, S22, S24, S26, S31, AC20, AC25 and §7's leg line, which the batch's S1 to S5, S8, S9, S12 to S18, S21 and S23 to S26 amend (ids 4, 10, 24, 2, 20, 11, 13, 15, 18, 21, 25, 26, 27, 5, 9, 22, 23, 30, 31)
-- **hands-off** `KICK-dKeptSession-64` — S19, S31, §5's "seven definitions" and S15 and §4's ack-chain sketch, whose ledger answers the batch's S4 reads (id 1)
+- **hands-off** `KICK-dKeptSession-64` — S19, S31, §5's "seven definitions" and S15 and §4's ack-chain sketch, which the batch's S4 answers in its own ledger (id 1)
 
 ## 4. Design
 
@@ -249,11 +255,12 @@ ref update.
   `tools/memory-tree/gen_build_index.py`
 - `tools/loop/loop_transition.py`, `tools/loop/selftest.py`
 - `tools/policy/policy-mirror.js`, `tools/policy/check_policy.py`
-- `memory/builds/dKeptSession/build/`: the ledger lines of S1 and S26
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-62-1-acceptance-ledger.md`:
+  S1's and S26's lines and every answer §1 names, beside the criteria observed
 
 ### Alternatives rejected
 
-- **Two batches.** S1 and S26 write ledgers of units in both the policy and the runlog sets, and S20
+- **Two batches.** S1 and S26 record lines for units in both the policy and the runlog sets, and S20
   and S22 share `resolve-python.test.sh`'s `PARITY_ROWS` with S16 and S17's `gen_build_index.py`, so
   no two write sets are disjoint by M6's clauses.
 - **One ack message whose `answers` lists every id, for S15.** It changes unit 5's record grammar,
@@ -278,9 +285,14 @@ ref update.
 
 Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`.
 
-- **AC1** — When the ledgers of units 49, 50 and 54 are read at this unit's pass, each names `policy
-  fixtures`, and those of units 52, 53 and 55 each name `loop selftest`.
-  Red when: an arm's unit records no leg that runs it.
+- **AC1** — When this unit's ledger is read at its pass, its lines for units 49, 50 and 54 each name
+  `policy fixtures`, and those for units 52, 53 and 55 each name `loop selftest`; `tr -s ' \r\n' ' '`
+  over it piped into `grep -c` prints `1` for each of "what the literal misses is", the unit 45
+  bullet S29 answers, and "the read is spelled twice, as at base", the unit 56 AC15 Red-when S3
+  rewrites; and `git diff --name-only <pass base> HEAD -- memory/builds/dKeptSession/build/` lists no
+  acceptance ledger but this unit's own.
+  Red when: an arm's unit has no line naming a leg that runs it, a line or answer lands in a record
+  of the unit it names, or a quoted passage is left out.
 - **AC2** — When `grep -c 'claude --version </dev/null' manifest-check.sh` runs in
   `skills/session-kickoff/`, it prints `1`, on a line inside `read_claude_version`'s range.
   Red when: a second invocation is written.
@@ -378,7 +390,7 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
 
 ## 7. Gates
 
-`build-index selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-hygiene self-test` · `spec-tokens self-test` · `tier2-review self-test` · `unattended kit gate` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `runlog selftest` · `format-guard self-test` · `pre-push run-log line` · `run-gates run-log line` · `scratch-guard self-test` · `agent-cap self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `memory-hygiene self-test` · `spec-tokens self-test` · `tier2-review self-test` · `unattended kit gate` · `policy fixtures` · `routed-commits selftest` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The policy kit's `policy fixtures` leg runs its cases once dGroundRules has landed it, and the loop
 kit's `loop selftest` leg its cases once dDeclaredLoop has landed it; the arm lines below declare
@@ -406,6 +418,15 @@ New arm: tools/policy/check_policy.py · covers AC21 AC22 · the four scaffold c
   record grammar that its state rule and id derivation read. (a) meets AC13 and keeps every record
   as unit 5 writes it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes:
   none
+- **F3 — Where are S1's lines and the answers to the sibling texts recorded?** Every unit whose text
+  or record an item answers builds before order 33, so each is CLOSED when this unit builds, and
+  their ledgers are in neither this unit's Files touched nor its write set. (a) Each named unit's
+  acceptance ledger, a record of a closed unit written by a later one; (b) this unit's own
+  acceptance ledger, one line per unit S1 names and each sibling text quoted. Recommendation (b).
+  RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED unit's records are never written by
+  a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected: (a), writing the other unit's ledger.
+  The main loop's ruling, in `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -414,6 +435,13 @@ New arm: tools/policy/check_policy.py · covers AC21 AC22 · the four scaffold c
   the edges the round-3 promotions' audit's disposal declared
 - rev-3 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-64` mirrored, the other ends of
   the edges the round-4 minors batch's audit's disposal declared
+- rev-4 · 2026-11-21 · §1 · S1 · S29 · §3 · §4 · AC1 · §7 · §8 · S1's six lines and S29's answer
+  move from units 49, 50, 52 to 55 and 45's ledgers to this unit's own acceptance ledger, which joins
+  Files touched, F3 resolved (b) and AC1 observing the lines and two quoted passages, under the brief
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class KICK-dKeptSession-49 rev-6
+  first resolved. The Edges bullet to `KICK-dKeptSession-64` says its S4 answers in its own ledger.
+  §7's line gains `policy fixtures` and `routed-commits selftest`, which the spec-token checker's
+  guards join named at rev-3; the ledger's path trips the two `recall floor` legs, already on it.
 
 ## 10. Reuse audit
 

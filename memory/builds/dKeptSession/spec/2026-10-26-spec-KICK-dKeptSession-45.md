@@ -1,6 +1,6 @@
 # KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-28-precheck-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-45-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-45-orders-14-reground-brief.md) | research | KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-56 |
@@ -52,8 +53,12 @@ it (order 14).
   `no root: <the error's text>`, the same direction as unit 30 S1's `no observation`. Observed by AC3.
 - **S3** — id 28. The sibling text superseded by name. `KICK-dKeptSession-30` S1's "`root` defaults
   to the harness's projects root, `~/.claude/projects`" and S2's "the default root" read as S1 here,
-  and unit 30's Reuse audit gains `resolve_projects_root` as a reused seam. Each is answered in unit
-  30's acceptance ledger. Observed by AC2.
+  and `resolve_projects_root` is a reused seam unit 30's Reuse audit does not name. Each is answered
+  in this unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md`,
+  which quotes S1's "defaults to the harness's projects root" and S2's "under the default root" and
+  names the seam. Unit 30 builds at order 13 and is CLOSED when this unit builds, so neither its spec
+  nor its ledger is written (F1). Observed by AC2 and AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -119,6 +124,8 @@ None: no stored state holds a window.
   `ASSERTION_FLOOR` raise with its `RAISED` comment
 - `memory/map/generated/symbols.json`: the case's `test_` function, regenerated by `gen_map.py
   --write`, which the bar's codebase-map leg grades
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-45-1-acceptance-ledger.md`:
+  S3's answers beside the criteria observed
 
 ### Alternatives rejected
 
@@ -157,6 +164,11 @@ beneath `%TEMP%`. Every probe runs with `CLAUDE_CODE_MAX_CONTEXT_TOKENS` removed
 - **AC3** — When the AC1 probe runs with `CLAUDE_CONFIG_DIR`, `HOME` and `USERPROFILE` all removed
   from its environment, it prints `(200000, 'no root: ...')` and exits 0.
   Red when: the derivation raises, so a fill read with no profile fails its caller.
+- **AC4** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -c "defaults to
+  the harness's projects root"` prints `1`, and into `grep -c "under the default root"` prints `1`;
+  and `git diff --name-only <pass base> HEAD --` over unit 30's spec and its acceptance ledger prints
+  nothing.
+  Red when: S3's answers land in a record of unit 30, or this unit's ledger quotes neither passage.
 
 ## 7. Gates
 
@@ -166,7 +178,15 @@ New arm: tools/runlog/selftest.py · covers AC1 AC3 · the scenario under a scra
 
 ## 8. Open questions
 
-none
+- **F1 — Where is S3's answer to unit 30's superseded wording recorded?** Unit 30 builds at order
+  13, one step before this unit, so it is CLOSED when this unit builds, and its ledger is in neither
+  this unit's Files touched nor its write set. (a) Unit 30's acceptance ledger, a record of a closed
+  unit written by a later one; (b) this unit's own acceptance ledger, quoting the unit 30 spec text
+  it supersedes. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung 3; a CLOSED
+  unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled. Rejected:
+  (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -186,6 +206,12 @@ none
   default's one caller before unit 46 and the policy fixture's import of `extract` shown unbroken;
   the resolver probed with no home set, raising as AC3 needs; the floor raise and `symbols.json`, with
   the `recall floor` legs its path trips, added. No landed unit since base touched a cited symbol.
+- rev-5 · 2026-11-21 · S3 · §4 · AC4 · §8 · S3's answers to unit 30 move to this unit's own
+  acceptance ledger, which joins Files touched, F1 resolved (b) and AC4 observing the quoted
+  passages, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
+  KICK-dKeptSession-49 rev-6 first resolved. Unit 30's Reuse audit is no longer said to gain the
+  seam, since that spec is not written. The ledger's path trips the two `recall floor` legs, already
+  on §7's leg line.
 
 ## 10. Reuse audit
 

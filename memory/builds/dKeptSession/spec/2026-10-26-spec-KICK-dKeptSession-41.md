@@ -1,6 +1,6 @@
 # KICK-dKeptSession-41 — the three catalogue rows that already stand given their summary and usage, one row per name, never a second minted beside them
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 29 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 29 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md) | research | KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
+| [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
@@ -57,8 +58,14 @@ build (order 29).
   lists none of the three. Observed by AC2.
 - **S4** — id 45. The three units' criteria, read as observations. `KICK-dKeptSession-8` S1 and AC8,
   `KICK-dKeptSession-11` S1 and AC6, and `KICK-dKeptSession-17` S1 and AC7 each observe the standing
-  row's owner and default, true at base; each unit's acceptance ledger answers its criterion with that
-  output and names this unit for the row's text. Observed by AC1.
+  row's owner and default, true at base, and each unit answers its own criterion in its own ledger at
+  its own build. This unit's own acceptance ledger,
+  `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-41-1-acceptance-ledger.md`,
+  records AC1's output against `KICK-dKeptSession-8 AC8`, `KICK-dKeptSession-11 AC6` and
+  `KICK-dKeptSession-17 AC7`, each named so, and quotes each unit's S1 sentence handing the row's text
+  here, the one ending "are KICK-dKeptSession-41's". Units 8, 11 and 17 build at orders 25 to 27 and
+  are CLOSED when this unit builds, so neither their specs nor their ledgers are written (F2).
+  Observed by AC1 and AC5.
 - **S5** — id 40, as `KICK-dKeptSession-56` S29 disposes it. The mirror. `.governance/policy.json`
   records the catalogue's blob id in `catalogue_blob` (`tools/policy/policy.py#render_mirror`), so S1
   moves it; `python tools/policy/policy.py mirror --write` renders it in this unit's commit (§8 F1).
@@ -119,6 +126,8 @@ None: summaries are prose fields no reader compares.
 - `.governance/policy.json`: S5, rendered
 - `help/reference/policy.md`: S6, rendered
 - `memory/project/docs-undocumented.txt`: S6, the rows of the members the page now anchors
+- `memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-41-1-acceptance-ledger.md`:
+  S4's answers beside the criteria observed
 
 ### Alternatives rejected
 
@@ -158,6 +167,13 @@ None: summaries are prose fields no reader compares.
   prints `0`.
   Red when: the page still lists a key as unsummarised, or a row stays for a member the page anchors.
   figure: both counts PINNED at writing, from the page and list at `c2a407b0`.
+- **AC5** — `tr -s ' \r\n' ' '` over this unit's acceptance ledger piped into `grep -o "are
+  KICK-dKeptSession-41's" | wc -l` prints `3`, one per quoted S1 sentence, and into `grep -c` for
+  each of `KICK-dKeptSession-8 AC8`, `KICK-dKeptSession-11 AC6` and `KICK-dKeptSession-17 AC7` prints
+  `1`; and `git diff --name-only <pass base> HEAD --` over the specs and acceptance ledgers of units
+  8, 11 and 17 prints nothing.
+  Red when: S4's answers land in a record of units 8, 11 or 17, or this unit's ledger leaves a
+  criterion or its S1 sentence out.
 
 ## 7. Gates
 
@@ -173,6 +189,15 @@ reference page that differs from its render, and `docs` a list row whose member 
   carrying a stale mirror until it lands. RESOLVED (agent, 2026-11-21, delegated): (a), rung 3;
   `KICK-dKeptSession-56` S29 disposes the mirror as this unit's write, and a fresh mirror on the
   branch lets AC3 observe it without a landing. widens: none · relaxes: none
+- **F2 — Where is S4's answer to the three units' criteria recorded?** Units 8, 11 and 17 build at
+  orders 25 to 27, before this unit, so each is CLOSED when this unit builds, and their ledgers are
+  in neither this unit's Files touched nor its write set. (a) Each unit's acceptance ledger, a record
+  of a closed unit written by a later one; (b) this unit's own acceptance ledger, quoting the three
+  units' spec text it answers. Recommendation (b). RESOLVED (agent, 2026-11-21, delegated): (b), rung
+  3; a CLOSED unit's records are never written by a later unit, as KICK-dKeptSession-49 rev-6 ruled.
+  Rejected: (a), writing the other unit's ledger. The main loop's ruling, in
+  `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -186,6 +211,11 @@ reference page that differs from its render, and `docs` a list row whose member 
   moves (the third non-goal was wrong, `KICK-dKeptSession-56` S29), and S6, the reference page and
   the docs list rows its anchors take off; the row citations re-cited by name, every line citation
   gone; the leg line names the guarded legs and the policy kit's.
+- rev-4 · 2026-11-21 · S4 · §4 · AC5 · §8 · S4's answers to units 8, 11 and 17 move to this unit's
+  own acceptance ledger, which joins Files touched, F2 resolved (b) and AC5 observing the quoted
+  sentences, under the brief `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class
+  KICK-dKeptSession-49 rev-6 first resolved. The ledger's path trips the two `recall floor` legs,
+  already on §7's leg line.
 
 ## 10. Reuse audit
 
