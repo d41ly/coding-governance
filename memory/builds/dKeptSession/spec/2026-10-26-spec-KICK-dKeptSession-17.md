@@ -1,6 +1,6 @@
 # KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0155@6d913746 whole
 **Carries:** node:policy-key.attendance
@@ -18,6 +18,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-17-1-spec-reviewer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-17-1-spec-reviewer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-17-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-17-orders-27-29-reground-brief.md) | research | KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-18 |
@@ -63,7 +64,8 @@ stand-ins until dWellOiledMachine and dFurnishedOrders land them.
   naming `attendance`, the value and the key or member, exit 1. No member of the set names an actor,
   the driver or a binding, so a declaration that swaps an actor can only be written as one of those
   refused shapes. The plants `attendance-actor`, `attendance-member` and `attendance-twice` join
-  `PLANTS` and `PLANT_OWED`, made in memory by `write_loop_plant`. Observed by AC5.
+  `PLANTS` and `PLANT_OWED`, made in memory by `write_loop_plant`. They move the `plants=<n>` token
+  of the `loop definition fixtures` row, re-priced as §4's budget rows state. Observed by AC5, AC8.
 - **S4** — The breakpoint source, in `tools/loop/breakpoints.py`. `read_policy_values` reads
   `attendance` beside `autonomy`, as a literal at its `read_value` call
   (`tools/loop/breakpoints.py#read_policy_values`), so the catalogue default `unattended` answers where
@@ -101,7 +103,8 @@ stand-ins until dWellOiledMachine and dFurnishedOrders land them.
   and run by `--selftest`: `attendance-values` (AC1 to AC4), `attendance-missing` (the `[[attendance]]`
   rows read with `confirm-steps` taken out, in memory) and `attendance-plan` (the driver's `--plan`
   under `attendance = "confirm-steps"`), each over the scratch repository `write_transition_plant`
-  builds for the `values` plant. Observed by AC1 to AC4 and AC6.
+  builds for the `values` plant. They move the `plants=<n>` token of the `loop breakpoint fixtures`
+  row, re-priced as §4's budget rows state. Observed by AC1 to AC4, AC6 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -191,11 +194,43 @@ unchanged.
 
 Live at landing; an owner who sets a value sees its gates on the next `--plan`.
 
+### The budget rows
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). Two rows
+move. `loop definition fixtures` runs `loop_lib.py --selftest`, and KICK-dKeptSession-5, ordered
+before this unit, adds `mail-kinds-repeated` to it, so S3's three plants move the token from 56 to
+59 (DERIVED: `len(PLANTS)` read at 7df6a1dac, 55, plus unit 5's one). `loop breakpoint fixtures`
+runs `breakpoints.py --selftest`, no unit ordered before this one adds to it, and S8's three plants
+move its token from 14 to 17 (DERIVED: `len(PLANTS)` read at 7df6a1dac, 14). The builder re-reads
+both counts at the unit's base and sets each token three above it.
+
+| Figure | `loop definition fixtures` | `loop breakpoint fixtures` |
+|---|---|---|
+| proxy reading `r` now, the row's note (PINNED 2026-11-21) | 21.3 s over 55 plants | 88.3 s over 14 plants |
+| unit 5's plant, an estimate (PINNED 2026-11-22) | 1 s | none |
+| this unit's plants, estimates (PINNED 2026-11-22) | 1 s each, 3 s | 4 s, 4 s and 18 s, 26 s |
+| `r` after this unit (PINNED 2026-11-22, the sum) | 25.3 s | 114.3 s |
+| budget, max of the row's value and 1.5 `r` | 60 stands over 38 | 317 stands over 172 |
+| the leg's ceiling in `tools/gate-legs.json` | 120, above 25.3 s | 300, above 114.3 s |
+
+The `loop_lib.py` estimates are the `witness-actor-listed` plant's 0.2 s rounded up, each plant made
+in memory. The `breakpoints.py` estimates are the `values` plant's 3.7 s for `attendance-values` and
+`attendance-missing`, each over the scratch repository `values` builds, and the `driver-plan`
+plant's 17.2 s for `attendance-plan`, which runs the driver's `--plan`, each read alone by direct
+CLI on the run's node at 7df6a1dac and rounded up. The builder reads each new plant alone by direct
+CLI and appends `Then re-read by KICK-dKeptSession-17 as PINNED proxy r <s>` to each row's note,
+with each budget the row's value or 1.5 `r` rounded up, whichever is higher. Neither leg has a row
+in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop.toml`: the four rows
 - `tools/loop/loop_lib.py`: the constant, the reader, the arm and its plants
 - `tools/loop/breakpoints.py`: the read, the attendance source, its line and its plants
+- `tools/run-gates/selftest-budgets.txt`: the `loop definition fixtures` row's `plants=` token 56 to
+  59 and the `loop breakpoint fixtures` row's 14 to 17, each note's re-read (DERIVED: `len(PLANTS)`
+  at the unit's base)
 - `help/loop.md`: the attendance bullet and its anchor
 - `memory/project/docs-undocumented.txt`: the `policy:attendance` row, taken off
 
@@ -259,14 +294,24 @@ Live at landing; an owner who sets a value sees its gates on the next `--plan`.
   `grep -c 'usage: policy:attendance ' loop.md` in `help/` prints 1; and at the repository's top level
   `grep -cP '^policy:attendance\t' memory/project/docs-undocumented.txt` prints 0.
   Red when: the key has no row, the page omits the rule, or the member is both anchored and listed.
+- **AC8** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_lib as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop definition fixtures\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`; the same probe importing `breakpoints` prints the number
+  `grep -oP '^loop breakpoint fixtures\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`; and S3's and S8's six plants are keys of the two `PLANTS`.
+  Red when: either row still carries the count from before this unit's plants.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probes print `55` and `14`, the greps `plants=55`
+  and `plants=14`.
 
 ## 7. Gates
 
-`loop definition` · `loop definition fixtures` · `loop breakpoint fixtures` · `policy check` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop definition` · `loop definition fixtures` · `loop breakpoint fixtures` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_lib.py · covers AC5 · the three planted declarations under `--selftest`'s `PLANT_OWED`, staged against the base module, which reads no `[[attendance]]` row · none
+New arm: tools/loop/loop_lib.py · covers AC5 · the three planted declarations under `--selftest`'s `PLANT_OWED`, staged against the base module, which reads no `[[attendance]]` row · the `loop definition fixtures` row's `plants=<n>` token rises by three
 
-New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 AC4 AC6 · each attendance value over the list, the missing row and the driver's `--plan`, under `--selftest`, staged against the base module, which reads no `attendance` · none
+New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 AC4 AC6 · each attendance value over the list, the missing row and the driver's `--plan`, under `--selftest`, staged against the base module, which reads no `attendance` · the `loop breakpoint fixtures` row's `plants=<n>` token rises by three
 
 `policy check` reads the new literal read of `attendance` through its reader coverage, and `docs` the
 anchor and the list row S7 moves.
@@ -303,6 +348,11 @@ anchor and the list row S7 moves.
   which gate; S7 gains the docs anchor and its list row; S8 the plants, the arms moved from the absent
   `tools/loop/selftest.py` to the two modules' plants; every line citation re-cited by blob pin or
   symbol, and the leg line names the loop and docs legs.
+- rev-4 · 2026-11-22 · S3 · S8 · §4 · §4 Files touched · AC8 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief`: S3's and S8's plants move two
+  `plants=<n>` tokens `check_plant_tokens` grades, so `tools/run-gates/selftest-budgets.txt` joins
+  Files touched, §4 states both rows' re-price over unit 5's plant, AC8 observes the tokens, and §7
+  names the budget leg and `policy fixtures`, whose guard `tools/loop/loop.toml` trips.
 
 ## 10. Reuse audit
 

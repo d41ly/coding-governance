@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers
@@ -19,6 +19,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-2-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-docs-row-brief.md) | research | — |
@@ -135,7 +136,9 @@ defines the item boundary, I12, the one point every later session unit reads at.
   `loop_transition`, whose top-level imports reach `loop_lib`, `loop_parents`, `loop_table`,
   `loop_checklist` and `loop_witness` and no `position` name (`skills/session-kickoff/manifest-check.sh#CARD_SNAPSHOT_PY`).
   `write_card_fixture` plants `card.pointers` at `every-item` beside the five keys it plants, since
-  the stub policy kit exits non-zero for a key no plant set. Observed by AC1 to AC7.
+  the stub policy kit exits non-zero for a key no plant set. The `boundary` case moves the
+  `plants=<n>` token of the `loop position fixtures` row, re-priced as §4's budget row states.
+  Observed by AC1 to AC7 and AC13.
 - **S10** — `help/orientation-card.md` gains a section on the pointers: each line, when it is
   rewritten under each value, and that an item boundary is noticed at the session's next shell call
   after a commit and reported at the call after the verb finishes. Observed by AC8.
@@ -243,9 +246,32 @@ finding none reads `none` for every line.
 
 Live at landing for a session whose card file routes a build. A session with no route is untouched.
 
+### The budget row
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). The
+`loop position fixtures` row runs `position.py --selftest`, and no unit ordered before this one adds
+a plant to it, so the `boundary` case moves the token from 31 to 32 (DERIVED: `len(PLANTS)` read
+at 7df6a1dac, 31). The builder re-reads the count at the unit's base and sets the token one above it.
+
+| Figure | Now | After this unit |
+|---|---|---|
+| proxy reading `r` | 68.3 s over 31 plants, the row's note (PINNED 2026-11-21) | 70.3 s |
+| the `boundary` case | none | 2 s, an estimate (PINNED 2026-11-22) |
+| budget, max of the row's value and 1.5 `r` | 432 | 432 stands over 106 |
+| the leg's ceiling in `tools/gate-legs.json` | 300 | 300, above 70.3 s |
+
+The estimate is the `stale-remote` plant's 1.0 s, read alone by direct CLI on the run's node at
+7df6a1dac, rounded up, since AC4 grades the case over planted engine answers. The builder reads the
+case alone by direct CLI and appends `Then re-read by KICK-dKeptSession-13 as PINNED proxy r <s>`
+to the row's note, with the budget the row's value or 1.5 `r` rounded up, whichever is higher.
+The leg has no row in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
+
 ### Files touched (estimate)
 
 - `tools/loop/position.py`: S1 and its `boundary` case
+- `tools/run-gates/selftest-budgets.txt`: the `loop position fixtures` row's `plants=` token 31 to
+  32 and its note's re-read (DERIVED: `len(PLANTS)` at the unit's base)
 - `skills/session-kickoff/manifest-check.sh`: S2, S4 to S6, S8
 - `memory/guides/SESSION-KICKOFF.md`: the kickoff manifest, `last-audit` re-stamped, as `watch:`
   names `manifest-check.sh`
@@ -353,16 +379,23 @@ Live at landing for a session whose card file routes a build. A session with no 
   names `help/reference/policy.md` as its page.
   Red when: the page carries no anchor for the key, or its row stays on the list the page drains.
   figure: PINNED 2026-11-21 at `022a28ab`, the base reads `0`, `1` and the page `-`.
+- **AC13** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import position as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop position fixtures\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt` prints
+  after `plants=`, and `boundary` is a key of `PLANTS`.
+  Red when: the row still carries the count from before the `boundary` case.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probe prints `31` and the grep `plants=31`.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `policy check` · `policy fixtures` · `help reference pages` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `routed-commits selftest` · `loop position fixtures` · `every held leg is budgeted, every budget row resolves` · `policy check` · `policy fixtures` · `help reference pages` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC6 AC11 · the pointers and boundary verbs over a stub loop kit, the failing case a crossing that leaves the ref's `item —` unchanged · `FLOOR_ASSERTIONS`, raised by one per new plant
 
 New arm: tools/hooks/scratch-guard.test.sh · covers AC5 · the boundary step against a stub checker, the failing case a step that starts the checker on an unchanged HEAD · none
 
-New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, the failing case an unchanged key reported as crossed · none
+New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, the failing case an unchanged key reported as crossed · the `loop position fixtures` row's `plants=<n>` token rises by one
 
 ## 8. Open questions
 
@@ -450,6 +483,10 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
   policy kit given `card.pointers`, and the stub `position.py` shown to break no import of the plants;
   `policy fixtures` named, KICK-dKeptSession-1 having put the loop kit under its guard; F3's tuple
   re-cited; the floor raised by the five plants; `symbols.json` added.
+- rev-7 · 2026-11-22 · S9 · §4 · §4 Files touched · AC13 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief`: the `boundary` case moves the
+  `plants=<n>` token `check_plant_tokens` grades, so `tools/run-gates/selftest-budgets.txt` joins Files
+  touched, §4 states the row's re-price, AC13 observes the token, and §7 names the budget leg.
 
 ## 10. Reuse audit
 

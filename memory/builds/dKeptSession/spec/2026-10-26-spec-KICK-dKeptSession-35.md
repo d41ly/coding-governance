@@ -1,6 +1,6 @@
 # KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message
 
-**Status:** DEFERRED · rev-4 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md](../build/2026-11-21-build-KICK-dKeptSession-10-reground-orders-20-26-returns.md) | research | KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief.md) | research | KICK-dKeptSession-30 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-35-orders-25-26-reground-brief.md) | research | KICK-dKeptSession-42 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
@@ -62,6 +63,9 @@ it (order 25).
   neither its spec nor its ledger is written (F1). Observed by AC1 and AC5.
 - **S5** — The user page. `help/loop.md`'s notices paragraph (`KICK-dKeptSession-7` S7) names the
   pass on each notice and the `notice — not posted` line. Observed by AC4.
+- **S6** — The budget row. `notices-two-dependents` and `notices-refused` move the `plants=<n>` token
+  of the `loop transition record` row in `tools/run-gates/selftest-budgets.txt`, re-priced as §4's
+  budget row states. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -119,9 +123,40 @@ exit 3  changed   · to build:dA · pass 3      changed   · to build:dB · pass
 
 None: no notice exists before `KICK-dKeptSession-7`.
 
+### The budget row
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). The
+`loop transition record` row runs `loop_transition.py check --selftest`. Units ordered
+before this one add seven plants, KICK-dKeptSession-5's two, -36's three, -24's one and -7's one,
+and KICK-dKeptSession-42, of this unit's step, adds four. So S6 moves the token from 20 to 22, or
+from 24 to 26 where unit 42 lands first (DERIVED: `len(PLANTS)` read at 7df6a1dac, 13, plus those
+units' plants). The builder re-reads the count at the unit's base and sets the token two above it.
+
+| Figure | `loop transition record` |
+|---|---|
+| proxy `r` at this tree, the row's note (PINNED 2026-11-21) | 33.4 s over 13 plants |
+| the earlier units' plants, estimates (PINNED 2026-11-22) | 7 times 9 s, and 4 times 9 s more after unit 42 |
+| this unit's plants, estimates (PINNED 2026-11-22) | 2 times 9 s |
+| `r` after this unit (PINNED 2026-11-22, the sum) | 114.4 s, or 150.4 s after unit 42 |
+| budget, max of the row's value and 1.5 `r` | 172, or 226 after unit 42 |
+| the leg's ceiling in `tools/gate-legs.json` | 120, above 114.4 s and under 150.4 s |
+
+The estimates are the `backward-rows` plant's 8.2 s, the module's slowest, rounded up, read alone
+by direct CLI on the run's node at 7df6a1dac, since each plant builds a scratch repository with a
+second build or a bare origin. The builder reads each new plant alone by direct CLI and appends
+`Then re-read by KICK-dKeptSession-35 as PINNED proxy r <s>` to the row's note, with the budget the
+row's value or 1.5 `r` rounded up, whichever is higher. The leg has no row in
+`tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves. A declared ceiling is the
+owner's to move (`memory/guides/BUILD-METHOD.md`, M3): where the builder's reading takes `r` to the
+leg's ceiling, the unit stops before it lands and names the raise for the owner, and it never edits
+`tools/gate-legs.json`.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_transition.py`: S1 and S3 in `write_dependency_notices`, and the two plants
+- `tools/run-gates/selftest-budgets.txt`: S6, the `loop transition record` row's `plants=` token two
+  above its count at the unit's base and its note's re-read (DERIVED: `len(PLANTS)`)
 - `tools/unattended/unattended.sh`: S2 and S3 in `verb_landed`, and `KIT_UNATTENDED_VERSION` moved
 - `tools/unattended/unattended.test.sh`: the landed arm extended
 - `help/loop.md`: S5's sentence
@@ -178,12 +213,20 @@ parent, a bare origin under `%TEMP%` and `RUN_CLAIMS=on`, planted by `loop_trans
   posts"` prints `1`; and `git diff --name-only <pass base> HEAD --` over unit 7's spec and its
   acceptance ledger prints nothing.
   Red when: S4's answer lands in a record of unit 7, or this unit's ledger quotes neither passage.
+- **AC6** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import loop_transition as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop transition record\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`, and `notices-two-dependents` and `notices-refused` are among the keys of `PLANTS`.
+  Red when: the row still carries the count from before this unit's plants.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probe prints `13` and the grep `plants=13`, before
+  the units ordered ahead of this one land.
 
 ## 7. Gates
 
-`loop transition record` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`loop transition record` · `every held leg is budgeted, every budget row resolves` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `docs` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_transition.py · covers AC1 AC3 · the `notices-two-dependents` and `notices-refused` plants, each rebinding the spawn the writer imports inside its function and restoring it after the run, staged red by a scratch copy dropping `--pass` · none
+New arm: tools/loop/loop_transition.py · covers AC1 AC3 · the `notices-two-dependents` and `notices-refused` plants, each rebinding the spawn the writer imports inside its function and restoring it after the run, staged red by a scratch copy dropping `--pass` · the `loop transition record` row's `plants=<n>` token rises by two
 New arm: tools/unattended/unattended.test.sh · covers AC2 · two landings to one dependent · the effective `FLOOR_ASSERTIONS` pin and its region's `FLOOR_SHARD_<k>` rise by the arm's counted assertions
 
 ## 8. Open questions
@@ -217,6 +260,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 · two landings to on
   line; F1 resolved (b) and AC5 observing the quoted passages, under the brief
   `2026-11-21-prompt-KICK-dKeptSession-30-ledger-class-brief`; the class KICK-dKeptSession-49 rev-6
   first resolved. `policy fixtures`, whose guard holds `tools/loop/`, joins the leg line too.
+- rev-5 · 2026-11-22 · S6 · §4 · §4 Files touched · AC6 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief`: the plants move the `plants=<n>` token
+  `check_plant_tokens` grades, so S6 and AC6 observe it, `tools/run-gates/selftest-budgets.txt` joins
+  Files touched, §4 states the row's re-price over the earlier units' plants and the stop at the
+  leg's ceiling, and §7 names the budget leg.
 
 ## 10. Reuse audit
 

@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: c2a407b0390f3d57a118b58e376c326aeb207c13 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a4dd146d6773f436a4527d2a9740a7beec69e405
 phase: BUILDING
@@ -113,3 +114,5 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T21:54:44Z brief · item KICK-dKeptSession-32 · reason ff45f44eaa2d memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-32-build-brief.md
 
 2026-11-21T21:56:09Z dispatch · item 38533a59 KICK-dKeptSession-32 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-32-1-acceptance-ledger.md memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md
+
+2026-11-21T22:21:09Z decision · item loop transition record's 120 s ceiling in tools/gate-legs.json: raise it, or split the leg, before order step 25 · reason By the plant estimates in specs 7, 35, 11, 52, 53 and 61, the leg reaches its 120 s ceiling at order step 25 (units 35 and 42) and about 219 s by unit 61. Options: (a) the owner raises the ceiling, (b) the leg is split into two legs. A declared ceiling is the owner's to move (BUILD-METHOD) and gate-legs.json names no row a run may raise, so the run cannot do either. Each of those specs now stops its unit before landing if the measured time reaches the ceiling, and never edits gate-legs.json.

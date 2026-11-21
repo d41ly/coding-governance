@@ -1,6 +1,6 @@
 # KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices
 
-**Status:** DEFERRED · rev-6 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 24 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 24 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0145@b38efe3e whole
 **Carries:** node:policy-key.deps.coordination
@@ -23,6 +23,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-7-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-7-1-spec-writer.md) | journal | — |
 | [2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md](../prompts/2026-11-05-prompt-KICK-dKeptSession-1-owner-forks.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-9 KICK-dKeptSession-20 KICK-dKeptSession-25 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-26 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-6-orders-23-24-reground-brief.md) | research | KICK-dKeptSession-6 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -123,6 +124,9 @@ another (gap-flow-06).
   `parse_front_matter` as `tools/loop/loop_parents.py#read_withdrawn_parents` reads it, sorted.
   `python loop_transition.py dependents --build <slug>` prints them one per line, exit 0, and
   `loop: unanswered · <why>`, exit 2, for an unreadable README. Observed by AC7 and AC8.
+- **S10** — The budget rows. The seven `deps-*` plants move the `plants=<n>` token of the `loop
+  position fixtures` row and `deps-notices` that of the `loop transition record` row in
+  `tools/run-gates/selftest-budgets.txt`, each re-priced as §4's budget rows state. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -244,11 +248,46 @@ Live with the engine and the mailbox. The notices post only where a README's `pa
 moving build, so a build no other build depends on posts nothing. The kit version is the lander's to
 mint at the push (`tools/push-main.sh@78f40c3c2475:27`).
 
+### The budget rows
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). Units
+ordered before this one add six `position.py` plants, KICK-dKeptSession-13's one and -10's five, and
+six `loop_transition.py` plants, KICK-dKeptSession-5's two, -36's three and -24's one. So S10 moves
+the `loop position fixtures` token from 37 to 44 and the `loop transition record` token from 19 to
+20 (DERIVED: `len(PLANTS)` read at 7df6a1dac, 31 and 13, plus those units' plants). The builder
+re-reads both counts at the unit's base and sets the tokens seven and one above them.
+
+| Figure | `loop position fixtures` | `loop transition record` |
+|---|---|---|
+| proxy `r` at this tree, the row's note (PINNED 2026-11-21) | 68.3 s over 31 plants | 33.4 s over 13 plants |
+| the earlier units' plants, estimates (PINNED 2026-11-22) | 2 s, then 5 times 5 s | 6 times 9 s |
+| this unit's plants, estimates (PINNED 2026-11-22) | 7 times 5 s | 9 s |
+| `r` after this unit (PINNED 2026-11-22, the sum) | 130.3 s | 96.4 s |
+| budget, max of the row's value and 1.5 `r` | 432 stands over 196 | 145, over the row's 60 today |
+| the leg's ceiling in `tools/gate-legs.json` | 300, above 130.3 s | 120, above 96.4 s |
+
+The `boundary` case's 2 s is KICK-dKeptSession-13's estimate (PINNED 2026-11-22). The other
+`position.py` estimates are the `plan-frontier` plant's 4.7 s, a driver run, rounded up, since each
+`deps-*` plant pushes to a bare origin and reads a lease. The `loop_transition.py` estimates are the
+`backward-rows` plant's 8.2 s, the module's slowest, rounded up, since each plant builds a scratch
+repository with a second build or a bare origin. Each analog was read alone by direct CLI on the
+run's node at 7df6a1dac. The builder reads each new plant alone by direct CLI and appends
+`Then re-read by KICK-dKeptSession-7 as PINNED proxy r <s>` to each row's note, with each budget the
+row's value or 1.5 `r` rounded up, whichever is higher. Neither leg has a row in
+`tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves. A declared ceiling is the
+owner's to move (`memory/guides/BUILD-METHOD.md`, M3): where the builder's reading takes either `r`
+to its leg's ceiling, the unit stops before it lands and names the raise for the owner, and it never
+edits `tools/gate-legs.json`.
+
 ### Files touched (estimate)
 
 - `tools/loop/position.py`: the reach, the switched gate, the key reads, seven plants
 - `tools/loop/loop_transition.py`: the listing, the notices, `read_dependents`, `dependents`, the launch, one plant
 - `tools/loop/placement.py`: `write_foreign_lease` takes extra record fields, its callers unchanged
+- `tools/run-gates/selftest-budgets.txt`: S10, the `loop position fixtures` row's `plants=` token 37
+  to 44 and the `loop transition record` row's 19 to 20, each note's re-read (DERIVED: `len(PLANTS)`
+  at the unit's base)
 - `tools/unattended/unattended.sh`: `--lease show`, `print_lease_witness`, the `landed` notice in `verb_landed`
 - `tools/unattended/unattended.test.sh`: the landed-notice and witness-read arm
 - `help/loop.md`: the new section and the `--lease` paragraph
@@ -338,13 +377,23 @@ mint at the push (`tools/push-main.sh@78f40c3c2475:27`).
   fixture after a renew with `--witness <sha>`, it prints that sha alone, exit 0; with no lease it
   prints `-`; with `RUN_CLAIMS` off it prints `lease — off · <parent>/build`, exit 0.
   Red when: the verb prints any field but the witness, or writes a ref.
+- **AC12** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import position as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop position fixtures\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`; the same probe importing `loop_transition` prints the number
+  `grep -oP '^loop transition record\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt`
+  prints after `plants=`; and the seven `deps-*` plants and `deps-notices` are keys of the two `PLANTS`.
+  Red when: either row still carries the count from before this unit's plants.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probes print `31` and `13`, the greps `plants=31`
+  and `plants=13`, before the units ordered ahead of this one land.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `loop position fixtures` · `loop transition record` · `loop placement fixtures` · `docs`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `scratch-guard self-test` · `tier2-review self-test` · `policy fixtures` · `loop position fixtures` · `loop transition record` · `loop placement fixtures` · `docs` · `every held leg is budgeted, every budget row resolves`
 
-New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · the seven `deps-*` plants, `deps-wait` staged red by the gate read without its value · none
-New arm: tools/loop/loop_transition.py · covers AC7 · the `deps-notices` plant over a two-build fixture, red with the notice call left out · none
+New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC9 · the seven `deps-*` plants, `deps-wait` staged red by the gate read without its value · the `loop position fixtures` row's `plants=<n>` token rises by seven
+New arm: tools/loop/loop_transition.py · covers AC7 · the `deps-notices` plant over a two-build fixture, red with the notice call left out · the `loop transition record` row's `plants=<n>` token rises by one
 New arm: tools/unattended/unattended.test.sh · covers AC8 AC11 · the landed notice, staged by a post planted to fail, and the witness read over a renewed lease · none
 
 ## 8. Open questions
@@ -430,6 +479,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC11 · the landed no
   the `confirm-request` answer dropped, by the kit version move the lander mints and the
   `subject-pins.tsv` regeneration no leg change owes; the leg line gains the loop legs, `loop
   placement fixtures` and `docs`; AC2 and AC6 stage unreachable by no lease.
+- rev-7 · 2026-11-22 · S10 · §4 · §4 Files touched · AC12 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief`: the eight plants move two `plants=<n>`
+  tokens `check_plant_tokens` grades, so S10 and AC12 observe them, `tools/run-gates/selftest-budgets.txt`
+  joins Files touched, §4 states both rows' re-price over the earlier units' plants and the stop at a
+  leg's ceiling, and §7 names the budget leg.
 
 ## 10. Reuse audit
 

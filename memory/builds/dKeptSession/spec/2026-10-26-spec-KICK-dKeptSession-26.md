@@ -1,6 +1,6 @@
 # KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers
 
-**Status:** DEFERRED · rev-3 · 2026-11-21 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
+**Status:** DEFERRED · rev-4 · 2026-11-22 · node a · Tier-2 · base c2a407b0 · streams kickoff · order 10 · advances KICK-dKeptSession-29 · closes TOOL-dDeclaredLoop-104
 
 **Carries:** cl-dClosedLoop-0163@709e57f9 whole
 
@@ -15,6 +15,7 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-1-build-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief.md) | research | KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-11 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 |
 | [2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-13-orders-9-10-reground-brief.md) | research | KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 |
 | [2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-1-spec-writer.md) | journal | — |
 | [2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md](../prompts/2026-11-21-prompt-KICK-dKeptSession-26-precheck-brief.md) | research | KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 |
@@ -78,7 +79,9 @@ a planted card that omits it.
   bullet beside "See the ending" anchored with the fingerprint `python tools/govkit/docs_leg.py
   --fingerprints` prints for that row. The `docs` leg tests every inline `python` span on a page
   under `help/` against the verb rows, so a page showing `budget.py state` with no row is a
-  `COMMAND` finding (`tools/govkit/docs_leg.py#check_page_command`). Observed by AC6, AC7.
+  `COMMAND` finding (`tools/govkit/docs_leg.py#check_page_command`). The case moves the
+  `plants=<n>` token of the `loop budget fixtures` row, re-priced as §4's budget row states.
+  Observed by AC6, AC7, AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -144,6 +147,27 @@ check's line names the remedy, `--card --pointers --build <slug>`, which renders
 
 Live at landing, the line and its reader landing together.
 
+### The budget row
+
+`check_plant_tokens` holds the `plants=<n>` token of each loop-kit row equal to `len(PLANTS)` of the
+module its argv runs, once imported (`tools/run-gates/run-selftests.sh#check_plant_tokens`). The
+`loop budget fixtures` row runs `budget.py --selftest`, and no unit ordered before this one adds a
+plant to it, so `state-answers` moves the token from 41 to 42 (DERIVED: `len(PLANTS)` read at
+7df6a1dac, 41). The builder re-reads the count at the unit's base and sets the token one above it.
+
+| Figure | Now | After this unit |
+|---|---|---|
+| proxy reading `r` | 177.7 s over 41 plants, the row's note (PINNED 2026-11-21) | 181.7 s |
+| the `state-answers` case | none | 4 s, an estimate (PINNED 2026-11-22) |
+| budget, max of the row's value and 1.5 `r` | 498 | 498 stands over 273 |
+| the leg's ceiling in `tools/gate-legs.json` | 300 | 300, above 181.7 s |
+
+The estimate is three builds at the `ending` plant's 1.4 s, read alone by direct CLI on the run's
+node at 7df6a1dac, rounded up, since AC6 plants three builds and reads each. The builder reads the
+case alone by direct CLI and appends `Then re-read by KICK-dKeptSession-26 as PINNED proxy r <s>`
+to the row's note, with the budget the row's value or 1.5 `r` rounded up, whichever is higher.
+The leg has no row in `tools/run-gates/ceiling-evidence.txt`, so no evidenced maximum moves.
+
 ### Files touched (estimate)
 
 - `skills/session-kickoff/manifest-check.sh`: `render_budget_line`, the `POINTER_LINES` word
@@ -153,6 +177,8 @@ Live at landing, the line and its reader landing together.
   raised by one per plant of S4, as the suite counts one `ok` row per plant `--list` names
 - `skills/session-kickoff/card-store.fixture.sh`: S4's plants and the stub `budget.py`
 - `tools/loop/budget.py`: S6's subcommand and its fixture case
+- `tools/run-gates/selftest-budgets.txt`: the `loop budget fixtures` row's `plants=` token 41 to 42
+  and its note's re-read (DERIVED: `len(PLANTS)` at the unit's base)
 - `tools/govkit/usage.toml`: S6's `#state` row
 - `help/loop.md`: S6's bullet and its usage anchor
 - `help/orientation-card.md`: S5's line
@@ -212,14 +238,21 @@ Live at landing, the line and its reader landing together.
 - **AC7** — When `python tools/govkit/docs_leg.py --fingerprints` runs, its row for the `state` verb
   of `budget.py` names `help/loop.md` as its page.
   Red when: the verb ships with no usage row, or its page carries no anchor for it.
+- **AC8** — When, at the unit's commit,
+  `python -I -c "import sys; sys.path.insert(0, 'tools/loop'); import budget as m; print(len(m.PLANTS))"`
+  runs, it prints the number that
+  `grep -oP '^loop budget fixtures\t.*\Kplants=\d+' tools/run-gates/selftest-budgets.txt` prints
+  after `plants=`, and `state-answers` is a key of `PLANTS`.
+  Red when: the row still carries the count from before the `state-answers` case.
+  figure: PINNED 2026-11-22 at `7df6a1dac`, the probe prints `41` and the grep `plants=41`.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `loop budget fixtures` · `policy fixtures` · `docs` · `help page commands` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `loop budget fixtures` · `every held leg is budgeted, every budget row resolves` · `policy fixtures` · `docs` · `help page commands` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4 · the budget line over a stub loop kit, the failing case a stored card whose `## pointers` lacks `budget —` passing `--card --check` · `FLOOR_ASSERTIONS`, raised by one per new plant
 
-New arm: tools/loop/budget.py · covers AC6 · the `state-answers` fixture case, the failing case a `state` line that differs from `budget_state`'s answer · none
+New arm: tools/loop/budget.py · covers AC6 · the `state-answers` fixture case, the failing case a `state` line that differs from `budget_state`'s answer · the `loop budget fixtures` row's `plants=<n>` token rises by one
 
 ## 8. Open questions
 
@@ -266,6 +299,10 @@ New arm: tools/loop/budget.py · covers AC6 · the `state-answers` fixture case,
   and exit stated as `run_budget_plant` prints them; the bound's read measured; `policy fixtures`,
   which `tools/loop/` trips since KICK-dKeptSession-1, the docs and govkit legs, the floor raise and
   `symbols.json` added.
+- rev-4 · 2026-11-22 · S6 · §4 · §4 Files touched · AC8 · §7 · by
+  `2026-11-21-prompt-KICK-dKeptSession-12-plant-budget-brief`: the `state-answers` case moves the
+  `plants=<n>` token `check_plant_tokens` grades, so `tools/run-gates/selftest-budgets.txt` joins Files
+  touched, §4 states the row's re-price, AC8 observes the token, and §7 names the budget leg.
 
 ## 10. Reuse audit
 
