@@ -33,6 +33,7 @@
 | [2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-design-notes.md) | research | — |
 | [2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-5.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-5.md) | red-fix | — |
 | [2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-6.md](../build/2026-11-19-build-TOOL-dPlacedRequest-1-red-fix-6.md) | red-fix | — |
+| [2026-11-21-build-TOOL-dPlacedRequest-1-departures-build.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-departures-build.md) | journal | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-642.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-642.md) | deviation | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-643.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-643.md) | deviation | — |
 | [2026-11-21-build-TOOL-dPlacedRequest-1-deviation-644.md](../build/2026-11-21-build-TOOL-dPlacedRequest-1-deviation-644.md) | deviation | — |
