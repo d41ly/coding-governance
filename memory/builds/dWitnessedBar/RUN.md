@@ -753,3 +753,5 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T09:24:45Z draw · re-dispatch · TOOL-dWitnessedBar-84 · 122/180 · 20261121T092445Z-1d5106
 
 2026-11-21T09:24:45Z dispatch · item 78cf6b85 TOOL-dWitnessedBar-84 · reason memory/guides/SESSION-KICKOFF.md memory/builds/dBoundRoles/README.md memory/builds/dConvergedCharter/README.md memory/backlog/PLAY.md
+
+2026-11-21T09:43:53Z brief · item TOOL-dWitnessedBar-85 · reason d632d55c5bf9 memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-85-build-brief.md
