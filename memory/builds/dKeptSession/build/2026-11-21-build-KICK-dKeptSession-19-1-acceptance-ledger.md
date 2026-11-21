@@ -27,7 +27,7 @@ naming clause and grown list and `reader-join-blank`'s blank conf, in `tools/pol
   `policy lists: green · 0 finding(s)`, printing `policy lists: unnamed-keys.txt · no comparison:
   tools/policy/unnamed-keys.txt is absent at c2a407b0390f (merge-base of HEAD and origin/main), and
   absent is never an empty list`. `grep -vc "^#" unnamed-keys.txt` printed 48, the count
-  `derive_unnamed_keys` gave in process: 48 of 273 catalogue keys over the view's 509 rows.
+  `derive_unnamed_keys` gave in process: 48 of 273 catalogue keys over the view's 509 rows (DERIVED at 2bf35aa1).
 - AC2 — `reader-join` — over `build_repo`'s copy, a design naming the catalogue's first row on its
   owner's row and the list seeded by `write_shrink_list` and committed as the base: unplanted, no
   finding, `base 589d06e41706 (upstream/main tip) carried 272, the list carries 272`; the planted
