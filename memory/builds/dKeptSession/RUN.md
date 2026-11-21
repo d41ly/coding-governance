@@ -128,3 +128,7 @@ base: c2a407b0390f3d57a118b58e376c326aeb207c13
 2026-11-21T22:51:01Z brief · item KICK-dKeptSession-60 · reason 1095181b0d72 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-60-build-brief.md
 
 2026-11-21T22:52:26Z dispatch · item 5198e204 KICK-dKeptSession-60 · reason tools/policy/README.md tools/policy/policy.py memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-60-1-acceptance-ledger.md
+
+2026-11-21T23:07:19Z brief · item KICK-dKeptSession-16 · reason 0243d2e02294 memory/builds/dKeptSession/prompts/2026-11-21-prompt-KICK-dKeptSession-16-build-brief.md
+
+2026-11-21T23:08:49Z dispatch · item ca43769b KICK-dKeptSession-16 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/unpurposed-namespaces.txt tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/LIVE.md memory/backlog/KICK.md memory/builds/dKeptSession/README.md memory/builds/dKeptSession/build/2026-11-21-build-KICK-dKeptSession-16-1-acceptance-ledger.md
