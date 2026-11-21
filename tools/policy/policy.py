@@ -1628,19 +1628,27 @@ def render_toml_value(v):
     raise ValueError(f"no TOML spelling for {v!r}")
 
 
-def render_scaffold(rows, preset=None):
+def render_scaffold(rows, preset):
     """The starter policy file: each literal-defaulted row this kit's build owns, one table per first
     segment, tables sorted, keys in catalogue order. A `preset` name is written as the file's first
-    key, `preset = "<name>"`, the line after SCAFFOLD_HEADER and above the tables; None writes no
-    such key, the bytes the callers that name no preset read (KICK-dKeptSession-4 S2)."""
+    key, `preset = "<name>"`, the line after SCAFFOLD_HEADER and above the tables, and a row whose
+    exact path the preset's assignment, `read_preset_assignment(preset, {})`, holds is written as the
+    comment `# <key> = <value> (preset <name>)` instead of its literal, so the file's own values never
+    beat the preset it names (KICK-dKeptSession-32 S1). None writes no such key and every literal
+    row, the bytes the callers that name no preset read (KICK-dKeptSession-4 S2). `preset` takes no
+    default, so a call naming none is a TypeError; the assignment's read refuses as that seam does."""
+    assignment = {} if preset is None else read_preset_assignment(preset, {})
     tables = {}
     for r in rows:
         if r.get("owner") == SCAFFOLD_OWNER and "default" in r and not check_derived(r["default"]):
             segs = str(r["name"]).split(".")
-            tables.setdefault(segs[0], []).append((".".join(segs[1:]), r["default"]))
+            key, path = ".".join(segs[1:]), parse_key(r["name"])
+            line = (f"# {key} = {render_toml_value(assignment[path])} (preset {preset})\n" if path in assignment
+                    else f"{key} = {render_toml_value(r['default'])}\n")
+            tables.setdefault(segs[0], []).append(line)
     out = SCAFFOLD_HEADER + ("" if preset is None else f"preset = {render_toml_value(preset)}\n")
     for t in sorted(tables):
-        out += f"\n[{t}]\n" + "".join(f"{k} = {render_toml_value(v)}\n" for k, v in tables[t])
+        out += f"\n[{t}]\n" + "".join(tables[t])
     return out
 
 
@@ -1733,7 +1741,8 @@ def cmd_scaffold(argv):
     """`scaffold --preset <name> [--kept <file>]` (KICK-dKeptSession-4 S2, S3). The name is checked
     by `check_value` on the catalogue's `preset` row, the reason on stderr and nothing on stdout, exit
     2, as is a call naming no preset. With no `--kept`, `render_scaffold` with that preset on stdout,
-    LF bytes. With `--kept <file>`, nothing is written: the file's top-level `preset`, through
+    LF bytes; a Refusal of the preset's assignment, `presets.py` not importing or the store not
+    reading, prints its line on stderr and nothing on stdout, exit 2 (KICK-dKeptSession-32 S2). With `--kept <file>`, nothing is written: the file's top-level `preset`, through
     `parse_policy`, the row's default where it names none, and where that is not the name one stdout
     line naming the file, its preset and the name; a file that does not read, decode or parse prints
     nothing, its invalidity the mirror step's to report. Exit 0."""
@@ -1756,9 +1765,14 @@ def cmd_scaffold(argv):
         print(f"policy: scaffold refused · preset · {why}", file=sys.stderr)
         return 2
     if kept is None:
+        try:  # the preset's assignment: presets.py not importing or the store not reading refuses
+            text = render_scaffold(rows, name)
+        except Refusal as exc:  # whole or nothing, so the adopter never writes a partial file
+            print(exc, file=sys.stderr)
+            return 2
         # The bytes, LF, never the text layer's newline translation: one output on every platform,
         # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
-        sys.stdout.buffer.write(render_scaffold(rows, preset=name).encode("utf-8"))
+        sys.stdout.buffer.write(text.encode("utf-8"))
         return 0
     try:
         named = parse_policy(Path(kept).read_bytes().decode("utf-8")).get(("preset",))

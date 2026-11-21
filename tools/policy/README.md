@@ -197,9 +197,11 @@ deleted list.
 - `python <prefix>/policy/policy.py scaffold --preset <name> [--kept <file>]` — print the starter policy
   file: `preset = "<name>"` as its first key, then each row this kit's build owns that has a literal
   default, one table per first segment, written as UTF-8 bytes with LF line ends on every platform, so
-  it equals the blob git stores (TOOL-dGroundRules-21 S1, KICK-dKeptSession-4 S2). A call naming no
+  it equals the blob git stores (TOOL-dGroundRules-21 S1, KICK-dKeptSession-4 S2). A row the named
+  preset assigns is written as a comment, `# <key> = <value> (preset <name>)` with the preset's value,
+  never as a literal that would beat the preset (KICK-dKeptSession-32). A call naming no
   preset is the usage line, and a name the catalogue's `preset` row refuses is that row's reason on
-  stderr, exit 2, nothing on stdout. `--kept <file>` writes nothing: where the file's preset, the
+  stderr, exit 2, nothing on stdout, as is `presets.py` not importing or the preset store not reading. `--kept <file>` writes nothing: where the file's preset, the
   default `standard` where it names none, is not `<name>`, it prints the kept-file line
   `policy: <file> keeps its preset "<its>", not the answer "<name>": …`, exit 0; a file that does not
   decode or parse prints nothing (S3).

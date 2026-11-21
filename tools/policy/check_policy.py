@@ -2048,8 +2048,8 @@ def run_arms_empty_target(name):
             said = render_said(out, f"policy-check: {arm} · ")
             checks.append(("the empty target", arm, said.startswith(f"policy-check: {arm} · not graded · "), said))
         rows = policy.load_catalogue(KIT)
-        keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(rows)), []))
-        write_policy(t, policy.render_scaffold(rows))
+        keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(rows, None)), []))
+        write_policy(t, policy.render_scaffold(rows, None))
         _rc, out = run_case_argv(t, [sys.executable, str(KIT / "check_policy.py"), "--repo", t.as_posix()])
         said = render_said(out, "policy-check: arm_schema · ")
         checks.append(("the scaffolded target", f"arm_schema grades the scaffold's {keys} key(s) with no finding",
@@ -2940,7 +2940,7 @@ def run_mirror_absent_adopter(name):
     try:
         carried = t / "carried"
         build_reader_repo(carried, None)
-        write_policy(carried, policy.render_scaffold(policy.load_catalogue(KIT)))
+        write_policy(carried, policy.render_scaffold(policy.load_catalogue(KIT), None))
         (t / "bare").mkdir()
         run_fixture_git(t / "bare", "init", "-q")
         for target, repo in (("HEAD carries neither", carried), ("no commit", t / "bare")):
@@ -6176,7 +6176,62 @@ def run_preset_diff(name):
     return print_checks(name, checks)
 
 
-CORE_FLOW_POINT = "point.flow.release"  # the release slot `build.closes = after-release-verifies` selects
+def run_scaffold_preset(name):
+    """`scaffold-preset` (KICK-dKeptSession-32 S3, AC1, AC2): per shipped preset, the stdout of this
+    kit's `policy.py scaffold --preset <name>`, exit 0 and nothing on stderr, committed as the policy
+    file of a `build_reader_repo` repository on `main`. There this kit's `policy.py get <key>
+    --explain`, for every key the preset's assignment holds, must exit 0 printing the assignment's
+    value as `get` spells it and `· preset · preset <name> at ` on stderr, so no literal the scaffold
+    writes beats the preset it names; and `policy.py preset --diff` must print `- no key differs`.
+    The presets run concurrently, one repository each. A store holding no preset, or a preset
+    assigning no key, is a WRONG, never a pass. WHAT IT DOES NOT CHECK: a scaffold naming no preset,
+    a repository's declared preset, and the adopter's write of the file, which `adopter-fresh-target`
+    and `intake-preset` read."""
+    import concurrent.futures
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+
+    def check_preset_scaffold(preset):
+        held = {}
+        made = check_run(preset, f"policy.py scaffold --preset {preset} exits 0 printing the file",
+                         [sys.executable, str(KIT / "policy.py"), "scaffold", "--preset", preset],
+                         lambda rc, o, e: held.update(text=o) is None and rc == 0 and bool(o) and not e.strip())
+        if not made[2]:
+            return [made]
+        repo = build_reader_repo(t / preset, held["text"])
+        assignment = presets.derive_preset_assignment(preset, presets.load_presets(KIT), None)
+        wrong = []
+        for path, value in assignment.items():
+            key = policy.render_dotted(path)
+            want = [v if isinstance(v, str) else policy.render_toml_value(v)
+                    for v in (value if isinstance(value, list) else [value])]
+            got = check_get(preset, repo, [key, "--explain"], lambda rc, o, e, want=want, key=key: rc == 0 and
+                            o.splitlines() == want and f"policy: {key} · preset · preset {preset} at " in e)
+            if not got[2]:
+                wrong.append(f"{key}: {got[3]}")
+        reads = (preset, f"get <key> --explain reads each of the {len(assignment)} assigned key(s) from the preset",
+                 bool(assignment) and not wrong, "; ".join(wrong[:3]) or (f"{len(assignment)} read from preset {preset}"
+                                                                         if assignment else "a population of 0"))
+        diff = check_get(preset, repo, ["--diff"], lambda rc, o, e: rc == 0 and o.splitlines() == [
+            f"- preset — {preset}", "- no key differs"], verb="preset")
+        return [made, reads, diff]
+
+    try:
+        store = presets.load_presets(KIT)
+        shipped = list(store.get("preset") or {}) if isinstance(store.get("preset"), dict) else []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            for got in pool.map(check_preset_scaffold, shipped):
+                checks += got
+        if not shipped:
+            checks.append(("store", "the shipped presets", False, f"{presets.STORE} holds no [preset.<name>] table"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+CORE_FLOW_POINT ="point.flow.release"  # the release slot `build.closes = after-release-verifies` selects
 
 
 def build_core_only_repo(t):
@@ -6336,6 +6391,7 @@ CASES = [
     ("presets-repo", None, run_presets_repo),  # a repository preset admitted and refused
     ("presets-core-only", None, run_presets_core_only),  # the load over a core-only register, and its two planted loaders
     ("preset-diff", None, run_preset_diff),  # the preset and its differing keys, three forms (KICK-dKeptSession-3)
+    ("scaffold-preset", None, run_scaffold_preset),  # each shipped preset's scaffold reads its preset (KICK-dKeptSession-32)
 ]
 
 
@@ -6362,7 +6418,7 @@ def build_repo(rows):
     for name in (policy.CATALOGUE, policy.LIST, budgets.CENSUS):
         (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
     Path(repo, POLICY_FILE[0]).mkdir()
-    Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows).encode("utf-8"))
+    Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows, None).encode("utf-8"))
     Path(repo, *CONSUMER_FILE[:-1]).mkdir()
     Path(repo, *CONSUMER_FILE).write_text(CONSUMER_TEXT.replace("@helper@", json.dumps(f"../{prefix}policy-mirror.js")),
                                           encoding="utf-8", newline="\n")
