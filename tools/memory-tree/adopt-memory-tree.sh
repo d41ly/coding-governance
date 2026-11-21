@@ -740,16 +740,59 @@ render_all
 # S4). A fresh tree's own rendered documents cite kit paths it may not hold, so writing them here
 # would red check 15 on the first run. Seeding either population writes its home and arms it:
 #   python <kit>/legacy_ledger.py seed --population id-orphan-waiver
-printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
-' > "$M/project/legacy-files.txt"
-printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
-' > "$M/project/curation-debt.txt"
-printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
-# text (check-arms.py). Fields: gate<TAB>check<TAB>ordinal<TAB>signature.
+#
+# EVERY LEDGER HOME OPENS WITH ITS RENDERED HEADER (TOOL-dWitnessedBar-108 S3), the line its
+# `[[ledger]]` table in this kit's descriptor renders through `legacy_ledger.render_header`, which is
+# the line every reader compares. A home opening with prose reads as a legacy file owing a conversion
+# it never needed, and a header typed here is a second copy of the table that drifts. The descriptor
+# is read where it sits, never through `read_registrations`, which reads tracked descriptors only:
+# the runbook scaffolds before the kit is committed. A header that will not render stops the
+# scaffold with exit 2, since a home written without one is the defect itself. Called inside a
+# `{ ...; }` group, never `$(...)`, so that exit stops the script.
+render_ledger_header() { # population -> its home's header line on stdout, or exit 2 naming why
+  local _rh
+  if ! _rh=$("$_PY" -I -c '
+import sys, tomllib, types
+sys.path.insert(0, sys.argv[1])
+import legacy_ledger
+def write_line(text):
+    sys.stdout.buffer.write((text + "\n").encode("utf-8"))
+with open(sys.argv[1] + "/kit.toml", "rb") as fh:
+    tables = [t for t in tomllib.load(fh).get("ledger", []) if isinstance(t, dict) and t.get("population") == sys.argv[2]]
+if len(tables) != 1:
+    write_line("%d [[ledger]] tables of %s/kit.toml name the population %s, not one" % (len(tables), sys.argv[1], sys.argv[2]))
+    sys.exit(1)
+bad = legacy_ledger._check_table(tables[0])
+if bad:
+    write_line("its [[ledger]] table does not register: " + "; ".join(bad))
+    sys.exit(1)
+write_line(legacy_ledger.render_header(types.SimpleNamespace(**tables[0])))
+' "$HERE" "$1" 2>&1); then
+    echo "memory-tree: $M/project/$1.txt has no rendered ledger header: ${_rh//$'\r'/}" >&2
+    exit 2
+  fi
+  printf '%s\n' "${_rh%$'\r'}"
+}
+{
+  render_ledger_header legacy-files
+  printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.\n'
+} > "$M/project/legacy-files.txt"
+{
+  render_ledger_header curation-debt
+  printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.\n'
+} > "$M/project/curation-debt.txt"
+# The comment states the LEDGER grammar and no field list of its own (TOOL-dWitnessedBar-108 S4): the
+# header above it names the key fields, and the pin reader, `check-arms.py`, reads exactly them.
+{
+  render_ledger_header unarmed-branches
+  printf '# unarmed-branches.txt — `fail` branches with no positive assertion naming their own failure
+# text (check-arms.py). Each row is the header'"'"'s key fields, then the count, the sha and the
+# disposition, TAB-separated.
 # SHRINK-ONLY, and EMPTY is the working state: a row appears only when a new branch lands that no
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
-' > "$M/project/unarmed-branches.txt"
+'
+} > "$M/project/unarmed-branches.txt"
 # build-readme-slot-limits.txt ships with its ROWS and without the origin repo's VALUES. A ceiling
 # measured against one corpus is a pin the adopter never measured, which is vacuous or permanently
 # red — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists
@@ -797,7 +840,7 @@ _rc=$({ git ls-files 2>/dev/null || true; find . -type f -not -path './.git/*' 2
       | sort -u | grep -E "^$M/builds/[^/]+/README\.md$" || true)
 _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 {
-  printf '# ledger \xc2\xb7 readme-contract \xc2\xb7 key site path,binding \xc2\xb7 direction declared-set \xc2\xb7 drain hunk\n'
+  render_ledger_header readme-contract
   printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.\n'
   printf '# Asserted BOTH ways: a tracked build README named by no row refuses, and a row naming a\n'
   printf '# path that is not one refuses. A `bound` row binds; an `exempt` row exempts, and one the\n'
@@ -814,7 +857,7 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is
 # measured from THEIR tree with the same predicate the leg uses, so gov's paths never travel.
 {
-  printf '# ledger \xc2\xb7 method-carriers \xc2\xb7 key site path \xc2\xb7 direction declared-set \xc2\xb7 drain hunk\n'
+  render_ledger_header method-carriers
   printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
   printf '# One ledger row each, keyed on PATH alone, never <path>:<line> - that keying is what\n'
   printf '# unpinned the install-prefix waiver registry (TOOL-dWitnessedBar-16).\n'
@@ -846,11 +889,14 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 # is GREEN at the merge-base and red at HEAD, on the arm asserting a freshly scaffolded tree is
 # clean. A descriptor claiming a file ships and an adopter that does not write it are two answers to
 # one question, and this was the copy that was wrong.
-printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
+{
+  render_ledger_header stale-header-waiver
+  printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
 # EMPTY IS THE EXPECTED STATE: the rows a tree needs are the headers that actually rotted in THAT
 # tree, so a list measured on another corpus is vacuous here. The file must EXIST even so — the
 # generator refuses a missing one, because a file nobody created is a decision nobody made.
-' > "$M/project/stale-header-waiver.txt"
+'
+} > "$M/project/stale-header-waiver.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

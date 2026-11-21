@@ -15524,7 +15524,7 @@ check_pass_open() { # grp · unit · run-state file · declared set (space-separ
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 check_commit_message() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py _fk_re _fk_a
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl graded st p q ok uncov uncovl briefs cmd kd head py _fk_re _fk_a _at _arc _ae
   local -a _fk_st=()
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
@@ -15555,6 +15555,24 @@ check_commit_message() { # commit message file
     PASSTRAILER) trl=none ;;
     "PASSTRAILER "*) trl=${trl#PASSTRAILER } ;;
     *) subj=$trl; trl="" ;;
+  esac
+  # THE CHARTER'S TRAILER, LAST (TOOL-dWitnessedBar-108 S9), asked of EVERY message a bound run's commit
+  # carries, `Pass: none` included, so before the `none` return below. The value is read from the
+  # charter, `AGENTS.md`, by the kit's one trailer reader, never typed here: an agent trailer naming the
+  # charter's address with another value, or a line after it, is refused with the line to write. Exit 2,
+  # an unreadable message, says so and the path checks continue. WHAT IT DOES NOT CHECK: a commit no run
+  # binds, a `--no-verify` commit, a `core.commentChar` other than `#`, and the commits already made.
+  _at=$("$py" "$KIT_DIR/commit_trailers.py" attribution "$msg" "$ROOT/AGENTS.md" 2>&1) && _arc=0 || _arc=$?
+  _at=${_at//$'\r'/}
+  case "$_arc" in
+    0) ;;
+    1) # the expected line, by the same reader's `read_charter_trailer`, so the repair names what it read
+       _ae=$("$py" -c 'import sys; sys.path.insert(0, sys.argv[1]); import commit_trailers as ct; print(ct.read_charter_trailer(sys.argv[2])[0])' \
+         "$KIT_DIR" "$ROOT/AGENTS.md" 2>/dev/null) || _ae=""
+       _ae=${_ae//$'\r'/}
+       fail 49 "--check-commit: ${_at#ATTRIBUTION refused · }; end the message with '$_ae' and nothing after it"
+       return 1 ;;
+    *) echo "unattended: --check-commit could not check this message's attribution: $_at" ;;
   esac
   # ONE LINE PER UNIT, `<o|O> <unit> <anchor> <declared paths>`, from the key holding the unit's LAST
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
@@ -15671,8 +15689,10 @@ check_commit_message() { # commit message file
   # Pass: trailer names an open dispatched pass: the message gains `Commit-Checked:
   # unattended@<kit version>`, so a pass commit this hook never saw is told by the trailer's absence,
   # which the pre-push hook and the pass-order leg read under `hooks.bypass`. A failed append prints one
-  # line and still admits: the trailer is evidence, and this check gains no refusal.
-  git interpret-trailers --in-place --if-exists replace --trailer "Commit-Checked: unattended@$KIT_UNATTENDED_VERSION" "$msg" 2>/dev/null \
+  # line and still admits: the trailer is evidence, and this check gains no refusal. Written at the
+  # START of the trailer block (TOOL-dWitnessedBar-108 S9, §8 F5), so the charter's trailer stays the
+  # message's last line, as the charter's "ends with" states and the attribution check above holds.
+  git interpret-trailers --in-place --where start --if-exists replace --trailer "Commit-Checked: unattended@$KIT_UNATTENDED_VERSION" "$msg" 2>/dev/null \
     || echo "unattended: --check-commit admitted this pass commit and could not append its Commit-Checked: trailer to $msg, so the pre-push hook will read it as made past the commit check"
   return 0
 }

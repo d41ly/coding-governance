@@ -2627,6 +2627,18 @@ drain = "key"
 direction = "shrink-only"
 home = "memory/project/unpinned-facts.txt"
 
+# TOOL-dWitnessedBar-108 S7: the `python reads` leg's params arm keeps the parameters it tolerates here,
+# shrink-only, each row drained by renaming the parameter to open `_` or by reading it.
+[[ledger]]
+population = "unread-params"
+leg = "python reads (a name never bound, an import outside its guard)"
+seed = ["python", "{prefix}/run-gates/py_reads.py", "--list-params"]
+key = "site"
+fields = ["path", "function", "param"]
+drain = "key"
+direction = "shrink-only"
+home = "memory/project/unread-params.txt"
+
 [[ledger]]
 population = "instructions-legacy"
 leg = "instruction render (one renderer of record)"

@@ -52,6 +52,7 @@ import os
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 import tomllib
@@ -787,6 +788,83 @@ def write_manifest_edit(top, fn):
     p.write_bytes((json.dumps(fn(json.loads(p.read_bytes().decode("utf-8"))), indent=2) + "\n").encode("utf-8"))
 
 
+def check_precommit_trigger(scratch):
+    """TOOL-dWitnessedBar-108 S2, §4 "The trigger parity arm": the pre-commit hook's staged list against
+    the runner's own `changed` line, for guard `a/` in a scratch repository holding `a/x`, `a/y` and
+    `b/z`. Four staged cases, each from a clean reset: a `git rm a/x`, a `git mv a/y b/y`, an edit of
+    `a/x` and an edit of `b/z`. The work tree always equals the index, so the runner's work-tree
+    compare and the hook's index compare read the same change. -> (cases failed, cases run), one
+    `arm ok` or `arm FAIL` line printed per case naming both answers. An absent `changed()` line, or no
+    bash, is an `arm FAIL` for every case naming why, never a skip. WHAT IT DOES NOT CHECK: an unstaged
+    edit, which the runner counts and the hook never sees by design, and a guard spelled with
+    `{prefix}`, which `derive_trigger` resolves before the compare."""
+    import precommit  # noqa: PLC0415 - the hook's own lister, this kit's sibling, loaded by this arm alone
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_") and k != "GATE_FULL"}
+
+    def run_git(*args):
+        return subprocess.run(["git", "-C", str(scratch), *args], capture_output=True, env=env,
+                              stdin=subprocess.DEVNULL, timeout=60)
+
+    def write_edit(rel):
+        pathlib.Path(scratch, rel).write_bytes(b"edited\n")
+        run_git("add", "--", rel)
+
+    cases = (("remove: a staged git rm a/x", lambda: run_git("rm", "-q", "--", "a/x")),
+             ("rename: a staged git mv a/y b/y", lambda: run_git("mv", "a/y", "b/y")),
+             ("edit inside: a/x edited and staged", lambda: write_edit("a/x")),
+             ("edit outside: b/z edited and staged", lambda: write_edit("b/z")))
+    runner = HERE / "run-gates.sh"
+    try:
+        line = next((ln for ln in runner.read_bytes().decode("utf-8").splitlines()
+                     if ln.startswith("changed()")), "")
+    except OSError as e:
+        line, why = "", f"{runner.as_posix()} could not be read: {e}"
+    else:
+        why = "" if line else f"{runner.as_posix()} holds no line opening changed()"
+    bash, refusal = precommit.resolve_bash_launcher()
+    if not why and not bash:
+        why = f"no bash runs the runner's changed line: {refusal}"
+    if not why:
+        scratch.mkdir(parents=True, exist_ok=True)
+        for rel in ("a/x", "a/y", "b/z"):
+            pathlib.Path(scratch, rel).parent.mkdir(parents=True, exist_ok=True)
+            pathlib.Path(scratch, rel).write_bytes(rel.encode("ascii") + b"\n")
+        steps = (("init", "-q", "--template="), ("add", "-A"),
+                 ("-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false",
+                  "commit", "-q", "--no-verify", "-m", "fixture"))
+        for step in steps:
+            p = subprocess.run(["git", "-C", str(scratch), *step], capture_output=True, env=env,
+                               stdin=subprocess.DEVNULL, timeout=60)
+            if p.returncode:
+                why = f"the scratch repository's git {step[0]} exited {p.returncode}"
+                break
+
+    def read_runner_verdict(guard):
+        """True where the runner's `changed` line, BASE at HEAD, calls `guard` changed; None where it
+        answered neither way."""
+        base = run_git("rev-parse", "HEAD").stdout.decode("ascii", "replace").strip()
+        p = subprocess.run([bash, "-c", f"BASE={base}\n{line}\nchanged \"$1\"", "trigger", guard],
+                           cwd=str(scratch), capture_output=True, env=env, stdin=subprocess.DEVNULL, timeout=60)
+        return {0: True, 1: False}.get(p.returncode)
+
+    failed = 0
+    for case, stage in cases:
+        if why:
+            failed += 1
+            print(f"arm FAIL  trigger parity, {case} — {why}")
+            continue
+        run_git("reset", "-q", "--hard")
+        run_git("clean", "-fdq")
+        stage()
+        runner_says = read_runner_verdict("a/")
+        hook_says = any(precommit.check_guard_trips(p, "a/") for p in precommit.read_staged(scratch))
+        ok = runner_says is not None and runner_says == hook_says
+        failed += not ok
+        print(f"arm {'ok  ' if ok else 'FAIL'}  trigger parity, {case} — the runner's changed says "
+              f"{runner_says}, the hook's staged list says {hook_says}")
+    return failed, len(cases)
+
+
 def run_selftest():
     """Each arm of §4 "The gate", and each plant §4 "The plants" moves out of govkit's selftest."""
     al, be, reg = "kits/alpha/kit.toml", "kits/beta/kit.toml", f"kits/{GOVKIT_HOME}/registry.toml"
@@ -945,9 +1023,12 @@ def run_selftest():
         if not ok:
             print("".join(f"      {ln}\n" for ln in lines[-12:]), end="")
         failed += not ok
+        # TOOL-dWitnessedBar-108 S2: the hook's staged list against the runner's own `changed` line.
+        trig_failed, trig_ran = check_precommit_trigger(scratch / "trigger")
+        failed += trig_failed
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
-    total = len(cases) + 3
+    total = len(cases) + 3 + trig_ran
     if failed:
         print(f"FAIL — {failed} of {total} leg-factory fixtures failed")
         return 1

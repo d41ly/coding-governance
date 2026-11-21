@@ -9769,6 +9769,47 @@ fi
 git reset -q --hard
 rm -f "$CCM"
 
+# ---- TOOL-dWitnessedBar-108 S10: THE CHARTER'S TRAILER, LAST. --check-commit asks it of every message a
+# ---- bound run's commit carries, `Pass: none` included, reading the value from the fixture's own
+# ---- AGENTS.md, which the last arm moves to show it is read and never typed. Against the parent the
+# ---- two refusals exit 0 and the admitted pass message ends with `Commit-Checked:`.
+CCM=$(mktemp)
+build_check_commit_fixture
+_fx_at='Co-Authored-By: Fx <fx@example.invalid>'
+printf '# charter\n\n- **Commit trailer:** every agent commit ends with `%s`.\n' "$_fx_at" > AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits the charter's trailer last under Pass: none, exit code" "$rc" "0"
+printf 'records\n\nPass: none\nCo-Authored-By: Fx 2 <fx@example.invalid>\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses another value of the charter's trailer, exit code" "$rc" "1"
+hit  "$out" "UNATTENDED check 49 FAILED"
+hit  "$out" "the trailer 'Co-Authored-By: Fx 2 <fx@example.invalid>' is not the charter's '$_fx_at'"
+hit  "$out" "end the message with '$_fx_at' and nothing after it"
+printf 'records\n\nPass: none\n%s\nCommit-Checked: unattended@0\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a line after the charter's trailer, exit code" "$rc" "1"
+hit  "$out" "the message's last line is 'Commit-Checked: unattended@0'"
+printf 'records\n\nPass: none\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a message carrying no agent trailer, exit code" "$rc" "0"
+# AC11: an admitted pass message gains its Commit-Checked: and still ends with the charter's trailer
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit admits a pass message ending with the charter's trailer, exit code" "$rc" "0"
+hit  "$(cat "$CCM")" "Commit-Checked: unattended@"
+same "the admitted pass message still ends with the charter's trailer" "$(grep -v '^#' "$CCM" | grep . | tail -n 1)" "$_fx_at"
+git reset -q --hard
+# the value is READ from the charter: moved and committed, the first message is refused
+sed -i 's/`Co-Authored-By: Fx </`Co-Authored-By: Fx 3 </' AGENTS.md
+git add AGENTS.md >/dev/null && git commit -q -m "records: the fixture's charter moved" --no-verify
+printf 'records\n\nPass: none\n%s\n' "$_fx_at" > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads the charter's trailer, so a moved value refuses the old one, exit code" "$rc" "1"
+rm -f "$CCM"
+
 # ---- TOOL-aGraftedHelix-39: ONE DERIVATION OF THE PATHS A DISPATCHED PASS MAY WRITE. Every row at one
 # ---- anchor stands and the pass may write their union; a row at a later anchor is a new pass. The
 # ---- kit library's `read_pass_declarations` answers it for `--dispatch`, `--check-commit`, `--audit`

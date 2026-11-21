@@ -831,3 +831,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T15:21:37Z dispatch · item 45fff6c2 TOOL-dWitnessedBar-107 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-11-21T15:29:49Z brief · item TOOL-dWitnessedBar-108 · reason d2a645718c2c memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-108-build-brief.md
+
+2026-11-21T15:32:34Z dispatch · item 74ae4b50 TOOL-dWitnessedBar-108 · reason .gitattributes .memory-tree.conf help/tags.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-108.md memory/guides/SESSION-KICKOFF.md memory/project/unread-params.txt tools/govkit/registry.toml tools/lib/commit_trailers.py tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/commit_trailers.py tools/run-gates/README.md tools/run-gates/leg_factory.py tools/run-gates/precommit.py tools/run-gates/py_reads.py tools/run-gates/verdict_flow.py tools/unattended/commit_trailers.py tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-108-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-108.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T15:46:35Z draw · re-dispatch · TOOL-dWitnessedBar-108 · 127/180 · 20261121T154635Z-5d0ca8
+
+2026-11-21T15:46:35Z dispatch · item 74ae4b50 TOOL-dWitnessedBar-108 · reason memory/project/shell-role.txt

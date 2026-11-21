@@ -181,8 +181,11 @@ def read_manifest(path):
 
 
 def read_staged(root):
-    """The staged paths: added, copied, modified or renamed, NUL-separated so no name is C-quoted."""
-    out = subprocess.run(["git", "-C", str(root), "diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"],
+    """The staged paths as the runner's `changed` counts them: every status, a deletion included, and
+    no rename detection, so a staged `git rm` lists its path and a staged `git mv` lists its source
+    and its destination, and either trips a guard the source sits under (TOOL-dWitnessedBar-108 S1).
+    NUL-separated so no name is C-quoted."""
+    out = subprocess.run(["git", "-C", str(root), "diff", "--cached", "--name-only", "--no-renames", "-z"],
                          capture_output=True)
     return [p for p in out.stdout.decode("utf-8", "replace").split("\0") if p]
 
