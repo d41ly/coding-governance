@@ -373,7 +373,8 @@ with one line saying so, as `policy-file.on-missing-expansion` says.
   key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
   any change to the instruction manifest or the deployer's answers. A mirror staged beside a change
   to any file it is rendered from, the policy file, the catalogue or a key of the mirror's
-  `legacy_blobs` record (today `.agent-cap.conf` alone), is refused
+  `legacy_blobs` record (its three inputs: the policy kit's `presets.toml`, the fanout conf
+  `.agent-cap.conf` and the instruction overlay `.governance/instructions.toml`), is refused
   with `the mirror renders HEAD and its input <path> is staged changed: commit <path> first, then
   regenerate`; one that is
   not its render, a hand edit say, with `differs from its render at HEAD`. Unstage it with
