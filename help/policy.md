@@ -135,6 +135,39 @@ allowed values and every check.
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
 
+## What each policy namespace is for
+
+A policy namespace is the first word of a dotted key name: `runtime` for `runtime.agents-in-flight`,
+`review` for `review.<stage>`. A key with no dot, such as `preset`, is no namespace; its own
+`summary` says what it is for. Each namespace says what it is for in one `[[namespace]]` row of
+`tools/policy/catalogue.toml`, after the last `[[key]]` row:
+
+```toml
+[[namespace]]
+name = "runtime"
+purpose = "How a session runs its agents, such as how many it may have in flight."
+```
+
+- **The namespaces still awaiting review:** a namespace with no row is listed in
+  `tools/policy/unpurposed-namespaces.txt`. The list is generated and may only shrink. Run
+  `python tools/policy/check_policy.py` and it prints them as one line,
+  `policy purposes: <n> awaiting review · <names>`; a listed namespace is not a failure.
+- **Give a namespace its purpose:** add its `[[namespace]]` row, a `name` and a one-sentence
+  `purpose`, then run `python tools/policy/policy.py lists --write`, which drains it from
+  unpurposed-namespaces.txt and prints `drained 1: <name>`. `lists --check` reds a listed namespace
+  that now has a row (`stale`) until you do.
+- **Adding a key that opens a new namespace:** the check refuses it,
+  `<name>: a new policy namespace declares no purpose: add a [[namespace]] row`. The list never
+  gains a name, so write the row in the same change as the key. The check also refuses a row naming
+  no namespace, a namespace written twice, an empty `purpose` and any field but `name` and `purpose`.
+- **The `memory.map-purpose` key:** it says how a namespace with no purpose is handled, and its
+  default, `review`, is the rule above: old namespaces wait on the list for review, and a new one must
+  declare its purpose. Its other values, `ledger`, `derive` and `refuse`, are not built yet; until the
+  build that owns the key lands them, every value is graded as `review`, and the check prints
+  `policy purposes: memory.map-purpose <value> is dTotalRecall's to arm; graded as review until it lands`.
+  The value is read from the policy file at the landed revision. Where it cannot be read there, before
+  a repository's first landing say, the check prints one `NOTE` line and grades as `review`.
+
 ## Presets
 
 A preset is a named, complete set of values for the policy keys, so a repository can pick a posture

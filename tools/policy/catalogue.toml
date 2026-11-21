@@ -8,6 +8,11 @@
 #
 # A row with no `summary` or no `usage` is named on `unsummarised-keys.txt`, a shrink-only list:
 # write both fields on a row, then drain it with `python <this kit>/policy.py lists --write`.
+#
+# A policy namespace, the first segment of a dotted key name, declares its purpose in one
+# [[namespace]] row, `name` and `purpose`, after the last [[key]] row (KICK-dKeptSession-16). A
+# namespace with no row is held on `unpurposed-namespaces.txt`, a shrink-only list awaiting review,
+# and a new namespace that declares no purpose is refused: give it a row, then `lists --write`.
 
 [[key]]
 name = "preset"
@@ -1753,3 +1758,59 @@ name = "install.steps"
 allowed = ["offer", "attended"]
 default = "offer"
 owner = "dShippedRelease"
+
+[[namespace]]
+name = "bar"
+purpose = "How the merge bar treats a red leg: whether a red bar or pass leg may be fixed inline with no spec, its record written after."
+
+[[namespace]]
+name = "budgets"
+purpose = "How the size caps are enforced: whether a cap's breach warns or refuses, and which caps refuse whatever that switch says."
+
+[[namespace]]
+name = "charter"
+purpose = "What the rendered charter carries, and which wins when a live instruction conflicts with it."
+
+[[namespace]]
+name = "core"
+purpose = "How the core checks hold: whether a permitted bypass skips them, and which exception records excuse a core red."
+
+[[namespace]]
+name = "help"
+purpose = "What the docs leg does with a stale help page, an undeclared verb or flag, a broken link or an undocumented member."
+
+[[namespace]]
+name = "install"
+purpose = "How install and update treat a moved or retired surface: a forwarder's deprecation window and its call, and an edited file gov no longer ships."
+
+[[namespace]]
+name = "instructions"
+purpose = "How instruction units are written, proved, excluded, pinned and rendered, and what a render does with a missing unit or a legacy file."
+
+[[namespace]]
+name = "memory"
+purpose = "How the memory tree's generated records are kept, such as whether the pre-commit hook renders and stages the build index."
+
+[[namespace]]
+name = "pass"
+purpose = "What runs after each unit pass, such as whether the declared fast gate legs run."
+
+[[namespace]]
+name = "platforms"
+purpose = "How the toolchain a platform needs is provisioned, such as what the Python resolver does below the interpreter floor."
+
+[[namespace]]
+name = "policy-file"
+purpose = "How the policy file itself reads, such as what a malformed file or a value outside its key's allowed set reads as."
+
+[[namespace]]
+name = "review"
+purpose = "How reviews run, such as how a spec audit disposes a confirmed finding and when its chain stops or holds for the owner."
+
+[[namespace]]
+name = "runtime"
+purpose = "How a session runs its agents, such as how many it may have in flight."
+
+[[namespace]]
+name = "tags"
+purpose = "What the `gov tag` commands do: how they show, check and bundle tags, and how they read a retired, positional or bare reference."
