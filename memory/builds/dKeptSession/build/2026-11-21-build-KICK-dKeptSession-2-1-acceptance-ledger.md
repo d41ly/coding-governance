@@ -53,7 +53,7 @@ restored.
   'preset strict at {rev}', 'source': 'preset', 'value': 'refused'}`.
 - AC9 — the scratch kit copy carrying `presets.py` and no `presets.toml`, run as `policy.py get
   hooks.bypass --rev HEAD` in the `strict`-named repository: exit 2, an empty stdout (`wc -c` 0, DERIVED, that run), one stderr
-  line `policy: refused · <kit copy>/presets.toml:0 · the preset store does not read: No such file
-  or directory`, no traceback, the refusal re-raised across the `__main__` module. With `presets.py`
+  line opening `policy: refused ·`, naming the kit copy's `presets.toml` at line zero and saying the preset store does
+  not read (No such file or directory), no traceback, the refusal re-raised across the `__main__` module. With `presets.py`
   removed from that copy too, a file naming no preset read `budgets.enforce` as before, and the
   `strict`-named file refused with one line naming `presets.py`.
