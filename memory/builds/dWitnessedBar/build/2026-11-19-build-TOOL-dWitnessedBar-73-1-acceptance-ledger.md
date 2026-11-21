@@ -12,7 +12,7 @@ sweep's Python, cut from `tools/run-gates/run-gates.gov.test.sh`, run against
 the gov suite, run over HEAD's `.githooks/pre-push` and three scratch copies of it; and a scratch clone at
 `%TEMP%/s73c`. Both suites passed `bash -n`. The shell-role seed measures the resolver suite at 1420 past
 1381 and the gov suite at 773 past 738, widened under `2026-11-21-build-TOOL-dWitnessedBar-73-widen-17`
-and each row set to its measured count. The §7 legs, each `New arm:` line's RED-first observation, and
+and each row set to its measured count. The §7 legs, each `New arm:` line's RED-first observation, and (DERIVED from the builder's probe)
 the ledger lines this spec places in units 66's and 67's ledgers are the main loop's at the close.
 
 **Evidences:** TOOL-dWitnessedBar-73
