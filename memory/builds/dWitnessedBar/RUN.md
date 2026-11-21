@@ -844,3 +844,7 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T16:29:34Z draw · review-round · dWitnessedBar · 129/180 · 20261121T162934Z-8c5f70
 
 2026-11-21T16:29:35Z review · item dWitnessedBar · reason verdict CLEAN WITH FIXES · blockers 0 · round-highs 2 · round-minors 6 · NON-CONVERGENT · highs 4 · minors 10 · to units · disposition promote
+
+2026-11-21T16:34:01Z rescope · item add TOOL-dWitnessedBar-109 · reason the closing diff review round 2 (NON-CONVERGENT) promotes its HIGH item: the attribution check reads only git's final trailer block, so a trailer followed by prose reads none
+
+2026-11-21T16:34:02Z rescope · item add TOOL-dWitnessedBar-110 · reason the closing diff review round 2 (NON-CONVERGENT) promotes its minors M1, M2, L1, L2 and L3, batched into one unit
