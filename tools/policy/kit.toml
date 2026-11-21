@@ -38,9 +38,11 @@ include = ["legacy-homes.txt", "unscanned-readers.txt", "unnamed-keys.txt"]
 role = "project-owned"
 
 # `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise, then
-# renders the harness's settings wherever HEAD resolves.
+# renders the harness's settings wherever HEAD resolves. `{preset}` is the posture the file names
+# first, an answer `intake` derives from this argv and records under `[answers]`, never defaulted
+# (KICK-dKeptSession-4 S1); over a kept file it is compared, never written.
 [adopt]
-argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
+argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold", "--preset", "{preset}"]
 mutates_index = false
 
 # `--scaffold` IS the re-render: on every update, unless GOVKIT_RERENDER=0 is exported, it re-runs

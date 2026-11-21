@@ -292,7 +292,7 @@ flags = ["--repo=", "--fixture", "--strict-from=", "--live"]
 id = "script:{prefix}/policy/adopt-policy.sh"
 shape = "verb"
 entry = "{prefix}/policy/adopt-policy.sh"
-flags = ["--scaffold", "--check", "--target="]
+flags = ["--scaffold", "--check", "--target=", "--preset="]
 
 [[usage]]
 id = "script:{prefix}/loop/loop_lib.py"

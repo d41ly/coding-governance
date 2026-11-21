@@ -9898,6 +9898,11 @@
       "file": "tools/run-gates/pass_legs.py"
     },
     {
+      "id": "cmd_scaffold",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -31606,6 +31611,11 @@
       "id": "run_instrument",
       "kind": "function",
       "file": "tools/chain-packet.py"
+    },
+    {
+      "id": "run_intake_preset",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_interrupt_plant",

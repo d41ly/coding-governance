@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 # adopt-policy.sh — scaffold a repository's policy file, and check it against the policy catalogue.
 #
-#   bash <this kit>/adopt-policy.sh --scaffold [--target <repo>]   # write .governance/policy.toml if absent
+#   bash <this kit>/adopt-policy.sh --scaffold [--preset <name>] [--target <repo>]   # write .governance/policy.toml if absent
 #   bash <this kit>/adopt-policy.sh --check [--target <repo>]      # every policy arm over <repo>
 #
 # <repo> defaults to the git top level of the working directory.
 #
-# `--scaffold` writes the starter file `policy.py scaffold` prints, and ONLY when no file is there:
-# a policy file is the repository's own from its first write, so an existing one is kept byte for
-# byte and the script says "kept". Then, kept or written, it renders the harness's two concurrency
+# `--scaffold` writes the starter file `policy.py scaffold --preset <name>` prints, and ONLY when no
+# file is there; with no file and no `--preset` it refuses, exit 2, since nobody chose a posture
+# (KICK-dKeptSession-4 S2). A policy file is the repository's own from its first write, so an
+# existing one is kept byte for byte and the script says "kept"; with `--preset`, `policy.py scaffold
+# --preset <name> --kept <file>` prints one line where the file's preset is not the answer, and its
+# non-zero exit, an unknown name, ends the script (S3). Then, kept or written, it renders the harness's two concurrency
 # settings from the agent limit at HEAD, `policy.py settings --write`, whenever HEAD resolves, so an
 # adopter spawns on install day without running the render by hand, and then the JSON mirror,
 # `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
@@ -22,25 +25,31 @@
 # kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
 #
 #   Exit 0 = written, kept or green · 1 = red, or a write failed · 2 = wrong invocation, no
-#   repository, no python, or an invalid policy file on install day.
+#   repository, no python, no `--preset` where no policy file is, a preset no catalogue row admits
+#   over a kept file, or an invalid policy file on install day.
 set -u
 
 HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)" || exit 2
-USAGE="usage: bash <this kit>/adopt-policy.sh --scaffold | --check [--target <repo>]"
+USAGE="usage: bash <this kit>/adopt-policy.sh --scaffold [--preset <name>] | --check [--target <repo>]"
 
 MODE=""
 TARGET=""
+PRESET=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --scaffold|--check) [ -z "$MODE" ] || { echo "$USAGE"; exit 2; }
                         MODE="$1" ;;
     --target) [ $# -ge 2 ] || { echo "$USAGE"; exit 2; }
               TARGET="$2"; shift ;;
+    --preset) [ $# -ge 2 ] && [ -n "$2" ] && [ -z "$PRESET" ] || { echo "$USAGE"; exit 2; }
+              PRESET="$2"; shift ;;
     *) echo "$USAGE"; exit 2 ;;
   esac
   shift
 done
 [ -n "$MODE" ] || { echo "$USAGE"; exit 2; }
+# `--preset` names the posture a scaffold writes; `--check` writes nothing, so it takes none.
+[ "$MODE" = "--scaffold" ] || [ -z "$PRESET" ] || { echo "$USAGE"; exit 2; }
 if [ -z "$TARGET" ]; then
   TARGET="$(git rev-parse --show-toplevel 2>/dev/null)" || {
     echo "policy: the working directory is in no git repository; name one with --target <repo>"; exit 2; }
@@ -225,13 +234,23 @@ fi
 FILE="$TARGET/.governance/policy.toml"
 if [ -e "$FILE" ]; then
   echo "kept     $FILE — a policy file is the repository's own, and the scaffold never overwrites it"
+  # KICK-dKeptSession-4 S3: the kept file's preset against the answer, one line where they differ;
+  # an unknown or unresolved name is the scaffold's exit 2, passed through before any render.
+  if [ -n "$PRESET" ]; then
+    "$PY" -B "$HERE/policy.py" scaffold --preset "$PRESET" --kept "$FILE"
+    RC=$?
+    [ "$RC" = 0 ] || exit "$RC"
+  fi
 else
+  [ -n "$PRESET" ] || {
+    echo "policy: $FILE does not exist, and --scaffold names no preset to write; pass --preset <name>, one of the policy catalogue's presets"
+    exit 2; }
   if ! mkdir -p "$TARGET/.governance" 2>/dev/null; then
     echo "policy: the directory .governance could not be made in $TARGET"
     exit 1
   fi
   _tmp=$(mktemp -u "$FILE.XXXXXXXX")
-  if ! { "$PY" -B "$HERE/policy.py" scaffold > "$_tmp" && mv "$_tmp" "$FILE"; } 2>/dev/null; then
+  if ! { "$PY" -B "$HERE/policy.py" scaffold --preset "$PRESET" > "$_tmp" && mv "$_tmp" "$FILE"; } 2>/dev/null; then
     rm -f "$_tmp" 2>/dev/null
     echo "policy: the scaffold could not be written to $FILE"
     exit 1

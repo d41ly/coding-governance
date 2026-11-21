@@ -191,11 +191,28 @@ that count when it runs, as it did before presets existed.
 
 ## Install
 
-`bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh f6cd6f1b -->
-repository. It writes the starter file only where none exists, then renders the harness settings
-from the agent limit and the policy mirror wherever the repository has a commit, so the first agent
-spawn passes and the merge bar finds the mirror fresh. `--check --target <repo>` checks that
-repository.
+`bash tools/policy/adopt-policy.sh --scaffold --preset <name> --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh dfdfbe12 -->
+repository. It writes the starter file only where none exists, its first key `preset = "<name>"`,
+then renders the harness settings from the agent limit and the policy mirror wherever the repository
+has a commit, so the first agent spawn passes and the merge bar finds the mirror fresh.
+`--check --target <repo>` checks that repository.
+
+The preset is the repository's posture, one of `velocity`, `standard`, `strict` and `guarded`, and
+nobody picks it for you. When the deployer installs the policy kit, `govkit intake` asks for it and
+refuses to go on without it; answer it on the intake line as `--answer preset=<name>`, which records
+`preset = "<name>"` under `[answers]` in `.governance/deploy.toml`. Answer `standard` for the
+catalogue's default. `strict` and `guarded` refuse hook bypass from the repository's first commit.
+With no policy file and no `--preset`, `--scaffold` writes nothing and exits 2 naming the flag; a
+name that is not a preset writes nothing either.
+
+A policy file that already exists is kept as it is. When its preset, `standard` where it names none,
+is not the answer, `--scaffold` prints one line naming both and still exits 0:
+`policy: <file> keeps its preset "<its preset>", not the answer "<name>": …`. To move a kept file to
+another preset, change its `preset` key as a policy change.
+
+A `.governance/deploy.toml` written before intake asked for the preset has no answer, and a re-run
+`apply` refuses at the policy adopter. Add one line under its `[answers]` table, `preset = "<name>"`,
+then run `apply` again.
 
 The mirror renders a commit, so on install day, while the install and the policy file are not
 committed yet, `--scaffold` prints
