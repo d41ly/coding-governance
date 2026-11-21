@@ -25,7 +25,6 @@ principle	principle.p34	dOrderedCharter
 principle	principle.p35	dTrueNorth
 principle	principle.p36	dWellOiledMachine
 principle	principle.p37	dSafePassage
-principle	principle.p40	dPlacedRequest
 principle	principle.p41	dTrueNorth
 practice	practice.yagni	dWitnessedBar
 practice	practice.reuse	dWitnessedBar

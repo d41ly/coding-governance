@@ -5,12 +5,14 @@ id = "loop"
 home = "loop"
 layer = "layer.flow"
 scope = "repo"
-# The two edges this core kit keeps into an expansion, each at a core point and each degrading where
+# The three edges this core kit keeps into an expansion, each at a core point and each degrading where
 # that kit does not resolve: position.py reads a build's refusal rows through the runlog kit's run-state
-# reader (TOOL-dDeclaredLoop-14), and stage_coverage.py reads the codebase-map kit's dossier claims
-# (TOOL-dDeclaredLoop-4).
+# reader (TOOL-dDeclaredLoop-14), placement.py redacts a recorded reason through the runlog kit's
+# `render_redacted` (TOOL-dPlacedRequest-4), and stage_coverage.py reads the codebase-map kit's dossier
+# claims (TOOL-dDeclaredLoop-4).
 optional = [
   { part = "position.py", point = "point.runtime.reading", fallback = "the refusal rows read unarmed, the reason said" },
+  { part = "placement.py", point = "point.runtime.reading", fallback = "the placement exits 2 unarmed, naming the kit that did not resolve" },
   { part = "stage_coverage.py", point = "point.memory.consult", fallback = "the stage coverage leg refuses, naming the kit that did not resolve" },
 ]
 # The kit's version constant; README.md's first line carries the marker that equals it.
