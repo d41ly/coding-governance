@@ -233,6 +233,14 @@ id = "playbook/instructions-legacy-seed"
 successor = "none"
 surfaces = ["file:{prefix}/playbook/instructions-legacy.txt"]
 
+# TOOL-dWitnessedBar-111, on the owner's ruling: the adopter-rules step's landed witness held each
+# converted rule to its text, so an instruction edit of a rule read as the step un-applied. Its
+# successor keeps the frozen up and down and reads a rule by its derived tag as well.
+[[retired]]
+id = "playbook/adopter-rules-to-overlay"
+successor = "playbook/adopter-rules-to-overlay-2"
+surfaces = []
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.

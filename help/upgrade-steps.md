@@ -491,14 +491,16 @@ behind.
   overlay back byte-for-byte. Commit the result, `.governance/steps/kickoff-manifest/` included, and
   regenerate the policy mirror, since the overlay changed.
 
-- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay` turns
+- **Your adopter rules move into the overlay.** The step `playbook/adopter-rules-to-overlay-2`, the
+  successor the `[[retired]]` row of `playbook/adopter-rules-to-overlay` names, turns
   each `- ` line of `[charter] adopter_rules` in `.governance/deploy.toml` into one level-0 unit of
   `.governance/instructions.toml`, tagged `repo.rule-<NN>-<words>` in the rules' order and scoped to
   every reader, then takes the key out of `deploy.toml`, every other byte kept. The rendered charter
   holds the same rules in the same order before and after. The up refuses, writing nothing, on a key
   line that is not a `- ` line, a rule the overlay reader refuses, a rule over the one-line budget,
   or an overlay already holding a level-0 unit whose tag sorts below the converted rules. Its witness
-  holds once the key is gone and each rule is a unit's text; its down puts both files back
+  holds once the key is gone and each rule is a level-0 unit's text or carries the rule's tag, so a
+  rule you edit after the up still reads applied; its down puts both files back
   byte-for-byte. The key stays a key the render reads, so a repository that has not run the step
   renders as before.
 - **The seeded charter template is retired.** The `playbook` entry no longer copies the template to

@@ -10465,6 +10465,11 @@
     {
       "id": "cmd_witness",
       "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_witness.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
       "file": "tools/govkit/steps/conf_pins_to_ledger.py"
     },
     {
@@ -16843,6 +16848,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "load_predecessor",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_witness.py"
+    },
+    {
       "id": "load_process_monitor",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -17236,6 +17246,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/adopter_rules_to_overlay.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/adopter_rules_witness.py"
     },
     {
       "id": "main",
