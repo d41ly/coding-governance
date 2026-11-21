@@ -150,10 +150,10 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate](spec/2026-10-26-spec-KICK-dKeptSession-52.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival](spec/2026-10-26-spec-KICK-dKeptSession-53.md) | 26 | 2 | DEFERRED | rev-4 | 2026-11-21 |
 | [KICK-dKeptSession-55 — the transition writer acknowledges notices only when the guard would then pass, and prints each one it consumed](spec/2026-10-26-spec-KICK-dKeptSession-55.md) | 26 | 2 | DEFERRED | rev-3 | 2026-11-21 |
-| [KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor](spec/2026-10-26-spec-KICK-dKeptSession-17.md) | 27 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed](spec/2026-10-26-spec-KICK-dKeptSession-61.md) | 27 | 2 | DEFERRED | rev-4 | 2026-10-26 |
-| [KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits](spec/2026-10-26-spec-KICK-dKeptSession-18.md) | 28 | 2 | DEFERRED | rev-3 | 2026-10-26 |
-| [KICK-dKeptSession-41 — the three catalogue rows that already stand given their summary and usage, one row per name, never a second minted beside them](spec/2026-10-26-spec-KICK-dKeptSession-41.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor](spec/2026-10-26-spec-KICK-dKeptSession-17.md) | 27 | 2 | DEFERRED | rev-3 | 2026-11-21 |
+| [KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed](spec/2026-10-26-spec-KICK-dKeptSession-61.md) | 27 | 2 | DEFERRED | rev-5 | 2026-11-21 |
+| [KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits](spec/2026-10-26-spec-KICK-dKeptSession-18.md) | 28 | 2 | DEFERRED | rev-4 | 2026-11-21 |
+| [KICK-dKeptSession-41 — the three catalogue rows that already stand given their summary and usage, one row per name, never a second minted beside them](spec/2026-10-26-spec-KICK-dKeptSession-41.md) | 29 | 2 | DEFERRED | rev-3 | 2026-11-21 |
 | [KICK-dKeptSession-44 — the round-1 spec audit's 42 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-44.md) | 30 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-56.md) | 31 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [KICK-dKeptSession-57 — the batch's pass-bound items observed at a pass that runs after them, never at an earlier unit's commit](spec/2026-10-26-spec-KICK-dKeptSession-57.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -163,7 +163,7 @@ ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSes
 | [KICK-dKeptSession-65 — the round-5 minors batch's audit's 26 minor findings, closed after the batch they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-65.md) | 36 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 187 bound to this build, across 4 record folder(s).
+Records: 190 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -231,7 +231,7 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 64 spec(s) at
 | 24 | `KICK-dKeptSession-7` | no |
 | 25 | `KICK-dKeptSession-35`, `KICK-dKeptSession-42`, `KICK-dKeptSession-8` | no |
 | 26 | `KICK-dKeptSession-11`, `KICK-dKeptSession-43`, `KICK-dKeptSession-52`, `KICK-dKeptSession-53`, `KICK-dKeptSession-55` | no |
-| 27 | `KICK-dKeptSession-17`, `KICK-dKeptSession-61` | no |
+| 27 | `KICK-dKeptSession-17`, `KICK-dKeptSession-61` | yes |
 | 28 | `KICK-dKeptSession-18` | no |
 | 29 | `KICK-dKeptSession-41` | no |
 | 30 | `KICK-dKeptSession-44` | no |
