@@ -4,8 +4,9 @@
 
 No merge bar, no self-test suite and no gate leg ran in this pass, and the `policy fixtures` leg and
 the other legs the spec's section 7 names were not run as commands. The criteria were observed on
-win32 at the pass's base `244bfb3f` by the unit's own case: `python tools/policy/check_policy.py
---fixture mirror-input-parity`, the one-case form AC1 and AC2 name, which runs that case and the
+win32 at the pass's base `244bfb3f` by the unit's own case, run from the repository's top as
+`python tools/policy/check_policy.py --fixture mirror-input-parity`,
+the one-case form AC1 and AC2 name, which runs that case and the
 guard trace's join over its reads and no other case; and by an in-process probe, `python -c`
 importing `check_policy` beside `policy` and calling `run_mirror_input_parity` directly. The unit adds
 the function `run_mirror_input_parity`, the constant `MIRROR_KIT_INPUTS_RX` and the `CASES` row
@@ -18,8 +19,8 @@ carrying an input the JS list lacks, and green once the edit is reverted. AC2 be
 observed once by this pass; the close's observation is still the main loop's.
 
 **Evidences:** KICK-dKeptSession-59
-- AC1 — at the base's tree, `--fixture mirror-input-parity` exited 0 (DERIVED, that run). The case's
-  line read the kit's two lists equal, `1 input(s) on each side: tools/policy/presets.toml`, the
+- AC1 — at the base's tree, `python check_policy.py --fixture mirror-input-parity` exited 0 (DERIVED, that run).
+  The case's line read the kit's two lists equal, `1 input(s) on each side: tools/policy/presets.toml`, the
   JS literal `["presets.toml"]` spelled by `policy.derive_kit_rel` against
   `policy.derive_mirror_inputs()` less `policy.LEGACY_INPUTS`. The guard trace kept 1 source read
   (DERIVED, that run), policy-mirror.js, and the run closed at 91 assertions with 0 wrong (DERIVED,
