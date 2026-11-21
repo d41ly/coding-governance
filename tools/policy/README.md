@@ -319,9 +319,12 @@ legacy input `resolve_read` reads, `LEGACY_INPUTS` in `policy.py`, today `.agent
 `[[policy]]` rows are the rows of the repository's own `adopter.` keys (PLAY-dOrderedCharter-32), and
 then this kit's preset store `presets.toml`, which the preset step reads (KICK-dKeptSession-40), by
 the kit's prefix in its repository as the catalogue is, `derive_mirror_inputs` in `policy.py`, each
-to its blob id at the rendered revision or null, and the helper
-reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE, so a
-landing that changes the conf alone is never read through a mirror holding the old limit. THE RULE: a
+to its blob id at the rendered revision or null. The helper takes the inputs it compares from its
+own code (KICK-dKeptSession-49): beside the policy file and the catalogue, every name of
+`MIRROR_KIT_INPUTS` in `policy-mirror.js` by the kit's prefix, then every other key the mirror
+records, and reads STALE a mirror whose recorded id differs at L, that lacks an expected key, or
+that carries no `legacy_blobs`, so a landing that changes the conf alone is never read through a
+mirror holding the old limit, and a mirror rendered before the store joined reads stale. THE RULE: a
 unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.
 
 `keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
