@@ -102,6 +102,7 @@ WAIVER = "project/id-orphan-waiver.txt"
 # specifiers, git refs and bare fragments as dead citations — upstream counted 13 085 of them.
 BACKTICKED = re.compile(r"`([^`\s]+)`")
 MD_LINK_TARGET = re.compile(r"\]\(([^)\s]+)\)")
+FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")  # a Markdown code fence's opening or closing line
 ELISION = ("...", "…", "<", ">", "*", "{{")
 
 
@@ -489,7 +490,13 @@ def walk(root: str, conf: dict) -> dict:
         # A live build README is ADMITTED to the path harvest only: no id citation, no check 15 key.
         admitted = not now and p in live_readmes
         sink = dead if now else advisory
+        # A FENCED BLOCK HOLDS NO HEADING: a `#` comment line inside ``` or ~~~ is code, so it is never
+        # an H1 anchor claiming an id for this folder; citations in it still count.
+        fence = ""
         for lineno, line in enumerate(text.split("\n"), 1):
+            opener = FENCE_RE.match(line)
+            if opener and (not fence or (opener.group(1)[0] == fence[0] and len(opener.group(1)) >= len(fence))):
+                fence = "" if fence else opener.group(1)
             # The `missing:` form (TOOL-aMendedFleet-26) is blanked out of the line before anything
             # reads it, so a marked id is neither a citation for check 14 nor an anchor.
             marked, line = scan_missing_citations(line, E.ID_RE)
@@ -499,7 +506,7 @@ def walk(root: str, conf: dict) -> dict:
                     missing_now.setdefault(i, set()).add(p)
             anchor = anchor_of(line)
             if anchor is None:
-                h = h1_re.match(line)
+                h = h1_re.match(line) if not fence else None
                 anchor = h.group(1) if h else None
             if anchor:
                 defs.setdefault(anchor, set()).add(p)
@@ -1259,6 +1266,15 @@ def cmd_selftest() -> int:
             "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md": "# ARCH-tOne-1 — the same id\n\nbody\n"})
         arm("check 13 catches one id in two build folders", "claimed by 2 build folders",
             lambda: "\n".join(checks(walk(t2, c2))))
+        # ...and its near miss: the same id on a `#` line inside a fenced block is code, no heading.
+        t3 = os.path.join(base, "coll-fenced"); os.makedirs(t3)
+        c3 = _scratch(t3, extra={
+            "memory/builds/tTwo/README.md":
+                "---\nslug: tTwo\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tTwo-1\nstatus: OPEN\n---\n\n# tTwo\n",
+            "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md":
+                "# ARCH-tTwo-1 — its own id\n\n```toml\n# ARCH-tOne-1 in a comment\n```\n"})
+        arm("check 13 reads no heading inside a fenced block", "NONE",
+            lambda: "\n".join(x for x in checks(walk(t3, c3)) if "check 13" in x) or "NONE")
 
         # ---- 13 and 15 UNDER `builds` (TOOL-dDerivedDocket-8). ONE corpus, five confs: an ask filed
         # ---- AFTER the cutoff and an ask filed BEFORE it, each anchored in a second build folder,
