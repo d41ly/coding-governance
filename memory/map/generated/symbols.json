@@ -31928,6 +31928,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_mirror_input_parity",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_mirror_landed",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
