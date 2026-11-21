@@ -455,6 +455,7 @@
       "text-mode-read-eats-a-bare-cr.md",
       "topology-sweep.md",
       "trace-profile-measures-itself.md",
+      "trailer-parse-reads-only-the-final-block.md",
       "trailing-comma-counted-as-an-element.md",
       "trapped-signal-waits-for-the-foreground-child.md",
       "two-answers-to-one-question.md",

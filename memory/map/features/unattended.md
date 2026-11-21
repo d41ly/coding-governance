@@ -30,7 +30,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
   "porcelain-diff-names-a-rename-by-its-destination.md", "a-helper-extraction-blinds-a-per-function-rule.md",
   "agent-output-interpolated-into-an-instruction.md", "fixed-base-assumes-one-commit-per-pass.md",
-  "refusal-branch-with-no-arm.md"]
+  "refusal-branch-with-no-arm.md", "trailer-parse-reads-only-the-final-block.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []

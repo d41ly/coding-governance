@@ -850,3 +850,8 @@ base: 9e21ac760dc0a43d6ed007396922722ccee98d57
 2026-11-21T16:34:02Z rescope · item add TOOL-dWitnessedBar-110 · reason the closing diff review round 2 (NON-CONVERGENT) promotes its minors M1, M2, L1, L2 and L3, batched into one unit
 
 2026-11-21T16:51:33Z brief · item TOOL-dWitnessedBar-109 · reason 58c4d9239e0a memory/builds/dWitnessedBar/prompts/2026-11-19-prompt-TOOL-dWitnessedBar-109-build-brief.md
+
+2026-11-21T16:54:05Z dispatch · item fb784a42 TOOL-dWitnessedBar-109 · reason help/tags.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dWitnessedBar/README.md memory/builds/dWitnessedBar/build memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-109.md memory/gotchas/INDEX.md memory/gotchas/trailer-parse-reads-only-the-final-block.md memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/map/generated tools/lib/commit_trailers.py tools/memory-tree/commit_trailers.py tools/unattended/commit_trailers.py tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/builds/dWitnessedBar/build/2026-11-19-build-TOOL-dWitnessedBar-109-1-acceptance-ledger.md memory/builds/dWitnessedBar/spec/2026-11-21-spec-TOOL-dWitnessedBar-109.md memory/builds/dWitnessedBar/README.md memory/LIVE.md memory/backlog/TOOL.md
+2026-11-21T16:58:59Z draw · re-dispatch · TOOL-dWitnessedBar-109 · 130/180 · 20261121T165859Z-3b645c
+
+2026-11-21T16:58:59Z dispatch · item fb784a42 TOOL-dWitnessedBar-109 · reason memory/project/shell-role.txt

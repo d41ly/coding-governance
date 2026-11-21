@@ -5323,6 +5323,21 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "check_attribution_fixture",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "check_attribution_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "check_attribution_fixture",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
+    },
+    {
       "id": "check_audit",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -14661,6 +14676,21 @@
       "id": "extract_line_ref",
       "kind": "function",
       "file": "tools/workflows/replay_scorer.py"
+    },
+    {
+      "id": "extract_message_lines",
+      "kind": "function",
+      "file": "tools/lib/commit_trailers.py"
+    },
+    {
+      "id": "extract_message_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/commit_trailers.py"
+    },
+    {
+      "id": "extract_message_lines",
+      "kind": "function",
+      "file": "tools/unattended/commit_trailers.py"
     },
     {
       "id": "extract_microformat_shapes",
